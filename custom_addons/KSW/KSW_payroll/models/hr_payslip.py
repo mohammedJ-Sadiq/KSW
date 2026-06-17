@@ -129,7 +129,7 @@ class HrPayslip(models.Model):
                  'version_id.other_allowance')
     def _compute_wage_rates(self):
         for slip in self:
-            v = slip.version_id
+            v = slip.version_id.sudo()
             base = (
                 (v.wage or 0.0)
                 + (v.travel_allowance or 0.0)

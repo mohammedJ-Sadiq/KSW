@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Tier 1: read-only access to the user's own payslips -->
+    <record id="group_hr_payroll_self" model="res.groups">
+        <field name="name">Only Self</field>
+        <field name="sequence">10</field>
+        <field name="privilege_id" ref="om_hr_payroll.privilege_payroll"/>
+        <field name="comment">The user can read his own payslips only. No create/edit/delete and no payroll configuration menus.</field>
+    </record>
+
+    <!-- Tier 2: own payslips + direct subordinates' payslips -->
+    <record id="group_hr_payroll_supervisor" model="res.groups">
+        <field name="name">Supervisor</field>
+        <field name="sequence">20</field>
+        <field name="privilege_id" ref="om_hr_payroll.privilege_payroll"/>
+        <field name="implied_ids" eval="[(4, ref('group_hr_payroll_self'))]"/>
+        <field name="comment">The user can read his own payslips and the payslips of employees who report directly to him.</field>
+    </record>
+
+    <!-- Tier 3: own payslips + subordinates' payslips, cascading down the full hierarchy -->
+    <record id="group_hr_payroll_supervisor_cascade" model="res.groups">
+        <field name="name">Supervisor (Cascade)</field>
+        <field name="sequence">30</field>
+        <field name="privilege_id" ref="om_hr_payroll.privilege_payroll"/>
+        <field name="implied_ids" eval="[(4, ref('group_hr_payroll_supervisor'))]"/>
+        <field name="comment">The user can read his own payslips and the payslips of every employee below him in the management hierarchy, at any depth.</field>
+    </record>
+
+    <!--
+        Fold Officer/Administrator into the same selection, ordered after
+        the tiers above. om_hr_payroll.group_hr_payroll_user/manager were
+        created inside a noupdate="1" block, so a plain <record> override
+        here would be silently ignored on every module upgrade after the
+        first install. <function> calls are not subject to that gate (they
+        run on every install/upgrade as long as this block itself isn't
+        noupdate), so use that instead: same technique already used in
+        KSW_deduction/security/security.xml for the equivalent problem.
+    -->
+    <function model="res.groups" name="write">
+        <value eval="[ref('om_hr_payroll.group_hr_payroll_user')]"/>
+        <value eval="{'sequence': 40, 'implied_ids': [(4, ref('group_hr_payroll_supervisor_cascade'))]}"/>
+    </function>
+
+    <function model="res.groups" name="write">
+        <value eval="[ref('om_hr_payroll.group_hr_payroll_manager')]"/>
+        <value eval="{'name': 'Administrator', 'sequence': 50}"/>
+    </function>
+
+    <!-- Payroll app: visible once the user has at least "Only Self".
+         Officer/Administrator automatically satisfy this too, since the
+         implied_ids chain above makes them members of every tier below
+         them, so there's no need to list them separately. No "parent"
+         attribute here on purpose: this is the top-level app menu. -->
+    <menuitem id="om_hr_payroll.menu_hr_payroll_root"
+              name="Payroll"
+              groups="group_hr_payroll_self"/>
+
+    <!-- Employee Payslips: same single menu/action Officer already uses
+         (its own group stays on it), opened up to the tiers above too.
+         Each tier only ever sees the rows its own ir.rule allows. -->
+    <menuitem id="om_hr_payroll.menu_department_tree"
+              name="Employee Payslips"
+              parent="om_hr_payroll.menu_hr_payroll_root"
+              groups="group_hr_payroll_self"/>
+
+    <!-- Payslip Batches: previously had no menu-level group restriction at
+         all, yet only Administrator had real model access underneath (see
+         the access row added below): Officers got a menu entry that
+         always errored. Restricting the menu to Officer+ now matches the
+         access we're granting them. -->
+    <menuitem id="om_hr_payroll.menu_hr_payslip_run"
+              name="Payslips Batches"
+              parent="om_hr_payroll.menu_hr_payroll_root"
+              groups="om_hr_payroll.group_hr_payroll_user"/>
+
+    <!-- Configuration menu is intentionally left untouched: stays
+         Administrator-only, exactly as om_hr_payroll ships it. -->
+
+    <data noupdate="1">
+
+        <!-- hr.payslip: self / supervisor / cascade tiers, read-only -->
+        <record id="hr_payslip_rule_self" model="ir.rule">
+            <field name="name">Payroll: own payslips (read only)</field>
+            <field name="model_id" ref="om_hr_payroll.model_hr_payslip"/>
+            <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_hr_payroll_self'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <record id="hr_payslip_rule_supervisor" model="ir.rule">
+            <field name="name">Payroll: own and direct subordinates' payslips (read only)</field>
+            <field name="model_id" ref="om_hr_payroll.model_hr_payslip"/>
+            <field name="domain_force">['|', ('employee_id.user_id', '=', user.id), ('employee_id.parent_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_hr_payroll_supervisor'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <record id="hr_payslip_rule_supervisor_cascade" model="ir.rule">
+            <field name="name">Payroll: own and all subordinates' payslips, cascading (read only)</field>
+            <field name="model_id" ref="om_hr_payroll.model_hr_payslip"/>
+            <field name="domain_force">[('employee_id', 'child_of', user.employee_ids.ids)]</field>
+            <field name="groups" eval="[(4, ref('group_hr_payroll_supervisor_cascade'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <!-- hr.payslip.line: same three tiers, filtered on its own employee_id -->
+        <record id="hr_payslip_line_rule_self" model="ir.rule">
+            <field name="name">Payroll lines: own payslips (read only)</field>
+            <field name="model_id" ref="om_hr_payroll.model_hr_payslip_line"/>
+            <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_hr_payroll_self'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <record id="hr_payslip_line_rule_supervisor" model="ir.rule">
+            <field name="name">Payroll lines: own and direct subordinates' payslips (read only)</field>
+            <field name="model_id" ref="om_hr_payroll.model_hr_payslip_line"/>
+            <field name="domain_force">['|', ('employee_id.user_id', '=', user.id), ('employee_id.parent_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_hr_payroll_supervisor'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <record id="hr_payslip_line_rule_supervisor_cascade" model="ir.rule">
+            <field name="name">Payroll lines: own and all subordinates' payslips, cascading (read only)</field>
+            <field name="model_id" ref="om_hr_payroll.model_hr_payslip_line"/>
+            <field name="domain_force">[('employee_id', 'child_of', user.employee_ids.ids)]</field>
+            <field name="groups" eval="[(4, ref('group_hr_payroll_supervisor_cascade'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <!-- hr.payslip.worked_days: same three tiers, via payslip_id.employee_id -->
+        <record id="hr_payslip_worked_days_rule_self" model="ir.rule">
+            <field name="name">Payroll worked days: own payslips (read only)</field>
+            <field name="model_id" ref="om_hr_payroll.model_hr_payslip_worked_days"/>
+            <field name="domain_force">[('payslip_id.employee_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_hr_payroll_self'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <record id="hr_payslip_worked_days_rule_supervisor" model="ir.rule">
+            <field name="name">Payroll worked days: own and direct subordinates' payslips (read only)</field>
+            <field name="model_id" ref="om_hr_payroll.model_hr_payslip_worked_days"/>
+            <field name="domain_force">['|', ('payslip_id.employee_id.user_id', '=', user.id), ('payslip_id.employee_id.parent_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_hr_payroll_supervisor'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <record id="hr_payslip_worked_days_rule_supervisor_cascade" model="ir.rule">
+            <field name="name">Payroll worked days: own and all subordinates' payslips, cascading (read only)</field>
+            <field name="model_id" ref="om_hr_payroll.model_hr_payslip_worked_days"/>
+            <field name="domain_force">[('payslip_id.employee_id', 'child_of', user.employee_ids.ids)]</field>
+            <field name="groups" eval="[(4, ref('group_hr_payroll_supervisor_cascade'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <!-- hr.payslip.input: same three tiers, via payslip_id.employee_id -->
+        <record id="hr_payslip_input_rule_self" model="ir.rule">
+            <field name="name">Payroll inputs: own payslips (read only)</field>
+            <field name="model_id" ref="om_hr_payroll.model_hr_payslip_input"/>
+            <field name="domain_force">[('payslip_id.employee_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_hr_payroll_self'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <record id="hr_payslip_input_rule_supervisor" model="ir.rule">
+            <field name="name">Payroll inputs: own and direct subordinates' payslips (read only)</field>
+            <field name="model_id" ref="om_hr_payroll.model_hr_payslip_input"/>
+            <field name="domain_force">['|', ('payslip_id.employee_id.user_id', '=', user.id), ('payslip_id.employee_id.parent_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_hr_payroll_supervisor'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <record id="hr_payslip_input_rule_supervisor_cascade" model="ir.rule">
+            <field name="name">Payroll inputs: own and all subordinates' payslips, cascading (read only)</field>
+            <field name="model_id" ref="om_hr_payroll.model_hr_payslip_input"/>
+            <field name="domain_force">[('payslip_id.employee_id', 'child_of', user.employee_ids.ids)]</field>
+            <field name="groups" eval="[(4, ref('group_hr_payroll_supervisor_cascade'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+    </data>
+</odoo>

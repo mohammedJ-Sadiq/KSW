@@ -2,6 +2,12 @@ FROM odoo:19
 
 USER root
 
+# pyzk (biometric device library) shells out to the system `ping` binary
+# to check device reachability before connecting — not present in the base image.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends iputils-ping \
+ && rm -rf /var/lib/apt/lists/*
+
 # Align the container's odoo user with the host odoo user (UID 1000)
 # so volume-mounted data dirs (/home/odoo/.local/share/Odoo) are
 # writable without manual chown on the host.

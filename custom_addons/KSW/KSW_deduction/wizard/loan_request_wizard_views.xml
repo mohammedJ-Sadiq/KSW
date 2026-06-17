@@ -118,12 +118,38 @@
     </record>
 
     <!-- =============================================================== -->
+    <!-- My Loans list: adds an always-visible "Request a Loan" button     -->
+    <!-- in the header, so the requester doesn't have to leave this page  -->
+    <!-- and hunt for the separate "Request a Loan" submenu. "display=    -->
+    <!-- always" is what makes a list-view header button show up         -->
+    <!-- regardless of row selection (default is "selection", which only -->
+    <!-- appears once a row is checked, which is not what we want here). -->
+    <!-- Bound only to action_ksw_my_loans below via its own view_id, so  -->
+    <!-- Officer/Manager's own deduction list views are untouched.       -->
+    <!-- =============================================================== -->
+    <record id="ksw_deduction_view_list_my_loans" model="ir.ui.view">
+        <field name="name">ksw.deduction.list.my.loans</field>
+        <field name="model">ksw.deduction</field>
+        <field name="inherit_id" ref="ksw_deduction_view_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <header>
+                    <button name="%(action_ksw_loan_request)d" type="action"
+                            string="Request a Loan" display="always"
+                            class="btn-primary"/>
+                </header>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- =============================================================== -->
     <!-- Action: My Loans (read-only list for the requester)               -->
     <!-- =============================================================== -->
     <record id="action_ksw_my_loans" model="ir.actions.act_window">
         <field name="name">My Loans</field>
         <field name="res_model">ksw.deduction</field>
         <field name="view_mode">list,form</field>
+        <field name="view_id" ref="ksw_deduction_view_list_my_loans"/>
         <field name="domain">[('is_loan', '=', True), '|', ('employee_id.user_id', '=', uid), ('employee_id.parent_id.user_id', '=', uid)]</field>
         <field name="context">{'search_default_active': 1}</field>
         <field name="help" type="html">
@@ -131,10 +157,10 @@
                 You have no loan requests yet
             </p>
             <p>
-                Use <b>Request a Loan</b> in the sidebar to submit a new
-                loan. Once submitted, your request goes through the
-                approval chain (DM → HR → Accounting → GM) and you can
-                track its status here.
+                Use <b>Request a Loan</b> above to submit a new loan. Once
+                submitted, your request goes through the approval chain
+                (DM → HR → Accounting → GM) and you can track its status
+                here.
             </p>
         </field>
     </record>

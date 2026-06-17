@@ -30,15 +30,15 @@
                         <td><strong>Department</strong></td>
                         <td t-out="o.employee_id.department_id.name or ''"/>
                         <td><strong>ID No.</strong></td>
-                        <td t-out="o.employee_id.ssnid or o.employee_id.identification_id or ''"/>
+                        <td t-out="o.employee_id.ssnid or o.employee_id.sudo().identification_id or ''"/>
                     </tr>
                     <tr>
                         <td><strong>Reference</strong></td>
                         <td t-out="o.number or ''"/>
                         <td><strong>Bank Account</strong></td>
                         <td>
-                            <t t-if="o.employee_id.bank_account_ids">
-                                <span t-out="o.employee_id.bank_account_ids[0].acc_number"/>
+                            <t t-if="o.employee_id.sudo().bank_account_ids">
+                                <span t-out="o.employee_id.sudo().bank_account_ids[0].acc_number"/>
                             </t>
                         </td>
                     </tr>

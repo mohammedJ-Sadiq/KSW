@@ -32,7 +32,7 @@ Extends om_hr_payroll with:
     ],
     'data': [
         # Security
-        # 'security/hr_payroll_security.xml',
+        'security/hr_payroll_security.xml',
         'security/ir.model.access.csv',
 
         # Data

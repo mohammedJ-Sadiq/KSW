@@ -11,6 +11,11 @@
         <field name="inherit_id" ref="om_hr_payroll.view_hr_payslip_form"/>
         <field name="arch" type="xml">
 
+            <!-- ── Hide all action buttons from read-only access tiers (self/supervisor/cascade) ── -->
+            <xpath expr="//header" position="attributes">
+                <attribute name="groups">om_hr_payroll.group_hr_payroll_user</attribute>
+            </xpath>
+
             <!-- ── Replace the entire worked-days list with a styled one ── -->
             <xpath expr="//field[@name='worked_days_line_ids']/list"
                    position="replace">
