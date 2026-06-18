@@ -17,4 +17,8 @@ class IrUiMenu(models.Model):
             )
             if not has_management_access:
                 menus[root.id]['name'] = _('Loans')
+                icon_data = self._compute_web_icon_data('KSW_deduction,static/description/icon_loans.png')
+                if icon_data:
+                    menus[root.id]['web_icon_data'] = icon_data.decode()
+                    menus[root.id]['web_icon_data_mimetype'] = 'image/png'
         return menus

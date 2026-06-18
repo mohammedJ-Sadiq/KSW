@@ -3,8 +3,9 @@
 
     <!-- ── App root ──────────────────────────────────────────────── -->
     <menuitem id="menu_ksw_commissions_root"
-              name="KSW Commissions"
-              sequence="85"/>
+              name="Commissions"
+              sequence="85"
+              web_icon="KSW_commissions,static/description/icon.png"/>
 
     <!-- ══ 1. Commissions and Other Allowances ══════════════════════ -->
     <menuitem id="menu_ksw_commissions_section"
