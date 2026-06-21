@@ -11,6 +11,7 @@ class ResourceCalendarGroup(models.Model):
         'resource.calendar.group.line',
         'calendar_group_id',
         string='Attendance Lines',
+        copy=True,
     )
 
     active = fields.Boolean(default=True)

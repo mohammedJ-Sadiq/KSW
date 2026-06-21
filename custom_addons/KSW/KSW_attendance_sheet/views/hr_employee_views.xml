@@ -12,6 +12,14 @@
                     <field name="x_is_attendance_sheet" widget="boolean_toggle"/>
                 </group>
             </xpath>
+            <div name="button_box" position="inside">
+                <button name="action_view_attendance_sheets" type="object"
+                        class="oe_stat_button" icon="fa-calendar"
+                        invisible="x_attendance_sheet_count == 0">
+                    <field name="x_attendance_sheet_count" string="Attendance Sheets"
+                           widget="statinfo"/>
+                </button>
+            </div>
         </field>
     </record>
 

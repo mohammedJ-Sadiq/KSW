@@ -13,6 +13,7 @@ _logger = logging.getLogger(__name__)
 class KswAttendanceSheet(models.Model):
     _name = 'ksw.attendance.sheet'
     _description = 'Monthly Attendance Sheet'
+    _inherit = ['mail.thread']
     _order = 'year desc, month desc, employee_id'
 
     employee_id = fields.Many2one(
@@ -63,6 +64,12 @@ class KswAttendanceSheet(models.Model):
         help='Locked sheets cannot be edited. '
              'Set automatically when the month ends.',
     )
+    is_editable_period = fields.Boolean(
+        string='Editable Period', compute='_compute_is_editable_period',
+        help='False once the sheet is confirmed/locked, or — for '
+             'supervisors — once it is no longer the current calendar '
+             'month. Older months are kept open for review only.',
+    )
 
     _unique_employee_month_year = models.Constraint(
         'UNIQUE(employee_id, month, year)',
@@ -78,6 +85,33 @@ class KswAttendanceSheet(models.Model):
         sheets = super().create(vals_list)
         sheets.action_generate_lines()
         return sheets
+
+    def write(self, vals):
+        # The period (employee/month/year) identifies which sheet this is
+        # and must never be reassigned after creation — doing so used to
+        # silently wipe the lines and repoint the record at a different
+        # month, corrupting that month's chatter history. Wrong period?
+        # Delete and recreate instead.
+        if 'month' in vals or 'year' in vals:
+            raise UserError(
+                'The period of an attendance sheet cannot be changed. '
+                'Delete this sheet and create a new one for the correct '
+                'month instead.')
+        return super().write(vals)
+
+    def _check_editable(self):
+        """Raise unless every sheet in self may have its lines edited."""
+        is_manager = self.env.user.has_group(
+            'KSW_attendance_sheet.group_attendance_sheet_manager')
+        today = fields.Date.context_today(self)
+        for sheet in self:
+            if sheet.state == 'confirmed' or sheet.is_locked:
+                raise UserError('Cannot modify a locked/confirmed sheet.')
+            if not is_manager and (sheet.year, int(sheet.month)) != (
+                    today.year, today.month):
+                raise UserError(
+                    'Supervisors can only edit the current month\'s '
+                    'attendance. Older months are read-only for review.')
 
     # ------------------------------------------------------------------
     # Computed fields
@@ -98,6 +132,18 @@ class KswAttendanceSheet(models.Model):
             mn = month_names.get(rec.month, '')
             rec.display_name = f"{emp} - {mn} {rec.year}"
 
+    @api.depends('state', 'is_locked', 'year', 'month')
+    def _compute_is_editable_period(self):
+        is_manager = self.env.user.has_group(
+            'KSW_attendance_sheet.group_attendance_sheet_manager')
+        today = fields.Date.context_today(self)
+        for rec in self:
+            rec.is_editable_period = (
+                rec.state != 'confirmed' and not rec.is_locked
+                and (is_manager or (rec.year, int(rec.month)) == (
+                    today.year, today.month))
+            )
+
     # ------------------------------------------------------------------
     # Schedule helpers
     # ------------------------------------------------------------------
@@ -113,6 +159,30 @@ class KswAttendanceSheet(models.Model):
             or 'UTC'
         )
         return pytz.timezone(tz_name)
+
+    def _get_employee_calendar(self, employee):
+        """Resolve the calendar used for schedule lookups."""
+        # sudo: main_calendar_id and other schedule fields on hr.employee
+        # require hr.group_hr_user; sheet supervisors may not have that group.
+        employee = employee.sudo()
+        return (
+            employee.main_calendar_id
+            or employee.resource_calendar_id
+            or employee.company_id.resource_calendar_id
+        )
+
+    def _is_misconfigured_calendar(self, employee):
+        """True when the employee's calendar exists but defines no
+        schedule at all (no calendar_group_ids and no attendance_ids).
+
+        Used to distinguish "calendar selected but never given hours"
+        (truly broken — must not default to attended) from "calendar
+        properly configured, this particular day just isn't on it"
+        (a genuine day off, e.g. Friday — see action_generate_lines).
+        """
+        calendar = self._get_employee_calendar(employee)
+        return bool(calendar) and not calendar.calendar_group_ids \
+            and not calendar.attendance_ids
 
     def _get_work_schedule(self, employee, check_date):
         """Get scheduled start/end for *employee* on *check_date*.
@@ -131,14 +201,8 @@ class KswAttendanceSheet(models.Model):
 
         Returns dict(hour_from, hour_to, break_hours) or None.
         """
-        # sudo: main_calendar_id and other schedule fields on hr.employee
-        # require hr.group_hr_user; sheet supervisors may not have that group.
+        calendar = self._get_employee_calendar(employee)
         employee = employee.sudo()
-        calendar = (
-            employee.main_calendar_id
-            or employee.resource_calendar_id
-            or employee.company_id.resource_calendar_id
-        )
 
         day_of_week = str(check_date.weekday())
 
@@ -290,6 +354,12 @@ class KswAttendanceSheet(models.Model):
                     line.sudo().write({'attendance_id': existing.id})
                     continue
 
+                if not line.is_workday:
+                    # Paid day off (e.g. Friday) with no real punch —
+                    # nothing to link, and we must not fabricate a
+                    # worked attendance record for a day off.
+                    continue
+
                 # -- Create attendance record --
                 schedule = line.sheet_id._get_work_schedule(
                     employee, line.date)
@@ -312,6 +382,61 @@ class KswAttendanceSheet(models.Model):
                 line.sudo().write({'attendance_id': False})
 
     # ------------------------------------------------------------------
+    # Weekly rest-day pay (e.g. Friday)
+    # ------------------------------------------------------------------
+
+    def _off_day_block(self, by_date, date):
+        """Dates of the contiguous run of non-workdays containing *date*."""
+        dates = {date}
+        d = date - timedelta(days=1)
+        while d in by_date and not by_date[d].is_workday:
+            dates.add(d)
+            d -= timedelta(days=1)
+        d = date + timedelta(days=1)
+        while d in by_date and not by_date[d].is_workday:
+            dates.add(d)
+            d += timedelta(days=1)
+        return frozenset(dates)
+
+    def _recompute_off_day_pay(self, changed_lines):
+        """Re-derive pay for any off-day block bordered by a workday whose
+        attendance just changed.
+
+        An off day (e.g. Friday) defaults to paid (is_attended=True). It
+        is only forfeited (is_attended=False) when the employee was
+        absent on BOTH the workday immediately before AND immediately
+        after the block — the standard weekly-rest-day rule. This is
+        fully derived: it overwrites whatever the line currently holds,
+        there is no separate manual-override state for off days.
+        """
+        for sheet in self:
+            sheet_lines = sheet.line_ids
+            by_date = {l.date: l for l in sheet_lines}
+            changed_dates = changed_lines.filtered(
+                lambda l: l.sheet_id == sheet).mapped('date')
+
+            blocks = set()
+            for d in changed_dates:
+                for delta in (-1, 1):
+                    neighbor = by_date.get(d + timedelta(days=delta))
+                    if neighbor and not neighbor.is_workday:
+                        blocks.add(self._off_day_block(by_date, neighbor.date))
+
+            for block_dates in blocks:
+                block = sheet_lines.filtered(lambda l: l.date in block_dates)
+                before = by_date.get(min(block_dates) - timedelta(days=1))
+                after = by_date.get(max(block_dates) + timedelta(days=1))
+                forfeited = bool(
+                    before and not before.is_attended
+                    and after and not after.is_attended
+                )
+                target = not forfeited
+                to_update = block.filtered(lambda l: l.is_attended != target)
+                if to_update:
+                    to_update.with_context(ksw_system_write=True).write(
+                        {'is_attended': target})
+
+    # ------------------------------------------------------------------
     # Actions
     # ------------------------------------------------------------------
 
@@ -332,6 +457,7 @@ class KswAttendanceSheet(models.Model):
             m = int(sheet.month)
             y = sheet.year
             num_days = monthrange(y, m)[1]
+            misconfigured = self._is_misconfigured_calendar(sheet.employee_id)
 
             vals_list = []
             for day in range(1, num_days + 1):
@@ -341,11 +467,15 @@ class KswAttendanceSheet(models.Model):
                     'sheet_id': sheet.id,
                     'date': d,
                     'is_workday': is_wd,
-                    # Workdays default to attended (HR flags exceptions);
-                    # non-workdays (weekends, or a misconfigured calendar
-                    # with no schedule at all) must NOT default to attended,
-                    # otherwise a broken calendar fabricates full pay.
-                    'is_attended': is_wd,
+                    # Workdays default to attended (HR flags exceptions).
+                    # Non-workdays (e.g. Friday) also default to attended —
+                    # they're a paid weekly rest day, not an absence —
+                    # UNLESS the calendar is misconfigured (selected but
+                    # never given hours), in which case every day looks
+                    # like a non-workday and defaulting to attended would
+                    # fabricate a full month of pay with no real schedule
+                    # behind it.
+                    'is_attended': is_wd or not misconfigured,
                 })
 
             new_lines = self.env['ksw.attendance.sheet.line'].create(vals_list)
@@ -353,18 +483,16 @@ class KswAttendanceSheet(models.Model):
             sheet._sync_line_attendance(new_lines)
 
     def action_mark_all_absent(self):
-        """Set every line to absent."""
+        """Set every workday to absent (off days are derived, not set)."""
         for sheet in self:
-            if sheet.state == 'confirmed':
-                raise UserError('Cannot modify a confirmed sheet.')
-            sheet.line_ids.write({'is_attended': False})
+            sheet._check_editable()
+            sheet.line_ids.filtered('is_workday').write({'is_attended': False})
 
     def action_mark_all_present(self):
-        """Set every line to present."""
+        """Set every workday to present (off days are derived, not set)."""
         for sheet in self:
-            if sheet.state == 'confirmed':
-                raise UserError('Cannot modify a confirmed sheet.')
-            sheet.line_ids.write({'is_attended': True})
+            sheet._check_editable()
+            sheet.line_ids.filtered('is_workday').write({'is_attended': True})
 
     def _do_confirm(self):
         """Confirm sheets (internal).

@@ -1,4 +1,6 @@
-from odoo import api, fields, models
+from markupsafe import Markup
+
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -36,14 +38,42 @@ class KswAttendanceSheetLine(models.Model):
 
     def write(self, vals):
         if 'is_attended' in vals:
-            for line in self:
-                sheet = line.sheet_id
-                if sheet.state == 'confirmed' or sheet.is_locked:
-                    raise UserError('Cannot modify a locked/confirmed sheet.')
+            if not self.env.context.get('ksw_system_write') and self.filtered(
+                    lambda l: not l.is_workday):
+                raise UserError(
+                    'Off-day attendance (e.g. the weekly rest day) is '
+                    'determined automatically and cannot be edited directly.')
+            old_values = {line.id: line.is_attended for line in self}
+            self.mapped('sheet_id')._check_editable()
         result = super().write(vals)
         if 'is_attended' in vals:
+            self._log_attendance_change(old_values)
             # Sync hr.attendance records for changed lines
             for sheet in self.mapped('sheet_id'):
                 sheet_lines = self.filtered(lambda l: l.sheet_id == sheet)
                 sheet._sync_line_attendance(sheet_lines)
+            # A workday's attendance can forfeit/restore the paid weekly
+            # rest day bordering it (e.g. Friday) — see _recompute_off_day_pay.
+            workday_changes = self.filtered(
+                lambda l: l.is_workday and old_values.get(l.id) != l.is_attended)
+            if workday_changes:
+                workday_changes.mapped('sheet_id')._recompute_off_day_pay(
+                    workday_changes)
         return result
+
+    def _log_attendance_change(self, old_values):
+        """Post a chatter message on the sheet for each day that changed."""
+        changed = self.filtered(
+            lambda l: old_values.get(l.id) != l.is_attended)
+        for sheet in changed.mapped('sheet_id'):
+            lines = changed.filtered(lambda l: l.sheet_id == sheet)
+            items = []
+            for line in lines:
+                status = _('Present') if line.is_attended else _('Absent')
+                items.append(Markup('<li>%s (%s): %s</li>') % (
+                    line.date.strftime('%d %b %Y'), line.day_name, status,
+                ))
+            body = Markup('%s<ul>%s</ul>') % (
+                _('Attendance updated:'), Markup('').join(items),
+            )
+            sheet.message_post(body=body)

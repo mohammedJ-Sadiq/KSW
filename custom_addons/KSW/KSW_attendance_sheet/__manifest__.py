@@ -16,6 +16,7 @@ the payroll pipeline can consume them identically to biometric records.
     """,
     'license': 'LGPL-3',
     'depends': [
+        'mail',
         'hr_biometric_attendance',
         'KSW_working_schedule',
     ],

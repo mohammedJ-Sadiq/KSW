@@ -12,6 +12,30 @@ class HrEmployee(models.Model):
              'the monthly attendance sheet by their manager, instead of '
              'biometric device punch-in/punch-out.',
     )
+    x_attendance_sheet_count = fields.Integer(
+        string='Attendance Sheet Count',
+        compute='_compute_x_attendance_sheet_count',
+    )
+
+    def _compute_x_attendance_sheet_count(self):
+        counts = self.env['ksw.attendance.sheet']._read_group(
+            [('employee_id', 'in', self.ids)], ['employee_id'], ['__count'])
+        by_employee = {employee.id: count for employee, count in counts}
+        for emp in self:
+            emp.x_attendance_sheet_count = by_employee.get(emp.id, 0)
+
+    def action_view_attendance_sheets(self):
+        """Open this employee's full attendance sheet history (all
+        months/years, including locked past ones) for review."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Attendance Sheets',
+            'res_model': 'ksw.attendance.sheet',
+            'view_mode': 'list,form',
+            'domain': [('employee_id', '=', self.id)],
+            'context': {'default_employee_id': self.id},
+        }
 
     def write(self, vals):
         """Auto-create current-month attendance sheet when the flag is turned ON."""
