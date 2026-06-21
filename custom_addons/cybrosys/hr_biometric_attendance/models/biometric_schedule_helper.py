@@ -78,6 +78,21 @@ class BiometricScheduleHelper(models.AbstractModel):
         }
 
     @api.model
+    def is_calendar_configured(self, employee):
+        """True only if the employee has a calendar AND that calendar has
+        at least one calendar_group_id linked to it.
+
+        A calendar that is assigned via main_calendar_id but was never
+        given any calendar_group_ids is a configuration error, not "no
+        schedule restriction". Callers must fail safe (treat every day as
+        unscheduled/absent, credit zero hours) instead of silently
+        granting full attendance because the schedule lookup found
+        nothing to check against.
+        """
+        calendar = employee.main_calendar_id
+        return bool(calendar and calendar.calendar_group_ids)
+
+    @api.model
     def is_scheduled_workday(self, employee, date):
         """Check if the employee is scheduled to work on the given date.
 
@@ -236,7 +251,7 @@ class BiometricScheduleHelper(models.AbstractModel):
         :param check_out: naive UTC datetime
         :param employee: hr.employee record
         :return: dict with 'worked_hours', 'late_minutes', 'early_leave_minutes',
-                 'overtime_hours'
+                 'overtime_hours', 'is_absent'
         """
         emp_tz = self.get_employee_tz(employee)
         local_ci = pytz.utc.localize(check_in).astimezone(emp_tz)
@@ -245,12 +260,35 @@ class BiometricScheduleHelper(models.AbstractModel):
 
         schedule = self.get_employee_day_schedule(employee, work_date, emp_tz)
         if not schedule:
+            if not self.is_calendar_configured(employee):
+                _logger.warning(
+                    "Employee %s (id=%s) has no valid work calendar "
+                    "(main_calendar_id missing or has no "
+                    "calendar_group_ids) -- marking %s absent (0 worked "
+                    "hours) instead of trusting the raw punch and paying "
+                    "for a day with no real schedule to validate against.",
+                    employee.name, employee.id, work_date)
+                return {
+                    'worked_hours': 0.0,
+                    'late_minutes': 0.0,
+                    'early_leave_minutes': 0.0,
+                    'overtime_hours': 0.0,
+                    'is_absent': True,
+                }
+            # Calendar is configured, but this weekday has no scheduled
+            # lines (e.g. Saturday deliberately excluded from the group).
+            # A punch here doesn't match the schedule, so it must NOT be
+            # credited as a regular worked day -- route it to overtime
+            # instead. Approval workflow for that overtime is deferred;
+            # for now this only ensures it stops being paid as a normal,
+            # schedule-matching day.
             raw_hours = (check_out - check_in).total_seconds() / 3600.0
             return {
-                'worked_hours': raw_hours,
+                'worked_hours': 0.0,
                 'late_minutes': 0.0,
                 'early_leave_minutes': 0.0,
-                'overtime_hours': 0.0,
+                'overtime_hours': raw_hours,
+                'is_absent': False,
             }
 
         grace_minutes = 16
@@ -299,6 +337,7 @@ class BiometricScheduleHelper(models.AbstractModel):
             'late_minutes': late_minutes,
             'early_leave_minutes': early_leave_minutes,
             'overtime_hours': overtime_hours,
+            'is_absent': False,
         }
 
 

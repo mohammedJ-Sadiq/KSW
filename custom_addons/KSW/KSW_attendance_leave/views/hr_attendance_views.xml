@@ -51,7 +51,7 @@
 
             <!-- Update list-level decorations to use net values -->
             <xpath expr="//list" position="attributes">
-                <attribute name="decoration-warning">x_net_late_minutes &gt; 0 or x_net_early_leave_minutes &gt; 0</attribute>
+                <attribute name="decoration-warning">x_net_late_minutes &gt; 0 or x_net_early_leave_minutes &gt; 0 or (x_net_worked_hours == 0 and not x_net_is_absent)</attribute>
                 <attribute name="decoration-danger">x_net_is_absent</attribute>
                 <attribute name="decoration-success">(x_net_late_minutes == 0 and x_late_minutes &gt; 0) or (x_net_early_leave_minutes == 0 and x_early_leave_minutes &gt; 0) or (not x_net_is_absent and x_is_absent)</attribute>
             </xpath>

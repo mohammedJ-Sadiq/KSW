@@ -120,7 +120,14 @@ class KswAttendanceSheet(models.Model):
         Lookup order:
         1. calendar_group_ids → group lines  (KSW custom schedule)
         2. attendance_ids                    (standard Odoo schedule)
-        3. Default Sun-Thu 08:00-17:00       (fallback)
+        3. Default Sun-Thu 08:00-17:00       (only if no calendar exists at all)
+
+        A calendar that exists but has neither calendar_group_ids nor
+        attendance_ids is treated as misconfigured, not as "no schedule
+        restriction" — it must NOT silently grant a default workday. Doing
+        so would let an incompletely-configured calendar (selected but
+        never given hours) produce fully-paid attendance with no real
+        schedule behind it.
 
         Returns dict(hour_from, hour_to, break_hours) or None.
         """
@@ -191,7 +198,20 @@ class KswAttendanceSheet(models.Model):
             return None
 
         # -- 3. Fallback: Sun-Thu 08:00-17:00 (Saudi standard) --
-        # Only used when the calendar has NO schedule data at all.
+        # Only used when there is no calendar reference at all (employee,
+        # employee's resource_calendar_id and company default are all
+        # unset). A calendar that *exists* but has empty calendar_group_ids
+        # and empty attendance_ids is a configuration error, not "no
+        # restriction" — fail safe (no workday) instead of fail open.
+        if calendar:
+            _logger.warning(
+                "Employee %s (id=%s): calendar '%s' has no "
+                "calendar_group_ids and no attendance_ids configured. "
+                "Treating %s as a non-workday until the calendar is fixed.",
+                employee.name, employee.id, calendar.name, check_date,
+            )
+            return None
+
         # weekday(): Mon=0 … Sun=6  →  work days = Sun(6), Mon(0)-Thu(3)
         if check_date.weekday() in (0, 1, 2, 3, 6):
             return {
@@ -321,7 +341,11 @@ class KswAttendanceSheet(models.Model):
                     'sheet_id': sheet.id,
                     'date': d,
                     'is_workday': is_wd,
-                    'is_attended': True,   # ALL days default to attended
+                    # Workdays default to attended (HR flags exceptions);
+                    # non-workdays (weekends, or a misconfigured calendar
+                    # with no schedule at all) must NOT default to attended,
+                    # otherwise a broken calendar fabricates full pay.
+                    'is_attended': is_wd,
                 })
 
             new_lines = self.env['ksw.attendance.sheet.line'].create(vals_list)

@@ -223,7 +223,15 @@ class BiometricAttendanceSync(models.AbstractModel):
         """
         sched_helper = self.env['biometric.schedule.helper']
 
-        if not sched_helper.is_scheduled_workday(employee, check_date):
+        # A misconfigured calendar (assigned but with no calendar_group_ids)
+        # must fail safe: treat every day as a workday so a missing punch
+        # is flagged as absence, instead of is_scheduled_workday() treating
+        # the lack of schedule data as "not a workday" and skipping it.
+        is_workday = (
+            not sched_helper.is_calendar_configured(employee)
+            or sched_helper.is_scheduled_workday(employee, check_date)
+        )
+        if not is_workday:
             return False
         if self._has_attendance_on_date(employee, check_date):
             return False
@@ -557,6 +565,7 @@ class BiometricAttendanceSync(models.AbstractModel):
         late_minutes = work_data['late_minutes']
         early_leave_minutes = work_data['early_leave_minutes']
         overtime_hours = work_data.get('overtime_hours', 0.0)
+        is_absent = work_data.get('is_absent', False)
 
         att_date = pytz.utc.localize(ci).astimezone(emp_tz).date()
         att_date_str = att_date.strftime("%Y-%m-%d")
@@ -587,6 +596,7 @@ class BiometricAttendanceSync(models.AbstractModel):
                 late_minutes = work_data['late_minutes']
                 early_leave_minutes = work_data['early_leave_minutes']
                 overtime_hours = work_data.get('overtime_hours', 0.0)
+                is_absent = work_data.get('is_absent', False)
 
             att_date = pytz.utc.localize(new_ci).astimezone(emp_tz).date()
             day_name = att_date.strftime('%A')
@@ -596,7 +606,7 @@ class BiometricAttendanceSync(models.AbstractModel):
                 "worked_hours = %s, "
                 "x_late_minutes = %s, x_early_leave_minutes = %s, "
                 "overtime_hours = %s, "
-                "x_day_of_week = %s, "
+                "x_day_of_week = %s, x_is_absent = %s, "
                 "write_date = NOW(), write_uid = %s "
                 "WHERE id = %s",
                 (new_ci.strftime("%Y-%m-%d %H:%M:%S"),
@@ -605,7 +615,7 @@ class BiometricAttendanceSync(models.AbstractModel):
                  worked_hours,
                  late_minutes, early_leave_minutes,
                  overtime_hours,
-                 day_name,
+                 day_name, is_absent,
                  self.env.uid, att_id))
 
             return False, True
@@ -616,11 +626,13 @@ class BiometricAttendanceSync(models.AbstractModel):
                 "(employee_id, check_in, check_out, date, "
                 "worked_hours, "
                 "x_late_minutes, x_early_leave_minutes,overtime_hours, x_day_of_week, "
+                "x_is_absent, "
                 "create_date, create_uid, write_date, write_uid) "
-                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s,%s, NOW(), %s, NOW(), %s)",
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s,%s,%s, NOW(), %s, NOW(), %s)",
                 (emp_id, ci_str, co_str, att_date_str,
                  worked_hours,
                  late_minutes, early_leave_minutes,overtime_hours, day_name,
+                 is_absent,
                  self.env.uid, self.env.uid))
             return True, False
 

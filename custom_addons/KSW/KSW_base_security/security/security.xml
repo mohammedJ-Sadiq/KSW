@@ -114,4 +114,30 @@
     <record id="hr_attendance.menu_hr_attendance_view_attendances_management" model="ir.ui.menu">
         <field name="group_ids" eval="[(4, ref('group_hr_attendance_employee_subordinate'))]"/>
     </record>
+
+    <!-- Hide Contacts app for plain Employee/Supervisor tier accounts:
+         everyone in this company gets base.group_user via the Employees
+         privilege groups above, so the core module's default
+         "base.group_user,base.group_partner_manager" leaves Contacts visible
+         to every single user. Replace it with the higher HR/admin tiers only. -->
+    <record id="contacts.menu_contacts" model="ir.ui.menu">
+        <field name="group_ids" eval="[(6, 0, [
+            ref('base.group_system'),
+            ref('base.group_partner_manager'),
+            ref('hr.group_hr_user'),
+            ref('hr.group_hr_manager'),
+        ])]"/>
+    </record>
+
+    <!-- Hide the UTM "Link Tracker" app for plain Employee/Supervisor tier
+         accounts. Core gates it with base.group_no_one ("Technical
+         Features"), which Odoo only enforces while the viewer's session has
+         debug mode on (see ir_ui_menu.py:_visible_menu_ids), so whether it
+         shows up depends on a per-user/per-session flag rather than a fixed
+         group, and can end up visible to non-admins (seen on prod) if that
+         flag was ever set for them. Replace it with an explicit group list
+         that isn't tied to debug mode at all. -->
+    <record id="utm.menu_link_tracker_root" model="ir.ui.menu">
+        <field name="group_ids" eval="[(6, 0, [ref('base.group_system')])]"/>
+    </record>
 </odoo>

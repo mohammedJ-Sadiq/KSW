@@ -4,10 +4,11 @@
     'category': 'Human Resources',
     'summary': 'Extended security groups and rules for Employees and Attendances',
     'author': 'KSW',
-    'depends': ['hr', 'hr_attendance', 'om_hr_payroll', 'hr_holidays', 'hr_homeworking'],
+    'depends': ['hr', 'hr_attendance', 'om_hr_payroll', 'hr_holidays', 'hr_homeworking', 'contacts', 'utm', 'sale'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
+        'views/sale_order_views.xml',
     ],
     'installable': True,
     'application': False,

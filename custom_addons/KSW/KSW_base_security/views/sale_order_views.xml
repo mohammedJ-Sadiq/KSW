@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Core leaves the "Tracking" group (Campaign/Medium/Source -> the same
+         utm.campaign/utm.medium/utm.source models behind the "Link Tracker"
+         app) wide open on the Sales Order form, unlike the equivalent group
+         on Invoices which core already gates with groups="base.group_no_one".
+         Clicking into the Campaign field lets a plain Employee/Supervisor
+         drill straight into the utm.campaign form. Gate it with an explicit
+         group instead of base.group_no_one, since that group's visibility
+         depends on debug mode being on for the viewer and isn't reliable
+         (see the Link Tracker menu fix in security/security.xml). -->
+    <record id="sale_order_view_form_hide_tracking" model="ir.ui.view">
+        <field name="name">sale.order.form.hide.tracking</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <group name="sale_reporting" position="attributes">
+                <attribute name="groups">base.group_system</attribute>
+            </group>
+        </field>
+    </record>
+</odoo>
