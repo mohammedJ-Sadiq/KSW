@@ -430,14 +430,14 @@ class HrLeaveUnpaid(models.Model):
             ('x_leave_id', '=', False),
         ])
         if lines:
-            # Bypass the leave-lock check in write() by writing
-            # is_attended first, then x_leave_id
-            for line in lines:
-                # Use super's write to bypass our leave-lock guard
-                super(type(line), line).write({
-                    'is_attended': False,
-                })
-                line.sudo().write({'x_leave_id': leave.id})
+            # ksw_system_write bypasses both the off-day guard (the leave
+            # range may include a weekly rest day, not directly editable
+            # otherwise) and the leave-lock guard (x_leave_id isn't set
+            # yet, so that one wouldn't fire anyway).
+            lines.with_context(ksw_system_write=True).write({
+                'is_attended': False,
+            })
+            lines.write({'x_leave_id': leave.id})
             # Sync attendance records (delete auto-generated ones)
             for sheet in lines.mapped('sheet_id'):
                 sheet._sync_line_attendance(
@@ -449,12 +449,12 @@ class HrLeaveUnpaid(models.Model):
             ('x_leave_id', '=', leave.id),
         ])
         if lines:
-            # Clear the lock first, then restore attended
+            # Clear the lock first, then restore attended. ksw_system_write
+            # bypasses the off-day guard (see _lock_attendance_sheet_lines).
             lines.write({'x_leave_id': False})
-            for line in lines:
-                super(type(line), line).write({
-                    'is_attended': True,
-                })
+            lines.with_context(ksw_system_write=True).write({
+                'is_attended': True,
+            })
             # Re-sync attendance records
             for sheet in lines.mapped('sheet_id'):
                 sheet._sync_line_attendance(
