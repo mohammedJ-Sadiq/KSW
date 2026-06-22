@@ -38,13 +38,18 @@ class KswAttendanceSheetLine(models.Model):
 
     def write(self, vals):
         if 'is_attended' in vals:
-            if not self.env.context.get('ksw_system_write') and self.filtered(
+            is_system_write = self.env.context.get('ksw_system_write')
+            if not is_system_write and self.filtered(
                     lambda l: not l.is_workday):
                 raise UserError(
                     'Off-day attendance (e.g. the weekly rest day) is '
                     'determined automatically and cannot be edited directly.')
             old_values = {line.id: line.is_attended for line in self}
-            self.mapped('sheet_id')._check_editable()
+            # System writes (leave approval locking/unlocking days, off-day
+            # pay recomputation) must go through even on a confirmed/locked
+            # sheet or an older month — those guards are for manual edits.
+            if not is_system_write:
+                self.mapped('sheet_id')._check_editable()
         result = super().write(vals)
         if 'is_attended' in vals:
             self._log_attendance_change(old_values)
