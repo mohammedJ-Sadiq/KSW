@@ -9,6 +9,7 @@
             <field name="is_loan" eval="True"/>
             <field name="managed_by">accounting</field>
             <field name="default_installments">10</field>
+            <field name="payroll_priority">40</field>
             <field name="description">Personal loan granted to the employee (requires full approval chain).</field>
             <field name="sequence">10</field>
         </record>
@@ -20,6 +21,7 @@
             <field name="is_loan" eval="False"/>
             <field name="managed_by">hr</field>
             <field name="default_installments">1</field>
+            <field name="payroll_priority">30</field>
             <field name="description">Short-term salary advance, deducted in one installment.</field>
             <field name="sequence">20</field>
         </record>
@@ -31,6 +33,7 @@
             <field name="is_loan" eval="False"/>
             <field name="managed_by">hr</field>
             <field name="default_installments">1</field>
+            <field name="payroll_priority">10</field>
             <field name="description">Government fine paid by the company on behalf of the employee.</field>
             <field name="sequence">30</field>
         </record>
@@ -42,6 +45,7 @@
             <field name="is_loan" eval="False"/>
             <field name="managed_by">hr</field>
             <field name="default_installments">1</field>
+            <field name="payroll_priority">20</field>
             <field name="description">Internal company penalty applied to the employee.</field>
             <field name="sequence">40</field>
         </record>
@@ -52,19 +56,19 @@
          block above is skipped on upgrades, so we use write() here). -->
     <function model="ksw.deduction.type" name="write">
         <value eval="[ref('type_loan')]"/>
-        <value eval="{'managed_by': 'accounting'}"/>
+        <value eval="{'managed_by': 'accounting', 'payroll_priority': 40}"/>
     </function>
     <function model="ksw.deduction.type" name="write">
         <value eval="[ref('type_advance')]"/>
-        <value eval="{'managed_by': 'hr'}"/>
+        <value eval="{'managed_by': 'hr', 'payroll_priority': 30}"/>
     </function>
     <function model="ksw.deduction.type" name="write">
         <value eval="[ref('type_gov_penalty')]"/>
-        <value eval="{'managed_by': 'hr'}"/>
+        <value eval="{'managed_by': 'hr', 'payroll_priority': 10}"/>
     </function>
     <function model="ksw.deduction.type" name="write">
         <value eval="[ref('type_internal_penalty')]"/>
-        <value eval="{'managed_by': 'hr'}"/>
+        <value eval="{'managed_by': 'hr', 'payroll_priority': 20}"/>
     </function>
 
 </odoo>

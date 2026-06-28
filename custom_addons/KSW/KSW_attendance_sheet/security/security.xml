@@ -5,8 +5,8 @@
     <!-- 1. Module Category                                            -->
     <!-- ============================================================ -->
     <record id="module_category_attendance_sheet" model="ir.module.category">
-        <field name="name">Attendance Sheet</field>
-        <field name="sequence">25</field>
+        <field name="name">KSW Attendance Sheet</field>
+        <field name="sequence">204</field>
     </record>
 
     <!-- ============================================================ -->

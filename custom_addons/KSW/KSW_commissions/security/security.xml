@@ -22,7 +22,7 @@
     -->
     <record id="module_category_ksw_commissions" model="ir.module.category">
         <field name="name">KSW Commissions</field>
-        <field name="sequence">210</field>
+        <field name="sequence">203</field>
     </record>
 
     <!-- ============================================================ -->

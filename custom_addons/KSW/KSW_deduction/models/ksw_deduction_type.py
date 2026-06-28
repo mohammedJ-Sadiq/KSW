@@ -40,6 +40,14 @@ class KswDeductionType(models.Model):
              'HR: gov. penalties, internal penalties, salary advances. '
              'Accounting: loans.',
     )
+    payroll_priority = fields.Integer(
+        string='Payroll Priority',
+        default=100,
+        help='Order in which this deduction type is collected when the '
+             'employee salary cannot cover all deductions in a month. '
+             'Lower is collected first (e.g. penalties before loans). '
+             'The unaffordable remainder is forwarded to the next month.',
+    )
     description = fields.Text()
     sequence = fields.Integer(default=10)
     active = fields.Boolean(default=True)

@@ -96,6 +96,27 @@ class KswDeductionLine(models.Model):
     type_id = fields.Many2one(
         related='deduction_id.type_id', store=True, readonly=True,
     )
+    payroll_priority = fields.Integer(
+        related='deduction_id.payroll_priority', store=True, readonly=True,
+        help='Lower is collected first when salary is insufficient '
+             '(used to order deduction collection at payroll time).',
+    )
+    # Set on lines that were created (or fully forwarded) because an
+    # earlier payslip could not afford the full installment. Lets
+    # `_sync_deductions_on_reset` undo the split/forward when that
+    # payslip is reset to draft.
+    forwarded_from_payslip_id = fields.Many2one(
+        'hr.payslip', readonly=True, copy=False,
+        help='Payslip whose shortfall created/forwarded this pending line.',
+    )
+    # When a payslip can only afford part of an installment, the line is
+    # split into a paid portion (kept on the original) and a pending
+    # remainder (a new line) that points back here. Lets a payslip reset
+    # merge the remainder back into the original line.
+    split_origin_id = fields.Many2one(
+        'ksw.deduction.line', readonly=True, copy=False, ondelete='set null',
+        help='Original installment this pending remainder was split from.',
+    )
 
     _valid_month = models.Constraint(
         'CHECK(month >= 1 AND month <= 12)',
@@ -440,6 +461,42 @@ class KswDeductionLine(models.Model):
         return lines
 
     # ==================================================================
+    # Shared installment-edit authorization
+    # ==================================================================
+
+    def _check_can_edit_lines(self):
+        """Authorize manual installment edits (split / mark paid).
+
+        Raises ``UserError`` unless the current user may modify every
+        deduction in ``self``. Returns silently under sudo. Mirrors the
+        manual-entry create() / write() privilege matrix:
+          • group_installment_edit (Accounting) → any type
+          • group_deduction_officer / group_loan_hr (HR) → HR-managed only
+        """
+        if self.env.su:
+            return
+        user = self.env.user
+        can_acc = user.has_group('KSW_deduction.group_installment_edit')
+        can_hr = (
+            user.has_group('KSW_deduction.group_deduction_officer')
+            or user.has_group('KSW_deduction.group_loan_hr')
+        )
+        if not (can_acc or can_hr):
+            raise UserError(_(
+                "You do not have permission to modify installments. "
+                "Contact your administrator."
+            ))
+        if not can_acc:
+            for line in self:
+                if line.deduction_id.managed_by == 'accounting':
+                    raise UserError(_(
+                        "Deduction '%(name)s' is managed by Accounting. "
+                        "Modifying its installments requires the 'Loan "
+                        "Installment Modification' privilege.",
+                        name=line.deduction_id.display_name,
+                    ))
+
+    # ==================================================================
     # One-click "Mark as Paid" (replaces the old add-a-new-row flow)
     # ==================================================================
 
@@ -450,23 +507,13 @@ class KswDeductionLine(models.Model):
         The line itself is stamped as manual/paid — no extra row is
         created, and no existing row needs to be zeroed or skipped.
 
-        Authorization mirrors the manual-entry create() guards:
+        Authorization mirrors the manual-entry create() guards (see
+        `_check_can_edit_lines`):
           - group_installment_edit (Accounting) → any type
           - group_deduction_officer or group_loan_hr (HR) → HR-managed types only
         """
+        self._check_can_edit_lines()
         user = self.env.user
-        if not self.env.su:
-            can_acc = user.has_group('KSW_deduction.group_installment_edit')
-            can_hr = (
-                user.has_group('KSW_deduction.group_deduction_officer')
-                or user.has_group('KSW_deduction.group_loan_hr')
-            )
-            if not (can_acc or can_hr):
-                raise UserError(_(
-                    "You do not have permission to manually close "
-                    "installments. Contact your administrator."
-                ))
-
         today = fields.Date.context_today(self)
         for line in self:
             if line.state != 'pending':
@@ -477,14 +524,6 @@ class KswDeductionLine(models.Model):
                     state=dict(line._fields['state'].selection).get(
                         line.state, line.state),
                 ))
-            if not self.env.su:
-                if not can_acc and line.deduction_id.managed_by == 'accounting':
-                    raise UserError(_(
-                        "Deduction '%(name)s' is managed by Accounting. "
-                        "Closing it requires the 'Loan Installment "
-                        "Modification' privilege.",
-                        name=line.deduction_id.display_name,
-                    ))
             # Stamp the existing line in-place — no new row needed.
             # `write()` early-returns for non-schedule keys so the
             # privilege guard in write() is not re-triggered here.

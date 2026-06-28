@@ -75,7 +75,7 @@ class TestLeaveAccess(TransactionCase):
 
     def test_02_leave_view_supervisor(self):
         """Test 'Supervisor' (immediate) viewing group."""
-        group_supervisor = self.env.ref('KSW_annual_leave.group_leave_view_supervisor')
+        group_supervisor = self.env.ref('KSW_annual_leave.group_leave_supervisor')
         self.user_b.write({'group_ids': [(4, group_supervisor.id)]})
         
         leaves = self.env['hr.leave'].with_user(self.user_b).search([])
@@ -85,7 +85,7 @@ class TestLeaveAccess(TransactionCase):
 
     def test_03_leave_view_supervisor_cascading(self):
         """Test 'Supervisor Cascading' viewing group."""
-        group_cascading = self.env.ref('KSW_annual_leave.group_leave_view_supervisor_cascading')
+        group_cascading = self.env.ref('KSW_annual_leave.group_leave_supervisor_cascading')
         self.user_a.write({'group_ids': [(4, group_cascading.id)]})
         
         leaves = self.env['hr.leave'].with_user(self.user_a).search([])

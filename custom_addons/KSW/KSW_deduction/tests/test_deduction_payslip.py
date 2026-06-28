@@ -46,6 +46,14 @@ class TestDeductionPayslip(DeductionCommon):
         cls.employee._compute_current_version_id()
         cls.period_from = date(2026, 4, 1)
         cls.period_to = date(2026, 4, 30)
+        # Without attendance data the ATTDED rule deducts the whole salary
+        # (every day counts as absent), driving net to 0 — which would make
+        # the new payroll deduction-capping logic forward everything. Make
+        # the employee attendance-sheet based with a fully-attended April
+        # sheet so ATTDED is 0 and net == wage, the realistic case.
+        cls.employee.write({'x_is_attendance_sheet': True})
+        cls.env['ksw.attendance.sheet'].create({
+            'employee_id': cls.employee.id, 'month': '4', 'year': 2026})
     def _make_payslip(self, employee=None, dfrom=None, dto=None, name='Slip'):
         return self.env['hr.payslip'].create({
             'employee_id': (employee or self.employee).id,
@@ -66,21 +74,28 @@ class TestDeductionPayslip(DeductionCommon):
                                    amount=300.0, installments=3,
                                    start_month=date(2026, 3, 1))
         ded.action_submit()
-        # Lines: Mar/Apr/May ; payslip Apr should pick the Apr line only
+        # Lines: Mar/Apr/May. The April payslip collects the April line AND
+        # the still-pending March line (overdue installments roll forward,
+        # i.e. there is no lower period bound); the future May line is not.
         slip = self._make_payslip()
         slip.compute_sheet()
         inputs = self._ksw_inputs(slip)
-        self.assertEqual(len(inputs), 1)
-        inp = inputs[0]
-        self.assertEqual(inp.amount, 100.0)
+        self.assertEqual(len(inputs), 2)
         apr_line = ded.line_ids.filtered(
             lambda l: l.period_date == date(2026, 4, 1))
-        self.assertEqual(inp.code, f'KSW_DED_{apr_line.id}')
-        self.assertEqual(inp.version_id, self.version)
-        self.assertGreaterEqual(inp.sequence, 50)
-        self.assertIn('inst 2/3', inp.name)
-        self.assertIn(ded.name, inp.name)
-        self.assertIn(ded.type_id.name, inp.name)
+        apr_input = inputs.filtered(
+            lambda i: i.code == f'KSW_DED_{apr_line.id}')
+        self.assertEqual(len(apr_input), 1)
+        self.assertEqual(apr_input.amount, 100.0)
+        self.assertEqual(apr_input.version_id, self.version)
+        self.assertGreaterEqual(apr_input.sequence, 50)
+        self.assertIn('inst 2/3', apr_input.name)
+        self.assertIn(ded.name, apr_input.name)
+        self.assertIn(ded.type_id.name, apr_input.name)
+        # The May line (future) is excluded.
+        self.assertFalse(ded.line_ids.filtered(
+            lambda l: l.period_date == date(2026, 5, 1)).id
+            in [int(i.code[8:]) for i in inputs])
     def test_inputs_skipped_for_lines_outside_period(self):
         ded = self._make_deduction(self.type_advance,
                                    amount=200.0, installments=2,

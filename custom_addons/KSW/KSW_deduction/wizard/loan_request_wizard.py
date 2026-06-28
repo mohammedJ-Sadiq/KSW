@@ -158,6 +158,21 @@ class KswLoanRequestWizard(models.TransientModel):
         if self.installments < 1:
             raise ValidationError(_("Installments must be at least 1."))
 
+        # One personal loan at a time — surface a friendly message before
+        # creating the draft (action_submit re-checks server-side).
+        if self.env['ksw.deduction'].sudo().search_count([
+            ('employee_id', '=', self.employee_id.id),
+            ('is_loan', '=', True),
+            '|',
+                ('approval_state', 'in', [
+                    'pending_dm', 'pending_hr', 'pending_acc', 'pending_gm']),
+                '&', ('state', '=', 'active'), ('total_pending', '>', 0),
+        ]):
+            raise UserError(_(
+                "You already have a personal loan in progress. A new loan "
+                "can only be requested once the current one is fully paid."
+            ))
+
         Deduction = self.env['ksw.deduction'].sudo()
         deduction = Deduction.create({
             'employee_id': self.employee_id.id,

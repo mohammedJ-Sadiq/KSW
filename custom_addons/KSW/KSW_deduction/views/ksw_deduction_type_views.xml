@@ -13,6 +13,7 @@
                 <field name="is_loan"/>
                 <field name="managed_by"/>
                 <field name="default_installments"/>
+                <field name="payroll_priority"/>
                 <field name="active" optional="hide"/>
             </list>
         </field>
@@ -36,6 +37,7 @@
                             <field name="is_loan"/>
                             <field name="managed_by"/>
                             <field name="default_installments"/>
+                            <field name="payroll_priority"/>
                             <field name="sequence"/>
                             <field name="active"/>
                         </group>

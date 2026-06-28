@@ -338,3 +338,32 @@ Python auth guard inside `action_confirm`).
 the existing loan-approvers rule so `group_loan_hr` users see:
 loans (`is_loan=True`) **OR** HR-managed deductions (`managed_by='hr'`).
 The `managed_by` field must be `store=True` on `ksw.deduction` for this domain to work.
+
+### Employee detail mirrors (read-only, HR users only)
+Three non-stored `related` fields on `ksw.deduction` surface employee identifiers
+directly on the deduction form (Employee group) without a separate lookup:
+
+| Field | Source | Label |
+|-------|--------|-------|
+| `x_emp_employee_no` | `employee_id.x_employee_no` (KSW_payroll) | Employee No. |
+| `x_emp_ssnid` | `employee_id.ssnid` (hr.version via `_inherits`) | SSN No. |
+| `x_emp_loan_acc_no` | `employee_id.x_loan_acc_no` (KSW_deduction/hr_employee) | Loan Acc No. in BAS |
+
+All three carry `groups='hr.group_hr_user'` (inherited from the source fields).
+Do **not** store them — they are display-only and need no column.
+
+### Payroll impact summary fields
+Two fields on `ksw.deduction` summarise the employee's payroll picture for HR
+approvers. Both are shown in a dedicated **Payroll Impact** group on the form
+(HR users only) and in the kanban card:
+
+- **`x_emp_monthly_total`** — non-stored `related` → `employee_id.x_deduction_monthly_total`.
+  Shows the sum of all pending installments for the current month across every
+  active deduction for this employee (including this one). Computed in
+  `KSW_deduction/models/hr_employee.py::_compute_deduction_count`.
+
+- **`x_gross_salary`** — non-stored `compute='_compute_gross_salary'`,
+  `groups='hr.group_hr_user'`. Reads `employee_id.sudo().current_version_id.wage`
+  (sudo required because `wage` is group-restricted). Uses the same data source
+  as `x_eos_last_wage` but is a separate field so it can appear outside the
+  Decision Support tab without pulling in the full EOS computation.

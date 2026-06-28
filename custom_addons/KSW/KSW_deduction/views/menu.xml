@@ -10,14 +10,14 @@
               web_icon="KSW_deduction,static/description/icon.png"/>
 
     <!-- ============================================================ -->
-    <!-- 1. Dashboard (officers + approvers)                            -->
+    <!-- 1. Dashboard (officers + approvers + supervisors)              -->
     <!-- ============================================================ -->
     <menuitem id="menu_ksw_deduction_dashboard"
               name="Dashboard"
               parent="menu_ksw_deduction_root"
               action="action_ksw_deduction_dashboard"
               sequence="1"
-              groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm"/>
+              groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_deduction_supervisor,KSW_deduction.group_hr_deduction_officer,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm"/>
 
     <!-- ============================================================ -->
     <!-- 2. Self-Service (every internal user)                          -->
@@ -45,13 +45,13 @@
               sequence="20"/>
 
     <!-- ============================================================ -->
-    <!-- 3. Operations (officers + approvers)                           -->
+    <!-- 3. Operations (officers + approvers + supervisors)             -->
     <!-- ============================================================ -->
     <menuitem id="menu_ksw_deduction_operations"
               name="Operations"
               parent="menu_ksw_deduction_root"
               sequence="10"
-              groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm"/>
+              groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_deduction_supervisor,KSW_deduction.group_hr_deduction_officer,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm"/>
 
     <menuitem id="menu_ksw_deduction_all"
               name="All Deductions"
@@ -60,35 +60,31 @@
               sequence="10"
               groups="KSW_deduction.group_deduction_officer"/>
 
+    <!-- Loans: officers, loan approvers, and supervisors (record rule limits
+         supervisors to their own + subordinates scope automatically) -->
     <menuitem id="menu_ksw_deduction_loans"
               name="Loans"
               parent="menu_ksw_deduction_operations"
               action="action_ksw_deduction_loans"
               sequence="20"
-              groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm"/>
+              groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_deduction_supervisor,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm"/>
 
-    <menuitem id="menu_ksw_deduction_penalties"
-              name="Penalties"
+    <!-- Non-loan HR officer: single consolidated view (mirrors "Loans" for approvers) -->
+    <menuitem id="menu_ksw_deduction_hr_managed"
+              name="Deductions"
               parent="menu_ksw_deduction_operations"
-              action="action_ksw_deduction_penalties"
-              sequence="30"
-              groups="KSW_deduction.group_deduction_officer"/>
-
-    <menuitem id="menu_ksw_deduction_advances"
-              name="Advances &amp; Other"
-              parent="menu_ksw_deduction_operations"
-              action="action_ksw_deduction_advances"
-              sequence="40"
-              groups="KSW_deduction.group_deduction_officer"/>
+              action="action_ksw_deduction_hr_managed"
+              sequence="20"
+              groups="KSW_deduction.group_hr_deduction_officer"/>
 
     <!-- ============================================================ -->
-    <!-- 5. Reports (officers + approvers)                              -->
+    <!-- 5. Reports (officers + approvers + supervisors)                -->
     <!-- ============================================================ -->
     <menuitem id="menu_ksw_deduction_reports"
               name="Reports"
               parent="menu_ksw_deduction_root"
               sequence="30"
-              groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm"/>
+              groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_deduction_supervisor,KSW_deduction.group_hr_deduction_officer,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm"/>
 
     <menuitem id="menu_ksw_deduction_report_by_employee"
               name="By Employee"
@@ -124,4 +120,3 @@
               sequence="10"/>
 
 </odoo>
-

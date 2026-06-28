@@ -177,9 +177,17 @@
                                    readonly="state != 'draft'"/>
                             <field name="department_id" readonly="1"/>
                             <field name="manager_id" readonly="1"/>
+                            <field name="x_emp_employee_no" readonly="1"
+                                   groups="hr.group_hr_user"/>
+                            <field name="x_emp_ssnid" readonly="1"
+                                   groups="hr.group_hr_user"/>
+                            <field name="x_emp_loan_acc_no" readonly="1"
+                                   groups="hr.group_hr_user"/>
                         </group>
                         <group string="Type">
+                            <field name="x_can_select_loan_type" invisible="1"/>
                             <field name="type_id"
+                                   domain="[] if x_can_select_loan_type else [('is_loan', '=', False)]"
                                    readonly="state != 'draft'"/>
                             <field name="category" readonly="1"/>
                             <field name="is_loan" invisible="1"/>
@@ -224,6 +232,14 @@
                             <field name="total_paid"/>
                             <field name="total_pending"/>
                             <field name="progress_percent" widget="progressbar"/>
+                        </group>
+                    </group>
+
+                    <group groups="hr.group_hr_user">
+                        <group string="Payroll Impact">
+                            <field name="x_gross_salary" readonly="1"/>
+                            <field name="x_emp_monthly_total" readonly="1"
+                                   string="Total Deductions This Month"/>
                         </group>
                     </group>
 
@@ -394,7 +410,7 @@
                             </group>
                         </page>
                         <page string="Decision Support" name="hr_decisions"
-                              groups="KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_deduction_officer">
+                              groups="KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_deduction_officer,KSW_deduction.group_hr_deduction_officer">
                             <!-- Approval confirmations (HR / Accounting) -->
                             <group string="Approval Confirmations">
                                 <group>
@@ -465,6 +481,8 @@
                 <field name="installment_amount" optional="hide"/>
                 <field name="x_emp_monthly_total" optional="show"
                        string="Employee's Total This Month"/>
+                <field name="x_gross_salary" optional="show"
+                       groups="hr.group_hr_user"/>
                 <field name="total_paid" sum="Total Paid" optional="show"/>
                 <field name="total_pending" sum="Total Pending" optional="show"/>
                 <field name="progress_percent" widget="progressbar"/>
@@ -543,6 +561,8 @@
                 <field name="is_loan"/>
                 <field name="total_paid"/>
                 <field name="total_pending"/>
+                <field name="x_gross_salary" groups="hr.group_hr_user"/>
+                <field name="x_emp_monthly_total" groups="hr.group_hr_user"/>
                 <templates>
                     <t t-name="card">
                         <div class="d-flex align-items-center mb-2">
@@ -564,6 +584,17 @@
                             </div>
                             <div class="col-12 mt-1">
                                 <field name="progress_percent" widget="progressbar"/>
+                            </div>
+                        </div>
+                        <div class="row g-0 mt-1 border-top pt-1"
+                             t-if="record.x_gross_salary.raw_value or record.x_emp_monthly_total.raw_value">
+                            <div class="col-7 text-muted small">Gross Salary</div>
+                            <div class="col-5 text-end small">
+                                <field name="x_gross_salary" widget="monetary"/>
+                            </div>
+                            <div class="col-7 text-muted small">Deductions This Month</div>
+                            <div class="col-5 text-end small">
+                                <field name="x_emp_monthly_total" widget="monetary"/>
                             </div>
                         </div>
                         <div class="d-flex justify-content-between mt-2">
@@ -617,7 +648,7 @@
         <field name="res_model">ksw.deduction</field>
         <field name="view_mode">kanban,graph,pivot,list,form</field>
         <field name="search_view_id" ref="ksw_deduction_view_search"/>
-        <field name="context">{'search_default_active': 1}</field>
+        <field name="context">{'search_default_active': 1, 'search_default_group_type': 1}</field>
     </record>
 
     <!-- Operations: all deductions (kanban-first for scanability) -->
@@ -648,6 +679,15 @@
         <field name="res_model">ksw.deduction</field>
         <field name="view_mode">list,kanban,form</field>
         <field name="domain">[('is_loan', '=', False), ('category', '=', 'borrowed')]</field>
+    </record>
+
+    <!-- Non-loan HR officer: all HR-managed non-loan deductions in one view -->
+    <record id="action_ksw_deduction_hr_managed" model="ir.actions.act_window">
+        <field name="name">Deductions</field>
+        <field name="res_model">ksw.deduction</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="domain">[('is_loan', '=', False), ('managed_by', '=', 'hr')]</field>
+        <field name="search_view_id" ref="ksw_deduction_view_search"/>
     </record>
 
     <!-- Approvals: one action per approval step + consolidated view -->

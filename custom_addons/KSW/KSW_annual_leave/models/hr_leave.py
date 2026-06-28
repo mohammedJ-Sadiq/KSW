@@ -42,9 +42,9 @@ class HrLeave(models.Model):
             ('company_id', 'in', self.env.companies.ids),
         ]
         user = self.env.user
-        if user.has_group('KSW_annual_leave.group_leave_create_officer'):
+        if user.has_group('KSW_annual_leave.group_leave_officer'):
             return domain
-        if user.has_group('KSW_annual_leave.group_leave_create_supervisor'):
+        if user.has_group('KSW_annual_leave.group_leave_supervisor'):
             # `child_of` on hr.employee traverses _parent_name (= parent_id)
             # and includes the anchor itself, so this returns the user's
             # own employee record + every descendant in the org chart.
@@ -1031,8 +1031,8 @@ class HrLeave(models.Model):
             # shadow that for them.
             return
 
-        is_ksw_manager = self.env.user.has_group('KSW_annual_leave.group_leave_delete_supervisor') or \
-                         self.env.user.has_group('KSW_annual_leave.group_leave_delete_officer')
+        is_ksw_manager = self.env.user.has_group('KSW_annual_leave.group_leave_supervisor') or \
+                         self.env.user.has_group('KSW_annual_leave.group_leave_officer')
 
         if is_ksw_manager:
             # We enforce Odoo's state check (confirm/validate1/cancel) 

@@ -9,5 +9,6 @@ from . import test_loan_request_wizard
 from . import test_user_permissions
 from . import test_managed_by
 from . import test_loan_payment_wizard
+from . import test_critical_fixes
 
 

@@ -130,6 +130,7 @@
     <record id="ksw_deduction_view_list_my_loans" model="ir.ui.view">
         <field name="name">ksw.deduction.list.my.loans</field>
         <field name="model">ksw.deduction</field>
+        <field name="mode">primary</field>
         <field name="inherit_id" ref="ksw_deduction_view_list"/>
         <field name="arch" type="xml">
             <xpath expr="//list" position="inside">

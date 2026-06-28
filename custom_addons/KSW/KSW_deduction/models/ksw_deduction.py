@@ -38,6 +38,22 @@ class KswDeduction(models.Model):
     manager_id = fields.Many2one(
         related='employee_id.parent_id', store=True, readonly=True,
     )
+    # Read-only mirrors of employee identification fields (HR users only)
+    x_emp_employee_no = fields.Char(
+        related='employee_id.x_employee_no', readonly=True,
+        string='Employee No.',
+        groups='hr.group_hr_user',
+    )
+    x_emp_ssnid = fields.Char(
+        related='employee_id.ssnid', readonly=True,
+        string='SSN No.',
+        groups='hr.group_hr_user',
+    )
+    x_emp_loan_acc_no = fields.Char(
+        related='employee_id.x_loan_acc_no', readonly=True,
+        string='Loan Acc No. in BAS',
+        groups='hr.group_hr_user',
+    )
 
     # ------------------------------------------------------------------
     # Type & category (drives workflow)
@@ -55,6 +71,11 @@ class KswDeduction(models.Model):
     managed_by = fields.Selection(
         related='type_id.managed_by', store=True, readonly=True,
         string='Managed By',
+    )
+    payroll_priority = fields.Integer(
+        related='type_id.payroll_priority', store=True, readonly=True,
+        string='Payroll Priority',
+        help='Lower is collected first when salary is insufficient.',
     )
 
     # ------------------------------------------------------------------
@@ -170,6 +191,15 @@ class KswDeduction(models.Model):
 
     # Submit-button visibility (creator or officer)
     x_can_submit = fields.Boolean(compute='_compute_x_can_submit')
+
+    # True when the current user may select a loan type in the type_id
+    # dropdown. Restricted to accounting approvers, deduction officers,
+    # managers, and supervisors (who can request loans for subordinates).
+    # Non-loan HR officers, plain loan approvers (HR/GM), and regular
+    # users should never see loan types in the type selector.
+    x_can_select_loan_type = fields.Boolean(
+        compute='_compute_x_can_select_loan_type',
+    )
 
     # Cancel-button visibility.
     # - Loans: only the requesting employee (employee_id.user_id) can
@@ -345,6 +375,12 @@ class KswDeduction(models.Model):
         currency_field='currency_id',
         readonly=True,
     )
+    x_gross_salary = fields.Monetary(
+        string='Gross Salary',
+        compute='_compute_gross_salary',
+        groups='hr.group_hr_user',
+        help='Current contract wage of the employee.',
+    )
 
     # ==================================================================
     # Computed fields
@@ -357,6 +393,14 @@ class KswDeduction(models.Model):
                 rec.installment_amount = rec.amount / rec.installments
             else:
                 rec.installment_amount = 0.0
+
+    @api.depends('employee_id', 'employee_id.current_version_id.wage')
+    def _compute_gross_salary(self):
+        for rec in self:
+            if rec.employee_id:
+                rec.x_gross_salary = rec.employee_id.sudo().current_version_id.wage or 0.0
+            else:
+                rec.x_gross_salary = 0.0
 
     @api.depends('line_ids.state', 'line_ids.amount', 'amount')
     def _compute_progress(self):
@@ -613,12 +657,32 @@ class KswDeduction(models.Model):
                     s=dict(LOAN_APPROVAL_STATES).get(
                         rec.approval_state, rec.approval_state),
                 ))
+            # Scope guard: non-officers can only submit loans for
+            # themselves or (supervisors) for direct subordinates.
+            if rec.is_loan and not self.env.su:
+                user = self.env.user
+                is_officer = user.has_group(
+                    'KSW_deduction.group_deduction_officer')
+                if not is_officer:
+                    is_own = (rec.employee_id.user_id == user)
+                    is_subordinate = (
+                        rec.employee_id.parent_id.user_id == user)
+                    if not (is_own or is_subordinate):
+                        raise UserError(_(
+                            "You can only submit loan requests for "
+                            "yourself or, as a supervisor, for your "
+                            "direct subordinates."
+                        ))
             if rec.amount <= 0:
                 raise ValidationError(_("Amount must be greater than zero."))
             if rec.installments < 1:
                 raise ValidationError(
                     _("Installments must be at least 1."))
             if rec.is_loan:
+                # One personal loan at a time: block if the employee
+                # already has a loan in the approval chain or an active
+                # loan with an outstanding balance.
+                rec._check_no_pending_loan()
                 rec.write({'approval_state': 'pending_dm'})
                 rec.message_post(
                     body=Markup(
@@ -737,6 +801,28 @@ class KswDeduction(models.Model):
             })
 
     # ==================================================================
+    # Constraints
+    # ==================================================================
+
+    @api.constrains('type_id')
+    def _check_loan_type_allowed(self):
+        """Prevent non-authorised users from selecting a loan type."""
+        if self.env.su:
+            return
+        user = self.env.user
+        can = (
+            user.has_group('KSW_deduction.group_loan_acc')
+            or user.has_group('KSW_deduction.group_deduction_officer')
+            or user.has_group('KSW_deduction.group_deduction_supervisor')
+        )
+        for rec in self:
+            if rec.is_loan and not can:
+                raise ValidationError(_(
+                    "Loan-type deductions can only be created by Accounting "
+                    "Approvers, Deduction Officers, or Supervisors."
+                ))
+
+    # ==================================================================
     # Loan workflow
     # ==================================================================
 
@@ -745,6 +831,31 @@ class KswDeduction(models.Model):
             if not rec.is_loan:
                 raise UserError(_(
                     "This action is only available for loan-type deductions."))
+
+    def _check_no_pending_loan(self):
+        """Block a new personal loan while the employee still has one
+        in progress: any loan currently in the approval chain, or an
+        active loan with an outstanding (pending) balance. Saudi policy
+        allows only one personal loan at a time."""
+        for rec in self.filtered('is_loan'):
+            if not rec.employee_id:
+                continue
+            dom = [
+                ('employee_id', '=', rec.employee_id.id),
+                ('is_loan', '=', True),
+                ('id', '!=', rec.id),
+                '|',
+                    ('approval_state', 'in', [
+                        'pending_dm', 'pending_hr', 'pending_acc', 'pending_gm']),
+                    '&', ('state', '=', 'active'), ('total_pending', '>', 0),
+            ]
+            if self.env['ksw.deduction'].sudo().search_count(dom):
+                raise UserError(_(
+                    "%(emp)s already has a personal loan in progress. A "
+                    "new loan can only be requested once the current one "
+                    "is fully paid.",
+                    emp=rec.employee_id.name,
+                ))
 
     def action_dm_approve(self):
         """Step 1: DM (direct manager) approval.
@@ -1109,6 +1220,7 @@ class KswDeduction(models.Model):
         can_acc = user.has_group('KSW_deduction.group_installment_edit')
         can_hr = (
             user.has_group('KSW_deduction.group_deduction_officer')
+            or user.has_group('KSW_deduction.group_hr_deduction_officer')
             or user.has_group('KSW_deduction.group_loan_hr')
         )
         for rec in self:
@@ -1121,21 +1233,45 @@ class KswDeduction(models.Model):
             else:
                 rec.x_can_edit_installments = False
 
+    @api.depends_context('uid')
+    @api.depends('employee_id', 'employee_id.parent_id.user_id', 'create_uid')
     def _compute_x_can_submit(self):
-        """Submit button visible only to the record creator or to
-        officers/managers (who can submit on behalf of an employee who
-        has no user account)."""
+        """Submit button visible to:
+        - Deduction officers/managers (any employee)
+        - The record's creator
+        - Supervisors submitting for a direct subordinate
+        """
+        user = self.env.user
         officer_grp = self.env.ref(
             'KSW_deduction.group_deduction_officer',
             raise_if_not_found=False)
-        is_officer = bool(officer_grp and self.env.user in officer_grp.user_ids)
+        is_officer = bool(officer_grp and user in officer_grp.user_ids)
+        is_supervisor = user.has_group(
+            'KSW_deduction.group_deduction_supervisor')
         uid = self.env.uid
         for rec in self:
+            is_subordinate = (
+                is_supervisor
+                and rec.employee_id.parent_id.user_id.id == uid
+            )
             rec.x_can_submit = (
                 is_officer
                 or (rec.create_uid and rec.create_uid.id == uid)
                 or not rec.id  # new record being composed
+                or is_subordinate
             )
+
+    @api.depends_context('uid')
+    def _compute_x_can_select_loan_type(self):
+        user = self.env.user
+        can = (
+            self.env.su
+            or user.has_group('KSW_deduction.group_loan_acc')
+            or user.has_group('KSW_deduction.group_deduction_officer')
+            or user.has_group('KSW_deduction.group_deduction_supervisor')
+        )
+        for rec in self:
+            rec.x_can_select_loan_type = can
 
     @api.depends_context('uid')
     @api.depends('employee_id', 'employee_id.parent_id.user_id')
@@ -1266,37 +1402,97 @@ class KswDeduction(models.Model):
     # Mark lines paid / unpaid (called by hr.payslip state transitions)
     # ==================================================================
 
-    def _mark_lines_paid(self, line_ids, payslip):
-        """Mark the given line ids as paid and attach them to the payslip."""
-        if not line_ids:
-            return
-        self.env['ksw.deduction.line'].browse(line_ids).write({
-            'state': 'paid',
-            'payslip_id': payslip.id,
-        })
-        # Auto-complete a deduction when all lines are paid
-        for ded in self.env['ksw.deduction.line'].browse(
-                line_ids).mapped('deduction_id'):
-            if all(l.state == 'paid' for l in ded.line_ids):
-                ded.write({'state': 'completed'})
-                ded.message_post(
+    def _settle_payslip_lines(self, lines, alloc, payslip):
+        """Reconcile installment lines with what `payslip` collected.
+
+        `alloc` maps line id -> amount actually deducted (already capped
+        by `hr.payslip._ksw_apply_deduction_priority`). Per line:
+          • collected == full  → mark paid;
+          • collected == 0      → leave pending (rolls forward next month);
+          • 0 < collected < full → split: pay the collected part, forward
+            the remainder as a new pending line that points back at the
+            origin (so a payslip reset can merge it back).
+        """
+        for ded in lines.mapped('deduction_id'):
+            cur = ded.currency_id
+            commands = []
+            for line in lines.filtered(lambda l: l.deduction_id == ded):
+                collected = cur.round(alloc.get(line.id, 0.0))
+                original = line.amount
+                if cur.is_zero(collected):
+                    continue  # nothing collected; stays pending
+                if cur.compare_amounts(collected, original) >= 0:
+                    commands.append((1, line.id, {
+                        'state': 'paid', 'payslip_id': payslip.id}))
+                else:
+                    remainder = cur.round(original - collected)
+                    commands.append((1, line.id, {
+                        'amount': collected,
+                        'state': 'paid',
+                        'payslip_id': payslip.id,
+                    }))
+                    commands.append((0, 0, {
+                        'sequence': line.sequence,
+                        'year': line.year,
+                        'month': line.month,
+                        'amount': remainder,
+                        'state': 'pending',
+                        'split_origin_id': line.id,
+                        'forwarded_from_payslip_id': payslip.id,
+                    }))
+            if commands:
+                ded.sudo().write({'line_ids': commands})
+            # Auto-complete a deduction when every line is now paid.
+            if ded.line_ids and all(
+                    l.state == 'paid' for l in ded.line_ids):
+                ded.sudo().write({'state': 'completed'})
+                ded.sudo().message_post(
                     body=Markup('<strong>🏁 Completed</strong> — all '
                                 'installments paid.'),
                     subtype_xmlid='mail.mt_note',
                 )
 
     def _unmark_lines_paid(self, payslip):
-        """Revert lines attached to the given payslip back to pending."""
-        lines = self.env['ksw.deduction.line'].search([
-            ('payslip_id', '=', payslip.id),
-            ('state', '=', 'paid'),
-        ])
-        if not lines:
+        """Reverse `_settle_payslip_lines` when a payslip is reset.
+
+        Reverts the lines this payslip paid back to pending and merges any
+        split remainder it created back into its origin line, so a
+        draft → done → draft cycle leaves the schedule unchanged.
+        """
+        Line = self.env['ksw.deduction.line'].sudo()
+        paid = Line.search([
+            ('payslip_id', '=', payslip.id), ('state', '=', 'paid')])
+        remainders = Line.search([
+            ('forwarded_from_payslip_id', '=', payslip.id)])
+        deductions = paid.mapped('deduction_id') | remainders.mapped(
+            'deduction_id')
+        if not deductions:
             return
-        deductions = lines.mapped('deduction_id')
-        lines.write({'state': 'pending', 'payslip_id': False})
-        # Re-open any deductions that were auto-completed
-        deductions.filtered(lambda d: d.state == 'completed').write(
+        # Reopen auto-completed deductions first.
+        deductions.filtered(lambda d: d.state == 'completed').sudo().write(
             {'state': 'active'})
+        # Phase A: revert paid lines (state/payslip only — not an edit key,
+        # so the per-line write guard is not triggered).
+        if paid:
+            paid.write({'state': 'pending', 'payslip_id': False})
+        # Phase B: merge each split remainder back into its (now pending)
+        # origin line and delete the remainder. Batched per deduction so
+        # the total-consistency check validates once on the final state.
+        for ded in deductions:
+            ded_rem = remainders.filtered(lambda l: l.deduction_id == ded)
+            if not ded_rem:
+                continue
+            cur = ded.currency_id
+            merged = {}
+            commands = []
+            for rem in ded_rem:
+                origin = rem.split_origin_id
+                if origin and origin.exists():
+                    merged[origin.id] = cur.round(
+                        merged.get(origin.id, origin.amount) + rem.amount)
+                commands.append((2, rem.id, 0))
+            for lid, amt in merged.items():
+                commands.append((1, lid, {'amount': amt}))
+            ded.sudo().write({'line_ids': commands})
 
 
