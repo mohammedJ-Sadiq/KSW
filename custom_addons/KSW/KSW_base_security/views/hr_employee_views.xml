@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_employee_view_form_bank_accounts" model="ir.ui.view">
+        <field name="name">hr.employee.form.bank.accounts</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='hr_settings']" position="inside">
+                <separator string="Bank Accounts"/>
+                <group>
+                    <field name="has_multiple_bank_accounts" invisible="1"/>
+                    <field name="bank_account_ids"
+                        widget="many2many_tags_salary_bank"
+                        context="{'default_partner_id': work_contact_id}"
+                        options="{'color_field': 'color', 'no_quick_create': False, 'edit_tags': True}"
+                        readonly="not id"
+                        groups="hr.group_hr_user"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_employee_filter_add_ssnid" model="ir.ui.view">
+        <field name="name">hr.employee.search.ssnid</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_filter"/>
+        <field name="arch" type="xml">
+            <field name="name" position="attributes">
+                <attribute name="filter_domain">['|', '|', ('work_email', 'ilike', self), ('name', 'ilike', self), ('ssnid', 'ilike', self)]</attribute>
+            </field>
+            <field name="name" position="after">
+                <field name="ssnid" string="SSN No"
+                       groups="hr.group_hr_user,KSW_base_security.group_hr_employee_subordinate,KSW_base_security.group_hr_employee_supervisor,KSW_base_security.group_hr_employee_supervisor_cascading"/>
+            </field>
+        </field>
+    </record>
+</odoo>

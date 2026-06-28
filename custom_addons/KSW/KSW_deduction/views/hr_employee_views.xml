@@ -14,6 +14,29 @@
                            string="Deductions"/>
                 </button>
             </xpath>
+            <xpath expr="//page[@name='hr_settings']" position="inside">
+                <separator string="Loans"/>
+                <group>
+                    <field name="x_loan_acc_no" groups="hr.group_hr_user"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_employee_filter_add_loan_acc_no" model="ir.ui.view">
+        <field name="name">hr.employee.search.loan.acc.no</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="KSW_base_security.view_employee_filter_add_ssnid"/>
+        <field name="arch" type="xml">
+            <field name="name" position="attributes">
+                <attribute name="filter_domain">['|', '|', '|', '|', ('work_email', 'ilike', self), ('name', 'ilike', self), ('ssnid', 'ilike', self), ('x_employee_no', 'ilike', self), ('x_loan_acc_no', 'ilike', self)]</attribute>
+            </field>
+            <field name="ssnid" position="after">
+                <field name="x_employee_no" string="Employee No."
+                       groups="hr.group_hr_user"/>
+                <field name="x_loan_acc_no" string="Loan Acc No. in Bas"
+                       groups="hr.group_hr_user"/>
+            </field>
         </field>
     </record>
 

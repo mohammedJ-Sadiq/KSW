@@ -31,6 +31,15 @@ class KswDeductionType(models.Model):
         help='Suggested number of installments when creating a new deduction '
              'of this type. Can be overridden per record.',
     )
+    managed_by = fields.Selection([
+        ('hr', 'HR Department'),
+        ('accounting', 'Accounting'),
+    ], string='Managed By', required=True, default='hr',
+        help='Which department can manually close (mark as paid) deductions '
+             'of this type outside payroll. '
+             'HR: gov. penalties, internal penalties, salary advances. '
+             'Accounting: loans.',
+    )
     description = fields.Text()
     sequence = fields.Integer(default=10)
     active = fields.Boolean(default=True)

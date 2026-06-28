@@ -171,6 +171,26 @@ The rate is maintained in Settings → Payroll → Social Insurance (GOSI).</fie
              KSW worked-day codes. -->
         <function model="hr.salary.rule" name="_ksw_sync_legacy_absence_deduction_rule"/>
 
+        <!-- ========================================================= -->
+        <!-- Move GROSS to sequence 25 so it runs after all allowances. -->
+        <!-- Mobile=13, Other=15, VACATION_BAL=16...VACATION_HRA=19.   -->
+        <!-- Previously GROSS was at seq 4 so it only saw HRA (seq 2)  -->
+        <!-- in categories.ALW; all other allowances were missed.       -->
+        <!-- ========================================================= -->
+        <record id="om_hr_payroll.hr_rule_taxable" model="hr.salary.rule">
+            <field name="sequence" eval="25"/>
+        </record>
+
+        <!-- ========================================================= -->
+        <!-- Move NET to sequence 200 so it runs after all deductions.  -->
+        <!-- ATTDED=150, GOSI=160, KSW_DEDUCTIONS/PENALTY=170...173.   -->
+        <!-- Previously NET was at seq 100 which meant ATTDED and GOSI  -->
+        <!-- had not yet run when categories.DED was read by NET.       -->
+        <!-- ========================================================= -->
+        <record id="om_hr_payroll.hr_rule_net" model="hr.salary.rule">
+            <field name="sequence" eval="200"/>
+        </record>
+
     </data>
 
 </odoo>

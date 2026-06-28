@@ -3,6 +3,22 @@ from datetime import datetime, time, timedelta
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
+
+# ======================================================================
+# hr.payroll.structure — absence-only deduction flag
+# ======================================================================
+
+class HrPayrollStructure(models.Model):
+    _inherit = 'hr.payroll.structure'
+
+    x_absence_only_deduction = fields.Boolean(
+        string='Absence-Only Deduction',
+        default=False,
+        help='When enabled, the payslip deducts only for fully absent or '
+             'unpresented days.  Late arrivals and early departures are '
+             'tracked in attendance but carry no salary penalty.',
+    )
+
 DAILY_HOURS = 8.0
 DAYS_PER_MONTH = 30.0
 
@@ -163,12 +179,21 @@ class HrPayslip(models.Model):
 
             # If a vacation return exists, force re-generation of worked
             # days from the return date (not the payslip start).
+            absence_only = bool(
+                payslip.struct_id
+                and payslip.struct_id.x_absence_only_deduction
+            )
             return_date = self._get_vacation_return_date(payslip)
-            if return_date and payslip.worked_days_line_ids:
+            # Clear and regenerate when:
+            #  - there is a vacation return (use return date as new start), OR
+            #  - the structure is absence-only (must drop any late/early lines
+            #    that may have been created before the flag was enabled)
+            if (return_date or absence_only) and payslip.worked_days_line_ids:
                 payslip.worked_days_line_ids.unlink()
 
             if not payslip.worked_days_line_ids:
-                self._ensure_worked_days(payslip, effective_from=return_date)
+                self._ensure_worked_days(payslip, effective_from=return_date,
+                                         absence_only=absence_only)
 
             self._inject_prior_hra_input(payslip)
         return super().compute_sheet()
@@ -419,7 +444,8 @@ class HrPayslip(models.Model):
     # Ensure worked-day lines exist (batch / programmatic creation)
     # ------------------------------------------------------------------
 
-    def _ensure_worked_days(self, payslip, effective_from=None):
+    def _ensure_worked_days(self, payslip, effective_from=None,
+                            absence_only=False):
         """Populate worked_days_line_ids when they are empty (e.g. batch
         payslip generation where the UI onchange never fires).
 
@@ -443,8 +469,8 @@ class HrPayslip(models.Model):
             return
         versions = self.env['hr.version'].browse(version_ids)
         start = effective_from or payslip.date_from
-        wd_vals = self.get_worked_day_lines(
-            versions, start, payslip.date_to)
+        ctx = self.with_context(ksw_absence_only=True) if absence_only else self
+        wd_vals = ctx.get_worked_day_lines(versions, start, payslip.date_to)
 
         # When effective_from shifts the attendance window, add the
         # pre-return calendar days as absent so ATTDED fires correctly.
@@ -581,9 +607,15 @@ class HrPayslip(models.Model):
             ])
 
             is_sheet = employee.sudo().x_is_attendance_sheet
+            is_absence_only = self.env.context.get('ksw_absence_only')
 
             if is_sheet:
                 res += self._worked_day_lines_sheet(
+                    version, employee, attendances, eff_from, eff_to)
+            elif is_absence_only:
+                # Absence-only structures (e.g. executives): deduct only for
+                # fully absent or unpresented days; late/early carry no penalty.
+                res += self._worked_day_lines_executive(
                     version, employee, attendances, eff_from, eff_to)
             else:
                 # Biometric employees — always use attendance-based logic.
@@ -675,6 +707,77 @@ class HrPayslip(models.Model):
                 })
 
                 # Legacy compatibility alias for older payroll structures.
+                lines.append({
+                    'name': _('Missing Days'),
+                    'sequence': 16,
+                    'code': 'MISDAYS',
+                    'number_of_days': absent_count,
+                    'number_of_hours': 0,
+                    'amount': deduction_total,
+                    'version_id': version.id,
+                })
+
+        return lines
+
+    # ------------------------------------------------------------------
+    # Executive / Absence-only employees
+    # ------------------------------------------------------------------
+
+    def _worked_day_lines_executive(self, version, employee, attendances,
+                                    date_from, date_to):
+        """For absence-only structures: a day is either attended (present,
+        regardless of late arrival or early departure) or absent/unpresented
+        (full-day deduction).  No partial deductions for late/early."""
+        lines = []
+
+        attended_dates = {a.check_in.date() for a in attendances if a.check_in}
+        attended_count = len(attended_dates)
+        attended_hours = sum(a.worked_hours or 0.0 for a in attendances)
+
+        lines.append({
+            'name': _('Worked Days'),
+            'sequence': 1,
+            'code': 'WORK100',
+            'number_of_days': attended_count,
+            'number_of_hours': round(attended_hours, 2),
+            'version_id': version.id,
+        })
+
+        calendar_days = (date_to - date_from).days + 1
+        absent_count = max(0, calendar_days - attended_count)
+
+        if absent_count > 0:
+            absent_hours = round(absent_count * DAILY_HOURS, 2)
+            v = employee.sudo().current_version_id or version
+            base = (
+                (v.wage or 0.0)
+                + (v.travel_allowance or 0.0)
+                + (v.mobile_allowance or 0.0)
+                + (v.other_allowance or 0.0)
+            )
+            daily_rate = base / DAYS_PER_MONTH if base else 0.0
+            deduction_total = round(daily_rate * absent_count)
+
+            lines.append({
+                'name': _('Absent Days'),
+                'sequence': 2,
+                'code': 'ATT_ABS',
+                'number_of_days': absent_count,
+                'number_of_hours': absent_hours,
+                'amount': deduction_total,
+                'version_id': version.id,
+            })
+
+            if deduction_total > 0:
+                lines.append({
+                    'name': _('Attendance Deduction'),
+                    'sequence': 15,
+                    'code': 'ATT_DED',
+                    'number_of_days': absent_count,
+                    'number_of_hours': 0,
+                    'amount': deduction_total,
+                    'version_id': version.id,
+                })
                 lines.append({
                     'name': _('Missing Days'),
                     'sequence': 16,
@@ -870,29 +973,36 @@ class HrPayslip(models.Model):
                 current += timedelta(days=1)
 
         # Attendance records with deductions (from effective start)
-        att_recs = self.env['hr.attendance'].sudo().search([
+        absence_only = (self.struct_id and self.struct_id.x_absence_only_deduction)
+        att_domain = [
             ('employee_id', '=', employee.id),
             ('check_in', '>=', datetime.combine(eff_from, time.min)),
             ('check_in', '<=', datetime.combine(d_to, time.max)),
             ('x_deduction_amount', '>', 0),
-        ], order='check_in asc')
+        ]
+        if absence_only:
+            att_domain.append(('x_net_is_absent', '=', True))
+        att_recs = self.env['hr.attendance'].sudo().search(
+            att_domain, order='check_in asc')
 
         for att in att_recs:
-            # For absent records, use the exact daily_rate (not the
-            # rounded x_deduction_amount) so all absent rows are
-            # consistent with unpresented-day rows.
-            if att.x_net_is_absent:
+            if absence_only:
+                ded = daily_rate
+            elif att.x_net_is_absent:
+                # For absent records, use the exact daily_rate (not the
+                # rounded x_deduction_amount) so all absent rows are
+                # consistent with unpresented-day rows.
                 ded = daily_rate
             else:
                 ded = att.x_deduction_amount or 0
             rows.append({
                 'date': att.check_in.strftime('%Y-%m-%d'),
                 'day': att.x_day_of_week or '',
-                'late_min': att.x_net_late_minutes or 0,
-                'early_min': att.x_net_early_leave_minutes or 0,
+                'late_min': 0 if absence_only else (att.x_net_late_minutes or 0),
+                'early_min': 0 if absence_only else (att.x_net_early_leave_minutes or 0),
                 'is_absent': att.x_net_is_absent,
                 'deduction': ded,
-                'type': 'absent' if att.x_net_is_absent else 'issue',
+                'type': 'absent' if (absence_only or att.x_net_is_absent) else 'issue',
             })
 
         # Unpresented days (from effective start, no attendance at all)

@@ -199,13 +199,30 @@ class KswDeductionLine(models.Model):
         # --- 2. Privilege guard -----------------------------------------
         if not self.env.su:
             user = self.env.user
-            if not user.has_group('KSW_deduction.group_installment_edit'):
-                raise UserError(_(
-                    "You do not have the 'Loan Installment Modification' "
-                    "privilege. Ask an administrator to grant it on your "
-                    "user (Settings → Users → Access Rights → KSW "
-                    "Deductions → Loan Installment Modification = Edit)."
-                ))
+            can_installment_edit = user.has_group(
+                'KSW_deduction.group_installment_edit')
+            can_hr_officer = (
+                user.has_group('KSW_deduction.group_deduction_officer')
+                or user.has_group('KSW_deduction.group_loan_hr')
+            )
+            for line in self:
+                managed_by = line.deduction_id.managed_by
+                if managed_by == 'accounting':
+                    if not can_installment_edit:
+                        raise UserError(_(
+                            "You do not have the 'Loan Installment "
+                            "Modification' privilege. Ask an administrator "
+                            "to grant it on your user (Settings → Users → "
+                            "Access Rights → KSW Deductions → Loan "
+                            "Installment Modification = Edit)."
+                        ))
+                else:  # hr-managed
+                    if not (can_installment_edit or can_hr_officer):
+                        raise UserError(_(
+                            "Editing installments on HR-managed deductions "
+                            "requires the Deduction Officer role or the "
+                            "'Loan Installment Modification' privilege."
+                        ))
 
         # --- 3. Snapshot per-line old (year, month) so we can compute
         #        the month-delta AFTER super().write() ------------------
@@ -342,13 +359,18 @@ class KswDeductionLine(models.Model):
             return super().create(vals_list)
 
         user = self.env.user
-        if not user.has_group('KSW_deduction.group_installment_edit'):
+        can_installment_edit = user.has_group(
+            'KSW_deduction.group_installment_edit')
+        can_hr_officer = (
+            user.has_group('KSW_deduction.group_deduction_officer')
+            or user.has_group('KSW_deduction.group_loan_hr')
+        )
+        if not (can_installment_edit or can_hr_officer):
             raise UserError(_(
-                "Adding a manual installment requires the 'Loan "
-                "Installment Modification' privilege. Ask an "
-                "administrator to grant it on your user "
-                "(Settings → Users → Access Rights → KSW Deductions "
-                "→ Loan Installment Modification = Edit)."
+                "Adding a manual installment requires either the "
+                "'Loan Installment Modification' privilege (Accounting) "
+                "or the Deduction Officer role (HR). Ask an administrator "
+                "to grant the appropriate access on your user."
             ))
         today = fields.Date.context_today(self)
         # Pre-compute max-sequence per parent so the batch stays linear.
@@ -360,6 +382,17 @@ class KswDeductionLine(models.Model):
                     "payslip — they represent payments collected "
                     "outside the payroll system."
                 ))
+            # Enforce the type's managing department.
+            ded_id = vals.get('deduction_id')
+            if ded_id and not can_installment_edit:
+                ded = self.env['ksw.deduction'].browse(ded_id).sudo()
+                if ded.managed_by == 'accounting':
+                    raise UserError(_(
+                        "Deduction '%(name)s' is managed by Accounting. "
+                        "Manually closing it requires the 'Loan Installment "
+                        "Modification' privilege, not the HR Officer role.",
+                        name=ded.display_name,
+                    ))
             vals['is_manual'] = True
             vals['state'] = 'paid'
             vals.setdefault('manual_by', user.id)
@@ -382,25 +415,109 @@ class KswDeductionLine(models.Model):
         # even if the batch created several manual lines for it).
         for ded in lines.mapped('deduction_id'):
             mine = lines.filtered(lambda l: l.deduction_id == ded)
-            body = [
-                '<strong>💵 Manual Payment(s) Recorded</strong><br/>',
-                '<b>By:</b> %s<br/>' % (user.name or ''),
-                '<b>Lines:</b><br/>',
-            ]
+            body = Markup(
+                '<strong>💵 Manual Payment(s) Recorded</strong><br/>'
+                '<b>By:</b> %(user)s<br/>'
+                '<b>Lines:</b><br/>'
+            ) % {'user': user.name or ''}
             for ml in mine:
-                body.append(
-                    '&nbsp;&nbsp;• %s — %.2f %s%s<br/>' % (
-                        ml.display_name,
-                        ml.amount,
-                        ded.currency_id.name or '',
-                        (' (%s)' % ml.manual_note) if ml.manual_note else '',
-                    )
+                note_part = (
+                    Markup(' (%(n)s)') % {'n': ml.manual_note}
+                    if ml.manual_note else Markup('')
                 )
+                body += Markup(
+                    '&nbsp;&nbsp;• %(label)s — %(amt).2f %(cur)s%(note)s<br/>'
+                ) % {
+                    'label': ml.display_name,
+                    'amt': ml.amount,
+                    'cur': ded.currency_id.name or '',
+                    'note': note_part,
+                }
             ded.message_post(
-                body=Markup(''.join(body)),
+                body=body,
                 subtype_xmlid='mail.mt_note',
             )
         return lines
+
+    # ==================================================================
+    # One-click "Mark as Paid" (replaces the old add-a-new-row flow)
+    # ==================================================================
+
+    def action_mark_line_paid(self):
+        """Mark a pending installment as settled outside payroll.
+
+        Called from the "Mark Paid" button on the installment line.
+        The line itself is stamped as manual/paid — no extra row is
+        created, and no existing row needs to be zeroed or skipped.
+
+        Authorization mirrors the manual-entry create() guards:
+          - group_installment_edit (Accounting) → any type
+          - group_deduction_officer or group_loan_hr (HR) → HR-managed types only
+        """
+        user = self.env.user
+        if not self.env.su:
+            can_acc = user.has_group('KSW_deduction.group_installment_edit')
+            can_hr = (
+                user.has_group('KSW_deduction.group_deduction_officer')
+                or user.has_group('KSW_deduction.group_loan_hr')
+            )
+            if not (can_acc or can_hr):
+                raise UserError(_(
+                    "You do not have permission to manually close "
+                    "installments. Contact your administrator."
+                ))
+
+        today = fields.Date.context_today(self)
+        for line in self:
+            if line.state != 'pending':
+                raise UserError(_(
+                    "Only pending installments can be marked as paid. "
+                    "'%(label)s' is already '%(state)s'.",
+                    label=line.display_name,
+                    state=dict(line._fields['state'].selection).get(
+                        line.state, line.state),
+                ))
+            if not self.env.su:
+                if not can_acc and line.deduction_id.managed_by == 'accounting':
+                    raise UserError(_(
+                        "Deduction '%(name)s' is managed by Accounting. "
+                        "Closing it requires the 'Loan Installment "
+                        "Modification' privilege.",
+                        name=line.deduction_id.display_name,
+                    ))
+            # Stamp the existing line in-place — no new row needed.
+            # `write()` early-returns for non-schedule keys so the
+            # privilege guard in write() is not re-triggered here.
+            line.write({
+                'state': 'paid',
+                'is_manual': True,
+                'manual_by': user.id,
+                'manual_date': today,
+            })
+            ded = line.deduction_id
+            ded.sudo().message_post(
+                body=Markup(
+                    '<strong>💵 Marked Paid (Manual)</strong><br/>'
+                    '<b>By:</b> %(u)s<br/>'
+                    '<b>Installment:</b> %(label)s — %(amt).2f %(cur)s%(note)s'
+                ) % {
+                    'u': user.name,
+                    'label': line.display_name,
+                    'amt': line.amount,
+                    'cur': line.currency_id.name or '',
+                    'note': (' — %s' % line.manual_note) if line.manual_note else '',
+                },
+                subtype_xmlid='mail.mt_note',
+            )
+            # Auto-complete if all lines are now paid
+            if all(l.state == 'paid' for l in ded.line_ids):
+                ded.sudo().write({'state': 'completed'})
+                ded.sudo().message_post(
+                    body=Markup(
+                        '<strong>🏁 Completed</strong> — all installments paid.'
+                    ),
+                    subtype_xmlid='mail.mt_note',
+                )
 
     def unlink(self):
         """Allow deletion of MANUAL lines by privileged users only;

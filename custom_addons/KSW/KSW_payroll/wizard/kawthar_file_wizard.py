@@ -329,7 +329,6 @@ class KawtharFileWizard(models.TransientModel):
         ))
 
         if not valid:
-            from odoo.exceptions import UserError
             raise UserError(_('No payslips with a positive NET and a bank account.'))
 
         cic = (bank_account.x_wps_cic_number or '').replace(' ', '')

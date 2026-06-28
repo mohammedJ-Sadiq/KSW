@@ -188,6 +188,14 @@ vacation payslips to avoid double deduction of the vacation month.</field>
             ]"/>
         </record>
 
+        <!-- ========================================================= -->
+        <!-- Bring legacy structures up to the new system feature set.  -->
+        <!-- Must run AFTER all vacation rules are attached to BASE so  -->
+        <!-- the rule lookup in the method finds them.                  -->
+        <!-- ========================================================= -->
+        <function model="hr.salary.rule"
+                  name="_ksw_migrate_structures_to_new_system"/>
+
     </data>
 
 </odoo>

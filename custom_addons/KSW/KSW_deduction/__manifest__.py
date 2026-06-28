@@ -22,6 +22,7 @@ via the KSW_DEDUCTIONS salary rule (regular + vacation payslips).
         'hr_holidays',
         'mail',
         'KSW_payroll',
+        'KSW_base_security',
     ],
     'data': [
         'security/security.xml',
@@ -34,6 +35,7 @@ via the KSW_DEDUCTIONS salary rule (regular + vacation payslips).
         'views/hr_employee_views.xml',
         'wizard/loan_request_wizard_views.xml',
         'wizard/loan_refuse_wizard_views.xml',
+        'wizard/ksw_loan_payment_wizard_views.xml',
         'views/menu.xml',
     ],
     'installable': True,

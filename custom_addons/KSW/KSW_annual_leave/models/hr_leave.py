@@ -1,7 +1,7 @@
 from markupsafe import Markup
 
 from odoo import api, fields, models
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import UserError
 
 ANNUAL_MULTI_STATES = [
     ('pending_dm', 'Pending DM Approval'),
@@ -476,12 +476,29 @@ class HrLeave(models.Model):
             leave.x_can_confirm_return_hr = False
 
     def action_confirm_return_manager(self):
+        user = self.env.user
         for leave in self:
             if leave.x_return_state != 'on_vacation':
                 raise UserError('This leave is not in "On Vacation" status.')
             if not leave.x_return_date:
                 raise UserError(
                     'Please set the Return Date before confirming.')
+            if not self.env.su:
+                is_hr = user.has_group(
+                    'KSW_annual_leave.group_annual_leave_hr')
+                is_manager = (
+                    leave.employee_id.leave_manager_id
+                    and leave.employee_id.leave_manager_id == user
+                )
+                if not (is_hr or is_manager):
+                    raise UserError(
+                        'Only %s (the leave manager) or an HR Approver '
+                        'can confirm the return.' % (
+                            leave.employee_id.leave_manager_id.name
+                            if leave.employee_id.leave_manager_id
+                            else 'the leave manager'
+                        )
+                    )
             leave.write({
                 'x_return_state': 'hr_confirmed',
                 'x_manager_return_confirmed_by':
@@ -693,35 +710,36 @@ class HrLeave(models.Model):
                 'x_hr_approved_by': self.env.user.employee_id.id,
                 'x_hr_approved_date': fields.Datetime.now(),
             })
-            body_parts = [
-                '<strong>✅ Step 2 — HR Approval</strong><br/>',
-                '<b>Approved by:</b> %s<br/>' % self.env.user.name,
-            ]
+            body = Markup(
+                '<strong>✅ Step 2 — HR Approval</strong><br/>'
+                '<b>Approved by:</b> %(user)s<br/>'
+            ) % {'user': self.env.user.name}
             if leave.x_penalty_amount:
-                body_parts.append(
-                    '<b>Penalty:</b> %.2f SAR' % leave.x_penalty_amount)
+                body += Markup(
+                    '<b>Penalty:</b> %(amt).2f SAR'
+                ) % {'amt': leave.x_penalty_amount}
                 if leave.x_penalty_description:
-                    body_parts.append(
-                        ' — %s' % leave.x_penalty_description)
-                body_parts.append('<br/>')
+                    body += Markup(' — %(desc)s') % {
+                        'desc': leave.x_penalty_description}
+                body += Markup('<br/>')
             if leave.x_iqama_renewal_amount:
-                body_parts.append(
-                    '<b>Iqama Renewal:</b> %.2f SAR'
-                    % leave.x_iqama_renewal_amount)
+                body += Markup(
+                    '<b>Iqama Renewal:</b> %(amt).2f SAR'
+                ) % {'amt': leave.x_iqama_renewal_amount}
                 if leave.x_iqama_renewal_description:
-                    body_parts.append(
-                        ' — %s' % leave.x_iqama_renewal_description)
-                body_parts.append('<br/>')
+                    body += Markup(' — %(desc)s') % {
+                        'desc': leave.x_iqama_renewal_description}
+                body += Markup('<br/>')
             if leave.x_flight_ticket_amount:
-                body_parts.append(
-                    '<b>Flight Ticket:</b> %.2f SAR'
-                    % leave.x_flight_ticket_amount)
+                body += Markup(
+                    '<b>Flight Ticket:</b> %(amt).2f SAR'
+                ) % {'amt': leave.x_flight_ticket_amount}
                 if leave.x_flight_ticket_description:
-                    body_parts.append(
-                        ' — %s' % leave.x_flight_ticket_description)
-                body_parts.append('<br/>')
+                    body += Markup(' — %(desc)s') % {
+                        'desc': leave.x_flight_ticket_description}
+                body += Markup('<br/>')
             leave.message_post(
-                body=Markup(''.join(body_parts)),
+                body=body,
                 subtype_xmlid='mail.mt_note',
             )
 
@@ -766,30 +784,29 @@ class HrLeave(models.Model):
                 'x_acc_approved_by': self.env.user.employee_id.id,
                 'x_acc_approved_date': fields.Datetime.now(),
             })
-            body_parts = [
-                '<strong>✅ Step 4 — Accounting Approval</strong><br/>',
-                '<b>Approved by:</b> %s<br/>' % self.env.user.name,
-            ]
+            body = Markup(
+                '<strong>✅ Step 4 — Accounting Approval</strong><br/>'
+                '<b>Approved by:</b> %(user)s<br/>'
+            ) % {'user': self.env.user.name}
             if leave.x_commission_line_ids:
-                body_parts.append(
-                    '<b>Additional Commissions:</b><br/>')
+                body += Markup('<b>Additional Commissions:</b><br/>')
                 for line in leave.x_commission_line_ids:
-                    body_parts.append(
-                        '&nbsp;&nbsp;• %s: %.2f SAR<br/>'
-                        % (line.name, line.amount))
-                body_parts.append(
-                    '<b>Total:</b> %.2f SAR<br/>'
-                    % leave.x_additional_commissions)
+                    body += Markup(
+                        '&nbsp;&nbsp;• %(name)s: %(amt).2f SAR<br/>'
+                    ) % {'name': line.name, 'amt': line.amount}
+                body += Markup(
+                    '<b>Total:</b> %(total).2f SAR<br/>'
+                ) % {'total': leave.x_additional_commissions}
             if leave.x_remaining_loans:
-                body_parts.append(
-                    '<b>Remaining Loans:</b> %.2f SAR'
-                    % leave.x_remaining_loans)
+                body += Markup(
+                    '<b>Remaining Loans:</b> %(amt).2f SAR'
+                ) % {'amt': leave.x_remaining_loans}
                 if leave.x_remaining_loans_description:
-                    body_parts.append(
-                        ' — %s' % leave.x_remaining_loans_description)
-                body_parts.append('<br/>')
+                    body += Markup(' — %(desc)s') % {
+                        'desc': leave.x_remaining_loans_description}
+                body += Markup('<br/>')
             leave.message_post(
-                body=Markup(''.join(body_parts)),
+                body=body,
                 subtype_xmlid='mail.mt_note',
             )
 
@@ -1008,9 +1025,15 @@ class HrLeave(models.Model):
         in the past. KSW Supervisors are often managing subordinate leaves 
         that just started and need correction/deletion.
         """
+        if self.env.user.has_group('hr_holidays.group_hr_holidays_manager'):
+            # Core Time-Off Administrators have no restrictions at all (matches
+            # Odoo core's own bypass) — don't let the KSW state check below
+            # shadow that for them.
+            return
+
         is_ksw_manager = self.env.user.has_group('KSW_annual_leave.group_leave_delete_supervisor') or \
                          self.env.user.has_group('KSW_annual_leave.group_leave_delete_officer')
-        
+
         if is_ksw_manager:
             # We enforce Odoo's state check (confirm/validate1/cancel) 
             # but SKIP the date check for KSW managers.

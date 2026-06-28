@@ -44,6 +44,29 @@
     <!-- ============================================================ -->
     <!-- 4. Record Rules (noupdate so manual edits are preserved)      -->
     <!-- ============================================================ -->
+    <!-- HR Officers: full access to all sheets (outside noupdate so it applies on every upgrade) -->
+    <record id="rule_attendance_sheet_hr_officer" model="ir.rule">
+        <field name="name">Attendance Sheet: HR Officer full access</field>
+        <field name="model_id" ref="model_ksw_attendance_sheet"/>
+        <field name="groups" eval="[(4, ref('hr.group_hr_user'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+
+    <record id="rule_attendance_sheet_line_hr_officer" model="ir.rule">
+        <field name="name">Attendance Sheet Line: HR Officer full access</field>
+        <field name="model_id" ref="model_ksw_attendance_sheet_line"/>
+        <field name="groups" eval="[(4, ref('hr.group_hr_user'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+
     <data noupdate="1">
 
         <!-- Supervisor: only see sheets where they are the manager -->

@@ -1,5 +1,5 @@
 from odoo import api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import MissingError, UserError
 from dateutil.relativedelta import relativedelta
 
 
@@ -54,7 +54,7 @@ class KswAnnualLeave(models.Model):
                     rec.leaves_taken = rec.allocation_id.leaves_taken
                 else:
                     rec.leaves_taken = 0.0
-            except Exception:
+            except MissingError:
                 rec.leaves_taken = 0.0
     remaining_balance = fields.Float(
         string='Remaining Balance',
@@ -265,7 +265,7 @@ class KswAnnualLeave(models.Model):
                     taken = rec.leaves_taken
                 else:
                     taken = 0.0
-            except Exception:
+            except MissingError:
                 taken = 0.0
             rec.remaining_balance = round(rec.total_accrued_days - taken, 4)
 
@@ -561,7 +561,7 @@ class KswAnnualLeave(models.Model):
         try:
             if ksw_rec and ksw_rec.allocation_id and ksw_rec.allocation_id.exists():
                 taken = ksw_rec.allocation_id.sudo().leaves_taken or 0.0
-        except Exception:
+        except MissingError:
             taken = 0.0
         taken = max(taken - exclude_days, 0.0)
 

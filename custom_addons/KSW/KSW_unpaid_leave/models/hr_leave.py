@@ -181,28 +181,28 @@ class HrLeaveUnpaid(models.Model):
             lambda l: l.x_excess_days_accepted and l.x_unpaid_portion_days > 0
         )
         for leave in combined:
-            body_parts = []
+            body = Markup('')
             if leave.x_financial_consideration_excess:
-                body_parts.append(
-                    '<b>Financial Consideration for Excess Leave:</b> '
-                    '%.2f SAR' % leave.x_financial_consideration_excess)
+                body += Markup(
+                    '<b>Financial Consideration for Excess Leave:</b>'
+                    ' %(amt).2f SAR'
+                ) % {'amt': leave.x_financial_consideration_excess}
                 if leave.x_financial_consideration_excess_description:
-                    body_parts.append(
-                        ' — %s'
-                        % leave.x_financial_consideration_excess_description)
-                body_parts.append('<br/>')
+                    body += Markup(' — %(desc)s') % {
+                        'desc': leave.x_financial_consideration_excess_description}
+                body += Markup('<br/>')
             if leave.x_visa_cost_recovery:
-                body_parts.append(
-                    '<b>Visa Cost Recovery for Excess Leave:</b> '
-                    '%.2f SAR' % leave.x_visa_cost_recovery)
+                body += Markup(
+                    '<b>Visa Cost Recovery for Excess Leave:</b>'
+                    ' %(amt).2f SAR'
+                ) % {'amt': leave.x_visa_cost_recovery}
                 if leave.x_visa_cost_recovery_description:
-                    body_parts.append(
-                        ' — %s'
-                        % leave.x_visa_cost_recovery_description)
-                body_parts.append('<br/>')
-            if body_parts:
+                    body += Markup(' — %(desc)s') % {
+                        'desc': leave.x_visa_cost_recovery_description}
+                body += Markup('<br/>')
+            if body:
                 leave.message_post(
-                    body=Markup(''.join(body_parts)),
+                    body=body,
                     subtype_xmlid='mail.mt_note',
                 )
 
@@ -219,31 +219,30 @@ class HrLeaveUnpaid(models.Model):
                 'x_acc_approved_by': self.env.user.employee_id.id,
                 'x_acc_approved_date': fields.Datetime.now(),
             })
-            body_parts = [
-                '<strong>✅ Step 4 — Accounting Approval '
-                '(Unpaid)</strong><br/>',
-                '<b>Approved by:</b> %s<br/>' % self.env.user.name,
-            ]
+            body = Markup(
+                '<strong>✅ Step 4 — Accounting Approval (Unpaid)</strong>'
+                '<br/><b>Approved by:</b> %(user)s<br/>'
+            ) % {'user': self.env.user.name}
             if leave.x_financial_consideration_excess:
-                body_parts.append(
-                    '<b>Financial Consideration for Excess Leave:</b> '
-                    '%.2f SAR' % leave.x_financial_consideration_excess)
+                body += Markup(
+                    '<b>Financial Consideration for Excess Leave:</b>'
+                    ' %(amt).2f SAR'
+                ) % {'amt': leave.x_financial_consideration_excess}
                 if leave.x_financial_consideration_excess_description:
-                    body_parts.append(
-                        ' — %s'
-                        % leave.x_financial_consideration_excess_description)
-                body_parts.append('<br/>')
+                    body += Markup(' — %(desc)s') % {
+                        'desc': leave.x_financial_consideration_excess_description}
+                body += Markup('<br/>')
             if leave.x_visa_cost_recovery:
-                body_parts.append(
-                    '<b>Visa Cost Recovery for Excess Leave:</b> '
-                    '%.2f SAR' % leave.x_visa_cost_recovery)
+                body += Markup(
+                    '<b>Visa Cost Recovery for Excess Leave:</b>'
+                    ' %(amt).2f SAR'
+                ) % {'amt': leave.x_visa_cost_recovery}
                 if leave.x_visa_cost_recovery_description:
-                    body_parts.append(
-                        ' — %s'
-                        % leave.x_visa_cost_recovery_description)
-                body_parts.append('<br/>')
+                    body += Markup(' — %(desc)s') % {
+                        'desc': leave.x_visa_cost_recovery_description}
+                body += Markup('<br/>')
             leave.message_post(
-                body=Markup(''.join(body_parts)),
+                body=body,
                 subtype_xmlid='mail.mt_note',
             )
 

@@ -108,6 +108,24 @@
     </record>
 
     <!-- ============================================================ -->
+    <!-- Payroll Structure form: expose absence-only deduction flag   -->
+    <!-- ============================================================ -->
+    <record id="view_hr_payroll_structure_form_inherit_ksw"
+            model="ir.ui.view">
+        <field name="name">hr.payroll.structure.form.inherit.ksw</field>
+        <field name="model">hr.payroll.structure</field>
+        <field name="inherit_id"
+               ref="om_hr_payroll.view_hr_employee_grade_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group" position="inside">
+                <field name="x_absence_only_deduction"
+                       string="Absence-Only Deduction"
+                       help="If enabled, only fully absent or unpresented days are deducted. Late arrivals and early departures carry no salary penalty."/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
     <!-- Generate Payslips wizard: move button to footer so the       -->
     <!-- default Save/Discard buttons are suppressed.                 -->
     <!-- ============================================================ -->

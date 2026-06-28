@@ -52,6 +52,10 @@ class KswDeduction(models.Model):
     is_loan = fields.Boolean(
         related='type_id.is_loan', store=True, readonly=True,
     )
+    managed_by = fields.Selection(
+        related='type_id.managed_by', store=True, readonly=True,
+        string='Managed By',
+    )
 
     # ------------------------------------------------------------------
     # Financial details
@@ -152,6 +156,16 @@ class KswDeduction(models.Model):
         help='Accounting must tick this before approving — confirms '
              'monthly budget impact and total outstanding are within '
              'the approved envelope.',
+    )
+
+    # Who can manually close installments on this deduction (add manual
+    # paid lines or edit year/month/amount on pending lines):
+    #   - group_installment_edit: accounting — can close ANY type
+    #   - group_deduction_officer: HR — can close HR-managed types only
+    x_can_edit_installments = fields.Boolean(
+        compute='_compute_x_can_edit_installments',
+        help='True if the current user may add manual installment lines or '
+             'reschedule pending installments on this deduction.',
     )
 
     # Submit-button visibility (creator or officer)
@@ -478,6 +492,20 @@ class KswDeduction(models.Model):
     # ==================================================================
     # UI helpers (smart buttons)
     # ==================================================================
+
+    def action_record_payment(self):
+        """Open the loan payment wizard (partial or full payment outside payroll)."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Record Payment — %s') % self.name,
+            'res_model': 'ksw.loan.payment.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_deduction_id': self.id,
+            },
+        }
 
     def action_view_installments(self):
         """Smart-button target. Re-opens the record on the same form
@@ -807,19 +835,23 @@ class KswDeduction(models.Model):
                 'acc_approved_by': self.env.user.employee_id.id,
                 'acc_approved_date': fields.Datetime.now(),
             })
-            body = [
-                '<strong>✅ Step 3 — Accounting Approval</strong><br/>',
-                '<b>By:</b> %s<br/>' % self.env.user.name,
-                '<b>Budget confirmed:</b> yes<br/>',
-                '<b>Installments:</b> %d<br/>' % rec.installments,
-                '<b>Installment Amount:</b> %.2f' % rec.installment_amount,
-            ]
+            body = Markup(
+                '<strong>✅ Step 3 — Accounting Approval</strong><br/>'
+                '<b>By:</b> %(user)s<br/>'
+                '<b>Budget confirmed:</b> yes<br/>'
+                '<b>Installments:</b> %(inst)d<br/>'
+                '<b>Installment Amount:</b> %(amt).2f'
+            ) % {
+                'user': self.env.user.name,
+                'inst': rec.installments,
+                'amt': rec.installment_amount,
+            }
             if modified:
-                body.append('<br/><b>Modifications by Accounting:</b><br/>')
+                body += Markup('<br/><b>Modifications by Accounting:</b><br/>')
                 for m in modified:
-                    body.append('&nbsp;&nbsp;• %s<br/>' % m)
+                    body += Markup('&nbsp;&nbsp;• %(m)s<br/>') % {'m': m}
             rec.message_post(
-                body=Markup(''.join(body)),
+                body=body,
                 subtype_xmlid='mail.mt_note',
             )
 
@@ -854,16 +886,16 @@ class KswDeduction(models.Model):
                 'gm_approved_date': fields.Datetime.now(),
             })
             rec._activate_and_generate_lines()
-            body = [
-                '<strong>✅ Step 4 — GM Final Approval</strong><br/>',
-                '<b>By:</b> %s<br/>' % self.env.user.name,
-            ]
+            body = Markup(
+                '<strong>✅ Step 4 — GM Final Approval</strong><br/>'
+                '<b>By:</b> %(user)s<br/>'
+            ) % {'user': self.env.user.name}
             if modified:
-                body.append('<b>Modifications:</b><br/>')
+                body += Markup('<b>Modifications:</b><br/>')
                 for m in modified:
-                    body.append('&nbsp;&nbsp;• %s<br/>' % m)
+                    body += Markup('&nbsp;&nbsp;• %(m)s<br/>') % {'m': m}
             rec.message_post(
-                body=Markup(''.join(body)),
+                body=body,
                 subtype_xmlid='mail.mt_note',
             )
 
@@ -1064,6 +1096,31 @@ class KswDeduction(models.Model):
     # Decision Support helpers
     # ==================================================================
 
+    @api.depends_context('uid')
+    @api.depends('managed_by', 'state')
+    def _compute_x_can_edit_installments(self):
+        """Who may manually close installments on this deduction.
+
+        Accounting staff (group_installment_edit) can close any type.
+        HR Officers (group_deduction_officer) can close HR-managed types.
+        In both cases the deduction must be active.
+        """
+        user = self.env.user
+        can_acc = user.has_group('KSW_deduction.group_installment_edit')
+        can_hr = (
+            user.has_group('KSW_deduction.group_deduction_officer')
+            or user.has_group('KSW_deduction.group_loan_hr')
+        )
+        for rec in self:
+            if rec.state != 'active':
+                rec.x_can_edit_installments = False
+            elif can_acc:
+                rec.x_can_edit_installments = True
+            elif can_hr and rec.managed_by == 'hr':
+                rec.x_can_edit_installments = True
+            else:
+                rec.x_can_edit_installments = False
+
     def _compute_x_can_submit(self):
         """Submit button visible only to the record creator or to
         officers/managers (who can submit on behalf of an employee who
@@ -1080,6 +1137,7 @@ class KswDeduction(models.Model):
                 or not rec.id  # new record being composed
             )
 
+    @api.depends_context('uid')
     @api.depends('employee_id', 'employee_id.parent_id.user_id')
     def _compute_x_can_dm_approve(self):
         """True when the current user is entitled to perform the DM

@@ -235,6 +235,19 @@
         <field name="domain_force">[('is_loan', '=', True)]</field>
     </record>
 
+    <!-- HR approvers additionally see all HR-managed non-loan deductions
+         (gov. penalties, internal penalties, advances) so they can
+         manually close them when the employee settles outside payroll.
+         Odoo ORs multiple rules for the same user, so together with the
+         loan_approvers rule above, group_loan_hr users see:
+         is_loan=True OR managed_by='hr'. -->
+    <record id="ksw_deduction_rule_hr_managed" model="ir.rule">
+        <field name="name">Deduction: HR approvers see HR-managed deductions</field>
+        <field name="model_id" ref="model_ksw_deduction"/>
+        <field name="groups" eval="[(4, ref('group_loan_hr'))]"/>
+        <field name="domain_force">[('managed_by', '=', 'hr')]</field>
+    </record>
+
 </odoo>
 
 

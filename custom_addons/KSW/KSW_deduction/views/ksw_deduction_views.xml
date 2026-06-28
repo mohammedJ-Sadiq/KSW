@@ -70,6 +70,16 @@
                             groups="KSW_deduction.group_loan_gm"
                             invisible="not is_loan or approval_state != 'pending_gm'"/>
 
+                    <!-- Record Payment: accounting staff only, active loans
+                         with at least one pending installment. Opens the
+                         payment wizard for partial or full payments made
+                         outside payroll. -->
+                    <button name="action_record_payment" type="object"
+                            string="Record Payment"
+                            class="btn-warning"
+                            groups="KSW_deduction.group_installment_edit"
+                            invisible="state != 'active' or not is_loan or total_pending == 0"/>
+
                     <!-- Cancel / Reset
                          Cancel is gated by x_can_cancel:
                            - Loans: only the requesting employee may cancel.
@@ -201,6 +211,7 @@
                             <field name="x_can_submit" invisible="1"/>
                             <field name="x_can_dm_approve" invisible="1"/>
                             <field name="x_can_cancel" invisible="1"/>
+                            <field name="x_can_edit_installments" invisible="1"/>
                             <!-- Per-user permission mirrors (computed from
                                  res.users). Loaded invisible because the
                                  readonly expressions above reference them. -->
@@ -283,8 +294,11 @@
                                 by the separate "Loan Request
                                 Modification" privilege.
                             -->
+                            <!-- Read-only view: shown to users who cannot
+                                 edit installments (x_can_edit_installments
+                                 is False). -->
                             <field name="line_ids" readonly="1"
-                                   groups="!KSW_deduction.group_installment_edit">
+                                   invisible="x_can_edit_installments">
                                 <list decoration-info="is_manual == True">
                                     <field name="sequence"/>
                                     <field name="year"/>
@@ -301,9 +315,14 @@
                                     <field name="currency_id" column_invisible="1"/>
                                 </list>
                             </field>
+                            <!-- Editable view: shown to Accounting (group_installment_edit)
+                                 for any type, and to HR Officers/Approvers
+                                 for HR-managed types. The Python guard in
+                                 ksw.deduction.line enforces these rules server-side.
+                                 "Mark Paid" button stamps the existing line in-place
+                                 — no extra row needed. Type a note first if desired. -->
                             <field name="line_ids"
-                                   readonly="state != 'active'"
-                                   groups="KSW_deduction.group_installment_edit">
+                                   invisible="not x_can_edit_installments">
                                 <list editable="bottom"
                                       decoration-info="is_manual == True">
                                     <field name="sequence" readonly="1"/>
@@ -314,42 +333,39 @@
                                     <field name="period_date" readonly="1"/>
                                     <field name="amount"
                                            readonly="state != 'pending' and not is_manual"/>
-                                    <!-- is_manual is read-only — create() sets
-                                         it automatically for new rows. Shown
-                                         so the accountant can tell at a glance
-                                         which rows are manual vs auto. -->
                                     <field name="is_manual" string="Manual"
                                            widget="boolean" readonly="1"/>
                                     <field name="state" widget="badge"
-                                           readonly="state == 'paid'"
+                                           readonly="1"
                                            decoration-success="state == 'paid'"
                                            decoration-warning="state == 'pending'"
                                            decoration-muted="state == 'skipped'"/>
                                     <field name="settlement_label"
                                            string="Settlement" readonly="1"/>
+                                    <!-- Note is editable on pending lines too so
+                                         the user can add a reference before clicking
+                                         "Mark Paid". -->
                                     <field name="manual_note" string="Note"
-                                           readonly="not is_manual"/>
+                                           readonly="state == 'paid' and not is_manual"/>
+                                    <button name="action_mark_line_paid"
+                                            type="object"
+                                            string="Mark Paid"
+                                            class="btn-sm btn-success"
+                                            title="Mark this installment as settled outside payroll"
+                                            invisible="state != 'pending'"/>
                                     <field name="currency_id" column_invisible="1"/>
                                 </list>
                             </field>
                             <div class="text-muted mt-2"
-                                 groups="KSW_deduction.group_installment_edit">
+                                 invisible="not x_can_edit_installments">
                                 <i class="fa fa-info-circle" title="Info" role="img" aria-label="Info"/>
-                                <b class="ms-1">Manual entries</b> —
-                                use the
-                                <i>Add a line</i>
-                                button to record a payment collected
-                                <b>outside payroll</b> (cash, direct
-                                bank transfer, etc.). The row is
-                                saved as <b>Paid (Manual)</b> and
-                                stamped with your name and today's
-                                date. Remember to balance the total:
-                                if the employee has already paid a
-                                scheduled month outside payroll,
-                                mark the corresponding pending row
-                                as <b>Skipped</b> (via state) or
-                                reduce its amount, so the sum still
-                                equals the total loan amount.
+                                <b class="ms-1">Tip</b> — type an optional
+                                note in the <i>Note</i> column, then click
+                                <b>Mark Paid</b> on the row to record a
+                                payment settled <b>outside payroll</b>.
+                                Use <i>Add a line</i> only for partial or
+                                split payments that don't match a scheduled
+                                installment.
                             </div>
                         </page>
                         <page string="Loan Approval History" name="approval_history"

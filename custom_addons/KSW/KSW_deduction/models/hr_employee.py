@@ -20,6 +20,11 @@ class HrEmployee(models.Model):
         compute='_compute_deduction_count',
         groups='hr.group_hr_user',
     )
+    x_loan_acc_no = fields.Char(
+        string='Loan Acc No. in Bas',
+        groups='hr.group_hr_user',
+        help='Employee loan account number in BAS (bank loan/financing system).',
+    )
 
     def _compute_deduction_count(self):
         company_currency = self.env.company.currency_id

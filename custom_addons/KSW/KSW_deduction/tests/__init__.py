@@ -7,5 +7,7 @@ from . import test_eos_and_summary
 from . import test_deduction_pass3
 from . import test_loan_request_wizard
 from . import test_user_permissions
+from . import test_managed_by
+from . import test_loan_payment_wizard
 
 

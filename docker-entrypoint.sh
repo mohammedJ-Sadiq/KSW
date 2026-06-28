@@ -62,4 +62,14 @@ wait-for-psql.py \
 # Strip the leading "odoo" arg if the container was started with CMD ["odoo"]
 if [ "${1:-}" = "odoo" ]; then shift; fi
 
-exec odoo -c /etc/odoo/odoo.conf "$@"
+# Odoo's CLI only recognizes a subcommand (shell, scaffold, ...) when it is
+# literally the first argument (see odoo/cli/command.py:main) — putting
+# "-c ..." first, as below, makes it silently fall back to the default
+# "server" command and treat the subcommand as an unrecognized leftover
+# argument instead. Keep the subcommand first when one is given.
+if [ -n "${1:-}" ] && [[ "$1" != -* ]]; then
+  subcommand="$1"; shift
+  exec odoo "$subcommand" -c /etc/odoo/odoo.conf "$@"
+else
+  exec odoo -c /etc/odoo/odoo.conf "$@"
+fi

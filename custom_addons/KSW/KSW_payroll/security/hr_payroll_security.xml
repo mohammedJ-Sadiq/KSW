@@ -113,6 +113,19 @@
             <field name="perm_unlink" eval="0"/>
         </record>
 
+        <!-- Officer/Administrator inherit the cascade tier above via
+             implied_ids, but its domain is scoped to user.employee_ids and
+             is empty for a user with no linked hr.employee (e.g. admin) -
+             leaving them with zero visible rows. Give this tier explicit
+             unrestricted access, same pattern as KSW_deduction's
+             "officer all" rule. -->
+        <record id="hr_payslip_rule_officer_all" model="ir.rule">
+            <field name="name">Payroll: officer/administrator all</field>
+            <field name="model_id" ref="om_hr_payroll.model_hr_payslip"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('om_hr_payroll.group_hr_payroll_user')), (4, ref('om_hr_payroll.group_hr_payroll_manager'))]"/>
+        </record>
+
         <!-- hr.payslip.line: same three tiers, filtered on its own employee_id -->
         <record id="hr_payslip_line_rule_self" model="ir.rule">
             <field name="name">Payroll lines: own payslips (read only)</field>
@@ -145,6 +158,14 @@
             <field name="perm_write" eval="0"/>
             <field name="perm_create" eval="0"/>
             <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <!-- Officer/Administrator: same reasoning as hr_payslip_rule_officer_all above. -->
+        <record id="hr_payslip_line_rule_officer_all" model="ir.rule">
+            <field name="name">Payroll lines: officer/administrator all</field>
+            <field name="model_id" ref="om_hr_payroll.model_hr_payslip_line"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('om_hr_payroll.group_hr_payroll_user')), (4, ref('om_hr_payroll.group_hr_payroll_manager'))]"/>
         </record>
 
         <!-- hr.payslip.worked_days: same three tiers, via payslip_id.employee_id -->
@@ -181,6 +202,14 @@
             <field name="perm_unlink" eval="0"/>
         </record>
 
+        <!-- Officer/Administrator: same reasoning as hr_payslip_rule_officer_all above. -->
+        <record id="hr_payslip_worked_days_rule_officer_all" model="ir.rule">
+            <field name="name">Payroll worked days: officer/administrator all</field>
+            <field name="model_id" ref="om_hr_payroll.model_hr_payslip_worked_days"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('om_hr_payroll.group_hr_payroll_user')), (4, ref('om_hr_payroll.group_hr_payroll_manager'))]"/>
+        </record>
+
         <!-- hr.payslip.input: same three tiers, via payslip_id.employee_id -->
         <record id="hr_payslip_input_rule_self" model="ir.rule">
             <field name="name">Payroll inputs: own payslips (read only)</field>
@@ -213,6 +242,14 @@
             <field name="perm_write" eval="0"/>
             <field name="perm_create" eval="0"/>
             <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <!-- Officer/Administrator: same reasoning as hr_payslip_rule_officer_all above. -->
+        <record id="hr_payslip_input_rule_officer_all" model="ir.rule">
+            <field name="name">Payroll inputs: officer/administrator all</field>
+            <field name="model_id" ref="om_hr_payroll.model_hr_payslip_input"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('om_hr_payroll.group_hr_payroll_user')), (4, ref('om_hr_payroll.group_hr_payroll_manager'))]"/>
         </record>
 
     </data>
