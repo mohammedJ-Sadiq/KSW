@@ -616,6 +616,16 @@ class HrLeave(models.Model):
         return records
 
     # ==================================================================
+    # Multi-Step Approval: action_confirm — notify DM on submission
+    # ==================================================================
+
+    def action_confirm(self):
+        result = super().action_confirm()
+        for leave in self.filtered(self._is_annual_multi):
+            self._notify_pending_approvers(leave, 'pending_dm')
+        return result
+
+    # ==================================================================
     # Multi-Step Approval: action_approve intercept
     # ==================================================================
 
@@ -693,6 +703,7 @@ class HrLeave(models.Model):
                 },
                 subtype_xmlid='mail.mt_note',
             )
+            self._notify_pending_approvers(leave, 'pending_hr')
 
     def action_hr_approve(self):
         """Step 2: HR approves and fills penalty + iqama renewal."""
@@ -742,6 +753,7 @@ class HrLeave(models.Model):
                 body=body,
                 subtype_xmlid='mail.mt_note',
             )
+            self._notify_pending_approvers(leave, 'pending_gm_initial')
 
     def action_gm_initial_approve(self):
         """Step 3: GM gives initial approval (read-only review)."""
@@ -767,6 +779,7 @@ class HrLeave(models.Model):
                 ) % {'approver': self.env.user.name},
                 subtype_xmlid='mail.mt_note',
             )
+            self._notify_pending_approvers(leave, 'pending_acc')
 
     def action_acc_approve(self):
         """Step 4: Accounting approves and fills flight ticket."""
@@ -809,6 +822,7 @@ class HrLeave(models.Model):
                 body=body,
                 subtype_xmlid='mail.mt_note',
             )
+            self._notify_pending_approvers(leave, 'pending_gm_final')
 
     def action_gm_final_approve(self):
         """Step 5: GM gives final approval.
@@ -870,6 +884,48 @@ class HrLeave(models.Model):
         """Raise UserError if current user doesn't belong to the group."""
         if not self.env.user.has_group(group_xmlid):
             raise UserError(message)
+
+    _ANNUAL_MULTI_STEP_CONFIG = {
+        'pending_dm':         {'label': 'Direct Manager Approval',  'group': None},
+        'pending_hr':         {'label': 'HR Approval',              'group': 'KSW_annual_leave.group_annual_leave_hr'},
+        'pending_gm_initial': {'label': 'GM Initial Approval',      'group': 'KSW_annual_leave.group_annual_leave_gm'},
+        'pending_acc':        {'label': 'Accounting Approval',      'group': 'KSW_annual_leave.group_annual_leave_acc'},
+        'pending_gm_final':   {'label': 'GM Final Approval',        'group': 'KSW_annual_leave.group_annual_leave_gm'},
+    }
+
+    def _notify_pending_approvers(self, leave, pending_state):
+        """Send an inbox + email notification to whoever must act on this step."""
+        config = self._ANNUAL_MULTI_STEP_CONFIG.get(pending_state)
+        if not config:
+            return
+
+        if pending_state == 'pending_dm':
+            dm_user = leave.employee_id.leave_manager_id  # res.users
+            partner_ids = [dm_user.partner_id.id] if dm_user and dm_user.partner_id else []
+        else:
+            group = self.env.ref(config['group'], raise_if_not_found=False)
+            partner_ids = group.users.mapped('partner_id').ids if group else []
+
+        if not partner_ids:
+            return
+
+        leave.message_post(
+            body=Markup(
+                '<strong>&#9203; Action Required — %(label)s</strong><br/>'
+                '<b>Employee:</b> %(employee)s<br/>'
+                '<b>Period:</b> %(date_from)s &#8594; %(date_to)s<br/>'
+                '<b>Days:</b> %(days).1f<br/>'
+                'This annual leave request is awaiting your approval.'
+            ) % {
+                'label': config['label'],
+                'employee': leave.employee_id.name,
+                'date_from': leave.request_date_from,
+                'date_to': leave.request_date_to,
+                'days': leave.number_of_days,
+            },
+            partner_ids=partner_ids,
+            subtype_xmlid='mail.mt_comment',
+        )
 
     def _reset_annual_multi_fields(self):
         """Reset all multi-step approval fields to their defaults."""

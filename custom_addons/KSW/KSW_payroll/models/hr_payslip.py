@@ -846,6 +846,18 @@ class HrPayslip(models.Model):
         daily_rate = base / DAYS_PER_MONTH if base else 0.0
         unpresented_deduction = round(daily_rate * unpresented_count)
 
+        # Saturday overtime credit for x_saturday_required calendars
+        bio_calendar = self.env['ksw.attendance.sheet']._get_employee_calendar(
+            employee)
+        sat_required = bool(bio_calendar and bio_calendar.x_saturday_required)
+        sat_absent_count = 0
+        if sat_required:
+            cur = date_from
+            while cur <= date_to:
+                if cur.weekday() == 5 and cur not in attended_dates:
+                    sat_absent_count += 1
+                cur += timedelta(days=1)
+
         # WORK100 — Actually worked days
         lines.append({
             'name': _('Worked Days'),
@@ -945,6 +957,20 @@ class HrPayslip(models.Model):
                 'amount': deduction_total,
                 'version_id': version.id,
             })
+
+        if sat_absent_count > 0:
+            sat_credit = round(daily_rate * sat_absent_count)
+            if sat_credit > 0:
+                lines.append({
+                    'name': _('Saturday Overtime Credit'),
+                    'sequence': 17,
+                    'code': 'SAT_OT',
+                    'number_of_days': sat_absent_count,
+                    'number_of_hours': round(
+                        sat_absent_count * DAILY_HOURS, 2),
+                    'amount': sat_credit,
+                    'version_id': version.id,
+                })
 
         return lines
 

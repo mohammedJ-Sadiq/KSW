@@ -172,6 +172,28 @@ class BiometricAttendanceSyncKSW(models.AbstractModel):
                     ref_day = nearest_before if nearest_before is not None else nearest_after
                     grant_day = weekend_start
                     while grant_day <= weekend_end:
+                        # For calendars that treat Saturday as a required
+                        # workday, suppress the weekend grant so the day
+                        # becomes unpresented and is deducted normally.
+                        if grant_day.weekday() == 5:
+                            emp_cal = (
+                                emp.resource_calendar_id
+                                or emp.company_id.resource_calendar_id
+                            )
+                            if emp_cal and emp_cal.x_saturday_required:
+                                stale = HrAttendance.sudo().search([
+                                    ('employee_id', '=', emp.id),
+                                    ('x_is_weekend', '=', True),
+                                    ('check_in', '>=', dt.combine(
+                                        grant_day, dt.min.time())),
+                                    ('check_in', '<', dt.combine(
+                                        grant_day + timedelta(days=1),
+                                        dt.min.time())),
+                                ])
+                                if stale:
+                                    stale.unlink()
+                                grant_day += timedelta(days=1)
+                                continue
                         if grant_day not in existing_dates:
                             ref_schedule = (
                                 helper.get_employee_day_schedule(emp, nearest_before, emp_tz)
