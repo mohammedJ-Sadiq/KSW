@@ -17,6 +17,14 @@ class ResourceCalendar(models.Model):
              'amount is credited back as Saturday overtime on the payslip.',
     )
 
+    x_skip_attendance_issues = fields.Boolean(
+        string='Skip Late/Early Leave Checks',
+        help='When set, late-arrival and early-departure minutes are not '
+             'recorded for employees using this schedule. Use for roles '
+             'where shift times vary frequently (e.g. executives). '
+             'Absence detection is still active.',
+    )
+
     calendar_group_ids = fields.Many2many(
         'resource.calendar.group',
         'resource_calendar_group_rel',

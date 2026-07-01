@@ -58,6 +58,19 @@ class BiometricAttendanceSyncKSW(models.AbstractModel):
         created, updated = super()._sync_attendance_record(
             new_cr, env, emp_id, day, times, emp_tz)
 
+        # Zero out late/early penalties for schedules that opt out of
+        # lateness tracking (x_skip_attendance_issues). Absences are kept.
+        employee = env['hr.employee'].browse(emp_id)
+        if employee.resource_calendar_id.x_skip_attendance_issues:
+            new_cr.execute(
+                "UPDATE hr_attendance "
+                "SET x_late_minutes = 0.0, x_early_leave_minutes = 0.0 "
+                "WHERE employee_id = %s "
+                "  AND check_in >= %s AND check_in < %s",
+                (emp_id,
+                 day.strftime("%Y-%m-%d"),
+                 (day + timedelta(days=1)).strftime("%Y-%m-%d")))
+
         # Patch net columns = raw columns for the record just inserted/updated.
         # Skip records already covered by a validated leave so we don't clobber
         # accepted-minutes that _compute_net_minutes stored on approval.

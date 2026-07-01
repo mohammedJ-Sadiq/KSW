@@ -8,6 +8,7 @@
             <xpath expr="//field[@name='tz']" position="after">
                 <field name="is_temp_schedule"/>
                 <field name="x_saturday_required"/>
+                <field name="x_skip_attendance_issues"/>
             </xpath>
         </field>
     </record>
