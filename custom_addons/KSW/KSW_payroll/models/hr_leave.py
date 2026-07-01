@@ -77,10 +77,35 @@ class HrLeave(models.Model):
                 )
                 continue
 
-            # Use the current month (approval month), not the leave
-            # start month.  Past months are already settled.
+            # Use the current month (approval month), not the leave start month.
+            # Exception: if no confirmed (done) payslip exists for the PREVIOUS
+            # month yet, use the previous month instead.  This avoids the case
+            # where a leave approved on the 1st of the month produces an
+            # attendance deduction against an empty month (0 records → all days
+            # counted absent), while the employee was fully present last month
+            # and that month's payslip has not been settled yet.
             month_start = today.replace(day=1)
-            if month_start.month == 12:
+
+            # Compute previous-month boundaries
+            if month_start.month == 1:
+                prev_month_start = date(month_start.year - 1, 12, 1)
+            else:
+                prev_month_start = date(month_start.year, month_start.month - 1, 1)
+            prev_month_end = month_start - timedelta(days=1)
+
+            done_prev = Payslip.search([
+                ('employee_id', '=', employee.id),
+                ('state', '=', 'done'),
+                ('date_from', '>=', prev_month_start),
+                ('date_from', '<=', prev_month_end),
+            ], limit=1)
+
+            if not done_prev:
+                # Previous month not yet settled — use it so that actual
+                # attendance data is available and no blank-month deduction fires.
+                month_start = prev_month_start
+                month_end = prev_month_end
+            elif month_start.month == 12:
                 month_end = date(month_start.year + 1, 1, 1) - timedelta(days=1)
             else:
                 month_end = date(month_start.year, month_start.month + 1, 1) - timedelta(days=1)
@@ -112,7 +137,7 @@ class HrLeave(models.Model):
                 month_start.year, month_start.month,
             )
 
-            leave.write({'x_vacation_payslip_id': payslip.id})
+            leave.sudo().write({'x_vacation_payslip_id': payslip.id})
 
     @staticmethod
     def _vacation_month_count(leave):

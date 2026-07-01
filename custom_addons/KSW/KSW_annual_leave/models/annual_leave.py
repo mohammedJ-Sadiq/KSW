@@ -32,9 +32,10 @@ class KswAnnualLeave(models.Model):
     total_accrued_days = fields.Float(
         string='Total Accrued', compute='_compute_leave_data',
         store=True, digits=(10, 4),
-        help='Total annual leave days accrued since effective start date '
-             '(opening reset date if set, otherwise joining date), '
-             'adjusted for leaves taken. Opening extra days are included.',
+        help='Gross annual leave days accrued since the effective start date '
+             '(opening reset date if set, otherwise joining date). '
+             'Opening extra days are included. Leaves taken are NOT deducted '
+             'here — see remaining_balance for the net figure.',
     )
     leaves_taken = fields.Float(
         string='Leaves Taken',
@@ -120,7 +121,10 @@ class KswAnnualLeave(models.Model):
                         'Uncheck "Opening Data Locked" before making changes.'
                         % rec.employee_id.name
                     )
-        return super().write(vals)
+        result = super().write(vals)
+        if opening_keys & vals.keys():
+            self._refresh_accrual()
+        return result
 
     def unlink(self):
         """Delete linked allocations when dashboard record is deleted."""
@@ -193,12 +197,6 @@ class KswAnnualLeave(models.Model):
             if total_days <= 0:
                 continue
 
-            # --- Approved annual leave days taken (from linked allocation) ---
-            # When x_opening_reset_date is set, the allocation's date_from is
-            # also set to that date, so allocation.leaves_taken only counts
-            # post-reset leaves automatically (Odoo allocation date_from filter).
-            taken = rec.leaves_taken
-
             # --- Two-tier daily accrual (Saudi Labor Law Art. 109) ---
             # We compute tier-1 and tier-2 calendar days in the EFFECTIVE
             # period (effective_start → today), but tier boundaries are based
@@ -206,8 +204,14 @@ class KswAnnualLeave(models.Model):
             # already past 5 years at the reset date correctly accrues at
             # the 30/365 rate.
             #
-            # tier1_effective = min(total_days, 1825) − min(reset_days, 1825)
-            # tier2_effective = max(total_days − 1825, 0) − max(reset_days − 1825, 0)
+            # tier1_effective = min(total_days, 1825) - min(reset_days, 1825)
+            # tier2_effective = max(total_days - 1825, 0) - max(reset_days - 1825, 0)
+            #
+            # total_accrued_days is GROSS entitlement only.
+            # Deduction of leaves taken is handled exclusively by
+            # _compute_remaining_balance (remaining_balance = total_accrued - taken).
+            # Do NOT read leaves_taken here — it is an undeclared dependency
+            # that breaks Odoo's recompute tracking and causes stale values.
             five_years_days = 5 * 365
 
             tier1_effective = (
@@ -222,28 +226,12 @@ class KswAnnualLeave(models.Model):
             )
             tier2_effective = max(tier2_effective, 0)
 
-            # Maximum accrued days each tier can produce in the effective period
             tier1_max = tier1_effective * (21.0 / 365.0)
             tier2_max = tier2_effective * (30.0 / 365.0)
 
-            # Opening extra days (manual go-live adjustment)
             extra_days = rec.x_opening_extra_days or 0.0
 
-            # --- FIFO deduction of leaves taken ---
-            # Each calendar vacation day in tier 1 removes 21/365 accrual days;
-            # once tier 1 is exhausted, each day in tier 2 removes 30/365.
-            tier1_deduction = min(taken * (21.0 / 365.0), tier1_max)
-            tier1_vac_days = min(taken, tier1_max / (21.0 / 365.0)) if tier1_max > 0 else 0
-            leftover_days = max(taken - tier1_vac_days, 0)
-            tier2_deduction = min(leftover_days * (30.0 / 365.0), tier2_max)
-
-            total_accrued = (
-                (tier1_max - tier1_deduction)
-                + (tier2_max - tier2_deduction)
-                + extra_days
-            )
-
-            rec.total_accrued_days = round(total_accrued, 4)
+            rec.total_accrued_days = round(tier1_max + tier2_max + extra_days, 4)
 
             # --- Current daily rate (based on total service from joining) ---
             rec.daily_rate = (

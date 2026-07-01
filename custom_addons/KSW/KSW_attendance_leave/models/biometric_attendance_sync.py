@@ -154,7 +154,31 @@ class BiometricAttendanceSyncKSW(models.AbstractModel):
                         and not helper.is_scheduled_workday(emp, weekend_end + timedelta(days=1)):
                     weekend_end += timedelta(days=1)
 
-                # Find nearest attended workday within the window on each side.
+                # Grant decision: the workday IMMEDIATELY before or after
+                # the block must be attended.  The 5-day window is used
+                # only to find a reference schedule for the check-in times.
+                day_before = weekend_start - timedelta(days=1)
+                day_after = weekend_end + timedelta(days=1)
+
+                if day_before not in attended_dates and day_after not in attended_dates:
+                    # Both adjacent workdays are absent: revoke any stale
+                    # grant records for this block and skip.
+                    stale = HrAttendance.sudo().search([
+                        ('employee_id', '=', emp.id),
+                        ('x_is_weekend', '=', True),
+                        ('check_in', '>=', dt.combine(
+                            weekend_start, dt.min.time())),
+                        ('check_in', '<', dt.combine(
+                            weekend_end + timedelta(days=1), dt.min.time())),
+                    ])
+                    if stale:
+                        stale.unlink()
+                    current = weekend_end + timedelta(days=1)
+                    continue
+
+                # Find nearest attended workday within the window on each
+                # side — used only for the schedule reference (check-in
+                # hours), not for the grant decision above.
                 nearest_before = next(
                     (weekend_start - timedelta(days=i)
                      for i in range(1, _ADJACENT_WINDOW + 1)

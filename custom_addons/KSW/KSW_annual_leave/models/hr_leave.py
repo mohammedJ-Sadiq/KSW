@@ -904,7 +904,7 @@ class HrLeave(models.Model):
             partner_ids = [dm_user.partner_id.id] if dm_user and dm_user.partner_id else []
         else:
             group = self.env.ref(config['group'], raise_if_not_found=False)
-            partner_ids = group.users.mapped('partner_id').ids if group else []
+            partner_ids = group.user_ids.mapped('partner_id').ids if group else []
 
         if not partner_ids:
             return
