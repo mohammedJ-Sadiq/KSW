@@ -54,6 +54,7 @@ Extends om_hr_payroll with:
 
         # Reports
         'report/report_payslip_deduction_templates.xml',
+        'report/report_annual_vacation_templates.xml',
     ],
     'assets': {},
     'installable': True,

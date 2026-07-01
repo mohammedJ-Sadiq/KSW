@@ -413,6 +413,13 @@ class HrLeave(models.Model):
             annual_multi._cancel_vacation_payslips()
         return result
 
+    def action_print_vacation_report(self):
+        """Return the Annual Vacation Report PDF action for this leave."""
+        self.ensure_one()
+        return self.env.ref(
+            'KSW_payroll.action_report_annual_vacation'
+        ).report_action(self)
+
     def action_open_vacation_payslips(self):
         """Open the vacation payslip(s) linked to this leave."""
         self.ensure_one()

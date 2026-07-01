@@ -15,11 +15,11 @@
             <div class="page">
 
                 <!-- ── Header ── -->
-                <h2>Payslip</h2>
-                <p t-out="o.name"/>
+                <h2 class="mb-1">Payslip</h2>
+                <p class="text-muted mb-3" t-out="o.name"/>
 
                 <!-- ── Employee info ── -->
-                <table class="table table-sm table-bordered mb-3">
+                <table class="table table-sm table-bordered mb-4">
                     <tr>
                         <td style="width:20%"><strong>Employee</strong></td>
                         <td style="width:30%" t-out="o.employee_id.name"/>
@@ -57,137 +57,144 @@
                 <!--  Section 1: Worked Days                          -->
                 <!-- ══════════════════════════════════════════════════ -->
                 <t t-if="o.worked_days_line_ids">
-                    <h4>Worked Days</h4>
-                    <table class="table table-sm table-bordered">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Description</th>
-                                <th>Code</th>
-                                <th class="text-end">Days</th>
-                                <th class="text-end">Hours</th>
-                                <th class="text-end">Deduction</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <t t-set="wd_total_days" t-value="0"/>
-                            <t t-set="wd_total_hours" t-value="0"/>
-                            <t t-set="wd_total_ded" t-value="0"/>
-                            <tr t-foreach="o.worked_days_line_ids" t-as="wd"
-                                t-attf-class="#{'table-danger fw-bold' if wd.code == 'ATT_DED' else 'table-warning' if wd.code in ('ATT_ABS','ATT_LATE','ATT_EARLY') else ''}">
-                                <td t-out="wd.name"/>
-                                <td t-out="wd.code"/>
-                                <td class="text-end" t-out="'%.0f' % wd.number_of_days"/>
-                                <td class="text-end" t-out="'%.0f' % wd.number_of_hours"/>
-                                <td class="text-end" t-out="'%.0f' % wd.amount if wd.amount else ''"/>
-                                <t t-set="wd_total_days" t-value="wd_total_days + wd.number_of_days"/>
-                                <t t-set="wd_total_hours" t-value="wd_total_hours + wd.number_of_hours"/>
-                                <t t-set="wd_total_ded" t-value="wd_total_ded + (wd.amount or 0)"/>
-                            </tr>
-                        </tbody>
-                        <tfoot class="fw-bold table-light">
-                            <tr>
-                                <td colspan="2">Total</td>
-                                <td class="text-end" t-out="'%.0f' % wd_total_days"/>
-                                <td class="text-end" t-out="'%.0f' % wd_total_hours"/>
-                                <td class="text-end" t-out="'%.0f' % wd_total_ded if wd_total_ded else ''"/>
-                            </tr>
-                        </tfoot>
-                    </table>
+                    <div style="page-break-inside: avoid">
+                        <h4 class="mt-4 border-bottom pb-1 mb-2">Worked Days</h4>
+                        <table class="table table-sm table-bordered mb-4">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Code</th>
+                                    <th class="text-end">Days</th>
+                                    <th class="text-end">Hours</th>
+                                    <th class="text-end">Deduction (SAR)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="wd_total_days" t-value="0"/>
+                                <t t-set="wd_total_hours" t-value="0"/>
+                                <t t-set="wd_total_ded" t-value="0"/>
+                                <tr t-foreach="o.worked_days_line_ids" t-as="wd"
+                                    t-attf-class="#{'table-danger fw-bold' if wd.code == 'ATT_DED' else 'table-warning' if wd.code in ('ATT_ABS','ATT_LATE','ATT_EARLY') else ''}">
+                                    <td t-out="wd.name"/>
+                                    <td t-out="wd.code"/>
+                                    <td class="text-end" t-out="'%.0f' % wd.number_of_days"/>
+                                    <td class="text-end" t-out="'%.0f' % wd.number_of_hours"/>
+                                    <td class="text-end" t-out="'%.2f' % wd.amount if wd.amount else ''"/>
+                                    <t t-set="wd_total_days" t-value="wd_total_days + wd.number_of_days"/>
+                                    <t t-set="wd_total_hours" t-value="wd_total_hours + wd.number_of_hours"/>
+                                    <t t-set="wd_total_ded" t-value="wd_total_ded + (wd.amount or 0)"/>
+                                </tr>
+                            </tbody>
+                            <tfoot class="fw-bold table-light">
+                                <tr>
+                                    <td colspan="2">Total</td>
+                                    <td class="text-end" t-out="'%.0f' % wd_total_days"/>
+                                    <td class="text-end" t-out="'%.0f' % wd_total_hours"/>
+                                    <td class="text-end" t-out="'%.2f' % wd_total_ded if wd_total_ded else ''"/>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
                 </t>
 
                 <!-- ══════════════════════════════════════════════════ -->
                 <!--  Section 2: Other Inputs                         -->
                 <!-- ══════════════════════════════════════════════════ -->
                 <t t-if="o.input_line_ids">
-                    <h4>Other Inputs</h4>
-                    <table class="table table-sm table-bordered">
+                    <div style="page-break-inside: avoid">
+                        <h4 class="mt-4 border-bottom pb-1 mb-2">Other Inputs</h4>
+                        <table class="table table-sm table-bordered mb-4">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Code</th>
+                                    <th class="text-end">Amount (SAR)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.input_line_ids" t-as="inp">
+                                    <td t-out="inp.name"/>
+                                    <td t-out="inp.code"/>
+                                    <td class="text-end" t-out="'%.2f' % inp.amount"/>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+
+                <!-- ══════════════════════════════════════════════════ -->
+                <!--  Section 3: Salary Computation (all visible)     -->
+                <!-- ══════════════════════════════════════════════════ -->
+                <t t-set="basic_total" t-value="sum(l.total for l in o.line_ids if l.code == 'BASIC')"/>
+                <t t-set="attded_total" t-value="sum(l.total for l in o.line_ids if l.code == 'ATTDED')"/>
+                <div style="page-break-inside: avoid">
+                    <h4 class="mt-4 border-bottom pb-1 mb-2">Salary Computation</h4>
+                    <table class="table table-sm table-bordered mb-4">
                         <thead class="table-light">
                             <tr>
                                 <th>Description</th>
                                 <th>Code</th>
-                                <th class="text-end">Amount</th>
+                                <th class="text-end">Amount (SAR)</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr t-foreach="o.input_line_ids" t-as="inp">
-                                <td t-out="inp.name"/>
-                                <td t-out="inp.code"/>
-                                <td class="text-end" t-out="'%.0f' % inp.amount"/>
-                            </tr>
+                            <t t-foreach="o.line_ids.filtered(lambda l: l.appears_on_payslip).sorted('sequence')"
+                                t-as="line">
+                                <tr t-attf-class="#{'table-success fw-bold' if line.code == 'NET' else 'table-danger' if line.total &lt; 0 else 'fw-bold' if line.code in ('BASIC','GROSS') else 'text-muted' if line.total == 0 else ''}">
+                                    <td t-out="line.name"/>
+                                    <td t-out="line.code"/>
+                                    <td class="text-end" t-out="'%.2f' % line.total"/>
+                                </tr>
+                                <tr t-if="line.code == 'BASIC'" class="table-info">
+                                    <td colspan="2"><em>Net Basic (Basic − Attendance Deduction)</em></td>
+                                    <td class="text-end" t-out="'%.2f' % (basic_total + attded_total)"/>
+                                </tr>
+                            </t>
                         </tbody>
                     </table>
-                </t>
+                </div>
 
                 <!-- ══════════════════════════════════════════════════ -->
-                <!--  Section 3: Attendance Deduction Breakdown       -->
+                <!--  Section 4: Attendance Deduction Breakdown       -->
                 <!-- ══════════════════════════════════════════════════ -->
                 <t t-set="deduction_rows" t-value="o.get_deduction_breakdown()"/>
                 <t t-if="deduction_rows">
-                    <h4>Attendance Deduction Breakdown</h4>
-                    <table class="table table-sm table-bordered">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Date</th>
-                                <th>Day</th>
-                                <th class="text-end">Late (min)</th>
-                                <th class="text-end">Early (min)</th>
-                                <th class="text-center">Absent</th>
-                                <th class="text-end">Deduction</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <t t-set="total_ded" t-value="0"/>
-                            <tr t-foreach="deduction_rows" t-as="row"
-                                t-attf-class="#{'table-danger' if row['is_absent'] else 'table-warning'}">
-                                <td t-out="row['date']"/>
-                                <td t-out="row['day']"/>
-                                <td class="text-end" t-out="'%.0f' % row['late_min']"/>
-                                <td class="text-end" t-out="'%.0f' % row['early_min']"/>
-                                <td class="text-center" t-out="'Yes' if row['is_absent'] else ''"/>
-                                <td class="text-end" t-out="'%.2f' % row['deduction']"/>
-                                <t t-set="total_ded"
-                                   t-value="total_ded + row['deduction']"/>
-                            </tr>
-                        </tbody>
-                        <tfoot class="fw-bold table-light">
-                            <tr>
-                                <td colspan="5">Total Deductions</td>
-                                <td class="text-end" t-out="'%.0f' % total_ded"/>
-                            </tr>
-                        </tfoot>
-                    </table>
+                    <div style="page-break-before: always">
+                        <h4 class="border-bottom pb-1 mb-2">Attendance Deduction Breakdown</h4>
+                        <table class="table table-sm table-bordered mb-4">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Day</th>
+                                    <th class="text-end">Late (min)</th>
+                                    <th class="text-end">Early (min)</th>
+                                    <th class="text-center">Absent</th>
+                                    <th class="text-end">Deduction (SAR)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="total_ded" t-value="0"/>
+                                <tr t-foreach="deduction_rows" t-as="row"
+                                    t-attf-class="#{'table-danger' if row['is_absent'] else 'table-warning'}">
+                                    <td t-out="row['date']"/>
+                                    <td t-out="row['day']"/>
+                                    <td class="text-end" t-out="'%.0f' % row['late_min']"/>
+                                    <td class="text-end" t-out="'%.0f' % row['early_min']"/>
+                                    <td class="text-center" t-out="'Yes' if row['is_absent'] else ''"/>
+                                    <td class="text-end" t-out="'%.2f' % row['deduction']"/>
+                                    <t t-set="total_ded"
+                                       t-value="total_ded + row['deduction']"/>
+                                </tr>
+                            </tbody>
+                            <tfoot class="fw-bold table-light">
+                                <tr>
+                                    <td colspan="5">Total Deductions</td>
+                                    <td class="text-end" t-out="'%.2f' % total_ded"/>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
                 </t>
-
-                <!-- ══════════════════════════════════════════════════ -->
-                <!--  Section 4: Salary Computation (all visible)     -->
-                <!-- ══════════════════════════════════════════════════ -->
-                <t t-set="basic_total" t-value="sum(l.total for l in o.line_ids if l.code == 'BASIC')"/>
-                <t t-set="attded_total" t-value="sum(l.total for l in o.line_ids if l.code == 'ATTDED')"/>
-                <h4>Salary Computation</h4>
-                <table class="table table-sm table-bordered">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Description</th>
-                            <th>Code</th>
-                            <th class="text-end">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <t t-foreach="o.line_ids.filtered(lambda l: l.appears_on_payslip).sorted('sequence')"
-                            t-as="line">
-                            <tr t-attf-class="#{'table-success fw-bold' if line.code == 'NET' else 'table-danger' if line.total &lt; 0 else 'fw-bold' if line.code in ('BASIC','GROSS') else 'text-muted' if line.total == 0 else ''}">
-                                <td t-out="line.name"/>
-                                <td t-out="line.code"/>
-                                <td class="text-end" t-out="'%.0f' % line.total"/>
-                            </tr>
-                            <tr t-if="line.code == 'BASIC'" class="table-info">
-                                <td>Net Basic Salary (Basic - ATTDED)</td>
-                                <td></td>
-                                <td class="text-end" t-out="'%.0f' % (basic_total + attded_total)"/>
-                            </tr>
-                        </t>
-                    </tbody>
-                </table>
 
                 <p class="text-end mt-4">
                     <strong>Authorized Signature</strong>

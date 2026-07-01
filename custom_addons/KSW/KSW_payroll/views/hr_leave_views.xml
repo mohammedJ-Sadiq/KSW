@@ -20,19 +20,28 @@
             <!-- Smart-button box injected before the leave content div. -->
             <xpath expr="//div[hasclass('o_hr_leave_content')]" position="before">
                 <div class="oe_button_box" name="button_box"
-                     invisible="not x_vacation_payslip_id"
-                     groups="om_hr_payroll.group_hr_payroll_user">
+                     invisible="not x_annual_approval_state">
                     <button class="oe_stat_button"
                             name="action_open_vacation_payslips"
                             type="object"
                             icon="fa-file-text-o"
-                            invisible="not x_vacation_payslip_id">
+                            invisible="not x_vacation_payslip_id"
+                            groups="om_hr_payroll.group_hr_payroll_user">
                         <div class="o_field_widget o_stat_info">
                             <span class="o_stat_value">
                                 <field name="x_vacation_payslip_ids" widget="statinfo"
                                        string=" " nolabel="1"/>
                             </span>
                             <span class="o_stat_text">Vacation Payslip(s)</span>
+                        </div>
+                    </button>
+                    <button class="oe_stat_button"
+                            name="action_print_vacation_report"
+                            type="object"
+                            icon="fa-print">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_text">Print Vacation</span>
+                            <span class="o_stat_text">Report</span>
                         </div>
                     </button>
                 </div>
