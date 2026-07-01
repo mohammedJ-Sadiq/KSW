@@ -96,10 +96,21 @@ class KswDeductionLine(models.Model):
     type_id = fields.Many2one(
         related='deduction_id.type_id', store=True, readonly=True,
     )
+    department_id = fields.Many2one(
+        'hr.department',
+        related='deduction_id.department_id', store=True, readonly=True,
+        string='Department',
+    )
     payroll_priority = fields.Integer(
         related='deduction_id.payroll_priority', store=True, readonly=True,
         help='Lower is collected first when salary is insufficient '
              '(used to order deduction collection at payroll time).',
+    )
+    x_is_overdue = fields.Boolean(
+        string='Overdue',
+        compute='_compute_x_is_overdue',
+        search='_search_x_is_overdue',
+        help='Pending installment whose scheduled month has already passed.',
     )
     # Set on lines that were created (or fully forwarded) because an
     # earlier payslip could not afford the full installment. Lets
@@ -162,6 +173,24 @@ class KswDeductionLine(models.Model):
                 )
             else:
                 line.settlement_label = ''
+
+    @api.depends('state', 'period_date')
+    def _compute_x_is_overdue(self):
+        current_month = fields.Date.today().replace(day=1)
+        for line in self:
+            line.x_is_overdue = (
+                line.state == 'pending'
+                and bool(line.period_date)
+                and line.period_date < current_month
+            )
+
+    def _search_x_is_overdue(self, operator, value):
+        current_month = fields.Date.today().replace(day=1)
+        if operator == '=' and value:
+            return [('state', '=', 'pending'), ('period_date', '<', current_month)]
+        if operator == '=' and not value:
+            return ['|', ('state', '!=', 'pending'), ('period_date', '>=', current_month)]
+        return [('id', '=', False)]
 
     def name_get(self):
         res = []

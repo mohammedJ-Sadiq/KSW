@@ -38,6 +38,7 @@ Extends om_hr_payroll with:
         # Data
         'data/salary_rule_deduction.xml',
         'data/vacation_salary_rules.xml',
+        'data/mail_template_payslip.xml',
 
         # Wizard
         'wizard/bank_file_export_wizard_views.xml',

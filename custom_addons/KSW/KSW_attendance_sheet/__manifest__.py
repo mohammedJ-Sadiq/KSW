@@ -24,6 +24,7 @@ the payroll pipeline can consume them identically to biometric records.
         'security/security.xml',
         'security/ir.model.access.csv',
         'views/hr_employee_views.xml',
+        'views/hr_attendance_views.xml',
         'views/attendance_sheet_views.xml',
         'data/cron.xml',
     ],

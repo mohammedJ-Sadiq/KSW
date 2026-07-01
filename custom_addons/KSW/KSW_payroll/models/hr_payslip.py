@@ -661,15 +661,24 @@ class HrPayslip(models.Model):
             ('year', '=', date_from.year),
         ], limit=1)
 
+        calendar = self.env['ksw.attendance.sheet']._get_employee_calendar(
+            employee)
+        sat_required = bool(calendar and calendar.x_saturday_required)
+
         if sheet:
             absent_lines = sheet.line_ids.filtered(
                 lambda l: date_from <= l.date <= date_to
                 and not l.is_attended
             )
             absent_count = len(absent_lines)
+            sat_absent_count = (
+                len(absent_lines.filtered(lambda l: l.date.weekday() == 5))
+                if sat_required else 0
+            )
         else:
             calendar_days = (date_to - date_from).days + 1
             absent_count = max(0, calendar_days - attended_count)
+            sat_absent_count = 0
 
         if absent_count > 0:
             absent_hours = round(absent_count * DAILY_HOURS, 2)
@@ -716,6 +725,20 @@ class HrPayslip(models.Model):
                     'amount': deduction_total,
                     'version_id': version.id,
                 })
+
+            if sat_absent_count > 0:
+                sat_credit = round(daily_rate * sat_absent_count)
+                if sat_credit > 0:
+                    lines.append({
+                        'name': _('Saturday Overtime Credit'),
+                        'sequence': 17,
+                        'code': 'SAT_OT',
+                        'number_of_days': sat_absent_count,
+                        'number_of_hours': round(
+                            sat_absent_count * DAILY_HOURS, 2),
+                        'amount': sat_credit,
+                        'version_id': version.id,
+                    })
 
         return lines
 
@@ -1030,3 +1053,23 @@ class HrPayslip(models.Model):
         # Sort by date
         rows.sort(key=lambda r: r['date'])
         return rows
+
+    # ------------------------------------------------------------------
+    # Auto-email payslip PDF on confirmation
+    # ------------------------------------------------------------------
+
+    def action_payslip_done(self):
+        res = super().action_payslip_done()
+        self._send_auto_payslip_email()
+        return res
+
+    def _send_auto_payslip_email(self):
+        template = self.env.ref(
+            'KSW_payroll.mail_template_payslip_auto', raise_if_not_found=False)
+        if not template:
+            return
+        for slip in self:
+            employee = slip.employee_id
+            if slip.state == 'done' and employee.x_auto_send_payslip and employee.work_email:
+                template.sudo().send_mail(
+                    slip.id, email_layout_xmlid='mail.mail_notification_light')

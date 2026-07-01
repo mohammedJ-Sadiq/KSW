@@ -518,11 +518,28 @@ class HrLeave(models.Model):
     # ──────────────────────────────────────────────────────────────────
 
     def action_approve(self, check_state=True):
-        """Bypass schedule-based checks during approval, then mark attendance as covered."""
+        """Bypass schedule-based checks during approval, then mark attendance as covered.
+
+        The "Validate" button on a second-approval (validate1) leave also calls
+        action_approve (see hr_holidays views) — core dispatches it to
+        _action_validate internally. Route on state the same way: leaves
+        already at validate1 go to _action_validate, leaves still at confirm
+        go through the attendance-based first-step method. Without this split,
+        a second approver clicking Validate on a validate1 leave was forced
+        through the confirm-only method and always hit "must be confirmed".
+        """
         attendance_leaves = self.filtered('x_attendance_ids')
 
         if attendance_leaves:
-            attendance_leaves._action_approve_attendance_based(check_state=check_state)
+            leave_to_validate = attendance_leaves.filtered(lambda l: l.state == 'validate1')
+            leave_to_approve = attendance_leaves - leave_to_validate
+
+            if leave_to_approve:
+                leave_to_approve._action_approve_attendance_based(check_state=check_state)
+            if leave_to_validate:
+                leave_to_validate._action_validate(check_state)
+            if not self.env.context.get('leave_fast_create'):
+                attendance_leaves.activity_update()
 
         remaining = self - attendance_leaves
         res = True
@@ -822,6 +839,37 @@ class HrLeave(models.Model):
                 )
         return holidays
 
+    def _auto_link_absence_attendance(self):
+        """Link existing biometric absence records to a freshly validated regular leave.
+
+        Called from _validate_leave_request for non-attendance-issue leave types
+        (annual, sick, business trip, etc.) so that absence records already in
+        hr.attendance for the leave date range get their x_leave_ids populated,
+        which in turn drives x_is_covered and x_net_is_absent via compute.
+
+        Absence records created by the biometric sync use check_in = midnight UTC,
+        which can fall before leave.date_from (the work-start time stored in UTC).
+        We widen the lower bound to start-of-UTC-day so these records are found.
+        """
+        HrAttendance = self.env['hr.attendance'].sudo()
+        for leave in self:
+            if not leave.employee_id or not leave.date_from or not leave.date_to:
+                continue
+            # Widen to full UTC days so midnight-UTC absence records aren't missed
+            date_from_sod = leave.date_from.replace(hour=0, minute=0, second=0, microsecond=0)
+            date_to_eod = leave.date_to.replace(hour=23, minute=59, second=59, microsecond=0)
+            absences = HrAttendance.search([
+                ('employee_id', '=', leave.employee_id.id),
+                ('x_is_absent', '=', True),
+                ('x_is_covered', '=', False),
+                ('check_in', '>=', date_from_sod),
+                ('check_in', '<=', date_to_eod),
+            ])
+            if absences:
+                leave.with_context(tracking_disable=True).write({
+                    'x_attendance_ids': [(4, att.id) for att in absences]
+                })
+
     def _validate_leave_request(self):
         """Override to post detailed approval message for attendance-based leaves."""
         attendance_leaves = self.filtered('x_attendance_ids')
@@ -829,6 +877,13 @@ class HrLeave(models.Model):
 
         if remaining:
             super(HrLeave, remaining)._validate_leave_request()
+            # For regular (non-attendance-issue) leaves, auto-link any absence
+            # records that fall within the leave date range so they show covered.
+            regular = remaining.filtered(
+                lambda l: not l.holiday_status_id.is_attendance_issue
+            )
+            if regular:
+                regular._auto_link_absence_attendance()
 
         if attendance_leaves:
             # Create resource leaves and calendar meetings

@@ -123,6 +123,36 @@ hr.attendance records during the payslip period.</field>
         </record>
 
         <!-- ========================================================= -->
+        <!-- Saturday Overtime Credit salary rule                       -->
+        <!-- Offsets, 1:1, the portion of ATTDED caused by a required   -->
+        <!-- Saturday absence (calendars with x_saturday_required).     -->
+        <!-- Reads the monetary total from worked_days.SAT_OT.amount    -->
+        <!-- ========================================================= -->
+
+        <record id="hr_rule_saturday_ot_credit" model="hr.salary.rule">
+            <field name="name">Saturday Overtime Credit</field>
+            <field name="sequence" eval="151"/>
+            <field name="code">SATOT</field>
+            <field name="category_id" ref="om_hr_payroll.ALW"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = bool(worked_days.SAT_OT)</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+result = worked_days.SAT_OT.amount if worked_days.SAT_OT else 0.0
+            </field>
+            <field name="appears_on_payslip" eval="True"/>
+            <field name="note">Credits back, as overtime, the portion of the
+attendance deduction (ATTDED) attributable to a required Saturday absence
+for employees on a calendar with Saturday Required enabled. Net effect on a
+missed Saturday is zero; other absences remain fully deducted.</field>
+        </record>
+
+        <record id="om_hr_payroll.structure_base" model="hr.payroll.structure">
+            <field name="rule_ids"
+                   eval="[(4, ref('hr_rule_saturday_ot_credit'))]"/>
+        </record>
+
+        <!-- ========================================================= -->
         <!-- Default GOSI rate (9.75 %)                                -->
         <!-- ========================================================= -->
         <record id="default_gosi_rate" model="ir.config_parameter">

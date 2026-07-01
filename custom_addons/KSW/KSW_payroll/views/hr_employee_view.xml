@@ -13,6 +13,7 @@
                         <field name="company_partner_id" invisible="1"/>
                         <field name="x_salary_bank_account_id"/>
                         <field name="x_payslip_export_order"/>
+                        <field name="x_auto_send_payslip"/>
                     </group>
                     <group string="Allowances">
                         <field name="hra"/>

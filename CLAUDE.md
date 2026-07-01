@@ -280,6 +280,28 @@ KSW_payroll access-tier feature. Know them before doing similar work again.
     See also the existing `self._check_group(...)` helper in
     `KSW_annual_leave/models/hr_leave.py` for the approval-step pattern.
 
+16. **`_generate_weekend_records` (cybrosys) crashes for night-shift employees.**
+    The upstream code extracts only `.hour`/`.minute` from `ref_schedule['end']`
+    and places both check_in and check_out on the same `grant_day`. For overnight
+    schedules (e.g. 22:00–06:00) `get_employee_day_schedule` already advances
+    `end` by +1 day, but `_generate_weekend_records` discards that offset, making
+    `check_out < check_in` → `ValidationError`. The fix — `if sched_end <=
+    sched_start: sched_end += timedelta(days=1)` — is applied as an override in
+    `KSW_attendance_leave/models/biometric_attendance_sync.py`. Never add a bare
+    call to the upstream `_generate_weekend_records` for employees with night
+    schedules; always go through the KSW override (which is the default once the
+    module is loaded).
+
+    **Root cause of missing old Fridays in KSWCO (June 2026):** "Generate All
+    Absences" runs as a background cron (`_run_generate_all_absences`). It calls
+    `_generate_weekend_records` for all biometric employees. If that run happened
+    before the device sync imported the full historical attendance, the adjacent-
+    workday check (`day_before in attended_dates or day_after in attended_dates`)
+    found no qualifying neighbour and silently skipped the weekend day — permanently,
+    because the function only creates records that don't already exist. Fix: re-run
+    "Generate All Absences" (or call `sync._generate_weekend_records(employees,
+    date_from, date_to)` directly in a shell) once all punch data is present.
+
 ## KSW_deduction architecture notes
 
 ### managed_by field

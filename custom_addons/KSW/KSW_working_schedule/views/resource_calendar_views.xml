@@ -7,6 +7,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='tz']" position="after">
                 <field name="is_temp_schedule"/>
+                <field name="x_saturday_required"/>
             </xpath>
         </field>
     </record>

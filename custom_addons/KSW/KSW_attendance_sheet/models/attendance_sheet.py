@@ -239,7 +239,11 @@ class KswAttendanceSheet(models.Model):
                         'break_hours': sum(
                             l.hour_to - l.hour_from for l in break_lines),
                     }
-            # Calendar has groups but this day is not scheduled → not a workday
+            # Calendar has groups but this day is not scheduled → not a
+            # workday, UNLESS this calendar forces Saturday to be required
+            # (e.g. "Standard 40 hours/week" — see x_saturday_required).
+            if calendar.x_saturday_required and day_of_week == '5':
+                return {'hour_from': 8.0, 'hour_to': 17.0, 'break_hours': 1.0}
             return None
 
         # -- 2. Try standard Odoo attendance_ids --
@@ -258,7 +262,10 @@ class KswAttendanceSheet(models.Model):
                         'break_hours': sum(
                             a.hour_to - a.hour_from for a in break_atts),
                     }
-            # Calendar has attendance lines but this day is not scheduled
+            # Calendar has attendance lines but this day is not scheduled,
+            # UNLESS this calendar forces Saturday to be required.
+            if calendar.x_saturday_required and day_of_week == '5':
+                return {'hour_from': 8.0, 'hour_to': 17.0, 'break_hours': 1.0}
             return None
 
         # -- 3. Fallback: Sun-Thu 08:00-17:00 (Saudi standard) --

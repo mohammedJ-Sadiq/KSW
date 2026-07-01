@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1">
+
+    <record id="cron_check_stale_biometric_devices" model="ir.cron">
+        <field name="name">Biometric: Stale Device Alert (every 30 minutes)</field>
+        <field name="model_id" ref="hr_biometric_attendance.model_biometric_device_details"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_check_stale_devices()</field>
+        <field name="active" eval="True"/>
+        <field name="interval_number">30</field>
+        <field name="interval_type">minutes</field>
+    </record>
+
+</odoo>

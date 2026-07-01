@@ -12,6 +12,13 @@ class HrEmployee(models.Model):
         'mobile_phone',
     ]
 
+    x_auto_send_payslip = fields.Boolean(
+        string='Auto-Email Payslip',
+        default=False,
+        groups='hr.group_hr_user',
+        help="If enabled, a PDF copy of each confirmed payslip is emailed "
+             "automatically to this employee's Work Email.",
+    )
     x_salary_bank_account_id = fields.Many2one(
         'res.partner.bank',
         string='Salary Paying Bank Account',

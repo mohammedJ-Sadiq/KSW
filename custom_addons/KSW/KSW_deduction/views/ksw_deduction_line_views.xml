@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- ================================================================ -->
+    <!-- INSTALLMENT SCHEDULE REPORT                                        -->
+    <!-- Views on ksw.deduction.line for the "Installment Schedule" report  -->
+    <!-- Excludes skipped lines and cancelled/draft parent deductions by    -->
+    <!-- default so the manager/accountant sees only actionable data.       -->
+    <!-- ================================================================ -->
+
+    <!-- SEARCH -->
+    <record id="ksw_deduction_line_view_search" model="ir.ui.view">
+        <field name="name">ksw.deduction.line.search</field>
+        <field name="model">ksw.deduction.line</field>
+        <field name="arch" type="xml">
+            <search string="Installment Schedule">
+                <field name="employee_id"/>
+                <field name="deduction_id"/>
+                <field name="type_id"/>
+                <field name="department_id"/>
+
+                <!-- Active parent filter is the default (set in the action context) -->
+                <filter string="Active Deductions Only" name="active_parent"
+                    domain="[('deduction_id.state', 'in', ['active', 'completed'])]"/>
+                <separator/>
+                <filter string="Pending" name="pending" domain="[('state', '=', 'pending')]"/>
+                <filter string="Paid" name="paid" domain="[('state', '=', 'paid')]"/>
+                <filter string="Skipped" name="skipped" domain="[('state', '=', 'skipped')]"/>
+                <separator/>
+                <!-- Overdue: pending lines whose period month has already passed -->
+                <filter string="Overdue" name="overdue" domain="[('x_is_overdue', '=', True)]"/>
+                <separator/>
+                <filter string="Manual Payments" name="manual" domain="[('is_manual', '=', True)]"/>
+                <group>
+                    <filter string="Employee" name="group_emp" domain="[]"
+                        context="{'group_by': 'employee_id'}"/>
+                    <filter string="Department" name="group_dept" domain="[]"
+                        context="{'group_by': 'department_id'}"/>
+                    <filter string="Type" name="group_type" domain="[]"
+                        context="{'group_by': 'type_id'}"/>
+                    <filter string="Month" name="group_month" domain="[]"
+                        context="{'group_by': 'period_date:month'}"/>
+                    <filter string="State" name="group_state" domain="[]"
+                        context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- LIST -->
+    <record id="ksw_deduction_line_view_list" model="ir.ui.view">
+        <field name="name">ksw.deduction.line.list</field>
+        <field name="model">ksw.deduction.line</field>
+        <field name="arch" type="xml">
+            <!-- Red row = overdue pending; green = paid; grey = skipped -->
+            <list decoration-danger="x_is_overdue"
+                  decoration-success="state == 'paid'"
+                  decoration-muted="state == 'skipped'">
+                <field name="employee_id"/>
+                <field name="department_id" optional="show"/>
+                <field name="deduction_id" string="Deduction"/>
+                <field name="type_id"/>
+                <field name="period_date" string="Month"/>
+                <field name="amount" sum="Total"/>
+                <field name="state" widget="badge"
+                       decoration-warning="state == 'pending' and not x_is_overdue"
+                       decoration-danger="state == 'pending' and x_is_overdue"
+                       decoration-success="state == 'paid'"
+                       decoration-muted="state == 'skipped'"/>
+                <field name="x_is_overdue" column_invisible="1"/>
+                <field name="settlement_label" string="Settlement" optional="show"/>
+                <field name="manual_note" string="Note" optional="hide"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- PIVOT: employee x month matrix — shows the full collection schedule -->
+    <record id="ksw_deduction_line_view_pivot" model="ir.ui.view">
+        <field name="name">ksw.deduction.line.pivot</field>
+        <field name="model">ksw.deduction.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Installment Schedule" sample="1">
+                <field name="employee_id" type="row"/>
+                <field name="period_date" interval="month" type="col"/>
+                <field name="amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- GRAPH: stacked bar by month — shows collection rate over time -->
+    <record id="ksw_deduction_line_view_graph" model="ir.ui.view">
+        <field name="name">ksw.deduction.line.graph</field>
+        <field name="model">ksw.deduction.line</field>
+        <field name="arch" type="xml">
+            <graph string="Installment Schedule" type="bar" stacked="1" sample="1">
+                <field name="period_date" interval="month"/>
+                <field name="state"/>
+                <field name="amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- ACTION -->
+    <record id="action_ksw_deduction_installment_schedule" model="ir.actions.act_window">
+        <field name="name">Installment Schedule</field>
+        <field name="res_model">ksw.deduction.line</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <!-- Exclude skipped lines and lines belonging to cancelled/draft deductions -->
+        <field name="domain">[('state', '!=', 'skipped'), ('deduction_id.state', 'not in', ['cancelled', 'draft'])]</field>
+        <field name="search_view_id" ref="ksw_deduction_line_view_search"/>
+        <field name="context">{'search_default_active_parent': 1}</field>
+    </record>
+
+</odoo>

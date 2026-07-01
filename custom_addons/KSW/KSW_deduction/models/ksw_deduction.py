@@ -394,11 +394,27 @@ class KswDeduction(models.Model):
             else:
                 rec.installment_amount = 0.0
 
-    @api.depends('employee_id', 'employee_id.current_version_id.wage')
+    @api.depends(
+        'employee_id',
+        'employee_id.current_version_id.wage',
+        'employee_id.current_version_id.hra',
+        'employee_id.current_version_id.travel_allowance',
+        'employee_id.current_version_id.da',
+        'employee_id.current_version_id.meal_allowance',
+        'employee_id.current_version_id.medical_allowance',
+        'employee_id.current_version_id.other_allowance',
+        'employee_id.current_version_id.mobile_allowance',
+    )
     def _compute_gross_salary(self):
+        _ALLOWANCE_FIELDS = (
+            'wage', 'hra', 'travel_allowance', 'da',
+            'meal_allowance', 'medical_allowance', 'other_allowance',
+            'mobile_allowance',
+        )
         for rec in self:
             if rec.employee_id:
-                rec.x_gross_salary = rec.employee_id.sudo().current_version_id.wage or 0.0
+                ver = rec.employee_id.sudo().current_version_id
+                rec.x_gross_salary = sum(getattr(ver, f, 0.0) or 0.0 for f in _ALLOWANCE_FIELDS)
             else:
                 rec.x_gross_salary = 0.0
 

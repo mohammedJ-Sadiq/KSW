@@ -9,6 +9,14 @@ class ResourceCalendar(models.Model):
         help='Indicates if this calendar is a temporary work schedule for employees',
     )
 
+    x_saturday_required = fields.Boolean(
+        string='Saturday Required (Deduct + Overtime Offset)',
+        help='When set, Saturday is treated as a required workday for '
+             'attendance-sheet purposes even if it has no schedule line in '
+             'this calendar. Absences are deducted normally and an equal '
+             'amount is credited back as Saturday overtime on the payslip.',
+    )
+
     calendar_group_ids = fields.Many2many(
         'resource.calendar.group',
         'resource_calendar_group_rel',

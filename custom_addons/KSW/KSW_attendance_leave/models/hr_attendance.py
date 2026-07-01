@@ -108,6 +108,56 @@ class HrAttendance(models.Model):
                 ) or 8.0
             att.x_net_worked_hours = (att.worked_hours or 0.0) + total_accepted_hours + absent_covered_hours
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super().create(vals_list)
+        absent_new = records.filtered(lambda a: a.x_is_absent and a.check_in and a.employee_id)
+        if absent_new:
+            absent_new._auto_link_regular_leave_coverage()
+        return records
+
+    def _auto_link_regular_leave_coverage(self):
+        """Link new absence records to any validated regular leave already covering the date.
+
+        Called from create() so that biometric-sync absences that arrive while
+        a regular leave (sick, business trip, etc.) is already approved get
+        their x_leave_ids populated immediately — without waiting for the user
+        to manually re-open the leave form.
+
+        Absence check_in is at midnight UTC; leave.date_from is work-start UTC.
+        We compare by expanding leave bounds to full UTC days.
+        """
+        HrLeave = self.env['hr.leave'].sudo()
+        from datetime import timedelta
+
+        emp_atts = {}
+        for att in self:
+            emp_atts.setdefault(att.employee_id.id, []).append(att)
+
+        for emp_id, atts in emp_atts.items():
+            check_ins = [a.check_in for a in atts]
+            max_ci = max(check_ins).replace(hour=23, minute=59, second=59)
+            min_ci = min(check_ins).replace(hour=0, minute=0, second=0)
+            leaves = HrLeave.search([
+                ('employee_id', '=', emp_id),
+                ('state', '=', 'validate'),
+                ('holiday_status_id.is_attendance_issue', '=', False),
+                ('date_from', '<=', max_ci),
+                ('date_to', '>=', min_ci),
+            ])
+            if not leaves:
+                continue
+            for att in atts:
+                att_sod = att.check_in.replace(hour=0, minute=0, second=0)
+                att_eod = att.check_in.replace(hour=23, minute=59, second=59)
+                covering = leaves.filtered(
+                    lambda l: l.date_from <= att_eod and l.date_to >= att_sod
+                )
+                if covering:
+                    covering[0].with_context(tracking_disable=True).write({
+                        'x_attendance_ids': [(4, att.id)]
+                    })
+
     def _compute_display_name(self):
         for rec in self:
             date_str = rec.check_in.strftime('%Y-%m-%d') if rec.check_in else 'No Date'

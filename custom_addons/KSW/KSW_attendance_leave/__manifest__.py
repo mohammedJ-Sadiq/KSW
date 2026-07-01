@@ -23,6 +23,7 @@ Connecting attendance records with leave management to be a list to choose from
 
         # Data
         'data/attendance_issue_defaults.xml',
+        'data/biometric_stale_device_cron.xml',
 
         # Views
         'views/hr_employee_views.xml',

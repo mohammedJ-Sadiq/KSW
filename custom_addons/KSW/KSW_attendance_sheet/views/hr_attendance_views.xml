@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Extend hr.attendance search to filter by attendance-sheet employee type -->
+    <record id="hr_attendance_view_filter_inherit_sheet" model="ir.ui.view">
+        <field name="name">hr.attendance.search.inherit.sheet</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='archivedemployees']" position="after">
+                <separator/>
+                <filter string="Attendance Sheet Employees" name="attendance_sheet_employees"
+                        domain="[('employee_id.x_is_attendance_sheet', '=', True)]"/>
+                <filter string="Fingerprint Employees" name="non_attendance_sheet_employees"
+                        domain="[('employee_id.x_is_attendance_sheet', '=', False)]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

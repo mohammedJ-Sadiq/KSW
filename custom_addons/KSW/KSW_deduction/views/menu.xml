@@ -104,6 +104,12 @@
               action="action_ksw_deduction_report_by_type"
               sequence="30"/>
 
+    <menuitem id="menu_ksw_deduction_installment_schedule"
+              name="Installment Schedule"
+              parent="menu_ksw_deduction_reports"
+              action="action_ksw_deduction_installment_schedule"
+              sequence="40"/>
+
     <!-- ============================================================ -->
     <!-- 6. Configuration (managers only)                               -->
     <!-- ============================================================ -->

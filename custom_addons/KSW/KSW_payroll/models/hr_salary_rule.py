@@ -13,11 +13,12 @@ class HrSalaryRule(models.Model):
 
         Per-structure plan
         ------------------
-        ATTSHEET  — remove MISDAYS/SCLINS/LO; add all new BASE rules inc. ATTDED
-        Executive — remove ABSENCE_DED/SCLINS/LO/UNPAIDVAC; add all new BASE rules inc. ATTDED
-        NoFin     — remove SCLINS/LO/UNPAIDVAC; add new BASE rules except ATTDED
-                    (no biometric or sheet tracking; ATTDED would deduct everything)
-        OCIR      — remove ABSENCE_DED/SCLINS/LO; add all new BASE rules inc. ATTDED
+        ATTSHEET  — remove MISDAYS/SCLINS/LO; add all new BASE rules inc. ATTDED/SATOT
+        Executive — remove ABSENCE_DED/SCLINS/LO/UNPAIDVAC; add all new BASE rules inc. ATTDED/SATOT
+        NoFin     — remove SCLINS/LO/UNPAIDVAC; add new BASE rules except ATTDED/SATOT
+                    (no biometric or sheet tracking; ATTDED would deduct everything,
+                    and SATOT only ever fires for attendance-sheet employees)
+        OCIR      — remove ABSENCE_DED/SCLINS/LO; add all new BASE rules inc. ATTDED/SATOT
         """
         Structure = self.env['hr.payroll.structure'].sudo()
         Rule = self.env['hr.salary.rule'].sudo()
@@ -29,11 +30,11 @@ class HrSalaryRule(models.Model):
         _NEW = [
             'DA', 'Travel', 'Meal', 'Medical', 'Mobile',
             'VACATION_BAL', 'FLIGHT_TICKET', 'ADDITIONAL_COMMISSIONS',
-            'VACATION_HRA', 'ATTDED', 'GOSI', 'VACATION_GOSI',
+            'VACATION_HRA', 'ATTDED', 'SATOT', 'GOSI', 'VACATION_GOSI',
             'PENALTY', 'KSW_DEDUCTIONS', 'REMAINING_LOANS',
             'FIN_CONSIDERATION', 'VISA_COST_RECOVERY',
         ]
-        _NEW_NO_ATTDED = [c for c in _NEW if c != 'ATTDED']
+        _NEW_NO_ATTDED = [c for c in _NEW if c not in ('ATTDED', 'SATOT')]
 
         STRUCT_PLAN = {
             'ATTSHEET':  {'remove': {'MISDAYS', 'SCLINS', 'LO'},

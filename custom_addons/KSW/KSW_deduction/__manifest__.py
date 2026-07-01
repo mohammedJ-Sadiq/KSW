@@ -32,6 +32,7 @@ via the KSW_DEDUCTIONS salary rule (regular + vacation payslips).
         'data/salary_rule_deduction.xml',
         'views/ksw_deduction_type_views.xml',
         'views/ksw_deduction_views.xml',
+        'views/ksw_deduction_line_views.xml',
         'views/hr_employee_views.xml',
         'wizard/loan_request_wizard_views.xml',
         'wizard/loan_refuse_wizard_views.xml',
