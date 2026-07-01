@@ -104,12 +104,12 @@
                        invisible="(validation_type != 'unpaid_multi' and (not x_excess_days_accepted or x_unpaid_portion_days == 0)) or x_annual_approval_state in ('pending_hr', 'pending_gm_initial')">
                     <field name="x_financial_consideration_excess"
                            readonly="x_annual_approval_state != 'pending_acc'"/>
-                    <field name="x_financial_consideration_excess_description"
+                    <field name="x_financial_consideration_excess_description" string="Notes"
                            readonly="x_annual_approval_state != 'pending_acc'"
                            placeholder="Details..."/>
                     <field name="x_visa_cost_recovery"
                            readonly="x_annual_approval_state != 'pending_acc'"/>
-                    <field name="x_visa_cost_recovery_description"
+                    <field name="x_visa_cost_recovery_description" string="Notes"
                            readonly="x_annual_approval_state != 'pending_acc'"
                            placeholder="Details..."/>
                 </group>

@@ -159,45 +159,45 @@
                     <!-- Tab 1 · HR Review -->
                     <page string="📝 HR Review" name="hr_review"
                           invisible="x_annual_approval_state == 'pending_dm'">
-                        <group>
-                            <group string="Penalty / Iqama / Flight" col="2">
-                                <field name="x_penalty_amount"
-                                       readonly="x_annual_approval_state != 'pending_hr'"/>
-                                <field name="x_penalty_description"
-                                       readonly="x_annual_approval_state != 'pending_hr'"
-                                       placeholder="Reason..."/>
-                                <field name="x_iqama_renewal_amount"
-                                       readonly="x_annual_approval_state != 'pending_hr'"/>
-                                <field name="x_iqama_renewal_description"
-                                       readonly="x_annual_approval_state != 'pending_hr'"
-                                       placeholder="Reason..."/>
-                                <field name="x_flight_ticket_amount"
-                                       readonly="x_annual_approval_state != 'pending_hr'"/>
-                                <field name="x_flight_ticket_description"
-                                       readonly="x_annual_approval_state != 'pending_hr'"
-                                       placeholder="Details..."/>
-                            </group>
+                        <group string="Penalty">
+                            <field name="x_penalty_amount"
+                                   readonly="x_annual_approval_state != 'pending_hr'"/>
+                            <field name="x_penalty_description" nolabel="1"
+                                   readonly="x_annual_approval_state != 'pending_hr'"
+                                   placeholder="Reason..."/>
+                        </group>
+                        <group string="Iqama Renewal">
+                            <field name="x_iqama_renewal_amount"
+                                   readonly="x_annual_approval_state != 'pending_hr'"/>
+                            <field name="x_iqama_renewal_description" nolabel="1"
+                                   readonly="x_annual_approval_state != 'pending_hr'"
+                                   placeholder="Reason..."/>
+                        </group>
+                        <group string="Flight Ticket">
+                            <field name="x_flight_ticket_amount"
+                                   readonly="x_annual_approval_state != 'pending_hr'"/>
+                            <field name="x_flight_ticket_description" nolabel="1"
+                                   readonly="x_annual_approval_state != 'pending_hr'"
+                                   placeholder="Details..."/>
                         </group>
                     </page>
 
                     <!-- Tab 2 · Accounting -->
                     <page string="💰 Accounting" name="accounting_page"
                           invisible="x_annual_approval_state in ('pending_dm', 'pending_hr', 'pending_gm_initial')">
-                        <group>
-                            <!-- KEEP name="accounting_allowances" —
-                                 KSW_unpaid_leave inserts a sibling group
-                                 (unpaid_accounting) with position="after". -->
-                            <group string="Allowances &amp; Loans"
-                                   name="accounting_allowances"
-                                   invisible="x_annual_approval_state in ('pending_hr', 'pending_gm_initial')">
-                                <field name="x_additional_commissions" string="Total Commissions"
-                                       readonly="1"/>
-                                <field name="x_remaining_loans"
-                                       readonly="x_annual_approval_state != 'pending_acc'"/>
-                                <field name="x_remaining_loans_description"
-                                       readonly="x_annual_approval_state != 'pending_acc'"
-                                       placeholder="Details..."/>
-                            </group>
+                        <!-- KEEP name="accounting_allowances" —
+                             KSW_unpaid_leave inserts a sibling group
+                             (unpaid_accounting) with position="after". -->
+                        <group string="Allowances &amp; Loans"
+                               name="accounting_allowances"
+                               invisible="x_annual_approval_state in ('pending_hr', 'pending_gm_initial')">
+                            <field name="x_additional_commissions" string="Total Commissions"
+                                   readonly="1"/>
+                            <field name="x_remaining_loans"
+                                   readonly="x_annual_approval_state != 'pending_acc'"/>
+                            <field name="x_remaining_loans_description" string="Notes"
+                                   readonly="x_annual_approval_state != 'pending_acc'"
+                                   placeholder="Details..."/>
                         </group>
 
                         <separator string="Additional Commissions Detail"
