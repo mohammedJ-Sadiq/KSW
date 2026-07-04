@@ -122,16 +122,17 @@
                         invisible="validation_type != 'unpaid_multi'"/>
             </xpath>
 
-            <!-- ===== Hide return confirmation fields for unpaid ===== -->
+            <!-- ===== Hide return confirmation fields for unpaid leaves
+                 and while the employee signature step is pending      ===== -->
             <xpath expr="//field[@name='x_return_date']" position="attributes">
                 <attribute name="invisible">
-                    x_return_state == 'not_applicable' or x_is_unpaid_leave_type
+                    x_return_state == 'not_applicable' or x_is_unpaid_leave_type or x_annual_approval_state == 'pending_employee_signature'
                 </attribute>
             </xpath>
 
             <xpath expr="//field[@name='x_return_state'][@widget='badge']" position="attributes">
                 <attribute name="invisible">
-                    x_return_state == 'not_applicable' or x_is_unpaid_leave_type
+                    x_return_state == 'not_applicable' or x_is_unpaid_leave_type or x_annual_approval_state == 'pending_employee_signature'
                 </attribute>
             </xpath>
 

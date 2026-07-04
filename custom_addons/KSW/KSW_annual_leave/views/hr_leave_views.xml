@@ -42,6 +42,15 @@
                 <field name="validation_type" invisible="1"/>
                 <field name="x_is_annual_leave_type" invisible="1"/>
                 <field name="x_exceeds_annual_balance" invisible="1"/>
+                <field name="x_can_sign" invisible="1"/>
+                <field name="x_can_dm_approve" invisible="1"/>
+                <field name="x_can_hr_approve" invisible="1"/>
+                <field name="x_can_gm_initial_approve" invisible="1"/>
+                <field name="x_can_acc_approve" invisible="1"/>
+                <field name="x_can_gm_final_approve" invisible="1"/>
+                <field name="x_is_hr_approver" invisible="1"/>
+                <field name="x_is_acc_approver" invisible="1"/>
+                <field name="x_balance_at_request" invisible="1"/>
             </xpath>
 
             <!-- Return confirmation button in header -->
@@ -50,7 +59,7 @@
                         name="action_confirm_return_manager"
                         type="object"
                         class="oe_highlight"
-                        invisible="not x_can_confirm_return_manager"/>
+                        invisible="not x_can_confirm_return_manager or x_annual_approval_state == 'pending_employee_signature'"/>
             </xpath>
 
             <!-- ===== Multi-step approval buttons ===== -->
@@ -58,27 +67,27 @@
                 <button string="✅ Approve (DM)"
                         name="action_dm_approve"
                         type="object" class="oe_highlight"
-                        invisible="x_annual_approval_state != 'pending_dm' or not id"/>
+                        invisible="not x_can_dm_approve"/>
                 <button string="✅ Approve (HR)"
                         name="action_hr_approve"
                         type="object" class="oe_highlight"
-                        groups="KSW_annual_leave.group_annual_leave_hr"
-                        invisible="x_annual_approval_state != 'pending_hr' or not id"/>
+                        invisible="not x_can_hr_approve"/>
                 <button string="✅ Initial Approve (GM)"
                         name="action_gm_initial_approve"
                         type="object" class="oe_highlight"
-                        groups="KSW_annual_leave.group_annual_leave_gm"
-                        invisible="x_annual_approval_state != 'pending_gm_initial' or not id"/>
+                        invisible="not x_can_gm_initial_approve"/>
                 <button string="✅ Approve (Accounting)"
                         name="action_acc_approve"
                         type="object" class="oe_highlight"
-                        groups="KSW_annual_leave.group_annual_leave_acc"
-                        invisible="x_annual_approval_state != 'pending_acc' or not id"/>
+                        invisible="not x_can_acc_approve"/>
                 <button string="✅ Final Approve (GM)"
                         name="action_gm_final_approve"
                         type="object" class="btn-success"
-                        groups="KSW_annual_leave.group_annual_leave_gm"
-                        invisible="x_annual_approval_state != 'pending_gm_final' or not id"/>
+                        invisible="not x_can_gm_final_approve"/>
+                <button string="✍️ Confirm Signature"
+                        name="action_employee_confirm_signature"
+                        type="object" class="btn-success"
+                        invisible="not x_can_sign"/>
             </xpath>
 
             <!-- Hide the built-in 'state' statusbars for multi-step
@@ -95,7 +104,7 @@
                    position="after">
                 <field name="x_annual_approval_state"
                        widget="statusbar"
-                       statusbar_visible="pending_dm,pending_hr,pending_gm_initial,pending_acc,pending_gm_final,approved"
+                       statusbar_visible="pending_dm,pending_hr,pending_gm_initial,pending_acc,pending_gm_final,pending_employee_signature,approved"
                        invisible="not x_annual_approval_state"
                        readonly="1"/>
             </xpath>
@@ -104,7 +113,7 @@
             <xpath expr="//sheet" position="inside">
                 <widget name="web_ribbon" title="🏖️ On Vacation"
                         bg_color="text-bg-warning"
-                        invisible="x_return_state != 'on_vacation'"/>
+                        invisible="x_return_state != 'on_vacation' or x_annual_approval_state == 'pending_employee_signature'"/>
                 <widget name="web_ribbon" title="⚠ Full Clearance"
                         bg_color="text-bg-danger"
                         invisible="not x_is_full_clearance"/>
@@ -113,39 +122,66 @@
                         invisible="not x_excess_days_accepted or x_unpaid_portion_days == 0"/>
             </xpath>
 
-            <!-- Inline fields below the leave description (compact). -->
-            <xpath expr="//field[@name='name']" position="after">
-                <field name="x_is_full_clearance" widget="boolean_toggle"
-                       invisible="not x_is_annual_leave_type or x_excess_days_accepted or x_exceeds_annual_balance"
-                       readonly="state != 'confirm'"/>
-                <field name="x_actual_vacation_days"
-                       invisible="not x_is_full_clearance or x_actual_vacation_days == 0"
-                       string="Actual Days Away"/>
-                <field name="x_clearance_balance"
-                       invisible="not x_is_full_clearance or x_clearance_balance == 0"
-                       string="Balance Consumed"/>
+            <!-- Replace hr_leave_stats in the right column with the KSW info panel.
+                 The col_right div itself stays intact so dashboard views that do
+                 position="replace" on it still work. -->
+            <xpath expr="//widget[@name='hr_leave_stats']" position="replace">
 
-                <field name="x_excess_days_accepted" widget="boolean_toggle"
-                       string="Accept Excess Days as Unpaid"
-                       invisible="not x_is_annual_leave_type or x_is_full_clearance or not x_exceeds_annual_balance"
-                       readonly="state != 'confirm'"/>
-                <field name="x_annual_portion_days"
-                       invisible="not x_excess_days_accepted or x_annual_portion_days == 0"
-                       string="Annual Portion (Days)"/>
-                <field name="x_unpaid_portion_days"
-                       invisible="not x_excess_days_accepted or x_unpaid_portion_days == 0"
-                       string="Unpaid Portion (Days)"/>
+                <!-- Non-annual leave types: keep the standard Odoo balance summary -->
+                <div invisible="x_is_annual_leave_type">
+                    <widget name="hr_leave_stats"/>
+                </div>
 
-                <field name="x_return_date"
-                       invisible="x_return_state == 'not_applicable'"
-                       readonly="x_return_state in ('hr_confirmed',)"
-                       required="x_return_state == 'on_vacation' and x_can_confirm_return_manager"/>
-                <field name="x_return_state" widget="badge"
-                       decoration-warning="x_return_state == 'on_vacation'"
-                       decoration-success="x_return_state == 'hr_confirmed'"
-                       invisible="x_return_state == 'not_applicable'"/>
-                <field name="x_manager_return_confirmed_by"
-                       invisible="x_return_state != 'hr_confirmed'"/>
+                <!-- Annual leave types: KSW custom info panel -->
+                <div invisible="not x_is_annual_leave_type">
+
+                    <group string="Annual Leave Balance">
+                        <field name="x_balance_at_request"
+                               string="Balance at Request (Days)"
+                               readonly="1"/>
+                    </group>
+
+                    <group string="Options">
+                        <!-- Full clearance toggle (when balance covers the request) -->
+                        <field name="x_is_full_clearance" widget="boolean_toggle"
+                               string="Full Balance Clearance"
+                               invisible="x_excess_days_accepted or x_exceeds_annual_balance"
+                               readonly="state != 'confirm'"/>
+                        <field name="x_actual_vacation_days"
+                               string="Actual Days Away" readonly="1"
+                               invisible="not x_is_full_clearance or x_actual_vacation_days == 0"/>
+                        <field name="x_clearance_balance"
+                               string="Balance Consumed" readonly="1"
+                               invisible="not x_is_full_clearance or x_clearance_balance == 0"/>
+
+                        <!-- Excess toggle (when request exceeds balance — mutually exclusive) -->
+                        <field name="x_excess_days_accepted" widget="boolean_toggle"
+                               string="Accept Excess as Unpaid"
+                               invisible="x_is_full_clearance or not x_exceeds_annual_balance"
+                               readonly="state != 'confirm'"/>
+                        <field name="x_annual_portion_days"
+                               string="Annual Portion (Days)" readonly="1"
+                               invisible="not x_excess_days_accepted or x_annual_portion_days == 0"/>
+                        <field name="x_unpaid_portion_days"
+                               string="Unpaid Portion (Days)" readonly="1"
+                               invisible="not x_excess_days_accepted or x_unpaid_portion_days == 0"/>
+                    </group>
+
+                    <group string="Return Status"
+                           invisible="x_return_state == 'not_applicable' or x_annual_approval_state == 'pending_employee_signature'">
+                        <field name="x_return_date"
+                               readonly="x_return_state in ('hr_confirmed',)"
+                               required="x_return_state == 'on_vacation' and x_can_confirm_return_manager"/>
+                        <field name="x_return_state" widget="badge"
+                               string="Return Status"
+                               decoration-warning="x_return_state == 'on_vacation'"
+                               decoration-success="x_return_state == 'hr_confirmed'"/>
+                        <field name="x_manager_return_confirmed_by"
+                               string="Confirmed By"
+                               invisible="x_return_state != 'hr_confirmed'"/>
+                    </group>
+
+                </div>
             </xpath>
 
             <!-- ========================================================= -->
@@ -161,24 +197,10 @@
                           invisible="x_annual_approval_state == 'pending_dm'">
                         <group string="Penalty">
                             <field name="x_penalty_amount"
-                                   readonly="x_annual_approval_state != 'pending_hr'"/>
+                                   readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"/>
                             <field name="x_penalty_description" nolabel="1"
-                                   readonly="x_annual_approval_state != 'pending_hr'"
+                                   readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"
                                    placeholder="Reason..."/>
-                        </group>
-                        <group string="Iqama Renewal">
-                            <field name="x_iqama_renewal_amount"
-                                   readonly="x_annual_approval_state != 'pending_hr'"/>
-                            <field name="x_iqama_renewal_description" nolabel="1"
-                                   readonly="x_annual_approval_state != 'pending_hr'"
-                                   placeholder="Reason..."/>
-                        </group>
-                        <group string="Flight Ticket">
-                            <field name="x_flight_ticket_amount"
-                                   readonly="x_annual_approval_state != 'pending_hr'"/>
-                            <field name="x_flight_ticket_description" nolabel="1"
-                                   readonly="x_annual_approval_state != 'pending_hr'"
-                                   placeholder="Details..."/>
                         </group>
                     </page>
 
@@ -194,9 +216,18 @@
                             <field name="x_additional_commissions" string="Total Commissions"
                                    readonly="1"/>
                             <field name="x_remaining_loans"
-                                   readonly="x_annual_approval_state != 'pending_acc'"/>
+                                   readonly="x_annual_approval_state != 'pending_acc' or not x_is_acc_approver"/>
                             <field name="x_remaining_loans_description" string="Notes"
-                                   readonly="x_annual_approval_state != 'pending_acc'"
+                                   readonly="x_annual_approval_state != 'pending_acc' or not x_is_acc_approver"
+                                   placeholder="Details..."/>
+                        </group>
+
+                        <group string="Flight Ticket"
+                               invisible="x_annual_approval_state in ('pending_hr', 'pending_gm_initial')">
+                            <field name="x_flight_ticket_amount"
+                                   readonly="x_annual_approval_state != 'pending_acc' or not x_is_acc_approver"/>
+                            <field name="x_flight_ticket_description" nolabel="1"
+                                   readonly="x_annual_approval_state != 'pending_acc' or not x_is_acc_approver"
                                    placeholder="Details..."/>
                         </group>
 
@@ -204,7 +235,7 @@
                                    name="commission_lines_section"
                                    invisible="x_annual_approval_state in ('pending_dm', 'pending_hr', 'pending_gm_initial') or not x_annual_approval_state"/>
                         <field name="x_commission_line_ids" nolabel="1"
-                               readonly="x_annual_approval_state != 'pending_acc'"
+                               readonly="x_annual_approval_state != 'pending_acc' or not x_is_acc_approver"
                                invisible="x_annual_approval_state in ('pending_dm', 'pending_hr', 'pending_gm_initial') or not x_annual_approval_state">
                             <list editable="bottom">
                                 <field name="sequence" widget="handle"/>
@@ -214,7 +245,19 @@
                         </field>
                     </page>
 
-                    <!-- Tab 3 · Approval Trail -->
+                    <!-- Tab 3 · Decision Support -->
+                    <page string="📊 Decision Support" name="decision_support"
+                          invisible="x_annual_approval_state == 'pending_dm'"
+                          groups="KSW_annual_leave.group_annual_leave_hr,KSW_annual_leave.group_annual_leave_acc,KSW_annual_leave.group_annual_leave_gm">
+                        <group string="End-of-Service (Saudi Art. 84–88)">
+                            <field name="x_eos_service_years" readonly="1"/>
+                            <field name="x_eos_last_wage" readonly="1"/>
+                            <field name="x_eos_termination_amount" readonly="1"/>
+                            <field name="x_eos_resignation_amount" readonly="1"/>
+                        </group>
+                    </page>
+
+                    <!-- Tab 4 · Approval Trail -->
                     <page string="📜 Approval Trail" name="approval_trail"
                           invisible="x_annual_approval_state == 'pending_dm'">
                         <group col="4" name="approval_history">
@@ -238,10 +281,14 @@
                                    invisible="not x_gm_final_approved_by"/>
                             <field name="x_gm_final_approved_date" string="Date"
                                    invisible="not x_gm_final_approved_date"/>
+                            <field name="x_employee_signed_by" string="Signature"
+                                   invisible="not x_employee_signed_by"/>
+                            <field name="x_employee_signed_date" string="Date"
+                                   invisible="not x_employee_signed_date"/>
                         </group>
                     </page>
 
-                    <!-- Tab 4 · Attachments -->
+                    <!-- Tab 5 · Attachments -->
                     <page string="📎 Attachments" name="attachments_page"
                           invisible="x_annual_approval_state == 'pending_dm'">
                         <field name="x_attachment_ids" widget="many2many_binary"
@@ -302,7 +349,10 @@
                 <separator/>
                 <filter string="⏳ Pending Approval"
                         name="pending_annual_approval"
-                        domain="[('x_annual_approval_state', 'in', ['pending_dm','pending_hr','pending_gm_initial','pending_acc','pending_gm_final'])]"/>
+                        domain="[('x_annual_approval_state', 'in', ['pending_dm','pending_hr','pending_gm_initial','pending_acc','pending_gm_final','pending_employee_signature'])]"/>
+                <filter string="✍️ Pending Signature"
+                        name="pending_employee_signature"
+                        domain="[('x_annual_approval_state', '=', 'pending_employee_signature')]"/>
                 <filter string="✅ Annual — Fully Approved"
                         name="annual_approved"
                         domain="[('x_annual_approval_state', '=', 'approved')]"/>

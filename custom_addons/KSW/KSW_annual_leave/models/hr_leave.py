@@ -9,6 +9,7 @@ ANNUAL_MULTI_STATES = [
     ('pending_gm_initial', 'Pending GM Initial'),
     ('pending_acc', 'Pending Accounting'),
     ('pending_gm_final', 'Pending GM Final'),
+    ('pending_employee_signature', 'Pending Employee Signature'),
     ('approved', 'Approved'),
 ]
 
@@ -133,6 +134,27 @@ class HrLeave(models.Model):
         help='True when the requested calendar days exceed the '
              'remaining annual leave balance.  Set by _compute_duration.',
     )
+    x_balance_at_request = fields.Float(
+        string='Balance at Request',
+        compute='_compute_balance_at_request',
+        digits=(10, 2),
+        help='Annual leave balance available when this request was made. '
+             'For validated leaves, reconstructed by adding back the days '
+             'deducted by this leave.',
+    )
+
+    @api.depends('employee_id', 'holiday_status_id', 'state', 'number_of_days')
+    def _compute_balance_at_request(self):
+        for leave in self:
+            if not leave.employee_id or not self._is_annual_leave(leave):
+                leave.x_balance_at_request = 0.0
+                continue
+            raw = self._get_remaining_balance(leave)
+            if leave.state == 'validate':
+                # Allocation already deducted — add back to show pre-request balance
+                leave.x_balance_at_request = raw + leave.number_of_days
+            else:
+                leave.x_balance_at_request = raw
 
     # ------------------------------------------------------------------
     # Full Balance Clearance
@@ -230,6 +252,21 @@ class HrLeave(models.Model):
     x_remaining_loans_description = fields.Text(
         string='Remaining Loans Description', copy=False,
     )
+
+    # --- End-of-Service support data (read-only reference for HR/Accounting) ---
+    x_eos_service_years = fields.Float(
+        string='Service Years', compute='_compute_eos_fields', digits=(5, 2),
+    )
+    x_eos_last_wage = fields.Float(
+        string='Last Wage (SAR)', compute='_compute_eos_fields', digits=(16, 2),
+    )
+    x_eos_termination_amount = fields.Float(
+        string='EOS — Termination (Art. 84)', compute='_compute_eos_fields', digits=(16, 2),
+    )
+    x_eos_resignation_amount = fields.Float(
+        string='EOS — Resignation (Art. 85)', compute='_compute_eos_fields', digits=(16, 2),
+    )
+
     x_attachment_ids = fields.Many2many(
         'ir.attachment', 'hr_leave_attachment_rel',
         'leave_id', 'attachment_id',
@@ -243,6 +280,40 @@ class HrLeave(models.Model):
         for leave in self:
             leave.x_additional_commissions = sum(
                 leave.x_commission_line_ids.mapped('amount'))
+
+    @api.depends(
+        'employee_id',
+        'employee_id.version_ids.contract_date_start',
+        'employee_id.version_ids.active',
+        'employee_id.current_version_id.wage',
+    )
+    def _compute_eos_fields(self):
+        today = fields.Date.context_today(self)
+        for leave in self:
+            wage = 0.0
+            years = 0.0
+            if leave.employee_id:
+                emp = leave.employee_id.sudo()
+                wage = emp.current_version_id.wage or 0.0
+                versions = emp.version_ids.filtered(lambda v: v.contract_date_start)
+                if versions:
+                    joining = min(versions.mapped('contract_date_start'))
+                    years = max((today - joining).days, 0) / 365.25
+            leave.x_eos_service_years = years
+            leave.x_eos_last_wage = wage
+            first = min(years, 5.0)
+            extra = max(years - 5.0, 0.0)
+            term = 0.5 * wage * first + 1.0 * wage * extra
+            leave.x_eos_termination_amount = term
+            if years < 2.0:
+                resig = 0.0
+            elif years < 5.0:
+                resig = term / 3.0
+            elif years < 10.0:
+                resig = term * 2.0 / 3.0
+            else:
+                resig = term
+            leave.x_eos_resignation_amount = resig
 
     # --- Approver tracking ---
     x_dm_approved_by = fields.Many2one(
@@ -275,6 +346,78 @@ class HrLeave(models.Model):
     x_gm_final_approved_date = fields.Datetime(
         string='GM Final Approved On', readonly=True, copy=False,
     )
+
+    # --- Employee signature step ---
+    x_employee_signed_by = fields.Many2one(
+        'hr.employee', string='Signature Confirmed By', readonly=True, copy=False,
+    )
+    x_employee_signed_date = fields.Datetime(
+        string='Signature Confirmed On', readonly=True, copy=False,
+    )
+    x_can_dm_approve = fields.Boolean(
+        compute='_compute_can_dm_approve',
+        help='True when the current user may perform the DM approval step.',
+    )
+    x_can_sign = fields.Boolean(
+        compute='_compute_can_sign',
+        help='True when the current user may confirm the employee signature step.',
+    )
+    # Role-gate fields: computed per-user so invisible= expressions
+    # hide buttons and lock fields without relying on groups= in the view.
+    x_can_hr_approve = fields.Boolean(compute='_compute_approval_role_gates')
+    x_can_gm_initial_approve = fields.Boolean(compute='_compute_approval_role_gates')
+    x_can_acc_approve = fields.Boolean(compute='_compute_approval_role_gates')
+    x_can_gm_final_approve = fields.Boolean(compute='_compute_approval_role_gates')
+    x_is_hr_approver = fields.Boolean(compute='_compute_approval_role_gates')
+    x_is_acc_approver = fields.Boolean(compute='_compute_approval_role_gates')
+
+    @api.depends_context('uid')
+    @api.depends('x_annual_approval_state')
+    def _compute_approval_role_gates(self):
+        user = self.env.user
+        is_hr = user.has_group('KSW_annual_leave.group_annual_leave_hr')
+        is_acc = user.has_group('KSW_annual_leave.group_annual_leave_acc')
+        is_gm = user.has_group('KSW_annual_leave.group_annual_leave_gm')
+        for leave in self:
+            s = leave.x_annual_approval_state
+            has_id = bool(leave.id)
+            leave.x_can_hr_approve = is_hr and s == 'pending_hr' and has_id
+            leave.x_can_gm_initial_approve = is_gm and s == 'pending_gm_initial' and has_id
+            leave.x_can_acc_approve = is_acc and s == 'pending_acc' and has_id
+            leave.x_can_gm_final_approve = is_gm and s == 'pending_gm_final' and has_id
+            leave.x_is_hr_approver = is_hr
+            leave.x_is_acc_approver = is_acc
+
+    @api.depends_context('uid')
+    @api.depends('x_annual_approval_state', 'employee_id',
+                 'employee_id.leave_manager_id')
+    def _compute_can_dm_approve(self):
+        user = self.env.user
+        is_hr = user.has_group('KSW_annual_leave.group_annual_leave_hr')
+        for leave in self:
+            if leave.x_annual_approval_state != 'pending_dm' or not leave.id:
+                leave.x_can_dm_approve = False
+                continue
+            dm = leave.employee_id.leave_manager_id
+            if not dm:
+                # No DM configured: HR approvers act as fallback
+                leave.x_can_dm_approve = is_hr
+            else:
+                leave.x_can_dm_approve = (dm == user)
+
+    @api.depends_context('uid')
+    @api.depends('x_annual_approval_state', 'employee_id',
+                 'employee_id.user_id', 'employee_id.leave_manager_id')
+    def _compute_can_sign(self):
+        user = self.env.user
+        for leave in self:
+            if leave.x_annual_approval_state != 'pending_employee_signature' or not leave.id:
+                leave.x_can_sign = False
+                continue
+            is_hr = user.has_group('KSW_annual_leave.group_annual_leave_hr')
+            is_employee = (leave.employee_id.user_id == user)
+            is_dm = (leave.employee_id.leave_manager_id == user)
+            leave.x_can_sign = bool(is_hr or is_employee or is_dm)
 
     # --- Link to vacation payslip ---
     # x_vacation_payslip_id lives in KSW_payroll (depends on om_hr_payroll).
@@ -547,6 +690,17 @@ class HrLeave(models.Model):
     # Write override — re-check allocation validity on toggle changes
     # ==================================================================
 
+    # Fields that only the HR Approver role may set to meaningful values
+    _HR_ONLY_FIELDS = frozenset({
+        'x_penalty_amount', 'x_penalty_description',
+        'x_iqama_renewal_amount', 'x_iqama_renewal_description',
+        'x_flight_ticket_amount', 'x_flight_ticket_description',
+    })
+    # Fields that only the Accounting Approver role may set to meaningful values
+    _ACC_ONLY_FIELDS = frozenset({
+        'x_remaining_loans', 'x_remaining_loans_description',
+    })
+
     def write(self, vals):
         """Re-trigger allocation validity on save for annual leaves.
 
@@ -575,6 +729,29 @@ class HrLeave(models.Model):
         when auto-clearing stale toggles — those internal clears should
         NOT trigger validity checks (the compute is still in progress).
         """
+        # Enforce role-based write restrictions for sensitive fields.
+        # Clearing fields to 0/False (e.g. from _reset_annual_multi_fields)
+        # is allowed for all roles; only *setting* meaningful values is guarded.
+        if not self.env.su:
+            hr_set = {k for k in vals if k in self._HR_ONLY_FIELDS and vals[k]}
+            if hr_set and not self.env.user.has_group(
+                    'KSW_annual_leave.group_annual_leave_hr'):
+                raise UserError(
+                    'Only HR Approvers can fill in penalty, iqama renewal, '
+                    'and flight ticket fields.')
+            acc_set = {k for k in vals if k in self._ACC_ONLY_FIELDS and vals[k]}
+            # For commission lines: treat create (0) or update (1) commands as writes
+            comm_cmds = vals.get('x_commission_line_ids', [])
+            has_comm_write = any(
+                isinstance(cmd, (list, tuple)) and cmd[0] in (0, 1)
+                for cmd in comm_cmds
+            )
+            if (acc_set or has_comm_write) and not self.env.user.has_group(
+                    'KSW_annual_leave.group_annual_leave_acc'):
+                raise UserError(
+                    'Only Accounting Approvers can fill in commission '
+                    'and loan fields.')
+
         result = super().write(vals)
 
         if self.env.context.get('_skip_toggle_validity'):
@@ -672,16 +849,23 @@ class HrLeave(models.Model):
             if leave.x_annual_approval_state != 'pending_dm':
                 raise UserError(
                     'This leave is not pending DM approval.')
-            # Check that current user is the leave manager or HR
-            if (leave.employee_id.leave_manager_id
-                    and leave.employee_id.leave_manager_id != self.env.user
-                    and not self.env.user.has_group(
-                        'KSW_annual_leave.group_annual_leave_hr')):
-                raise UserError(
-                    'Only %s (the leave manager) or an HR Approver '
-                    'can approve this step.'
-                    % leave.employee_id.leave_manager_id.name
-                )
+            if not self.env.su:
+                dm = leave.employee_id.leave_manager_id
+                if dm:
+                    # DM is configured: only that specific user may approve
+                    if dm != self.env.user:
+                        raise UserError(
+                            'Only %s (the leave manager) can approve this step.'
+                            % dm.name
+                        )
+                else:
+                    # No DM configured: HR Approver acts as fallback
+                    if not self.env.user.has_group(
+                            'KSW_annual_leave.group_annual_leave_hr'):
+                        raise UserError(
+                            'No Direct Manager is configured for this employee. '
+                            'An HR Approver must perform this step.'
+                        )
             leave.write({
                 'x_annual_approval_state': 'pending_hr',
                 'x_dm_approved_by': self.env.user.employee_id.id,
@@ -827,8 +1011,11 @@ class HrLeave(models.Model):
     def action_gm_final_approve(self):
         """Step 5: GM gives final approval.
 
-        Creates vacation payslip, then triggers Odoo validation
-        (state → validate, allocation deducted, on-vacation flag).
+        Creates the vacation payslip (all financial data is now ready)
+        then moves to 'pending_employee_signature' and notifies the
+        employee (or their DM if the leave was submitted on their behalf).
+        The final Odoo validation (state → validate) happens only after
+        the employee signature is confirmed in Step 6.
         """
         self._check_group(
             'KSW_annual_leave.group_annual_leave_gm',
@@ -841,28 +1028,77 @@ class HrLeave(models.Model):
                     'This leave is not pending GM final approval.')
 
             leave.write({
-                'x_annual_approval_state': 'approved',
+                'x_annual_approval_state': 'pending_employee_signature',
                 'x_gm_final_approved_by':
                     self.env.user.employee_id.id,
                 'x_gm_final_approved_date': fields.Datetime.now(),
             })
 
-            # Create vacation payslip BEFORE _action_validate
-            # (_action_validate sets x_return_state='on_vacation'
-            #  which would trigger the vacation-return guard).
+            # Create vacation payslip now — all financial inputs are
+            # finalised and the payslip guard (x_return_state) has not
+            # been set yet (that happens in _action_validate / Step 6).
             leave._create_vacation_payslip()
 
             leave.message_post(
                 body=Markup(
                     '<strong>✅ Step 5 — GM Final Approval</strong>'
                     '<br/><b>Approved by:</b> %(approver)s<br/>'
-                    '<b>Status:</b> Fully approved.'
+                    '<b>Next:</b> Awaiting employee signature to finalise.'
                 ) % {'approver': self.env.user.name},
                 subtype_xmlid='mail.mt_note',
             )
+            self._notify_pending_approvers(leave, 'pending_employee_signature')
 
-        # Standard Odoo validation: state → 'validate'
-        self._action_validate(check_state=False)
+    def action_employee_confirm_signature(self):
+        """Step 6: Employee (or DM on their behalf) confirms signature.
+
+        Requires at least one attachment to be present on the leave
+        (the signed vacation form). After confirmation the leave is
+        fully validated by Odoo (state → 'validate', allocation deducted,
+        x_return_state set to 'on_vacation').
+        """
+        user = self.env.user
+        for leave in self:
+            if leave.x_annual_approval_state != 'pending_employee_signature':
+                raise UserError(
+                    'This leave is not pending employee signature.')
+            if not self.env.su:
+                is_hr = user.has_group('KSW_annual_leave.group_annual_leave_hr')
+                is_employee = (leave.employee_id.user_id == user)
+                is_dm = (leave.employee_id.leave_manager_id == user)
+                if not (is_hr or is_employee or is_dm):
+                    raise UserError(
+                        'Only the employee, their leave manager, or an '
+                        'HR Approver can confirm the signature.')
+            if not leave.x_attachment_ids:
+                raise UserError(
+                    'Please upload the signed vacation form as an attachment '
+                    'before confirming the signature.')
+
+            leave.write({
+                'x_annual_approval_state': 'approved',
+                'x_employee_signed_by': user.employee_id.id,
+                'x_employee_signed_date': fields.Datetime.now(),
+            })
+            leave.message_post(
+                body=Markup(
+                    '<strong>✅ Step 6 — Employee Signature Confirmed</strong><br/>'
+                    '<b>Confirmed by:</b> %(user)s<br/>'
+                    '<b>Employee:</b> %(employee)s<br/>'
+                    '<b>Status:</b> Fully approved.'
+                ) % {
+                    'user': user.name,
+                    'employee': leave.employee_id.name,
+                },
+                subtype_xmlid='mail.mt_note',
+            )
+
+        # Standard Odoo validation — skip leaves already in 'validate'
+        # state (e.g. retroactive signature requests on leaves approved
+        # before this step existed).
+        to_validate = self.filtered(lambda l: l.state != 'validate')
+        if to_validate:
+            to_validate._action_validate(check_state=False)
 
     # ==================================================================
     # Vacation payslip hook (overridden by KSW_payroll)
@@ -886,11 +1122,12 @@ class HrLeave(models.Model):
             raise UserError(message)
 
     _ANNUAL_MULTI_STEP_CONFIG = {
-        'pending_dm':         {'label': 'Direct Manager Approval',  'group': None},
-        'pending_hr':         {'label': 'HR Approval',              'group': 'KSW_annual_leave.group_annual_leave_hr'},
-        'pending_gm_initial': {'label': 'GM Initial Approval',      'group': 'KSW_annual_leave.group_annual_leave_gm'},
-        'pending_acc':        {'label': 'Accounting Approval',      'group': 'KSW_annual_leave.group_annual_leave_acc'},
-        'pending_gm_final':   {'label': 'GM Final Approval',        'group': 'KSW_annual_leave.group_annual_leave_gm'},
+        'pending_dm':                 {'label': 'Direct Manager Approval',  'group': None},
+        'pending_hr':                 {'label': 'HR Approval',              'group': 'KSW_annual_leave.group_annual_leave_hr'},
+        'pending_gm_initial':         {'label': 'GM Initial Approval',      'group': 'KSW_annual_leave.group_annual_leave_gm'},
+        'pending_acc':                {'label': 'Accounting Approval',      'group': 'KSW_annual_leave.group_annual_leave_acc'},
+        'pending_gm_final':           {'label': 'GM Final Approval',        'group': 'KSW_annual_leave.group_annual_leave_gm'},
+        'pending_employee_signature': {'label': 'Employee Signature',       'group': None},
     }
 
     def _notify_pending_approvers(self, leave, pending_state):
@@ -902,6 +1139,17 @@ class HrLeave(models.Model):
         if pending_state == 'pending_dm':
             dm_user = leave.employee_id.leave_manager_id  # res.users
             partner_ids = [dm_user.partner_id.id] if dm_user and dm_user.partner_id else []
+        elif pending_state == 'pending_employee_signature':
+            # Notify the employee if they submitted their own leave.
+            # If the leave was submitted by a supervisor on their behalf,
+            # notify the DM instead so they can upload the signed form.
+            submitter = leave.sudo().create_uid
+            employee_user = leave.employee_id.user_id
+            if submitter == employee_user or not leave.employee_id.leave_manager_id:
+                notify_user = employee_user
+            else:
+                notify_user = leave.employee_id.leave_manager_id
+            partner_ids = [notify_user.partner_id.id] if notify_user and notify_user.partner_id else []
         else:
             group = self.env.ref(config['group'], raise_if_not_found=False)
             partner_ids = group.user_ids.mapped('partner_id').ids if group else []
@@ -909,19 +1157,28 @@ class HrLeave(models.Model):
         if not partner_ids:
             return
 
+        if pending_state == 'pending_employee_signature':
+            instruction = (
+                'Please upload the signed vacation request form as an '
+                'attachment, then click "Confirm Signature" to complete the approval.'
+            )
+        else:
+            instruction = 'This annual leave request is awaiting your approval.'
+
         leave.message_post(
             body=Markup(
                 '<strong>&#9203; Action Required — %(label)s</strong><br/>'
                 '<b>Employee:</b> %(employee)s<br/>'
                 '<b>Period:</b> %(date_from)s &#8594; %(date_to)s<br/>'
                 '<b>Days:</b> %(days).1f<br/>'
-                'This annual leave request is awaiting your approval.'
+                '%(instruction)s'
             ) % {
                 'label': config['label'],
                 'employee': leave.employee_id.name,
                 'date_from': leave.request_date_from,
                 'date_to': leave.request_date_to,
                 'days': leave.number_of_days,
+                'instruction': instruction,
             },
             partner_ids=partner_ids,
             subtype_xmlid='mail.mt_comment',
@@ -955,6 +1212,8 @@ class HrLeave(models.Model):
             'x_acc_approved_date': False,
             'x_gm_final_approved_by': False,
             'x_gm_final_approved_date': False,
+            'x_employee_signed_by': False,
+            'x_employee_signed_date': False,
         })
 
     # ==================================================================

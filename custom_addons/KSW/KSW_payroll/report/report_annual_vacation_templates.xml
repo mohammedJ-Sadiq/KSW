@@ -191,6 +191,18 @@
                                         <t t-else="">—</t>
                                     </td>
                                 </tr>
+                                <!-- Step 6: Employee Signature -->
+                                <tr t-attf-class="#{'table-success fw-bold' if o.x_employee_signed_by else ''}">
+                                    <td class="text-center fw-bold">6</td>
+                                    <td><strong>Employee Signature</strong></td>
+                                    <td t-out="o.x_employee_signed_by.name if o.x_employee_signed_by else '—'"/>
+                                    <td>
+                                        <t t-if="o.x_employee_signed_date">
+                                            <t t-out="o.x_employee_signed_date.strftime('%Y-%m-%d  %H:%M')"/>
+                                        </t>
+                                        <t t-else="">—</t>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
 
@@ -199,7 +211,6 @@
                         <!-- ══════════════════════════════════════════ -->
                         <t t-set="has_financials" t-value="
                             o.x_penalty_amount or
-                            o.x_iqama_renewal_amount or
                             o.x_flight_ticket_amount or
                             o.x_additional_commissions or
                             o.x_remaining_loans
@@ -222,11 +233,6 @@
                                             t-out="'%.2f' % o.x_penalty_amount"/>
                                         <td t-out="o.x_penalty_description or ''"/>
                                     </tr>
-                                    <tr t-if="o.x_iqama_renewal_amount">
-                                        <td>Iqama Renewal <em class="text-muted">(for record only, not in payslip)</em></td>
-                                        <td class="text-end" t-out="'%.2f' % o.x_iqama_renewal_amount"/>
-                                        <td t-out="o.x_iqama_renewal_description or ''"/>
-                                    </tr>
                                     <tr t-if="o.x_flight_ticket_amount">
                                         <td>Flight Ticket Allowance</td>
                                         <td class="text-end text-success fw-bold"
@@ -241,12 +247,6 @@
                                                 t-out="'%.2f' % cl.amount"/>
                                             <td/>
                                         </tr>
-                                        <tr class="fw-bold table-info">
-                                            <td>Total Additional Commissions</td>
-                                            <td class="text-end"
-                                                t-out="'%.2f' % o.x_additional_commissions"/>
-                                            <td/>
-                                        </tr>
                                     </t>
                                     <!-- Accounting items: remaining loans -->
                                     <tr t-if="o.x_remaining_loans">
@@ -255,14 +255,53 @@
                                             t-out="'%.2f' % o.x_remaining_loans"/>
                                         <td t-out="o.x_remaining_loans_description or ''"/>
                                     </tr>
+                                    <!-- Total of all payslip-impacting inputs (iqama excluded).
+                                         Penalty and Remaining Loans are stored positive but the salary
+                                         rules negate them, so we subtract them here to match payslip impact. -->
+                                    <t t-set="x_total_additional"
+                                       t-value="(o.x_flight_ticket_amount or 0.0) + (o.x_additional_commissions or 0.0) - (o.x_penalty_amount or 0.0) - (o.x_remaining_loans or 0.0)"/>
+                                    <tr t-if="x_total_additional != 0" class="fw-bold table-info">
+                                        <td>Total Additional Inputs</td>
+                                        <td t-att-class="'text-end ' + ('text-danger' if x_total_additional &lt; 0 else 'text-success')"
+                                            t-out="'%.2f' % x_total_additional"/>
+                                        <td/>
+                                    </tr>
                                 </tbody>
                             </table>
                         </t>
 
                         <!-- ══════════════════════════════════════════ -->
-                        <!--  Section 4: Vacation Payslip              -->
+                        <!--  Section 4: End-of-Service Data           -->
                         <!-- ══════════════════════════════════════════ -->
-                        <t t-set="payslip" t-value="o.x_vacation_payslip_ids[0] if o.x_vacation_payslip_ids else False"/>
+                        <t t-if="o.x_eos_service_years or o.x_eos_last_wage">
+                            <h5 class="border-bottom pb-1 mb-2">End-of-Service Data (Saudi Art. 84–88)</h5>
+                            <table class="table table-sm table-bordered mb-4">
+                                <tbody>
+                                    <tr>
+                                        <td style="width:50%"><strong>Service Years</strong></td>
+                                        <td t-out="'%.2f' % (o.x_eos_service_years or 0.0)"/>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Last Wage (SAR)</strong></td>
+                                        <td t-out="'%.2f' % (o.x_eos_last_wage or 0.0)"/>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>EOS — Termination (Art. 84)</strong></td>
+                                        <td class="fw-bold" t-out="'%.2f' % (o.x_eos_termination_amount or 0.0)"/>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>EOS — Resignation (Art. 85)</strong></td>
+                                        <td class="fw-bold" t-out="'%.2f' % (o.x_eos_resignation_amount or 0.0)"/>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <!-- ══════════════════════════════════════════ -->
+                        <!--  Section 5: Vacation Payslip              -->
+                        <!-- ══════════════════════════════════════════ -->
+                        <t t-set="_vac_payslips" t-value="o.sudo().x_vacation_payslip_ids"/>
+                        <t t-set="payslip" t-value="_vac_payslips[0] if _vac_payslips else False"/>
 
                         <t t-if="payslip">
 
@@ -316,39 +355,7 @@
                                 </table>
                             </t>
 
-                            <!-- Payslip: Other Inputs (vacation items fed by the leave) -->
-                            <t t-if="payslip.input_line_ids">
-                                <h6 class="mt-3 mb-1 fw-bold">Vacation Inputs</h6>
-                                <table class="table table-sm table-bordered mb-3">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Description</th>
-                                            <th>Code</th>
-                                            <th class="text-end">Amount (SAR)</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <t t-set="inp_total" t-value="0"/>
-                                        <tr t-foreach="payslip.input_line_ids" t-as="inp">
-                                            <td t-out="inp.name"/>
-                                            <td t-out="inp.code"/>
-                                            <td class="text-end fw-bold"
-                                                t-out="'%.2f' % inp.amount"/>
-                                            <t t-set="inp_total" t-value="inp_total + inp.amount"/>
-                                        </tr>
-                                    </tbody>
-                                    <tfoot class="fw-bold table-light">
-                                        <tr>
-                                            <td colspan="2">Total Inputs</td>
-                                            <td class="text-end" t-out="'%.2f' % inp_total"/>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </t>
-
                             <!-- Payslip: Salary Computation -->
-                            <t t-set="ps_basic" t-value="sum(l.total for l in payslip.line_ids if l.code == 'BASIC')"/>
-                            <t t-set="ps_attded" t-value="sum(l.total for l in payslip.line_ids if l.code == 'ATTDED')"/>
                             <h6 class="mt-3 mb-1 fw-bold">Salary Computation</h6>
                             <table class="table table-sm table-bordered mb-4">
                                 <thead class="table-light">
@@ -366,12 +373,6 @@
                                             <td t-out="line.code"/>
                                             <td class="text-end" t-out="'%.2f' % line.total"/>
                                         </tr>
-                                        <tr t-if="line.code == 'BASIC'" class="table-info">
-                                            <td colspan="2">
-                                                <em>Net Basic (Basic − Attendance Deduction)</em>
-                                            </td>
-                                            <td class="text-end" t-out="'%.2f' % (ps_basic + ps_attded)"/>
-                                        </tr>
                                     </t>
                                 </tbody>
                             </table>
@@ -387,11 +388,15 @@
                         <!-- ══════════════════════════════════════════ -->
                         <!--  Section 5: Signature Block               -->
                         <!-- ══════════════════════════════════════════ -->
-                        <div class="row mt-5 text-center">
+                        <div class="row mt-5 pt-5 text-center">
                             <div class="col-4">
                                 <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
-                                    <strong>Employee</strong><br/>
-                                    <span t-out="o.employee_id.name"/>
+                                    <strong>Accountant</strong>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
+                                    <strong>Accounting Manager</strong>
                                 </div>
                             </div>
                             <div class="col-4">
@@ -399,9 +404,18 @@
                                     <strong>HR Manager</strong>
                                 </div>
                             </div>
-                            <div class="col-4">
+                        </div>
+                        
+                        <div class="row mt-5 pt-5 text-center">
+                            <div class="col-6">
                                 <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
                                     <strong>General Manager</strong>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
+                                    <strong>Employee</strong><br/>
+                                    <span t-out="o.employee_id.name"/>
                                 </div>
                             </div>
                         </div>
