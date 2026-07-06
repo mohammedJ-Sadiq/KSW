@@ -48,6 +48,7 @@
                 <field name="x_can_gm_initial_approve" invisible="1"/>
                 <field name="x_can_acc_approve" invisible="1"/>
                 <field name="x_can_gm_final_approve" invisible="1"/>
+                <field name="x_can_gm_return" invisible="1"/>
                 <field name="x_is_hr_approver" invisible="1"/>
                 <field name="x_is_acc_approver" invisible="1"/>
                 <field name="x_balance_at_request" invisible="1"/>
@@ -84,6 +85,10 @@
                         name="action_gm_final_approve"
                         type="object" class="btn-success"
                         invisible="not x_can_gm_final_approve"/>
+                <button string="↩ Return to Approver"
+                        name="action_open_gm_return_wizard"
+                        type="object" class="btn-warning"
+                        invisible="not x_can_gm_return"/>
                 <button string="✍️ Confirm Signature"
                         name="action_employee_confirm_signature"
                         type="object" class="btn-success"

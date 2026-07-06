@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_gm_return_approver_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.gm.return.approver.wizard.form</field>
+        <field name="model">ksw.gm.return.approver.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Return Leave for Revision">
+                <sheet>
+                    <group string="Leave Summary" col="2">
+                        <field name="employee_name" string="Employee" readonly="1"/>
+                        <field name="leave_period"  string="Period"   readonly="1" nolabel="1"/>
+                        <field name="current_state_label" string="Currently At" readonly="1"/>
+                    </group>
+                    <group string="Return Settings">
+                        <field name="target_state" widget="radio" string="Return To"/>
+                        <field name="reason" string="Message to Approver"
+                               placeholder="Describe what needs to be corrected..."
+                               nolabel="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Return for Revision"
+                            name="action_confirm"
+                            type="object"
+                            class="btn-warning"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_gm_return_approver_wizard" model="ir.actions.act_window">
+        <field name="name">Return to Approver</field>
+        <field name="res_model">ksw.gm.return.approver.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

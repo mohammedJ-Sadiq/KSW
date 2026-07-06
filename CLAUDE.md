@@ -49,12 +49,12 @@ Everything else is read-only reference:
 | `KSW_attendance_leave` | Attendance-based leave tracking |
 | `KSW_attendance_sheet` | Monthly attendance sheet for non-biometric employees |
 | `KSW_attendance_report` | PDF monthly attendance report |
-| `KSW_annual_leave` | Saudi-law annual leave: 21 days/yr (<5 yrs), 30 days/yr (≥5 yrs), auto-allocated daily |
+| `KSW_annual_leave` | Saudi-law annual leave: 21 days/yr (<5 yrs), 30 days/yr (≥5 yrs), auto-allocated daily; 6-step multi-approval chain with GM return-to-approver feature |
 | `KSW_unpaid_leave` | Unpaid leave with 2-step approval + attendance integration |
 | `KSW_leave_approval` | 2-step time-off approval: Direct Manager → HR Manager |
 | `KSW_deduction` | Employee deductions (loans, penalties, advances) |
 | `KSW_commissions` | Monthly commissions & allowances for non-biometric employees |
-| `KSW_payroll` | Full payroll: extends `om_hr_payroll`, biometric attendance deduction, payslip runs, bank export |
+| `KSW_payroll` | Full payroll: extends `om_hr_payroll`, biometric attendance deduction, payslip runs, bank export; `ksw.payslip.run.bank.total` stores per-bank NET totals on the batch |
 
 ## Dependency Chain
 ```
@@ -280,7 +280,21 @@ KSW_payroll access-tier feature. Know them before doing similar work again.
     See also the existing `self._check_group(...)` helper in
     `KSW_annual_leave/models/hr_leave.py` for the approval-step pattern.
 
-16. **`_generate_weekend_records` (cybrosys) crashes for night-shift employees.**
+16. **`_check_group` does NOT check `self.env.su` — use `with_user()`, not just `sudo()`.** The KSW `_check_group(xmlid, message)` helper calls `self.env.user.has_group(xmlid)` unconditionally. This means `record.sudo()` alone is insufficient if the effective user (from `with_user`) lacks the group. Pattern for tests and server code:
+    ```python
+    # WRONG — sudo() doesn't give user_hr the group_annual_leave_hr group
+    leave.sudo().action_hr_approve()
+    # RIGHT — set the authorised user first, then widen record-rule scope with sudo
+    leave.with_user(user_hr).sudo().action_hr_approve()
+    ```
+    Applies equally to `action_dm_approve`, `action_gm_initial_approve`,
+    `action_acc_approve`, `action_gm_final_approve`.
+
+17. **In Odoo 19, `hr.leave` is created directly in `confirm` state — `action_confirm()` does not exist on the base model.** The field has `default='confirm'`. Any test or override that calls `leave.action_confirm()` or `super().action_confirm()` will raise `AttributeError: 'super' object has no attribute 'action_confirm'`. Move post-create side effects (DM notifications, etc.) into the `create()` override directly.
+
+18. **`action_gm_final_approve` does NOT directly validate the leave (state → validate). It moves to `pending_employee_signature`.** The Odoo `_action_validate` call only happens after `action_employee_confirm_signature()`. Tests that assert `leave.state == 'validate'` after `action_gm_final_approve` will fail. Add the employee signature step with a stub attachment (see KSW_annual_leave architecture section below).
+
+19. **`_generate_weekend_records` (cybrosys) crashes for night-shift employees.**
     The upstream code extracts only `.hour`/`.minute` from `ref_schedule['end']`
     and places both check_in and check_out on the same `grant_day`. For overnight
     schedules (e.g. 22:00–06:00) `get_employee_day_schedule` already advances
@@ -389,3 +403,77 @@ approvers. Both are shown in a dedicated **Payroll Impact** group on the form
   (sudo required because `wage` is group-restricted). Uses the same data source
   as `x_eos_last_wage` but is a separate field so it can appear outside the
   Decision Support tab without pulling in the full EOS computation.
+
+## KSW_annual_leave: multi-step approval chain
+
+### Full chain
+`emp → pending_dm → pending_hr → pending_gm_initial → pending_acc →
+pending_gm_final → pending_employee_signature → approved`
+
+Field: `x_annual_approval_state` (Selection) on `hr.leave`.
+
+### Per-step action methods
+| State leaving | Method | Group required |
+|---|---|---|
+| `pending_dm` | `action_dm_approve` | leave manager of the employee (or any HR) |
+| `pending_hr` | `action_hr_approve` | `group_annual_leave_hr` |
+| `pending_gm_initial` | `action_gm_initial_approve` | `group_annual_leave_gm` |
+| `pending_acc` | `action_acc_approve` | `group_annual_leave_acc` |
+| `pending_gm_final` | `action_gm_final_approve` | `group_annual_leave_gm` |
+| `pending_employee_signature` | `action_employee_confirm_signature` | employee, DM, or HR |
+
+`_check_group(xmlid, message)` raises `UserError` when the calling user lacks the
+group. **It does NOT check `self.env.su`.** So `record.sudo()` alone is not enough
+to bypass the check — use `record.with_user(authorised_user).sudo()` in tests.
+
+### Odoo 19: no `action_confirm` on `hr.leave`
+Odoo 19's `hr.leave` has `default='confirm'` — leaves are created directly in
+`confirm` state. There is no `action_confirm()` method on the base model.
+The KSW `create()` override calls `_notify_pending_approvers(leave, 'pending_dm')`
+directly after writing `x_annual_approval_state = 'pending_dm'`.
+Do **not** add `action_confirm()` overrides or test code that calls it.
+
+### Employee signature step
+`action_gm_final_approve` moves the leave to `pending_employee_signature`
+(NOT directly to `validate`). The Odoo `state → 'validate'` only happens after
+`action_employee_confirm_signature()` is called. That method requires at least
+one attachment on `x_attachment_ids`. In tests, create a stub attachment:
+```python
+att = self.env['ir.attachment'].sudo().create({
+    'name': 'test_signed_form.pdf',
+    'datas': base64.b64encode(b'stub'),
+    'res_model': 'hr.leave', 'res_id': leave.id,
+})
+leave.sudo().write({'x_attachment_ids': [(4, att.id)]})
+leave.sudo().action_employee_confirm_signature()
+```
+
+### GM Return-to-Approver wizard
+`ksw.gm.return.approver.wizard` (in `KSW_annual_leave/wizard/`) lets the GM
+return a leave to an earlier approver instead of refusing it outright.
+
+- **Valid return targets** — only from the two GM steps:
+  - From `pending_gm_initial`: `pending_dm` or `pending_hr`
+  - From `pending_gm_final`: `pending_dm`, `pending_hr`, `pending_gm_initial`,
+    or `pending_acc`
+- **Stamp clearing**: returning to state X clears that stamp and all later ones;
+  earlier stamps are preserved. `_CLEAR_STAMPS` dict in the wizard defines this.
+- **Gate field**: `x_can_gm_return` (Boolean, `@api.depends_context('uid')`) is
+  True only for GM users at the two GM steps. Controls button visibility in the
+  form and is the correct guard to read in XML `invisible=` expressions.
+- **Inbox notification**: `_notify_return()` posts with `mail.mt_comment` and
+  sets `partner_ids` so the target approver (group or DM user) gets an Odoo
+  inbox notification containing the GM's reason text.
+- **Test helper pattern**: `_advance_to(leave, target)` in the tests is
+  resume-aware — it skips steps already past the current state. This lets you
+  call it multiple times on the same leave with increasing targets.
+
+20. **`editable="0"` is not a valid value for the `<list>` editable attribute.** Odoo 19 only accepts `"top"` or `"bottom"`. Using `editable="0"` raises a `ParseError` on module upgrade. For a read-only embedded list, simply omit the `editable` attribute (or set `readonly="1"` on the parent `<field>`).
+
+21. **Inserting elements after a field inside a `<group>` puts them *inside* that group, breaking the grid layout.** In the `hr.payslip.run` base form, `credit_note` lives inside a `<group col="4">`. Any `<xpath expr="//field[@name='credit_note']" position="after">` block adds its children to that same 4-column group, which misaligns the Period/Credit Note row. To place content *outside* the group (at sheet level), use a separate xpath targeting a sibling that is outside the group — e.g. `<xpath expr="//field[@name='slip_ids']" position="before">`.
+
+### `requires_allocation` in tests
+Must be `False` (Python bool), **not** `'no'` (truthy string). The string `'no'`
+evaluates as True and triggers `_check_validity`'s allocation guard even when no
+allocation is needed. All test leave types that do not require allocation must use
+`'requires_allocation': False`.

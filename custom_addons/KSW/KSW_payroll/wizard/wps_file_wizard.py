@@ -16,6 +16,7 @@ class WpsFileWizard(models.TransientModel):
         help='Payment value date (the date the bank processes the transfer).',
     )
     _LINE_LEN = 300
+    _HEADER_LINE_LEN = 301
     def action_generate(self):
         self.ensure_one()
         batch = self.payslip_run_id
@@ -117,15 +118,15 @@ class WpsFileWizard(models.TransientModel):
             now.strftime('%Y%m%d'),                            # creation date 8
             now.strftime('%H%M%S'),                            # creation time 6
             '01',                                              # batch number  2
-            self._pz(int(cic) if cic.isdigit() else 0, 15),   # CIC          15
+            self._pz(int(cic) if cic.isdigit() else 0, 16),   # CIC          16
             self._pr(mol, 10),                                 # MOL ID       10
-            ' ' * 9,                                           # filler        9
+            ' ' * 8,                                           # filler        8
             self._pr('PAYR', 4),                               # payment type  4
             ' ' * 6,                                           # filler        6
             self._pr('Payroll', 7),                            # description   7
         ])
-        h = h.ljust(self._LINE_LEN - 1) + 'N'
-        return h[:self._LINE_LEN]
+        h = h.ljust(self._HEADER_LINE_LEN - 1) + 'N'
+        return h[:self._HEADER_LINE_LEN]
     def _detail(self, slip):
         emp = slip.employee_id
         bank = emp.sudo().primary_bank_account_id
@@ -138,7 +139,7 @@ class WpsFileWizard(models.TransientModel):
             l.total for l in slip.line_ids
             if l.category_id.code == 'DED'
         )) or 0.0
-        emp_ref = emp.barcode or '0'
+        emp_ref = emp.x_employee_no or '0'
         emp_iban = (bank.acc_number or '').replace(' ', '') if bank else ''
         emp_name = (emp.name or '').upper()
         emp_id = emp.ssnid or emp.identification_id or '0'

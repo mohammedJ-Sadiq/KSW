@@ -28,6 +28,7 @@
         'views/annual_leave_views.xml',
         'wizard/absent_days_wizard_views.xml',
         'wizard/opening_balance_wizard_views.xml',
+        'wizard/gm_return_approver_wizard_views.xml',
         'data/cron.xml',
     ],
     'installable': True,

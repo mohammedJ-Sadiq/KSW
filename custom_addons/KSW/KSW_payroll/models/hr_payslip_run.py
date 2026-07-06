@@ -8,6 +8,38 @@ except ImportError:
     openpyxl = None
 
 
+class KswPayslipRunBankTotal(models.Model):
+    """Per-bank-account NET total summary for a payslip batch.
+
+    Refreshed automatically after compute_sheet(), action_payslip_done(),
+    and whenever the batch-level fallback bank account changes.
+    """
+    _name = 'ksw.payslip.run.bank.total'
+    _description = 'Payslip Batch — Bank Account NET Total'
+    _order = 'total_net desc'
+
+    run_id = fields.Many2one(
+        'hr.payslip.run', string='Payslip Batch',
+        required=True, ondelete='cascade', index=True,
+    )
+    bank_account_id = fields.Many2one(
+        'res.partner.bank', string='Bank Account',
+        ondelete='set null',
+    )
+    bank_name = fields.Char(
+        related='bank_account_id.bank_id.name',
+        string='Bank Name',
+        store=True,
+    )
+    file_type = fields.Selection(
+        related='bank_account_id.x_file_type',
+        string='Type',
+        store=True,
+    )
+    slip_count = fields.Integer(string='Employees')
+    total_net = fields.Float(string='Total NET', digits=(16, 2))
+
+
 class KswPayslipRunSkipLine(models.Model):
     """Records employees that were skipped during batch payslip generation,
     along with the reason they were excluded."""
@@ -43,6 +75,47 @@ class HrPayslipRun(models.Model):
         help='Employees that were automatically skipped during payslip '
              'generation and the reason they were excluded.',
     )
+
+    x_bank_total_ids = fields.One2many(
+        'ksw.payslip.run.bank.total', 'run_id',
+        string='Bank Account Totals',
+        readonly=True,
+    )
+
+    def write(self, vals):
+        res = super().write(vals)
+        if 'x_salary_bank_account_id' in vals:
+            self._refresh_bank_totals()
+        return res
+
+    def _refresh_bank_totals(self):
+        """Recompute per-bank NET totals from the current slip_ids."""
+        BankTotal = self.env['ksw.payslip.run.bank.total'].sudo()
+        for run in self:
+            BankTotal.search([('run_id', '=', run.id)]).unlink()
+            groups = {}
+            fallback = run.x_salary_bank_account_id
+            for slip in run.slip_ids:
+                bank = slip.employee_id.sudo().x_salary_bank_account_id or fallback
+                bid = bank.id if bank else False
+                if bid not in groups:
+                    groups[bid] = {
+                        'run_id': run.id,
+                        'bank_account_id': bid or False,
+                        'slip_count': 0,
+                        'total_net': 0.0,
+                    }
+                net_line = slip.line_ids.filtered(lambda l: l.code == 'NET')
+                net = net_line[:1].total if net_line else 0.0
+                groups[bid]['total_net'] += net
+                groups[bid]['slip_count'] += 1
+            for row in groups.values():
+                BankTotal.create(row)
+
+    def action_refresh_bank_totals(self):
+        self.ensure_one()
+        self._refresh_bank_totals()
+        return True
 
     def action_clear_skip_log(self):
         """Remove all skipped-employee log entries for this batch."""

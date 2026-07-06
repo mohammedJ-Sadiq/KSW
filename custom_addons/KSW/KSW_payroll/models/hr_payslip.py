@@ -196,7 +196,11 @@ class HrPayslip(models.Model):
                                          absence_only=absence_only)
 
             self._inject_prior_hra_input(payslip)
-        return super().compute_sheet()
+        res = super().compute_sheet()
+        runs = self.mapped('payslip_run_id').filtered(bool)
+        if runs:
+            runs._refresh_bank_totals()
+        return res
 
     # ------------------------------------------------------------------
     # Refresh VACATION_BAL input on vacation payslips
@@ -1087,6 +1091,24 @@ class HrPayslip(models.Model):
     def action_payslip_done(self):
         res = super().action_payslip_done()
         self._send_auto_payslip_email()
+        runs = self.mapped('payslip_run_id').filtered(bool)
+        if runs:
+            runs._refresh_bank_totals()
+        return res
+
+    def write(self, vals):
+        res = super().write(vals)
+        if 'payslip_run_id' in vals or 'state' in vals:
+            runs = self.mapped('payslip_run_id').filtered(bool)
+            if runs:
+                runs._refresh_bank_totals()
+        return res
+
+    def unlink(self):
+        runs = self.mapped('payslip_run_id').filtered(bool)
+        res = super().unlink()
+        if runs:
+            runs._refresh_bank_totals()
         return res
 
     def _send_auto_payslip_email(self):

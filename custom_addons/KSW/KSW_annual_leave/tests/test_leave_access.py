@@ -38,9 +38,11 @@ class TestLeaveAccess(TransactionCase):
         cls.emp_c.write({'user_id': cls.user_c.id})
 
         # Create leave types and leaves
+        # requires_allocation must be False (bool) in Odoo 19.
+        # 'no' is a truthy string and triggers _check_validity's allocation guard.
         cls.leave_type = cls.env['hr.leave.type'].sudo().create({
             'name': 'Generic Leave',
-            'requires_allocation': 'no',
+            'requires_allocation': False,
         })
         
         cls.leave_a = cls.env['hr.leave'].sudo().create({

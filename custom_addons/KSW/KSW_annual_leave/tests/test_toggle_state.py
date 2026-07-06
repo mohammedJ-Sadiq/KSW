@@ -11,6 +11,7 @@ toggles:
   - Refuse / draft / back-to-approval clears all toggles
   - Consistency after multiple toggle state transitions
 """
+import base64
 from datetime import date, datetime, timedelta
 
 from odoo.exceptions import ValidationError
@@ -228,6 +229,22 @@ class TestToggleState(TransactionCase):
             getattr(leave.with_user(user).sudo(), method_name)()
             if step_name == up_to_step:
                 break
+
+    def _fully_approve(self, leave):
+        """Run the full approval chain including the employee signature step.
+
+        action_gm_final_approve moves to pending_employee_signature (not
+        validate). A stub attachment is added so the signature check passes.
+        """
+        self._approve_through_step(leave, 'gm_final')
+        att = self.env['ir.attachment'].sudo().create({
+            'name': 'test_signed_form.pdf',
+            'datas': base64.b64encode(b'stub'),
+            'res_model': 'hr.leave',
+            'res_id': leave.id,
+        })
+        leave.sudo().write({'x_attachment_ids': [(4, att.id)]})
+        leave.sudo().action_employee_confirm_signature()
 
     # ==================================================================
     # BUG 1: Unchecking x_excess_days_accepted triggers allocation check
@@ -476,9 +493,8 @@ class TestToggleState(TransactionCase):
         leave._compute_duration()
         self.assertTrue(leave.x_is_full_clearance)
 
-        # Approve through all steps
-        self._approve_through_step(leave, 'acc')
-        leave.with_user(self.user_gm).sudo().action_gm_final_approve()
+        # Fully approve (includes employee signature step → state = validate)
+        self._fully_approve(leave)
         self.assertEqual(leave.state, 'validate')
 
         # Refuse
@@ -521,9 +537,8 @@ class TestToggleState(TransactionCase):
         leave.invalidate_recordset()
         leave._compute_duration()
 
-        # Fully approve
-        self._approve_through_step(leave, 'acc')
-        leave.with_user(self.user_gm).sudo().action_gm_final_approve()
+        # Fully approve (includes employee signature step → state = validate)
+        self._fully_approve(leave)
         self.assertEqual(leave.state, 'validate')
 
         # Back to approval

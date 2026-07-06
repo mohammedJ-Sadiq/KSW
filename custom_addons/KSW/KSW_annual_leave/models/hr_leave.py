@@ -368,6 +368,7 @@ class HrLeave(models.Model):
     x_can_gm_initial_approve = fields.Boolean(compute='_compute_approval_role_gates')
     x_can_acc_approve = fields.Boolean(compute='_compute_approval_role_gates')
     x_can_gm_final_approve = fields.Boolean(compute='_compute_approval_role_gates')
+    x_can_gm_return = fields.Boolean(compute='_compute_approval_role_gates')
     x_is_hr_approver = fields.Boolean(compute='_compute_approval_role_gates')
     x_is_acc_approver = fields.Boolean(compute='_compute_approval_role_gates')
 
@@ -385,6 +386,11 @@ class HrLeave(models.Model):
             leave.x_can_gm_initial_approve = is_gm and s == 'pending_gm_initial' and has_id
             leave.x_can_acc_approve = is_acc and s == 'pending_acc' and has_id
             leave.x_can_gm_final_approve = is_gm and s == 'pending_gm_final' and has_id
+            leave.x_can_gm_return = (
+                is_gm
+                and s in ('pending_gm_initial', 'pending_gm_final')
+                and has_id
+            )
             leave.x_is_hr_approver = is_hr
             leave.x_is_acc_approver = is_acc
 
@@ -787,20 +793,11 @@ class HrLeave(models.Model):
         records = super().create(vals_list)
         for leave in records:
             if self._is_annual_multi(leave):
-                leave.sudo().write({
-                    'x_annual_approval_state': 'pending_dm',
-                })
+                leave.sudo().write({'x_annual_approval_state': 'pending_dm'})
+                # In Odoo 19, leaves are created directly in 'confirm' state
+                # (no action_confirm). Notify the DM here.
+                self._notify_pending_approvers(leave, 'pending_dm')
         return records
-
-    # ==================================================================
-    # Multi-Step Approval: action_confirm — notify DM on submission
-    # ==================================================================
-
-    def action_confirm(self):
-        result = super().action_confirm()
-        for leave in self.filtered(self._is_annual_multi):
-            self._notify_pending_approvers(leave, 'pending_dm')
-        return result
 
     # ==================================================================
     # Multi-Step Approval: action_approve intercept
@@ -1048,6 +1045,24 @@ class HrLeave(models.Model):
                 subtype_xmlid='mail.mt_note',
             )
             self._notify_pending_approvers(leave, 'pending_employee_signature')
+
+    def action_open_gm_return_wizard(self):
+        """Open the wizard allowing the GM to return the request to a previous approver."""
+        self.ensure_one()
+        if not self.env.su and not self.env.user.has_group(
+                'KSW_annual_leave.group_annual_leave_gm'):
+            raise UserError('Only the General Manager can return a leave to an approver.')
+        if self.x_annual_approval_state not in ('pending_gm_initial', 'pending_gm_final'):
+            raise UserError(
+                'The leave must be at a GM approval step to use this action.')
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Return to Approver',
+            'res_model': 'ksw.gm.return.approver.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_leave_id': self.id},
+        }
 
     def action_employee_confirm_signature(self):
         """Step 6: Employee (or DM on their behalf) confirms signature.

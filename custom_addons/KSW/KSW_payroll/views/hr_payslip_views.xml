@@ -182,9 +182,29 @@
                         icon="fa-download"
                         class="btn-secondary"/>
             </xpath>
-            <!-- Bank account selector for WPS export -->
+            <!-- x_salary_bank_account_id hidden inside the group (used as fallback in refresh logic) -->
             <xpath expr="//field[@name='credit_note']" position="after">
-                <field name="x_salary_bank_account_id"/>
+                <field name="x_salary_bank_account_id" invisible="1"/>
+            </xpath>
+            <!-- Bank totals: outside the group, before the payslips list -->
+            <xpath expr="//field[@name='slip_ids']" position="before">
+                <div>
+                    <button name="action_refresh_bank_totals" type="object"
+                            string="Refresh Totals" icon="fa-refresh"
+                            class="btn-sm btn-secondary"/>
+                </div>
+                <separator string="NET Totals by Bank Account"
+                           invisible="not x_bank_total_ids"/>
+                <field name="x_bank_total_ids" nolabel="1" readonly="1"
+                       invisible="not x_bank_total_ids">
+                    <list string="Bank Account Totals">
+                        <field name="bank_account_id" string="Account" width="300px"/>
+                        <field name="slip_count" string="Employees" width="100px"/>
+                        <field name="total_net" string="Total NET"
+                               digits="[16,2]" width="150px"
+                               decoration-bf="True"/>
+                    </list>
+                </field>
             </xpath>
             <xpath expr="//field[@name='slip_ids']" position="before">
                 <button name="action_open_batch_payslips" type="object"
