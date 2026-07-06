@@ -472,6 +472,10 @@ return a leave to an earlier approver instead of refusing it outright.
 
 21. **Inserting elements after a field inside a `<group>` puts them *inside* that group, breaking the grid layout.** In the `hr.payslip.run` base form, `credit_note` lives inside a `<group col="4">`. Any `<xpath expr="//field[@name='credit_note']" position="after">` block adds its children to that same 4-column group, which misaligns the Period/Credit Note row. To place content *outside* the group (at sheet level), use a separate xpath targeting a sibling that is outside the group — e.g. `<xpath expr="//field[@name='slip_ids']" position="before">`.
 
+22. **`hr.payslip.line` `digits=(16, 0)` override causes a 1-SAR NET display gap when deduction inputs are fractional.** KSW_payroll overrides `hr.payslip.line.amount`, `quantity`, and `total` to `fields.Float(digits=(16, 0))`, storing all amounts as integers. The base engine (`om_hr_payroll`) accumulates category sums using `currency.round()` (SAR = 2 dp), so a 87.5 SAR loan installment enters `categories.DED` as -87.5, giving `NET = 6153.5`, which Python's banker's rounding stores as 6154. But the displayed `KSW_DEDUCTIONS` line is -88 (87.5 rounded to nearest integer), so the user sees `6850 − 609 − 88 = 6153 ≠ NET 6154`.
+    **Fix applied in `KSW_payroll/models/hr_payslip.py`:** After `super().compute_sheet()`, a post-processing block re-derives `NET = GROSS.amount + Σ(DED category line amounts)` using the already-rounded integer stored values. This guarantees the displayed numbers are always arithmetically consistent.
+    **Test coverage:** `KSW_payroll/tests/test_net_rounding_consistency.py` — five tests (integer inputs, 87.5 fractional, two fractional inputs, round-down fractional, no KSW_DED inputs).
+
 ### `requires_allocation` in tests
 Must be `False` (Python bool), **not** `'no'` (truthy string). The string `'no'`
 evaluates as True and triggers `_check_validity`'s allocation guard even when no

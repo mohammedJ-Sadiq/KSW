@@ -197,6 +197,27 @@ class HrPayslip(models.Model):
 
             self._inject_prior_hra_input(payslip)
         res = super().compute_sheet()
+        # Re-derive NET from the already-rounded (digits=(16,0)) GROSS and DED
+        # line amounts.  The base engine accumulates categories using
+        # currency.round (SAR = 2 dp), but our amount field stores integers.
+        # When an input is fractional (e.g. 87.5 SAR loan), the engine sums
+        # -87.5 into categories.DED and the NET lands on 6153.5 → rounds to
+        # 6154, while the displayed KSW_DEDUCTIONS line shows -88 (87.5
+        # rounded to integer).  Recomputing NET from the displayed amounts
+        # ensures GROSS − Σ(deductions) = NET with no 1-SAR display gap.
+        for payslip in self:
+            gross_lines = payslip.line_ids.filtered(lambda l: l.code == 'GROSS')
+            net_lines = payslip.line_ids.filtered(lambda l: l.code == 'NET')
+            if not gross_lines or not net_lines:
+                continue
+            gross_amt = gross_lines[0].amount
+            ded_amt = sum(
+                l.amount for l in payslip.line_ids
+                if l.category_id.code == 'DED'
+            )
+            correct_net = gross_amt + ded_amt
+            if net_lines[0].amount != correct_net:
+                net_lines[0].amount = correct_net
         runs = self.mapped('payslip_run_id').filtered(bool)
         if runs:
             runs._refresh_bank_totals()
