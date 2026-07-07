@@ -614,4 +614,55 @@ class TestAttendanceSheet(TransactionCase):
         tz = sheet._get_employee_tz(self.employee)
         self.assertEqual(str(tz), 'Asia/Riyadh')
 
+    # ------------------------------------------------------------------
+    # Test: Cron resilience (savepoints)
+    # ------------------------------------------------------------------
 
+    def test_cron_savepoint_resilience(self):
+        """A sheet that errors during confirmation must not block the rest."""
+        from unittest.mock import patch
+
+        emp2 = self.env['hr.employee'].create({
+            'name': 'Cron Resilience Emp 2',
+            'resource_calendar_id': self.calendar.id,
+        })
+        sheet_bad = self._create_sheet(month='12', year=2025)
+        sheet_good = self._create_sheet(employee=emp2, month='12', year=2025)
+        bad_id = sheet_bad.id
+
+        Model = type(sheet_bad)
+        orig = Model._do_confirm
+
+        def patched(inner_self):
+            if inner_self.id == bad_id:
+                raise ValueError('forced failure')
+            return orig(inner_self)
+
+        with patch.object(Model, '_do_confirm', patched):
+            self.env['ksw.attendance.sheet']._cron_generate_sheets()
+
+        sheet_bad.invalidate_recordset()
+        sheet_good.invalidate_recordset()
+        self.assertEqual(sheet_bad.state, 'draft',
+                         "Failed sheet must remain draft (savepoint rolled it back)")
+        self.assertEqual(sheet_good.state, 'confirmed',
+                         "Good sheet must be confirmed despite the other failing")
+
+    def test_cron_confirm_skips_insync_lines(self):
+        """_do_confirm must not create duplicate attendance records for in-sync lines."""
+        sheet = self._create_sheet(month='12', year=2025)
+        # action_generate_lines (called on create) already synced all attended lines
+        att_count_before = self.env['hr.attendance'].search_count([
+            ('employee_id', '=', self.employee.id),
+        ])
+        self.assertGreater(att_count_before, 0, "Lines should have auto-generated attendance records")
+
+        self.env['ksw.attendance.sheet']._cron_generate_sheets()
+
+        att_count_after = self.env['hr.attendance'].search_count([
+            ('employee_id', '=', self.employee.id),
+        ])
+        sheet.invalidate_recordset()
+        self.assertEqual(sheet.state, 'confirmed')
+        self.assertEqual(att_count_before, att_count_after,
+                         "_do_confirm must not re-create attendance records for already-synced lines")

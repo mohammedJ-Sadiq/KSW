@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_ksw_leave_attendance_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.leave.attendance.wizard.form</field>
+        <field name="model">ksw.leave.attendance.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Update Attendance Sheet">
+                <sheet>
+                    <div class="alert alert-warning" role="alert">
+                        <strong>Attendance Sheet Employee</strong><br/>
+                        This employee is tracked on a monthly attendance sheet.
+                        The leave period below covers workdays that are currently
+                        marked as <em>attended</em>. You can mark them absent now,
+                        or update the attendance sheet manually later.
+                    </div>
+                    <group string="Leave Details" col="2">
+                        <field name="employee_name" string="Employee" readonly="1"/>
+                        <field name="date_from"     string="Leave From" readonly="1"/>
+                        <field name="date_to"       string="Leave To"   readonly="1"/>
+                    </group>
+                    <group string="Attendance Sheet Impact" col="2">
+                        <field name="affected_count"  string="Attended Workdays in Period" readonly="1"/>
+                        <field name="affected_months" string="Month(s) Affected"           readonly="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Mark All Absent"
+                            name="action_mark_absent"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="I'll Update Manually"
+                            name="action_dismiss"
+                            type="object"
+                            class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

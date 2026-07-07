@@ -12,6 +12,7 @@ LOAN_APPROVAL_STATES = [
     ('pending_hr', 'Pending HR Approval'),
     ('pending_acc', 'Pending Accounting'),
     ('pending_gm', 'Pending GM Final'),
+    ('pending_disbursement', 'Pending Disbursement'),
     ('approved', 'Approved'),
     ('refused', 'Refused'),
 ]
@@ -154,6 +155,8 @@ class KswDeduction(models.Model):
     acc_approved_date = fields.Datetime(readonly=True, copy=False)
     gm_approved_by = fields.Many2one('hr.employee', readonly=True, copy=False)
     gm_approved_date = fields.Datetime(readonly=True, copy=False)
+    disbursement_confirmed_by = fields.Many2one('hr.employee', readonly=True, copy=False)
+    disbursement_confirmed_date = fields.Datetime(readonly=True, copy=False)
 
     # GM modification tracking
     gm_original_amount = fields.Monetary(readonly=True, copy=False)
@@ -806,6 +809,7 @@ class KswDeduction(models.Model):
                 'hr_approved_by': False, 'hr_approved_date': False,
                 'acc_approved_by': False, 'acc_approved_date': False,
                 'gm_approved_by': False, 'gm_approved_date': False,
+                'disbursement_confirmed_by': False, 'disbursement_confirmed_date': False,
                 'gm_original_amount': 0.0, 'gm_original_installments': 0,
                 'acc_original_amount': 0.0, 'acc_original_installments': 0,
                 'x_hr_no_penalties_confirmed': False,
@@ -862,7 +866,8 @@ class KswDeduction(models.Model):
                 ('id', '!=', rec.id),
                 '|',
                     ('approval_state', 'in', [
-                        'pending_dm', 'pending_hr', 'pending_acc', 'pending_gm']),
+                        'pending_dm', 'pending_hr', 'pending_acc', 'pending_gm',
+                        'pending_disbursement']),
                     '&', ('state', '=', 'active'), ('total_pending', '>', 0),
             ]
             if self.env['ksw.deduction'].sudo().search_count(dom):
@@ -988,8 +993,9 @@ class KswDeduction(models.Model):
 
         GM may have modified `amount` and/or `installments` before clicking.
         Any change is logged (gm_original_* was captured when entering the
-        pending_gm state via write()). After approval, the deduction moves
-        to 'active' and installment lines are generated.
+        pending_gm state via write()). After approval, the loan moves to
+        'pending_disbursement' — installment lines are NOT generated yet.
+        The Loan Disbursement Officer triggers generation in the next step.
         """
         self._check_loan()
         for rec in self:
@@ -1008,11 +1014,10 @@ class KswDeduction(models.Model):
                     'Installments: %d → %d' % (
                         rec.gm_original_installments, rec.installments))
             rec.write({
-                'approval_state': 'approved',
+                'approval_state': 'pending_disbursement',
                 'gm_approved_by': self.env.user.employee_id.id,
                 'gm_approved_date': fields.Datetime.now(),
             })
-            rec._activate_and_generate_lines()
             body = Markup(
                 '<strong>✅ Step 4 — GM Final Approval</strong><br/>'
                 '<b>By:</b> %(user)s<br/>'
@@ -1021,10 +1026,47 @@ class KswDeduction(models.Model):
                 body += Markup('<b>Modifications:</b><br/>')
                 for m in modified:
                     body += Markup('&nbsp;&nbsp;• %(m)s<br/>') % {'m': m}
+            body += Markup('<b>Next:</b> Awaiting Loan Disbursement Officer confirmation.')
             rec.message_post(
                 body=body,
                 subtype_xmlid='mail.mt_note',
             )
+
+    def action_disbursement_confirm(self):
+        """Step 5: Loan Disbursement Officer confirms and activates the loan.
+
+        This is the ONLY step that generates the installment schedule and
+        sets the loan active. Restricted to group_loan_disbursement — a
+        single dedicated accounting role separate from the Accounting
+        Approver (group_loan_acc) that acts at step 3.
+        """
+        self._check_loan()
+        for rec in self:
+            if not self.env.su and not self.env.user.has_group(
+                'KSW_deduction.group_loan_disbursement'
+            ):
+                raise UserError(_(
+                    'Only the Loan Disbursement Officer can confirm disbursement.'))
+            if rec.approval_state != 'pending_disbursement':
+                raise UserError(_('Loan is not in Pending Disbursement state.'))
+            rec.write({
+                'approval_state': 'approved',
+                'disbursement_confirmed_by': self.env.user.employee_id.id,
+                'disbursement_confirmed_date': fields.Datetime.now(),
+            })
+            rec._activate_and_generate_lines()
+            body = Markup(
+                '<strong>✅ Step 5 — Disbursement Confirmed</strong><br/>'
+                '<b>By:</b> %(user)s<br/>'
+                '<b>Amount:</b> %(amount).2f SAR<br/>'
+                '<b>Installments:</b> %(inst)d starting %(start)s'
+            ) % {
+                'user': self.env.user.name,
+                'amount': rec.amount,
+                'inst': rec.installments,
+                'start': rec.start_month,
+            }
+            rec.sudo().message_post(body=body, subtype_xmlid='mail.mt_note')
 
     # ==================================================================
     # Loan refusal (any step)

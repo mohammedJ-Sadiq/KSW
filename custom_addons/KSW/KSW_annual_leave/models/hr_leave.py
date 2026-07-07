@@ -1,6 +1,8 @@
+import calendar as _cal
+
 from markupsafe import Markup
 
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 ANNUAL_MULTI_STATES = [
@@ -886,6 +888,30 @@ class HrLeave(models.Model):
             )
             self._notify_pending_approvers(leave, 'pending_hr')
 
+        # If a single attendance-sheet employee's leave is being approved and
+        # there are draft sheet lines covering the leave period, open the wizard
+        # so the DM can mark those days absent immediately.
+        if 'ksw.attendance.sheet' in self.env and len(self) == 1:
+            leave = self
+            if getattr(leave.employee_id, 'x_is_attendance_sheet', False):
+                has_lines = self.env['ksw.attendance.sheet.line'].sudo().search_count([
+                    ('sheet_id.employee_id', '=', leave.employee_id.id),
+                    ('sheet_id.state', '=', 'draft'),
+                    ('date', '>=', leave.request_date_from),
+                    ('date', '<=', leave.request_date_to),
+                    ('is_workday', '=', True),
+                    ('is_attended', '=', True),
+                ])
+                if has_lines:
+                    return {
+                        'type': 'ir.actions.act_window',
+                        'name': _('Update Attendance Sheet'),
+                        'res_model': 'ksw.leave.attendance.wizard',
+                        'view_mode': 'form',
+                        'target': 'new',
+                        'context': {'default_leave_id': leave.id},
+                    }
+
     def action_hr_approve(self):
         """Step 2: HR approves and fills penalty + iqama renewal."""
         self._check_group(
@@ -1114,6 +1140,9 @@ class HrLeave(models.Model):
         to_validate = self.filtered(lambda l: l.state != 'validate')
         if to_validate:
             to_validate._action_validate(check_state=False)
+            # Safety net: mark any remaining attended workday lines absent.
+            # No-op if the DM already did this via the wizard at step 1.
+            to_validate._mark_attendance_sheet_leave_absent()
 
     # ==================================================================
     # Vacation payslip hook (overridden by KSW_payroll)
@@ -1135,6 +1164,50 @@ class HrLeave(models.Model):
         """Raise UserError if current user doesn't belong to the group."""
         if not self.env.user.has_group(group_xmlid):
             raise UserError(message)
+
+    def _mark_attendance_sheet_leave_absent(self):
+        """Mark remaining attended workday lines absent on draft attendance sheets.
+
+        Called at final validation as a safety net. If the DM already marked
+        the lines via the wizard, this search returns nothing and is a no-op.
+        Only acts when KSW_attendance_sheet is installed.
+        """
+        if 'ksw.attendance.sheet' not in self.env:
+            return
+        Line = self.env['ksw.attendance.sheet.line'].sudo()
+        for leave in self:
+            emp = leave.employee_id
+            if not getattr(emp, 'x_is_attendance_sheet', False):
+                continue
+            lines = Line.search([
+                ('sheet_id.employee_id', '=', emp.id),
+                ('sheet_id.state', '=', 'draft'),
+                ('date', '>=', leave.request_date_from),
+                ('date', '<=', leave.request_date_to),
+                ('is_workday', '=', True),
+                ('is_attended', '=', True),
+            ])
+            if not lines:
+                continue
+            lines.with_context(ksw_system_write=True).write({'is_attended': False})
+            months = sorted({(l.date.year, l.date.month) for l in lines})
+            month_strs = ', '.join(
+                '%s %d' % (_cal.month_name[m], y) for y, m in months
+            )
+            leave.message_post(
+                body=Markup(
+                    '<strong>📋 Attendance Sheet Auto-Updated at Validation</strong><br/>'
+                    '<b>%(emp)s</b>: %(count)d remaining workday(s) marked absent '
+                    'across %(months)s (leave %(from_)s – %(to_)s).'
+                ) % {
+                    'emp': emp.name,
+                    'count': len(lines),
+                    'months': month_strs,
+                    'from_': leave.request_date_from,
+                    'to_': leave.request_date_to,
+                },
+                subtype_xmlid='mail.mt_note',
+            )
 
     _ANNUAL_MULTI_STEP_CONFIG = {
         'pending_dm':                 {'label': 'Direct Manager Approval',  'group': None},

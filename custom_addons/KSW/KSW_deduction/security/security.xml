@@ -164,6 +164,12 @@
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
     </record>
 
+    <record id="group_loan_disbursement" model="res.groups">
+        <field name="name">Loan Disbursement Officer</field>
+        <field name="privilege_id" ref="privilege_loan_approval"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
     <!-- ============================================================ -->
     <!-- Layer 3: Groups — Loan Modification (single dropdown)          -->
     <!-- ============================================================ -->
@@ -240,12 +246,12 @@
         <field name="domain_force">[(1, '=', 1)]</field>
     </record>
 
-    <!-- Loan approvers (HR/Accounting/GM) see all loan deductions
+    <!-- Loan approvers (HR/Accounting/GM/Disbursement) see all loan deductions
          so they can act on the ones pending their step. -->
     <record id="ksw_deduction_rule_loan_approvers" model="ir.rule">
         <field name="name">Deduction: loan approvers see all loans</field>
         <field name="model_id" ref="model_ksw_deduction"/>
-        <field name="groups" eval="[(4, ref('group_loan_hr')), (4, ref('group_loan_acc')), (4, ref('group_loan_gm'))]"/>
+        <field name="groups" eval="[(4, ref('group_loan_hr')), (4, ref('group_loan_acc')), (4, ref('group_loan_gm')), (4, ref('group_loan_disbursement'))]"/>
         <field name="domain_force">[('is_loan', '=', True)]</field>
     </record>
 

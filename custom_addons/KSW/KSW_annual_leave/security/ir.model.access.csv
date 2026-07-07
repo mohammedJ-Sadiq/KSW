@@ -11,4 +11,5 @@ access_commission_line_officer,hr.leave.commission.line.officer,model_hr_leave_c
 access_opening_balance_wizard_hr,opening.balance.wizard.hr,model_opening_balance_wizard,KSW_annual_leave.group_annual_leave_hr,1,1,1,1
 access_opening_balance_wizard_line_hr,opening.balance.wizard.line.hr,model_opening_balance_wizard_line,KSW_annual_leave.group_annual_leave_hr,1,1,1,1
 access_gm_return_approver_wizard_gm,ksw.gm.return.approver.wizard.gm,model_ksw_gm_return_approver_wizard,KSW_annual_leave.group_annual_leave_gm,1,1,1,1
+access_leave_attendance_wizard_user,ksw.leave.attendance.wizard.user,model_ksw_leave_attendance_wizard,base.group_user,1,1,1,1
 

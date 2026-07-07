@@ -69,6 +69,11 @@
                             class="btn-danger"
                             groups="KSW_deduction.group_loan_gm"
                             invisible="not is_loan or approval_state != 'pending_gm'"/>
+                    <button name="action_disbursement_confirm" type="object"
+                            string="✅ Confirm Disbursement"
+                            class="btn-success"
+                            groups="KSW_deduction.group_loan_disbursement"
+                            invisible="not is_loan or approval_state != 'pending_disbursement'"/>
 
                     <!-- Record Payment: accounting staff only, active loans
                          with at least one pending installment. Opens the
