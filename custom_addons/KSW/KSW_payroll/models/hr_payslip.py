@@ -218,9 +218,6 @@ class HrPayslip(models.Model):
             correct_net = gross_amt + ded_amt
             if net_lines[0].amount != correct_net:
                 net_lines[0].amount = correct_net
-        runs = self.mapped('payslip_run_id').filtered(bool)
-        if runs:
-            runs._refresh_bank_totals()
         return res
 
     # ------------------------------------------------------------------
@@ -1087,9 +1084,34 @@ class HrPayslip(models.Model):
         ])
         attended_dates = {a.check_in.date() for a in all_att if a.check_in}
 
+        # For attendance-sheet employees, Fridays (non-workdays) never get an
+        # hr.attendance record even when paid (is_attended=True), so the
+        # generic "no record → absent" loop would wrongly flag every Friday.
+        # Instead, use the sheet lines: only days explicitly marked
+        # is_attended=False are real absences.
+        is_sheet = employee.sudo().x_is_attendance_sheet
+        sheet_absent_dates = None
+        if is_sheet:
+            sheet = self.env['ksw.attendance.sheet'].sudo().search([
+                ('employee_id', '=', employee.id),
+                ('month', '=', str(eff_from.month)),
+                ('year', '=', eff_from.year),
+            ], limit=1)
+            if sheet:
+                sheet_absent_dates = {
+                    l.date for l in sheet.line_ids
+                    if eff_from <= l.date <= d_to and not l.is_attended
+                }
+
         current = eff_from
         while current <= d_to:
             if current not in attended_dates:
+                # Sheet employees: skip days the sheet considers attended
+                # (e.g. Fridays with is_attended=True have no attendance
+                # record but are not absences).
+                if sheet_absent_dates is not None and current not in sheet_absent_dates:
+                    current += timedelta(days=1)
+                    continue
                 rows.append({
                     'date': current.strftime('%Y-%m-%d'),
                     'day': day_names[current.weekday()],
@@ -1112,14 +1134,15 @@ class HrPayslip(models.Model):
     def action_payslip_done(self):
         res = super().action_payslip_done()
         self._send_auto_payslip_email()
-        runs = self.mapped('payslip_run_id').filtered(bool)
-        if runs:
-            runs._refresh_bank_totals()
+        if not self.env.context.get('_ksw_skip_bank_refresh'):
+            runs = self.mapped('payslip_run_id').filtered(bool)
+            if runs:
+                runs._refresh_bank_totals()
         return res
 
     def write(self, vals):
         res = super().write(vals)
-        if 'payslip_run_id' in vals or 'state' in vals:
+        if 'payslip_run_id' in vals:
             runs = self.mapped('payslip_run_id').filtered(bool)
             if runs:
                 runs._refresh_bank_totals()
@@ -1141,4 +1164,4 @@ class HrPayslip(models.Model):
             employee = slip.employee_id
             if slip.state == 'done' and employee.x_auto_send_payslip and employee.work_email:
                 template.sudo().send_mail(
-                    slip.id, email_layout_xmlid='mail.mail_notification_light')
+                    slip.id, force_send=False)

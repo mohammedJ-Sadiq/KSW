@@ -92,11 +92,13 @@ class TestKawtharFileWizard(TransactionCase):
             acc_number=False,
         )
 
-        # ── Assign company bank ──
+        # ── Assign company bank + export order ──
         for emp in (cls.emp_1, cls.emp_2, cls.emp_no_bank):
             emp.sudo().write({
                 'x_salary_bank_account_id': cls.company_bank.id,
             })
+        cls.emp_1.sudo().write({'x_payslip_export_order': 1})
+        cls.emp_2.sudo().write({'x_payslip_export_order': 2})
 
         # ── Payslip batch ──
         cls.batch = cls.env['hr.payslip.run'].create({
@@ -570,8 +572,8 @@ class TestKawtharFileWizard(TransactionCase):
         lines = [l for l in content.split('\n') if l]
         self.assertEqual(len(lines), 1)
 
-    def test_txt_employee_barcode_field(self):
-        """First 12 chars are zero-padded employee barcode."""
+    def test_txt_employee_export_order_field(self):
+        """First 12 chars are the zero-padded x_payslip_export_order."""
         wiz = self._make_wizard()
         content = wiz._build_kawthar_text(
             self.company_bank, self.slip_1, date(2026, 3, 30),
@@ -580,16 +582,17 @@ class TestKawtharFileWizard(TransactionCase):
         self.assertEqual(line[:12], '000000000001')
 
     def test_txt_cic_field(self):
-        """Chars 13-22 are CIC number zero-padded to 10 digits."""
+        """Chars 13-22 are the CIC derived from the first 5 chars of acc_number."""
         wiz = self._make_wizard()
         content = wiz._build_kawthar_text(
             self.company_bank, self.slip_1, date(2026, 3, 30),
         )
         line = content.split('\n')[0]
-        self.assertEqual(line[12:22], '0001389678')
+        # acc_number='5689110000130257800' → first 5 chars '56891' → padded '0000056891'
+        self.assertEqual(line[12:22], '0000056891')
 
     def test_txt_card_number_field(self):
-        """Chars 23-36 are card number (acc_number) left-justified 14 chars."""
+        """Chars 23-36 are the card number (acc_number[5:], 14 chars)."""
         wiz = self._make_wizard()
         content = wiz._build_kawthar_text(
             self.company_bank, self.slip_1, date(2026, 3, 30),
@@ -597,7 +600,8 @@ class TestKawtharFileWizard(TransactionCase):
         line = content.split('\n')[0]
         card = line[22:36]
         self.assertEqual(len(card), 14)
-        self.assertTrue(card.startswith('56891100001302'))
+        # acc_number='5689110000130257800' → chars 6-19 = '10000130257800'
+        self.assertEqual(card, '10000130257800')
 
     def test_txt_name_field(self):
         """Chars 37-86 are the employee name left-justified 50 chars."""

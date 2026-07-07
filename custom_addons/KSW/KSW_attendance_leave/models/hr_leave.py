@@ -869,6 +869,9 @@ class HrLeave(models.Model):
                 leave.with_context(tracking_disable=True).write({
                     'x_attendance_ids': [(4, att.id) for att in absences]
                 })
+                # Force-recompute deductions so x_deduction_amount is zeroed
+                # out in this transaction before any payslip reads it.
+                absences._recompute_deductions()
 
     def _validate_leave_request(self):
         """Override to post detailed approval message for attendance-based leaves."""
@@ -957,6 +960,15 @@ class HrLeave(models.Model):
                     subtype_xmlid='mail.mt_comment',
                 )
 
+        # Synchronously recompute coverage and deduction amounts for every
+        # attendance record linked to this batch of leaves.  The ORM trigger
+        # chain (x_leave_ids.state → _compute_net_minutes) is registered but
+        # can be deferred past the payslip-creation transaction; this call
+        # guarantees x_deduction_amount is zeroed out in the DB right now.
+        all_atts = self.mapped('x_attendance_ids')
+        if all_atts:
+            all_atts._recompute_deductions()
+
     def action_refuse(self):
         """Unmark attendance records when leave is refused, post detailed message."""
         attendance_leaves = self.filtered('x_attendance_ids')
@@ -1008,6 +1020,8 @@ class HrLeave(models.Model):
             })
             attendance_leaves.mapped('meeting_id').write({'active': False})
             attendance_leaves.activity_update()
+            # Restore deductions now that the leave is refused (no longer validated).
+            attendance_leaves.mapped('x_attendance_ids')._recompute_deductions()
         return True
 
     def action_draft(self):
@@ -1023,5 +1037,7 @@ class HrLeave(models.Model):
             'first_approver_id': False,
             'second_approver_id': False,
         })
+        # Leave is no longer validated — restore deductions on linked records.
+        self.mapped('x_attendance_ids')._recompute_deductions()
         self.activity_update()
         return True

@@ -700,11 +700,11 @@ class HrLeave(models.Model):
     _HR_ONLY_FIELDS = frozenset({
         'x_penalty_amount', 'x_penalty_description',
         'x_iqama_renewal_amount', 'x_iqama_renewal_description',
-        'x_flight_ticket_amount', 'x_flight_ticket_description',
     })
     # Fields that only the Accounting Approver role may set to meaningful values
     _ACC_ONLY_FIELDS = frozenset({
         'x_remaining_loans', 'x_remaining_loans_description',
+        'x_flight_ticket_amount', 'x_flight_ticket_description',
     })
 
     def write(self, vals):
@@ -755,8 +755,8 @@ class HrLeave(models.Model):
             if (acc_set or has_comm_write) and not self.env.user.has_group(
                     'KSW_annual_leave.group_annual_leave_acc'):
                 raise UserError(
-                    'Only Accounting Approvers can fill in commission '
-                    'and loan fields.')
+                    'Only Accounting Approvers can fill in commission, '
+                    'loan, and flight ticket fields.')
 
         result = super().write(vals)
 

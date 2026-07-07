@@ -158,6 +158,35 @@ class HrAttendance(models.Model):
                         'x_attendance_ids': [(4, att.id)]
                     })
 
+    def _recompute_deductions(self):
+        """Force-recompute coverage and net-minute fields on these records.
+
+        Called explicitly after leave approval / refusal / reset-to-draft so
+        that x_deduction_amount (defined in KSW_payroll) is guaranteed to be
+        current in the DB before the next payslip run.
+
+        The standard ORM trigger chain (x_leave_ids.state →
+        _compute_net_minutes) is registered correctly but can be deferred past
+        the transaction that generates a payslip — particularly when the leave
+        state is written through complex multi-step approval chains.  This
+        explicit call provides a synchronous guarantee inside the same
+        transaction as the state change.
+        """
+        if not self:
+            return
+        self._compute_is_covered()
+        self._compute_net_minutes()
+        # Notify the ORM that these stored fields changed so that downstream
+        # fields (x_deduction_amount in KSW_payroll) are queued and flushed
+        # to the DB within this same transaction.
+        self.modified([
+            'x_is_covered',
+            'x_net_late_minutes',
+            'x_net_early_leave_minutes',
+            'x_net_is_absent',
+            'x_net_worked_hours',
+        ])
+
     def _compute_display_name(self):
         for rec in self:
             date_str = rec.check_in.strftime('%Y-%m-%d') if rec.check_in else 'No Date'

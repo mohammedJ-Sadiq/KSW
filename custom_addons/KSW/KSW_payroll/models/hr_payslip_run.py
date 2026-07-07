@@ -112,6 +112,16 @@ class HrPayslipRun(models.Model):
             for row in groups.values():
                 BankTotal.create(row)
 
+    def done_payslip_run(self):
+        """Override: suppress per-slip bank total refresh during bulk validation.
+        Calls _refresh_bank_totals() once per batch instead of once per slip.
+        """
+        for line in self.slip_ids:
+            line.with_context(_ksw_skip_bank_refresh=True).action_payslip_done()
+        self.write({'state': 'done'})
+        self._refresh_bank_totals()
+        return True
+
     def action_refresh_bank_totals(self):
         self.ensure_one()
         self._refresh_bank_totals()

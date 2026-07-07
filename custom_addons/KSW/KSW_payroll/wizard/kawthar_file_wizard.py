@@ -316,7 +316,7 @@ class KawtharFileWizard(models.TransientModel):
 
         Each line is 194 characters, no header row.
         Format per line:
-          Employee barcode (12N) | CIC (10N) | Card number (14N) |
+          Employee export order (12N) | CIC from card (10N) | Card number (14N) |
           Employee name (50A) | National ID (10N) | Net in halalas (15N) |
           Value date YYYYMMDD (8) | Operation code (1X) |
           Zeros filler (6) | Spaces filler (20) |
@@ -331,7 +331,6 @@ class KawtharFileWizard(models.TransientModel):
         if not valid:
             raise UserError(_('No payslips with a positive NET and a bank account.'))
 
-        cic = (bank_account.x_wps_cic_number or '').replace(' ', '')
         op = self.operation_code or '2'
         vdate = value_date.strftime('%Y%m%d')
 
@@ -340,8 +339,14 @@ class KawtharFileWizard(models.TransientModel):
             emp = slip.employee_id
             bank = emp.sudo().primary_bank_account_id
 
-            emp_ref = emp.barcode or '0'
-            card_no = (bank.acc_number or '').replace(' ', '')
+            # Employee export order (matches the Excel emp-ref column)
+            emp_ref = emp.sudo().x_payslip_export_order or 0
+
+            # acc_number is stored as CIC(5) + card_no(14) = 19 chars
+            acc_full = (bank.acc_number or '').replace(' ', '') if bank else ''
+            cic_from_card = acc_full[:5] if len(acc_full) >= 5 else acc_full
+            card_no = acc_full[5:] if len(acc_full) > 5 else ''
+
             emp_name = (emp.name or '')
             emp_id = emp.ssnid or emp.identification_id or '0'
 
@@ -356,8 +361,8 @@ class KawtharFileWizard(models.TransientModel):
             )) or 0.0
 
             line = ''.join([
-                self._pz(int(emp_ref) if emp_ref.isdigit() else 0, 12),
-                self._pz(int(cic) if cic.isdigit() else 0, 10),
+                self._pz(emp_ref, 12),
+                self._pz(int(cic_from_card) if cic_from_card.isdigit() else 0, 10),
                 self._pr(card_no, 14),
                 self._pr(emp_name, 50),
                 self._pz(int(emp_id) if emp_id.isdigit() else 0, 10),
