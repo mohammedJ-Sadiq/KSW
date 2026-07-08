@@ -1,0 +1,432 @@
+# Arabic (Modern Standard Arabic) translation for KSW_annual_leave
+# Copyright (C) 2026 Mohammed Albadr
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-07 00:00+0000\n"
+"PO-Revision-Date: 2026-07-07 00:00+0000\n"
+"Last-Translator: Mohammed Albadr <m.sadiq@alkawthersw.com>\n"
+"Language-Team: Arabic\n"
+"Language: ar_001\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+
+#. module: KSW_annual_leave
+msgid "Pending DM Approval"
+msgstr "في انتظار موافقة المدير المباشر"
+
+#. module: KSW_annual_leave
+msgid "Pending HR Approval"
+msgstr "في انتظار موافقة الموارد البشرية"
+
+#. module: KSW_annual_leave
+msgid "Pending GM Initial"
+msgstr "في انتظار الموافقة الأولية للمدير العام"
+
+#. module: KSW_annual_leave
+msgid "Pending Accounting"
+msgstr "في انتظار موافقة المحاسبة"
+
+#. module: KSW_annual_leave
+msgid "Pending GM Final"
+msgstr "في انتظار الموافقة النهائية للمدير العام"
+
+#. module: KSW_annual_leave
+msgid "Pending Employee Signature"
+msgstr "في انتظار توقيع الموظف"
+
+#. module: KSW_annual_leave
+msgid "Approved"
+msgstr "معتمد"
+
+#. module: KSW_annual_leave
+msgid "Is Annual Leave"
+msgstr "إجازة سنوية"
+
+#. module: KSW_annual_leave
+msgid "Annual Leave – Multi-Step Approval"
+msgstr "إجازة سنوية — موافقة متعددة المراحل"
+
+#. module: KSW_annual_leave
+msgid "✅ Confirm Return"
+msgstr "✅ تأكيد العودة"
+
+#. module: KSW_annual_leave
+msgid "✅ Approve (DM)"
+msgstr "✅ موافقة المدير المباشر"
+
+#. module: KSW_annual_leave
+msgid "✅ Approve (HR)"
+msgstr "✅ موافقة الموارد البشرية"
+
+#. module: KSW_annual_leave
+msgid "✅ Initial Approve (GM)"
+msgstr "✅ الموافقة الأولية (المدير العام)"
+
+#. module: KSW_annual_leave
+msgid "✅ Approve (Accounting)"
+msgstr "✅ موافقة المحاسبة"
+
+#. module: KSW_annual_leave
+msgid "✅ Final Approve (GM)"
+msgstr "✅ الموافقة النهائية (المدير العام)"
+
+#. module: KSW_annual_leave
+msgid "↩ Return to Approver"
+msgstr "↩ إعادة إلى المعتمد"
+
+#. module: KSW_annual_leave
+msgid "✍️ Confirm Signature"
+msgstr "✍️ تأكيد التوقيع"
+
+#. module: KSW_annual_leave
+msgid "🏖️ On Vacation"
+msgstr "🏖️ في إجازة"
+
+#. module: KSW_annual_leave
+msgid "⚠ Full Clearance"
+msgstr "⚠ تصفية رصيد كاملة"
+
+#. module: KSW_annual_leave
+msgid "⚠ Combined Leave"
+msgstr "⚠ إجازة مدمجة"
+
+#. module: KSW_annual_leave
+msgid "Annual Leave Balance"
+msgstr "رصيد الإجازة السنوية"
+
+#. module: KSW_annual_leave
+msgid "Balance at Request (Days)"
+msgstr "الرصيد عند الطلب (أيام)"
+
+#. module: KSW_annual_leave
+msgid "Options"
+msgstr "خيارات"
+
+#. module: KSW_annual_leave
+msgid "Full Balance Clearance"
+msgstr "تصفية الرصيد بالكامل"
+
+#. module: KSW_annual_leave
+msgid "Actual Days Away"
+msgstr "أيام الغياب الفعلية"
+
+#. module: KSW_annual_leave
+msgid "Balance Consumed"
+msgstr "الرصيد المستهلك"
+
+#. module: KSW_annual_leave
+msgid "Accept Excess as Unpaid"
+msgstr "قبول الزيادة كإجازة بدون أجر"
+
+#. module: KSW_annual_leave
+msgid "Annual Portion (Days)"
+msgstr "الجزء السنوي (أيام)"
+
+#. module: KSW_annual_leave
+msgid "Unpaid Portion (Days)"
+msgstr "الجزء غير مدفوع الأجر (أيام)"
+
+#. module: KSW_annual_leave
+msgid "Return Status"
+msgstr "حالة العودة"
+
+#. module: KSW_annual_leave
+msgid "Confirmed By"
+msgstr "تم التأكيد بواسطة"
+
+#. module: KSW_annual_leave
+msgid "📝 HR Review"
+msgstr "📝 مراجعة الموارد البشرية"
+
+#. module: KSW_annual_leave
+msgid "Penalty"
+msgstr "خصم جزائي"
+
+#. module: KSW_annual_leave
+msgid "💰 Accounting"
+msgstr "💰 المحاسبة"
+
+#. module: KSW_annual_leave
+msgid "Allowances & Loans"
+msgstr "البدلات والقروض"
+
+#. module: KSW_annual_leave
+msgid "Total Commissions"
+msgstr "إجمالي العمولات"
+
+#. module: KSW_annual_leave
+msgid "Flight Ticket"
+msgstr "تذكرة السفر"
+
+#. module: KSW_annual_leave
+msgid "Additional Commissions Detail"
+msgstr "تفاصيل العمولات الإضافية"
+
+#. module: KSW_annual_leave
+msgid "Month / Description"
+msgstr "الشهر / الوصف"
+
+#. module: KSW_annual_leave
+msgid "📊 Decision Support"
+msgstr "📊 دعم القرار"
+
+#. module: KSW_annual_leave
+msgid "End-of-Service (Saudi Art. 84–88)"
+msgstr "مكافأة نهاية الخدمة (المواد 84–88 من نظام العمل السعودي)"
+
+#. module: KSW_annual_leave
+msgid "📜 Approval Trail"
+msgstr "📜 سجل الاعتمادات"
+
+#. module: KSW_annual_leave
+msgid "📎 Attachments"
+msgstr "📎 المرفقات"
+
+#. module: KSW_annual_leave
+msgid "Supporting Documents"
+msgstr "المستندات الداعمة"
+
+#. module: KSW_annual_leave
+msgid "Approval Progress"
+msgstr "تقدم الاعتماد"
+
+#. module: KSW_annual_leave
+msgid "Full Clearance"
+msgstr "تصفية رصيد كاملة"
+
+#. module: KSW_annual_leave
+msgid "Return Date"
+msgstr "تاريخ العودة"
+
+#. module: KSW_annual_leave
+msgid "🏖️ Currently On Vacation"
+msgstr "🏖️ في إجازة حالياً"
+
+#. module: KSW_annual_leave
+msgid "✅ Return Confirmed"
+msgstr "✅ تم تأكيد العودة"
+
+#. module: KSW_annual_leave
+msgid "📋 Full Clearance"
+msgstr "📋 تصفية رصيد كاملة"
+
+#. module: KSW_annual_leave
+msgid "⏳ Pending Approval"
+msgstr "⏳ في انتظار الاعتماد"
+
+#. module: KSW_annual_leave
+msgid "✍️ Pending Signature"
+msgstr "✍️ في انتظار التوقيع"
+
+#. module: KSW_annual_leave
+msgid "✅ Annual — Fully Approved"
+msgstr "✅ سنوية — معتمدة بالكامل"
+
+#. module: KSW_annual_leave
+msgid "Service Years"
+msgstr "سنوات الخدمة"
+
+#. module: KSW_annual_leave
+msgid "Last Wage (SAR)"
+msgstr "آخر راتب (ريال)"
+
+#. module: KSW_annual_leave
+msgid "EOS — Termination (Art. 84)"
+msgstr "نهاية الخدمة — إنهاء العقد (المادة 84)"
+
+#. module: KSW_annual_leave
+msgid "EOS — Resignation (Art. 85)"
+msgstr "نهاية الخدمة — الاستقالة (المادة 85)"
+
+#. module: KSW_annual_leave
+msgid "Employee"
+msgstr "الموظف"
+
+#. module: KSW_annual_leave
+msgid "Joining Date"
+msgstr "تاريخ الالتحاق"
+
+#. module: KSW_annual_leave
+msgid "Years of Service"
+msgstr "سنوات الخدمة"
+
+#. module: KSW_annual_leave
+msgid "Daily Rate"
+msgstr "الأجر اليومي"
+
+#. module: KSW_annual_leave
+msgid "Total Accrued"
+msgstr "إجمالي المتراكم"
+
+#. module: KSW_annual_leave
+msgid "Leaves Taken"
+msgstr "الإجازات المأخوذة"
+
+#. module: KSW_annual_leave
+msgid "Remaining Balance"
+msgstr "الرصيد المتبقي"
+
+#. module: KSW_annual_leave
+msgid "Opening Reset Date"
+msgstr "تاريخ إعادة تعيين الرصيد الافتتاحي"
+
+#. module: KSW_annual_leave
+msgid "Opening Extra Days"
+msgstr "أيام إضافية افتتاحية"
+
+#. module: KSW_annual_leave
+msgid "Opening Data Locked"
+msgstr "البيانات الافتتاحية مقفلة"
+
+#. module: KSW_annual_leave
+msgid "Effective Start Date"
+msgstr "تاريخ بدء السريان"
+
+#. module: KSW_annual_leave
+msgid "Linked Allocation"
+msgstr "التخصيص المرتبط"
+
+#. module: KSW_annual_leave
+msgid "Update Attendance Sheet"
+msgstr "تحديث كشف الحضور"
+
+#. module: KSW_annual_leave
+msgid "Attendance Sheet Employee"
+msgstr "موظف كشف الحضور"
+
+#. module: KSW_annual_leave
+msgid "This employee is tracked on a monthly attendance sheet. The leave period below covers workdays that are currently marked as attended. You can mark them absent now, or update the attendance sheet manually later."
+msgstr "يتم تتبع هذا الموظف في كشف حضور شهري. تغطي فترة الإجازة أدناه أيام عمل مسجلة حاليًا على أنها حضور. يمكنك تسجيلها غياباً الآن، أو تحديث كشف الحضور يدويًا لاحقًا."
+
+#. module: KSW_annual_leave
+msgid "Leave Details"
+msgstr "تفاصيل الإجازة"
+
+#. module: KSW_annual_leave
+msgid "Leave From"
+msgstr "الإجازة من"
+
+#. module: KSW_annual_leave
+msgid "Leave To"
+msgstr "الإجازة إلى"
+
+#. module: KSW_annual_leave
+msgid "Attendance Sheet Impact"
+msgstr "أثر كشف الحضور"
+
+#. module: KSW_annual_leave
+msgid "Workdays Currently Attended"
+msgstr "أيام العمل المسجلة حضورًا"
+
+#. module: KSW_annual_leave
+msgid "Attended Workdays in Period"
+msgstr "أيام العمل المحضورة خلال الفترة"
+
+#. module: KSW_annual_leave
+msgid "Affected Month(s)"
+msgstr "الشهر (الأشهر) المتأثرة"
+
+#. module: KSW_annual_leave
+msgid "Month(s) Affected"
+msgstr "الشهر (الأشهر) المتأثرة"
+
+#. module: KSW_annual_leave
+msgid "Mark All Absent"
+msgstr "تسجيل غياب الجميع"
+
+#. module: KSW_annual_leave
+msgid "I'll Update Manually"
+msgstr "سأقوم بالتحديث يدويًا"
+
+#. module: KSW_annual_leave
+msgid "none"
+msgstr "لا يوجد"
+
+#. module: KSW_annual_leave
+msgid "GM Return to Approver Wizard"
+msgstr "معالج إعادة الطلب من المدير العام"
+
+#. module: KSW_annual_leave
+msgid "Return To"
+msgstr "العودة إلى"
+
+#. module: KSW_annual_leave
+msgid "Reason"
+msgstr "السبب"
+
+#. module: KSW_annual_leave
+msgid "Direct Manager"
+msgstr "المدير المباشر"
+
+#. module: KSW_annual_leave
+msgid "HR Approver"
+msgstr "معتمد الموارد البشرية"
+
+#. module: KSW_annual_leave
+msgid "GM (Initial Step)"
+msgstr "المدير العام (المرحلة الأولى)"
+
+#. module: KSW_annual_leave
+msgid "Accounting"
+msgstr "المحاسبة"
+
+#. module: KSW_annual_leave
+msgid "Return to Approver"
+msgstr "إعادة إلى المعتمد"
+
+#. module: KSW_annual_leave
+msgid "Cancel"
+msgstr "إلغاء"
+
+#. module: KSW_annual_leave
+msgid "This leave is not pending DM approval."
+msgstr "هذا الطلب لا ينتظر موافقة المدير المباشر."
+
+#. module: KSW_annual_leave
+msgid "Only %s (the leave manager) can approve this step."
+msgstr "يحق فقط لـ %s (مدير الإجازات) اعتماد هذه الخطوة."
+
+#. module: KSW_annual_leave
+msgid "No Direct Manager is configured for this employee. An HR Approver must perform this step."
+msgstr "لم يتم تعيين مدير مباشر لهذا الموظف. يجب على معتمد الموارد البشرية تنفيذ هذه الخطوة."
+
+#. module: KSW_annual_leave
+msgid "Only HR Approvers can approve this step."
+msgstr "يُسمح فقط لمعتمدي الموارد البشرية باعتماد هذه الخطوة."
+
+#. module: KSW_annual_leave
+msgid "This leave is not pending HR approval."
+msgstr "هذا الطلب لا ينتظر موافقة الموارد البشرية."
+
+#. module: KSW_annual_leave
+msgid "Only GM Approvers can approve this step."
+msgstr "يُسمح فقط للمدراء العامين باعتماد هذه الخطوة."
+
+#. module: KSW_annual_leave
+msgid "This leave is not pending GM initial approval."
+msgstr "هذا الطلب لا ينتظر الموافقة الأولية للمدير العام."
+
+#. module: KSW_annual_leave
+msgid "Only Accounting Approvers can approve this step."
+msgstr "يُسمح فقط لمعتمدي المحاسبة باعتماد هذه الخطوة."
+
+#. module: KSW_annual_leave
+msgid "This leave is not pending Accounting approval."
+msgstr "هذا الطلب لا ينتظر موافقة المحاسبة."
+
+#. module: KSW_annual_leave
+msgid "This leave is not pending GM final approval."
+msgstr "هذا الطلب لا ينتظر الموافقة النهائية للمدير العام."
+
+#. module: KSW_annual_leave
+msgid "This leave is not pending employee signature."
+msgstr "هذا الطلب لا ينتظر توقيع الموظف."
+
+#. module: KSW_annual_leave
+msgid "Please attach the signed leave form before confirming."
+msgstr "يرجى إرفاق نموذج الإجازة الموقّع قبل التأكيد."

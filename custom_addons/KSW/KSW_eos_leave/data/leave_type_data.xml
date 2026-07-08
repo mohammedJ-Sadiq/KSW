@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data noupdate="0">
+
+        <!-- EOS leave type: uses the 6-step annual_multi approval chain
+             but does NOT require an allocation balance. -->
+        <record id="leave_type_eos" model="hr.leave.type">
+            <field name="name">End of Service Request</field>
+            <field name="leave_validation_type">annual_multi</field>
+            <field name="requires_allocation" eval="False"/>
+            <field name="is_eos_leave" eval="True"/>
+            <field name="is_annual_leave" eval="False"/>
+            <field name="time_type">leave</field>
+            <field name="color" eval="3"/>
+        </record>
+
+    </data>
+
+</odoo>

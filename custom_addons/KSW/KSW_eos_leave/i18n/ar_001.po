@@ -1,0 +1,116 @@
+# Arabic (Modern Standard Arabic) translation for KSW_eos_leave
+# Copyright (C) 2026 Mohammed Albadr
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-07 00:00+0000\n"
+"PO-Revision-Date: 2026-07-07 00:00+0000\n"
+"Last-Translator: Mohammed Albadr <m.sadiq@alkawthersw.com>\n"
+"Language-Team: Arabic\n"
+"Language: ar_001\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+
+#. module: KSW_eos_leave
+msgid "End of Service Request"
+msgstr "طلب مكافأة نهاية الخدمة"
+
+#. module: KSW_eos_leave
+msgid "Is EOS Leave"
+msgstr "طلب نهاية خدمة"
+
+#. module: KSW_eos_leave
+msgid "Unpaid Vacations to be Deducted (Days)"
+msgstr "أيام الإجازات غير مدفوعة الأجر المستقطعة"
+
+#. module: KSW_eos_leave
+msgid "Article 84 — Termination by Employer"
+msgstr "المادة 84 — إنهاء العقد من قبل صاحب العمل"
+
+#. module: KSW_eos_leave
+msgid "Article 85 — Resignation"
+msgstr "المادة 85 — الاستقالة"
+
+#. module: KSW_eos_leave
+msgid "Termination Reason"
+msgstr "سبب إنهاء الخدمة"
+
+#. module: KSW_eos_leave
+msgid "Previous Payments"
+msgstr "المدفوعات السابقة"
+
+#. module: KSW_eos_leave
+msgid "Notice Pay (Deduction)"
+msgstr "بدل فترة الإشعار (خصم)"
+
+#. module: KSW_eos_leave
+msgid "Adjusted Service Years"
+msgstr "سنوات الخدمة المعدلة"
+
+#. module: KSW_eos_leave
+msgid "Adjusted EOS — Termination (Art. 84)"
+msgstr "مكافأة الإنهاء المعدلة (المادة 84)"
+
+#. module: KSW_eos_leave
+msgid "Adjusted EOS — Resignation (Art. 85)"
+msgstr "مكافأة الاستقالة المعدلة (المادة 85)"
+
+#. module: KSW_eos_leave
+msgid "EOS Payout Amount"
+msgstr "مبلغ مكافأة نهاية الخدمة"
+
+#. module: KSW_eos_leave
+msgid "EOS Payslip"
+msgstr "راتب نهاية الخدمة"
+
+#. module: KSW_eos_leave
+msgid "🏢 EOS Review"
+msgstr "🏢 مراجعة نهاية الخدمة"
+
+#. module: KSW_eos_leave
+msgid "Service Period Reference"
+msgstr "بيانات فترة الخدمة المرجعية"
+
+#. module: KSW_eos_leave
+msgid "Base Service Years (Unadjusted)"
+msgstr "سنوات الخدمة الأساسية (غير معدلة)"
+
+#. module: KSW_eos_leave
+msgid "Base EOS — Termination (Art. 84, Unadjusted)"
+msgstr "مكافأة الإنهاء الأساسية (المادة 84، غير معدلة)"
+
+#. module: KSW_eos_leave
+msgid "Base EOS — Resignation (Art. 85, Unadjusted)"
+msgstr "مكافأة الاستقالة الأساسية (المادة 85، غير معدلة)"
+
+#. module: KSW_eos_leave
+msgid "HR Inputs"
+msgstr "مدخلات الموارد البشرية"
+
+#. module: KSW_eos_leave
+msgid "EOS Payout Summary"
+msgstr "ملخص مكافأة نهاية الخدمة"
+
+#. module: KSW_eos_leave
+msgid "EOS Amount"
+msgstr "مكافأة نهاية الخدمة"
+
+#. module: KSW_eos_leave
+msgid "EOS Previous Payments"
+msgstr "مدفوعات نهاية الخدمة السابقة"
+
+#. module: KSW_eos_leave
+msgid "EOS Notice Pay (Deduction)"
+msgstr "بدل الإشعار - خصم (نهاية الخدمة)"
+
+#. module: KSW_eos_leave
+msgid "Only HR Approvers can fill EOS financial fields."
+msgstr "يُسمح فقط لمعتمدي الموارد البشرية بتعبئة حقول نهاية الخدمة المالية."
+
+#. module: KSW_eos_leave
+msgid "No EOS payslip found for this leave."
+msgstr "لم يتم العثور على راتب نهاية خدمة لهذا الطلب."

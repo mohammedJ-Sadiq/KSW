@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data noupdate="0">
+
+        <!-- ============================================================= -->
+        <!-- EOS Amount (ALW — earning, feeds into GROSS)                  -->
+        <!-- Reads from payslip input 'EOS_AMOUNT'                         -->
+        <!-- Only fires when the input is present (EOS payslips only).     -->
+        <!-- ============================================================= -->
+        <record id="hr_rule_eos_amount" model="hr.salary.rule">
+            <field name="name">EOS Amount</field>
+            <field name="sequence" eval="20"/>
+            <field name="code">EOS_AMOUNT</field>
+            <field name="category_id" ref="om_hr_payroll.ALW"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = bool(inputs.EOS_AMOUNT) and inputs.EOS_AMOUNT.amount</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs.EOS_AMOUNT.amount if inputs.EOS_AMOUNT else 0.0</field>
+            <field name="appears_on_payslip" eval="True"/>
+            <field name="note">End-of-Service payout (Article 84 or 85), adjusted for unpaid leave days.
+Only appears on EOS payslips.</field>
+        </record>
+
+        <!-- ============================================================= -->
+        <!-- EOS Previous Payments (DED — deduction)                       -->
+        <!-- Reads from payslip input 'EOS_PREV_PAYMENTS'                  -->
+        <!-- ============================================================= -->
+        <record id="hr_rule_eos_prev_payments" model="hr.salary.rule">
+            <field name="name">EOS Previous Payments</field>
+            <field name="sequence" eval="174"/>
+            <field name="code">EOS_PREV_PAYMENTS</field>
+            <field name="category_id" ref="om_hr_payroll.DED"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = bool(inputs.EOS_PREV_PAYMENTS) and inputs.EOS_PREV_PAYMENTS.amount</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = -inputs.EOS_PREV_PAYMENTS.amount if inputs.EOS_PREV_PAYMENTS else 0.0</field>
+            <field name="appears_on_payslip" eval="True"/>
+            <field name="note">EOS payments already made to the employee in prior instalments.
+Deducted from the EOS payslip. Only appears on EOS payslips.</field>
+        </record>
+
+        <!-- ============================================================= -->
+        <!-- EOS Notice Pay Deduction (DED — deduction)                    -->
+        <!-- Reads from payslip input 'EOS_NOTICE_PAY'                     -->
+        <!-- ============================================================= -->
+        <record id="hr_rule_eos_notice_pay" model="hr.salary.rule">
+            <field name="name">EOS Notice Pay (Deduction)</field>
+            <field name="sequence" eval="175"/>
+            <field name="code">EOS_NOTICE_PAY</field>
+            <field name="category_id" ref="om_hr_payroll.DED"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = bool(inputs.EOS_NOTICE_PAY) and inputs.EOS_NOTICE_PAY.amount</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = -inputs.EOS_NOTICE_PAY.amount if inputs.EOS_NOTICE_PAY else 0.0</field>
+            <field name="appears_on_payslip" eval="True"/>
+            <field name="note">Notice period deduction (e.g. employee did not serve notice period).
+Only appears on EOS payslips.</field>
+        </record>
+
+        <!-- ============================================================= -->
+        <!-- Attach EOS rules to the BASE salary structure                 -->
+        <!-- ============================================================= -->
+        <record id="om_hr_payroll.structure_base" model="hr.payroll.structure">
+            <field name="rule_ids" eval="[
+                (4, ref('hr_rule_eos_amount')),
+                (4, ref('hr_rule_eos_prev_payments')),
+                (4, ref('hr_rule_eos_notice_pay')),
+            ]"/>
+        </record>
+
+        <!-- ============================================================= -->
+        <!-- Propagate EOS rules to legacy payroll structures              -->
+        <!-- (ATTSHEET, Executive, NoFin, OCIR)                            -->
+        <!-- Must run AFTER rules are attached to BASE above.              -->
+        <!-- ============================================================= -->
+        <function model="hr.salary.rule"
+                  name="_ksw_migrate_eos_rules_to_structures"/>
+
+    </data>
+
+</odoo>
