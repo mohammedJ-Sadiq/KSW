@@ -19,6 +19,33 @@
                        groups="om_hr_payroll.group_hr_payroll_user"/>
             </xpath>
 
+            <!-- ===== Replace date-range picker with single Termination Date for EOS ===== -->
+            <!-- Hide the "Dates" label (shown for full-day leaves) when EOS -->
+            <xpath expr="//label[@for='request_date_from' and @invisible='request_unit_half or request_unit_hours']"
+                   position="attributes">
+                <attribute name="invisible">x_is_eos_leave or request_unit_half or request_unit_hours</attribute>
+            </xpath>
+            <!-- Hide the "Date" label (shown for half-day/hour leaves) when EOS -->
+            <xpath expr="//label[@for='request_date_from' and @invisible='not request_unit_half and not request_unit_hours']"
+                   position="attributes">
+                <attribute name="invisible">x_is_eos_leave or (not request_unit_half and not request_unit_hours)</attribute>
+            </xpath>
+            <!-- Hide the date-range div when EOS -->
+            <xpath expr="//div[@id='full_date']" position="attributes">
+                <attribute name="invisible">x_is_eos_leave</attribute>
+            </xpath>
+            <!-- Add single Termination Date field after the hidden range div -->
+            <xpath expr="//div[@id='full_date']" position="after">
+                <label for="request_date_from" string="Termination Date"
+                       invisible="not x_is_eos_leave"/>
+                <div class="o_row" invisible="not x_is_eos_leave">
+                    <field name="request_date_from"
+                           widget="date"
+                           readonly="state != 'confirm'"
+                           required="x_is_eos_leave"/>
+                </div>
+            </xpath>
+
             <!-- ===== Hide the standard HR Review tab for EOS leaves ===== -->
             <!-- EOS has its own dedicated tab instead. -->
             <xpath expr="//page[@name='hr_review']" position="attributes">

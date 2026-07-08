@@ -52,6 +52,23 @@
                 </attribute>
             </xpath>
 
+            <!-- ===== Statusbar: unpaid chain has no signature step ===== -->
+            <!-- Hide the shared 7-step statusbar for unpaid leaves and show
+                 one without pending_employee_signature instead, so users are
+                 not shown a step the unpaid flow never reaches. -->
+            <xpath expr="//field[@name='x_annual_approval_state'][@widget='statusbar']"
+                   position="attributes">
+                <attribute name="invisible">not x_annual_approval_state or validation_type == 'unpaid_multi'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='x_annual_approval_state'][@widget='statusbar']"
+                   position="after">
+                <field name="x_annual_approval_state"
+                       widget="statusbar"
+                       statusbar_visible="pending_dm,pending_hr,pending_gm_initial,pending_acc,pending_gm_final,approved"
+                       invisible="not x_annual_approval_state or validation_type != 'unpaid_multi'"
+                       readonly="1"/>
+            </xpath>
+
             <!-- ===== Hide full-clearance toggle for unpaid ===== -->
             <xpath expr="//field[@name='x_is_full_clearance'][@widget='boolean_toggle']" position="attributes">
                 <attribute name="invisible">

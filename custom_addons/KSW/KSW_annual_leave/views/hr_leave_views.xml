@@ -89,7 +89,7 @@
                         name="action_open_gm_return_wizard"
                         type="object" class="btn-warning"
                         invisible="not x_can_gm_return"/>
-                <button string="✍️ Confirm Signature"
+                <button string="✅ Confirm &amp; Finalise"
                         name="action_employee_confirm_signature"
                         type="object" class="btn-success"
                         invisible="not x_can_sign"/>
@@ -99,11 +99,11 @@
                  leaves; we render our own approval-stage statusbar. -->
             <xpath expr="//field[@name='state'][@widget='statusbar'][1]"
                    position="attributes">
-                <attribute name="invisible">validation_type != 'both' or validation_type == 'annual_multi'</attribute>
+                <attribute name="invisible">validation_type != 'both' or x_annual_approval_state</attribute>
             </xpath>
             <xpath expr="//field[@name='state'][@widget='statusbar'][2]"
                    position="attributes">
-                <attribute name="invisible">validation_type == 'both' or validation_type == 'annual_multi'</attribute>
+                <attribute name="invisible">validation_type == 'both' or x_annual_approval_state</attribute>
             </xpath>
             <xpath expr="//field[@name='state'][@widget='statusbar'][2]"
                    position="after">
@@ -319,6 +319,7 @@
                        string="Approval Progress"
                        decoration-info="x_annual_approval_state in ('pending_dm','pending_hr')"
                        decoration-warning="x_annual_approval_state in ('pending_gm_initial','pending_acc','pending_gm_final')"
+                       decoration-primary="x_annual_approval_state == 'pending_employee_signature'"
                        decoration-success="x_annual_approval_state == 'approved'"/>
                 <field name="x_is_full_clearance" widget="boolean_toggle"
                        optional="hidden" string="Full Clearance"/>

@@ -11,7 +11,7 @@ ANNUAL_MULTI_STATES = [
     ('pending_gm_initial', 'Pending GM Initial'),
     ('pending_acc', 'Pending Accounting'),
     ('pending_gm_final', 'Pending GM Final'),
-    ('pending_employee_signature', 'Pending Employee Signature'),
+    ('pending_employee_signature', 'Pending HR Confirmation'),
     ('approved', 'Approved'),
 ]
 
@@ -414,18 +414,15 @@ class HrLeave(models.Model):
                 leave.x_can_dm_approve = (dm == user)
 
     @api.depends_context('uid')
-    @api.depends('x_annual_approval_state', 'employee_id',
-                 'employee_id.user_id', 'employee_id.leave_manager_id')
+    @api.depends('x_annual_approval_state')
     def _compute_can_sign(self):
         user = self.env.user
+        is_hr = user.has_group('KSW_annual_leave.group_annual_leave_hr')
         for leave in self:
             if leave.x_annual_approval_state != 'pending_employee_signature' or not leave.id:
                 leave.x_can_sign = False
                 continue
-            is_hr = user.has_group('KSW_annual_leave.group_annual_leave_hr')
-            is_employee = (leave.employee_id.user_id == user)
-            is_dm = (leave.employee_id.leave_manager_id == user)
-            leave.x_can_sign = bool(is_hr or is_employee or is_dm)
+            leave.x_can_sign = is_hr
 
     # --- Link to vacation payslip ---
     # x_vacation_payslip_id lives in KSW_payroll (depends on om_hr_payroll).
@@ -1035,10 +1032,9 @@ class HrLeave(models.Model):
         """Step 5: GM gives final approval.
 
         Creates the vacation payslip (all financial data is now ready)
-        then moves to 'pending_employee_signature' and notifies the
-        employee (or their DM if the leave was submitted on their behalf).
+        then moves to 'pending_employee_signature' and notifies HR.
         The final Odoo validation (state → validate) happens only after
-        the employee signature is confirmed in Step 6.
+        HR confirms the document upload in Step 6.
         """
         self._check_group(
             'KSW_annual_leave.group_annual_leave_gm',
@@ -1066,7 +1062,7 @@ class HrLeave(models.Model):
                 body=Markup(
                     '<strong>✅ Step 5 — GM Final Approval</strong>'
                     '<br/><b>Approved by:</b> %(approver)s<br/>'
-                    '<b>Next:</b> Awaiting employee signature to finalise.'
+                    '<b>Next:</b> Awaiting HR document confirmation to finalise.'
                 ) % {'approver': self.env.user.name},
                 subtype_xmlid='mail.mt_note',
             )
@@ -1091,7 +1087,7 @@ class HrLeave(models.Model):
         }
 
     def action_employee_confirm_signature(self):
-        """Step 6: Employee (or DM on their behalf) confirms signature.
+        """Step 6: HR confirms document upload and finalises the leave.
 
         Requires at least one attachment to be present on the leave
         (the signed vacation form). After confirmation the leave is
@@ -1102,19 +1098,16 @@ class HrLeave(models.Model):
         for leave in self:
             if leave.x_annual_approval_state != 'pending_employee_signature':
                 raise UserError(
-                    'This leave is not pending employee signature.')
+                    'This leave is not pending HR confirmation.')
             if not self.env.su:
                 is_hr = user.has_group('KSW_annual_leave.group_annual_leave_hr')
-                is_employee = (leave.employee_id.user_id == user)
-                is_dm = (leave.employee_id.leave_manager_id == user)
-                if not (is_hr or is_employee or is_dm):
+                if not is_hr:
                     raise UserError(
-                        'Only the employee, their leave manager, or an '
-                        'HR Approver can confirm the signature.')
+                        'Only an HR Approver can confirm the document upload.')
             if not leave.x_attachment_ids:
                 raise UserError(
                     'Please upload the signed vacation form as an attachment '
-                    'before confirming the signature.')
+                    'before confirming.')
 
             leave.write({
                 'x_annual_approval_state': 'approved',
@@ -1123,7 +1116,7 @@ class HrLeave(models.Model):
             })
             leave.message_post(
                 body=Markup(
-                    '<strong>✅ Step 6 — Employee Signature Confirmed</strong><br/>'
+                    '<strong>✅ Step 6 — HR Document Confirmation</strong><br/>'
                     '<b>Confirmed by:</b> %(user)s<br/>'
                     '<b>Employee:</b> %(employee)s<br/>'
                     '<b>Status:</b> Fully approved.'
@@ -1215,7 +1208,7 @@ class HrLeave(models.Model):
         'pending_gm_initial':         {'label': 'GM Initial Approval',      'group': 'KSW_annual_leave.group_annual_leave_gm'},
         'pending_acc':                {'label': 'Accounting Approval',      'group': 'KSW_annual_leave.group_annual_leave_acc'},
         'pending_gm_final':           {'label': 'GM Final Approval',        'group': 'KSW_annual_leave.group_annual_leave_gm'},
-        'pending_employee_signature': {'label': 'Employee Signature',       'group': None},
+        'pending_employee_signature': {'label': 'HR Confirmation',           'group': 'KSW_annual_leave.group_annual_leave_hr'},
     }
 
     def _notify_pending_approvers(self, leave, pending_state):
@@ -1227,17 +1220,6 @@ class HrLeave(models.Model):
         if pending_state == 'pending_dm':
             dm_user = leave.employee_id.leave_manager_id  # res.users
             partner_ids = [dm_user.partner_id.id] if dm_user and dm_user.partner_id else []
-        elif pending_state == 'pending_employee_signature':
-            # Notify the employee if they submitted their own leave.
-            # If the leave was submitted by a supervisor on their behalf,
-            # notify the DM instead so they can upload the signed form.
-            submitter = leave.sudo().create_uid
-            employee_user = leave.employee_id.user_id
-            if submitter == employee_user or not leave.employee_id.leave_manager_id:
-                notify_user = employee_user
-            else:
-                notify_user = leave.employee_id.leave_manager_id
-            partner_ids = [notify_user.partner_id.id] if notify_user and notify_user.partner_id else []
         else:
             group = self.env.ref(config['group'], raise_if_not_found=False)
             partner_ids = group.user_ids.mapped('partner_id').ids if group else []
@@ -1248,7 +1230,7 @@ class HrLeave(models.Model):
         if pending_state == 'pending_employee_signature':
             instruction = (
                 'Please upload the signed vacation request form as an '
-                'attachment, then click "Confirm Signature" to complete the approval.'
+                'attachment, then click "Confirm & Finalise" to complete the approval.'
             )
         else:
             instruction = 'This annual leave request is awaiting your approval.'

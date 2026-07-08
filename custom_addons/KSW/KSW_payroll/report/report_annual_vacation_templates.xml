@@ -118,95 +118,6 @@
                         </table>
 
                         <!-- ══════════════════════════════════════════ -->
-                        <!--  Section 2: Approval Trail                -->
-                        <!-- ══════════════════════════════════════════ -->
-                        <h5 class="border-bottom pb-1 mb-2">Approval Trail</h5>
-                        <table class="table table-sm table-bordered mb-4">
-                            <thead class="table-light">
-                                <tr>
-                                    <th class="text-center" style="width:5%">#</th>
-                                    <th style="width:28%">Step</th>
-                                    <th style="width:35%">Approved By</th>
-                                    <th style="width:32%">Date &amp; Time</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Step 1: Direct Manager -->
-                                <tr t-attf-class="#{'table-success' if o.x_dm_approved_by else ''}">
-                                    <td class="text-center fw-bold">1</td>
-                                    <td>Direct Manager (DM)</td>
-                                    <td t-out="o.x_dm_approved_by.name if o.x_dm_approved_by else '—'"/>
-                                    <td>
-                                        <t t-if="o.x_dm_approved_date">
-                                            <t t-out="o.x_dm_approved_date.strftime('%Y-%m-%d  %H:%M')"/>
-                                        </t>
-                                        <t t-else="">—</t>
-                                    </td>
-                                </tr>
-                                <!-- Step 2: HR -->
-                                <tr t-attf-class="#{'table-success' if o.x_hr_approved_by else ''}">
-                                    <td class="text-center fw-bold">2</td>
-                                    <td>Human Resources (HR)</td>
-                                    <td t-out="o.x_hr_approved_by.name if o.x_hr_approved_by else '—'"/>
-                                    <td>
-                                        <t t-if="o.x_hr_approved_date">
-                                            <t t-out="o.x_hr_approved_date.strftime('%Y-%m-%d  %H:%M')"/>
-                                        </t>
-                                        <t t-else="">—</t>
-                                    </td>
-                                </tr>
-                                <!-- Step 3: GM Initial -->
-                                <tr t-attf-class="#{'table-success' if o.x_gm_initial_approved_by else ''}">
-                                    <td class="text-center fw-bold">3</td>
-                                    <td>General Manager — Initial Review</td>
-                                    <td t-out="o.x_gm_initial_approved_by.name if o.x_gm_initial_approved_by else '—'"/>
-                                    <td>
-                                        <t t-if="o.x_gm_initial_approved_date">
-                                            <t t-out="o.x_gm_initial_approved_date.strftime('%Y-%m-%d  %H:%M')"/>
-                                        </t>
-                                        <t t-else="">—</t>
-                                    </td>
-                                </tr>
-                                <!-- Step 4: Accounting -->
-                                <tr t-attf-class="#{'table-success' if o.x_acc_approved_by else ''}">
-                                    <td class="text-center fw-bold">4</td>
-                                    <td>Accounting</td>
-                                    <td t-out="o.x_acc_approved_by.name if o.x_acc_approved_by else '—'"/>
-                                    <td>
-                                        <t t-if="o.x_acc_approved_date">
-                                            <t t-out="o.x_acc_approved_date.strftime('%Y-%m-%d  %H:%M')"/>
-                                        </t>
-                                        <t t-else="">—</t>
-                                    </td>
-                                </tr>
-                                <!-- Step 5: GM Final -->
-                                <tr t-attf-class="#{'table-success fw-bold' if o.x_gm_final_approved_by else ''}">
-                                    <td class="text-center fw-bold">5</td>
-                                    <td><strong>General Manager — Final Approval</strong></td>
-                                    <td t-out="o.x_gm_final_approved_by.name if o.x_gm_final_approved_by else '—'"/>
-                                    <td>
-                                        <t t-if="o.x_gm_final_approved_date">
-                                            <t t-out="o.x_gm_final_approved_date.strftime('%Y-%m-%d  %H:%M')"/>
-                                        </t>
-                                        <t t-else="">—</t>
-                                    </td>
-                                </tr>
-                                <!-- Step 6: Employee Signature -->
-                                <tr t-attf-class="#{'table-success fw-bold' if o.x_employee_signed_by else ''}">
-                                    <td class="text-center fw-bold">6</td>
-                                    <td><strong>Employee Signature</strong></td>
-                                    <td t-out="o.x_employee_signed_by.name if o.x_employee_signed_by else '—'"/>
-                                    <td>
-                                        <t t-if="o.x_employee_signed_date">
-                                            <t t-out="o.x_employee_signed_date.strftime('%Y-%m-%d  %H:%M')"/>
-                                        </t>
-                                        <t t-else="">—</t>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        <!-- ══════════════════════════════════════════ -->
                         <!--  Section 3: Financial Items               -->
                         <!-- ══════════════════════════════════════════ -->
                         <t t-set="has_financials" t-value="
@@ -388,6 +299,8 @@
                         <!-- ══════════════════════════════════════════ -->
                         <!--  Section 5: Signature Block               -->
                         <!-- ══════════════════════════════════════════ -->
+                        <t t-set="requester_name"
+                           t-value="o.employee_id.name if (o.sudo().create_uid == o.employee_id.user_id or not o.employee_id.leave_manager_id) else o.sudo().create_uid.name"/>
                         <div class="row mt-5 pt-5 text-center">
                             <div class="col-4">
                                 <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
@@ -405,17 +318,22 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="row mt-5 pt-5 text-center">
-                            <div class="col-6">
+                            <div class="col-4">
                                 <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
                                     <strong>General Manager</strong>
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-4">
                                 <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
-                                    <strong>Employee</strong><br/>
-                                    <span t-out="o.employee_id.name"/>
+                                    <strong>Applicant</strong><br/>
+                                    <span t-out="requester_name"/>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
+                                    <strong>Document Upload Confirmation</strong>
                                 </div>
                             </div>
                         </div>

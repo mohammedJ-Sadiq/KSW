@@ -243,7 +243,29 @@ class HrLeave(models.Model):
 
     # ------------------------------------------------------------------
     # Write guard: EOS financial fields are HR-only
+    # Sync: EOS leaves always have request_date_to == request_date_from
     # ------------------------------------------------------------------
+
+    @api.onchange('request_date_from', 'x_is_eos_leave')
+    def _onchange_eos_sync_dates(self):
+        """Keep request_date_to == request_date_from for EOS leaves."""
+        for leave in self:
+            if leave.x_is_eos_leave and leave.request_date_from:
+                leave.request_date_to = leave.request_date_from
+
+    def create(self, vals_list):
+        """For EOS leave types, force request_date_to == request_date_from."""
+        if isinstance(vals_list, dict):
+            vals_list = [vals_list]
+        eos_type_ids = set(
+            self.env['hr.leave.type'].search(
+                [('is_eos_leave', '=', True)]).ids
+        )
+        for vals in vals_list:
+            if (vals.get('holiday_status_id') in eos_type_ids
+                    and vals.get('request_date_from')):
+                vals['request_date_to'] = vals['request_date_from']
+        return super().create(vals_list)
 
     def write(self, vals):
         eos_written = _EOS_HR_FIELDS & set(vals)
