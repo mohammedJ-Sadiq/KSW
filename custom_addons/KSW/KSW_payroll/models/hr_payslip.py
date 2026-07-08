@@ -1,7 +1,20 @@
+from calendar import monthrange
 from datetime import datetime, time, timedelta
 
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
+
+
+def _days_in_month(d):
+    """Number of calendar days in the month of ``d`` (e.g. 31, 30, 28/29).
+
+    Used as the daily-wage / deduction divisor so per-day amounts reflect
+    the actual month length instead of a fixed 30.  ``d`` may be a date or
+    a datetime; falls back to 30 if ``d`` is falsy.
+    """
+    if not d:
+        return 30.0
+    return float(monthrange(d.year, d.month)[1])
 
 
 # ======================================================================
@@ -20,6 +33,8 @@ class HrPayrollStructure(models.Model):
     )
 
 DAILY_HOURS = 8.0
+# Fallback only.  The live daily-wage / deduction divisor is the actual
+# number of days in the payslip's month — see _days_in_month().
 DAYS_PER_MONTH = 30.0
 
 
@@ -112,7 +127,8 @@ class HrPayslip(models.Model):
         string='Daily Wage',
         compute='_compute_wage_rates',
         digits=(16, 2),
-        help='(Wage + DA + Travel + Meal + Medical + Other) / 30. '
+        help='(Wage + DA + Travel + Meal + Medical + Other) divided by the '
+             'number of days in the payslip month. '
              'Excludes housing allowance (HRA).',
     )
     x_hourly_wage = fields.Float(
@@ -140,7 +156,7 @@ class HrPayslip(models.Model):
             net_lines = slip.line_ids.filtered(lambda l: l.code == 'NET')
             slip.x_net_wage = sum(net_lines.mapped('total'))
 
-    @api.depends('version_id.wage',
+    @api.depends('date_from', 'version_id.wage',
                  'version_id.travel_allowance', 'version_id.mobile_allowance',
                  'version_id.other_allowance')
     def _compute_wage_rates(self):
@@ -152,7 +168,7 @@ class HrPayslip(models.Model):
                 + (v.mobile_allowance or 0.0)
                 + (v.other_allowance or 0.0)
             )
-            daily = base / DAYS_PER_MONTH if base else 0.0
+            daily = base / _days_in_month(slip.date_from) if base else 0.0
             slip.x_daily_wage = daily
             slip.x_hourly_wage = daily / DAILY_HOURS if daily else 0.0
 
@@ -500,14 +516,16 @@ class HrPayslip(models.Model):
             pre_return_days = (effective_from - payslip.date_from).days
             if pre_return_days > 0:
                 self._add_pre_return_absent_days(
-                    wd_vals, pre_return_days, versions[:1])
+                    wd_vals, pre_return_days, versions[:1],
+                    period_date=payslip.date_from)
 
         if wd_vals:
             payslip.worked_days_line_ids = [
                 (0, 0, v) for v in wd_vals
             ]
 
-    def _add_pre_return_absent_days(self, wd_vals, pre_return_days, version):
+    def _add_pre_return_absent_days(self, wd_vals, pre_return_days, version,
+                                    period_date=None):
         """Inject pre-return calendar days into ATT_ABS / ATT_DED lines.
 
         When the monthly payslip only counts attendance from the vacation
@@ -524,7 +542,7 @@ class HrPayslip(models.Model):
             + (v.mobile_allowance or 0.0)
             + (v.other_allowance or 0.0)
         )
-        daily_rate = base / DAYS_PER_MONTH if base else 0.0
+        daily_rate = base / _days_in_month(period_date) if base else 0.0
         pre_return_deduction = round(daily_rate * pre_return_days)
         pre_return_hours = round(pre_return_days * DAILY_HOURS, 2)
 
@@ -653,6 +671,31 @@ class HrPayslip(models.Model):
         return res
 
     # ------------------------------------------------------------------
+    # Scheduled Saturday hours (for short-shift overtime reclassification)
+    # ------------------------------------------------------------------
+
+    def _scheduled_saturday_hours(self, calendar):
+        """Net scheduled hours on Saturday (dayofweek '5') for a calendar:
+        sum of work-line hours minus break-line hours across its groups.
+        Returns 0.0 when Saturday has no schedule line.
+
+        e.g. 'Standard 44 hours/week' → 3.0 (10:00-13:00),
+             'Abdullah Mutawa Special Shift' → 4.0 (08:00-12:00).
+        """
+        if not calendar:
+            return 0.0
+        total = 0.0
+        for group in calendar.calendar_group_ids:
+            for line in group.line_ids:
+                if line.dayofweek == '5':
+                    span = (line.hour_to or 0.0) - (line.hour_from or 0.0)
+                    if line.day_period == 'break':
+                        total -= span
+                    else:
+                        total += span
+        return max(0.0, total)
+
+    # ------------------------------------------------------------------
     # Attendance-sheet employees (attended / absent only)
     # ------------------------------------------------------------------
 
@@ -713,7 +756,7 @@ class HrPayslip(models.Model):
                 + (v.mobile_allowance or 0.0)
                 + (v.other_allowance or 0.0)
             )
-            daily_rate = base / DAYS_PER_MONTH if base else 0.0
+            daily_rate = base / _days_in_month(date_from) if base else 0.0
             deduction_total = round(daily_rate * absent_count)
 
             lines.append({
@@ -800,7 +843,7 @@ class HrPayslip(models.Model):
                 + (v.mobile_allowance or 0.0)
                 + (v.other_allowance or 0.0)
             )
-            daily_rate = base / DAYS_PER_MONTH if base else 0.0
+            daily_rate = base / _days_in_month(date_from) if base else 0.0
             deduction_total = round(daily_rate * absent_count)
 
             lines.append({
@@ -865,7 +908,7 @@ class HrPayslip(models.Model):
             + (v.mobile_allowance or 0.0)
             + (v.other_allowance or 0.0)
         )
-        daily_rate = base / DAYS_PER_MONTH if base else 0.0
+        daily_rate = base / _days_in_month(date_from) if base else 0.0
         unpresented_deduction = round(daily_rate * unpresented_count)
 
         # Saturday overtime credit for x_saturday_required calendars
@@ -879,6 +922,27 @@ class HrPayslip(models.Model):
                 if cur.weekday() == 5 and cur not in attended_dates:
                     sat_absent_count += 1
                 cur += timedelta(days=1)
+
+        # Saturday short-shift overtime reclassification (net-zero):
+        # Saturday is scheduled <8h; deduct the (8h - actual Saturday hours)
+        # gap and credit the same amount back as overtime.  Only Saturdays
+        # the employee actually worked (short shift present) count.
+        sat_short = bool(bio_calendar and bio_calendar.x_saturday_short_overtime)
+        sat_short_amount = 0
+        sat_short_count = 0
+        sat_short_hours = 0.0
+        if sat_short and daily_rate > 0:
+            sched_sat = self._scheduled_saturday_hours(bio_calendar)
+            shortfall_h = max(0.0, DAILY_HOURS - sched_sat)
+            if shortfall_h > 0:
+                cur = date_from
+                while cur <= date_to:
+                    if cur.weekday() == 5 and cur in attended_dates:
+                        sat_short_count += 1
+                    cur += timedelta(days=1)
+                sat_short_hours = shortfall_h * sat_short_count
+                sat_short_amount = round(
+                    (daily_rate / DAILY_HOURS) * sat_short_hours)
 
         # WORK100 — Actually worked days
         lines.append({
@@ -950,15 +1014,16 @@ class HrPayslip(models.Model):
                 'version_id': version.id,
             })
 
-        # ATT_DED — Aggregated monetary deduction (records + unpresented)
+        # ATT_DED — Aggregated monetary deduction (records + unpresented +
+        # the Saturday short-shift gap, which is credited back via SAT_OT).
         record_deduction = round(sum(
             a.x_deduction_amount or 0.0 for a in attendances))
-        deduction_total = record_deduction + unpresented_deduction
+        deduction_total = record_deduction + unpresented_deduction + sat_short_amount
         if deduction_total > 0:
             record_ded_days = len(
                 attendances.filtered(
                     lambda a: (a.x_deduction_amount or 0.0) > 0))
-            deduction_days = record_ded_days + unpresented_count
+            deduction_days = record_ded_days + unpresented_count + sat_short_count
             lines.append({
                 'name': _('Attendance Deduction'),
                 'sequence': 15,
@@ -980,19 +1045,21 @@ class HrPayslip(models.Model):
                 'version_id': version.id,
             })
 
-        if sat_absent_count > 0:
-            sat_credit = round(daily_rate * sat_absent_count)
-            if sat_credit > 0:
-                lines.append({
-                    'name': _('Saturday Overtime Credit'),
-                    'sequence': 17,
-                    'code': 'SAT_OT',
-                    'number_of_days': sat_absent_count,
-                    'number_of_hours': round(
-                        sat_absent_count * DAILY_HOURS, 2),
-                    'amount': sat_credit,
-                    'version_id': version.id,
-                })
+        # Saturday overtime credit — full-day (x_saturday_required) and/or
+        # short-shift (x_saturday_short_overtime) folded into one SAT_OT line,
+        # 1:1 offset of the matching ATT_DED portion (net-zero).
+        sat_credit = round(daily_rate * sat_absent_count) + sat_short_amount
+        if sat_credit > 0:
+            lines.append({
+                'name': _('Saturday Overtime Credit'),
+                'sequence': 17,
+                'code': 'SAT_OT',
+                'number_of_days': sat_absent_count + sat_short_count,
+                'number_of_hours': round(
+                    sat_absent_count * DAILY_HOURS + sat_short_hours, 2),
+                'amount': sat_credit,
+                'version_id': version.id,
+            })
 
         return lines
 
@@ -1019,7 +1086,7 @@ class HrPayslip(models.Model):
             + (v.mobile_allowance or 0.0)
             + (v.other_allowance or 0.0)
         ) if v else 0.0
-        daily_rate = base / DAYS_PER_MONTH if base else 0.0
+        daily_rate = base / _days_in_month(d_from) if base else 0.0
 
         day_names = ['Monday', 'Tuesday', 'Wednesday', 'Thursday',
                      'Friday', 'Saturday', 'Sunday']

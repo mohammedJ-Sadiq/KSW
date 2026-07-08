@@ -1,8 +1,18 @@
+from calendar import monthrange
+
 from odoo import api, fields, models
 
-# Hardcoded constants: all employees are required 30 days/month, 8 hours/day
+# 8 hours/day.  The monthly divisor is the actual number of days in the
+# attendance record's month (see _days_in_month), not a fixed 30.
 DAILY_MINUTES = 480.0   # 8 hours
-DAYS_PER_MONTH = 30.0
+DAYS_PER_MONTH = 30.0   # fallback only
+
+
+def _days_in_month(d):
+    """Number of days in the month of ``d`` (date/datetime); 30 if falsy."""
+    if not d:
+        return 30.0
+    return float(monthrange(d.year, d.month)[1])
 
 
 class HrAttendance(models.Model):
@@ -95,7 +105,7 @@ class HrAttendance(models.Model):
                 + (version.other_allowance or 0.0)
             )
             att.x_deductible_base = round(base)
-            daily_rate = base / DAYS_PER_MONTH
+            daily_rate = base / _days_in_month(att.check_in)
             att.x_daily_rate = round(daily_rate)
             att.x_hourly_rate = round(daily_rate / (DAILY_MINUTES / 60.0))
 

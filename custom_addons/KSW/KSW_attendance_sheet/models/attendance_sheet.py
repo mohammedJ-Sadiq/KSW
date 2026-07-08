@@ -340,8 +340,14 @@ class KswAttendanceSheet(models.Model):
         """Create or delete hr.attendance records to match is_attended.
 
         Called after lines are generated and whenever is_attended changes.
+        Attendance creates are batched into a single ORM call to avoid
+        per-record INSERT + _check_validity overhead on large sets.
         """
         HrAttendance = self.env['hr.attendance'].sudo()
+
+        create_vals = []
+        create_lines = []
+        create_worked = []
 
         for line in lines:
             employee = line.sheet_id.employee_id
@@ -367,26 +373,32 @@ class KswAttendanceSheet(models.Model):
                     # worked attendance record for a day off.
                     continue
 
-                # -- Create attendance record --
+                # -- Queue for batch create --
                 schedule = line.sheet_id._get_work_schedule(
                     employee, line.date)
                 ci_utc, co_utc, worked = self._build_attendance_vals(
                     employee, line.date, schedule)
-
-                att = HrAttendance.create({
+                create_vals.append({
                     'employee_id': employee.id,
                     'check_in': ci_utc,
                     'check_out': co_utc,
                     'x_is_auto_generated': True,
                 })
-                att.write({'worked_hours': worked})
-                line.sudo().write({'attendance_id': att.id})
+                create_lines.append(line)
+                create_worked.append(worked)
 
             elif not line.is_attended and line.attendance_id:
                 # -- Delete auto-generated record --
                 if line.attendance_id.x_is_auto_generated:
                     line.attendance_id.sudo().unlink()
                 line.sudo().write({'attendance_id': False})
+
+        # -- Batch create all new attendance records in one INSERT --
+        if create_vals:
+            new_atts = HrAttendance.create(create_vals)
+            for att, line, worked in zip(new_atts, create_lines, create_worked):
+                att.write({'worked_hours': worked})
+                line.sudo().write({'attendance_id': att.id})
 
     # ------------------------------------------------------------------
     # Weekly rest-day pay (e.g. Friday)

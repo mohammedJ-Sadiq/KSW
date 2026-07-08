@@ -17,6 +17,16 @@ class ResourceCalendar(models.Model):
              'amount is credited back as Saturday overtime on the payslip.',
     )
 
+    x_saturday_short_overtime = fields.Boolean(
+        string='Saturday Short-Shift Overtime',
+        help='When set, Saturday is a short shift (<8h). The gap between a '
+             'full 8h day and the actual Saturday hours is deducted and '
+             'credited back 1:1 as overtime on the payslip (net-zero '
+             'reclassification, like the full-day Saturday Required option). '
+             'Used for schedules such as "Standard 44 hours/week" (Sat 3h) '
+             'and "Abdullah Mutawa Special Shift" (Sat 4h).',
+    )
+
     x_skip_attendance_issues = fields.Boolean(
         string='Skip Late/Early Leave Checks',
         help='When set, late-arrival and early-departure minutes are not '

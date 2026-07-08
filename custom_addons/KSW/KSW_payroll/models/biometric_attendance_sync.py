@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
+from calendar import monthrange
 from datetime import timedelta
 
 from odoo import models
 
 # Must match the constants in hr_attendance.py
 DAILY_MINUTES = 480.0   # 8 hours
-DAYS_PER_MONTH = 30.0
+DAYS_PER_MONTH = 30.0   # fallback only
 
 
 class BiometricAttendanceSyncPayroll(models.AbstractModel):
@@ -30,7 +31,9 @@ class BiometricAttendanceSyncPayroll(models.AbstractModel):
             + (version.mobile_allowance or 0.0)
             + (version.other_allowance or 0.0)
         )
-        daily_rate = round(base / DAYS_PER_MONTH)
+        # Divisor = actual days in the synced day's month (e.g. 31, 30, 28/29).
+        days_in_month = monthrange(day.year, day.month)[1]
+        daily_rate = round(base / days_in_month)
         hourly_rate = round(daily_rate / (DAILY_MINUTES / 60.0))
         base = round(base)
         # Update deduction columns via SQL.
