@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Flag the known short-Saturday schedules (Standard 44 hours/week,
+         Abdullah Mutawa Special Shift) so the payslip reclassifies their
+         Saturday gap (8h minus the short shift) as net-zero overtime.
+         Uses <function> so it runs on every upgrade regardless of noupdate
+         gating (see CLAUDE.md gotcha #2).  Idempotent — only sets True. -->
+    <function model="resource.calendar"
+              name="_ksw_set_saturday_short_overtime_defaults"/>
+</odoo>

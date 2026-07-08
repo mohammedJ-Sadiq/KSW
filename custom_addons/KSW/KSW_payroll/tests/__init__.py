@@ -13,6 +13,7 @@ from . import test_cross_month_vacation
 from . import test_combined_leave
 from . import test_historical_vacation_value
 from . import test_net_rounding_consistency
+from . import test_saturday_short_overtime
 
 
 

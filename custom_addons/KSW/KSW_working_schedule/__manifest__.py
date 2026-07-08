@@ -26,6 +26,9 @@ This module extends the employee model to include fields for managing work sched
         'views/resource_calendar_group_views.xml',
         'views/resource_calendar_views.xml',
 
+        # Data
+        'data/resource_calendar_data.xml',
+
     ],
     'assets': {},
     'installable': True,

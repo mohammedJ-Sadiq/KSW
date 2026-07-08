@@ -1,8 +1,28 @@
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class ResourceCalendar(models.Model):
     _inherit = 'resource.calendar'
+
+    # Schedules whose Saturday is a short shift (<8h) and should have the gap
+    # to a full 8h day reclassified as overtime (net-zero).  Set on install/
+    # upgrade via the data <function> call.  Admins can also tick the boolean
+    # manually on any other schedule.
+    _SATURDAY_SHORT_OVERTIME_NAMES = (
+        'Standard 44 hours/week',
+        'Abdullah Mutawa Special Shift',
+    )
+
+    @api.model
+    def _ksw_set_saturday_short_overtime_defaults(self):
+        """Flag the known short-Saturday schedules by name (idempotent, only
+        sets True — never clears an admin's choice)."""
+        cals = self.search([
+            ('name', 'in', list(self._SATURDAY_SHORT_OVERTIME_NAMES)),
+            ('x_saturday_short_overtime', '=', False),
+        ])
+        if cals:
+            cals.write({'x_saturday_short_overtime': True})
 
     is_temp_schedule = fields.Boolean(
         string='Is temporary Schedule',

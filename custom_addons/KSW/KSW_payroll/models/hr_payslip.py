@@ -745,6 +745,13 @@ class HrPayslip(models.Model):
             absent_count = max(0, calendar_days - attended_count)
             sat_absent_count = 0
 
+        # NOTE: the Saturday short-shift overtime reclassification
+        # (x_saturday_short_overtime) is deliberately NOT applied to
+        # attendance-sheet employees — their days are marked manually by a
+        # supervisor, not derived from real punches, so there is no short
+        # Saturday shift to deduct-and-credit.  The full-day
+        # x_saturday_required behaviour below is unchanged.
+
         if absent_count > 0:
             absent_hours = round(absent_count * DAILY_HOURS, 2)
 
@@ -1189,6 +1196,34 @@ class HrPayslip(models.Model):
                     'type': 'unpresented',
                 })
             current += timedelta(days=1)
+
+        # Saturday short-shift overtime gap (present Saturdays scheduled <8h).
+        # The (8h - actual) gap is folded into ATT_DED and credited back 1:1
+        # as Saturday overtime (net zero); add matching rows so the breakdown
+        # total reconciles with ATT_DED.  Biometric employees only — sheet
+        # (supervisor-marked) employees are excluded, matching the worked-day
+        # builder.
+        calendar = self.env['ksw.attendance.sheet']._get_employee_calendar(
+            employee)
+        if (not is_sheet and calendar
+                and calendar.x_saturday_short_overtime and daily_rate > 0):
+            shortfall_h = max(
+                0.0, DAILY_HOURS - self._scheduled_saturday_hours(calendar))
+            if shortfall_h > 0:
+                gap = (daily_rate / DAILY_HOURS) * shortfall_h
+                current = eff_from
+                while current <= d_to:
+                    if current.weekday() == 5 and current in attended_dates:
+                        rows.append({
+                            'date': current.strftime('%Y-%m-%d'),
+                            'day': day_names[current.weekday()],
+                            'late_min': 0,
+                            'early_min': 0,
+                            'is_absent': False,
+                            'deduction': gap,
+                            'type': 'sat_short',
+                        })
+                    current += timedelta(days=1)
 
         # Sort by date
         rows.sort(key=lambda r: r['date'])
