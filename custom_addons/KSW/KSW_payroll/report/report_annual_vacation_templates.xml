@@ -213,6 +213,8 @@
                         <!-- ══════════════════════════════════════════ -->
                         <t t-set="_vac_payslips" t-value="o.sudo().x_vacation_payslip_ids"/>
                         <t t-set="payslip" t-value="_vac_payslips[0] if _vac_payslips else False"/>
+                        <t t-set="requester_name"
+                           t-value="o.employee_id.name if (o.sudo().create_uid == o.employee_id.user_id or not o.employee_id.leave_manager_id) else o.sudo().create_uid.name"/>
 
                         <t t-if="payslip">
 
@@ -266,77 +268,120 @@
                                 </table>
                             </t>
 
-                            <!-- Payslip: Salary Computation -->
-                            <h6 class="mt-3 mb-1 fw-bold">Salary Computation</h6>
-                            <table class="table table-sm table-bordered mb-4">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Description</th>
-                                        <th>Code</th>
-                                        <th class="text-end">Amount (SAR)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <t t-foreach="payslip.line_ids.filtered(lambda l: l.appears_on_payslip).sorted('sequence')"
-                                       t-as="line">
-                                        <tr t-attf-class="#{'table-success fw-bold' if line.code == 'NET' else 'table-danger' if line.total &lt; 0 else 'fw-bold' if line.code in ('BASIC','GROSS') else 'text-muted' if line.total == 0 else ''}">
-                                            <td t-out="line.name"/>
-                                            <td t-out="line.code"/>
-                                            <td class="text-end" t-out="'%.2f' % line.total"/>
+                            <!-- Salary Computation and Signatures are wrapped together so
+                                 wkhtmltopdf keeps them on the same page when possible. -->
+                            <div style="page-break-inside: avoid">
+                                <h6 class="mt-3 mb-1 fw-bold">Salary Computation</h6>
+                                <table class="table table-sm table-bordered mb-4">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Description</th>
+                                            <th>Code</th>
+                                            <th class="text-end">Amount (SAR)</th>
                                         </tr>
-                                    </t>
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="payslip.line_ids.filtered(lambda l: l.appears_on_payslip).sorted('sequence')"
+                                           t-as="line">
+                                            <tr t-attf-class="#{'table-success fw-bold' if line.code == 'NET' else 'table-danger' if line.total &lt; 0 else 'fw-bold' if line.code in ('BASIC','GROSS') else 'text-muted' if line.total == 0 else ''}">
+                                                <td t-out="line.name"/>
+                                                <td t-out="line.code"/>
+                                                <td class="text-end" t-out="'%.2f' % line.total"/>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+
+                                <!-- ══════════════════════════════════════════ -->
+                                <!--  Signature Block                           -->
+                                <!-- ══════════════════════════════════════════ -->
+                                <div class="row mt-4 pt-2 text-center">
+                                    <div class="col-4">
+                                        <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
+                                            <strong>Accountant</strong>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
+                                            <strong>Accounting Manager</strong>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
+                                            <strong>HR Manager</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-4 pt-2 text-center">
+                                    <div class="col-4">
+                                        <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
+                                            <strong>General Manager</strong>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
+                                            <strong>Applicant</strong><br/>
+                                            <span t-out="requester_name"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
+                                            <strong>Document Upload Confirmation</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                         </t>
                         <t t-else="">
-                            <div class="alert alert-warning mt-3 mb-4">
-                                <strong>Vacation payslip not yet generated.</strong>
-                                The payslip is created automatically upon GM Final Approval.
+                            <!-- No-payslip warning and Signatures wrapped together so they
+                                 never appear alone on a blank page. -->
+                            <div style="page-break-inside: avoid">
+                                <div class="alert alert-warning mt-3 mb-4">
+                                    <strong>Vacation payslip not yet generated.</strong>
+                                    The payslip is created automatically upon GM Final Approval.
+                                </div>
+
+                                <!-- ══════════════════════════════════════════ -->
+                                <!--  Signature Block                           -->
+                                <!-- ══════════════════════════════════════════ -->
+                                <div class="row mt-4 pt-2 text-center">
+                                    <div class="col-4">
+                                        <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
+                                            <strong>Accountant</strong>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
+                                            <strong>Accounting Manager</strong>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
+                                            <strong>HR Manager</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-4 pt-2 text-center">
+                                    <div class="col-4">
+                                        <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
+                                            <strong>General Manager</strong>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
+                                            <strong>Applicant</strong><br/>
+                                            <span t-out="requester_name"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
+                                            <strong>Document Upload Confirmation</strong>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </t>
-
-                        <!-- ══════════════════════════════════════════ -->
-                        <!--  Section 5: Signature Block               -->
-                        <!-- ══════════════════════════════════════════ -->
-                        <t t-set="requester_name"
-                           t-value="o.employee_id.name if (o.sudo().create_uid == o.employee_id.user_id or not o.employee_id.leave_manager_id) else o.sudo().create_uid.name"/>
-                        <div class="row mt-5 pt-5 text-center">
-                            <div class="col-4">
-                                <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
-                                    <strong>Accountant</strong>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
-                                    <strong>Accounting Manager</strong>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
-                                    <strong>HR Manager</strong>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row mt-5 pt-5 text-center">
-                            <div class="col-4">
-                                <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
-                                    <strong>General Manager</strong>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
-                                    <strong>Applicant</strong><br/>
-                                    <span t-out="requester_name"/>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
-                                    <strong>Document Upload Confirmation</strong>
-                                </div>
-                            </div>
-                        </div>
 
                     </div>
                 </t>

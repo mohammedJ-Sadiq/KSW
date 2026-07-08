@@ -292,7 +292,7 @@ KSW_payroll access-tier feature. Know them before doing similar work again.
 
 17. **In Odoo 19, `hr.leave` is created directly in `confirm` state — `action_confirm()` does not exist on the base model.** The field has `default='confirm'`. Any test or override that calls `leave.action_confirm()` or `super().action_confirm()` will raise `AttributeError: 'super' object has no attribute 'action_confirm'`. Move post-create side effects (DM notifications, etc.) into the `create()` override directly.
 
-18. **`action_gm_final_approve` does NOT directly validate the leave (state → validate). It moves to `pending_employee_signature`.** The Odoo `_action_validate` call only happens after `action_employee_confirm_signature()`. Tests that assert `leave.state == 'validate'` after `action_gm_final_approve` will fail. Add the employee signature step with a stub attachment (see KSW_annual_leave architecture section below).
+18. **`action_gm_final_approve` does NOT directly validate the leave (state → validate). It moves to `pending_employee_signature`.** The Odoo `_action_validate` call only happens after `action_employee_confirm_signature()` — now called by HR only (changed July 2026). Tests that assert `leave.state == 'validate'` after `action_gm_final_approve` will fail. Add the HR confirmation step with a stub attachment and `with_user(user_hr).sudo()` (see KSW_annual_leave architecture section below).
 
 19. **`_generate_weekend_records` (cybrosys) crashes for night-shift employees.**
     The upstream code extracts only `.hour`/`.minute` from `ref_schedule['end']`
@@ -420,7 +420,11 @@ Field: `x_annual_approval_state` (Selection) on `hr.leave`.
 | `pending_gm_initial` | `action_gm_initial_approve` | `group_annual_leave_gm` |
 | `pending_acc` | `action_acc_approve` | `group_annual_leave_acc` |
 | `pending_gm_final` | `action_gm_final_approve` | `group_annual_leave_gm` |
-| `pending_employee_signature` | `action_employee_confirm_signature` | employee, DM, or HR |
+| `pending_employee_signature` | `action_employee_confirm_signature` | **HR only** (`group_annual_leave_hr`) |
+
+Step 6 changed in July 2026: it was previously confirmed by the employee/DM. It is
+now HR-only. The notification after GM final approval goes to the HR group (not the
+employee or DM). The state label is "Pending HR Confirmation".
 
 `_check_group(xmlid, message)` raises `UserError` when the calling user lacks the
 group. **It does NOT check `self.env.su`.** So `record.sudo()` alone is not enough
@@ -433,11 +437,12 @@ The KSW `create()` override calls `_notify_pending_approvers(leave, 'pending_dm'
 directly after writing `x_annual_approval_state = 'pending_dm'`.
 Do **not** add `action_confirm()` overrides or test code that calls it.
 
-### Employee signature step
+### HR confirmation step (Step 6)
 `action_gm_final_approve` moves the leave to `pending_employee_signature`
 (NOT directly to `validate`). The Odoo `state → 'validate'` only happens after
-`action_employee_confirm_signature()` is called. That method requires at least
-one attachment on `x_attachment_ids`. In tests, create a stub attachment:
+`action_employee_confirm_signature()` is called **by an HR user**. That method
+requires at least one attachment on `x_attachment_ids`. In tests, create a stub
+attachment and call via `with_user(user_hr).sudo()`:
 ```python
 att = self.env['ir.attachment'].sudo().create({
     'name': 'test_signed_form.pdf',
@@ -445,8 +450,9 @@ att = self.env['ir.attachment'].sudo().create({
     'res_model': 'hr.leave', 'res_id': leave.id,
 })
 leave.sudo().write({'x_attachment_ids': [(4, att.id)]})
-leave.sudo().action_employee_confirm_signature()
+leave.with_user(user_hr).sudo().action_employee_confirm_signature()
 ```
+`x_can_sign` (gate field for the button) is True only for HR users at this step.
 
 ### GM Return-to-Approver wizard
 `ksw.gm.return.approver.wizard` (in `KSW_annual_leave/wizard/`) lets the GM
@@ -475,6 +481,17 @@ return a leave to an earlier approver instead of refusing it outright.
 22. **`hr.payslip.line` `digits=(16, 0)` override causes a 1-SAR NET display gap when deduction inputs are fractional.** KSW_payroll overrides `hr.payslip.line.amount`, `quantity`, and `total` to `fields.Float(digits=(16, 0))`, storing all amounts as integers. The base engine (`om_hr_payroll`) accumulates category sums using `currency.round()` (SAR = 2 dp), so a 87.5 SAR loan installment enters `categories.DED` as -87.5, giving `NET = 6153.5`, which Python's banker's rounding stores as 6154. But the displayed `KSW_DEDUCTIONS` line is -88 (87.5 rounded to nearest integer), so the user sees `6850 − 609 − 88 = 6153 ≠ NET 6154`.
     **Fix applied in `KSW_payroll/models/hr_payslip.py`:** After `super().compute_sheet()`, a post-processing block re-derives `NET = GROSS.amount + Σ(DED category line amounts)` using the already-rounded integer stored values. This guarantees the displayed numbers are always arithmetically consistent.
     **Test coverage:** `KSW_payroll/tests/test_net_rounding_consistency.py` — five tests (integer inputs, 87.5 fractional, two fractional inputs, round-down fractional, no KSW_DED inputs).
+
+23. **When testing "notification NOT sent to user X", snapshot `message_ids.ids` before the action, then filter to only new messages.** `leave.message_ids` contains ALL chatter history. If user X was notified at an earlier step (e.g. the DM is in `partner_ids` of the step-1 creation message), a bare `leave.message_ids.filtered(lambda m: x_partner in m.partner_ids)` will find that old message and give a false positive. Pattern:
+    ```python
+    existing_ids = leave.message_ids.ids
+    leave.with_user(some_user).sudo().action_something()
+    new_msgs = leave.message_ids.filtered(lambda m: m.id not in existing_ids)
+    self.assertFalse(new_msgs.filtered(lambda m: x_partner in m.partner_ids))
+    ```
+    Hit during `TestHrConfirmationStep.test_gm_final_does_not_notify_dm` — the DM
+    WAS in the step-1 notification but not in the step-6 one; the test was wrong, not
+    the code.
 
 ### `requires_allocation` in tests
 Must be `False` (Python bool), **not** `'no'` (truthy string). The string `'no'`
