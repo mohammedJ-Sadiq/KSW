@@ -184,7 +184,7 @@ class KswAttendanceSheet(models.Model):
         return bool(calendar) and not calendar.calendar_group_ids \
             and not calendar.attendance_ids
 
-    def _get_work_schedule(self, employee, check_date):
+    def _get_work_schedule(self, employee, check_date, preloaded_group_lines=None):
         """Get scheduled start/end for *employee* on *check_date*.
 
         Lookup order:
@@ -199,6 +199,11 @@ class KswAttendanceSheet(models.Model):
         never given hours) produce fully-paid attendance with no real
         schedule behind it.
 
+        preloaded_group_lines: optional recordset of ALL resource.calendar.group.line
+        records for this employee's calendar, pre-fetched by the caller for the whole
+        month. When provided, filtering is done in Python instead of hitting the DB
+        once per day (31 searches → 1 per employee).
+
         Returns dict(hour_from, hour_to, break_hours) or None.
         """
         calendar = self._get_employee_calendar(employee)
@@ -208,25 +213,31 @@ class KswAttendanceSheet(models.Model):
 
         # -- 1. Try calendar_group_ids (KSW custom groups) --
         if calendar and calendar.calendar_group_ids:
-            base_domain = Domain([
-                ('calendar_group_id', 'in', calendar.calendar_group_ids.ids),
-                ('dayofweek', '=', day_of_week),
-            ])
-            date_domain = Domain.AND([
-                Domain.OR([
-                    Domain([('start_date', '=', False)]),
-                    Domain([('start_date', '<=', check_date)]),
-                ]),
-                Domain.OR([
-                    Domain([('end_date', '=', False)]),
-                    Domain([('end_date', '>=', check_date)]),
-                ]),
-            ])
-
-            all_lines = self.env['resource.calendar.group.line'].search(
-                Domain.AND([base_domain, date_domain]),
-                order='hour_from asc',
-            )
+            if preloaded_group_lines is not None:
+                all_lines = preloaded_group_lines.filtered(lambda l:
+                    l.dayofweek == day_of_week
+                    and (not l.start_date or l.start_date <= check_date)
+                    and (not l.end_date or l.end_date >= check_date)
+                ).sorted('hour_from')
+            else:
+                base_domain = Domain([
+                    ('calendar_group_id', 'in', calendar.calendar_group_ids.ids),
+                    ('dayofweek', '=', day_of_week),
+                ])
+                date_domain = Domain.AND([
+                    Domain.OR([
+                        Domain([('start_date', '=', False)]),
+                        Domain([('start_date', '<=', check_date)]),
+                    ]),
+                    Domain.OR([
+                        Domain([('end_date', '=', False)]),
+                        Domain([('end_date', '>=', check_date)]),
+                    ]),
+                ])
+                all_lines = self.env['resource.calendar.group.line'].search(
+                    Domain.AND([base_domain, date_domain]),
+                    order='hour_from asc',
+                )
             if all_lines:
                 work_lines = all_lines.filtered(
                     lambda l: l.day_period != 'break')
@@ -336,12 +347,15 @@ class KswAttendanceSheet(models.Model):
 
         return ci_utc, co_utc, max(0.0, worked)
 
-    def _sync_line_attendance(self, lines):
+    def _sync_line_attendance(self, lines, schedules=None):
         """Create or delete hr.attendance records to match is_attended.
 
         Called after lines are generated and whenever is_attended changes.
         Attendance creates are batched into a single ORM call to avoid
         per-record INSERT + _check_validity overhead on large sets.
+
+        schedules: optional {date: schedule_dict} precomputed by
+        action_generate_lines; avoids re-calling _get_work_schedule per line.
         """
         HrAttendance = self.env['hr.attendance'].sudo()
 
@@ -374,8 +388,11 @@ class KswAttendanceSheet(models.Model):
                     continue
 
                 # -- Queue for batch create --
-                schedule = line.sheet_id._get_work_schedule(
-                    employee, line.date)
+                if schedules is not None and line.date in schedules:
+                    schedule = schedules[line.date]
+                else:
+                    schedule = line.sheet_id._get_work_schedule(
+                        employee, line.date)
                 ci_utc, co_utc, worked = self._build_attendance_vals(
                     employee, line.date, schedule)
                 create_vals.append({
@@ -478,10 +495,28 @@ class KswAttendanceSheet(models.Model):
             num_days = monthrange(y, m)[1]
             misconfigured = self._is_misconfigured_calendar(sheet.employee_id)
 
+            # Pre-load all group lines for this employee's calendar in one
+            # query, then filter in Python per day — avoids 31 DB searches
+            # per employee (one per day) during bulk sheet generation.
+            calendar = self._get_employee_calendar(sheet.employee_id)
+            preloaded_group_lines = None
+            if calendar and calendar.calendar_group_ids:
+                preloaded_group_lines = self.env[
+                    'resource.calendar.group.line'].sudo().search([
+                        ('calendar_group_id', 'in',
+                         calendar.calendar_group_ids.ids),
+                    ], order='hour_from asc')
+
             vals_list = []
+            schedules = {}
             for day in range(1, num_days + 1):
                 d = fields.Date.to_date(f'{y}-{m:02d}-{day:02d}')
-                is_wd = self._is_workday(sheet.employee_id, d)
+                schedule = self._get_work_schedule(
+                    sheet.employee_id, d,
+                    preloaded_group_lines=preloaded_group_lines,
+                )
+                is_wd = schedule is not None
+                schedules[d] = schedule
                 vals_list.append({
                     'sheet_id': sheet.id,
                     'date': d,
@@ -499,7 +534,7 @@ class KswAttendanceSheet(models.Model):
 
             new_lines = self.env['ksw.attendance.sheet.line'].create(vals_list)
             # Immediately create hr.attendance records
-            sheet._sync_line_attendance(new_lines)
+            sheet._sync_line_attendance(new_lines, schedules=schedules)
 
     def action_mark_all_absent(self):
         """Set every workday to absent (off days are derived, not set)."""
@@ -572,6 +607,16 @@ class KswAttendanceSheet(models.Model):
 
         Each sheet/employee is wrapped in a savepoint so a single bad
         record cannot roll back the entire batch.
+
+        Phase 1 (confirmations) is committed before Phase 2 (creation)
+        begins so that June confirmations survive even if July creation
+        fails or the cursor is closed mid-way (e.g. HTTP 120-s timeout).
+        Phase 2 commits every 50 employees for the same reason.
+
+        IMPORTANT: never access ORM fields inside an except block —
+        the cursor may already be closed, making emp.name / sheet.x
+        raise InterfaceError and escape the except, killing the whole job.
+        Use emp.id (always in Python memory) instead.
         """
         today = fields.Date.context_today(self)
 
@@ -595,15 +640,19 @@ class KswAttendanceSheet(models.Model):
                 except Exception:
                     skipped += 1
                     _logger.exception(
-                        'Attendance sheet cron: failed to confirm sheet %s '
-                        '(%s %s/%s) — skipping.',
-                        sheet.id, sheet.employee_id.name,
-                        sheet.month, sheet.year,
+                        'Attendance sheet cron: failed to confirm sheet id=%s '
+                        'month=%s year=%s — skipping.',
+                        sheet.id, sheet.month, sheet.year,
                     )
             _logger.info(
                 'Attendance sheet cron: confirmed %d, skipped %d.',
                 confirmed, skipped,
             )
+
+        # Commit Phase 1 before starting Phase 2 so confirmations are
+        # permanently saved even if July sheet creation fails or the
+        # cursor is killed (e.g. 120-s HTTP timeout on manual trigger).
+        self.env.cr.commit()
 
         # -- 2. Generate sheets for the current month --
         month = str(today.month)
@@ -626,14 +675,19 @@ class KswAttendanceSheet(models.Model):
                             'year': year,
                         })
                     created += 1
+                    # Commit every 50 employees so partial progress is
+                    # saved if the cursor is killed mid-way.
+                    if created % 50 == 0:
+                        self.env.cr.commit()
                 except Exception:
                     emp_skipped += 1
                     _logger.exception(
                         'Attendance sheet cron: failed to create sheet for '
-                        'employee %s (%s) — skipping.',
-                        emp.name, emp.id,
+                        'employee id=%s — skipping.',
+                        emp.id,
                     )
 
+        self.env.cr.commit()
         _logger.info(
             'Attendance sheet cron: created %d sheets for %s/%s '
             '(skipped %d employees).',

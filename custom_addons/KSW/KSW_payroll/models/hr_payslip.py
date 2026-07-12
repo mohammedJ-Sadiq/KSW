@@ -200,15 +200,30 @@ class HrPayslip(models.Model):
                 and payslip.struct_id.x_absence_only_deduction
             )
             return_date = self._get_vacation_return_date(payslip)
+
+            # For vacation / EOS payslips (x_leave_id set), cap the
+            # attendance window to the day BEFORE the leave starts.
+            # Days from the leave start to payslip.date_to are injected
+            # as absent so ATTDED deducts for them; the VACATION_BAL /
+            # EOS input lines compensate for those vacation-period days.
+            effective_to = None
+            if payslip.x_leave_id:
+                leave_start = payslip.x_leave_id.request_date_from
+                if leave_start and leave_start <= payslip.date_to:
+                    effective_to = leave_start - timedelta(days=1)
+
             # Clear and regenerate when:
             #  - there is a vacation return (use return date as new start), OR
-            #  - the structure is absence-only (must drop any late/early lines
-            #    that may have been created before the flag was enabled)
-            if (return_date or absence_only) and payslip.worked_days_line_ids:
+            #  - the structure is absence-only, OR
+            #  - this is a vacation/EOS payslip (attendance window must be
+            #    capped to the day before leave starts)
+            if (return_date or absence_only or effective_to is not None) \
+                    and payslip.worked_days_line_ids:
                 payslip.worked_days_line_ids.unlink()
 
             if not payslip.worked_days_line_ids:
                 self._ensure_worked_days(payslip, effective_from=return_date,
+                                         effective_to=effective_to,
                                          absence_only=absence_only)
 
             self._inject_prior_hra_input(payslip)
@@ -483,7 +498,7 @@ class HrPayslip(models.Model):
     # ------------------------------------------------------------------
 
     def _ensure_worked_days(self, payslip, effective_from=None,
-                            absence_only=False):
+                            effective_to=None, absence_only=False):
         """Populate worked_days_line_ids when they are empty (e.g. batch
         payslip generation where the UI onchange never fires).
 
@@ -492,11 +507,14 @@ class HrPayslip(models.Model):
         date onwards** is counted — pre-vacation days are not
         double-counted.
 
+        When *effective_to* is given (e.g. a vacation/EOS payslip where
+        the leave starts mid-month), the attendance window is capped at
+        that date.  Post-leave calendar days (effective_to+1 through
+        payslip.date_to) are injected as absent so ATTDED fires for them.
+
         Because salary rules always compute full-month amounts (e.g.
-        BASIC = wage), the pre-return calendar days must still appear as
-        absent so that ATTDED deducts the correct amount.  Otherwise the
-        employee would receive almost an entire extra month's salary on
-        the monthly payslip.
+        BASIC = wage), the pre-return / post-leave calendar days must
+        still appear as absent so ATTDED deducts the correct amount.
         """
         version_ids = (
             payslip.version_id.ids
@@ -507,8 +525,9 @@ class HrPayslip(models.Model):
             return
         versions = self.env['hr.version'].browse(version_ids)
         start = effective_from or payslip.date_from
+        end = effective_to if effective_to is not None else payslip.date_to
         ctx = self.with_context(ksw_absence_only=True) if absence_only else self
-        wd_vals = ctx.get_worked_day_lines(versions, start, payslip.date_to)
+        wd_vals = ctx.get_worked_day_lines(versions, start, end)
 
         # When effective_from shifts the attendance window, add the
         # pre-return calendar days as absent so ATTDED fires correctly.
@@ -518,6 +537,31 @@ class HrPayslip(models.Model):
                 self._add_pre_return_absent_days(
                     wd_vals, pre_return_days, versions[:1],
                     period_date=payslip.date_from)
+
+        # When effective_to caps the window, add the post-leave calendar
+        # days (effective_to+1 → payslip.date_to) as absent.
+        if effective_to is not None:
+            period_start = max(effective_to,
+                               payslip.date_from - timedelta(days=1))
+            post_leave_days = (payslip.date_to - period_start).days
+            if post_leave_days > 0:
+                self._add_post_leave_absent_days(
+                    wd_vals, post_leave_days, versions[:1],
+                    period_date=payslip.date_from)
+
+            # When the leave starts on or before the payslip's first day
+            # (effective_to < date_from), get_worked_day_lines returns
+            # nothing — the attendance window is empty.  Salary rules
+            # require a WORK100 line to exist (0 days worked).
+            if not any(v.get('code') == 'WORK100' for v in wd_vals):
+                wd_vals.insert(0, {
+                    'name': _('Worked Days'),
+                    'sequence': 1,
+                    'code': 'WORK100',
+                    'number_of_days': 0.0,
+                    'number_of_hours': 0.0,
+                    'version_id': versions[:1].id,
+                })
 
         if wd_vals:
             payslip.worked_days_line_ids = [
@@ -601,6 +645,80 @@ class HrPayslip(models.Model):
                     'number_of_days': pre_return_days,
                     'number_of_hours': pre_return_hours,
                     'amount': pre_return_deduction,
+                    'version_id': version.id,
+                })
+
+    def _add_post_leave_absent_days(self, wd_vals, post_leave_days, version,
+                                    period_date=None):
+        """Inject post-leave calendar days into ATT_ABS / ATT_DED lines.
+
+        For vacation and EOS payslips the leave starts mid-month.  Days
+        from the leave start through payslip.date_to are not worked and
+        must appear absent so ATTDED deducts for them.
+        VACATION_BAL / EOS input lines compensate for those days.
+        """
+        v = version.employee_id.sudo().current_version_id or version
+        base = (
+            (v.wage or 0.0)
+            + (v.travel_allowance or 0.0)
+            + (v.mobile_allowance or 0.0)
+            + (v.other_allowance or 0.0)
+        )
+        daily_rate = base / _days_in_month(period_date) if base else 0.0
+        post_leave_deduction = round(daily_rate * post_leave_days)
+        post_leave_hours = round(post_leave_days * DAILY_HOURS, 2)
+
+        att_abs = next((d for d in wd_vals if d.get('code') == 'ATT_ABS'),
+                       None)
+        if att_abs:
+            att_abs['number_of_days'] += post_leave_days
+            att_abs['number_of_hours'] = round(
+                att_abs.get('number_of_hours', 0) + post_leave_hours, 2)
+            att_abs['amount'] = att_abs.get('amount', 0) + post_leave_deduction
+        else:
+            wd_vals.append({
+                'name': _('Absent Days'),
+                'sequence': 2,
+                'code': 'ATT_ABS',
+                'number_of_days': post_leave_days,
+                'number_of_hours': post_leave_hours,
+                'amount': post_leave_deduction,
+                'version_id': version.id,
+            })
+
+        if post_leave_deduction > 0:
+            att_ded = next(
+                (d for d in wd_vals if d.get('code') == 'ATT_DED'), None)
+            if att_ded:
+                att_ded['number_of_days'] += post_leave_days
+                att_ded['amount'] = (att_ded.get('amount', 0)
+                                     + post_leave_deduction)
+            else:
+                wd_vals.append({
+                    'name': _('Attendance Deduction'),
+                    'sequence': 15,
+                    'code': 'ATT_DED',
+                    'number_of_days': post_leave_days,
+                    'number_of_hours': 0,
+                    'amount': post_leave_deduction,
+                    'version_id': version.id,
+                })
+
+        if post_leave_deduction > 0:
+            misdays = next(
+                (d for d in wd_vals if d.get('code') == 'MISDAYS'), None)
+            if misdays:
+                misdays['number_of_days'] += post_leave_days
+                misdays['amount'] = (misdays.get('amount', 0)
+                                     + post_leave_deduction)
+            else:
+                wd_vals.append({
+                    'name': _('Missing Days'),
+                    'sequence': 16,
+                    'code': 'MISDAYS',
+                    'number_of_days': post_leave_days,
+                    'number_of_hours': post_leave_hours,
+                    'amount': post_leave_deduction,
                     'version_id': version.id,
                 })
 

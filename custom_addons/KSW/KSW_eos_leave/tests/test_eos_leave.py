@@ -258,6 +258,53 @@ class TestEosLeave(TransactionCase):
         self.assertEqual(leave.state, 'validate')
 
     # ==================================================================
+    # Employee archival at GM Final Approval
+    # ==================================================================
+
+    def test_employee_archived_on_gm_final_art84(self):
+        """GM Final Approve on Art. 84 EOS archives the employee as 'Fired'."""
+        leave = self._make_leave(offset=17)
+        leave.sudo().write({'x_eos_termination_reason': '84'})
+        self._advance_to(leave, 'pending_employee_signature')
+        emp = leave.employee_id.with_context(active_test=False)
+        self.assertFalse(emp.active)
+        self.assertEqual(
+            emp.departure_reason_id,
+            self.env.ref('hr.departure_fired'),
+        )
+        self.assertEqual(emp.departure_date, leave.request_date_from)
+
+    def test_employee_archived_on_gm_final_art85(self):
+        """GM Final Approve on Art. 85 EOS archives the employee as 'Resigned'."""
+        leave = self._make_leave(offset=18)
+        leave.sudo().write({'x_eos_termination_reason': '85'})
+        self._advance_to(leave, 'pending_employee_signature')
+        emp = leave.employee_id.with_context(active_test=False)
+        self.assertFalse(emp.active)
+        self.assertEqual(
+            emp.departure_reason_id,
+            self.env.ref('hr.departure_resigned'),
+        )
+
+    def test_employee_not_archived_for_non_eos_leave(self):
+        """GM Final Approve on a regular annual leave must NOT archive the employee."""
+        annual_type = self.env['hr.leave.type'].create({
+            'name': 'Annual Leave Archive Guard Test',
+            'leave_validation_type': 'annual_multi',
+            'requires_allocation': False,
+            'is_eos_leave': False,
+            'is_annual_leave': True,
+        })
+        leave = self.env['hr.leave'].sudo().create({
+            'employee_id': self.employee.id,
+            'holiday_status_id': annual_type.id,
+            'request_date_from': date(2027, 9, 1),
+            'request_date_to': date(2027, 9, 5),
+        })
+        self._advance_to(leave, 'pending_employee_signature')
+        self.assertTrue(self.employee.active)
+
+    # ==================================================================
     # EOS payslip creation
     # ==================================================================
 

@@ -4,6 +4,7 @@ from markupsafe import Markup
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
+from odoo.osv import expression as odoo_expr
 
 ANNUAL_MULTI_STATES = [
     ('pending_dm', 'Pending DM Approval'),
@@ -373,6 +374,82 @@ class HrLeave(models.Model):
     x_can_gm_return = fields.Boolean(compute='_compute_approval_role_gates')
     x_is_hr_approver = fields.Boolean(compute='_compute_approval_role_gates')
     x_is_acc_approver = fields.Boolean(compute='_compute_approval_role_gates')
+
+    # Searchable field: True when the current user is the designated approver
+    # for the leave's current step. Used by the "Waiting For Me" search filter
+    # so each role only sees leaves that are actually pending their action.
+    x_is_pending_my_action = fields.Boolean(
+        compute='_compute_is_pending_my_action',
+        search='_search_is_pending_my_action',
+        string='Pending My Action',
+    )
+
+    @api.depends_context('uid')
+    @api.depends('x_annual_approval_state', 'employee_id', 'employee_id.leave_manager_id')
+    def _compute_is_pending_my_action(self):
+        user = self.env.user
+        uid = user.id
+        is_hr = user.has_group('KSW_annual_leave.group_annual_leave_hr')
+        is_gm = user.has_group('KSW_annual_leave.group_annual_leave_gm')
+        is_acc = user.has_group('KSW_annual_leave.group_annual_leave_acc')
+        for leave in self:
+            s = leave.x_annual_approval_state
+            if not s or not leave.id:
+                leave.x_is_pending_my_action = False
+                continue
+            if s == 'pending_dm':
+                dm = leave.employee_id.leave_manager_id
+                leave.x_is_pending_my_action = (
+                    (dm and dm.id == uid) or (not dm and is_hr)
+                )
+            elif s == 'pending_hr':
+                leave.x_is_pending_my_action = is_hr
+            elif s in ('pending_gm_initial', 'pending_gm_final'):
+                leave.x_is_pending_my_action = is_gm
+            elif s == 'pending_acc':
+                leave.x_is_pending_my_action = is_acc
+            elif s == 'pending_employee_signature':
+                leave.x_is_pending_my_action = is_hr
+            else:
+                leave.x_is_pending_my_action = False
+
+    def _search_is_pending_my_action(self, operator, value):
+        """Build the ORM domain for the "Waiting For Me" filter.
+
+        Returns records where the current user is the active approver for
+        the leave's current KSW multi-step state.
+        """
+        if operator not in ('=', '!=') or not isinstance(value, bool):
+            return []
+        user = self.env.user
+        uid = user.id
+        is_hr = user.has_group('KSW_annual_leave.group_annual_leave_hr')
+        is_gm = user.has_group('KSW_annual_leave.group_annual_leave_gm')
+        is_acc = user.has_group('KSW_annual_leave.group_annual_leave_acc')
+
+        parts = [
+            # DM step: current user is the configured leave manager
+            [('x_annual_approval_state', '=', 'pending_dm'),
+             ('employee_id.leave_manager_id', '=', uid)],
+        ]
+        if is_hr:
+            parts.extend([
+                # HR as DM fallback when no manager is configured
+                [('x_annual_approval_state', '=', 'pending_dm'),
+                 ('employee_id.leave_manager_id', '=', False)],
+                [('x_annual_approval_state', '=', 'pending_hr')],
+                [('x_annual_approval_state', '=', 'pending_employee_signature')],
+            ])
+        if is_gm:
+            parts.append([('x_annual_approval_state', 'in', ['pending_gm_initial', 'pending_gm_final'])])
+        if is_acc:
+            parts.append([('x_annual_approval_state', '=', 'pending_acc')])
+
+        positive = odoo_expr.OR(parts)
+        if (operator == '=' and value) or (operator == '!=' and not value):
+            return positive
+        matching_ids = self.with_context(active_test=False).search(positive).ids
+        return [('id', 'not in', matching_ids)]
 
     @api.depends_context('uid')
     @api.depends('x_annual_approval_state')

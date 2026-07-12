@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bas_account,ksw.bas.account,model_ksw_bas_account,base.group_user,1,0,0,0
+access_bas_account_manager,ksw.bas.account.manager,model_ksw_bas_account,base.group_system,1,1,1,1
+access_bas_invoice,ksw.bas.invoice,model_ksw_bas_invoice,base.group_user,1,0,0,0
+access_bas_invoice_manager,ksw.bas.invoice.manager,model_ksw_bas_invoice,base.group_system,1,1,1,1
+access_bas_payment,ksw.bas.payment,model_ksw_bas_payment,base.group_user,1,0,0,0
+access_bas_payment_manager,ksw.bas.payment.manager,model_ksw_bas_payment,base.group_system,1,1,1,1

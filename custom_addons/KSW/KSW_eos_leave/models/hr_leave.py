@@ -280,6 +280,49 @@ class HrLeave(models.Model):
         return super().write(vals)
 
     # ------------------------------------------------------------------
+    # GM Final Approval: archive the employee upon EOS approval
+    # ------------------------------------------------------------------
+
+    _EOS_DEPARTURE_REASON = {
+        '84': 'hr.departure_fired',     # Termination by employer
+        '85': 'hr.departure_resigned',  # Resignation
+    }
+
+    def action_gm_final_approve(self):
+        result = super().action_gm_final_approve()
+        for leave in self.filtered('x_is_eos_leave'):
+            employee = leave.employee_id
+            if not employee or not employee.active:
+                continue
+            departure_xmlid = self._EOS_DEPARTURE_REASON.get(
+                leave.x_eos_termination_reason)
+            departure_reason = (
+                self.env.ref(departure_xmlid, raise_if_not_found=False)
+                if departure_xmlid else None
+            )
+            termination_date = leave.request_date_from or fields.Date.context_today(self)
+            employee.sudo().with_context(no_wizard=True).action_archive()
+            employee.sudo().write({
+                'departure_reason_id': departure_reason.id if departure_reason else False,
+                'departure_date': termination_date,
+            })
+            leave.sudo().message_post(
+                body=Markup(
+                    '<strong>🏢 Employee Archived</strong><br/>'
+                    '<b>Employee:</b> %(emp)s<br/>'
+                    '<b>Departure Date:</b> %(date)s<br/>'
+                    '<b>Reason:</b> %(reason)s'
+                ) % {
+                    'emp': employee.name,
+                    'date': termination_date.strftime('%Y-%m-%d'),
+                    'reason': departure_reason.name if departure_reason
+                              else _('Not specified'),
+                },
+                subtype_xmlid='mail.mt_note',
+            )
+        return result
+
+    # ------------------------------------------------------------------
     # DM step: suppress attendance-sheet wizard for EOS leaves
     # ------------------------------------------------------------------
 

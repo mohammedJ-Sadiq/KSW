@@ -262,34 +262,9 @@
                                 </tr>
                             </table>
 
-                            <!-- Payslip: Worked Days summary -->
-                            <t t-if="payslip.worked_days_line_ids">
-                                <h6 class="mt-3 mb-1 fw-bold">Worked Days</h6>
-                                <table class="table table-sm table-bordered mb-3">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Description</th>
-                                            <th>Code</th>
-                                            <th class="text-end">Days</th>
-                                            <th class="text-end">Hours</th>
-                                            <th class="text-end">Deduction (SAR)</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr t-foreach="payslip.worked_days_line_ids" t-as="wd"
-                                            t-attf-class="#{'table-danger fw-bold' if wd.code == 'ATT_DED' else 'table-warning' if wd.code in ('ATT_ABS','ATT_LATE','ATT_EARLY') else ''}">
-                                            <td t-out="wd.name"/>
-                                            <td t-out="wd.code"/>
-                                            <td class="text-end" t-out="'%.0f' % wd.number_of_days"/>
-                                            <td class="text-end" t-out="'%.0f' % wd.number_of_hours"/>
-                                            <td class="text-end" t-out="'%.2f' % wd.amount if wd.amount else ''"/>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </t>
-
                             <!-- Salary Computation and Signatures are wrapped together so
                                  wkhtmltopdf keeps them on the same page when possible. -->
+                            <t t-set="_att_ded_wd" t-value="payslip.worked_days_line_ids.filtered(lambda w: w.code == 'ATT_DED')"/>
                             <div style="page-break-inside: avoid">
                                 <h6 class="mt-3 mb-1 fw-bold">Salary Computation</h6>
                                 <table class="table table-sm table-bordered mb-4">
@@ -304,7 +279,12 @@
                                         <t t-foreach="payslip.line_ids.filtered(lambda l: l.appears_on_payslip).sorted('sequence')"
                                            t-as="line">
                                             <tr t-attf-class="#{'table-success fw-bold' if line.code == 'NET' else 'table-danger' if line.total &lt; 0 else 'fw-bold' if line.code in ('BASIC','GROSS') else 'text-muted' if line.total == 0 else ''}">
-                                                <td t-out="line.name"/>
+                                                <td>
+                                                    <t t-out="line.name"/>
+                                                    <t t-if="line.code == 'ATTDED' and _att_ded_wd and _att_ded_wd.number_of_days">
+                                                        <span class="text-muted ms-1">(<t t-out="'%.0f' % _att_ded_wd.number_of_days"/> days)</span>
+                                                    </t>
+                                                </td>
                                                 <td t-out="line.code"/>
                                                 <td class="text-end" t-out="'%.2f' % line.total"/>
                                             </tr>
@@ -332,7 +312,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row mt-4 pt-2 text-center">
+                                <div class="row mt-5 pt-3 text-center">
                                     <div class="col-4">
                                         <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
                                             <strong>General Manager</strong>
@@ -382,7 +362,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row mt-4 pt-2 text-center">
+                                <div class="row mt-5 pt-3 text-center">
                                     <div class="col-4">
                                         <div style="border-top: 1px solid #000; margin: 0 1rem; padding-top: 4px;">
                                             <strong>General Manager</strong>

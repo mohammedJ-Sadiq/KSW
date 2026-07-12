@@ -216,9 +216,9 @@
                                 without Loan Modification cannot edit loan amount/installments.
                             -->
                             <field name="amount"
-                                   readonly="(state != 'draft' and not (is_loan and approval_state == 'pending_gm')) or (is_loan and not x_allow_edit_amount)"/>
+                                   readonly="state != 'draft' and not (is_loan and approval_state == 'pending_gm' and x_allow_edit_amount)"/>
                             <field name="installments"
-                                   readonly="(state != 'draft' and not (is_loan and approval_state in ('pending_acc', 'pending_gm'))) or (is_loan and not x_allow_edit_installments)"/>
+                                   readonly="state != 'draft' and not (is_loan and approval_state in ('pending_acc', 'pending_gm') and x_allow_edit_installments)"/>
                             <field name="installment_amount"/>
                             <field name="currency_id" invisible="1"/>
                             <field name="x_can_submit" invisible="1"/>

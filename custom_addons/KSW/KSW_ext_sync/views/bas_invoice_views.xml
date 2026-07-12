@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bas_invoice_list" model="ir.ui.view">
+        <field name="name">ksw.bas.invoice.list</field>
+        <field name="model">ksw.bas.invoice</field>
+        <field name="arch" type="xml">
+            <list string="BAS Sales Invoices" default_order="invoice_date desc">
+                <field name="invoice_date"/>
+                <field name="number"/>
+                <field name="branch_code"/>
+                <field name="ftype"/>
+                <field name="from_account"/>
+                <field name="to_account"/>
+                <field name="subtotal" sum="Subtotal"/>
+                <field name="tax_amount" sum="VAT"/>
+                <field name="total" sum="Total"/>
+                <field name="status"/>
+                <field name="last_synced" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bas_invoice_search" model="ir.ui.view">
+        <field name="name">ksw.bas.invoice.search</field>
+        <field name="model">ksw.bas.invoice</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="number"/>
+                <field name="from_account"/>
+                <field name="to_account"/>
+                <filter name="this_month" string="This Month"
+                    domain="[('invoice_date','&gt;=', (context_today()).strftime('%Y-%m-01'))]"/>
+                <separator/>
+                <filter name="group_branch" string="Branch" domain="[]" context="{'group_by':'branch_code'}"/>
+                <filter name="group_type" string="Doc Type" domain="[]" context="{'group_by':'ftype'}"/>
+                <filter name="group_month" string="Month" domain="[]" context="{'group_by':'invoice_date:month'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bas_invoice" model="ir.actions.act_window">
+        <field name="name">BAS Sales Invoices</field>
+        <field name="res_model">ksw.bas.invoice</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_bas_invoice_search"/>
+        <field name="context">{'search_default_this_month': 1}</field>
+    </record>
+</odoo>
