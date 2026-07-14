@@ -161,6 +161,7 @@ class HrLeave(models.Model):
 
     @api.depends(
         'x_is_eos_leave',
+        'request_date_from',
         'employee_id',
         'employee_id.version_ids.contract_date_start',
         'employee_id.version_ids.active',
@@ -175,6 +176,7 @@ class HrLeave(models.Model):
                 leave.x_eos_termination_amount = 0.0
                 leave.x_eos_resignation_amount = 0.0
                 continue
+            as_of = leave.request_date_from or today
             emp = leave.employee_id.sudo()
             wage = emp.current_version_id.wage or 0.0
             versions = emp.version_ids.filtered(lambda v: v.contract_date_start)
@@ -185,7 +187,7 @@ class HrLeave(models.Model):
                 leave.x_eos_resignation_amount = 0.0
                 continue
             joining = min(versions.mapped('contract_date_start'))
-            total_days = max((today - joining).days, 0)
+            total_days = max((as_of - joining).days, 0)
             years, term, resig = self._eos_calc(total_days, wage)
             leave.x_eos_service_years = years
             leave.x_eos_last_wage = wage
@@ -195,6 +197,7 @@ class HrLeave(models.Model):
     @api.depends(
         'x_is_eos_leave',
         'x_eos_unpaid_days',
+        'request_date_from',
         'employee_id',
         'employee_id.version_ids.contract_date_start',
         'employee_id.version_ids.active',
@@ -209,6 +212,7 @@ class HrLeave(models.Model):
                 leave.x_eos_adjusted_resignation_amount = 0.0
                 continue
 
+            as_of = leave.request_date_from or today
             emp = leave.employee_id.sudo()
             wage = emp.current_version_id.wage or 0.0
             versions = emp.version_ids.filtered(lambda v: v.contract_date_start)
@@ -219,7 +223,7 @@ class HrLeave(models.Model):
                 continue
 
             joining = min(versions.mapped('contract_date_start'))
-            total_days = max((today - joining).days, 0)
+            total_days = max((as_of - joining).days, 0)
             adjusted_days = max(total_days - (leave.x_eos_unpaid_days or 0.0), 0.0)
             years, term, resig = self._eos_calc(adjusted_days, wage)
 
@@ -356,10 +360,17 @@ class HrLeave(models.Model):
         """Create a final-month payslip including EOS components.
 
         The payslip includes the employee's regular salary for the final
-        month PLUS:
-          EOS_AMOUNT       — the chosen Art. 84 / Art. 85 payout
+        month PLUS all one-time items:
+          EOS_AMOUNT        — the chosen Art. 84 / Art. 85 payout
           EOS_PREV_PAYMENTS — previous EOS payments (deduction)
-          EOS_NOTICE_PAY   — notice period deduction
+          EOS_NOTICE_PAY    — notice period deduction
+          VACATION_BAL      — remaining annual leave balance settlement
+          FLIGHT_TICKET     — flight ticket allowance (if any)
+          ADDITIONAL_COMMISSIONS — accrued commissions (if any)
+          REMAINING_LOANS   — outstanding loan deductions (if any)
+          PENALTY           — penalty deduction (if any)
+        HRA and GOSI advances are excluded — those are already part of
+        the regular monthly salary lines on this terminal payslip.
         """
         Payslip = self.env['hr.payslip'].sudo()
         today = fields.Date.context_today(self)
@@ -424,7 +435,21 @@ class HrLeave(models.Model):
                 'x_leave_id': leave.id,
             })
 
+            # EOS-specific items: payout amount, previous payments, notice pay
             input_vals = self._build_eos_input_lines(leave, payslip)
+
+            # Also include vacation balance settlement, commissions, flight
+            # ticket, loans, and penalty — same as a regular vacation payslip.
+            # Skip HRA/GOSI advance (already in the regular monthly salary
+            # on this terminal payslip) and excess-leave cost-recovery items.
+            _EOS_SKIP = frozenset({
+                'VACATION_HRA', 'VACATION_GOSI',
+                'FIN_CONSIDERATION', 'VISA_COST_RECOVERY',
+            })
+            for item in self._build_vacation_input_lines(leave, employee, payslip):
+                if item['code'] not in _EOS_SKIP:
+                    input_vals.append(item)
+
             if input_vals:
                 self.env['hr.payslip.input'].sudo().create(input_vals)
 
@@ -529,3 +554,28 @@ class HrLeave(models.Model):
             'res_id': self.x_eos_payslip_id.id,
             'target': 'current',
         }
+
+    def action_recompute_eos_payslip(self):
+        """Cancel the existing EOS payslip and recreate it from current leave inputs.
+
+        Use this when the EOS inputs (unpaid days, previous payments, notice pay,
+        termination reason, etc.) were updated after the payslip was already generated.
+        The old payslip is cancelled (kept for audit) and a fresh one is created.
+        """
+        self.ensure_one()
+        if not self.env.su and not (
+            self.env.user.has_group('om_hr_payroll.group_hr_payroll_user')
+            or self.env.user.has_group('KSW_annual_leave.group_annual_leave_hr')
+        ):
+            raise UserError(_('Only HR Payroll users or HR Approvers can recompute EOS payslips.'))
+        if not self.x_eos_payslip_id:
+            raise UserError(_('No EOS payslip found on this leave to recompute.'))
+        self._cancel_eos_payslip()
+        self._create_eos_payslip()
+        self.sudo().message_post(
+            body=Markup(
+                '<strong>🔄 EOS Payslip Recomputed</strong><br/>'
+                '<b>By:</b> %(user)s'
+            ) % {'user': self.env.user.name},
+            subtype_xmlid='mail.mt_note',
+        )

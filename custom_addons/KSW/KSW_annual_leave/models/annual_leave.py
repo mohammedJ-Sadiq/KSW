@@ -257,6 +257,44 @@ class KswAnnualLeave(models.Model):
                 taken = 0.0
             rec.remaining_balance = round(rec.total_accrued_days - taken, 4)
 
+    def _compute_accrued_as_of(self, as_of_date):
+        """Return total accrued vacation days as of a specific date.
+
+        Same tier logic as _compute_leave_data but parametric on the date
+        instead of using today. Used when pinning payslip calculations to
+        a leave's request_date_from rather than the recompute date.
+        """
+        self.ensure_one()
+        if not self.employee_id:
+            return 0.0
+        versions = self.employee_id.sudo().version_ids.filtered(
+            lambda v: v.contract_date_start
+        )
+        if not versions:
+            return 0.0
+        joining = min(versions.mapped('contract_date_start'))
+        effective_start = (
+            max(self.x_opening_reset_date, joining)
+            if self.x_opening_reset_date else joining
+        )
+        if effective_start > as_of_date:
+            return 0.0
+        total_days = (as_of_date - joining).days
+        if total_days <= 0:
+            return 0.0
+        reset_days = (effective_start - joining).days
+        five_years_days = 5 * 365
+        tier1 = max(
+            min(total_days, five_years_days) - min(reset_days, five_years_days), 0
+        )
+        tier2 = max(
+            max(total_days - five_years_days, 0)
+            - max(reset_days - five_years_days, 0),
+            0,
+        )
+        extra = self.x_opening_extra_days or 0.0
+        return round(tier1 * (21.0 / 365.0) + tier2 * (30.0 / 365.0) + extra, 4)
+
     # ------------------------------------------------------------------
     # Refresh accrual — called whenever leaves_taken changes
     # ------------------------------------------------------------------

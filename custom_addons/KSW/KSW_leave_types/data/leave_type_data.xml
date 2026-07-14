@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!--
+        Archive the stock Odoo "Sick Time Off" to avoid duplication with our Sick Leave type.
+        Uses <function> (not <record>) because the target record lives in hr_holidays noupdate="1",
+        so a <record> override would be silently ignored on every upgrade after first install.
+    -->
+    <function model="hr.leave.type" name="write">
+        <value eval="[ref('hr_holidays.leave_type_sick_time_off')]"/>
+        <value eval="{'active': False}"/>
+    </function>
+
+<data noupdate="1">
+
+    <!-- Sick Leave: 120 days/year, renews on service anniversary, requires medical certificate -->
+    <record id="leave_type_sick" model="hr.leave.type">
+        <field name="name">Sick Leave</field>
+        <field name="is_sick_leave" eval="True"/>
+        <field name="requires_allocation">True</field>
+        <field name="leave_validation_type">both</field>
+        <field name="request_unit">day</field>
+        <field name="support_document" eval="True"/>
+        <field name="color">3</field>
+        <field name="sequence">20</field>
+        <field name="company_id" eval="False"/>
+        <field name="country_id" eval="False"/>
+    </record>
+
+    <!-- Maternity Leave: 70 days per birth event, allocated by HR per occurrence -->
+    <record id="leave_type_maternity" model="hr.leave.type">
+        <field name="name">Maternity Leave</field>
+        <field name="is_maternity_leave" eval="True"/>
+        <field name="requires_allocation">True</field>
+        <field name="leave_validation_type">hr</field>
+        <field name="request_unit">day</field>
+        <field name="color">1</field>
+        <field name="sequence">21</field>
+        <field name="company_id" eval="False"/>
+        <field name="country_id" eval="False"/>
+    </record>
+
+    <!-- Paternity Leave: 3 days per birth event, allocated by HR per occurrence -->
+    <record id="leave_type_paternity" model="hr.leave.type">
+        <field name="name">Paternity Leave</field>
+        <field name="is_paternity_leave" eval="True"/>
+        <field name="requires_allocation">True</field>
+        <field name="leave_validation_type">both</field>
+        <field name="request_unit">day</field>
+        <field name="color">4</field>
+        <field name="sequence">22</field>
+        <field name="company_id" eval="False"/>
+        <field name="country_id" eval="False"/>
+    </record>
+
+    <!-- Hajj Leave: 10 days, once per service lifetime; auto-allocated after 2 years of service -->
+    <record id="leave_type_hajj" model="hr.leave.type">
+        <field name="name">Hajj Leave</field>
+        <field name="is_hajj_leave" eval="True"/>
+        <field name="requires_allocation">True</field>
+        <field name="leave_validation_type">both</field>
+        <field name="request_unit">day</field>
+        <field name="color">6</field>
+        <field name="sequence">23</field>
+        <field name="company_id" eval="False"/>
+        <field name="country_id" eval="False"/>
+    </record>
+
+</data>
+</odoo>

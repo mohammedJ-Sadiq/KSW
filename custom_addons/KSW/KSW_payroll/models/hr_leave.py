@@ -1,7 +1,10 @@
 import logging
 from datetime import date, timedelta
 
+from markupsafe import Markup
+
 from odoo import fields, models
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -16,7 +19,12 @@ class HrLeave(models.Model):
 
     x_vacation_payslip_id = fields.Many2one(
         'hr.payslip', string='Vacation Payslip', readonly=True, copy=False,
-        groups='om_hr_payroll.group_hr_payroll_user',
+        # Annual-leave HR approvers can also see the link (needed by the
+        # Recompute Payslip button, which they are authorised to use) —
+        # keeping the field payroll-only while the button is visible to
+        # HR crashes the form for HR users ("field is undefined").
+        groups='om_hr_payroll.group_hr_payroll_user,'
+               'KSW_annual_leave.group_annual_leave_hr',
         help='The vacation payslip generated for this annual leave '
              '(covers the current month at the time of approval).',
     )
@@ -158,12 +166,19 @@ class HrLeave(models.Model):
         version_id = payslip.version_id.id
 
         # 1. Vacation Balance Settlement (FIFO historical wage slicing)
+        # For EOS and full-clearance leaves, pin the balance to the leave's
+        # request_date_from so recomputing on a later day gives the same figure.
         if leave.x_is_full_clearance:
-            vacation_days = self._get_remaining_balance(leave)
+            vacation_days = self._get_remaining_balance(leave, leave.request_date_from)
             label_prefix = 'Vacation Balance Settlement — Full Clearance'
         elif leave.x_excess_days_accepted and leave.x_annual_portion_days > 0:
             vacation_days = leave.x_annual_portion_days
             label_prefix = 'Vacation Balance Settlement — Annual Portion'
+        elif getattr(leave, 'x_is_eos_leave', False):
+            # EOS leaves are always 1 calendar day; vacation days to pay out
+            # is the full remaining annual leave balance, not the leave duration.
+            vacation_days = self._get_remaining_balance(leave, leave.request_date_from)
+            label_prefix = 'Vacation Balance Settlement — EOS Payout'
         else:
             vacation_days, _hours = self._annual_cal_days(leave)
             label_prefix = 'Vacation Balance Settlement'
@@ -440,4 +455,32 @@ class HrLeave(models.Model):
             'domain': [('id', 'in', payslip_ids)],
             'target': 'current',
         }
+
+    def action_recompute_vacation_payslip(self):
+        """Cancel the existing vacation payslip and recreate it from current leave inputs.
+
+        Use this when the leave's financial inputs (penalty, commissions, loans,
+        flight ticket, etc.) were updated after the payslip was already generated.
+        The old payslip is cancelled (kept for audit) and a fresh one is created.
+        """
+        self.ensure_one()
+        if not self.env.su and not (
+            self.env.user.has_group('om_hr_payroll.group_hr_payroll_user')
+            or self.env.user.has_group('KSW_annual_leave.group_annual_leave_hr')
+        ):
+            raise UserError('Only HR Payroll users or HR Approvers can recompute vacation payslips.')
+        if not self.x_vacation_payslip_id:
+            raise UserError('No vacation payslip found on this leave to recompute.')
+        # sudo(): authorisation was checked above; annual-leave HR users
+        # lack payroll ACLs and the group-restricted x_vacation_payslip_ids
+        # field that these helpers read/write.
+        self.sudo()._cancel_vacation_payslips()
+        self.sudo()._create_vacation_payslip()
+        self.sudo().message_post(
+            body=Markup(
+                '<strong>🔄 Vacation Payslip Recomputed</strong><br/>'
+                '<b>By:</b> %(user)s'
+            ) % {'user': self.env.user.name},
+            subtype_xmlid='mail.mt_note',
+        )
 

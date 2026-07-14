@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+<!--
+    Sick leave is implemented as a regular 120-day allocation per service year
+    (date_from = service anniversary, date_to = next anniversary minus 1 day).
+    Odoo's accrual plan mechanism is NOT used because its yearly frequency anchors
+    to a fixed calendar date (January 1) rather than per-employee service anniversaries.
+    Auto-allocation and renewal are handled by the daily cron in hr_employee.py.
+-->
+</odoo>

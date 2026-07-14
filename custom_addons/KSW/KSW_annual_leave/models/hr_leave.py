@@ -112,14 +112,33 @@ class HrLeave(models.Model):
             return (cal_days, cal_days * daily_hours)
         return (0, 0)
 
-    def _get_remaining_balance(self, leave):
-        """Get the remaining annual leave balance for an employee."""
+    def _get_remaining_balance(self, leave, as_of_date=None):
+        """Get the remaining annual leave balance for an employee.
+
+        When as_of_date is supplied, accrual is computed up to that date
+        instead of today — used for EOS and full-clearance payslips to
+        pin the vacation balance to the leave's request_date_from so that
+        recomputing on a later day doesn't change the payout figure.
+        """
         if not leave.employee_id or not leave.holiday_status_id:
             return 0.0
         ksw_rec = self.env['ksw.annual.leave'].sudo().search([
             ('employee_id', '=', leave.employee_id.id),
         ], limit=1)
-        return ksw_rec.remaining_balance if ksw_rec else 0.0
+        if not ksw_rec:
+            return 0.0
+        if as_of_date:
+            accrued = ksw_rec._compute_accrued_as_of(as_of_date)
+            try:
+                taken = (
+                    ksw_rec.leaves_taken
+                    if ksw_rec.allocation_id and ksw_rec.allocation_id.exists()
+                    else 0.0
+                )
+            except Exception:
+                taken = 0.0
+            return max(round(accrued - taken, 4), 0.0)
+        return ksw_rec.remaining_balance
 
     # ------------------------------------------------------------------
     # View helper fields (stored for reliable invisible expressions)
@@ -418,9 +437,19 @@ class HrLeave(models.Model):
 
         Returns records where the current user is the active approver for
         the leave's current KSW multi-step state.
+
+        Odoo 19 rewrites boolean conditions to 'in'/'not in' with a
+        collection value before calling search= methods (see
+        odoo.orm.domains._operator_equal_as_in), so both forms must be
+        handled — a bare '='/'!=' guard would never match and silently
+        return a match-all domain.
         """
-        if operator not in ('=', '!=') or not isinstance(value, bool):
-            return []
+        if operator in ('in', 'not in'):
+            positive_wanted = (operator == 'in') == any(value)
+        elif operator in ('=', '!='):
+            positive_wanted = (operator == '=') == bool(value)
+        else:
+            return NotImplemented
         user = self.env.user
         uid = user.id
         is_hr = user.has_group('KSW_annual_leave.group_annual_leave_hr')
@@ -446,7 +475,7 @@ class HrLeave(models.Model):
             parts.append([('x_annual_approval_state', '=', 'pending_acc')])
 
         positive = odoo_expr.OR(parts)
-        if (operator == '=' and value) or (operator == '!=' and not value):
+        if positive_wanted:
             return positive
         matching_ids = self.with_context(active_test=False).search(positive).ids
         return [('id', 'not in', matching_ids)]

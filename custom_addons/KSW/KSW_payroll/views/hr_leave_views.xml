@@ -14,7 +14,7 @@
                  (used in invisible expressions below). -->
             <xpath expr="//field[@name='x_is_annual_leave_type']" position="after">
                 <field name="x_vacation_payslip_id" invisible="1"
-                       groups="om_hr_payroll.group_hr_payroll_user"/>
+                       groups="om_hr_payroll.group_hr_payroll_user,KSW_annual_leave.group_annual_leave_hr"/>
             </xpath>
 
             <!-- Smart-button box injected before the leave content div. -->
@@ -42,6 +42,18 @@
                         <div class="o_field_widget o_stat_info">
                             <span class="o_stat_text">Print Vacation</span>
                             <span class="o_stat_text">Report</span>
+                        </div>
+                    </button>
+                    <button class="oe_stat_button"
+                            name="action_recompute_vacation_payslip"
+                            type="object"
+                            icon="fa-refresh"
+                            invisible="not x_vacation_payslip_id"
+                            groups="om_hr_payroll.group_hr_payroll_user,KSW_annual_leave.group_annual_leave_hr"
+                            confirm="This will cancel the existing payslip and recreate it from the current leave inputs. Continue?">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_text">Recompute</span>
+                            <span class="o_stat_text">Payslip</span>
                         </div>
                     </button>
                 </div>

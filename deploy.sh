@@ -21,7 +21,9 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 COMPOSE_FILE="$SCRIPT_DIR/docker-compose.prod.yml"
+COMPOSE_BASE="$SCRIPT_DIR/docker-compose.yml"
 IMAGE="ghcr.io/mohammedj-sadiq/kswco-odoo:latest"
+PROJECT="kswco-prod"
 
 # ── Guard: systemd must be stopped before Docker takes port 8069 ──────────────
 if systemctl is-active --quiet odoo 2>/dev/null; then
@@ -53,7 +55,7 @@ echo "    ✓ Image built"
 
 # ── Step 2: Replace the running container ─────────────────────────────────────
 echo "→ [2/3] Restarting prod container..."
-docker compose -f "$COMPOSE_FILE" up -d --remove-orphans
+docker compose -p "$PROJECT" -f "$COMPOSE_BASE" -f "$COMPOSE_FILE" up -d --remove-orphans
 echo "    ✓ Container started"
 
 # ── Step 3: Verify it came up ─────────────────────────────────────────────────
@@ -75,7 +77,8 @@ echo ""
 echo "=== Deploy complete — alkawthersw.ddns.net is live ==="
 echo ""
 echo "Useful commands:"
-echo "  Logs:    docker compose -f docker-compose.prod.yml logs -f"
-echo "  Status:  docker compose -f docker-compose.prod.yml ps"
-echo "  Restart: docker compose -f docker-compose.prod.yml restart"
+echo "  Logs:    dc-prod logs -f"
+echo "  Status:  dc-prod ps"
+echo "  Down:    dc-prod down"
+echo "  Up:      dc-prod up -d"
 echo ""

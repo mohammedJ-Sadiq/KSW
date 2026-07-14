@@ -493,6 +493,27 @@ return a leave to an earlier approver instead of refusing it outright.
     WAS in the step-1 notification but not in the step-6 one; the test was wrong, not
     the code.
 
+24. **Odoo 19 rewrites `=`/`!=` boolean conditions to `in`/`not in` (with an
+    `OrderedSet` value) BEFORE calling a field's `search=` method** (see
+    `odoo.orm.domains._operator_equal_as_in`; core search methods check
+    `if operator != 'in': return NotImplemented`). A guard like
+    `if operator not in ('=', '!=') ...: return []` therefore ALWAYS takes the
+    early-return path, and returning `[]` means "match every record" — the
+    filter silently shows everything with no error. This bug shipped in
+    `KSW_annual_leave._search_is_pending_my_action` and was copied into
+    KSW_deduction before being caught (July 2026; both now fixed). Pattern:
+    ```python
+    if operator in ('in', 'not in'):
+        positive_wanted = (operator == 'in') == any(value)
+    elif operator in ('=', '!='):
+        positive_wanted = (operator == '=') == bool(value)
+    else:
+        return NotImplemented
+    ```
+    Related: a dotted domain path like `('employee_id.parent_id.user_id', '=',
+    False)` does NOT match records whose intermediate `parent_id` is null —
+    OR it with `('employee_id.parent_id', '=', False)` explicitly.
+
 ### `requires_allocation` in tests
 Must be `False` (Python bool), **not** `'no'` (truthy string). The string `'no'`
 evaluates as True and triggers `_check_validity`'s allocation guard even when no

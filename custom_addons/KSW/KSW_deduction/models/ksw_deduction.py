@@ -5,6 +5,7 @@ from markupsafe import Markup
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
+from odoo.osv import expression as odoo_expr
 
 
 LOAN_APPROVAL_STATES = [
@@ -716,6 +717,7 @@ class KswDeduction(models.Model):
                     },
                     subtype_xmlid='mail.mt_note',
                 )
+                rec._notify_pending_approvers('pending_dm')
             else:
                 rec._activate_and_generate_lines()
                 rec.message_post(
@@ -912,6 +914,7 @@ class KswDeduction(models.Model):
                 ) % self.env.user.name,
                 subtype_xmlid='mail.mt_note',
             )
+            rec._notify_pending_approvers('pending_hr')
 
     def action_hr_approve(self):
         self._check_loan()
@@ -938,6 +941,7 @@ class KswDeduction(models.Model):
                 ) % self.env.user.name,
                 subtype_xmlid='mail.mt_note',
             )
+            rec._notify_pending_approvers('pending_acc')
 
     def action_acc_approve(self):
         self._check_loan()
@@ -986,6 +990,7 @@ class KswDeduction(models.Model):
                 body=body,
                 subtype_xmlid='mail.mt_note',
             )
+            rec._notify_pending_approvers('pending_gm')
 
 
     def action_gm_approve(self):
@@ -1031,6 +1036,7 @@ class KswDeduction(models.Model):
                 body=body,
                 subtype_xmlid='mail.mt_note',
             )
+            rec._notify_pending_approvers('pending_disbursement')
 
     def action_disbursement_confirm(self):
         """Step 5: Loan Disbursement Officer confirms and activates the loan.
@@ -1066,7 +1072,14 @@ class KswDeduction(models.Model):
                 'inst': rec.installments,
                 'start': rec.start_month,
             }
-            rec.sudo().message_post(body=body, subtype_xmlid='mail.mt_note')
+            emp_user = rec.employee_id.user_id
+            rec.sudo().message_post(
+                body=body,
+                partner_ids=(
+                    [emp_user.partner_id.id]
+                    if emp_user and emp_user.partner_id else []),
+                subtype_xmlid='mail.mt_comment',
+            )
 
     # ==================================================================
     # Loan refusal (any step)
@@ -1171,7 +1184,80 @@ class KswDeduction(models.Model):
                 'by': user.name,
                 'r': reason,
             },
-            subtype_xmlid='mail.mt_note',
+            partner_ids=(
+                [self.employee_id.user_id.partner_id.id]
+                if self.employee_id.user_id
+                and self.employee_id.user_id.partner_id else []),
+            subtype_xmlid='mail.mt_comment',
+        )
+
+    # ==================================================================
+    # Approver notifications (inbox + email)
+    # ==================================================================
+
+    _LOAN_STEP_NOTIFY_CONFIG = {
+        'pending_dm': {
+            'label': 'Direct Manager Approval', 'group': None},
+        'pending_hr': {
+            'label': 'HR Approval',
+            'group': 'KSW_deduction.group_loan_hr'},
+        'pending_acc': {
+            'label': 'Accounting Approval',
+            'group': 'KSW_deduction.group_loan_acc'},
+        'pending_gm': {
+            'label': 'GM Final Approval',
+            'group': 'KSW_deduction.group_loan_gm'},
+        'pending_disbursement': {
+            'label': 'Disbursement Confirmation',
+            'group': 'KSW_deduction.group_loan_disbursement'},
+    }
+
+    def _notify_pending_approvers(self, pending_state):
+        """Send an inbox + email notification to whoever must act on the
+        given approval step (mirrors the KSW_annual_leave pattern).
+
+        Uses ``sudo()`` for the post because the previous actor (the
+        submitting employee or the DM) may only have read access to
+        ksw.deduction; authorization was already checked by the calling
+        action. ``sudo()`` preserves the author (uid).
+        """
+        self.ensure_one()
+        config = self._LOAN_STEP_NOTIFY_CONFIG.get(pending_state)
+        if not config:
+            return
+
+        if pending_state == 'pending_dm':
+            mgr_user = self.employee_id.parent_id.user_id
+            if mgr_user and mgr_user.partner_id:
+                partner_ids = [mgr_user.partner_id.id]
+            else:
+                # No manager user configured: officers act as fallback
+                group = self.env.ref(
+                    'KSW_deduction.group_deduction_officer',
+                    raise_if_not_found=False)
+                partner_ids = group.user_ids.partner_id.ids if group else []
+        else:
+            group = self.env.ref(config['group'], raise_if_not_found=False)
+            partner_ids = group.user_ids.partner_id.ids if group else []
+
+        if not partner_ids:
+            return
+
+        self.sudo().message_post(
+            body=Markup(
+                '<strong>&#9203; Action Required — %(label)s</strong><br/>'
+                '<b>Employee:</b> %(employee)s<br/>'
+                '<b>Amount:</b> %(amount).2f SAR<br/>'
+                '<b>Installments:</b> %(inst)d<br/>'
+                'This loan request is awaiting your approval.'
+            ) % {
+                'label': config['label'],
+                'employee': self.employee_id.name,
+                'amount': self.amount,
+                'inst': self.installments,
+            },
+            partner_ids=partner_ids,
+            subtype_xmlid='mail.mt_comment',
         )
 
     # ==================================================================
@@ -1356,6 +1442,99 @@ class KswDeduction(models.Model):
                 or is_officer
                 or (mgr_user and mgr_user.id == uid)
             )
+
+    x_is_pending_my_action = fields.Boolean(
+        compute='_compute_is_pending_my_action',
+        search='_search_is_pending_my_action',
+        string='Pending My Action',
+    )
+
+    @api.depends_context('uid')
+    @api.depends('approval_state', 'employee_id',
+                 'employee_id.parent_id.user_id')
+    def _compute_is_pending_my_action(self):
+        """True when the current loan approval step requires the current
+        user's action. Backs the "Waiting For Me" search filter.
+
+        Note: deliberately no superuser shortcut — an admin browsing the
+        list should not see every pending loan flagged as "mine".
+        """
+        user = self.env.user
+        uid = user.id
+        is_officer = user.has_group('KSW_deduction.group_deduction_officer')
+        is_hr = user.has_group('KSW_deduction.group_loan_hr')
+        is_acc = user.has_group('KSW_deduction.group_loan_acc')
+        is_gm = user.has_group('KSW_deduction.group_loan_gm')
+        is_disb = user.has_group('KSW_deduction.group_loan_disbursement')
+        for rec in self:
+            s = rec.approval_state
+            if not s or not rec.id:
+                rec.x_is_pending_my_action = False
+            elif s == 'pending_dm':
+                mgr_user = rec.employee_id.parent_id.user_id
+                rec.x_is_pending_my_action = bool(
+                    (mgr_user and mgr_user.id == uid)
+                    or (not mgr_user and is_officer)
+                )
+            elif s == 'pending_hr':
+                rec.x_is_pending_my_action = is_hr
+            elif s == 'pending_acc':
+                rec.x_is_pending_my_action = is_acc
+            elif s == 'pending_gm':
+                rec.x_is_pending_my_action = is_gm
+            elif s == 'pending_disbursement':
+                rec.x_is_pending_my_action = is_disb
+            else:
+                rec.x_is_pending_my_action = False
+
+    def _search_is_pending_my_action(self, operator, value):
+        """Build the ORM domain for the "Waiting For Me" filter.
+
+        Odoo 19 rewrites boolean conditions to 'in'/'not in' with a
+        collection value before calling search= methods (see
+        odoo.orm.domains._operator_equal_as_in), so both forms must be
+        handled — a bare '='/'!=' guard would never match and silently
+        return a match-all domain.
+        """
+        if operator in ('in', 'not in'):
+            positive_wanted = (operator == 'in') == any(value)
+        elif operator in ('=', '!='):
+            positive_wanted = (operator == '=') == bool(value)
+        else:
+            return NotImplemented
+        user = self.env.user
+        uid = user.id
+
+        parts = [
+            # DM step: current user is the employee's direct manager
+            [('approval_state', '=', 'pending_dm'),
+             ('employee_id.parent_id.user_id', '=', uid)],
+        ]
+        if user.has_group('KSW_deduction.group_deduction_officer'):
+            # Officer fallback when no manager user is configured —
+            # either the employee has no manager at all, or the manager
+            # has no linked user (a dotted path alone would not match
+            # records whose intermediate parent_id is null).
+            parts.append([
+                ('approval_state', '=', 'pending_dm'),
+                '|',
+                ('employee_id.parent_id', '=', False),
+                ('employee_id.parent_id.user_id', '=', False),
+            ])
+        for group_xmlid, state in (
+            ('KSW_deduction.group_loan_hr', 'pending_hr'),
+            ('KSW_deduction.group_loan_acc', 'pending_acc'),
+            ('KSW_deduction.group_loan_gm', 'pending_gm'),
+            ('KSW_deduction.group_loan_disbursement', 'pending_disbursement'),
+        ):
+            if user.has_group(group_xmlid):
+                parts.append([('approval_state', '=', state)])
+
+        positive = odoo_expr.OR(parts)
+        if positive_wanted:
+            return positive
+        matching_ids = self.with_context(active_test=False).search(positive).ids
+        return [('id', 'not in', matching_ids)]
 
     @api.depends_context('uid')
     @api.depends('is_loan', 'state', 'employee_id.user_id')
