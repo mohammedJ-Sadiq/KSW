@@ -200,6 +200,109 @@ The rate is maintained in Settings → Payroll → Social Insurance (GOSI).</fie
         <function model="hr.salary.rule" name="_ksw_sync_legacy_absence_deduction_rule"/>
 
         <!-- ========================================================= -->
+        <!-- Sick Leave Pay Adjustment (seq 155)                         -->
+        <!-- Saudi Labour Law: full pay for days 1-30 per service year,  -->
+        <!-- 75% pay for days 31-90, unpaid for days 91-120.             -->
+        <!-- Thresholds are configurable via system parameters:           -->
+        <!--   ksw_payroll.sick_full_pay_days  (default 30)              -->
+        <!--   ksw_payroll.sick_partial_pay_days (default 90)            -->
+        <!--   ksw_payroll.sick_partial_pay_pct  (default 75)            -->
+        <!-- Settings > Technical > Parameters > System Parameters       -->
+        <!-- ========================================================= -->
+        <record id="hr_rule_sick_pay_adj" model="hr.salary.rule">
+            <field name="name">Sick Leave Pay Adjustment</field>
+            <field name="sequence" eval="155"/>
+            <field name="code">SICK_PAY_ADJ</field>
+            <field name="category_id" ref="om_hr_payroll.DED"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+sick_type = payslip.env.ref('KSW_leave_types.leave_type_sick', raise_if_not_found=False)
+if not sick_type:
+    result = False
+else:
+    result = bool(payslip.env['hr.leave'].sudo().search_count([
+        ('employee_id', '=', employee.id),
+        ('holiday_status_id', '=', sick_type.id),
+        ('state', '=', 'validate'),
+        ('request_date_from', '&lt;=', payslip.date_to),
+        ('request_date_to', '&gt;=', payslip.date_from),
+    ]))
+            </field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+# Saudi Labour Law Article 117 tiered sick pay.
+# Days 1-t_full: 100% (no deduction).
+# Days t_full+1 to t_partial: pct% pay, deduct (100-pct)% of daily wage.
+# Days t_partial+1 to 120: 0% pay, deduct 100% of daily wage.
+result = 0.0
+sick_type = payslip.env.ref('KSW_leave_types.leave_type_sick', raise_if_not_found=False)
+if sick_type:
+    alloc = payslip.env['hr.leave.allocation'].sudo().search([
+        ('employee_id', '=', employee.id),
+        ('holiday_status_id', '=', sick_type.id),
+        ('state', '=', 'validate'),
+        ('date_from', '&lt;=', payslip.date_to),
+    ], order='date_from desc', limit=1)
+    if alloc:
+        year_start = alloc.date_from
+        year_end = alloc.date_to or payslip.date_to
+        p = payslip.env['ir.config_parameter'].sudo()
+        t_full = int(p.get_param('ksw_payroll.sick_full_pay_days', '30'))
+        t_partial = int(p.get_param('ksw_payroll.sick_partial_pay_days', '90'))
+        pct = float(p.get_param('ksw_payroll.sick_partial_pay_pct', '75'))
+        ps_start = payslip.date_from
+        ps_end = payslip.date_to
+        sick_leaves = payslip.env['hr.leave'].sudo().search([
+            ('employee_id', '=', employee.id),
+            ('holiday_status_id', '=', sick_type.id),
+            ('state', '=', 'validate'),
+            ('request_date_from', '&lt;=', year_end),
+            ('request_date_to', '&gt;=', year_start),
+        ])
+        prior = 0.0
+        period = 0.0
+        for lv in sick_leaves:
+            ls = max(lv.request_date_from, year_start)
+            le = min(lv.request_date_to, year_end)
+            # Pro-rate number_of_days to the service-year portion (handles year boundary).
+            # Use number_of_days (schedule-aware) rather than raw calendar days so the
+            # bracket thresholds match the system's leave counting.
+            total_cal = (lv.request_date_to - lv.request_date_from).days + 1
+            clip_cal = (le - ls).days + 1
+            lv_days = lv.number_of_days * clip_cal / total_cal if total_cal else 0.0
+            if le &lt; ps_start:
+                prior += lv_days
+            elif ls &gt; ps_end:
+                pass
+            elif ls &gt;= ps_start and le &lt;= ps_end:
+                period += lv_days
+            else:
+                pre_cal = max(0, (ps_start - ls).days)
+                in_cal = (min(le, ps_end) - max(ls, ps_start)).days + 1
+                prior += lv_days * pre_cal / clip_cal
+                period += lv_days * in_cal / clip_cal
+        daily = payslip.x_daily_wage or 0.0
+        if period &gt; 0.0 and daily:
+            end_cum = prior + period
+            d_partial = max(0.0, min(end_cum, t_partial) - max(prior, t_full))
+            d_unpaid = max(0.0, end_cum - max(prior, t_partial))
+            ded = d_partial * daily * (1.0 - pct / 100.0) + d_unpaid * daily
+            result = -round(ded)
+            </field>
+            <field name="appears_on_payslip" eval="True"/>
+            <field name="note">Tiered sick pay deduction per Saudi Labour Law Article 117.
+Days 1-30 of the service year: full pay (no deduction).
+Days 31-90: 75% pay (25% of daily wage deducted per day).
+Days 91-120: unpaid (100% of daily wage deducted per day).
+Thresholds are configurable in Settings &gt; Technical &gt; Parameters &gt; System Parameters
+using keys ksw_payroll.sick_full_pay_days / sick_partial_pay_days / sick_partial_pay_pct.</field>
+        </record>
+
+        <record id="om_hr_payroll.structure_base" model="hr.payroll.structure">
+            <field name="rule_ids" eval="[(4, ref('hr_rule_sick_pay_adj'))]"/>
+        </record>
+
+        <!-- ========================================================= -->
         <!-- Move GROSS to sequence 25 so it runs after all allowances. -->
         <!-- Mobile=13, Other=15, VACATION_BAL=16...VACATION_HRA=19.   -->
         <!-- Previously GROSS was at seq 4 so it only saw HRA (seq 2)  -->
@@ -219,6 +322,22 @@ The rate is maintained in Settings → Payroll → Social Insurance (GOSI).</fie
             <field name="sequence" eval="200"/>
         </record>
 
+    </data>
+
+    <!-- Sick leave pay thresholds — noupdate=1 so user edits in UI persist across upgrades. -->
+    <data noupdate="1">
+        <record id="sick_pay_param_full_days" model="ir.config_parameter">
+            <field name="key">ksw_payroll.sick_full_pay_days</field>
+            <field name="value">30</field>
+        </record>
+        <record id="sick_pay_param_partial_days" model="ir.config_parameter">
+            <field name="key">ksw_payroll.sick_partial_pay_days</field>
+            <field name="value">90</field>
+        </record>
+        <record id="sick_pay_param_partial_pct" model="ir.config_parameter">
+            <field name="key">ksw_payroll.sick_partial_pay_pct</field>
+            <field name="value">75</field>
+        </record>
     </data>
 
 </odoo>

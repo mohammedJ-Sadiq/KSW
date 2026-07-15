@@ -13,6 +13,7 @@
         'data/leave_type_data.xml',
         'data/accrual_plan_data.xml',
         'data/cron.xml',
+        'views/leave_balance_views.xml',
     ],
     'post_init_hook': '_post_init_hook',
     'installable': True,

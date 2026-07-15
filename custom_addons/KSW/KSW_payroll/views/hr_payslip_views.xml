@@ -53,8 +53,12 @@
                 </form>
             </xpath>
 
-            <!-- ── Hide version_id in Other Inputs list & form ── -->
+            <!-- ── Hide version_id and sequence in Other Inputs list & form ── -->
             <xpath expr="//field[@name='input_line_ids']/list/field[@name='version_id']"
+                   position="attributes">
+                <attribute name="column_invisible">True</attribute>
+            </xpath>
+            <xpath expr="//field[@name='input_line_ids']/list/field[@name='sequence']"
                    position="attributes">
                 <attribute name="column_invisible">True</attribute>
             </xpath>
@@ -81,8 +85,8 @@
                     <field name="code"/>
                     <field name="category_id"/>
                     <field name="sequence" column_invisible="True"/>
-                    <field name="quantity"  string="Qty"/>
-                    <field name="rate"      string="Rate (%)"/>
+                    <field name="quantity"  column_invisible="True"/>
+                    <field name="rate"      column_invisible="True"/>
                     <field name="amount"/>
                     <field name="total"
                            decoration-danger="total &lt; 0"/>

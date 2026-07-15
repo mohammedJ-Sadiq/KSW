@@ -249,7 +249,75 @@ class HrPayslip(models.Model):
             correct_net = gross_amt + ded_amt
             if net_lines[0].amount != correct_net:
                 net_lines[0].amount = correct_net
+            # Update SICK_PAY_ADJ line name to show bracket details.
+            sick_lines = payslip.line_ids.filtered(lambda l: l.code == 'SICK_PAY_ADJ')
+            if sick_lines:
+                sick_lines[0].name = self._sick_pay_adj_line_name(payslip)
         return res
+
+    def _sick_pay_adj_line_name(self, payslip):
+        """Build a descriptive name for the SICK_PAY_ADJ payslip line.
+
+        Example: 'Sick Leave Pay Adjustment (18.9d at 75% + 5.0d unpaid)'
+        """
+        sick_type = self.env.ref('KSW_leave_types.leave_type_sick', raise_if_not_found=False)
+        if not sick_type:
+            return 'Sick Leave Pay Adjustment'
+        alloc = self.env['hr.leave.allocation'].sudo().search([
+            ('employee_id', '=', payslip.employee_id.id),
+            ('holiday_status_id', '=', sick_type.id),
+            ('state', '=', 'validate'),
+            ('date_from', '<=', payslip.date_to),
+        ], order='date_from desc', limit=1)
+        if not alloc:
+            return 'Sick Leave Pay Adjustment'
+        p = self.env['ir.config_parameter'].sudo()
+        t_full = int(p.get_param('ksw_payroll.sick_full_pay_days', '30'))
+        t_partial = int(p.get_param('ksw_payroll.sick_partial_pay_days', '90'))
+        pct = float(p.get_param('ksw_payroll.sick_partial_pay_pct', '75'))
+        year_start = alloc.date_from
+        year_end = alloc.date_to or payslip.date_to
+        ps_start = payslip.date_from
+        ps_end = payslip.date_to
+        sick_leaves = self.env['hr.leave'].sudo().search([
+            ('employee_id', '=', payslip.employee_id.id),
+            ('holiday_status_id', '=', sick_type.id),
+            ('state', '=', 'validate'),
+            ('request_date_from', '<=', year_end),
+            ('request_date_to', '>=', year_start),
+        ])
+        prior = period = 0.0
+        for lv in sick_leaves:
+            ls = max(lv.request_date_from, year_start)
+            le = min(lv.request_date_to, year_end)
+            total_cal = (lv.request_date_to - lv.request_date_from).days + 1
+            clip_cal = (le - ls).days + 1
+            lv_days = lv.number_of_days * clip_cal / total_cal if total_cal else 0.0
+            if le < ps_start:
+                prior += lv_days
+            elif ls > ps_end:
+                pass
+            elif ls >= ps_start and le <= ps_end:
+                period += lv_days
+            else:
+                pre_cal = max(0, (ps_start - ls).days)
+                in_cal = (min(le, ps_end) - max(ls, ps_start)).days + 1
+                prior += lv_days * pre_cal / clip_cal
+                period += lv_days * in_cal / clip_cal
+        if period <= 0:
+            return 'Sick Leave Pay Adjustment'
+        end_cum = prior + period
+        d_partial = max(0.0, min(end_cum, t_partial) - max(prior, t_full))
+        d_unpaid = max(0.0, end_cum - max(prior, t_partial))
+        pct_int = int(pct)
+        parts = []
+        if d_partial > 0:
+            parts.append(f'{d_partial:.1f}d at {pct_int}% pay')
+        if d_unpaid > 0:
+            parts.append(f'{d_unpaid:.1f}d unpaid')
+        if not parts:
+            return 'Sick Leave Pay Adjustment'
+        return f'Sick Leave Pay Adjustment ({", ".join(parts)})'
 
     # ------------------------------------------------------------------
     # Refresh VACATION_BAL input on vacation payslips

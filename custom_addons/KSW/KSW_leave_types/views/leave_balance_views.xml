@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!--
+        Leave Balances: read-only list over hr.leave.allocation.
+        One menu for everyone — record rules scope the rows:
+        employees see own allocations (Odoo stock rule), supervisors see
+        subordinates' (KSW_annual_leave read-cascade rules), officers see all.
+        Balances are live computed fields, so no cron/refresh is needed.
+    -->
+
+    <record id="hr_leave_allocation_view_list_balance" model="ir.ui.view">
+        <field name="name">hr.leave.allocation.list.balance</field>
+        <field name="model">hr.leave.allocation</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false" delete="false"
+                  decoration-danger="virtual_remaining_leaves &lt;= 0"
+                  decoration-success="virtual_remaining_leaves &gt; 0">
+                <field name="employee_id"/>
+                <field name="department_id" optional="show"/>
+                <field name="holiday_status_id" string="Leave Type"/>
+                <field name="date_from" string="Valid From"/>
+                <field name="date_to" string="Valid Until" optional="show"/>
+                <field name="number_of_days" string="Allocated" sum="Total Allocated"/>
+                <field name="leaves_taken" string="Taken"/>
+                <field name="virtual_remaining_leaves" string="Balance"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_leave_allocation_view_search_balance" model="ir.ui.view">
+        <field name="name">hr.leave.allocation.search.balance</field>
+        <field name="model">hr.leave.allocation</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="holiday_status_id"/>
+                <field name="department_id"/>
+                <filter name="currently_valid" string="Currently Valid"
+                        domain="['&amp;', ('date_from', '&lt;=', context_today().strftime('%Y-%m-%d')), '|', ('date_to', '=', False), ('date_to', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter name="filter_sick" string="Sick Leave"
+                        domain="[('holiday_status_id.is_sick_leave', '=', True)]"/>
+                <filter name="filter_hajj" string="Hajj Leave"
+                        domain="[('holiday_status_id.is_hajj_leave', '=', True)]"/>
+                <filter name="filter_maternity" string="Maternity Leave"
+                        domain="[('holiday_status_id.is_maternity_leave', '=', True)]"/>
+                <filter name="filter_paternity" string="Paternity Leave"
+                        domain="[('holiday_status_id.is_paternity_leave', '=', True)]"/>
+                <filter name="filter_annual" string="Annual Leave"
+                        domain="[('holiday_status_id.is_annual_leave', '=', True)]"/>
+                <group>
+                    <filter name="group_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+                    <filter name="group_leave_type" string="Leave Type" context="{'group_by': 'holiday_status_id'}"/>
+                    <filter name="group_department" string="Department" context="{'group_by': 'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_leave_balances" model="ir.actions.act_window">
+        <field name="name">Leave Balances</field>
+        <field name="res_model">hr.leave.allocation</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="hr_leave_allocation_view_list_balance"/>
+        <field name="search_view_id" ref="hr_leave_allocation_view_search_balance"/>
+        <field name="domain">[('state', '=', 'validate')]</field>
+        <field name="context">{'search_default_currently_valid': 1, 'search_default_group_employee': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No leave balances found</p>
+            <p>Validated leave allocations appear here with their allocated, taken and remaining days.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_leave_balances"
+              name="Leave Balances"
+              parent="hr_holidays.menu_hr_holidays_root"
+              action="action_leave_balances"
+              sequence="25"/>
+
+</odoo>
