@@ -240,7 +240,7 @@
                         </group>
                     </group>
 
-                    <group groups="hr.group_hr_user">
+                    <group groups="hr.group_hr_user,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_loan_disbursement,KSW_deduction.group_hr_deduction_officer,KSW_deduction.group_deduction_officer,KSW_deduction.group_installment_edit">
                         <group string="Payroll Impact">
                             <field name="x_gross_salary" readonly="1"/>
                             <field name="x_emp_monthly_total" readonly="1"
@@ -487,7 +487,7 @@
                 <field name="x_emp_monthly_total" optional="show"
                        string="Employee's Total This Month"/>
                 <field name="x_gross_salary" optional="show"
-                       groups="hr.group_hr_user"/>
+                       groups="hr.group_hr_user,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_loan_disbursement,KSW_deduction.group_hr_deduction_officer,KSW_deduction.group_deduction_officer,KSW_deduction.group_installment_edit"/>
                 <field name="total_paid" sum="Total Paid" optional="show"/>
                 <field name="total_pending" sum="Total Pending" optional="show"/>
                 <field name="progress_percent" widget="progressbar"/>
@@ -572,8 +572,8 @@
                 <field name="is_loan"/>
                 <field name="total_paid"/>
                 <field name="total_pending"/>
-                <field name="x_gross_salary" groups="hr.group_hr_user"/>
-                <field name="x_emp_monthly_total" groups="hr.group_hr_user"/>
+                <field name="x_gross_salary" groups="hr.group_hr_user,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_loan_disbursement,KSW_deduction.group_hr_deduction_officer,KSW_deduction.group_deduction_officer,KSW_deduction.group_installment_edit"/>
+                <field name="x_emp_monthly_total" groups="hr.group_hr_user,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_loan_disbursement,KSW_deduction.group_hr_deduction_officer,KSW_deduction.group_deduction_officer,KSW_deduction.group_installment_edit"/>
                 <templates>
                     <t t-name="card">
                         <div class="d-flex align-items-center mb-2">

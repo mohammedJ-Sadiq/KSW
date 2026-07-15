@@ -519,3 +519,117 @@ Must be `False` (Python bool), **not** `'no'` (truthy string). The string `'no'`
 evaluates as True and triggers `_check_validity`'s allocation guard even when no
 allocation is needed. All test leave types that do not require allocation must use
 `'requires_allocation': False`.
+
+25. **`name_get()` is dead in Odoo 19 — use `_compute_display_name` instead.**
+    The ORM never calls `name_get()` anymore; any override is silently ignored and
+    display names fall back to the `_name,id` generic form. This breaks chatter
+    references, wizard selects, and any `display_name` read. Pattern:
+    ```python
+    # WRONG — dead code in Odoo 19
+    def name_get(self):
+        return [(r.id, 'Jan 2026') for r in self]
+
+    # CORRECT
+    def _compute_display_name(self):
+        for r in self:
+            r.display_name = 'Jan 2026'
+    ```
+    Found in `ksw.deduction.line` (month/year labels). Check every model for
+    `name_get` before adding display-name logic to a new model.
+
+26. **Approve actions need the same server-side group guard as their refuse
+    counterparts — approve and refuse are NOT asymmetric in their access
+    requirements.** `_do_refuse` in `ksw_deduction.py` correctly enforces
+    `has_group('group_loan_hr/acc/gm')` per step. But `action_hr_approve`,
+    `action_acc_approve`, and `action_gm_approve` had no such check — any user
+    with write access on `ksw.deduction` could walk a loan through the full chain
+    via RPC. Rule: **every `action_*` method that advances a multi-step workflow
+    state must open with a `has_group` check** (gotcha #15). Write the check once
+    outside the `for rec in self` loop so it fails fast on the first call.
+    ```python
+    def action_hr_approve(self):
+        self._check_loan()
+        if not self.env.su and not self.env.user.has_group(
+            'KSW_deduction.group_loan_hr'
+        ):
+            raise UserError(_('Only HR Approvers can approve at the HR step.'))
+        for rec in self:
+            ...
+    ```
+
+27. **When overriding `_action_approve_attendance_based` / `_action_validate` (or
+    any method) for a filtered subset of `self`, always process the complement via
+    `super()` in the same call.** Anti-pattern:
+    ```python
+    # WRONG — when attendance_leaves is non-empty, non_attendance is silently dropped
+    attendance_leaves = self.filtered('x_attendance_ids')
+    if not attendance_leaves:
+        return super()._action_validate(...)   # only reached when subset is empty
+    for leave in attendance_leaves:
+        ...
+    ```
+    Correct pattern:
+    ```python
+    attendance_leaves = self.filtered('x_attendance_ids')
+    non_attendance = self - attendance_leaves
+    if non_attendance:
+        super(HrLeave, non_attendance)._action_validate(...)
+    for leave in attendance_leaves:
+        ...
+    ```
+    Apply this pattern to every override that filters `self` and handles only a
+    portion. Found in `KSW_leave_approval/models/hr_leave.py` for both
+    `_action_approve_attendance_based` and `_action_validate`.
+
+28. **Every `create()` override that sets an initial `x_annual_approval_state`
+    must also call `_notify_pending_approvers(leave, state)`.** Without it the
+    approver receives no inbox notification and the workflow starts silently.
+    ```python
+    leave.sudo().write({'x_annual_approval_state': 'pending_dm'})
+    self._notify_pending_approvers(leave, 'pending_dm')   # ← always pair these
+    ```
+    Found in `KSW_unpaid_leave/models/hr_leave.py` `create()` — the annual-leave
+    `create()` notified correctly; the unpaid override did not. Every new leave
+    type that forks the multi-step chain must include the notify call.
+
+29. **Attendance sheet lock/unlock must only lock lines that were already
+    `is_attended=True`.** If the lock searches without `('is_attended', '=', True)`,
+    it also locks lines that were already absent — and unlock then unconditionally
+    restores them to attended, corrupting historical attendance for days the employee
+    genuinely missed before the leave was created.
+    ```python
+    # Correct lock domain in _lock_attendance_sheet_lines:
+    lines = self.env['ksw.attendance.sheet.line'].sudo().search([
+        ('sheet_id.employee_id', '=', leave.employee_id.id),
+        ('date', '>=', date_from),
+        ('date', '<=', date_to),
+        ('x_leave_id', '=', False),
+        ('is_attended', '=', True),   # ← only lock attended lines
+    ])
+    ```
+    With this filter, `_unlock_attendance_sheet_lines` can unconditionally restore
+    every locked line to `is_attended=True` without remembering prior state.
+
+30. **When a dependent module redefines `compute=` on fields declared in the parent
+    module, the new compute wins for ALL records — do NOT zero-out fields for
+    "records that don't apply to this module".** `KSW_eos_leave` redefined
+    `x_eos_service_years / x_eos_last_wage / x_eos_termination_amount /
+    x_eos_resignation_amount` and zeroed them whenever `x_is_eos_leave` was
+    False — which includes every ordinary annual leave, breaking the EOS reference
+    panel on the annual leave approval form. Rule: only zero-out when source data
+    is genuinely absent (no employee, no joining date, no wage). The dependent
+    module should add its *additional* fields (adjusted amounts, payout amounts)
+    without blanking the base values for unrelated records.
+    ```python
+    # WRONG — blanks EOS panel on all ordinary annual leaves
+    if not leave.x_is_eos_leave or not leave.employee_id:
+        leave.x_eos_service_years = 0.0
+        ...
+        continue
+
+    # CORRECT — only zero out when data is missing
+    if not leave.employee_id:
+        leave.x_eos_service_years = 0.0
+        ...
+        continue
+    ```

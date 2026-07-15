@@ -134,7 +134,6 @@ class HrLeave(models.Model):
         string='EOS Payslip',
         readonly=True,
         copy=False,
-        groups='om_hr_payroll.group_hr_payroll_user',
         help='The EOS payslip generated at GM Final Approval.',
     )
 
@@ -170,7 +169,7 @@ class HrLeave(models.Model):
     def _compute_eos_base(self):
         today = fields.Date.context_today(self)
         for leave in self:
-            if not leave.x_is_eos_leave or not leave.employee_id:
+            if not leave.employee_id:
                 leave.x_eos_service_years = 0.0
                 leave.x_eos_last_wage = 0.0
                 leave.x_eos_termination_amount = 0.0

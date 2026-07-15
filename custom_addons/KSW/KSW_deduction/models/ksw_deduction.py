@@ -382,7 +382,6 @@ class KswDeduction(models.Model):
     x_gross_salary = fields.Monetary(
         string='Gross Salary',
         compute='_compute_gross_salary',
-        groups='hr.group_hr_user',
         help='Current contract wage of the employee.',
     )
 
@@ -918,6 +917,10 @@ class KswDeduction(models.Model):
 
     def action_hr_approve(self):
         self._check_loan()
+        if not self.env.su and not self.env.user.has_group(
+            'KSW_deduction.group_loan_hr'
+        ):
+            raise UserError(_('Only HR Approvers can approve at the HR step.'))
         for rec in self:
             if rec.approval_state != 'pending_hr':
                 raise UserError(_("Not pending HR approval."))
@@ -945,6 +948,10 @@ class KswDeduction(models.Model):
 
     def action_acc_approve(self):
         self._check_loan()
+        if not self.env.su and not self.env.user.has_group(
+            'KSW_deduction.group_loan_acc'
+        ):
+            raise UserError(_('Only Accounting Approvers can approve at the Accounting step.'))
         for rec in self:
             if rec.approval_state != 'pending_acc':
                 raise UserError(_("Not pending accounting approval."))
@@ -1003,6 +1010,10 @@ class KswDeduction(models.Model):
         The Loan Disbursement Officer triggers generation in the next step.
         """
         self._check_loan()
+        if not self.env.su and not self.env.user.has_group(
+            'KSW_deduction.group_loan_gm'
+        ):
+            raise UserError(_('Only GM Final Approvers can approve at the GM step.'))
         for rec in self:
             if rec.approval_state != 'pending_gm':
                 raise UserError(_("Not pending GM final approval."))

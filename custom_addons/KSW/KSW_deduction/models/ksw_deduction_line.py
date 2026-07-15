@@ -186,23 +186,24 @@ class KswDeductionLine(models.Model):
 
     def _search_x_is_overdue(self, operator, value):
         current_month = fields.Date.today().replace(day=1)
-        if operator == '=' and value:
+        if operator in ('in', 'not in'):
+            positive_wanted = (operator == 'in') == any(value)
+        elif operator in ('=', '!='):
+            positive_wanted = (operator == '=') == bool(value)
+        else:
+            return NotImplemented
+        if positive_wanted:
             return [('state', '=', 'pending'), ('period_date', '<', current_month)]
-        if operator == '=' and not value:
-            return ['|', ('state', '!=', 'pending'), ('period_date', '>=', current_month)]
-        return [('id', '=', False)]
+        return ['|', ('state', '!=', 'pending'), ('period_date', '>=', current_month)]
 
-    def name_get(self):
-        res = []
+    def _compute_display_name(self):
         month_names = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
         for line in self:
-            label = '%s %d' % (
+            line.display_name = '%s %d' % (
                 month_names[line.month] if 1 <= line.month <= 12 else '?',
                 line.year or 0,
             )
-            res.append((line.id, label))
-        return res
 
     # ------------------------------------------------------------------
     # Post-confirmation installment modification

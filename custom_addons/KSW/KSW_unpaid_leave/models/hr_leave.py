@@ -144,6 +144,7 @@ class HrLeaveUnpaid(models.Model):
                 leave.sudo().write({
                     'x_annual_approval_state': 'pending_dm',
                 })
+                self._notify_pending_approvers(leave, 'pending_dm')
         return records
 
     # ------------------------------------------------------------------
@@ -427,6 +428,7 @@ class HrLeaveUnpaid(models.Model):
             ('date', '>=', date_from),
             ('date', '<=', date_to),
             ('x_leave_id', '=', False),
+            ('is_attended', '=', True),
         ])
         if lines:
             # ksw_system_write bypasses both the off-day guard (the leave
