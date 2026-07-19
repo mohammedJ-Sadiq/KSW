@@ -255,6 +255,23 @@
         <field name="domain_force">[('is_loan', '=', True)]</field>
     </record>
 
+    <!-- Deduction officers and all loan-workflow groups need to read the full
+         hr.employee record for the employees on the deductions they manage.
+         Without this, the deduction form crashes with "Access Denied by record
+         rules for operation: read on hr.employee" for users who are not in
+         hr.group_hr_user (whose own rule already grants all employees). -->
+    <record id="rule_hr_employee_deduction_groups_all" model="ir.rule">
+        <field name="name">Employee: Deduction officers and loan approvers see all employees</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_deduction_officer')),
+                                    (4, ref('group_hr_deduction_officer')),
+                                    (4, ref('group_loan_hr')),
+                                    (4, ref('group_loan_acc')),
+                                    (4, ref('group_loan_gm')),
+                                    (4, ref('group_loan_disbursement'))]"/>
+    </record>
+
     <!-- group_hr_deduction_officer can create and manage HR-managed non-loan
          deductions. group_loan_hr also sees them so they can close
          installments from the HR approval context. Odoo ORs rules per

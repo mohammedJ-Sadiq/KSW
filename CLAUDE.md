@@ -398,11 +398,14 @@ approvers. Both are shown in a dedicated **Payroll Impact** group on the form
   active deduction for this employee (including this one). Computed in
   `KSW_deduction/models/hr_employee.py::_compute_deduction_count`.
 
-- **`x_gross_salary`** — non-stored `compute='_compute_gross_salary'`,
-  `groups='hr.group_hr_user'`. Reads `employee_id.sudo().current_version_id.wage`
-  (sudo required because `wage` is group-restricted). Uses the same data source
-  as `x_eos_last_wage` but is a separate field so it can appear outside the
-  Decision Support tab without pulling in the full EOS computation.
+- **`x_gross_salary`** — non-stored `compute='_compute_gross_salary'` (no model-level
+  `groups=`). Reads `employee_id.sudo().current_version_id.wage` (sudo required because
+  `wage` is group-restricted). Model-level `groups=` was intentionally omitted: the
+  compute already protects the underlying data via `sudo()`, and adding `groups=` at
+  the model level would cause an OWL "field is undefined" crash for loan approvers who
+  see view elements with `invisible=` expressions referencing this field (see gotcha
+  #31). View-level groups on the form "Payroll Impact" section, list column, and kanban
+  card restrict visibility to HR users and all deduction-management/loan-approval groups.
 
 ## KSW_annual_leave: multi-step approval chain
 
@@ -632,4 +635,44 @@ allocation is needed. All test leave types that do not require allocation must u
         leave.x_eos_service_years = 0.0
         ...
         continue
+    ```
+
+31. **Model-level `groups=` on a field causes an OWL "field is undefined" crash when
+    any view element with a broader (or absent) `groups=` uses that field in an
+    `invisible=` expression.** Odoo 19's OWL parser calls `fields_get()` first and
+    then resolves every `invisible=` expression against that list. A model-level
+    `groups=` gate causes `fields_get()` to omit the field entirely for non-group
+    users — even if the view-level `groups=` on the *field element* would hide it.
+    The dangerous case is a button with `groups="A,B"` that also has
+    `invisible="not some_field"`, while `some_field` has model `groups='A'` only:
+    group-B users see the button (it passes the view filter) but `some_field` is
+    missing from their `fields_get()` → crash.
+
+    **Rule: Never put `groups=` on a model field if that field is referenced in an
+    `invisible=` expression on any view element that could be visible to users
+    outside that group.**
+
+    - If the compute uses `sudo()` to access sensitive underlying data, the output
+      field does **not** need model-level `groups=`. Use view-level `groups=` only
+      to control where it is displayed.
+    - If the underlying field value itself is sensitive AND must be model-gated,
+      ensure every view element whose `invisible=` references it also has a
+      `groups=` that is a strict *subset* of the model field's groups (so the
+      element is always filtered out before the client parses it).
+    - When adding a button with `groups="A,B"` and an `invisible=` referencing
+      `some_field`, verify the model field's `groups=` includes both A and B.
+
+    **Cases fixed July 2026:**
+    - `x_gross_salary` on `ksw.deduction` — removed model `groups='hr.group_hr_user'`;
+      compute already uses `.sudo()`. View groups expanded to all deduction/loan groups.
+    - `x_eos_payslip_id` on `hr.leave` — removed model
+      `groups='om_hr_payroll.group_hr_payroll_user'`; the "Recompute EOS Payslip"
+      button had `groups="...payroll_user,...leave_hr"` so HR-leave users saw the
+      button but couldn't resolve the field. Removing the model gate fixed it.
+
+    **Audit command before adding any `groups=` to a model field:**
+    ```bash
+    grep -rn "invisible=.*FIELD_NAME" custom_addons/KSW/*/views/*.xml
+    # For each hit, verify the containing element's groups= is a strict subset
+    # of the model field's groups=
     ```

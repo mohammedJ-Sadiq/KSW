@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_ksw_hr_confirm_signature_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.hr.confirm.signature.wizard.form</field>
+        <field name="model">ksw.hr.confirm.signature.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Confirm Signed Vacation Form">
+                <sheet>
+                    <group string="Leave Summary">
+                        <field name="employee_name" string="Employee" readonly="1"/>
+                        <field name="leave_period"  string="Period"   readonly="1"/>
+                    </group>
+                    <group string="Upload Signed Form">
+                        <field name="attachment_file"
+                               widget="binary"
+                               filename="attachment_filename"
+                               string="Signed Vacation Form"/>
+                        <field name="attachment_filename" invisible="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="✅ Confirm &amp; Finalise"
+                            name="action_confirm"
+                            type="object"
+                            class="btn-success"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ksw_hr_confirm_signature_wizard" model="ir.actions.act_window">
+        <field name="name">Confirm Signed Vacation Form</field>
+        <field name="res_model">ksw.hr.confirm.signature.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

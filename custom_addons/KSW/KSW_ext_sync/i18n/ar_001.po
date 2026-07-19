@@ -1,0 +1,343 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_ext_sync
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-15 12:11+0000\n"
+"PO-Revision-Date: 2026-07-15 12:11+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar_001\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
+"X-Generator: KSW ar-engine v2\n"
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__bas_code
+msgid "Account Code"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__amount
+msgid "Amount"
+msgstr "المبلغ"
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_account_list
+msgid "BAS Accounts"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.actions.act_window,name:KSW_ext_sync.action_bas_account
+msgid "BAS Accounts (Loans & Advances)"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model,name:KSW_ext_sync.model_ksw_bas_account
+msgid "BAS GL Account (Loans & Advances)"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__bas_key
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__bas_key
+msgid "BAS Key"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model,name:KSW_ext_sync.model_ksw_bas_payment
+msgid "BAS Payment Voucher"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.actions.act_window,name:KSW_ext_sync.action_bas_payment
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_payment_list
+msgid "BAS Payment Vouchers"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model,name:KSW_ext_sync.model_ksw_bas_connector
+msgid "BAS SQL Server Connector"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model,name:KSW_ext_sync.model_ksw_bas_invoice
+msgid "BAS Sales Invoice"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.actions.act_window,name:KSW_ext_sync.action_bas_invoice
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_invoice_list
+msgid "BAS Sales Invoices"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.ui.menu,name:KSW_ext_sync.menu_bas_root
+msgid "BAS Sync"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__balance
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_account_list
+msgid "Balance"
+msgstr "الرصيد"
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields.selection,name:KSW_ext_sync.selection__ksw_bas_account__category__loan
+msgid "Bank Loan"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_account_search
+msgid "Bank Loans"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__branch_code
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__branch_code
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_invoice_search
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_payment_search
+msgid "Branch"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__category
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_account_search
+msgid "Category"
+msgstr "الفئة"
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__create_uid
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__create_uid
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__create_uid
+msgid "Created by"
+msgstr "أنشئ بواسطة"
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__create_date
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__create_date
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__create_date
+msgid "Created on"
+msgstr "أنشئ في"
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_account_list
+msgid "Credit"
+msgstr "الدائن"
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__current_credit
+msgid "Current Credit"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__current_debit
+msgid "Current Debit"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__invoice_date
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__payment_date
+msgid "Date"
+msgstr "التاريخ"
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_account_list
+msgid "Debit"
+msgstr "المدين"
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__remark
+msgid "Description"
+msgstr "الوصف"
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__display_name
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_connector__display_name
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__display_name
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__display_name
+msgid "Display Name"
+msgstr "اسم العرض"
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__ftype
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_invoice_search
+msgid "Doc Type"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields.selection,name:KSW_ext_sync.selection__ksw_bas_account__category__advance
+msgid "Employee Advance"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_account_search
+msgid "Employee Advances"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__from_account
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__from_account
+msgid "From Account"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__id
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_connector__id
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__id
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__id
+msgid "ID"
+msgstr "المعرف"
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__number
+msgid "Invoice No."
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.actions.server,name:KSW_ext_sync.cron_bas_sync_ir_actions_server
+msgid "KSW BAS: Sync from SQL Server (every 10 min)"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__last_synced
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__last_synced
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__last_synced
+msgid "Last Synced"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__write_uid
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__write_uid
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__write_uid
+msgid "Last Updated by"
+msgstr "آخر تحديث بواسطة"
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__write_date
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__write_date
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__write_date
+msgid "Last Updated on"
+msgstr "آخر تحديث في"
+
+#. module: KSW_ext_sync
+#: model:ir.ui.menu,name:KSW_ext_sync.menu_bas_accounts
+msgid "Loans & Advances"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_invoice_search
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_payment_search
+msgid "Month"
+msgstr "الشهر"
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__name_ar
+msgid "Name (Arabic)"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__name_en
+msgid "Name (English)"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_account_search
+msgid "Non-Zero Balance"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_account_list
+msgid "Opening"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__opening_balance
+msgid "Opening Balance"
+msgstr "الرصيد الافتتاحي"
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields.selection,name:KSW_ext_sync.selection__ksw_bas_account__category__other
+msgid "Other"
+msgstr "غير ذلك"
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__pay_mode
+msgid "Payment Mode"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.ui.menu,name:KSW_ext_sync.menu_bas_payments
+msgid "Payment Vouchers"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_payment_search
+msgid "Payments"
+msgstr "الدفعات"
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_payment_search
+msgid "Receipts"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.ui.menu,name:KSW_ext_sync.menu_bas_invoices
+msgid "Sales Invoices"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__status
+msgid "Status"
+msgstr "الحالة"
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__subtotal
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_invoice_list
+msgid "Subtotal"
+msgstr "الناتج الفرعي"
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_invoice_search
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_payment_search
+msgid "This Month"
+msgstr "هذا الشهر"
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__to_account
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__to_account
+msgid "To Account"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__total
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_invoice_list
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_payment_list
+msgid "Total"
+msgstr "الإجمالي"
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__acc_type
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_payment_search
+msgid "Type"
+msgstr "النوع"
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__tax_amount
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_invoice_list
+msgid "VAT"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__number
+msgid "Voucher No."
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__ftype
+msgid "Voucher Type"
+msgstr ""

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-08 08:17+0000\n"
-"PO-Revision-Date: 2026-07-08 08:17+0000\n"
+"POT-Creation-Date: 2026-07-15 12:11+0000\n"
+"PO-Revision-Date: 2026-07-15 12:11+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar_001\n"
@@ -15,11 +15,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
+"X-Generator: KSW ar-engine v2\n"
 
 #. module: KSW_eos_leave
 #: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
 msgid "<span class=\"o_stat_text\">EOS Payslip</span>"
-msgstr "<span class=\"o_stat_text\">قسيمة نهاية الخدمة</span>"
+msgstr "<span class=\"o_stat_text\">كشف نهاية الخدمة</span>"
+
+#. module: KSW_eos_leave
+#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
+msgid ""
+"<span class=\"o_stat_text\">Recompute</span>\n"
+"                        <span class=\"o_stat_text\">EOS Payslip</span>"
+msgstr ""
 
 #. module: KSW_eos_leave
 #: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_adjusted_resignation_amount
@@ -42,13 +50,13 @@ msgid ""
 "Amount of EOS payments already made to the employee in prior instalments. "
 "Deducted from the EOS payslip."
 msgstr ""
-"مبلغ دفعات نهاية الخدمة المدفوعة سابقاً للموظف على دفعات. يُخصم من قسيمة "
-"نهاية الخدمة."
+"مبلغ دفعات نهاية الخدمة المدفوعة سابقا للموظف على دفعات. يخصم من كشف نهاية "
+"الخدمة."
 
 #. module: KSW_eos_leave
 #: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_adjusted_termination_amount
 msgid "Article 84 EOS amount computed on the adjusted service years."
-msgstr "مبلغ نهاية الخدمة وفق المادة 84 محسوباً على سنوات الخدمة المعدَّلة."
+msgstr "مبلغ نهاية الخدمة وفق المادة 84 محسوبا على سنوات الخدمة المعدلة."
 
 #. module: KSW_eos_leave
 #: model:ir.model.fields.selection,name:KSW_eos_leave.selection__hr_leave__x_eos_termination_reason__84
@@ -58,7 +66,7 @@ msgstr "المادة 84 — إنهاء العقد من قبل صاحب العم�
 #. module: KSW_eos_leave
 #: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_adjusted_resignation_amount
 msgid "Article 85 EOS amount computed on the adjusted service years."
-msgstr "مبلغ نهاية الخدمة وفق المادة 85 محسوباً على سنوات الخدمة المعدَّلة."
+msgstr "مبلغ نهاية الخدمة وفق المادة 85 محسوبا على سنوات الخدمة المعدلة."
 
 #. module: KSW_eos_leave
 #: model:ir.model.fields.selection,name:KSW_eos_leave.selection__hr_leave__x_eos_termination_reason__85
@@ -69,13 +77,13 @@ msgstr "المادة 85 — الاستقالة"
 #: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_resignation_amount
 #: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
 msgid "Base EOS — Resignation (Art. 85, Unadjusted)"
-msgstr "مكافأة الاستقالة الأساسية (المادة 85، غير معدلة)"
+msgstr "نهاية الخدمة الأساسية — استقالة (المادة 85، غير معدلة)"
 
 #. module: KSW_eos_leave
 #: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_termination_amount
 #: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
 msgid "Base EOS — Termination (Art. 84, Unadjusted)"
-msgstr "مكافأة الإنهاء الأساسية (المادة 84، غير معدلة)"
+msgstr "نهاية الخدمة الأساسية — إنهاء عقد (المادة 84، غير معدلة)"
 
 #. module: KSW_eos_leave
 #: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_service_years
@@ -90,8 +98,8 @@ msgid ""
 "termination (full entitlement). Article 85 = employee resignation (tiered "
 "entitlement)."
 msgstr ""
-"يحدد معادلة نهاية الخدمة المطبَّقة. المادة 84 = إنهاء من صاحب العمل (استحقاق"
-" كامل). المادة 85 = استقالة الموظف (استحقاق متدرج)."
+"يحدد معادلة نهاية الخدمة المطبقة. المادة 84 = إنهاء من صاحب العمل (استحقاق "
+"كامل). المادة 85 = استقالة الموظف (استحقاق متدرج)."
 
 #. module: KSW_eos_leave
 #: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__display_name
@@ -108,7 +116,7 @@ msgstr "مكافأة نهاية الخدمة"
 #. module: KSW_eos_leave
 #: model:hr.salary.rule,name:KSW_eos_leave.hr_rule_eos_notice_pay
 msgid "EOS Notice Pay (Deduction)"
-msgstr "بدل الإشعار - خصم (نهاية الخدمة)"
+msgstr "تعويض مهلة الإشعار (خصم)"
 
 #. module: KSW_eos_leave
 #: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_payout_amount
@@ -123,7 +131,7 @@ msgstr "ملخص مكافأة نهاية الخدمة"
 #. module: KSW_eos_leave
 #: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_payslip_id
 msgid "EOS Payslip"
-msgstr "راتب نهاية الخدمة"
+msgstr "كشف راتب نهاية الخدمة"
 
 #. module: KSW_eos_leave
 #: model:hr.salary.rule,name:KSW_eos_leave.hr_rule_eos_prev_payments
@@ -141,8 +149,8 @@ msgid ""
 "Final EOS amount: the adjusted Art. 84 or Art. 85 figure, depending on the "
 "selected Termination Reason."
 msgstr ""
-"المبلغ النهائي لنهاية الخدمة: قيمة المادة 84 أو المادة 85 المعدَّلة، حسب سبب"
-" إنهاء الخدمة المحدد."
+"المبلغ النهائي لنهاية الخدمة: قيمة المادة 84 أو المادة 85 المعدلة، حسب سبب "
+"إنهاء الخدمة المحدد."
 
 #. module: KSW_eos_leave
 #: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
@@ -154,7 +162,7 @@ msgstr "مدخلات الموارد البشرية"
 #: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave_type__id
 #: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_salary_rule__id
 msgid "ID"
-msgstr "المُعرف"
+msgstr "المعرف"
 
 #. module: KSW_eos_leave
 #: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_is_eos_leave
@@ -165,7 +173,7 @@ msgstr "طلب نهاية خدمة"
 #. module: KSW_eos_leave
 #: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_last_wage
 msgid "Last Wage (SAR)"
-msgstr "آخر راتب (ريال)"
+msgstr "الأجر الأخير (ريال)"
 
 #. module: KSW_eos_leave
 #: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave_type__is_eos_leave
@@ -173,13 +181,13 @@ msgid ""
 "Mark this leave type as an End of Service request. Enables EOS-specific "
 "fields and payslip generation during the multi-step approval chain."
 msgstr ""
-"حدد نوع الإجازة هذا كطلب نهاية خدمة. يفعّل حقول نهاية الخدمة الخاصة وإنشاء "
-"قسيمة الراتب خلال سلسلة الاعتماد متعددة الخطوات."
+"حدد نوع الإجازة هذا كطلب نهاية خدمة. يفعل حقول نهاية الخدمة الخاصة وإنشاء "
+"كشف الراتب خلال سلسلة الاعتماد متعددة الخطوات."
 
 #. module: KSW_eos_leave
 #: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_notice_pay
 msgid "Notice Pay (Deduction)"
-msgstr "بدل فترة الإشعار (خصم)"
+msgstr "تعويض مهلة الإشعار (خصم)"
 
 #. module: KSW_eos_leave
 #: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_notice_pay
@@ -187,8 +195,8 @@ msgid ""
 "Notice period pay deducted from the EOS payslip (e.g. when the employee did "
 "not serve the notice period)."
 msgstr ""
-"مقابل فترة الإشعار الذي يُخصم من قسيمة نهاية الخدمة (مثلاً عندما لم يقضِ "
-"الموظف فترة الإشعار)."
+"مقابل فترة الإشعار الذي يخصم من كشف نهاية الخدمة (مثلا عندما لم يقض الموظف "
+"فترة الإشعار)."
 
 #. module: KSW_eos_leave
 #: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_unpaid_days
@@ -197,8 +205,8 @@ msgid ""
 "excluded from the service period before recomputing the Article 84/85 EOS "
 "entitlement."
 msgstr ""
-"عدد أيام الإجازة غير المدفوعة المأخوذة خلال فترة الخدمة. تُستبعد هذه الأيام "
-"من فترة الخدمة قبل إعادة حساب استحقاق نهاية الخدمة وفق المادتين 84/85."
+"عدد أيام الإجازة بدون أجر المأخوذة خلال فترة الخدمة. تستبعد هذه الأيام من "
+"فترة الخدمة قبل إعادة حساب استحقاق نهاية الخدمة وفق المادتين 84/85."
 
 #. module: KSW_eos_leave
 #: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_previous_payments
@@ -208,7 +216,7 @@ msgstr "المدفوعات السابقة"
 #. module: KSW_eos_leave
 #: model:ir.model,name:KSW_eos_leave.model_hr_salary_rule
 msgid "Salary Rule"
-msgstr "قاعدة مرتبات"
+msgstr "قاعدة الراتب"
 
 #. module: KSW_eos_leave
 #: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
@@ -220,7 +228,7 @@ msgstr "بيانات فترة الخدمة المرجعية"
 msgid ""
 "Service years after subtracting unpaid leave days from the total service "
 "period."
-msgstr "سنوات الخدمة بعد خصم أيام الإجازة غير المدفوعة من إجمالي فترة الخدمة."
+msgstr "سنوات الخدمة بعد خصم أيام الإجازة بدون أجر من إجمالي فترة الخدمة."
 
 #. module: KSW_eos_leave
 #: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
@@ -235,7 +243,14 @@ msgstr "سبب إنهاء الخدمة"
 #. module: KSW_eos_leave
 #: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_payslip_id
 msgid "The EOS payslip generated at GM Final Approval."
-msgstr "قسيمة نهاية الخدمة المُنشأة عند الاعتماد النهائي للمدير العام."
+msgstr "كشف نهاية الخدمة المنشأة عند الاعتماد النهائي للمدير العام."
+
+#. module: KSW_eos_leave
+#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
+msgid ""
+"This will cancel the existing EOS payslip and recreate it from the current "
+"leave inputs. Continue?"
+msgstr ""
 
 #. module: KSW_eos_leave
 #: model:ir.model,name:KSW_eos_leave.model_hr_leave
@@ -250,12 +265,12 @@ msgstr "نوع الإجازة"
 #. module: KSW_eos_leave
 #: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_is_eos_leave
 msgid "True when the leave type is flagged as an EOS request."
-msgstr "صحيح عندما يكون نوع الإجازة محدداً كطلب نهاية خدمة."
+msgstr "صحيح عندما يكون نوع الإجازة محددا كطلب نهاية خدمة."
 
 #. module: KSW_eos_leave
 #: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_unpaid_days
 msgid "Unpaid Vacations to be Deducted (Days)"
-msgstr "أيام الإجازات غير مدفوعة الأجر المستقطعة"
+msgstr "أيام الإجازات بدون أجر المستقطعة"
 
 #. module: KSW_eos_leave
 #: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos

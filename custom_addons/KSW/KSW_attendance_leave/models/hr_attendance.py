@@ -171,15 +171,21 @@ class HrAttendance(models.Model):
         state is written through complex multi-step approval chains.  This
         explicit call provides a synchronous guarantee inside the same
         transaction as the state change.
+
+        sudo() is required: the approving user (DM, HR Manager) typically lacks
+        "Attendances/Administrator" write access, but updating these stored
+        computed fields is an internal system operation — auth is already
+        enforced at the leave-approval level before this method is called.
         """
         if not self:
             return
-        self._compute_is_covered()
-        self._compute_net_minutes()
+        sudo_self = self.sudo()
+        sudo_self._compute_is_covered()
+        sudo_self._compute_net_minutes()
         # Notify the ORM that these stored fields changed so that downstream
         # fields (x_deduction_amount in KSW_payroll) are queued and flushed
         # to the DB within this same transaction.
-        self.modified([
+        sudo_self.modified([
             'x_is_covered',
             'x_net_late_minutes',
             'x_net_early_leave_minutes',

@@ -1276,6 +1276,19 @@ class KswDeduction(models.Model):
     # ==================================================================
 
     def write(self, vals):
+        # Block edits to core loan terms once the GM has approved and sent
+        # to disbursement. The loan is still state='draft' at that point,
+        # so the normal "state != draft" guard doesn't protect these fields.
+        if not self.env.su:
+            frozen = {'amount', 'installments', 'start_month'}
+            if frozen & set(vals):
+                for rec in self:
+                    if rec.approval_state == 'pending_disbursement':
+                        raise UserError(_(
+                            'Loan terms (amount, installments, start month) '
+                            'cannot be changed once the loan is pending disbursement.'
+                        ))
+
         # Snapshot original values when moving into pending_acc / pending_gm
         # so we can log any modifications done during those steps.
         if 'approval_state' in vals:

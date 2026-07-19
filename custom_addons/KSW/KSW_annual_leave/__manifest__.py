@@ -30,6 +30,7 @@
         'wizard/opening_balance_wizard_views.xml',
         'wizard/gm_return_approver_wizard_views.xml',
         'wizard/ksw_leave_attendance_wizard_views.xml',
+        'wizard/ksw_hr_confirm_signature_wizard_views.xml',
         'data/cron.xml',
     ],
     'installable': True,

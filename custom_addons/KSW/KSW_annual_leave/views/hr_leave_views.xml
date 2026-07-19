@@ -90,7 +90,7 @@
                         type="object" class="btn-warning"
                         invisible="not x_can_gm_return"/>
                 <button string="✅ Confirm &amp; Finalise"
-                        name="action_employee_confirm_signature"
+                        name="action_open_hr_confirm_wizard"
                         type="object" class="btn-success"
                         invisible="not x_can_sign"/>
             </xpath>

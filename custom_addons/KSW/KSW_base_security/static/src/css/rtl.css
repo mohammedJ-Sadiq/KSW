@@ -1,0 +1,7 @@
+/* RTL text direction — Odoo 19 Community sets the o_rtl class on <body>
+   when the user's language direction is rtl, but never sets the CSS
+   `direction` property that makes text and flexbox flow right-to-left.
+   This rule provides that missing foundation. */
+body.o_rtl {
+    direction: rtl;
+}

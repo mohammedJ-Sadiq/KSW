@@ -1,0 +1,1405 @@
+﻿# KSW Arabic — FULL master glossary / جدول المصطلحات العربية الكامل
+# راجع عمود proposed_ar وعدّله مباشرة حيث تريد صيغة مختلفة، ثم أعد الملف.
+# status: changed = قرار مُدار | matched-core = مطابق لترجمة Odoo الرسمية
+#         changed (auto) = تنظيف تلقائي (إزالة تشكيل/توحيد مفهوم) | unchanged = يبقى كما هو
+# source: labour-law/ksa-hr/sap-oracle/odoo-core/unify/auto/keep-current
+# ملاحظة: العبارات الطويلة (تلميحات/مساعدة/رسائل) تُعالَج آلياً ولا تظهر هنا.
+term_en,current_ar,proposed_ar,status,source,modules,note
+# ═══ [changed] الرواتب — Payroll ═══
+Allowance,البدل,بدل,changed,ksa-hr,commissions,الأساسي «علاوة» = زيادة راتب — خطأ سياقي
+Attendance Deduction,خصم الحضور,خصم الغياب والتأخير,changed,ksa-hr,payroll,وصف وظيفي دقيق؛ الحالي «خصم الحضور» عكس المعنى
+Attendance Deduction Breakdown,تفصيل خصم الحضور,تفصيل خصم الغياب والتأخير,changed,ksa-hr,payroll,
+Auto-Email Payslip,إرسال قسيمة الراتب تلقائياً,إرسال كشف الراتب تلقائيا,changed,sap-oracle,payroll,
+Daily Rate,الأجر اليومي | المعدل اليومي,الأجر اليومي,changed,unify,"annual_leave,payroll",يوحّد «الأجر اليومي» و«المعدل اليومي»
+EOS Payslip,راتب نهاية الخدمة,كشف راتب نهاية الخدمة,changed,unify,eos_leave,يوحّد «قسيمة/راتب نهاية الخدمة»
+Forwarded From Payslip,منقول من قسيمة الراتب,مرحل من كشف راتب سابق,changed,sap-oracle,deduction,المصطلح المحاسبي للترحيل
+GOSI Rate (%),نسبة التأمينات (٪),نسبة التأمينات الاجتماعية (٪),changed,labour-law,payroll,
+Hourly Wage,الأجر الساعي,الأجر بالساعة,changed,ksa-hr,payroll,
+Net Salary,صافي الراتب,صافي الراتب,changed,ksa-hr,payroll,
+Payslip,قسيمة الراتب,كشف الراتب,changed,sap-oracle,"deduction,payroll",قرار المستخدم: كشف الراتب (وليس قسيمة)
+Payslip Auto-Email Template,قالب البريد التلقائي لقسيمة الراتب,قالب الإرسال التلقائي لكشف الراتب,changed,sap-oracle,payroll,
+Payslip Batch,دفعة قسيمة الراتب,كشف الرواتب,changed,sap-oracle,payroll,قرار المستخدم: الدفعة الشهرية = كشف الرواتب
+Payslip Batch — Bank Account NET Total,دفعة قسائم الراتب — صافي الحساب البنكي,كشف الرواتب — إجمالي الصافي حسب البنك,changed,sap-oracle,payroll,
+Payslip Batch — Skipped Employee Log,دفعة قسائم الراتب — سجل الموظفين المتخطَّين,كشف الرواتب — سجل الموظفين المستبعدين,changed,ksa-hr,payroll,«مستبعد» بدل «متخطى»
+Payslip Batches,دفعات المرتب,كشوف الرواتب,changed,sap-oracle,payroll,
+Payslip File Order,ترتيب ملف قسيمة الراتب,ترتيب ملف كشف الراتب,changed,sap-oracle,payroll,
+Payslip Line,بنود المرتب,بند كشف الراتب,changed,sap-oracle,payroll,
+Payslip Lines,بنود قسيمة الراتب,بنود كشف الراتب,changed,sap-oracle,payroll,
+Payslip Worked Days,أيام العمل في القسيمة,أيام العمل في كشف الراتب,changed,sap-oracle,payroll,
+Payslip: {{ object.number }},قسيمة الراتب: {{ object.number }},كشف الراتب: {{ object.number }},changed,sap-oracle,payroll,
+Salary Rule,قاعدة مرتبات,قاعدة الراتب,changed,ksa-hr,"eos_leave,payroll",om الأساسي: «قاعدة مرتبات» — سجل مصري
+Saturday Overtime Credit,رصيد إضافي السبت,رصيد العمل الإضافي للسبت,changed,labour-law,payroll,
+Saturday Short-Shift Overtime,إضافي وردية السبت القصيرة,العمل الإضافي لوردية السبت القصيرة,changed,labour-law,working_schedule,
+Search Payslip Lines,بحث في بنود قسيمة الراتب,البحث في بنود كشف الراتب,changed,sap-oracle,payroll,
+Skipped,متخطى,مستبعد,changed,ksa-hr,deduction,
+Social Insurance (GOSI),التأمينات الاجتماعية (GOSI),التأمينات الاجتماعية,changed,labour-law,payroll,
+Transportation Allowance,بدل المواصلات,بدل النقل,changed,ksa-hr,payroll,صيغة العقود السعودية
+Vacation Payslip,قسيمة راتب الإجازة,كشف راتب الإجازة,changed,sap-oracle,payroll,
+Vacation Payslips,قسائم رواتب الإجازة,كشوف رواتب الإجازة,changed,sap-oracle,payroll,
+Wage,الأجر | الراتب,الأجر,changed,labour-law,"base_security,commissions",مصطلح نظام العمل
+Worked Days,أيام العمل,أيام العمل,changed,ksa-hr,"commissions,payroll",الأساسي مطوَّل
+WPS (Bank Transfer),WPS (تحويل بنكي),حماية الأجور (تحويل بنكي),changed,labour-law,payroll,نظام حماية الأجور
+WPS Text File Generator,مولّد الملف النصي لـ WPS,مولد الملف النصي لنظام حماية الأجور (WPS),changed,labour-law,payroll,
+# ═══ [changed] نهاية الخدمة — End of Service ═══
+End-of-Service (Saudi Art. 84–88),مكافأة نهاية الخدمة (المواد 84–88 من نظام العمل السعودي) | نهاية الخدمة (المواد السعودية 84–88),مكافأة نهاية الخدمة (المواد 84–88 من نظام العمل),changed,unify,"annual_leave,deduction",
+EOS Notice Pay (Deduction),بدل الإشعار - خصم (نهاية الخدمة),تعويض مهلة الإشعار (خصم),changed,labour-law,eos_leave,المادة 76
+Last Wage (SAR),آخر راتب (ريال),الأجر الأخير (ريال),changed,labour-law,"annual_leave,eos_leave",المادة 84
+Notice Pay (Deduction),بدل فترة الإشعار (خصم),تعويض مهلة الإشعار (خصم),changed,labour-law,eos_leave,
+# ═══ [changed] الإجازات — Leaves ═══
+Annual Leave – Multi-Step Approval,إجازة سنوية — موافقة متعددة المراحل,الإجازة السنوية — اعتماد متعدد المراحل,changed,ksa-hr,annual_leave,سجل «اعتماد» + إزالة التشكيل
+Financial Consideration for Excess Leave,التعويض المالي عن الإجازة الزائدة | المقابل المالي للإجازة الزائدة,المقابل المالي عن الإجازة الزائدة,changed,unify,"payroll,unpaid_leave",
+Full Balance Clearance,تصفية الرصيد الكامل | تصفية الرصيد بالكامل,تصفية كامل الرصيد,changed,unify,"annual_leave,payroll",
+Is Unpaid Leave,إجازة غير مدفوعة,إجازة بدون أجر,changed,labour-law,unpaid_leave,
+Leave,الإجازة,إجازة,changed,ksa-hr,annual_leave,الأساسي «مغادرة» — غير مناسبة
+Return Confirmed,العودة مؤكَّدة,تمت المباشرة,changed,ksa-hr,annual_leave,
+Return Date,تاريخ العودة,تاريخ المباشرة,changed,ksa-hr,annual_leave,«مباشرة العمل» = العودة من الإجازة
+Return Status,حالة العودة,حالة المباشرة,changed,ksa-hr,annual_leave,
+Sick Leave,إجازة مرضية,الإجازة المرضية,changed,labour-law,leave_types,المادة 117
+Time Off,الإجازات,الإجازات,changed,odoo-core,"annual_leave,attendance_leave,eos_leave,leave_approval,payroll,unpaid_leave",
+Unpaid Leave,الإجازة غير المدفوعة,الإجازة بدون أجر,changed,labour-law,unpaid_leave,المادة 116
+Unpaid Leave Days,أيام الإجازة غير المدفوعة,أيام الإجازة بدون أجر,changed,labour-law,unpaid_leave,
+Unpaid Leave – Multi-Step Approval,الإجازة غير المدفوعة – اعتماد متعدد الخطوات,الإجازة بدون أجر — اعتماد متعدد المراحل,changed,ksa-hr,unpaid_leave,
+Unpaid Portion (Days),الجزء غير مدفوع الأجر (أيام),الجزء بدون أجر (أيام),changed,labour-law,annual_leave,
+Visa Cost Recovery for Excess Leave,استرداد تكلفة التأشيرة عن الإجازة الزائدة | استرداد تكلفة التأشيرة للإجازة الزائدة,استرداد تكلفة التأشيرة عن الإجازة الزائدة,changed,unify,"payroll,unpaid_leave",
+✅ Confirm Return,✅ تأكيد العودة,✅ تأكيد المباشرة,changed,ksa-hr,annual_leave,
+✅ Return Confirmed,✅ تم تأكيد العودة,✅ تمت المباشرة,changed,ksa-hr,annual_leave,
+# ═══ [changed] سير الاعتماد — Approval workflow ═══
+Approved,معتمد,معتمد,changed,ksa-hr,"annual_leave,deduction",
+Cancelled,مُلغى,ملغي,changed,sap-oracle,deduction,
+Confirmed,مؤكَّد,مؤكد,changed,sap-oracle,"attendance_sheet,commissions",
+Confirmed By,أُكِّد من قِبَل | تم التأكيد بواسطة,تم التأكيد بواسطة,changed,unify,"annual_leave,commissions",
+GM (Initial Review),المدير العام (مراجعة أولية),المدير العام (مراجعة أولية),changed,ksa-hr,annual_leave,
+HR Approver,معتمد الموارد البشرية | مُعتمِد الموارد البشرية,معتمد الموارد البشرية,changed,unify,"annual_leave,deduction",
+My Pending Approvals,اعتماداتي المعلّقة,طلبات بانتظار اعتمادي,changed,ksa-hr,deduction,
+Pending Accounting,بانتظار المحاسبة | في انتظار موافقة المحاسبة,بانتظار اعتماد المحاسبة,changed,unify,"annual_leave,deduction",
+Pending DM Approval,بانتظار اعتماد المدير المباشر | في انتظار موافقة المدير المباشر,بانتظار اعتماد المدير المباشر,changed,unify,"annual_leave,deduction",توحيد «بانتظار»
+Pending GM Final,بانتظار اعتماد المدير العام النهائي | في انتظار الموافقة النهائية للمدير العام,بانتظار الاعتماد النهائي للمدير العام,changed,unify,"annual_leave,deduction",
+Pending GM Initial,في انتظار الموافقة الأولية للمدير العام,بانتظار الاعتماد الأولي للمدير العام,changed,unify,annual_leave,
+Pending HR Approval,بانتظار اعتماد الموارد البشرية | في انتظار موافقة الموارد البشرية,بانتظار اعتماد الموارد البشرية,changed,unify,"annual_leave,deduction",
+Pending HR Confirmation,في انتظار توقيع الموظف,بانتظار تأكيد الموارد البشرية,changed,ksa-hr,annual_leave,تصحيح: الخطوة 6 صارت للموارد البشرية
+Pending My Action,بانتظار إجراء مني,بانتظار إجرائي,changed,ksa-hr,"annual_leave,deduction",
+Refused,مرفوض,مرفوض,changed,sap-oracle,deduction,
+Submit Request,تقديم الطلب,تقديم الطلب,changed,ksa-hr,deduction,
+✅ Initial Approve (GM),✅ الموافقة الأولية (المدير العام),✅ الاعتماد الأولي (المدير العام),changed,ksa-hr,annual_leave,اتفاق التذكير مع «اعتماد»
+# ═══ [changed] الخصومات — Deductions ═══
+Advances & Other,السلف وأخرى,السلف وغيرها,changed,ksa-hr,deduction,
+Full (incl. active installments),تعديل,تعديل كامل (شامل الأقساط النشطة),changed,ksa-hr,deduction,تصحيح: الحالي «تعديل» ناقص
+Internal Penalty,غرامة داخلية,جزاء داخلي,changed,labour-law,deduction,لائحة الجزاءات
+Loan Disbursement Officer,مسؤول صرف القرض,مسؤول صرف القروض,changed,ksa-hr,deduction,
+Mark Paid,تسجيل كمدفوع,تسجيل السداد,changed,ksa-hr,deduction,
+Paid,مدفوع,مسدد,changed,ksa-hr,deduction,سياق الأقساط = سداد
+Paid / Total,المدفوع / الإجمالي,المسدد / الإجمالي,changed,ksa-hr,deduction,
+Penalties,الغرامات,الجزاءات والغرامات,changed,labour-law,deduction,
+Record Loan Payment,تسجيل دفعة قرض,تسجيل سداد قرض,changed,ksa-hr,deduction,
+Salary Advance,سُلفة راتب,سلفة راتب,changed,ksa-hr,deduction,
+Total Paid,الإجمالي المدفوع,إجمالي المسدد,changed,ksa-hr,deduction,
+# ═══ [changed] الحضور والانصراف — Attendance ═══
+Attendance,الحاضرين,الحضور والانصراف,changed,ksa-hr,"attendance_leave,attendance_sheet,payroll",المصطلح الوظيفي الكامل
+Attendance Record,سجل الحضور,سجل الحضور والانصراف,changed,ksa-hr,"attendance_leave,attendance_sheet",
+Attendance Sheet,كشف الحضور,كشف الحضور والانصراف,changed,ksa-hr,attendance_sheet,
+Attendance Sheets,كشوف الحضور,كشوف الحضور والانصراف,changed,ksa-hr,attendance_sheet,
+Biometric Attendance Sync Service,خدمة مزامنة الحضور البيومتري,خدمة مزامنة حضور البصمة,changed,ksa-hr,"attendance_leave,payroll",
+Biometric Device,الجهاز البيومتري,جهاز البصمة,changed,ksa-hr,attendance_leave,الاستخدام السعودي: البصمة
+Biometric Device Details,تفاصيل الجهاز البيومتري,بيانات جهاز البصمة,changed,ksa-hr,attendance_leave,
+Biometric Schedule Helper,مساعد الجدول البيومتري,مساعد جداول البصمة,changed,ksa-hr,attendance_leave,
+Biometric: Stale Device Alert (every 30 minutes),البيومتري: تنبيه الجهاز المعطَّل (كل 30 دقيقة),البصمة: تنبيه توقف الجهاز (كل 30 دقيقة),changed,ksa-hr,attendance_leave,
+Covered,مغطى,مشمول بإجازة,changed,ksa-hr,attendance_leave,الحالي «مغطى» حرفية
+Covered by Time Off,مغطى بإجازة,مشمول بإجازة,changed,ksa-hr,attendance_leave,
+Early Leave,خروج مبكر,الانصراف المبكر,changed,ksa-hr,attendance_leave,
+Early Leave (min),خروج مبكر (دقيقة),انصراف مبكر (دقيقة),changed,ksa-hr,attendance_report,
+Early Leave Minutes,دقائق الخروج المبكر,دقائق الانصراف المبكر,changed,ksa-hr,attendance_leave,
+Main Work Schedule,جدول العمل الرئيسي,جدول الدوام الأساسي,changed,ksa-hr,working_schedule,«الدوام» = اللفظ السعودي
+Monthly Attendance Report,تقرير الحضور الشهري,تقرير الحضور والانصراف الشهري,changed,ksa-hr,attendance_report,
+Monthly Attendance Sheet,كشف الحضور الشهري,كشف الحضور والانصراف الشهري,changed,ksa-hr,attendance_sheet,
+Skip Late/Early Leave Checks,تجاهل فحوصات التأخير/الخروج المبكر,تجاهل فحوصات التأخير/الانصراف المبكر,changed,ksa-hr,working_schedule,
+Temporary Work Schedule,جدول عمل مؤقت,جدول دوام مؤقت,changed,ksa-hr,working_schedule,
+Total Early Leave Minutes,إجمالي دقائق الخروج المبكر,إجمالي دقائق الانصراف المبكر,changed,ksa-hr,"attendance_leave,attendance_report",
+# ═══ [changed] العمولات وعامة — Commissions & misc ═══
+Amount,القيمة | المبلغ,المبلغ,changed,unify,"annual_leave,commissions,deduction,ext_sync,payroll",يوحّد «القيمة» و«المبلغ»
+Salesman,البائع,مندوب المبيعات,changed,ksa-hr,commissions,«البائع» = بائع محل
+Salesman & Collector,بائع ومحصِّل,مندوب مبيعات ومحصل,changed,ksa-hr,commissions,
+Salesperson,المندوب,مندوب المبيعات,changed,unify,commissions,
+Salesperson Profiles,ملفات المندوبين,ملفات مندوبي المبيعات,changed,ksa-hr,commissions,
+# ═══ [matched-core] عبارات النظام — مطابقة Odoo ═══
+"<span class=""ms-1"">%</span>","<span class=""ms-1"">٪</span>","<span class=""ms-1"">%</span>",matched-core,odoo-core,payroll,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Absent,غائب,غائب,matched-core,odoo-core,"attendance_leave,attendance_sheet,payroll",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Account,الحساب,الحساب,matched-core,odoo-core,payroll,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Accounting,المحاسبة,المحاسبة,matched-core,odoo-core,"annual_leave,deduction,unpaid_leave",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Action Needed,إجراء مطلوب,إجراء مطلوب,matched-core,odoo-core,"attendance_sheet,commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Active,مُفعَّل,نشط,matched-core,odoo-core,"commissions,deduction,working_schedule",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Active Employee,موظف نشط,موظف نشط,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Activities,الأنشطة,الأنشطة,matched-core,odoo-core,"commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Activity Exception Decoration,تنبيه استثناء النشاط,زخرفة استثناء النشاط,matched-core,odoo-core,"commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Activity State,حالة النشاط,حالة النشاط,matched-core,odoo-core,"commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Activity Type Icon,أيقونة نوع النشاط,أيقونة نوع النشاط,matched-core,odoo-core,"commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Additional Information,معلومات إضافية,معلومات إضافية,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Additional Note,ملاحظة إضافية,ملاحظة إضافية,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Afternoon,فترة ما بعد الظهر,بعد الظهر,matched-core,odoo-core,working_schedule,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Allocated,مُخصَّص,المخصصة,matched-core,odoo-core,leave_types,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Allocation,التخصيص,التخصيص,matched-core,odoo-core,annual_leave,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+April,أبريل,أبريل,matched-core,odoo-core,"attendance_report,attendance_sheet,commissions",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Archived,مؤرشف,مؤرشف,matched-core,odoo-core,"commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Attachment Count,عدد المرفقات,عدد المرفقات,matched-core,odoo-core,"attendance_sheet,commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Attachments,المرفقات,المرفقات,matched-core,odoo-core,"annual_leave,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+August,أغسطس,أغسطس,matched-core,odoo-core,"attendance_report,attendance_sheet,commissions",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Balance,الرصيد,الرصيد,matched-core,odoo-core,"ext_sync,leave_types",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Bank Account,الحساب البنكي,الحساب البنكي,matched-core,odoo-core,"commissions,payroll",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Bank Accounts,الحسابات البنكية,الحسابات البنكية,matched-core,odoo-core,"base_security,payroll",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Bank Name,اسم البنك,اسم البنك,matched-core,odoo-core,payroll,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Birthday,يوم الميلاد,يوم الميلاد,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+by,بواسطة,بواسطة,matched-core,odoo-core,payroll,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+By Department,حسب القسم,حسب القسم,matched-core,odoo-core,deduction,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+By Employee,حسب الموظف,حسب الموظف,matched-core,odoo-core,deduction,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Cancel,إلغاء,إلغاء,matched-core,odoo-core,"annual_leave,attendance_report,commissions,deduction,payroll",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Category,الفئة,الفئة,matched-core,odoo-core,"commissions,deduction,ext_sync",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Check In,تسجيل الدخول,تسجيل الحضور,matched-core,odoo-core,attendance_report,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Check Out,تسجيل الخروج,تسجيل الخروج,matched-core,odoo-core,attendance_report,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Client,العميل,العميل,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Close,إغلاق,إغلاق,matched-core,odoo-core,annual_leave,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Closed,مُقفل,مغلق,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Code,الرمز,رمز,matched-core,odoo-core,"commissions,deduction,payroll",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Commission,العمولة,العمولة,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Commissions,عمولات KSW,العمولات,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Companies,الشركات,الشركات,matched-core,odoo-core,leave_approval,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Condition,الشرط,الشرط,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Config Settings,تهيئة الإعدادات,تهيئة الإعدادات,matched-core,odoo-core,"commissions,leave_approval,payroll",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Configuration,الإعدادات,التهيئة,matched-core,odoo-core,"commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Confirm,تأكيد,تأكيد,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Contact,جهة الاتصال,جهة الاتصال,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Contract End Date,تاريخ انتهاء العقد,تاريخ انتهاء العقد,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Contract Start Date,تاريخ بدء العقد,تاريخ بدء العقد,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Contract Template,قالب العقد,قالب العقد,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Contract Type,نوع العقد,نوع العقد,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Contract Wage,أجر العقد,أجر العقد,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Count,العدد,التعداد,matched-core,odoo-core,payroll,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Country Code,رمز الدولة,رمز الدولة,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Created by,أنشأه | أنشئ بواسطة,أنشئ بواسطة,matched-core,odoo-core,"annual_leave,attendance_leave,attendance_report,attendance_sheet,commissions,deduction,ext_sync,payroll,working_schedule",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Created on,أنشئ في | تاريخ الإنشاء,أنشئ في,matched-core,odoo-core,"annual_leave,attendance_leave,attendance_report,attendance_sheet,commissions,deduction,ext_sync,payroll,working_schedule",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Credit,دائن,الدائن,matched-core,odoo-core,ext_sync,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Currency,العملة,العملة,matched-core,odoo-core,"base_security,commissions,deduction,payroll",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Current Balance,الرصيد الحالي,الرصيد الحالي,matched-core,odoo-core,annual_leave,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Current Time Off Status,حالة الإجازة الحالية,حالة الإجازة الحالية,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Current Time Off Type,نوع الإجازة الحالية,نوع الإجازة الحالية,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Currently Valid,ساري حالياً,صالح حاليا,matched-core,odoo-core,leave_types,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Dashboard,لوحة المعلومات,لوحة البيانات,matched-core,odoo-core,deduction,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Date,التاريخ,التاريخ,matched-core,odoo-core,"annual_leave,attendance_leave,attendance_report,attendance_sheet,ext_sync,payroll,unpaid_leave",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Date End,تاريخ الانتهاء,تاريخ الانتهاء,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Date Start,تاريخ البدء,تاريخ البدء,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Date Version,نسخة بتاريخ,نسخة بتاريخ,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Day,اليوم,اليوم,matched-core,odoo-core,"attendance_report,attendance_sheet,payroll",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Day Period,فترة اليوم,فترة اليوم,matched-core,odoo-core,working_schedule,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Days,الأيام,الأيام,matched-core,odoo-core,"commissions,payroll",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+days,أيام,يوم,matched-core,odoo-core,payroll,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+days),أيام),أيام),matched-core,odoo-core,payroll,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Debit,مدين,المدين,matched-core,odoo-core,ext_sync,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+December,ديسمبر,ديسمبر,matched-core,odoo-core,"attendance_report,attendance_sheet,commissions",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Department,القسم,القسم,matched-core,odoo-core,"annual_leave,attendance_sheet,base_security,commissions,deduction,leave_types",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Departure Date,تاريخ المغادرة,تاريخ المغادرة,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Departure Reason,سبب المغادرة,سبب المغادرة,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Dependent Children,الأطفال المعالون,الأطفال المعالون,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Description,الوصف,الوصف,matched-core,odoo-core,"commissions,deduction,ext_sync,payroll,working_schedule",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Details,التفاصيل,التفاصيل,matched-core,odoo-core,deduction,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Display Name,اسم العرض | الاسم الظاهر,اسم العرض,matched-core,odoo-core,"annual_leave,attendance_leave,attendance_report,attendance_sheet,base_security,commissions,deduction,eos_leave,ext_sync,leave_approval,leave_types,payroll,unpaid_leave,working_schedule",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Done,منجز,منتهي,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Done Date,تاريخ الإنجاز,تاريخ الاكتمال,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Draft,مسودة,مسودة,matched-core,odoo-core,"attendance_sheet,commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Emergency Contact,جهة الاتصال في حالات الطوارئ,جهة الاتصال في حالات الطوارئ,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Emergency Phone,هاتف الطوارئ,هاتف الطوارئ,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Employee,الموظف,الموظف,matched-core,odoo-core,"annual_leave,attendance_leave,attendance_report,attendance_sheet,base_security,commissions,deduction,leave_types,payroll,working_schedule",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Employee Category,فئة الموظف,فئة الموظف,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Employee Contract,عقد الموظف,عقد الموظف,matched-core,odoo-core,"annual_leave,base_security,payroll",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Employee Name,اسم الموظف,اسم الموظف,matched-core,odoo-core,annual_leave,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Employee Type,نوع الموظف,نوع الموظف,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Employee Versions,نُسَخ الموظف,نسخ الموظف,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Employees,الموظفون,الموظفون,matched-core,odoo-core,"annual_leave,commissions,payroll",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+End Date,تاريخ الانتهاء,تاريخ الانتهاء,matched-core,odoo-core,working_schedule,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+End of Trial Period,نهاية الفترة التجريبية,نهاية الفترة التجريبية,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Export,تصدير,تصدير,matched-core,odoo-core,"commissions,payroll",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+February,فبراير,فبراير,matched-core,odoo-core,"attendance_report,attendance_sheet,commissions",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Female,أنثى,أنثى,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Followers,المتابعون,المتابعين,matched-core,odoo-core,"attendance_sheet,commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Followers (Partners),المتابعون (الشركاء),المتابعين (الشركاء),matched-core,odoo-core,"attendance_sheet,commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Font awesome icon e.g. fa-tasks,أيقونة Font Awesome مثل fa-tasks,أيقونة من Font awesome مثال: fa-tasks,matched-core,odoo-core,"commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Friday,الجمعة,الجمعة,matched-core,odoo-core,working_schedule,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+From,من,من,matched-core,odoo-core,attendance_leave,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+From Date,من تاريخ,من تاريخ,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Full Day,يوم كامل,يوم كامل,matched-core,odoo-core,working_schedule,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Gender,الجنس,الجنس,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+General Settings,الإعدادات العامة,الإعدادات العامة,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Generate,إنشاء,إنشاء,matched-core,odoo-core,payroll,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Generate payslips for all selected employees,إنشاء قسائم دفع الرواتب لجميع الموظفين الذين تم تحديدهم,إنشاء قسائم دفع الرواتب لجميع الموظفين الذين تم تحديدهم,matched-core,odoo-core,payroll,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Gross,الإجمالي,الإجمالي,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Group Name,اسم المجموعة,اسم المجموعة,matched-core,odoo-core,working_schedule,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Hajj Leave,إجازة الحج,إجازة الحج,matched-core,odoo-core,leave_types,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Has Message,يحتوي رسالة,يحتوي على رسالة,matched-core,odoo-core,"attendance_sheet,commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Home-Work Distance,المسافة بين المنزل والعمل,المسافة بين المنزل والعمل,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Home-Work Distance in Km,المسافة بين المنزل والعمل بالكيلومترات,المسافة بين المنزل والعمل بالكيلومترات,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Home-Work Distance unit,وحدة قياس المسافة بين المنزل والعمل,وحدة قياس المسافة بين المنزل والعمل,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Hours,الساعات,ساعات,matched-core,odoo-core,payroll,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+HR Responsible,مسؤول الموارد البشرية,مسؤول الموارد البشرية,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Human Resources,الموارد البشرية,الموارد البشرية,matched-core,odoo-core,unpaid_leave,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Icon,الأيقونة,الأيقونة,matched-core,odoo-core,"commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+ID,المعرّف | المُعرف,المعرف,matched-core,odoo-core,"annual_leave,attendance_leave,attendance_report,attendance_sheet,base_security,commissions,deduction,eos_leave,ext_sync,leave_approval,leave_types,payroll,unpaid_leave,working_schedule",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Identification No,رقم الهوية,رقم الهوية,matched-core,odoo-core,"base_security,commissions",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Import,استيراد,استيراد,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Is Current,جاري,جاري,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Is Custom Job Title,مسمى وظيفي مخصص,مسمى وظيفي مخصص,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Is Flexible,مرنة,مرنة,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Is Follower,متابع,متابع,matched-core,odoo-core,"attendance_sheet,commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Is Fully Flexible,مرنة بالكامل,مرنة بالكامل,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Is Future,مستقبلي,مستقبلي,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Is In Contract,ضمن العقد,ضمن العقد,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Is Past,في الماضي,في الماضي,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+January,يناير,يناير,matched-core,odoo-core,"attendance_report,attendance_sheet,commissions",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Job,الوظيفة,الوظيفة,matched-core,odoo-core,"base_security,commissions",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Job Title,المسمى الوظيفي,المسمى الوظيفي,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+July,يوليو,يوليو,matched-core,odoo-core,"attendance_report,attendance_sheet,commissions",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+June,يونيو,يونيو,matched-core,odoo-core,"attendance_report,attendance_sheet,commissions",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Last Modified by,آخر تعديل بواسطة,آخر تعديل بواسطة,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Last Modified on,آخر تعديل في,آخر تعديل في,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Last Updated by,آخر تحديث بواسطة | حدّثه آخراً,آخر تحديث بواسطة,matched-core,odoo-core,"annual_leave,attendance_leave,attendance_report,attendance_sheet,commissions,deduction,ext_sync,payroll,working_schedule",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Last Updated on,آخر تحديث | آخر تحديث في,آخر تحديث في,matched-core,odoo-core,"annual_leave,attendance_leave,attendance_report,attendance_sheet,commissions,deduction,ext_sync,payroll,working_schedule",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Late,متأخر,متأخر,matched-core,odoo-core,attendance_leave,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Legal Name,الاسم القانوني,الاسم القانوني,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Line,البند,البند,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Lines,البنود,البنود,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Lock,قفل,قفل,matched-core,odoo-core,annual_leave,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Lunch,الغداء,الغداء,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Mail Server,خادم البريد الإلكتروني,خادم البريد الإلكتروني,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Male,ذكر,ذكر,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Manager,المدير,المدير,matched-core,odoo-core,"attendance_sheet,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Manual,يدوي,يدوي,matched-core,odoo-core,deduction,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+March,مارس,مارس,matched-core,odoo-core,"attendance_report,attendance_sheet,commissions",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Marital Status,الحالة الاجتماعية,الحالة الاجتماعية,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Maternity Leave,إجازة أمومة,إجازة وضع,matched-core,odoo-core,leave_types,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+May,مايو,مايو,matched-core,odoo-core,"attendance_report,attendance_sheet,commissions",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Member of department,عضو في قسم,عضو في قسم,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Menu,القائمة,القائمة,matched-core,odoo-core,deduction,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Message Delivery error,خطأ تسليم الرسالة,خطأ في تسليم الرسائل,matched-core,odoo-core,"attendance_sheet,commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Messages,الرسائل,الرسائل,matched-core,odoo-core,"attendance_sheet,commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Minutes,الدقائق,الدقائق,matched-core,odoo-core,attendance_leave,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Monday,الاثنين,الاثنين,matched-core,odoo-core,working_schedule,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Month,الشهر,الشهر,matched-core,odoo-core,"attendance_report,attendance_sheet,commissions,deduction,ext_sync",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Morning,فترة الصباح,صباحا,matched-core,odoo-core,working_schedule,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+My Activity Deadline,موعد نهائي لنشاطي,الموعد النهائي لنشاطاتي,matched-core,odoo-core,"commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+My Team,فريقي,فريقي,matched-core,odoo-core,attendance_sheet,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Name,الاسم,الاسم,matched-core,odoo-core,"commissions,deduction,working_schedule",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Nationality (Country),الجنسية (البلد),الجنسية (البلد),matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Next Activity Calendar Event,حدث التقويم للنشاط التالي,الفعالية التالية في تقويم الأنشطة,matched-core,odoo-core,"commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Next Activity Deadline,الموعد النهائي للنشاط التالي,الموعد النهائي للنشاط التالي,matched-core,odoo-core,"commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Next Activity Summary,ملخص النشاط التالي,ملخص النشاط التالي,matched-core,odoo-core,"commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Next Activity Type,نوع النشاط التالي,نوع النشاط التالي,matched-core,odoo-core,"commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Note,ملاحظة,الملاحظات,matched-core,odoo-core,"annual_leave,commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Notes,ملاحظات,الملاحظات,matched-core,odoo-core,"annual_leave,attendance_report,commissions,unpaid_leave",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+November,نوفمبر,نوفمبر,matched-core,odoo-core,"attendance_report,attendance_sheet,commissions",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Number of Actions,عدد الإجراءات,عدد الإجراءات,matched-core,odoo-core,"attendance_sheet,commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Number of Days,عدد الأيام,عدد الأيام,matched-core,odoo-core,payroll,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Number of errors,عدد الأخطاء,عدد الأخطاء,matched-core,odoo-core,"attendance_sheet,commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Number of Hours,عدد الساعات,عدد الساعات,matched-core,odoo-core,payroll,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Number of messages requiring action,عدد الرسائل التي تتطلب إجراءً,عدد الرسائل التي تتطلب اتخاذ إجراء,matched-core,odoo-core,"attendance_sheet,commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Number of messages with delivery error,عدد الرسائل ذات خطأ التسليم,عدد الرسائل الحادث بها خطأ في التسليم,matched-core,odoo-core,"attendance_sheet,commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+October,أكتوبر,أكتوبر,matched-core,odoo-core,"attendance_report,attendance_sheet,commissions",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+on,في,في,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Opening Balance,الرصيد الافتتاحي,الرصيد الافتتاحي,matched-core,odoo-core,ext_sync,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Operation,العملية,العملية,matched-core,odoo-core,payroll,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Options,خيارات,الخيارات,matched-core,odoo-core,annual_leave,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Other,أخرى | غير ذلك,غير ذلك,matched-core,odoo-core,"base_security,commissions,ext_sync",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Other Inputs,مدخلات أخرى,مدخلات أخرى,matched-core,odoo-core,payroll,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Overdue,متأخر,متأخر,matched-core,odoo-core,deduction,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Partner,الشريك,الشريك,matched-core,odoo-core,payroll,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Passport No,رقم جواز السفر,رقم جواز السفر,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Paternity Leave,إجازة أبوة,إجازة الأبوة,matched-core,odoo-core,leave_types,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Pay Slip,قسيمة المرتب,قسيمة المرتب,matched-core,odoo-core,"commissions,deduction,payroll",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Payment Date,تاريخ الدفع,تاريخ الدفع,matched-core,odoo-core,deduction,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Payments,المدفوعات,الدفعات,matched-core,odoo-core,ext_sync,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Period,الفترة,الفترة,matched-core,odoo-core,"annual_leave,commissions",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Print,طباعة,طباعة,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Priority,الأولوية,الأولوية,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Private City,مدينة خاصة,مدينة خاصة,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Private Country,الدولة خاصة,الدولة خاصة,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Private Email,بريد الكتروني خاص,بريد الكتروني خاص,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Private Phone,هاتف خاص,هاتف خاص,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Private State,الحالة الخاصة,الحالة الخاصة,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Private Street,الشارع خاص,الشارع خاص,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Private Street2,الشارع 2 خاص,الشارع 2 خاص,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Private Zip,رمز Zip خاص,رمز Zip خاص,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Quantity,الكمية,الكمية,matched-core,odoo-core,"commissions,payroll",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Ratings,التقييمات,التقييمات,matched-core,odoo-core,"attendance_sheet,commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Reason,السبب,السبب,matched-core,odoo-core,"commissions,deduction,payroll",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Reports,التقارير,التقارير,matched-core,odoo-core,deduction,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Request End Date,تاريخ نهاية الطلب,تاريخ نهاية الطلب,matched-core,odoo-core,annual_leave,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Request Start Date,تاريخ بداية الطلب,تاريخ بداية الطلب,matched-core,odoo-core,annual_leave,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Required,المطلوب,مطلوب,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Reset to Draft,إعادة إلى المسودة,إعادة التعيين كمسودة,matched-core,odoo-core,"commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Resource Working Time,فترة عمل المَورِد,فترة عمل المورد,matched-core,odoo-core,working_schedule,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Resource's Calendar,تقويم المَورِد,تقويم المورد,matched-core,odoo-core,working_schedule,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Responsible User,المستخدم المسؤول,المستخدم المسؤول,matched-core,odoo-core,"commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Revoke,إلغاء,إلغاء,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Role,الدور,الدور,matched-core,odoo-core,"commissions,unpaid_leave",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Rule,القاعدة,قاعدة,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Ruleset,مجموعة القواعد,مجموعة القواعد,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Salary Structure,هيكل المرتب,هيكل المرتب,matched-core,odoo-core,payroll,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Salary Structure Type,نوع هيكل الراتب,نوع هيكل الراتب,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Sales,المبيعات,المبيعات,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Saturday,السبت,السبت,matched-core,odoo-core,working_schedule,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Scheduled Pay,الدفع المجدول,الدفع المجدول,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Scope,النطاق,النطاق,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Self,الذاتية,ذاتي,matched-core,odoo-core,"annual_leave,commissions",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+September,سبتمبر,سبتمبر,matched-core,odoo-core,"attendance_report,attendance_sheet,commissions",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Sequence,الترتيب,تسلسل,matched-core,odoo-core,"annual_leave,commissions,deduction,working_schedule",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Service,الخدمة,الخدمة,matched-core,odoo-core,annual_leave,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+SMS Delivery error,خطأ تسليم الرسالة النصية,خطأ في تسليم الرسائل النصية القصيرة,matched-core,odoo-core,"attendance_sheet,commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Social Security Number,رقم الضمان الاجتماعي,رقم الضمان الاجتماعي,matched-core,odoo-core,"base_security,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Spouse Birthdate,تاريخ ميلاد الزوج/الزوجة,تاريخ ميلاد الزوج/الزوجة,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Spouse Legal Name,الاسم القانوني للزوج/الزوجة,الاسم القانوني للزوج/الزوجة,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+SSN No,رقم الضمان الاجتماعي,رقم الضمان الاجتماعي,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Start Date,تاريخ البدء,تاريخ البدء,matched-core,odoo-core,working_schedule,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Status,الحالة,الحالة,matched-core,odoo-core,"attendance_report,attendance_sheet,commissions,ext_sync,unpaid_leave",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Step,الخطوة,خطوة,matched-core,odoo-core,unpaid_leave,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Submit,إرسال,إرسال,matched-core,odoo-core,deduction,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Subtotal,المجموع الفرعي,الناتج الفرعي,matched-core,odoo-core,ext_sync,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Summary,الملخص,الملخص,matched-core,odoo-core,"attendance_report,attendance_sheet,commissions",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Sunday,الأحد,الأحد,matched-core,odoo-core,working_schedule,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Supporting Documents,المستندات الداعمة,المستندات الداعمة,matched-core,odoo-core,"annual_leave,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Taken,مُستهلَك,تم أخذها,matched-core,odoo-core,leave_types,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Target Line,بند الهدف,البند المستهدف,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Template,القالب,القالب,matched-core,odoo-core,commissions,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+This Month,هذا الشهر,هذا الشهر,matched-core,odoo-core,ext_sync,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Thursday,الخميس,الخميس,matched-core,odoo-core,working_schedule,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Time Off Type,نوع الإجازة,نوع الإجازة,matched-core,odoo-core,"annual_leave,attendance_leave,eos_leave,leave_types,unpaid_leave",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Time Off Validation,تصديق الإجازة,تصديق الإجازة,matched-core,odoo-core,"annual_leave,unpaid_leave",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+To,إلى,إلى,matched-core,odoo-core,attendance_leave,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Today,اليوم,اليوم,matched-core,odoo-core,annual_leave,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Total,الإجمالي,الإجمالي,matched-core,odoo-core,"annual_leave,commissions,deduction,ext_sync,payroll",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Total number of allocations,إجمالي عدد المخصصات,إجمالي عدد المخصصات,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Tuesday,الثلاثاء,الثلاثاء,matched-core,odoo-core,working_schedule,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Type,النوع,النوع,matched-core,odoo-core,"commissions,deduction,ext_sync,payroll",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Usage,الاستخدام,الاستخدام,matched-core,odoo-core,annual_leave,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+User,المستخدم,المستخدم,matched-core,odoo-core,deduction,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Validation Type,نوع التصديق,نوع التصديق,matched-core,odoo-core,annual_leave,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Value,القيمة,القيمة,matched-core,odoo-core,payroll,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+VAT,ضريبة القيمة المضافة,ضريبة القيمة المضافة,matched-core,odoo-core,ext_sync,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Version,الإصدار,الإصدار,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Versions Count,عدد النسخ,عدد النسخ,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Visa Expiration Date,تاريخ انتهاء صلاحية التأشيرة,تاريخ انتهاء صلاحية التأشيرة,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Visa No,رقم التأشيرة,رقم التأشيرة,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Waiting For Me,بانتظاري,بانتظاري,matched-core,odoo-core,"annual_leave,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Website communication history,سجل تواصل الموقع,سجل تواصل الموقع الإلكتروني,matched-core,odoo-core,"attendance_sheet,commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Website Messages,رسائل الموقع,رسائل الموقع الإلكتروني,matched-core,odoo-core,"attendance_sheet,commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Wednesday,الأربعاء,الأربعاء,matched-core,odoo-core,working_schedule,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Wizard,المعالج,المعالج,matched-core,odoo-core,annual_leave,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Work Address,عنوان العمل,عنوان العمل,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Work Detail,تفاصيل العمل,تفاصيل العمل,matched-core,odoo-core,working_schedule,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Work Location,مكان العمل,مكان العمل,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Work Permit Expiration Date,تاريخ انتهاء تصريح العمل,تاريخ انتهاء تصريح العمل,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Work Permit No,رقم تصريح العمل,رقم تصريح العمل,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Working Hours,ساعات العمل,ساعات العمل,matched-core,odoo-core,base_security,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Working Time,وقت العمل,وقت العمل,matched-core,odoo-core,working_schedule,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Year,السنة,السنة,matched-core,odoo-core,"attendance_report,attendance_sheet,commissions,deduction",مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+Yes,نعم,نعم,matched-core,odoo-core,unpaid_leave,مطابقة الترجمة الرسمية لـ Odoo (قرار المستخدم رقم 4)
+# ═══ [changed (auto)] تنظيف تلقائي (تشكيل/توحيد مفاهيم) ═══
+"<span class=""fw-bold text-success"">Confirmed</span>","<span class=""fw-bold text-success"">مؤكَّد</span>","<span class=""fw-bold text-success"">مؤكد</span>",changed (auto),auto,payroll,
+"<span class=""o_stat_text"">EOS Payslip</span>","<span class=""o_stat_text"">قسيمة نهاية الخدمة</span>","<span class=""o_stat_text"">كشف نهاية الخدمة</span>",changed (auto),auto,eos_leave,
+"<span class=""o_stat_text"">Vacation Payslip(s)</span>","<span class=""o_stat_text"">قسيمة(قسائم) الإجازة</span>","<span class=""o_stat_text"">كشف(كشوف) الإجازة</span>",changed (auto),auto,payroll,
+"<span style=""color:#6a1b9a;"">☑ Covered</span>","<span style=""color:#6a1b9a;"">☑ مغطى</span>","<span style=""color:#6a1b9a;"">☑ مشمول بإجازة</span>",changed (auto),auto,attendance_report,
+<strong>Applicant</strong><br/>,<strong>مقدِّم الطلب</strong><br/>,<strong>مقدم الطلب</strong><br/>,changed (auto),auto,payroll,
+<strong>Approved by Manager</strong>,<strong>اعتمد من قِبَل المدير</strong>,<strong>اعتمد من قبل المدير</strong>,changed (auto),auto,commissions,
+<strong>Approved by</strong>,<strong>اعتُمد بواسطة</strong>,<strong>اعتمد بواسطة</strong>,changed (auto),auto,commissions,
+<strong>Authorized Signature</strong>,<strong>التوقيع المفوَّض</strong>,<strong>التوقيع المفوض</strong>,changed (auto),auto,payroll,
+<strong>Combined Leave</strong>,<strong>إجازة مركّبة</strong>,<strong>إجازة مركبة</strong>,changed (auto),auto,unpaid_leave,
+<strong>Confirmed by</strong>,<strong>أُكِّد بواسطة</strong>,<strong>أكد بواسطة</strong>,changed (auto),auto,commissions,
+<strong>Finalised by</strong>,<strong>أُنهي بواسطة</strong>,<strong>أنهي بواسطة</strong>,changed (auto),auto,commissions,
+<strong>Payslip Name</strong>,<strong>اسم قسيمة الراتب</strong>,<strong>اسم كشف الراتب</strong>,changed (auto),auto,payroll,
+<strong>Prepared by Supervisor</strong>,<strong>أُعدَّ من قِبَل المشرف</strong>,<strong>أعد من قبل المشرف</strong>,changed (auto),auto,commissions,
+<strong>Printed on</strong>,<strong>طُبع في</strong>,<strong>طبع في</strong>,changed (auto),auto,commissions,
+<strong>Reviewed by Accountant</strong>,<strong>روجِع من قِبَل المحاسب</strong>,<strong>روجع من قبل المحاسب</strong>,changed (auto),auto,commissions,
+<strong>Unpaid Portion</strong>,<strong>الجزء غير المدفوع</strong>,<strong>الجزء بدون أجر</strong>,changed (auto),auto,unpaid_leave,
+Accounting Approver,مُعتمِد المحاسبة,معتمد المحاسبة,changed (auto),auto,"annual_leave,deduction",
+Accounting Inputs — Unpaid Leave,مدخلات المحاسبة — الإجازة غير المدفوعة,مدخلات المحاسبة — الإجازة بدون أجر,changed (auto),auto,unpaid_leave,
+Accounting — Unpaid Leave,المحاسبة — الإجازة غير المدفوعة,المحاسبة — الإجازة بدون أجر,changed (auto),auto,unpaid_leave,
+Accounting: Budget confirmed,المحاسبة: الموازنة مؤكَّدة,المحاسبة: الموازنة مؤكدة,changed (auto),auto,deduction,
+Achieved Amount (auto),المبلغ المحقَّق (تلقائي),المبلغ المحقق (تلقائي),changed (auto),auto,commissions,
+Achieved Collection,التحصيل المحقَّق,التحصيل المحقق,changed (auto),auto,commissions,
+Achieved Sales,المبيعات المحقَّقة,المبيعات المحققة,changed (auto),auto,commissions,
+Active Deductions,الخصومات الفعّالة,الخصومات الفعالة,changed (auto),auto,deduction,
+Active Deductions Breakdown,تفاصيل الخصومات الفعّالة,تفاصيل الخصومات الفعالة,changed (auto),auto,deduction,
+Active Deductions Only,الخصومات الفعّالة فقط,الخصومات الفعالة فقط,changed (auto),auto,deduction,
+Active Portfolio,المحفظة الفعّالة,المحفظة الفعالة,changed (auto),auto,deduction,
+Advance GOSI (Paid Vacation Months),مقدَّم التأمينات (أشهر الإجازة المدفوعة),مقدم التأمينات (أشهر الإجازة المدفوعة),changed (auto),auto,payroll,
+Advance HRA (Paid Vacation Months),مقدَّم بدل السكن (أشهر الإجازة المدفوعة),مقدم بدل السكن (أشهر الإجازة المدفوعة),changed (auto),auto,payroll,
+Annual + Unpaid Leave — Approval Report,الإجازة السنوية + غير المدفوعة — تقرير الاعتماد,الإجازة السنوية + بدون أجر — تقرير الاعتماد,changed (auto),auto,unpaid_leave,
+Approver,المُعتمِد,المعتمد,changed (auto),auto,unpaid_leave,
+Assigned Employees,الموظفون المعنيّون,الموظفون المعنيون,changed (auto),auto,commissions,
+Attendance Sheet Count,عدد كشوف الحضور,عدد كشوف الحضور والانصراف,changed (auto),auto,attendance_sheet,
+Attendance Sheet Daily Line,البند اليومي لكشف الحضور,البند اليومي لكشف الحضور والانصراف,changed (auto),auto,"attendance_sheet,unpaid_leave",
+Attendance Sheet Employees,موظفو كشف الحضور,موظفو كشف الحضور والانصراف,changed (auto),auto,attendance_sheet,
+Attendance Sheet Impact,أثر كشف الحضور,أثر كشف الحضور والانصراف,changed (auto),auto,annual_leave,
+Attendance Sheet Update on Annual Leave DM Approval,تحديث كشف الحضور عند اعتماد المدير المباشر للإجازة السنوية,تحديث كشف الحضور والانصراف عند اعتماد المدير المباشر للإجازة السنوية,changed (auto),auto,annual_leave,
+Auto Generated,مولَّد تلقائياً,مولد تلقائيا,changed (auto),auto,attendance_sheet,
+BAS SQL Server Connector,موصّل SQL Server لـ BAS,موصل SQL Server ل BAS,changed (auto),auto,ext_sync,
+"Base EOS — Resignation (Art. 85, Unadjusted)",نهاية الخدمة الأساسية — استقالة (المادة 85، غير معدَّلة),نهاية الخدمة الأساسية — استقالة (المادة 85، غير معدلة),changed (auto),auto,"annual_leave,eos_leave",
+"Base EOS — Termination (Art. 84, Unadjusted)",نهاية الخدمة الأساسية — إنهاء عقد (المادة 84، غير معدَّلة),نهاية الخدمة الأساسية — إنهاء عقد (المادة 84، غير معدلة),changed (auto),auto,"annual_leave,eos_leave",
+Base Service Years (Unadjusted),سنوات الخدمة الأساسية (غير معدَّلة),سنوات الخدمة الأساسية (غير معدلة),changed (auto),auto,"annual_leave,eos_leave",
+Borrowed,مُقترَض,مقترض,changed (auto),auto,deduction,
+Borrowed (with employee consent),مُقترَض (بموافقة الموظف),مقترض (بموافقة الموظف),changed (auto),auto,deduction,
+Collected By,حُصِّل بواسطة,حصل بواسطة,changed (auto),auto,deduction,
+Collection Achieved,التحصيل المحقَّق,التحصيل المحقق,changed (auto),auto,commissions,
+Collection Based on Total,التحصيل بناءً على الإجمالي,التحصيل بناء على الإجمالي,changed (auto),auto,commissions,
+Collector,المحصِّل,المحصل,changed (auto),auto,commissions,
+Currently At,حالياً عند,حاليا عند,changed (auto),auto,annual_leave,
+Currently On Vacation,في إجازة حالياً,في إجازة حاليا,changed (auto),auto,annual_leave,
+Disbursement Confirmed By,أُكِّد صرف القرض بواسطة,أكد صرف القرض بواسطة,changed (auto),auto,deduction,
+Done (Finalised),منجز (مُنهَى),منجز (منهى),changed (auto),auto,commissions,
+Done By,أُنجز بواسطة,أنجز بواسطة,changed (auto),auto,commissions,
+Early (min),خروج مبكر (دقيقة),انصراف مبكر (دقيقة),changed (auto),auto,payroll,
+Early Leave Minutes (Net),دقائق الخروج المبكر (صافي),دقائق الانصراف المبكر (صافي),changed (auto),auto,attendance_leave,
+GM Approver,مُعتمِد المدير العام,معتمد المدير العام,changed (auto),auto,annual_leave,
+GM Final Approved By,اعتمده المدير العام نهائياً,اعتمده المدير العام نهائيا,changed (auto),auto,annual_leave,
+GM Final Approver,مُعتمِد المدير العام النهائي,معتمد المدير العام النهائي,changed (auto),auto,deduction,
+GM Initial Approved By,اعتمده المدير العام أولياً,اعتمده المدير العام أوليا,changed (auto),auto,annual_leave,
+GM: Return Annual Leave to Approver,المدير العام: إعادة الإجازة السنوية إلى مُعتمِد سابق,المدير العام: إعادة الإجازة السنوية إلى معتمد سابق,changed (auto),auto,annual_leave,
+HR Confirmed By,أكّدته الموارد البشرية,أكدته الموارد البشرية,changed (auto),auto,annual_leave,
+HR: No pending penalties on this employee,الموارد البشرية: لا توجد غرامات معلّقة على هذا الموظف,الموارد البشرية: لا توجد غرامات معلقة على هذا الموظف,changed (auto),auto,deduction,
+I'll Update Manually,سأقوم بالتحديث يدويًا,سأقوم بالتحديث يدويا,changed (auto),auto,annual_leave,
+Is Locked,مُجمَّد,مجمد,changed (auto),auto,commissions,
+Is Unpaid Leave Type,نوع إجازة غير مدفوعة,نوع إجازة بدون أجر,changed (auto),auto,unpaid_leave,
+Kawthar (Itqan) Payroll Card File Generator,مولّد ملف بطاقة كوثر (إتقان) للرواتب,مولد ملف بطاقة كوثر (إتقان) للرواتب,changed (auto),auto,payroll,
+KSW Salesperson Monthly Target,هدف المندوب الشهري KSW,هدف مندوب المبيعات الشهري KSW,changed (auto),auto,commissions,
+KSW Salesperson Profile (yearly target),ملف المندوب (الهدف السنوي) KSW,ملف مندوب المبيعات (الهدف السنوي) KSW,changed (auto),auto,commissions,
+KSW Salesperson Profile — Client Split Rule,ملف المندوب — قاعدة تقسيم العميل KSW,ملف مندوب المبيعات — قاعدة تقسيم العميل KSW,changed (auto),auto,commissions,
+KSW: Auto-create Leave Allocations,KSW: إنشاء تخصيصات الإجازة تلقائياً,KSW: إنشاء تخصيصات الإجازة تلقائيا,changed (auto),auto,leave_types,
+Loans (locked),القروض (مُجمَّدة),القروض (مجمدة),changed (auto),auto,commissions,
+Managed By,تُدار بواسطة,تدار بواسطة,changed (auto),auto,deduction,
+Manager Confirmed By,أكّده المدير,أكده المدير,changed (auto),auto,annual_leave,
+Mark this installment as settled outside payroll,تسجيل هذا القسط كمُسوَّى خارج الراتب,تسجيل هذا القسط كمسوى خارج الراتب,changed (auto),auto,deduction,
+Message to Approver,رسالة إلى المُعتمِد,رسالة إلى المعتمد,changed (auto),auto,annual_leave,
+MOL ID,معرّف وزارة العمل,معرف وزارة العمل,changed (auto),auto,payroll,
+Monthly Attendance Report Wizard,معالج تقرير الحضور الشهري,معالج تقرير الحضور والانصراف الشهري,changed (auto),auto,attendance_report,
+No leave balances found,لم يُعثَر على أرصدة إجازة,لم يعثر على أرصدة إجازة,changed (auto),auto,leave_types,
+Originally Scheduled Amount,المبلغ المجدول أصلاً,المبلغ المجدول أصلا,changed (auto),auto,commissions,
+Other Active Deductions,خصومات فعّالة أخرى,خصومات فعالة أخرى,changed (auto),auto,deduction,
+Other Active Deductions (same employee),خصومات فعّالة أخرى (لنفس الموظف),خصومات فعالة أخرى (لنفس الموظف),changed (auto),auto,deduction,
+Pending,معلّق,معلق,changed (auto),auto,"commissions,deduction",
+Pending Commission Sheet,كشف عمولة معلّق,كشف عمولة معلق,changed (auto),auto,commissions,
+Pending Installments,الأقساط المعلَّقة,الأقساط المعلقة,changed (auto),auto,deduction,
+per month starting,شهرياً ابتداءً من,شهريا ابتداء من,changed (auto),auto,deduction,
+Printed on,طُبع في,طبع في,changed (auto),auto,commissions,
+Raw Early Leave Minutes,دقائق الخروج المبكر الخام,دقائق الانصراف المبكر الخام,changed (auto),auto,attendance_leave,
+Raw Early Min,دق. خروج مبكر خام,دق. انصراف مبكر خام,changed (auto),auto,attendance_leave,
+Redistribute Annual → Monthly (Even),إعادة توزيع السنوي → الشهري (متساوٍ),إعادة توزيع السنوي → الشهري (متساو),changed (auto),auto,commissions,
+Reduced Rate Multiplier,معامل النسبة المخفَّضة,معامل النسبة المخفضة,changed (auto),auto,commissions,
+Reduced Rate Up To %,النسبة المخفَّضة حتى ٪,النسبة المخفضة حتى ٪,changed (auto),auto,commissions,
+Refused At,رُفض في,رفض في,changed (auto),auto,deduction,
+Repayment progress,تقدّم السداد,تقدم السداد,changed (auto),auto,deduction,
+Sales Achieved,المبيعات المحقَّقة,المبيعات المحققة,changed (auto),auto,commissions,
+Salesperson Profile,ملف المندوب,ملف مندوب المبيعات,changed (auto),auto,commissions,
+Search Attendance Sheets,بحث في كشوف الحضور,بحث في كشوف الحضور والانصراف,changed (auto),auto,attendance_sheet,
+Signature Confirmed By,أكّد التوقيع,أكد التوقيع,changed (auto),auto,annual_leave,
+Skip (Already Locked),تخطي (مقفل مسبقاً),تخطي (مقفل مسبقا),changed (auto),auto,annual_leave,
+Skip Already-Locked Records,تخطي السجلات المقفلة مسبقاً,تخطي السجلات المقفلة مسبقا,changed (auto),auto,annual_leave,
+Skipped Employees,الموظفون المتخطَّون,الموظفون المتخطون,changed (auto),auto,payroll,
+Targets & Achieved,الأهداف والمحقَّق,الأهداف والمحقق,changed (auto),auto,commissions,
+The biometric device this employee is registered on,الجهاز البيومتري المسجَّل عليه الموظف,جهاز البصمة المسجل عليه الموظف,changed (auto),auto,attendance_leave,
+Tier Ladder,سلّم الشرائح,سلم الشرائح,changed (auto),auto,commissions,
+Total Allocated,إجمالي المُخصَّص,إجمالي المخصص,changed (auto),auto,leave_types,
+Total Pending,الإجمالي المعلّق,الإجمالي المعلق,changed (auto),auto,deduction,
+Unified Bank File Export Wizard,معالج تصدير الملف البنكي الموحَّد,معالج تصدير الملف البنكي الموحد,changed (auto),auto,payroll,
+Unpaid Leave — Approval Report,الإجازة غير المدفوعة — تقرير الاعتماد,الإجازة بدون أجر — تقرير الاعتماد,changed (auto),auto,unpaid_leave,
+Unpaid Vacations to be Deducted (Days),أيام الإجازات غير مدفوعة الأجر المستقطعة,أيام الإجازات بدون أجر المستقطعة,changed (auto),auto,eos_leave,
+Update Attendance Sheet,تحديث كشف الحضور,تحديث كشف الحضور والانصراف,changed (auto),auto,annual_leave,
+Uses Attendance Sheet,يستخدم كشف الحضور,يستخدم كشف الحضور والانصراف,changed (auto),auto,attendance_sheet,
+will be redistributed across,سيُوزَّع على,سيوزع على,changed (auto),auto,deduction,
+Workdays Currently Attended,أيام العمل المسجلة حضورًا,أيام العمل المسجلة حضورا,changed (auto),auto,annual_leave,
+X Is Acc Approver,مُعتمِد محاسبة,معتمد محاسبة,changed (auto),auto,annual_leave,
+X Is Hr Approver,مُعتمِد موارد بشرية,معتمد موارد بشرية,changed (auto),auto,annual_leave,
+Yes — Annual + Unpaid,نعم — سنوية + غير مدفوعة,نعم — سنوية + بدون أجر,changed (auto),auto,unpaid_leave,
+⏳ Pending,⏳ معلّق,⏳ معلق,changed (auto),auto,unpaid_leave,
+⏳ Pending Approval,⏳ في انتظار الاعتماد,⏳ بانتظار الاعتماد,changed (auto),auto,annual_leave,
+⚠ Skipped Employees,⚠ موظفون متخطَّون,⚠ موظفون متخطون,changed (auto),auto,payroll,
+⛔ Unpaid Leave,⛔ إجازة غير مدفوعة,⛔ إجازة بدون أجر,changed (auto),auto,unpaid_leave,
+⛔ Unpaid Leaves,⛔ الإجازات غير المدفوعة,⛔ الإجازات بدون أجر,changed (auto),auto,unpaid_leave,
+✍️ Pending Signature,✍️ في انتظار التوقيع,✍️ بانتظار التوقيع,changed (auto),auto,annual_leave,
+✓ Confirmed,✓ مؤكَّد,✓ مؤكد,changed (auto),auto,commissions,
+🏖️ Currently On Vacation,🏖️ في إجازة حالياً,🏖️ في إجازة حاليا,changed (auto),auto,annual_leave,
+# ═══ [unchanged] تبقى كما هي ═══
+# Employees,عدد الموظفين,عدد الموظفين,unchanged,auto,commissions,
+('Annual Vacation Report - %s' % (object.employee_id.name)),('تقرير الإجازة السنوية - %s' % (object.employee_id.name)),('تقرير الإجازة السنوية - %s' % (object.employee_id.name)),unchanged,auto,payroll,
+1 – New,1 – جديد,1 – جديد,unchanged,auto,commissions,
+2 – Renewal,2 – تجديد,2 – تجديد,unchanged,auto,commissions,
+3 – Delete,3 – حذف,3 – حذف,unchanged,auto,commissions,
+<em>Net Basic (Basic − Attendance Deduction)</em>,<em>الأساسي الصافي (الأساسي − خصم الحضور)</em>,<em>الأساسي الصافي (الأساسي − خصم الحضور)</em>,unchanged,auto,payroll,
+"<span class=""fw-bold text-success"">Approved</span>","<span class=""fw-bold text-success"">معتمد</span>","<span class=""fw-bold text-success"">معتمد</span>",unchanged,auto,payroll,
+"<span class=""mx-1"">/</span>","<span class=""mx-1"">/</span>","<span class=""mx-1"">/</span>",unchanged,auto,deduction,
+"<span class=""mx-1"">·</span>","<span class=""mx-1"">·</span>","<span class=""mx-1"">·</span>",unchanged,auto,commissions,
+"<span class=""mx-2"">on</span>","<span class=""mx-2"">في</span>","<span class=""mx-2"">في</span>",unchanged,auto,deduction,
+"<span class=""text-muted ms-1"" style=""font-size:0.8em"">(baseline)</span>","<span class=""text-muted ms-1"" style=""font-size:0.8em"">(خط الأساس)</span>","<span class=""text-muted ms-1"" style=""font-size:0.8em"">(خط الأساس)</span>",unchanged,auto,payroll,
+"<span class=""text-muted"">—</span>","<span class=""text-muted"">—</span>","<span class=""text-muted"">—</span>",unchanged,auto,commissions,
+"<span style=""color:#1565c0;"">⬛ Weekend</span>","<span style=""color:#1565c0;"">⬛ نهاية أسبوع</span>","<span style=""color:#1565c0;"">⬛ نهاية أسبوع</span>",unchanged,auto,attendance_report,
+"<span style=""color:#2e7d32;"">✓ Present</span>","<span style=""color:#2e7d32;"">✓ حاضر</span>","<span style=""color:#2e7d32;"">✓ حاضر</span>",unchanged,auto,attendance_report,
+"<span style=""color:#90a4ae;"">⬜ Weekend</span>","<span style=""color:#90a4ae;"">⬜ نهاية أسبوع</span>","<span style=""color:#90a4ae;"">⬜ نهاية أسبوع</span>",unchanged,auto,attendance_report,
+"<span style=""color:#bdbdbd;"">—</span>","<span style=""color:#bdbdbd;"">—</span>","<span style=""color:#bdbdbd;"">—</span>",unchanged,auto,attendance_report,
+"<span style=""color:#c62828;"">✗ Absent</span>","<span style=""color:#c62828;"">✗ غائب</span>","<span style=""color:#c62828;"">✗ غائب</span>",unchanged,auto,attendance_report,
+"<span style=""color:#e65100;"">🏖 Leave</span>","<span style=""color:#e65100;"">🏖 إجازة</span>","<span style=""color:#e65100;"">🏖 إجازة</span>",unchanged,auto,attendance_report,
+"<span style=""color:#f9a825;"">⚠ No Record</span>","<span style=""color:#f9a825;"">⚠ لا سجل</span>","<span style=""color:#f9a825;"">⚠ لا سجل</span>",unchanged,auto,attendance_report,
+<span>/ month</span>,<span>/ شهر</span>,<span>/ شهر</span>,unchanged,auto,payroll,
+<strong>Accountant</strong>,<strong>المحاسب</strong>,<strong>المحاسب</strong>,unchanged,auto,payroll,
+<strong>Accounting Manager</strong>,<strong>مدير المحاسبة</strong>,<strong>مدير المحاسبة</strong>,unchanged,auto,payroll,
+<strong>Annual Portion</strong>,<strong>الجزء السنوي</strong>,<strong>الجزء السنوي</strong>,unchanged,auto,unpaid_leave,
+<strong>Balance Consumed (Days)</strong>,<strong>الرصيد المستهلك (أيام)</strong>,<strong>الرصيد المستهلك (أيام)</strong>,unchanged,auto,payroll,
+<strong>Balance Consumed</strong>,<strong>الرصيد المستهلك</strong>,<strong>الرصيد المستهلك</strong>,unchanged,auto,unpaid_leave,
+<strong>Bank Account</strong>,<strong>الحساب البنكي</strong>,<strong>الحساب البنكي</strong>,unchanged,keep-current,payroll,ترجمة Odoo الأساسية معطوبة (وسوم HTML معكوسة)
+<strong>Bank Transfer Amount</strong>,<strong>مبلغ التحويل البنكي</strong>,<strong>مبلغ التحويل البنكي</strong>,unchanged,auto,commissions,
+<strong>Basic Wage</strong>,<strong>الراتب الأساسي</strong>,<strong>الراتب الأساسي</strong>,unchanged,auto,commissions,
+<strong>Calendar Days Away</strong>,<strong>أيام الغياب التقويمية</strong>,<strong>أيام الغياب التقويمية</strong>,unchanged,auto,payroll,
+<strong>Calendar Days</strong>,<strong>الأيام التقويمية</strong>,<strong>الأيام التقويمية</strong>,unchanged,auto,unpaid_leave,
+<strong>Company</strong>,<strong>الشركة</strong>,<strong>الشركة</strong>,unchanged,auto,payroll,
+<strong>Date From</strong>,<strong>من تاريخ</strong>,<strong>من تاريخ</strong>,unchanged,keep-current,unpaid_leave,قالب تقرير KSW؛ «من تاريخ» أوضح
+<strong>Date To</strong>,<strong>إلى تاريخ</strong>,<strong>إلى تاريخ</strong>,unchanged,keep-current,unpaid_leave,قالب تقرير KSW؛ «إلى تاريخ» أوضح
+<strong>Department</strong>,<strong>القسم</strong>,<strong>القسم</strong>,unchanged,auto,"commissions,payroll,unpaid_leave",
+<strong>Description</strong>,<strong>الوصف</strong>,<strong>الوصف</strong>,unchanged,auto,unpaid_leave,
+<strong>Designation</strong>,<strong>المسمى الوظيفي</strong>,<strong>المسمى الوظيفي</strong>,unchanged,keep-current,"payroll,unpaid_leave",الأساسي «التعيين» — المقصود المسمى الوظيفي
+<strong>Document Upload Confirmation</strong>,<strong>تأكيد رفع المستند</strong>,<strong>تأكيد رفع المستند</strong>,unchanged,auto,payroll,
+<strong>Driver's Commission</strong>,<strong>عمولة السائق</strong>,<strong>عمولة السائق</strong>,unchanged,auto,commissions,
+<strong>Employee</strong>,<strong>الموظف</strong>,<strong>الموظف</strong>,unchanged,auto,"commissions,payroll,unpaid_leave",
+<strong>End Date</strong>,<strong>تاريخ الانتهاء</strong>,<strong>تاريخ الانتهاء</strong>,unchanged,auto,payroll,
+<strong>EOS — Resignation (Art. 85)</strong>,<strong>نهاية الخدمة — استقالة (المادة 85)</strong>,<strong>نهاية الخدمة — استقالة (المادة 85)</strong>,unchanged,auto,payroll,
+<strong>EOS — Termination (Art. 84)</strong>,<strong>نهاية الخدمة — إنهاء عقد (المادة 84)</strong>,<strong>نهاية الخدمة — إنهاء عقد (المادة 84)</strong>,unchanged,auto,payroll,
+<strong>Financial Consideration for Excess Leave</strong>,<strong>المقابل المالي للإجازة الزائدة</strong>,<strong>المقابل المالي للإجازة الزائدة</strong>,unchanged,auto,unpaid_leave,
+<strong>Flight Ticket</strong>,<strong>تذكرة الطيران</strong>,<strong>تذكرة الطيران</strong>,unchanged,auto,unpaid_leave,
+<strong>Full Clearance</strong>,<strong>تصفية كامل الرصيد</strong>,<strong>تصفية كامل الرصيد</strong>,unchanged,auto,unpaid_leave,
+<strong>General Manager</strong>,<strong>المدير العام</strong>,<strong>المدير العام</strong>,unchanged,auto,"payroll,unpaid_leave",
+<strong>Gross Total</strong>,<strong>الإجمالي قبل الخصم</strong>,<strong>الإجمالي قبل الخصم</strong>,unchanged,auto,commissions,
+<strong>HR Manager</strong>,<strong>مدير الموارد البشرية</strong>,<strong>مدير الموارد البشرية</strong>,unchanged,auto,"payroll,unpaid_leave",
+<strong>Iqama Renewal</strong>,<strong>تجديد الإقامة</strong>,<strong>تجديد الإقامة</strong>,unchanged,auto,unpaid_leave,
+<strong>Job Position</strong>,<strong>المسمى الوظيفي</strong>,<strong>المسمى الوظيفي</strong>,unchanged,auto,commissions,
+<strong>Job Title</strong>,<strong>المسمى الوظيفي</strong>,<strong>المسمى الوظيفي</strong>,unchanged,auto,payroll,
+<strong>Joining Date</strong>,<strong>تاريخ الالتحاق</strong>,<strong>تاريخ الالتحاق</strong>,unchanged,auto,payroll,
+<strong>Last Return Date</strong>,<strong>تاريخ آخر عودة</strong>,<strong>تاريخ آخر عودة</strong>,unchanged,auto,payroll,
+<strong>Last Wage (SAR)</strong>,<strong>آخر راتب (ريال)</strong>,<strong>آخر راتب (ريال)</strong>,unchanged,auto,payroll,
+<strong>Leave Manager</strong>,<strong>مدير الإجازة</strong>,<strong>مدير الإجازة</strong>,unchanged,auto,payroll,
+<strong>Leave Nature</strong>,<strong>طبيعة الإجازة</strong>,<strong>طبيعة الإجازة</strong>,unchanged,auto,payroll,
+<strong>Leave Type</strong>,<strong>نوع الإجازة</strong>,<strong>نوع الإجازة</strong>,unchanged,auto,"payroll,unpaid_leave",
+<strong>Lines Subtotal</strong>,<strong>مجموع البنود</strong>,<strong>مجموع البنود</strong>,unchanged,auto,commissions,
+<strong>Loans Deduction</strong>,<strong>خصم القروض</strong>,<strong>خصم القروض</strong>,unchanged,auto,commissions,
+<strong>National / Iqama ID</strong>,<strong>الهوية الوطنية / الإقامة</strong>,<strong>الهوية الوطنية / الإقامة</strong>,unchanged,auto,payroll,
+<strong>National ID</strong>,<strong>الهوية الوطنية</strong>,<strong>الهوية الوطنية</strong>,unchanged,auto,commissions,
+<strong>Overall Status</strong>,<strong>الحالة الإجمالية</strong>,<strong>الحالة الإجمالية</strong>,unchanged,auto,payroll,
+<strong>Penalty Amount</strong>,<strong>مبلغ الغرامة</strong>,<strong>مبلغ الغرامة</strong>,unchanged,auto,unpaid_leave,
+<strong>Period</strong>,<strong>الفترة</strong>,<strong>الفترة</strong>,unchanged,auto,"commissions,payroll",
+<strong>Reference</strong>,<strong>المرجع</strong>,<strong>المرجع</strong>,unchanged,keep-current,payroll,الأساسي «رقم الإشارة» — غير مناسب
+<strong>Remaining Loans</strong>,<strong>القروض المتبقية</strong>,<strong>القروض المتبقية</strong>,unchanged,auto,unpaid_leave,
+<strong>Request under review</strong>,<strong>الطلب قيد المراجعة</strong>,<strong>الطلب قيد المراجعة</strong>,unchanged,auto,deduction,
+<strong>Return Date</strong>,<strong>تاريخ العودة</strong>,<strong>تاريخ العودة</strong>,unchanged,auto,payroll,
+<strong>Return Status</strong>,<strong>حالة العودة</strong>,<strong>حالة العودة</strong>,unchanged,auto,payroll,
+<strong>Service Years</strong>,<strong>سنوات الخدمة</strong>,<strong>سنوات الخدمة</strong>,unchanged,auto,payroll,
+<strong>Site Manager</strong>,<strong>مدير الموقع</strong>,<strong>مدير الموقع</strong>,unchanged,auto,commissions,
+<strong>Site</strong>,<strong>الموقع</strong>,<strong>الموقع</strong>,unchanged,auto,commissions,
+<strong>Start Date</strong>,<strong>تاريخ البدء</strong>,<strong>تاريخ البدء</strong>,unchanged,auto,payroll,
+<strong>Status</strong>,<strong>الحالة</strong>,<strong>الحالة</strong>,unchanged,auto,"commissions,payroll,unpaid_leave",
+<strong>Step 1 — Loan Details</strong>,<strong>الخطوة 1 — تفاصيل القرض</strong>,<strong>الخطوة 1 — تفاصيل القرض</strong>,unchanged,auto,deduction,
+<strong>Step 2 — Justification &amp; Documents</strong>,<strong>الخطوة 2 — المبرر والمستندات</strong>,<strong>الخطوة 2 — المبرر والمستندات</strong>,unchanged,auto,deduction,
+<strong>Submit a new loan request</strong>,<strong>تقديم طلب قرض جديد</strong>,<strong>تقديم طلب قرض جديد</strong>,unchanged,auto,deduction,
+<strong>Summary</strong>,<strong>الملخص</strong>,<strong>الملخص</strong>,unchanged,auto,deduction,
+<strong>Supervisor</strong>,<strong>المشرف</strong>,<strong>المشرف</strong>,unchanged,auto,commissions,
+<strong>Total Calendar Days</strong>,<strong>إجمالي الأيام التقويمية</strong>,<strong>إجمالي الأيام التقويمية</strong>,unchanged,auto,unpaid_leave,
+<strong>Visa Cost Recovery for Excess Leave</strong>,<strong>استرداد تكلفة التأشيرة للإجازة الزائدة</strong>,<strong>استرداد تكلفة التأشيرة للإجازة الزائدة</strong>,unchanged,auto,unpaid_leave,
+<strong>⚠ No Record</strong>,<strong>⚠ لا سجل</strong>,<strong>⚠ لا سجل</strong>,unchanged,auto,attendance_report,
+<strong>⛔ Loan Request Refused</strong>,<strong>⛔ تم رفض طلب القرض</strong>,<strong>⛔ تم رفض طلب القرض</strong>,unchanged,auto,deduction,
+<strong>✓ Present Days</strong>,<strong>✓ أيام الحضور</strong>,<strong>✓ أيام الحضور</strong>,unchanged,auto,attendance_report,
+<strong>✗ Absent Days</strong>,<strong>✗ أيام الغياب</strong>,<strong>✗ أيام الغياب</strong>,unchanged,auto,attendance_report,
+<strong>⬛ Weekend (Worked)</strong>,<strong>⬛ نهاية أسبوع (عمل)</strong>,<strong>⬛ نهاية أسبوع (عمل)</strong>,unchanged,auto,attendance_report,
+<strong>⬜ Weekend Days</strong>,<strong>⬜ أيام نهاية الأسبوع</strong>,<strong>⬜ أيام نهاية الأسبوع</strong>,unchanged,auto,attendance_report,
+<strong>🏖 Leave Days</strong>,<strong>🏖 أيام الإجازة</strong>,<strong>🏖 أيام الإجازة</strong>,unchanged,auto,attendance_report,
+___________________________,___________________________,___________________________,unchanged,auto,unpaid_leave,
+Absence-Only Deduction,خصم الغياب فقط,خصم الغياب فقط,unchanged,auto,payroll,
+Absent (Net),غائب (صافي),غائب (صافي),unchanged,auto,attendance_leave,
+Absent Days,أيام الغياب,أيام الغياب,unchanged,auto,attendance_leave,
+ACC Approved By,اعتمدته المحاسبة,اعتمدته المحاسبة,unchanged,auto,annual_leave,
+Acc Approved By,اعتمدته المحاسبة,اعتمدته المحاسبة,unchanged,auto,deduction,
+Acc Approved Date,تاريخ اعتماد المحاسبة,تاريخ اعتماد المحاسبة,unchanged,auto,deduction,
+ACC Approved On,تاريخ اعتماد المحاسبة,تاريخ اعتماد المحاسبة,unchanged,auto,annual_leave,
+Acc Original Amount,المبلغ الأصلي (المحاسبة),المبلغ الأصلي (المحاسبة),unchanged,auto,deduction,
+Acc Original Installments,الأقساط الأصلية (المحاسبة),الأقساط الأصلية (المحاسبة),unchanged,auto,deduction,
+Accept Excess as Unpaid,قبول الزيادة كإجازة بدون أجر,قبول الزيادة كإجازة بدون أجر,unchanged,auto,annual_leave,
+Accepted (min),مقبول (دقيقة),مقبول (دقيقة),unchanged,auto,attendance_leave,
+Account Code,رمز الحساب,رمز الحساب,unchanged,auto,ext_sync,
+Accountant,المحاسب,المحاسب,unchanged,auto,commissions,
+Accounting Approval,اعتماد المحاسبة,اعتماد المحاسبة,unchanged,auto,deduction,
+Accounting Inputs,مدخلات المحاسبة,مدخلات المحاسبة,unchanged,auto,unpaid_leave,
+Accrual,الاستحقاق,الاستحقاق,unchanged,auto,annual_leave,
+Activate Card - تنشيط البطاقة,تنشيط البطاقة,تنشيط البطاقة,unchanged,auto,payroll,
+Actual,الفعلي,الفعلي,unchanged,auto,commissions,
+Actual Days Away,أيام الغياب الفعلية,أيام الغياب الفعلية,unchanged,auto,annual_leave,
+Actual Trips,الرحلات الفعلية,الرحلات الفعلية,unchanged,auto,commissions,
+Actual Vacation Days,أيام الإجازة الفعلية,أيام الإجازة الفعلية,unchanged,auto,annual_leave,
+Additional Commissions,عمولات إضافية,عمولات إضافية,unchanged,auto,payroll,
+Additional Commissions Detail,تفاصيل العمولات الإضافية,تفاصيل العمولات الإضافية,unchanged,auto,annual_leave,
+Adjusted EOS — Resignation (Art. 85),مكافأة الاستقالة المعدلة (المادة 85),مكافأة الاستقالة المعدلة (المادة 85),unchanged,auto,eos_leave,
+Adjusted EOS — Termination (Art. 84),مكافأة الإنهاء المعدلة (المادة 84),مكافأة الإنهاء المعدلة (المادة 84),unchanged,auto,eos_leave,
+Adjusted Service Years,سنوات الخدمة المعدلة,سنوات الخدمة المعدلة,unchanged,auto,eos_leave,
+Admin,مسؤول النظام,مسؤول النظام,unchanged,auto,commissions,
+Affected Month(s),الشهر (الأشهر) المتأثرة,الشهر (الأشهر) المتأثرة,unchanged,auto,annual_leave,
+All banks – Excel files,جميع البنوك – ملفات إكسل,جميع البنوك – ملفات إكسل,unchanged,auto,"commissions,payroll",
+All banks – Text files,جميع البنوك – ملفات نصية,جميع البنوك – ملفات نصية,unchanged,auto,payroll,
+All banks – Text files (Kawthar),جميع البنوك – ملفات نصية (الكوثر),جميع البنوك – ملفات نصية (الكوثر),unchanged,auto,commissions,
+All Deductions,جميع الخصومات,جميع الخصومات,unchanged,auto,deduction,
+All Sheets,كل الكشوف,كل الكشوف,unchanged,auto,commissions,
+Allowance &amp; Commission Lines,بنود البدلات والعمولات,بنود البدلات والعمولات,unchanged,auto,commissions,
+Allowances,البدلات,البدلات,unchanged,auto,payroll,
+Allowances & Loans,البدلات والقروض,البدلات والقروض,unchanged,auto,annual_leave,
+Allowances &amp; Commissions,البدلات والعمولات,البدلات والعمولات,unchanged,auto,commissions,
+Allowed Country State,الولاية/المحافظة المسموح بها,الولاية/المحافظة المسموح بها,unchanged,auto,base_security,
+Amount (SAR),المبلغ (ريال),المبلغ (ريال),unchanged,auto,"payroll,unpaid_leave",
+Amount Formula,صيغة المبلغ,صيغة المبلغ,unchanged,auto,commissions,
+Annual Collection Target,هدف التحصيل السنوي,هدف التحصيل السنوي,unchanged,auto,commissions,
+Annual Entitlement,الاستحقاق السنوي,الاستحقاق السنوي,unchanged,auto,annual_leave,
+Annual Leave,الإجازة السنوية,الإجازة السنوية,unchanged,auto,"annual_leave,leave_types",
+Annual Leave Approval,اعتماد الإجازة السنوية,اعتماد الإجازة السنوية,unchanged,auto,annual_leave,
+Annual Leave Balance,رصيد الإجازة السنوية,رصيد الإجازة السنوية,unchanged,auto,annual_leave,
+Annual Leave Dashboard,لوحة الإجازات السنوية,لوحة الإجازات السنوية,unchanged,auto,"annual_leave,unpaid_leave",
+Annual Leave — Approval Report,الإجازة السنوية — تقرير الاعتماد,الإجازة السنوية — تقرير الاعتماد,unchanged,auto,unpaid_leave,
+Annual Portion (Days),الجزء السنوي (أيام),الجزء السنوي (أيام),unchanged,auto,annual_leave,
+Annual Sales Target,هدف المبيعات السنوي,هدف المبيعات السنوي,unchanged,auto,commissions,
+Annual Vacation Balance,رصيد الإجازة السنوية,رصيد الإجازة السنوية,unchanged,auto,deduction,
+Annual Vacation Report,تقرير الإجازة السنوية,تقرير الإجازة السنوية,unchanged,auto,payroll,
+Applies To,ينطبق على,ينطبق على,unchanged,auto,commissions,
+Apply Opening Balances,تطبيق الأرصدة الافتتاحية,تطبيق الأرصدة الافتتاحية,unchanged,auto,annual_leave,
+Apply Override,تطبيق التجاوز,تطبيق التجاوز,unchanged,auto,commissions,
+Apply Template,تطبيق القالب,تطبيق القالب,unchanged,auto,commissions,
+Approval Confirmations,تأكيدات الاعتماد,تأكيدات الاعتماد,unchanged,auto,deduction,
+Approval Progress,تقدم الاعتماد,تقدم الاعتماد,unchanged,auto,annual_leave,
+Approval State,حالة الاعتماد,حالة الاعتماد,unchanged,auto,deduction,
+Approval Steps,خطوات الاعتماد,خطوات الاعتماد,unchanged,auto,unpaid_leave,
+Article 84 — Termination by Employer,المادة 84 — إنهاء العقد من قبل صاحب العمل,المادة 84 — إنهاء العقد من قبل صاحب العمل,unchanged,auto,eos_leave,
+Article 85 — Resignation,المادة 85 — الاستقالة,المادة 85 — الاستقالة,unchanged,auto,eos_leave,
+Attendance Issue Hours,ساعات مشكلة الحضور,ساعات مشكلة الحضور,unchanged,auto,attendance_leave,
+Attendance Issues,مشكلات الحضور,مشكلات الحضور,unchanged,auto,attendance_leave,
+Attendance Lines,بنود الحضور,بنود الحضور,unchanged,auto,working_schedule,
+Attendance Records,سجلات الحضور,سجلات الحضور,unchanged,auto,attendance_leave,
+Attendance Tracking,تتبع الحضور,تتبع الحضور,unchanged,auto,attendance_leave,
+Attended,حضر,حضر,unchanged,auto,attendance_sheet,
+Attended Workdays in Period,أيام العمل المحضورة خلال الفترة,أيام العمل المحضورة خلال الفترة,unchanged,auto,annual_leave,
+Available Balance,الرصيد المتاح,الرصيد المتاح,unchanged,auto,annual_leave,
+Awaiting Accountant,بانتظار المحاسب,بانتظار المحاسب,unchanged,auto,commissions,
+Awaiting Commission,بانتظار العمولة,بانتظار العمولة,unchanged,auto,commissions,
+Awaiting Sheet,كشف بانتظار التسوية,كشف بانتظار التسوية,unchanged,auto,commissions,
+Balance at Request,الرصيد عند الطلب,الرصيد عند الطلب,unchanged,auto,annual_leave,
+Balance at Request (Days),الرصيد عند الطلب (أيام),الرصيد عند الطلب (أيام),unchanged,auto,annual_leave,
+Balance Consumed,الرصيد المستهلك,الرصيد المستهلك,unchanged,auto,annual_leave,
+Band,الشريحة,الشريحة,unchanged,auto,commissions,
+Bank Account Totals,إجماليات الحساب البنكي,إجماليات الحساب البنكي,unchanged,auto,payroll,
+Bank Loan,قرض بنكي,قرض بنكي,unchanged,auto,ext_sync,
+Bank Loans,قروض بنكية,قروض بنكية,unchanged,auto,ext_sync,
+Bank Transfer,التحويل البنكي,التحويل البنكي,unchanged,auto,commissions,
+Bank Transfer Amount,مبلغ التحويل البنكي,مبلغ التحويل البنكي,unchanged,auto,commissions,
+Bank<br/>Transfer,تحويل<br/>بنكي,تحويل<br/>بنكي,unchanged,auto,commissions,
+BAS Accounts,حسابات BAS,حسابات BAS,unchanged,auto,ext_sync,
+BAS Accounts (Loans & Advances),حسابات BAS (القروض والسلف),حسابات BAS (القروض والسلف),unchanged,auto,ext_sync,
+BAS GL Account (Loans & Advances),حساب BAS العام (القروض والسلف),حساب BAS العام (القروض والسلف),unchanged,auto,ext_sync,
+BAS Key,مفتاح BAS,مفتاح BAS,unchanged,auto,ext_sync,
+BAS Payment Voucher,سند دفع BAS,سند دفع BAS,unchanged,auto,ext_sync,
+BAS Payment Vouchers,سندات دفع BAS,سندات دفع BAS,unchanged,auto,ext_sync,
+BAS Sales Invoice,فاتورة مبيعات BAS,فاتورة مبيعات BAS,unchanged,auto,ext_sync,
+BAS Sales Invoices,فواتير مبيعات BAS,فواتير مبيعات BAS,unchanged,auto,ext_sync,
+BAS Sync,مزامنة BAS,مزامنة BAS,unchanged,auto,ext_sync,
+Base,الأساس,الأساس,unchanged,keep-current,commissions,سياق العمولات: «الأساس» لا «قاعدة»
+Baseline,خط الأساس,خط الأساس,unchanged,auto,annual_leave,
+Batch,الدفعة,الدفعة,unchanged,auto,commissions,
+Bonus,مكافأة,مكافأة,unchanged,auto,commissions,
+Both,كلاهما,كلاهما,unchanged,auto,commissions,
+Branch,الفرع,الفرع,unchanged,auto,ext_sync,
+Break,استراحة,استراحة,unchanged,keep-current,working_schedule,الأساسي «فاصل» — المصطلح الوظيفي «استراحة»
+Breakfast,الإفطار,الإفطار,unchanged,auto,commissions,
+Breakfast (qty),الإفطار (عدد),الإفطار (عدد),unchanged,auto,commissions,
+Breakfast (SAR),الإفطار (ريال),الإفطار (ريال),unchanged,auto,commissions,
+Breakfast Amount,مبلغ الإفطار,مبلغ الإفطار,unchanged,auto,commissions,
+Breakfast Price,سعر الإفطار,سعر الإفطار,unchanged,auto,commissions,
+Breakfast Qty,عدد الإفطار,عدد الإفطار,unchanged,auto,commissions,
+Bulk Opening Balance Setup,إعداد الأرصدة الافتتاحية دفعة واحدة,إعداد الأرصدة الافتتاحية دفعة واحدة,unchanged,auto,annual_leave,
+Bulk Opening Balance Wizard,معالج الأرصدة الافتتاحية الجماعي,معالج الأرصدة الافتتاحية الجماعي,unchanged,auto,annual_leave,
+By Type,حسب النوع,حسب النوع,unchanged,auto,deduction,
+Calendar Group,مجموعة التقويم,مجموعة التقويم,unchanged,auto,working_schedule,
+Calendar Groups,مجموعات التقويم,مجموعات التقويم,unchanged,auto,working_schedule,
+Check-in Only,تسجيل دخول فقط,تسجيل دخول فقط,unchanged,auto,attendance_leave,
+CIC Number (رقم العميل),رقم العميل (CIC),رقم العميل (CIC),unchanged,auto,payroll,
+Clear Skip Log,مسح سجل التخطي,مسح سجل التخطي,unchanged,auto,payroll,
+Client Account Number,رقم حساب العميل,رقم حساب العميل,unchanged,auto,commissions,
+Client Split,تقسيم العميل,تقسيم العميل,unchanged,auto,commissions,
+Client Splits,تقسيمات العملاء,تقسيمات العملاء,unchanged,auto,commissions,
+Client-specific,خاص بعميل,خاص بعميل,unchanged,auto,commissions,
+Clients,العملاء,العملاء,unchanged,auto,commissions,
+Close Batch,إقفال الدفعة,إقفال الدفعة,unchanged,auto,commissions,
+Close Card - أغلاق البطاقة,إغلاق البطاقة,إغلاق البطاقة,unchanged,auto,payroll,
+Coll. %,نسبة التحصيل ٪,نسبة التحصيل ٪,unchanged,auto,commissions,
+Coll. Rule,قاعدة التحصيل,قاعدة التحصيل,unchanged,auto,commissions,
+Collected On,تاريخ التحصيل,تاريخ التحصيل,unchanged,auto,deduction,
+Collection,التحصيل,التحصيل,unchanged,auto,commissions,
+Collection %,نسبة التحصيل ٪,نسبة التحصيل ٪,unchanged,auto,commissions,
+Collection Commission,عمولة التحصيل,عمولة التحصيل,unchanged,auto,commissions,
+Collection Commission Amount,مبلغ عمولة التحصيل,مبلغ عمولة التحصيل,unchanged,auto,commissions,
+Collection Commission Rule,قاعدة عمولة التحصيل,قاعدة عمولة التحصيل,unchanged,auto,commissions,
+Collection Excel File,ملف Excel للتحصيل,ملف Excel للتحصيل,unchanged,auto,commissions,
+Collection File,ملف التحصيل,ملف التحصيل,unchanged,auto,commissions,
+Collection File Name,اسم ملف التحصيل,اسم ملف التحصيل,unchanged,auto,commissions,
+Collection Manager Options,خيارات مدير التحصيل,خيارات مدير التحصيل,unchanged,auto,commissions,
+Collection Min %,الحد الأدنى لنسبة التحصيل ٪,الحد الأدنى لنسبة التحصيل ٪,unchanged,auto,commissions,
+Collection Rule,قاعدة التحصيل,قاعدة التحصيل,unchanged,auto,commissions,
+Collection Target,هدف التحصيل,هدف التحصيل,unchanged,auto,commissions,
+Combined,مشترك,مشترك,unchanged,auto,commissions,
+Combined (Sales & Collection),مشترك (مبيعات وتحصيل),مشترك (مبيعات وتحصيل),unchanged,auto,commissions,
+Combined Commission,العمولة المشتركة,العمولة المشتركة,unchanged,auto,commissions,
+Combined Commission Amount,مبلغ العمولة المشتركة,مبلغ العمولة المشتركة,unchanged,auto,commissions,
+Combined Commission Rule,قاعدة العمولة المشتركة,قاعدة العمولة المشتركة,unchanged,auto,commissions,
+Combined Rule,القاعدة المشتركة,القاعدة المشتركة,unchanged,auto,commissions,
+Commission & Allowance Sheet,كشف العمولات والبدلات,كشف العمولات والبدلات,unchanged,auto,commissions,
+Commission &amp; Allowance Sheet,كشف العمولات والبدلات,كشف العمولات والبدلات,unchanged,auto,commissions,
+Commission Approval,اعتماد العمولة,اعتماد العمولة,unchanged,auto,commissions,
+Commission Batch,دفعة العمولة,دفعة العمولة,unchanged,auto,commissions,
+Commission Batches,دفعات العمولات,دفعات العمولات,unchanged,auto,commissions,
+Commission Categories,فئات العمولات,فئات العمولات,unchanged,auto,commissions,
+Commission Configuration,إعدادات العمولات,إعدادات العمولات,unchanged,auto,commissions,
+Commission Import Name,اسم استيراد العمولة,اسم استيراد العمولة,unchanged,auto,commissions,
+Commission Lines,بنود العمولات,بنود العمولات,unchanged,auto,annual_leave,
+Commission Management,إدارة العمولات,إدارة العمولات,unchanged,auto,commissions,
+Commission Rule,قاعدة العمولة,قاعدة العمولة,unchanged,auto,commissions,
+Commission Rules,قواعد العمولات,قواعد العمولات,unchanged,auto,commissions,
+Commission Sheet,كشف العمولة,كشف العمولة,unchanged,auto,commissions,
+Commission Sheets,كشوف العمولات,كشوف العمولات,unchanged,auto,commissions,
+Commission Template,قالب العمولة,قالب العمولة,unchanged,auto,commissions,
+Commission Templates,قوالب العمولات,قوالب العمولات,unchanged,auto,commissions,
+Commission Type,نوع العمولة,نوع العمولة,unchanged,auto,commissions,
+Commission —,العمولة —,العمولة —,unchanged,auto,payroll,
+Commission — Month / Description,العمولة — الشهر / الوصف,العمولة — الشهر / الوصف,unchanged,auto,unpaid_leave,
+Commissions & Allowances Summary,ملخص العمولات والبدلات,ملخص العمولات والبدلات,unchanged,auto,commissions,
+Commissions &amp; Allowances Summary,ملخص العمولات والبدلات,ملخص العمولات والبدلات,unchanged,auto,commissions,
+Commissions and Other Allowances,العمولات والبدلات الأخرى,العمولات والبدلات الأخرى,unchanged,auto,commissions,
+Company Paid (on behalf of employee),دفعته الشركة (نيابة عن الموظف),دفعته الشركة (نيابة عن الموظف),unchanged,auto,deduction,
+Company Partner,شريك الشركة,شريك الشركة,unchanged,auto,"commissions,payroll",
+Company-Paid,مدفوع من الشركة,مدفوع من الشركة,unchanged,auto,deduction,
+Completed,مكتمل,مكتمل,unchanged,auto,deduction,
+Computed Amounts,المبالغ المحسوبة,المبالغ المحسوبة,unchanged,auto,commissions,
+Condition Formula,صيغة الشرط,صيغة الشرط,unchanged,auto,commissions,
+Condition Overridden,تم تجاوز الشرط,تم تجاوز الشرط,unchanged,auto,commissions,
+Condition Type,نوع الشرط,نوع الشرط,unchanged,auto,commissions,
+Confirm Payment,تأكيد الدفع,تأكيد الدفع,unchanged,auto,deduction,
+Confirm Refusal,تأكيد الرفض,تأكيد الرفض,unchanged,auto,deduction,
+Confirmed Date,تاريخ التأكيد,تاريخ التأكيد,unchanged,auto,commissions,
+Create New Card - أنشاء بطاقة جديدة,إنشاء بطاقة جديدة,إنشاء بطاقة جديدة,unchanged,auto,payroll,
+Create New PIN - تجديد الرقم السري,تجديد الرقم السري,تجديد الرقم السري,unchanged,auto,payroll,
+Current,الحالي,الحالي,unchanged,auto,base_security,
+Current Credit,دائن حالي,دائن حالي,unchanged,auto,ext_sync,
+Current Debit,مدين حالي,مدين حالي,unchanged,auto,ext_sync,
+Current State Label,تسمية الحالة الحالية,تسمية الحالة الحالية,unchanged,auto,annual_leave,
+Current user may delete,يحق للمستخدم الحالي الحذف,يحق للمستخدم الحالي الحذف,unchanged,auto,deduction,
+Current user may edit amount,يحق للمستخدم الحالي تعديل المبلغ,يحق للمستخدم الحالي تعديل المبلغ,unchanged,auto,deduction,
+Current user may edit installments,يحق للمستخدم الحالي تعديل الأقساط,يحق للمستخدم الحالي تعديل الأقساط,unchanged,auto,deduction,
+Custom Formula (advanced),صيغة مخصصة (متقدم),صيغة مخصصة (متقدم),unchanged,auto,commissions,
+DA,بدل الغلاء,بدل الغلاء,unchanged,auto,base_security,
+Daily Attendance,الحضور اليومي,الحضور اليومي,unchanged,auto,attendance_sheet,
+Daily Wage,الأجر اليومي,الأجر اليومي,unchanged,auto,payroll,
+Data Entry Allowance,بدل إدخال البيانات,بدل إدخال البيانات,unchanged,auto,commissions,
+Day of Week,يوم الأسبوع,يوم الأسبوع,unchanged,keep-current,working_schedule,الأساسي «اليوم من الأسبوع» — ركيكة
+days consumed from balance,أيام مستهلكة من الرصيد,أيام مستهلكة من الرصيد,unchanged,auto,payroll,
+Days Taken (All Time),الأيام المأخوذة (الإجمالي الكلي),الأيام المأخوذة (الإجمالي الكلي),unchanged,auto,annual_leave,
+"Days, Trips, Hours…",أيام، رحلات، ساعات…,أيام، رحلات، ساعات…,unchanged,auto,commissions,
+Dearness allowance,بدل الغلاء المعيشي,بدل الغلاء المعيشي,unchanged,auto,base_security,
+Debit Account (IBAN),حساب المدين (IBAN),حساب المدين (IBAN),unchanged,auto,payroll,
+Decision Support,دعم القرار,دعم القرار,unchanged,auto,deduction,
+Deductible Base,الوعاء الاستقطاعي,الوعاء الاستقطاعي,unchanged,auto,payroll,
+Deduction,الخصم,الخصم,unchanged,keep-current,"deduction,payroll",قرار المستخدم رقم 3: «خصم» وليس «الاستقطاعات»
+Deduction (SAR),الخصم (ريال),الخصم (ريال),unchanged,auto,payroll,
+Deduction Management,إدارة الخصومات,إدارة الخصومات,unchanged,auto,deduction,
+Deduction Types,أنواع الخصومات,أنواع الخصومات,unchanged,auto,deduction,
+Deductions,الخصومات,الخصومات,unchanged,auto,deduction,
+Deductions This Month,خصومات هذا الشهر,خصومات هذا الشهر,unchanged,auto,deduction,
+Default Installments,الأقساط الافتراضية,الأقساط الافتراضية,unchanged,auto,deduction,
+Default Lines,البنود الافتراضية,البنود الافتراضية,unchanged,auto,commissions,
+Default Paying Bank Account,حساب البنك الافتراضي للدفع,حساب البنك الافتراضي للدفع,unchanged,auto,commissions,
+Delete only,حذف فقط,حذف فقط,unchanged,auto,deduction,
+Depends on Attendance Issue,يعتمد على مشكلة الحضور,يعتمد على مشكلة الحضور,unchanged,auto,attendance_leave,
+Description / usage notes…,وصف / ملاحظات الاستخدام…,وصف / ملاحظات الاستخدام…,unchanged,auto,commissions,
+Dinner,العشاء,العشاء,unchanged,auto,commissions,
+Dinner (qty),العشاء (عدد),العشاء (عدد),unchanged,auto,commissions,
+Dinner (SAR),العشاء (ريال),العشاء (ريال),unchanged,auto,commissions,
+Dinner Amount,مبلغ العشاء,مبلغ العشاء,unchanged,auto,commissions,
+Dinner Price,سعر العشاء,سعر العشاء,unchanged,auto,commissions,
+Dinner Qty,عدد العشاء,عدد العشاء,unchanged,auto,commissions,
+Direct Manager,المدير المباشر,المدير المباشر,unchanged,auto,"annual_leave,unpaid_leave",
+Disbursement Confirmed Date,تاريخ تأكيد صرف القرض,تاريخ تأكيد صرف القرض,unchanged,auto,deduction,
+DM,المدير المباشر,المدير المباشر,unchanged,auto,"annual_leave,deduction",
+DM Approval,اعتماد المدير المباشر,اعتماد المدير المباشر,unchanged,auto,deduction,
+DM Approved By,اعتمده المدير المباشر,اعتمده المدير المباشر,unchanged,auto,annual_leave,
+Dm Approved By,اعتمده المدير المباشر,اعتمده المدير المباشر,unchanged,auto,deduction,
+Dm Approved Date,تاريخ اعتماد المدير المباشر,تاريخ اعتماد المدير المباشر,unchanged,auto,deduction,
+DM Approved On,تاريخ اعتماد المدير المباشر,تاريخ اعتماد المدير المباشر,unchanged,auto,annual_leave,
+Doc Type,نوع المستند,نوع المستند,unchanged,auto,ext_sync,
+Driver,السائق,السائق,unchanged,auto,commissions,
+Driver Commission,عمولة السائق,عمولة السائق,unchanged,auto,commissions,
+Driver Commission Amount,مبلغ عمولة السائق,مبلغ عمولة السائق,unchanged,auto,commissions,
+Driver Commission Sheet,كشف عمولة السائق,كشف عمولة السائق,unchanged,auto,commissions,
+Driver Commission Sheets,كشوف عمولات السائقين,كشوف عمولات السائقين,unchanged,auto,commissions,
+Driver Commission — Monthly Summary,عمولة السائق — الملخص الشهري,عمولة السائق — الملخص الشهري,unchanged,auto,commissions,
+Driver Commissions,عمولات السائقين,عمولات السائقين,unchanged,auto,commissions,
+Driver Total,إجمالي السائق,إجمالي السائق,unchanged,auto,commissions,
+Driver Trip Tally,إجمالي رحلات السائق,إجمالي رحلات السائق,unchanged,auto,commissions,
+Driver's Commission,عمولة السائق,عمولة السائق,unchanged,auto,commissions,
+Driver<br/>Commission,عمولة<br/>السائق,عمولة<br/>السائق,unchanged,auto,commissions,
+Drivers,السائقون,السائقون,unchanged,auto,commissions,
+Dual Threshold (sales% AND collection% both ≥ X%),حد مزدوج (نسبة المبيعات ونسبة التحصيل كلاهما ≥ X٪),حد مزدوج (نسبة المبيعات ونسبة التحصيل كلاهما ≥ X٪),unchanged,auto,commissions,
+Duration (min),المدة (دقيقة),المدة (دقيقة),unchanged,auto,attendance_leave,
+e.g. Sales — General,مثال: المبيعات — عام,مثال: المبيعات — عام,unchanged,auto,commissions,
+Edit and Delete,تعديل وحذف,تعديل وحذف,unchanged,auto,deduction,
+Edit only,تعديل فقط,تعديل فقط,unchanged,auto,deduction,
+Editable Period,فترة قابلة للتعديل,فترة قابلة للتعديل,unchanged,auto,attendance_sheet,
+Effective Start,بداية الاحتساب,بداية الاحتساب,unchanged,auto,annual_leave,
+Effective Start Date,تاريخ بدء السريان,تاريخ بدء السريان,unchanged,auto,annual_leave,
+Eid Al-Adha,عيد الأضحى,عيد الأضحى,unchanged,auto,commissions,
+Eid Al-Fitr,عيد الفطر,عيد الفطر,unchanged,auto,commissions,
+Employee + Client,الموظف + العميل,الموظف + العميل,unchanged,auto,commissions,
+Employee Advance,سلفة موظف,سلفة موظف,unchanged,auto,ext_sync,
+Employee Advances,سلف الموظفين,سلف الموظفين,unchanged,auto,ext_sync,
+Employee Bonus,مكافأة موظف,مكافأة موظف,unchanged,auto,commissions,
+Employee category,فئة الموظف,فئة الموظف,unchanged,auto,base_security,
+Employee Information,بيانات الموظف,بيانات الموظف,unchanged,auto,payroll,
+Employee's Total This Month,إجمالي الموظف هذا الشهر,إجمالي الموظف هذا الشهر,unchanged,auto,deduction,
+Employee-specific,خاص بموظف,خاص بموظف,unchanged,auto,commissions,
+End of Service Request,طلب مكافأة نهاية الخدمة,طلب مكافأة نهاية الخدمة,unchanged,auto,eos_leave,
+End-of-Service Data (Saudi Art. 84–88),بيانات نهاية الخدمة (المواد السعودية 84-88),بيانات نهاية الخدمة (المواد السعودية 84-88),unchanged,auto,payroll,
+EOS Amount,مكافأة نهاية الخدمة,مكافأة نهاية الخدمة,unchanged,auto,eos_leave,
+EOS Payout Amount,مبلغ مكافأة نهاية الخدمة,مبلغ مكافأة نهاية الخدمة,unchanged,auto,eos_leave,
+EOS Payout Summary,ملخص مكافأة نهاية الخدمة,ملخص مكافأة نهاية الخدمة,unchanged,auto,eos_leave,
+EOS Previous Payments,مدفوعات نهاية الخدمة السابقة,مدفوعات نهاية الخدمة السابقة,unchanged,auto,eos_leave,
+EOS — Resignation (Art. 85),نهاية الخدمة — استقالة (المادة 85),نهاية الخدمة — استقالة (المادة 85),unchanged,auto,deduction,
+EOS — Termination (Art. 84),نهاية الخدمة — إنهاء عقد (المادة 84),نهاية الخدمة — إنهاء عقد (المادة 84),unchanged,auto,deduction,
+Exceeds Annual Balance,يتجاوز الرصيد السنوي,يتجاوز الرصيد السنوي,unchanged,auto,annual_leave,
+Exclude VAT (÷ 1.15),استبعاد ضريبة القيمة المضافة (÷ 1.15),استبعاد ضريبة القيمة المضافة (÷ 1.15),unchanged,auto,commissions,
+Export Bank File,تصدير ملف بنكي,تصدير ملف بنكي,unchanged,auto,"commissions,payroll",
+Export Mode,نمط التصدير,نمط التصدير,unchanged,auto,"commissions,payroll",
+Extra Days,أيام إضافية,أيام إضافية,unchanged,auto,annual_leave,
+Finalise,إنهاء,إنهاء,unchanged,auto,commissions,
+Financial Consideration Description,وصف المقابل المالي,وصف المقابل المالي,unchanged,auto,unpaid_leave,
+Financial Items,البنود المالية,البنود المالية,unchanged,auto,payroll,
+Financials,المالية,المالية,unchanged,auto,deduction,
+Fingerprint Employees,موظفو البصمة,موظفو البصمة,unchanged,auto,attendance_sheet,
+Flight Ticket,تذكرة السفر,تذكرة السفر,unchanged,auto,annual_leave,
+Flight Ticket Allowance,بدل تذكرة الطيران,بدل تذكرة الطيران,unchanged,auto,payroll,
+Flight Ticket Amount,مبلغ تذكرة الطيران,مبلغ تذكرة الطيران,unchanged,auto,annual_leave,
+Flight Ticket Description,وصف تذكرة الطيران,وصف تذكرة الطيران,unchanged,auto,annual_leave,
+Force Majeure (Art. 87),القوة القاهرة (المادة 87),القوة القاهرة (المادة 87),unchanged,auto,deduction,
+Foundation Day,يوم التأسيس,يوم التأسيس,unchanged,auto,commissions,
+Friday Work Allowance,بدل العمل يوم الجمعة,بدل العمل يوم الجمعة,unchanged,auto,commissions,
+From %,من ٪,من ٪,unchanged,auto,commissions,
+From Account,من الحساب,من الحساب,unchanged,auto,ext_sync,
+Full Clearance,تصفية رصيد كاملة,تصفية رصيد كاملة,unchanged,auto,annual_leave,
+Full Refund - أستراد كامل المبلغ,استرداد كامل المبلغ,استرداد كامل المبلغ,unchanged,auto,payroll,
+General (default),عام (افتراضي),عام (افتراضي),unchanged,auto,commissions,
+General Manager (Final),المدير العام (نهائي),المدير العام (نهائي),unchanged,auto,unpaid_leave,
+General Manager (Initial),المدير العام (أولي),المدير العام (أولي),unchanged,auto,unpaid_leave,
+Generate / Refresh All,إنشاء / تحديث الكل,إنشاء / تحديث الكل,unchanged,auto,annual_leave,
+GM,المدير العام,المدير العام,unchanged,auto,deduction,
+GM (Final),المدير العام (نهائي),المدير العام (نهائي),unchanged,auto,annual_leave,
+GM (Initial),المدير العام (أولي),المدير العام (أولي),unchanged,auto,annual_leave,
+Gm Approved By,اعتمده المدير العام,اعتمده المدير العام,unchanged,auto,deduction,
+Gm Approved Date,تاريخ اعتماد المدير العام,تاريخ اعتماد المدير العام,unchanged,auto,deduction,
+GM Final Approval,الاعتماد النهائي من المدير العام,الاعتماد النهائي من المدير العام,unchanged,auto,deduction,
+GM Final Approved On,تاريخ الاعتماد النهائي للمدير العام,تاريخ الاعتماد النهائي للمدير العام,unchanged,auto,annual_leave,
+GM Initial Approved On,تاريخ الاعتماد الأولي للمدير العام,تاريخ الاعتماد الأولي للمدير العام,unchanged,auto,annual_leave,
+Gm Original Amount,المبلغ الأصلي (المدير العام),المبلغ الأصلي (المدير العام),unchanged,auto,deduction,
+Gm Original Installments,الأقساط الأصلية (المدير العام),الأقساط الأصلية (المدير العام),unchanged,auto,deduction,
+Government Penalty,غرامة حكومية,غرامة حكومية,unchanged,auto,deduction,
+Grant commission exception (Sales Manager),منح استثناء العمولة (مدير المبيعات),منح استثناء العمولة (مدير المبيعات),unchanged,auto,commissions,
+Gross Salary,الراتب الإجمالي,الراتب الإجمالي,unchanged,auto,deduction,
+Gross Total,الإجمالي قبل الخصم,الإجمالي قبل الخصم,unchanged,auto,commissions,
+Gross<br/>Total,الإجمالي<br/>قبل الخصم,الإجمالي<br/>قبل الخصم,unchanged,auto,commissions,
+Has Opening Reset Date,له تاريخ إعادة ضبط افتتاحي,له تاريخ إعادة ضبط افتتاحي,unchanged,auto,annual_leave,
+Holiday,العطلة,العطلة,unchanged,auto,commissions,
+Holiday Bonus,بدل العطلة,بدل العطلة,unchanged,auto,commissions,
+Hourly Rate,المعدل الساعي,المعدل الساعي,unchanged,auto,payroll,
+HR,الموارد البشرية,الموارد البشرية,unchanged,auto,"annual_leave,deduction",
+HR Approval,اعتماد الموارد البشرية,اعتماد الموارد البشرية,unchanged,keep-current,deduction,سجل «اعتماد» (الأساسي: موافقة)
+HR Approved By,اعتمدته الموارد البشرية,اعتمدته الموارد البشرية,unchanged,auto,annual_leave,
+Hr Approved By,اعتمدته الموارد البشرية,اعتمدته الموارد البشرية,unchanged,auto,deduction,
+Hr Approved Date,تاريخ اعتماد الموارد البشرية,تاريخ اعتماد الموارد البشرية,unchanged,auto,deduction,
+HR Approved On,تاريخ اعتماد الموارد البشرية,تاريخ اعتماد الموارد البشرية,unchanged,auto,annual_leave,
+HR Confirmed On,تاريخ تأكيد الموارد البشرية,تاريخ تأكيد الموارد البشرية,unchanged,auto,annual_leave,
+HR Department,قسم الموارد البشرية,قسم الموارد البشرية,unchanged,auto,deduction,
+HR Inputs,مدخلات الموارد البشرية,مدخلات الموارد البشرية,unchanged,auto,"eos_leave,unpaid_leave",
+HR Leave Manager,مدير إجازات الموارد البشرية,مدير إجازات الموارد البشرية,unchanged,auto,leave_approval,
+HR Officer (Non-Loan),مسؤول موارد بشرية (غير قروض),مسؤول موارد بشرية (غير قروض),unchanged,auto,deduction,
+HRA,بدل السكن,بدل السكن,unchanged,auto,base_security,
+Identification,الهوية,الهوية,unchanged,auto,commissions,
+Import from Excel,استيراد من Excel,استيراد من Excel,unchanged,auto,commissions,
+Import Sales & Collection from Excel,استيراد المبيعات والتحصيل من Excel,استيراد المبيعات والتحصيل من Excel,unchanged,auto,commissions,
+Installment Amount,قيمة القسط,قيمة القسط,unchanged,auto,deduction,
+Installment Lines,الأقساط,الأقساط,unchanged,auto,deduction,
+Installment Schedule,جدول الأقساط,جدول الأقساط,unchanged,auto,deduction,
+Installments,الأقساط,الأقساط,unchanged,auto,deduction,
+Internal notes…,ملاحظات داخلية…,ملاحظات داخلية…,unchanged,auto,commissions,
+Iqama Renewal Amount,مبلغ تجديد الإقامة,مبلغ تجديد الإقامة,unchanged,auto,annual_leave,
+Iqama Renewal Description,وصف تجديد الإقامة,وصف تجديد الإقامة,unchanged,auto,annual_leave,
+Is Absent,غائب,غائب,unchanged,auto,attendance_leave,
+Is Annual Leave,إجازة سنوية,إجازة سنوية,unchanged,auto,annual_leave,
+Is Annual Leave Type,نوع إجازة سنوية,نوع إجازة سنوية,unchanged,auto,annual_leave,
+Is EOS Leave,طلب نهاية خدمة,طلب نهاية خدمة,unchanged,auto,eos_leave,
+Is Full Payment,دفع كامل,دفع كامل,unchanged,auto,deduction,
+Is Hajj Leave,إجازة الحج,إجازة الحج,unchanged,auto,leave_types,
+Is Maternity Leave,إجازة أمومة,إجازة أمومة,unchanged,auto,leave_types,
+Is Paternity Leave,إجازة أبوة,إجازة أبوة,unchanged,auto,leave_types,
+Is Sick Leave,إجازة مرضية,إجازة مرضية,unchanged,auto,leave_types,
+Is System,نظامي,نظامي,unchanged,keep-current,commissions,الأساسي «نظام» — المقصود «نظامي»
+Is temporary Schedule,جدول مؤقت,جدول مؤقت,unchanged,auto,working_schedule,
+Issue Type,نوع المشكلة,نوع المشكلة,unchanged,auto,attendance_leave,
+Item,البند,البند,unchanged,auto,payroll,
+Joining Date,تاريخ الالتحاق,تاريخ الالتحاق,unchanged,auto,annual_leave,
+Kawthar (Itqan Payroll Card),بطاقة كوثر (إتقان للرواتب),بطاقة كوثر (إتقان للرواتب),unchanged,auto,payroll,
+Kawthar Operation,عملية الكوثر,عملية الكوثر,unchanged,auto,"commissions,payroll",
+Kind,النوع,النوع,unchanged,auto,commissions,
+KSW Attendance Sheet,كشف حضور KSW,كشف حضور KSW,unchanged,auto,attendance_sheet,
+KSW Commission & Allowance Sheet,كشف عمولات وبدلات KSW,كشف عمولات وبدلات KSW,unchanged,auto,commissions,
+KSW Commission / Allowance Category,فئة عمولات / بدلات KSW,فئة عمولات / بدلات KSW,unchanged,auto,commissions,
+KSW Commission Bank File Export Wizard,معالج تصدير ملف بنكي لعمولات KSW,معالج تصدير ملف بنكي لعمولات KSW,unchanged,auto,commissions,
+KSW Commission Batch,دفعة عمولات KSW,دفعة عمولات KSW,unchanged,auto,commissions,
+KSW Commission Sheet Line,بند كشف عمولة KSW,بند كشف عمولة KSW,unchanged,auto,commissions,
+KSW Commission Sheet Template,قالب كشف عمولة KSW,قالب كشف عمولة KSW,unchanged,auto,commissions,
+KSW Commission Template Line,بند قالب عمولة KSW,بند قالب عمولة KSW,unchanged,auto,commissions,
+KSW Commissions,عمولات KSW,عمولات KSW,unchanged,auto,commissions,
+KSW Commissions Settings,إعدادات عمولات KSW,إعدادات عمولات KSW,unchanged,auto,commissions,
+KSW Commissions: monthly sheet creation,عمولات KSW: الإنشاء الشهري للكشوف,عمولات KSW: الإنشاء الشهري للكشوف,unchanged,auto,commissions,
+KSW Deduction,خصومات KSW,خصومات KSW,unchanged,auto,"commissions,deduction",
+KSW Deduction Installment Line,بند قسط خصم KSW,بند قسط خصم KSW,unchanged,auto,"commissions,deduction",
+KSW Deduction Type,نوع خصم KSW,نوع خصم KSW,unchanged,auto,deduction,
+KSW Deductions,خصومات KSW,خصومات KSW,unchanged,auto,deduction,
+KSW Driver Commission Line,بند عمولة سائق KSW,بند عمولة سائق KSW,unchanged,auto,commissions,
+KSW Driver Commission Sheet,كشف عمولة سائق KSW,كشف عمولة سائق KSW,unchanged,auto,commissions,
+KSW Leaves,إجازات KSW,إجازات KSW,unchanged,auto,annual_leave,
+KSW Loan Refusal Wizard,معالج رفض قرض KSW,معالج رفض قرض KSW,unchanged,auto,deduction,
+KSW Loan Request (Self-Service),طلب قرض KSW (خدمة ذاتية),طلب قرض KSW (خدمة ذاتية),unchanged,auto,deduction,
+KSW Sales / Collection Commission Line,بند عمولة مبيعات / تحصيل KSW,بند عمولة مبيعات / تحصيل KSW,unchanged,auto,commissions,
+KSW Sales / Collection Commission Rule,قاعدة عمولة مبيعات / تحصيل KSW,قاعدة عمولة مبيعات / تحصيل KSW,unchanged,auto,commissions,
+KSW Sales / Collection Commission Sheet,كشف عمولة مبيعات / تحصيل KSW,كشف عمولة مبيعات / تحصيل KSW,unchanged,auto,commissions,
+KSW Sales / Collection Commission Tier,شريحة عمولة مبيعات / تحصيل KSW,شريحة عمولة مبيعات / تحصيل KSW,unchanged,auto,commissions,
+KSW Sales/Collection Commission Import Wizard,معالج استيراد عمولة مبيعات / تحصيل KSW,معالج استيراد عمولة مبيعات / تحصيل KSW,unchanged,auto,commissions,
+KSW Technician Location Allowance Line,بند بدل موقع الفني KSW,بند بدل موقع الفني KSW,unchanged,auto,commissions,
+KSW Technician Location Allowance Sheet,كشف بدل موقع الفني KSW,كشف بدل موقع الفني KSW,unchanged,auto,commissions,
+KSW Work Site,موقع عمل KSW,موقع عمل KSW,unchanged,auto,commissions,
+Label,التسمية,التسمية,unchanged,keep-current,commissions,الأساسي «بطاقة عنوان» — «التسمية» صحيحة
+Last Synced,آخر مزامنة,آخر مزامنة,unchanged,auto,ext_sync,
+Last Wage,آخر راتب,آخر راتب,unchanged,auto,deduction,
+Late (min),تأخير (دقيقة),تأخير (دقيقة),unchanged,auto,"attendance_report,payroll",
+Late Minutes,دقائق التأخير,دقائق التأخير,unchanged,auto,attendance_leave,
+Late Minutes (Net),دقائق التأخير (صافي),دقائق التأخير (صافي),unchanged,auto,attendance_leave,
+Leave Approval Report,تقرير اعتماد الإجازة,تقرير اعتماد الإجازة,unchanged,auto,unpaid_leave,
+Leave Attendance Issue Hours,ساعات مشكلة حضور الإجازة,ساعات مشكلة حضور الإجازة,unchanged,auto,attendance_leave,
+Leave Balance,رصيد الإجازة,رصيد الإجازة,unchanged,auto,annual_leave,
+Leave Balances,أرصدة الإجازة,أرصدة الإجازة,unchanged,auto,leave_types,
+Leave Commission Line,بند عمولة الإجازة,بند عمولة الإجازة,unchanged,auto,annual_leave,
+Leave Details,تفاصيل الإجازة,تفاصيل الإجازة,unchanged,auto,"annual_leave,unpaid_leave",
+Leave From,الإجازة من,الإجازة من,unchanged,auto,annual_leave,
+Leave Lock,قفل الإجازة,قفل الإجازة,unchanged,auto,unpaid_leave,
+Leave Management,إدارة الإجازات,إدارة الإجازات,unchanged,auto,annual_leave,
+Leave Period,فترة الإجازة,فترة الإجازة,unchanged,auto,annual_leave,
+Leave Request,طلب إجازة,طلب إجازة,unchanged,auto,attendance_leave,
+Leave Request Details,تفاصيل طلب الإجازة,تفاصيل طلب الإجازة,unchanged,auto,payroll,
+Leave Summary,ملخص الإجازة,ملخص الإجازة,unchanged,auto,annual_leave,
+Leave To,الإجازة إلى,الإجازة إلى,unchanged,auto,annual_leave,
+Leave Type,نوع الإجازة,نوع الإجازة,unchanged,auto,leave_types,
+Leave — Approval Report,الإجازة — تقرير الاعتماد,الإجازة — تقرير الاعتماد,unchanged,auto,unpaid_leave,
+Leaves Taken,الإجازات المأخوذة,الإجازات المأخوذة,unchanged,auto,annual_leave,
+Lines Subtotal,مجموع البنود,مجموع البنود,unchanged,auto,commissions,
+Lines Total,إجمالي البنود,إجمالي البنود,unchanged,auto,commissions,
+Lines<br/>Subtotal,مجموع<br/>البنود,مجموع<br/>البنود,unchanged,auto,commissions,
+Linked Allocation,التخصيص المرتبط,التخصيص المرتبط,unchanged,auto,annual_leave,
+Linked Leave,الإجازة المرتبطة,الإجازة المرتبطة,unchanged,auto,unpaid_leave,
+Live Shortfall (auto),العجز الحالي (تلقائي),العجز الحالي (تلقائي),unchanged,auto,commissions,
+Load All Unlocked Employees,تحميل جميع الموظفين غير المقفلين,تحميل جميع الموظفين غير المقفلين,unchanged,auto,annual_leave,
+Load Funds - تحميل رصيد,تحميل رصيد,تحميل رصيد,unchanged,auto,payroll,
+Loan,القرض,القرض,unchanged,auto,deduction,
+Loan (5-step Approval),قرض (اعتماد بخمس خطوات),قرض (اعتماد بخمس خطوات),unchanged,auto,deduction,
+Loan Acc No. in BAS,رقم حساب القرض في BAS,رقم حساب القرض في BAS,unchanged,auto,deduction,
+Loan Acc No. in Bas,رقم حساب القرض في BAS,رقم حساب القرض في BAS,unchanged,auto,deduction,
+Loan Approval,اعتماد القرض,اعتماد القرض,unchanged,auto,deduction,
+Loan Approval History,سجل اعتمادات القرض,سجل اعتمادات القرض,unchanged,auto,deduction,
+Loan Modification,تعديل طلب القرض (قبل التأكيد),تعديل طلب القرض (قبل التأكيد),unchanged,auto,deduction,
+Loan Request,طلب قرض,طلب قرض,unchanged,auto,deduction,
+Loan Type,نوع القرض,نوع القرض,unchanged,auto,deduction,
+Loans,القروض,القروض,unchanged,auto,"commissions,deduction",
+Loans & Advances,القروض والسلف,القروض والسلف,unchanged,auto,ext_sync,
+Loans Amount,مبلغ القروض,مبلغ القروض,unchanged,auto,commissions,
+Loans Deduction,خصم القروض,خصم القروض,unchanged,auto,commissions,
+Loans<br/>Deduction,خصم<br/>القروض,خصم<br/>القروض,unchanged,auto,commissions,
+Location Allowance,بدل الموقع,بدل الموقع,unchanged,auto,commissions,
+Location Allowance Amount,مبلغ بدل الموقع,مبلغ بدل الموقع,unchanged,auto,commissions,
+Location Allowance Sheets,كشوف بدل الموقع,كشوف بدل الموقع,unchanged,auto,commissions,
+Lock After Apply,قفل بعد التطبيق,قفل بعد التطبيق,unchanged,auto,annual_leave,
+Locked,مقفل,مقفل,unchanged,auto,attendance_sheet,
+Lunch (qty),الغداء (عدد),الغداء (عدد),unchanged,auto,commissions,
+Lunch (SAR),الغداء (ريال),الغداء (ريال),unchanged,auto,commissions,
+Lunch Amount,مبلغ الغداء,مبلغ الغداء,unchanged,auto,commissions,
+Lunch Price,سعر الغداء,سعر الغداء,unchanged,auto,commissions,
+Lunch Qty,عدد الغداء,عدد الغداء,unchanged,auto,commissions,
+Manager Confirmed On,تاريخ تأكيد المدير,تاريخ تأكيد المدير,unchanged,auto,annual_leave,
+Manual Entry,إدخال يدوي,إدخال يدوي,unchanged,auto,deduction,
+Manual Payments,المدفوعات اليدوية,المدفوعات اليدوية,unchanged,auto,deduction,
+Mark All Absent,تسجيل غياب الجميع,تسجيل غياب الجميع,unchanged,auto,annual_leave,
+Max Quantity,أقصى كمية,أقصى كمية,unchanged,auto,commissions,
+Meal Allowance,بدل الوجبة,بدل الوجبة,unchanged,auto,base_security,
+Meal allowance,بدل الوجبة,بدل الوجبة,unchanged,auto,base_security,
+Meal Occurrences,عدد الوجبات,عدد الوجبات,unchanged,auto,commissions,
+Medical Allowance,البدل الطبي,البدل الطبي,unchanged,auto,base_security,
+Medical allowance,البدل الطبي,البدل الطبي,unchanged,auto,base_security,
+Min Quantity,أدنى كمية,أدنى كمية,unchanged,auto,commissions,
+Missing Joining Date,تاريخ الالتحاق مفقود,تاريخ الالتحاق مفقود,unchanged,auto,annual_leave,
+Mobile Allowance,بدل الجوال,بدل الجوال,unchanged,auto,payroll,
+Mobile allowance,بدل الجوال,بدل الجوال,unchanged,auto,payroll,
+Mobile Phone Allowance,بدل الجوال,بدل الجوال,unchanged,auto,commissions,
+Month / Description,الشهر / الوصف,الشهر / الوصف,unchanged,auto,annual_leave,
+Month number (1-12),رقم الشهر (1-12),رقم الشهر (1-12),unchanged,auto,deduction,
+Month(s) Affected,الشهر (الأشهر) المتأثرة,الشهر (الأشهر) المتأثرة,unchanged,auto,annual_leave,
+Monthly Cumulative Summary,الملخص التراكمي الشهري,الملخص التراكمي الشهري,unchanged,auto,commissions,
+Monthly Deduction Total,إجمالي الخصم الشهري,إجمالي الخصم الشهري,unchanged,auto,deduction,
+Monthly Impact (other),الأثر الشهري (أخرى),الأثر الشهري (أخرى),unchanged,auto,deduction,
+Monthly Report,التقرير الشهري,التقرير الشهري,unchanged,auto,attendance_report,
+Monthly Sheets,الكشوف الشهرية,الكشوف الشهرية,unchanged,auto,commissions,
+Monthly Targets,الأهداف الشهرية,الأهداف الشهرية,unchanged,auto,commissions,
+Multiplied,مضاعف,مضاعف,unchanged,auto,commissions,
+Multiplied Trips,الرحلات المضاعفة,الرحلات المضاعفة,unchanged,auto,commissions,
+My Employee's Sheets,كشوف موظفي,كشوف موظفي,unchanged,auto,commissions,
+My Loans,قروضي,قروضي,unchanged,auto,deduction,
+My Subordinates' Sheets,كشوف مرؤوسي,كشوف مرؤوسي,unchanged,auto,commissions,
+N/A,غير منطبق,غير منطبق,unchanged,auto,annual_leave,
+Name (Arabic),الاسم (عربي),الاسم (عربي),unchanged,auto,ext_sync,
+Name (English),الاسم (إنجليزي),الاسم (إنجليزي),unchanged,auto,ext_sync,
+National Day,اليوم الوطني,اليوم الوطني,unchanged,auto,commissions,
+NET Totals by Bank Account,صافي الإجماليات حسب الحساب البنكي,صافي الإجماليات حسب الحساب البنكي,unchanged,auto,payroll,
+New Amount / Installment,المبلغ الجديد / القسط,المبلغ الجديد / القسط,unchanged,auto,deduction,
+Non-loans,غير القروض,غير القروض,unchanged,auto,deduction,
+Non-Zero Balance,رصيد غير صفري,رصيد غير صفري,unchanged,auto,ext_sync,
+Notes / Description,ملاحظات / وصف,ملاحظات / وصف,unchanged,auto,payroll,
+Notes…,ملاحظات…,ملاحظات…,unchanged,auto,commissions,
+Officer,مسؤول,مسؤول,unchanged,keep-current,"annual_leave,commissions,deduction",الأساسي «مستخدم» — خطأ؛ المقصود مسؤول
+On Vacation,في إجازة,في إجازة,unchanged,auto,"annual_leave,payroll",
+Only Self,ذاتي فقط,ذاتي فقط,unchanged,auto,payroll,
+Opening,الرصيد الافتتاحي,الرصيد الافتتاحي,unchanged,auto,ext_sync,
+Opening Balance (Go-Live Setup),الرصيد الافتتاحي (إعداد الانطلاق),الرصيد الافتتاحي (إعداد الانطلاق),unchanged,auto,annual_leave,
+Opening Balance Wizard Line,بند معالج الرصيد الافتتاحي,بند معالج الرصيد الافتتاحي,unchanged,auto,annual_leave,
+Opening Data Locked,البيانات الافتتاحية مقفلة,البيانات الافتتاحية مقفلة,unchanged,auto,annual_leave,
+Opening Extra Days,أيام إضافية افتتاحية,أيام إضافية افتتاحية,unchanged,auto,annual_leave,
+Opening Locked,الرصيد الافتتاحي مقفل,الرصيد الافتتاحي مقفل,unchanged,auto,annual_leave,
+Opening Reset Date,تاريخ إعادة تعيين الرصيد الافتتاحي,تاريخ إعادة تعيين الرصيد الافتتاحي,unchanged,auto,annual_leave,
+Operations,العمليات,العمليات,unchanged,auto,deduction,
+Optional notes about this template…,ملاحظات اختيارية عن هذا القالب…,ملاحظات اختيارية عن هذا القالب…,unchanged,auto,commissions,
+Other Allowance,بدل آخر,بدل آخر,unchanged,auto,"base_security,payroll",
+Other allowances,بدلات أخرى,بدلات أخرى,unchanged,auto,base_security,
+Other Allowances,البدلات الأخرى,البدلات الأخرى,unchanged,auto,payroll,
+Outstanding Balance,الرصيد المتبقي,الرصيد المتبقي,unchanged,auto,deduction,
+Outstanding Before Payment,المتبقي قبل الدفع,المتبقي قبل الدفع,unchanged,auto,deduction,
+over,على مدى,على مدى,unchanged,auto,deduction,
+Overridden By,تم التجاوز بواسطة,تم التجاوز بواسطة,unchanged,auto,commissions,
+Override,تجاوز,تجاوز,unchanged,auto,commissions,
+Override Commission Condition,تجاوز شرط العمولة,تجاوز شرط العمولة,unchanged,auto,commissions,
+Override Condition,تجاوز الشرط,تجاوز الشرط,unchanged,auto,commissions,
+Override Date,تاريخ التجاوز,تاريخ التجاوز,unchanged,auto,commissions,
+Override Reason,سبب التجاوز,سبب التجاوز,unchanged,auto,commissions,
+Paid via Commission Sheet,مدفوع عبر كشف العمولة,مدفوع عبر كشف العمولة,unchanged,auto,commissions,
+Paid via Sheet,مدفوع عبر الكشف,مدفوع عبر الكشف,unchanged,auto,commissions,
+Partial Refund - أستراد جزء من المبلغ,استرداد جزء من المبلغ,استرداد جزء من المبلغ,unchanged,auto,payroll,
+Passport Expiration Date,تاريخ انتهاء الجواز,تاريخ انتهاء الجواز,unchanged,auto,base_security,
+Payment Amount,مبلغ الدفع,مبلغ الدفع,unchanged,auto,deduction,
+Payment Details,تفاصيل الدفع,تفاصيل الدفع,unchanged,auto,deduction,
+Payment Mode,طريقة الدفع,طريقة الدفع,unchanged,auto,ext_sync,
+Payment Vouchers,سندات الدفع,سندات الدفع,unchanged,auto,ext_sync,
+Payroll File Configuration,إعداد ملف الرواتب,إعداد ملف الرواتب,unchanged,auto,payroll,
+Payroll File Type,نوع ملف الرواتب,نوع ملف الرواتب,unchanged,auto,payroll,
+Payroll Impact,الأثر على الراتب,الأثر على الراتب,unchanged,auto,deduction,
+Payroll Priority,أولوية الراتب,أولوية الراتب,unchanged,auto,deduction,
+Penalty,خصم جزائي,خصم جزائي,unchanged,auto,annual_leave,
+Penalty Amount,مبلغ الغرامة,مبلغ الغرامة,unchanged,auto,annual_leave,
+Penalty Deduction,خصم الغرامة,خصم الغرامة,unchanged,auto,payroll,
+Penalty Description,وصف الغرامة,وصف الغرامة,unchanged,auto,annual_leave,
+Pending Disbursement,بانتظار الصرف,بانتظار الصرف,unchanged,auto,deduction,
+Pending DM,بانتظار المدير المباشر,بانتظار المدير المباشر,unchanged,auto,deduction,
+Pending GM,بانتظار المدير العام,بانتظار المدير العام,unchanged,auto,deduction,
+Pending HR,بانتظار الموارد البشرية,بانتظار الموارد البشرية,unchanged,auto,deduction,
+Per-Driver Roll-up,إجمالي لكل سائق,إجمالي لكل سائق,unchanged,auto,commissions,
+Period Date,تاريخ الفترة,تاريخ الفترة,unchanged,auto,deduction,
+Permit No,رقم التصريح,رقم التصريح,unchanged,auto,base_security,
+Personal Loan,قرض شخصي,قرض شخصي,unchanged,auto,deduction,
+Previous Payments,المدفوعات السابقة,المدفوعات السابقة,unchanged,auto,eos_leave,
+Profile,الملف,الملف,unchanged,auto,commissions,
+Progress %,نسبة الإنجاز ٪,نسبة الإنجاز ٪,unchanged,auto,deduction,
+Progress Percent,نسبة الإنجاز,نسبة الإنجاز,unchanged,auto,deduction,
+Project Management Allowance,بدل إدارة المشاريع,بدل إدارة المشاريع,unchanged,auto,commissions,
+Qty,الكمية,الكمية,unchanged,auto,commissions,
+Quantity Label,تسمية الكمية,تسمية الكمية,unchanged,auto,commissions,
+Quantity-Based Amount,مبلغ قائم على الكمية,مبلغ قائم على الكمية,unchanged,auto,commissions,
+Rate,النسبة,النسبة,unchanged,keep-current,commissions,سياق العمولات: «النسبة» لا «المعدل»
+Rate %,نسبة العمولة ٪,نسبة العمولة ٪,unchanged,auto,commissions,
+Rate (SAR / trip),النسبة (ريال / رحلة),النسبة (ريال / رحلة),unchanged,auto,commissions,
+Raw Absent,غياب خام,غياب خام,unchanged,auto,attendance_leave,
+Raw Late Min,دق. تأخير خام,دق. تأخير خام,unchanged,auto,attendance_leave,
+Raw Late Minutes,دقائق التأخير الخام,دقائق التأخير الخام,unchanged,auto,attendance_leave,
+Raw Worked Hours,ساعات العمل الخام,ساعات العمل الخام,unchanged,auto,attendance_leave,
+Re-Issue Card - أعادة اصدار البطاقة,إعادة إصدار البطاقة,إعادة إصدار البطاقة,unchanged,auto,payroll,
+Reason for refusal,سبب الرفض,سبب الرفض,unchanged,auto,deduction,
+Reason Skipped,سبب التخطي,سبب التخطي,unchanged,auto,payroll,
+"Receipt #, bank reference…",رقم الإيصال، مرجع بنكي…,رقم الإيصال، مرجع بنكي…,unchanged,auto,deduction,
+Receipts,المقبوضات,المقبوضات,unchanged,keep-current,ext_sync,المصطلح المحاسبي «المقبوضات»
+Record Payment,تسجيل دفعة,تسجيل دفعة,unchanged,auto,deduction,
+Reference / Note,المرجع / الملاحظة,المرجع / الملاحظة,unchanged,auto,deduction,
+Refresh All,تحديث الكل,تحديث الكل,unchanged,auto,annual_leave,
+Refresh Annual Leave Dashboard,تحديث لوحة الإجازات السنوية,تحديث لوحة الإجازات السنوية,unchanged,auto,annual_leave,
+Refresh Totals,تحديث الإجماليات,تحديث الإجماليات,unchanged,auto,payroll,
+Refusal Reason,سبب الرفض,سبب الرفض,unchanged,auto,deduction,
+Refuse Loan Request,رفض طلب القرض,رفض طلب القرض,unchanged,auto,deduction,
+Refused By,رفضه,رفضه,unchanged,auto,deduction,
+Refusing At,حالة الرفض عند,حالة الرفض عند,unchanged,auto,deduction,
+Related Leave,الإجازة المرتبطة,الإجازة المرتبطة,unchanged,auto,payroll,
+Related Leaves,الإجازات المرتبطة,الإجازات المرتبطة,unchanged,auto,attendance_leave,
+Related Time Off,الإجازة المرتبطة,الإجازة المرتبطة,unchanged,auto,attendance_leave,
+Remaining After Payment,المتبقي بعد الدفع,المتبقي بعد الدفع,unchanged,auto,deduction,
+Remaining Balance,الرصيد المتبقي,الرصيد المتبقي,unchanged,auto,annual_leave,
+Remaining Loans,القروض المتبقية,القروض المتبقية,unchanged,auto,"annual_leave,payroll",
+Remaining Loans Description,وصف القروض المتبقية,وصف القروض المتبقية,unchanged,auto,annual_leave,
+Reopen,إعادة فتح,إعادة فتح,unchanged,auto,commissions,
+Request a Loan,طلب قرض,طلب قرض,unchanged,auto,deduction,
+Required Trips,الرحلات المطلوبة,الرحلات المطلوبة,unchanged,auto,commissions,
+Required Trips (full month),الرحلات المطلوبة (شهر كامل),الرحلات المطلوبة (شهر كامل),unchanged,auto,commissions,
+Required/30d,المطلوب / 30 يوم,المطلوب / 30 يوم,unchanged,auto,commissions,
+Resolved Rules,القواعد المحلولة,القواعد المحلولة,unchanged,auto,commissions,
+Resource Calendar Group,مجموعة تقويم الموارد,مجموعة تقويم الموارد,unchanged,auto,working_schedule,
+Resource Calendar Group Line,بند مجموعة تقويم الموارد,بند مجموعة تقويم الموارد,unchanged,auto,working_schedule,
+Result,النتيجة,النتيجة,unchanged,auto,deduction,
+result = quantity * 100,result = quantity * 100,result = quantity * 100,unchanged,auto,commissions,
+Return for Revision,إعادة للمراجعة,إعادة للمراجعة,unchanged,auto,annual_leave,
+Return Leave for Revision,إعادة الإجازة للمراجعة,إعادة الإجازة للمراجعة,unchanged,auto,annual_leave,
+Return Settings,إعدادات الإعادة,إعدادات الإعادة,unchanged,auto,annual_leave,
+Return To,العودة إلى,العودة إلى,unchanged,auto,annual_leave,
+Return to Approver,إعادة إلى المعتمد,إعادة إلى المعتمد,unchanged,auto,annual_leave,
+Review Only,مراجعة فقط,مراجعة فقط,unchanged,auto,attendance_sheet,
+Revoke Override,إلغاء التجاوز,إلغاء التجاوز,unchanged,auto,commissions,
+Revoke override,إلغاء التجاوز,إلغاء التجاوز,unchanged,auto,commissions,
+Salary Computation,احتساب الراتب,احتساب الراتب,unchanged,keep-current,payroll,سجل «راتب» لا «مرتب»
+Salary Deduction,خصم الراتب,خصم الراتب,unchanged,auto,payroll,
+Salary Paying Bank Account,الحساب البنكي لصرف الراتب,الحساب البنكي لصرف الراتب,unchanged,auto,payroll,
+Salary Payment,دفع الراتب,دفع الراتب,unchanged,auto,payroll,
+Sales %,نسبة المبيعات ٪,نسبة المبيعات ٪,unchanged,auto,commissions,
+Sales & Collection Commissions,عمولات المبيعات والتحصيل,عمولات المبيعات والتحصيل,unchanged,auto,commissions,
+Sales / Collection Commission Rule,قاعدة عمولة مبيعات / تحصيل,قاعدة عمولة مبيعات / تحصيل,unchanged,auto,commissions,
+Sales / Collection Commission Sheet,كشف عمولة مبيعات / تحصيل,كشف عمولة مبيعات / تحصيل,unchanged,auto,commissions,
+Sales Commission,عمولة المبيعات,عمولة المبيعات,unchanged,auto,commissions,
+Sales Commission Amount,مبلغ عمولة المبيعات,مبلغ عمولة المبيعات,unchanged,auto,commissions,
+Sales Commission and Other,عمولات المبيعات وأخرى,عمولات المبيعات وأخرى,unchanged,auto,commissions,
+Sales Commission Rule,قاعدة عمولة المبيعات,قاعدة عمولة المبيعات,unchanged,auto,commissions,
+Sales Excel File,ملف Excel للمبيعات,ملف Excel للمبيعات,unchanged,auto,commissions,
+Sales File,ملف المبيعات,ملف المبيعات,unchanged,auto,commissions,
+Sales File Name,اسم ملف المبيعات,اسم ملف المبيعات,unchanged,auto,commissions,
+Sales Invoices,فواتير المبيعات,فواتير المبيعات,unchanged,auto,ext_sync,
+Sales Manager,مدير المبيعات,مدير المبيعات,unchanged,auto,commissions,
+Sales Min %,الحد الأدنى لنسبة المبيعات ٪,الحد الأدنى لنسبة المبيعات ٪,unchanged,auto,commissions,
+Sales Override,تجاوز المبيعات,تجاوز المبيعات,unchanged,auto,commissions,
+Sales Rule,قاعدة المبيعات,قاعدة المبيعات,unchanged,auto,commissions,
+Sales Target,هدف المبيعات,هدف المبيعات,unchanged,auto,commissions,
+Sales-Manager Commission Condition Override Wizard,معالج تجاوز شرط عمولة مدير المبيعات,معالج تجاوز شرط عمولة مدير المبيعات,unchanged,auto,commissions,
+Sales/Collection Commission Line,بند عمولة مبيعات / تحصيل,بند عمولة مبيعات / تحصيل,unchanged,auto,commissions,
+Sales/Collection Commission Rules,قواعد عمولة مبيعات / تحصيل,قواعد عمولة مبيعات / تحصيل,unchanged,auto,commissions,
+Sales/Collection Commission Sheets,كشوف عمولة مبيعات / تحصيل,كشوف عمولة مبيعات / تحصيل,unchanged,auto,commissions,
+SAR,ريال,ريال,unchanged,auto,commissions,
+Saturday Required (Deduct + Overtime Offset),السبت المطلوب (خصم + تعويض الإضافي),السبت المطلوب (خصم + تعويض الإضافي),unchanged,auto,working_schedule,
+Sched. Min,الدقائق المجدولة,الدقائق المجدولة,unchanged,auto,payroll,
+Schedule,الجدول,الجدول,unchanged,keep-current,deduction,المقصود جدول الأقساط (اسم) لا «جدولة»
+Scheduled Minutes,الدقائق المجدولة,الدقائق المجدولة,unchanged,auto,payroll,
+Search Annual Leave,بحث في الإجازات السنوية,بحث في الإجازات السنوية,unchanged,auto,annual_leave,
+Selection,الاختيار,الاختيار,unchanged,keep-current,attendance_report,الأساسي «قائمة خيارات» — المقصود الاختيار
+Self-Service,الخدمة الذاتية,الخدمة الذاتية,unchanged,auto,deduction,
+Service Days Calculator,حاسبة أيام الخدمة,حاسبة أيام الخدمة,unchanged,auto,"annual_leave,unpaid_leave",
+Service Period Reference,بيانات فترة الخدمة المرجعية,بيانات فترة الخدمة المرجعية,unchanged,auto,eos_leave,
+Service Years,سنوات الخدمة,سنوات الخدمة,unchanged,auto,"annual_leave,deduction",
+Settlement,التسوية,التسوية,unchanged,auto,deduction,
+Setup Opening Balances,إعداد الأرصدة الافتتاحية,إعداد الأرصدة الافتتاحية,unchanged,auto,annual_leave,
+Sheet,الكشف,الكشف,unchanged,auto,"attendance_sheet,commissions",
+Sheet Count,عدد الكشوف,عدد الكشوف,unchanged,auto,commissions,
+Sheet Total,إجمالي الكشف,إجمالي الكشف,unchanged,auto,commissions,
+sheet(s),كشف/كشوف,كشف/كشوف,unchanged,auto,commissions,
+Sheets,الكشوف,الكشوف,unchanged,auto,commissions,
+Sick Leave Pay Adjustment,تسوية راتب إجازة مرضية,تسوية راتب إجازة مرضية,unchanged,auto,payroll,
+Signature,التوقيع,التوقيع,unchanged,auto,annual_leave,
+Signature Confirmed On,تاريخ تأكيد التوقيع,تاريخ تأكيد التوقيع,unchanged,auto,annual_leave,
+Single Threshold (one metric ≥ X%),حد أحادي (مقياس واحد ≥ X٪),حد أحادي (مقياس واحد ≥ X٪),unchanged,auto,commissions,
+Site,الموقع,الموقع,unchanged,auto,commissions,
+Special Close - إقفال بطاقة وإصدار بطاقة,إغلاق خاص وإصدار بطاقة,إغلاق خاص وإصدار بطاقة,unchanged,auto,payroll,
+Specific bank – Excel,بنك محدد – إكسل,بنك محدد – إكسل,unchanged,auto,"commissions,payroll",
+Specific bank – Text file,بنك محدد – ملف نصي,بنك محدد – ملف نصي,unchanged,auto,"commissions,payroll",
+Split,تقسيم,تقسيم,unchanged,auto,commissions,
+Split Origin,مصدر التجزئة,مصدر التجزئة,unchanged,auto,deduction,
+Start Month,شهر البداية,شهر البداية,unchanged,auto,deduction,
+State,الحالة,الحالة,unchanged,keep-current,"commissions,deduction",الأساسي «الولاية» — المقصود حالة سير العمل
+Summary by Department,الملخص حسب القسم,الملخص حسب القسم,unchanged,auto,commissions,
+Supervisor,المشرف,المشرف,unchanged,auto,"annual_leave,attendance_sheet,base_security,commissions,deduction,payroll",
+Supervisor (Cascade),المشرف (تسلسلي),المشرف (تسلسلي),unchanged,auto,payroll,
+Supervisor Cascading,التسلسل الإشرافي | تسلسل المشرفين,التسلسل الإشرافي,unchanged,auto,"annual_leave,base_security",
+T1,م1,م1,unchanged,auto,commissions,
+T2,م2,م2,unchanged,auto,commissions,
+T3,م3,م3,unchanged,auto,commissions,
+T4,م4,م4,unchanged,auto,commissions,
+T5,م5,م5,unchanged,auto,commissions,
+Target Amount (auto),المبلغ المستهدف (تلقائي),المبلغ المستهدف (تلقائي),unchanged,auto,commissions,
+Target Collection,هدف التحصيل,هدف التحصيل,unchanged,auto,commissions,
+Target Sales,هدف المبيعات,هدف المبيعات,unchanged,auto,commissions,
+Technician,الفني,الفني,unchanged,auto,commissions,
+Technician Allowance,بدل الفني,بدل الفني,unchanged,auto,commissions,
+Technician Location Allowance,بدل موقع الفني,بدل موقع الفني,unchanged,auto,commissions,
+Technicians,الفنيون,الفنيون,unchanged,auto,commissions,
+Template Lines,بنود القالب,بنود القالب,unchanged,auto,commissions,
+Template name…,اسم القالب…,اسم القالب…,unchanged,auto,commissions,
+Termination Date,تاريخ إنهاء الخدمة,تاريخ إنهاء الخدمة,unchanged,auto,eos_leave,
+Termination Reason,سبب إنهاء الخدمة,سبب إنهاء الخدمة,unchanged,auto,eos_leave,
+Threshold Metric,مقياس الحد الأدنى,مقياس الحد الأدنى,unchanged,auto,commissions,
+Tier,المستوى,المستوى,unchanged,auto,commissions,
+Tier 1 (No Commission),المستوى الأول (بلا عمولة),المستوى الأول (بلا عمولة),unchanged,auto,commissions,
+Tier 2,المستوى الثاني,المستوى الثاني,unchanged,auto,commissions,
+Tier 3,المستوى الثالث,المستوى الثالث,unchanged,auto,commissions,
+Tier 4,المستوى الرابع,المستوى الرابع,unchanged,auto,commissions,
+Tier 5 (Open),المستوى الخامس (مفتوح),المستوى الخامس (مفتوح),unchanged,auto,commissions,
+Tier 5 (remaining),المستوى الخامس (المتبقي),المستوى الخامس (المتبقي),unchanged,auto,commissions,
+Tier Breakdown,توزيع المستويات,توزيع المستويات,unchanged,auto,commissions,
+Tier Rate Configuration,إعدادات نسب المستويات,إعدادات نسب المستويات,unchanged,auto,commissions,
+Tier1 Trips,رحلات المستوى الأول,رحلات المستوى الأول,unchanged,auto,commissions,
+Tier2 Rate,نسبة المستوى الثاني,نسبة المستوى الثاني,unchanged,auto,commissions,
+Tier2 Trips,رحلات المستوى الثاني,رحلات المستوى الثاني,unchanged,auto,commissions,
+Tier3 Rate,نسبة المستوى الثالث,نسبة المستوى الثالث,unchanged,auto,commissions,
+Tier3 Trips,رحلات المستوى الثالث,رحلات المستوى الثالث,unchanged,auto,commissions,
+Tier4 Rate,نسبة المستوى الرابع,نسبة المستوى الرابع,unchanged,auto,commissions,
+Tier4 Trips,رحلات المستوى الرابع,رحلات المستوى الرابع,unchanged,auto,commissions,
+Tier5 Rate,نسبة المستوى الخامس,نسبة المستوى الخامس,unchanged,auto,commissions,
+Tier5 Trips,رحلات المستوى الخامس,رحلات المستوى الخامس,unchanged,auto,commissions,
+Tiered Commission Rules,قواعد العمولات المتدرجة,قواعد العمولات المتدرجة,unchanged,auto,commissions,
+Time Off Approval,اعتماد الإجازات,اعتماد الإجازات,unchanged,keep-current,leave_approval,سجل «اعتماد» (الأساسي: الموافقة على طلب الإجازة)
+To %,إلى ٪,إلى ٪,unchanged,auto,commissions,
+To Account,إلى الحساب,إلى الحساب,unchanged,auto,ext_sync,
+Total Accrued,إجمالي المتراكم,إجمالي المتراكم,unchanged,auto,annual_leave,
+Total Accrued Days,إجمالي الأيام المستحقة,إجمالي الأيام المستحقة,unchanged,auto,annual_leave,
+Total Additional Commissions,إجمالي العمولات الإضافية,إجمالي العمولات الإضافية,unchanged,auto,"annual_leave,unpaid_leave",
+Total Additional Inputs,إجمالي المدخلات الإضافية,إجمالي المدخلات الإضافية,unchanged,auto,payroll,
+Total Allowance,إجمالي البدلات,إجمالي البدلات,unchanged,auto,commissions,
+Total Calendar Days,إجمالي الأيام التقويمية,إجمالي الأيام التقويمية,unchanged,auto,annual_leave,
+Total Collection Commission,إجمالي عمولة التحصيل,إجمالي عمولة التحصيل,unchanged,auto,commissions,
+Total Combined Commission,إجمالي العمولة المشتركة,إجمالي العمولة المشتركة,unchanged,auto,commissions,
+Total Commission,إجمالي العمولة,إجمالي العمولة,unchanged,auto,commissions,
+Total Commissions,إجمالي العمولات,إجمالي العمولات,unchanged,auto,annual_leave,
+Total Days,إجمالي الأيام,إجمالي الأيام,unchanged,auto,attendance_sheet,
+Total Deductions,إجمالي الخصومات,إجمالي الخصومات,unchanged,auto,payroll,
+Total Deductions This Month,إجمالي الخصومات هذا الشهر,إجمالي الخصومات هذا الشهر,unchanged,auto,deduction,
+Total Late Minutes,إجمالي دقائق التأخير,إجمالي دقائق التأخير,unchanged,auto,"attendance_leave,attendance_report",
+Total NET,إجمالي الصافي,إجمالي الصافي,unchanged,auto,payroll,
+Total Outstanding (other),الإجمالي المتبقي (أخرى),الإجمالي المتبقي (أخرى),unchanged,auto,deduction,
+Total Payable,الإجمالي المستحق,الإجمالي المستحق,unchanged,keep-current,commissions,ترجمة الأساسي بها خطأ إملائي
+Total Sales Commission,إجمالي عمولة المبيعات,إجمالي عمولة المبيعات,unchanged,auto,commissions,
+Total Trips (Mult.),إجمالي الرحلات (مضاعفة),إجمالي الرحلات (مضاعفة),unchanged,auto,commissions,
+Total Worked Hours,إجمالي ساعات العمل,إجمالي ساعات العمل,unchanged,auto,attendance_report,
+TOTALS,الإجمالي,الإجمالي,unchanged,auto,commissions,
+Travel Allowance,بدل السفر,بدل السفر,unchanged,auto,base_security,
+Travel allowance,بدل السفر,بدل السفر,unchanged,auto,base_security,
+Trip Base,أساس الرحلة,أساس الرحلة,unchanged,auto,commissions,
+Trips,الرحلات,الرحلات,unchanged,auto,commissions,
+Trips in band,الرحلات في الشريحة,الرحلات في الشريحة,unchanged,auto,commissions,
+Update Employee ID - تحديث الرقم الوظيفي,تحديث الرقم الوظيفي,تحديث الرقم الوظيفي,unchanged,auto,payroll,
+Update Employee Name - تحديث اسم الموظف,تحديث اسم الموظف,تحديث اسم الموظف,unchanged,auto,payroll,
+Update National ID - تحديث الهوية,تحديث الهوية الوطنية,تحديث الهوية الوطنية,unchanged,auto,payroll,
+Vacation Balance (days),رصيد الإجازة (أيام),رصيد الإجازة (أيام),unchanged,auto,deduction,
+Vacation Balance Breakdown,تفاصيل رصيد الإجازة,تفاصيل رصيد الإجازة,unchanged,auto,deduction,
+Vacation Balance Settlement,تسوية رصيد الإجازة,تسوية رصيد الإجازة,unchanged,auto,payroll,
+Vacation Balance Value,قيمة رصيد الإجازة,قيمة رصيد الإجازة,unchanged,auto,deduction,
+Valid From,صالح من,صالح من,unchanged,auto,leave_types,
+Valid Until,صالح حتى,صالح حتى,unchanged,auto,leave_types,
+Value Date,تاريخ القيمة,تاريخ القيمة,unchanged,auto,"commissions,payroll",
+Vehicle,المركبة,المركبة,unchanged,auto,commissions,
+Vehicle Commission,عمولة المركبة,عمولة المركبة,unchanged,auto,commissions,
+Vehicle Number,رقم المركبة,رقم المركبة,unchanged,auto,commissions,
+Visa Cost Recovery Description,وصف استرداد تكلفة التأشيرة,وصف استرداد تكلفة التأشيرة,unchanged,auto,unpaid_leave,
+Visa Expire,انتهاء التأشيرة,انتهاء التأشيرة,unchanged,auto,base_security,
+Voucher Type,نوع السند,نوع السند,unchanged,auto,ext_sync,
+Why do you need this loan? (required),لماذا تحتاج هذا القرض؟ (مطلوب),لماذا تحتاج هذا القرض؟ (مطلوب),unchanged,auto,deduction,
+Work From,العمل من,العمل من,unchanged,auto,working_schedule,
+Work Site,موقع العمل,موقع العمل,unchanged,auto,commissions,
+Work Sites,مواقع العمل,مواقع العمل,unchanged,auto,commissions,
+Work To,العمل إلى,العمل إلى,unchanged,auto,working_schedule,
+Workday,يوم عمل,يوم عمل,unchanged,auto,attendance_sheet,
+Worked Day,يوم عمل فعلي,يوم عمل فعلي,unchanged,keep-current,payroll,الأساسي مطوَّل
+Worked Hours,ساعات العمل,ساعات العمل,unchanged,keep-current,attendance_leave,الأساسي «ساعات العمل المقضية» — مطوَّل
+Worked Hours (Net),ساعات العمل (صافي),ساعات العمل (صافي),unchanged,auto,attendance_leave,
+Worked Hrs,ساعات العمل,ساعات العمل,unchanged,auto,attendance_report,
+X Can Acc Approve,يمكن للمحاسبة الاعتماد,يمكن للمحاسبة الاعتماد,unchanged,auto,annual_leave,
+X Can Cancel,يمكن الإلغاء,يمكن الإلغاء,unchanged,auto,deduction,
+X Can Confirm Return Hr,يمكن للموارد البشرية تأكيد العودة,يمكن للموارد البشرية تأكيد العودة,unchanged,auto,annual_leave,
+X Can Confirm Return Manager,يمكن للمدير تأكيد العودة,يمكن للمدير تأكيد العودة,unchanged,auto,annual_leave,
+X Can Dm Approve,يمكن للمدير المباشر الاعتماد,يمكن للمدير المباشر الاعتماد,unchanged,auto,"annual_leave,deduction",
+X Can Edit Installments,يمكن تعديل الأقساط,يمكن تعديل الأقساط,unchanged,auto,deduction,
+X Can Gm Final Approve,يمكن للمدير العام الاعتماد النهائي,يمكن للمدير العام الاعتماد النهائي,unchanged,auto,annual_leave,
+X Can Gm Initial Approve,يمكن للمدير العام الاعتماد الأولي,يمكن للمدير العام الاعتماد الأولي,unchanged,auto,annual_leave,
+X Can Gm Return,يمكن للمدير العام الإعادة,يمكن للمدير العام الإعادة,unchanged,auto,annual_leave,
+X Can Hr Approve,يمكن للموارد البشرية الاعتماد,يمكن للموارد البشرية الاعتماد,unchanged,auto,annual_leave,
+X Can Select Loan Type,يمكن اختيار نوع القرض,يمكن اختيار نوع القرض,unchanged,auto,deduction,
+X Can Sign,يمكن التوقيع,يمكن التوقيع,unchanged,auto,annual_leave,
+X Can Submit,يمكن الإرسال,يمكن الإرسال,unchanged,auto,deduction,
+X Deduction Currency,عملة الخصم,عملة الخصم,unchanged,auto,deduction,
+X Refused Date,تاريخ الرفض,تاريخ الرفض,unchanged,auto,deduction,
+X Stale Alert Sent,تم إرسال تنبيه التقادم,تم إرسال تنبيه التقادم,unchanged,auto,attendance_leave,
+X Unwind Data,بيانات الاسترجاع,بيانات الاسترجاع,unchanged,auto,commissions,
+Years of Service,سنوات الخدمة,سنوات الخدمة,unchanged,auto,annual_leave,
+You are requesting,أنت تطلب,أنت تطلب,unchanged,auto,deduction,
+You have no loan requests yet,لا توجد لديك طلبات قروض بعد,لا توجد لديك طلبات قروض بعد,unchanged,auto,deduction,
+× Price,× السعر,× السعر,unchanged,auto,commissions,
+— No Department —,— بلا قسم —,— بلا قسم —,unchanged,auto,commissions,
+↩ Reset to Draft,↩ إعادة إلى المسودة,↩ إعادة إلى المسودة,unchanged,auto,attendance_sheet,
+↩ Return to Approver,↩ إعادة إلى المعتمد,↩ إعادة إلى المعتمد,unchanged,auto,annual_leave,
+⚠ Combined Leave,⚠ إجازة مدمجة,⚠ إجازة مدمجة,unchanged,auto,annual_leave,
+⚠ Full Clearance,⚠ تصفية رصيد كاملة,⚠ تصفية رصيد كاملة,unchanged,auto,annual_leave,
+⛔ Refuse,⛔ رفض,⛔ رفض,unchanged,auto,deduction,
+✅ Annual — Fully Approved,✅ سنوية — معتمدة بالكامل,✅ سنوية — معتمدة بالكامل,unchanged,auto,annual_leave,
+✅ Approve (Accounting),✅ اعتماد (المحاسبة) | ✅ موافقة المحاسبة,✅ اعتماد (المحاسبة),unchanged,auto,"annual_leave,deduction",
+✅ Approve (DM),✅ اعتماد (المدير المباشر) | ✅ موافقة المدير المباشر,✅ اعتماد (المدير المباشر),unchanged,auto,"annual_leave,deduction",
+✅ Approve (HR),✅ اعتماد (الموارد البشرية) | ✅ موافقة الموارد البشرية,✅ اعتماد (الموارد البشرية),unchanged,auto,"annual_leave,deduction",
+✅ Approved,✅ معتمد,✅ معتمد,unchanged,auto,unpaid_leave,
+✅ Confirm & Finalise,✅ تأكيد وإنهاء,✅ تأكيد وإنهاء,unchanged,auto,annual_leave,
+✅ Confirm Disbursement,✅ تأكيد الصرف,✅ تأكيد الصرف,unchanged,auto,deduction,
+✅ Final Approve (GM),✅ الاعتماد النهائي (المدير العام) | ✅ الموافقة النهائية (المدير العام),✅ الاعتماد النهائي (المدير العام),unchanged,auto,"annual_leave,deduction",
+✅ Submit,✅ إرسال,✅ إرسال,unchanged,auto,attendance_leave,
+✓ All Present,✓ جميعهم حاضرون,✓ جميعهم حاضرون,unchanged,auto,attendance_sheet,
+✓ Done,✓ تم,✓ تم,unchanged,auto,commissions,
+✔ Accepted,✔ مقبول,✔ مقبول,unchanged,auto,attendance_leave,
+✗ All Absent,✗ جميعهم غائبون,✗ جميعهم غائبون,unchanged,auto,attendance_sheet,
+➕ Record New Penalty,➕ تسجيل غرامة جديدة,➕ تسجيل غرامة جديدة,unchanged,auto,deduction,
+⟳ Generate All Sheets,⟳ إنشاء جميع الكشوف,⟳ إنشاء جميع الكشوف,unchanged,auto,attendance_sheet,
+🏖️ On Vacation,🏖️ في إجازة,🏖️ في إجازة,unchanged,auto,annual_leave,
+🏢 EOS Review,🏢 مراجعة نهاية الخدمة,🏢 مراجعة نهاية الخدمة,unchanged,auto,eos_leave,
+💰 Accounting,💰 المحاسبة,💰 المحاسبة,unchanged,auto,annual_leave,
+📊 Decision Support,📊 دعم القرار,📊 دعم القرار,unchanged,auto,annual_leave,
+📋 Full Clearance,📋 تصفية رصيد كاملة,📋 تصفية رصيد كاملة,unchanged,auto,annual_leave,
+📎 Attachments,📎 المرفقات,📎 المرفقات,unchanged,auto,annual_leave,
+📜 Approval Trail,📜 سجل الاعتمادات,📜 سجل الاعتمادات,unchanged,auto,annual_leave,
+📝 HR Review,📝 مراجعة الموارد البشرية,📝 مراجعة الموارد البشرية,unchanged,auto,annual_leave,
+🖨 Print Report,🖨 طباعة التقرير,🖨 طباعة التقرير,unchanged,auto,attendance_report,
+# ─── مصطلحات تبقى كما هي عمداً رغم اختلافها عن Odoo (للاطلاع فقط) ───
+# KEEP: <strong>Bank Account</strong> = <strong>الحساب البنكي</strong> — ترجمة Odoo الأساسية معطوبة (وسوم HTML معكوسة)
+# KEEP: <strong>Designation</strong> = <strong>المسمى الوظيفي</strong> — الأساسي «التعيين» — المقصود المسمى الوظيفي
+# KEEP: <strong>Date From</strong> = <strong>من تاريخ</strong> — قالب تقرير KSW؛ «من تاريخ» أوضح
+# KEEP: <strong>Date To</strong> = <strong>إلى تاريخ</strong> — قالب تقرير KSW؛ «إلى تاريخ» أوضح
+# KEEP: <strong>Reference</strong> = <strong>المرجع</strong> — الأساسي «رقم الإشارة» — غير مناسب
+# KEEP: Deduction = الخصم — قرار المستخدم رقم 3: «خصم» وليس «الاستقطاعات»
+# KEEP: HR Approval = اعتماد الموارد البشرية — سجل «اعتماد» (الأساسي: موافقة)
+# KEEP: Time Off Approval = اعتماد الإجازات — سجل «اعتماد» (الأساسي: الموافقة على طلب الإجازة)
+# KEEP: Officer = مسؤول — الأساسي «مستخدم» — خطأ؛ المقصود مسؤول
+# KEEP: State = الحالة — الأساسي «الولاية» — المقصود حالة سير العمل
+# KEEP: Rate = النسبة — سياق العمولات: «النسبة» لا «المعدل»
+# KEEP: Base = الأساس — سياق العمولات: «الأساس» لا «قاعدة»
+# KEEP: Schedule = الجدول — المقصود جدول الأقساط (اسم) لا «جدولة»
+# KEEP: Label = التسمية — الأساسي «بطاقة عنوان» — «التسمية» صحيحة
+# KEEP: Selection = الاختيار — الأساسي «قائمة خيارات» — المقصود الاختيار
+# KEEP: Is System = نظامي — الأساسي «نظام» — المقصود «نظامي»
+# KEEP: Break = استراحة — الأساسي «فاصل» — المصطلح الوظيفي «استراحة»
+# KEEP: Worked Day = يوم عمل فعلي — الأساسي مطوَّل
+# KEEP: Worked Hours = ساعات العمل — الأساسي «ساعات العمل المقضية» — مطوَّل
+# KEEP: Salary Computation = احتساب الراتب — سجل «راتب» لا «مرتب»
+# KEEP: Total Payable = الإجمالي المستحق — ترجمة الأساسي بها خطأ إملائي
+# KEEP: Receipts = المقبوضات — المصطلح المحاسبي «المقبوضات»
+# KEEP: Day of Week = يوم الأسبوع — الأساسي «اليوم من الأسبوع» — ركيكة

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-08 08:17+0000\n"
-"PO-Revision-Date: 2026-07-08 08:17+0000\n"
+"POT-Creation-Date: 2026-07-15 12:11+0000\n"
+"PO-Revision-Date: 2026-07-15 12:11+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar_001\n"
@@ -15,6 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
+"X-Generator: KSW ar-engine v2\n"
 
 #. module: KSW_unpaid_leave
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.report_leave_approval
@@ -34,7 +35,7 @@ msgstr "<strong>الأيام التقويمية</strong>"
 #. module: KSW_unpaid_leave
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.report_leave_approval
 msgid "<strong>Combined Leave</strong>"
-msgstr "<strong>إجازة مركّبة</strong>"
+msgstr "<strong>إجازة مركبة</strong>"
 
 #. module: KSW_unpaid_leave
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.report_leave_approval
@@ -129,7 +130,7 @@ msgstr "<strong>إجمالي الأيام التقويمية</strong>"
 #. module: KSW_unpaid_leave
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.report_leave_approval
 msgid "<strong>Unpaid Portion</strong>"
-msgstr "<strong>الجزء غير المدفوع</strong>"
+msgstr "<strong>الجزء بدون أجر</strong>"
 
 #. module: KSW_unpaid_leave
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.report_leave_approval
@@ -149,12 +150,12 @@ msgstr "مدخلات المحاسبة"
 #. module: KSW_unpaid_leave
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.report_leave_approval
 msgid "Accounting Inputs — Unpaid Leave"
-msgstr "مدخلات المحاسبة — الإجازة غير المدفوعة"
+msgstr "مدخلات المحاسبة — الإجازة بدون أجر"
 
 #. module: KSW_unpaid_leave
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.hr_leave_view_form_inherit_unpaid
 msgid "Accounting — Unpaid Leave"
-msgstr "المحاسبة — الإجازة غير المدفوعة"
+msgstr "المحاسبة — الإجازة بدون أجر"
 
 #. module: KSW_unpaid_leave
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.report_leave_approval
@@ -164,7 +165,7 @@ msgstr "المبلغ (ريال)"
 #. module: KSW_unpaid_leave
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.report_leave_approval
 msgid "Annual + Unpaid Leave — Approval Report"
-msgstr "الإجازة السنوية + غير المدفوعة — تقرير الاعتماد"
+msgstr "الإجازة السنوية + بدون أجر — تقرير الاعتماد"
 
 #. module: KSW_unpaid_leave
 #: model:ir.model,name:KSW_unpaid_leave.model_ksw_annual_leave
@@ -184,17 +185,17 @@ msgstr "خطوات الاعتماد"
 #. module: KSW_unpaid_leave
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.report_leave_approval
 msgid "Approver"
-msgstr "المُعتمِد"
+msgstr "المعتمد"
 
 #. module: KSW_unpaid_leave
 #: model:ir.model,name:KSW_unpaid_leave.model_ksw_attendance_sheet_line
 msgid "Attendance Sheet Daily Line"
-msgstr "البند اليومي لكشف الحضور"
+msgstr "البند اليومي لكشف الحضور والانصراف"
 
 #. module: KSW_unpaid_leave
 #: model:ir.model.fields,help:KSW_unpaid_leave.field_hr_leave_type__is_unpaid_leave
 msgid "Check this box if this leave type represents unpaid leave."
-msgstr "فعِّل هذا الخيار إذا كان نوع الإجازة هذا يمثل إجازة غير مدفوعة."
+msgstr "فعل هذا الخيار إذا كان نوع الإجازة هذا يمثل إجازة بدون أجر."
 
 #. module: KSW_unpaid_leave
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.report_leave_approval
@@ -233,13 +234,13 @@ msgstr "وصف المقابل المالي"
 #. module: KSW_unpaid_leave
 #: model:ir.model.fields,field_description:KSW_unpaid_leave.field_hr_leave__x_financial_consideration_excess
 msgid "Financial Consideration for Excess Leave"
-msgstr "المقابل المالي للإجازة الزائدة"
+msgstr "المقابل المالي عن الإجازة الزائدة"
 
 #. module: KSW_unpaid_leave
 #: model:ir.model.fields,help:KSW_unpaid_leave.field_hr_leave__x_financial_consideration_excess
 msgid ""
 "Financial consideration for excess unpaid leave days (filled by Accounting)."
-msgstr "المقابل المالي لأيام الإجازة غير المدفوعة الزائدة (تعبئه المحاسبة)."
+msgstr "المقابل المالي لأيام الإجازة بدون أجر الزائدة (تعبئه المحاسبة)."
 
 #. module: KSW_unpaid_leave
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.report_leave_approval
@@ -268,17 +269,17 @@ msgstr "الموارد البشرية"
 #: model:ir.model.fields,field_description:KSW_unpaid_leave.field_ksw_annual_leave__id
 #: model:ir.model.fields,field_description:KSW_unpaid_leave.field_ksw_attendance_sheet_line__id
 msgid "ID"
-msgstr "المُعرف"
+msgstr "المعرف"
 
 #. module: KSW_unpaid_leave
 #: model:ir.model.fields,field_description:KSW_unpaid_leave.field_hr_leave_type__is_unpaid_leave
 msgid "Is Unpaid Leave"
-msgstr "إجازة غير مدفوعة"
+msgstr "إجازة بدون أجر"
 
 #. module: KSW_unpaid_leave
 #: model:ir.model.fields,field_description:KSW_unpaid_leave.field_hr_leave__x_is_unpaid_leave_type
 msgid "Is Unpaid Leave Type"
-msgstr "نوع إجازة غير مدفوعة"
+msgstr "نوع إجازة بدون أجر"
 
 #. module: KSW_unpaid_leave
 #: model:ir.actions.report,name:KSW_unpaid_leave.action_report_leave_approval
@@ -308,7 +309,7 @@ msgstr "الإجازة المرتبطة"
 #. module: KSW_unpaid_leave
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.hr_leave_view_form_inherit_unpaid
 msgid "Notes"
-msgstr "ملاحظات"
+msgstr "الملاحظات"
 
 #. module: KSW_unpaid_leave
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.report_leave_approval
@@ -328,12 +329,12 @@ msgstr "الحالة"
 #. module: KSW_unpaid_leave
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.report_leave_approval
 msgid "Step"
-msgstr "الخطوة"
+msgstr "خطوة"
 
 #. module: KSW_unpaid_leave
 #: model:ir.model.fields,help:KSW_unpaid_leave.field_hr_leave__x_is_unpaid_leave_type
 msgid "Stored related field for reliable use in view invisible expressions."
-msgstr "حقل مرتبط مخزَّن للاستخدام الموثوق في تعابير الإخفاء في الواجهات."
+msgstr "حقل مرتبط مخزن للاستخدام الموثوق في تعابير الإخفاء في الواجهات."
 
 #. module: KSW_unpaid_leave
 #: model:ir.model,name:KSW_unpaid_leave.model_hr_leave
@@ -358,28 +359,27 @@ msgstr "إجمالي العمولات الإضافية"
 #. module: KSW_unpaid_leave
 #: model:ir.model.fields,help:KSW_unpaid_leave.field_absent_days_wizard__unpaid_leave_days
 msgid "Total approved unpaid leave calendar days (all time)."
-msgstr ""
-"إجمالي الأيام التقويمية للإجازات غير المدفوعة المعتمدة (الإجمالي الكلي)."
+msgstr "إجمالي الأيام التقويمية للإجازات بدون أجر المعتمدة (الإجمالي الكلي)."
 
 #. module: KSW_unpaid_leave
 #: model:hr.leave.type,name:KSW_unpaid_leave.leave_type_unpaid_ksw
 msgid "Unpaid Leave"
-msgstr "الإجازة غير المدفوعة"
+msgstr "الإجازة بدون أجر"
 
 #. module: KSW_unpaid_leave
 #: model:ir.model.fields,field_description:KSW_unpaid_leave.field_absent_days_wizard__unpaid_leave_days
 msgid "Unpaid Leave Days"
-msgstr "أيام الإجازة غير المدفوعة"
+msgstr "أيام الإجازة بدون أجر"
 
 #. module: KSW_unpaid_leave
 #: model:ir.model.fields.selection,name:KSW_unpaid_leave.selection__hr_leave_type__leave_validation_type__unpaid_multi
 msgid "Unpaid Leave – Multi-Step Approval"
-msgstr "الإجازة غير المدفوعة – اعتماد متعدد الخطوات"
+msgstr "الإجازة بدون أجر — اعتماد متعدد المراحل"
 
 #. module: KSW_unpaid_leave
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.report_leave_approval
 msgid "Unpaid Leave — Approval Report"
-msgstr "الإجازة غير المدفوعة — تقرير الاعتماد"
+msgstr "الإجازة بدون أجر — تقرير الاعتماد"
 
 #. module: KSW_unpaid_leave
 #: model:ir.model.fields,field_description:KSW_unpaid_leave.field_hr_leave__x_visa_cost_recovery_description
@@ -389,14 +389,14 @@ msgstr "وصف استرداد تكلفة التأشيرة"
 #. module: KSW_unpaid_leave
 #: model:ir.model.fields,field_description:KSW_unpaid_leave.field_hr_leave__x_visa_cost_recovery
 msgid "Visa Cost Recovery for Excess Leave"
-msgstr "استرداد تكلفة التأشيرة للإجازة الزائدة"
+msgstr "استرداد تكلفة التأشيرة عن الإجازة الزائدة"
 
 #. module: KSW_unpaid_leave
 #: model:ir.model.fields,help:KSW_unpaid_leave.field_hr_leave__x_visa_cost_recovery
 msgid ""
 "Visa cost recovery for excess unpaid leave days (filled by Accounting)."
 msgstr ""
-"استرداد تكلفة التأشيرة لأيام الإجازة غير المدفوعة الزائدة (تعبئه المحاسبة)."
+"استرداد تكلفة التأشيرة لأيام الإجازة بدون أجر الزائدة (تعبئه المحاسبة)."
 
 #. module: KSW_unpaid_leave
 #: model:ir.model.fields,help:KSW_unpaid_leave.field_ksw_attendance_sheet_line__x_leave_id
@@ -404,7 +404,7 @@ msgid ""
 "When set, this day is locked by an approved leave and cannot be toggled by "
 "the supervisor."
 msgstr ""
-"عند تحديده، يكون هذا اليوم مقفلاً بإجازة معتمدة ولا يمكن للمشرف تغييره."
+"عند تحديده، يكون هذا اليوم مقفلا بإجازة معتمدة ولا يمكن للمشرف تغييره."
 
 #. module: KSW_unpaid_leave
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.report_leave_approval
@@ -414,27 +414,27 @@ msgstr "نعم"
 #. module: KSW_unpaid_leave
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.report_leave_approval
 msgid "Yes — Annual + Unpaid"
-msgstr "نعم — سنوية + غير مدفوعة"
+msgstr "نعم — سنوية + بدون أجر"
 
 #. module: KSW_unpaid_leave
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.report_leave_approval
 msgid "___________________________"
-msgstr "___________________________"
+msgstr ""
 
 #. module: KSW_unpaid_leave
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.report_leave_approval
 msgid "⏳ Pending"
-msgstr "⏳ معلّق"
+msgstr "⏳ معلق"
 
 #. module: KSW_unpaid_leave
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.hr_leave_view_form_inherit_unpaid
 msgid "⛔ Unpaid Leave"
-msgstr "⛔ إجازة غير مدفوعة"
+msgstr "⛔ إجازة بدون أجر"
 
 #. module: KSW_unpaid_leave
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.hr_leave_view_search_inherit_unpaid
 msgid "⛔ Unpaid Leaves"
-msgstr "⛔ الإجازات غير المدفوعة"
+msgstr "⛔ الإجازات بدون أجر"
 
 #. module: KSW_unpaid_leave
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.report_leave_approval

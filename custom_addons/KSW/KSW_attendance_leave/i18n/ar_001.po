@@ -1,0 +1,400 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_attendance_leave
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-15 12:11+0000\n"
+"PO-Revision-Date: 2026-07-15 12:11+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar_001\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
+"X-Generator: KSW ar-engine v2\n"
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_list_inherit_coverage
+msgid "Absent"
+msgstr "غائب"
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_form_inherit_leaves
+msgid "Absent (Net)"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave__x_total_absent_days
+msgid "Absent Days"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__accepted_minutes
+msgid "Accepted (min)"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model,name:KSW_attendance_leave.model_hr_attendance
+msgid "Attendance"
+msgstr "الحضور والانصراف"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave__x_attendance_line_ids
+msgid "Attendance Issue Hours"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave__x_attendance_ids
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_form_inherit_leaves
+msgid "Attendance Issues"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__attendance_id
+msgid "Attendance Record"
+msgstr "سجل الحضور والانصراف"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave__x_attendance_count
+msgid "Attendance Records"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_employee_view_form_check_in_only
+msgid "Attendance Tracking"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model,name:KSW_attendance_leave.model_biometric_attendance_sync
+msgid "Biometric Attendance Sync Service"
+msgstr "خدمة مزامنة حضور البصمة"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_employee__device_id
+msgid "Biometric Device"
+msgstr "جهاز البصمة"
+
+#. module: KSW_attendance_leave
+#: model:ir.model,name:KSW_attendance_leave.model_biometric_device_details
+msgid "Biometric Device Details"
+msgstr "بيانات جهاز البصمة"
+
+#. module: KSW_attendance_leave
+#: model:ir.model,name:KSW_attendance_leave.model_biometric_schedule_helper
+msgid "Biometric Schedule Helper"
+msgstr "مساعد جداول البصمة"
+
+#. module: KSW_attendance_leave
+#: model:ir.actions.server,name:KSW_attendance_leave.cron_check_stale_biometric_devices_ir_actions_server
+msgid "Biometric: Stale Device Alert (every 30 minutes)"
+msgstr "البصمة: تنبيه توقف الجهاز (كل 30 دقيقة)"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,help:KSW_attendance_leave.field_hr_leave__holiday_status_is_attendance_issue
+#: model:ir.model.fields,help:KSW_attendance_leave.field_hr_leave_type__is_attendance_issue
+msgid ""
+"Check this box if this leave type requires linking to specific attendance "
+"records (late, early leave, or absence)."
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_employee__x_check_in_only
+msgid "Check-in Only"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_list_inherit_coverage
+msgid "Covered"
+msgstr "مشمول بإجازة"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_attendance__x_is_covered
+msgid "Covered by Time Off"
+msgstr "مشمول بإجازة"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__create_uid
+msgid "Created by"
+msgstr "أنشئ بواسطة"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__create_date
+msgid "Created on"
+msgstr "أنشئ في"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__date
+msgid "Date"
+msgstr "التاريخ"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave__holiday_status_is_attendance_issue
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_type__is_attendance_issue
+msgid "Depends on Attendance Issue"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_biometric_attendance_sync__display_name
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_biometric_device_details__display_name
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_biometric_schedule_helper__display_name
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_attendance__display_name
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave__display_name
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__display_name
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_type__display_name
+msgid "Display Name"
+msgstr "اسم العرض"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__duration_minutes
+msgid "Duration (min)"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields.selection,name:KSW_attendance_leave.selection__hr_leave_attendance_line__issue_type__early_leave
+msgid "Early Leave"
+msgstr "الانصراف المبكر"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_attendance__x_net_early_leave_minutes
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_list_inherit_coverage
+msgid "Early Leave Minutes"
+msgstr "دقائق الانصراف المبكر"
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_form_inherit_leaves
+msgid "Early Leave Minutes (Net)"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,help:KSW_attendance_leave.field_hr_attendance__x_net_early_leave_minutes
+msgid "Early leave minutes remaining after deducting approved time-off."
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model,name:KSW_attendance_leave.model_hr_employee
+msgid "Employee"
+msgstr "الموظف"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__hour_from
+msgid "From"
+msgstr "من"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_biometric_attendance_sync__id
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_biometric_device_details__id
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_biometric_schedule_helper__id
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_attendance__id
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_employee__id
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave__id
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__id
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_type__id
+msgid "ID"
+msgstr "المعرف"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,help:KSW_attendance_leave.field_hr_employee__x_check_in_only
+msgid ""
+"If enabled, only a check-in punch is required. Early-leave deductions are "
+"suppressed; the scheduled end is used as the effective checkout for worked-"
+"hours calculation."
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,help:KSW_attendance_leave.field_hr_attendance__x_is_covered
+msgid ""
+"Indicates whether this attendance issue has been covered by an approved "
+"time-off request."
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_attendance__x_net_is_absent
+msgid "Is Absent"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__issue_type
+msgid "Issue Type"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__write_uid
+msgid "Last Updated by"
+msgstr "آخر تحديث بواسطة"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__write_date
+msgid "Last Updated on"
+msgstr "آخر تحديث في"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields.selection,name:KSW_attendance_leave.selection__hr_leave_attendance_line__issue_type__late
+msgid "Late"
+msgstr "متأخر"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_attendance__x_net_late_minutes
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_list_inherit_coverage
+msgid "Late Minutes"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_form_inherit_leaves
+msgid "Late Minutes (Net)"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,help:KSW_attendance_leave.field_hr_attendance__x_net_late_minutes
+msgid "Late minutes remaining after deducting approved time-off."
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model,name:KSW_attendance_leave.model_hr_leave_attendance_line
+msgid "Leave Attendance Issue Hours"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__leave_id
+msgid "Leave Request"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_leave_view_form_inherit_attendance_issue
+msgid "Minutes"
+msgstr "الدقائق"
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_form_inherit_leaves
+msgid "Raw Absent"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_form_inherit_leaves
+msgid "Raw Early Leave Minutes"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_list_inherit_coverage
+msgid "Raw Early Min"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_list_inherit_coverage
+msgid "Raw Late Min"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_form_inherit_leaves
+msgid "Raw Late Minutes"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_form_inherit_leaves
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_list_inherit_coverage
+msgid "Raw Worked Hours"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_attendance__x_leave_ids
+msgid "Related Leaves"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_form_inherit_leaves
+msgid "Related Time Off"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,help:KSW_attendance_leave.field_hr_leave__x_attendance_ids
+msgid ""
+"Select the attendance records with issues (late, early leave, or absence) "
+"that this time-off request is meant to cover."
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,help:KSW_attendance_leave.field_biometric_device_details__x_stale_alert_sent
+msgid ""
+"Set when a stale-sync alert email has been sent for the current outage; "
+"cleared once the device syncs successfully again so the next outage can re-"
+"alert."
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,help:KSW_attendance_leave.field_hr_leave_attendance_line__accepted_minutes
+msgid ""
+"The approved portion of this issue in minutes. Cannot exceed the total "
+"duration."
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,help:KSW_attendance_leave.field_hr_employee__device_id
+msgid "The biometric device this employee is registered on"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model,name:KSW_attendance_leave.model_hr_leave
+msgid "Time Off"
+msgstr "الإجازات"
+
+#. module: KSW_attendance_leave
+#: model:ir.model,name:KSW_attendance_leave.model_hr_leave_type
+msgid "Time Off Type"
+msgstr "نوع الإجازة"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__hour_to
+msgid "To"
+msgstr "إلى"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave__x_total_early_leave_minutes
+msgid "Total Early Leave Minutes"
+msgstr "إجمالي دقائق الانصراف المبكر"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave__x_total_late_minutes
+msgid "Total Late Minutes"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,help:KSW_attendance_leave.field_hr_attendance__x_net_is_absent
+msgid ""
+"True if the employee is absent and not fully covered by an approved time-"
+"off."
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_attendance__x_net_worked_hours
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_list_inherit_coverage
+msgid "Worked Hours"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_form_inherit_leaves
+msgid "Worked Hours (Net)"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,help:KSW_attendance_leave.field_hr_attendance__x_net_worked_hours
+msgid "Worked hours including time covered by approved time-off."
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_biometric_device_details__x_stale_alert_sent
+msgid "X Stale Alert Sent"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_leave_view_form_inherit_attendance_issue
+msgid "✅ Submit"
+msgstr ""
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_leave_view_form_inherit_attendance_issue
+msgid "✔ Accepted"
+msgstr ""

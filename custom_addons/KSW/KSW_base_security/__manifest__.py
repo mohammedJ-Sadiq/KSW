@@ -11,6 +11,11 @@
         'views/sale_order_views.xml',
         'views/hr_employee_views.xml',
     ],
+    'assets': {
+        'web.assets_web': [
+            'KSW_base_security/static/src/css/rtl.css',
+        ],
+    },
     'installable': True,
     'application': False,
     'license': 'LGPL-3',

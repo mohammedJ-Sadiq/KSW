@@ -1192,6 +1192,17 @@ class HrLeave(models.Model):
             'context': {'default_leave_id': self.id},
         }
 
+    def action_open_hr_confirm_wizard(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Confirm Signed Vacation Form',
+            'res_model': 'ksw.hr.confirm.signature.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_leave_id': self.id},
+        }
+
     def action_employee_confirm_signature(self):
         """Step 6: HR confirms document upload and finalises the leave.
 

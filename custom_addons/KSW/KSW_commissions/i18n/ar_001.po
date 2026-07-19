@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-28 05:45+0000\n"
-"PO-Revision-Date: 2026-04-28 05:45+0000\n"
+"POT-Creation-Date: 2026-07-15 12:11+0000\n"
+"PO-Revision-Date: 2026-07-15 12:11+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar_001\n"
@@ -15,13 +15,18 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
-"X-Generator: KSW translator\n"
+"X-Generator: KSW ar-engine v2\n"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_template__employee_count
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_template_list
 msgid "# Employees"
 msgstr "عدد الموظفين"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_category_form
+msgid "0 means no upper bound."
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_commission_bank_export_wizard__operation_code__1
@@ -39,6 +44,77 @@ msgid "3 – Delete"
 msgstr "3 – حذف"
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid ""
+"<br/>\n"
+"                                            <b>Reason:</b>"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_override_wizard_form
+msgid ""
+"<br/>\n"
+"                        The salesperson will receive the"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_import_wizard_form
+msgid ""
+"<i class=\"fa fa-calculator me-1\" role=\"img\" aria-label=\"VAT\"/>\n"
+"                            Target and Collected amounts will be divided by <b>1.15</b>\n"
+"                            to remove the 15% VAT before being saved."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_salesperson_profile_form
+msgid ""
+"<i class=\"fa fa-code-fork me-2\"/>\n"
+"                                Define client buckets that receive <b>separate</b> commission\n"
+"                                lines on the monthly sheet. Each split must reference a\n"
+"                                <i>Client-specific</i> or <i>Employee + Client</i> rule whose\n"
+"                                <b>Clients</b> list names the customers in this bucket.\n"
+"                                The <b>general</b> line will receive the remaining sales\n"
+"                                (total minus all split amounts). Leave empty when the\n"
+"                                employee has a single uniform rule."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_override_wizard_form
+msgid ""
+"<i class=\"fa fa-exclamation-triangle me-2\" title=\"Warning\" role=\"img\" "
+"aria-label=\"Warning\"/>"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_import_wizard_form
+msgid ""
+"<i class=\"fa fa-info-circle me-2\" title=\"Info\" role=\"img\" aria-label=\"Info\"/>\n"
+"                        Upload the monthly Excel files produced by the accountant application.\n"
+"                        You may upload one or both files — only the uploaded file(s) will update\n"
+"                        the corresponding achieved amounts. The other column is left unchanged."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_salesperson_profile_form
+msgid ""
+"<i class=\"fa fa-info-circle me-2\"/>\n"
+"                                On import, <b>Achieved Collection</b> will be set\n"
+"                                to the <b>grand total</b> of all collections from\n"
+"                                the Excel file (all reps combined), and\n"
+"                                <b>Target Collection</b> will be set to the grand\n"
+"                                total of all targets from the same file."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_salesperson_profile_form
+msgid ""
+"<i class=\"fa fa-info-circle me-2\"/>\n"
+"                            Select which commission rule applies to this employee.\n"
+"                            Leave blank to auto-select the most-specific active rule\n"
+"                            by scope matching."
+msgstr ""
+
+#. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_form_inherit_awaiting_commission
 msgid ""
 "<i class=\"fa fa-info-circle\" title=\"Info\" role=\"img\" aria-label=\"Info\"/>\n"
@@ -49,19 +125,47 @@ msgid ""
 msgstr ""
 "<i class=\"fa fa-info-circle\" title=\"معلومة\" role=\"img\" aria-label=\"معلومة\"/>\n"
 "                    <b class=\"ms-1\">استرجاع جزء عبر كشف العمولة</b> —\n"
-"                    عندما لا يستطيع الموظف تحمّل قسط كامل من الراتب\n"
+"                    عندما لا يستطيع الموظف تحمل قسط كامل من الراتب\n"
 "                    وحده، يمكنك تحويل جزء (أو كله) إلى كشف عمولته\n"
 "                    الشهري:"
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_import_wizard_form
+msgid ""
+"<i class=\"fa fa-link me-2\" title=\"Mapping\" role=\"img\" aria-label=\"Mapping\"/>\n"
+"                        <b>Employee mapping:</b> the wizard matches the salesman name in the Excel file\n"
+"                        using the <i>Commission Import Name</i> field on each employee record.\n"
+"                        If blank, it falls back to the employee's <i>Name</i>.\n"
+"                        Unmatched names are listed in the sheet's chatter after import."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid ""
+"<i class=\"fa fa-shield me-2\" title=\"Override\" role=\"img\" aria-label=\"Override\"/>\n"
+"                                            <strong>Condition overridden by Sales Manager.</strong>"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "<span class=\"mx-1\">·</span>"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
+msgid "<span class=\"text-muted\">—</span>"
+msgstr ""
+
+#. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
 msgid "<strong>Approved by Manager</strong>"
-msgstr "<strong>اعتمد من قِبَل المدير</strong>"
+msgstr "<strong>اعتمد من قبل المدير</strong>"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
 msgid "<strong>Approved by</strong>"
-msgstr "<strong>اعتُمد بواسطة</strong>"
+msgstr "<strong>اعتمد بواسطة</strong>"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
@@ -76,7 +180,7 @@ msgstr "<strong>الراتب الأساسي</strong>"
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
 msgid "<strong>Confirmed by</strong>"
-msgstr "<strong>أُكِّد بواسطة</strong>"
+msgstr "<strong>أكد بواسطة</strong>"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
@@ -96,7 +200,7 @@ msgstr "<strong>الموظف</strong>"
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
 msgid "<strong>Finalised by</strong>"
-msgstr "<strong>أُنهي بواسطة</strong>"
+msgstr "<strong>أنهي بواسطة</strong>"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
@@ -131,18 +235,20 @@ msgstr "<strong>الفترة</strong>"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
 msgid "<strong>Prepared by Supervisor</strong>"
-msgstr "<strong>أُعدَّ من قِبَل المشرف</strong>"
+msgstr "<strong>أعد من قبل المشرف</strong>"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
 msgid "<strong>Printed on</strong>"
-msgstr "<strong>طُبع في</strong>"
+msgstr "<strong>طبع في</strong>"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
 msgid "<strong>Reviewed by Accountant</strong>"
-msgstr "<strong>روجِع من قِبَل المحاسب</strong>"
+msgstr "<strong>روجع من قبل المحاسب</strong>"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
@@ -179,6 +285,31 @@ msgid ""
 msgstr "لا يمكن إدخال نفس العطلة أكثر من مرة في الكشف الواحد تحت نفس الفئة."
 
 #. module: KSW_commissions
+#: model:ir.model.constraint,message:KSW_commissions.constraint_ksw_salesperson_profile_unique_employee_year
+msgid "A salesperson can only have one profile per year."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.constraint,message:KSW_commissions.constraint_ksw_location_allowance_line_unique_employee_per_sheet
+msgid "A technician can only appear once per location-allowance sheet."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_partner_form_ksw_commission
+msgid "Account no. as in col 0 of the Excel Sales file (primary match key)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_res_partner__x_client_account_number
+#: model:ir.model.fields,help:KSW_commissions.field_res_users__x_client_account_number
+msgid ""
+"Account number exactly as it appears in col 0 of the accountant's monthly "
+"Sales Excel file. Used by the import wizard as the primary key to match this"
+" customer to the correct commission split bucket. Takes priority over the "
+"Commission Import Name."
+msgstr ""
+
+#. module: KSW_commissions
 #: model:res.groups,name:KSW_commissions.group_commission_accountant
 msgid "Accountant"
 msgstr "المحاسب"
@@ -186,27 +317,50 @@ msgstr "المحاسب"
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet__done_by
 msgid "Accountant who finalised the sheet (state confirmed → done)."
-msgstr "المحاسب الذي أنهى الكشف (الحالة من مؤكَّد إلى منجز)."
+msgstr "المحاسب الذي أنهى الكشف (الحالة من مؤكد إلى منجز)."
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_tier__base__achieved
+msgid "Achieved Amount (auto)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__achieved_collection
+msgid "Achieved Collection"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__achieved_sales
+msgid "Achieved Sales"
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__message_needaction
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__message_needaction
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__message_needaction
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__message_needaction
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_needaction
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_needaction
 msgid "Action Needed"
 msgstr "إجراء مطلوب"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_category__active
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_template__active
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__active
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__active
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__active
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_template_search
 msgid "Active"
-msgstr "مُفعَّل"
+msgstr "نشط"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__activity_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__activity_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__activity_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__activity_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__activity_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__activity_ids
 msgid "Activities"
 msgstr "الأنشطة"
 
@@ -214,13 +368,19 @@ msgstr "الأنشطة"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__activity_exception_decoration
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__activity_exception_decoration
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__activity_exception_decoration
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__activity_exception_decoration
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__activity_exception_decoration
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__activity_exception_decoration
 msgid "Activity Exception Decoration"
-msgstr "تنبيه استثناء النشاط"
+msgstr "زخرفة استثناء النشاط"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__activity_state
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__activity_state
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__activity_state
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__activity_state
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__activity_state
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__activity_state
 msgid "Activity State"
 msgstr "حالة النشاط"
 
@@ -228,6 +388,9 @@ msgstr "حالة النشاط"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__activity_type_icon
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__activity_type_icon
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__activity_type_icon
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__activity_type_icon
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__activity_type_icon
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__activity_type_icon
 msgid "Activity Type Icon"
 msgstr "أيقونة نوع النشاط"
 
@@ -245,7 +408,7 @@ msgstr "الرحلات الفعلية"
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_driver_commission_line__worked_days
 msgid "Actual days worked this month (entered by supervisor)."
-msgstr "عدد أيام العمل الفعلي هذا الشهر (يُدخلها المشرف)."
+msgstr "عدد أيام العمل الفعلي هذا الشهر (يدخلها المشرف)."
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_form_inherit_awaiting_commission
@@ -255,10 +418,10 @@ msgid ""
 "                            <b>Awaiting Commission</b>. Leave it as\n"
 "                            <i>Pending</i>."
 msgstr ""
-"أضف بنداً جديداً <em>لنفس</em> السنة/الشهر بالمبلغ\n"
-"                            المتبقي (مثلاً 150) وفعّل\n"
+"أضف بندا جديدا <em>لنفس</em> السنة/الشهر بالمبلغ\n"
+"                            المتبقي (مثلا 150) وفعل\n"
 "                            <b>بانتظار العمولة</b>. اتركه في حالة\n"
-"                            <i>معلَّق</i>."
+"                            <i>معلق</i>."
 
 #. module: KSW_commissions
 #: model:res.groups,comment:KSW_commissions.group_commission_accountant
@@ -267,8 +430,8 @@ msgid ""
 "done). Implicitly grants Officer scope so the accountant can see every "
 "confirmed sheet."
 msgstr ""
-"تعديل مبلغ القروض المُجمَّد على الكشوف المؤكَّدة وإنهاؤها (الحالة منجز). "
-"يمنح ضمناً صلاحية المسؤول حتى يتمكن المحاسب من رؤية كل الكشوف المؤكَّدة."
+"تعديل مبلغ القروض المجمد على الكشوف المؤكدة وإنهاؤها (الحالة منجز). يمنح "
+"ضمنا صلاحية المسؤول حتى يتمكن المحاسب من رؤية كل الكشوف المؤكدة."
 
 #. module: KSW_commissions
 #: model:res.groups,name:KSW_commissions.group_commission_admin
@@ -293,12 +456,17 @@ msgstr "جميع البنوك – ملفات نصية (الكوثر)"
 #. module: KSW_commissions
 #: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_commission_category__kind__allowance
 msgid "Allowance"
-msgstr "البدل"
+msgstr "بدل"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
 msgid "Allowance &amp; Commission Lines"
 msgstr "بنود البدلات والعمولات"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
+msgid "Allowances &amp; Commissions"
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet_line__amount
@@ -308,13 +476,47 @@ msgid "Amount"
 msgstr "المبلغ"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_category__formula
+msgid "Amount Formula"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__annual_collection_target
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_salesperson_profile_list
+msgid "Annual Collection Target"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__annual_sales_target
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_salesperson_profile_list
+msgid "Annual Sales Target"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_form
+msgid "Applies To"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_override_wizard_form
+msgid "Apply Override"
+msgstr ""
+
+#. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_form
 msgid "Apply Template"
 msgstr "تطبيق القالب"
 
 #. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_salesperson_target_line__month__4
+msgid "April"
+msgstr "أبريل"
+
+#. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_template_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_template_search
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_search
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_salesperson_profile_search
 msgid "Archived"
 msgstr "مؤرشف"
 
@@ -322,12 +524,15 @@ msgstr "مؤرشف"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_template__employee_ids
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_template_form
 msgid "Assigned Employees"
-msgstr "الموظفون المعنيّون"
+msgstr "الموظفون المعنيون"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__message_attachment_count
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__message_attachment_count
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__message_attachment_count
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__message_attachment_count
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_attachment_count
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_attachment_count
 msgid "Attachment Count"
 msgstr "عدد المرفقات"
 
@@ -339,9 +544,29 @@ msgid ""
 " signal that a slice of this month is being routed to the commission sheet —"
 " this field is kept purely for traceability."
 msgstr ""
-"للتدقيق فقط: المبلغ الذي أُنشئ به هذا القسط (مولَّد تلقائياً أو مُدخل "
-"يدوياً). أصبحت إشارة \"بانتظار العمولة\" هي المرجع لتحويل جزء من هذا الشهر "
-"إلى كشف العمولة — يُحتفظ بهذا الحقل لأغراض التتبع فقط."
+"للتدقيق فقط: المبلغ الذي أنشئ به هذا القسط (مولد تلقائيا أو مدخل يدويا). "
+"أصبحت إشارة \"بانتظار العمولة\" هي المرجع لتحويل جزء من هذا الشهر إلى كشف "
+"العمولة — يحتفظ بهذا الحقل لأغراض التتبع فقط."
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_salesperson_target_line__month__8
+msgid "August"
+msgstr "أغسطس"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet__combined_commission_amount
+msgid ""
+"Auto-resolved combined sales+collection commission for hybrid (Salesman & "
+"Collector) employees."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet__collection_commission_amount
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet__sales_commission_amount
+msgid ""
+"Auto-resolved from the confirmed sales-commission line for this "
+"employee/period."
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet__driver_commission_amount
@@ -349,8 +574,15 @@ msgid ""
 "Auto-resolved from the matching driver-commission line (per site, per "
 "period). Phase A: always 0."
 msgstr ""
-"يُحدَّد تلقائياً من بند عمولة السائق المطابق (لكل موقع، لكل فترة). المرحلة "
-"A: دائماً 0."
+"يحدد تلقائيا من بند عمولة السائق المطابق (لكل موقع، لكل فترة). المرحلة A: "
+"دائما 0."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet__location_allowance_amount
+msgid ""
+"Auto-resolved from the matching technician location-allowance line (per "
+"period). Updated when the location-allowance sheet is confirmed."
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_commission_sheet__state__confirmed
@@ -382,6 +614,7 @@ msgstr "الحساب البنكي"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_list
 msgid "Bank Transfer"
 msgstr "التحويل البنكي"
@@ -390,6 +623,16 @@ msgstr "التحويل البنكي"
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_form
 msgid "Bank Transfer Amount"
 msgstr "مبلغ التحويل البنكي"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
+msgid "Bank<br/>Transfer"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_tier__base
+msgid "Base"
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_bank_export_wizard__batch_id
@@ -402,7 +645,53 @@ msgid "Bonus"
 msgstr "مكافأة"
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_salesperson_profile_search
+msgid "Both"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_form
+msgid "Breakfast"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_form
+msgid "Breakfast (SAR)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_form
+msgid "Breakfast (qty)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_line__breakfast_amount
+msgid "Breakfast Amount"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_line__breakfast_price
+#: model:ir.model.fields,field_description:KSW_commissions.field_res_config_settings__ksw_meal_breakfast_price
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.res_config_settings_view_form_ksw_commissions
+msgid "Breakfast Price"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_line__breakfast_qty
+msgid "Breakfast Qty"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_override_wizard__reason
+msgid ""
+"Brief justification for granting the commission despite the unmet condition."
+" Stored on the line and posted to the sheet chatter for audit."
+msgstr ""
+
+#. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_bank_export_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_import_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_override_wizard_form
 msgid "Cancel"
 msgstr "إلغاء"
 
@@ -416,7 +705,45 @@ msgstr "الفئة"
 #. module: KSW_commissions
 #: model:ir.model.constraint,message:KSW_commissions.constraint_ksw_commission_category_unique_code
 msgid "Category code must be unique."
-msgstr "يجب أن يكون رمز الفئة فريداً."
+msgstr "يجب أن يكون رمز الفئة فريدا."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__partner_id
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_search
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Client"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_res_partner__x_client_account_number
+#: model:ir.model.fields,field_description:KSW_commissions.field_res_users__x_client_account_number
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_partner_form_ksw_commission
+msgid "Client Account Number"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__split_id
+msgid "Client Split"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__split_ids
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_salesperson_profile_form
+msgid "Client Splits"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_rule__scope__client
+msgid "Client-specific"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__partner_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_client_split__client_names
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_list
+msgid "Clients"
+msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_batch_form
@@ -427,18 +754,162 @@ msgstr "إقفال الدفعة"
 #: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_commission_batch__state__closed
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_batch_search
 msgid "Closed"
-msgstr "مُقفل"
+msgstr "مقفل"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_category__code
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__code
 msgid "Code"
-msgstr "الرمز"
+msgstr "رمز"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Coll. %"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Coll. Comm."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Coll. Rule"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_rule__kind__collection
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_search
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_list
+msgid "Collection"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__collection_pct
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_override_wizard__collection_pct
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_rule__single_threshold_metric__collection
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_override_wizard_form
+msgid "Collection %"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_tier__base__collection_achieved
+msgid "Collection Achieved"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__x_collection_based_on_total
+msgid "Collection Based on Total"
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ksw.commission.category,name:KSW_commissions.cat_collection_commission
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_list
 msgid "Collection Commission"
 msgstr "عمولة التحصيل"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__collection_commission_amount
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__collection_commission_amount
+msgid "Collection Commission Amount"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__collection_rule_id
+msgid "Collection Commission Rule"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_import_wizard__collection_file
+msgid "Collection Excel File"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_import_wizard_form
+msgid "Collection File"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_import_wizard__collection_filename
+msgid "Collection File Name"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_salesperson_profile_form
+msgid "Collection Manager Options"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__collection_min_pct
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_form
+msgid "Collection Min %"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__collection_rule_id
+msgid "Collection Rule"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_target_line__collection_target
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_tier__base__collection_target
+msgid "Collection Target"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_line__role__collect
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_salesperson_profile__role__collect
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_salesperson_profile_client_split__role__collect
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_salesperson_profile_search
+msgid "Collector"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_search
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_list
+msgid "Combined"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_rule__kind__combined
+msgid "Combined (Sales & Collection)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__combined_rule_id
+msgid ""
+"Combined (sales + collection) rule for this employee. If blank, auto-"
+"selected by scope matching."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Combined Comm."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_list
+msgid "Combined Commission"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__combined_commission_amount
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__combined_commission_amount
+msgid "Combined Commission Amount"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__combined_rule_id
+msgid "Combined Commission Rule"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__combined_rule_id
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Combined Rule"
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_commission_category__kind__commission
@@ -486,9 +957,32 @@ msgid "Commission Configuration"
 msgstr "إعدادات العمولات"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_hr_employee__x_commission_import_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_res_partner__x_commission_import_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_res_users__x_commission_import_name
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_partner_form_ksw_commission
+msgid "Commission Import Name"
+msgstr ""
+
+#. module: KSW_commissions
 #: model:res.groups.privilege,name:KSW_commissions.privilege_commission_management
 msgid "Commission Management"
 msgstr "إدارة العمولات"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_client_split__rule_id
+msgid "Commission Rule"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_salesperson_profile_form
+msgid "Commission Rules"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_import_wizard__sheet_id
+msgid "Commission Sheet"
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.actions.act_window,name:KSW_commissions.action_ksw_commission_sheet_all
@@ -507,6 +1001,40 @@ msgid "Commission Templates"
 msgstr "قوالب العمولات"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_override_wizard__commission_kind
+msgid "Commission Type"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_tier__rate_pct
+msgid ""
+"Commission ratio applied to the base amount (target or achieved). E.g. 1.5 "
+"means 1.5% of base."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile_client_split__role
+msgid ""
+"Commission type applied to this client bucket (sales-only is the most common"
+" for special-client splits)."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.ui.menu,name:KSW_commissions.menu_ksw_commissions_root
+msgid "Commissions"
+msgstr "عمولات KSW"
+
+#. module: KSW_commissions
+#: model:ir.actions.report,name:KSW_commissions.action_report_commissions_summary
+msgid "Commissions & Allowances Summary"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
+msgid "Commissions &amp; Allowances Summary"
+msgstr ""
+
+#. module: KSW_commissions
 #: model:ir.ui.menu,name:KSW_commissions.menu_ksw_commissions_section
 msgid "Commissions and Other Allowances"
 msgstr "العمولات والبدلات الأخرى"
@@ -517,32 +1045,92 @@ msgid "Company Partner"
 msgstr "شريك الشركة"
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Computed Amounts"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_form
+msgid "Condition"
+msgstr "الشرط"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__condition_formula
+msgid "Condition Formula"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__x_condition_override
+msgid "Condition Overridden"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__condition_type
+msgid "Condition Type"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_res_config_settings
+msgid "Config Settings"
+msgstr "تهيئة الإعدادات"
+
+#. module: KSW_commissions
 #: model:ir.ui.menu,name:KSW_commissions.menu_ksw_commissions_config
 msgid "Configuration"
-msgstr "الإعدادات"
+msgstr "التهيئة"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_driver_commission_sheet_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
 msgid "Confirm"
 msgstr "تأكيد"
 
 #. module: KSW_commissions
 #: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_driver_commission_sheet__state__confirmed
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_location_allowance_sheet__state__confirmed
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_sheet__state__confirmed
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_driver_commission_sheet_search
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_search
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_search
 msgid "Confirmed"
-msgstr "مؤكَّد"
+msgstr "مؤكد"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__confirmed_by
 msgid "Confirmed By"
-msgstr "أُكِّد من قِبَل"
+msgstr "تم التأكيد بواسطة"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__confirmed_date
 msgid "Confirmed Date"
 msgstr "تاريخ التأكيد"
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_res_partner
+msgid "Contact"
+msgstr "جهة الاتصال"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_tier__base
+msgid ""
+"Controls which monetary amount the Rate %% is applied to AND how the tier ladder is walked.\n"
+"\n"
+"TARGET bases (Target / Sales Target / Collection Target):\n"
+"  Walk the ladder using the real achievement %%. A tier is only reached once %%achievement exceeds its lower bound.\n"
+"  Slice = band_pts / 100 × target.\n"
+"  → Use when commission is proportional to the target amount.\n"
+"\n"
+"ACHIEVED bases (Achieved / Sales Achieved / Collection Achieved):\n"
+"  Walk ALL tiers unconditionally — the earned amount is split proportionally across every tier band.\n"
+"  Tier 1 (0-70%%) always gets 70%% of achieved; Tier 2 (70-∞) gets the rest — regardless of %%achievement.\n"
+"  → Use when commission is proportional to the actual earned amount.\n"
+"\n"
+"• \"(auto)\" variants use the rule's own metric.\n"
+"• Explicit \"Sales …\" / \"Collection …\" are useful on Combined rules."
+msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.actions.act_window,help:KSW_commissions.action_ksw_commission_template
@@ -559,9 +1147,20 @@ msgstr "أنشئ أول قالب عمولة!"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_template_line__create_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_line__create_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__create_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_line__create_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__create_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_import_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__create_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_override_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__create_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__create_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_tier__create_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__create_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_client_split__create_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_target_line__create_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__create_uid
 msgid "Created by"
-msgstr "أنشأه"
+msgstr "أنشئ بواسطة"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_bank_export_wizard__create_date
@@ -573,9 +1172,20 @@ msgstr "أنشأه"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_template_line__create_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_line__create_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__create_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_line__create_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__create_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_import_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__create_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_override_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__create_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__create_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_tier__create_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__create_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_client_split__create_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_target_line__create_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__create_date
 msgid "Created on"
-msgstr "تاريخ الإنشاء"
+msgstr "أنشئ في"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__currency_id
@@ -584,6 +1194,12 @@ msgstr "تاريخ الإنشاء"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_template_line__currency_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_line__currency_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__currency_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_line__currency_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__currency_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__currency_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__currency_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__currency_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_target_line__currency_id
 msgid "Currency"
 msgstr "العملة"
 
@@ -593,8 +1209,29 @@ msgid ""
 "Current sum of KSW_deduction pending shortfalls for this employee/period. "
 "Frozen into 'Loans Deduction' when you confirm."
 msgstr ""
-"إجمالي العجز المعلَّق لخصومات KSW لهذا الموظف/الفترة. يُجمَّد في حقل \"خصم "
+"إجمالي العجز المعلق لخصومات KSW لهذا الموظف/الفترة. يجمد في حقل \"خصم "
 "القروض\" عند التأكيد."
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_rule__condition_type__formula
+msgid "Custom Formula (advanced)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_partner_form_ksw_commission
+msgid ""
+"Customer name as in col 1 of the Excel Sales file (fallback if account# "
+"blank)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_res_partner__x_commission_import_name
+#: model:ir.model.fields,help:KSW_commissions.field_res_users__x_commission_import_name
+msgid ""
+"Customer name exactly as it appears in the accountant's monthly Sales Excel "
+"file (col 1 = Customer name). Fallback when Commission Account Number is "
+"blank. Leave blank to fall back to the partner's regular Name."
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ksw.commission.category,name:KSW_commissions.cat_data_entry
@@ -602,10 +1239,22 @@ msgid "Data Entry Allowance"
 msgstr "بدل إدخال البيانات"
 
 #. module: KSW_commissions
+#: model:ksw.commission.category,quantity_label:KSW_commissions.cat_data_entry
+#: model:ksw.commission.category,quantity_label:KSW_commissions.cat_friday
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_driver_commission_sheet_form
 msgid "Days"
 msgstr "الأيام"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_category_form
+msgid "Days, Trips, Hours…"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_salesperson_target_line__month__12
+msgid "December"
+msgstr "ديسمبر"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_template_form
@@ -620,15 +1269,33 @@ msgstr "حساب البنك الافتراضي للدفع"
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_template_line__amount
 msgid ""
-"Default amount pre-filled on new sheets. The supervisor can change it on "
-"each sheet."
+"Default amount pre-filled on new sheets. For Quantity-Based categories this "
+"is auto-computed from the formula × default quantity."
 msgstr ""
-"المبلغ الافتراضي المُعبَّأ مسبقاً على الكشوف الجديدة. يمكن للمشرف تغييره على"
-" كل كشف."
+"المبلغ الافتراضي المعبأ مسبقا على الكشوف الجديدة. يمكن للمشرف تغييره على كل "
+"كشف."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_template_line__quantity
+msgid ""
+"Default quantity pre-filled on new sheets when the category is Quantity-"
+"Based. The supervisor can adjust it on each sheet."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_line__role
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_override_wizard__role
+msgid ""
+"Defaults to the salesperson profile role for the year. May be overridden per"
+" line if needed."
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__department_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_line__department_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__department_id
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_search
 msgid "Department"
 msgstr "القسم"
@@ -638,6 +1305,9 @@ msgstr "القسم"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet_line__description
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_template__description
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_template_line__description
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__description
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_tier__description
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_form
 msgid "Description"
 msgstr "الوصف"
 
@@ -645,6 +1315,38 @@ msgstr "الوصف"
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_category_form
 msgid "Description / usage notes…"
 msgstr "وصف / ملاحظات الاستخدام…"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_form
+msgid "Dinner"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_form
+msgid "Dinner (SAR)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_form
+msgid "Dinner (qty)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_line__dinner_amount
+msgid "Dinner Amount"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_line__dinner_price
+#: model:ir.model.fields,field_description:KSW_commissions.field_res_config_settings__ksw_meal_dinner_price
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.res_config_settings_view_form_ksw_commissions
+msgid "Dinner Price"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_line__dinner_qty
+msgid "Dinner Qty"
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_hr_employee__display_name
@@ -660,40 +1362,67 @@ msgstr "وصف / ملاحظات الاستخدام…"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_line__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_line__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_line__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_import_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_override_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_tier__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_client_split__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_target_line__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_res_partner__display_name
 msgid "Display Name"
-msgstr "الاسم الظاهر"
+msgstr "اسم العرض"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_category__quantity_label
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet_line__quantity_label
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_template_line__quantity_label
+msgid ""
+"Display label for the quantity field on the sheet line (e.g. \"Days\", "
+"\"Trips\", \"Hours\"). Falls back to \"Quantity\" when empty."
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_commission_sheet__state__done
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_search
 msgid "Done"
-msgstr "منجز"
+msgstr "منتهي"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
 msgid "Done (Finalised)"
-msgstr "منجز (مُنهَى)"
+msgstr "منجز (منهى)"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__done_by
 msgid "Done By"
-msgstr "أُنجز بواسطة"
+msgstr "أنجز بواسطة"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__done_date
 msgid "Done Date"
-msgstr "تاريخ الإنجاز"
+msgstr "تاريخ الاكتمال"
 
 #. module: KSW_commissions
 #: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_commission_batch__state__draft
 #: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_commission_sheet__state__draft
 #: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_driver_commission_sheet__state__draft
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_location_allowance_sheet__state__draft
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_sheet__state__draft
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_batch_search
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_search
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_driver_commission_sheet_search
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_search
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_search
 msgid "Draft"
 msgstr "مسودة"
 
@@ -740,6 +1469,7 @@ msgstr "عمولات السائقين"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
 msgid "Driver Total"
 msgstr "إجمالي السائق"
 
@@ -752,6 +1482,11 @@ msgstr "إجمالي رحلات السائق"
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_form
 msgid "Driver's Commission"
 msgstr "عمولة السائق"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
+msgid "Driver<br/>Commission"
+msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
@@ -767,8 +1502,41 @@ msgid ""
 "Drives UI hints. 'holiday_bonus' enables the holiday selector on the line "
 "and a unique-per-holiday constraint."
 msgstr ""
-"يتحكم بإرشادات الواجهة. تفعيل \"holiday_bonus\" يُظهر منتقي العطلة على البند"
-" ويفرض قيد فريد لكل عطلة."
+"يتحكم بإرشادات الواجهة. تفعيل \"holiday_bonus\" يظهر منتقي العطلة على البند "
+"ويفرض قيد فريد لكل عطلة."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__role
+msgid ""
+"Drives which kind of commission rules apply: sales, collection, or combined."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_rule__condition_type__dual_threshold
+msgid "Dual Threshold (sales% AND collection% both ≥ X%)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.constraint,message:KSW_commissions.constraint_ksw_salesperson_target_line_unique_profile_month
+msgid "Each month can only appear once per profile."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_form
+msgid ""
+"Each tier maps an achievement-percentage range\n"
+"                                (<i>From %</i>–<i>To %</i>) to a commission\n"
+"                                <i>Rate %</i>.  The <i>Base</i> column controls\n"
+"                                which monetary amount the rate is multiplied against.\n"
+"                                Leave <i>To %</i> at 0 for an unbounded top tier.\n"
+"                                <br/>\n"
+"                                <b>Reduced Rate:</b> Set <i>Reduced Rate Up To %</i>\n"
+"                                and <i>Reduced Rate Multiplier</i> on a tier to apply\n"
+"                                a discounted rate when the final achievement falls at or\n"
+"                                below that bound.  Example: Rate = 1%, Reduced Up To = 69,\n"
+"                                Multiplier = 0.7 → employees achieving 50–69% earn 0.7%\n"
+"                                instead of the full 1%."
+msgstr ""
 
 #. module: KSW_commissions
 #: model:res.groups,comment:KSW_commissions.group_commission_officer
@@ -776,7 +1544,7 @@ msgid ""
 "Edit any commission sheet company-wide and reset confirmed sheets back to "
 "draft."
 msgstr ""
-"تعديل أي كشف عمولة على مستوى الشركة وإعادة الكشوف المؤكَّدة إلى المسودة."
+"تعديل أي كشف عمولة على مستوى الشركة وإعادة الكشوف المؤكدة إلى المسودة."
 
 #. module: KSW_commissions
 #: model:res.groups,comment:KSW_commissions.group_commission_supervisor
@@ -792,8 +1560,8 @@ msgid ""
 "Editable only by the Commission Accountant while the sheet is in state "
 "\"confirmed\". Frozen from ``loans_amount`` on supervisor-confirm."
 msgstr ""
-"قابل للتعديل فقط من قِبَل محاسب العمولات أثناء حالة الكشف \"مؤكَّد\". "
-"يُجمَّد من ``loans_amount`` عند تأكيد المشرف."
+"قابل للتعديل فقط من قبل محاسب العمولات أثناء حالة الكشف \"مؤكد\". يجمد من "
+"``loans_amount`` عند تأكيد المشرف."
 
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_driver_commission_line__multiplied_trips
@@ -801,8 +1569,8 @@ msgid ""
 "Effective trip count after any manual adjustment by the supervisor. Entered "
 "directly — not computed."
 msgstr ""
-"عدد الرحلات الفعلي بعد أي تعديل يدوي من المشرف. يُدخل مباشرة — لا يُحسب "
-"تلقائياً."
+"عدد الرحلات الفعلي بعد أي تعديل يدوي من المشرف. يدخل مباشرة — لا يحسب "
+"تلقائيا."
 
 #. module: KSW_commissions
 #: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_commission_sheet_line__holiday_id__eid_adha
@@ -820,7 +1588,13 @@ msgstr "عيد الفطر"
 #: model:ir.model,name:KSW_commissions.model_hr_employee
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__employee_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_line__employee_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_line__employee_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__employee_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_override_wizard__employee_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__employee_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__employee_id
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_search
@@ -829,12 +1603,23 @@ msgid "Employee"
 msgstr "الموظف"
 
 #. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_rule__scope__employee_client
+msgid "Employee + Client"
+msgstr ""
+
+#. module: KSW_commissions
 #: model:ksw.commission.category,name:KSW_commissions.cat_employee_bonus
 msgid "Employee Bonus"
 msgstr "مكافأة موظف"
 
 #. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_rule__scope__employee
+msgid "Employee-specific"
+msgstr ""
+
+#. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_template_form
 msgid "Employees"
 msgstr "الموظفون"
@@ -848,7 +1633,7 @@ msgid ""
 "                                An employee can only be assigned to one\n"
 "                                template at a time."
 msgstr ""
-"سيتم تعبئة هذه البنود مسبقاً للموظفين\n"
+"سيتم تعبئة هذه البنود مسبقا للموظفين\n"
 "                                المدرجين هنا عند إنشاء كشف عمولتهم\n"
 "                                الشهري. يمكن إسناد الموظف إلى قالب واحد\n"
 "                                فقط في الوقت ذاته."
@@ -860,8 +1645,28 @@ msgid ""
 " (e.g., Aadhaar, SIN, NIN). This is used for official records and statutory "
 "compliance."
 msgstr ""
-"أدخل رقم الهوية الوطنية للموظف الصادر من الجهة الحكومية. يُستخدم في السجلات "
-"الرسمية والامتثال النظامي."
+"أدخل رقم الهوية الوطنية للموظف الصادر عن الحكومة (مثل Aadhaar أو SIN أو "
+"NIN). يستخدم هذا الرقم في السجلات الرسمية والامتثال القانوني."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_import_wizard__collection_exclude_vat
+msgid "Exclude VAT (÷ 1.15)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_import_wizard_form
+msgid ""
+"Expected columns: Account number · Customer name ·\n"
+"                            Balance · Aging · <b>Target ← imported</b> ·\n"
+"                            <b>Collected ← imported</b> · Rep name · Collection %"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_import_wizard_form
+msgid ""
+"Expected columns: Account number · Customer name ·\n"
+"                            Sales (VAT-incl.) · <b>Pre-tax sales ← imported</b> · Salesman"
+msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_bank_export_wizard_form
@@ -880,10 +1685,23 @@ msgid "Export Mode"
 msgstr "نمط التصدير"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_tier__reduced_rate_multiplier
+msgid ""
+"Factor applied to Rate % when achievement is in the reduced zone (≤ Reduced "
+"Rate Up To %). E.g. 0.7 = 70 %% of the normal rate. Has no effect when "
+"Reduced Rate Up To % is 0."
+msgstr ""
+
+#. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_batch__x_salary_bank_account_id
 msgid ""
 "Fallback for employees who have no personal Salary Paying Bank Account set."
 msgstr "بديل للموظفين الذين ليس لديهم حساب بنكي شخصي محدد للراتب."
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_salesperson_target_line__month__2
+msgid "February"
+msgstr "فبراير"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_form
@@ -892,6 +1710,9 @@ msgstr "إنهاء"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet__period
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_location_allowance_sheet__period
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_line__period
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_sheet__period
 msgid "First day of the month covered by this sheet."
 msgstr "اليوم الأول من الشهر الذي يغطيه هذا الكشف."
 
@@ -899,22 +1720,31 @@ msgstr "اليوم الأول من الشهر الذي يغطيه هذا الك�
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__message_follower_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__message_follower_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__message_follower_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__message_follower_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_follower_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_follower_ids
 msgid "Followers"
-msgstr "المتابعون"
+msgstr "المتابعين"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__message_partner_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__message_partner_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__message_partner_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__message_partner_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_partner_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_partner_ids
 msgid "Followers (Partners)"
-msgstr "المتابعون (الشركاء)"
+msgstr "المتابعين (الشركاء)"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_batch__activity_type_icon
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet__activity_type_icon
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_driver_commission_sheet__activity_type_icon
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_location_allowance_sheet__activity_type_icon
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_sheet__activity_type_icon
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__activity_type_icon
 msgid "Font awesome icon e.g. fa-tasks"
-msgstr "أيقونة Font Awesome مثل fa-tasks"
+msgstr "أيقونة من Font awesome مثال: fa-tasks"
 
 #. module: KSW_commissions
 #: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_commission_sheet_line__holiday_id__foundation_day
@@ -928,23 +1758,52 @@ msgid "Friday Work Allowance"
 msgstr "بدل العمل يوم الجمعة"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_tier__from_pct
+msgid "From %"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_rule__scope__general
+msgid "General (default)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.ui.menu,name:KSW_commissions.menu_ksw_commissions_settings
+msgid "General Settings"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Grant commission exception (Sales Manager)"
+msgstr ""
+
+#. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
 msgid "Gross"
 msgstr "الإجمالي"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_list
 msgid "Gross Total"
 msgstr "الإجمالي قبل الخصم"
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
+msgid "Gross<br/>Total"
+msgstr ""
+
+#. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__has_message
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__has_message
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__has_message
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__has_message
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__has_message
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__has_message
 msgid "Has Message"
-msgstr "يحتوي رسالة"
+msgstr "يحتوي على رسالة"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet_line__holiday_id
@@ -973,14 +1832,30 @@ msgstr "بدل العطلة"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_line__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_line__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_line__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_import_wizard__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_override_wizard__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_tier__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_client_split__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_target_line__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_res_config_settings__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_res_partner__id
 msgid "ID"
-msgstr "المعرّف"
+msgstr "المعرف"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__activity_exception_icon
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__activity_exception_icon
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__activity_exception_icon
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__activity_exception_icon
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__activity_exception_icon
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__activity_exception_icon
 msgid "Icon"
 msgstr "الأيقونة"
 
@@ -988,8 +1863,11 @@ msgstr "الأيقونة"
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_batch__activity_exception_icon
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet__activity_exception_icon
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_driver_commission_sheet__activity_exception_icon
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_location_allowance_sheet__activity_exception_icon
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_sheet__activity_exception_icon
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__activity_exception_icon
 msgid "Icon to indicate an exception activity."
-msgstr "أيقونة للدلالة على نشاط استثنائي."
+msgstr "الأيقونة للإشارة إلى النشاط المستثنى."
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_site_form
@@ -1005,8 +1883,11 @@ msgstr "رقم الهوية"
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_batch__message_needaction
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet__message_needaction
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_driver_commission_sheet__message_needaction
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_location_allowance_sheet__message_needaction
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_sheet__message_needaction
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__message_needaction
 msgid "If checked, new messages require your attention."
-msgstr "إذا تم تفعيله، فإن الرسائل الجديدة تحتاج اهتمامك."
+msgstr "إذا كان محددا، فهناك رسائل جديدة عليك رؤيتها."
 
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_batch__message_has_error
@@ -1015,8 +1896,35 @@ msgstr "إذا تم تفعيله، فإن الرسائل الجديدة تحتا
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet__message_has_sms_error
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_driver_commission_sheet__message_has_error
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_driver_commission_sheet__message_has_sms_error
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_location_allowance_sheet__message_has_error
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_location_allowance_sheet__message_has_sms_error
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_sheet__message_has_error
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_sheet__message_has_sms_error
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__message_has_error
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
-msgstr "إذا تم تفعيله، فإن بعض الرسائل بها خطأ في التسليم."
+msgstr "إذا كان محددا، فقد حدث خطأ في تسليم بعض الرسائل."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_import_wizard_form
+msgid "Import"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_import_wizard_form
+msgid "Import Sales & Collection from Excel"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid ""
+"Import achieved sales & collection amounts from the accountant's Excel files"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Import from Excel"
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet__x_unwind_data
@@ -1024,12 +1932,18 @@ msgid ""
 "Internal JSON used to unwind the KSW_deduction mutations applied at done "
 "time. Touched only by the model."
 msgstr ""
-"JSON داخلي يُستخدم لاسترجاع تغييرات خصومات KSW المطبَّقة عند الإنجاز. "
-"يُعدَّل فقط من خلال النموذج."
+"JSON داخلي يستخدم لاسترجاع تغييرات خصومات KSW المطبقة عند الإنجاز. يعدل فقط "
+"من خلال النموذج."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_form
+msgid "Internal notes — when does this rule apply, why was it created…"
+msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_batch_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_salesperson_profile_form
 msgid "Internal notes…"
 msgstr "ملاحظات داخلية…"
 
@@ -1037,14 +1951,19 @@ msgstr "ملاحظات داخلية…"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__message_is_follower
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__message_is_follower
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__message_is_follower
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__message_is_follower
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_is_follower
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_is_follower
 msgid "Is Follower"
 msgstr "متابع"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__is_locked
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__is_locked
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__is_locked
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__is_locked
 msgid "Is Locked"
-msgstr "مُجمَّد"
+msgstr "مجمد"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_category__is_system
@@ -1052,9 +1971,24 @@ msgid "Is System"
 msgstr "نظامي"
 
 #. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_salesperson_target_line__month__1
+msgid "January"
+msgstr "يناير"
+
+#. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__job_id
 msgid "Job"
 msgstr "الوظيفة"
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_salesperson_target_line__month__7
+msgid "July"
+msgstr "يوليو"
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_salesperson_target_line__month__6
+msgid "June"
+msgstr "يونيو"
 
 #. module: KSW_commissions
 #: model:ir.model,name:KSW_commissions.model_ksw_commission_sheet
@@ -1093,9 +2027,14 @@ msgstr "بند قالب عمولة KSW"
 
 #. module: KSW_commissions
 #: model:ir.module.category,name:KSW_commissions.module_category_ksw_commissions
-#: model:ir.ui.menu,name:KSW_commissions.menu_ksw_commissions_root
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.res_config_settings_view_form_ksw_commissions
 msgid "KSW Commissions"
 msgstr "عمولات KSW"
+
+#. module: KSW_commissions
+#: model:ir.actions.act_window,name:KSW_commissions.action_ksw_commissions_config_settings
+msgid "KSW Commissions Settings"
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.actions.server,name:KSW_commissions.ir_cron_create_monthly_sheets_ir_actions_server
@@ -1123,6 +2062,56 @@ msgid "KSW Driver Commission Sheet"
 msgstr "كشف عمولة سائق KSW"
 
 #. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_sales_commission_line
+msgid "KSW Sales / Collection Commission Line"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_sales_commission_rule
+msgid "KSW Sales / Collection Commission Rule"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_sales_commission_sheet
+msgid "KSW Sales / Collection Commission Sheet"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_sales_commission_tier
+msgid "KSW Sales / Collection Commission Tier"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_sales_commission_import_wizard
+msgid "KSW Sales/Collection Commission Import Wizard"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_salesperson_target_line
+msgid "KSW Salesperson Monthly Target"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_salesperson_profile
+msgid "KSW Salesperson Profile (yearly target)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_salesperson_profile_client_split
+msgid "KSW Salesperson Profile — Client Split Rule"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_location_allowance_line
+msgid "KSW Technician Location Allowance Line"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_location_allowance_sheet
+msgid "KSW Technician Location Allowance Sheet"
+msgstr ""
+
+#. module: KSW_commissions
 #: model:ir.model,name:KSW_commissions.model_ksw_site
 msgid "KSW Work Site"
 msgstr "موقع عمل KSW"
@@ -1136,8 +2125,15 @@ msgstr "عملية الكوثر"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_category__kind
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet_line__kind
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_template_line__kind
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__kind
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_search
 msgid "Kind"
 msgstr "النوع"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_client_split__label
+msgid "Label"
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_bank_export_wizard__write_uid
@@ -1149,9 +2145,20 @@ msgstr "النوع"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_template_line__write_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_line__write_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__write_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_line__write_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__write_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_import_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__write_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_override_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__write_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__write_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_tier__write_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__write_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_client_split__write_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_target_line__write_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__write_uid
 msgid "Last Updated by"
-msgstr "حدّثه آخراً"
+msgstr "آخر تحديث بواسطة"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_bank_export_wizard__write_date
@@ -1163,19 +2170,34 @@ msgstr "حدّثه آخراً"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_template_line__write_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_line__write_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__write_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_line__write_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__write_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_import_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__write_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_override_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__write_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__write_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_tier__write_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__write_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_client_split__write_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_target_line__write_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__write_date
 msgid "Last Updated on"
-msgstr "آخر تحديث"
+msgstr "آخر تحديث في"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__line_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__line_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__line_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_override_wizard__line_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__line_ids
 msgid "Line"
 msgstr "البند"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
 msgid "Lines"
 msgstr "البنود"
 
@@ -1185,7 +2207,7 @@ msgid ""
 "Lines + driver commission. Bank-transfer total uses ``total_payable`` "
 "instead (which subtracts loans)."
 msgstr ""
-"البنود + عمولة السائق. يستخدم إجمالي التحويل البنكي ``total_payable`` بدلاً "
+"البنود + عمولة السائق. يستخدم إجمالي التحويل البنكي ``total_payable`` بدلا "
 "من ذلك (الذي يخصم القروض)."
 
 #. module: KSW_commissions
@@ -1197,13 +2219,24 @@ msgstr "مجموع البنود"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
 msgid "Lines Total"
 msgstr "إجمالي البنود"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
+msgid "Lines<br/>Subtotal"
+msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_form
 msgid "Live Shortfall (auto)"
 msgstr "العجز الحالي (تلقائي)"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_location_allowance_line__breakfast_price
+msgid "Live unit price from KSW_commissions general settings."
+msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
@@ -1214,7 +2247,7 @@ msgstr "القروض"
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__x_loans_amount_locked
 msgid "Loans (locked)"
-msgstr "القروض (مُجمَّدة)"
+msgstr "القروض (مجمدة)"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__loans_amount
@@ -1227,9 +2260,58 @@ msgid "Loans Deduction"
 msgstr "خصم القروض"
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
+msgid "Loans<br/>Deduction"
+msgstr ""
+
+#. module: KSW_commissions
 #: model:ksw.commission.category,name:KSW_commissions.cat_location
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_list
 msgid "Location Allowance"
 msgstr "بدل الموقع"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__location_allowance_amount
+msgid "Location Allowance Amount"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.ui.menu,name:KSW_commissions.menu_ksw_location_allowance_sheet
+msgid "Location Allowance Sheets"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_form
+msgid "Lunch"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_form
+msgid "Lunch (SAR)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_form
+msgid "Lunch (qty)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_line__lunch_amount
+msgid "Lunch Amount"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_line__lunch_price
+#: model:ir.model.fields,field_description:KSW_commissions.field_res_config_settings__ksw_meal_lunch_price
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.res_config_settings_view_form_ksw_commissions
+msgid "Lunch Price"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_line__lunch_qty
+msgid "Lunch Qty"
+msgstr ""
 
 #. module: KSW_commissions
 #: model:res.groups,comment:KSW_commissions.group_commission_admin
@@ -1241,18 +2323,88 @@ msgstr ""
 "الإدارة/الاعتماد."
 
 #. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_salesperson_target_line__month__3
+msgid "March"
+msgstr "مارس"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_category__max_quantity
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet_line__max_quantity
+msgid "Max Quantity"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_category__max_quantity
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet_line__max_quantity
+msgid ""
+"Maximum quantity accepted on a sheet line. 0 means no upper bound (e.g. "
+"unlimited Fridays)."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_salesperson_target_line__month__5
+msgid "May"
+msgstr "مايو"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_form
+msgid "Meal Occurrences"
+msgstr ""
+
+#. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__message_has_error
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__message_has_error
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__message_has_error
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__message_has_error
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_has_error
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_has_error
 msgid "Message Delivery error"
-msgstr "خطأ تسليم الرسالة"
+msgstr "خطأ في تسليم الرسائل"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__message_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__message_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__message_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__message_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_ids
 msgid "Messages"
 msgstr "الرسائل"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_category__min_quantity
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet_line__min_quantity
+msgid "Min Quantity"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_rule__collection_min_pct
+msgid ""
+"Minimum achievement percentage on collection for the condition to pass (used"
+" by single_threshold when metric=collection, and by dual_threshold)."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_rule__sales_min_pct
+msgid ""
+"Minimum achievement percentage on sales for the condition to pass (used by "
+"single_threshold when metric=sales or kind=combined, and by dual_threshold)."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_category__min_quantity
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet_line__min_quantity
+msgid ""
+"Minimum quantity accepted on a sheet line. 0 = no lower bound (negative "
+"quantities are still rejected)."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet_line__is_quantity_based
+msgid ""
+"Mirrored from the category. Drives readonly on Amount and shows the Quantity"
+" column."
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ksw.commission.category,name:KSW_commissions.cat_mobile_phone
@@ -1260,9 +2412,24 @@ msgid "Mobile Phone Allowance"
 msgstr "بدل الجوال"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_target_line__month
+msgid "Month"
+msgstr "الشهر"
+
+#. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
 msgid "Monthly Cumulative Summary"
 msgstr "الملخص التراكمي الشهري"
+
+#. module: KSW_commissions
+#: model:ir.ui.menu,name:KSW_commissions.menu_ksw_sales_commission_sheet
+msgid "Monthly Sheets"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_salesperson_profile_form
+msgid "Monthly Targets"
+msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
@@ -1283,8 +2450,11 @@ msgstr "الرحلات المضاعفة"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__my_activity_date_deadline
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__my_activity_date_deadline
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__my_activity_date_deadline
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__my_activity_date_deadline
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__my_activity_date_deadline
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__my_activity_date_deadline
 msgid "My Activity Deadline"
-msgstr "موعد نهائي لنشاطي"
+msgstr "الموعد النهائي لنشاطاتي"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_search
@@ -1303,9 +2473,26 @@ msgstr "كشوف مرؤوسي"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_template__name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__name
 msgid "Name"
 msgstr "الاسم"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_hr_employee__x_commission_import_name
+msgid ""
+"Name exactly as it appears in the accountant's monthly Sales / Collection "
+"Excel files (column \"البائع\" / \"مندوب التحصيل\"). Used by the Excel "
+"import wizard to auto-match rows to this employee. Leave blank to fall back "
+"to the employee's regular name."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile_client_split__client_names
+msgid "Names of clients from the rule, shown for quick reference."
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_commission_sheet_line__holiday_id__national_day
@@ -1317,13 +2504,19 @@ msgstr "اليوم الوطني"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__activity_calendar_event_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__activity_calendar_event_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__activity_calendar_event_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__activity_calendar_event_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__activity_calendar_event_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__activity_calendar_event_id
 msgid "Next Activity Calendar Event"
-msgstr "حدث التقويم للنشاط التالي"
+msgstr "الفعالية التالية في تقويم الأنشطة"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__activity_date_deadline
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__activity_date_deadline
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__activity_date_deadline
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__activity_date_deadline
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__activity_date_deadline
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__activity_date_deadline
 msgid "Next Activity Deadline"
 msgstr "الموعد النهائي للنشاط التالي"
 
@@ -1331,6 +2524,9 @@ msgstr "الموعد النهائي للنشاط التالي"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__activity_summary
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__activity_summary
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__activity_summary
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__activity_summary
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__activity_summary
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__activity_summary
 msgid "Next Activity Summary"
 msgstr "ملخص النشاط التالي"
 
@@ -1338,13 +2534,16 @@ msgstr "ملخص النشاط التالي"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__activity_type_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__activity_type_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__activity_type_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__activity_type_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__activity_type_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__activity_type_id
 msgid "Next Activity Type"
 msgstr "نوع النشاط التالي"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
 msgid "No driver lines entered."
-msgstr "لم تُدخل بيانات سائقين."
+msgstr "لم تدخل بيانات سائقين."
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
@@ -1352,17 +2551,25 @@ msgid "No lines entered."
 msgstr "لا توجد بنود."
 
 #. module: KSW_commissions
-#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__note
-#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__note
-#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__note
-msgid "Note"
-msgstr "ملاحظة"
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
+msgid "No sheets selected."
+msgstr ""
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__note
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__note
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__note
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__note
+msgid "Note"
+msgstr "الملاحظات"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__notes
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_salesperson_profile_form
 msgid "Notes"
-msgstr "ملاحظات"
+msgstr "الملاحظات"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_site_form
@@ -1370,9 +2577,17 @@ msgid "Notes…"
 msgstr "ملاحظات…"
 
 #. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_salesperson_target_line__month__11
+msgid "November"
+msgstr "نوفمبر"
+
+#. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__message_needaction_counter
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__message_needaction_counter
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__message_needaction_counter
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__message_needaction_counter
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_needaction_counter
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_needaction_counter
 msgid "Number of Actions"
 msgstr "عدد الإجراءات"
 
@@ -1380,6 +2595,9 @@ msgstr "عدد الإجراءات"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__message_has_error_counter
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__message_has_error_counter
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__message_has_error_counter
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__message_has_error_counter
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_has_error_counter
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_has_error_counter
 msgid "Number of errors"
 msgstr "عدد الأخطاء"
 
@@ -1387,20 +2605,38 @@ msgstr "عدد الأخطاء"
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_batch__message_needaction_counter
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet__message_needaction_counter
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_driver_commission_sheet__message_needaction_counter
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_location_allowance_sheet__message_needaction_counter
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_sheet__message_needaction_counter
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__message_needaction_counter
 msgid "Number of messages requiring action"
-msgstr "عدد الرسائل التي تتطلب إجراءً"
+msgstr "عدد الرسائل التي تتطلب اتخاذ إجراء"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_batch__message_has_error_counter
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet__message_has_error_counter
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_driver_commission_sheet__message_has_error_counter
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_location_allowance_sheet__message_has_error_counter
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_sheet__message_has_error_counter
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__message_has_error_counter
 msgid "Number of messages with delivery error"
-msgstr "عدد الرسائل ذات خطأ التسليم"
+msgstr "عدد الرسائل الحادث بها خطأ في التسليم"
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_salesperson_target_line__month__10
+msgid "October"
+msgstr "أكتوبر"
 
 #. module: KSW_commissions
 #: model:res.groups,name:KSW_commissions.group_commission_officer
 msgid "Officer"
 msgstr "مسؤول"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_rule__partner_ids
+msgid ""
+"One or more clients this rule applies to. Leave empty when scope is General "
+"or Employee-specific."
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.constraint,message:KSW_commissions.constraint_ksw_commission_sheet_unique_employee_period
@@ -1411,6 +2647,16 @@ msgstr "كشف عمولة واحد فقط لكل موظف في الشهر."
 #: model:ir.model.constraint,message:KSW_commissions.constraint_ksw_driver_commission_sheet_unique_site_period
 msgid "Only one driver commission sheet per site per month."
 msgstr "كشف عمولة سائقين واحد فقط لكل موقع في الشهر."
+
+#. module: KSW_commissions
+#: model:ir.model.constraint,message:KSW_commissions.constraint_ksw_sales_commission_sheet_unique_period
+msgid "Only one sales/collection commission sheet per month."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.constraint,message:KSW_commissions.constraint_ksw_location_allowance_sheet_unique_period
+msgid "Only one technician location-allowance sheet per month."
+msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_template_form
@@ -1425,18 +2671,79 @@ msgstr "ملاحظات اختيارية عن وقت/كيفية استخدام ه
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_site__code
 msgid "Optional short code used in driver-commission filenames."
-msgstr "رمز قصير اختياري يُستخدم في أسماء ملفات عمولات السائقين."
+msgstr "رمز قصير اختياري يستخدم في أسماء ملفات عمولات السائقين."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_line__partner_id
+msgid ""
+"Optional. When set, client-specific commission rules will be matched first "
+"by the resolver."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_tier__reduced_rate_max_pct
+msgid ""
+"Optional: when the achievement % is at or below this value the rate is "
+"multiplied by the Reduced Rate Multiplier. Leave at 0 to always use the full"
+" Rate %. Example: set to 69 with multiplier 0.7 so that employees achieving "
+"50–69% earn only 70 %% of the normal rate."
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_line__x_original_amount
 msgid "Originally Scheduled Amount"
-msgstr "المبلغ المجدول أصلاً"
+msgstr "المبلغ المجدول أصلا"
 
 #. module: KSW_commissions
 #: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_commission_category__kind__other
 #: model:ksw.commission.category,name:KSW_commissions.cat_other
 msgid "Other"
-msgstr "أخرى"
+msgstr "غير ذلك"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__x_override_by
+msgid "Overridden By"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Override"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_override_wizard_form
+msgid "Override Commission Condition"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Override Condition"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__x_override_date
+msgid "Override Date"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__x_override_reason
+msgid "Override Reason"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:res.groups,comment:KSW_commissions.group_sales_commission_manager
+msgid ""
+"Override the commission-rule condition on individual sales/collection "
+"commission lines (e.g. grant the commission to a salesperson who fell below "
+"the threshold)."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_salesperson_profile_form
+msgid ""
+"Overwrite the 12 monthly target rows with an even split of the current "
+"annual totals?"
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_line__x_paid_via_commission_sheet_id
@@ -1451,7 +2758,7 @@ msgstr "مدفوع عبر الكشف"
 #. module: KSW_commissions
 #: model:ir.model,name:KSW_commissions.model_hr_payslip
 msgid "Pay Slip"
-msgstr "قسيمة الراتب"
+msgstr "كشف الراتب"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_bank_export_wizard__value_date
@@ -1460,13 +2767,14 @@ msgstr "تاريخ قيمة الدفع المستخدم في ملفات TXT."
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
 msgid "Pending"
-msgstr "معلّق"
+msgstr "معلق"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_line__x_pending_commission_sheet_id
 msgid "Pending Commission Sheet"
-msgstr "كشف عمولة معلّق"
+msgstr "كشف عمولة معلق"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
@@ -1477,19 +2785,40 @@ msgstr "إجمالي لكل سائق"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__period
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__period
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__period
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__period
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__period
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__period
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_batch_search
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_search
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_driver_commission_sheet_search
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_search
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_search
 msgid "Period"
 msgstr "الفترة"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_form
 msgid "Pre-fill lines from the employee's assigned commission template"
-msgstr "تعبئة البنود من قالب العمولة المسنَد للموظف"
+msgstr "تعبئة البنود من قالب العمولة المسند للموظف"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.res_config_settings_view_form_ksw_commissions
+msgid "Price (SAR) per breakfast occurrence."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.res_config_settings_view_form_ksw_commissions
+msgid "Price (SAR) per dinner occurrence."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.res_config_settings_view_form_ksw_commissions
+msgid "Price (SAR) per lunch occurrence."
+msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_form
@@ -1501,7 +2830,18 @@ msgstr "طباعة"
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
 msgid "Printed on"
-msgstr "طُبع في"
+msgstr "طبع في"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__priority
+msgid "Priority"
+msgstr "الأولوية"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_client_split__profile_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_target_line__profile_id
+msgid "Profile"
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ksw.commission.category,name:KSW_commissions.cat_project_management
@@ -1509,9 +2849,58 @@ msgid "Project Management Allowance"
 msgstr "بدل إدارة المشاريع"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_rule__condition_formula
+msgid ""
+"Python expression assigning a boolean to ``result``. Variables in scope: ``sales_pct``, ``collection_pct``, ``sales_target``, ``collection_target``, ``sales_achieved``, ``collection_achieved``, ``employee``, ``client``.\n"
+"Example: result = sales_pct >= 50 and collection_pct >= 60"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_category__formula
+msgid ""
+"Python expression evaluated to compute the line amount from the entered quantity. The variable ``quantity`` (alias ``qty``) is in scope; assign the final amount to ``result``.\n"
+"\n"
+"Example: result = quantity * 100\n"
+"Example: result = qty * 50 + (100 if qty >= 5 else 0)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_template_form
+msgid "Qty"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet_line__quantity
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_template_line__quantity
+msgid "Quantity"
+msgstr "الكمية"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_category__quantity_label
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet_line__quantity_label
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_template_line__quantity_label
+msgid "Quantity Label"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_category__is_quantity_based
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet_line__is_quantity_based
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_template_line__is_quantity_based
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_category_form
+msgid "Quantity-Based Amount"
+msgstr ""
+
+#. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
 msgid "Rate"
 msgstr "النسبة"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_tier__rate_pct
+msgid "Rate %"
+msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_site_form
@@ -1519,13 +2908,43 @@ msgid "Rate (SAR / trip)"
 msgstr "النسبة (ريال / رحلة)"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__rating_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__rating_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__rating_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__rating_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__rating_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__rating_ids
+msgid "Ratings"
+msgstr "التقييمات"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_override_wizard__reason
+msgid "Reason"
+msgstr "السبب"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_salesperson_profile_form
+msgid "Redistribute Annual → Monthly (Even)"
+msgstr ""
+
+#. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_form_inherit_awaiting_commission
 msgid ""
 "Reduce the original month's row to the amount\n"
 "                            payroll <em>can</em> afford (e.g. 200 → 50)."
 msgstr ""
-"قلِّل بند الشهر الأصلي إلى المبلغ الذي\n"
-"                            <em>يستطيع</em> الراتب تحمّله (مثلاً 200 → 50)."
+"قلل بند الشهر الأصلي إلى المبلغ الذي\n"
+"                            <em>يستطيع</em> الراتب تحمله (مثلا 200 → 50)."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_tier__reduced_rate_multiplier
+msgid "Reduced Rate Multiplier"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_tier__reduced_rate_max_pct
+msgid "Reduced Rate Up To %"
+msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_batch_form
@@ -1559,7 +2978,7 @@ msgid ""
 "rated for partial-month attendance: required_trips = "
 "round(required_trips_full_month * worked_days / 30)."
 msgstr ""
-"الرحلات المضاعفة المطلوبة لموظف عمل 30 يوماً كاملة. تُحتسب نسبياً للحضور "
+"الرحلات المضاعفة المطلوبة لموظف عمل 30 يوما كاملة. تحتسب نسبيا للحضور "
 "الجزئي: required_trips = round(required_trips_full_month * worked_days / "
 "30)."
 
@@ -1575,8 +2994,8 @@ msgid ""
 "(sheet, category, holiday) so the same holiday cannot be entered twice on "
 "one sheet."
 msgstr ""
-"مطلوب عندما تكون الفئة \"بدل العطلة\". كما يفرض تفرّد (الكشف، الفئة، العطلة)"
-" بحيث لا يمكن إدخال نفس العطلة مرتين على الكشف نفسه."
+"مطلوب عندما تكون الفئة \"بدل العطلة\". كما يفرض تفرد (الكشف، الفئة، العطلة) "
+"بحيث لا يمكن إدخال نفس العطلة مرتين على الكشف نفسه."
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
@@ -1586,15 +3005,77 @@ msgstr "المطلوب / 30 يوم"
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_driver_commission_sheet_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
 msgid "Reset to Draft"
-msgstr "إعادة إلى المسودة"
+msgstr "إعادة التعيين كمسودة"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Resolved Rules"
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__activity_user_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__activity_user_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__activity_user_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__activity_user_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__activity_user_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__activity_user_id
 msgid "Responsible User"
 msgstr "المستخدم المسؤول"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Revoke"
+msgstr "إلغاء"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Revoke Override"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Revoke override"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__role
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_override_wizard__role
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__role
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_client_split__role
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_salesperson_profile_search
+msgid "Role"
+msgstr "الدور"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_tier__rule_id
+msgid "Rule"
+msgstr "القاعدة"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile_client_split__rule_id
+msgid ""
+"Rule for this client group. Its Clients list (partner_ids) defines which "
+"customers belong to this split bucket. Must have scope \"Client-specific\" "
+"or \"Employee + Client\"."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__collection_rule_id
+msgid ""
+"Rule used to calculate collection commission for this employee. If blank, "
+"auto-selected by scope matching."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__sales_rule_id
+msgid ""
+"Rule used to calculate sales commission for this employee. If blank, the "
+"system auto-selects the most specific active rule that matches this employee"
+" (scope matching)."
+msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
@@ -1605,13 +3086,175 @@ msgstr "ريال"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__message_has_sms_error
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__message_has_sms_error
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__message_has_sms_error
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__message_has_sms_error
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_has_sms_error
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_has_sms_error
 msgid "SMS Delivery error"
-msgstr "خطأ تسليم الرسالة النصية"
+msgstr "خطأ في تسليم الرسائل النصية القصيرة"
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_rule__kind__sales
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_search
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_list
+msgid "Sales"
+msgstr "المبيعات"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__sales_pct
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_override_wizard__sales_pct
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_rule__single_threshold_metric__sales
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_override_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Sales %"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.ui.menu,name:KSW_commissions.menu_ksw_sales_commission_section
+msgid "Sales & Collection Commissions"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_form
+msgid "Sales / Collection Commission Rule"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Sales / Collection Commission Sheet"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_tier__base__sales_achieved
+msgid "Sales Achieved"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Sales Comm."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_list
+msgid "Sales Commission"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__sales_commission_amount
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__sales_commission_amount
+msgid "Sales Commission Amount"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__sales_rule_id
+msgid "Sales Commission Rule"
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ksw.commission.category,name:KSW_commissions.cat_sales_commission
 msgid "Sales Commission and Other"
 msgstr "عمولات المبيعات وأخرى"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_import_wizard__sales_file
+msgid "Sales Excel File"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_import_wizard_form
+msgid "Sales File"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_import_wizard__sales_filename
+msgid "Sales File Name"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:res.groups,name:KSW_commissions.group_sales_commission_manager
+msgid "Sales Manager"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__sales_min_pct
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_form
+msgid "Sales Min %"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:res.groups.privilege,name:KSW_commissions.privilege_sales_override
+msgid "Sales Override"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__sales_rule_id
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Sales Rule"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_target_line__sales_target
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_tier__base__sales_target
+msgid "Sales Target"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_sales_commission_override_wizard
+msgid "Sales-Manager Commission Condition Override Wizard"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Sales/Collection Commission Line"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.actions.act_window,name:KSW_commissions.action_ksw_sales_commission_rule
+#: model:ir.ui.menu,name:KSW_commissions.menu_ksw_sales_commission_rules
+msgid "Sales/Collection Commission Rules"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.actions.act_window,name:KSW_commissions.action_ksw_sales_commission_sheet
+msgid "Sales/Collection Commission Sheets"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_line__role__sales
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_salesperson_profile__role__sales
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_salesperson_profile_client_split__role__sales
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_salesperson_profile_search
+msgid "Salesman"
+msgstr "مندوب المبيعات"
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_line__role__both
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_salesperson_profile__role__both
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_salesperson_profile_client_split__role__both
+msgid "Salesman & Collector"
+msgstr "مندوب مبيعات ومحصل"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Salesperson"
+msgstr "مندوب المبيعات"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_salesperson_profile_form
+msgid "Salesperson Profile"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.actions.act_window,name:KSW_commissions.action_ksw_salesperson_profile
+#: model:ir.ui.menu,name:KSW_commissions.menu_ksw_salesperson_profile
+msgid "Salesperson Profiles"
+msgstr "ملفات مندوبي المبيعات"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__scope
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_search
+msgid "Scope"
+msgstr ""
 
 #. module: KSW_commissions
 #: model:res.groups,comment:KSW_commissions.group_commission_self
@@ -1624,17 +3267,36 @@ msgid "Self"
 msgstr "الذاتية"
 
 #. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_salesperson_target_line__month__9
+msgid "September"
+msgstr "سبتمبر"
+
+#. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_category__sequence
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet_line__sequence
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_template_line__sequence
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_line__sequence
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_line__sequence
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__sequence
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__sequence
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_tier__sequence
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_client_split__sequence
 msgid "Sequence"
-msgstr "الترتيب"
+msgstr "تسلسل"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_line__x_condition_override
+msgid ""
+"Set by a Sales Manager via the \"Override Condition\" button. While True, "
+"the commission is paid even when the rule's condition (threshold / formula) "
+"does not pass — using the tier ladder applied to the actual achievement "
+"percentage (or the lowest tier as a floor)."
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_category__is_system
 msgid "Set on seeded categories. Blocks unlink."
-msgstr "يُحدَّد للفئات المُنشأة افتراضياً. يمنع الحذف."
+msgstr "يحدد للفئات المنشأة افتراضيا. يمنع الحذف."
 
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_deduction_line__x_paid_via_commission_sheet_id
@@ -1642,14 +3304,17 @@ msgid ""
 "Set when a KSW Commissions sheet finalised this installment as paid. Lets "
 "the sheet reset path unwind the offset."
 msgstr ""
-"يُحدَّد عندما يُنهي كشف عمولات KSW هذا القسط كمدفوع. يسمح لمسار إعادة الكشف "
+"يحدد عندما ينهي كشف عمولات KSW هذا القسط كمدفوع. يسمح لمسار إعادة الكشف "
 "باسترجاع الخصم."
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet_line__sheet_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_line__sheet_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_line__sheet_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__sheet_id
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_driver_commission_sheet_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_form
 msgid "Sheet"
 msgstr "الكشف"
 
@@ -1660,6 +3325,7 @@ msgstr "عدد الكشوف"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_driver_commission_sheet_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_form
 msgid "Sheet Total"
 msgstr "إجمالي الكشف"
 
@@ -1670,8 +3336,20 @@ msgid "Sheets"
 msgstr "الكشوف"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_line__split_label
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile_client_split__label
+msgid "Short description of this bucket, e.g. \"Special Clients — Sales Only\"."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_rule__condition_type__single_threshold
+msgid "Single Threshold (one metric ≥ X%)"
+msgstr ""
+
+#. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__site_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__site_id
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_driver_commission_sheet_search
 msgid "Site"
@@ -1684,7 +3362,7 @@ msgid ""
 "month: the driver line is recorded on the month-end site only."
 msgstr ""
 "إسناد الموقع المستخدم في نموذج عمولة السائق الفرعي. عند تغيير الموقع خلال "
-"الشهر: يُسجَّل بند السائق على موقع نهاية الشهر فقط."
+"الشهر: يسجل بند السائق على موقع نهاية الشهر فقط."
 
 #. module: KSW_commissions
 #: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_commission_bank_export_wizard__export_mode__specific_excel
@@ -1697,21 +3375,31 @@ msgid "Specific bank – Text file"
 msgstr "بنك محدد – ملف نصي"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__split_label
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Split"
+msgstr ""
+
+#. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_category__code
 msgid "Stable identifier used in reports / exports. Must be unique."
-msgstr "معرّف ثابت يُستخدم في التقارير والتصدير. يجب أن يكون فريداً."
+msgstr "معرف ثابت يستخدم في التقارير والتصدير. يجب أن يكون فريدا."
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__state
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__state
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__state
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__state
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__state
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_batch_search
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_sheet_search
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_search
 msgid "State"
 msgstr "الحالة"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
 msgid "Status"
 msgstr "الحالة"
@@ -1720,16 +3408,19 @@ msgstr "الحالة"
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_batch__activity_state
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet__activity_state
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_driver_commission_sheet__activity_state
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_location_allowance_sheet__activity_state
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_sheet__activity_state
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__activity_state
 msgid ""
 "Status based on activities\n"
 "Overdue: Due date is already passed\n"
 "Today: Activity date is today\n"
 "Planned: Future activities."
 msgstr ""
-"الحالة بناءً على الأنشطة\n"
-"متأخر: تاريخ الاستحقاق قد فات\n"
+"الأنشطة المعتمدة على الحالة\n"
+"المتأخرة: تاريخ الاستحقاق مر\n"
 "اليوم: تاريخ النشاط هو اليوم\n"
-"مخطط: أنشطة مستقبلية."
+"المخطط: الأنشطة المستقبلية."
 
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet__lines_subtotal
@@ -1737,7 +3428,7 @@ msgid ""
 "Sum of all entered line amounts (allowances, commissions, holiday bonuses, "
 "etc.)."
 msgstr ""
-"مجموع جميع مبالغ البنود المُدخلة (البدلات، العمولات، بدلات العطلات، إلخ)."
+"مجموع جميع مبالغ البنود المدخلة (البدلات، العمولات، بدلات العطلات، إلخ)."
 
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet__loans_amount
@@ -1748,18 +3439,20 @@ msgid ""
 "settle them. The supervisor sees this as read-only; the commission "
 "accountant can adjust it after the supervisor confirms."
 msgstr ""
-"مجموع أقساط خصومات KSW المعلَّقة لهذا الموظف/الفترة والتي وضع عليها محاسب "
-"الخصومات إشارة \"بانتظار العمولة\" — أي أجزاء من الأقساط الشهرية مُحوَّلة "
-"بعيداً عن الراتب لتُسوَّى عبر كشف العمولة. يراها المشرف للقراءة فقط؛ يمكن "
-"لمحاسب العمولات تعديلها بعد تأكيد المشرف."
+"مجموع أقساط خصومات KSW المعلقة لهذا الموظف/الفترة والتي وضع عليها محاسب "
+"الخصومات إشارة \"بانتظار العمولة\" — أي أجزاء من الأقساط الشهرية محولة بعيدا"
+" عن الراتب لتسوى عبر كشف العمولة. يراها المشرف للقراءة فقط؛ يمكن لمحاسب "
+"العمولات تعديلها بعد تأكيد المشرف."
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_driver_commission_sheet_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_form
 msgid "Summary"
 msgstr "الملخص"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
 msgid "Summary by Department"
 msgstr "الملخص حسب القسم"
 
@@ -1771,7 +3464,7 @@ msgstr "المشرف"
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet__confirmed_by
 msgid "Supervisor who confirmed the sheet (state draft → confirmed)."
-msgstr "المشرف الذي أكّد الكشف (الحالة من مسودة إلى مؤكَّد)."
+msgstr "المشرف الذي أكد الكشف (الحالة من مسودة إلى مؤكد)."
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
@@ -1805,9 +3498,58 @@ msgstr "م5"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
 msgid "TOTALS"
 msgstr "الإجمالي"
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_tier__base__target
+msgid "Target Amount (auto)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__target_collection
+msgid "Target Collection"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__target_line_ids
+msgid "Target Line"
+msgstr "البند المستهدف"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__target_sales
+msgid "Target Sales"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Targets & Achieved"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_form
+msgid "Technician"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_form
+msgid "Technician Allowance"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.actions.act_window,name:KSW_commissions.action_ksw_location_allowance_sheet
+#: model:ir.ui.menu,name:KSW_commissions.menu_ksw_location_allowance_section
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.res_config_settings_view_form_ksw_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_form
+msgid "Technician Location Allowance"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_form
+msgid "Technicians"
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_template_line__template_id
@@ -1835,7 +3577,7 @@ msgid ""
 msgstr ""
 "تتيح لك القوالب تعريف بنود البدلات / العمولات\n"
 "                المعتادة مرة واحدة وإسناد الموظفين إليها. سيتم تعبئة\n"
-"                كل كشف شهري جديد لموظف مُسنَد بهذه البنود تلقائياً —\n"
+"                كل كشف شهري جديد لموظف مسند بهذه البنود تلقائيا —\n"
 "                ما عليك سوى تعديل المبالغ."
 
 #. module: KSW_commissions
@@ -1844,8 +3586,8 @@ msgid ""
 "The (existing) commission sheet that will settle this parked installment "
 "when finalised. Empty if no sheet exists yet for that employee/month."
 msgstr ""
-"كشف العمولة (الموجود) الذي سيُسوّي هذا القسط المُؤجل عند إنهائه. يكون فارغاً"
-" إذا لم يُنشأ كشف بعد لذلك الموظف/الشهر."
+"كشف العمولة (الموجود) الذي سيسوي هذا القسط المؤجل عند إنهائه. يكون فارغا إذا"
+" لم ينشأ كشف بعد لذلك الموظف/الشهر."
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_form_inherit_awaiting_commission
@@ -1855,8 +3597,8 @@ msgid ""
 "                    parked row, and the commission sheet flips it to\n"
 "                    <i>Paid</i> when finalised."
 msgstr ""
-"يبقى إجمالي القرض متوازناً (50 + 150 = 200) فلا يتأثر\n"
-"                    الجدول؛ يتخطى الراتب البند المُؤجل، ويحوّله كشف\n"
+"يبقى إجمالي القرض متوازنا (50 + 150 = 200) فلا يتأثر\n"
+"                    الجدول؛ يتخطى الراتب البند المؤجل، ويحوله كشف\n"
 "                    العمولة إلى <i>مدفوع</i> عند الإنهاء."
 
 #. module: KSW_commissions
@@ -1866,9 +3608,14 @@ msgid ""
 "                            picks the 150 up in its <i>Loans (auto)</i>\n"
 "                            field and settles it on Finalise."
 msgstr ""
-"يلتقط كشف العمولة المطابق المبلغ 150 تلقائياً\n"
-"                            في حقل <i>القروض (تلقائي)</i> ويُسوّيه عند\n"
+"يلتقط كشف العمولة المطابق المبلغ 150 تلقائيا\n"
+"                            في حقل <i>القروض (تلقائي)</i> ويسويه عند\n"
 "                            الإنهاء."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__single_threshold_metric
+msgid "Threshold Metric"
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_deduction_line__x_awaiting_commission
@@ -1879,9 +3626,21 @@ msgid ""
 "(auto)\" total. Cleared automatically when the line is paid via a commission"
 " sheet."
 msgstr ""
-"فعّل هذا الخيار على بند قسط معلَّق ليعني: لا تخصم هذا الجزء من الراتب — "
-"استرجعه عبر كشف العمولة الشهري للموظف. يلتقطه كشف العمولة المطابق تلقائياً "
-"ضمن إجمالي \"القروض (تلقائي)\". يُلغى تلقائياً عند دفع البند عبر كشف عمولة."
+"فعل هذا الخيار على بند قسط معلق ليعني: لا تخصم هذا الجزء من الراتب — استرجعه"
+" عبر كشف العمولة الشهري للموظف. يلتقطه كشف العمولة المطابق تلقائيا ضمن "
+"إجمالي \"القروض (تلقائي)\". يلغى تلقائيا عند دفع البند عبر كشف عمولة."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_rule__priority
+msgid ""
+"Tie-breaker within the same scope. Lower priority wins. Use this to layer "
+"multiple employee-specific rules."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__tier_ids
+msgid "Tier"
+msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
@@ -1922,6 +3681,11 @@ msgid "Tier Breakdown"
 msgstr "توزيع المستويات"
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_form
+msgid "Tier Ladder"
+msgstr ""
+
+#. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
 msgid "Tier Rate Configuration"
 msgstr "إعدادات نسب المستويات"
@@ -1933,7 +3697,7 @@ msgid ""
 "No commission earned until this is exceeded."
 msgstr ""
 "حد المستوى الأول: round(site.required_trips_full_month × worked_days / 30). "
-"لا تُكتسب عمولة حتى يتم تجاوزه."
+"لا تكتسب عمولة حتى يتم تجاوزه."
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_line__tier1_trips
@@ -1989,16 +3753,43 @@ msgid "Tiered Commission Rules"
 msgstr "قواعد العمولات المتدرجة"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_tier__to_pct
+msgid "To %"
+msgstr ""
+
+#. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__total
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_batch_list
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_driver_commission_sheet_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_driver_commission_sheet_list
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_list
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_list
 msgid "Total"
 msgstr "الإجمالي"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_line__total_allowance
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__total_allowance
+msgid "Total Allowance"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__total_collection_commission
+msgid "Total Collection Commission"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__total_combined_commission
+msgid "Total Combined Commission"
+msgstr ""
+
+#. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_line__total_commission
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__total_commission
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__total_commission
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__total_commission
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
 msgid "Total Commission"
 msgstr "إجمالي العمولة"
@@ -2009,6 +3800,11 @@ msgstr "إجمالي العمولة"
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_batch_form
 msgid "Total Payable"
 msgstr "الإجمالي المستحق"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__total_sales_commission
+msgid "Total Sales Commission"
+msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
@@ -2037,9 +3833,9 @@ msgid ""
 "Boolean (Odoo 19 does not reliably evaluate non-stored computes in readonly "
 "expressions)."
 msgstr ""
-"صحيح عندما تكون الحالة \"منجز\". يُحرّك خاصية القراءة فقط في النموذج عبر "
-"بوليان مخزَّن (لا يُقيِّم Odoo 19 بشكل موثوق الحقول المحسوبة غير المخزَّنة "
-"في تعابير readonly)."
+"صحيح عندما تكون الحالة \"منجز\". يحرك خاصية القراءة فقط في النموذج عبر "
+"بوليان مخزن (لا يقيم Odoo 19 بشكل موثوق الحقول المحسوبة غير المخزنة في "
+"تعابير readonly)."
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
@@ -2050,8 +3846,55 @@ msgstr "النوع"
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_batch__activity_exception_decoration
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet__activity_exception_decoration
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_driver_commission_sheet__activity_exception_decoration
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_location_allowance_sheet__activity_exception_decoration
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_sheet__activity_exception_decoration
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr "نوع نشاط الاستثناء المسجَّل."
+msgstr "نوع النشاط المستثنى في السجل."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_res_config_settings__ksw_meal_breakfast_price
+msgid ""
+"Unit price (SAR) per breakfast occurrence on a technician location-allowance"
+" line."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_res_config_settings__ksw_meal_dinner_price
+msgid ""
+"Unit price (SAR) per dinner occurrence on a technician location-allowance "
+"line."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_res_config_settings__ksw_meal_lunch_price
+msgid ""
+"Unit price (SAR) per lunch occurrence on a technician location-allowance "
+"line."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.res_config_settings_view_form_ksw_commissions
+msgid ""
+"Unit prices used by the Technician Location Allowance calculator. Changing "
+"these values updates every line on every existing sheet on next read."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_tier__to_pct
+msgid ""
+"Upper bound (inclusive). Leave at 0 for an unbounded top tier (captures ALL "
+"achievement above its lower bound, including achievements that exceed 100%% "
+"of target on target-based tiers). Use this for the highest sales tier so "
+"over-achievers are rewarded."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet_line__quantity
+msgid ""
+"Used when the category is Quantity-Based. The line amount is computed by the"
+" category formula from this quantity (e.g. Fridays = quantity × 100 SAR)."
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_bank_export_wizard__value_date
@@ -2077,21 +3920,27 @@ msgstr "رقم المركبة"
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__wage
 msgid "Wage"
-msgstr "الراتب"
+msgstr "الأجر"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_batch__website_message_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_sheet__website_message_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_driver_commission_sheet__website_message_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_location_allowance_sheet__website_message_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__website_message_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__website_message_ids
 msgid "Website Messages"
-msgstr "رسائل الموقع"
+msgstr "رسائل الموقع الإلكتروني"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_batch__website_message_ids
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet__website_message_ids
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_driver_commission_sheet__website_message_ids
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_location_allowance_sheet__website_message_ids
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_sheet__website_message_ids
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__website_message_ids
 msgid "Website communication history"
-msgstr "سجل تواصل الموقع"
+msgstr "سجل تواصل الموقع الإلكتروني"
 
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_sheet__total_payable
@@ -2100,8 +3949,50 @@ msgid ""
 "(locked amount when state is confirmed/done, otherwise the auto-pulled "
 "shortfall)."
 msgstr ""
-"ما يجب أن يحوّله البنك فعلياً = الإجمالي ناقص خصم القرض (المبلغ المُجمَّد "
-"عندما تكون الحالة مؤكَّد/منجز، وإلا فالعجز المسحوب تلقائياً)."
+"ما يجب أن يحوله البنك فعليا = الإجمالي ناقص خصم القرض (المبلغ المجمد عندما "
+"تكون الحالة مؤكد/منجز، وإلا فالعجز المسحوب تلقائيا)."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_import_wizard__collection_exclude_vat
+msgid ""
+"When checked, both the Target and Collected amounts from the collection file"
+" are divided by 1.15 to remove the 15% VAT before being written to the "
+"commission line."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_category__is_quantity_based
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_template_line__is_quantity_based
+msgid ""
+"When checked, sheet lines using this category disable the \"Amount\" field "
+"and compute it from a Python formula applied to the entered quantity (e.g. "
+"Friday Work Allowance = quantity × 100 SAR)."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__x_collection_based_on_total
+msgid ""
+"When enabled, the Excel import sets this employee's Achieved Collection to "
+"the grand total of ALL collections across every rep in the Excel file — not "
+"just the rows labelled with this employee's name. Use for the Collection "
+"Manager whose commission is driven by overall company collection "
+"performance."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_line__split_id
+msgid ""
+"When set, this line covers only the clients defined in the split rule. The "
+"general line (split blank) receives the remaining totals."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_rule__single_threshold_metric
+msgid ""
+"Which metric the single threshold is checked against. \"Sales %\" compares "
+"sales_pct ≥ Sales Min %. \"Collection %\" compares collection_pct ≥ "
+"Collection Min %. Only used when Condition Type = Single Threshold."
+msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_hr_employee__x_site_id
@@ -2125,15 +4016,72 @@ msgid "X Unwind Data"
 msgstr "بيانات الاسترجاع"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__year
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_salesperson_profile_search
+msgid "Year"
+msgstr "السنة"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_override_wizard_form
+msgid ""
+"You are about to override the\n"
+"                        commission-rule condition on this line\n"
+"                        ("
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_override_wizard_form
+msgid ""
+"e.g. Approved by Sales Manager — major customer demobilised mid-month due to"
+" project delay; achievement was 63% vs the 65% threshold."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_form
+msgid "e.g. Sales — General"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_override_wizard_form
+msgid ""
+"even though the threshold (or formula) was not\n"
+"                        met. The reason you provide will be stored on\n"
+"                        the line and posted to the sheet chatter for\n"
+"                        audit."
+msgstr ""
+
+#. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
 msgid "on"
 msgstr "في"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_category_form
+msgid "result = quantity * 100"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_form
+msgid "result = sales_pct >= 50 and collection_pct >= 60"
+msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
 msgid "sheet(s)"
 msgstr "كشف/كشوف"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
+msgid ""
+"sheet(s) ·\n"
+"                        Printed on"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_location_allowance_sheet_form
+msgid "× Price"
+msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commission_sheet
@@ -2143,4 +4091,9 @@ msgstr "— بلا قسم —"
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_driver_commission_sheet
 msgid "✓ Confirmed"
-msgstr "✓ مؤكَّد"
+msgstr "✓ مؤكد"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_commissions_summary
+msgid "✓ Done"
+msgstr ""

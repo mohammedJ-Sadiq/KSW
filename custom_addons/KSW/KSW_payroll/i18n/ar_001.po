@@ -1,0 +1,1549 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_payroll
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-15 12:11+0000\n"
+"PO-Revision-Date: 2026-07-15 12:11+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar_001\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
+"X-Generator: KSW ar-engine v2\n"
+
+#. module: KSW_payroll
+#: model:ir.actions.report,print_report_name:KSW_payroll.action_report_annual_vacation
+msgid "('Annual Vacation Report - %s' % (object.employee_id.name))"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_hr_payslip__x_daily_wage
+msgid ""
+"(Wage + DA + Travel + Meal + Medical + Other) divided by the number of days "
+"in the payslip month. Excludes housing allowance (HRA)."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:mail.template,body_html:KSW_payroll.mail_template_payslip_auto
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p>Dear <t t-out=\"object.employee_id.name or ''\"/>,</p>\n"
+"                    <p>Please find the attached payslip for the period: <t t-out=\"object.date_from\"/> - <t t-out=\"object.date_to\"/></p>\n"
+"                    <p>In case of any queries concerning this matter, do not hesitate to contact our HR department.</p>\n"
+"                    <br/>\n"
+"                    Best Regards,\n"
+"                    <br/>\n"
+"                    <t t-out=\"user.name\"/>\n"
+"                    <br/>\n"
+"                </div>\n"
+"            "
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "<em>Net Basic (Basic − Attendance Deduction)</em>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<span class=\"fw-bold text-success\">Approved</span>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<span class=\"fw-bold text-success\">Confirmed</span>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.res_config_settings_view_form_ksw_payroll
+msgid "<span class=\"ms-1\">%</span>"
+msgstr "<span class=\"ms-1\">%</span>"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_leave_view_form_inherit_payroll_vacation
+msgid ""
+"<span class=\"o_stat_text\">Print Vacation</span>\n"
+"                            <span class=\"o_stat_text\">Report</span>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_leave_view_form_inherit_payroll_vacation
+msgid ""
+"<span class=\"o_stat_text\">Recompute</span>\n"
+"                            <span class=\"o_stat_text\">Payslip</span>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_leave_view_form_inherit_payroll_vacation
+msgid "<span class=\"o_stat_text\">Vacation Payslip(s)</span>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<span class=\"text-muted ms-1\" style=\"font-size:0.8em\">(baseline)</span>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_contract_form_inherit_ksw_payroll
+msgid "<span>/ month</span>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>Accountant</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>Accounting Manager</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>Applicant</strong><br/>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "<strong>Authorized Signature</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>Balance Consumed (Days)</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "<strong>Bank Account</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>Calendar Days Away</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid ""
+"<strong>Combined Leave</strong>\n"
+"                                    — Annual portion:"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "<strong>Company</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "<strong>Department</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "<strong>Designation</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>Document Upload Confirmation</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>EOS — Resignation (Art. 85)</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>EOS — Termination (Art. 84)</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "<strong>Employee</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>End Date</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>General Manager</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>HR Manager</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "<strong>ID No.</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>Job Title</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>Joining Date</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>Last Return Date</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>Last Wage (SAR)</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>Leave Manager</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>Leave Nature</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>Leave Type</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>National / Iqama ID</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>Overall Status</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>Payslip Name</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "<strong>Period</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "<strong>Reference</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>Return Date</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>Return Status</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>Service Years</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>Start Date</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "<strong>Status</strong>"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid ""
+"<strong>Vacation payslip not yet generated.</strong>\n"
+"                                    The payslip is created automatically upon GM Final Approval."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payroll_structure__x_absence_only_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.view_hr_payroll_structure_form_inherit_ksw
+msgid "Absence-Only Deduction"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "Absent"
+msgstr "غائب"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_payslip_run_form_inherit_ksw
+msgid "Account"
+msgstr "الحساب"
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__ksw_kawthar_file_wizard__operation_code__4
+msgid "Activate Card - تنشيط البطاقة"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:hr.salary.rule,name:KSW_payroll.hr_rule_additional_commissions
+msgid "Additional Commissions"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:hr.salary.rule,name:KSW_payroll.hr_rule_vacation_gosi
+msgid "Advance GOSI (Paid Vacation Months)"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:hr.salary.rule,name:KSW_payroll.hr_rule_vacation_hra
+msgid "Advance HRA (Paid Vacation Months)"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__ksw_bank_file_export_wizard__export_mode__all_excel
+msgid "All banks – Excel files"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__ksw_bank_file_export_wizard__export_mode__all_txt
+msgid "All banks – Text files"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_employee_view_form_inherit
+msgid "Allowances"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip_line__amount
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip_worked_days__amount
+msgid "Amount"
+msgstr "المبلغ"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "Amount (SAR)"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.actions.report,name:KSW_payroll.action_report_annual_vacation
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "Annual Vacation Report"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model,name:KSW_payroll.model_hr_attendance
+msgid "Attendance"
+msgstr "الحضور والانصراف"
+
+#. module: KSW_payroll
+#: model:hr.salary.rule,name:KSW_payroll.hr_rule_attendance_deduction
+msgid "Attendance Deduction"
+msgstr "خصم الغياب والتأخير"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "Attendance Deduction Breakdown"
+msgstr "تفصيل خصم الغياب والتأخير"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_employee__x_auto_send_payslip
+msgid "Auto-Email Payslip"
+msgstr "إرسال كشف الراتب تلقائيا"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_bank_file_export_wizard__bank_account_id
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_payslip_run_bank_total__bank_account_id
+msgid "Bank Account"
+msgstr "الحساب البنكي"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip_run__x_bank_total_ids
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_payslip_run_form_inherit_ksw
+msgid "Bank Account Totals"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model,name:KSW_payroll.model_res_partner_bank
+msgid "Bank Accounts"
+msgstr "الحسابات البنكية"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_payslip_run_bank_total__bank_name
+msgid "Bank Name"
+msgstr "اسم البنك"
+
+#. module: KSW_payroll
+#: model:ir.model,name:KSW_payroll.model_biometric_attendance_sync
+msgid "Biometric Attendance Sync Service"
+msgstr "خدمة مزامنة حضور البصمة"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_account_setup_bank_manual_config__x_wps_cic_number
+#: model:ir.model.fields,field_description:KSW_payroll.field_res_partner_bank__x_wps_cic_number
+msgid "CIC Number (رقم العميل)"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.view_bank_file_export_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.view_hr_payslip_by_employees_inherit
+msgid "Cancel"
+msgstr "إلغاء"
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__ksw_kawthar_file_wizard__operation_code__d
+msgid "Change Card Details & Special Close - تحديث المعلومات كاملة"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_payslip_run_form_inherit_ksw
+msgid "Clear Skip Log"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__ksw_kawthar_file_wizard__operation_code__3
+msgid "Close Card - أغلاق البطاقة"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "Code"
+msgstr "رمز"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "Commission —"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_account_setup_bank_manual_config__x_wps_debit_account
+#: model:ir.model.fields,help:KSW_payroll.field_res_partner_bank__x_wps_debit_account
+msgid "Company IBAN that salaries are debited from in the WPS file."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_bank_file_export_wizard__company_partner_id
+msgid "Company Partner"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_hr_employee__x_salary_bank_account_id
+msgid ""
+"Company bank account used to pay this employee's salary. This is the source "
+"account the accounting team transfers from, not the employee's personal bank"
+" account."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model,name:KSW_payroll.model_res_config_settings
+msgid "Config Settings"
+msgstr "تهيئة الإعدادات"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip_worked_days__x_count_display
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.view_hr_payslip_form_inherit_worked_days
+msgid "Count"
+msgstr "التعداد"
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__ksw_kawthar_file_wizard__operation_code__1
+msgid "Create New Card - أنشاء بطاقة جديدة"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__ksw_kawthar_file_wizard__operation_code__p
+msgid "Create New PIN - تجديد الرقم السري"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_bank_file_export_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_kawthar_file_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_payslip_run_bank_total__create_uid
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_payslip_run_skip_line__create_uid
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_wps_file_wizard__create_uid
+msgid "Created by"
+msgstr "أنشئ بواسطة"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_bank_file_export_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_kawthar_file_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_payslip_run_bank_total__create_date
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_payslip_run_skip_line__create_date
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_wps_file_wizard__create_date
+msgid "Created on"
+msgstr "أنشئ في"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_attendance__x_currency_id
+msgid "Currency"
+msgstr "العملة"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_account_setup_bank_manual_config__x_wps_cic_number
+#: model:ir.model.fields,help:KSW_payroll.field_res_partner_bank__x_wps_cic_number
+msgid "Customer Identification Code for the WPS bank file."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_attendance__x_daily_rate
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_attendance_view_list_inherit_deduction
+msgid "Daily Rate"
+msgstr "الأجر اليومي"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip__x_daily_wage
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.view_hr_payslip_form_inherit_worked_days
+msgid "Daily Wage"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_hr_attendance__x_hourly_rate
+msgid "Daily rate / 8 hours."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_hr_payslip__x_hourly_wage
+msgid "Daily wage / 8 hours."
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "Date"
+msgstr "التاريخ"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "Day"
+msgstr "اليوم"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "Days"
+msgstr "الأيام"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_account_setup_bank_manual_config__x_wps_debit_account
+#: model:ir.model.fields,field_description:KSW_payroll.field_res_partner_bank__x_wps_debit_account
+msgid "Debit Account (IBAN)"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_attendance__x_deductible_base
+msgid "Deductible Base"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_hr_attendance__x_daily_rate
+msgid "Deductible base / 30."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_attendance__x_deduction_amount
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_attendance_view_list_inherit_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.view_hr_payslip_form_inherit_worked_days
+msgid "Deduction"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "Deduction (SAR)"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_hr_payslip_run__x_salary_bank_account_id
+msgid ""
+"Default company bank account for WPS export. Employees with their own Salary"
+" Paying Bank Account will override this."
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "Description"
+msgstr "الوصف"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_biometric_attendance_sync__display_name
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_attendance__display_name
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_leave__display_name
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payroll_structure__display_name
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip__display_name
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip_employees__display_name
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip_line__display_name
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip_run__display_name
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip_worked_days__display_name
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_salary_rule__display_name
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_version__display_name
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_bank_file_export_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_kawthar_file_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_payslip_run_bank_total__display_name
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_payslip_run_skip_line__display_name
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_wps_file_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_payroll.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:KSW_payroll.field_res_partner_bank__display_name
+msgid "Display Name"
+msgstr "اسم العرض"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "Early (min)"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model,name:KSW_payroll.model_hr_employee
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_payslip_run_skip_line__employee_id
+msgid "Employee"
+msgstr "الموظف"
+
+#. module: KSW_payroll
+#: model:ir.model,name:KSW_payroll.model_hr_version
+msgid "Employee Contract"
+msgstr "عقد الموظف"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "Employee Information"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_employee__x_employee_no
+msgid "Employee No."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_payslip_run_bank_total__slip_count
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_payslip_run_form_inherit_ksw
+msgid "Employees"
+msgstr "الموظفون"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_hr_payslip_run__x_skip_line_ids
+msgid ""
+"Employees that were automatically skipped during payslip generation and the "
+"reason they were excluded."
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "End-of-Service Data (Saudi Art. 84–88)"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.view_bank_file_export_wizard_form
+msgid "Export"
+msgstr "تصدير"
+
+#. module: KSW_payroll
+#: model:ir.actions.act_window,name:KSW_payroll.action_bank_file_export_wizard
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_payslip_run_form_inherit_ksw
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.view_bank_file_export_wizard_form
+msgid "Export Bank File"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_bank_file_export_wizard__export_mode
+msgid "Export Mode"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:hr.salary.rule,name:KSW_payroll.hr_rule_fin_consideration
+msgid "Financial Consideration for Excess Leave"
+msgstr "المقابل المالي عن الإجازة الزائدة"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "Financial Items"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:hr.salary.rule,name:KSW_payroll.hr_rule_flight_ticket
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "Flight Ticket Allowance"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "Full Balance Clearance"
+msgstr "تصفية كامل الرصيد"
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__ksw_kawthar_file_wizard__operation_code__9
+msgid "Full Refund - أستراد كامل المبلغ"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_res_config_settings__ksw_gosi_rate
+msgid "GOSI Rate (%)"
+msgstr "نسبة التأمينات الاجتماعية (٪)"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.view_hr_payslip_by_employees_inherit
+msgid "Generate"
+msgstr "إنشاء"
+
+#. module: KSW_payroll
+#: model:ir.model,name:KSW_payroll.model_hr_payslip_employees
+msgid "Generate payslips for all selected employees"
+msgstr "إنشاء قسائم دفع الرواتب لجميع الموظفين الذين تم تحديدهم"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_attendance__x_hourly_rate
+msgid "Hourly Rate"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip__x_hourly_wage
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.view_hr_payslip_form_inherit_worked_days
+msgid "Hourly Wage"
+msgstr "الأجر بالساعة"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "Hours"
+msgstr "ساعات"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_biometric_attendance_sync__id
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_attendance__id
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_employee__id
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_leave__id
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payroll_structure__id
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip__id
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip_employees__id
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip_line__id
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip_run__id
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip_worked_days__id
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_salary_rule__id
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_version__id
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_bank_file_export_wizard__id
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_kawthar_file_wizard__id
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_payslip_run_bank_total__id
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_payslip_run_skip_line__id
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_wps_file_wizard__id
+#: model:ir.model.fields,field_description:KSW_payroll.field_res_config_settings__id
+#: model:ir.model.fields,field_description:KSW_payroll.field_res_partner_bank__id
+msgid "ID"
+msgstr "المعرف"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_hr_employee__x_auto_send_payslip
+msgid ""
+"If enabled, a PDF copy of each confirmed payslip is emailed automatically to"
+" this employee's Work Email."
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.view_hr_payroll_structure_form_inherit_ksw
+msgid ""
+"If enabled, only fully absent or unpresented days are deducted. Late "
+"arrivals and early departures carry no salary penalty."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_hr_employee__x_employee_no
+msgid "Internal employee number used by HR."
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "Item"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__res_partner_bank__x_file_type__kawthar
+msgid "Kawthar (Itqan Payroll Card)"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model,name:KSW_payroll.model_ksw_kawthar_file_wizard
+msgid "Kawthar (Itqan) Payroll Card File Generator"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_bank_file_export_wizard__operation_code
+msgid "Kawthar Operation"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_bank_file_export_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_kawthar_file_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_payslip_run_bank_total__write_uid
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_payslip_run_skip_line__write_uid
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_wps_file_wizard__write_uid
+msgid "Last Updated by"
+msgstr "آخر تحديث بواسطة"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_bank_file_export_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_kawthar_file_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_payslip_run_bank_total__write_date
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_payslip_run_skip_line__write_date
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_wps_file_wizard__write_date
+msgid "Last Updated on"
+msgstr "آخر تحديث في"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "Late (min)"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "Leave Request Details"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__ksw_kawthar_file_wizard__operation_code__2
+msgid "Load Funds - تحميل رصيد"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_hr_employee__x_payslip_export_order
+msgid "Lower numbers are exported first in payroll TXT/Excel files."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_account_setup_bank_manual_config__x_wps_mol_id
+#: model:ir.model.fields,field_description:KSW_payroll.field_res_partner_bank__x_wps_mol_id
+msgid "MOL ID"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__ksw_kawthar_file_wizard__operation_code__5
+msgid "Mark Card as Lost - ألاشارة على البطاقة كضائعة"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__ksw_kawthar_file_wizard__operation_code__6
+msgid "Mark Card as Stolen - ألاشارة على البطاقة كمسروقة"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_account_setup_bank_manual_config__x_wps_mol_id
+#: model:ir.model.fields,help:KSW_payroll.field_res_partner_bank__x_wps_mol_id
+msgid "Ministry of Labor establishment ID for WPS."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:hr.salary.rule,name:KSW_payroll.hr_rule_mobile
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_employee__mobile_allowance
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_version__mobile_allowance
+msgid "Mobile Allowance"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_hr_employee__mobile_allowance
+#: model:ir.model.fields,help:KSW_payroll.field_hr_version__mobile_allowance
+msgid "Mobile allowance"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_hr_payslip_worked_days__amount
+msgid ""
+"Monetary amount associated with this worked-day entry (e.g. total attendance"
+" deduction)."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_hr_attendance__x_deductible_base
+msgid "Monthly wage + allowances (excl. housing) used as deduction base."
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_payslip_run_form_inherit_ksw
+msgid "NET Totals by Bank Account"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip__x_net_wage
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.view_hr_payslip_list_inherit_ksw_net
+msgid "Net Salary"
+msgstr "صافي الراتب"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "Notes / Description"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip_worked_days__number_of_days
+msgid "Number of Days"
+msgstr "عدد الأيام"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip_worked_days__number_of_hours
+msgid "Number of Hours"
+msgstr "عدد الساعات"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "On Vacation"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:res.groups,name:KSW_payroll.group_hr_payroll_self
+msgid "Only Self"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_kawthar_file_wizard__operation_code
+msgid "Operation"
+msgstr "العملية"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_ksw_bank_file_export_wizard__operation_code
+msgid "Operation type for Kawthar payroll card files."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:hr.salary.rule,name:KSW_payroll.hr_rule_other
+msgid "Other Allowance"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_contract_form_inherit_ksw_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_employee_view_form_inherit
+msgid "Other Allowances"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "Other Inputs"
+msgstr "مدخلات أخرى"
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__ksw_kawthar_file_wizard__operation_code__8
+msgid "Partial Refund - أستراد جزء من المبلغ"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_employee__company_partner_id
+msgid "Partner"
+msgstr "الشريك"
+
+#. module: KSW_payroll
+#: model:ir.model,name:KSW_payroll.model_hr_payslip
+msgid "Pay Slip"
+msgstr "كشف الراتب"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_ksw_wps_file_wizard__value_date
+msgid "Payment value date (the date the bank processes the transfer)."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_ksw_bank_file_export_wizard__value_date
+msgid "Payment value date for the WPS text file header."
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.view_partner_bank_form_inherit_ksw_wps
+msgid "Payroll File Configuration"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_account_setup_bank_manual_config__x_file_type
+#: model:ir.model.fields,field_description:KSW_payroll.field_res_partner_bank__x_file_type
+msgid "Payroll File Type"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "Payslip"
+msgstr "كشف الراتب"
+
+#. module: KSW_payroll
+#: model:mail.template,name:KSW_payroll.mail_template_payslip_auto
+msgid "Payslip Auto-Email Template"
+msgstr "قالب الإرسال التلقائي لكشف الراتب"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_bank_file_export_wizard__payslip_run_id
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_kawthar_file_wizard__payslip_run_id
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_payslip_run_bank_total__run_id
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_payslip_run_skip_line__run_id
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_wps_file_wizard__payslip_run_id
+msgid "Payslip Batch"
+msgstr "كشف الرواتب"
+
+#. module: KSW_payroll
+#: model:ir.model,name:KSW_payroll.model_ksw_payslip_run_bank_total
+msgid "Payslip Batch — Bank Account NET Total"
+msgstr "كشف الرواتب — إجمالي الصافي حسب البنك"
+
+#. module: KSW_payroll
+#: model:ir.model,name:KSW_payroll.model_ksw_payslip_run_skip_line
+msgid "Payslip Batch — Skipped Employee Log"
+msgstr "كشف الرواتب — سجل الموظفين المستبعدين"
+
+#. module: KSW_payroll
+#: model:ir.model,name:KSW_payroll.model_hr_payslip_run
+msgid "Payslip Batches"
+msgstr "كشوف الرواتب"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_employee__x_payslip_export_order
+msgid "Payslip File Order"
+msgstr "ترتيب ملف كشف الراتب"
+
+#. module: KSW_payroll
+#: model:ir.model,name:KSW_payroll.model_hr_payslip_line
+msgid "Payslip Line"
+msgstr "بند كشف الراتب"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.view_hr_payslip_form_inherit_worked_days
+msgid "Payslip Lines"
+msgstr "بنود كشف الراتب"
+
+#. module: KSW_payroll
+#: model:ir.model,name:KSW_payroll.model_hr_payslip_worked_days
+msgid "Payslip Worked Days"
+msgstr "أيام العمل في كشف الراتب"
+
+#. module: KSW_payroll
+#: model:mail.template,subject:KSW_payroll.mail_template_payslip_auto
+msgid "Payslip: {{ object.number }}"
+msgstr "كشف الراتب: {{ object.number }}"
+
+#. module: KSW_payroll
+#: model:hr.salary.rule,name:KSW_payroll.hr_rule_penalty
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "Penalty Deduction"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.res_config_settings_view_form_ksw_payroll
+msgid "Percentage deducted from (Basic + HRA) for Saudi employees."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip_line__quantity
+msgid "Quantity"
+msgstr "الكمية"
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__ksw_kawthar_file_wizard__operation_code__7
+msgid "Re-Issue Card - أعادة اصدار البطاقة"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_payslip_run_skip_line__reason
+msgid "Reason"
+msgstr "السبب"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_payslip_run_form_inherit_ksw
+msgid "Reason Skipped"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_payslip_run_form_inherit_ksw
+msgid "Refresh Totals"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip__x_leave_id
+msgid "Related Leave"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:hr.salary.rule,name:KSW_payroll.hr_rule_remaining_loans
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "Remaining Loans"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_payslip_run_form_inherit_ksw
+msgid "Remove all skipped-employee entries from this batch?"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_hr_attendance__x_scheduled_minutes
+msgid "Required work minutes per day (hardcoded 480 = 8 hours)."
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "Salary Computation"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_attendance_view_form_inherit_deduction
+msgid "Salary Deduction"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_employee__x_salary_bank_account_id
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip_run__x_salary_bank_account_id
+msgid "Salary Paying Bank Account"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_employee_view_form_inherit
+msgid "Salary Payment"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model,name:KSW_payroll.model_hr_salary_rule
+msgid "Salary Rule"
+msgstr "قاعدة الراتب"
+
+#. module: KSW_payroll
+#: model:ir.model,name:KSW_payroll.model_hr_payroll_structure
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.view_hr_payslip_form_inherit_worked_days
+msgid "Salary Structure"
+msgstr "هيكل المرتب"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_hr_attendance__x_deduction_amount
+msgid "Salary deduction amount for this attendance record."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:hr.salary.rule,name:KSW_payroll.hr_rule_saturday_ot_credit
+msgid "Saturday Overtime Credit"
+msgstr "رصيد العمل الإضافي للسبت"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_attendance_view_list_inherit_deduction
+msgid "Sched. Min"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_attendance__x_scheduled_minutes
+msgid "Scheduled Minutes"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_payslip_run_form_inherit_ksw
+msgid "Search Payslip Lines"
+msgstr "البحث في بنود كشف الراتب"
+
+#. module: KSW_payroll
+#: model:hr.salary.rule,name:KSW_payroll.hr_rule_sick_pay_adj
+msgid "Sick Leave Pay Adjustment"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip_run__x_skip_line_ids
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_payslip_run_form_inherit_ksw
+msgid "Skipped Employees"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:hr.salary.rule,name:KSW_payroll.hr_rule_gosi
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.res_config_settings_view_form_ksw_payroll
+msgid "Social Insurance (GOSI)"
+msgstr "التأمينات الاجتماعية"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_res_config_settings__ksw_gosi_rate
+msgid ""
+"Social insurance (GOSI) deduction percentage applied to (Basic + HRA) for "
+"Saudi employees."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__ksw_kawthar_file_wizard__operation_code__s
+msgid "Special Close - إقفال بطاقة وإصدار بطاقة"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__ksw_bank_file_export_wizard__export_mode__specific_excel
+msgid "Specific bank – Excel"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__ksw_bank_file_export_wizard__export_mode__specific_txt
+msgid "Specific bank – Text file"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:res.groups,name:KSW_payroll.group_hr_payroll_supervisor
+msgid "Supervisor"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:res.groups,name:KSW_payroll.group_hr_payroll_supervisor_cascade
+msgid "Supervisor (Cascade)"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_hr_payslip__x_leave_id
+msgid ""
+"The annual leave that triggered the creation of this vacation payslip.  Set "
+"automatically by _create_vacation_payslip()."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_account_setup_bank_manual_config__x_file_type
+#: model:ir.model.fields,help:KSW_payroll.field_ksw_payslip_run_bank_total__file_type
+#: model:ir.model.fields,help:KSW_payroll.field_res_partner_bank__x_file_type
+msgid ""
+"The bank file format used when exporting payroll for employees assigned to "
+"this bank account."
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_payslip_run_form_inherit_ksw
+msgid ""
+"The following employees were automatically skipped during\n"
+"                    payslip generation. Resolve the issue shown and\n"
+"                    re-generate payslips to include them."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:res.groups,comment:KSW_payroll.group_hr_payroll_supervisor
+msgid ""
+"The user can read his own payslips and the payslips of employees who report "
+"directly to him."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:res.groups,comment:KSW_payroll.group_hr_payroll_supervisor_cascade
+msgid ""
+"The user can read his own payslips and the payslips of every employee below "
+"him in the management hierarchy, at any depth."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:res.groups,comment:KSW_payroll.group_hr_payroll_self
+msgid ""
+"The user can read his own payslips only. No create/edit/delete and no "
+"payroll configuration menus."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_hr_leave__x_vacation_payslip_id
+msgid ""
+"The vacation payslip generated for this annual leave (covers the current "
+"month at the time of approval)."
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_leave_view_form_inherit_payroll_vacation
+msgid ""
+"This will cancel the existing payslip and recreate it from the current leave"
+" inputs. Continue?"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model,name:KSW_payroll.model_hr_leave
+msgid "Time Off"
+msgstr "الإجازات"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip_line__total
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "Total"
+msgstr "الإجمالي"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "Total Additional Inputs"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+msgid "Total Deductions"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_payslip_run_bank_total__total_net
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_payslip_run_form_inherit_ksw
+msgid "Total NET"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_hr_payslip__x_net_wage
+msgid "Total of the NET salary rule line after compute_sheet()."
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_contract_form_inherit_ksw_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_employee_view_form_inherit
+msgid "Transportation Allowance"
+msgstr "بدل النقل"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_payslip_run_bank_total__file_type
+msgid "Type"
+msgstr "النوع"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_ksw_kawthar_file_wizard__operation_code
+msgid "Type of payroll-card operation to include in the file."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model,name:KSW_payroll.model_ksw_bank_file_export_wizard
+msgid "Unified Bank File Export Wizard"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__ksw_kawthar_file_wizard__operation_code__a
+msgid "Update Employee ID - تحديث الرقم الوظيفي"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__ksw_kawthar_file_wizard__operation_code__c
+msgid "Update Employee Name - تحديث اسم الموظف"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__ksw_kawthar_file_wizard__operation_code__b
+msgid "Update National ID - تحديث الهوية"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:hr.salary.rule,name:KSW_payroll.hr_rule_vacation_balance
+msgid "Vacation Balance Settlement"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_leave__x_vacation_payslip_id
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "Vacation Payslip"
+msgstr "كشف راتب الإجازة"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_leave__x_vacation_payslip_ids
+msgid "Vacation Payslips"
+msgstr "كشوف رواتب الإجازة"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_hr_leave__x_vacation_payslip_ids
+msgid "Vacation payslip(s) linked to this leave via x_leave_id."
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_payslip_worked_days__x_value_display
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.view_hr_payslip_form_inherit_worked_days
+msgid "Value"
+msgstr "القيمة"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_bank_file_export_wizard__value_date
+#: model:ir.model.fields,field_description:KSW_payroll.field_ksw_wps_file_wizard__value_date
+msgid "Value Date"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:hr.salary.rule,name:KSW_payroll.hr_rule_visa_cost_recovery
+msgid "Visa Cost Recovery for Excess Leave"
+msgstr "استرداد تكلفة التأشيرة عن الإجازة الزائدة"
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__res_partner_bank__x_file_type__wps
+msgid "WPS (Bank Transfer)"
+msgstr "حماية الأجور (تحويل بنكي)"
+
+#. module: KSW_payroll
+#: model:ir.model,name:KSW_payroll.model_ksw_wps_file_wizard
+msgid "WPS Text File Generator"
+msgstr "مولد الملف النصي لنظام حماية الأجور (WPS)"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_hr_payroll_structure__x_absence_only_deduction
+msgid ""
+"When enabled, the payslip deducts only for fully absent or unpresented days."
+"  Late arrivals and early departures are tracked in attendance but carry no "
+"salary penalty."
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.view_hr_payslip_form_inherit_worked_days
+msgid "Worked Day"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_payslip_override
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.view_hr_payslip_form_inherit_worked_days
+msgid "Worked Days"
+msgstr "أيام العمل"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "by"
+msgstr "بواسطة"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "days"
+msgstr "أيام"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "days consumed from balance"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid ""
+"days |\n"
+"                                    Unpaid portion:"
+msgstr ""
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "days)"
+msgstr "أيام)"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_payslip_run_form_inherit_ksw
+msgid "⚠ Skipped Employees"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# om_hr_payroll terminology overrides — KSW_payroll loads after om_hr_payroll
+# so these entries win on every language load / Settings > Update.
+# ---------------------------------------------------------------------------
+
+#. module: KSW_payroll
+#: model:ir.ui.menu,name:om_hr_payroll.menu_hr_payroll_root
+msgid "Payroll"
+msgstr "الرواتب"
+
+#. module: KSW_payroll
+#: model:ir.actions.act_window,name:om_hr_payroll.action_view_hr_payslip_form
+#: model:ir.ui.menu,name:om_hr_payroll.menu_department_tree
+msgid "Employee Payslips"
+msgstr "كشوف الراتب"
+
+#. module: KSW_payroll
+#: model:ir.actions.act_window,name:om_hr_payroll.action_hr_payslip_by_employees
+msgid "Generate Payslips"
+msgstr "إنشاء كشوف الراتب"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:om_hr_payroll.field_hr_payslip_input__payslip_id
+#: model:ir.model.fields,field_description:om_hr_payroll.field_hr_payslip_line__slip_id
+#: model:ir.model.fields,field_description:om_hr_payroll.field_hr_payslip_worked_days__payslip_id
+msgid "Pay Slip"
+msgstr "كشف الراتب"
+
+#. module: KSW_payroll
+#: model:ir.actions.act_window,name:om_hr_payroll.action_payslip_lines_contribution_register
+msgid "PaySlip Lines"
+msgstr "بنود كشف الراتب"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:om_hr_payroll.field_hr_payslip__payslip_run_id
+msgid "Payslip Batches"
+msgstr "كشوف الرواتب"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:om_hr_payroll.field_hr_employee__payslip_count
+msgid "Payslip Count"
+msgstr "عدد كشوف الراتب"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:om_hr_payroll.field_hr_payslip__input_line_ids
+msgid "Payslip Inputs"
+msgstr "مدخلات كشف الراتب"
+
+#. module: KSW_payroll
+#: model:ir.actions.act_window,name:om_hr_payroll.act_contribution_reg_payslip_lines
+#: model:ir.model.fields,field_description:om_hr_payroll.field_hr_payslip__line_ids
+msgid "Payslip Lines"
+msgstr "بنود كشف الراتب"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:om_hr_payroll.field_hr_payslip__name
+msgid "Payslip Name"
+msgstr "اسم كشف الراتب"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:om_hr_payroll.field_hr_payslip__worked_days_line_ids
+msgid "Payslip Worked Days"
+msgstr "أيام العمل في كشف الراتب"
+
+#. module: KSW_payroll
+#: model:ir.actions.act_window,name:om_hr_payroll.act_hr_employee_payslip_list
+#: model:ir.model.fields,field_description:om_hr_payroll.field_hr_employee__slip_ids
+#: model:ir.model.fields,field_description:om_hr_payroll.field_hr_payslip_run__slip_ids
+msgid "Payslips"
+msgstr "كشوف الراتب"
+
+#. module: KSW_payroll
+#: model:ir.actions.act_window,name:om_hr_payroll.action_hr_payslip_run_tree
+#: model:ir.ui.menu,name:om_hr_payroll.menu_hr_payslip_run
+msgid "Payslips Batches"
+msgstr "كشوف الرواتب"
+
+#. module: KSW_payroll
+#: model:ir.actions.act_window,name:om_hr_payroll.action_hr_salary_rule_category
+#: model:ir.ui.menu,name:om_hr_payroll.menu_hr_salary_rule_category
+msgid "Salary Rule Categories"
+msgstr "فئات قواعد الرواتب"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:om_hr_payroll.field_hr_rule_input__input_id
+msgid "Salary Rule Input"
+msgstr "مدخلات قاعدة الرواتب"
+
+#. module: KSW_payroll
+#: model:ir.actions.act_window,name:om_hr_payroll.action_salary_rule_form
+#: model:ir.model.fields,field_description:om_hr_payroll.field_hr_payroll_structure__rule_ids
+#: model:ir.ui.menu,name:om_hr_payroll.menu_action_hr_salary_rule_form
+msgid "Salary Rules"
+msgstr "قواعد الرواتب"
+
+#. module: KSW_payroll
+#: model:ir.actions.act_window,name:om_hr_payroll.action_view_hr_payroll_structure_list_form
+#: model:ir.ui.menu,name:om_hr_payroll.menu_hr_payroll_structure_view
+msgid "Salary Structures"
+msgstr "هياكل الرواتب"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:om_hr_payroll.field_hr_payslip_line__appears_on_payslip
+#: model:ir.model.fields,field_description:om_hr_payroll.field_hr_salary_rule__appears_on_payslip
+msgid "Appears on Payslip"
+msgstr "يظهر في كشف الراتب"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:om_hr_payroll.field_hr_payslip_line__child_ids
+#: model:ir.model.fields,field_description:om_hr_payroll.field_hr_salary_rule__child_ids
+msgid "Child Salary Rule"
+msgstr "قواعد الراتب الفرعية"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:om_hr_payroll.field_hr_payslip__details_by_salary_rule_category
+msgid "Details by Salary Rule Category"
+msgstr "تفاصيل حسب فئات قواعد الراتب"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:om_hr_payroll.field_hr_payslip_line__parent_rule_id
+#: model:ir.model.fields,field_description:om_hr_payroll.field_hr_salary_rule__parent_rule_id
+msgid "Parent Salary Rule"
+msgstr "قاعدة الراتب الأصل"

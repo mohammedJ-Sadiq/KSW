@@ -1,0 +1,666 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_base_security
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-15 12:11+0000\n"
+"PO-Revision-Date: 2026-07-15 12:11+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar_001\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
+"X-Generator: KSW ar-engine v2\n"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__active_employee
+msgid "Active Employee"
+msgstr "موظف نشط"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__departure_description
+msgid "Additional Information"
+msgstr "معلومات إضافية"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__additional_note
+msgid "Additional Note"
+msgstr "ملاحظة إضافية"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__allowed_country_state_ids
+msgid "Allowed Country State"
+msgstr ""
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.hr_employee_view_form_bank_accounts
+msgid "Bank Accounts"
+msgstr "الحسابات البنكية"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__birthday
+msgid "Birthday"
+msgstr "يوم الميلاد"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__contract_date_end
+msgid "Contract End Date"
+msgstr "تاريخ انتهاء العقد"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__contract_date_start
+msgid "Contract Start Date"
+msgstr "تاريخ بدء العقد"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__contract_template_id
+msgid "Contract Template"
+msgstr "قالب العقد"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__contract_type_id
+msgid "Contract Type"
+msgstr "نوع العقد"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__contract_wage
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__contract_wage
+msgid "Contract Wage"
+msgstr "أجر العقد"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__country_code
+msgid "Country Code"
+msgstr "رمز الدولة"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__currency_id
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__currency_id
+msgid "Currency"
+msgstr "العملة"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__exceptional_location_id
+msgid "Current"
+msgstr "الحالي"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__current_leave_state
+msgid "Current Time Off Status"
+msgstr "حالة الإجازة الحالية"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__current_leave_id
+msgid "Current Time Off Type"
+msgstr "نوع الإجازة الحالية"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__da
+msgid "DA"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__date_end
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__date_end
+msgid "Date End"
+msgstr "تاريخ الانتهاء"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__date_start
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__date_start
+msgid "Date Start"
+msgstr "تاريخ البدء"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__date_version
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__date_version
+msgid "Date Version"
+msgstr "نسخة بتاريخ"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__da
+msgid "Dearness allowance"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__schedule_pay
+msgid "Defines the frequency of the wage payment."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__department_id
+msgid "Department"
+msgstr "القسم"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__departure_date
+msgid "Departure Date"
+msgstr "تاريخ المغادرة"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__departure_reason_id
+msgid "Departure Reason"
+msgstr "سبب المغادرة"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__children
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__children
+msgid "Dependent Children"
+msgstr "الأطفال المعالون"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__display_name
+#: model:ir.model.fields,field_description:KSW_base_security.field_ir_mail_server__display_name
+msgid "Display Name"
+msgstr "اسم العرض"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__emergency_contact
+msgid "Emergency Contact"
+msgstr "جهة الاتصال في حالات الطوارئ"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__emergency_phone
+msgid "Emergency Phone"
+msgstr "هاتف الطوارئ"
+
+#. module: KSW_base_security
+#: model:ir.model,name:KSW_base_security.model_hr_employee
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__employee_id
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__employee_id
+#: model:res.groups,name:KSW_base_security.group_hr_attendance_employee_subordinate
+#: model:res.groups,name:KSW_base_security.group_hr_employee_subordinate
+msgid "Employee"
+msgstr "الموظف"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__type_id
+msgid "Employee Category"
+msgstr "فئة الموظف"
+
+#. module: KSW_base_security
+#: model:ir.model,name:KSW_base_security.model_hr_version
+msgid "Employee Contract"
+msgstr "عقد الموظف"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__employee_type
+msgid "Employee Type"
+msgstr "نوع الموظف"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__version_ids
+msgid "Employee Versions"
+msgstr "نسخ الموظف"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__type_id
+msgid "Employee category"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__wage
+msgid "Employee's monthly gross wage."
+msgstr "إجمالي المرتب الشهري للموظف."
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__resource_calendar_id
+msgid "Employee's working schedule."
+msgstr "جدول عمل الموظف."
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__contract_date_end
+msgid "End date of the contract (if it's a fixed-term contract)."
+msgstr "تاريخ انتهاء العقد (إذا كان عقدا محدد المدة)."
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__trial_date_end
+msgid "End date of the trial period (if there is one)."
+msgstr "تاريخ انتهاء الفترة التجريبية (إذا وجدت)."
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__trial_date_end
+msgid "End of Trial Period"
+msgstr "نهاية الفترة التجريبية"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__identification_id
+msgid ""
+"Enter the employee's National Identification Number issued by the government"
+" (e.g., Aadhaar, SIN, NIN). This is used for official records and statutory "
+"compliance."
+msgstr ""
+"أدخل رقم الهوية الوطنية للموظف الصادر عن الحكومة (مثل Aadhaar أو SIN أو "
+"NIN). يستخدم هذا الرقم في السجلات الرسمية والامتثال القانوني."
+
+#. module: KSW_base_security
+#: model:ir.model.fields.selection,name:KSW_base_security.selection__hr_version__sex__female
+msgid "Female"
+msgstr "أنثى"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__leave_date_from
+msgid "From Date"
+msgstr "من تاريخ"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__sex
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__sex
+msgid "Gender"
+msgstr "الجنس"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__hr_responsible_id
+msgid "HR Responsible"
+msgstr "مسؤول الموارد البشرية"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__hra
+msgid "HRA"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__distance_home_work
+msgid "Home-Work Distance"
+msgstr "المسافة بين المنزل والعمل"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__km_home_work
+msgid "Home-Work Distance in Km"
+msgstr "المسافة بين المنزل والعمل بالكيلومترات"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__distance_home_work_unit
+msgid "Home-Work Distance unit"
+msgstr "وحدة قياس المسافة بين المنزل والعمل"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__hra
+msgid "House rent allowance."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__id
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__id
+#: model:ir.model.fields,field_description:KSW_base_security.field_ir_mail_server__id
+msgid "ID"
+msgstr "المعرف"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__identification_id
+msgid "Identification No"
+msgstr "رقم الهوية"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__active_employee
+msgid ""
+"If the active field is set to False, it will allow you to hide the resource "
+"record without removing it."
+msgstr ""
+"إذا تم تحويل قيمة الحقل النشط إلى خطأ، يمكنك إخفاء سجل مورد دون إزالته."
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__is_current
+msgid "Is Current"
+msgstr "جاري"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__is_custom_job_title
+msgid "Is Custom Job Title"
+msgstr "مسمى وظيفي مخصص"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__is_flexible
+msgid "Is Flexible"
+msgstr "مرنة"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__is_fully_flexible
+msgid "Is Fully Flexible"
+msgstr "مرنة بالكامل"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__is_future
+msgid "Is Future"
+msgstr "مستقبلي"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__is_in_contract
+msgid "Is In Contract"
+msgstr "ضمن العقد"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__is_past
+msgid "Is Past"
+msgstr "في الماضي"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__job_id
+msgid "Job"
+msgstr "الوظيفة"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__job_title
+msgid "Job Title"
+msgstr "المسمى الوظيفي"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__last_modified_uid
+msgid "Last Modified by"
+msgstr "آخر تعديل بواسطة"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__last_modified_date
+msgid "Last Modified on"
+msgstr "آخر تعديل في"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__legal_name
+msgid "Legal Name"
+msgstr "الاسم القانوني"
+
+#. module: KSW_base_security
+#: model:ir.model,name:KSW_base_security.model_ir_mail_server
+msgid "Mail Server"
+msgstr "خادم البريد الإلكتروني"
+
+#. module: KSW_base_security
+#: model:ir.model.fields.selection,name:KSW_base_security.selection__hr_version__sex__male
+msgid "Male"
+msgstr "ذكر"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__marital
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__marital
+msgid "Marital Status"
+msgstr "الحالة الاجتماعية"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__meal_allowance
+msgid "Meal Allowance"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__meal_allowance
+msgid "Meal allowance"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__medical_allowance
+msgid "Medical Allowance"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__medical_allowance
+msgid "Medical allowance"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__member_of_department
+msgid "Member of department"
+msgstr "عضو في قسم"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__country_id
+msgid "Nationality (Country)"
+msgstr "الجنسية (البلد)"
+
+#. module: KSW_base_security
+#: model:ir.model.fields.selection,name:KSW_base_security.selection__hr_version__sex__other
+msgid "Other"
+msgstr "غير ذلك"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__other_allowance
+msgid "Other Allowance"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__other_allowance
+msgid "Other allowances"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__passport_expiration_date
+msgid "Passport Expiration Date"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__passport_id
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__passport_id
+msgid "Passport No"
+msgstr "رقم جواز السفر"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__permit_no
+msgid "Permit No"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__hr_responsible_id
+msgid "Person responsible for validating the employee's contracts."
+msgstr "الشخص المسؤول عن تصديق عقود الموظفين."
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__private_city
+msgid "Private City"
+msgstr "مدينة خاصة"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__private_country_id
+msgid "Private Country"
+msgstr "الدولة خاصة"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__private_email
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__private_email
+msgid "Private Email"
+msgstr "بريد الكتروني خاص"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__private_phone
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__private_phone
+msgid "Private Phone"
+msgstr "هاتف خاص"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__private_state_id
+msgid "Private State"
+msgstr "الحالة الخاصة"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__private_street
+msgid "Private Street"
+msgstr "الشارع خاص"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__private_street2
+msgid "Private Street2"
+msgstr "الشارع 2 خاص"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__private_zip
+msgid "Private Zip"
+msgstr "رمز Zip خاص"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__ruleset_id
+msgid "Ruleset"
+msgstr "مجموعة القواعد"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__ssnid
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__ssnid
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_employee_filter_add_ssnid
+msgid "SSN No"
+msgstr "رقم الضمان الاجتماعي"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__structure_type_id
+msgid "Salary Structure Type"
+msgstr "نوع هيكل الراتب"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__schedule_pay
+msgid "Scheduled Pay"
+msgstr "الدفع المجدول"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__contract_template_id
+msgid ""
+"Select a contract template to auto-fill the contract form with predefined "
+"values. You can still edit the fields as needed after applying the template."
+msgstr ""
+"قم بتحديد قالب للعقد لتعبئة استمارة العقد تلقائيا بقيم محددة مسبقا. لا يزال "
+"بإمكانك تعديل الحقول حسب الحاجة بعد تطبيق القالب."
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__ssnid
+#: model:ir.model.fields,help:KSW_base_security.field_hr_version__ssnid
+msgid "Social Security Number"
+msgstr "رقم الضمان الاجتماعي"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__spouse_birthdate
+msgid "Spouse Birthdate"
+msgstr "تاريخ ميلاد الزوج/الزوجة"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__spouse_complete_name
+msgid "Spouse Legal Name"
+msgstr "الاسم القانوني للزوج/الزوجة"
+
+#. module: KSW_base_security
+#: model:res.groups,name:KSW_base_security.group_hr_attendance_supervisor
+#: model:res.groups,name:KSW_base_security.group_hr_employee_supervisor
+msgid "Supervisor"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:res.groups,name:KSW_base_security.group_hr_attendance_supervisor_cascading
+#: model:res.groups,name:KSW_base_security.group_hr_employee_supervisor_cascading
+msgid "Supervisor Cascading"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__country_code
+msgid ""
+"The ISO country code in two chars. \n"
+"You can use this field for quick search."
+msgstr ""
+"كود الدولة حسب المعيار الدولي أيزو المكون من حرفين.\n"
+"يمكنك استخدام هذا الحقل لإجراء بحث سريع."
+
+#. module: KSW_base_security
+#: model:res.groups,comment:KSW_base_security.group_hr_attendance_employee_subordinate
+msgid ""
+"The user will be able to view their own and their subordinates' attendances."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:res.groups,comment:KSW_base_security.group_hr_employee_subordinate
+msgid ""
+"The user will be able to view their own and their subordinates' employee "
+"profiles."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__exceptional_location_id
+msgid "This is the exceptional, non-weekly, location set for today."
+msgstr "هذا هو الموقع الاستثنائي وغير الأسبوعي المحدد لهذا اليوم."
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__sex
+#: model:ir.model.fields,help:KSW_base_security.field_hr_version__sex
+msgid "This is the legal sex recognized by the state."
+msgstr "هذا هو الجنس القانوني المعترف به من الدولة."
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__allocations_count
+msgid "Total number of allocations"
+msgstr "إجمالي عدد المخصصات"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__allocation_count
+msgid "Total number of days allocated."
+msgstr "إجمالي عدد الأيام المخصصة."
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__travel_allowance
+msgid "Travel Allowance"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__travel_allowance
+msgid "Travel allowance"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__version_id
+msgid "Version"
+msgstr "الإصدار"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__versions_count
+msgid "Versions Count"
+msgstr "عدد النسخ"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__visa_expire
+msgid "Visa Expiration Date"
+msgstr "تاريخ انتهاء صلاحية التأشيرة"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__visa_expire
+msgid "Visa Expire"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__visa_no
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__visa_no
+msgid "Visa No"
+msgstr "رقم التأشيرة"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__wage
+msgid "Wage"
+msgstr "الأجر"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__member_of_department
+msgid ""
+"Whether the employee is a member of the active user's department or one of "
+"it's child department."
+msgstr "ما إذا كان الموظف عضوا في قسم المستخدم النشط أو أحد أقسامه التابعة."
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__address_id
+msgid "Work Address"
+msgstr "عنوان العمل"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__work_location_id
+msgid "Work Location"
+msgstr "مكان العمل"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__work_permit_expiration_date
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__work_permit_expiration_date
+msgid "Work Permit Expiration Date"
+msgstr "تاريخ انتهاء تصريح العمل"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__permit_no
+msgid "Work Permit No"
+msgstr "رقم تصريح العمل"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__resource_calendar_id
+msgid "Working Hours"
+msgstr "ساعات العمل"

@@ -216,9 +216,9 @@
                                 without Loan Modification cannot edit loan amount/installments.
                             -->
                             <field name="amount"
-                                   readonly="state != 'draft' and not (is_loan and approval_state == 'pending_gm' and x_allow_edit_amount)"/>
+                                   readonly="(state != 'draft' or approval_state == 'pending_disbursement') and not (is_loan and approval_state == 'pending_gm' and x_allow_edit_amount)"/>
                             <field name="installments"
-                                   readonly="state != 'draft' and not (is_loan and approval_state in ('pending_acc', 'pending_gm') and x_allow_edit_installments)"/>
+                                   readonly="(state != 'draft' or approval_state == 'pending_disbursement') and not (is_loan and approval_state in ('pending_acc', 'pending_gm') and x_allow_edit_installments)"/>
                             <field name="installment_amount"/>
                             <field name="currency_id" invisible="1"/>
                             <field name="x_can_submit" invisible="1"/>
@@ -233,7 +233,7 @@
                         </group>
                         <group string="Schedule">
                             <field name="start_month"
-                                   readonly="state != 'draft'"/>
+                                   readonly="state != 'draft' or approval_state == 'pending_disbursement'"/>
                             <field name="total_paid"/>
                             <field name="total_pending"/>
                             <field name="progress_percent" widget="progressbar"/>

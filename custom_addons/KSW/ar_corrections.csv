@@ -1,0 +1,18 @@
+# KSW Arabic Translation Corrections
+# ─────────────────────────────────────────────────────────────────────────────
+# HOW TO USE:
+#   1. Find the wrong label in the Odoo UI.
+#   2. Add a row below: module, the exact English text, your Arabic correction.
+#   3. Tell the admin to run:
+#        python3 /home/odoo/Odoo/odoo/custom_addons/KSW/_apply_corrections.py
+#
+# RULES:
+#   - module   : exact folder name under custom_addons/KSW/  (e.g. KSW_payroll)
+#                Use "any" to search all modules.
+#   - english  : copy the label exactly as it appears (case-sensitive).
+#   - arabic   : your corrected Arabic translation.
+#   - Lines starting with # are comments and are ignored.
+#   - Commas inside a value must be wrapped in "double quotes".
+#
+# module,english,arabic
+# ─── Add corrections below this line ─────────────────────────────────────────
