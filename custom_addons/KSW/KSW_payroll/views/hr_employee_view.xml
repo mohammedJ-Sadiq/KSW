@@ -14,6 +14,8 @@
                         <field name="x_salary_bank_account_id"/>
                         <field name="x_payslip_export_order"/>
                         <field name="x_auto_send_payslip"/>
+                        <field name="x_exclude_from_payroll"
+                               groups="base.group_system"/>
                     </group>
                     <group string="Allowances">
                         <field name="hra"/>

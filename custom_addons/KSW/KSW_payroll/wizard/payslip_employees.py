@@ -1,4 +1,4 @@
-from odoo import api, models, _
+from odoo import api, fields, models, _
 
 
 class HrPayslipEmployees(models.TransientModel):
@@ -13,6 +13,14 @@ class HrPayslipEmployees(models.TransientModel):
     4. Return a sticky warning notification if any employees were skipped.
     """
     _inherit = 'hr.payslip.employees'
+
+    employee_ids = fields.Many2many(
+        'hr.employee',
+        'hr_employee_group_rel', 'payslip_id', 'employee_id',
+        domain=lambda self: []
+               if self.env.user.has_group('base.group_system')
+               else [('x_exclude_from_payroll', '=', False)],
+    )
 
     # ------------------------------------------------------------------
     # Helpers
@@ -82,7 +90,10 @@ class HrPayslipEmployees(models.TransientModel):
         payslips = payslip_model
         skipped = []  # list of (employee, reason)
 
+        is_admin = self.env.user.has_group('base.group_system')
         for employee in self.env['hr.employee'].browse(data['employee_ids']):
+            if employee.x_exclude_from_payroll and not is_admin:
+                continue
             reason = self._check_employee_for_batch(employee, from_date, to_date)
             if reason:
                 skipped.append((employee, reason))

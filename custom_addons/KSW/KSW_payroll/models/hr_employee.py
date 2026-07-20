@@ -42,6 +42,12 @@ class HrEmployee(models.Model):
         groups='hr.group_hr_user',
         help='Lower numbers are exported first in payroll TXT/Excel files.',
     )
+    x_exclude_from_payroll = fields.Boolean(
+        string='Exclude from Payroll Batches',
+        default=False,
+        help='If enabled, this employee is hidden from payslip batch generation '
+             'and the skip log for all non-administrator users.',
+    )
     company_partner_id = fields.Many2one(
         related='company_id.partner_id',
         store=False,
