@@ -1,5 +1,25 @@
 # KSW Odoo Project — Claude Context
 
+## Second Brain — MANDATORY PROTOCOL
+
+The project has an Obsidian knowledge base at **`~/KSW-Brain/`**. This is the authoritative map of everything built, in progress, and pending in this project.
+
+**At the start of EVERY conversation:**
+1. Read `~/KSW-Brain/Home.md` to understand current project state (what's done, in progress, backlog)
+2. Read any relevant module or feature notes from `~/KSW-Brain/` before touching related code
+3. Check `~/KSW-Brain/Gotchas & Patterns/Odoo 19 Pitfalls.md` before writing new models or views
+
+**After completing ANY piece of work:**
+1. Update the relevant note in `~/KSW-Brain/` (module note, feature note, or architecture note)
+2. If a new feature was shipped: create a new `✅ Feature Name.md` in `~/KSW-Brain/Features/` and add it to the Done list in `Home.md`
+3. If a new bug/gotcha was discovered: add it to `~/KSW-Brain/Gotchas & Patterns/Odoo 19 Pitfalls.md` and the July 2026 Audit Checklist if it's a recurring pattern
+4. If a new module was created: add a note to `~/KSW-Brain/Modules/` and update the dependency chain in `~/KSW-Brain/Architecture/Dependency Chain.md`
+5. If something moved from backlog to in-progress or done: update `Home.md` accordingly
+
+**The second brain reduces ramp-up time every session. Keep it current.**
+
+---
+
 ## Project Identity
 - **Product**: Odoo 19 Community Edition, customised for Al-Kawthar Software (KSW)
 - **Active branch**: `KSWDev` → merges into `19.0`

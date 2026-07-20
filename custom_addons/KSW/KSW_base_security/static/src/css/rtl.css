@@ -1,7 +1,193 @@
-/* RTL text direction — Odoo 19 Community sets the o_rtl class on <body>
-   when the user's language direction is rtl, but never sets the CSS
-   `direction` property that makes text and flexbox flow right-to-left.
-   This rule provides that missing foundation. */
+/* =============================================================================
+   KSW — Arabic RTL layout overrides for Odoo 19 Community
+   Target class: body.o_rtl  (added by start.js when lang direction = rtl)
+
+   IMPORTANT: This file is processed by the rtlcss CLI when Odoo builds the
+   RTL asset bundle.  Rules that must NOT be auto-flipped (because they are
+   already written for the RTL context) carry a  /*rtl:ignore*/  comment on
+   the line BEFORE the declaration.  Without that guard, rtlcss would convert
+   e.g. "direction: rtl" → "direction: ltr", cancelling the fix.
+   ============================================================================= */
+
+
+/* 1. FOUNDATION
+   ---------------------------------------------------------------------------
+   Sets the CSS text/layout direction for the entire page.
+   rtlcss would normally flip "direction: rtl" → "direction: ltr" — the
+   /*rtl:ignore*/ prevents that so the RTL bundle keeps direction: rtl.       */
+
 body.o_rtl {
+    /*rtl:ignore*/
     direction: rtl;
+}
+
+
+/* 2. DROPDOWNS
+   ---------------------------------------------------------------------------
+   General dropdown text alignment + systray (user/debug menus) positioning.
+   Popper.js-managed dropdowns already have "rtl:begin:ignore" blocks in
+   Odoo core — do not override their left/right positioning here.             */
+
+body.o_rtl .dropdown-menu {
+    text-align: right;
+}
+
+/* Systray menus (top-right in LTR → top-left in RTL): anchor to the right
+   edge of their trigger so they don't fly off screen.                        */
+body.o_rtl .o_menu_systray .dropdown-menu {
+    /*rtl:ignore*/
+    right: 0;
+    left: auto;
+}
+
+
+/* 3. NAVBAR
+   ---------------------------------------------------------------------------
+   The .o_main_navbar flex row auto-reverses with direction: rtl on the body.
+   Only text alignment overrides are needed here.                             */
+
+body.o_rtl .o_menu_brand {
+    text-align: right;
+}
+
+body.o_rtl .o_nav_entry,
+body.o_rtl .o_menu_sections {
+    text-align: right;
+}
+
+
+/* 4. BREADCRUMBS
+   ---------------------------------------------------------------------------
+   fontawesome_overridden.scss already rotates .fa-chevron-left/right 180°
+   under .o_rtl.  This rule is a safety net for the back-button icon in case
+   the core rule doesn't reach the KSW custom views.                          */
+
+body.o_rtl .o_breadcrumb .o_back_button .fa-chevron-left {
+    /*rtl:ignore*/
+    display: inline-block;
+    transform: rotate(180deg);
+}
+
+
+/* 5. NUMERIC / DATE / MONETARY INPUTS
+   ---------------------------------------------------------------------------
+   Digits and codes (IBANs, phone numbers, IDs) must always read left-to-right
+   regardless of page direction.  The field is right-aligned so the cursor
+   starts at the rightmost position, matching Arabic reading conventions.      */
+
+body.o_rtl input[type="number"],
+body.o_rtl .o_field_integer input,
+body.o_rtl .o_field_float input,
+body.o_rtl .o_field_date input,
+body.o_rtl .o_field_datetime input,
+body.o_rtl .o_field_char input[inputmode="decimal"],
+body.o_rtl .o_field_char input[inputmode="numeric"] {
+    /*rtl:ignore*/
+    direction: ltr;
+    text-align: right;
+}
+
+/* Fields whose names end in _no or _id typically contain codes/references
+   that should stay LTR and be left-aligned (e.g. employee number, IBAN).    */
+body.o_rtl .o_field_phone input,
+body.o_rtl .o_field_char[name$="_no"] input,
+body.o_rtl .o_field_char[name$="_id"] input {
+    /*rtl:ignore*/
+    direction: ltr;
+    text-align: left;
+}
+
+
+/* 6. FORM VIEWS
+   ---------------------------------------------------------------------------
+   Label alignment and status-bar flow.                                       */
+
+body.o_rtl .o_wrap_field > label,
+body.o_rtl .o_cell.o_wrap_label label {
+    text-align: right;
+}
+
+/* Status bar steps should flow right → left in Arabic.
+   The core statusbar_field.scss already has a complex clip-path RTL override;
+   this ensures the flex container itself is also reversed when that override
+   is insufficient.                                                            */
+body.o_rtl .o_statusbar_status {
+    /*rtl:ignore*/
+    flex-direction: row-reverse;
+}
+
+
+/* 7. LIST VIEWS
+   ---------------------------------------------------------------------------
+   Text columns: right-aligned.  Numeric columns: keep LTR + right-aligned
+   (Odoo core already applies /*rtl:ignore*/ direction:ltr to .o_list_number,
+   so these rules reinforce rather than replace the core behaviour).           */
+
+body.o_rtl .o_list_table th,
+body.o_rtl .o_list_table td {
+    text-align: right;
+}
+
+body.o_rtl .o_list_table .o_list_number,
+body.o_rtl .o_list_table .o_list_number_th {
+    /*rtl:ignore*/
+    direction: ltr;
+    text-align: right;
+}
+
+
+/* 8. SEARCH PANEL (sidebar filters)
+   ---------------------------------------------------------------------------
+   Odoo renders the SearchPanel as a flex sibling of the view content.
+   With direction:rtl the flex row reverses automatically — SearchPanel moves
+   to the right and content fills the left.  These rules handle the internals
+   of the panel itself.                                                        */
+
+body.o_rtl .o_search_panel {
+    text-align: right;
+}
+
+body.o_rtl .o_search_panel_category_value,
+body.o_rtl .o_search_panel_filter_value {
+    /*rtl:ignore*/
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+
+
+/* 9. KSW ATTENDANCE SHEET
+   ---------------------------------------------------------------------------
+   The attendance sheet is a list view with inline-editable rows, date columns,
+   coloured status badges, and header action buttons.                          */
+
+/* Status badges inside list rows — force RTL text regardless of any inherited
+   LTR direction from numeric-column overrides.                                */
+body.o_rtl .o_list_renderer .badge {
+    /*rtl:ignore*/
+    direction: rtl;
+    unicode-bidi: embed;
+}
+
+/* Header action buttons: reverse the flex order so the primary action (Save /
+   Discard / Generate) appears on the right side for Arabic users.            */
+body.o_rtl .o_control_panel_actions {
+    /*rtl:ignore*/
+    flex-direction: row-reverse;
+}
+
+
+/* 10. MODAL DIALOGS AND WIZARDS
+   ---------------------------------------------------------------------------
+   Titles and body text right-aligned; footer buttons reversed so Cancel is
+   on the right and Save/Confirm is on the left (matching Arabic UX convention
+   where the primary action is on the right edge of a horizontal sequence).   */
+
+body.o_rtl .modal-header,
+body.o_rtl .modal-body {
+    text-align: right;
+}
+
+body.o_rtl .modal-footer {
+    /*rtl:ignore*/
+    flex-direction: row-reverse;
 }
