@@ -1,0 +1,577 @@
+<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"><title>دليل الموظف</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "Noto Naskh Arabic","Noto Sans Arabic UI","DejaVu Sans",sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: right; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-right: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">دليل الموظف</div>
+  <div class="meta">دليل تدريب المستخدم<br/>KSW HR &amp; Payroll · 2026-07-23</div>
+</div>
+<section id="g-employee-readme"><h1>أدلة الموظف</h1>
+<p><strong>لجميع الموظفين.</strong> تغطّي هذه الأدلة المهام التي تؤدّيها لنفسك بصرف النظر
+عن قسمك. لا يمكنك الاطّلاع إلا على <strong>سجلاتك الخاصة</strong> أو التصرّف فيها.</p>
+<blockquote>
+<p>هل هذه أول مرة تستخدم النظام؟ ابدأ بالدليل العام:
+<strong><span class="xref">البدء في استخدام النظام</span></strong></p>
+</blockquote>
+<h2>ما يمكنك فعله</h2>
+<table>
+<thead>
+<tr>
+<th>أريد أن…</th>
+<th>الدليل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>أطّلع على سجل حضوري وأيام التأخر</td>
+<td><a href="#g-employee-01-view-attendance">الاطّلاع على سجل حضوري</a></td>
+</tr>
+<tr>
+<td>أطلب إجازة سنوية أو مرضية أو بدون أجر</td>
+<td><a href="#g-employee-02-request-time-off">طلب إجازة</a></td>
+</tr>
+<tr>
+<td>أتقدّم بطلب سلفة خاصة وأتابع اعتمادها</td>
+<td><a href="#g-employee-03-request-a-loan">طلب سلفة خاصة</a></td>
+</tr>
+<tr>
+<td>أطّلع على كشف راتبي وأنزّله</td>
+<td><a href="#g-employee-04-view-payslip">الاطّلاع على كشف راتبي</a></td>
+</tr>
+</tbody></table>
+<h2>القواعد الأساسية</h2>
+<ul>
+<li><strong>تتصرّف في سجلاتك الخاصة فقط.</strong> تنتقل طلباتك إلى <strong>مديرك المباشر</strong> أولًا
+ثم تكمل مسار الاعتماد.</li>
+<li><strong>راقب شريط الحالة</strong> في أي طلب لمعرفة المرحلة الراهنة.</li>
+<li><strong>استخدم صندوق الوارد</strong> (أيقونة الجرس أعلى اليمين) — تصلك إشعارات عند كل
+اعتماد، بما فيها الرفض مع بيان السبب.</li>
+</ul>
+</section>
+<section id="g-employee-01-view-attendance"><h1>الاطّلاع على سجل حضورك الشخصي</h1>
+<p><strong>الفئة المستهدفة:</strong> الموظف
+<strong>الوقت المقدّر:</strong> أقل من دقيقة</p>
+<hr>
+<h2>ما الذي يمكنك الاطّلاع عليه</h2>
+<p>سجلّ حضورك يعكس كل بصمة ثبّتها جهاز الحضور الإلكتروني: وقتَي الدخول والخروج،
+وساعات العمل الفعلية، وأي تأخر أو خروج مبكر. الصفحة للقراءة فحسب — لا تقبل
+التعديل المباشر.</p>
+<blockquote>
+<p><strong>ملاحظة:</strong> لا تظهر إلا <strong>بياناتك الخاصة</strong>؛ ليس بإمكانك الاطّلاع على سجلات
+زملائك.</p>
+</blockquote>
+<hr>
+<h2>الخطوات</h2>
+<p>١. <strong>افتح تطبيق الحضور والانصراف</strong> من القائمة الجانبية. تظهر سجلاتك مرتّبةً
+   تنازليًا من الأحدث فالأقدم.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/employee/attendance-01.png" alt="تطبيق الحضور والانصراف"></p>
+<p>٢. <strong>اقرأ سجلاتك</strong> — يعرض كل سطر:</p>
+<table>
+<thead>
+<tr>
+<th>العمود</th>
+<th>المحتوى</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>التاريخ</td>
+<td>اليوم والشهر والسنة</td>
+</tr>
+<tr>
+<td>وقت الدخول</td>
+<td>أول بصمة صباحية</td>
+</tr>
+<tr>
+<td>وقت الخروج</td>
+<td>آخر بصمة مسائية</td>
+</tr>
+<tr>
+<td>ساعات العمل</td>
+<td>المدة الفعلية بين الدخول والخروج</td>
+</tr>
+<tr>
+<td>دقائق التأخر</td>
+<td>الفارق بين وقت وصولك الفعلي وبداية دوامك</td>
+</tr>
+<tr>
+<td>الخروج المبكر</td>
+<td>الفارق بين انصرافك الفعلي ونهاية دوامك</td>
+</tr>
+<tr>
+<td>غائب</td>
+<td>✔ إن لم تُسجَّل بصمة دخول لهذا اليوم</td>
+</tr>
+<tr>
+<td>مُغطَّى</td>
+<td>✔ إن كان الغياب مرتبطًا بإجازة معتمَدة</td>
+</tr>
+</tbody></table>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/employee/attendance-02.png" alt="سجلات حضوري"></p>
+<hr>
+<h2>دلالة الألوان</h2>
+<p>الألوان في القائمة تخبرك دفعةً واحدة بحالة كل يوم دون الحاجة إلى فتح السجل:</p>
+<table>
+<thead>
+<tr>
+<th>اللون</th>
+<th>المعنى</th>
+<th>ما تفعله</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>أخضر</strong></td>
+<td>يوم غياب <strong>مُغطَّى بإجازة معتمَدة</strong> — لا خصم</td>
+<td>لا شيء، الوضع سليم</td>
+</tr>
+<tr>
+<td><strong>أصفر</strong></td>
+<td>تأخر في الحضور، أو خروج مبكر، أو دوام منعدم غير مبرَّر</td>
+<td>راجع الوقت مع مشرفك أو أبلغ الموارد البشرية</td>
+</tr>
+<tr>
+<td><strong>أحمر</strong></td>
+<td><strong>غياب تام</strong> — لم تُسجَّل أي بصمة لهذا اليوم</td>
+<td>تواصل مع الموارد البشرية لمراجعة البيانات أو تقديم إجازة</td>
+</tr>
+<tr>
+<td>بلا لون</td>
+<td>يوم حضور عادي، ساعات مكتملة، لا تأخير ولا خروج مبكر</td>
+<td>لا شيء</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>مثال عملي:</strong>
+طلبتَ إجازة سنوية لأسبوع. قبل اعتماد الإجازة ستظهر أيامها <strong>حمراء</strong> (غياب).
+بعد اعتماد المدير لإجازتك يُحدِّث النظام هذه الأيام تلقائيًا لتصبح <strong>خضراء</strong>،
+وعمود «مُغطَّى» ✔ يُفعَّل في كل منها.</p>
+</blockquote>
+<hr>
+<h2>كيف تعرف أن مشكلة الحضور قد عُولجت</h2>
+<p>عند الاطّلاع على يوم كان به إشكال (تأخر أو غياب)، تحقّق مما يلي:</p>
+<table>
+<thead>
+<tr>
+<th>ما تراه في السجل</th>
+<th>تفسيره</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>السطر <strong>أخضر</strong> + عمود <strong>مُغطَّى</strong> ✔</td>
+<td>الغياب مرتبط بإجازة معتمَدة — <strong>المشكلة معالَجة، لا خصم</strong></td>
+</tr>
+<tr>
+<td>السطر <strong>أصفر</strong> + دقائق تأخر = 0</td>
+<td>كان التأخر مُعفَى منه أو صُحِّح بعد مراجعة الموارد البشرية</td>
+</tr>
+<tr>
+<td>السطر لا يزال <strong>أحمر</strong> + عمود <strong>مُغطَّى</strong> فارغ</td>
+<td>الغياب لم يُبرَّر — <strong>سيُخصَم من راتبك</strong> ما لم تقدّم إجازة وتُعتمَد</td>
+</tr>
+<tr>
+<td>السطر لا يزال <strong>أصفر</strong></td>
+<td>التأخر لم يُعالَج بعد — قد يُولِّد خصمًا في الراتب</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>الصلة بكشف راتبك</h2>
+<ul>
+<li>الأيام <strong>الحمراء</strong> التي لم تتحوّل إلى <strong>خضراء</strong> قبل إصدار كشف الراتب تُولِّد
+<strong>خصم الغياب</strong>.</li>
+<li>الدقائق <strong>الصفراء</strong> المتبقّية بعد حساب نهاية الشهر تُولِّد <strong>خصم التأخير</strong>.</li>
+<li>بمجرد اعتماد إجازتك يُعيد النظام احتساب التأثير تلقائيًا حتى لو كانت الأيام
+قد مرّت.</li>
+</ul>
+<hr>
+<h2>إن وجدت خطأً في السجلات</h2>
+<p>تواصل مع <strong>الموارد البشرية</strong> مباشرةً — هي المخوَّلة بمراجعة بيانات جهاز البصمة
+وإجراء التصحيح. لا تنتظر؛ خصم الغياب والتأخير يُحتسب تلقائيًا عند إصدار كشوف
+الرواتب.</p>
+<hr>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>العَرَض</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>يوم إجازة لا يزال أحمر</td>
+<td>لم تُعتمَد إجازتك بعد أو أنها قيد الاعتماد</td>
+<td>تابع حالة إجازتك من تطبيق <strong>الإجازات</strong></td>
+</tr>
+<tr>
+<td>يوم أخضر لكنه يظهر في الخصومات</td>
+<td>كشف الراتب أُصدِر قبل اعتماد الإجازة</td>
+<td>أبلغ الموارد البشرية لمراجعة كشف الراتب</td>
+</tr>
+<tr>
+<td>سجل وقت خاطئ أو مفقود</td>
+<td>خطأ في جهاز البصمة أو التوقيت</td>
+<td>أبلغ الموارد البشرية للمراجعة والتصحيح</td>
+</tr>
+<tr>
+<td>لا تظهر بياناتي أصلًا</td>
+<td>الحساب غير مرتبط بسجل الحضور</td>
+<td>تواصل مع تقنية المعلومات أو الموارد البشرية</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li><a href="#g-employee-02-request-time-off">طلب إجازة</a></li>
+<li><a href="#g-employee-04-view-payslip">الاطّلاع على كشف راتبي</a></li>
+</ul>
+</section>
+<section id="g-employee-02-request-time-off"><h1>تقديم طلب إجازة</h1>
+<p><strong>الفئة المستهدفة:</strong> الموظف (تطلب لنفسك)
+<strong>الوقت المقدّر:</strong> ٢–٣ دقائق</p>
+<hr>
+<h2>قبل أن تبدأ — اقرأ هذا</h2>
+<ul>
+<li><strong>احتساب المدة:</strong> تُحتسب أيام الإجازة <strong>بالأيام التقويمية</strong> شاملةً أيام العطل
+ونهايات الأسبوع. إجازة من الأحد إلى الخميس تعادل ٧ أيام تقويمية، لا خمسة.</li>
+<li><strong>رصيد الإجازة السنوية:</strong> اطّلع على رصيدك في <strong>الإجازات ← رصيد الإجازات</strong> قبل
+تقديم الطلب.</li>
+<li><strong>تأكيد المباشرة:</strong> بعد عودتك من <strong>الإجازة السنوية</strong>، يُسجّل مديرك المباشر
+عودتك — ليس أنت. لا تحتاج إلى إجراء أي خطوة إضافية عند العودة.</li>
+</ul>
+<hr>
+<h2>الخطوات</h2>
+<p>١. <strong>افتح تطبيق الإجازات</strong> من القائمة الجانبية، ثم اضغط <strong>جديد</strong> من
+   قائمة <strong>إجازاتي</strong>.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/employee/timeoff-01.png" alt="قائمة إجازاتي — زر جديد"></p>
+<p>٢. <strong>حدّد نوع الإجازة:</strong> الإجازة السنوية، المرضية، بدون أجر، أو غيرها. يتكيّف
+   النموذج تلقائيًا حسب النوع المختار — بعض الأنواع تطلب وثيقة مساندة.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/employee/timeoff-02.png" alt="اختيار نوع الإجازة"></p>
+<p>٣. <strong>حدّد التواريخ</strong> (من / إلى). يحتسب النظام عدد الأيام تلقائيًا ويعرضه
+   أسفل حقول التاريخ.</p>
+<p>٤. <strong>(للإجازة السنوية فحسب)</strong> إن طلبت أيامًا تتجاوز رصيدك المتاح، فعّل خيار
+   <strong>قبول الأيام الزائدة بدون أجر</strong> ليُكمَل الطلب بدلًا من رفضه؛ الأيام التي تتجاوز رصيدك تُعدّ إجازةً بلا راتب وتُستقطع من مستحقاتك.</p>
+<p>٥. أضف ملاحظة أو مرفقًا إن طُلب ذلك، ثم اضغط <strong>إرسال</strong>. احفظ السجل بعدها.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/employee/timeoff-03.png" alt="نموذج طلب الإجازة جاهز للإرسال"></p>
+<hr>
+<h2>مسار الاعتماد بعد الإرسال</h2>
+<p>يختلف المسار حسب نوع الإجازة:</p>
+<p><strong>الإجازة السنوية — ٦ مراحل:</strong></p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>المرحلة</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>١</td>
+<td>المدير المباشر</td>
+</tr>
+<tr>
+<td>٢</td>
+<td>الموارد البشرية</td>
+</tr>
+<tr>
+<td>٣</td>
+<td>المدير العام (مراجعة أولية)</td>
+</tr>
+<tr>
+<td>٤</td>
+<td>المحاسبة</td>
+</tr>
+<tr>
+<td>٥</td>
+<td>المدير العام (اعتماد نهائي)</td>
+</tr>
+<tr>
+<td>٦</td>
+<td>الموارد البشرية — تأكيد النموذج الموقَّع</td>
+</tr>
+</tbody></table>
+<p><strong>الإجازة المرضية / بدون أجر / غيرها — مرحلتان:</strong></p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>المرحلة</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>١</td>
+<td>المدير المباشر</td>
+</tr>
+<tr>
+<td>٢</td>
+<td>الموارد البشرية (اعتماد نهائي)</td>
+</tr>
+</tbody></table>
+<p>تصلك إشعارات عند كل انتقال بين المراحل. لمتابعة وضع طلبك في أي وقت:
+افتح <strong>الإجازات ← إجازاتي</strong> وراجع حقل <strong>حالة الاعتماد</strong> أو شريط التقدّم
+في أعلى نموذج الإجازة.</p>
+<hr>
+<h2>إعادة تقديم طلب مرفوض</h2>
+<p>إن رُفِض طلبك، يصلك إشعار يتضمّن سبب الرفض. افتح الطلب ← اضغط
+<strong>إعادة إلى مسودة</strong> ← عدّل البيانات ← أرسل من جديد.</p>
+<hr>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>العَرَض</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>زر «إرسال» غير ظاهر</td>
+<td>الطلب مُقدَّم بالفعل أو في مرحلة لاحقة</td>
+<td>راجع شريط الحالة — الطلب تجاوز مرحلة المسودة</td>
+</tr>
+<tr>
+<td>الأيام المحتسبة أكثر مما توقّعت</td>
+<td>الاحتساب بالأيام التقويمية شاملًا الإجازات</td>
+<td>هذا صحيح وفق نظام العمل السعودي — الإجازات تحتسب كاملةً</td>
+</tr>
+<tr>
+<td>رُفِض طلبي</td>
+<td>أحد المعتمِدين رفضه</td>
+<td>اطّلع على التعليق في المحادثة؛ صحّح البيانات وأعِد الإرسال</td>
+</tr>
+<tr>
+<td>مديري لا يرى طلبي</td>
+<td>لا يوجد مدير مباشر مُسنَد لك</td>
+<td>اطلب من الموارد البشرية تعيين مديرك أو اعتماد الخطوة الأولى نيابةً</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li><a href="#g-employee-01-view-attendance">الاطّلاع على سجل حضوري</a></li>
+<li><a href="#g-employee-04-view-payslip">الاطّلاع على كشف راتبي</a></li>
+</ul>
+</section>
+<section id="g-employee-03-request-a-loan"><h1>طلب سلفة خاصة</h1>
+<p><strong>الفئة المستهدفة:</strong> الموظف (تطلب لنفسك)
+<strong>الوقت المقدّر:</strong> ٣–٥ دقائق</p>
+<hr>
+<h2>كيف تسير السلفة الخاصة</h2>
+<p>تمرّ كل سلفة خاصة بأربع مراحل اعتماد متتالية قبل أن يُصرَف المبلغ؛ وبعد الصرف
+تبدأ الأقساط بالخصم تلقائيًا من كشف راتبك الشهري. جهّز المعلومات التالية قبل
+البدء:</p>
+<ul>
+<li><strong>المبلغ المطلوب</strong> وعدد <strong>الأقساط الشهرية</strong> — يعرض النظام قيمة القسط
+تلقائيًا.</li>
+<li><strong>سبب الطلب</strong> (حقل إلزامي).</li>
+<li>أي <strong>مستندات مساندة</strong> (كخطاب طبي أو عرض سعر) إن وُجدت.</li>
+</ul>
+<hr>
+<h2>الخطوات</h2>
+<p>١. <strong>افتح تطبيق الخصومات</strong> من القائمة الجانبية، ثم انتقل إلى
+   <strong>الخدمة الذاتية ← سلفي الخاصة</strong>.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/employee/loan-01.png" alt="قائمة سلفي الخاصة"></p>
+<p>٢. اضغط <strong>طلب سلفة خاصة</strong> في أعلى القائمة — الزر ظاهر دائمًا بصرف النظر عن عدد
+   السلف الخاصة الحالية.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/employee/loan-02.png" alt="زر طلب سلفة خاصة"></p>
+<p>٣. <strong>عبّئ تفاصيل السلفة الخاصة:</strong> النوع، والمبلغ، وعدد الأقساط، وشهر بدء الاقتطاع.
+   يُحتسب <strong>مبلغ القسط الشهري</strong> تلقائيًا أسفل الحقول.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/employee/loan-03.png" alt="نافذة طلب السلفة الخاصة"></p>
+<p>٤. أدخِل <strong>سبب الطلب</strong> في الحقل المخصّص (إلزامي)، وأرفق أي مستندات مساندة
+   باستخدام أيقونة المرفق.</p>
+<p>٥. راجع <strong>ملخّص السلفة الخاصة</strong> في أسفل النافذة: المبلغ الإجمالي، عدد الأشهر، القسط
+   الشهري، شهر البدء — ثم اضغط <strong>تقديم الطلب</strong>.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/employee/loan-04.png" alt="تقديم طلب القرض"></p>
+<hr>
+<h2>مسار الاعتماد بعد تقديم السلفة</h2>
+<p>بعد تقديم طلبك تسير السلفة الخاصة وفق المراحل التالية:</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>المرحلة</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>١</td>
+<td>المدير المباشر</td>
+</tr>
+<tr>
+<td>٢</td>
+<td>الموارد البشرية</td>
+</tr>
+<tr>
+<td>٣</td>
+<td>المحاسبة</td>
+</tr>
+<tr>
+<td>٤</td>
+<td>المدير العام (اعتماد نهائي)</td>
+</tr>
+<tr>
+<td>٥</td>
+<td>الصرف — استلام المبلغ من مسؤول الصرف</td>
+</tr>
+</tbody></table>
+<ul>
+<li>بعد <strong>الاعتماد النهائي للمدير العام</strong>، يصلك إشعار بأن سلفتك الخاصة معتمَدة وجاهزة
+للصرف؛ توجّه إلى مسؤول الصرف لاستلام المبلغ.</li>
+<li>يُسجّل مسؤول الصرف العملية في النظام بالضغط على <strong>تأكيد الصرف</strong>، وعندها فقط
+تصبح السلفة الخاصة <strong>نشطة</strong> وتبدأ أقساطها بالخصم من الشهر المحدَّد.</li>
+<li>إن رُفِض طلبك في أي مرحلة، يصلك إشعار مرفقًا بالسبب؛ افتح السلفة الخاصة واستخدم
+<strong>إعادة إلى مسودة</strong> لتعديلها وإعادة تقديمها.</li>
+</ul>
+<hr>
+<h2>متابعة سير السلفة بعد التفعيل</h2>
+<p>من <strong>الخصومات ← الخدمة الذاتية ← سلفي الخاصة</strong> ترى:</p>
+<ul>
+<li>مرحلة الاعتماد الحالية (أو حالة «نشط»).</li>
+<li><strong>إجمالي المسدَّد</strong> و<strong>إجمالي المتبقي</strong> وشريط التقدّم.</li>
+<li>تبويب <strong>الأقساط</strong> يعرض جدول السداد الكامل شهرًا بشهر.</li>
+</ul>
+<hr>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>العَرَض</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>لا أرى زر «طلب سلفة خاصة»</td>
+<td>لست في قائمة «سلفي الخاصة»</td>
+<td>انتقل إلى <strong>الخصومات ← الخدمة الذاتية ← سلفي الخاصة</strong></td>
+</tr>
+<tr>
+<td>زر التقديم غير مُفعَّل</td>
+<td>حقل إلزامي غير مكتمل</td>
+<td>تحقّق من إدخال <strong>السبب</strong> والمبلغ وعدد الأقساط</td>
+</tr>
+<tr>
+<td>رُفِض طلبي</td>
+<td>رفضه أحد المعتمِدين</td>
+<td>اطّلع على سبب الرفض في سجل المحادثة، عدّل البيانات، وأعِد التقديم</td>
+</tr>
+<tr>
+<td>لم تبدأ الأقساط بالخصم</td>
+<td>السلفة لم تُصرَف بعد</td>
+<td>السلفة تصبح نشطًا فقط بعد <strong>تأكيد الصرف</strong> — راجع شريط الحالة</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li><a href="#g-employee-04-view-payslip">الاطّلاع على كشف راتبي</a> — حيث تظهر أقساط السلفة ضمن الخصومات</li>
+</ul>
+</section>
+<section id="g-employee-04-view-payslip"><h1>كشف راتبك الشهري — القراءة والتحقّق</h1>
+<p><strong>الفئة المستهدفة:</strong> الموظف
+<strong>الوقت المقدّر:</strong> دقيقة واحدة</p>
+<hr>
+<h2>ما تجده في كشف راتبك</h2>
+<p>صافي راتبك المحوَّل إلى حسابك البنكي هو محصّلة حسابية واضحة؛ إليك بنيتها:</p>
+<table>
+<thead>
+<tr>
+<th>البند</th>
+<th>المحتوى</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>الأجر الأساسي</strong></td>
+<td>الراتب المتعاقَد عليه في عقد العمل</td>
+</tr>
+<tr>
+<td><strong>البدلات</strong></td>
+<td>بدل النقل، بدل السكن، وغيرها حسب عقدك</td>
+</tr>
+<tr>
+<td><strong>الإجمالي</strong></td>
+<td>الأجر الأساسي + مجموع البدلات</td>
+</tr>
+<tr>
+<td><strong>خصم الغياب والتأخير</strong></td>
+<td>يُخصَم مقابل الغياب غير المغطَّى أو التأخر عن أوقات العمل</td>
+</tr>
+<tr>
+<td><strong>إجمالي الخصومات</strong></td>
+<td>أقساط السلف الخاصة + الجزاءات السارية لهذا الشهر</td>
+</tr>
+<tr>
+<td><strong>صافي الراتب</strong></td>
+<td>الإجمالي − إجمالي الخصومات − خصم الغياب والتأخير</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>الخطوات</h2>
+<p>١. <strong>افتح تطبيق الرواتب</strong> من القائمة الجانبية، ثم اختر <strong>كشوف رواتبي</strong>.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/employee/payslip-01.png" alt="قائمة كشوف رواتبي"></p>
+<p>٢. <strong>اختر الشهر</strong> المطلوب من القائمة. يظهر <strong>صافي الراتب</strong> على السطر مباشرةً
+   دون الحاجة إلى فتح الكشف.</p>
+<p>٣. <strong>افتح الكشف</strong> للاطّلاع على تفاصيل البنود — اقرأه من الأعلى إلى الأسفل:
+   الإجمالي أولًا، ثم بنود الخصم واحدًا واحدًا، وصولًا إلى صافي الراتب.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/employee/payslip-02.png" alt="بنود كشف الراتب"></p>
+<p>٤. <strong>نزّل الكشف أو اطبعه</strong> باستخدام أيقونة الطباعة إن احتجت نسخة ورقية
+   (للبنك أو جهة حكومية أو التأشيرة).</p>
+<hr>
+<h2>تفسير الفروق الشائعة</h2>
+<p><strong>صافي الراتب أقل من المتوقّع؟</strong> تحقّق بالترتيب:</p>
+<p>١. هل هناك <strong>خصم غياب أو تأخير</strong>؟ — راجع <a href="#g-employee-01-view-attendance">سجل حضورك</a>
+   للتحقّق من الأيام المخصومة.
+٢. هل هناك <strong>قسط سلفة خاصة</strong> جديد؟ — افتح سلفتك الخاصة من تطبيق <strong>الخصومات</strong> وراجع تبويب
+   <strong>الأقساط</strong>.
+٣. إن ظلّ الرقم غير مفهوم، تواصل مع <strong>الموارد البشرية</strong> أو قسم <strong>الرواتب</strong>
+   مرفقًا باسم الشهر ورقم كشف الراتب.</p>
+<hr>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>العَرَض</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>لا يوجد كشف راتب لهذا الشهر</td>
+<td>دفعة الرواتب لم تُصدَر بعد</td>
+<td>انتظر؛ تصدر الدفعة بعد إتمام إجراءات الرواتب الشهرية</td>
+</tr>
+<tr>
+<td>لا أستطيع تنزيل الكشف</td>
+<td>مشكلة في المتصفح</td>
+<td>جرّب متصفحًا آخر أو أبلغ تقنية المعلومات</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li><a href="#g-employee-01-view-attendance">الاطّلاع على سجل حضوري</a></li>
+<li><a href="#g-employee-03-request-a-loan">طلب سلفة خاصة</a></li>
+</ul>
+</section>
+</body></html>

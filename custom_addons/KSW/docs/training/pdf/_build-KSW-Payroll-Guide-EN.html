@@ -1,0 +1,243 @@
+<!doctype html><html lang="en" dir="ltr"><head>
+<meta charset="utf-8"><title>Payroll Guide</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "DejaVu Sans",Arial,sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: left; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-left: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">Payroll Guide</div>
+  <div class="meta">User Training Guide<br/>KSW HR &amp; Payroll · 2026-07-21</div>
+</div>
+<section id="g-payroll-readme"><h1>Payroll Guides</h1>
+<p>For the <strong>payroll initiator</strong> — the person who runs the monthly payroll. You
+create the payslip batch, generate the payslips, resolve any employees the
+system skipped, and export the bank transfer file.</p>
+<blockquote>
+<p>Start with the <strong>General guide</strong> (<span class="xref">Getting Started</span>).</p>
+</blockquote>
+<h2>What you can do</h2>
+<table>
+<thead>
+<tr>
+<th>I want to…</th>
+<th>Guide</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Create a batch and generate payslips</td>
+<td><a href="#g-payroll-01-generate-payslip-batch">Generate a payslip batch</a></td>
+</tr>
+<tr>
+<td>Fix employees the system skipped</td>
+<td><a href="#g-payroll-02-skipped-employees">Resolve skipped employees</a></td>
+</tr>
+<tr>
+<td>Export the bank transfer file</td>
+<td><a href="#g-payroll-03-bank-file-export">Bank file export</a></td>
+</tr>
+</tbody></table>
+<h2>The golden rules</h2>
+<ul>
+<li>Payroll for an employee is <strong>blocked</strong> if they have an <strong>unconfirmed
+annual-leave return</strong> — those employees are <em>skipped</em> and must be resolved.</li>
+<li>Loan and penalty installments, and attendance deductions, flow into payslips
+automatically — you don&#39;t enter them by hand.</li>
+<li>The bank file is generated <strong>per bank</strong>, with NET totals shown on the batch.</li>
+</ul>
+</section>
+<section id="g-payroll-01-generate-payslip-batch"><h1>Generating a Payslip Batch</h1>
+<p><strong>Who is this for:</strong> Payroll initiator
+<strong>How long it takes:</strong> 5–10 minutes per month</p>
+<h2>What this does</h2>
+<p>Lets you run the monthly payroll: create a batch for the period, generate a
+payslip for each employee, and review the results before export.</p>
+<h2>Before you start</h2>
+<ul>
+<li>Make sure attendance and any commission/loan updates for the period are done.</li>
+<li>Employees with an <strong>unconfirmed annual-leave return</strong> will be skipped — chase
+those confirmations first if you can.</li>
+</ul>
+<h2>Steps</h2>
+<ol>
+<li><p><strong>Open Payroll → Payslip Batches</strong> and create a new batch for the <strong>period</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/payroll/batch-01.png" alt="Payslip batch form"></p>
+</li>
+<li><p>Set the employees/period as needed, then click <strong>Generate</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/payroll/batch-02.png" alt="Generate button"></p>
+</li>
+<li><p>The system creates a payslip per employee. Each payslip computes Basic →
+Gross → deductions (attendance, loans/penalties) → <strong>Net Salary</strong>.</p>
+</li>
+<li><p><strong>Review</strong> the batch: open a few payslips to sanity-check the NET, and check
+the <strong>Skipped Employees</strong> section for anyone left out (see the next guide).</p>
+</li>
+</ol>
+<h2>What happens next</h2>
+<p>Once the payslips look right, you can refresh the per-bank NET totals
+(<strong>Refresh Totals</strong>) and export the bank file (see
+<a href="#g-payroll-03-bank-file-export">Bank file export</a>).</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Some employees have no payslip</td>
+<td>They were skipped</td>
+<td>See <a href="#g-payroll-02-skipped-employees">Resolve skipped employees</a></td>
+</tr>
+<tr>
+<td>A NET looks wrong</td>
+<td>A deduction/attendance issue</td>
+<td>Open the payslip; the lines explain it. Fix the source (loan/attendance) and regenerate</td>
+</tr>
+<tr>
+<td>Generate seems stuck</td>
+<td>Large batch</td>
+<td>Give it a moment; it processes each employee</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-payroll-02-skipped-employees">Resolve skipped employees</a></li>
+<li><a href="#g-payroll-03-bank-file-export">Bank file export</a></li>
+</ul>
+</section>
+<section id="g-payroll-02-skipped-employees"><h1>Resolving Skipped Employees</h1>
+<p><strong>Who is this for:</strong> Payroll initiator
+<strong>How long it takes:</strong> varies</p>
+<h2>What this does</h2>
+<p>When you generate payslips, the system <strong>skips</strong> any employee it can&#39;t process
+and lists them with a reason. This guide explains how to clear those so everyone
+gets paid.</p>
+<h2>Before you start</h2>
+<ul>
+<li>The most common reason is an <strong>unconfirmed annual-leave return</strong> — payroll is
+deliberately blocked until the employee confirms they&#39;re back.</li>
+</ul>
+<h2>Steps</h2>
+<ol>
+<li><p>In the batch, open the <strong>Skipped Employees</strong> section. Each row shows the
+employee and the <strong>reason</strong> they were skipped.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/payroll/skipped-01.png" alt="Skipped employees list"></p>
+</li>
+<li><p><strong>Fix the cause</strong> of each skip:</p>
+<ul>
+<li><em>Unconfirmed leave return</em> → the employee (or HR) confirms the return date
+on the leave. See the employee guide
+<span class="xref">Confirm my return</span>.</li>
+<li>Other data issues → correct the underlying record (contract, bank, etc.).</li>
+</ul>
+</li>
+<li><p><strong>Re-generate</strong> the payslips. Resolved employees now get a payslip. Use
+<strong>Clear Skip Log</strong> to tidy the list once handled.</p>
+</li>
+</ol>
+<h2>What happens next</h2>
+<p>Once no one is skipped (or the remaining skips are intentional), proceed to the
+<a href="#g-payroll-03-bank-file-export">Bank file export</a>.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Same employee keeps getting skipped</td>
+<td>The cause isn&#39;t fixed yet</td>
+<td>Resolve the exact reason shown, then regenerate</td>
+</tr>
+<tr>
+<td>Skip list is cluttered</td>
+<td>Old entries</td>
+<td>Use <strong>Clear Skip Log</strong></td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-payroll-01-generate-payslip-batch">Generate a payslip batch</a></li>
+</ul>
+</section>
+<section id="g-payroll-03-bank-file-export"><h1>Exporting the Bank File</h1>
+<p><strong>Who is this for:</strong> Payroll initiator
+<strong>How long it takes:</strong> 2 minutes</p>
+<h2>What this does</h2>
+<p>Lets you export the salary transfer file for a completed payslip batch, ready to
+upload to the bank. Totals are shown per bank so you can reconcile before paying.</p>
+<h2>Before you start</h2>
+<ul>
+<li>Generate and review the batch first, and resolve skipped employees.</li>
+</ul>
+<h2>Steps</h2>
+<ol>
+<li><p>Open the payslip batch. Click <strong>Refresh Totals</strong> to recalculate the per-bank
+NET totals, then check the table (Bank Account, Employee Count, Total NET).
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/payroll/export-01.png" alt="Per-bank totals"></p>
+</li>
+<li><p>Click <strong>Export Bank File</strong>, choose the format (WPS / bank), and download.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/payroll/export-02.png" alt="Export bank file"></p>
+</li>
+<li><p>Upload the file to the bank through your normal banking process.</p>
+</li>
+</ol>
+<h2>What happens next</h2>
+<p>The exported file is the record of what you paid. Keep it with the batch for
+reconciliation.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Totals look outdated</td>
+<td>Not refreshed after changes</td>
+<td>Click <strong>Refresh Totals</strong> again</td>
+</tr>
+<tr>
+<td>An employee missing from the file</td>
+<td>They were skipped, or have no bank account</td>
+<td>Resolve the skip; ensure the employee&#39;s bank account is set</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-payroll-01-generate-payslip-batch">Generate a payslip batch</a></li>
+<li><a href="#g-payroll-02-skipped-employees">Resolve skipped employees</a></li>
+</ul>
+</section>
+</body></html>

@@ -1,0 +1,328 @@
+<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"><title>دليل المحاسبة</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "Noto Naskh Arabic","Noto Sans Arabic UI","DejaVu Sans",sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: right; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-right: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">دليل المحاسبة</div>
+  <div class="meta">دليل تدريب المستخدم<br/>KSW HR &amp; Payroll · 2026-07-23</div>
+</div>
+<section id="g-accounting-readme"><h1>أدلة المحاسبة</h1>
+<p><strong>للمحاسبين.</strong> تغطّي هذه الأدلة مهام الاعتماد والصرف وإدارة الخصومات
+والتصدير البنكي الخاصة بقسم المحاسبة.</p>
+<blockquote>
+<p>هل هذه أول مرة؟ ابدأ بـ <strong><span class="xref">البدء في استخدام النظام</span></strong></p>
+</blockquote>
+<h2>ما يمكنك فعله</h2>
+<table>
+<thead>
+<tr>
+<th>أريد أن…</th>
+<th>الدليل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>أعتمد مرحلة المحاسبة في الإجازة السنوية</td>
+<td><a href="#g-accounting-01-leave-acc-approval">الإجازات: اعتماد المحاسبة</a></td>
+</tr>
+<tr>
+<td>أعتمد سلفة خاصة وأؤكّد صرفها</td>
+<td><a href="#g-accounting-02-loan-approval-disbursement">السلف الخاصة: الاعتماد والصرف</a></td>
+</tr>
+<tr>
+<td>أصدّر ملف تحويل العمولات البنكي</td>
+<td><a href="#g-accounting-04-commission-export">تصدير العمولات</a></td>
+</tr>
+<tr>
+<td>أُنشئ جزاءً حكوميًا أو داخليًا</td>
+<td><a href="#g-accounting-05-create-penalties">إنشاء جزاء</a></td>
+</tr>
+</tbody></table>
+</section>
+<section id="g-accounting-01-leave-acc-approval"><h1>الإجازات: اعتماد المحاسبة</h1>
+<p><strong>الفئة المستهدفة:</strong> المحاسبة
+<strong>الوقت المقدّر:</strong> ١–٢ دقيقة لكل طلب</p>
+<h2>نظرة عامة</h2>
+<p>يُتيح لك هذا الدليل إتمام <strong>اعتماد المحاسبة</strong> في مسار الإجازة السنوية — المرحلة
+الرابعة بعد الاعتماد الأولي للمدير العام، وقبل الاعتماد النهائي له. مهمّتك
+إدخال الأرقام المالية المتعلقة بأجر الإجازة.</p>
+<h2>أين تجد الطلبات</h2>
+<p>افتح تطبيق <strong>الإجازات ← الإدارة ← الإجازات</strong>. ابحث عن الطلبات في مرحلة
+<strong>بانتظار اعتماد المحاسبة</strong>.</p>
+<h2>الخطوات</h2>
+<ol>
+<li><p><strong>افتح الإجازات ← الإدارة ← الإجازات</strong> وافتح الطلب عند مرحلة
+<strong>بانتظار اعتماد المحاسبة</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/accounting/leave-acc-01.png" alt="الإجازات بانتظار المحاسبة"></p>
+</li>
+<li><p>افتح تبويب <strong>المحاسبة</strong> — أكمِل حقول <strong>أجر الإجازة</strong> وأي بيانات أخرى تُطلَب
+في هذه الخطوة.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/accounting/leave-acc-02.png" alt="تبويب المحاسبة — الحقول والأرقام"></p>
+</li>
+<li><p>اضغط <strong>اعتماد (المحاسبة)</strong> — تنتقل الإجازة إلى <strong>بانتظار الاعتماد النهائي
+للمدير العام</strong>. (أو <strong>رفض</strong> مع ذكر السبب إن وجد خلل في الأرقام.)</p>
+</li>
+</ol>
+<h2>ما يحدث بعد ذلك</h2>
+<p>ينتقل الطلب إلى <strong>الاعتماد النهائي للمدير العام</strong>، ثم بعد اعتماده ينتقل إلى
+<strong>الموارد البشرية</strong> لتأكيد النموذج الموقَّع وإتمام الاعتماد.</p>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>العَرَض</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>لا يوجد زر الاعتماد</td>
+<td>الطلب ليس في مرحلة المحاسبة</td>
+<td>راجع شريط الحالة</td>
+</tr>
+<tr>
+<td>أرقام الإجازة تبدو غلطة</td>
+<td>بيانات الراتب أو المدة غير دقيقة</td>
+<td>تواصل مع الموارد البشرية للمراجعة قبل الاعتماد</td>
+</tr>
+</tbody></table>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li><a href="#g-accounting-02-loan-approval-disbursement">السلف الخاصة: الاعتماد والصرف</a></li>
+</ul>
+</section>
+<section id="g-accounting-02-loan-approval-disbursement"><h1>السلف الخاصة: الاعتماد والصرف</h1>
+<p><strong>الفئة المستهدفة:</strong> المحاسبة
+<strong>الوقت المقدّر:</strong> ١–٢ دقيقة لكل سلفة</p>
+<h2>نظرة عامة</h2>
+<p>تتضمّن مسؤوليتك في مسار السلف الخاصة <strong>مرحلتين</strong> رئيسيتين:</p>
+<ol>
+<li><strong>اعتماد المحاسبة</strong> (بعد الموارد البشرية، وقبل المدير العام).</li>
+<li><strong>تأكيد الصرف</strong> — الإجراء الأخير الذي يُفعّل السلفة الخاصة ويُطلِق أقساطها.</li>
+</ol>
+<h2>ملاحظات أولية</h2>
+<ul>
+<li>تجد السلف الخاصة في <strong>الخصومات ← العمليات ← السلف الخاصة</strong>؛ تفتح القائمة على <strong>بانتظاري</strong>
+تلقائيًا.</li>
+</ul>
+<h2>الخطوات — اعتماد المحاسبة</h2>
+<ol>
+<li><p><strong>افتح الخصومات ← العمليات ← السلف الخاصة.</strong> تفتح القائمة على <strong>بانتظاري</strong> تلقائيًا.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/accounting/loan-acc-01.png" alt="السلف الخاصة بانتظار المحاسبة"></p>
+</li>
+<li><p><strong>افتح السلفة الخاصة</strong>، وراجع المبلغ وعدد الأقساط وخصومات الموظف الأخرى في تبويب
+<strong>دعم القرار</strong>. ضع إشارة تأكيد الميزانية عند الاقتضاء.</p>
+</li>
+<li><p>اضغط <strong>اعتماد (المحاسبة)</strong> — تنتقل السلفة الخاصة إلى <strong>بانتظار الاعتماد النهائي
+للمدير العام</strong>. (أو اضغط <strong>رفض</strong> مع ذكر السبب.)
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/accounting/loan-acc-02.png" alt="اعتماد المحاسبة على السلفة الخاصة"></p>
+</li>
+</ol>
+<h2>الخطوات — تأكيد الصرف</h2>
+<p>بعد الاعتماد النهائي للمدير العام، تصل السلفة الخاصة إلى <strong>بانتظار الصرف</strong> ويُشعَر
+الموظف بجاهزية صرف مبلغها.</p>
+<ol>
+<li><p>افتح السلفة الخاصة واضغط <strong>تأكيد الصرف</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/accounting/loan-disburse-01.png" alt="تأكيد الصرف"></p>
+</li>
+<li><p>تصبح السلفة الخاصة <strong>نشطة</strong>. تظهر أقساطها تلقائيًا على كشوف رواتب الموظف.</p>
+</li>
+</ol>
+<h2>ما يحدث بعد ذلك</h2>
+<p>بعد تفعيل السلفة الخاصة يُخصَم كل قسط معلّق عند تشغيل دفعة الرواتب. إن سدّد الموظف
+خارج الرواتب لاحقًا، تتولّى <strong>الموارد البشرية</strong> ذلك — راجع
+<span class="xref">الموارد البشرية ← تعديل الخصومات وإدارة الأقساط</span>.</p>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>العَرَض</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>لا يوجد زر <strong>تأكيد الصرف</strong></td>
+<td>السلفة الخاصة لم تصل مرحلة الصرف أو تنقصك صلاحية الصرف</td>
+<td>راجع الحالة الراهنة؛ تحقّق من صلاحياتك</td>
+</tr>
+<tr>
+<td>الأقساط لا تُخصَم</td>
+<td>السلفة الخاصة لم تُصرَف بعد</td>
+<td>يجب أن تكون السلفة الخاصة <strong>نشطة</strong> أولًا</td>
+</tr>
+</tbody></table>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li><a href="#g-accounting-05-create-penalties">إنشاء جزاء</a></li>
+</ul>
+</section>
+<section id="g-accounting-04-commission-export"><h1>تصدير العمولات والمكافآت (المحاسبة)</h1>
+<p><strong>الفئة المستهدفة:</strong> المحاسبة
+<strong>الوقت المقدّر:</strong> ٥–١٠ دقائق شهريًا</p>
+<h2>نظرة عامة</h2>
+<p>يُتيح لك هذا الدليل تجميع كشوف العمولات الشهرية المعتمدة في <strong>دفعة واحدة</strong>،
+ثم تصدير ملف التحويل البنكي لصرفها.</p>
+<h2>ملاحظات أولية</h2>
+<ul>
+<li>يجب على المشرفين إتمام <strong>اعتماد</strong> كشوف العمولات قبل أن تتمكّن من المعالجة.</li>
+<li>تحتاج إلى مراجعة الأرقام الإجمالية قبل التصدير النهائي.</li>
+</ul>
+<h2>الخطوات</h2>
+<ol>
+<li><p><strong>افتح تطبيق العمولات ← العمليات ← دفعات العمولات.</strong></p>
+</li>
+<li><p><strong>أنشئ دفعة جديدة</strong> للشهر المطلوب، ثم اضغط <strong>توليد</strong> لجمع كشوف الموظفين
+المعتمدة.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/accounting/comm-01.png" alt="نموذج دفعة العمولات"></p>
+</li>
+<li><p><strong>راجع الإجماليات</strong> حسب القسم أو البنك، ثم <strong>نهائي</strong>. بعد إقفال الدفعة
+لا يمكن إضافة كشوف إليها.</p>
+</li>
+<li><p>اضغط <strong>تصدير ملف التحويل البنكي</strong> ونزّل الملف.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/accounting/comm-03.png" alt="تصدير ملف التحويل البنكي"></p>
+</li>
+<li><p>ارفع الملف على منصة البنك.</p>
+</li>
+</ol>
+<h2>ما يحدث بعد ذلك</h2>
+<p>الملف سجل دائم. احتفظ به مع الدفعة للمطابقة المحاسبية.</p>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>العَرَض</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>كشف موظف غائب من الدفعة</td>
+<td>الكشف لم يُعتمَد بعد</td>
+<td>اطلب من المشرف اعتماده قبل التوليد</td>
+</tr>
+<tr>
+<td>الدفعة لا تقبل الإضافة</td>
+<td>الدفعة في حالة «نهائي»</td>
+<td>افتح دفعة الشهر القادم لإضافة ما فات</td>
+</tr>
+</tbody></table>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li>المشرف: <span class="xref">كشوف العمولات</span></li>
+</ul>
+</section>
+<section id="g-accounting-05-create-penalties"><h1>إنشاء جزاء حكومي أو جزاء داخلي</h1>
+<p><strong>الفئة المستهدفة:</strong> المحاسبة
+<strong>الوقت المقدّر:</strong> دقيقتان</p>
+<hr>
+<h2>الجزاءات — اختصاص المحاسبة حصرًا</h2>
+<p>الجزاءات بنوعيها — الحكومي والداخلي — تُنشئها المحاسبة مباشرةً في النظام؛
+وتُوزَّع خصوماتها تلقائيًا على كشوف رواتب الأشهر المحدَّدة.</p>
+<table>
+<thead>
+<tr>
+<th>نوع الجزاء</th>
+<th>أمثلة</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>جزاء حكومي</strong></td>
+<td>غرامات هيئة التأمينات الاجتماعية (GOSI)، وزارة الموارد البشرية</td>
+</tr>
+<tr>
+<td><strong>جزاء داخلي</strong></td>
+<td>مخالفات لوائح الشركة، التأخر المتكرّر</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>ملاحظة:</strong> سلف الرواتب تُنشئها <strong>الموارد البشرية</strong> لا المحاسبة — راجع
+<span class="xref">إنشاء سلفة راتب</span>.</p>
+</blockquote>
+<hr>
+<h2>ما تحتاجه قبل البدء</h2>
+<ul>
+<li>اسم الموظف.</li>
+<li>نوع الجزاء: حكومي أو داخلي.</li>
+<li>المبلغ الإجمالي وعدد الأقساط (غالبًا قسط واحد للجزاءات الفورية).</li>
+<li>مرجع القرار أو رقم المخالفة (للتوثيق).</li>
+</ul>
+<hr>
+<h2>الخطوات</h2>
+<p>١. افتح <strong>الخصومات ← العمليات ← الخصومات</strong> من القائمة الجانبية، ثم اضغط
+   <strong>جديد</strong>.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/accounting/penalty-create-01.png" alt="قائمة الخصومات — جديد"></p>
+<p>٢. اختر <strong>الموظف</strong> من القائمة، ثم حدّد نوع الخصم: <strong>جزاء حكومي</strong> أو
+   <strong>جزاء داخلي</strong>.</p>
+<p>٣. أدخِل <strong>المبلغ الإجمالي</strong> و<strong>عدد الأقساط</strong> و<strong>شهر البدء</strong>. يُنشئ النظام
+   جدول الأقساط تلقائيًا في تبويب <strong>الأقساط</strong>.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/accounting/penalty-create-02.png" alt="نموذج الجزاء مكتمل"></p>
+<p>٤. أضف <strong>ملاحظة</strong> في الحقل المخصّص: رقم القرار، تاريخ المخالفة، المرجع
+   الرسمي. هذا التوثيق ضروري للمراجعات الداخلية والخارجية.</p>
+<p>٥. اضغط <strong>إرسال</strong> — يُفعَّل الجزاء ويبدأ الاقتطاع في الشهر المحدَّد.</p>
+<hr>
+<h2>ما يحدث بعد التفعيل</h2>
+<ul>
+<li>كل قسط معلّق يُدرَج تلقائيًا في دفعة الرواتب الشهرية.</li>
+<li>يظهر الخصم للموظف في بند <strong>إجمالي الخصومات</strong> بكشف راتبه بوضوح.</li>
+<li>عند سداد جميع الأقساط، يُعلَّم الجزاء <strong>مكتملًا</strong> تلقائيًا دون تدخّل يدوي.</li>
+</ul>
+<hr>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>العَرَض</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>لا أجد نوع «جزاء حكومي / داخلي» في القائمة</td>
+<td>أنواع الخصومات لم تُضبَط في النظام</td>
+<td>تواصل مع مسؤول النظام لإضافة هذه الأنواع</td>
+</tr>
+<tr>
+<td>الخصم لا يظهر في راتب الموظف</td>
+<td>السجل في حالة مسودة</td>
+<td>تأكّد من الضغط على <strong>إرسال</strong> لا على حفظ فقط</td>
+</tr>
+<tr>
+<td>أريد تعديل قسط بعد التفعيل</td>
+<td>الجزاء نشط</td>
+<td>راجع <span class="xref">تعديل الخصومات</span> للتحديث اليدوي</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li><a href="#g-accounting-02-loan-approval-disbursement">السلف الخاصة: الاعتماد والصرف</a></li>
+<li><span class="xref">تعديل الخصومات وإدارة الأقساط</span></li>
+</ul>
+</section>
+</body></html>

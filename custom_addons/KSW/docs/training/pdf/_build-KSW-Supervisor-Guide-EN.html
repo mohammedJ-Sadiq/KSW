@@ -1,0 +1,435 @@
+<!doctype html><html lang="en" dir="ltr"><head>
+<meta charset="utf-8"><title>Supervisor Guide</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "DejaVu Sans",Arial,sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: left; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-left: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">Supervisor Guide</div>
+  <div class="meta">User Training Guide<br/>KSW HR &amp; Payroll · 2026-07-21</div>
+</div>
+<section id="g-supervisor-readme"><h1>Supervisor Guides</h1>
+<p>For <strong>direct managers</strong> — anyone who has staff reporting to them. You are the
+<strong>first approval step</strong> for your team&#39;s requests, and you maintain their
+attendance and commission sheets.</p>
+<blockquote>
+<p>You also do everything an <span class="xref">Employee</span> does for yourself. Read
+those guides too. And start with the <strong>General guide</strong> (<span class="xref">Getting Started</span>).</p>
+</blockquote>
+<h2>What you can do</h2>
+<table>
+<thead>
+<tr>
+<th>I want to…</th>
+<th>Guide</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Approve (or refuse) my team&#39;s time-off requests</td>
+<td><a href="#g-supervisor-01-approve-time-off">Approve time off</a></td>
+</tr>
+<tr>
+<td>Request leave for a team member without a login</td>
+<td><a href="#g-supervisor-01-approve-time-off">Approve time off</a></td>
+</tr>
+<tr>
+<td>Record a team member&#39;s return from vacation</td>
+<td><a href="#g-supervisor-01-approve-time-off">Approve time off</a></td>
+</tr>
+<tr>
+<td>Approve (or refuse) my team&#39;s loan requests</td>
+<td><a href="#g-supervisor-02-approve-loan">Approve a loan</a></td>
+</tr>
+<tr>
+<td>Mark my team&#39;s monthly attendance (non-biometric staff)</td>
+<td><a href="#g-supervisor-03-attendance-sheets">Attendance sheets</a></td>
+</tr>
+<tr>
+<td>Record my team&#39;s commissions &amp; allowances</td>
+<td><a href="#g-supervisor-04-commission-sheets">Commission sheets</a></td>
+</tr>
+<tr>
+<td>See my team&#39;s payslips</td>
+<td><a href="#g-supervisor-05-view-team-payslips">View team payslips</a></td>
+</tr>
+</tbody></table>
+<h2>The golden rules</h2>
+<ul>
+<li>You see and act on <strong>yourself + your direct reports</strong>.</li>
+<li>You are the <strong>Direct Manager (DM)</strong> step — the <strong>first</strong> approval on both
+leave and loan requests. After you approve, it goes to HR.</li>
+<li><strong>Time-off</strong> requests live in <strong>Time Off → Management → Time Off</strong>;
+<strong>loan</strong> requests live in <strong>Loans → Operations → Loans</strong>.</li>
+<li>Every approval/refusal is recorded with your name; a refusal always needs a
+<strong>reason</strong>, which the employee sees.</li>
+</ul>
+</section>
+<section id="g-supervisor-01-approve-time-off"><h1>Approving Time Off (Direct Manager)</h1>
+<p><strong>Who is this for:</strong> Supervisor / Direct Manager
+<strong>How long it takes:</strong> 1 minute per request</p>
+<h2>What this does</h2>
+<p>Lets you approve or refuse a leave request from someone who reports to you. You
+are the <strong>first</strong> step; after you approve, it continues to HR (and, for annual
+leave, through the rest of the chain).</p>
+<h2>Before you start</h2>
+<ul>
+<li>You act only on <strong>your direct reports&#39;</strong> requests.</li>
+<li>A refusal requires a short <strong>reason</strong> — the employee will see it.</li>
+</ul>
+<h2>Where to find your team&#39;s requests</h2>
+<p>Open the <strong>Time Off</strong> app, then <strong>Management → Time Off</strong>. This list shows your
+team&#39;s requests; find the employee whose request you want to review.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/leave-approve-01.png" alt="Time Off → Management → Time Off"></p>
+<h2>Steps</h2>
+<ol>
+<li><p><strong>Open the employee&#39;s request</strong> from the Management → Time Off list (or click
+the request link in your Inbox).</p>
+</li>
+<li><p><strong>Review</strong> the leave type, dates, and number of days.</p>
+</li>
+<li><p><strong>Decide:</strong></p>
+<ul>
+<li><strong>Approve</strong> → click <strong>Approve (DM)</strong>. The request moves on to HR.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/leave-approve-02.png" alt="Approve (DM) button"></li>
+<li><strong>Refuse</strong> → click <strong>Refuse</strong>, enter the reason, and confirm.</li>
+</ul>
+</li>
+<li><p><strong>(Non-biometric staff only)</strong> After you approve, a short window may appear
+asking how to reflect the leave on the attendance sheet — choose
+<strong>Mark All Absent</strong> to update those days automatically, or
+<strong>I&#39;ll Update Manually</strong> to do it yourself later.</p>
+</li>
+</ol>
+<h2>Requesting leave for someone without a system account</h2>
+<p>Some field staff don&#39;t have their own login. In that case <strong>you</strong> submit the
+request for them and then approve the manager step yourself:</p>
+<ol>
+<li>In <strong>Management → Time Off</strong>, click <strong>New</strong>.</li>
+<li>Select the <strong>employee</strong>, the <strong>leave type</strong>, and the <strong>dates</strong>, then save.</li>
+<li>Approve the <strong>Direct Manager</strong> step as above. The request then continues to
+HR like any other.</li>
+</ol>
+<h2>Confirming an employee&#39;s return</h2>
+<p>When one of your team returns from <strong>annual</strong> leave, you record their return —
+the employee does not do this themselves:</p>
+<ol>
+<li>Open the approved leave (it shows an <strong>On Vacation</strong> ribbon).</li>
+<li>Fill in the employee&#39;s actual <strong>Return Date</strong>.</li>
+<li>Click <strong>Confirm Return</strong>.</li>
+</ol>
+<blockquote>
+<p><strong>Why this matters:</strong> payroll is <strong>blocked</strong> for an employee with an
+unconfirmed annual-leave return. Confirming promptly keeps their next payslip
+on time.</p>
+</blockquote>
+<h2>What happens next</h2>
+<ul>
+<li><strong>Approved</strong> annual leave → moves to <strong>Pending HR Approval</strong>, then continues
+through GM → Accounting → GM → HR confirmation.</li>
+<li><strong>Approved</strong> sick / unpaid / other leave → moves to <strong>Pending HR Approval</strong>
+(HR gives the final approval).</li>
+<li><strong>Refused</strong> → the employee is notified with your reason and can revise and
+resubmit.</li>
+</ul>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>I can&#39;t see a request</td>
+<td>The employee isn&#39;t your direct report</td>
+<td>Confirm they report to you in <strong>Management → Time Off</strong></td>
+</tr>
+<tr>
+<td>No <strong>Approve (DM)</strong> button</td>
+<td>Already approved, or not your team member</td>
+<td>Read the status bar</td>
+</tr>
+<tr>
+<td>Refuse won&#39;t confirm</td>
+<td>Reason left empty</td>
+<td>Enter a reason — it&#39;s required</td>
+</tr>
+<tr>
+<td>The employee has no login</td>
+<td>They&#39;re field staff without an account</td>
+<td>Create the request for them (see above) and approve it</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-supervisor-03-attendance-sheets">Attendance sheets</a></li>
+<li><a href="#g-supervisor-02-approve-loan">Approve a loan</a></li>
+</ul>
+</section>
+<section id="g-supervisor-02-approve-loan"><h1>Approving a Loan (Direct Manager)</h1>
+<p><strong>Who is this for:</strong> Supervisor / Direct Manager
+<strong>How long it takes:</strong> 1 minute per request</p>
+<h2>What this does</h2>
+<p>Lets you approve or refuse a loan request from someone who reports to you. You
+are the <strong>first</strong> approval step; after you approve it goes to HR, then
+Accounting, then the GM, then disbursement.</p>
+<h2>Before you start</h2>
+<ul>
+<li>You act only on <strong>your direct reports&#39;</strong> loan requests.</li>
+<li>A refusal requires a <strong>reason</strong>, which the employee sees.</li>
+</ul>
+<h2>Steps</h2>
+<ol>
+<li><p><strong>Open the Loans app → Operations → Loans</strong> (or click the request in your
+Inbox). The list opens on <strong>Waiting For Me</strong>, showing only loans at your step.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/loan-approve-01.png" alt="Loans list, Waiting For Me"></p>
+</li>
+<li><p><strong>Open the request</strong> and review the amount, number of installments, the
+resulting monthly payment, and the employee&#39;s reason/attachments.</p>
+</li>
+<li><p><strong>Decide:</strong></p>
+<ul>
+<li><strong>Approve</strong> → click <strong>Approve (DM)</strong>. It moves to HR.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/loan-approve-02.png" alt="Approve (DM) button on loan"></li>
+<li><strong>Refuse</strong> → click <strong>Refuse</strong>, enter the reason, confirm.</li>
+</ul>
+</li>
+</ol>
+<h2>What happens next</h2>
+<p>An approved loan moves to <strong>Pending HR Approval</strong> and continues:
+<strong>HR → Accounting → GM (final) → Disbursement → Active</strong>. You&#39;ll see its state
+update in <strong>Loans → Operations → Loans</strong>. A refused loan returns to the employee
+with your reason.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>I can&#39;t find the loan</td>
+<td>Not your report, or not at your step</td>
+<td>Use <strong>Waiting For Me</strong>; confirm they report to you</td>
+</tr>
+<tr>
+<td>No approve button</td>
+<td>Already past the DM step</td>
+<td>Check the approval state banner</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-supervisor-01-approve-time-off">Approve time off</a></li>
+</ul>
+</section>
+<section id="g-supervisor-03-attendance-sheets"><h1>Attendance Sheets (Non-Biometric Staff)</h1>
+<p><strong>Who is this for:</strong> Supervisor / Direct Manager
+<strong>How long it takes:</strong> 5 minutes per month</p>
+<h2>What this does</h2>
+<p>Lets you record the monthly attendance of team members who are <strong>not</strong> on the
+fingerprint/face device. You mark each workday present or absent; the sheet then
+feeds payroll (uncovered absences cause deductions).</p>
+<h2>Before you start</h2>
+<ul>
+<li>This is only for <strong>non-biometric</strong> employees who report to you.</li>
+<li>You edit a sheet during its month; once the month closes it becomes read-only.</li>
+<li>Days already covered by an <strong>approved leave</strong> are <strong>locked</strong> — you can&#39;t (and
+shouldn&#39;t) change them.</li>
+</ul>
+<h2>Steps</h2>
+<ol>
+<li><p><strong>Open Attendance → Attendance Sheets.</strong>
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/attsheet-01.png" alt="Attendance sheets list"></p>
+</li>
+<li><p><strong>Generate the sheets</strong> for the month if they don&#39;t exist yet — use
+<strong>Generate All Sheets</strong> on the list.</p>
+</li>
+<li><p><strong>Open an employee&#39;s sheet.</strong> In the <strong>Daily Attendance</strong> tab you&#39;ll see one
+row per day.</p>
+</li>
+<li><p><strong>Mark attendance:</strong></p>
+<ul>
+<li>Toggle each day between present (green) and absent (red), <strong>or</strong></li>
+<li>Use <strong>All Present</strong> / <strong>All Absent</strong> to set the whole month, then fix the
+exceptions.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/attsheet-02.png" alt="Marking daily attendance"></li>
+</ul>
+</li>
+<li><p>Days with a linked <strong>approved leave</strong> are already filled and locked — leave
+them as they are.</p>
+</li>
+</ol>
+<h2>What happens next</h2>
+<p>The sheet stays editable through the current month, then is confirmed (locked)
+when the month ends. Approved leaves automatically lock and fill the relevant
+days. If a sheet needs reopening after it&#39;s locked, an <strong>HR / attendance
+manager</strong> can Reset it to Draft (see the HR guide).</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A day won&#39;t toggle</td>
+<td>It&#39;s covered by an approved leave (locked)</td>
+<td>That&#39;s expected — don&#39;t change it</td>
+</tr>
+<tr>
+<td>No sheet for an employee</td>
+<td>Not generated yet</td>
+<td>Use <strong>Generate All Sheets</strong></td>
+</tr>
+<tr>
+<td>The sheet is read-only</td>
+<td>The month has closed</td>
+<td>Ask HR to Reset to Draft if a correction is genuinely needed</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-supervisor-01-approve-time-off">Approve time off</a></li>
+<li><a href="#g-supervisor-04-commission-sheets">Commission sheets</a></li>
+</ul>
+</section>
+<section id="g-supervisor-04-commission-sheets"><h1>Commission &amp; Allowance Sheets</h1>
+<p><strong>Who is this for:</strong> Supervisor / Direct Manager
+<strong>How long it takes:</strong> 5 minutes per employee per month</p>
+<h2>What this does</h2>
+<p>Lets you record the monthly <strong>commissions and allowances</strong> for your team
+members who receive them, and confirm the sheet so Accounting can pay it.</p>
+<h2>Before you start</h2>
+<ul>
+<li>Applies to your direct reports who are set up for commissions.</li>
+<li>You fill and <strong>Confirm</strong> the sheet; Accounting then finalises it.</li>
+</ul>
+<h2>Steps</h2>
+<ol>
+<li><p><strong>Open Commissions → My Subordinates&#39; Sheets.</strong>
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/comm-01.png" alt="My subordinates&#39; commission sheets"></p>
+</li>
+<li><p><strong>Open (or create) the sheet</strong> for the employee and period.</p>
+</li>
+<li><p><strong>Add the lines</strong> — each commission or allowance with its <strong>category</strong> and
+either a <strong>quantity</strong> (for quantity-based items) or an <strong>amount</strong>.</p>
+<ul>
+<li>Shortcut: <strong>Apply Template</strong> pre-fills the lines from the employee&#39;s saved
+template, then you adjust.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/comm-02.png" alt="Commission sheet lines"></li>
+</ul>
+</li>
+<li><p><strong>Check the totals</strong> on the right. Note <strong>Loans Deduction</strong> shows the
+employee&#39;s current loan shortfall (&quot;Live Shortfall&quot;) that will be recovered
+from this sheet — it freezes when you confirm.</p>
+</li>
+<li><p><strong>Confirm.</strong> Click <strong>Confirm</strong> when the sheet is complete.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/comm-03.png" alt="Confirm commission sheet"></p>
+</li>
+</ol>
+<h2>What happens next</h2>
+<p>The sheet moves <strong>Draft → Confirmed</strong> and the loan-recovery amount is frozen.
+It now waits for <strong>Accounting</strong> to finalise it (state → Done) and include it in
+a payment batch. You can no longer edit the lines once confirmed — ask an
+officer/accountant to reset it if you need to change something.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>I can&#39;t edit after confirming</td>
+<td>Sheet is Confirmed</td>
+<td>Ask a commission officer/accountant to Reset to Draft</td>
+</tr>
+<tr>
+<td>Employee has no sheet option</td>
+<td>Not set up for commissions</td>
+<td>Confirm eligibility with HR</td>
+</tr>
+<tr>
+<td>A category is missing</td>
+<td>Not in the catalog</td>
+<td>Ask the Commission Admin to add it</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-supervisor-03-attendance-sheets">Attendance sheets</a></li>
+</ul>
+</section>
+<section id="g-supervisor-05-view-team-payslips"><h1>Viewing My Team&#39;s Payslips</h1>
+<p><strong>Who is this for:</strong> Supervisor / Direct Manager
+<strong>How long it takes:</strong> 1 minute</p>
+<h2>What this does</h2>
+<p>Lets you see the payslips of the people who report to you (read-only), so you
+can answer questions or check that pay was processed.</p>
+<h2>Before you start</h2>
+<ul>
+<li>You can see <strong>your own + your direct reports&#39;</strong> payslips. You cannot edit them.</li>
+</ul>
+<h2>Steps</h2>
+<ol>
+<li><strong>Open Payroll</strong> from the main menu.</li>
+<li><strong>Open a payslip</strong> for a team member and read the salary lines (Basic, Gross,
+deductions, Net Salary) — same layout as your own payslip.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/team-payslip-01.png" alt="Team payslip"></li>
+</ol>
+<h2>What happens next</h2>
+<p>Read-only. For corrections, contact HR/payroll — supervisors cannot change
+payslips.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>I can&#39;t see a team member&#39;s payslip</td>
+<td>Not a direct report, or not generated</td>
+<td>Confirm they report to you and payroll has run</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><span class="xref">View my payslip</span></li>
+</ul>
+</section>
+</body></html>

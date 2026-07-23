@@ -1,0 +1,5 @@
+node_modules/
+package-lock.json
+
+# generated PDF build temp
+pdf/_manual-*.html

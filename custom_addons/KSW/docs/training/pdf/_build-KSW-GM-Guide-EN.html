@@ -1,0 +1,250 @@
+<!doctype html><html lang="en" dir="ltr"><head>
+<meta charset="utf-8"><title>General Manager Guide</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "DejaVu Sans",Arial,sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: left; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-left: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">General Manager Guide</div>
+  <div class="meta">User Training Guide<br/>KSW HR &amp; Payroll · 2026-07-21</div>
+</div>
+<section id="g-gm-readme"><h1>General Manager (GM) Guides</h1>
+<p>For the <strong>General Manager</strong>. You provide the <strong>initial</strong> and <strong>final</strong> approvals
+on annual leave, the <strong>final</strong> approval on loans, and — uniquely — you can
+<strong>return</strong> a request to an earlier approver for revision instead of refusing it
+outright.</p>
+<blockquote>
+<p>Start with the <strong>General guide</strong> (<span class="xref">Getting Started</span>).</p>
+</blockquote>
+<h2>What you can do</h2>
+<table>
+<thead>
+<tr>
+<th>I want to…</th>
+<th>Guide</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Give initial and final approval on annual leave</td>
+<td><a href="#g-gm-01-leave-gm-approvals">Leave: GM approvals</a></td>
+</tr>
+<tr>
+<td>Send a request back to an earlier approver</td>
+<td><a href="#g-gm-02-return-to-approver">Return to approver</a></td>
+</tr>
+<tr>
+<td>Give final approval on a loan</td>
+<td><a href="#g-gm-03-loan-gm-approval">Loan: GM final approval</a></td>
+</tr>
+</tbody></table>
+<h2>The golden rules</h2>
+<ul>
+<li>On <strong>annual leave</strong> you act <strong>twice</strong>: an initial review (step 3) and the
+final approval (step 5). Your final approval creates the vacation payslip.</li>
+<li>Instead of refusing, you can <strong>Return to Approver</strong> with a reason, sending the
+request back to a specific earlier step for correction.</li>
+<li><strong>Time-off</strong> approvals live in <strong>Time Off → Management → Time Off</strong>;
+<strong>loan</strong> approvals live in <strong>Loans → Operations → Loans</strong> (opens on
+<strong>Waiting For Me</strong>).</li>
+</ul>
+</section>
+<section id="g-gm-01-leave-gm-approvals"><h1>Leave: GM Approvals</h1>
+<p><strong>Who is this for:</strong> General Manager
+<strong>How long it takes:</strong> 1–2 minutes per request</p>
+<h2>What this does</h2>
+<p>Covers your <strong>two</strong> approval points on an annual leave:</p>
+<ol>
+<li><strong>Initial approval</strong> (step 3) — a review after HR.</li>
+<li><strong>Final approval</strong> (step 5) — after Accounting; this creates the vacation
+payslip and sends the leave on for the signed-form confirmation.</li>
+</ol>
+<h2>Before you start</h2>
+<ul>
+<li>Leave requests live in <strong>Time Off → Management → Time Off</strong>. Look for requests
+at <strong>Pending GM Initial</strong> or <strong>Pending GM Final</strong>.</li>
+</ul>
+<h2>Steps — Initial approval</h2>
+<ol>
+<li><p><strong>Open Time Off → Management → Time Off</strong> and open the employee&#39;s request
+(at <strong>Pending GM Initial</strong>).
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/gm/leave-gm-01.png" alt="Time Off → Management → Time Off"></p>
+</li>
+<li><p><strong>Open the leave</strong> and review the HR/Decision-Support details (read-only at
+this step).</p>
+</li>
+<li><p>Click <strong>Initial Approve (GM)</strong> → the leave moves to <strong>Accounting</strong>.
+(Or use <strong>Return to Approver</strong> — see the next guide.)
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/gm/leave-gm-02.png" alt="Initial Approve (GM)"></p>
+</li>
+</ol>
+<h2>Steps — Final approval</h2>
+<ol>
+<li><p>Open the leave (now at <strong>Pending GM Final</strong>) and review the <strong>Accounting</strong>
+tab figures.</p>
+</li>
+<li><p>Click <strong>Final Approve (GM)</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/gm/leave-gm-03.png" alt="Final Approve (GM)"></p>
+<p>This <strong>creates the vacation payslip</strong> and moves the leave to <strong>Pending HR
+Confirmation</strong> (HR then attaches the signed form).</p>
+</li>
+</ol>
+<h2>What happens next</h2>
+<ul>
+<li>Initial approval → Accounting fills the financial details.</li>
+<li>Final approval → vacation payslip is generated; HR does the final confirmation.</li>
+</ul>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>No approve button</td>
+<td>Leave not at a GM step</td>
+<td>Check the status bar</td>
+</tr>
+<tr>
+<td>I don&#39;t want to refuse but it needs changes</td>
+<td>Use <strong>Return to Approver</strong></td>
+<td>See <a href="#g-gm-02-return-to-approver">Return to approver</a></td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-gm-02-return-to-approver">Return to approver</a></li>
+<li><a href="#g-gm-03-loan-gm-approval">Loan: GM final approval</a></li>
+</ul>
+</section>
+<section id="g-gm-02-return-to-approver"><h1>Return a Leave to an Earlier Approver</h1>
+<p><strong>Who is this for:</strong> General Manager
+<strong>How long it takes:</strong> 1 minute</p>
+<h2>What this does</h2>
+<p>Instead of refusing a leave outright, lets you send it <strong>back</strong> to an earlier
+approver (for example HR or the direct manager) with a note explaining what
+needs to change. The request keeps its history and simply resumes from the step
+you choose.</p>
+<h2>Before you start</h2>
+<ul>
+<li>This is available only to the GM, and only at the two GM steps (<strong>Pending GM
+Initial</strong> and <strong>Pending GM Final</strong>).</li>
+<li>From the initial step you can return to the DM or HR. From the final step you
+can return to the DM, HR, GM-initial, or Accounting.</li>
+</ul>
+<h2>Steps</h2>
+<ol>
+<li><p>Open the leave at a GM step and click <strong>Return to Approver</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/gm/return-01.png" alt="Return to Approver button"></p>
+</li>
+<li><p>In the window, choose the <strong>target step</strong> to return to and type a <strong>reason</strong>
+(this is sent to that approver).
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/gm/return-02.png" alt="Return wizard"></p>
+</li>
+<li><p>Click <strong>Return for Revision</strong>.</p>
+</li>
+</ol>
+<h2>What happens next</h2>
+<p>The leave goes back to the chosen step. That approver receives an <strong>Inbox
+notification</strong> with your reason and re-does their part. Stamps from the returned
+step onward are cleared; earlier approvals are kept. When it comes back up the
+chain, it returns to you.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>No <strong>Return to Approver</strong> button</td>
+<td>You&#39;re not the GM, or not at a GM step</td>
+<td>It&#39;s GM-only and appears only at the GM steps</td>
+</tr>
+<tr>
+<td>A step isn&#39;t offered as a target</td>
+<td>It&#39;s not a valid return target from your current step</td>
+<td>Choose one of the allowed earlier steps</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-gm-01-leave-gm-approvals">Leave: GM approvals</a></li>
+</ul>
+</section>
+<section id="g-gm-03-loan-gm-approval"><h1>Loan: GM Final Approval</h1>
+<p><strong>Who is this for:</strong> General Manager
+<strong>How long it takes:</strong> 1 minute per loan</p>
+<h2>What this does</h2>
+<p>Lets you give the <strong>final approval</strong> on a loan, after HR and Accounting. Your
+approval sends the loan to disbursement.</p>
+<h2>Before you start</h2>
+<ul>
+<li>Loans live in <strong>Loans → Operations → Loans</strong> (opens on <strong>Waiting For Me</strong>).</li>
+</ul>
+<h2>Steps</h2>
+<ol>
+<li><p><strong>Open the Loans app → Operations → Loans.</strong> It opens on <strong>Waiting For Me</strong>,
+showing loans at <strong>Pending GM Final</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/gm/loan-gm-01.png" alt="Loans awaiting GM"></p>
+</li>
+<li><p><strong>Open the loan</strong> and review the amount, installments, and the Decision
+Support summary (leave balance, other deductions, gross salary impact).</p>
+</li>
+<li><p>Click <strong>Final Approve (GM)</strong> → the loan moves to <strong>Pending Disbursement</strong>.
+(Or <strong>Refuse</strong> with a reason.)
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/gm/loan-gm-02.png" alt="Final Approve (GM) on loan"></p>
+</li>
+</ol>
+<h2>What happens next</h2>
+<p>Accounting confirms disbursement, which turns the loan <strong>Active</strong> and starts its
+installments.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>No final-approve button</td>
+<td>Loan not at the GM step</td>
+<td>Check the approval-state banner</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li>Accounting: <span class="xref">Loan approval &amp; disbursement</span></li>
+</ul>
+</section>
+</body></html>

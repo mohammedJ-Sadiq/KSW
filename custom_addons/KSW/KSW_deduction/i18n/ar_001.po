@@ -1076,7 +1076,7 @@ msgstr "معالج رفض قرض KSW"
 #. module: KSW_deduction
 #: model:ir.model,name:KSW_deduction.model_ksw_loan_request_wizard
 msgid "KSW Loan Request (Self-Service)"
-msgstr "طلب قرض KSW (خدمة ذاتية)"
+msgstr "طلب سلفة خاصة (خدمة ذاتية)"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__write_uid
@@ -1140,7 +1140,7 @@ msgstr "سجل اعتمادات القرض"
 #. module: KSW_deduction
 #: model:res.groups,name:KSW_deduction.group_loan_disbursement
 msgid "Loan Disbursement Officer"
-msgstr "مسؤول صرف القروض"
+msgstr "مسؤول صرف السلف الخاصة"
 
 #. module: KSW_deduction
 #: model:res.groups.privilege,name:KSW_deduction.privilege_loan_modification
@@ -1168,7 +1168,7 @@ msgstr "نوع خصم من فئة القروض. الأنواع غير القرض
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_employee_view_form_inherit_ksw_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_search
 msgid "Loans"
-msgstr "القروض"
+msgstr "السلف الخاصة"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_line__payroll_priority
@@ -1307,7 +1307,7 @@ msgstr "الموعد النهائي لنشاطاتي"
 #: model:ir.actions.act_window,name:KSW_deduction.action_ksw_my_loans
 #: model:ir.ui.menu,name:KSW_deduction.menu_ksw_my_loans
 msgid "My Loans"
-msgstr "قروضي"
+msgstr "سلفي الخاصة"
 
 #. module: KSW_deduction
 #: model:ir.actions.act_window,name:KSW_deduction.action_ksw_deduction_pending
@@ -1348,7 +1348,7 @@ msgstr "نوع النشاط التالي"
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_search
 msgid "Non-loans"
-msgstr "غير القروض"
+msgstr "غير السلف الخاصة"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__manual_note
@@ -1740,7 +1740,7 @@ msgstr "التقارير"
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_list_my_loans
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_request_wizard_form
 msgid "Request a Loan"
-msgstr "طلب قرض"
+msgstr "طلب سلفة خاصة"
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form

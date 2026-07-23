@@ -3,6 +3,7 @@
     <menuitem id="menu_bas_root"
         name="BAS Sync"
         sequence="95"
+        groups="base.group_system"
         web_icon="KSW_ext_sync,static/description/icon.png"/>
 
     <menuitem id="menu_bas_accounts"

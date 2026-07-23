@@ -1,0 +1,284 @@
+<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"><title>دليل الرواتب</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "Noto Naskh Arabic","Noto Sans Arabic UI","DejaVu Sans",sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: right; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-right: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">دليل الرواتب</div>
+  <div class="meta">دليل تدريب المستخدم<br/>KSW HR &amp; Payroll · 2026-07-23</div>
+</div>
+<section id="g-payroll-readme"><h1>أدلة الرواتب</h1>
+<p><strong>لمُصدِري الرواتب والموارد البشرية.</strong> تغطّي هذه الأدلة دورة إصدار الرواتب
+الشهرية: التوليد والمراجعة والتصدير البنكي.</p>
+<blockquote>
+<p>هل هذه أول مرة؟ ابدأ بـ <strong><span class="xref">البدء في استخدام النظام</span></strong></p>
+</blockquote>
+<h2>ما يمكنك فعله</h2>
+<table>
+<thead>
+<tr>
+<th>أريد أن…</th>
+<th>الدليل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>أُنشئ دفعة رواتب شهرية وأُولّد الكشوف</td>
+<td><a href="#g-payroll-01-generate-payslip-batch">إنشاء دفعة الرواتب</a></td>
+</tr>
+<tr>
+<td>أحلّ مشكلة موظفين مستبعدين من الدفعة</td>
+<td><a href="#g-payroll-02-skipped-employees">الموظفون المستبعدون</a></td>
+</tr>
+<tr>
+<td>أُصدّر ملف التحويل البنكي</td>
+<td><a href="#g-payroll-03-bank-file-export">تصدير الملف البنكي</a></td>
+</tr>
+</tbody></table>
+</section>
+<section id="g-payroll-01-generate-payslip-batch"><h1>تشغيل دفعة كشوف الرواتب الشهرية</h1>
+<p><strong>الفئة المستهدفة:</strong> مُصدِر كشوف الرواتب
+<strong>الوقت المقدّر:</strong> ٥–١٠ دقائق شهريًا</p>
+<hr>
+<h2>قبل تشغيل الدفعة — قائمة التحقّق</h2>
+<p>تأكّد من إتمام البنود التالية قبل فتح شاشة الرواتب؛ أي بيانات مفقودة تُعقِّد
+عملية المراجعة بعد التوليد:</p>
+<ul>
+<li><input disabled="" type="checkbox"> بيانات الحضور مكتملة ومراجعة للشهر المعني.</li>
+<li><input disabled="" type="checkbox"> إجازات سنوية معلّقة قيد التأكيد — تواصل مع المديرين المباشرين وأكِّد
+حلّها (<strong>إجازة سنوية غير مؤكَّدة المباشرة = استبعاد تلقائي من الدفعة</strong>).</li>
+<li><input disabled="" type="checkbox"> عمولات وبدلات الشهر الجاري أُدخلت في النظام.</li>
+<li><input disabled="" type="checkbox"> أي تعديلات على السلف الخاصة والخصومات حُفظت ونُشِّطت.</li>
+</ul>
+<hr>
+<h2>الخطوات</h2>
+<p>١. افتح <strong>الرواتب</strong> من القائمة الجانبية، ثم اختر <strong>كشوف الرواتب</strong> ← أنشئ
+   <strong>دفعة جديدة</strong> وحدّد <strong>الفترة</strong> (الشهر والسنة).</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/payroll/batch-01.png" alt="نموذج دفعة كشوف الرواتب"></p>
+<p>٢. حدّد نطاق الموظفين إن احتجت تشغيل مجموعة بعينها (أو اترك الحقل فارغًا
+   لتشمل الجميع)، ثم اضغط <strong>توليد</strong>.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/payroll/batch-02.png" alt="زر التوليد"></p>
+<p>٣. يُنشئ النظام <strong>كشف راتب لكل موظف</strong> داخل الدفعة. يحتسب كل كشف:</p>
+<ul>
+<li>الأجر الأساسي والبدلات → الإجمالي.</li>
+<li>خصم الغياب والتأخير (بناءً على سجلات الحضور).</li>
+<li>أقساط السلف الخاصة والخصومات السارية لهذا الشهر.</li>
+<li><strong>صافي الراتب</strong> = الإجمالي − مجموع الخصومات.</li>
+</ul>
+<p>٤. <strong>راجع الدفعة:</strong></p>
+<ul>
+<li>افتح عينةً من الكشوف وتحقّق من صافي الراتب.</li>
+<li>راجع قسم <strong>الموظفون المستبعدون</strong> (إن ظهر) لمعرفة من لم يُدرَج
+وسبب الاستبعاد — راجع <a href="#g-payroll-02-skipped-employees">حلّ مشكلة الموظفين المستبعدين</a>.</li>
+</ul>
+<p>٥. بعد التأكّد من صحة الكشوف، اضغط <strong>تحديث الإجماليات</strong> لتحديث إجماليات
+   كل بنك، ثم انتقل إلى <a href="#g-payroll-03-bank-file-export">تصدير ملف التحويل البنكي</a>.</p>
+<hr>
+<h2>نقاط يجب مراعاتها</h2>
+<ul>
+<li><strong>الاستبعاد التلقائي:</strong> الموظف الذي لديه إجازة سنوية لم يُؤكَّد مباشرته
+يُستبعَد تلقائيًا من الدفعة لحماية دقة الراتب. لا يمكن تجاوز هذا الإجراء
+إلا بتأكيد المباشرة من المدير المباشر.</li>
+<li><strong>الاستبعاد اليدوي:</strong> الموظفون المُعلَّمون يدويًا «مستبعد من الدفعات»
+في ملفاتهم لن يظهروا في الدفعة.</li>
+<li><strong>إعادة التوليد:</strong> يمكنك إعادة توليد الدفعة بعد حلّ أسباب الاستبعاد —
+الكشوف الناجحة تُحدَّث والمستبعَدون السابقون يُدرَجون.</li>
+</ul>
+<hr>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>العَرَض</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>موظفون بلا كشوف</td>
+<td>استُبعدوا تلقائيًا أو يدويًا</td>
+<td>راجع <a href="#g-payroll-02-skipped-employees">حلّ مشكلة المستبعدين</a></td>
+</tr>
+<tr>
+<td>صافي راتب يبدو غير صحيح</td>
+<td>خصم إضافي أو مشكلة حضور</td>
+<td>افتح الكشف؛ تُفسّر بنوده التفصيلية الفارق. صحّح المصدر وأعِد التوليد</td>
+</tr>
+<tr>
+<td>التوليد يستغرق وقتًا طويلًا</td>
+<td>حجم الدفعة كبير</td>
+<td>انتظر حتى الاكتمال؛ تجنّب تحديث الصفحة أثناء المعالجة</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li><a href="#g-payroll-02-skipped-employees">حلّ مشكلة الموظفين المستبعدين</a></li>
+<li><a href="#g-payroll-03-bank-file-export">تصدير ملف التحويل البنكي</a></li>
+</ul>
+</section>
+<section id="g-payroll-02-skipped-employees"><h1>الموظفون المستبعدون من دفعة الرواتب — التشخيص والحلول</h1>
+<p><strong>الفئة المستهدفة:</strong> مُصدِر كشوف الرواتب
+<strong>الوقت المقدّر:</strong> دقيقتان إلى خمس دقائق حسب السبب</p>
+<hr>
+<h2>لماذا يُستبعَد موظف من الدفعة؟</h2>
+<p>النظام يستبعد الموظف تلقائيًا حماية لدقة الرواتب لا عقوبةً؛ الاستبعاد يعني
+أن ثمّة بيانات ناقصة أو قرارًا إداريًا مُسجَّلًا يمنع المعالجة. أسباب ثلاثة
+تُشكّل معظم حالات الاستبعاد:</p>
+<hr>
+<h2>١. إجازة سنوية دون تأكيد مباشرة</h2>
+<p><strong>السبب:</strong> موظف عاد من إجازة سنوية لكن مديره المباشر لم يُؤكِّد مباشرته في
+النظام بعد. يوقف النظام معالجة راتبه حتى يُحسَم الأمر.</p>
+<p><strong>الحل:</strong></p>
+<ul>
+<li>تواصل مع <strong>المدير المباشر</strong> للموظف المعني.</li>
+<li>اطلب منه فتح الإجازة السنوية المعتمدة ← تعبئة <strong>تاريخ المباشرة</strong> ←
+الضغط على <strong>تأكيد المباشرة</strong>.</li>
+<li>أعِد توليد الدفعة — سيُدرَج الموظف في الكشف.</li>
+</ul>
+<blockquote>
+<p><strong>ملاحظة:</strong> ابدأ بمتابعة تأكيدات المباشرة قبل يومين من موعد تشغيل الرواتب
+لتجنّب التأخير.</p>
+</blockquote>
+<hr>
+<h2>٢. مستبعَد يدويًا من الدفعات</h2>
+<p><strong>السبب:</strong> تم تفعيل خيار <strong>مستبعد من الدفعات</strong> في ملف الموظف — عادةً لأسباب
+إدارية (إجازة بدون راتب طويلة، إيقاف مؤقت…).</p>
+<p><strong>الحل:</strong></p>
+<ul>
+<li>افتح ملف الموظف ← انتقل إلى تبويب <strong>الرواتب</strong>.</li>
+<li>أزِل تحديد <strong>مستبعد من الدفعات</strong> — لن يُحذَف هذا الخيار تلقائيًا؛ يتطلّب
+تدخّلًا يدويًا.</li>
+<li>احفظ ← أعِد توليد الدفعة.</li>
+</ul>
+<hr>
+<h2>٣. بيانات عقد أو راتب مفقودة</h2>
+<p><strong>السبب:</strong> الموظف لا يملك عقدًا نشطًا أو لا توجد بيانات راتب مُدخَلة في
+النظام — غالبًا موظف جديد أو نقص في إعداد ملفه.</p>
+<p><strong>الحل:</strong></p>
+<ul>
+<li>تواصل مع <strong>الموارد البشرية</strong> لإكمال بيانات العقد في ملف الموظف.</li>
+<li>تأكّد من حالة العقد <strong>نشط</strong> وأن تاريخ البدء لا يتجاوز نهاية الشهر المعني.</li>
+<li>أعِد التوليد بعد إكمال البيانات.</li>
+</ul>
+<hr>
+<h2>أين تجد قائمة المستبعدين</h2>
+<p>افتح الدفعة المعنية ← انتقل إلى قسم <strong>الموظفون المستبعدون</strong> في أسفل الصفحة.
+يعرض كل سطر: اسم الموظف والسبب المحدَّد.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/payroll/skipped-01.png" alt="قسم الموظفين المستبعدين"></p>
+<hr>
+<h2>بعد الإصلاح — خطوات الاسترداد</h2>
+<p>١. عالج سبب الاستبعاد (تأكيد المباشرة، رفع الاستبعاد اليدوي، إكمال العقد).
+٢. ارجع إلى الدفعة واضغط <strong>توليد</strong> مرة أخرى — يُنشئ النظام كشوف الرواتب
+   للموظفين المستردّين دون المساس بالكشوف الموجودة.
+٣. راجع قسم <strong>المستبعدين</strong> مجددًا؛ يجب أن يكون فارغًا أو يحتوي فقط من تقرّر
+   إدارياً استمرار استبعادهم.</p>
+<hr>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>العَرَض</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>لا يوجد قسم «مستبعدون» في الدفعة</td>
+<td>جميع الموظفين مُدرَجون بنجاح</td>
+<td>الدفعة مكتملة — تابع إلى المراجعة والتصدير</td>
+</tr>
+<tr>
+<td>الموظف لا يزال مستبعدًا بعد التصحيح</td>
+<td>سبب ثانوي لم يُعالَج</td>
+<td>اقرأ نص السبب من جديد؛ تواصل مع مسؤول النظام إن لم يكن واضحًا</td>
+</tr>
+<tr>
+<td>تعذّر تأكيد المباشرة</td>
+<td>الإجازة ليست في الحالة الصحيحة</td>
+<td>تأكّد أن الإجازة في حالة «معتمدة»؛ إن كانت في مرحلة وسيطة، أكمِل مسار الاعتماد أولًا</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li><a href="#g-payroll-01-generate-payslip-batch">إنشاء دفعة كشوف الرواتب</a></li>
+<li><a href="#g-payroll-03-bank-file-export">تصدير ملف التحويل البنكي</a></li>
+<li><span class="xref">اعتماد الإجازات — المدير المباشر</span></li>
+</ul>
+</section>
+<section id="g-payroll-03-bank-file-export"><h1>تصدير ملف التحويل البنكي</h1>
+<p><strong>الفئة المستهدفة:</strong> مُصدِر كشوف الرواتب (الموارد البشرية)
+<strong>الوقت المقدّر:</strong> دقيقتان</p>
+<h2>نظرة عامة</h2>
+<p>يُتيح لك هذا الدليل تصدير ملف تحويل الرواتب لدفعة كشوف مكتملة جاهز للرفع على
+نظام البنك. تُعرض الإجماليات مجمَّعةً بحسب كل بنك للتحقّق قبل التنفيذ.</p>
+<h2>ملاحظات أولية</h2>
+<ul>
+<li>توليد الدفعة ومراجعتها وحلّ مشكلة المستبعدين خطوات سابقة لازمة.</li>
+</ul>
+<h2>الخطوات</h2>
+<ol>
+<li><p>افتح دفعة كشوف الرواتب. اضغط <strong>تحديث الإجماليات</strong> لإعادة احتساب الإجماليات
+الصافية بحسب كل بنك، ثم راجع الجدول (البنك، عدد الموظفين، الإجمالي الصافي).
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/payroll/export-01.png" alt="الإجماليات حسب البنك"></p>
+</li>
+<li><p>اضغط <strong>تصدير ملف التحويل البنكي</strong>، اختر الصيغة (WPS / بنك)، ونزّل الملف.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/payroll/export-02.png" alt="تصدير ملف التحويل"></p>
+</li>
+<li><p>ارفع الملف على منصة البنك وفق إجراءاتك المعتادة.</p>
+</li>
+</ol>
+<h2>ما يحدث بعد ذلك</h2>
+<p>الملف المصدَّر هو سجل المدفوعات. احتفظ به مع الدفعة للمطابقة المحاسبية.</p>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>العَرَض</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>الإجماليات تبدو قديمة</td>
+<td>لم يُحدَّث بعد تعديلات أُجريت</td>
+<td>اضغط <strong>تحديث الإجماليات</strong> من جديد</td>
+</tr>
+<tr>
+<td>موظف مفقود من الملف</td>
+<td>مستبعد من الدفعة أو ليس لديه حساب بنكي</td>
+<td>حلّ مشكلة الاستبعاد؛ تأكّد من إدخال الحساب البنكي للموظف</td>
+</tr>
+</tbody></table>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li><a href="#g-payroll-01-generate-payslip-batch">إنشاء دفعة كشوف الرواتب</a></li>
+<li><a href="#g-payroll-02-skipped-employees">حلّ مشكلة الموظفين المستبعدين</a></li>
+</ul>
+</section>
+</body></html>

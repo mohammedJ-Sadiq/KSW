@@ -1048,6 +1048,38 @@ class KswDeduction(models.Model):
                 subtype_xmlid='mail.mt_note',
             )
             rec._notify_pending_approvers('pending_disbursement')
+            rec._notify_requester_disbursement()
+
+    def _notify_requester_disbursement(self):
+        """Notify whoever requested the loan (the creator — the employee or the
+        supervisor who submitted on their behalf) plus the employee, that the
+        loan is fully approved and ready for disbursement. In practice they go
+        and collect the funds; the officer confirms disbursement afterwards.
+        """
+        self.ensure_one()
+        partners = set()
+        if self.create_uid and self.create_uid.partner_id:
+            partners.add(self.create_uid.partner_id.id)
+        if self.employee_id.user_id and self.employee_id.user_id.partner_id:
+            partners.add(self.employee_id.user_id.partner_id.id)
+        if not partners:
+            return
+        self.sudo().message_post(
+            body=Markup(
+                '<strong>&#128181; Loan Approved — Ready for Disbursement</strong><br/>'
+                '<b>Employee:</b> %(emp)s<br/>'
+                '<b>Amount:</b> %(amt).2f SAR over %(inst)d installment(s)<br/>'
+                'Your loan request has completed the approval chain. Please '
+                'collect the funds from the disbursement officer; the loan '
+                'becomes active once disbursement is confirmed.'
+            ) % {
+                'emp': self.employee_id.name,
+                'amt': self.amount,
+                'inst': self.installments,
+            },
+            partner_ids=list(partners),
+            subtype_xmlid='mail.mt_comment',
+        )
 
     def action_disbursement_confirm(self):
         """Step 5: Loan Disbursement Officer confirms and activates the loan.

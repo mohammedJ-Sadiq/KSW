@@ -1,0 +1,210 @@
+<!doctype html><html lang="en" dir="ltr"><head>
+<meta charset="utf-8"><title>Administrator Guide</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "DejaVu Sans",Arial,sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: left; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-left: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">Administrator Guide</div>
+  <div class="meta">User Training Guide<br/>KSW HR &amp; Payroll · 2026-07-21</div>
+</div>
+<section id="g-admin-readme"><h1>Administrator Guides</h1>
+<p>For staff who <strong>configure and oversee</strong> whole areas of the system rather than
+process individual requests.</p>
+<blockquote>
+<p>Start with the <strong>General guide</strong> (<span class="xref">Getting Started</span>).</p>
+</blockquote>
+<h2>What you can do</h2>
+<table>
+<thead>
+<tr>
+<th>Your area</th>
+<th>Guide</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Oversee all deductions &amp; configure deduction types</td>
+<td><a href="#g-admin-deductions">Deductions administration</a></td>
+</tr>
+<tr>
+<td>Configure commissions (categories, sites, rules, salespeople)</td>
+<td><a href="#g-admin-commissions">Commissions administration</a></td>
+</tr>
+</tbody></table>
+<h2>The golden rules</h2>
+<ul>
+<li>Configuration changes affect <strong>everyone</strong> — change catalogs (types,
+categories, rules) deliberately.</li>
+<li>Deduction officers/managers can see and act across the company; keep to your
+area of responsibility.</li>
+</ul>
+</section>
+<section id="g-admin-commissions"><h1>Commissions Administration</h1>
+<p><strong>Who is this for:</strong> Commission Admin (and Sales Commission Manager)
+<strong>How long it takes:</strong> varies</p>
+<h2>What this does</h2>
+<p>Lets you configure the building blocks the commission sheets rely on:
+categories, work sites/trip tiers, sales &amp; collection rules, and salesperson
+profiles. Sales managers can additionally override a commission condition on an
+individual sales line.</p>
+<h2>Before you start</h2>
+<ul>
+<li>These are <strong>configuration</strong> items — changes affect every future commission
+sheet. Change them deliberately.</li>
+</ul>
+<h2>Steps — Configure the catalog</h2>
+<ol>
+<li><p><strong>Open Commissions → Configuration.</strong> From here you manage:</p>
+<ul>
+<li><strong>Commission Categories</strong> — the allowance/commission types supervisors pick
+on a sheet line.</li>
+<li><strong>Work Sites</strong> — sites and their trip tiers (for location/driver
+allowances).</li>
+<li><strong>Sales / Collection Commission Rules</strong> — thresholds and conditions.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/admin/comm-config-01.png" alt="Commissions configuration menu"></li>
+</ul>
+</li>
+<li><p>Add or edit an item and save. It becomes available on new sheets.</p>
+</li>
+</ol>
+<h2>Steps — Salesperson profiles</h2>
+<ol>
+<li><strong>Open Commissions → Sales &amp; Collection → Salespeople</strong> to maintain each
+salesperson&#39;s profile used by the sales/collection commission rules.</li>
+</ol>
+<h2>Steps — Override a sales-line condition (Sales Manager)</h2>
+<ol>
+<li>On a sales/collection commission line that falls below the rule threshold,
+use the override to <strong>grant</strong> the commission anyway. The override is recorded
+with an audit trail.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/admin/comm-override-01.png" alt="Sales line override"></li>
+</ol>
+<h2>What happens next</h2>
+<p>New categories/sites/rules appear on the next commission sheets supervisors
+create. Existing confirmed sheets are unaffected.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A supervisor can&#39;t find a category</td>
+<td>Not added to the catalog</td>
+<td>Add it under <strong>Commission Categories</strong></td>
+</tr>
+<tr>
+<td>Override option missing</td>
+<td>You&#39;re not a sales commission manager</td>
+<td>It&#39;s restricted to that role</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li>Supervisor: <span class="xref">Commission sheets</span></li>
+<li>Accounting: <span class="xref">Commissions: finalise &amp; batch</span></li>
+</ul>
+</section>
+<section id="g-admin-deductions"><h1>Deductions Administration</h1>
+<p><strong>Who is this for:</strong> Deduction Officer / Deduction Manager
+<strong>How long it takes:</strong> varies</p>
+<h2>What this does</h2>
+<p>Lets you oversee <strong>all</strong> deductions across the company from a single dashboard,
+create any deduction type, and (as a manager) configure the deduction-type
+catalog. Managers can also edit or delete loans <strong>before</strong> they&#39;re confirmed.</p>
+<h2>Before you start</h2>
+<ul>
+<li>Officers see and manage all deductions (loans + HR-managed). Managers add the
+ability to configure types and delete records.</li>
+</ul>
+<h2>Steps — Oversee deductions</h2>
+<ol>
+<li><p><strong>Open Deductions → Dashboard</strong> for a company-wide view (by state, type,
+department) with kanban, graph, and pivot.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/admin/ded-dashboard-01.png" alt="Deductions dashboard"></p>
+</li>
+<li><p><strong>Open Deductions → All Deductions</strong> to browse or create any deduction, or
+use the <strong>Reports</strong> (By Employee / Department / Type / Installment Schedule)
+to analyse the portfolio.</p>
+</li>
+</ol>
+<h2>Steps — Configure deduction types (Manager)</h2>
+<ol>
+<li><p><strong>Open Deductions → Configuration → Deduction Types.</strong>
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/admin/ded-types-01.png" alt="Deduction types"></p>
+</li>
+<li><p>Review or edit a type&#39;s key settings:</p>
+<ul>
+<li><strong>Is Loan</strong> — whether it uses the full 4-step approval chain.</li>
+<li><strong>Managed By</strong> — HR or Accounting (who can close installments outside
+payroll).</li>
+<li><strong>Default installments</strong> and <strong>priority</strong>.</li>
+</ul>
+</li>
+<li><p>Save. New/edited types are available when creating deductions.</p>
+</li>
+</ol>
+<h2>Steps — Edit or delete a loan before confirmation (Manager)</h2>
+<ol>
+<li>Open a loan that is still <strong>pre-confirmation</strong> (before disbursement).</li>
+<li>Adjust the amount/installments, or delete the record if it has no paid
+installments. (Once active/confirmed, use the Accounting payment tools
+instead.)</li>
+</ol>
+<h2>What happens next</h2>
+<p>Config changes take effect immediately for new records. Existing active
+deductions keep their original schedule.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>I can&#39;t see the Configuration menu</td>
+<td>You&#39;re an officer, not a manager</td>
+<td>Type configuration is a manager privilege</td>
+</tr>
+<tr>
+<td>Can&#39;t delete a loan</td>
+<td>It has paid installments / is active</td>
+<td>Deletion is limited once payments exist</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li>HR: <span class="xref">Create a deduction</span></li>
+<li>HR: <span class="xref">Modify deductions &amp; change installments</span></li>
+</ul>
+</section>
+</body></html>

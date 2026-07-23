@@ -666,7 +666,7 @@ msgstr "تصدير"
 #: model_terms:ir.ui.view,arch_db:KSW_payroll.hr_payslip_run_form_inherit_ksw
 #: model_terms:ir.ui.view,arch_db:KSW_payroll.view_bank_file_export_wizard_form
 msgid "Export Bank File"
-msgstr ""
+msgstr "تصدير ملف التحويل البنكي"
 
 #. module: KSW_payroll
 #: model:ir.model.fields,field_description:KSW_payroll.field_ksw_bank_file_export_wizard__export_mode

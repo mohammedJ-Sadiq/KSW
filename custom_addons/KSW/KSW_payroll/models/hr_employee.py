@@ -45,6 +45,16 @@ class HrEmployee(models.Model):
     x_exclude_from_payroll = fields.Boolean(
         string='Exclude from Payroll Batches',
         default=False,
+        # Must carry an HR group like every other custom hr.employee field:
+        # without it, this stored field is the only custom employee field that
+        # leaks into the non-HR "public profile" fetch path, raising an
+        # AccessError ("not available for employee public profiles") the moment
+        # a regular employee opens their own Time Off form (which reads their
+        # employee record via hr.employee.public). group_hr_payroll_user (used
+        # by the payslip batch wizard) implies hr.group_hr_user, so the wizard
+        # keeps full access. Not referenced in any invisible= expression, so
+        # gotcha #31 does not apply.
+        groups='hr.group_hr_user',
         help='If enabled, this employee is hidden from payslip batch generation '
              'and the skip log for all non-administrator users.',
     )

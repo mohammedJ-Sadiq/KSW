@@ -696,3 +696,32 @@ allocation is needed. All test leave types that do not require allocation must u
     # For each hit, verify the containing element's groups= is a strict subset
     # of the model field's groups=
     ```
+
+32. **The MIRROR of #31: a `store=True` custom field added to `hr.employee`
+    WITHOUT `groups=` crashes a regular employee's own forms with
+    `AccessError: "The fields '…' … are not available for employee public
+    profiles."`** A non-HR user has no model-level read on `hr.employee`; the ORM
+    serves their own record through the `hr.employee.public` HACK path
+    (`hr_employee.py::fetch`/`search_fetch` → `_check_private_fields`). That path
+    fetches every stored field returned by `_determine_fields_to_fetch()` **that
+    the user is group-allowed to read** and copies it from the `hr.employee.public`
+    SQL view — which only exposes a curated field list. A stored custom field with
+    no `groups=` is group-allowed for everyone, so it enters the fetch set, is
+    absent from the public model, and raises. Because **every other** KSW
+    `hr.employee` field carries `groups='hr.group_hr_user'`, such a field is
+    usually the *only* one listed in the error (that's the tell).
+    **Fix: give the field `groups='hr.group_hr_user'`** (or the appropriate HR/
+    payroll group) so non-HR users skip it in the fetch. `group_hr_payroll_user`
+    implies `hr.group_hr_user`, so payroll wizards keep access.
+    - Symptom: an ordinary employee opening **Time Off → New** (their leave form
+      reads their own employee record) hits the dialog; HR/admin never see it.
+    - Rule: **never add a bare stored field to `hr.employee` — always attach an HR
+      group**, matching the existing fields. This is the inverse trade-off to #31,
+      so first confirm the field is NOT referenced in any `invisible=` on a view
+      element visible outside that group (audit command above).
+    - **Case fixed July 2026:** `x_exclude_from_payroll` on `hr.employee`
+      (`KSW_payroll/models/hr_employee.py`) had no `groups=` — the lone bare
+      stored employee field — and crashed every employee's Time Off form. Added
+      `groups='hr.group_hr_user'`; it is only shown (view-level `groups=`) on the
+      admin-only employee payroll page and read by the payslip batch wizard (a
+      payroll-group user), both of which retain access.

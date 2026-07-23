@@ -1,0 +1,447 @@
+<!doctype html><html lang="en" dir="ltr"><head>
+<meta charset="utf-8"><title>HR Guide</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "DejaVu Sans",Arial,sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: left; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-left: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">HR Guide</div>
+  <div class="meta">User Training Guide<br/>KSW HR &amp; Payroll · 2026-07-21</div>
+</div>
+<section id="g-hr-readme"><h1>HR Guides</h1>
+<p>For <strong>HR staff</strong>. You approve leave and loans at the <strong>HR step</strong>, create
+<strong>salary advances</strong>, own all <strong>installment changes</strong>, review attendance sheets,
+and run the <strong>bank file export</strong>.</p>
+<blockquote>
+<p>You also do everything an <span class="xref">Employee</span> does. Start with
+the <strong>General guide</strong> (<span class="xref">Getting Started</span>).</p>
+</blockquote>
+<h2>What you can do</h2>
+<table>
+<thead>
+<tr>
+<th>I want to…</th>
+<th>Guide</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Approve leave at the HR step (and confirm the signed annual-leave form)</td>
+<td><a href="#g-hr-01-leave-hr-approval">Leave: HR approval</a></td>
+</tr>
+<tr>
+<td>Approve a loan at the HR step</td>
+<td><a href="#g-hr-02-loan-hr-approval">Loan: HR approval</a></td>
+</tr>
+<tr>
+<td>Create a salary advance</td>
+<td><a href="#g-hr-03-create-deductions">Create a salary advance</a></td>
+</tr>
+<tr>
+<td>Change installments / mark paid / record a loan payment</td>
+<td><a href="#g-hr-04-modify-deductions">Modify deductions &amp; change installments</a></td>
+</tr>
+<tr>
+<td>Review attendance sheets</td>
+<td><a href="#g-hr-05-attendance-sheet-management">Attendance sheets (HR review)</a></td>
+</tr>
+<tr>
+<td>Export the salary/commission bank file</td>
+<td><span class="xref">Payroll → Bank file export</span></td>
+</tr>
+</tbody></table>
+<h2>The golden rules</h2>
+<ul>
+<li><strong>Time-off</strong> approvals live in <strong>Time Off → Management → Time Off</strong>;
+<strong>loan</strong> approvals live in <strong>Loans → Operations → Loans</strong> (opens on
+<strong>Waiting For Me</strong>).</li>
+<li>On <strong>annual leave</strong> you act <strong>twice</strong>: the HR approval step, and the final
+<strong>HR confirmation</strong> of the signed form.</li>
+<li><strong>You create salary advances; you own all installment changes</strong> (edit
+schedules, mark installments paid, record loan payments).</li>
+<li><strong>Penalties</strong> (government + internal) are created by <strong>Accounting</strong>, not HR.</li>
+<li>On attendance sheets you <strong>review</strong> only — you edit a sheet just for employees
+you directly manage.</li>
+</ul>
+</section>
+<section id="g-hr-01-leave-hr-approval"><h1>Leave: HR Approval</h1>
+<p><strong>Who is this for:</strong> HR
+<strong>How long it takes:</strong> 1–2 minutes per request</p>
+<h2>What this does</h2>
+<p>Covers your <strong>two</strong> roles in the leave workflow:</p>
+<ol>
+<li>The <strong>HR approval</strong> step (step 2 of annual leave; the final step of sick /
+unpaid / other leaves).</li>
+<li>The <strong>HR confirmation</strong> of the signed form at the end of annual leave
+(step 6).</li>
+</ol>
+<h2>Where to find requests</h2>
+<p>Open the <strong>Time Off</strong> app, then <strong>Management → Time Off</strong>. This list shows the
+company&#39;s leave requests; find the employee whose request is waiting for you
+(for annual leave, look for their <strong>Annual Vacation</strong> request).</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/hr/leave-hr-01.png" alt="Time Off → Management → Time Off"></p>
+<h2>Steps — HR approval</h2>
+<ol>
+<li><p><strong>Open the employee&#39;s request</strong> from <strong>Management → Time Off</strong>.</p>
+</li>
+<li><p><strong>Fill in the HR details.</strong> For annual leave, complete the <strong>HR Review</strong> tab
+as applicable — for example a <strong>penalty amount</strong> and its reason, or any
+required notes for the request.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/hr/leave-hr-02.png" alt="HR Review tab with the Approve (HR) button"></p>
+</li>
+<li><p><strong>Approve:</strong></p>
+<ul>
+<li><strong>Annual leave</strong> → click <strong>Approve (HR)</strong>. It moves to the GM for initial
+review.</li>
+<li><strong>Sick / unpaid / other</strong> → click <strong>Validate</strong>. This is the final approval
+and the leave is granted.</li>
+</ul>
+<p>To decline instead, use <strong>Refuse</strong> with a reason.</p>
+</li>
+</ol>
+<h2>Steps — HR confirmation (annual leave, final step)</h2>
+<p>After the GM&#39;s final approval, an annual leave returns to you at <strong>Pending HR
+Confirmation</strong>, waiting for the signed leave form.</p>
+<ol>
+<li>Open the leave (it&#39;s at <strong>Pending HR Confirmation</strong>) from <strong>Management →
+Time Off</strong>.</li>
+<li>Click <strong>Confirm &amp; Finalise</strong>.</li>
+<li><strong>Upload the signed form</strong> (PDF) in the window, then confirm.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/hr/leave-hr-03.png" alt="Confirm &amp; Finalise wizard"></li>
+</ol>
+<p>The leave is now fully <strong>Approved</strong> and the employee&#39;s balance is deducted.</p>
+<h2>What happens next</h2>
+<ul>
+<li>Approving annual leave sends it to <strong>GM (initial)</strong> → Accounting → GM (final)
+→ back to <strong>you</strong> for the signed-form confirmation.</li>
+<li>Validating a sick / unpaid / other leave grants it immediately.</li>
+</ul>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>I can&#39;t find a request</td>
+<td>Wrong list</td>
+<td>Use <strong>Time Off → Management → Time Off</strong>, not &quot;My Time Off&quot;</td>
+</tr>
+<tr>
+<td>No <strong>Confirm &amp; Finalise</strong> button</td>
+<td>Leave not yet at the confirmation step</td>
+<td>It appears only after GM final approval</td>
+</tr>
+<tr>
+<td>Can&#39;t finalise</td>
+<td>No signed form attached</td>
+<td>Upload the PDF in the wizard first</td>
+</tr>
+<tr>
+<td>I can&#39;t approve</td>
+<td>You&#39;re not in the HR approver group</td>
+<td>Ask an administrator to check your access</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-hr-02-loan-hr-approval">Loan: HR approval</a></li>
+</ul>
+</section>
+<section id="g-hr-02-loan-hr-approval"><h1>Loan: HR Approval</h1>
+<p><strong>Who is this for:</strong> HR
+<strong>How long it takes:</strong> 1–2 minutes per request</p>
+<h2>What this does</h2>
+<p>Lets you approve or refuse a loan at the <strong>HR step</strong> — the second step, after
+the direct manager and before Accounting.</p>
+<h2>Before you start</h2>
+<ul>
+<li>Loans live in the <strong>Loans</strong> app under <strong>Operations → Loans</strong>; that list opens
+on <strong>Waiting For Me</strong>, showing loans at <strong>Pending HR Approval</strong>.</li>
+</ul>
+<h2>Steps</h2>
+<ol>
+<li><p><strong>Open the Loans app → Operations → Loans.</strong> It opens on <strong>Waiting For Me</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/hr/loan-hr-01.png" alt="Loans awaiting HR"></p>
+</li>
+<li><p><strong>Open the loan</strong> and review the <strong>Decision Support</strong> tab, which summarises
+the employee&#39;s situation (leave balance, other active deductions, monthly
+impact) to inform your decision. You can also tick the HR confirmation
+(&quot;no pending penalties&quot;) if applicable.</p>
+</li>
+<li><p><strong>Decide:</strong></p>
+<ul>
+<li><strong>Approve (HR)</strong> → moves the loan to <strong>Pending Accounting</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/hr/loan-hr-02.png" alt="Approve (HR) on loan"></li>
+<li><strong>Refuse</strong> → enter a reason; the employee is notified.</li>
+</ul>
+</li>
+</ol>
+<h2>What happens next</h2>
+<p>An approved loan continues to <strong>Accounting → GM (final) → Disbursement →
+Active</strong>. A refused loan returns to the employee with your reason.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>No approve button</td>
+<td>Loan isn&#39;t at the HR step</td>
+<td>Check the approval-state banner</td>
+</tr>
+<tr>
+<td>I want more context</td>
+<td>Use the Decision Support tab</td>
+<td>It shows balances and other deductions</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-hr-03-create-deductions">Create a deduction</a></li>
+<li><a href="#g-hr-01-leave-hr-approval">Leave: HR approval</a></li>
+</ul>
+</section>
+<section id="g-hr-03-create-deductions"><h1>Creating a Salary Advance</h1>
+<p><strong>Who is this for:</strong> HR
+<strong>How long it takes:</strong> 2 minutes</p>
+<h2>What this does</h2>
+<p>Lets you create a <strong>salary advance</strong> — money paid to an employee ahead of
+payroll and recovered from their salary over one or more installments. Advances
+do <strong>not</strong> go through the four-step loan approval chain; you create one and it
+takes effect on the next payslip.</p>
+<blockquote>
+<p><strong>Who creates what:</strong> HR creates <strong>salary advances</strong>. <strong>Government</strong> and
+<strong>internal penalties</strong> are created by <strong>Accounting</strong> — see
+<span class="xref">Accounting → Create a penalty</span>. Loans
+are a separate flow with full approval — see the loan guides.</p>
+</blockquote>
+<h2>Before you start</h2>
+<ul>
+<li>Know the <strong>employee</strong>, the <strong>amount</strong>, and the number of <strong>installments</strong>
+(advances are often a single installment).</li>
+</ul>
+<h2>Steps</h2>
+<ol>
+<li><p><strong>Open Deductions → Operations → Deductions</strong> (the HR-managed list).
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/hr/deduction-create-01.png" alt="HR-managed deductions list"></p>
+</li>
+<li><p><strong>Create a new record.</strong> Choose the <strong>employee</strong> and the type <strong>Salary
+Advance</strong>.</p>
+</li>
+<li><p><strong>Enter the amount and installments.</strong> The monthly installment schedule is
+generated for you.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/hr/deduction-create-02.png" alt="Salary advance form"></p>
+</li>
+<li><p><strong>Submit.</strong> The advance becomes active and will be deducted on the
+employee&#39;s next payslip(s).</p>
+</li>
+</ol>
+<h2>What happens next</h2>
+<p>The advance is <strong>Active</strong>. Each pending installment is picked up automatically
+by payroll and shown on the employee&#39;s payslip under <strong>Total Deductions</strong>. When
+all installments are paid, it is marked <strong>Completed</strong>.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>I need to add a penalty</td>
+<td>Penalties are Accounting&#39;s job</td>
+<td>See <span class="xref">Accounting → Create a penalty</span></td>
+</tr>
+<tr>
+<td>The amount isn&#39;t deducting</td>
+<td>Still in Draft</td>
+<td>Make sure you clicked <strong>Submit</strong> so it&#39;s Active</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-hr-04-modify-deductions">Modify a deduction &amp; change installments</a></li>
+</ul>
+</section>
+<section id="g-hr-04-modify-deductions"><h1>Modifying Deductions &amp; Changing Installments</h1>
+<p><strong>Who is this for:</strong> HR
+<strong>How long it takes:</strong> 1–3 minutes</p>
+<h2>What this does</h2>
+<p>HR owns <strong>installment changes</strong> across loans and deductions: editing a schedule,
+marking an installment paid outside payroll, recording a loan repayment, and
+cancelling a deduction. Use this when an employee pays in cash, settles early, or
+a schedule needs adjusting.</p>
+<h2>Before you start</h2>
+<ul>
+<li>You can freely edit amount and installments while a deduction is still in
+<strong>Draft</strong>. Once <strong>Active</strong>, the amount is fixed but you can still change
+pending installments, mark them paid, and record payments.</li>
+<li>Loans must be <strong>Active</strong> (disbursed) before their installments can be changed.</li>
+</ul>
+<h2>Edit before it&#39;s active</h2>
+<ol>
+<li>Open the deduction (in <strong>Draft</strong>).</li>
+<li>Change the <strong>amount</strong> or <strong>installments</strong>, then Save — the schedule updates.</li>
+</ol>
+<h2>Mark a single installment paid</h2>
+<ol>
+<li>Open the record → <strong>Installments</strong> tab.</li>
+<li>On a pending installment, add a short <strong>note</strong> (e.g. receipt number) and click
+<strong>Mark Paid</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/hr/deduction-modify-01.png" alt="Mark installment paid"></li>
+<li>The line turns green (Paid). If every installment is now paid, the record
+auto-completes.</li>
+</ol>
+<h2>Record a loan payment (full or partial)</h2>
+<p>When an employee repays a loan outside payroll:</p>
+<ol>
+<li>Open the active loan (<strong>Loans → Operations → Loans</strong>) and click
+<strong>Record Payment</strong>.</li>
+<li>Enter the <strong>Payment Amount</strong>, <strong>Payment Date</strong>, and an optional note. The
+window shows what will happen:<ul>
+<li><strong>Full payment</strong> (equals the outstanding balance) → <strong>all</strong> pending
+installments are marked paid.</li>
+<li><strong>Partial payment</strong> → the remaining balance is spread across the pending
+installments, and one new &quot;paid&quot; line records this payment.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/hr/loan-payment-02.png" alt="Loan payment window"></li>
+</ul>
+</li>
+<li>Click <strong>Confirm Payment</strong>.</li>
+</ol>
+<h2>Change the installment schedule</h2>
+<ol>
+<li>Open the record → <strong>Installments</strong> tab (editable view).</li>
+<li>Adjust the <strong>year/month</strong> or <strong>amount</strong> of pending lines, or add a manual
+line. Paid lines are locked.</li>
+</ol>
+<h2>Cancel a deduction</h2>
+<ol>
+<li>Open the record and click <strong>Cancel</strong> (confirm when prompted). Cancellation is
+limited once some installments are already paid.</li>
+</ol>
+<h2>What happens next</h2>
+<p>Paid installments are excluded from future payroll runs. When every installment
+is paid, the record auto-completes. The employee sees the updated Total Paid /
+Total Pending.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>I can&#39;t edit the amount</td>
+<td>It&#39;s Active</td>
+<td>Amount is fixed once active; cancel and recreate if it&#39;s wrong</td>
+</tr>
+<tr>
+<td>No <strong>Record Payment</strong> button</td>
+<td>Loan not active, or no pending installments</td>
+<td>It must be <strong>Active</strong> with pending installments</td>
+</tr>
+<tr>
+<td>Can&#39;t edit a paid line</td>
+<td>Paid lines are locked</td>
+<td>Only pending lines are editable</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-hr-03-create-deductions">Create a salary advance</a></li>
+<li><a href="#g-hr-02-loan-hr-approval">Loan: HR approval</a></li>
+</ul>
+</section>
+<section id="g-hr-05-attendance-sheet-management"><h1>Attendance Sheets (HR Review)</h1>
+<p><strong>Who is this for:</strong> HR
+<strong>How long it takes:</strong> 1–2 minutes</p>
+<h2>What this does</h2>
+<p>Lets HR <strong>review</strong> the monthly attendance sheets of non-biometric staff across
+the company. Day-to-day marking is done by each employee&#39;s <strong>supervisor</strong> — as
+HR you look, but you don&#39;t normally change.</p>
+<h2>Before you start</h2>
+<ul>
+<li>You can <strong>see every</strong> sheet, but you <strong>edit only</strong> sheets for employees you
+<strong>directly manage</strong> (i.e. where you are their supervisor). For everyone else,
+the sheet is read-only for you.</li>
+<li>Approved-leave days are locked and are managed by the leave workflow, not by
+editing the sheet.</li>
+</ul>
+<h2>Steps — review a sheet</h2>
+<ol>
+<li><p><strong>Open Attendance → Attendance Sheets.</strong> You can see all sheets.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/hr/attsheet-01.png" alt="All attendance sheets"></p>
+</li>
+<li><p><strong>Open a sheet</strong> and review the daily attendance, the totals, and any
+absences. Green = attended, red = absent.</p>
+</li>
+</ol>
+<h2>If a correction is needed</h2>
+<ul>
+<li>If you are the employee&#39;s <strong>direct manager</strong>, you can edit the sheet (mark days
+present/absent) the same way a supervisor does — see
+<span class="xref">Supervisor → Attendance sheets</span>.</li>
+<li>If you are <strong>not</strong> their manager, ask the responsible <strong>supervisor</strong> to make
+the correction. HR review is for oversight, not day-to-day editing.</li>
+</ul>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>I can&#39;t edit a sheet</td>
+<td>You&#39;re not that employee&#39;s manager</td>
+<td>Ask their supervisor to correct it</td>
+</tr>
+<tr>
+<td>A day looks wrong but is locked</td>
+<td>It&#39;s covered by an approved leave</td>
+<td>That&#39;s managed by the leave workflow, not the sheet</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li>Supervisor: <span class="xref">Attendance sheets</span></li>
+</ul>
+</section>
+</body></html>

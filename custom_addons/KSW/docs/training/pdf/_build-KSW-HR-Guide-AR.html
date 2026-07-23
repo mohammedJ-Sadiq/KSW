@@ -1,0 +1,508 @@
+<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"><title>دليل الموارد البشرية</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "Noto Naskh Arabic","Noto Sans Arabic UI","DejaVu Sans",sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: right; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-right: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">دليل الموارد البشرية</div>
+  <div class="meta">دليل تدريب المستخدم<br/>KSW HR &amp; Payroll · 2026-07-23</div>
+</div>
+<section id="g-hr-readme"><h1>أدلة الموارد البشرية</h1>
+<p><strong>لمنسوبي الموارد البشرية.</strong> تغطّي هذه الأدلة مهام الاعتماد وإدارة الإجازات
+والخصومات والتقارير الخاصة بقسم الموارد البشرية.</p>
+<blockquote>
+<p>هل هذه أول مرة؟ ابدأ بـ <strong><span class="xref">البدء في استخدام النظام</span></strong></p>
+</blockquote>
+<h2>ما يمكنك فعله</h2>
+<table>
+<thead>
+<tr>
+<th>أريد أن…</th>
+<th>الدليل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>أعتمد إجازة (مرحلة الموارد البشرية) أو أُنهي التأكيد بالنموذج الموقَّع</td>
+<td><a href="#g-hr-01-leave-hr-approval">الإجازات: اعتماد الموارد البشرية</a></td>
+</tr>
+<tr>
+<td>أعتمد سلفة خاصة في مرحلة الموارد البشرية</td>
+<td><a href="#g-hr-02-loan-hr-approval">السلف الخاصة: اعتماد الموارد البشرية</a></td>
+</tr>
+<tr>
+<td>أُنشئ سلفة راتب</td>
+<td><a href="#g-hr-03-create-deductions">إنشاء سلفة راتب</a></td>
+</tr>
+<tr>
+<td>أعدّل خصمًا أو أسجّل سداد سلفة خاصة</td>
+<td><a href="#g-hr-04-modify-deductions">تعديل الخصومات</a></td>
+</tr>
+</tbody></table>
+</section>
+<section id="g-hr-01-leave-hr-approval"><h1>الإجازات — دور الموارد البشرية في الاعتماد والتوثيق</h1>
+<p><strong>الفئة المستهدفة:</strong> موظف الموارد البشرية
+<strong>الوقت المقدّر:</strong> دقيقة إلى دقيقتين لكل طلب</p>
+<hr>
+<h2>المهمتان الرئيسيتان للموارد البشرية في مسار الإجازات</h2>
+<p>تضطلع الموارد البشرية بمسؤوليتين متمايزتين ضمن دورة اعتماد الإجازات:</p>
+<table>
+<thead>
+<tr>
+<th>المهمة</th>
+<th>متى تُطلَب</th>
+<th>الإجازات المعنية</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>اعتماد الموارد البشرية</strong> (المرحلة ٢)</td>
+<td>بعد موافقة المدير المباشر</td>
+<td>الإجازة السنوية</td>
+</tr>
+<tr>
+<td><strong>التصديق النهائي</strong></td>
+<td>بعد موافقة المدير المباشر</td>
+<td>المرضية، بدون أجر، وغيرها</td>
+</tr>
+<tr>
+<td><strong>تأكيد الموارد البشرية + رفع النموذج</strong> (المرحلة ٦)</td>
+<td>بعد الاعتماد النهائي للمدير العام</td>
+<td>الإجازة السنوية فحسب</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>أين تجد الطلبات</h2>
+<p>افتح تطبيق <strong>الإجازات</strong> ← <strong>الإدارة ← الإجازات</strong>. تعرض هذه القائمة إجازات
+الشركة كاملةً؛ استخدم مرشّح <strong>بانتظاري</strong> لتصفية الطلبات التي في دورك.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/hr/leave-hr-01.png" alt="الإجازات ← الإدارة ← الإجازات"></p>
+<hr>
+<h2>المهمة الأولى — اعتماد الموارد البشرية</h2>
+<h3>للإجازة السنوية (المرحلة ٢)</h3>
+<p>١. افتح الطلب الواصل إليك بعد موافقة المدير المباشر.
+٢. راجع التواريخ والأيام وبيانات الموظف.
+٣. أكمِل تبويب <strong>مراجعة الموارد البشرية</strong> عند الحاجة (ملاحظات، مبلغ جزاء
+   مترتّب إن وُجد).</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/hr/leave-hr-02.png" alt="تبويب مراجعة الموارد البشرية"></p>
+<p>٤. اضغط <strong>اعتماد (الموارد البشرية)</strong>. ينتقل الطلب إلى المدير العام للمراجعة
+   الأولية.</p>
+<h3>للإجازة المرضية وبدون أجر وغيرها (اعتماد نهائي)</h3>
+<p>بعد موافقة المدير المباشر تصل هذه الإجازات إليك للاعتماد النهائي مباشرةً:
+افتح الطلب واضغط <strong>تصديق</strong> — تُمنَح الإجازة فورًا وتنتهي الدورة.</p>
+<hr>
+<h2>المهمة الثانية — تأكيد الموارد البشرية والنموذج الموقَّع (المرحلة ٦)</h2>
+<blockquote>
+<p><strong>تنبيه:</strong> هذه المرحلة حصرية للموارد البشرية فقط — لا يملك الموظف ولا المدير
+المباشر إتمامها. لا تُعتمَد الإجازة السنوية نهائيًا إلا بعد رفع النموذج هنا.</p>
+</blockquote>
+<p>بعد الاعتماد النهائي للمدير العام، تعود الإجازة السنوية إليك عند حالة
+<strong>بانتظار تأكيد الموارد البشرية</strong>:</p>
+<p>١. افتح الإجازة من <strong>الإدارة ← الإجازات</strong> (ابحث عن حالة «بانتظار تأكيد
+   الموارد البشرية»).
+٢. اضغط <strong>تأكيد وإنهاء</strong>.
+٣. <strong>ارفع النموذج الموقَّع</strong> (PDF) في النافذة المنبثقة — هذا الحقل إلزامي؛
+   لا يمكن إتمام الخطوة بدونه.
+٤. أكِّد — تُعتمَد الإجازة نهائيًا وتُخصَم الأيام من رصيد الموظف.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/hr/leave-hr-03.png" alt="نافذة تأكيد وإنهاء مع رفع الملف"></p>
+<hr>
+<h2>سير العمل الكامل للإجازة السنوية (للمرجعية)</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>المرحلة</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>١</td>
+<td>المدير المباشر</td>
+</tr>
+<tr>
+<td>٢</td>
+<td><strong>الموارد البشرية ← أنت هنا</strong></td>
+</tr>
+<tr>
+<td>٣</td>
+<td>المدير العام (مراجعة أولية)</td>
+</tr>
+<tr>
+<td>٤</td>
+<td>المحاسبة</td>
+</tr>
+<tr>
+<td>٥</td>
+<td>المدير العام (اعتماد نهائي)</td>
+</tr>
+<tr>
+<td>٦</td>
+<td><strong>الموارد البشرية — تأكيد النموذج الموقَّع ← أنت هنا أيضًا</strong></td>
+</tr>
+<tr>
+<td>✔</td>
+<td>معتمدة</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>العَرَض</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>لا أعثر على الطلب</td>
+<td>القائمة المفتوحة غير صحيحة</td>
+<td>استخدم <strong>الإجازات ← الإدارة ← الإجازات</strong> لا «إجازاتي»</td>
+</tr>
+<tr>
+<td>لا يوجد زر «تأكيد وإنهاء»</td>
+<td>الإجازة لم تصل المرحلة ٦ بعد</td>
+<td>يظهر الزر فقط بعد الاعتماد النهائي للمدير العام</td>
+</tr>
+<tr>
+<td>لا يمكن إتمام التأكيد</td>
+<td>لم يُرفَق النموذج الموقَّع</td>
+<td>ارفع ملف PDF في النافذة المنبثقة أولًا</td>
+</tr>
+<tr>
+<td>لا أستطيع الاعتماد على الإطلاق</td>
+<td>لست ضمن مجموعة معتمدي الموارد البشرية</td>
+<td>اطلب من المسؤول مراجعة صلاحياتك</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li><a href="#g-hr-02-loan-hr-approval">السلف الخاصة: اعتماد الموارد البشرية</a></li>
+<li><a href="#g-hr-03-create-deductions">إنشاء سلفة راتب</a></li>
+</ul>
+</section>
+<section id="g-hr-02-loan-hr-approval"><h1>السلف الخاصة: اعتماد الموارد البشرية</h1>
+<p><strong>الفئة المستهدفة:</strong> الموارد البشرية
+<strong>الوقت المقدّر:</strong> ١–٢ دقيقة لكل طلب</p>
+<h2>نظرة عامة</h2>
+<p>يُتيح لك هذا الدليل اعتماد السلف الخاصة أو ردّها في <strong>مرحلة الموارد البشرية</strong> — المرحلة
+الثانية بعد المدير المباشر وقبل المحاسبة.</p>
+<h2>ملاحظات أولية</h2>
+<ul>
+<li>تجد السلف الخاصة في <strong>الخصومات ← العمليات ← السلف الخاصة</strong>؛ تفتح القائمة على <strong>بانتظاري</strong>
+وتعرض السلف الخاصة عند <strong>بانتظار اعتماد الموارد البشرية</strong>.</li>
+</ul>
+<h2>الخطوات</h2>
+<ol>
+<li><p><strong>افتح الخصومات ← العمليات ← السلف الخاصة.</strong> تفتح القائمة على <strong>بانتظاري</strong> تلقائيًا.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/hr/loan-hr-01.png" alt="السلف الخاصة بانتظار الموارد البشرية"></p>
+</li>
+<li><p><strong>افتح السلفة الخاصة</strong> وراجع تبويب <strong>دعم القرار</strong>، الذي يلخّص وضع الموظف (رصيد
+الإجازة، الخصومات الأخرى النشطة، الأثر الشهري المتوقّع) لمساعدتك في اتخاذ
+القرار. ضع إشارة تأكيد الموارد البشرية عند الاقتضاء.</p>
+</li>
+<li><p><strong>اتخذ قرارك:</strong></p>
+<ul>
+<li><strong>اعتماد (الموارد البشرية)</strong> — تنتقل السلفة الخاصة إلى <strong>بانتظار اعتماد
+المحاسبة</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/hr/loan-hr-02.png" alt="زر اعتماد الموارد البشرية على السلفة الخاصة"></li>
+<li><strong>ردّ</strong>: أدخِل السبب؛ يُشعَر الموظف بذلك.</li>
+</ul>
+</li>
+</ol>
+<h2>ما يحدث بعد ذلك</h2>
+<p>تتابع السلفة الخاصة المعتمَدة مسارها: <strong>المحاسبة ← المدير العام (نهائي) ← الصرف ← نشطة</strong>.
+أما المردودة فتعود إلى الموظف مرفقةً بالسبب.</p>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>العَرَض</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>لا يوجد زر الاعتماد</td>
+<td>السلفة الخاصة ليست في مرحلة الموارد البشرية</td>
+<td>راجع شريط حالة الاعتماد</td>
+</tr>
+<tr>
+<td>أريد مزيدًا من المعلومات</td>
+<td>استخدم تبويب دعم القرار</td>
+<td>يعرض الأرصدة والخصومات الأخرى</td>
+</tr>
+</tbody></table>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li><a href="#g-hr-03-create-deductions">إنشاء سلفة راتب</a></li>
+<li><a href="#g-hr-01-leave-hr-approval">الإجازات: اعتماد الموارد البشرية</a></li>
+</ul>
+</section>
+<section id="g-hr-03-create-deductions"><h1>إنشاء سلفة راتب</h1>
+<p><strong>الفئة المستهدفة:</strong> موظف الموارد البشرية
+<strong>الوقت المقدّر:</strong> دقيقتان</p>
+<hr>
+<h2>الموارد البشرية تُنشئ السلف — والمحاسبة تُنشئ الجزاءات</h2>
+<p>قبل البدء، وضّح هذا التوزيع لتجنّب الخلط:</p>
+<table>
+<thead>
+<tr>
+<th>النوع</th>
+<th>من يُنشئه</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>سلفة راتب</strong></td>
+<td>✅ الموارد البشرية</td>
+</tr>
+<tr>
+<td><strong>جزاء داخلي / جزاء حكومي</strong></td>
+<td>المحاسبة — راجع <span class="xref">إنشاء جزاء</span></td>
+</tr>
+<tr>
+<td><strong>السلف الخاصة</strong></td>
+<td>مسار اعتماد مستقل — راجع أدلة السلف الخاصة</td>
+</tr>
+</tbody></table>
+<p>سلفة الراتب لا تمرّ بمسار اعتماد السلف الخاصة؛ تُنشئها مباشرةً وتُفعَّل فورًا.</p>
+<hr>
+<h2>ما تحتاجه قبل البدء</h2>
+<ul>
+<li>اسم الموظف.</li>
+<li>مبلغ السلفة.</li>
+<li>عدد الأقساط الشهرية (غالبًا قسط واحد).</li>
+<li>شهر بدء الاقتطاع.</li>
+</ul>
+<hr>
+<h2>الخطوات</h2>
+<p>١. افتح <strong>الخصومات ← العمليات ← الخصومات</strong> من القائمة الجانبية.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/hr/deduction-create-01.png" alt="قائمة خصومات الموارد البشرية"></p>
+<p>٢. اضغط <strong>جديد</strong>، ثم اختر <strong>الموظف</strong> ونوع الخصم <strong>سلفة راتب</strong>.</p>
+<p>٣. أدخِل <strong>المبلغ</strong> و<strong>عدد الأقساط</strong> و<strong>شهر البدء</strong>. يُنشئ النظام <strong>جدول
+   الأقساط الشهرية</strong> تلقائيًا في تبويب الأقساط أسفل النموذج.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/hr/deduction-create-02.png" alt="نموذج سلفة الراتب"></p>
+<p>٤. أضف <strong>ملاحظة</strong> تُوضّح السبب أو المرجع (اختياري لكن مفيد للمراجعات اللاحقة).</p>
+<p>٥. اضغط <strong>إرسال</strong> — تُفعَّل السلفة فورًا ويبدأ الخصم في الشهر المحدَّد.</p>
+<hr>
+<h2>ما يحدث بعد التفعيل</h2>
+<ul>
+<li>كل قسط معلّق يُخصَم تلقائيًا مع دفعة الرواتب الشهرية.</li>
+<li>يرى الموظف قيمة القسط في بند <strong>إجمالي الخصومات</strong> في كشف راتبه.</li>
+<li>بعد سداد جميع الأقساط، تُعلَّم السلفة <strong>مكتملة</strong> تلقائيًا.</li>
+</ul>
+<hr>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>العَرَض</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>المبلغ لا يُخصَم</td>
+<td>السجل لا يزال في المسودة</td>
+<td>تأكّد من الضغط على <strong>إرسال</strong> لا <strong>حفظ</strong></td>
+</tr>
+<tr>
+<td>أحتاج إنشاء جزاء لا سلفة</td>
+<td>الجزاءات من اختصاص المحاسبة</td>
+<td>راجع <span class="xref">إنشاء جزاء</span></td>
+</tr>
+<tr>
+<td>لا أجد الموظف في القائمة</td>
+<td>الاسم مكتوب بشكل مختلف</td>
+<td>ابحث بأول ثلاثة أحرف أو برقم الموظف</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li><a href="#g-hr-04-modify-deductions">تعديل الخصومات وإدارة الأقساط</a></li>
+<li><a href="#g-hr-02-loan-hr-approval">السلف الخاصة: اعتماد الموارد البشرية</a></li>
+</ul>
+</section>
+<section id="g-hr-04-modify-deductions"><h1>تعديل الخصومات وإدارة الأقساط</h1>
+<p><strong>الفئة المستهدفة:</strong> موظف الموارد البشرية
+<strong>الوقت المقدّر:</strong> ١–٣ دقائق حسب نوع التعديل</p>
+<hr>
+<h2>نطاق هذا الدليل</h2>
+<p>ثمّة ثلاثة إجراءات مختلفة تندرج تحت «تعديل الخصومات»؛ حدّد ما تحتاجه أولًا:</p>
+<table>
+<thead>
+<tr>
+<th>الإجراء</th>
+<th>متى تستخدمه</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>تعديل جدول الأقساط</td>
+<td>تغيير مواعيد أو قيم الأقساط المعلّقة</td>
+</tr>
+<tr>
+<td>تحديد قسط كمدفوع</td>
+<td>الموظف سدّد قسطًا نقدًا خارج نظام الرواتب</td>
+</tr>
+<tr>
+<td>تسجيل سداد سلفة خاصة (كلي أو جزئي)</td>
+<td>سداد مبلغ إضافي لتسريع إنهاء السلفة الخاصة</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>تعديل خصم قبل تفعيله (حالة المسودة)</h2>
+<p>افتح الخصم (في حالة <strong>مسودة</strong>) ← عدّل <strong>المبلغ</strong> أو <strong>عدد الأقساط</strong> مباشرةً ←
+احفظ. يتحدّث جدول الأقساط تلقائيًا. بعد الضغط على <strong>إرسال</strong> يثبت المبلغ ولا
+يمكن تعديله.</p>
+<hr>
+<h2>تحديد قسط منفرد كمدفوع</h2>
+<p>١. افتح سجل الخصم أو السلفة الخاصة.
+٢. انتقل إلى تبويب <strong>الأقساط</strong>.
+٣. في السطر المعلّق الذي سُدِّد، أضف <strong>ملاحظة</strong> (رقم الإيصال أو تاريخ الاستلام
+   النقدي).
+٤. اضغط <strong>تحديد كمدفوع</strong> — يتحوّل السطر إلى اللون الأخضر ويُستثنى من دفعة
+   الرواتب القادمة.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/hr/deduction-modify-01.png" alt="تحديد القسط كمدفوع"></p>
+<p>٥. إن كان هذا القسط الأخير، يُعلَّم السجل <strong>مكتملًا</strong> تلقائيًا.</p>
+<hr>
+<h2>تسجيل سداد سلفة خاصة (كلي أو جزئي)</h2>
+<p>استخدم هذا الإجراء حين يُسدِّد الموظف مبلغًا إضافيًا لتقليل رصيد سلفته الخاصة خارج
+نظام الرواتب:</p>
+<p>١. افتح السلفة الخاصة النشطة من <strong>الخصومات ← العمليات ← السلف الخاصة</strong>.
+٢. اضغط <strong>تسجيل سداد</strong>.
+٣. أدخِل <strong>مبلغ السداد</strong> و<strong>تاريخه</strong> وملاحظة اختيارية. يعرض النظام معاينة
+   للتأثير:</p>
+<table>
+<thead>
+<tr>
+<th>نوع السداد</th>
+<th>ما يحدث</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>كلي</strong> (يساوي الرصيد المتبقي)</td>
+<td>تُعلَّم <strong>جميع</strong> الأقساط المعلّقة مدفوعةً</td>
+</tr>
+<tr>
+<td><strong>جزئي</strong> (أقل من الرصيد المتبقي)</td>
+<td>يُوزَّع الرصيد المتبقي على الأقساط؛ يُضاف سطر جديد للسداد</td>
+</tr>
+</tbody></table>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/accounting/loan-payment-02.png" alt="نافذة تسجيل سداد السلفة الخاصة"></p>
+<p>٤. اضغط <strong>تأكيد السداد</strong>.</p>
+<hr>
+<h2>تعديل جدول الأقساط المعلّقة</h2>
+<p>١. افتح السجل ← تبويب <strong>الأقساط</strong>.
+٢. عدّل <strong>الشهر/السنة</strong> أو <strong>المبلغ</strong> في الأسطر المعلّقة. الأسطر المدفوعة
+   محجوبة ولا تقبل التعديل.
+٣. يمكن إضافة سطر يدوي جديد إن احتجت توزيعًا مختلفًا.</p>
+<hr>
+<h2>إلغاء خصم كامل</h2>
+<p>افتح السجل ← اضغط <strong>إلغاء</strong> (أكِّد عند المطالبة). الإلغاء الكامل غير مقيّد
+قبل سداد أي قسط؛ بعد السداد يُلغى ما تبقّى فحسب.</p>
+<hr>
+<h2>ما يحدث بعد التعديلات</h2>
+<p>الأقساط المدفوعة والمعلَّقة المعدَّلة تؤثّر فورًا في دفعات الرواتب القادمة؛
+يرى الموظف التحديث مباشرةً في إجمالي المسدَّد / المتبقي داخل سجله.</p>
+<hr>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>العَرَض</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>لا أستطيع تعديل المبلغ</td>
+<td>الخصم نشط بالفعل (تجاوز المسودة)</td>
+<td>ألغِ السجل وأنشئ سجلًا جديدًا إن كان خطأً</td>
+</tr>
+<tr>
+<td>لا يوجد زر «تسجيل سداد»</td>
+<td>السلفة الخاصة غير نشطة أو لا توجد أقساط معلّقة</td>
+<td>يجب أن تكون السلفة الخاصة <strong>نشطة</strong> بأقساط معلّقة</td>
+</tr>
+<tr>
+<td>لا يمكن تعديل سطر مدفوع</td>
+<td>الأسطر المدفوعة محجوبة نظامًا</td>
+<td>يمكن تعديل المعلّقة فقط</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li><a href="#g-hr-03-create-deductions">إنشاء سلفة راتب</a></li>
+<li><a href="#g-hr-02-loan-hr-approval">السلف الخاصة: اعتماد الموارد البشرية</a></li>
+</ul>
+</section>
+<section id="g-hr-05-attendance-sheet-management"><h1>إدارة كشوف الحضور (الموارد البشرية)</h1>
+<p><strong>الفئة المستهدفة:</strong> الموارد البشرية / مسؤول الحضور
+<strong>الوقت المقدّر:</strong> ٥ دقائق</p>
+<h2>نظرة عامة</h2>
+<p>يُتيح لك هذا الدليل الاطّلاع على كشوف حضور الموظفين غير المرتبطين بجهاز البصمة
+وإدارتها على مستوى الشركة: <strong>إقفالها</strong> في نهاية الشهر أو <strong>إعادتها إلى مسودة</strong>
+لإجراء تصحيح.</p>
+<h2>الخطوات</h2>
+<ol>
+<li><p><strong>افتح الحضور والانصراف ← كشوف الحضور.</strong> تظهر جميع الكشوف الشهرية لجميع
+الموظفين.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/hr/attsheet-01.png" alt="جميع كشوف الحضور"></p>
+</li>
+<li><p>للتصحيح بعد إقفال الشهر: افتح الكشف المراد تعديله ← اضغط <strong>إعادة إلى
+مسودة</strong>. يصبح قابلًا للتعديل من قِبَل المشرف مجدّدًا.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/hr/attsheet-02.png" alt="إعادة الكشف إلى مسودة"></p>
+</li>
+<li><p>بعد التصحيح، يمكن إقفال الكشف مجدّدًا أو تركه للمشرف ليُقفِله.</p>
+</li>
+</ol>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>العَرَض</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>لا أرى كشف موظف</td>
+<td>الكشوف لم تُنشأ بعد</td>
+<td>استخدم <strong>إنشاء جميع الكشوف</strong> من قائمة المشرف</td>
+</tr>
+<tr>
+<td>الكشف للقراءة فقط</td>
+<td>الشهر منتهٍ وأُقفِل</td>
+<td>استخدم <strong>إعادة إلى مسودة</strong></td>
+</tr>
+</tbody></table>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li>المشرف: <span class="xref">كشوف الحضور</span></li>
+</ul>
+</section>
+</body></html>

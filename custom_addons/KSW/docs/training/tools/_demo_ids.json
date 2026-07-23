@@ -1,0 +1,22 @@
+{
+  "loan_pending_dm": 3469,
+  "loan_pending_hr": 3470,
+  "loan_pending_acc": 3471,
+  "loan_pending_gm": 3472,
+  "loan_pending_disbursement": 3473,
+  "loan_active": 3474,
+  "commission_sheet": 1056,
+  "leave_pending_dm": 6084,
+  "leave_pending_hr": 6085,
+  "leave_pending_gm_initial": 6086,
+  "leave_pending_acc": 6087,
+  "leave_pending_gm_final": 6088,
+  "leave_pending_employee_signature": 6089,
+  "advance": 3475,
+  "att_sheet": 2695,
+  "skip_batch": 290,
+  "payslip": 16260,
+  "comm_batch": 10,
+  "sales_sheet": 6,
+  "payslip_batch": 240
+}
