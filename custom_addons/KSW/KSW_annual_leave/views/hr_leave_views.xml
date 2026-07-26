@@ -404,5 +404,34 @@
         </field>
     </record>
 
+    <!-- ============================================================ -->
+    <!-- Return Confirmation — self + subordinates on-vacation queue  -->
+    <!-- Scoping to "self" vs "subordinates" is handled entirely by   -->
+    <!-- the core hr_holidays record rules (hr_leave_rule_employee /  -->
+    <!-- hr_leave_rule_responsible_read) — no extra domain needed.    -->
+    <!-- ============================================================ -->
+    <record id="hr_leave_action_return_confirmation" model="ir.actions.act_window">
+        <field name="name">Return Confirmation</field>
+        <field name="res_model">hr.leave</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('x_return_state', '=', 'on_vacation')]</field>
+        <field name="context">{'search_default_on_vacation': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No pending return confirmations.
+            </p><p>
+                Employees currently on annual vacation whose return has not
+                yet been confirmed.
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+        id="hr_leave_menu_return_confirmation"
+        name="Return Confirmation"
+        parent="hr_holidays.menu_hr_holidays_management"
+        action="hr_leave_action_return_confirmation"
+        sequence="8"/>
+
 </odoo>
 

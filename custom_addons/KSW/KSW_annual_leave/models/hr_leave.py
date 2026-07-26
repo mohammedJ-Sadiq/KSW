@@ -797,6 +797,30 @@ class HrLeave(models.Model):
         for leave in annual_multi:
             leave.can_validate = False
 
+    # Once the GM has given final approval, the decision is locked in —
+    # only the HR confirmation step and the return-date confirmation flow
+    # remain. Refuse no longer applies from here on.
+    _REFUSE_LOCKED_STATES = frozenset({'pending_employee_signature', 'approved'})
+
+    @api.depends('state', 'employee_id', 'department_id', 'x_annual_approval_state')
+    def _compute_can_refuse(self):
+        """Hide 'Refuse' once an annual_multi leave has cleared GM final approval.
+
+        Refuse remains available through pending_gm_final so an approver can
+        still reject the request outright instead of advancing it. Once GM
+        final approval is done (pending_employee_signature or approved),
+        refusing no longer makes sense.
+        """
+        annual_multi_done = self.filtered(
+            lambda l: self._is_annual_multi(l)
+            and l.x_annual_approval_state in self._REFUSE_LOCKED_STATES
+        )
+        remaining = self - annual_multi_done
+        if remaining:
+            super(HrLeave, remaining)._compute_can_refuse()
+        for leave in annual_multi_done:
+            leave.can_refuse = False
+
     # ==================================================================
     # Write override — re-check allocation validity on toggle changes
     # ==================================================================
@@ -1461,6 +1485,16 @@ class HrLeave(models.Model):
 
     def action_refuse(self):
         """Reset return and multi-step fields when refused."""
+        if not self.env.su:
+            locked = self.filtered(
+                lambda l: self._is_annual_multi(l)
+                and l.x_annual_approval_state in self._REFUSE_LOCKED_STATES
+            )
+            if locked:
+                raise UserError(_(
+                    'This annual leave has already received final GM '
+                    'approval and can no longer be refused.'
+                ))
         annual = self.filtered(
             lambda l: self._is_annual_leave(l)
             and l.x_return_state != 'not_applicable'

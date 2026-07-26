@@ -6,16 +6,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-15 12:11+0000\n"
-"PO-Revision-Date: 2026-07-15 12:11+0000\n"
+"POT-Creation-Date: 2026-07-26 11:38+0000\n"
+"PO-Revision-Date: 2026-07-26 11:38+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
-"Language: ar_001\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
-"X-Generator: KSW ar-engine v2\n"
+"Plural-Forms: \n"
 
 #. module: KSW_annual_leave
 #: model:ir.model.fields,help:KSW_annual_leave.field_absent_days_wizard__entitlement_days
@@ -299,6 +297,7 @@ msgstr ""
 #. module: KSW_annual_leave
 #: model_terms:ir.ui.view,arch_db:KSW_annual_leave.opening_balance_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_gm_return_approver_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_hr_confirm_signature_wizard_form
 msgid "Cancel"
 msgstr "إلغاء"
 
@@ -318,6 +317,12 @@ msgid "Commission Lines"
 msgstr "بنود العمولات"
 
 #. module: KSW_annual_leave
+#: model:ir.actions.act_window,name:KSW_annual_leave.action_ksw_hr_confirm_signature_wizard
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_hr_confirm_signature_wizard_form
+msgid "Confirm Signed Vacation Form"
+msgstr ""
+
+#. module: KSW_annual_leave
 #: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
 msgid "Confirmed By"
 msgstr "تم التأكيد بواسطة"
@@ -332,6 +337,7 @@ msgstr "إنشاء وعرض وتعديل وحذف طلبات إجازته الخ
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_commission_line__create_uid
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__create_uid
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_gm_return_approver_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_hr_confirm_signature_wizard__create_uid
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_leave_attendance_wizard__create_uid
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard__create_uid
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__create_uid
@@ -343,6 +349,7 @@ msgstr "أنشئ بواسطة"
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_commission_line__create_date
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__create_date
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_gm_return_approver_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_hr_confirm_signature_wizard__create_date
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_leave_attendance_wizard__create_date
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard__create_date
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__create_date
@@ -429,6 +436,7 @@ msgstr "المدير المباشر"
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_version__display_name
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__display_name
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_gm_return_approver_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_hr_confirm_signature_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_leave_attendance_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__display_name
@@ -458,6 +466,7 @@ msgstr "تاريخ بدء السريان"
 #: model_terms:ir.ui.view,arch_db:KSW_annual_leave.ksw_annual_leave_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_absent_days_wizard_form
 #: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_gm_return_approver_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_hr_confirm_signature_wizard_form
 #: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_leave_attendance_wizard_form
 msgid "Employee"
 msgstr "الموظف"
@@ -469,6 +478,7 @@ msgstr "عقد الموظف"
 
 #. module: KSW_annual_leave
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_gm_return_approver_wizard__employee_name
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_hr_confirm_signature_wizard__employee_name
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_leave_attendance_wizard__employee_name
 msgid "Employee Name"
 msgstr "اسم الموظف"
@@ -484,7 +494,7 @@ msgstr "الموظفون"
 msgid ""
 "Employees currently on annual vacation whose return has not\n"
 "                yet been confirmed."
-msgstr "الموظفون الذين هم حاليا في إجازة سنوية ولم يتم تأكيد مباشرتهم بعد."
+msgstr ""
 
 #. module: KSW_annual_leave
 #: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
@@ -500,6 +510,11 @@ msgstr "يتجاوز الرصيد السنوي"
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__opening_extra_days
 msgid "Extra Days"
 msgstr "أيام إضافية"
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_hr_confirm_signature_wizard__attachment_filename
+msgid "File Name"
+msgstr ""
 
 #. module: KSW_annual_leave
 #: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
@@ -667,6 +682,11 @@ msgid "HR Confirmed On"
 msgstr "تاريخ تأكيد الموارد البشرية"
 
 #. module: KSW_annual_leave
+#: model:ir.model,name:KSW_annual_leave.model_ksw_hr_confirm_signature_wizard
+msgid "HR: Confirm Signed Vacation Form"
+msgstr ""
+
+#. module: KSW_annual_leave
 #: model_terms:ir.ui.view,arch_db:KSW_annual_leave.ksw_annual_leave_view_search
 msgid "Has Opening Reset Date"
 msgstr "له تاريخ إعادة ضبط افتتاحي"
@@ -684,6 +704,7 @@ msgstr "سأقوم بالتحديث يدويا"
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_version__id
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__id
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_gm_return_approver_wizard__id
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_hr_confirm_signature_wizard__id
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_leave_attendance_wizard__id
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard__id
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__id
@@ -746,6 +767,7 @@ msgstr "إجازات KSW"
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_commission_line__write_uid
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__write_uid
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_gm_return_approver_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_hr_confirm_signature_wizard__write_uid
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_leave_attendance_wizard__write_uid
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard__write_uid
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__write_uid
@@ -757,6 +779,7 @@ msgstr "آخر تحديث بواسطة"
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_commission_line__write_date
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__write_date
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_gm_return_approver_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_hr_confirm_signature_wizard__write_date
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_leave_attendance_wizard__write_date
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard__write_date
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__write_date
@@ -770,6 +793,7 @@ msgstr "الأجر الأخير (ريال)"
 
 #. module: KSW_annual_leave
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_commission_line__leave_id
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_hr_confirm_signature_wizard__leave_id
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_leave_attendance_wizard__leave_id
 msgid "Leave"
 msgstr "إجازة"
@@ -801,11 +825,13 @@ msgstr "إدارة الإجازات"
 
 #. module: KSW_annual_leave
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_gm_return_approver_wizard__leave_period
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_hr_confirm_signature_wizard__leave_period
 msgid "Leave Period"
 msgstr "فترة الإجازة"
 
 #. module: KSW_annual_leave
 #: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_gm_return_approver_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_hr_confirm_signature_wizard_form
 msgid "Leave Summary"
 msgstr "ملخص الإجازة"
 
@@ -906,7 +932,7 @@ msgstr "لا توجد سجلات إجازة سنوية بعد."
 #. module: KSW_annual_leave
 #: model_terms:ir.actions.act_window,help:KSW_annual_leave.hr_leave_action_return_confirmation
 msgid "No pending return confirmations."
-msgstr "لا توجد إجازات بانتظار تأكيد المباشرة."
+msgstr ""
 
 #. module: KSW_annual_leave
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__note
@@ -1046,6 +1072,7 @@ msgstr "بانتظار إجرائي"
 
 #. module: KSW_annual_leave
 #: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_gm_return_approver_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_hr_confirm_signature_wizard_form
 msgid "Period"
 msgstr "الفترة"
 
@@ -1100,7 +1127,7 @@ msgstr "تاريخ بداية الطلب"
 #: model:ir.actions.act_window,name:KSW_annual_leave.hr_leave_action_return_confirmation
 #: model:ir.ui.menu,name:KSW_annual_leave.hr_leave_menu_return_confirmation
 msgid "Return Confirmation"
-msgstr "تأكيد المباشرة"
+msgstr ""
 
 #. module: KSW_annual_leave
 #: model:ir.model.fields.selection,name:KSW_annual_leave.selection__hr_leave__x_return_state__hr_confirmed
@@ -1202,6 +1229,12 @@ msgid "Signature Confirmed On"
 msgstr "تاريخ تأكيد التوقيع"
 
 #. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_hr_confirm_signature_wizard__attachment_file
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_hr_confirm_signature_wizard_form
+msgid "Signed Vacation Form"
+msgstr ""
+
+#. module: KSW_annual_leave
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__skip_if_locked
 msgid "Skip (Already Locked)"
 msgstr "تخطي (مقفل مسبقا)"
@@ -1282,16 +1315,6 @@ msgid ""
 msgstr ""
 "العدد الحقيقي للأيام التقويمية التي يقضيها الموظف في الإجازة (من تواريخ "
 "الطلب). يظهر عند استخدام تصفية كامل الرصيد."
-
-#. module: KSW_annual_leave
-#. odoo-python
-#: code:addons/KSW_annual_leave/models/hr_leave.py:0
-msgid ""
-"This annual leave has already received final GM approval and can no "
-"longer be refused."
-msgstr ""
-"تم اعتماد هذه الإجازة السنوية نهائيا من المدير العام، ولم يعد بالإمكان "
-"رفضها."
 
 #. module: KSW_annual_leave
 #: model:ir.model,name:KSW_annual_leave.model_hr_leave
@@ -1408,6 +1431,11 @@ msgstr "الجزء بدون أجر (أيام)"
 #: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_leave_attendance_wizard_form
 msgid "Update Attendance Sheet"
 msgstr "تحديث كشف الحضور والانصراف"
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_hr_confirm_signature_wizard_form
+msgid "Upload Signed Form"
+msgstr ""
 
 #. module: KSW_annual_leave
 #: model_terms:ir.ui.view,arch_db:KSW_annual_leave.ksw_annual_leave_view_form
@@ -1570,8 +1598,9 @@ msgstr "✅ اعتماد الموارد البشرية"
 
 #. module: KSW_annual_leave
 #: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_hr_confirm_signature_wizard_form
 msgid "✅ Confirm & Finalise"
-msgstr ""
+msgstr "✅ تأكيد وإنهاء"
 
 #. module: KSW_annual_leave
 #: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
