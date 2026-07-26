@@ -657,4 +657,38 @@ These BAS modules are licensed but not used by this company:
 
 ---
 
-*This reference was built by querying `bas9ss` directly via pymssql. Last updated: 2026-07-11.*
+## Driver Commission Trips — «الحركة التجارية للأصناف» (discovered 2026-07-23)
+
+Source of the KSW driver-commission report (BAS menu: بيانات وحركات الأصناف →
+الحركة التجارية للأصناف, filtered by warehouse + period). Used by
+`KSW_commissions` `ksw.driver.commission.sheet.action_pull_from_bas`.
+
+- **Trips = water-tanker sales lines of item `ICODE='11032'`** («مياه عذبة تريلات»,
+  sold by cubic metre; **one tanker load / «ردّة» = 32 m³**).
+- POS warehouses (e.g. Tabuk 2): header in **`vou10` FTYPE='600'**, item line in
+  **`STR10`** (join `FTYPE,FTYPE2,CODE2,NUMBER1`). `STR10.FCODE` = customer
+  account; `vou10.COST_CENTER` = equipment cost center (T-code);
+  **`vou10.COST_CENTER2` = driver cost center** («مركز تكلفة الموظف», e.g.
+  `WAHAB JAN1387`).
+- **عدد الردود = COUNT of item-11032 lines** (each load ≈ 1).
+- **الرد المضاعف = Σ `cod10.FACTORE`** of each line's customer — **`cod10.FACTORE`
+  is the per-customer distance multiplier** (e.g. NEOM/International Energy 2.14,
+  Jafurah 2.5, near sites 1.0, some 0.75; NULL ⇒ 0). Join `STR10.FCODE =
+  cod10.DCODE1`.
+- The `OROOD_NUMBER/PRICE/TYPE` "الردة" columns on bin/vou/STR are **empty** in
+  this instance — do NOT use them. The `Trans_*` transport tables are also empty.
+- Validated: the query reproduces the driver report exactly for 2026-07-22
+  (WAHAB 2/4·T164, SULEMAN 5/7·T165, Babel 4/8·T175, EHTSHAM 5/8.25·T190, …).
+- Other warehouses (e.g. «Kawthar Factory ALnabia») sell via credit-delivery
+  notes «اذن تسليم الاجل» (not FTYPE=600) — a fully general query must also union
+  those document lines (same COST_CENTER2 / FCODE→FACTORE logic). Item/FTYPE lists
+  are configurable via `ir.config_parameter` `ksw_commissions.orood_item_codes`
+  (default `11032`) and `ksw_commissions.orood_ftypes` (default `600`).
+
+Cost-center master: **`cost_c`** (`code` category, `mcost`, `name`) — 617 rows
+(trailers/tankers «تيدر/تريلا», customer cars). Equipment cost centers are the
+`T###` codes carried on the movement rows, not a separate table.
+
+---
+
+*This reference was built by querying `bas9ss` directly via pymssql. Last updated: 2026-07-23.*

@@ -27,6 +27,12 @@
                 <field name="state" invisible="1"/>
 
                 <header>
+                    <button name="action_pull_from_bas"
+                            string="Pull from BAS"
+                            type="object" class="btn-secondary"
+                            groups="KSW_commissions.group_commission_supervisor"
+                            invisible="state != 'draft'"
+                            confirm="Fill trips for all site drivers from BAS for this period? Existing trip values on their rows will be overwritten."/>
                     <button name="action_confirm" string="Confirm"
                             type="object" class="btn-primary"
                             invisible="state != 'draft'"/>

@@ -23,6 +23,16 @@ class HrEmployee(models.Model):
              'auto-match rows to this employee. Leave blank to fall back '
              'to the employee\'s regular name.',
     )
+    x_bas_driver_cost_center = fields.Char(
+        string='BAS Driver Cost Center',
+        groups='hr.group_hr_user',
+        help='Exact "مركز تكلفة الموظف" value for this driver in BAS '
+             '(e.g. "WAHAB JAN1387"). Used by the driver-commission '
+             '"Pull from BAS" button to match BAS trip rows '
+             '(vou10.COST_CENTER2) to this employee. The BAS label often '
+             'differs from the employee\'s Odoo name, so this must be set '
+             'explicitly for the pull to find the driver\'s loads.',
+    )
 
     # ------------------------------------------------------------------
     # Auto-create the current-month commission sheet when an HR officer

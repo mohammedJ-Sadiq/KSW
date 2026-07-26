@@ -1,8 +1,18 @@
 import logging
-import pymssql
 from odoo import models, api
 
 _logger = logging.getLogger(__name__)
+
+try:
+    import pymssql
+    _PYMSSQL_AVAILABLE = True
+except ImportError:
+    pymssql = None
+    _PYMSSQL_AVAILABLE = False
+    _logger.warning(
+        "KSW_ext_sync: pymssql is not installed — BAS sync will be unavailable. "
+        "Run: pip install pymssql"
+    )
 
 _SERVER = '192.168.1.82'
 _PORT = '59090'
@@ -16,6 +26,8 @@ class BASConnector(models.AbstractModel):
     _description = 'BAS SQL Server Connector'
 
     def _bas_connect(self):
+        if not _PYMSSQL_AVAILABLE:
+            raise ImportError("pymssql is not installed. Run: pip install pymssql")
         p = self.env['ir.config_parameter'].sudo()
         return pymssql.connect(
             server=p.get_param('ksw_bas.server', _SERVER),

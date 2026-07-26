@@ -996,7 +996,7 @@ class HrLeave(models.Model):
         # so the DM can mark those days absent immediately.
         if 'ksw.attendance.sheet' in self.env and len(self) == 1:
             leave = self
-            if getattr(leave.employee_id, 'x_is_attendance_sheet', False):
+            if leave.employee_id.sudo().x_is_attendance_sheet:
                 has_lines = self.env['ksw.attendance.sheet.line'].sudo().search_count([
                     ('sheet_id.employee_id', '=', leave.employee_id.id),
                     ('sheet_id.state', '=', 'draft'),
@@ -1287,7 +1287,7 @@ class HrLeave(models.Model):
         Line = self.env['ksw.attendance.sheet.line'].sudo()
         for leave in self:
             emp = leave.employee_id
-            if not getattr(emp, 'x_is_attendance_sheet', False):
+            if not emp.sudo().x_is_attendance_sheet:
                 continue
             lines = Line.search([
                 ('sheet_id.employee_id', '=', emp.id),

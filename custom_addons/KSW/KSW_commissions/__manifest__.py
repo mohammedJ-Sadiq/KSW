@@ -29,6 +29,7 @@ WPS / Kawthar bank-file export, and the PDF report.
         'KSW_working_schedule',
         'KSW_attendance_sheet',
         'KSW_deduction',
+        'KSW_ext_sync',
     ],
     'data': [
         'security/security.xml',
