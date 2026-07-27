@@ -203,20 +203,49 @@ function buildFull(lang) {
   renderDoc(lang, orderedFiles(lang), `KSW-User-Manual-${lang.toUpperCase()}`, title, sub);
 }
 
-// ---- CLI ----------------------------------------------------------------
-// node build_pdf.mjs            -> per-persona PDFs, both languages
-// node build_pdf.mjs en         -> per-persona PDFs, English only
-// node build_pdf.mjs full       -> comprehensive manual, both languages
-// node build_pdf.mjs full en    -> comprehensive manual, English only
-const args = process.argv.slice(2);
-const wantFull = args.includes('full');
-const lang = args.find(a => a === 'en' || a === 'ar');
-const langs = lang ? [lang] : ['en', 'ar'];
-
-for (const l of langs) {
-  console.log(`\n[${l}]`);
-  if (wantFull) { buildFull(l); continue; }
-  buildGeneral(l);
-  for (const persona of Object.keys(PERSONA_DOCS)) buildPersona(l, persona);
+// one standalone PDF for a single guide page (both languages), independent
+// of the per-persona handbooks — doesn't touch any other PDF output.
+function buildSingle(relPath, slug, titleEn, titleAr) {
+  for (const l of ['en', 'ar']) {
+    const f = join(ROOT, l, relPath);
+    if (!existsSync(f)) { console.warn(`  ! missing ${f}, skipped`); continue; }
+    const title = l === 'ar' ? titleAr : titleEn;
+    const sub = l === 'ar' ? 'دليل تدريب المستخدم' : 'User Training Guide';
+    console.log(`\n[${l}] single: ${relPath}`);
+    renderDoc(l, [f], `KSW-${slug}-Guide-${l.toUpperCase()}`, title, sub);
+  }
 }
-console.log('\nDone.');
+
+// ---- CLI ----------------------------------------------------------------
+// node build_pdf.mjs                              -> per-persona PDFs, both languages
+// node build_pdf.mjs en                            -> per-persona PDFs, English only
+// node build_pdf.mjs full                          -> comprehensive manual, both languages
+// node build_pdf.mjs full en                       -> comprehensive manual, English only
+// node build_pdf.mjs single <relPath> <slug> <titleEn> <titleAr>
+//                                                   -> one standalone PDF (both languages)
+//                                                      built from a single guide page, e.g.:
+//   node build_pdf.mjs single supervisor/06-confirm-return.md Return-Confirmation \
+//     "Confirming a Return from Annual Leave" "تأكيد مباشرة الموظف من إجازته السنوية"
+const args = process.argv.slice(2);
+
+if (args[0] === 'single') {
+  const [, relPath, slug, titleEn, titleAr] = args;
+  if (!relPath || !slug || !titleEn || !titleAr) {
+    console.error('Usage: node build_pdf.mjs single <relPath> <slug> <titleEn> <titleAr>');
+    process.exit(1);
+  }
+  buildSingle(relPath, slug, titleEn, titleAr);
+  console.log('\nDone.');
+} else {
+  const wantFull = args.includes('full');
+  const lang = args.find(a => a === 'en' || a === 'ar');
+  const langs = lang ? [lang] : ['en', 'ar'];
+
+  for (const l of langs) {
+    console.log(`\n[${l}]`);
+    if (wantFull) { buildFull(l); continue; }
+    buildGeneral(l);
+    for (const persona of Object.keys(PERSONA_DOCS)) buildPersona(l, persona);
+  }
+  console.log('\nDone.');
+}

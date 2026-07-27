@@ -13,7 +13,7 @@ attendance and commission sheets.
 |---|---|
 | Approve (or refuse) my team's time-off requests | [Approve time off](01-approve-time-off.md) |
 | Request leave for a team member without a login | [Approve time off](01-approve-time-off.md#requesting-leave-for-someone-without-a-system-account) |
-| Record a team member's return from vacation | [Approve time off](01-approve-time-off.md#confirming-an-employees-return) |
+| Record a team member's return from vacation | [Confirming a return](06-confirm-return.md) |
 | Approve (or refuse) my team's loan requests | [Approve a loan](02-approve-loan.md) |
 | Mark my team's monthly attendance (non-biometric staff) | [Attendance sheets](03-attendance-sheets.md) |
 | Record my team's commissions & allowances | [Commission sheets](04-commission-sheets.md) |

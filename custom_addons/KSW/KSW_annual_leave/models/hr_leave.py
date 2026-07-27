@@ -718,19 +718,20 @@ class HrLeave(models.Model):
             )
 
     @api.depends_context('uid')
-    @api.depends('state', 'x_return_state', 'x_return_date')
+    @api.depends('state', 'x_return_state', 'x_return_date', 'employee_id.leave_manager_id')
     def _compute_return_permissions(self):
+        uid = self.env.uid
         for leave in self:
             leave.x_can_confirm_return_manager = (
                 leave.state == 'validate'
                 and leave.x_return_state == 'on_vacation'
                 and leave.x_return_date
+                and leave.employee_id.leave_manager_id.id == uid
             )
-            # HR step removed — manager confirms directly
+            # HR cannot confirm returns — only the leave's direct manager
             leave.x_can_confirm_return_hr = False
 
     def action_confirm_return_manager(self):
-        user = self.env.user
         for leave in self:
             if leave.x_return_state != 'on_vacation':
                 raise UserError('This leave is not in "On Vacation" status.')
@@ -738,16 +739,14 @@ class HrLeave(models.Model):
                 raise UserError(
                     'Please set the Return Date before confirming.')
             if not self.env.su:
-                is_hr = user.has_group(
-                    'KSW_annual_leave.group_annual_leave_hr')
                 is_manager = (
                     leave.employee_id.leave_manager_id
-                    and leave.employee_id.leave_manager_id == user
+                    and leave.employee_id.leave_manager_id == self.env.user
                 )
-                if not (is_hr or is_manager):
+                if not is_manager:
                     raise UserError(
-                        'Only %s (the leave manager) or an HR Approver '
-                        'can confirm the return.' % (
+                        'Only %s (the leave manager) can confirm the '
+                        'return.' % (
                             leave.employee_id.leave_manager_id.name
                             if leave.employee_id.leave_manager_id
                             else 'the leave manager'

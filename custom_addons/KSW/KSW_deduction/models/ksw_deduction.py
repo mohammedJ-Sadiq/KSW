@@ -371,13 +371,30 @@ class KswDeduction(models.Model):
         sanitize=False,
     )
 
-    # Employee's current-month total across ALL active deductions
-    # (this record included) — useful on the list view for HR/Accounting.
+    # Employee's totals across ALL active deductions (this record included) —
+    # useful on the list view for HR/Accounting.
+    #
+    # These are computes reading the employee with sudo(), NOT related fields:
+    # a related field inherits the source field's `groups` (see
+    # `_related_groups` in odoo/orm/fields.py), and the hr.employee sources are
+    # gated to hr.group_hr_user — which the loan approver groups
+    # (group_loan_acc / group_loan_gm / group_loan_disbursement) do NOT imply.
+    # The form/list/kanban deliberately expose these figures to those groups.
     x_emp_monthly_total = fields.Monetary(
         string="Employee's Total This Month",
-        related='employee_id.x_deduction_monthly_total',
+        compute='_compute_employee_deduction_totals',
         currency_field='currency_id',
-        readonly=True,
+        help='What this month\'s payroll will collect from this employee '
+             'across every active deduction (this one included): '
+             'installments scheduled for the current month plus any left '
+             'pending from earlier months.',
+    )
+    x_emp_outstanding_total = fields.Monetary(
+        string="Employee's Total Outstanding",
+        compute='_compute_employee_deduction_totals',
+        currency_field='currency_id',
+        help='All still-pending installments of this employee across every '
+             'active deduction, regardless of month.',
     )
     x_gross_salary = fields.Monetary(
         string='Gross Salary',
@@ -420,6 +437,20 @@ class KswDeduction(models.Model):
                 rec.x_gross_salary = sum(getattr(ver, f, 0.0) or 0.0 for f in _ALLOWANCE_FIELDS)
             else:
                 rec.x_gross_salary = 0.0
+
+    @api.depends('employee_id')
+    def _compute_employee_deduction_totals(self):
+        """Mirror the employee-level deduction totals onto the deduction.
+
+        Read through `sudo()` because the hr.employee source fields are
+        restricted to hr.group_hr_user, while these figures are shown to every
+        loan/deduction approver group.
+        """
+        for rec in self:
+            emp = rec.employee_id.sudo()
+            rec.x_emp_monthly_total = emp.x_deduction_monthly_total if emp else 0.0
+            rec.x_emp_outstanding_total = (
+                emp.x_deduction_outstanding_total if emp else 0.0)
 
     @api.depends('line_ids.state', 'line_ids.amount', 'amount')
     def _compute_progress(self):
@@ -585,6 +616,58 @@ class KswDeduction(models.Model):
             'view_mode': 'form',
             'target': 'current',
         }
+
+    def _action_employee_installments(self, name, extra_domain=None):
+        """Open the installment lines behind an employee-level total.
+
+        The domain mirrors `hr.employee._compute_deduction_count` (pending
+        lines of active deductions) so the list always adds up to the figure
+        displayed on the form. Record rules still apply: an approver may not be
+        able to open every parent deduction listed here.
+        """
+        self.ensure_one()
+        domain = [
+            ('employee_id', '=', self.employee_id.id),
+            ('state', '=', 'pending'),
+            ('deduction_id.state', '=', 'active'),
+        ] + (extra_domain or [])
+        return {
+            'type': 'ir.actions.act_window',
+            'name': name,
+            'res_model': 'ksw.deduction.line',
+            'view_mode': 'list,form',
+            'views': [
+                (self.env.ref('KSW_deduction.ksw_deduction_line_view_list').id, 'list'),
+                (self.env.ref('KSW_deduction.ksw_deduction_line_view_form').id, 'form'),
+            ],
+            'search_view_id': self.env.ref(
+                'KSW_deduction.ksw_deduction_line_view_search').id,
+            'domain': domain,
+            'context': {'search_default_group_deduction': 1, 'create': False},
+            'target': 'current',
+        }
+
+    def action_view_employee_month_installments(self):
+        """Drill-down behind "Total Deductions This Month".
+
+        No lower bound on the period: an installment left pending in an
+        earlier month is collected by this month's payslip (see
+        `hr.payslip._ksw_pending_lines_domain`), so it belongs in this list.
+        """
+        self.ensure_one()
+        period_start = fields.Date.context_today(self).replace(day=1)
+        period_end = period_start + relativedelta(months=1, days=-1)
+        return self._action_employee_installments(
+            _('Deductions This Month — %s') % (self.employee_id.name or ''),
+            [('period_date', '<=', period_end)],
+        )
+
+    def action_view_employee_outstanding_installments(self):
+        """Drill-down behind "Total Outstanding Deductions"."""
+        self.ensure_one()
+        return self._action_employee_installments(
+            _('Outstanding Deductions — %s') % (self.employee_id.name or ''),
+        )
 
     # ==================================================================
     # CRUD

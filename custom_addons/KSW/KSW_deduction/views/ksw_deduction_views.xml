@@ -243,8 +243,30 @@
                     <group groups="hr.group_hr_user,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_loan_disbursement,KSW_deduction.group_hr_deduction_officer,KSW_deduction.group_deduction_officer,KSW_deduction.group_installment_edit">
                         <group string="Payroll Impact">
                             <field name="x_gross_salary" readonly="1"/>
-                            <field name="x_emp_monthly_total" readonly="1"
+                            <!-- Both totals are clickable: the arrow opens the
+                                 installment lines that make up the figure,
+                                 grouped per deduction, each row linking back to
+                                 its source loan/deduction. -->
+                            <label for="x_emp_monthly_total"
                                    string="Total Deductions This Month"/>
+                            <div class="o_row">
+                                <field name="x_emp_monthly_total" nolabel="1"
+                                       readonly="1" class="oe_inline"/>
+                                <button name="action_view_employee_month_installments"
+                                        type="object" class="btn btn-link p-0 ms-2"
+                                        icon="fa-external-link"
+                                        title="Show the installments behind this total"/>
+                            </div>
+                            <label for="x_emp_outstanding_total"
+                                   string="Total Outstanding Deductions"/>
+                            <div class="o_row">
+                                <field name="x_emp_outstanding_total" nolabel="1"
+                                       readonly="1" class="oe_inline"/>
+                                <button name="action_view_employee_outstanding_installments"
+                                        type="object" class="btn btn-link p-0 ms-2"
+                                        icon="fa-external-link"
+                                        title="Show every pending installment of this employee"/>
+                            </div>
                         </group>
                     </group>
 
@@ -453,6 +475,7 @@
                                     <field name="x_active_deductions_total_outstanding" readonly="1"/>
                                     <field name="x_active_deductions_monthly_impact" readonly="1"/>
                                     <field name="x_emp_monthly_total" readonly="1"/>
+                                    <field name="x_emp_outstanding_total" readonly="1"/>
                                 </group>
                             </group>
                             <field name="x_active_deductions_summary" readonly="1" nolabel="1"/>
@@ -486,6 +509,8 @@
                 <field name="installment_amount" optional="hide"/>
                 <field name="x_emp_monthly_total" optional="show"
                        string="Employee's Total This Month"/>
+                <field name="x_emp_outstanding_total" optional="hide"
+                       string="Employee's Total Outstanding"/>
                 <field name="x_gross_salary" optional="show"
                        groups="hr.group_hr_user,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_loan_disbursement,KSW_deduction.group_hr_deduction_officer,KSW_deduction.group_deduction_officer,KSW_deduction.group_installment_edit"/>
                 <field name="total_paid" sum="Total Paid" optional="show"/>
@@ -598,7 +623,7 @@
                             </div>
                         </div>
                         <div class="row g-0 mt-1 border-top pt-1"
-                             t-if="record.x_gross_salary.raw_value or record.x_emp_monthly_total.raw_value">
+                             t-if="(record.x_gross_salary and record.x_gross_salary.raw_value) or (record.x_emp_monthly_total and record.x_emp_monthly_total.raw_value)">
                             <div class="col-7 text-muted small">Gross Salary</div>
                             <div class="col-5 text-end small">
                                 <field name="x_gross_salary" widget="monetary"/>

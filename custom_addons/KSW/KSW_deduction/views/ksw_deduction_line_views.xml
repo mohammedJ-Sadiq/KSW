@@ -38,6 +38,8 @@
                         context="{'group_by': 'department_id'}"/>
                     <filter string="Type" name="group_type" domain="[]"
                         context="{'group_by': 'type_id'}"/>
+                    <filter string="Deduction" name="group_deduction" domain="[]"
+                        context="{'group_by': 'deduction_id'}"/>
                     <filter string="Month" name="group_month" domain="[]"
                         context="{'group_by': 'period_date:month'}"/>
                     <filter string="State" name="group_state" domain="[]"
@@ -71,7 +73,53 @@
                 <field name="settlement_label" string="Settlement" optional="show"/>
                 <field name="manual_note" string="Note" optional="hide"/>
                 <field name="currency_id" column_invisible="1"/>
+                <!-- Jump from an installment back to its source loan/deduction -->
+                <button name="action_open_deduction" type="object"
+                        string="Open" icon="fa-external-link"
+                        title="Open the deduction this installment belongs to"/>
             </list>
+        </field>
+    </record>
+
+    <!-- FORM: read-only detail of a single installment.
+         Needed so drill-down actions can use view_mode="list,form" without
+         falling back to an auto-generated form. `settlement_label` is shown
+         instead of `payslip_id` so non-payroll users are not blocked by the
+         payslip record rules. -->
+    <record id="ksw_deduction_line_view_form" model="ir.ui.view">
+        <field name="name">ksw.deduction.line.form</field>
+        <field name="model">ksw.deduction.line</field>
+        <field name="arch" type="xml">
+            <form string="Installment" create="false" edit="false">
+                <header>
+                    <button name="action_open_deduction" type="object"
+                            string="Open Deduction" class="btn-primary"
+                            icon="fa-external-link"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="pending,paid"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Installment">
+                            <field name="deduction_id"/>
+                            <field name="type_id"/>
+                            <field name="period_date" string="Month"/>
+                            <field name="amount"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="x_is_overdue"/>
+                        </group>
+                        <group string="Employee">
+                            <field name="employee_id"/>
+                            <field name="department_id"/>
+                        </group>
+                    </group>
+                    <group string="Settlement">
+                        <field name="settlement_label"/>
+                        <field name="manual_note"
+                               invisible="not manual_note"/>
+                    </group>
+                </sheet>
+            </form>
         </field>
     </record>
 
@@ -105,7 +153,7 @@
     <record id="action_ksw_deduction_installment_schedule" model="ir.actions.act_window">
         <field name="name">Installment Schedule</field>
         <field name="res_model">ksw.deduction.line</field>
-        <field name="view_mode">pivot,graph,list</field>
+        <field name="view_mode">pivot,graph,list,form</field>
         <!-- Exclude skipped lines and lines belonging to cancelled/draft deductions -->
         <field name="domain">[('state', '!=', 'skipped'), ('deduction_id.state', 'not in', ['cancelled', 'draft'])]</field>
         <field name="search_view_id" ref="ksw_deduction_line_view_search"/>

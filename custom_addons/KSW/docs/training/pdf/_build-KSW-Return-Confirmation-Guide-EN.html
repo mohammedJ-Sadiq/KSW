@@ -1,0 +1,128 @@
+<!doctype html><html lang="en" dir="ltr"><head>
+<meta charset="utf-8"><title>Confirming a Return from Annual Leave</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "DejaVu Sans",Arial,sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: left; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-left: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">Confirming a Return from Annual Leave</div>
+  <div class="meta">User Training Guide<br/>KSW HR &amp; Payroll · 2026-07-26</div>
+</div>
+<section id="g-supervisor-06-confirm-return"><h1>Confirming a Return from Annual Leave</h1>
+<p><strong>Who is this for:</strong> Supervisor / Direct Manager
+<strong>How long it takes:</strong> 1 minute per employee</p>
+<h2>What this does</h2>
+<p>Records the date one of your team actually came back to work after <strong>annual</strong>
+leave, and closes out that leave&#39;s return status. This is a separate step
+from approving the leave itself — it happens <em>after</em> the leave is fully
+approved and the employee has already gone on vacation.</p>
+<h2>Why this matters</h2>
+<ul>
+<li><strong>Payroll is blocked</strong> for any employee whose annual leave still shows as
+&quot;On Vacation&quot; with no confirmed return. If you don&#39;t confirm it, that
+employee&#39;s payslip cannot be generated — even if they are already back at
+work and being paid as normal.</li>
+<li>It gives HR and Accounting a reliable record of who has actually returned,
+separate from the dates on the original request (people sometimes come
+back early or late).</li>
+<li><strong>This is exclusively your responsibility.</strong> Odoo only lets the leave&#39;s
+<strong>Direct Manager</strong> confirm a return — not the employee, and not HR. If you
+don&#39;t do it, no one else will.</li>
+</ul>
+<h2>Before you start</h2>
+<ul>
+<li>The leave must already be <strong>fully approved</strong> — the record shows an
+<strong>🏖️ On Vacation</strong> ribbon.</li>
+<li>You need the employee&#39;s actual return date on hand (it may differ from the
+date originally requested).</li>
+<li>The <strong>Confirm Return</strong> button only appears for the leave&#39;s own <strong>Direct
+Manager</strong> — if you don&#39;t manage that employee, you won&#39;t see it.</li>
+</ul>
+<h2>Where to find it</h2>
+<p>Two ways to reach it:</p>
+<ul>
+<li><strong>Fastest:</strong> open the <strong>Time Off</strong> app → <strong>Management → Return
+Confirmation</strong>. This list shows only leaves that are currently &quot;On
+Vacation&quot; and still need a return date — for yourself and your direct
+reports. Nothing else clutters the list.</li>
+<li><strong>Alternative:</strong> open the leave directly from <strong>Management → Time Off</strong>,
+the same place you go to approve any other request.</li>
+</ul>
+<h2>Steps</h2>
+<ol>
+<li><strong>Open the employee&#39;s leave</strong> from <strong>Management → Return Confirmation</strong>
+(or <strong>Management → Time Off</strong>).</li>
+<li><strong>Check the Return Date field</strong> and fill in the employee&#39;s actual return
+date if it isn&#39;t already set.</li>
+<li><strong>Click Confirm Return.</strong> The leave&#39;s Return Status changes to
+<strong>✅ Return Confirmed</strong>.</li>
+</ol>
+<h2>What happens next</h2>
+<ul>
+<li>The leave&#39;s <strong>Return Status</strong> badge changes from <strong>🏖️ On Vacation</strong> to
+<strong>✅ Return Confirmed</strong>.</li>
+<li>The employee&#39;s <strong>next payslip is no longer blocked</strong> by this leave.</li>
+<li>A note is posted on the leave&#39;s chatter recording who confirmed the return
+and when — useful if HR or Accounting ask about it later.</li>
+</ul>
+<h2>A note on the Refuse button</h2>
+<p>Once a leave has cleared the <strong>General Manager&#39;s final approval</strong> —
+including while it is waiting on HR&#39;s final document confirmation — the
+<strong>Refuse</strong> button is no longer available on it. At that stage the only
+action left is confirming the return date; refusing an already-approved,
+already-taken vacation doesn&#39;t make sense.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>I don&#39;t see <strong>Confirm Return</strong> on the leave</td>
+<td>The leave isn&#39;t fully approved yet, no return date is set, or you&#39;re not this employee&#39;s Direct Manager</td>
+<td>Fill in the <strong>Return Date</strong> field first; if the button still doesn&#39;t appear, check that you&#39;re set as their Direct Manager</td>
+</tr>
+<tr>
+<td>The leave doesn&#39;t appear in <strong>Return Confirmation</strong></td>
+<td>It&#39;s already confirmed, or it isn&#39;t a fully-approved annual leave</td>
+<td>Check <strong>Management → Time Off</strong> and the leave&#39;s status bar</td>
+</tr>
+<tr>
+<td>I can&#39;t confirm a leave that isn&#39;t mine or my team&#39;s</td>
+<td>Only the employee&#39;s Direct Manager can confirm a return — there is no other route</td>
+<td>If their Direct Manager is unavailable, ask HR to update the employee&#39;s Direct Manager field first</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><span class="xref">Approve time off</span></li>
+</ul>
+</section>
+</body></html>

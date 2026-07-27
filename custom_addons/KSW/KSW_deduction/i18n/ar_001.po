@@ -2234,3 +2234,64 @@ msgstr "✅ الاعتماد النهائي (المدير العام)"
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "➕ Record New Penalty"
 msgstr "➕ تسجيل غرامة جديدة"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid "Total Outstanding Deductions"
+msgstr "إجمالي الخصومات المتبقية"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_emp_outstanding_total
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_list
+msgid "Employee's Total Outstanding"
+msgstr "إجمالي المتبقي على الموظف"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_employee__x_deduction_outstanding_total
+msgid "Outstanding Deduction Total"
+msgstr "إجمالي الخصومات المتبقية"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid "Show the installments behind this total"
+msgstr "عرض الأقساط المكوّنة لهذا الإجمالي"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid "Show every pending installment of this employee"
+msgstr "عرض جميع الأقساط المستحقة على هذا الموظف"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_list
+msgid "Open"
+msgstr "فتح"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_list
+msgid "Open the deduction this installment belongs to"
+msgstr "فتح الخصم التابع له هذا القسط"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_form
+msgid "Open Deduction"
+msgstr "فتح الخصم"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_form
+msgid "Installment"
+msgstr "القسط"
+
+#. module: KSW_deduction
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Deductions This Month — %s"
+msgstr "خصومات هذا الشهر — %s"
+
+#. module: KSW_deduction
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Outstanding Deductions — %s"
+msgstr "الخصومات المتبقية — %s"
+
+#. module: KSW_deduction
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid "You do not have access to deduction %(name)s."
+msgstr "ليس لديك صلاحية الوصول إلى الخصم %(name)s."

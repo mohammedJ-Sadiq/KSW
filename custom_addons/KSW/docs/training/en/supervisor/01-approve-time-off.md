@@ -51,15 +51,9 @@ request for them and then approve the manager step yourself:
 ## Confirming an employee's return
 
 When one of your team returns from **annual** leave, you record their return —
-the employee does not do this themselves:
-
-1. Open the approved leave (it shows an **On Vacation** ribbon).
-2. Fill in the employee's actual **Return Date**.
-3. Click **Confirm Return**.
-
-> **Why this matters:** payroll is **blocked** for an employee with an
-> unconfirmed annual-leave return. Confirming promptly keeps their next payslip
-> on time.
+the employee does not do this themselves, and their next payslip is blocked
+until you (or HR) do. See the dedicated guide:
+[Confirming a Return from Annual Leave](06-confirm-return.md).
 
 ## What happens next
 

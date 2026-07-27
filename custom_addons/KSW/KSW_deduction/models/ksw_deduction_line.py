@@ -4,7 +4,7 @@ from dateutil.relativedelta import relativedelta
 from markupsafe import Markup
 
 from odoo import _, api, fields, models
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import AccessError, UserError, ValidationError
 
 
 # Fields that constitute a post-confirmation "installment modification"
@@ -587,6 +587,36 @@ class KswDeductionLine(models.Model):
                     ),
                     subtype_xmlid='mail.mt_note',
                 )
+
+    # ==================================================================
+    # Drill-down: jump from an installment back to its source deduction
+    # ==================================================================
+
+    def action_open_deduction(self):
+        """Open the parent loan/deduction of this installment.
+
+        `ksw.deduction.line` has no record rules, but `ksw.deduction` does —
+        so a user may legitimately see a line here without being allowed to
+        open its parent. Turn that into a readable message instead of a
+        raw AccessError traceback.
+        """
+        self.ensure_one()
+        ded = self.deduction_id
+        try:
+            ded.check_access('read')
+        except AccessError:
+            raise UserError(_(
+                "You do not have access to deduction %(name)s.",
+                name=ded.sudo().display_name,
+            ))
+        return {
+            'type': 'ir.actions.act_window',
+            'name': ded.display_name,
+            'res_model': 'ksw.deduction',
+            'res_id': ded.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
 
     def unlink(self):
         """Allow deletion of MANUAL lines by privileged users only;
