@@ -346,16 +346,16 @@ class HrLeave(models.Model):
     # Payslip hook: route EOS leaves to _create_eos_payslip
     # ------------------------------------------------------------------
 
-    def _create_vacation_payslip(self):
+    def _create_vacation_payslip(self, preview=False):
         eos = self.filtered('x_is_eos_leave')
         if eos:
-            eos._create_eos_payslip()
+            eos._create_eos_payslip(preview=preview)
         regular = self - eos
         if regular:
             # Call the KSW_payroll implementation for non-EOS leaves
-            super(HrLeave, regular)._create_vacation_payslip()
+            super(HrLeave, regular)._create_vacation_payslip(preview=preview)
 
-    def _create_eos_payslip(self):
+    def _create_eos_payslip(self, preview=False):
         """Create a final-month payslip including EOS components.
 
         The payslip includes the employee's regular salary for the final
@@ -373,6 +373,10 @@ class HrLeave(models.Model):
         """
         Payslip = self.env['hr.payslip'].sudo()
         today = fields.Date.context_today(self)
+
+        if not preview:
+            # The definitive payslip supersedes any provisional run.
+            self._cancel_preview_vacation_payslips()
 
         for leave in self:
             employee = leave.employee_id
@@ -425,13 +429,15 @@ class HrLeave(models.Model):
 
             payslip = Payslip.create({
                 'employee_id': employee.id,
-                'name': 'EOS Payslip — %s — %s/%s' % (
+                'name': '%s — %s — %s/%s' % (
+                    'EOS Payslip (Provisional)' if preview else 'EOS Payslip',
                     employee.name, month_start.year, month_start.month),
                 'date_from': month_start,
                 'date_to': month_end,
                 'struct_id': structure.id,
                 'version_id': version.id,
                 'x_leave_id': leave.id,
+                'x_is_vacation_preview': preview,
             })
 
             # EOS-specific items: payout amount, previous payments, notice pay
@@ -506,12 +512,18 @@ class HrLeave(models.Model):
     # ------------------------------------------------------------------
 
     def _cancel_eos_payslip(self):
-        """Cancel any EOS payslip linked to these leaves."""
-        for leave in self:
+        """Cancel any EOS payslip linked to these leaves.
+
+        sudo(): same reasoning as ``_cancel_vacation_payslips`` — the
+        refusing user (direct manager / KSW Supervisor) may have no read
+        access on ``hr.payslip`` at all, and an AccessError here would roll
+        the whole refuse back.
+        """
+        for leave in self.sudo():
             if leave.x_eos_payslip_id and leave.x_eos_payslip_id.state != 'cancel':
-                leave.x_eos_payslip_id.sudo().write({'state': 'cancel'})
+                leave.x_eos_payslip_id.write({'state': 'cancel'})
             if leave.x_eos_payslip_id:
-                leave.sudo().write({'x_eos_payslip_id': False})
+                leave.write({'x_eos_payslip_id': False})
 
     def action_refuse(self):
         result = super().action_refuse()
@@ -569,8 +581,11 @@ class HrLeave(models.Model):
             raise UserError(_('Only HR Payroll users or HR Approvers can recompute EOS payslips.'))
         if not self.x_eos_payslip_id:
             raise UserError(_('No EOS payslip found on this leave to recompute.'))
+        # A payslip generated mid-chain stays provisional when recomputed —
+        # it only becomes definitive at GM final approval.
+        preview = self.sudo().x_eos_payslip_id.x_is_vacation_preview
         self._cancel_eos_payslip()
-        self._create_eos_payslip()
+        self._create_eos_payslip(preview=preview)
         self.sudo().message_post(
             body=Markup(
                 '<strong>🔄 EOS Payslip Recomputed</strong><br/>'

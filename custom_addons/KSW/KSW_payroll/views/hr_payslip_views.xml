@@ -16,6 +16,14 @@
                 <attribute name="groups">om_hr_payroll.group_hr_payroll_user</attribute>
             </xpath>
 
+            <!-- ── Flag provisional (mid-approval) vacation calculations ── -->
+            <xpath expr="//sheet" position="inside">
+                <field name="x_is_vacation_preview" invisible="1"/>
+                <widget name="web_ribbon" title="Provisional"
+                        bg_color="text-bg-warning"
+                        invisible="not x_is_vacation_preview"/>
+            </xpath>
+
             <!-- ── Replace the entire worked-days list with a styled one ── -->
             <xpath expr="//field[@name='worked_days_line_ids']/list"
                    position="replace">

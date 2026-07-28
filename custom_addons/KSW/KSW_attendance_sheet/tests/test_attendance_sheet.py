@@ -196,6 +196,97 @@ class TestAttendanceSheet(TransactionCase):
         for line in sheet.line_ids:
             self.assertTrue(line.attendance_id)
 
+    # ------------------------------------------------------------------
+    # Test: off-day (weekly rest day) pay derivation
+    # ------------------------------------------------------------------
+
+    def _line_on(self, sheet, day):
+        """Return the sheet line for `day` of the sheet's month."""
+        d = fields.Date.to_date(f'{sheet.year}-{int(sheet.month):02d}-{day:02d}')
+        return sheet.line_ids.filtered(lambda l: l.date == d)
+
+    def test_off_day_forfeited_when_both_neighbours_absent(self):
+        """Mid-month rest day is forfeited only when both sides are absent."""
+        # Jan 2026, schedule Sun-Thu: Fri 9th + Sat 10th are the off block,
+        # bordered by Thu 8th and Sun 11th.
+        sheet = self._create_sheet()
+        self.assertFalse(self._line_on(sheet, 9).is_workday)
+        self.assertFalse(self._line_on(sheet, 10).is_workday)
+
+        (self._line_on(sheet, 8) | self._line_on(sheet, 11)).write(
+            {'is_attended': False})
+
+        self.assertFalse(self._line_on(sheet, 9).is_attended)
+        self.assertFalse(self._line_on(sheet, 10).is_attended)
+
+    def test_off_day_paid_when_one_neighbour_present(self):
+        """Mid-month rest day stays paid when only one side is absent."""
+        sheet = self._create_sheet()
+        self._line_on(sheet, 8).write({'is_attended': False})
+
+        self.assertTrue(self._line_on(sheet, 9).is_attended)
+        self.assertTrue(self._line_on(sheet, 10).is_attended)
+
+    def test_off_day_at_month_end_uses_only_known_neighbour(self):
+        """A rest day on the last day(s) of the month has no 'day after'
+        inside this sheet — the day before alone decides it."""
+        # Jan 2026 ends Fri 30th + Sat 31st, bordered only by Thu 29th.
+        sheet = self._create_sheet()
+        last_day = monthrange(sheet.year, int(sheet.month))[1]
+        self.assertEqual(last_day, 31)
+        self.assertFalse(self._line_on(sheet, 30).is_workday)
+        self.assertFalse(self._line_on(sheet, 31).is_workday)
+
+        self._line_on(sheet, 29).write({'is_attended': False})
+
+        self.assertFalse(
+            self._line_on(sheet, 30).is_attended,
+            "Month-end rest day must follow the only neighbour it has")
+        self.assertFalse(self._line_on(sheet, 31).is_attended)
+
+    def test_off_day_at_month_end_paid_when_previous_day_present(self):
+        """The month-edge fallback must not forfeit a rest day when the
+        one known neighbour was present."""
+        sheet = self._create_sheet()
+        # Absent earlier in the month, present on Thu 29th.
+        self._line_on(sheet, 8).write({'is_attended': False})
+
+        self.assertTrue(self._line_on(sheet, 30).is_attended)
+        self.assertTrue(self._line_on(sheet, 31).is_attended)
+
+    def test_mark_all_absent_forfeits_month_end_rest_day(self):
+        """The reported case: supervisor presses 'Mark All Absent' and the
+        trailing rest day of the month must not stay present."""
+        sheet = self._create_sheet()
+        sheet.action_mark_all_absent()
+
+        last_day = monthrange(sheet.year, int(sheet.month))[1]
+        self.assertFalse(self._line_on(sheet, last_day).is_attended)
+        self.assertEqual(sheet.total_attended, 0)
+
+    def test_off_day_derivation_respects_filter_hook(self):
+        """The derivation must route through _filter_derivable_off_days.
+
+        KSW_unpaid_leave pins days covered by an approved leave via
+        x_leave_id and its write() refuses any change to them. Without
+        the hook, re-deriving such a day raises UserError and aborts the
+        whole 'Mark All Absent' action.
+        """
+        sheet = self._create_sheet()
+        protected = self._line_on(sheet, 31)
+        line_model = type(self.env['ksw.attendance.sheet.line'])
+        self.patch(line_model, '_filter_derivable_off_days',
+                   lambda records: records - protected)
+
+        sheet.action_mark_all_absent()  # must not raise
+
+        self.assertTrue(
+            protected.is_attended,
+            "A day excluded by the hook must be left untouched")
+        self.assertFalse(
+            self._line_on(sheet, 30).is_attended,
+            "The rest of the block must still be derived normally")
+
     def test_mark_all_absent_raises_if_confirmed(self):
         """Cannot mark absent on a confirmed sheet."""
         sheet = self._create_sheet()

@@ -15,6 +15,12 @@
             <xpath expr="//field[@name='x_is_annual_leave_type']" position="after">
                 <field name="x_vacation_payslip_id" invisible="1"
                        groups="om_hr_payroll.group_hr_payroll_user,KSW_annual_leave.group_annual_leave_hr"/>
+                <!-- Ungated on purpose: both are sudo-computed and are used
+                     in invisible= expressions on elements visible to HR /
+                     Accounting / GM approvers as well as payroll users. -->
+                <field name="x_can_preview_vacation_payslip" invisible="1"/>
+                <field name="x_has_vacation_calc" invisible="1"/>
+                <field name="x_vacation_calc_is_preview" invisible="1"/>
             </xpath>
 
             <!-- Smart-button box injected before the leave content div. -->
@@ -57,6 +63,62 @@
                         </div>
                     </button>
                 </div>
+            </xpath>
+
+            <!-- ================================================== -->
+            <!-- Provisional vacation calculation                   -->
+            <!-- Lets HR / Accounting / GM see the vacation balance -->
+            <!-- and salary figures before the chain completes.     -->
+            <!-- ================================================== -->
+            <xpath expr="//page[@name='decision_support']" position="after">
+                <page string="🧮 Vacation Calculation" name="vacation_calculation"
+                      invisible="not x_annual_approval_state"
+                      groups="om_hr_payroll.group_hr_payroll_user,KSW_annual_leave.group_annual_leave_hr,KSW_annual_leave.group_annual_leave_acc,KSW_annual_leave.group_annual_leave_gm">
+
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not x_vacation_calc_is_preview">
+                        <strong>Provisional figures.</strong>
+                        This calculation was generated before the request
+                        finished its approval chain, so some inputs
+                        (penalty, commissions, loans, flight ticket) may
+                        still be missing or change. A definitive payslip
+                        replaces it at GM final approval.
+                    </div>
+
+                    <div class="alert alert-info" role="alert"
+                         invisible="x_has_vacation_calc or not x_can_preview_vacation_payslip">
+                        No calculation has been generated yet. Use
+                        <strong>Generate Draft Calculation</strong> below to
+                        see the vacation balance and salary figures as they
+                        stand right now.
+                    </div>
+
+                    <button string="🧮 Generate Draft Calculation"
+                            name="action_preview_vacation_payslip"
+                            type="object" class="btn-secondary"
+                            invisible="not x_can_preview_vacation_payslip"
+                            confirm="This produces a DRAFT vacation payslip from the data entered so far. Any earlier draft calculation for this request is cancelled. Continue?"/>
+
+                    <group invisible="not x_has_vacation_calc">
+                        <group string="Calculation">
+                            <field name="x_vacation_calc_period"
+                                   string="Payslip Period" readonly="1"/>
+                            <field name="x_vacation_calc_balance"
+                                   string="Vacation Balance Settlement"
+                                   readonly="1"/>
+                        </group>
+                        <group string="Salary">
+                            <field name="x_vacation_calc_gross"
+                                   string="Gross" readonly="1"/>
+                            <field name="x_vacation_calc_deductions"
+                                   string="Total Deductions" readonly="1"/>
+                            <field name="x_vacation_calc_net"
+                                   string="Net Payable" readonly="1"
+                                   class="fw-bold"/>
+                        </group>
+                    </group>
+
+                </page>
             </xpath>
 
         </field>

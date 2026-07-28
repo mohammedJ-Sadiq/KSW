@@ -31,6 +31,16 @@ class KswAttendanceSheetLine(models.Model):
         help='Linked hr.attendance record (auto-synced).',
     )
 
+    def _filter_derivable_off_days(self):
+        """Hook: the subset of self whose off-day pay may be re-derived.
+
+        Modules that pin a day to an external document exclude it here —
+        such a day belongs to that document, not to the weekly-rest-day
+        rule, and its write() refuses to change it (see
+        KSW_unpaid_leave's x_leave_id lock).
+        """
+        return self
+
     @api.depends('date')
     def _compute_day_name(self):
         for line in self:

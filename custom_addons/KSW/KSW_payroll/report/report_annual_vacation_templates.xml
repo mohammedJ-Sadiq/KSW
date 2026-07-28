@@ -231,7 +231,14 @@
                         <!-- ══════════════════════════════════════════ -->
                         <!--  Section 5: Vacation Payslip              -->
                         <!-- ══════════════════════════════════════════ -->
-                        <t t-set="_vac_payslips" t-value="o.sudo().x_vacation_payslip_ids"/>
+                        <!-- Skip cancelled runs, and never print a provisional
+                             (draft mid-chain) calculation once the definitive
+                             payslip exists. -->
+                        <t t-set="_vac_payslips"
+                           t-value="o.sudo().x_vacation_payslip_ids.filtered(lambda p: p.state != 'cancel')"/>
+                        <t t-set="_final_payslips"
+                           t-value="_vac_payslips.filtered(lambda p: not p.x_is_vacation_preview)"/>
+                        <t t-set="_vac_payslips" t-value="_final_payslips or _vac_payslips"/>
                         <t t-set="payslip" t-value="_vac_payslips[0] if _vac_payslips else False"/>
                         <t t-set="requester_name"
                            t-value="o.employee_id.name if (o.sudo().create_uid == o.employee_id.user_id or not o.employee_id.leave_manager_id) else o.sudo().create_uid.name"/>

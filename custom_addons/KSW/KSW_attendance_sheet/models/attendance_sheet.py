@@ -444,6 +444,16 @@ class KswAttendanceSheet(models.Model):
         after the block — the standard weekly-rest-day rule. This is
         fully derived: it overwrites whatever the line currently holds,
         there is no separate manual-override state for off days.
+
+        A block sitting on the first/last day of the month has only one
+        neighbour inside this sheet — the other falls in an adjacent
+        month whose sheet may not even exist yet (next month's sheet is
+        only opened when that month starts). In that case the rule is
+        decided on the neighbour we do have: absent before → the off day
+        is forfeited. This month-edge fallback is specific to the manual
+        attendance sheet; biometric absence generation
+        (KSW_attendance_leave._generate_weekend_records) is unaffected
+        and still requires a real workday on both sides.
         """
         for sheet in self:
             sheet_lines = sheet.line_ids
@@ -462,12 +472,17 @@ class KswAttendanceSheet(models.Model):
                 block = sheet_lines.filtered(lambda l: l.date in block_dates)
                 before = by_date.get(min(block_dates) - timedelta(days=1))
                 after = by_date.get(max(block_dates) + timedelta(days=1))
-                forfeited = bool(
-                    before and not before.is_attended
-                    and after and not after.is_attended
-                )
+                # Only the neighbours that exist in this sheet count; a
+                # block at the month edge is judged on its single known
+                # side (see docstring). A block with no neighbour at all
+                # (a whole month of off days) stays paid.
+                known = [n for n in (before, after) if n]
+                forfeited = bool(known) and not any(
+                    n.is_attended for n in known)
                 target = not forfeited
-                to_update = block.filtered(lambda l: l.is_attended != target)
+                to_update = block.filtered(
+                    lambda l: l.is_attended != target
+                )._filter_derivable_off_days()
                 if to_update:
                     to_update.with_context(ksw_system_write=True).write(
                         {'is_attended': target})

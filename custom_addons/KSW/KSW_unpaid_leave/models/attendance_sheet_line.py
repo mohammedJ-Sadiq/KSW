@@ -12,6 +12,17 @@ class KswAttendanceSheetLineLeave(models.Model):
              'and cannot be toggled by the supervisor.',
     )
 
+    def _filter_derivable_off_days(self):
+        """A day locked by an approved leave is owned by that leave.
+
+        The weekly-rest-day derivation must leave it alone — write()
+        below refuses the change anyway, so without this the whole
+        recompute (and the 'Mark All Absent' action that triggers it)
+        would abort with a UserError.
+        """
+        return super()._filter_derivable_off_days().filtered(
+            lambda l: not l.x_leave_id)
+
     def write(self, vals):
         if 'is_attended' in vals:
             locked_by_leave = self.filtered(lambda l: l.x_leave_id)

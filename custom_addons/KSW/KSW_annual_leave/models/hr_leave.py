@@ -4,6 +4,7 @@ from markupsafe import Markup
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
+from odoo.tools import float_round
 from odoo.osv import expression as odoo_expr
 
 ANNUAL_MULTI_STATES = [
@@ -177,6 +178,112 @@ class HrLeave(models.Model):
                 leave.x_balance_at_request = raw + leave.number_of_days
             else:
                 leave.x_balance_at_request = raw
+
+    # ------------------------------------------------------------------
+    # Requested calendar days (as opposed to the balance-paid duration)
+    # ------------------------------------------------------------------
+    # `number_of_days` — and therefore the core `duration_display` shown in
+    # parentheses next to the picked dates — carries the duration Odoo
+    # deducts from the allocation.  For combined leaves that is only the
+    # annual portion and for full-clearance leaves only the balance
+    # consumed, so a reviewer sees the same figure twice (next to the dates
+    # AND as "Balance at Request") and cannot tell how long the employee
+    # actually asked to be away.  These two fields always report the full
+    # requested span.
+    # ------------------------------------------------------------------
+
+    x_requested_days = fields.Float(
+        string='Total Days Requested',
+        compute='_compute_requested_days',
+        digits=(10, 2),
+        help='Total calendar days covered by the request dates, whether or '
+             'not the annual leave balance pays for all of them.  On '
+             'combined and full-clearance leaves this is larger than the '
+             'duration deducted from the allocation.',
+    )
+    x_requested_days_display = fields.Char(
+        string='Requested',
+        compute='_compute_requested_days',
+        help='Human-readable form of Total Days Requested, used next to the '
+             'request dates in place of the core Requested duration.',
+    )
+
+    @api.depends('holiday_status_id', 'request_date_from', 'request_date_to',
+                 'employee_id', 'duration_display')
+    def _compute_requested_days(self):
+        for leave in self:
+            if not self._is_annual_leave(leave):
+                # Non-annual leaves keep the core figure verbatim.
+                leave.x_requested_days = 0.0
+                leave.x_requested_days_display = leave.duration_display
+                continue
+            cal_days, _hours = self._annual_cal_days(leave)
+            leave.x_requested_days = cal_days
+            leave.x_requested_days_display = '%g %s' % (
+                float_round(cal_days, precision_digits=2), _('days'))
+
+    # ------------------------------------------------------------------
+    # Service reference dates (shown next to the balance from step 1)
+    # ------------------------------------------------------------------
+
+    x_joining_date = fields.Date(
+        string='Joining Date',
+        compute='_compute_service_reference_dates',
+        help='The employee joining date — the earliest contract start date '
+             'across all of the employee versions.',
+    )
+    x_last_return_date = fields.Date(
+        string='Last Return Date',
+        compute='_compute_service_reference_dates',
+        help='Return date of the employee most recent annual vacation whose '
+             'return was confirmed.  When there is no previous confirmed '
+             'return, the annual-leave effective start date is shown instead '
+             '(the opening reset date if one is set, otherwise the joining '
+             'date).',
+    )
+
+    @api.depends('employee_id')
+    def _compute_service_reference_dates(self):
+        # sudo(): hr.version.contract_date_start is gated behind
+        # hr.group_hr_manager, and the panel must be readable by the
+        # requesting employee from the moment the request is created.
+        Annual = self.env['ksw.annual.leave'].sudo()
+        Leave = self.env['hr.leave'].sudo()
+        for leave in self:
+            leave.x_joining_date = False
+            leave.x_last_return_date = False
+            employee = leave.employee_id
+            if not employee:
+                continue
+
+            ksw_rec = Annual.search(
+                [('employee_id', '=', employee.id)], limit=1)
+
+            joining = ksw_rec.joining_date if ksw_rec else False
+            if not joining:
+                starts = employee.sudo().version_ids.filtered(
+                    'contract_date_start'
+                ).mapped('contract_date_start')
+                joining = min(starts) if starts else False
+            leave.x_joining_date = joining
+
+            domain = [
+                ('employee_id', '=', employee.id),
+                ('holiday_status_id.is_annual_leave', '=', True),
+                ('x_return_state', '=', 'hr_confirmed'),
+                ('x_return_date', '!=', False),
+            ]
+            # _origin.id is 0 for a record still being created in the form.
+            if leave._origin.id:
+                domain.append(('id', '!=', leave._origin.id))
+            previous = Leave.search(
+                domain, order='x_return_date desc', limit=1)
+
+            leave.x_last_return_date = (
+                previous.x_return_date
+                or (ksw_rec.x_effective_start_date if ksw_rec else False)
+                or joining
+            )
 
     # ------------------------------------------------------------------
     # Full Balance Clearance
@@ -708,6 +815,12 @@ class HrLeave(models.Model):
     x_can_confirm_return_hr = fields.Boolean(
         compute='_compute_return_permissions',
     )
+    x_can_edit_return_date = fields.Boolean(
+        string='Can Amend Return Date',
+        compute='_compute_return_permissions',
+        help='True for the employee leave manager, who may correct the '
+             'return date even after the return has been confirmed.',
+    )
 
     @api.depends('state', 'x_return_state')
     def _compute_is_on_vacation(self):
@@ -730,6 +843,23 @@ class HrLeave(models.Model):
             )
             # HR cannot confirm returns — only the leave's direct manager
             leave.x_can_confirm_return_hr = False
+            # The same manager may also correct the date afterwards.
+            leave.x_can_edit_return_date = (
+                leave.x_return_state in ('on_vacation', 'hr_confirmed')
+                and leave.employee_id.leave_manager_id.id == uid
+            )
+
+    def _check_can_edit_return_date(self):
+        """Only the leave manager may amend an already-confirmed return date."""
+        self.ensure_one()
+        manager = self.employee_id.leave_manager_id
+        if not manager or manager != self.env.user:
+            raise UserError(
+                'Only %s (the leave manager) can change the return date '
+                'after the return has been confirmed.' % (
+                    manager.name if manager else 'the leave manager'
+                )
+            )
 
     def action_confirm_return_manager(self):
         for leave in self:
@@ -886,7 +1016,38 @@ class HrLeave(models.Model):
                     'Only Accounting Approvers can fill in commission, '
                     'loan, and flight ticket fields.')
 
+        # A confirmed return date may still be corrected, but only by the
+        # employee's leave manager (the same person who confirmed it).
+        # View-level readonly is cosmetic — this is the real gate.
+        amended_from = {}
+        if 'x_return_date' in vals:
+            new_date = fields.Date.to_date(vals['x_return_date'])
+            for leave in self:
+                if (leave.x_return_state != 'hr_confirmed'
+                        or leave.x_return_date == new_date):
+                    continue
+                if not self.env.su:
+                    leave._check_can_edit_return_date()
+                amended_from[leave.id] = leave.x_return_date
+
         result = super().write(vals)
+
+        for leave in self.filtered(lambda l: l.id in amended_from):
+            leave.sudo().message_post(
+                body=Markup(
+                    '<strong>📅 Return Date Amended</strong><br/>'
+                    '<b>Was:</b> %(old)s<br/>'
+                    '<b>Now:</b> %(new)s<br/>'
+                    '<b>Changed by:</b> %(user)s<br/>'
+                    '<i>Vacation/monthly payroll figures that depend on the '
+                    'return date may need to be recomputed.</i>'
+                ) % {
+                    'old': amended_from[leave.id] or '—',
+                    'new': leave.x_return_date or '—',
+                    'user': self.env.user.name,
+                },
+                subtype_xmlid='mail.mt_note',
+            )
 
         if self.env.context.get('_skip_toggle_validity'):
             return result
@@ -1552,13 +1713,38 @@ class HrLeave(models.Model):
     # Override _unlink_if_correct_states — allow KSW managers to delete past leaves
     # ==================================================================
 
+    def _is_own_unapproved_request(self):
+        """True when this leave is the current user's own request and it has
+        not been fully approved yet.
+
+        "Fully approved" means the Odoo state reached ``validate`` (or, on the
+        KSW multi-step chains, ``x_annual_approval_state == 'approved'``).
+        Every earlier step — including the whole 6-step annual/EOS/unpaid
+        chain, which keeps ``state == 'confirm'`` throughout — counts as still
+        pending, so the employee stays in control of their own request.
+        """
+        self.ensure_one()
+        if self.employee_id.sudo().user_id != self.env.user:
+            return False
+        # `cancel` is deliberately excluded: those are handled by Odoo's own
+        # cancellation flow, not by deletion.
+        if self.state not in ('confirm', 'validate1'):
+            return False
+        return self.x_annual_approval_state != 'approved'
+
     @api.ondelete(at_uninstall=False)
     def _unlink_if_correct_states(self):
-        """Override to allow KSW Supervisors/Officers to delete past leaves.
-        
-        Odoo core blocks non-Officer users from deleting leaves that started
-        in the past. KSW Supervisors are often managing subordinate leaves 
-        that just started and need correction/deletion.
+        """Override to relax Odoo's deletion rules for two KSW cases.
+
+        1. KSW Supervisors/Officers may delete leaves that started in the
+           past — they manage subordinate leaves that just started and need
+           correction/deletion — and may also delete a **refused** request,
+           which Odoo core reserves for Administrators.
+        2. Any employee may delete their **own** request as long as it is not
+           fully approved yet, whatever its start date. Odoo core blocks
+           non-Officer users from deleting a leave whose ``date_from`` is in
+           the past, which strands employees whose request is still crawling
+           through the multi-step approval chain past its own start date.
         """
         if self.env.user.has_group('hr_holidays.group_hr_holidays_manager'):
             # Core Time-Off Administrators have no restrictions at all (matches
@@ -1570,16 +1756,30 @@ class HrLeave(models.Model):
                          self.env.user.has_group('KSW_annual_leave.group_leave_officer')
 
         if is_ksw_manager:
-            # We enforce Odoo's state check (confirm/validate1/cancel) 
+            # We enforce a state check (confirm/validate1/cancel/refuse)
             # but SKIP the date check for KSW managers.
+            #
+            # 'refuse' is KSW-specific: a supervisor who refused a wrong
+            # request (typically one they raised themselves for a
+            # subordinate) must be able to clear it away afterwards.
+            # A refused leave has no payroll or attendance effect left —
+            # action_refuse already cancelled the vacation payslip,
+            # released the attendance lines and refreshed the accrual.
             error_message = self.env._('Oops! %(state)s Time-Off requests can only be deleted by Administrators.')
             state_description_values = {elem[0]: elem[1] for elem in self._fields['state']._description_selection(self.env)}
             for holiday in self:
-                if holiday.state not in ['confirm', 'validate1', 'cancel']:
+                if holiday.state not in ['confirm', 'validate1', 'cancel', 'refuse']:
                     raise UserError(error_message % {'state': state_description_values.get(holiday.state)})
             return # Bypass Odoo's core check
-            
-        return super()._unlink_if_correct_states()
+
+        # Own, still-unapproved requests bypass core's past-date guard. The
+        # rest of the recordset still goes through Odoo's checks — never drop
+        # the complement (see July 2026 audit, mixed-batch filter drop).
+        own_pending = self.filtered(lambda l: l._is_own_unapproved_request())
+        remaining = self - own_pending
+        if remaining:
+            return super(HrLeave, remaining)._unlink_if_correct_states()
+        return None
 
     # ==================================================================
     # Override unlink — refresh accrual when annual leave is deleted

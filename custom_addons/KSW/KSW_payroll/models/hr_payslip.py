@@ -119,6 +119,14 @@ class HrPayslip(models.Model):
              '_create_vacation_payslip().',
     )
 
+    x_is_vacation_preview = fields.Boolean(
+        string='Provisional Calculation', readonly=True, copy=False,
+        help='This payslip is a provisional vacation calculation produced '
+             'before the leave finished its approval chain.  Figures may '
+             'still change; it is cancelled and replaced by the definitive '
+             'payslip when the GM gives final approval.',
+    )
+
     # ------------------------------------------------------------------
     # Daily / Hourly wage (read-only info fields)
     # ------------------------------------------------------------------
@@ -445,6 +453,7 @@ class HrPayslip(models.Model):
         for leave in vacation_leaves:
             for vac_slip in leave.x_vacation_payslip_ids:
                 if (vac_slip.state != 'cancel'
+                        and not vac_slip.x_is_vacation_preview
                         and vac_slip.id != payslip.id
                         and vac_slip not in prior_slips
                         and vac_slip.date_from <= payslip.date_to

@@ -3,10 +3,30 @@ from datetime import date, timedelta
 
 from markupsafe import Markup
 
-from odoo import fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
+
+# Approval steps at which an approver may ask for a provisional
+# ("draft / incomplete") vacation calculation.  Everything from the
+# moment the request is created up to — but not including — the HR
+# confirmation step, where the definitive payslip already exists.
+PREVIEW_STATES = (
+    'pending_dm',
+    'pending_hr',
+    'pending_gm_initial',
+    'pending_acc',
+    'pending_gm_final',
+)
+
+# Groups allowed to trigger and read a provisional calculation.
+PREVIEW_GROUPS = (
+    'om_hr_payroll.group_hr_payroll_user',
+    'KSW_annual_leave.group_annual_leave_hr',
+    'KSW_annual_leave.group_annual_leave_acc',
+    'KSW_annual_leave.group_annual_leave_gm',
+)
 
 
 class HrLeave(models.Model):
@@ -37,11 +57,184 @@ class HrLeave(models.Model):
     )
 
     # ------------------------------------------------------------------
+    # Provisional ("draft / incomplete") vacation calculation
+    # ------------------------------------------------------------------
+    # HR and Accounting routinely need the vacation-balance and salary
+    # figures long before the GM signs off.  The fields below expose a
+    # read-only summary of whichever payslip is currently attached to the
+    # leave — a provisional one produced by action_preview_vacation_payslip
+    # or the definitive one created at GM final approval.
+    #
+    # None of them carry a model-level ``groups=``: they are all computed
+    # through ``sudo()`` (the underlying payslip and wage data is
+    # group-restricted) and some are referenced in ``invisible=``
+    # expressions on view elements, which would otherwise crash the form
+    # for users outside that group (Odoo 19 OWL "field is undefined").
+    # Visibility is controlled with view-level ``groups=`` instead.
+    # ------------------------------------------------------------------
+
+    x_can_preview_vacation_payslip = fields.Boolean(
+        string='Can Preview Vacation Calculation',
+        compute='_compute_vacation_calc_summary',
+        help='True when the current user may generate a provisional '
+             'vacation calculation at the current approval step.',
+    )
+    x_has_vacation_calc = fields.Boolean(
+        string='Has Vacation Calculation',
+        compute='_compute_vacation_calc_summary',
+    )
+    x_vacation_calc_is_preview = fields.Boolean(
+        string='Calculation Is Provisional',
+        compute='_compute_vacation_calc_summary',
+        help='The figures below come from a provisional calculation and '
+             'will be recomputed when the approval chain completes.',
+    )
+    x_vacation_calc_period = fields.Char(
+        string='Calculation Period',
+        compute='_compute_vacation_calc_summary',
+    )
+    x_vacation_calc_balance = fields.Float(
+        string='Vacation Balance Settlement', digits=(16, 2),
+        compute='_compute_vacation_calc_summary',
+        help='The VACATION_BAL line — the monetary value of the annual '
+             'leave balance being settled.',
+    )
+    x_vacation_calc_gross = fields.Float(
+        string='Gross', digits=(16, 2),
+        compute='_compute_vacation_calc_summary',
+    )
+    x_vacation_calc_deductions = fields.Float(
+        string='Total Deductions', digits=(16, 2),
+        compute='_compute_vacation_calc_summary',
+    )
+    x_vacation_calc_net = fields.Float(
+        string='Net Payable', digits=(16, 2),
+        compute='_compute_vacation_calc_summary',
+    )
+
+    def _current_vacation_payslip(self):
+        """Return the live (non-cancelled) payslip attached to this leave.
+
+        Covers both the vacation payslip and the EOS payslip — both are
+        linked through ``hr.payslip.x_leave_id``.  The most recently
+        created one wins, so a fresh recompute always shadows an older
+        provisional run.
+        """
+        self.ensure_one()
+        slips = self.sudo().x_vacation_payslip_ids.filtered(
+            lambda p: p.state != 'cancel'
+        )
+        if not slips:
+            return self.env['hr.payslip']
+        return max(slips, key=lambda p: p.id)
+
+    @staticmethod
+    def _payslip_line_total(payslip, code):
+        return sum(
+            payslip.line_ids.filtered(lambda l: l.code == code).mapped('total')
+        )
+
+    @api.depends_context('uid')
+    @api.depends('x_annual_approval_state', 'x_vacation_payslip_ids',
+                 'x_vacation_payslip_ids.state',
+                 'x_vacation_payslip_ids.line_ids.total')
+    def _compute_vacation_calc_summary(self):
+        allowed = self.env.su or any(
+            self.env.user.has_group(g) for g in PREVIEW_GROUPS
+        )
+        for leave in self:
+            leave.x_can_preview_vacation_payslip = bool(
+                allowed
+                and leave.x_annual_approval_state in PREVIEW_STATES
+            )
+
+            payslip = leave._current_vacation_payslip()
+            leave.x_has_vacation_calc = bool(payslip)
+            if not payslip:
+                leave.x_vacation_calc_is_preview = False
+                leave.x_vacation_calc_period = False
+                leave.x_vacation_calc_balance = 0.0
+                leave.x_vacation_calc_gross = 0.0
+                leave.x_vacation_calc_deductions = 0.0
+                leave.x_vacation_calc_net = 0.0
+                continue
+
+            gross = self._payslip_line_total(payslip, 'GROSS')
+            net = self._payslip_line_total(payslip, 'NET')
+
+            leave.x_vacation_calc_is_preview = payslip.x_is_vacation_preview
+            leave.x_vacation_calc_period = '%s → %s' % (
+                payslip.date_from, payslip.date_to)
+            leave.x_vacation_calc_balance = self._payslip_line_total(
+                payslip, 'VACATION_BAL')
+            leave.x_vacation_calc_gross = gross
+            # Derived rather than summed so the panel is always
+            # arithmetically consistent with the stored NET (see the
+            # integer-rounding note in KSW_payroll/models/hr_payslip.py).
+            leave.x_vacation_calc_deductions = net - gross
+            leave.x_vacation_calc_net = net
+
+    def action_preview_vacation_payslip(self):
+        """Generate a provisional vacation calculation for this leave.
+
+        Produces the very same draft payslip that GM final approval would
+        produce, flagged ``x_is_vacation_preview`` so it is obvious that
+        the inputs are not final.  Approvers use it to see the vacation
+        balance and salary figures before the chain completes.
+
+        Any earlier provisional payslip for the leave is cancelled first,
+        so there is never more than one live provisional run.
+        """
+        self.ensure_one()
+        if not self.env.su and not any(
+            self.env.user.has_group(g) for g in PREVIEW_GROUPS
+        ):
+            raise UserError(
+                'Only HR, Accounting, GM approvers or Payroll users can '
+                'generate a provisional vacation calculation.')
+        if self.x_annual_approval_state not in PREVIEW_STATES:
+            raise UserError(
+                'A provisional calculation can only be generated while the '
+                'request is still going through the approval chain.')
+
+        # sudo(): authorisation was checked above; HR / Accounting / GM
+        # approvers have no payroll ACLs of their own.
+        leave = self.sudo()
+        leave._cancel_preview_vacation_payslips()
+        leave._create_vacation_payslip(preview=True)
+
+        if not leave._current_vacation_payslip():
+            raise UserError(
+                'No provisional calculation could be produced for %s — the '
+                'employee has no active contract version or no salary '
+                'structure.' % self.employee_id.name)
+
+        leave.message_post(
+            body=Markup(
+                '<strong>🧮 Provisional Vacation Calculation</strong><br/>'
+                '<b>Generated by:</b> %(user)s<br/>'
+                '<b>Note:</b> Draft figures — the request has not completed '
+                'its approval chain yet.'
+            ) % {'user': self.env.user.name},
+            subtype_xmlid='mail.mt_note',
+        )
+        return {'type': 'ir.actions.client', 'tag': 'soft_reload'}
+
+    def _cancel_preview_vacation_payslips(self):
+        """Cancel provisional payslips so a definitive one can replace them."""
+        for leave in self:
+            previews = leave.sudo().x_vacation_payslip_ids.filtered(
+                lambda p: p.x_is_vacation_preview and p.state != 'cancel'
+            )
+            if previews:
+                previews.sudo().write({'state': 'cancel'})
+
+    # ------------------------------------------------------------------
     # Override the hook defined in KSW_annual_leave to create a
     # vacation payslip when the GM gives final approval.
     # ------------------------------------------------------------------
 
-    def _create_vacation_payslip(self):
+    def _create_vacation_payslip(self, preview=False):
         """Create a single vacation payslip for the approved annual leave.
 
         Only **one** payslip is created, covering the **current month**
@@ -54,9 +247,18 @@ class HrLeave(models.Model):
 
         Called BEFORE _action_validate so x_return_state is still
         'not_applicable', avoiding the vacation-return guard.
+
+        :param preview: when True the payslip is flagged as a provisional
+            calculation (``x_is_vacation_preview``) requested by an
+            approver mid-chain.  When False (the definitive run) any
+            leftover provisional payslip is cancelled first.
         """
         Payslip = self.env['hr.payslip'].sudo()
         today = fields.Date.context_today(self)
+
+        if not preview:
+            # The definitive payslip supersedes any provisional run.
+            self._cancel_preview_vacation_payslips()
 
         for leave in self:
             employee = leave.employee_id
@@ -120,13 +322,16 @@ class HrLeave(models.Model):
 
             payslip = Payslip.create({
                 'employee_id': employee.id,
-                'name': 'Vacation Payslip — %s — %s/%s' % (
+                'name': '%s — %s — %s/%s' % (
+                    'Vacation Payslip (Provisional)' if preview
+                    else 'Vacation Payslip',
                     employee.name, month_start.year, month_start.month),
                 'date_from': month_start,
                 'date_to': month_end,
                 'struct_id': structure.id,
                 'version_id': version.id,
                 'x_leave_id': leave.id,
+                'x_is_vacation_preview': preview,
             })
 
             # Build and attach input lines
@@ -139,8 +344,9 @@ class HrLeave(models.Model):
             payslip.compute_sheet()
 
             _logger.info(
-                'Vacation payslip #%s created for employee %s '
+                '%s payslip #%s created for employee %s '
                 '(leave #%s, month %s/%s).',
+                'Provisional vacation' if preview else 'Vacation',
                 payslip.id, employee.name, leave.id,
                 month_start.year, month_start.month,
             )
@@ -386,14 +592,24 @@ class HrLeave(models.Model):
     # ------------------------------------------------------------------
 
     def _cancel_vacation_payslips(self):
-        """Cancel any vacation payslips linked to these leaves."""
-        for leave in self:
+        """Cancel any vacation payslips linked to these leaves.
+
+        sudo(): this runs as a side effect of refuse / back-to-approval /
+        reset-to-draft, all of which a direct manager or KSW Supervisor is
+        entitled to do. Those users have no payroll ACLs, and both
+        ``x_vacation_payslip_ids`` and ``x_vacation_payslip_id`` carry a
+        model-level ``groups=``, so reading them as the calling user raises
+        AccessError and rolls the whole refuse back. Authorisation for the
+        action itself is enforced by the callers.
+        """
+        records = self.sudo()
+        for leave in records:
             payslips = leave.x_vacation_payslip_ids.filtered(
                 lambda p: p.state != 'cancel'
             )
             if payslips:
-                payslips.sudo().write({'state': 'cancel'})
-        self.filtered('x_vacation_payslip_id').write({
+                payslips.write({'state': 'cancel'})
+        records.filtered('x_vacation_payslip_id').write({
             'x_vacation_payslip_id': False,
         })
 
@@ -427,6 +643,22 @@ class HrLeave(models.Model):
         if annual_multi:
             annual_multi._cancel_vacation_payslips()
         return result
+
+    def unlink(self):
+        """Cancel any live vacation payslip before the leave disappears.
+
+        ``hr.payslip.x_leave_id`` is a plain many2one, so deleting the leave
+        only NULLs it — the payslip (usually the provisional one produced by
+        "Calculate Vacation") would survive as an orphan draft nobody can
+        trace back. Confirmed ('done') payslips are left alone: those are
+        already paid and must stay on the books.
+        """
+        payslips = self.sudo().x_vacation_payslip_ids.filtered(
+            lambda p: p.state not in ('done', 'cancel')
+        )
+        if payslips:
+            payslips.write({'state': 'cancel'})
+        return super().unlink()
 
     def action_print_vacation_report(self):
         """Return the Annual Vacation Report PDF action for this leave."""
@@ -471,11 +703,14 @@ class HrLeave(models.Model):
             raise UserError('Only HR Payroll users or HR Approvers can recompute vacation payslips.')
         if not self.x_vacation_payslip_id:
             raise UserError('No vacation payslip found on this leave to recompute.')
+        # A payslip generated mid-chain stays provisional when recomputed —
+        # it only becomes definitive at GM final approval.
+        preview = self.sudo().x_vacation_payslip_id.x_is_vacation_preview
         # sudo(): authorisation was checked above; annual-leave HR users
         # lack payroll ACLs and the group-restricted x_vacation_payslip_ids
         # field that these helpers read/write.
         self.sudo()._cancel_vacation_payslips()
-        self.sudo()._create_vacation_payslip()
+        self.sudo()._create_vacation_payslip(preview=preview)
         self.sudo().message_post(
             body=Markup(
                 '<strong>🔄 Vacation Payslip Recomputed</strong><br/>'
