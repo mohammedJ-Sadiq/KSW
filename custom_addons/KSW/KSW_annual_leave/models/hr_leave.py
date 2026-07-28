@@ -242,12 +242,25 @@ class HrLeave(models.Model):
              'date).',
     )
 
+    def _get_ksw_annual_rec(self, employee):
+        """Return the employee's ksw.annual.leave record — sudo, may be empty.
+
+        sudo() because `ksw.annual.leave` only grants read to the KSW Leaves
+        tier groups (self / supervisor / cascading / officer) and write to
+        officers alone; `group_annual_leave_hr` has no ACL row at all.  Every
+        balance figure surfaced on the leave form must therefore be read with
+        elevated rights and exposed through ungated computed fields.
+        """
+        if not employee:
+            return self.env['ksw.annual.leave']
+        return self.env['ksw.annual.leave'].sudo().search(
+            [('employee_id', '=', employee.id)], limit=1)
+
     @api.depends('employee_id')
     def _compute_service_reference_dates(self):
         # sudo(): hr.version.contract_date_start is gated behind
         # hr.group_hr_manager, and the panel must be readable by the
         # requesting employee from the moment the request is created.
-        Annual = self.env['ksw.annual.leave'].sudo()
         Leave = self.env['hr.leave'].sudo()
         for leave in self:
             leave.x_joining_date = False
@@ -256,8 +269,7 @@ class HrLeave(models.Model):
             if not employee:
                 continue
 
-            ksw_rec = Annual.search(
-                [('employee_id', '=', employee.id)], limit=1)
+            ksw_rec = self._get_ksw_annual_rec(employee)
 
             joining = ksw_rec.joining_date if ksw_rec else False
             if not joining:
@@ -284,6 +296,171 @@ class HrLeave(models.Model):
                 or (ksw_rec.x_effective_start_date if ksw_rec else False)
                 or joining
             )
+
+    # ------------------------------------------------------------------
+    # Balance calculation breakdown (audit panel)
+    # ------------------------------------------------------------------
+    # Mirrors the derivation held on `ksw.annual.leave` so a reviewer can
+    # audit the balance without leaving the request.  All read-only.
+    #
+    # NOTE none of these carry a model-level `groups=`.  The tab has no
+    # `groups=` either, and its elements reference these fields in
+    # `invisible=` expressions — a model gate would drop them from
+    # `fields_get()` for outside users and crash the form with the OWL
+    # "field is undefined" error (Odoo 19 pitfall #31).  The protection is
+    # the `sudo()` inside `_get_ksw_annual_rec`, matching the approach used
+    # for `x_gross_salary` on `ksw.deduction`.
+    # ------------------------------------------------------------------
+
+    x_bal_opening_reset_date = fields.Date(
+        string='Opening Reset Date',
+        compute='_compute_balance_breakdown',
+        help='Go-live baseline. When set, accrual is counted from this date '
+             'instead of the joining date.',
+    )
+    x_bal_effective_start_date = fields.Date(
+        string='Effective Start Date',
+        compute='_compute_balance_breakdown',
+        help='The date accrual actually starts from — the opening reset date '
+             'when one is set, otherwise the joining date.',
+    )
+    x_bal_daily_rate = fields.Float(
+        string='Daily Accrual Rate', digits=(10, 6),
+        compute='_compute_balance_breakdown',
+        help='21/365 for the first five years of service, 30/365 after that '
+             '(Saudi Labour Law Art. 109).',
+    )
+    x_bal_accrued_since_start = fields.Float(
+        string='Accrued since Effective Start', digits=(10, 4),
+        compute='_compute_balance_breakdown',
+        help='Days earned by daily accrual since the effective start date, '
+             'excluding any manual opening adjustment.',
+    )
+    x_bal_opening_extra_days = fields.Float(
+        string='Opening Extra Days', digits=(10, 4),
+        compute='_compute_balance_breakdown',
+        help='One-time manual adjustment applied at the opening reset date '
+             '(carry-over from a prior system, or a negative correction).',
+    )
+    x_bal_total_accrued = fields.Float(
+        string='Total Accrued', digits=(10, 4),
+        compute='_compute_balance_breakdown',
+        help='Accrued since effective start plus the opening extra days. '
+             'Gross entitlement — leaves taken are not deducted here.',
+    )
+    x_bal_leaves_taken = fields.Float(
+        string='Leaves Taken', digits=(10, 4),
+        compute='_compute_balance_breakdown',
+        help='Approved annual leave days already consumed, from the linked '
+             'allocation.',
+    )
+    x_bal_remaining = fields.Float(
+        string='Remaining Balance', digits=(10, 4),
+        compute='_compute_balance_breakdown',
+        help='Total accrued minus leaves taken.',
+    )
+    x_can_open_balance_record = fields.Boolean(
+        string='Can Open Balance Record',
+        compute='_compute_balance_breakdown',
+        help='True when the current user may read the underlying annual '
+             'leave balance record.',
+    )
+    x_can_refresh_balance = fields.Boolean(
+        string='Can Refresh Balance',
+        compute='_compute_balance_breakdown',
+        help='True for HR approvers and Leave Officers, who may re-run the '
+             'accrual for this employee.',
+    )
+
+    @api.depends_context('uid')
+    @api.depends('employee_id')
+    def _compute_balance_breakdown(self):
+        may_refresh = self.env.su or (
+            self.env.user.has_group('KSW_annual_leave.group_leave_officer')
+            or self.env.user.has_group('KSW_annual_leave.group_annual_leave_hr')
+        )
+        for leave in self:
+            ksw_rec = self._get_ksw_annual_rec(leave.employee_id)
+
+            leave.x_can_refresh_balance = bool(may_refresh and ksw_rec)
+            # has_access() answers with the *real* user's rights even though
+            # ksw_rec itself was fetched sudo, so the jump button is hidden
+            # rather than raising AccessError when it is clicked.
+            leave.x_can_open_balance_record = bool(
+                ksw_rec
+                and ksw_rec.with_user(self.env.user).has_access('read')
+            )
+
+            if not ksw_rec:
+                leave.x_bal_opening_reset_date = False
+                leave.x_bal_effective_start_date = False
+                leave.x_bal_daily_rate = 0.0
+                leave.x_bal_accrued_since_start = 0.0
+                leave.x_bal_opening_extra_days = 0.0
+                leave.x_bal_total_accrued = 0.0
+                leave.x_bal_leaves_taken = 0.0
+                leave.x_bal_remaining = 0.0
+                continue
+
+            extra = ksw_rec.x_opening_extra_days or 0.0
+            total = ksw_rec.total_accrued_days or 0.0
+
+            leave.x_bal_opening_reset_date = ksw_rec.x_opening_reset_date
+            leave.x_bal_effective_start_date = ksw_rec.x_effective_start_date
+            leave.x_bal_daily_rate = ksw_rec.daily_rate
+            # total_accrued_days already folds the opening extra days in
+            # (see ksw.annual.leave._compute_leave_data), so the pure
+            # accrual component has to be derived by subtraction.
+            leave.x_bal_accrued_since_start = round(total - extra, 4)
+            leave.x_bal_opening_extra_days = extra
+            leave.x_bal_total_accrued = total
+            leave.x_bal_leaves_taken = ksw_rec.leaves_taken
+            leave.x_bal_remaining = ksw_rec.remaining_balance
+
+    def action_open_balance_record(self):
+        """Open the employee's ksw.annual.leave record for review."""
+        self.ensure_one()
+        ksw_rec = self._get_ksw_annual_rec(self.employee_id)
+        if not ksw_rec:
+            raise UserError(
+                'No annual leave balance record exists for %s yet.'
+                % (self.employee_id.name or 'this employee'))
+        if not ksw_rec.with_user(self.env.user).has_access('read'):
+            raise UserError(
+                'You are not allowed to open the annual leave balance '
+                'record of %s.' % self.employee_id.name)
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Annual Leave Balance',
+            'res_model': 'ksw.annual.leave',
+            'view_mode': 'form',
+            'res_id': ksw_rec.id,
+            'target': 'current',
+        }
+
+    def action_refresh_annual_balance(self):
+        """Re-run the accrual for this employee and reload the form.
+
+        Useful when a contract date or wage was corrected after the request
+        was filed, leaving the displayed balance stale.
+        """
+        self.ensure_one()
+        if not self.env.su and not (
+            self.env.user.has_group('KSW_annual_leave.group_leave_officer')
+            or self.env.user.has_group('KSW_annual_leave.group_annual_leave_hr')
+        ):
+            raise UserError(
+                'Only HR Approvers and Leave Officers can refresh the '
+                'annual leave balance.')
+        ksw_rec = self._get_ksw_annual_rec(self.employee_id)
+        if not ksw_rec:
+            raise UserError(
+                'No annual leave balance record exists for %s yet.'
+                % (self.employee_id.name or 'this employee'))
+        # sudo(): authorisation was checked above; HR approvers hold no ACL
+        # on ksw.annual.leave, and _refresh_accrual writes the allocation.
+        ksw_rec.sudo()._refresh_accrual()
+        return {'type': 'ir.actions.client', 'tag': 'soft_reload'}
 
     # ------------------------------------------------------------------
     # Full Balance Clearance

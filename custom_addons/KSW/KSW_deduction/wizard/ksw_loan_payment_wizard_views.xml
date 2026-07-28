@@ -31,9 +31,10 @@
                             <field name="payment_amount"/>
                             <field name="payment_date"/>
                             <field name="note" placeholder="Receipt #, bank reference…"/>
+                            <field name="application_mode" widget="radio"/>
                         </group>
                         <group string="Result">
-                            <!-- Full payment -->
+                            <!-- Full payment: identical in both modes -->
                             <div invisible="not is_full_payment"
                                  class="alert alert-success mb-0">
                                 <i class="fa fa-check-circle me-1"/>
@@ -42,11 +43,37 @@
                                        readonly="1" nolabel="1"/>
                                 pending installment(s) will be marked as paid.
                             </div>
-                            <!-- Partial payment -->
-                            <div invisible="is_full_payment or not payment_amount"
+                            <!-- Partial: settle earliest installments first -->
+                            <div invisible="is_full_payment or not payment_amount or application_mode != 'sequential'"
                                  class="alert alert-info mb-0">
                                 <i class="fa fa-info-circle me-1"/>
-                                <strong>Partial payment</strong> — remaining
+                                <strong>Settle earliest first</strong> —
+                                <field name="seq_settled_count" class="oe_inline"
+                                       readonly="1" nolabel="1"/>
+                                installment(s) will be fully settled.
+                                <span invisible="not seq_partial_label">
+                                    <br/>
+                                    <field name="seq_partial_label"
+                                           class="oe_inline" readonly="1"
+                                           nolabel="1"/>
+                                    is partially settled:
+                                    <field name="seq_partial_paid"
+                                           class="oe_inline" readonly="1"
+                                           nolabel="1"/>
+                                    paid,
+                                    <field name="seq_partial_remainder"
+                                           class="oe_inline" readonly="1"
+                                           nolabel="1"/>
+                                    stays pending in the same month.
+                                </span>
+                                <br/>Later installments keep their original
+                                amounts and dates.
+                            </div>
+                            <!-- Partial: redistribute across all installments -->
+                            <div invisible="is_full_payment or not payment_amount or application_mode != 'redistribute'"
+                                 class="alert alert-info mb-0">
+                                <i class="fa fa-info-circle me-1"/>
+                                <strong>Redistribute</strong> — remaining
                                 <field name="remaining_after" class="oe_inline"
                                        readonly="1" nolabel="1"/>
                                 will be redistributed across

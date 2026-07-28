@@ -53,6 +53,11 @@
                 <field name="x_is_hr_approver" invisible="1"/>
                 <field name="x_is_acc_approver" invisible="1"/>
                 <field name="x_balance_at_request" invisible="1"/>
+                <!-- Ungated on purpose: sudo-computed, and referenced in
+                     invisible= on the Balance Calculation tab, which is
+                     visible to everyone who can see the leave. -->
+                <field name="x_can_open_balance_record" invisible="1"/>
+                <field name="x_can_refresh_balance" invisible="1"/>
             </xpath>
 
             <!-- The core parenthesis next to the picked dates renders
@@ -274,7 +279,60 @@
                         </field>
                     </page>
 
-                    <!-- Tab 3 · Decision Support -->
+                    <!-- Tab 3 · Balance Calculation (audit / revision) -->
+                    <!-- Deliberately ungated and visible at every step: the
+                         requesting employee and every approver may audit how
+                         the balance was derived.  Read-only — corrections are
+                         made on the ksw.annual.leave record itself, which
+                         enforces the opening-balance lock. -->
+                    <page string="🧮 Balance Calculation" name="balance_calculation"
+                          invisible="not x_annual_approval_state">
+
+                        <div class="alert alert-info" role="status"
+                             invisible="x_bal_total_accrued != 0 or x_bal_leaves_taken != 0">
+                            No annual leave balance record exists for this
+                            employee yet, so there is nothing to break down.
+                            An HR Approver can create one from
+                            <strong>Time Off → Management → Annual Leave</strong>.
+                        </div>
+
+                        <group>
+                            <group string="Accrual">
+                                <field name="x_bal_opening_reset_date"
+                                       readonly="1"
+                                       invisible="not x_bal_opening_reset_date"/>
+                                <field name="x_bal_effective_start_date"
+                                       readonly="1"/>
+                                <field name="x_bal_daily_rate" readonly="1"/>
+                                <field name="x_bal_accrued_since_start"
+                                       readonly="1"/>
+                                <field name="x_bal_opening_extra_days"
+                                       readonly="1"/>
+                                <field name="x_bal_total_accrued" readonly="1"
+                                       class="fw-bold text-primary"/>
+                            </group>
+                            <group string="Usage">
+                                <field name="x_bal_leaves_taken" readonly="1"/>
+                                <field name="x_bal_remaining" readonly="1"
+                                       class="fw-bold text-success"/>
+                            </group>
+                        </group>
+
+                        <div class="mt-2">
+                            <button string="🔎 Open Balance Record"
+                                    name="action_open_balance_record"
+                                    type="object" class="btn-secondary"
+                                    invisible="not x_can_open_balance_record"/>
+                            <button string="🔄 Refresh Balance"
+                                    name="action_refresh_annual_balance"
+                                    type="object" class="btn-secondary ms-2"
+                                    invisible="not x_can_refresh_balance"
+                                    confirm="This re-runs the accrual for this employee and re-syncs the leave allocation. Continue?"/>
+                        </div>
+
+                    </page>
+
+                    <!-- Tab 4 · Decision Support -->
                     <page string="📊 Decision Support" name="decision_support"
                           invisible="x_annual_approval_state == 'pending_dm'"
                           groups="KSW_annual_leave.group_annual_leave_hr,KSW_annual_leave.group_annual_leave_acc,KSW_annual_leave.group_annual_leave_gm">
@@ -286,7 +344,7 @@
                         </group>
                     </page>
 
-                    <!-- Tab 4 · Approval Trail -->
+                    <!-- Tab 5 · Approval Trail -->
                     <page string="📜 Approval Trail" name="approval_trail"
                           invisible="x_annual_approval_state == 'pending_dm'">
                         <group col="4" name="approval_history">
@@ -317,7 +375,7 @@
                         </group>
                     </page>
 
-                    <!-- Tab 5 · Attachments -->
+                    <!-- Tab 6 · Attachments -->
                     <page string="📎 Attachments" name="attachments_page"
                           invisible="x_annual_approval_state == 'pending_dm'">
                         <field name="x_attachment_ids" widget="many2many_binary"
