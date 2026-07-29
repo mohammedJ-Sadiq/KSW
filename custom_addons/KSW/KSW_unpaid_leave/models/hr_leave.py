@@ -57,6 +57,14 @@ class HrLeaveUnpaid(models.Model):
             and leave.holiday_status_id.leave_validation_type == 'unpaid_multi'
         )
 
+    def _multi_step_validation_types(self):
+        """Declare 'unpaid_multi' as a KSW multi-step chain.
+
+        Lets KSW_annual_leave's chain/type re-sync (_resync_multi_step_chain)
+        cover unpaid leaves without hardcoding a validation type it doesn't own.
+        """
+        return super()._multi_step_validation_types() | {'unpaid_multi'}
+
     # ------------------------------------------------------------------
     # Duration: calendar-day counting (same as annual, no full-clearance)
     # ------------------------------------------------------------------

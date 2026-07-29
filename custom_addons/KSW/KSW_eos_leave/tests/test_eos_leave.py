@@ -157,10 +157,11 @@ class TestEosLeave(TransactionCase):
         """0 unpaid days — adjusted years equal the base EOS service years."""
         leave = self._make_leave(offset=2)
         leave.sudo().write({'x_eos_unpaid_days': 0.0})
-        # Base years: use the same formula
-        from odoo import fields as ofields
-        today = ofields.Date.context_today(leave)
-        total_days = max((today - date(2020, 1, 1)).days, 0)
+        # Base years: same formula as _compute_eos_adjusted, which measures
+        # service up to the EOS date (request_date_from) — NOT up to today.
+        # Measuring to today made this test drift out of date and fail.
+        total_days = max(
+            (leave.request_date_from - date(2020, 1, 1)).days, 0)
         expected_years = total_days / 365.25
         self.assertAlmostEqual(
             leave.x_eos_adjusted_service_years, expected_years, places=1)
@@ -441,3 +442,89 @@ class TestEosLeave(TransactionCase):
         leave = self._make_leave(offset=16)
         leave.sudo().write({'x_eos_previous_payments': 500.0})
         self.assertAlmostEqual(leave.x_eos_previous_payments, 500.0, places=2)
+
+    def test_hr_field_clear_allowed_for_non_hr(self):
+        """Clearing an EOS figure to 0/False is open to every role.
+
+        Only *setting* a meaningful value is HR-gated — otherwise a chain
+        reset triggered by a non-HR user (a GM refusing, say) would raise.
+        """
+        leave = self._make_leave(offset=17)
+        leave.sudo().write({'x_eos_unpaid_days': 10.0})
+
+        leave.with_user(self.user_dm).sudo().write({'x_eos_unpaid_days': 0.0})
+
+        self.assertAlmostEqual(leave.x_eos_unpaid_days, 0.0, places=2)
+
+    # ==================================================================
+    # Chain reset clears the HR-filled EOS figures
+    # ==================================================================
+
+    def test_refuse_clears_eos_financial_fields(self):
+        """Refusing wipes the EOS figures along with the rest of the chain."""
+        leave = self._make_leave(offset=18)
+        leave.sudo().write({
+            'x_eos_termination_reason': '84',
+            'x_eos_unpaid_days': 10.0,
+            'x_eos_previous_payments': 500.0,
+            'x_eos_notice_pay': 250.0,
+        })
+        self._advance_to(leave, 'pending_gm_final')
+
+        leave.sudo().action_refuse()
+
+        self.assertFalse(leave.x_eos_termination_reason)
+        self.assertAlmostEqual(leave.x_eos_unpaid_days, 0.0, places=2)
+        self.assertAlmostEqual(leave.x_eos_previous_payments, 0.0, places=2)
+        self.assertAlmostEqual(leave.x_eos_notice_pay, 0.0, places=2)
+        # The payout derives from the termination reason, so it clears too.
+        self.assertAlmostEqual(leave.x_eos_payout_amount, 0.0, places=2)
+
+    def test_draft_clears_eos_financial_fields(self):
+        """Back-to-draft wipes the EOS figures so the chain restarts clean."""
+        leave = self._make_leave(offset=19)
+        leave.sudo().write({
+            'x_eos_termination_reason': '85',
+            'x_eos_previous_payments': 750.0,
+        })
+        self._advance_to(leave, 'pending_gm_final')
+
+        leave.sudo().action_draft()
+
+        self.assertFalse(leave.x_eos_termination_reason)
+        self.assertAlmostEqual(leave.x_eos_previous_payments, 0.0, places=2)
+
+    # ==================================================================
+    # Single-day date sync on write (not just on create)
+    # ==================================================================
+
+    def test_type_change_to_eos_syncs_end_date(self):
+        """Switching an existing multi-day leave to an EOS type collapses it."""
+        other_type = self.env['hr.leave.type'].create({
+            'name': 'Non-EOS Switch Source',
+            'leave_validation_type': 'annual_multi',
+            'requires_allocation': False,
+            'is_eos_leave': False,
+        })
+        start = date(2027, 12, 1)
+        leave = self.env['hr.leave'].sudo().create({
+            'employee_id': self.employee.id,
+            'holiday_status_id': other_type.id,
+            'request_date_from': start,
+            'request_date_to': start + timedelta(days=5),
+        })
+        self.assertNotEqual(leave.request_date_from, leave.request_date_to)
+
+        leave.sudo().write({'holiday_status_id': self.eos_leave_type.id})
+
+        self.assertEqual(leave.request_date_to, leave.request_date_from)
+
+    def test_moving_start_date_syncs_end_date(self):
+        """Editing request_date_from on an EOS leave drags the end date along."""
+        leave = self._make_leave(offset=20)
+        new_start = leave.request_date_from + timedelta(days=3)
+
+        leave.sudo().write({'request_date_from': new_start})
+
+        self.assertEqual(leave.request_date_from, new_start)
+        self.assertEqual(leave.request_date_to, new_start)

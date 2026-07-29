@@ -271,7 +271,12 @@ class HrLeave(models.Model):
         return super().create(vals_list)
 
     def write(self, vals):
-        eos_written = _EOS_HR_FIELDS & set(vals)
+        # Only *setting* a meaningful value is HR-gated; clearing to 0/False
+        # stays open to every role so a chain reset (_reset_annual_multi_fields,
+        # driven by refuse / back-to-draft / a leave-type change) can wipe these
+        # figures whoever triggers it. Same trade-off as _HR_ONLY_FIELDS in
+        # KSW_annual_leave.
+        eos_written = {k for k in vals if k in _EOS_HR_FIELDS and vals[k]}
         if eos_written:
             for leave in self:
                 if not leave.x_is_eos_leave or self.env.su:
@@ -280,7 +285,70 @@ class HrLeave(models.Model):
                         'KSW_annual_leave.group_annual_leave_hr'):
                     raise UserError(_(
                         'Only HR Approvers can fill EOS financial fields.'))
-        return super().write(vals)
+        # An EOS request covers a single day. create() forces that from vals,
+        # but a *later* edit — moving the start date, or changing the type to
+        # EOS — must sync the end date too, or the leave keeps the range it
+        # had before.
+        #
+        # Moving request_date_from alone has to be fixed up *before* super():
+        # an EOS leave already has from == to, so a later start date makes
+        # from > to and trips the hr_leave_date_check2 DB constraint inside
+        # super() — a post-write pass would never be reached. Only done when
+        # every target record will be EOS, since vals is shared across the
+        # whole recordset; anything else is left to the post-write pass.
+        if ('request_date_from' in vals and 'request_date_to' not in vals
+                and self._will_all_be_eos(vals)):
+            vals = dict(vals, request_date_to=vals['request_date_from'])
+
+        result = super().write(vals)
+
+        if {'holiday_status_id', 'request_date_from',
+                'request_date_to'} & vals.keys():
+            self._sync_eos_dates()
+
+        return result
+
+    def _will_all_be_eos(self, vals):
+        """True when every record in self is an EOS leave after applying vals."""
+        if not self:
+            return False
+        if 'holiday_status_id' in vals:
+            return bool(self.env['hr.leave.type'].browse(
+                vals['holiday_status_id']).is_eos_leave)
+        return all(leave.x_is_eos_leave for leave in self)
+
+    def _sync_eos_dates(self):
+        """Force request_date_to == request_date_from on EOS leaves.
+
+        The nested write() re-enters this method, but the second pass finds
+        the dates already equal and stops there.
+        """
+        for leave in self:
+            if (leave.x_is_eos_leave
+                    and leave.request_date_from
+                    and leave.request_date_to != leave.request_date_from):
+                leave.write({'request_date_to': leave.request_date_from})
+
+    # ------------------------------------------------------------------
+    # Chain reset: EOS figures must not outlive the approvals they belong to
+    # ------------------------------------------------------------------
+
+    def _reset_annual_multi_fields(self):
+        """Also clear the HR-filled EOS figures when the chain is reset.
+
+        KSW_annual_leave wipes every HR/Accounting figure on refuse, back-to-
+        draft and leave-type change so the next run through the chain starts
+        clean.  The EOS fields are the exact analogue and were being left
+        behind, so a refused EOS request kept its termination reason and
+        payout figures — and therefore a stale x_eos_payout_amount.
+        """
+        result = super()._reset_annual_multi_fields()
+        # Deliberately not filtered on x_is_eos_leave: on the leave-type-change
+        # path the type has already flipped by the time this runs, so filtering
+        # would skip exactly the record that needs clearing. Writing False over
+        # an already-empty field on a non-EOS leave is a no-op.
+        self.write({field: False for field in sorted(_EOS_HR_FIELDS)})
+        return result
 
     # ------------------------------------------------------------------
     # GM Final Approval: archive the employee upon EOS approval

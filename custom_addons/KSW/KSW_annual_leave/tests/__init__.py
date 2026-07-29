@@ -6,3 +6,4 @@ from . import test_leave_attendance_sheet
 from . import test_hr_confirmation_step
 from . import test_return_date_amend
 from . import test_own_request_delete
+from . import test_leave_type_switch

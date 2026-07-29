@@ -102,6 +102,25 @@ class HrLeave(models.Model):
             and leave.holiday_status_id.leave_validation_type == 'annual_multi'
         )
 
+    # Validation types whose approval progress lives in
+    # ``x_annual_approval_state`` rather than in the stock ``state`` field.
+    # This module only owns 'annual_multi'; sibling chain modules extend the
+    # set through _multi_step_validation_types() so KSW_annual_leave never
+    # has to name a validation type it doesn't own.
+    _KSW_MULTI_STEP_TYPES = frozenset({'annual_multi'})
+
+    def _multi_step_validation_types(self):
+        """Return the leave_validation_type values driven by the KSW chain."""
+        return set(self._KSW_MULTI_STEP_TYPES)
+
+    def _uses_multi_step_chain(self, leave):
+        """True when this leave's type is driven by x_annual_approval_state."""
+        return bool(
+            leave.holiday_status_id
+            and leave.holiday_status_id.leave_validation_type
+            in self._multi_step_validation_types()
+        )
+
     def _annual_cal_days(self, leave):
         """Return (days, hours) using calendar-day counting for annual leave."""
         if leave.request_date_from and leave.request_date_to:
@@ -1083,7 +1102,7 @@ class HrLeave(models.Model):
     # Multi-Step Approval: can_approve / can_validate overrides
     # ==================================================================
 
-    @api.depends('state', 'employee_id', 'department_id')
+    @api.depends('state', 'employee_id', 'department_id', 'holiday_status_id')
     def _compute_can_approve(self):
         """Hide the standard 'Approve' button for annual_multi leaves."""
         annual_multi = self.filtered(self._is_annual_multi)
@@ -1093,7 +1112,7 @@ class HrLeave(models.Model):
         for leave in annual_multi:
             leave.can_approve = False
 
-    @api.depends('state', 'employee_id', 'department_id')
+    @api.depends('state', 'employee_id', 'department_id', 'holiday_status_id')
     def _compute_can_validate(self):
         """Hide the standard 'Validate' button for annual_multi leaves."""
         annual_multi = self.filtered(self._is_annual_multi)
@@ -1108,7 +1127,8 @@ class HrLeave(models.Model):
     # remain. Refuse no longer applies from here on.
     _REFUSE_LOCKED_STATES = frozenset({'pending_employee_signature', 'approved'})
 
-    @api.depends('state', 'employee_id', 'department_id', 'x_annual_approval_state')
+    @api.depends('state', 'employee_id', 'department_id',
+                 'x_annual_approval_state', 'holiday_status_id')
     def _compute_can_refuse(self):
         """Hide 'Refuse' once an annual_multi leave has cleared GM final approval.
 
@@ -1207,6 +1227,15 @@ class HrLeave(models.Model):
                     leave._check_can_edit_return_date()
                 amended_from[leave.id] = leave.x_return_date
 
+        # Snapshot the pre-write leave type so _resync_multi_step_chain can
+        # tell a genuine type switch from a re-save of the same type. The
+        # *type id* is needed, not just its validation type: EOS types are
+        # 'annual_multi' too, so Annual -> EOS is a real chain restart even
+        # though the validation type never changes.
+        types_before = {}
+        if 'holiday_status_id' in vals:
+            types_before = {l.id: l.holiday_status_id.id for l in self}
+
         result = super().write(vals)
 
         for leave in self.filtered(lambda l: l.id in amended_from):
@@ -1225,6 +1254,14 @@ class HrLeave(models.Model):
                 },
                 subtype_xmlid='mail.mt_note',
             )
+
+        # Keep the multi-step chain in sync with the leave type. Runs AFTER
+        # super() so holiday_status_id (and the stored relateds derived from
+        # it) already carry the new value, and before the
+        # _skip_toggle_validity early return below — that flag is about
+        # allocation re-validation, not about the chain.
+        if types_before:
+            self._resync_multi_step_chain(types_before)
 
         if self.env.context.get('_skip_toggle_validity'):
             return result
@@ -1251,6 +1288,125 @@ class HrLeave(models.Model):
         return result
 
     # ==================================================================
+    # Multi-Step Approval: keep the chain in sync with the leave type
+    # ==================================================================
+
+    _CHAIN_RESYNC_MESSAGES = {
+        'started': 'Approval chain started — this leave type uses the KSW '
+                   'multi-step approval chain.',
+        'restarted': 'Approval chain restarted from Direct Manager — the '
+                     'approvals already recorded were given for the previous '
+                     'leave type and no longer apply.',
+        'repaired': 'Approval chain re-synchronised with the leave type.',
+        'cleared': 'Approval chain cleared — this leave type uses the '
+                   'standard approval flow.',
+    }
+
+    def _resync_multi_step_chain(self, types_before=None):
+        """Re-sync ``x_annual_approval_state`` with the current leave type.
+
+        ``x_annual_approval_state`` used to be stamped at create() time only,
+        so a leave whose type was edited afterwards kept whatever the
+        *original* type implied: a Sick -> Annual switch left the field False
+        (the KSW statusbar is hidden and the record falls back to the stock
+        2-step bar), and an Annual -> Sick switch left a stale ``pending_*``
+        value behind (which hides the *stock* statusbar instead).
+
+        This method reconciles the two and is safe to call repeatedly — it is
+        a no-op once the record is consistent, so simply re-saving a record
+        broken by the old behaviour heals it.
+
+        Only draft/confirm records are touched. From validate1 onwards the
+        decision is made and the type field is readonly in the view; a
+        programmatic write at that point must not silently rewind approvals.
+
+        :param types_before: optional {leave_id: previous holiday_status_id}
+            captured before the write. Needed to tell a genuine type switch
+            from a re-save: Annual and EOS are both ``annual_multi``, so the
+            validation type alone cannot tell them apart. When omitted, only
+            the self-healing branches fire.
+        """
+        types_before = types_before or {}
+        for leave in self:
+            if leave.state not in ('draft', 'confirm'):
+                continue
+
+            wants_chain = self._uses_multi_step_chain(leave)
+            current = leave.x_annual_approval_state
+            type_changed = (
+                leave.id in types_before
+                and types_before[leave.id] != leave.holiday_status_id.id
+            )
+
+            if wants_chain and not current:
+                # Switched into a chain, or a record broken by the old code.
+                reason = 'started' if type_changed else 'repaired'
+            elif not wants_chain and current:
+                # Switched out of a chain: drop it so the stock statusbar and
+                # the standard Approve/Validate buttons come back.
+                leave._reset_chain_for_type_change(notify=False)
+                leave._post_chain_resync_note('cleared')
+                continue
+            elif wants_chain and current and type_changed:
+                if current == 'pending_dm':
+                    # Nothing approved yet — clear the type-specific figures
+                    # but stay at step 1 without re-notifying the DM.
+                    leave._reset_chain_for_type_change(notify=False)
+                    leave.sudo().write({
+                        'x_annual_approval_state': 'pending_dm'})
+                    continue
+                # Approvals already given were given for a *different* leave
+                # type and no longer mean anything. Restart from the top.
+                reason = 'restarted'
+            else:
+                continue
+
+            leave._reset_chain_for_type_change(notify=True)
+            leave._post_chain_resync_note(reason)
+
+    def _reset_chain_for_type_change(self, notify):
+        """Clear every chain stamp and, when entering a chain, restart at DM.
+
+        sudo() is required on two counts: _reset_annual_multi_fields unlinks
+        x_commission_line_ids (unlink is granted to group_leave_officer only,
+        yet the chain reaches pending_acc while state is still 'confirm' and
+        the type field is still editable), and the reset writes fields behind
+        the _HR_ONLY_FIELDS / _ACC_ONLY_FIELDS role guards.
+
+        _skip_toggle_validity suppresses the redundant _check_validity that
+        the reset's own write() would trigger through x_excess_days_accepted /
+        x_is_full_clearance — base hr.leave.write already validated the new
+        type inside the enclosing super() call.
+        """
+        self.ensure_one()
+        record = self.sudo().with_context(_skip_toggle_validity=True)
+        record._reset_annual_multi_fields()
+        if notify:
+            record.write({'x_annual_approval_state': 'pending_dm'})
+            # Notify as the acting user (not sudo) so the DM sees who made
+            # the change. leave_manager_id carries no field-level groups= and
+            # the pending_dm branch never dereferences a res.groups, so this
+            # is safe for employee-level users — it is the same call create()
+            # already makes on their behalf.
+            self._notify_pending_approvers(self, 'pending_dm')
+
+    def _post_chain_resync_note(self, reason):
+        self.ensure_one()
+        self.sudo().message_post(
+            body=Markup(
+                '<strong>🔄 Leave Type Changed</strong><br/>'
+                '<b>New type:</b> %(type)s<br/>'
+                '<b>Changed by:</b> %(user)s<br/>'
+                '<i>%(detail)s</i>'
+            ) % {
+                'type': self.holiday_status_id.display_name or '—',
+                'user': self.env.user.name,
+                'detail': self._CHAIN_RESYNC_MESSAGES[reason],
+            },
+            subtype_xmlid='mail.mt_note',
+        )
+
+    # ==================================================================
     # Multi-Step Approval: create hook
     # ==================================================================
 
@@ -1258,6 +1414,11 @@ class HrLeave(models.Model):
     def create(self, vals_list):
         records = super().create(vals_list)
         for leave in records:
+            # Deliberately _is_annual_multi, NOT _uses_multi_step_chain:
+            # KSW_unpaid_leave.create() stamps its own leaves after its own
+            # super() call, so widening this check would stamp and notify
+            # twice for unpaid leaves. The chain/type re-sync in write()
+            # (_resync_multi_step_chain) is the one that uses the hook.
             if self._is_annual_multi(leave):
                 leave.sudo().write({'x_annual_approval_state': 'pending_dm'})
                 # In Odoo 19, leaves are created directly in 'confirm' state
