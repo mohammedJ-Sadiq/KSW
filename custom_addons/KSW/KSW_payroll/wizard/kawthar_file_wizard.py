@@ -4,6 +4,8 @@ import io
 from odoo import fields, models, _
 from odoo.exceptions import UserError
 
+from ..models.hr_payslip_run import EXCLUDED_STATUSES
+
 try:
     import openpyxl
     from openpyxl.styles import Font, Alignment, Border, Side, PatternFill
@@ -139,20 +141,9 @@ class KawtharFileWizard(models.TransientModel):
         if not batch.slip_ids:
             raise UserError(_('No payslips in this batch to export.'))
 
-        # Filter to employees with a bank account and positive NET
-        valid_slips = batch._sorted_export_slips(batch.slip_ids.filtered(
-            lambda s: s.employee_id.sudo().primary_bank_account_id
-            and self._get_line_total(s, 'NET') > 0
-        ))
-
-        if not valid_slips:
-            raise UserError(_(
-                'No payslips with a positive NET salary and a '
-                'bank account on the employee.'
-            ))
-
+        # Every payslip is written; rows the text file drops are colour-coded.
         wb = openpyxl.Workbook()
-        self._fill_kawthar_sheet(wb, valid_slips)
+        self._fill_kawthar_sheet(wb, batch.slip_ids)
 
         # Remove default empty sheet if still present
         if 'Sheet' in wb.sheetnames and len(wb.sheetnames) > 1:
@@ -225,6 +216,8 @@ class KawtharFileWizard(models.TransientModel):
             'Mobile Number(10N)',
             'Bio Pin(1N)',
             'User Field(10A)',
+            # Column O — past the 14-column bank template, review use only
+            'Status',
         ]
         for ci, h in enumerate(en_headers, 1):
             c = ws.cell(3, ci, h)
@@ -257,16 +250,20 @@ class KawtharFileWizard(models.TransientModel):
             c.alignment = Alignment(horizontal='center')
 
         # ── Data rows (row 5+) ──
+        # Every payslip is written, so the reviewer can see WHY someone was
+        # left out of the text file. Rows the text file drops are pushed into
+        # a trailing block behind a banner, keeping the top of the sheet
+        # upload-ready.
         op_label = OPERATION_CODE_LABEL.get(self.operation_code, '')
-        seq = 0
-        for slip in slips:
-            emp = slip.employee_id
-            net = self._get_line_total(slip, 'NET')
-            if not net:
-                continue
+        batch = self.payslip_run_id
+        classified = batch._classify_export_slips(slips, 'kawthar')
+        included = [r for r in classified if r[1] not in EXCLUDED_STATUSES]
+        excluded = [r for r in classified if r[1] in EXCLUDED_STATUSES]
 
-            seq += 1
+        def _write(row_idx, slip, status, reason, seq):
+            emp = slip.employee_id
             bank = emp.sudo().primary_bank_account_id
+            net = self._get_line_total(slip, 'NET')
             basic = self._get_line_total(slip, 'BASIC')
             hra = self._get_line_total(slip, 'HRA')
             gross = self._get_line_total(slip, 'GROSS')
@@ -292,11 +289,28 @@ class KawtharFileWizard(models.TransientModel):
                 '',                                                    # L: Mobile Number
                 '',                                                    # M: Bio Pin
                 '',                                                    # N: User Field
+                reason,                                                # O: Status (review only)
             ]
-            ri = 4 + seq  # row 5, 6, 7, …
             for ci, v in enumerate(row, 1):
-                c = ws.cell(ri, ci, v)
+                c = ws.cell(row_idx, ci, v)
                 c.border = thin
+            batch._style_export_row(ws, row_idx, len(en_headers), status)
+
+        # The sequence in column A must stay a clean 1..N over payable rows
+        # only, so it no longer tracks the row index.
+        ri = 5
+        for seq, (slip, status, reason) in enumerate(included, 1):
+            _write(ri, slip, status, reason, seq)
+            ri += 1
+
+        if excluded:
+            ri = batch._write_export_banner(ws, ri - 1, _(
+                'Excluded from the bank text file — review only, '
+                'delete these rows before uploading'
+            ))
+            for slip, status, reason in excluded:
+                _write(ri, slip, status, reason, '')
+                ri += 1
 
         # ── Auto-width columns ──
         for ci in range(1, len(en_headers) + 1):

@@ -49,9 +49,11 @@ class TestBankFileExportWizard(TransactionCase):
         })
 
         # ── Company bank accounts ──
+        # acc_number is unique per partner, and the dev/production databases
+        # hold real company accounts with these names — hence the TEST prefix.
         # WPS bank account
         cls.wps_bank = cls.env['res.partner.bank'].create({
-            'acc_number': 'WPS Main Account',
+            'acc_number': 'TEST WPS Main Account',
             'partner_id': cls.company_partner.id,
             'bank_id': cls.bank_anb.id,
             'x_wps_cic_number': '1389678',
@@ -61,14 +63,14 @@ class TestBankFileExportWizard(TransactionCase):
         })
         # Kawthar bank accounts (two, to test unique filenames)
         cls.kawthar_bank_1 = cls.env['res.partner.bank'].create({
-            'acc_number': 'Kawther Raj Cards',
+            'acc_number': 'TEST Kawther Raj Cards',
             'partner_id': cls.company_partner.id,
             'bank_id': cls.bank_rajhi.id,
             'x_wps_cic_number': '5555555',
             'x_file_type': 'kawthar',
         })
         cls.kawthar_bank_2 = cls.env['res.partner.bank'].create({
-            'acc_number': 'Hayat Raj Cards',
+            'acc_number': 'TEST Hayat Raj Cards',
             'partner_id': cls.company_partner.id,
             'bank_id': cls.bank_rajhi.id,
             'x_wps_cic_number': '6666666',
@@ -709,4 +711,210 @@ class TestBankFileExportWizard(TransactionCase):
         wiz = self._make_wizard(mode='specific_excel', bank=unused_bank)
         with self.assertRaises(UserError):
             wiz.action_export()
+
+    # ================================================================
+    # Tests — Excel shows every record, colour-coded by TXT inclusion
+    #
+    # The bank TXT keeps dropping unpayable rows; the Excel must show
+    # them so the accountant can see WHY someone is missing (zero net
+    # from a loan / ATT_DED, or a data problem).
+    # ================================================================
+
+    RED = 'FFC7CE'
+    AMBER = 'FFEB9C'
+
+    def _fill_rgb(self, cell):
+        """Return the 6-char fill colour of a cell, or '' when unfilled.
+
+        An unfilled openpyxl cell still reports rgb '00000000', so the
+        pattern type is what actually distinguishes "no fill".
+        """
+        if not cell.fill.patternType:
+            return ''
+        rgb = cell.fill.fgColor.rgb
+        return rgb[-6:] if isinstance(rgb, str) else ''
+
+    def _sheet_rows(self, ws, name_col, first_row):
+        """Return {employee name: row index} for a sheet's data rows."""
+        return {
+            ws.cell(r, name_col).value: r
+            for r in range(first_row, ws.max_row + 1)
+            if ws.cell(r, name_col).value
+        }
+
+    def _export_wb(self, mode, bank):
+        """Run an Excel export and return the loaded workbook."""
+        wiz = self._make_wizard(mode=mode, bank=bank)
+        result = wiz.action_export()
+        att_id = int(result['url'].split('/web/content/')[1].split('?')[0])
+        att = self.env['ir.attachment'].browse(att_id)
+        return openpyxl.load_workbook(io.BytesIO(base64.b64decode(att.datas)))
+
+    def _export_txt(self, bank):
+        """Run a TXT export and return the decoded content."""
+        wiz = self._make_wizard(mode='specific_txt', bank=bank)
+        result = wiz.action_export()
+        att_id = int(result['url'].split('/web/content/')[1].split('?')[0])
+        att = self.env['ir.attachment'].browse(att_id)
+        return base64.b64decode(att.datas).decode('utf-8')
+
+    def _add_wps_employee(self, name, barcode, id_number, net, iban='SA99'):
+        """Create a WPS employee + payslip with an explicit NET."""
+        emp = self._create_employee(name, barcode, id_number,
+                                    self.bank_anb, iban)
+        emp.sudo().write({'x_salary_bank_account_id': self.wps_bank.id})
+        self._create_payslip(
+            emp, self.batch,
+            basic=5000, hra=1000, gross=6000,
+            deductions=6000 - net, net=net,
+        )
+        return emp
+
+    def test_zero_net_row_present_and_red_in_wps_excel(self):
+        """A zero-NET employee is written to the WPS Excel, filled red."""
+        self._add_wps_employee('ZERO NET GUY', '901', '9009009001', net=0)
+        wb = self._export_wb('specific_excel', self.wps_bank)
+
+        ws = wb['WPS Bank File']
+        rows = self._sheet_rows(ws, 3, 8)          # col C = Employee Name
+        self.assertIn('ZERO NET GUY', rows,
+                      'zero-NET employee must still appear in the Excel')
+        r = rows['ZERO NET GUY']
+        self.assertEqual(self._fill_rgb(ws.cell(r, 1)), self.RED)
+        self.assertIn('Zero net', ws.cell(r, 15).value)
+        # The deduction that ate the salary must be visible (col J)
+        self.assertEqual(ws.cell(r, 10).value, 6000)
+
+        # A normally-paid employee stays unfilled
+        paid = rows['AHMED WPS EMPLOYEE']
+        self.assertEqual(self._fill_rgb(ws.cell(paid, 1)), '')
+
+    def test_zero_net_row_red_in_payroll_summary(self):
+        """The same colour coding applies to the Payroll Summary sheet."""
+        self._add_wps_employee('ZERO NET GUY', '901', '9009009001', net=0)
+        wb = self._export_wb('specific_excel', self.wps_bank)
+
+        ws = wb['Payroll Summary']
+        rows = self._sheet_rows(ws, 1, 2)
+        r = rows['ZERO NET GUY']
+        self.assertEqual(self._fill_rgb(ws.cell(r, 1)), self.RED)
+        self.assertIn('Zero net', ws.cell(r, 18).value)
+        self.assertEqual(
+            self._fill_rgb(ws.cell(rows['AHMED WPS EMPLOYEE'], 1)), '')
+
+    def test_zero_net_still_excluded_from_wps_txt(self):
+        """TXT behaviour is unchanged, and its control totals still match."""
+        self._add_wps_employee('ZERO NET GUY', '901', '9009009001', net=0)
+        content = self._export_txt(self.wps_bank)
+
+        self.assertNotIn('ZERO NET GUY', content)
+        lines = content.strip('\n').split('\n')
+        header, details = lines[0], lines[1:]
+        # Header record count (10N at offset 42) must match the detail lines
+        self.assertEqual(int(header[42:52]), len(details))
+        # Header total is whole SAR (13N at offset 29); the detail NET is in
+        # halalas (15N at offset 109, after ref/swift/filler/iban/name).
+        detail_total = sum(int(d[109:124]) for d in details) / 100.0
+        self.assertEqual(int(header[29:42]), int(round(detail_total)))
+
+    def test_negative_net_red_in_excel_and_absent_from_txt(self):
+        """Negative NET is treated exactly like zero: red, and not in the TXT.
+
+        This previously diverged — WPS Excel wrote the row, WPS TXT dropped it.
+        """
+        self._add_wps_employee('OVER DEDUCTED', '902', '9009009002', net=-250)
+
+        wb = self._export_wb('specific_excel', self.wps_bank)
+        ws = wb['WPS Bank File']
+        r = self._sheet_rows(ws, 3, 8)['OVER DEDUCTED']
+        self.assertEqual(self._fill_rgb(ws.cell(r, 1)), self.RED)
+        self.assertIn('Negative net', ws.cell(r, 15).value)
+
+        self.assertNotIn('OVER DEDUCTED', self._export_txt(self.wps_bank))
+
+    def test_kawthar_no_bank_account_amber_and_absent_from_txt(self):
+        """A Kawthar employee with no payroll card is amber, not red."""
+        emp = self._create_employee(
+            'NO CARD EMPLOYEE', '903', '9009009003', self.bank_rajhi, None,
+        )
+        emp.sudo().write({
+            'x_salary_bank_account_id': self.kawthar_bank_1.id,
+        })
+        self._create_payslip(
+            emp, self.batch,
+            basic=4000, hra=0, gross=4000, deductions=0, net=4000,
+        )
+
+        wb = self._export_wb('specific_excel', self.kawthar_bank_1)
+        ws = wb['PREFORMAT PAYMENTS']
+        r = self._sheet_rows(ws, 3, 5)['NO CARD EMPLOYEE']
+        self.assertEqual(self._fill_rgb(ws.cell(r, 1)), self.AMBER)
+        self.assertIn('No payroll card', ws.cell(r, 15).value)
+
+        wiz = self._make_wizard(mode='specific_txt', bank=self.kawthar_bank_1)
+        result = wiz.action_export()
+        att_id = int(result['url'].split('/web/content/')[1].split('?')[0])
+        content = base64.b64decode(
+            self.env['ir.attachment'].browse(att_id).datas).decode('utf-8')
+        self.assertNotIn('NO CARD EMPLOYEE', content)
+
+    def test_kawthar_sequence_covers_payable_rows_only(self):
+        """Column A stays a clean 1..N; excluded rows get a blank sequence."""
+        emp = self._create_employee(
+            'ZERO CARD EMPLOYEE', '904', '9009009004',
+            self.bank_rajhi, '5689110000130257801',
+        )
+        emp.sudo().write({
+            'x_salary_bank_account_id': self.kawthar_bank_1.id,
+        })
+        self._create_payslip(
+            emp, self.batch,
+            basic=4000, hra=0, gross=4000, deductions=4000, net=0,
+        )
+
+        ws = self._export_wb(
+            'specific_excel', self.kawthar_bank_1)['PREFORMAT PAYMENTS']
+        rows = self._sheet_rows(ws, 3, 5)
+        seqs = [
+            ws.cell(r, 1).value for r in sorted(rows.values())
+            if ws.cell(r, 1).value
+        ]
+        self.assertEqual(seqs, list(range(1, len(seqs) + 1)))
+        # The excluded row carries no sequence number
+        self.assertFalse(ws.cell(rows['ZERO CARD EMPLOYEE'], 1).value)
+
+    def test_excluded_rows_sit_below_every_payable_row(self):
+        """Excluded rows are a trailing block, so the top stays uploadable."""
+        self._add_wps_employee('ZERO NET GUY', '901', '9009009001', net=0)
+        self._add_wps_employee('PAID LATER', '905', '9009009005', net=3000)
+
+        ws = self._export_wb('specific_excel', self.wps_bank)['WPS Bank File']
+        rows = self._sheet_rows(ws, 3, 8)
+        payable = [rows['AHMED WPS EMPLOYEE'], rows['PAID LATER']]
+        self.assertGreater(rows['ZERO NET GUY'], max(payable))
+
+    def test_generation_skips_on_summary_sheet_only(self):
+        """Employees with no payslip are listed on the summary sheet only."""
+        skipped_emp = self._create_employee(
+            'NEVER GENERATED', '906', '9009009006', self.bank_anb, None,
+        )
+        self.env['ksw.payslip.run.skip.line'].create({
+            'run_id': self.batch.id,
+            'employee_id': skipped_emp.id,
+            'reason': 'No active contract / salary structure for this period',
+        })
+
+        wb = self._export_wb('specific_excel', self.wps_bank)
+
+        ws_summary = wb['Payroll Summary']
+        rows = self._sheet_rows(ws_summary, 1, 2)
+        self.assertIn('NEVER GENERATED', rows)
+        r = rows['NEVER GENERATED']
+        self.assertEqual(self._fill_rgb(ws_summary.cell(r, 1)), self.AMBER)
+        self.assertIn('No active contract', ws_summary.cell(r, 18).value)
+
+        # They have no resolved paying bank, so they must not reach the
+        # bank sheet — it is an upload template.
+        ws_bank = wb['WPS Bank File']
+        self.assertNotIn('NEVER GENERATED', self._sheet_rows(ws_bank, 3, 8))
 

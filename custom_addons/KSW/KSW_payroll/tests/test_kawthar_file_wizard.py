@@ -254,8 +254,12 @@ class TestKawtharFileWizard(TransactionCase):
         with self.assertRaises(UserError):
             wiz.action_generate()
 
-    def test_error_no_bank_employees(self):
-        """Wizard raises when no employees have a bank account."""
+    def test_no_bank_employees_still_produce_a_review_sheet(self):
+        """A batch where nobody is payable still generates a review sheet.
+
+        The Excel is a review document, so it must show the employee and the
+        reason rather than refusing to generate (the TXT still refuses).
+        """
         batch = self.env['hr.payslip.run'].create({
             'name': 'No Bank',
             'date_start': date(2026, 3, 1),
@@ -266,8 +270,13 @@ class TestKawtharFileWizard(TransactionCase):
             basic=3000, hra=0, gross=3000, deductions=0, net=3000,
         )
         wiz = self._make_wizard(batch=batch)
-        with self.assertRaises(UserError):
-            wiz.action_generate()
+        ws = self._generate_and_read(wiz)['PREFORMAT PAYMENTS']
+        names = [
+            ws.cell(r, 3).value for r in range(5, ws.max_row + 1)
+            if ws.cell(r, 3).value
+        ]
+        self.assertEqual(len(names), 1)
+        self.assertIn('NO BANK', names[0])
 
     # ================================================================
     # Tests — Sheet structure
@@ -325,17 +334,24 @@ class TestKawtharFileWizard(TransactionCase):
     # Tests — Data rows
     # ================================================================
 
+    def _payable_rows(self, ws):
+        """Rows in the payable block — the ones carrying a sequence number."""
+        return [
+            r for r in range(5, ws.max_row + 1)
+            if isinstance(ws.cell(r, 1).value, int)
+        ]
+
     def test_data_row_count(self):
-        """Only employees with bank accounts and positive NET are included."""
+        """Only employees with a bank account and positive NET are payable.
+
+        Everyone else is still written, below the banner, without a sequence
+        number — see test_no_bank_employee_marked_excluded.
+        """
         wiz = self._make_wizard()
         wb = self._generate_and_read(wiz)
         ws = wb['PREFORMAT PAYMENTS']
-        # 4 header rows + 2 data rows (emp_no_bank excluded)
-        data_rows = 0
-        for r in range(5, ws.max_row + 1):
-            if ws.cell(r, 1).value is not None:
-                data_rows += 1
-        self.assertEqual(data_rows, 2)
+        # 2 payable rows; emp_no_bank is present but not payable
+        self.assertEqual(len(self._payable_rows(ws)), 2)
 
     def test_sequential_employee_id(self):
         """Employee ID column uses sequential numbering (1, 2, 3…)."""
@@ -459,8 +475,12 @@ class TestKawtharFileWizard(TransactionCase):
     # Tests — Zero-net slips excluded
     # ================================================================
 
-    def test_zero_net_slips_excluded(self):
-        """Payslips with NET=0 are excluded."""
+    def test_zero_net_slips_shown_but_not_payable(self):
+        """NET=0 stays out of the payable block but is written and flagged red.
+
+        The accountant must be able to see that the salary was consumed by
+        deductions rather than find the employee silently missing.
+        """
         zero_emp = self._create_employee(
             'ZERO SALARY', '999', '0000000000',
             acc_number='5689110000999957800',
@@ -475,11 +495,18 @@ class TestKawtharFileWizard(TransactionCase):
         wiz = self._make_wizard()
         wb = self._generate_and_read(wiz)
         ws = wb['PREFORMAT PAYMENTS']
-        data_rows = 0
-        for r in range(5, ws.max_row + 1):
-            if ws.cell(r, 1).value is not None:
-                data_rows += 1
-        self.assertEqual(data_rows, 2)
+
+        self.assertEqual(len(self._payable_rows(ws)), 2)
+
+        zero_rows = [
+            r for r in range(5, ws.max_row + 1)
+            if (ws.cell(r, 3).value or '') == 'ZERO SALARY'
+        ]
+        self.assertEqual(len(zero_rows), 1)
+        r = zero_rows[0]
+        self.assertNotIn(r, self._payable_rows(ws))
+        self.assertEqual(ws.cell(r, 1).fill.fgColor.rgb[-6:], 'FFC7CE')
+        self.assertIn('Zero net', ws.cell(r, 15).value)
 
     # ================================================================
     # Tests — File output
@@ -534,18 +561,28 @@ class TestKawtharFileWizard(TransactionCase):
         self.assertLess(name_1, name_2)
 
     # ================================================================
-    # Tests — No-bank employees are excluded (not errored)
+    # Tests — No-bank employees are flagged, not silently dropped
     # ================================================================
 
-    def test_no_bank_employee_excluded(self):
-        """Employees without a bank account are excluded from file."""
+    def test_no_bank_employee_marked_excluded(self):
+        """Employees without a payroll card are written, amber, without a seq.
+
+        They stay out of the TXT; the Excel shows them so the missing card is
+        visible to whoever reviews the batch.
+        """
         wiz = self._make_wizard()
         wb = self._generate_and_read(wiz)
         ws = wb['PREFORMAT PAYMENTS']
-        # Check no row contains 'NO BANK EMPLOYEE'
-        for r in range(5, ws.max_row + 1):
-            name = ws.cell(r, 3).value or ''
-            self.assertNotIn('NO BANK', name)
+
+        rows = [
+            r for r in range(5, ws.max_row + 1)
+            if 'NO BANK' in (ws.cell(r, 3).value or '')
+        ]
+        self.assertEqual(len(rows), 1)
+        r = rows[0]
+        self.assertNotIn(r, self._payable_rows(ws))
+        self.assertEqual(ws.cell(r, 1).fill.fgColor.rgb[-6:], 'FFEB9C')
+        self.assertIn('No payroll card', ws.cell(r, 15).value)
 
     # ================================================================
     # Tests — Kawthar TXT format (_build_kawthar_text)

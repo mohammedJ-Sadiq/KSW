@@ -117,7 +117,7 @@ class BankFileExportWizard(models.TransientModel):
             raise UserError(_('The openpyxl library is required.'))
         batch = self.payslip_run_id
         wb = openpyxl.Workbook()
-        batch._fill_payroll_summary_sheet(wb, slips)
+        batch._fill_payroll_summary_sheet(wb, slips, file_type='wps')
         batch._fill_wps_sheet(wb, bank, slips)
         if 'Sheet' in wb.sheetnames and len(wb.sheetnames) > 1:
             del wb['Sheet']
@@ -144,15 +144,9 @@ class BankFileExportWizard(models.TransientModel):
         })
         batch = self.payslip_run_id
         wb = openpyxl.Workbook()
-        # Filter to employees with bank account and positive NET
-        valid_slips = batch._sorted_export_slips(slips.filtered(
-            lambda s: s.employee_id.sudo().primary_bank_account_id
-            and kaw_wiz._get_line_total(s, 'NET') > 0
-        ))
-        if not valid_slips:
-            return None
-        batch._fill_payroll_summary_sheet(wb, valid_slips)
-        kaw_wiz._fill_kawthar_sheet(wb, valid_slips)
+        # Every payslip is written; rows the text file drops are colour-coded.
+        batch._fill_payroll_summary_sheet(wb, slips, file_type='kawthar')
+        kaw_wiz._fill_kawthar_sheet(wb, slips)
         if 'Sheet' in wb.sheetnames and len(wb.sheetnames) > 1:
             del wb['Sheet']
         buf = io.BytesIO()
@@ -252,8 +246,7 @@ class BankFileExportWizard(models.TransientModel):
                 files.append(('WPS_%s_%s.xlsx' % (bl, label), data))
             elif bank.x_file_type == 'kawthar':
                 data = self._make_kawthar_excel(slips)
-                if data:
-                    files.append(('Kawthar_%s_%s.xlsx' % (bl, label), data))
+                files.append(('Kawthar_%s_%s.xlsx' % (bl, label), data))
         if not files:
             raise UserError(_('No Excel files could be generated.'))
         return self._bundle_and_download(files)
@@ -296,10 +289,6 @@ class BankFileExportWizard(models.TransientModel):
             fname = 'WPS_%s_%s.xlsx' % (bl, label)
         elif bank.x_file_type == 'kawthar':
             data = self._make_kawthar_excel(slips)
-            if not data:
-                raise UserError(_(
-                    'No payslips with a positive NET and a bank account '
-                    'on the employee for the Kawthar file.'))
             fname = 'Kawthar_%s_%s.xlsx' % (bl, label)
         else:
             raise UserError(_('Unsupported file type: %s', bank.x_file_type))
