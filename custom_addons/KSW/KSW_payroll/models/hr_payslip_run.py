@@ -7,6 +7,16 @@ try:
 except ImportError:
     openpyxl = None
 
+# Excel row styling per export status: status -> (fill colour, font colour).
+# 'ok' is deliberately absent — included rows carry no fill.
+EXPORT_ROW_STYLES = {
+    'excluded_zero': ('FFC7CE', '9C0006'),   # red   — NET <= 0, not payable
+    'excluded_other': ('FFEB9C', '9C6500'),  # amber — dropped for another reason
+    'warning': ('FFEB9C', '9C6500'),         # amber — in the file but needs a look
+}
+
+EXCLUDED_STATUSES = ('excluded_zero', 'excluded_other')
+
 
 class KswPayslipRunBankTotal(models.Model):
     """Per-bank-account NET total summary for a payslip batch.
@@ -222,10 +232,79 @@ class HrPayslipRun(models.Model):
         )
 
     # ------------------------------------------------------------------
+    # Export classification — shared by every Excel sheet
+    # ------------------------------------------------------------------
+
+    def _classify_export_slips(self, slips, file_type='wps'):
+        """Return ``[(slip, status, reason)]`` in ``_sorted_export_slips`` order.
+
+        ``status`` mirrors exactly what the bank **text** file does with the row,
+        so the Excel colour is never a guess:
+
+        ``ok``
+            written to the text file, no fill
+        ``excluded_zero``
+            NET <= 0, dropped from the text file (red)
+        ``excluded_other``
+            dropped from the text file for another reason (amber)
+        ``warning``
+            written to the text file but needs attention (amber)
+
+        The text-file builders keep their own predicates; this must stay in
+        agreement with them (``_build_wps_text``, ``_build_kawthar_text``).
+        """
+        rows = []
+        for slip in self._sorted_export_slips(slips):
+            net = self._get_line_total(slip, 'NET')
+            bank = slip.employee_id.sudo().primary_bank_account_id
+            if not net:
+                status = 'excluded_zero'
+                reason = _('Zero net salary — fully absorbed by deductions')
+            elif net < 0:
+                status = 'excluded_zero'
+                reason = _('Negative net (%.2f) — over-deducted', net)
+            elif not bank and file_type == 'kawthar':
+                status = 'excluded_other'
+                reason = _('No payroll card / bank account on the employee')
+            elif not bank:
+                status = 'warning'
+                reason = _('No IBAN on the employee — still written to the '
+                           'text file')
+            else:
+                status = 'ok'
+                reason = _('Included in bank text file')
+            rows.append((slip, status, reason))
+        return rows
+
+    def _style_export_row(self, ws, row_idx, ncols, status):
+        """Apply the status fill/font to every cell of an Excel row."""
+        style = EXPORT_ROW_STYLES.get(status)
+        if not style:
+            return
+        fill_rgb, font_rgb = style
+        fill = PatternFill('solid', fgColor=fill_rgb)
+        font = Font(color=font_rgb)
+        for ci in range(1, ncols + 1):
+            c = ws.cell(row_idx, ci)
+            c.fill = fill
+            c.font = font
+
+    def _write_export_banner(self, ws, last_row, text):
+        """Write a bold separator banner below ``last_row``.
+
+        Row ``last_row + 1`` is left blank so the banner is visually detached
+        from the rows above it. Returns the first free row index after the
+        banner.
+        """
+        c = ws.cell(last_row + 2, 1, text)
+        c.font = Font(bold=True, size=11, color='9C6500')
+        return last_row + 3
+
+    # ------------------------------------------------------------------
     # Sheet 1 — Internal payroll summary
     # ------------------------------------------------------------------
 
-    def _fill_payroll_summary_sheet(self, wb, slips=None):
+    def _fill_payroll_summary_sheet(self, wb, slips=None, file_type='wps'):
         if slips is None:
             slips = self.slip_ids
         ws = wb.active
@@ -237,6 +316,7 @@ class HrPayslipRun(models.Model):
             'Gross', 'Absence Deduction', 'Attendance Deductions',
             'Missed Days (ATT SHEET)', 'Social Insurance', 'Loan',
             'Net Salary', 'Bank Account Number', 'Bank Name',
+            'Bank File Status',
         ]
 
         hdr_font = Font(bold=True, size=11)
@@ -254,7 +334,11 @@ class HrPayslipRun(models.Model):
             c.alignment = hdr_align
             c.border = thin
 
-        for ri, slip in enumerate(self._sorted_export_slips(slips), 2):
+        ri = 1
+        for slip, status, reason in self._classify_export_slips(
+            slips, file_type,
+        ):
+            ri += 1
             emp = slip.employee_id
             bank = emp.sudo().primary_bank_account_id
             is_sheet = emp.sudo().x_is_attendance_sheet
@@ -309,10 +393,27 @@ class HrPayslipRun(models.Model):
                 net,
                 bank.acc_number if bank else '',
                 bank.bank_id.name if bank and bank.bank_id else '',
+                reason,
             ]
             for ci, v in enumerate(row, 1):
                 c = ws.cell(row=ri, column=ci, value=v)
                 c.border = thin
+            self._style_export_row(ws, ri, len(headers), status)
+
+        # Employees that never got a payslip in this batch. They have no
+        # resolved paying bank, so they cannot be attributed to a single bank
+        # file — they belong on this internal sheet only.
+        if self.x_skip_line_ids:
+            ri = self._write_export_banner(
+                ws, ri, _('Employees with no payslip in this batch'),
+            )
+            for line in self.x_skip_line_ids:
+                ws.cell(ri, 1, line.employee_id.name or '').border = thin
+                ws.cell(ri, len(headers), line.reason or '').border = thin
+                self._style_export_row(
+                    ws, ri, len(headers), 'excluded_other',
+                )
+                ri += 1
 
         # Auto-width columns
         for ci in range(1, len(headers) + 1):
@@ -384,6 +485,8 @@ class HrPayslipRun(models.Model):
             'Basic Salary', 'Housing Allowance', 'Other Earnings',
             'Deductions', 'Branch Code', 'Branch Name',
             'Employee Remarks', 'Employee Department',
+            # Column O — past the 14-column bank template, review use only
+            'Status',
         ]
         ar_headers = [
             'بنك الموظف', 'رقم أيبان الموظف', 'إسم الموظف',
@@ -391,6 +494,7 @@ class HrPayslipRun(models.Model):
             'الراتب الأساسي', 'بدل السكن', 'بدل أخرى',
             'الخصومات', 'رمز الفرع', 'اسم الفرع',
             'ملاحظات الموظف', 'قسم الموظف',
+            'الحالة',
         ]
 
         for ci, (e, a) in enumerate(zip(en_headers, ar_headers), 1):
@@ -406,16 +510,20 @@ class HrPayslipRun(models.Model):
             c7.border = thin
             c7.alignment = Alignment(horizontal='center')
 
-        # ── Data rows (row 8+), skip employees with net == 0 ──
-        ri = 8
-        for slip in self._sorted_export_slips(slips):
-            net = self._get_line_total(slip, 'NET')
-            if not net:
-                continue
+        # ── Data rows (row 8+) ──
+        # Every payslip is written, so the reviewer can see WHY someone was
+        # left out of the text file. Rows the text file drops are pushed into
+        # a trailing block behind a banner, keeping the top of the sheet
+        # upload-ready.
+        classified = self._classify_export_slips(slips, 'wps')
+        included = [r for r in classified if r[1] not in EXCLUDED_STATUSES]
+        excluded = [r for r in classified if r[1] in EXCLUDED_STATUSES]
 
+        def _write(row_idx, slip, status, reason):
             emp = slip.employee_id
             bank = emp.sudo().primary_bank_account_id
 
+            net = self._get_line_total(slip, 'NET')
             basic = self._get_line_total(slip, 'BASIC')
             hra = self._get_line_total(slip, 'HRA')
             gross = self._get_line_total(slip, 'GROSS')
@@ -441,11 +549,26 @@ class HrPayslipRun(models.Model):
                 '',               # L: Branch Name
                 '',               # M: Employee Remarks
                 emp.department_id.name if emp.department_id else '',
+                reason,           # O: Status (review only)
             ]
             for ci, v in enumerate(data, 1):
-                c = ws.cell(ri, ci, v)
+                c = ws.cell(row_idx, ci, v)
                 c.border = thin
+            self._style_export_row(ws, row_idx, len(en_headers), status)
+
+        ri = 8
+        for slip, status, reason in included:
+            _write(ri, slip, status, reason)
             ri += 1
+
+        if excluded:
+            ri = self._write_export_banner(ws, ri - 1, _(
+                'Excluded from the bank text file — review only, '
+                'delete these rows before uploading'
+            ))
+            for slip, status, reason in excluded:
+                _write(ri, slip, status, reason)
+                ri += 1
 
         # Auto-width columns
         for ci in range(1, len(en_headers) + 1):

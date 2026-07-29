@@ -5,12 +5,12 @@
         <field name="name">ksw.loan.payment.wizard.form</field>
         <field name="model">ksw.loan.payment.wizard</field>
         <field name="arch" type="xml">
-            <form string="Record Loan Payment">
+            <form string="Record Payment">
                 <sheet>
                     <!-- Hidden fields loaded for invisible= expressions -->
                     <field name="is_full_payment" invisible="1"/>
 
-                    <group string="Loan">
+                    <group string="Deduction">
                         <group>
                             <field name="employee_id" readonly="1"/>
                             <field name="deduction_id" readonly="1"/>

@@ -7,7 +7,15 @@ from odoo.exceptions import UserError, ValidationError
 
 
 class KswLoanPaymentWizard(models.TransientModel):
-    """Record a payment made outside payroll against a loan.
+    """Record a payment made outside payroll against a deduction.
+
+    Works for every type — loans, salary advances and penalties alike.
+    Who may open it is decided per-record by
+    ``ksw.deduction.x_can_edit_installments``: accounting
+    (``group_installment_edit``) can close any type, HR
+    (``group_hr_deduction_officer`` / ``group_loan_hr``) can close
+    HR-managed types only. The model keeps its historical
+    ``ksw.loan.payment.wizard`` name.
 
     Full payment (payment_amount == outstanding) always behaves the same:
     every pending installment is stamped paid/manual in-place, no extra row.
@@ -40,7 +48,7 @@ class KswLoanPaymentWizard(models.TransientModel):
     """
 
     _name = 'ksw.loan.payment.wizard'
-    _description = 'Record Loan Payment'
+    _description = 'Record Deduction Payment'
 
     deduction_id = fields.Many2one(
         'ksw.deduction', required=True, readonly=True, ondelete='cascade',
@@ -198,17 +206,22 @@ class KswLoanPaymentWizard(models.TransientModel):
         self.ensure_one()
         ded = self.deduction_id
 
-        if not self.env.su:
-            if not self.env.user.has_group(
-                    'KSW_deduction.group_installment_edit'):
-                raise UserError(_(
-                    "Recording a loan payment requires the 'Loan "
-                    "Installment Modification' privilege."
-                ))
+        # Same per-record matrix the Installments tab uses: accounting
+        # (Loan Modification = Full) closes any type, HR officers and HR
+        # approvers close HR-managed types (advances, penalties). The
+        # compute also requires the deduction to be active.
+        if not self.env.su and not ded.x_can_edit_installments:
+            raise UserError(_(
+                "You are not allowed to record a payment on this "
+                "deduction. Accounting staff with the 'Loan Modification: "
+                "Full' privilege can settle any type; HR officers and HR "
+                "approvers can settle HR-managed types (salary advances "
+                "and penalties) only."
+            ))
 
         pending = self._pending_in_due_order(ded)
         if not pending:
-            raise UserError(_("This loan has no pending installments."))
+            raise UserError(_("This deduction has no pending installments."))
 
         cur = ded.currency_id
         outstanding = sum(pending.mapped('amount'))

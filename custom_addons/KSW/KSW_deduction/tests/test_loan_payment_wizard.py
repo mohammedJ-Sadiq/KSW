@@ -368,3 +368,161 @@ class TestLoanPaymentWizard(DeductionCommon):
         self.assertIn('Partially settled', bodies)
         self.assertIn(lines[0].display_name, bodies)
         self.assertIn(lines[1].display_name, bodies)
+
+
+class TestNonLoanPaymentWizard(DeductionCommon):
+    """The payment wizard is not loan-only.
+
+    Salary advances and penalties (managed_by='hr') can be settled
+    outside payroll too. Who may do it follows the same per-record
+    matrix as the Installments tab (`x_can_edit_installments`):
+    accounting closes any type, HR closes HR-managed types only.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        Users = cls.env['res.users'].with_context(no_reset_password=True)
+
+        def _mk(login, group_xmlids):
+            return Users.create({
+                'name': login,
+                'login': login,
+                'email': f'{login}@kswnl.test',
+                'group_ids': [(6, 0, [cls.env.ref(g).id for g in group_xmlids])],
+            })
+
+        cls.user_acc = _mk(
+            'kswnl_acc', ['KSW_deduction.group_installment_edit'])
+        cls.user_hr_officer = _mk(
+            'kswnl_hr_officer',
+            ['KSW_deduction.group_hr_deduction_officer'])
+        cls.user_loan_hr = _mk(
+            'kswnl_loan_hr', ['KSW_deduction.group_loan_hr'])
+        cls.user_plain = _mk(
+            'kswnl_plain', ['KSW_deduction.group_deduction_user'])
+
+    # ------------------------------------------------------------------ #
+    # Helpers                                                               #
+    # ------------------------------------------------------------------ #
+
+    def _active_non_loan(self, ded_type=None, amount=1000.0, installments=4):
+        """A submitted (therefore active) HR-managed deduction."""
+        ded = self._make_deduction(ded_type or self.type_advance,
+                                   amount=amount, installments=installments)
+        ded.action_submit()
+        self.assertEqual(ded.state, 'active')
+        self.assertFalse(ded.is_loan)
+        self.assertEqual(ded.managed_by, 'hr')
+        return ded
+
+    def _active_loan(self, amount=6000.0, installments=4):
+        ded = self._make_deduction(self.type_loan, amount=amount,
+                                   installments=installments)
+        self._walk_loan_to_pending_gm(ded)
+        ded.action_gm_approve()
+        ded.action_disbursement_confirm()
+        self.assertEqual(ded.state, 'active')
+        return ded
+
+    def _wizard(self, ded, payment_amount, note='', user=None, mode=None):
+        Wizard = self.env['ksw.loan.payment.wizard']
+        if user is not None:
+            Wizard = Wizard.with_user(user)
+        vals = {
+            'deduction_id': ded.id,
+            'payment_amount': payment_amount,
+            'payment_date': self.this_month,
+            'note': note,
+        }
+        if mode is not None:
+            vals['application_mode'] = mode
+        return Wizard.create(vals)
+
+    # ------------------------------------------------------------------ #
+    # Button gating (x_can_edit_installments drives the header button)      #
+    # ------------------------------------------------------------------ #
+
+    def test_hr_officer_can_edit_installments_on_advance(self):
+        ded = self._active_non_loan()
+        self.assertTrue(
+            ded.with_user(self.user_hr_officer).x_can_edit_installments)
+
+    def test_hr_officer_cannot_edit_installments_on_loan(self):
+        ded = self._active_loan()
+        self.assertFalse(
+            ded.with_user(self.user_loan_hr).x_can_edit_installments)
+
+    def test_accounting_can_edit_installments_on_advance(self):
+        ded = self._active_non_loan()
+        self.assertTrue(ded.with_user(self.user_acc).x_can_edit_installments)
+
+    # ------------------------------------------------------------------ #
+    # HR settles an HR-managed deduction                                    #
+    # ------------------------------------------------------------------ #
+
+    def test_hr_officer_full_payment_on_advance_completes_it(self):
+        ded = self._active_non_loan(amount=1000.0, installments=4)
+        wiz = self._wizard(ded, 1000.0, note='Cash SR-11',
+                           user=self.user_hr_officer)
+        wiz.action_confirm()
+        self.assertTrue(all(l.state == 'paid' for l in ded.line_ids))
+        self.assertEqual(ded.state, 'completed')
+        bodies = ' '.join(str(m.body or '') for m in ded.message_ids)
+        self.assertIn('Cash SR-11', bodies)
+
+    def test_hr_officer_sequential_partial_on_penalty_splits_installment(self):
+        ded = self._active_non_loan(self.type_gov_pen, amount=400.0,
+                                    installments=4)
+        wiz = self._wizard(ded, 150.0, user=self.user_hr_officer)
+        wiz.action_confirm()
+        paid = ded.line_ids.filtered(lambda l: l.state == 'paid')
+        self.assertEqual(len(paid), 2)               # 100 + 50 of the second
+        self.assertAlmostEqual(sum(paid.mapped('amount')), 150.0, places=2)
+        relevant = ded.line_ids.filtered(
+            lambda l: l.state in ('pending', 'paid'))
+        self.assertAlmostEqual(sum(relevant.mapped('amount')), 400.0, places=2)
+        self.assertEqual(ded.state, 'active')
+
+    def test_loan_hr_approver_can_settle_advance(self):
+        ded = self._active_non_loan(amount=800.0, installments=2)
+        wiz = self._wizard(ded, 800.0, user=self.user_loan_hr)
+        wiz.action_confirm()
+        self.assertEqual(ded.state, 'completed')
+
+    def test_accounting_can_settle_advance_too(self):
+        ded = self._active_non_loan(amount=800.0, installments=2)
+        wiz = self._wizard(ded, 800.0, user=self.user_acc)
+        wiz.action_confirm()
+        self.assertEqual(ded.state, 'completed')
+
+    def test_redistribute_mode_works_on_advance(self):
+        ded = self._active_non_loan(amount=1000.0, installments=4)
+        wiz = self._wizard(ded, 200.0, user=self.user_hr_officer,
+                           mode='redistribute')
+        wiz.action_confirm()
+        pending = ded.line_ids.filtered(lambda l: l.state == 'pending')
+        self.assertEqual(len(pending), 4)
+        self.assertAlmostEqual(sum(pending.mapped('amount')), 800.0, places=2)
+
+    # ------------------------------------------------------------------ #
+    # Auth guards                                                           #
+    # ------------------------------------------------------------------ #
+
+    def test_hr_approver_blocked_from_settling_a_loan(self):
+        """group_loan_hr sees loans but may not close accounting-managed ones."""
+        ded = self._active_loan(amount=6000.0, installments=4)
+        wiz = self._wizard(ded, 1000.0, user=self.user_loan_hr)
+        with self.assertRaises(UserError):
+            wiz.action_confirm()
+
+    def test_plain_user_still_blocked_at_acl_level_on_non_loan(self):
+        ded = self._active_non_loan()
+        with self.assertRaises(AccessError):
+            self._wizard(ded, 100.0, user=self.user_plain)
+
+    def test_overpayment_rejected_on_advance(self):
+        ded = self._active_non_loan(amount=500.0, installments=2)
+        wiz = self._wizard(ded, 600.0, user=self.user_hr_officer)
+        with self.assertRaises(ValidationError):
+            wiz.action_confirm()

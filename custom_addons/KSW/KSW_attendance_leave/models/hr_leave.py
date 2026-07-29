@@ -188,7 +188,7 @@ class HrLeave(models.Model):
     @api.depends('x_attendance_ids', 'x_attendance_line_ids.accepted_minutes')
     def _compute_display_name(self):
         """Override to show the full date range for attendance-based leaves."""
-        attendance_leaves = self.filtered('x_attendance_ids')
+        attendance_leaves = self._attendance_issue_leaves()
         remaining = self - attendance_leaves
 
         if remaining:
@@ -234,6 +234,25 @@ class HrLeave(models.Model):
                     start=display_date,
                     count=record_count,
                 )
+
+    def _attendance_issue_leaves(self):
+        """Return the leaves whose duration really is derived from attendance issues.
+
+        `x_attendance_ids` is also filled on ordinary leave types (business trip,
+        sick, umrah…) by `_auto_link_absence_attendance()` — there it only marks
+        which absence records the leave covers, and must NOT change the duration.
+        Duration / display overrides therefore filter on the leave type,
+        never on the m2m being non-empty.
+
+        Hour-unit leaves (Late Excuse / Early Excuse) are included even when the
+        type is not flagged: they exist solely to excuse late/early minutes and
+        their duration must stay driven by the accepted minutes.
+        """
+        return self.filtered(
+            lambda l: l.x_attendance_ids and (
+                l.holiday_status_id.is_attendance_issue or l.request_unit_hours
+            )
+        )
 
     @api.constrains('x_attendance_ids', 'holiday_status_id')
     def _check_attendance_ids_required(self):
@@ -287,17 +306,25 @@ class HrLeave(models.Model):
         """Get daily work hours from resource.calendar.group.line
         via: employee -> resource_calendar_id -> (m2m) resource.calendar.group -> line_ids.
         Break hours are deducted from the total.
+
+        Without `check_in_date` there is no single day to measure, so the
+        average over the week's working days is returned.  (Summing the
+        unfiltered group lines would yield the WEEKLY total — e.g. 48.5 h — and
+        that value used to leak into `number_of_hours`.)
         """
         calendar = employee.resource_calendar_id
         if not calendar:
             return 8.0
 
-        lines = self._get_group_lines_for_calendar(calendar, target_date=check_in_date)
+        lines = (
+            self._get_group_lines_for_calendar(calendar, target_date=check_in_date)
+            if check_in_date else self.env['resource.calendar.group.line']
+        )
 
         if not lines:
             if check_in_date:
                 return 8.0
-            # Fallback: compute average from all lines
+            # No specific date: average the week's hours over its working days
             calendar_groups = calendar.calendar_group_ids
             if not calendar_groups:
                 return 8.0
@@ -403,7 +430,7 @@ class HrLeave(models.Model):
         """Override to compute duration from accepted minutes for attendance-based leaves,
         and group-line working days for other non-attendance leaves.
         Annual-leave calendar-day logic is handled by KSW_annual_leave."""
-        leaves_with_attendance = self.filtered('x_attendance_ids')
+        leaves_with_attendance = self._attendance_issue_leaves()
         remaining = self - leaves_with_attendance
 
         if remaining:
@@ -417,8 +444,13 @@ class HrLeave(models.Model):
                         leave.number_of_days = days
                         leave.number_of_hours = hours
 
+        # x_exceeds_annual_balance lives in KSW_annual_leave, which depends on
+        # this module — it is absent while this module's own tests run.
+        has_annual_flag = 'x_exceeds_annual_balance' in self._fields
+
         for leave in leaves_with_attendance:
-            leave.x_exceeds_annual_balance = False
+            if has_annual_flag:
+                leave.x_exceeds_annual_balance = False
             if leave.request_unit_hours:
                 total_accepted = leave._get_total_accepted_minutes()
                 total_hours = total_accepted / 60.0
@@ -435,10 +467,30 @@ class HrLeave(models.Model):
                 leave.number_of_days = absent_count
                 leave.number_of_hours = absent_hours
 
+    def _leave_local_dates(self, leave):
+        """Return the (start, end) dates of a leave as the user requested them.
+
+        `date_from` / `date_to` are UTC datetimes — in Riyadh a one-day leave is
+        stored as 21:00 of the previous day → 20:59 of the day itself, so taking
+        `.date()` off them counts one extra day.  `request_date_from/to` are
+        plain dates and are what the form shows, so prefer them.
+        """
+        start = leave.request_date_from
+        end = leave.request_date_to or start
+        if not start:
+            start = leave.date_from.date() if leave.date_from else None
+            end = leave.date_to.date() if leave.date_to else start
+        return (start, end)
+
     def _compute_days_from_group_lines(self, leave):
-        """Count working days between date_from and date_to using
+        """Count working days over the leave's date range using
         resource.calendar.group.line when standard attendance_ids are empty."""
-        calendar = leave.employee_id.resource_calendar_id
+        start, end = self._leave_local_dates(leave)
+        return self._count_group_line_days(leave.employee_id, start, end)
+
+    def _count_group_line_days(self, employee, start, end):
+        """(days, hours) between two dates from resource.calendar.group.line."""
+        calendar = employee.resource_calendar_id
         if not calendar or not calendar.calendar_group_ids:
             return (0, 0)
 
@@ -453,31 +505,42 @@ class HrLeave(models.Model):
 
         # Count working days in the date range
         from datetime import timedelta
-        start = leave.date_from.date() if hasattr(leave.date_from, 'date') else leave.date_from
-        end = leave.date_to.date() if hasattr(leave.date_to, 'date') else leave.date_to
+        if not start or not end:
+            return (0, 0)
 
         work_days = 0
+        covered = False       # any group line valid on any day of the range
         current = start
         while current <= end:
-            if current.weekday() in work_weekdays:
-                # Check if group lines cover this specific date
-                day_lines = all_lines.filtered(
-                    lambda l, d=current: (not l.start_date or l.start_date <= d)
-                                         and (not l.end_date or l.end_date >= d)
-                                         and l.dayofweek == str(d.weekday())
-                )
-                if day_lines:
+            day_lines = all_lines.filtered(
+                lambda l, d=current: (not l.start_date or l.start_date <= d)
+                                     and (not l.end_date or l.end_date >= d)
+            )
+            if day_lines:
+                covered = True
+                if current.weekday() in work_weekdays and day_lines.filtered(
+                    lambda l, d=current: l.dayofweek == str(d.weekday())
+                ):
                     work_days += 1
             current += timedelta(days=1)
 
         # Calculate average daily hours for the total hours figure
-        daily_hours = self._get_daily_work_hours(leave.employee_id)
+        daily_hours = self._get_daily_work_hours(employee) or 8.0
+
+        if not work_days and not covered:
+            # The work schedule says nothing about this period at all — usually
+            # a schedule group whose lines expired and were never extended.
+            # Falling through with 0 would display "0 days" for a real absence,
+            # so count calendar days instead.
+            cal_days = (end - start).days + 1
+            return (cal_days, cal_days * daily_hours)
+
         return (work_days, work_days * daily_hours)
 
     def _get_durations(self, check_leave_type=True, resource_calendar=None):
         """Override to use accepted minutes for attendance-based leaves,
         and group lines fallback for others."""
-        attendance_leaves = self.filtered('x_attendance_ids')
+        attendance_leaves = self._attendance_issue_leaves()
         remaining = self - attendance_leaves
 
         result = {}
@@ -627,7 +690,7 @@ class HrLeave(models.Model):
     def _get_number_of_days(self, date_from, date_to, employee_id):
         """Override to return attendance-based day count using accepted minutes,
         and group lines for other non-attendance leaves."""
-        if self and self.x_attendance_ids:
+        if self and self._attendance_issue_leaves():
             if self.request_unit_hours:
                 total_accepted = self._get_total_accepted_minutes()
                 total_hours = total_accepted / 60.0
@@ -655,31 +718,14 @@ class HrLeave(models.Model):
         result = {'days': 0, 'hours': 0}
         if date_from and date_to and employee_id:
             employee = self.env['hr.employee'].browse(employee_id)
-            calendar = employee.resource_calendar_id
-            if calendar and calendar.calendar_group_ids:
-                from datetime import timedelta
-                all_lines = calendar.calendar_group_ids.mapped('line_ids').filtered(
-                    lambda l: l.day_period != 'break'
-                )
-                if all_lines:
-                    work_weekdays = set(int(d) for d in all_lines.mapped('dayofweek'))
-                    start = date_from.date() if hasattr(date_from, 'date') else date_from
-                    end = date_to.date() if hasattr(date_to, 'date') else date_to
-                    work_days = 0
-                    current = start
-                    while current <= end:
-                        if current.weekday() in work_weekdays:
-                            day_lines = all_lines.filtered(
-                                lambda l, d=current: (not l.start_date or l.start_date <= d)
-                                                     and (not l.end_date or l.end_date >= d)
-                                                     and l.dayofweek == str(d.weekday())
-                            )
-                            if day_lines:
-                                work_days += 1
-                        current += timedelta(days=1)
-                    if work_days > 0:
-                        daily_hours = self._get_daily_work_hours(employee)
-                        result = {'days': work_days, 'hours': work_days * daily_hours}
+            if self:
+                start, end = self._leave_local_dates(self[0])
+            else:
+                start = date_from.date() if hasattr(date_from, 'date') else date_from
+                end = date_to.date() if hasattr(date_to, 'date') else date_to
+            days, hours = self._count_group_line_days(employee, start, end)
+            if days > 0:
+                result = {'days': days, 'hours': hours}
         return result
 
     @api.constrains('date_from', 'date_to', 'employee_id')

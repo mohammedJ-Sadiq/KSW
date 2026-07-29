@@ -21,5 +21,7 @@ access_ksw_deduction_loan_delete,ksw.deduction.loan.delete,model_ksw_deduction,K
 access_ksw_loan_request_wizard_user,ksw.loan.request.wizard.user,model_ksw_loan_request_wizard,base.group_user,1,1,1,1
 access_ksw_loan_refuse_wizard_user,ksw.loan.refuse.wizard.user,model_ksw_loan_refuse_wizard,base.group_user,1,1,1,1
 access_ksw_loan_payment_wizard,ksw.loan.payment.wizard,model_ksw_loan_payment_wizard,KSW_deduction.group_installment_edit,1,1,1,1
+access_ksw_loan_payment_wizard_hr_officer,ksw.loan.payment.wizard.hr.officer,model_ksw_loan_payment_wizard,KSW_deduction.group_hr_deduction_officer,1,1,1,1
+access_ksw_loan_payment_wizard_loan_hr,ksw.loan.payment.wizard.loan.hr,model_ksw_loan_payment_wizard,KSW_deduction.group_loan_hr,1,1,1,1
 
 

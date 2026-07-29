@@ -374,9 +374,17 @@ because the accounting user may lack write scope to HR-managed deductions via re
 rules, yet is authorised to trigger auto-completion (auth is checked before the loop).
 
 ### ksw.loan.payment.wizard
-`wizard/ksw_loan_payment_wizard.py` — TransientModel for partial or full loan
-payments outside payroll. Only `group_installment_edit` users can open it (ACL +
-Python auth guard inside `action_confirm`).
+`wizard/ksw_loan_payment_wizard.py` — TransientModel for partial or full payments
+outside payroll. **Not loan-only** (widened July 2026): the **Record Payment** header
+button shows on any *active* deduction that has pending installments. Both the
+button's `invisible=` and the `action_confirm` guard read
+`ksw.deduction.x_can_edit_installments` — the same matrix as the Installments tab:
+accounting (`group_installment_edit`) settles any type, HR
+(`group_hr_deduction_officer`, `group_loan_hr`) settles `managed_by='hr'` types only.
+The button's `groups=` list is only a coarse pre-filter and **must stay a superset** of
+the groups that compute can grant, or a user who passes the button filter will be
+missing the field from `fields_get()` and crash (gotcha #31). The model keeps its
+historical `ksw.loan.payment.wizard` name.
 
 - **Full payment** (`payment_amount == total_outstanding`): stamps all pending lines
   as paid in-place via O2M `(1, id, vals)` commands on the parent write. No new
@@ -725,3 +733,34 @@ allocation is needed. All test leave types that do not require allocation must u
       `groups='hr.group_hr_user'`; it is only shown (view-level `groups=`) on the
       admin-only employee payroll page and read by the payslip batch wizard (a
       payroll-group user), both of which retain access.
+
+33. **`x_attendance_ids` means two different things — duration overrides must gate on
+    the leave TYPE, not on the m2m being non-empty.** `_auto_link_absence_attendance()`
+    fills `x_attendance_ids` on *ordinary* leave types (business trip, sick, umrah)
+    when they are validated, purely to mark the covered absences. But every duration /
+    display override filtered on `self.filtered('x_attendance_ids')`, so an ordinary
+    leave was silently reclassified as an attendance-issue leave and
+    `number_of_days` became **the count of linked absence rows** (KSWCO leave 4853:
+    Jul 22 → Jul 31 displayed "6 days — 6 records"; the two Fridays produce no absence
+    row and Jul 29–31 had not synced yet). The number also crept up nightly, because
+    `hr.attendance.create()` auto-links new absences to already-validated leaves.
+    Use the gate helper instead:
+    ```python
+    def _attendance_issue_leaves(self):
+        return self.filtered(
+            lambda l: l.x_attendance_ids and (
+                l.holiday_status_id.is_attendance_issue or l.request_unit_hours
+            )
+        )
+    ```
+    `request_unit_hours` is in the gate on purpose — the live Late/Early Excuse types
+    are NOT flagged `is_attendance_issue` yet must keep the accepted-minutes duration.
+    Related traps fixed in the same pass (`KSW_attendance_leave/models/hr_leave.py`):
+    `_get_daily_work_hours(emp)` without a date summed the **whole week** (48.5 h) and
+    leaked into `number_of_hours`; counting days off `date_from.date()` is off by one
+    in Riyadh (21:00 → 20:59 UTC) so use `request_date_from/to`; and a work-schedule
+    group whose lines expired (`end_date` in the past) yields a **0-day** leave —
+    `_count_group_line_days` now falls back to calendar days when no group line covers
+    any day of the range. When repairing stored durations, **exclude annual leaves** —
+    theirs depends on the balance at request time, so recomputing restamps them with
+    today's balance.

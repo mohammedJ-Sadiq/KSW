@@ -588,7 +588,13 @@ class KswDeduction(models.Model):
     # ==================================================================
 
     def action_record_payment(self):
-        """Open the loan payment wizard (partial or full payment outside payroll)."""
+        """Open the payment wizard (partial or full payment outside payroll).
+
+        Available on any active deduction type — loans, salary advances
+        and penalties. The privilege check lives in
+        `ksw.loan.payment.wizard.action_confirm`, which mirrors
+        `x_can_edit_installments`.
+        """
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
@@ -1472,9 +1478,9 @@ class KswDeduction(models.Model):
             if ded.currency_id.compare_amounts(total, ded.amount) != 0:
                 diff = ded.amount - total
                 raise ValidationError(_(
-                    "The sum of the installments on loan %(name)s no "
-                    "longer matches the total loan amount.\n\n"
-                    "  • Total loan amount : %(amt).2f %(cur)s\n"
+                    "The sum of the installments on %(name)s no "
+                    "longer matches the total amount.\n\n"
+                    "  • Total amount      : %(amt).2f %(cur)s\n"
                     "  • Sum of installments: %(tot).2f %(cur)s\n"
                     "  • Difference        : %(diff).2f %(cur)s\n\n"
                     "Adjust one or more of the other pending "
