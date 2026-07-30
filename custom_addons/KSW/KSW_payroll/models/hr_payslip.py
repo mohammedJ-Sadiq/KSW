@@ -298,20 +298,18 @@ class HrPayslip(models.Model):
         for lv in sick_leaves:
             ls = max(lv.request_date_from, year_start)
             le = min(lv.request_date_to, year_end)
-            total_cal = (lv.request_date_to - lv.request_date_from).days + 1
-            clip_cal = (le - ls).days + 1
-            lv_days = lv.number_of_days * clip_cal / total_cal if total_cal else 0.0
+            # Sick leave counts all calendar days — use them directly.
             if le < ps_start:
-                prior += lv_days
+                prior += (le - ls).days + 1
             elif ls > ps_end:
                 pass
             elif ls >= ps_start and le <= ps_end:
-                period += lv_days
+                period += (le - ls).days + 1
             else:
                 pre_cal = max(0, (ps_start - ls).days)
                 in_cal = (min(le, ps_end) - max(ls, ps_start)).days + 1
-                prior += lv_days * pre_cal / clip_cal
-                period += lv_days * in_cal / clip_cal
+                prior += pre_cal
+                period += in_cal
         if period <= 0:
             return 'Sick Leave Pay Adjustment'
         end_cum = prior + period
