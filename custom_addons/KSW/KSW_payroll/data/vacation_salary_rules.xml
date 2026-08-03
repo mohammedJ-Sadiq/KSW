@@ -94,6 +94,26 @@ Filled by the Accounting department during the annual leave approval process.</f
         </record>
 
         <!-- ========================================================= -->
+        <!-- Other Deductions (DED)                                     -->
+        <!-- Reads from payslip input line 'OTHER_DEDUCTIONS'           -->
+        <!-- Input is stored positive; the rule emits it negative.      -->
+        <!-- ========================================================= -->
+        <record id="hr_rule_other_deductions" model="hr.salary.rule">
+            <field name="name">Other Deductions</field>
+            <field name="sequence" eval="174"/>
+            <field name="code">OTHER_DEDUCTIONS</field>
+            <field name="category_id" ref="om_hr_payroll.DED"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = inputs.OTHER_DEDUCTIONS and inputs.OTHER_DEDUCTIONS.amount</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = -inputs.OTHER_DEDUCTIONS.amount if inputs.OTHER_DEDUCTIONS else 0.0</field>
+            <field name="appears_on_payslip" eval="True"/>
+            <field name="note">Sum of the Additional Deductions Detail lines on the leave
+request. Filled by the Accounting department during the annual leave approval
+process.</field>
+        </record>
+
+        <!-- ========================================================= -->
         <!-- Financial Consideration for Excess Leave (DED)             -->
         <!-- Reads from payslip input line 'FIN_CONSIDERATION'          -->
         <!-- ========================================================= -->
@@ -181,6 +201,7 @@ vacation payslips to avoid double deduction of the vacation month.</field>
                 (4, ref('hr_rule_penalty')),
                 (4, ref('hr_rule_additional_commissions')),
                 (4, ref('hr_rule_remaining_loans')),
+                (4, ref('hr_rule_other_deductions')),
                 (4, ref('hr_rule_fin_consideration')),
                 (4, ref('hr_rule_visa_cost_recovery')),
                 (4, ref('hr_rule_vacation_hra')),

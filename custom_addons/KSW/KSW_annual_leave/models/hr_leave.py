@@ -577,6 +577,18 @@ class HrLeave(models.Model):
     x_remaining_loans_description = fields.Text(
         string='Remaining Loans Description', copy=False,
     )
+    x_deduction_line_ids = fields.One2many(
+        'hr.leave.deduction.line', 'leave_id',
+        string='Other Deduction Lines', copy=False,
+        help='Individual other-deduction entries (filled by Accounting).',
+    )
+    x_other_deductions = fields.Float(
+        string='Other Deductions', digits=(16, 2),
+        compute='_compute_other_deductions', store=True,
+        tracking=True,
+        help='Sum of all other-deduction lines. Automatically computed. '
+             'Deducted from the vacation payslip.',
+    )
 
     # --- End-of-Service support data (read-only reference for HR/Accounting) ---
     x_eos_service_years = fields.Float(
@@ -605,6 +617,12 @@ class HrLeave(models.Model):
         for leave in self:
             leave.x_additional_commissions = sum(
                 leave.x_commission_line_ids.mapped('amount'))
+
+    @api.depends('x_deduction_line_ids.amount')
+    def _compute_other_deductions(self):
+        for leave in self:
+            leave.x_other_deductions = sum(
+                leave.x_deduction_line_ids.mapped('amount'))
 
     @api.depends(
         'employee_id',
@@ -1201,17 +1219,19 @@ class HrLeave(models.Model):
                     'Only HR Approvers can fill in penalty, iqama renewal, '
                     'and flight ticket fields.')
             acc_set = {k for k in vals if k in self._ACC_ONLY_FIELDS and vals[k]}
-            # For commission lines: treat create (0) or update (1) commands as writes
-            comm_cmds = vals.get('x_commission_line_ids', [])
-            has_comm_write = any(
+            # For commission / other-deduction lines: treat create (0) or
+            # update (1) commands as writes
+            line_cmds = (vals.get('x_commission_line_ids', [])
+                         + vals.get('x_deduction_line_ids', []))
+            has_line_write = any(
                 isinstance(cmd, (list, tuple)) and cmd[0] in (0, 1)
-                for cmd in comm_cmds
+                for cmd in line_cmds
             )
-            if (acc_set or has_comm_write) and not self.env.user.has_group(
+            if (acc_set or has_line_write) and not self.env.user.has_group(
                     'KSW_annual_leave.group_annual_leave_acc'):
                 raise UserError(
                     'Only Accounting Approvers can fill in commission, '
-                    'loan, and flight ticket fields.')
+                    'other deduction, loan, and flight ticket fields.')
 
         # A confirmed return date may still be corrected, but only by the
         # employee's leave manager (the same person who confirmed it).
@@ -1368,7 +1388,8 @@ class HrLeave(models.Model):
         """Clear every chain stamp and, when entering a chain, restart at DM.
 
         sudo() is required on two counts: _reset_annual_multi_fields unlinks
-        x_commission_line_ids (unlink is granted to group_leave_officer only,
+        x_commission_line_ids / x_deduction_line_ids (unlink is granted to
+        group_leave_officer only,
         yet the chain reaches pending_acc while state is still 'confirm' and
         the type field is still editable), and the reset writes fields behind
         the _HR_ONLY_FIELDS / _ACC_ONLY_FIELDS role guards.
@@ -1650,6 +1671,15 @@ class HrLeave(models.Model):
                     body += Markup(' — %(desc)s') % {
                         'desc': leave.x_remaining_loans_description}
                 body += Markup('<br/>')
+            if leave.x_deduction_line_ids:
+                body += Markup('<b>Other Deductions:</b><br/>')
+                for line in leave.x_deduction_line_ids:
+                    body += Markup(
+                        '&nbsp;&nbsp;• %(name)s: %(amt).2f SAR<br/>'
+                    ) % {'name': line.name, 'amt': line.amount}
+                body += Markup(
+                    '<b>Total:</b> %(total).2f SAR<br/>'
+                ) % {'total': leave.x_other_deductions}
             leave.message_post(
                 body=body,
                 subtype_xmlid='mail.mt_note',
@@ -1895,8 +1925,10 @@ class HrLeave(models.Model):
 
     def _reset_annual_multi_fields(self):
         """Reset all multi-step approval fields to their defaults."""
-        # Delete commission lines (cascaded by ORM, but explicit is clearer)
+        # Delete commission / other-deduction lines (cascaded by ORM, but
+        # explicit is clearer)
         self.mapped('x_commission_line_ids').unlink()
+        self.mapped('x_deduction_line_ids').unlink()
         self.write({
             'x_annual_approval_state': False,
             'x_is_full_clearance': False,

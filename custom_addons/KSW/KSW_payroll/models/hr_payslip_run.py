@@ -46,8 +46,31 @@ class KswPayslipRunBankTotal(models.Model):
         string='Type',
         store=True,
     )
-    slip_count = fields.Integer(string='Employees')
-    total_net = fields.Float(string='Total NET', digits=(16, 2))
+    slip_count = fields.Integer(
+        string='Employees',
+        help='Payslips in this batch resolved to this bank account, '
+             'payable or not.',
+    )
+    payable_count = fields.Integer(
+        string='In Bank File',
+        help='Rows the bank text file actually carries.',
+    )
+    total_net = fields.Float(
+        string='Total NET', digits=(16, 2),
+        help='What the bank will debit: the sum of the rows written to the '
+             'text file. Zero and negative NET rows are NOT netted off this '
+             'figure — they are reported separately.',
+    )
+    excluded_count = fields.Integer(
+        string='Excluded',
+        help='Rows dropped from the bank text file (zero or negative NET, '
+             'or no payroll card).',
+    )
+    excluded_net = fields.Float(
+        string='Excluded NET', digits=(16, 2),
+        help='Sum of NET on the dropped rows. Negative when an employee was '
+             'over-deducted.',
+    )
 
 
 class KswPayslipRunSkipLine(models.Model):
@@ -99,28 +122,47 @@ class HrPayslipRun(models.Model):
         return res
 
     def _refresh_bank_totals(self):
-        """Recompute per-bank NET totals from the current slip_ids."""
+        """Recompute per-bank NET totals from the current slip_ids.
+
+        ``total_net`` answers one question only: **what will the bank debit?**
+        So it is built from the same classifier the export files use and sums
+        the payable rows alone. Zero and negative NET rows are counted and
+        summed separately instead of being netted off the payable figure.
+
+        Summing every slip is what made this screen disagree with the file:
+        on the KSWCO July 2026 batch, 4 over-deducted slips at -390 SAR pulled
+        the Kawthar total down to 362,027 while the text file paid 363,587,
+        and the 285 "Employees" included 44 zero-NET rows the bank never sees.
+
+        Grouping is delegated to ``_group_slips_by_bank_account`` so the
+        summary and the export wizard can never resolve banks differently.
+        """
         BankTotal = self.env['ksw.payslip.run.bank.total'].sudo()
         for run in self:
             BankTotal.search([('run_id', '=', run.id)]).unlink()
-            groups = {}
-            fallback = run.x_salary_bank_account_id
-            for slip in run.slip_ids:
-                bank = slip.employee_id.sudo().x_salary_bank_account_id or fallback
-                bid = bank.id if bank else False
-                if bid not in groups:
-                    groups[bid] = {
-                        'run_id': run.id,
-                        'bank_account_id': bid or False,
-                        'slip_count': 0,
-                        'total_net': 0.0,
-                    }
-                net_line = slip.line_ids.filtered(lambda l: l.code == 'NET')
-                net = net_line[:1].total if net_line else 0.0
-                groups[bid]['total_net'] += net
-                groups[bid]['slip_count'] += 1
-            for row in groups.values():
-                BankTotal.create(row)
+            for bank, slips in run._group_slips_by_bank_account().items():
+                payable_count = payable_net = 0
+                excluded_count = excluded_net = 0
+                classified = run._classify_export_slips(
+                    slips, bank.x_file_type or 'wps',
+                )
+                for slip, status, _reason in classified:
+                    net = run._get_line_total(slip, 'NET')
+                    if status in EXCLUDED_STATUSES:
+                        excluded_count += 1
+                        excluded_net += net
+                    else:
+                        payable_count += 1
+                        payable_net += net
+                BankTotal.create({
+                    'run_id': run.id,
+                    'bank_account_id': bank.id or False,
+                    'slip_count': len(slips),
+                    'payable_count': payable_count,
+                    'total_net': payable_net,
+                    'excluded_count': excluded_count,
+                    'excluded_net': excluded_net,
+                })
 
     def done_payslip_run(self):
         """Override: suppress per-slip bank total refresh during bulk validation.
@@ -300,6 +342,48 @@ class HrPayslipRun(models.Model):
         c.font = Font(bold=True, size=11, color='9C6500')
         return last_row + 3
 
+    def _write_export_totals(self, ws, last_row, money_col,
+                             payable_count, payable_net,
+                             excluded_count, excluded_net,
+                             banner=False):
+        """Write the payable / excluded / batch totals under a data block.
+
+        The payable line is the only one that matches the bank text file, so
+        it is stated separately from the batch total instead of leaving the
+        reader to sum the money column — that sum silently nets the negative
+        (over-deducted) rows off the amount the bank will actually debit.
+
+        ``banner`` adds the review-only warning used on the bank upload
+        sheets, where every row below the payable block must be deleted
+        before uploading. Returns the index of the last row written.
+        """
+        bold = Font(bold=True, size=11)
+        ri = last_row + 2
+        if banner:
+            c = ws.cell(ri, 1, _('Totals — review only, delete these rows '
+                                 'before uploading'))
+            c.font = Font(bold=True, size=11, color='9C6500')
+            ri += 2
+        rows = [(
+            _('Total written to the bank file (%s rows)', payable_count),
+            payable_net,
+        )]
+        if excluded_count:
+            rows.append((
+                _('Excluded from the bank file (%s rows)', excluded_count),
+                excluded_net,
+            ))
+            rows.append((
+                _('Batch total (all %s rows)',
+                  payable_count + excluded_count),
+                payable_net + excluded_net,
+            ))
+        for label, amount in rows:
+            ws.cell(ri, 1, label).font = bold
+            ws.cell(ri, money_col, amount).font = bold
+            ri += 1
+        return ri - 1
+
     # ------------------------------------------------------------------
     # Sheet 1 — Internal payroll summary
     # ------------------------------------------------------------------
@@ -335,6 +419,8 @@ class HrPayslipRun(models.Model):
             c.border = thin
 
         ri = 1
+        payable_count = payable_net = 0
+        excluded_count = excluded_net = 0
         for slip, status, reason in self._classify_export_slips(
             slips, file_type,
         ):
@@ -399,6 +485,19 @@ class HrPayslipRun(models.Model):
                 c = ws.cell(row=ri, column=ci, value=v)
                 c.border = thin
             self._style_export_row(ws, ri, len(headers), status)
+
+            if status in EXCLUDED_STATUSES:
+                excluded_count += 1
+                excluded_net += net
+            else:
+                payable_count += 1
+                payable_net += net
+
+        # 'Net Salary' is column 15 — see `headers` above.
+        ri = self._write_export_totals(
+            ws, ri, 15, payable_count, payable_net,
+            excluded_count, excluded_net,
+        )
 
         # Employees that never got a payslip in this batch. They have no
         # resolved paying bank, so they cannot be attributed to a single bank
@@ -538,7 +637,11 @@ class HrPayslipRun(models.Model):
                 bank.bank_id.name if bank and bank.bank_id else '',
                 bank.acc_number if bank else '',
                 emp.name or '',
-                emp.barcode or '',
+                # Must be the same identifier the WPS TXT writes in its first
+                # 12 chars (x_employee_no). barcode is the biometric device ID
+                # and is empty for every WPS employee in KSWCO, which left this
+                # column blank in the Excel while the TXT carried a number.
+                emp.sudo().x_employee_no or emp.barcode or '',
                 emp.ssnid or emp.identification_id or '',
                 net,              # F: Salary (net)
                 basic,            # G: Basic
@@ -569,6 +672,16 @@ class HrPayslipRun(models.Model):
             for slip, status, reason in excluded:
                 _write(ri, slip, status, reason)
                 ri += 1
+
+        # 'Salary (15N)' is column 6 — see `en_headers` above.
+        self._write_export_totals(
+            ws, ri - 1, 6,
+            len(included), sum(self._get_line_total(r[0], 'NET')
+                               for r in included),
+            len(excluded), sum(self._get_line_total(r[0], 'NET')
+                               for r in excluded),
+            banner=True,
+        )
 
         # Auto-width columns
         for ci in range(1, len(en_headers) + 1):

@@ -609,14 +609,60 @@ class TestKawtharFileWizard(TransactionCase):
         lines = [l for l in content.split('\n') if l]
         self.assertEqual(len(lines), 1)
 
-    def test_txt_employee_export_order_field(self):
-        """First 12 chars are the zero-padded x_payslip_export_order."""
+    def test_txt_employee_id_is_a_1_to_n_sequence(self):
+        """First 12 chars are a running 1..N over the rows of THIS file."""
         wiz = self._make_wizard()
         content = wiz._build_kawthar_text(
-            self.company_bank, self.slip_1, date(2026, 3, 30),
+            self.company_bank, self.slip_1 | self.slip_2, date(2026, 3, 30),
         )
-        line = content.split('\n')[0]
-        self.assertEqual(line[:12], '000000000001')
+        lines = [l for l in content.split('\n') if l]
+        self.assertEqual(
+            [l[:12] for l in lines],
+            ['000000000001', '000000000002'],
+        )
+
+    def test_txt_employee_id_ignores_stored_export_order_value(self):
+        """Gaps/duplicates in x_payslip_export_order never reach the file.
+
+        The stored field only decides the ORDER. It keeps its old value when
+        an employee leaves the batch, so using it as the Employee ID numbered
+        the TXT beyond the row count while the Excel showed a clean 1..N.
+        """
+        self.emp_1.sudo().write({'x_payslip_export_order': 40})
+        self.emp_2.sudo().write({'x_payslip_export_order': 90})
+        wiz = self._make_wizard()
+        content = wiz._build_kawthar_text(
+            self.company_bank, self.slip_1 | self.slip_2, date(2026, 3, 30),
+        )
+        lines = [l for l in content.split('\n') if l]
+        self.assertEqual(
+            [l[:12] for l in lines],
+            ['000000000001', '000000000002'],
+        )
+
+    def test_txt_employee_id_matches_excel_column_a(self):
+        """The TXT Employee ID and Excel column A agree row for row."""
+        self.emp_1.sudo().write({'x_payslip_export_order': 7})
+        self.emp_2.sudo().write({'x_payslip_export_order': 0})
+        slips = self.slip_1 | self.slip_2 | self.slip_no_bank
+        wiz = self._make_wizard()
+
+        content = wiz._build_kawthar_text(
+            self.company_bank, slips, date(2026, 3, 30),
+        )
+        txt_ids = [int(l[:12]) for l in content.split('\n') if l]
+
+        wb = openpyxl.Workbook()
+        wiz._fill_kawthar_sheet(wb, slips)
+        ws = wb['PREFORMAT PAYMENTS']
+        excel_ids = []
+        for r in range(5, ws.max_row + 1):
+            v = ws.cell(r, 1).value
+            if isinstance(v, int):
+                excel_ids.append(v)
+
+        self.assertEqual(txt_ids, excel_ids)
+        self.assertEqual(txt_ids, list(range(1, len(txt_ids) + 1)))
 
     def test_txt_cic_field(self):
         """Chars 13-22 are the CIC derived from the first 5 chars of acc_number."""

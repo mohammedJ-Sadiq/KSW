@@ -31,7 +31,7 @@ class HrSalaryRule(models.Model):
             'DA', 'Travel', 'Meal', 'Medical', 'Mobile',
             'VACATION_BAL', 'FLIGHT_TICKET', 'ADDITIONAL_COMMISSIONS',
             'VACATION_HRA', 'ATTDED', 'SATOT', 'GOSI', 'VACATION_GOSI',
-            'PENALTY', 'KSW_DEDUCTIONS', 'REMAINING_LOANS',
+            'PENALTY', 'KSW_DEDUCTIONS', 'REMAINING_LOANS', 'OTHER_DEDUCTIONS',
             'FIN_CONSIDERATION', 'VISA_COST_RECOVERY',
         ]
         _NEW_NO_ATTDED = [c for c in _NEW if c not in ('ATTDED', 'SATOT')]

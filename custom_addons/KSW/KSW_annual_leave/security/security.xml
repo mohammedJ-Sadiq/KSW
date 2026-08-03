@@ -311,6 +311,38 @@
     </record>
 
     <!-- ============================================================ -->
+    <!-- Record Rules — hr.leave.deduction.line                        -->
+    <!-- Mirrors the commission-line rules exactly.                    -->
+    <!-- ============================================================ -->
+    <record id="hr_leave_deduction_line_rule_self" model="ir.rule">
+        <field name="name">KSW Leave Other Deduction: self</field>
+        <field name="model_id" ref="model_hr_leave_deduction_line"/>
+        <field name="groups" eval="[(4, ref('group_leave_self'))]"/>
+        <field name="domain_force">[('leave_id.employee_id.user_id', '=', user.id)]</field>
+    </record>
+
+    <record id="hr_leave_deduction_line_rule_supervisor" model="ir.rule">
+        <field name="name">KSW Leave Other Deduction: supervisor (immediate)</field>
+        <field name="model_id" ref="model_hr_leave_deduction_line"/>
+        <field name="groups" eval="[(4, ref('group_leave_supervisor'))]"/>
+        <field name="domain_force">[('leave_id.employee_id.parent_id.user_id', '=', user.id)]</field>
+    </record>
+
+    <record id="hr_leave_deduction_line_rule_supervisor_cascading" model="ir.rule">
+        <field name="name">KSW Leave Other Deduction: supervisor cascading (recursive)</field>
+        <field name="model_id" ref="model_hr_leave_deduction_line"/>
+        <field name="groups" eval="[(4, ref('group_leave_supervisor_cascading'))]"/>
+        <field name="domain_force">[('leave_id.employee_id', 'child_of', user.employee_ids.ids)]</field>
+    </record>
+
+    <record id="hr_leave_deduction_line_rule_officer" model="ir.rule">
+        <field name="name">KSW Leave Other Deduction: officer (all)</field>
+        <field name="model_id" ref="model_hr_leave_deduction_line"/>
+        <field name="groups" eval="[(4, ref('group_leave_officer'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <!-- ============================================================ -->
     <!-- Odoo built-in rule overrides + Time Off dropdown removal      -->
     <!-- ============================================================ -->
     <!--

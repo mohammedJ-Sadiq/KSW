@@ -8,6 +8,10 @@ access_commission_line_self,hr.leave.commission.line.self,model_hr_leave_commiss
 access_commission_line_supervisor,hr.leave.commission.line.supervisor,model_hr_leave_commission_line,group_leave_supervisor,1,0,0,0
 access_commission_line_cascading,hr.leave.commission.line.cascading,model_hr_leave_commission_line,group_leave_supervisor_cascading,1,0,0,0
 access_commission_line_officer,hr.leave.commission.line.officer,model_hr_leave_commission_line,group_leave_officer,1,1,1,1
+access_deduction_line_self,hr.leave.deduction.line.self,model_hr_leave_deduction_line,group_leave_self,1,0,0,0
+access_deduction_line_supervisor,hr.leave.deduction.line.supervisor,model_hr_leave_deduction_line,group_leave_supervisor,1,0,0,0
+access_deduction_line_cascading,hr.leave.deduction.line.cascading,model_hr_leave_deduction_line,group_leave_supervisor_cascading,1,0,0,0
+access_deduction_line_officer,hr.leave.deduction.line.officer,model_hr_leave_deduction_line,group_leave_officer,1,1,1,1
 access_opening_balance_wizard_hr,opening.balance.wizard.hr,model_opening_balance_wizard,KSW_annual_leave.group_annual_leave_hr,1,1,1,1
 access_opening_balance_wizard_line_hr,opening.balance.wizard.line.hr,model_opening_balance_wizard_line,KSW_annual_leave.group_annual_leave_hr,1,1,1,1
 access_gm_return_approver_wizard_gm,ksw.gm.return.approver.wizard.gm,model_ksw_gm_return_approver_wizard,KSW_annual_leave.group_annual_leave_gm,1,1,1,1

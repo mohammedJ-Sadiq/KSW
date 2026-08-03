@@ -15,6 +15,7 @@
             <!-- ===== Hidden EOS helper fields ===== -->
             <xpath expr="//field[@name='x_is_annual_leave_type']" position="after">
                 <field name="x_is_eos_leave" invisible="1"/>
+                <field name="x_eos_inputs_editable" invisible="1"/>
                 <field name="x_eos_payslip_id" invisible="1"
                        groups="om_hr_payroll.group_hr_payroll_user"/>
             </xpath>
@@ -68,19 +69,31 @@
                                string="Base EOS — Resignation (Art. 85, Unadjusted)"/>
                     </group>
 
-                    <!-- HR inputs — editable only by HR at pending_hr state -->
+                    <!-- HR inputs — editable by HR at their own step only
+                         (x_eos_inputs_editable = HR approver + pending_hr).
+                         To correct a figure later the GM returns the request
+                         to HR with the Return to Approver wizard; the payslip
+                         is then rebuilt when the chain reaches GM final again.
+                         Backed server-side by the write() guard — the
+                         readonly= below is cosmetic on its own. -->
                     <group string="HR Inputs">
                         <field name="x_eos_unpaid_days"
-                               readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"/>
+                               readonly="not x_eos_inputs_editable"/>
                         <field name="x_eos_adjusted_service_years" readonly="1"/>
                         <field name="x_eos_adjusted_termination_amount" readonly="1"/>
                         <field name="x_eos_adjusted_resignation_amount" readonly="1"/>
+                        <!-- required is the exact complement of readonly: the
+                             red asterisk and the save block apply only while
+                             HR can actually type into it. Making it required
+                             when readonly would stop the DM, the employee and
+                             the GM from saving the record at all. -->
                         <field name="x_eos_termination_reason"
-                               readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"/>
+                               readonly="not x_eos_inputs_editable"
+                               required="x_eos_inputs_editable"/>
                         <field name="x_eos_previous_payments"
-                               readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"/>
+                               readonly="not x_eos_inputs_editable"/>
                         <field name="x_eos_notice_pay"
-                               readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"/>
+                               readonly="not x_eos_inputs_editable"/>
                     </group>
 
                     <!-- EOS payout summary -->

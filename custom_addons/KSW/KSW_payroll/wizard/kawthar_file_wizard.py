@@ -312,6 +312,16 @@ class KawtharFileWizard(models.TransientModel):
                 _write(ri, slip, status, reason, '')
                 ri += 1
 
+        # 'Amount (15N)' is column 5 — see `en_headers` above.
+        batch._write_export_totals(
+            ws, ri - 1, 5,
+            len(included), sum(self._get_line_total(r[0], 'NET')
+                               for r in included),
+            len(excluded), sum(self._get_line_total(r[0], 'NET')
+                               for r in excluded),
+            banner=True,
+        )
+
         # ── Auto-width columns ──
         for ci in range(1, len(en_headers) + 1):
             letter = openpyxl.utils.get_column_letter(ci)
@@ -330,7 +340,8 @@ class KawtharFileWizard(models.TransientModel):
 
         Each line is 194 characters, no header row.
         Format per line:
-          Employee export order (12N) | CIC from card (10N) | Card number (14N) |
+          Employee ID — 1..N over this file (12N) | CIC from card (10N) |
+          Card number (14N) |
           Employee name (50A) | National ID (10N) | Net in halalas (15N) |
           Value date YYYYMMDD (8) | Operation code (1X) |
           Zeros filler (6) | Spaces filler (20) |
@@ -349,12 +360,19 @@ class KawtharFileWizard(models.TransientModel):
         vdate = value_date.strftime('%Y%m%d')
 
         lines = []
-        for slip in valid:
+        for seq, slip in enumerate(valid, 1):
             emp = slip.employee_id
             bank = emp.sudo().primary_bank_account_id
 
-            # Employee export order (matches the Excel emp-ref column)
-            emp_ref = emp.sudo().x_payslip_export_order or 0
+            # Employee ID — a running 1..N sequence over the payable rows of
+            # THIS file, identical to column A of the Kawthar Excel sheet.
+            # It must be derived positionally: x_payslip_export_order only
+            # decides the sort order (_sorted_export_slips) and keeps its old
+            # value when an employee leaves the batch, so reading it here left
+            # the TXT numbered up to 319 (with gaps, and 000000000000 repeated
+            # for every employee whose order was never set) while the Excel
+            # showed a clean 1..285 for the same 285 rows.
+            emp_ref = seq
 
             # acc_number is stored as CIC(5) + card_no(14) = 19 chars
             acc_full = (bank.acc_number or '').replace(' ', '') if bank else ''

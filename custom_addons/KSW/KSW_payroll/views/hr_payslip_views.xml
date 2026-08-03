@@ -210,11 +210,19 @@
                 <field name="x_bank_total_ids" nolabel="1" readonly="1"
                        invisible="not x_bank_total_ids">
                     <list string="Bank Account Totals">
-                        <field name="bank_account_id" string="Account" width="300px"/>
-                        <field name="slip_count" string="Employees" width="100px"/>
-                        <field name="total_net" string="Total NET"
+                        <field name="bank_account_id" string="Account" width="260px"/>
+                        <field name="slip_count" string="Employees" width="90px"/>
+                        <field name="payable_count" string="In Bank File"
+                               width="90px"/>
+                        <field name="total_net" string="Total NET (Paid)"
                                digits="[16,2]" width="150px"
                                decoration-bf="True"/>
+                        <field name="excluded_count" string="Excluded"
+                               width="90px"
+                               decoration-danger="excluded_count &gt; 0"/>
+                        <field name="excluded_net" string="Excluded NET"
+                               digits="[16,2]" width="130px"
+                               decoration-danger="excluded_net &lt; 0"/>
                     </list>
                 </field>
             </xpath>

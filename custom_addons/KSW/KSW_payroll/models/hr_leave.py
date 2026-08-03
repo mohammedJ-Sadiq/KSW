@@ -450,6 +450,19 @@ class HrLeave(models.Model):
                 'amount': leave.x_remaining_loans,
             })
 
+        # 5b. Other Deductions (sum of the additional-deduction lines).
+        # Stored positive on the leave; the OTHER_DEDUCTIONS salary rule
+        # negates it so it lands in the DED category.
+        other_deductions = getattr(leave, 'x_other_deductions', 0) or 0
+        if other_deductions:
+            vals_list.append({
+                'payslip_id': payslip.id,
+                'version_id': version_id,
+                'name': 'Other Deductions',
+                'code': 'OTHER_DEDUCTIONS',
+                'amount': other_deductions,
+            })
+
         # 6. Financial Consideration for Excess Leave (combined leave only)
         fin_consideration = getattr(leave, 'x_financial_consideration_excess', 0) or 0
         if fin_consideration:

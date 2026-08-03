@@ -114,6 +114,18 @@
                 </attribute>
             </xpath>
 
+            <!-- ===== Hide other-deduction lines section for unpaid ===== -->
+            <xpath expr="//separator[@name='deduction_lines_section']" position="attributes">
+                <attribute name="invisible">
+                    x_annual_approval_state in ('pending_dm', 'pending_hr', 'pending_gm_initial') or not x_annual_approval_state or validation_type == 'unpaid_multi'
+                </attribute>
+            </xpath>
+            <xpath expr="//field[@name='x_deduction_line_ids']" position="attributes">
+                <attribute name="invisible">
+                    x_annual_approval_state in ('pending_dm', 'pending_hr', 'pending_gm_initial') or not x_annual_approval_state or validation_type == 'unpaid_multi'
+                </attribute>
+            </xpath>
+
             <!-- ===== Unpaid accounting fields (unpaid_multi OR combined annual+unpaid) ===== -->
             <xpath expr="//group[@name='accounting_allowances']" position="after">
                 <group string="Accounting — Unpaid Leave"

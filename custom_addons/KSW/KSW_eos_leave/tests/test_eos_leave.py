@@ -14,7 +14,7 @@ Covers:
 import base64
 from datetime import date, timedelta
 
-from odoo.exceptions import UserError
+from odoo.exceptions import AccessError, UserError
 from odoo.tests.common import TransactionCase
 
 
@@ -251,6 +251,9 @@ class TestEosLeave(TransactionCase):
     def test_full_approval_chain(self):
         """All 6 steps complete; leave reaches state='validate'."""
         leave = self._make_leave(offset=8)
+        # Required from the HR step onwards — the chain will not advance past
+        # pending_dm without it, sudo included.
+        leave.sudo().write({'x_eos_termination_reason': '84'})
         self._advance_to(leave, 'pending_employee_signature')
         self.assertEqual(leave.x_annual_approval_state, 'pending_employee_signature')
         self._add_stub_attachment(leave)
@@ -528,3 +531,165 @@ class TestEosLeave(TransactionCase):
 
         self.assertEqual(leave.request_date_from, new_start)
         self.assertEqual(leave.request_date_to, new_start)
+
+    # ==================================================================
+    # Termination Reason guard (missing reason ⇒ no EOS_AMOUNT on payslip)
+    # ==================================================================
+
+    def test_hr_approve_blocked_without_termination_reason(self):
+        """HR cannot approve an EOS request that has no Termination Reason.
+
+        Without the reason x_eos_payout_amount is 0 and no EOS_AMOUNT input
+        is written, so the EOS payslip would silently omit the payout.
+        """
+        leave = self._make_leave(offset=21)
+        leave.with_user(self.user_dm).sudo().action_dm_approve()
+        self.assertEqual(leave.x_annual_approval_state, 'pending_hr')
+        self.assertFalse(leave.x_eos_termination_reason)
+
+        with self.assertRaises(UserError) as ctx:
+            leave.with_user(self.user_hr).action_hr_approve()
+        self.assertIn('Termination Reason', str(ctx.exception))
+
+        self.assertEqual(leave.x_annual_approval_state, 'pending_hr')
+
+    def test_sudo_cannot_bypass_termination_reason(self):
+        """Data-integrity guard, not a permission one — sudo is no escape."""
+        leave = self._make_leave(offset=28)
+        leave.with_user(self.user_dm).sudo().action_dm_approve()
+
+        with self.assertRaises(UserError) as ctx:
+            leave.with_user(self.user_hr).sudo().action_hr_approve()
+        self.assertIn('Termination Reason', str(ctx.exception))
+
+    def test_dm_step_exempt_from_termination_reason(self):
+        """The DM approves before HR has ever seen the request."""
+        leave = self._make_leave(offset=29)
+        self.assertFalse(leave.x_eos_termination_reason)
+
+        leave.with_user(self.user_dm).sudo().action_dm_approve()
+
+        self.assertEqual(leave.x_annual_approval_state, 'pending_hr')
+
+    def test_later_steps_blocked_without_termination_reason(self):
+        """A reason cleared mid-chain stops every remaining forward step.
+
+        Covers the GM's return-to-approver path, which re-enters the chain at
+        Accounting and so never passes back through the HR step.
+        """
+        leave = self._make_leave(offset=30)
+        leave.sudo().write({'x_eos_termination_reason': '84'})
+        self._advance_to(leave, 'pending_acc')
+        self.assertEqual(leave.x_annual_approval_state, 'pending_acc')
+
+        leave.sudo().write({'x_eos_termination_reason': False})
+
+        with self.assertRaises(UserError) as ctx:
+            leave.with_user(self.user_acc).action_acc_approve()
+        self.assertIn('Termination Reason', str(ctx.exception))
+        self.assertEqual(leave.x_annual_approval_state, 'pending_acc')
+
+    def test_hr_approve_allowed_once_reason_filled(self):
+        """Filling the reason unblocks the same HR approval."""
+        leave = self._make_leave(offset=22)
+        leave.with_user(self.user_dm).sudo().action_dm_approve()
+        leave.with_user(self.user_hr).write({'x_eos_termination_reason': '84'})
+
+        leave.with_user(self.user_hr).action_hr_approve()
+
+        self.assertEqual(leave.x_annual_approval_state, 'pending_gm_initial')
+
+    def test_definitive_payslip_refuses_missing_reason(self):
+        """A non-preview EOS payslip is never generated without a reason."""
+        leave = self._make_leave(offset=23)
+        with self.assertRaises(UserError) as ctx:
+            leave.with_user(self.user_hr)._create_eos_payslip(preview=False)
+        self.assertIn('Termination Reason', str(ctx.exception))
+
+    def test_preview_payslip_allowed_without_reason(self):
+        """A provisional run may legitimately predate the HR figures.
+
+        Only the guard is under test — payroll access on hr.version.wage is
+        out of scope, so an AccessError further down is tolerated while a
+        UserError (the guard) is not.
+        """
+        leave = self._make_leave(offset=24)
+        try:
+            leave.with_user(self.user_hr)._create_eos_payslip(preview=True)
+        except AccessError:
+            pass  # AccessError subclasses UserError — must be caught first
+        except UserError:
+            self.fail('A provisional EOS payslip must not require a reason.')
+
+    def test_preview_payslip_has_no_eos_amount_without_reason(self):
+        """The provisional payslip simply carries no EOS_AMOUNT line."""
+        leave = self._make_leave(offset=27)
+        leave.sudo()._create_eos_payslip(preview=True)
+        self.assertTrue(leave.x_eos_payslip_id)
+        self.assertFalse(
+            leave.sudo().x_eos_payslip_id.input_line_ids.filtered(
+                lambda i: i.code == 'EOS_AMOUNT'))
+
+    # ==================================================================
+    # HR may still correct the EOS inputs after step 2
+    # ==================================================================
+
+    def test_eos_inputs_editable_only_at_hr_step(self):
+        """HR owns these figures at their own step and nowhere else."""
+        leave = self._make_leave(offset=25)
+        leave.with_user(self.user_dm).sudo().action_dm_approve()
+        self.assertEqual(leave.x_annual_approval_state, 'pending_hr')
+
+        self.assertTrue(leave.with_user(self.user_hr).x_eos_inputs_editable)
+        self.assertFalse(leave.with_user(self.user_acc).x_eos_inputs_editable)
+
+        leave.with_user(self.user_hr).write({'x_eos_previous_payments': 500.0})
+        self.assertEqual(leave.x_eos_previous_payments, 500.0)
+
+    def test_eos_inputs_frozen_once_past_hr_step(self):
+        """Past their step HR can no longer rewrite the figures — by RPC either.
+
+        The correction path is the GM's return-to-approver wizard, which
+        accepts 'pending_hr' as a target from both GM steps.
+        """
+        leave = self._make_leave(offset=31)
+        leave.sudo().write({'x_eos_termination_reason': '84'})
+        self._advance_to(leave, 'pending_gm_final')
+
+        self.assertFalse(leave.with_user(self.user_hr).x_eos_inputs_editable)
+
+        with self.assertRaises(UserError) as ctx:
+            leave.with_user(self.user_hr).write(
+                {'x_eos_previous_payments': 500.0})
+        self.assertIn('HR Approval step', str(ctx.exception))
+        self.assertFalse(leave.x_eos_previous_payments)
+
+    def test_gm_return_reopens_hr_edit_window(self):
+        """Returning the request to HR makes the figures writable again."""
+        leave = self._make_leave(offset=32)
+        leave.sudo().write({'x_eos_termination_reason': '84'})
+        self._advance_to(leave, 'pending_gm_final')
+
+        wizard = self.env['ksw.gm.return.approver.wizard'].with_user(
+            self.user_gm).sudo().create({
+                'leave_id': leave.id,
+                'target_state': 'pending_hr',
+                'reason': 'Wrong termination reason — please correct.',
+            })
+        wizard.action_confirm()
+
+        self.assertEqual(leave.x_annual_approval_state, 'pending_hr')
+        self.assertTrue(leave.with_user(self.user_hr).x_eos_inputs_editable)
+        leave.with_user(self.user_hr).write({'x_eos_termination_reason': '85'})
+        self.assertEqual(leave.x_eos_termination_reason, '85')
+
+    def test_eos_inputs_not_editable_once_approved(self):
+        """The gate closes when the request leaves the approval chain."""
+        leave = self._make_leave(offset=26)
+        leave.sudo().write({'x_eos_termination_reason': '84'})
+        self._advance_to(leave, 'pending_employee_signature')
+        self._add_stub_attachment(leave)
+        leave.with_user(self.user_hr).sudo().action_employee_confirm_signature()
+
+        self.assertEqual(leave.x_annual_approval_state, 'approved')
+        self.assertFalse(leave.with_user(self.user_hr).x_eos_inputs_editable)

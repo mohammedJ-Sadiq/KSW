@@ -372,6 +372,38 @@ class TestCombinedLeave(TransactionCase):
         self.assertEqual(leave.x_additional_commissions, 0)
 
     # ==================================================================
+    # OTHER DEDUCTION LINES
+    # ==================================================================
+
+    def test_deduction_lines_compute_total(self):
+        """Deduction line amounts are summed into x_other_deductions."""
+        leave = self._create_leave()
+        self.env['hr.leave.deduction.line'].create([
+            {'leave_id': leave.id, 'name': 'Uniform', 'amount': 120.0},
+            {'leave_id': leave.id, 'name': 'Traffic fine', 'amount': 300.0},
+            {'leave_id': leave.id, 'name': 'Housing', 'amount': 80.0},
+        ])
+        leave.invalidate_recordset()
+        self.assertAlmostEqual(leave.x_other_deductions, 500.0)
+
+    def test_deduction_lines_empty_gives_zero(self):
+        """No deduction lines → total is 0."""
+        leave = self._create_leave()
+        self.assertEqual(leave.x_other_deductions, 0)
+
+    def test_deduction_lines_deleted_on_reset(self):
+        """Other-deduction lines are deleted when multi-step fields reset."""
+        leave = self._create_leave()
+        self.env['hr.leave.deduction.line'].create([
+            {'leave_id': leave.id, 'name': 'Uniform', 'amount': 500.0},
+        ])
+        self.assertEqual(len(leave.x_deduction_line_ids), 1)
+
+        leave._reset_annual_multi_fields()
+        self.assertEqual(len(leave.x_deduction_line_ids), 0)
+        self.assertEqual(leave.x_other_deductions, 0)
+
+    # ==================================================================
     # COMBINED LEAVE PAYSLIP INPUTS
     # ==================================================================
 
@@ -875,6 +907,10 @@ class TestCombinedLeave(TransactionCase):
             {'leave_id': leave.id, 'name': 'Jan', 'amount': 800.0},
             {'leave_id': leave.id, 'name': 'Feb', 'amount': 600.0},
         ])
+        self.env['hr.leave.deduction.line'].create([
+            {'leave_id': leave.id, 'name': 'Uniform', 'amount': 150.0},
+            {'leave_id': leave.id, 'name': 'Traffic fine', 'amount': 250.0},
+        ])
         leave.invalidate_recordset()
 
         self._approve_through_step(leave, 'acc')
@@ -886,11 +922,22 @@ class TestCombinedLeave(TransactionCase):
         expected_codes = {
             'VACATION_BAL', 'FLIGHT_TICKET', 'PENALTY',
             'ADDITIONAL_COMMISSIONS', 'REMAINING_LOANS',
+            'OTHER_DEDUCTIONS',
             'FIN_CONSIDERATION', 'VISA_COST_RECOVERY',
         }
         self.assertTrue(
             expected_codes.issubset(codes),
             msg=f"Missing input codes: {expected_codes - codes}")
+
+        # The input is stored positive; the salary rule must emit it negative.
+        other_input = payslip.input_line_ids.filtered(
+            lambda i: i.code == 'OTHER_DEDUCTIONS')
+        self.assertAlmostEqual(other_input.amount, 400.0)
+        other_line = payslip.line_ids.filtered(
+            lambda l: l.code == 'OTHER_DEDUCTIONS')
+        self.assertTrue(other_line, 'OTHER_DEDUCTIONS salary line missing')
+        self.assertLess(other_line.total, 0)
+        self.assertEqual(other_line.category_id.code, 'DED')
 
 
 

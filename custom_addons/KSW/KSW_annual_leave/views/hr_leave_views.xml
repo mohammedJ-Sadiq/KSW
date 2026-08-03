@@ -19,6 +19,8 @@
     <!--   * group     name="accounting_allowances"  (KSW_unpaid)     -->
     <!--   * separator name="commission_lines_section"                -->
     <!--   * field     x_commission_line_ids                          -->
+    <!--   * separator name="deduction_lines_section"                 -->
+    <!--   * field     x_deduction_line_ids                           -->
     <!--   * field     x_return_date                                  -->
     <!--   * field     x_return_state[@widget='badge']                -->
     <!--   * field     x_dm_approved_by              (KSW_payroll)    -->
@@ -254,6 +256,8 @@
                             <field name="x_remaining_loans_description" string="Notes"
                                    readonly="x_annual_approval_state != 'pending_acc' or not x_is_acc_approver"
                                    placeholder="Details..."/>
+                            <field name="x_other_deductions" string="Other Deductions"
+                                   readonly="1"/>
                         </group>
 
                         <group string="Flight Ticket"
@@ -274,6 +278,19 @@
                             <list editable="bottom">
                                 <field name="sequence" widget="handle"/>
                                 <field name="name" string="Month / Description"/>
+                                <field name="amount" sum="Total"/>
+                            </list>
+                        </field>
+
+                        <separator string="Additional Deductions Detail"
+                                   name="deduction_lines_section"
+                                   invisible="x_annual_approval_state in ('pending_dm', 'pending_hr', 'pending_gm_initial') or not x_annual_approval_state"/>
+                        <field name="x_deduction_line_ids" nolabel="1"
+                               readonly="x_annual_approval_state != 'pending_acc' or not x_is_acc_approver"
+                               invisible="x_annual_approval_state in ('pending_dm', 'pending_hr', 'pending_gm_initial') or not x_annual_approval_state">
+                            <list editable="bottom">
+                                <field name="sequence" widget="handle"/>
+                                <field name="name" string="Description"/>
                                 <field name="amount" sum="Total"/>
                             </list>
                         </field>

@@ -16,6 +16,14 @@ _EOS_HR_FIELDS = frozenset({
     'x_eos_notice_pay',
 })
 
+# The one state at which HR may fill or correct the EOS figures: their own
+# step. An approver editing a request that is sitting in someone else's queue
+# would change figures the later approvers have already signed off on. The
+# correction path is the GM's return-to-approver wizard, which lists
+# 'pending_hr' as a valid target from both GM steps
+# (see _VALID_RETURN_TARGETS in KSW_annual_leave/wizard/).
+_EOS_INPUT_STATE = 'pending_hr'
+
 
 class HrLeave(models.Model):
     _inherit = 'hr.leave'
@@ -123,6 +131,13 @@ class HrLeave(models.Model):
         digits=(16, 2),
         help='Final EOS amount: the adjusted Art. 84 or Art. 85 figure, '
              'depending on the selected Termination Reason.',
+    )
+
+    x_eos_inputs_editable = fields.Boolean(
+        string='EOS Inputs Editable',
+        compute='_compute_eos_inputs_editable',
+        help='True when the current user may still fill or correct the '
+             'HR-owned EOS financial inputs on this request.',
     )
 
     # ------------------------------------------------------------------
@@ -244,6 +259,16 @@ class HrLeave(models.Model):
             else:
                 leave.x_eos_payout_amount = 0.0
 
+    @api.depends_context('uid')
+    @api.depends('x_is_eos_leave', 'x_annual_approval_state', 'x_is_hr_approver')
+    def _compute_eos_inputs_editable(self):
+        for leave in self:
+            leave.x_eos_inputs_editable = bool(
+                leave.x_is_eos_leave
+                and leave.x_is_hr_approver
+                and leave.x_annual_approval_state == _EOS_INPUT_STATE
+            )
+
     # ------------------------------------------------------------------
     # Write guard: EOS financial fields are HR-only
     # Sync: EOS leaves always have request_date_to == request_date_from
@@ -285,6 +310,17 @@ class HrLeave(models.Model):
                         'KSW_annual_leave.group_annual_leave_hr'):
                     raise UserError(_(
                         'Only HR Approvers can fill EOS financial fields.'))
+                # HR owns these figures at their own step only. The view's
+                # readonly= is cosmetic — without this an HR user could still
+                # rewrite figures the later approvers already signed off on,
+                # via RPC or a stale form.
+                if leave.x_annual_approval_state != _EOS_INPUT_STATE:
+                    raise UserError(_(
+                        'EOS financial figures can only be filled while the '
+                        'request is at the HR Approval step.\n\n'
+                        'If a figure needs correcting later, the GM must '
+                        'return the request to HR first.'
+                    ))
         # An EOS request covers a single day. create() forces that from vals,
         # but a *later* edit — moving the start date, or changing the type to
         # EOS — must sync the end date too, or the leave keeps the range it
@@ -360,6 +396,9 @@ class HrLeave(models.Model):
     }
 
     def action_gm_final_approve(self):
+        # The Termination Reason is already guaranteed here: super() opens with
+        # _check_annual_approval_can_advance(), which this module overrides to
+        # enforce it. So the departure reason picked below is never blank.
         result = super().action_gm_final_approve()
         for leave in self.filtered('x_is_eos_leave'):
             employee = leave.employee_id
@@ -411,6 +450,51 @@ class HrLeave(models.Model):
         return result
 
     # ------------------------------------------------------------------
+    # Approval guards: an EOS request is worthless without its reason
+    # ------------------------------------------------------------------
+
+    def _check_eos_reason_filled(self):
+        """Raise unless every EOS request in self has a Termination Reason.
+
+        Without it ``_compute_eos_payout`` returns 0 and
+        ``_build_eos_input_lines`` emits no EOS_AMOUNT input at all, so the
+        payslip generated at GM final approval carries every other settlement
+        item (vacation balance, ticket, commissions) but *not* the EOS payout
+        — silently, with no error anywhere in the chain.
+
+        Deliberately **not** exempt under ``self.env.su``, unlike the HR write
+        guard in ``write()``. That one is a permission check, where sudo is a
+        legitimate escape hatch; this is a data-integrity requirement, and an
+        EOS payslip with no payout is just as wrong when a sudo'd caller
+        produced it.
+        """
+        missing = self.filtered(
+            lambda l: l.x_is_eos_leave and not l.x_eos_termination_reason)
+        if missing:
+            raise UserError(_(
+                'Select a Termination Reason (Article 84 — Termination or '
+                'Article 85 — Resignation) in the EOS Review tab first.\n\n'
+                'Without it the End-of-Service payout is computed as 0 and '
+                'will not appear on the EOS payslip.'
+            ))
+
+    def _check_annual_approval_can_advance(self):
+        """Make the Termination Reason unskippable for EOS requests.
+
+        Every forward step of the six-step chain (DM, HR, GM initial,
+        Accounting, GM final) funnels through this method before touching
+        state, so one override covers all of them — including a request that
+        re-enters the chain through the GM's return-to-approver wizard.
+
+        The DM step is the single exemption: at ``pending_dm`` the request has
+        not reached HR yet, and the reason is an HR-only field.
+        """
+        self.filtered(
+            lambda l: l.x_annual_approval_state not in ('pending_dm', False)
+        )._check_eos_reason_filled()
+        return super()._check_annual_approval_can_advance()
+
+    # ------------------------------------------------------------------
     # Payslip hook: route EOS leaves to _create_eos_payslip
     # ------------------------------------------------------------------
 
@@ -435,6 +519,7 @@ class HrLeave(models.Model):
           FLIGHT_TICKET     — flight ticket allowance (if any)
           ADDITIONAL_COMMISSIONS — accrued commissions (if any)
           REMAINING_LOANS   — outstanding loan deductions (if any)
+          OTHER_DEDUCTIONS  — sum of the other-deduction lines (if any)
           PENALTY           — penalty deduction (if any)
         HRA and GOSI advances are excluded — those are already part of
         the regular monthly salary lines on this terminal payslip.
@@ -443,6 +528,11 @@ class HrLeave(models.Model):
         today = fields.Date.context_today(self)
 
         if not preview:
+            # A provisional run may legitimately predate the HR figures, but a
+            # definitive EOS payslip without a Termination Reason would ship
+            # with a 0 payout and no EOS_AMOUNT line. Also covers the
+            # "Recompute EOS Payslip" button.
+            self._check_eos_reason_filled()
             # The definitive payslip supersedes any provisional run.
             self._cancel_preview_vacation_payslips()
 

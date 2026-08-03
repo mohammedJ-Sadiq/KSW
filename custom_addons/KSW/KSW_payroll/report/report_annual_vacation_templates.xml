@@ -144,7 +144,8 @@
                             o.x_penalty_amount or
                             o.x_flight_ticket_amount or
                             o.x_additional_commissions or
-                            o.x_remaining_loans
+                            o.x_remaining_loans or
+                            o.x_other_deductions
                         "/>
                         <t t-if="has_financials">
                             <h5 class="border-bottom pb-1 mb-2">Financial Items</h5>
@@ -186,11 +187,21 @@
                                             t-out="'%.2f' % o.x_remaining_loans"/>
                                         <td t-out="o.x_remaining_loans_description or ''"/>
                                     </tr>
+                                    <!-- Accounting items: other deductions detail -->
+                                    <t t-if="o.x_deduction_line_ids">
+                                        <tr t-foreach="o.x_deduction_line_ids" t-as="dl">
+                                            <td>Other Deduction — <t t-out="dl.name"/></td>
+                                            <td class="text-end text-danger"
+                                                t-out="'%.2f' % dl.amount"/>
+                                            <td/>
+                                        </tr>
+                                    </t>
                                     <!-- Total of all payslip-impacting inputs (iqama excluded).
-                                         Penalty and Remaining Loans are stored positive but the salary
-                                         rules negate them, so we subtract them here to match payslip impact. -->
+                                         Penalty, Remaining Loans and Other Deductions are stored
+                                         positive but the salary rules negate them, so we subtract
+                                         them here to match payslip impact. -->
                                     <t t-set="x_total_additional"
-                                       t-value="(o.x_flight_ticket_amount or 0.0) + (o.x_additional_commissions or 0.0) - (o.x_penalty_amount or 0.0) - (o.x_remaining_loans or 0.0)"/>
+                                       t-value="(o.x_flight_ticket_amount or 0.0) + (o.x_additional_commissions or 0.0) - (o.x_penalty_amount or 0.0) - (o.x_remaining_loans or 0.0) - (o.x_other_deductions or 0.0)"/>
                                     <tr t-if="x_total_additional != 0" class="fw-bold table-info">
                                         <td>Total Additional Inputs</td>
                                         <td t-att-class="'text-end ' + ('text-danger' if x_total_additional &lt; 0 else 'text-success')"

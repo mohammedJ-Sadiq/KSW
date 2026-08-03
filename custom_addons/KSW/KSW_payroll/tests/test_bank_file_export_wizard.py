@@ -383,13 +383,8 @@ class TestBankFileExportWizard(TransactionCase):
 
         wb = openpyxl.load_workbook(io.BytesIO(base64.b64decode(att.datas)))
         ws_summary = wb['Payroll Summary']
-        names = []
-        for r in range(2, ws_summary.max_row + 1):
-            name = ws_summary.cell(r, 1).value
-            if name:
-                names.append(name)
         self.assertEqual(
-            names,
+            self._data_block_names(ws_summary, 1, 2),
             ['ZZ EXCEL ONE', 'AA EXCEL TWO', 'AHMED WPS EMPLOYEE'],
         )
 
@@ -523,15 +518,15 @@ class TestBankFileExportWizard(TransactionCase):
                 'Kawthar TXT line length mismatch: %d' % len(line),
             )
 
-    def test_kawthar_txt_employee_barcode(self):
-        """First 12 chars are zero-padded employee barcode."""
+    def test_kawthar_txt_employee_id_is_row_sequence(self):
+        """First 12 chars are the row's 1..N position in this file."""
         wiz = self._make_wizard(mode='specific_txt',
                                 bank=self.kawthar_bank_1,
                                 value_date=date(2026, 3, 30))
         data = wiz._make_kawthar_txt(self.kawthar_bank_1,
                                      self.slip_kaw_1)
         line = data.decode('utf-8').split('\n')[0]
-        self.assertEqual(line[:12], '000000000201')
+        self.assertEqual(line[:12], '000000000001')
 
     def test_kawthar_txt_cic(self):
         """Chars 13-22 are the CIC number zero-padded to 10."""
@@ -646,11 +641,7 @@ class TestBankFileExportWizard(TransactionCase):
         # Only pass the WPS slip
         self.batch._fill_payroll_summary_sheet(wb, self.slip_wps)
         ws = wb.active
-        names = []
-        for r in range(2, ws.max_row + 1):
-            name = ws.cell(r, 1).value
-            if name:
-                names.append(name)
+        names = self._data_block_names(ws, 1, 2)
         self.assertEqual(len(names), 1)
         self.assertEqual(names[0], 'AHMED WPS EMPLOYEE')
 
@@ -659,12 +650,7 @@ class TestBankFileExportWizard(TransactionCase):
         wb = openpyxl.Workbook()
         self.batch._fill_payroll_summary_sheet(wb)
         ws = wb.active
-        names = []
-        for r in range(2, ws.max_row + 1):
-            name = ws.cell(r, 1).value
-            if name:
-                names.append(name)
-        self.assertEqual(len(names), 3)
+        self.assertEqual(len(self._data_block_names(ws, 1, 2)), 3)
 
     # ================================================================
     # Tests — Error handling
@@ -741,6 +727,20 @@ class TestBankFileExportWizard(TransactionCase):
             for r in range(first_row, ws.max_row + 1)
             if ws.cell(r, name_col).value
         }
+
+    def _data_block_names(self, ws, name_col, first_row):
+        """Names in the contiguous data block, stopping at the first blank.
+
+        Everything past that blank is a labelled review block (banner,
+        excluded rows, totals), not employee data.
+        """
+        names = []
+        for r in range(first_row, ws.max_row + 1):
+            v = ws.cell(r, name_col).value
+            if not v:
+                break
+            names.append(v)
+        return names
 
     def _export_wb(self, mode, bank):
         """Run an Excel export and return the loaded workbook."""
@@ -917,4 +917,94 @@ class TestBankFileExportWizard(TransactionCase):
         # bank sheet — it is an upload template.
         ws_bank = wb['WPS Bank File']
         self.assertNotIn('NEVER GENERATED', self._sheet_rows(ws_bank, 3, 8))
+
+    # ================================================================
+    # Tests — batch totals must state what the BANK pays
+    # ================================================================
+
+    def _totals_row(self, ws, prefix, money_col):
+        """Return the amount on the totals line whose label starts prefix."""
+        for r in range(1, ws.max_row + 1):
+            v = ws.cell(r, 1).value
+            if isinstance(v, str) and v.startswith(prefix):
+                return ws.cell(r, money_col).value
+        return None
+
+    def _wps_bank_total(self):
+        self.batch._refresh_bank_totals()
+        return self.batch.x_bank_total_ids.filtered(
+            lambda t: t.bank_account_id == self.wps_bank
+        )
+
+    def test_bank_total_excludes_negative_net(self):
+        """An over-deducted slip must not be netted off the payable total.
+
+        Reproduces KSWCO batch 246: 4 slips at -390 dragged the displayed
+        Kawthar total to 362,027 while the bank file paid 363,587.
+        """
+        self._add_wps_employee('OVER DEDUCTED', '910', '9009009010', net=-390)
+
+        total = self._wps_bank_total()
+        self.assertEqual(total.total_net, 11000,
+                         'Total NET must be what the bank debits')
+        self.assertEqual(total.excluded_net, -390)
+        self.assertEqual(total.excluded_count, 1)
+        self.assertEqual(total.payable_count, 1)
+        self.assertEqual(total.slip_count, 2)
+
+    def test_bank_total_excludes_zero_net(self):
+        """Zero-NET rows inflate the employee count but pay nothing."""
+        self._add_wps_employee('ZERO NET GUY', '911', '9009009011', net=0)
+
+        total = self._wps_bank_total()
+        self.assertEqual(total.total_net, 11000)
+        self.assertEqual(total.payable_count, 1)
+        self.assertEqual(total.excluded_count, 1)
+        self.assertEqual(total.excluded_net, 0)
+        self.assertEqual(total.slip_count, 2)
+
+    def test_bank_total_matches_the_txt_control_total(self):
+        """Total NET on the batch equals the WPS header's control total."""
+        self._add_wps_employee('OVER DEDUCTED', '912', '9009009012', net=-390)
+        self._add_wps_employee('ZERO NET GUY', '913', '9009009013', net=0)
+        self._add_wps_employee('PAID TOO', '914', '9009009014', net=2500)
+
+        total = self._wps_bank_total()
+        header = self._export_txt(self.wps_bank).split('\n')[0]
+        # Header layout: 12 filler + 'G' + 8 + 8, then the 13-digit total.
+        self.assertEqual(int(header[29:42]), int(total.total_net))
+        self.assertEqual(int(header[42:52]), total.payable_count)
+        self.assertEqual(total.total_net, 13500)
+
+    def test_excel_states_payable_and_batch_totals_separately(self):
+        """Summing the Net column can no longer be mistaken for the payment."""
+        self._add_wps_employee('OVER DEDUCTED', '915', '9009009015', net=-390)
+
+        ws = self._export_wb('specific_excel', self.wps_bank)['Payroll Summary']
+        self.assertEqual(
+            self._totals_row(ws, 'Total written to the bank file', 15), 11000,
+        )
+        self.assertEqual(
+            self._totals_row(ws, 'Excluded from the bank file', 15), -390,
+        )
+        self.assertEqual(
+            self._totals_row(ws, 'Batch total', 15), 10610,
+        )
+
+    def test_bank_sheet_totals_carry_the_review_only_banner(self):
+        """Totals on an upload sheet must be flagged as rows to delete."""
+        self._add_wps_employee('OVER DEDUCTED', '916', '9009009016', net=-390)
+
+        ws = self._export_wb('specific_excel', self.wps_bank)['WPS Bank File']
+        self.assertEqual(
+            self._totals_row(ws, 'Total written to the bank file', 6), 11000,
+        )
+        labels = [
+            ws.cell(r, 1).value for r in range(1, ws.max_row + 1)
+            if isinstance(ws.cell(r, 1).value, str)
+        ]
+        self.assertTrue(
+            any(l.startswith('Totals') and 'delete' in l for l in labels),
+            'the totals block must warn that it is not part of the upload',
+        )
 
