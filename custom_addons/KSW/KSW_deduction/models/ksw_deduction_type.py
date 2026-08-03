@@ -32,13 +32,15 @@ class KswDeductionType(models.Model):
              'of this type. Can be overridden per record.',
     )
     managed_by = fields.Selection([
-        ('hr', 'HR Department'),
-        ('accounting', 'Accounting'),
-    ], string='Managed By', required=True, default='hr',
-        help='Which department can manually close (mark as paid) deductions '
+        ('acc_data_entry', 'Accounting Data Entry'),
+        ('accounting', 'Accounting (Loans)'),
+    ], string='Managed By', required=True, default='acc_data_entry',
+        help='Who can create and manually close (mark as paid) deductions '
              'of this type outside payroll. '
-             'HR: gov. penalties, internal penalties, salary advances. '
-             'Accounting: loans.',
+             'Accounting Data Entry: gov. penalties, internal penalties, '
+             'salary advances. '
+             'Accounting (Loans): loans, which additionally require the '
+             '"Loan Modification: Full" privilege.',
     )
     payroll_priority = fields.Integer(
         string='Payroll Priority',

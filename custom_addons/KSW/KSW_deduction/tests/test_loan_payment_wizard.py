@@ -373,10 +373,12 @@ class TestLoanPaymentWizard(DeductionCommon):
 class TestNonLoanPaymentWizard(DeductionCommon):
     """The payment wizard is not loan-only.
 
-    Salary advances and penalties (managed_by='hr') can be settled
-    outside payroll too. Who may do it follows the same per-record
-    matrix as the Installments tab (`x_can_edit_installments`):
-    accounting closes any type, HR closes HR-managed types only.
+    Salary advances and penalties (managed_by='acc_data_entry') can be
+    settled outside payroll too. Who may do it follows the same per-record
+    matrix as the Installments tab (`x_can_edit_installments`): accounting
+    with Loan Modification = Full closes any type, the Accounting Data
+    Entry role closes the non-loan types. HR-side roles are read-only on
+    them since August 2026.
     """
 
     @classmethod
@@ -394,9 +396,9 @@ class TestNonLoanPaymentWizard(DeductionCommon):
 
         cls.user_acc = _mk(
             'kswnl_acc', ['KSW_deduction.group_installment_edit'])
-        cls.user_hr_officer = _mk(
-            'kswnl_hr_officer',
-            ['KSW_deduction.group_hr_deduction_officer'])
+        cls.user_data_entry = _mk(
+            'kswnl_data_entry',
+            ['KSW_deduction.group_acc_data_entry'])
         cls.user_loan_hr = _mk(
             'kswnl_loan_hr', ['KSW_deduction.group_loan_hr'])
         cls.user_plain = _mk(
@@ -407,13 +409,13 @@ class TestNonLoanPaymentWizard(DeductionCommon):
     # ------------------------------------------------------------------ #
 
     def _active_non_loan(self, ded_type=None, amount=1000.0, installments=4):
-        """A submitted (therefore active) HR-managed deduction."""
+        """A submitted (therefore active) non-loan deduction."""
         ded = self._make_deduction(ded_type or self.type_advance,
                                    amount=amount, installments=installments)
         ded.action_submit()
         self.assertEqual(ded.state, 'active')
         self.assertFalse(ded.is_loan)
-        self.assertEqual(ded.managed_by, 'hr')
+        self.assertEqual(ded.managed_by, 'acc_data_entry')
         return ded
 
     def _active_loan(self, amount=6000.0, installments=4):
@@ -443,13 +445,20 @@ class TestNonLoanPaymentWizard(DeductionCommon):
     # Button gating (x_can_edit_installments drives the header button)      #
     # ------------------------------------------------------------------ #
 
-    def test_hr_officer_can_edit_installments_on_advance(self):
+    def test_data_entry_can_edit_installments_on_advance(self):
         ded = self._active_non_loan()
         self.assertTrue(
-            ded.with_user(self.user_hr_officer).x_can_edit_installments)
+            ded.with_user(self.user_data_entry).x_can_edit_installments)
 
-    def test_hr_officer_cannot_edit_installments_on_loan(self):
+    def test_data_entry_cannot_read_a_loan(self):
+        """Loans are outside the data-entry record rule altogether."""
         ded = self._active_loan()
+        with self.assertRaises(AccessError):
+            ded.with_user(self.user_data_entry).read(['managed_by'])
+
+    def test_loan_hr_cannot_edit_installments_on_advance(self):
+        """HR approvers are read-only on non-loan deductions."""
+        ded = self._active_non_loan()
         self.assertFalse(
             ded.with_user(self.user_loan_hr).x_can_edit_installments)
 
@@ -458,23 +467,23 @@ class TestNonLoanPaymentWizard(DeductionCommon):
         self.assertTrue(ded.with_user(self.user_acc).x_can_edit_installments)
 
     # ------------------------------------------------------------------ #
-    # HR settles an HR-managed deduction                                    #
+    # Accounting data entry settles a non-loan deduction                    #
     # ------------------------------------------------------------------ #
 
-    def test_hr_officer_full_payment_on_advance_completes_it(self):
+    def test_data_entry_full_payment_on_advance_completes_it(self):
         ded = self._active_non_loan(amount=1000.0, installments=4)
         wiz = self._wizard(ded, 1000.0, note='Cash SR-11',
-                           user=self.user_hr_officer)
+                           user=self.user_data_entry)
         wiz.action_confirm()
         self.assertTrue(all(l.state == 'paid' for l in ded.line_ids))
         self.assertEqual(ded.state, 'completed')
         bodies = ' '.join(str(m.body or '') for m in ded.message_ids)
         self.assertIn('Cash SR-11', bodies)
 
-    def test_hr_officer_sequential_partial_on_penalty_splits_installment(self):
+    def test_data_entry_sequential_partial_on_penalty_splits_installment(self):
         ded = self._active_non_loan(self.type_gov_pen, amount=400.0,
                                     installments=4)
-        wiz = self._wizard(ded, 150.0, user=self.user_hr_officer)
+        wiz = self._wizard(ded, 150.0, user=self.user_data_entry)
         wiz.action_confirm()
         paid = ded.line_ids.filtered(lambda l: l.state == 'paid')
         self.assertEqual(len(paid), 2)               # 100 + 50 of the second
@@ -484,11 +493,11 @@ class TestNonLoanPaymentWizard(DeductionCommon):
         self.assertAlmostEqual(sum(relevant.mapped('amount')), 400.0, places=2)
         self.assertEqual(ded.state, 'active')
 
-    def test_loan_hr_approver_can_settle_advance(self):
+    def test_loan_hr_approver_cannot_settle_advance(self):
+        """Read-only since non-loan moved to accounting data entry."""
         ded = self._active_non_loan(amount=800.0, installments=2)
-        wiz = self._wizard(ded, 800.0, user=self.user_loan_hr)
-        wiz.action_confirm()
-        self.assertEqual(ded.state, 'completed')
+        with self.assertRaises(AccessError):
+            self._wizard(ded, 800.0, user=self.user_loan_hr)
 
     def test_accounting_can_settle_advance_too(self):
         ded = self._active_non_loan(amount=800.0, installments=2)
@@ -498,7 +507,7 @@ class TestNonLoanPaymentWizard(DeductionCommon):
 
     def test_redistribute_mode_works_on_advance(self):
         ded = self._active_non_loan(amount=1000.0, installments=4)
-        wiz = self._wizard(ded, 200.0, user=self.user_hr_officer,
+        wiz = self._wizard(ded, 200.0, user=self.user_data_entry,
                            mode='redistribute')
         wiz.action_confirm()
         pending = ded.line_ids.filtered(lambda l: l.state == 'pending')
@@ -509,10 +518,10 @@ class TestNonLoanPaymentWizard(DeductionCommon):
     # Auth guards                                                           #
     # ------------------------------------------------------------------ #
 
-    def test_hr_approver_blocked_from_settling_a_loan(self):
-        """group_loan_hr sees loans but may not close accounting-managed ones."""
+    def test_data_entry_blocked_from_settling_a_loan(self):
+        """The data-entry role may not close accounting-managed loans."""
         ded = self._active_loan(amount=6000.0, installments=4)
-        wiz = self._wizard(ded, 1000.0, user=self.user_loan_hr)
+        wiz = self._wizard(ded, 1000.0, user=self.user_data_entry)
         with self.assertRaises(UserError):
             wiz.action_confirm()
 
@@ -523,6 +532,6 @@ class TestNonLoanPaymentWizard(DeductionCommon):
 
     def test_overpayment_rejected_on_advance(self):
         ded = self._active_non_loan(amount=500.0, installments=2)
-        wiz = self._wizard(ded, 600.0, user=self.user_hr_officer)
+        wiz = self._wizard(ded, 600.0, user=self.user_data_entry)
         with self.assertRaises(ValidationError):
             wiz.action_confirm()

@@ -13,3 +13,4 @@ from . import test_critical_fixes
 from . import test_waiting_for_me
 
 
+from . import test_employee_identifier_search

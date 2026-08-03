@@ -252,9 +252,9 @@ class KswDeductionLine(models.Model):
             user = self.env.user
             can_installment_edit = user.has_group(
                 'KSW_deduction.group_installment_edit')
-            can_hr_officer = (
-                user.has_group('KSW_deduction.group_deduction_officer')
-                or user.has_group('KSW_deduction.group_loan_hr')
+            can_data_entry = (
+                user.has_group('KSW_deduction.group_acc_data_entry')
+                or user.has_group('KSW_deduction.group_deduction_manager')
             )
             for line in self:
                 managed_by = line.deduction_id.managed_by
@@ -267,11 +267,11 @@ class KswDeductionLine(models.Model):
                             "Access Rights → KSW Deductions → Loan "
                             "Installment Modification = Edit)."
                         ))
-                else:  # hr-managed
-                    if not (can_installment_edit or can_hr_officer):
+                else:  # accounting data-entry managed
+                    if not (can_installment_edit or can_data_entry):
                         raise UserError(_(
-                            "Editing installments on HR-managed deductions "
-                            "requires the Deduction Officer role or the "
+                            "Editing installments on non-loan deductions "
+                            "requires the Accounting Data Entry role or the "
                             "'Loan Installment Modification' privilege."
                         ))
 
@@ -412,15 +412,15 @@ class KswDeductionLine(models.Model):
         user = self.env.user
         can_installment_edit = user.has_group(
             'KSW_deduction.group_installment_edit')
-        can_hr_officer = (
-            user.has_group('KSW_deduction.group_deduction_officer')
-            or user.has_group('KSW_deduction.group_loan_hr')
+        can_data_entry = (
+            user.has_group('KSW_deduction.group_acc_data_entry')
+            or user.has_group('KSW_deduction.group_deduction_manager')
         )
-        if not (can_installment_edit or can_hr_officer):
+        if not (can_installment_edit or can_data_entry):
             raise UserError(_(
                 "Adding a manual installment requires either the "
-                "'Loan Installment Modification' privilege (Accounting) "
-                "or the Deduction Officer role (HR). Ask an administrator "
+                "'Loan Installment Modification' privilege or the "
+                "Accounting Data Entry role. Ask an administrator "
                 "to grant the appropriate access on your user."
             ))
         today = fields.Date.context_today(self)
@@ -439,9 +439,10 @@ class KswDeductionLine(models.Model):
                 ded = self.env['ksw.deduction'].browse(ded_id).sudo()
                 if ded.managed_by == 'accounting':
                     raise UserError(_(
-                        "Deduction '%(name)s' is managed by Accounting. "
-                        "Manually closing it requires the 'Loan Installment "
-                        "Modification' privilege, not the HR Officer role.",
+                        "Deduction '%(name)s' is a loan managed by "
+                        "Accounting. Manually closing it requires the 'Loan "
+                        "Installment Modification' privilege, not the "
+                        "Accounting Data Entry role.",
                         name=ded.display_name,
                     ))
             vals['is_manual'] = True
@@ -500,18 +501,19 @@ class KswDeductionLine(models.Model):
         Raises ``UserError`` unless the current user may modify every
         deduction in ``self``. Returns silently under sudo. Mirrors the
         manual-entry create() / write() privilege matrix:
-          • group_installment_edit (Accounting) → any type
-          • group_deduction_officer / group_loan_hr (HR) → HR-managed only
+          • group_installment_edit (Accounting, "Full") → any type
+          • group_acc_data_entry / group_deduction_manager
+            → managed_by='acc_data_entry' (non-loan) only
         """
         if self.env.su:
             return
         user = self.env.user
         can_acc = user.has_group('KSW_deduction.group_installment_edit')
-        can_hr = (
-            user.has_group('KSW_deduction.group_deduction_officer')
-            or user.has_group('KSW_deduction.group_loan_hr')
+        can_data_entry = (
+            user.has_group('KSW_deduction.group_acc_data_entry')
+            or user.has_group('KSW_deduction.group_deduction_manager')
         )
-        if not (can_acc or can_hr):
+        if not (can_acc or can_data_entry):
             raise UserError(_(
                 "You do not have permission to modify installments. "
                 "Contact your administrator."
@@ -520,9 +522,9 @@ class KswDeductionLine(models.Model):
             for line in self:
                 if line.deduction_id.managed_by == 'accounting':
                     raise UserError(_(
-                        "Deduction '%(name)s' is managed by Accounting. "
-                        "Modifying its installments requires the 'Loan "
-                        "Installment Modification' privilege.",
+                        "Deduction '%(name)s' is a loan managed by "
+                        "Accounting. Modifying its installments requires "
+                        "the 'Loan Installment Modification' privilege.",
                         name=line.deduction_id.display_name,
                     ))
 

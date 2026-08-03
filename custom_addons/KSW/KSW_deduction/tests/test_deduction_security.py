@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Tests for ACLs, record rules, and group implication chain."""
-from odoo.exceptions import AccessError
+from odoo.exceptions import AccessError, UserError
 from odoo.tools import mute_logger
 from .common import DeductionCommon
 class TestDeductionSecurity(DeductionCommon):
@@ -70,19 +70,40 @@ class TestDeductionSecurity(DeductionCommon):
     # ------------------------------------------------------------------
     @mute_logger('odoo.addons.base.models.ir_model')
     def test_user_cannot_create_or_unlink(self):
+        # Loans: blocked by the ACL (group_deduction_user is read-only).
         with self.assertRaises(AccessError):
+            self.env['ksw.deduction'].with_user(self.user_dept_user).create({
+                'employee_id': self.employee.id,
+                'type_id': self.type_loan.id,
+                'amount': 100.0, 'installments': 1,
+            })
+    @mute_logger('odoo.addons.base.models.ir_model')
+    def test_user_cannot_create_non_loan(self):
+        # Non-loan: the ownership guard raises UserError before the ORM
+        # gets to its AccessError (Odoo 19 Pitfalls #12).
+        with self.assertRaises(UserError):
             self.env['ksw.deduction'].with_user(self.user_dept_user).create({
                 'employee_id': self.employee.id,
                 'type_id': self.type_advance.id,
                 'amount': 100.0, 'installments': 1,
             })
-    def test_officer_can_create(self):
+    def test_officer_can_create_loan(self):
         ded = self.env['ksw.deduction'].with_user(self.user_officer).create({
             'employee_id': self.employee.id,
-            'type_id': self.type_advance.id,
+            'type_id': self.type_loan.id,
             'amount': 100.0, 'installments': 1,
         })
         ded.with_user(self.user_officer).write({'reason': 'test'})
+    @mute_logger('odoo.addons.base.models.ir_model')
+    def test_officer_cannot_create_non_loan(self):
+        """Non-loan deductions belong to the accounting data-entry team
+        since August 2026; the Officer role only reads them."""
+        with self.assertRaises(UserError):
+            self.env['ksw.deduction'].with_user(self.user_officer).create({
+                'employee_id': self.employee.id,
+                'type_id': self.type_advance.id,
+                'amount': 100.0, 'installments': 1,
+            })
     @mute_logger('odoo.addons.base.models.ir_model')
     def test_officer_cannot_unlink(self):
         ded = self._make_deduction()

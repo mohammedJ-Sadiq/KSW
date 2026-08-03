@@ -41,7 +41,6 @@ PERSONAS = {
         "hr.group_hr_user",
         "KSW_annual_leave.group_annual_leave_hr",
         "KSW_deduction.group_loan_hr",
-        "KSW_deduction.group_hr_deduction_officer",
         "KSW_attendance_sheet.group_attendance_sheet_manager",
     ],
     "accounting": [
@@ -50,6 +49,7 @@ PERSONAS = {
         "KSW_deduction.group_loan_acc",
         "KSW_deduction.group_loan_disbursement",
         "KSW_deduction.group_installment_edit",
+        "KSW_deduction.group_acc_data_entry",
         "KSW_commissions.group_commission_accountant",
     ],
     "gm": [

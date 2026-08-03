@@ -17,7 +17,7 @@
               parent="menu_ksw_deduction_root"
               action="action_ksw_deduction_dashboard"
               sequence="1"
-              groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_deduction_supervisor,KSW_deduction.group_hr_deduction_officer,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm"/>
+              groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_deduction_supervisor,KSW_deduction.group_acc_data_entry,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm"/>
 
     <!-- ============================================================ -->
     <!-- 2. Self-Service (every internal user)                          -->
@@ -51,7 +51,7 @@
               name="Operations"
               parent="menu_ksw_deduction_root"
               sequence="10"
-              groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_deduction_supervisor,KSW_deduction.group_hr_deduction_officer,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm"/>
+              groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_deduction_supervisor,KSW_deduction.group_acc_data_entry,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm"/>
 
     <menuitem id="menu_ksw_deduction_all"
               name="All Deductions"
@@ -69,13 +69,14 @@
               sequence="20"
               groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_deduction_supervisor,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm"/>
 
-    <!-- Non-loan HR officer: single consolidated view (mirrors "Loans" for approvers) -->
-    <menuitem id="menu_ksw_deduction_hr_managed"
+    <!-- Accounting data entry: single consolidated view of the non-loan
+         deductions they own (mirrors "Loans" for approvers) -->
+    <menuitem id="menu_ksw_deduction_acc_data_entry"
               name="Deductions"
               parent="menu_ksw_deduction_operations"
-              action="action_ksw_deduction_hr_managed"
+              action="action_ksw_deduction_acc_data_entry"
               sequence="20"
-              groups="KSW_deduction.group_hr_deduction_officer"/>
+              groups="KSW_deduction.group_acc_data_entry"/>
 
     <!-- ============================================================ -->
     <!-- 5. Reports (officers + approvers + supervisors)                -->
@@ -84,7 +85,7 @@
               name="Reports"
               parent="menu_ksw_deduction_root"
               sequence="30"
-              groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_deduction_supervisor,KSW_deduction.group_hr_deduction_officer,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm"/>
+              groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_deduction_supervisor,KSW_deduction.group_acc_data_entry,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm"/>
 
     <menuitem id="menu_ksw_deduction_report_by_employee"
               name="By Employee"

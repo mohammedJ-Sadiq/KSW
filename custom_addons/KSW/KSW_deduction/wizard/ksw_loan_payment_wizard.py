@@ -12,10 +12,11 @@ class KswLoanPaymentWizard(models.TransientModel):
     Works for every type — loans, salary advances and penalties alike.
     Who may open it is decided per-record by
     ``ksw.deduction.x_can_edit_installments``: accounting
-    (``group_installment_edit``) can close any type, HR
-    (``group_hr_deduction_officer`` / ``group_loan_hr``) can close
-    HR-managed types only. The model keeps its historical
-    ``ksw.loan.payment.wizard`` name.
+    (``group_installment_edit``) can close any type, the accounting
+    data-entry team (``group_acc_data_entry``) and the module
+    administrator (``group_deduction_manager``) can close the non-loan
+    types (``managed_by='acc_data_entry'``). The model keeps its
+    historical ``ksw.loan.payment.wizard`` name.
 
     Full payment (payment_amount == outstanding) always behaves the same:
     every pending installment is stamped paid/manual in-place, no extra row.
@@ -207,16 +208,16 @@ class KswLoanPaymentWizard(models.TransientModel):
         ded = self.deduction_id
 
         # Same per-record matrix the Installments tab uses: accounting
-        # (Loan Modification = Full) closes any type, HR officers and HR
-        # approvers close HR-managed types (advances, penalties). The
-        # compute also requires the deduction to be active.
+        # with Loan Modification = Full closes any type, the accounting
+        # data-entry team closes the non-loan types (advances, penalties).
+        # The compute also requires the deduction to be active.
         if not self.env.su and not ded.x_can_edit_installments:
             raise UserError(_(
                 "You are not allowed to record a payment on this "
                 "deduction. Accounting staff with the 'Loan Modification: "
-                "Full' privilege can settle any type; HR officers and HR "
-                "approvers can settle HR-managed types (salary advances "
-                "and penalties) only."
+                "Full' privilege can settle any type; the Accounting Data "
+                "Entry role can settle non-loan deductions (salary "
+                "advances and penalties) only."
             ))
 
         pending = self._pending_in_due_order(ded)

@@ -2219,3 +2219,18 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "➕ Record New Penalty"
 msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_type__managed_by__acc_data_entry
+msgid "Accounting Data Entry"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:res.groups,name:KSW_deduction.group_acc_data_entry
+msgid "Accounting Data Entry (Non-Loan)"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_type__managed_by__accounting
+msgid "Accounting (Loans)"
+msgstr ""

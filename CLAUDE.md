@@ -339,31 +339,48 @@ KSW_payroll access-tier feature. Know them before doing similar work again.
 ## KSW_deduction architecture notes
 
 ### managed_by field
-`ksw.deduction.type.managed_by` (`Selection`: `'hr'` / `'accounting'`, default `'hr'`)
-controls which department can manually close installments outside payroll.
+`ksw.deduction.type.managed_by` (`Selection`: `'acc_data_entry'` / `'accounting'`,
+default `'acc_data_entry'`) controls who owns the type: who may create it and
+manually close its installments outside payroll.
+
+**August 2026 — non-loan deductions moved from HR to accounting.** The value
+`'hr'` became `'acc_data_entry'` and the group `group_hr_deduction_officer`
+("HR Officer (Non-Loan)") became `group_acc_data_entry` ("Accounting Data Entry
+(Non-Loan)"). Both renames, including the group's xml id, are handled by
+`migrations/19.0.1.1.0/pre-migrate.py` — group membership is preserved.
 
 | Type | managed_by |
 |------|-----------|
-| Loan | `accounting` |
-| Salary Advance | `hr` |
-| Gov. Penalty | `hr` |
-| Internal Penalty | `hr` |
+| Loan | `accounting` (label "Accounting (Loans)") |
+| Salary Advance | `acc_data_entry` |
+| Gov. Penalty | `acc_data_entry` |
+| Internal Penalty | `acc_data_entry` |
 
 `ksw.deduction.managed_by` is a `store=True` related field that mirrors the type's
 value. Stored so record rules can filter on it without a subquery.
 
 ### Installment privilege matrix
 
-| Group | HR-managed deductions | Accounting-managed (loans) |
-|-------|----------------------|---------------------------|
-| `group_deduction_officer` | can mark paid, edit schedule | ✗ |
-| `group_loan_hr` | can mark paid, edit schedule | see loans only (via record rule) |
-| `group_installment_edit` | can mark paid, edit schedule | can mark paid, edit schedule, open wizard |
+| Group | Non-loan (`acc_data_entry`) | Loans (`accounting`) |
+|-------|------------------------------|----------------------|
+| `group_acc_data_entry` | create, mark paid, edit schedule, wizard | not visible |
+| `group_deduction_officer` | **read-only** | create/edit (loan rules apply) |
+| `group_loan_hr` | **read-only** | see + approve loans |
+| `group_deduction_manager` | full (administrator) | full |
+| `group_installment_edit` | mark paid, edit schedule, wizard | mark paid, edit schedule, wizard |
 
 `x_can_edit_installments` is a non-stored `@api.depends_context('uid')` computed
 Boolean on `ksw.deduction` that reflects this matrix for the current user. The view
 uses it for `invisible=` on the installments tab; Python `create()`/`write()` guards
 enforce it at the ORM level.
+
+The read-only tier is enforced by splitting the officer record rule in two —
+`ksw_deduction_rule_officer` (read, `[(1,'=',1)]`) and
+`ksw_deduction_rule_officer_write` (write/create/unlink,
+`[('managed_by','!=','acc_data_entry')]`) — plus
+`ksw_deduction_rule_non_loan_readonly` for `group_loan_hr`.
+`ksw.deduction.create()` also calls `_check_acc_data_entry_ownership()` so an HR
+user gets an explanatory `UserError` instead of a bare `AccessError`.
 
 ### action_mark_line_paid
 `ksw.deduction.line.action_mark_line_paid()` stamps a single pending line as paid
@@ -379,8 +396,9 @@ outside payroll. **Not loan-only** (widened July 2026): the **Record Payment** h
 button shows on any *active* deduction that has pending installments. Both the
 button's `invisible=` and the `action_confirm` guard read
 `ksw.deduction.x_can_edit_installments` — the same matrix as the Installments tab:
-accounting (`group_installment_edit`) settles any type, HR
-(`group_hr_deduction_officer`, `group_loan_hr`) settles `managed_by='hr'` types only.
+accounting with Loan Modification = Full (`group_installment_edit`) settles any type;
+`group_acc_data_entry` (and `group_deduction_manager`) settle
+`managed_by='acc_data_entry'` types only. HR-side roles cannot settle anything.
 The button's `groups=` list is only a coarse pre-filter and **must stay a superset** of
 the groups that compute can grant, or a user who passes the button filter will be
 missing the field from `fields_get()` and crash (gotcha #31). The model keeps its
@@ -397,15 +415,22 @@ historical `ksw.loan.payment.wizard` name.
   validates the total constraint once at the end.
 - Chatter writes use `ded.sudo().message_post(...)` (see gotcha #11).
 
-### Record rule: group_loan_hr sees HR-managed deductions
-`ksw_deduction_rule_hr_managed` (in `KSW_deduction/security/security.xml`) ORs with
-the existing loan-approvers rule so `group_loan_hr` users see:
-loans (`is_loan=True`) **OR** HR-managed deductions (`managed_by='hr'`).
-The `managed_by` field must be `store=True` on `ksw.deduction` for this domain to work.
+### Record rule: group_loan_hr sees non-loan deductions (read-only)
+`ksw_deduction_rule_non_loan_readonly` (in `KSW_deduction/security/security.xml`)
+ORs with the existing loan-approvers rule so `group_loan_hr` users **see**:
+loans (`is_loan=True`) **OR** non-loan deductions (`managed_by='acc_data_entry'`),
+but may only **write** the loans. The `managed_by` field must be `store=True` on
+`ksw.deduction` for this domain to work.
 
-### Employee detail mirrors (read-only, HR users only)
-Three non-stored `related` fields on `ksw.deduction` surface employee identifiers
-directly on the deduction form (Employee group) without a separate lookup:
+Note `group_loan_hr` used to *imply* the non-loan officer group; that implication
+lived on in databases even after the file stopped declaring it (gotcha #3), so the
+XML now uses `(6, 0, [...])` on its `implied_ids` to actively remove it.
+
+### Employee detail mirrors (read-only)
+Three non-stored **sudo computes** (`_compute_employee_identifiers`, converted from
+`related=` in August 2026 so non-HR deduction roles can read them) on
+`ksw.deduction` surface employee identifiers directly on the deduction form
+(Employee group) without a separate lookup:
 
 | Field | Source | Label |
 |-------|--------|-------|
@@ -764,3 +789,37 @@ allocation is needed. All test leave types that do not require allocation must u
     any day of the range. When repairing stored durations, **exclude annual leaves** —
     theirs depends on the balance at request time, so recomputing restamps them with
     today's balance.
+
+34. **A non-HR user's employee search never reaches `hr.employee` — it is
+    answered by `hr.employee.public`.** `hr.employee.search_fetch()` and
+    `hr.employee._search()` both start with
+    `if self.browse().has_access('read')` and, when false, delegate the whole
+    query to `hr.employee.public` (the "HACK" comment in
+    `addons/hr/models/hr_employee.py`). So an override of
+    `_search_display_name` / `_name_search` on `hr.employee` alone is dead
+    code for exactly the users you wrote it for. **Always override on both
+    models** (`hr.employee` *and* `hr.employee.public`); ids match between
+    them, so a shared helper returning `Domain('id', 'in', <sudo search>)`
+    works for either. See
+    `KSW_deduction/models/hr_employee.py::_deduction_identifier_domain` —
+    it lets the Accounting Data Entry role find employees by SSN, iqama,
+    employee no. and BAS loan account, none of which the stock
+    `_rec_names_search` path can match for them (`ssnid` /
+    `identification_id` are on `hr.version`, whose record rules expose only
+    the user's own version; `x_employee_no` / `x_loan_acc_no` are
+    `hr.group_hr_user`-gated).
+
+35. **A new msgid must be added to the module's `.pot`, or its `.po`
+    translation is silently discarded on import.** `PoFileReader.__init__`
+    (in `odoo/tools/translate.py`) does `self.pofile.merge(polib.pofile(pot_path))`
+    when a sibling `<module>.pot` exists — polib's `merge` marks every entry
+    absent from the template as **obsolete**, and `__iter__` skips obsolete
+    entries. Symptom: `odoo-bin i18n import` and `-u --i18n-overwrite` both
+    report success, the `.po` looks perfect, and the DB `jsonb` value keeps
+    only `en_US`. Fix: append the same `msgid` block (empty `msgstr`) to
+    `i18n/<module>.pot`, then re-run the update. Verify in the DB, never in
+    the file:
+    ```bash
+    psql -d odoo_dev -c "select g.name from res_groups g join ir_model_data d \
+      on d.model='res.groups' and d.res_id=g.id where d.name='group_acc_data_entry';"
+    ```

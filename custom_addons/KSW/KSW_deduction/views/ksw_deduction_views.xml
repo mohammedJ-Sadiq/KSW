@@ -80,14 +80,15 @@
                          installment. Opens the payment wizard for partial or
                          full payments made outside payroll.
                          Who sees it is decided per-record by
-                         x_can_edit_installments (accounting closes any type,
-                         HR closes HR-managed types) — the groups= list below
-                         is only the coarse pre-filter, so it must be a
-                         superset of the groups that compute can grant. -->
+                         x_can_edit_installments (Loan Modification = Full
+                         closes any type, Accounting Data Entry closes the
+                         non-loan types) — the groups= list below is only the
+                         coarse pre-filter, so it must be a superset of the
+                         groups that compute can grant. -->
                     <button name="action_record_payment" type="object"
                             string="Record Payment"
                             class="btn-warning"
-                            groups="KSW_deduction.group_installment_edit,KSW_deduction.group_hr_deduction_officer,KSW_deduction.group_loan_hr"
+                            groups="KSW_deduction.group_installment_edit,KSW_deduction.group_acc_data_entry,KSW_deduction.group_deduction_manager"
                             invisible="state != 'active' or total_pending == 0 or not x_can_edit_installments"/>
 
                     <!-- Cancel / Reset
@@ -187,12 +188,17 @@
                                    readonly="state != 'draft'"/>
                             <field name="department_id" readonly="1"/>
                             <field name="manager_id" readonly="1"/>
+                            <!-- Identifiers are sudo-computed mirrors, so
+                                 accounting data entry and the loan approvers
+                                 (who are not HR users) can read them: they
+                                 identify the employee they are deducting
+                                 from by employee no. / SSN. -->
                             <field name="x_emp_employee_no" readonly="1"
-                                   groups="hr.group_hr_user"/>
+                                   groups="hr.group_hr_user,KSW_deduction.group_acc_data_entry,KSW_deduction.group_deduction_officer,KSW_deduction.group_installment_edit,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_loan_disbursement"/>
                             <field name="x_emp_ssnid" readonly="1"
-                                   groups="hr.group_hr_user"/>
+                                   groups="hr.group_hr_user,KSW_deduction.group_acc_data_entry,KSW_deduction.group_deduction_officer,KSW_deduction.group_installment_edit,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_loan_disbursement"/>
                             <field name="x_emp_loan_acc_no" readonly="1"
-                                   groups="hr.group_hr_user"/>
+                                   groups="hr.group_hr_user,KSW_deduction.group_acc_data_entry,KSW_deduction.group_deduction_officer,KSW_deduction.group_installment_edit,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_loan_disbursement"/>
                         </group>
                         <group string="Type">
                             <field name="x_can_select_loan_type" invisible="1"/>
@@ -245,7 +251,7 @@
                         </group>
                     </group>
 
-                    <group groups="hr.group_hr_user,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_loan_disbursement,KSW_deduction.group_hr_deduction_officer,KSW_deduction.group_deduction_officer,KSW_deduction.group_installment_edit">
+                    <group groups="hr.group_hr_user,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_loan_disbursement,KSW_deduction.group_acc_data_entry,KSW_deduction.group_deduction_officer,KSW_deduction.group_installment_edit">
                         <group string="Payroll Impact">
                             <field name="x_gross_salary" readonly="1"/>
                             <!-- Both totals are clickable: the arrow opens the
@@ -442,7 +448,7 @@
                             </group>
                         </page>
                         <page string="Decision Support" name="hr_decisions"
-                              groups="KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_deduction_officer,KSW_deduction.group_hr_deduction_officer">
+                              groups="KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_deduction_officer,KSW_deduction.group_acc_data_entry">
                             <!-- Approval confirmations (HR / Accounting) -->
                             <group string="Approval Confirmations">
                                 <group>
@@ -517,7 +523,7 @@
                 <field name="x_emp_outstanding_total" optional="hide"
                        string="Employee's Total Outstanding"/>
                 <field name="x_gross_salary" optional="show"
-                       groups="hr.group_hr_user,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_loan_disbursement,KSW_deduction.group_hr_deduction_officer,KSW_deduction.group_deduction_officer,KSW_deduction.group_installment_edit"/>
+                       groups="hr.group_hr_user,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_loan_disbursement,KSW_deduction.group_acc_data_entry,KSW_deduction.group_deduction_officer,KSW_deduction.group_installment_edit"/>
                 <field name="total_paid" sum="Total Paid" optional="show"/>
                 <field name="total_pending" sum="Total Pending" optional="show"/>
                 <field name="progress_percent" widget="progressbar"/>
@@ -541,7 +547,11 @@
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
-                <field name="employee_id"/>
+                <!-- employee_id matches on name, SSN, iqama/ID, employee no.
+                     and badge — see hr.employee._search_display_name in
+                     KSW_deduction/models/hr_employee.py -->
+                <field name="employee_id"
+                       filter_domain="[('employee_id', 'ilike', self)]"/>
                 <field name="department_id"/>
                 <field name="type_id"/>
                 <filter string="Active Portfolio" name="active_portfolio"
@@ -602,8 +612,8 @@
                 <field name="is_loan"/>
                 <field name="total_paid"/>
                 <field name="total_pending"/>
-                <field name="x_gross_salary" groups="hr.group_hr_user,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_loan_disbursement,KSW_deduction.group_hr_deduction_officer,KSW_deduction.group_deduction_officer,KSW_deduction.group_installment_edit"/>
-                <field name="x_emp_monthly_total" groups="hr.group_hr_user,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_loan_disbursement,KSW_deduction.group_hr_deduction_officer,KSW_deduction.group_deduction_officer,KSW_deduction.group_installment_edit"/>
+                <field name="x_gross_salary" groups="hr.group_hr_user,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_loan_disbursement,KSW_deduction.group_acc_data_entry,KSW_deduction.group_deduction_officer,KSW_deduction.group_installment_edit"/>
+                <field name="x_emp_monthly_total" groups="hr.group_hr_user,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_loan_disbursement,KSW_deduction.group_acc_data_entry,KSW_deduction.group_deduction_officer,KSW_deduction.group_installment_edit"/>
                 <templates>
                     <t t-name="card">
                         <div class="d-flex align-items-center mb-2">
@@ -722,12 +732,12 @@
         <field name="domain">[('is_loan', '=', False), ('category', '=', 'borrowed')]</field>
     </record>
 
-    <!-- Non-loan HR officer: all HR-managed non-loan deductions in one view -->
-    <record id="action_ksw_deduction_hr_managed" model="ir.actions.act_window">
+    <!-- Accounting data entry: all non-loan deductions in one view -->
+    <record id="action_ksw_deduction_acc_data_entry" model="ir.actions.act_window">
         <field name="name">Deductions</field>
         <field name="res_model">ksw.deduction</field>
         <field name="view_mode">list,kanban,form</field>
-        <field name="domain">[('is_loan', '=', False), ('managed_by', '=', 'hr')]</field>
+        <field name="domain">[('is_loan', '=', False), ('managed_by', '=', 'acc_data_entry')]</field>
         <field name="search_view_id" ref="ksw_deduction_view_search"/>
     </record>
 

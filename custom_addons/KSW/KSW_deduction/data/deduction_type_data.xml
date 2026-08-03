@@ -19,7 +19,7 @@
             <field name="code">ADV</field>
             <field name="category">borrowed</field>
             <field name="is_loan" eval="False"/>
-            <field name="managed_by">hr</field>
+            <field name="managed_by">acc_data_entry</field>
             <field name="default_installments">1</field>
             <field name="payroll_priority">30</field>
             <field name="description">Short-term salary advance, deducted in one installment.</field>
@@ -31,7 +31,7 @@
             <field name="code">GOVPEN</field>
             <field name="category">company_paid</field>
             <field name="is_loan" eval="False"/>
-            <field name="managed_by">hr</field>
+            <field name="managed_by">acc_data_entry</field>
             <field name="default_installments">1</field>
             <field name="payroll_priority">10</field>
             <field name="description">Government fine paid by the company on behalf of the employee.</field>
@@ -43,7 +43,7 @@
             <field name="code">INTPEN</field>
             <field name="category">company_paid</field>
             <field name="is_loan" eval="False"/>
-            <field name="managed_by">hr</field>
+            <field name="managed_by">acc_data_entry</field>
             <field name="default_installments">1</field>
             <field name="payroll_priority">20</field>
             <field name="description">Internal company penalty applied to the employee.</field>
@@ -60,15 +60,15 @@
     </function>
     <function model="ksw.deduction.type" name="write">
         <value eval="[ref('type_advance')]"/>
-        <value eval="{'managed_by': 'hr', 'payroll_priority': 30}"/>
+        <value eval="{'managed_by': 'acc_data_entry', 'payroll_priority': 30}"/>
     </function>
     <function model="ksw.deduction.type" name="write">
         <value eval="[ref('type_gov_penalty')]"/>
-        <value eval="{'managed_by': 'hr', 'payroll_priority': 10}"/>
+        <value eval="{'managed_by': 'acc_data_entry', 'payroll_priority': 10}"/>
     </function>
     <function model="ksw.deduction.type" name="write">
         <value eval="[ref('type_internal_penalty')]"/>
-        <value eval="{'managed_by': 'hr', 'payroll_priority': 20}"/>
+        <value eval="{'managed_by': 'acc_data_entry', 'payroll_priority': 20}"/>
     </function>
 
 </odoo>

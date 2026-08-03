@@ -108,29 +108,39 @@
     </record>
 
     <!--
-        HR Officer (Non-Loan): folded into the Deduction Management
-        dropdown (it used to live under its own "Non-Loan HR
-        Management" privilege). Scope: create/manage HR-managed
-        non-loan deductions (gov. penalties, internal penalties,
-        salary advances) for all employees, WITHOUT loan visibility
-        or loan-approval rights. group_loan_hr still implies this so
-        HR Approvers keep their non-loan access; full Officer (below)
-        implies it too since Officer is a strict superset.
+        Accounting Data Entry (Non-Loan): the data-entry staff in the
+        accounting team who own every non-loan deduction (gov.
+        penalties, internal penalties, salary advances). Formerly named
+        "HR Officer (Non-Loan)" — the role was moved out of HR in
+        August 2026; only the label and the xml id changed, the group
+        record and its members are the same (see migration
+        19.0.1.1.0/pre-migrate.py).
+        Scope: create/manage `managed_by='acc_data_entry'` deductions
+        for all employees, WITHOUT loan visibility or loan-approval
+        rights. Deliberately NOT implied by Officer/Manager any more:
+        HR-side roles now only READ these deductions.
     -->
-    <record id="group_hr_deduction_officer" model="res.groups">
-        <field name="name">HR Officer (Non-Loan)</field>
+    <record id="group_acc_data_entry" model="res.groups">
+        <field name="name">Accounting Data Entry (Non-Loan)</field>
         <field name="sequence">3</field>
         <field name="privilege_id" ref="privilege_deduction_management"/>
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-        <field name="comment">Create and manage HR-managed non-loan deductions (penalties, salary advances) for all employees. Does NOT grant loan visibility or loan-approval rights.</field>
+        <field name="comment">Create and manage non-loan deductions (penalties, salary advances) for all employees — the accounting data-entry role. Does NOT grant loan visibility or loan-approval rights.</field>
     </record>
 
+    <!--
+        Officer no longer implies the data-entry role: non-loan
+        deductions belong to accounting now, so Officer (an HR-side
+        role) keeps full rights on loans and READ-ONLY access to
+        accounting data-entry deductions (see the split officer record
+        rules below).
+    -->
     <record id="group_deduction_officer" model="res.groups">
         <field name="name">Officer</field>
         <field name="sequence">4</field>
         <field name="privilege_id" ref="privilege_deduction_management"/>
-        <field name="implied_ids" eval="[(4, ref('group_deduction_user')), (4, ref('group_hr_deduction_officer'))]"/>
-        <field name="comment">Create and edit deductions for all employees (loans and non-loan). Implies "HR Officer (Non-Loan)" since the full Officer scope is a superset of it.</field>
+        <field name="implied_ids" eval="[(6, 0, [ref('group_deduction_user')])]"/>
+        <field name="comment">Create and edit loan deductions for all employees, and read every deduction. Non-loan (Accounting Data Entry) deductions are read-only for this role.</field>
     </record>
 
     <record id="group_deduction_manager" model="res.groups">
@@ -138,7 +148,7 @@
         <field name="sequence">5</field>
         <field name="privilege_id" ref="privilege_deduction_management"/>
         <field name="implied_ids" eval="[(4, ref('group_deduction_officer'))]"/>
-        <field name="comment">Full access to non-loan deductions including delete. Loan-specific edit/delete still requires the dedicated "Loan Modification" privilege — Manager does NOT auto-grant it, so an HR/Admin can be Deduction Manager without being able to touch loan amount/installments or delete loans.</field>
+        <field name="comment">Administrator role: full access to every deduction including delete, so the system stays administrable when the accounting data-entry staff are unavailable. Loan-specific edit/delete still requires the dedicated "Loan Modification" privilege — Manager does NOT auto-grant it, so an HR/Admin can be Deduction Manager without being able to touch loan amount/installments or delete loans.</field>
     </record>
 
     <!-- ============================================================ -->
@@ -146,10 +156,15 @@
     <!-- ============================================================ -->
     <!-- NOTE: "DM Approver" intentionally removed. DM approval is
          derived dynamically from employee.parent_id.user_id. -->
+    <!-- (6, 0, ...) not (4, ...): an earlier version of this file had
+         group_loan_hr imply the non-loan officer role, and an additive
+         command would never undo that in databases where it was already
+         written (CLAUDE.md gotcha #3). HR Approvers are read-only on
+         non-loan deductions now, so the implication must actually go. -->
     <record id="group_loan_hr" model="res.groups">
         <field name="name">HR Approver</field>
         <field name="privilege_id" ref="privilege_loan_approval"/>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="implied_ids" eval="[(6, 0, [ref('base.group_user')])]"/>
     </record>
 
     <record id="group_loan_acc" model="res.groups">
@@ -238,11 +253,40 @@
         <field name="domain_force">['|', ('employee_id.user_id', '=', user.id), ('employee_id.parent_id.user_id', '=', user.id)]</field>
     </record>
 
-    <!-- Officers see everything -->
+    <!-- Officers READ everything (loans and non-loan alike). -->
     <record id="ksw_deduction_rule_officer" model="ir.rule">
-        <field name="name">Deduction: officer all</field>
+        <field name="name">Deduction: officer reads all</field>
         <field name="model_id" ref="model_ksw_deduction"/>
         <field name="groups" eval="[(4, ref('group_deduction_officer'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- ...but they may only CREATE/EDIT/DELETE what is not owned by the
+         accounting data-entry team. Non-loan deductions moved to accounting
+         in August 2026: Officer keeps loans, and reads the rest. -->
+    <record id="ksw_deduction_rule_officer_write" model="ir.rule">
+        <field name="name">Deduction: officer edits everything except accounting data-entry deductions</field>
+        <field name="model_id" ref="model_ksw_deduction"/>
+        <field name="groups" eval="[(4, ref('group_deduction_officer'))]"/>
+        <field name="domain_force">[('managed_by', '!=', 'acc_data_entry')]</field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- Deduction Manager is the administrator role and keeps full control of
+         every deduction (rules are ORed across a user's groups, so this
+         re-grants what the officer split above withholds). Without it nobody
+         but the accounting data-entry staff could fix a bad penalty row. -->
+    <record id="ksw_deduction_rule_manager_all" model="ir.rule">
+        <field name="name">Deduction: manager full access</field>
+        <field name="model_id" ref="model_ksw_deduction"/>
+        <field name="groups" eval="[(4, ref('group_deduction_manager'))]"/>
         <field name="domain_force">[(1, '=', 1)]</field>
     </record>
 
@@ -265,22 +309,36 @@
         <field name="model_id" ref="hr.model_hr_employee"/>
         <field name="domain_force">[(1, '=', 1)]</field>
         <field name="groups" eval="[(4, ref('group_deduction_officer')),
-                                    (4, ref('group_hr_deduction_officer')),
+                                    (4, ref('group_acc_data_entry')),
                                     (4, ref('group_loan_hr')),
                                     (4, ref('group_loan_acc')),
                                     (4, ref('group_loan_gm')),
                                     (4, ref('group_loan_disbursement'))]"/>
     </record>
 
-    <!-- group_hr_deduction_officer can create and manage HR-managed non-loan
-         deductions. group_loan_hr also sees them so they can close
-         installments from the HR approval context. Odoo ORs rules per
-         user, so group_loan_hr sees: is_loan=True OR managed_by='hr'. -->
-    <record id="ksw_deduction_rule_hr_managed" model="ir.rule">
-        <field name="name">Deduction: HR officers and HR approvers see HR-managed deductions</field>
+    <!-- The accounting data-entry team owns non-loan deductions outright:
+         create, edit and delete. -->
+    <record id="ksw_deduction_rule_acc_data_entry" model="ir.rule">
+        <field name="name">Deduction: accounting data entry manages non-loan deductions</field>
         <field name="model_id" ref="model_ksw_deduction"/>
-        <field name="groups" eval="[(4, ref('group_hr_deduction_officer')), (4, ref('group_loan_hr'))]"/>
-        <field name="domain_force">[('managed_by', '=', 'hr')]</field>
+        <field name="groups" eval="[(4, ref('group_acc_data_entry'))]"/>
+        <field name="domain_force">[('managed_by', '=', 'acc_data_entry')]</field>
+    </record>
+
+    <!-- HR Approvers keep VISIBILITY of non-loan deductions (they still need
+         the employee's full deduction picture when approving a loan) but may
+         no longer touch them — read-only since August 2026. Odoo ORs rules per
+         user and per operation, so group_loan_hr reads is_loan=True OR
+         managed_by='acc_data_entry', and writes only is_loan=True. -->
+    <record id="ksw_deduction_rule_non_loan_readonly" model="ir.rule">
+        <field name="name">Deduction: HR approvers read non-loan deductions</field>
+        <field name="model_id" ref="model_ksw_deduction"/>
+        <field name="groups" eval="[(4, ref('group_loan_hr'))]"/>
+        <field name="domain_force">[('managed_by', '=', 'acc_data_entry')]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
     </record>
 
 </odoo>

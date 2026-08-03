@@ -40,21 +40,25 @@ class KswDeduction(models.Model):
     manager_id = fields.Many2one(
         related='employee_id.parent_id', store=True, readonly=True,
     )
-    # Read-only mirrors of employee identification fields (HR users only)
+    # Read-only mirrors of employee identification fields.
+    # Computed with sudo() rather than `related=`, because a related field
+    # inherits the source field's `groups` (hr.group_hr_user here) and the
+    # accounting data-entry / loan-approver roles are not HR users — they
+    # still need the employee number and SSN to identify who they are
+    # deducting from. Visibility is controlled view-side (see the "Employee"
+    # group in the form), never with a model-level `groups=`
+    # (Odoo 19 Pitfalls #31).
     x_emp_employee_no = fields.Char(
-        related='employee_id.x_employee_no', readonly=True,
+        compute='_compute_employee_identifiers', readonly=True,
         string='Employee No.',
-        groups='hr.group_hr_user',
     )
     x_emp_ssnid = fields.Char(
-        related='employee_id.ssnid', readonly=True,
+        compute='_compute_employee_identifiers', readonly=True,
         string='SSN No.',
-        groups='hr.group_hr_user',
     )
     x_emp_loan_acc_no = fields.Char(
-        related='employee_id.x_loan_acc_no', readonly=True,
+        compute='_compute_employee_identifiers', readonly=True,
         string='Loan Acc No. in BAS',
-        groups='hr.group_hr_user',
     )
 
     # ------------------------------------------------------------------
@@ -438,6 +442,21 @@ class KswDeduction(models.Model):
             else:
                 rec.x_gross_salary = 0.0
 
+    @api.depends('employee_id', 'employee_id.x_employee_no',
+                 'employee_id.ssnid', 'employee_id.x_loan_acc_no')
+    def _compute_employee_identifiers(self):
+        """Mirror the employee's identifiers onto the deduction.
+
+        Read through `sudo()`: the sources are gated to hr.group_hr_user,
+        while accounting data-entry staff and loan approvers — who are not
+        HR users — need them to identify the employee on the record.
+        """
+        for rec in self:
+            emp = rec.employee_id.sudo()
+            rec.x_emp_employee_no = emp.x_employee_no if emp else False
+            rec.x_emp_ssnid = emp.ssnid if emp else False
+            rec.x_emp_loan_acc_no = emp.x_loan_acc_no if emp else False
+
     @api.depends('employee_id')
     def _compute_employee_deduction_totals(self):
         """Mirror the employee-level deduction totals onto the deduction.
@@ -702,8 +721,42 @@ class KswDeduction(models.Model):
                     else:
                         code = 'ksw.deduction.regular'
                 vals['name'] = Seq.next_by_code(code) or 'New'
+        self._check_acc_data_entry_ownership(vals_list)
         records = super().create(vals_list)
         return records
+
+    @api.model
+    def _check_acc_data_entry_ownership(self, vals_list):
+        """Non-loan deductions belong to the accounting data-entry team.
+
+        The record rules already block the write, but they surface as a
+        bare AccessError; raise the explanatory message first (Odoo 19
+        Pitfalls #12 — the Python guard is what reaches the caller).
+        """
+        if self.env.su:
+            return
+        user = self.env.user
+        if (
+            user.has_group('KSW_deduction.group_acc_data_entry')
+            or user.has_group('KSW_deduction.group_installment_edit')
+            or user.has_group('KSW_deduction.group_deduction_manager')
+        ):
+            return
+        DeductionType = self.env['ksw.deduction.type']
+        for vals in vals_list:
+            type_id = vals.get('type_id')
+            if not type_id:
+                continue
+            ded_type = DeductionType.browse(type_id).sudo()
+            if ded_type.managed_by == 'acc_data_entry':
+                raise UserError(_(
+                    "'%(type)s' deductions are handled by the Accounting "
+                    "Data Entry team. Ask an administrator to grant you "
+                    "Settings → Users → Access Rights → KSW Deductions → "
+                    "Deduction Management = Accounting Data Entry "
+                    "(Non-Loan).",
+                    type=ded_type.name,
+                ))
 
     def unlink(self):
         # Block deletion if any installment has been paid (linked to a confirmed payslip)
@@ -1501,23 +1554,26 @@ class KswDeduction(models.Model):
     def _compute_x_can_edit_installments(self):
         """Who may manually close installments on this deduction.
 
-        Accounting staff (group_installment_edit) can close any type.
-        HR Officers (group_deduction_officer) can close HR-managed types.
-        In both cases the deduction must be active.
+        Accounting staff holding "Loan Modification: Full"
+        (group_installment_edit) can close any type. The Accounting Data
+        Entry role — plus the Deduction Manager, who administers the
+        module — can close the non-loan types they own
+        (managed_by='acc_data_entry'). HR-side roles (Officer, HR
+        Approver) are read-only on those since August 2026.
+        In every case the deduction must be active.
         """
         user = self.env.user
         can_acc = user.has_group('KSW_deduction.group_installment_edit')
-        can_hr = (
-            user.has_group('KSW_deduction.group_deduction_officer')
-            or user.has_group('KSW_deduction.group_hr_deduction_officer')
-            or user.has_group('KSW_deduction.group_loan_hr')
+        can_data_entry = (
+            user.has_group('KSW_deduction.group_acc_data_entry')
+            or user.has_group('KSW_deduction.group_deduction_manager')
         )
         for rec in self:
             if rec.state != 'active':
                 rec.x_can_edit_installments = False
             elif can_acc:
                 rec.x_can_edit_installments = True
-            elif can_hr and rec.managed_by == 'hr':
+            elif can_data_entry and rec.managed_by == 'acc_data_entry':
                 rec.x_can_edit_installments = True
             else:
                 rec.x_can_edit_installments = False

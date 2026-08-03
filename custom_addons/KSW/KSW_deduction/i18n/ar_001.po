@@ -2295,3 +2295,18 @@ msgstr "الخصومات المتبقية — %s"
 #: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
 msgid "You do not have access to deduction %(name)s."
 msgstr "ليس لديك صلاحية الوصول إلى الخصم %(name)s."
+
+#. module: KSW_deduction
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_type__managed_by__acc_data_entry
+msgid "Accounting Data Entry"
+msgstr "مدخل بيانات المحاسبة"
+
+#. module: KSW_deduction
+#: model:res.groups,name:KSW_deduction.group_acc_data_entry
+msgid "Accounting Data Entry (Non-Loan)"
+msgstr "مدخل بيانات المحاسبة (غير القروض)"
+
+#. module: KSW_deduction
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_type__managed_by__accounting
+msgid "Accounting (Loans)"
+msgstr "المحاسبة (القروض)"
