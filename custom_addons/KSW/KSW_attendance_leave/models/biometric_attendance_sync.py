@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 import logging
 from datetime import datetime as dt, timedelta
 
@@ -93,9 +94,143 @@ class BiometricAttendanceSyncKSW(models.AbstractModel):
 
         return created, updated
 
+    # -- Targeted download: one period, chosen employees ----------------------
+
     @api.model
-    def _generate_weekend_records(self, employees, date_from, date_to):
+    def _fetch_attendance_range(self, device, date_from, date_to, employees):
+        """Raw device logs for these employees inside this period.
+
+        Unlike _fetch_biometric_attendance this applies no year filter, no
+        batch cap and no incremental cutoff — the period *is* the filter — and
+        it never touches ``last_download_time``.  Advancing that stamp here
+        would make the incremental cron skip every punch between its previous
+        cutoff and now, silently losing recent days just because someone
+        re-pulled an old month.
+        """
+        bio_ids = {str(e.biometric_user_id)
+                   for e in employees if e.biometric_user_id}
+        if not bio_ids:
+            _logger.warning(
+                "Targeted download: none of the %d selected employees has a "
+                "biometric ID.", len(employees))
+            return []
+
+        device_tz = pytz.timezone(device.tz or 'UTC')
+        # Widen by a day on each side: _group_biometric_data files a
+        # night-shift punch made before noon under the PREVIOUS day, so the
+        # punches belonging to date_to arrive stamped date_to + 1.  The extra
+        # days are trimmed back off after grouping.
+        window_start = dt.combine(date_from - timedelta(days=1), dt.min.time())
+        window_end = dt.combine(date_to + timedelta(days=2), dt.min.time())
+
+        conn = device._connect_device()
+        try:
+            raw_logs = conn.get_attendance() or []
+        finally:
+            conn.disconnect()
+        _logger.info(
+            "Targeted download: %d raw logs on %s, filtering to %s..%s for "
+            "%d biometric ID(s)",
+            len(raw_logs), device.name, date_from, date_to, len(bio_ids))
+
+        logs = []
+        for log in raw_logs:
+            if str(log.user_id) not in bio_ids:
+                continue
+            stamp = log.timestamp
+            local = (device_tz.localize(stamp) if not stamp.tzinfo
+                     else stamp.astimezone(device_tz))
+            if not (window_start <= local.replace(tzinfo=None) < window_end):
+                continue
+            utc_time = local.astimezone(pytz.utc).replace(tzinfo=None)
+            logs.append({
+                'user_id': log.user_id,
+                'timestamp': utc_time.strftime("%Y-%m-%d %H:%M:%S"),
+            })
+        return logs
+
+    @api.model
+    def download_attendance_range(self, device, date_from, date_to, employees):
+        """Sync only the chosen employees' punches for the chosen period.
+
+        Returns ``{'created': n, 'updated': n, 'days': n}``.
+        """
+        logs = self._fetch_attendance_range(
+            device, date_from, date_to, employees)
+        if not logs:
+            return {'created': 0, 'updated': 0, 'days': 0}
+
+        helper = self.env['biometric.schedule.helper']
+        grouped = self._group_biometric_data(logs)
+        allowed_ids = set(employees.ids)
+        created = updated = days = 0
+
+        for emp_id, day_map in grouped.items():
+            if emp_id not in allowed_ids:
+                continue
+            employee = self.env['hr.employee'].browse(emp_id)
+            emp_tz = helper.get_employee_tz(employee)
+            for day, times in sorted(day_map.items()):
+                # Drop the day we only widened the window to capture.
+                if not (date_from <= day <= date_to):
+                    continue
+                was_created, was_updated = self._sync_attendance_record(
+                    self.env.cr, self.env, emp_id, day, times, emp_tz)
+                created += int(was_created)
+                updated += int(was_updated)
+                days += 1
+
+        # _sync_attendance_record writes with raw SQL, so the ORM cache still
+        # holds the pre-download picture. The absence and weekend passes that
+        # follow read hr.attendance and would not see these rows.
+        self.env.invalidate_all()
+
+        _logger.info(
+            "Targeted download complete: %d created, %d updated across %d "
+            "employee-days", created, updated, days)
+        return {'created': created, 'updated': updated, 'days': days}
+
+    @api.model
+    def _generate_absences_date_range(self, employees, date_from, date_to,
+                                      commit=True):
+        """Override: allow the per-employee commit to be switched off.
+
+        Upstream commits (and rolls back) once per employee as a cron progress
+        checkpoint. That is wrong inside an HTTP request — a later failure
+        would leave the run half applied — and Odoo forbids it outright in
+        tests. The cron path keeps the upstream behaviour untouched.
+        """
+        if commit:
+            return super()._generate_absences_date_range(
+                employees, date_from, date_to)
+
+        total_created = 0
+        for employee in employees:
+            current_date = date_from
+            while current_date <= date_to:
+                if self._check_absence_for_date(employee, current_date):
+                    total_created += 1
+                current_date += timedelta(days=1)
+        _logger.info(
+            "Absence generation complete: %d created (no intermediate commit)",
+            total_created)
+        return total_created
+
+    @api.model
+    def _generate_weekend_records(self, employees, date_from, date_to,
+                                  dry_run=False, commit=True):
         """Override: fix overnight-shift and late-sync issues.
+
+        With ``dry_run=True`` nothing is written: the same decisions are made
+        but grants are only counted, so the weekend-grant wizard can report
+        what a real run would do.  Returns
+        ``{'created': n, 'revoked': m}`` (upstream returns None and every
+        upstream caller ignores the result).
+
+        The per-employee ``commit`` is a cron progress checkpoint; callers
+        running inside an HTTP request (the wizard) pass ``commit=False`` so a
+        later failure rolls the whole run back instead of leaving it half
+        applied.  Odoo also forbids committing from inside a test.
 
         Two fixes over upstream:
 
@@ -118,6 +253,7 @@ class BiometricAttendanceSyncKSW(models.AbstractModel):
         helper = self.env['biometric.schedule.helper']
         HrAttendance = self.env['hr.attendance']
         total_created = 0
+        total_revoked = 0
 
         for emp in employees:
             emp_tz = helper.get_employee_tz(emp)
@@ -172,7 +308,9 @@ class BiometricAttendanceSyncKSW(models.AbstractModel):
                             weekend_end + timedelta(days=1), dt.min.time())),
                     ])
                     if stale:
-                        stale.unlink()
+                        total_revoked += len(stale)
+                        if not dry_run:
+                            stale.unlink()
                     current = weekend_end + timedelta(days=1)
                     continue
 
@@ -215,7 +353,9 @@ class BiometricAttendanceSyncKSW(models.AbstractModel):
                                         dt.min.time())),
                                 ])
                                 if stale:
-                                    stale.unlink()
+                                    total_revoked += len(stale)
+                                    if not dry_run:
+                                        stale.unlink()
                                 grant_day += timedelta(days=1)
                                 continue
                         if grant_day not in existing_dates:
@@ -247,26 +387,31 @@ class BiometricAttendanceSyncKSW(models.AbstractModel):
                                 worked = ((co_utc - ci_utc).total_seconds() / 3600.0
                                           - break_hours)
 
-                                rec = HrAttendance.sudo().create({
-                                    'employee_id': emp.id,
-                                    'check_in': ci_utc,
-                                    'check_out': co_utc,
-                                    'x_is_absent': False,
-                                    'x_is_weekend': True,
-                                    'x_weekend_granted': True,
-                                })
-                                rec.sudo().write({'worked_hours': worked})
+                                if not dry_run:
+                                    rec = HrAttendance.sudo().create({
+                                        'employee_id': emp.id,
+                                        'check_in': ci_utc,
+                                        'check_out': co_utc,
+                                        'x_is_absent': False,
+                                        'x_is_weekend': True,
+                                        'x_weekend_granted': True,
+                                    })
+                                    rec.sudo().write({'worked_hours': worked})
 
                                 existing_dates.add(grant_day)
                                 total_created += 1
                                 _logger.info(
-                                    "Weekend granted for %s on %s (%.2fh)",
+                                    "Weekend %s for %s on %s (%.2fh)",
+                                    'missing' if dry_run else 'granted',
                                     emp.name, grant_day, worked)
                         grant_day += timedelta(days=1)
 
                 current = weekend_end + timedelta(days=1)
 
-            self.env.cr.commit()
+            if not dry_run and commit:
+                self.env.cr.commit()
+
+        return {'created': total_created, 'revoked': total_revoked}
 
     _DEVICE_PARAM = 'ksw_attendance_leave.generate_absences_device_id'
 
@@ -336,6 +481,56 @@ class BiometricAttendanceSyncKSW(models.AbstractModel):
         _logger.info(
             "Generate All Absences: device %d complete — %d absences created",
             device_id, total_created)
+        return True
+
+    _WEEKEND_PARAM = 'ksw_attendance_leave.weekend_grant_job'
+
+    @api.model
+    def _run_generate_weekend_grants(self):
+        """Cron entry point for the "Generate Weekend Grants" wizard.
+
+        Weekend re-generation on its own (no absence scan) is what's needed
+        after attendance has been deleted and re-downloaded: the download
+        restores the punches but not the granted Friday/Saturday records,
+        which only ever exist as Odoo-side rows.
+
+        The wizard writes its parameters as JSON to an ir.config_parameter
+        and triggers this cron; we read and clear them immediately so a
+        second run isn't blocked.
+        """
+        ICP = self.env['ir.config_parameter'].sudo()
+        raw = ICP.get_param(self._WEEKEND_PARAM, default='')
+        # The wizard re-enables the cron for each run; park it again so it
+        # never fires on its own schedule.
+        cron = self.env.ref(
+            'KSW_attendance_leave.ir_cron_ksw_generate_weekend_grants',
+            raise_if_not_found=False)
+        if cron:
+            cron.sudo().write({'active': False})
+
+        if not raw:
+            _logger.warning(
+                "Generate Weekend Grants: no job parameters found, nothing to do.")
+            return True
+
+        ICP.set_param(self._WEEKEND_PARAM, '')
+        self.env.cr.commit()
+
+        job = json.loads(raw)
+        employees = self.env['hr.employee'].browse(job['employee_ids']).exists()
+        date_from = fields.Date.to_date(job['date_from'])
+        date_to = fields.Date.to_date(job['date_to'])
+        if not employees:
+            _logger.info("Generate Weekend Grants: no employees in job, skipping.")
+            return True
+
+        _logger.info(
+            "Generate Weekend Grants: %d employees, %s to %s",
+            len(employees), date_from, date_to)
+        result = self._generate_weekend_records(employees, date_from, date_to)
+        _logger.info(
+            "Generate Weekend Grants complete: %d granted, %d revoked",
+            result['created'], result['revoked'])
         return True
 
     @api.model

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- Targeted repair actions next to "Generate All Absences".
+         After a Clear Attendance + Download All Attendance cycle the punches
+         come back but the Odoo-side absence rows and granted Friday/Saturday
+         records do not, and both device-level buttons are all-or-nothing. -->
+    <record id="biometric_device_details_view_form_ksw" model="ir.ui.view">
+        <field name="name">biometric.device.details.view.form.ksw</field>
+        <field name="model">biometric.device.details</field>
+        <field name="inherit_id"
+               ref="hr_biometric_attendance.biometric_device_details_view_form"/>
+        <field name="arch" type="xml">
+            <!-- "Download New Attendance Only" is unused: the incremental cron
+                 (every 30 min) already covers it, and the button offers no
+                 control over what it pulls. Replaced by the targeted download
+                 below. The cron itself is untouched. -->
+            <xpath expr="//button[@name='action_download_incremental_attendance']"
+                   position="replace"/>
+
+            <!-- Same for its line in the help box; describe what replaced it. -->
+            <xpath expr="//p[strong[text()='Download New Attendance Only:']]"
+                   position="replace">
+                <p><strong>Download Specific Attendance:</strong> Re-downloads
+                one period only, optionally for selected employees, and rebuilds
+                that period's absences and weekend grants. Use this after
+                clearing and re-downloading attendance.</p>
+                <p><strong>Weekend Grants:</strong> Checks for and re-creates
+                the granted Friday/Saturday days on their own. These live only
+                in Odoo, so the device never gives them back.</p>
+            </xpath>
+
+            <xpath expr="//button[@name='action_generate_all_absences']"
+                   position="after">
+                <button name="%(KSW_attendance_leave.ksw_attendance_download_wizard_action)d"
+                        string="Download Specific Attendance"
+                        type="action"
+                        class="btn-secondary"
+                        groups="hr.group_hr_manager,base.group_system"
+                        context="{'default_device_id': id}"
+                        help="Re-download one period, optionally for specific employees only, and rebuild that period's absences and weekend grants."/>
+                <button name="%(KSW_attendance_leave.ksw_weekend_grant_wizard_action)d"
+                        string="Weekend Grants"
+                        type="action"
+                        class="btn-secondary"
+                        groups="hr.group_hr_manager,base.group_system"
+                        context="{'default_device_id': id}"
+                        help="Check for and re-create missing granted Friday/Saturday days without re-running the absence scan."/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

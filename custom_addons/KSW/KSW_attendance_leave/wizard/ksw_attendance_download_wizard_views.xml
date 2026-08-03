@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="ksw_attendance_download_wizard_view_form" model="ir.ui.view">
+        <field name="name">ksw.attendance.download.wizard.form</field>
+        <field name="model">ksw.attendance.download.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Download Specific Attendance">
+                <div class="alert alert-info" role="alert">
+                    Re-downloads the punches for one period and, if you want,
+                    only certain employees, instead of re-processing the whole
+                    device history. The absence rows and weekend grants for
+                    that period are rebuilt straight afterwards, since neither
+                    of those comes back from the device on its own.
+                </div>
+                <group>
+                    <group>
+                        <field name="device_id" options="{'no_create': True}"/>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group>
+                        <field name="include_unassigned"/>
+                        <field name="employee_count"/>
+                        <field name="generate_absences"/>
+                        <field name="generate_weekend_grants"/>
+                    </group>
+                </group>
+                <group string="Limit to specific employees (optional)">
+                    <field name="employee_ids" nolabel="1" widget="many2many_tags"
+                           options="{'no_create': True}"/>
+                </group>
+                <group invisible="not result_message">
+                    <field name="result_message" nolabel="1" readonly="1"/>
+                </group>
+                <footer>
+                    <button name="action_download" string="Download"
+                            type="object" class="btn-primary"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="ksw_attendance_download_wizard_action" model="ir.actions.act_window">
+        <field name="name">Download Specific Attendance</field>
+        <field name="res_model">ksw.attendance.download.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="ksw_weekend_grant_wizard_view_form" model="ir.ui.view">
+        <field name="name">ksw.weekend.grant.wizard.form</field>
+        <field name="model">ksw.weekend.grant.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Check / Generate Weekend Grants">
+                <div class="alert alert-info" role="alert">
+                    Granted Friday/Saturday records exist only in Odoo, so they
+                    are lost whenever attendance is cleared and re-downloaded.
+                    This re-creates the missing ones for the selected range
+                    without re-running the full absence scan.
+                </div>
+                <group>
+                    <group>
+                        <field name="device_id" options="{'no_create': True}"/>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group>
+                        <field name="include_unassigned"/>
+                        <field name="employee_count"/>
+                    </group>
+                </group>
+                <group string="Limit to specific employees (optional)">
+                    <field name="employee_ids" nolabel="1" widget="many2many_tags"
+                           options="{'no_create': True}"/>
+                </group>
+                <group invisible="not result_message">
+                    <field name="result_message" nolabel="1" readonly="1"/>
+                </group>
+                <footer>
+                    <button name="action_check" string="Check Only"
+                            type="object" class="btn-primary"/>
+                    <button name="action_generate" string="Generate Weekend Grants"
+                            type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="ksw_weekend_grant_wizard_action" model="ir.actions.act_window">
+        <field name="name">Check / Generate Weekend Grants</field>
+        <field name="res_model">ksw.weekend.grant.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

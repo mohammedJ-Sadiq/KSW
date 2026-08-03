@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- Background job for large "Generate Weekend Grants" runs.
+         Disabled by default; the wizard writes its parameters to
+         ir.config_parameter and fires this with _trigger() so the scan runs
+         in a worker thread instead of blocking the 120s HTTP request. -->
+    <record id="ir_cron_ksw_generate_weekend_grants" model="ir.cron">
+        <field name="name">Biometric: Generate Weekend Grants (manual trigger)</field>
+        <field name="model_id" ref="hr_biometric_attendance.model_biometric_attendance_sync"/>
+        <field name="state">code</field>
+        <field name="code">model._run_generate_weekend_grants()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">False</field>
+        <field name="nextcall"
+               eval="(DateTime.now() + timedelta(days=365)).replace(hour=3, minute=0, second=0)"/>
+    </record>
+</odoo>
