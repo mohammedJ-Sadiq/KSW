@@ -1015,6 +1015,29 @@ class HrLeave(models.Model):
         if all_atts:
             all_atts._recompute_deductions()
 
+        # A covered absence counts as an attended workday for the adjacent
+        # weekend grant, so approving this leave can entitle the employee to a
+        # Friday/Saturday the nightly cron already decided against.
+        self._recheck_weekend_grants()
+
+    def _recheck_weekend_grants(self):
+        """Re-open the weekend-grant decision for the days around these leaves.
+
+        The grant asks whether the workday immediately before/after a weekend
+        block was attended, and a validated leave flips that answer (a covered
+        absence counts as attended).  The nightly cron takes that decision once,
+        the day after — long before the leave is usually approved — and never
+        revisits it, so without this the granted Friday is simply never created.
+
+        Also covers the reverse direction: refusing or resetting a leave
+        uncovers the absence, and the same pass revokes the now-unearned grant.
+        """
+        # x_is_covered is a stored compute driven by x_leave_ids.state; the
+        # weekend pass reads it straight from the DB, so it has to be written
+        # out before we hand over.
+        self.env.flush_all()
+        self.env['biometric.attendance.sync']._regenerate_weekends_for_leaves(self)
+
     def action_refuse(self):
         """Unmark attendance records when leave is refused, post detailed message."""
         attendance_leaves = self.filtered('x_attendance_ids')
@@ -1068,6 +1091,8 @@ class HrLeave(models.Model):
             attendance_leaves.activity_update()
             # Restore deductions now that the leave is refused (no longer validated).
             attendance_leaves.mapped('x_attendance_ids')._recompute_deductions()
+        # The days are uncovered again — revoke any weekend they had earned.
+        self._recheck_weekend_grants()
         return True
 
     def action_draft(self):
@@ -1085,5 +1110,6 @@ class HrLeave(models.Model):
         })
         # Leave is no longer validated — restore deductions on linked records.
         self.mapped('x_attendance_ids')._recompute_deductions()
+        self._recheck_weekend_grants()
         self.activity_update()
         return True

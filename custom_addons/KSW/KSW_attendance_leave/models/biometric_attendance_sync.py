@@ -23,6 +23,12 @@ _INCREMENTAL_LOOKBACK_HOURS = 4
 # adjacent day is missing from the sync.
 _ADJACENT_WINDOW = 5
 
+# How far back the daily cron re-checks weekend grants.  The grant decision
+# for a given weekend depends on evidence that keeps arriving after the day
+# itself (the next workday's punches, a leave approved days later), so the
+# decision has to stay open for a while instead of being taken once.
+_WEEKEND_RECHECK_LOOKBACK = 7
+
 
 class BiometricAttendanceSyncKSW(models.AbstractModel):
     _inherit = 'biometric.attendance.sync'
@@ -412,6 +418,95 @@ class BiometricAttendanceSyncKSW(models.AbstractModel):
                 self.env.cr.commit()
 
         return {'created': total_created, 'revoked': total_revoked}
+
+    # ------------------------------------------------------------------
+    # Re-evaluation after a time-off decision
+    # ------------------------------------------------------------------
+
+    @api.model
+    def _regenerate_weekends_for_leaves(self, leaves):
+        """Re-run the weekend grant around the dates of `leaves`.
+
+        The weekend grant is decided from a *snapshot*: the daily cron looks
+        at a one-day window and asks whether the immediately adjacent workday
+        is attended.  A validated leave turns that day's absence into a
+        covered absence, which counts as attended — but the leave is almost
+        always approved *after* the cron already made (and never revisits)
+        its decision, so the Friday is silently lost forever.
+
+        Approving/refusing a leave therefore has to re-open the decision for
+        the days around it.  `_generate_weekend_records` is idempotent: it
+        skips days that already have a record and revokes stale grants whose
+        adjacent workdays are no longer attended, so this equally handles the
+        refuse/reset direction.
+
+        Days in the future are excluded — a weekend is only ever granted once
+        the surrounding days have actually happened, matching the cron.
+        """
+        leaves = leaves.filtered(
+            lambda l: l.employee_id and l.request_date_from and l.request_date_to
+        )
+        if not leaves:
+            return {'created': 0, 'revoked': 0}
+
+        yesterday = fields.Date.context_today(self) - timedelta(days=1)
+        created = revoked = 0
+
+        for employee in leaves.mapped('employee_id'):
+            if not employee.biometric_user_id:
+                continue
+            emp_leaves = leaves.filtered(lambda l: l.employee_id == employee)
+            date_from = (min(emp_leaves.mapped('request_date_from'))
+                         - timedelta(days=_ADJACENT_WINDOW))
+            date_to = (max(emp_leaves.mapped('request_date_to'))
+                       + timedelta(days=_ADJACENT_WINDOW))
+            date_to = min(date_to, yesterday)
+            if date_from > date_to:
+                continue
+            # commit=False: this runs inside the approval request, so a later
+            # failure must roll the whole thing back.
+            result = self._generate_weekend_records(
+                employee, date_from, date_to, commit=False)
+            created += result['created']
+            revoked += result['revoked']
+
+        if created or revoked:
+            _logger.info(
+                "Weekend re-check after time-off decision: %d granted, "
+                "%d revoked across %d leave(s)",
+                created, revoked, len(leaves))
+        return {'created': created, 'revoked': revoked}
+
+    @api.model
+    def cron_generate_absences(self):
+        """Override: give recent weekends a second look.
+
+        Upstream evaluates only `lastcall .. yesterday`, i.e. a single day.
+        That day is judged on whether the immediately adjacent workday is
+        attended — and on the morning after a Friday neither side is settled
+        yet: Thursday's absence may not be covered (the leave gets approved
+        days later) and Saturday's punches have not been downloaded at all.
+        The Friday is then skipped permanently, because no later run ever
+        looks at it again.
+
+        A second, idempotent weekend pass over the preceding
+        _WEEKEND_RECHECK_LOOKBACK days lets those decisions settle: grants
+        appear once the evidence arrives and stale ones are revoked.
+        """
+        res = super().cron_generate_absences()
+
+        yesterday = fields.Date.context_today(self) - timedelta(days=1)
+        date_from = yesterday - timedelta(days=_WEEKEND_RECHECK_LOOKBACK)
+        employees = self.env['hr.employee'].search([
+            ('biometric_user_id', '!=', False),
+        ])
+        if employees:
+            result = self._generate_weekend_records(
+                employees, date_from, yesterday)
+            _logger.info(
+                "Weekend re-check %s to %s: %d granted, %d revoked",
+                date_from, yesterday, result['created'], result['revoked'])
+        return res
 
     _DEVICE_PARAM = 'ksw_attendance_leave.generate_absences_device_id'
 

@@ -823,3 +823,24 @@ allocation is needed. All test leave types that do not require allocation must u
     psql -d odoo_dev -c "select g.name from res_groups g join ir_model_data d \
       on d.model='res.groups' and d.res_id=g.id where d.name='group_acc_data_entry';"
     ```
+
+36. **A rule evaluated once, from a one-day cron snapshot, is evaluated too
+    early.** `cron_generate_absences` decided the Friday weekend grant at 01:00
+    the next morning by asking whether the adjacent workday was attended — but
+    Thursday's absence was not yet *covered* (the excuse leave gets approved
+    days later) and Saturday had not been synced. Grant refused, and since the
+    cron window only ever covers *yesterday*, that Friday was never revisited.
+    Seven employees permanently lost a paid rest day. The rule was correct
+    (`_generate_weekend_records` already counts `x_is_covered` absences as
+    attended) — only the timing was wrong. **Whenever a scheduled job reads
+    state that keeps arriving after it runs, you need both:** (a) the write path
+    that changes the state re-triggers the evaluation —
+    `hr.leave._recheck_weekend_grants()` off `_validate_leave_request` /
+    `action_refuse` / `action_draft`; and (b) the periodic job keeps the
+    decision open — `_WEEKEND_RECHECK_LOOKBACK = 7` days, not just yesterday.
+    Both require the pass to be idempotent **in both directions** (skip what
+    exists, revoke what is no longer earned). Two traps when wiring the
+    re-trigger: `env.flush_all()` first, because `x_is_covered` is a *stored*
+    compute the pass reads from the DB; and pass `commit=False`, because the
+    pass commits per employee as a cron checkpoint and you are inside an open
+    HTTP transaction.
