@@ -16,6 +16,7 @@ from . import test_net_rounding_consistency
 from . import test_saturday_short_overtime
 from . import test_vacation_attendance_cap
 from . import test_supervisor_refuse_delete
+from . import test_payslip_reversal_rights
 
 
 

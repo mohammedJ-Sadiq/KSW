@@ -164,6 +164,19 @@ class HrPayslipRun(models.Model):
                     'excluded_net': excluded_net,
                 })
 
+    def draft_payslip_run(self):
+        """Reopening a closed batch is a Payroll Manager action only.
+
+        Same rationale as `hr.payslip._check_payroll_manager` — the stock
+        button is open to every payroll Officer.
+        """
+        if not self.env.su and not self.env.user.has_group(
+                'om_hr_payroll.group_hr_payroll_manager'):
+            raise UserError(_(
+                'Only a Payroll Manager may set a payslip batch back to '
+                'draft. Please ask the payroll administrator to do it.'))
+        return super().draft_payslip_run()
+
     def done_payslip_run(self):
         """Override: suppress per-slip bank total refresh during bulk validation.
         Calls _refresh_bank_totals() once per batch instead of once per slip.

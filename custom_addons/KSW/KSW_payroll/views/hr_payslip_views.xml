@@ -16,6 +16,26 @@
                 <attribute name="groups">om_hr_payroll.group_hr_payroll_user</attribute>
             </xpath>
 
+            <!-- ── Reversal actions: Payroll Manager only ──
+                 Cancel Payslip / Set to Draft / Refund undo a confirmed
+                 payslip. Stock om_hr_payroll leaves them open to every
+                 payroll Officer, with no reason recorded (only write_uid /
+                 write_date). Server-side guards live in
+                 hr.payslip._check_payroll_manager; these groups= just keep
+                 the buttons off screen. -->
+            <xpath expr="//header/button[@name='action_payslip_cancel']"
+                   position="attributes">
+                <attribute name="groups">om_hr_payroll.group_hr_payroll_manager</attribute>
+            </xpath>
+            <xpath expr="//header/button[@name='action_payslip_draft']"
+                   position="attributes">
+                <attribute name="groups">om_hr_payroll.group_hr_payroll_manager</attribute>
+            </xpath>
+            <xpath expr="//header/button[@name='refund_sheet']"
+                   position="attributes">
+                <attribute name="groups">om_hr_payroll.group_hr_payroll_manager</attribute>
+            </xpath>
+
             <!-- ── Flag provisional (mid-approval) vacation calculations ── -->
             <xpath expr="//sheet" position="inside">
                 <field name="x_is_vacation_preview" invisible="1"/>
@@ -193,6 +213,13 @@
                         string="Export Bank File"
                         icon="fa-download"
                         class="btn-secondary"/>
+            </xpath>
+
+            <!-- Reopening a closed batch: Payroll Manager only (guarded in
+                 hr.payslip.run.draft_payslip_run as well). -->
+            <xpath expr="//header/button[@name='draft_payslip_run']"
+                   position="attributes">
+                <attribute name="groups">om_hr_payroll.group_hr_payroll_manager</attribute>
             </xpath>
             <!-- x_salary_bank_account_id hidden inside the group (used as fallback in refresh logic) -->
             <xpath expr="//field[@name='credit_note']" position="after">

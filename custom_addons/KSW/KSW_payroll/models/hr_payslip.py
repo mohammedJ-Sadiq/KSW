@@ -2,7 +2,10 @@ from calendar import monthrange
 from datetime import datetime, time, timedelta
 
 from odoo import api, fields, models, _
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
+
+# Group allowed to reverse a payslip (reject / reset to draft / refund).
+PAYROLL_MANAGER_GROUP = 'om_hr_payroll.group_hr_payroll_manager'
 
 
 def _days_in_month(d):
@@ -1421,6 +1424,39 @@ class HrPayslip(models.Model):
         # Sort by date
         rows.sort(key=lambda r: r['date'])
         return rows
+
+    # ------------------------------------------------------------------
+    # Reversal actions restricted to the Payroll Manager
+    # ------------------------------------------------------------------
+
+    def _check_payroll_manager(self, what):
+        """Guard the three actions that undo a payslip.
+
+        `om_hr_payroll` leaves "Cancel Payslip" / "Set to Draft" / "Refund"
+        open to any `group_hr_payroll_user` and records no reason, so a
+        confirmed payslip could be silently rejected after the batch was
+        closed (KSWCO SLIP/11307, June 2026).  The view-level `groups=` is
+        only cosmetic — this is the check that actually holds over RPC.
+        """
+        if self.env.su:
+            return
+        if not self.env.user.has_group(PAYROLL_MANAGER_GROUP):
+            raise UserError(_(
+                'Only a Payroll Manager may %s. Please ask the payroll '
+                'administrator to do it.'
+            ) % what)
+
+    def action_payslip_cancel(self):
+        self._check_payroll_manager(_('reject (cancel) a payslip'))
+        return super().action_payslip_cancel()
+
+    def action_payslip_draft(self):
+        self._check_payroll_manager(_('reset a payslip to draft'))
+        return super().action_payslip_draft()
+
+    def refund_sheet(self):
+        self._check_payroll_manager(_('refund a payslip'))
+        return super().refund_sheet()
 
     # ------------------------------------------------------------------
     # Auto-email payslip PDF on confirmation
