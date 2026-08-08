@@ -7,3 +7,7 @@ from . import test_hr_confirmation_step
 from . import test_return_date_amend
 from . import test_own_request_delete
 from . import test_leave_type_switch
+from . import test_finalised_leave_lock
+from . import test_admin_return_any_state
+from . import test_return_wizard_ui
+from . import test_manager_assistant_delegation

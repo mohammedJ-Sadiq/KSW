@@ -7,6 +7,11 @@ from odoo.exceptions import UserError
 from odoo.tools import float_round
 from odoo.osv import expression as odoo_expr
 
+# Reversing a finalised request (refuse / back to approval / reset to draft /
+# cancel / delete) is reserved for this group alone — see
+# HrLeave._check_final_reversal_rights.
+SETTINGS_ADMIN_GROUP = 'base.group_system'
+
 ANNUAL_MULTI_STATES = [
     ('pending_dm', 'Pending DM Approval'),
     ('pending_hr', 'Pending HR Approval'),
@@ -41,6 +46,18 @@ class HrLeave(models.Model):
     #   * Create=Officer  -> all employees
     #   * Create=Supervisor -> own + parent_id descendants
     #   * Create=Self    -> own only
+    #
+    # The Manager Assistant delegation is ADDITIVE on top of whichever
+    # tier the user holds, because an assistant very often has a tier of
+    # their own as well. It is also a Create tier — the assistant may
+    # file for the delegated team — so the invariant above still holds.
+    #
+    # NOTE this method is a security boundary, not just UX: an assistant
+    # with no hr.employee ACL row has their queries answered by
+    # hr.employee.public, whose only rule is multi-company. So this
+    # domain is the only thing restricting the picker. The create record
+    # rule in security.xml is the backstop; the two must always be
+    # changed together.
     def _get_employee_domain(self):
         domain = [
             ('active', '=', True),
@@ -53,14 +70,53 @@ class HrLeave(models.Model):
             # `child_of` on hr.employee traverses _parent_name (= parent_id)
             # and includes the anchor itself, so this returns the user's
             # own employee record + every descendant in the org chart.
-            domain += [
+            scope = [
                 '|',
                 ('user_id', '=', user.id),
                 ('id', 'child_of', user.employee_ids.ids),
             ]
         else:
-            domain += [('user_id', '=', user.id)]
-        return domain
+            scope = [('user_id', '=', user.id)]
+        # Direct reports of every manager who nominated this user as their
+        # assistant. Empty list (the undelegated case) leaves scope alone.
+        manager_ids = user._ksw_assisted_manager_ids()
+        if manager_ids:
+            scope = odoo_expr.OR([scope, [
+                '|',
+                ('parent_id.user_id', 'in', manager_ids),
+                ('leave_manager_id', 'in', manager_ids),
+            ]])
+        return domain + scope
+
+    def _check_assistant_employee_scope(self, employee):
+        """Block a Manager Assistant from targeting an employee outside
+        their delegation.
+
+        Record rules are evaluated on the PRE-write values only (there is
+        no post-write re-check in BaseModel.write), so the scope-gated
+        write rule cannot by itself stop an assistant re-pointing an
+        in-scope request at an out-of-scope employee. Reusing
+        `_get_employee_domain()` keeps this guard and the picker
+        provably identical.
+
+        Also called from create() so the assistant gets a readable
+        UserError instead of a bare AccessError.
+        """
+        user = self.env.user
+        if self.env.su:
+            return
+        if not user.has_group('KSW_base_security.group_manager_assistant'):
+            return
+        if user.has_group('KSW_annual_leave.group_leave_officer'):
+            return
+        if not employee:
+            return
+        allowed = self.env['hr.employee'].sudo().search_count(
+            self._get_employee_domain() + [('id', '=', employee.id)])
+        if not allowed:
+            raise UserError(_(
+                'You may only prepare requests for the direct reports of '
+                'the managers you assist.'))
 
     # ------------------------------------------------------------------
     # Override `validation_type` to be readonly to prevent propagating
@@ -712,6 +768,13 @@ class HrLeave(models.Model):
     x_can_acc_approve = fields.Boolean(compute='_compute_approval_role_gates')
     x_can_gm_final_approve = fields.Boolean(compute='_compute_approval_role_gates')
     x_can_gm_return = fields.Boolean(compute='_compute_approval_role_gates')
+    # No model-level groups= on purpose: it is read by an invisible=
+    # expression on a button every user can see (gotcha #31).
+    x_can_admin_return = fields.Boolean(
+        compute='_compute_approval_role_gates',
+        help='True for the Settings Administrator, who may return a request '
+             'to any approval step at any time.',
+    )
     x_is_hr_approver = fields.Boolean(compute='_compute_approval_role_gates')
     x_is_acc_approver = fields.Boolean(compute='_compute_approval_role_gates')
 
@@ -802,15 +865,23 @@ class HrLeave(models.Model):
         return [('id', 'not in', matching_ids)]
 
     @api.depends_context('uid')
-    @api.depends('x_annual_approval_state')
+    @api.depends('x_annual_approval_state', 'state', 'holiday_status_id')
     def _compute_approval_role_gates(self):
         user = self.env.user
         is_hr = user.has_group('KSW_annual_leave.group_annual_leave_hr')
         is_acc = user.has_group('KSW_annual_leave.group_annual_leave_acc')
         is_gm = user.has_group('KSW_annual_leave.group_annual_leave_gm')
+        is_admin = self.env.su or user.has_group(SETTINGS_ADMIN_GROUP)
+        wizard = self.env['ksw.gm.return.approver.wizard']
         for leave in self:
             s = leave.x_annual_approval_state
             has_id = bool(leave.id)
+            # The administrator may return a request from *any* state, on
+            # every leave type — but only where there is somewhere earlier to
+            # send it back to. A request still sitting at the first step has
+            # no return target, so the button stays hidden.
+            leave.x_can_admin_return = bool(
+                is_admin and has_id and wizard._allowed_targets(leave))
             leave.x_can_hr_approve = is_hr and s == 'pending_hr' and has_id
             leave.x_can_gm_initial_approve = is_gm and s == 'pending_gm_initial' and has_id
             leave.x_can_acc_approve = is_acc and s == 'pending_acc' and has_id
@@ -1145,6 +1216,7 @@ class HrLeave(models.Model):
     # remain. Refuse no longer applies from here on.
     _REFUSE_LOCKED_STATES = frozenset({'pending_employee_signature', 'approved'})
 
+    @api.depends_context('uid')
     @api.depends('state', 'employee_id', 'department_id',
                  'x_annual_approval_state', 'holiday_status_id')
     def _compute_can_refuse(self):
@@ -1154,8 +1226,12 @@ class HrLeave(models.Model):
         still reject the request outright instead of advancing it. Once GM
         final approval is done (pending_employee_signature or approved),
         refusing no longer makes sense.
+
+        The Settings Administrator keeps the button — they are the only role
+        allowed to undo a finalised request (_check_final_reversal_rights).
         """
-        annual_multi_done = self.filtered(
+        is_admin = self.env.su or self.env.user.has_group(SETTINGS_ADMIN_GROUP)
+        annual_multi_done = self.env['hr.leave'] if is_admin else self.filtered(
             lambda l: self._is_annual_multi(l)
             and l.x_annual_approval_state in self._REFUSE_LOCKED_STATES
         )
@@ -1164,6 +1240,147 @@ class HrLeave(models.Model):
             super(HrLeave, remaining)._compute_can_refuse()
         for leave in annual_multi_done:
             leave.can_refuse = False
+
+    @api.depends_context('uid')
+    @api.depends('state', 'employee_id', 'x_annual_approval_state',
+                 'holiday_status_id', 'first_approver_id', 'second_approver_id')
+    def _compute_can_cancel(self):
+        """Hide 'Cancel' once anybody has approved the request.
+
+        Odoo lets an employee cancel their own *approved* leave through the
+        Cancel wizard. KSW policy is the opposite: the request stops being
+        the employee's the moment an approver acts on it, and once it is
+        finalised only the Settings Administrator may undo it.
+        """
+        super()._compute_can_cancel()
+        if self.env.su or self.env.user.has_group(SETTINGS_ADMIN_GROUP):
+            # The mirror case: core only offers Cancel on the user's **own**
+            # leave (`is_own_leave` in _get_next_states_by_state), so without
+            # this the administrator we just made the sole owner of the
+            # reversal routes cannot cancel anybody else's request.
+            for leave in self:
+                if not leave.can_cancel and leave.state in (
+                        'validate1', 'validate', 'refuse'):
+                    leave.can_cancel = True
+            return
+        for leave in self:
+            if leave.can_cancel and (
+                    leave._is_finalised() or leave._has_approver_action()):
+                leave.can_cancel = False
+
+    @api.depends_context('uid')
+    @api.depends('state', 'employee_id', 'department_id')
+    def _compute_can_back_to_approve(self):
+        """'Back to Approval' only exists on a validated leave — i.e. always
+        on a finalised one — so it is Settings-Administrator only."""
+        super()._compute_can_back_to_approve()
+        if self.env.su or self.env.user.has_group(SETTINGS_ADMIN_GROUP):
+            return
+        for leave in self:
+            if leave.can_back_to_approve and leave._is_finalised():
+                leave.can_back_to_approve = False
+
+    # ==================================================================
+    # Finalised requests: reversal restricted to the Settings Administrator
+    # ==================================================================
+
+    # Every ``state`` transition that walks a request *backwards*. Guarded in
+    # write() so RPC callers cannot sidestep the action methods below.
+    _REVERSAL_STATES = frozenset({'refuse', 'cancel', 'confirm', 'draft'})
+
+    def _is_finalised(self):
+        """True once the request may no longer be undone by a normal user.
+
+        Two independent finish lines, because the KSW chains do not use the
+        stock ``state`` field to record their progress:
+
+        * ``state == 'validate'`` — covers every ordinary leave type
+          (sick, business trip, umrah, the stock 1/2-step flows);
+        * a KSW multi-step chain (annual / unpaid / EOS) that cleared **GM
+          final approval** — those sit in ``state == 'confirm'`` right up
+          until HR confirms the signed form, so ``state`` alone sees nothing.
+
+        KSW_payroll and KSW_eos_leave extend this with "the leave already has
+        a confirmed (done) payslip".
+        """
+        self.ensure_one()
+        if self.state == 'validate':
+            return True
+        return bool(
+            self._uses_multi_step_chain(self)
+            and self.x_annual_approval_state in self._REFUSE_LOCKED_STATES
+        )
+
+    def _has_confirmed_payslip(self):
+        """True when a **confirmed (done)** payslip hangs off this request.
+
+        Overridden in KSW_payroll (vacation payslip) and KSW_eos_leave (EOS
+        payslip), exactly like `_is_finalised`. Split out from it because the
+        admin return needs to refuse *only* this case: reversing a request
+        whose slip is already paid would strand a paid payslip on a
+        mid-chain request, and cancelling it re-collects its installments
+        next month (KSWCO SLIP/11307).
+        """
+        self.ensure_one()
+        return False
+
+    def _has_approver_action(self):
+        """True once any approver has confirmed a step on this request.
+
+        Used for the employee's own delete/cancel window: it closes as soon
+        as somebody in the chain has acted, not only at final approval.
+        """
+        self.ensure_one()
+        if self._uses_multi_step_chain(self):
+            # The chain starts at 'pending_dm'; anything beyond it means a
+            # step was signed off. A GM return-to-approver that lands back on
+            # 'pending_dm' clears every stamp, so it reopens the window too.
+            return self.x_annual_approval_state not in (False, 'pending_dm')
+        return bool(
+            self.state in ('validate1', 'validate')
+            or self.first_approver_id
+            or self.second_approver_id
+        )
+
+    def _check_final_reversal_rights(self, what):
+        """Guard every route that undoes a finalised time off request.
+
+        Same rationale as ``hr.payslip._check_payroll_manager``: view-level
+        ``invisible=`` / ``can_refuse`` is cosmetic, this is the check that
+        holds over RPC. ``self.env.su`` stays exempt so internal flows
+        (payslip cancellation, employee archiving, crons) keep working —
+        ``sudo()`` is not reachable from the web client.
+        """
+        if self.env.su or self.env.user.has_group(SETTINGS_ADMIN_GROUP):
+            return
+        if any(leave._is_finalised() for leave in self):
+            raise UserError(_(
+                'This time off request is already approved and can no longer '
+                'be %s. Only the system administrator can do that.'
+            ) % what)
+
+    def _action_user_cancel(self, reason=None):
+        """The Cancel wizard is another way out of an approved request.
+
+        ``_force_cancel`` writes the state through ``sudo()``, so the write()
+        guard never sees it — check here instead.
+        """
+        self._check_final_reversal_rights(_('cancelled'))
+        is_admin = self.env.su or self.env.user.has_group(SETTINGS_ADMIN_GROUP)
+        if not (is_admin or self.env.user.has_group(
+                'KSW_annual_leave.group_leave_officer')):
+            if any(leave._has_approver_action() for leave in self):
+                raise UserError(_(
+                    'This time off request has already been approved by one '
+                    'of the approvers and can no longer be cancelled. Ask HR '
+                    'to refuse it instead.'))
+        if is_admin and not self.env.su:
+            # Cancelling posts to the chatter, and mail.message create is
+            # gated on access to the document. The administrator's leave
+            # scope depends on which HR tier they hold; this action must not
+            # (auth was settled above — gotcha #11).
+            return super(HrLeave, self.sudo())._action_user_cancel(reason)
+        return super()._action_user_cancel(reason)
 
     # ==================================================================
     # Write override — re-check allocation validity on toggle changes
@@ -1208,6 +1425,20 @@ class HrLeave(models.Model):
         when auto-clearing stale toggles — those internal clears should
         NOT trigger validity checks (the compute is still in progress).
         """
+        # Walking a finalised request backwards is Settings-Administrator
+        # only. Guarding write() and not just the action_* methods closes the
+        # direct-RPC route: core's own _check_approval_update happily lets the
+        # employee's leave manager write state='refuse' on a validated leave.
+        if vals.get('state') in self._REVERSAL_STATES:
+            self._check_final_reversal_rights(_('reversed'))
+
+        # Record rules only see the pre-write values, so re-pointing a
+        # request at somebody outside the delegation would otherwise slip
+        # past the scope-gated assistant rule.
+        if vals.get('employee_id'):
+            self._check_assistant_employee_scope(
+                self.env['hr.employee'].sudo().browse(vals['employee_id']))
+
         # Enforce role-based write restrictions for sensitive fields.
         # Clearing fields to 0/False (e.g. from _reset_annual_multi_fields)
         # is allowed for all roles; only *setting* meaningful values is guarded.
@@ -1433,6 +1664,13 @@ class HrLeave(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        # Checked before super() so a Manager Assistant filing for someone
+        # outside their delegation gets an explanatory UserError rather
+        # than the bare AccessError the create record rule would raise.
+        for vals in vals_list:
+            if vals.get('employee_id'):
+                self._check_assistant_employee_scope(
+                    self.env['hr.employee'].sudo().browse(vals['employee_id']))
         records = super().create(vals_list)
         for leave in records:
             # Deliberately _is_annual_multi, NOT _uses_multi_step_chain:
@@ -1727,14 +1965,24 @@ class HrLeave(models.Model):
             self._notify_pending_approvers(leave, 'pending_employee_signature')
 
     def action_open_gm_return_wizard(self):
-        """Open the wizard allowing the GM to return the request to a previous approver."""
+        """Open the return wizard — two audiences, one button.
+
+        The GM may return a request to an earlier approver from either of the
+        two GM steps. The Settings Administrator may return *any* request to
+        *any* step at any time (including one already validated); the wizard
+        itself decides which targets each role may pick.
+        """
         self.ensure_one()
-        if not self.env.su and not self.env.user.has_group(
-                'KSW_annual_leave.group_annual_leave_gm'):
-            raise UserError('Only the General Manager can return a leave to an approver.')
-        if self.x_annual_approval_state not in ('pending_gm_initial', 'pending_gm_final'):
-            raise UserError(
-                'The leave must be at a GM approval step to use this action.')
+        is_admin = self.env.su or self.env.user.has_group(SETTINGS_ADMIN_GROUP)
+        if not is_admin:
+            if not self.env.user.has_group(
+                    'KSW_annual_leave.group_annual_leave_gm'):
+                raise UserError(
+                    'Only the General Manager can return a leave to an approver.')
+            if self.x_annual_approval_state not in (
+                    'pending_gm_initial', 'pending_gm_final'):
+                raise UserError(
+                    'The leave must be at a GM approval step to use this action.')
         return {
             'type': 'ir.actions.act_window',
             'name': 'Return to Approver',
@@ -1904,12 +2152,25 @@ class HrLeave(models.Model):
         else:
             instruction = 'This annual leave request is awaiting your approval.'
 
+        # Name whoever actually filed the request when that is not the
+        # employee themselves — typically a Manager Assistant preparing it
+        # for the DM. create_uid is the single source of truth here; it is
+        # immutable and already what the vacation report prints as
+        # "Requested By". Lives in _notify_pending_approvers rather than
+        # create() so KSW_unpaid_leave's own stamp+notify pair inherits it.
+        prepared_by = Markup('')
+        if leave.create_uid and leave.create_uid != leave.employee_id.sudo().user_id:
+            prepared_by = Markup('<b>Prepared by:</b> %(by)s<br/>') % {
+                'by': leave.create_uid.name,
+            }
+
         leave.message_post(
             body=Markup(
                 '<strong>&#9203; Action Required — %(label)s</strong><br/>'
                 '<b>Employee:</b> %(employee)s<br/>'
                 '<b>Period:</b> %(date_from)s &#8594; %(date_to)s<br/>'
                 '<b>Days:</b> %(days).1f<br/>'
+                '%(prepared_by)s'
                 '%(instruction)s'
             ) % {
                 'label': config['label'],
@@ -1917,6 +2178,7 @@ class HrLeave(models.Model):
                 'date_from': leave.request_date_from,
                 'date_to': leave.request_date_to,
                 'days': leave.number_of_days,
+                'prepared_by': prepared_by,
                 'instruction': instruction,
             },
             partner_ids=partner_ids,
@@ -1979,6 +2241,7 @@ class HrLeave(models.Model):
     def _move_validate_leave_to_confirm(self):
         """Override 'Back to Approval' to reset multi-step approval,
         return state, and restart the approval chain."""
+        self._check_final_reversal_rights(_('sent back to approval'))
         annual = self.filtered(
             lambda l: self._is_annual_leave(l)
             and l.x_return_state != 'not_applicable'
@@ -1998,33 +2261,34 @@ class HrLeave(models.Model):
                 'x_hr_return_date': False,
             })
 
-        if annual_multi:
+        # A *targeted* return (the admin wizard picking a specific step) keeps
+        # every figure the approvers already entered and sets its own target
+        # state afterwards — only the plain "Back to Approval" restarts the
+        # chain from scratch.
+        keep_data = self.env.context.get('ksw_keep_approval_data')
+
+        if annual_multi and not keep_data:
             annual_multi._reset_annual_multi_fields()
 
         result = super()._move_validate_leave_to_confirm()
 
         # After super sets state='confirm', restart the approval chain
-        if annual_multi:
+        if annual_multi and not keep_data:
             annual_multi.write({'x_annual_approval_state': 'pending_dm'})
 
         # Refresh accrual — leaves_taken changed
         if annual_emp_ids:
             self.env['ksw.annual.leave'].with_user(1)._refresh_accrual_for_employees(annual_emp_ids)
 
+        # The leave is no longer validated, so its days are uncovered again —
+        # revoke any weekend they had earned. Idempotent in both directions.
+        self._recheck_weekend_grants()
+
         return result
 
     def action_refuse(self):
         """Reset return and multi-step fields when refused."""
-        if not self.env.su:
-            locked = self.filtered(
-                lambda l: self._is_annual_multi(l)
-                and l.x_annual_approval_state in self._REFUSE_LOCKED_STATES
-            )
-            if locked:
-                raise UserError(_(
-                    'This annual leave has already received final GM '
-                    'approval and can no longer be refused.'
-                ))
+        self._check_final_reversal_rights(_('refused'))
         annual = self.filtered(
             lambda l: self._is_annual_leave(l)
             and l.x_return_state != 'not_applicable'
@@ -2062,6 +2326,7 @@ class HrLeave(models.Model):
 
     def action_draft(self):
         """When resetting to draft, restart the approval chain."""
+        self._check_final_reversal_rights(_('reset to draft'))
         # Collect employee IDs before state changes
         annual_emp_ids = self.filtered(self._is_annual_leave).mapped('employee_id').ids
 
@@ -2083,39 +2348,59 @@ class HrLeave(models.Model):
     # Override _unlink_if_correct_states — allow KSW managers to delete past leaves
     # ==================================================================
 
-    def _is_own_unapproved_request(self):
-        """True when this leave is the current user's own request and it has
-        not been fully approved yet.
+    def _is_own_untouched_request(self):
+        """True when this leave is the current user's own request and no
+        approver has acted on it yet.
 
-        "Fully approved" means the Odoo state reached ``validate`` (or, on the
-        KSW multi-step chains, ``x_annual_approval_state == 'approved'``).
-        Every earlier step — including the whole 6-step annual/EOS/unpaid
-        chain, which keeps ``state == 'confirm'`` throughout — counts as still
-        pending, so the employee stays in control of their own request.
+        The employee owns the request only until somebody signs off a step:
+        on the KSW chains that is any ``x_annual_approval_state`` past
+        ``pending_dm``, on the stock flows the first approval (``validate1``
+        / ``first_approver_id``). Up to that point the request may be deleted
+        whatever its start date — Odoo core blocks non-Officer users from
+        deleting a leave whose ``date_from`` is in the past, which strands
+        employees whose request is still crawling through the chain past its
+        own start date.
         """
         self.ensure_one()
         if self.employee_id.sudo().user_id != self.env.user:
             return False
         # `cancel` is deliberately excluded: those are handled by Odoo's own
         # cancellation flow, not by deletion.
-        if self.state not in ('confirm', 'validate1'):
+        if self.state != 'confirm':
             return False
-        return self.x_annual_approval_state != 'approved'
+        return not self._has_approver_action()
 
     @api.ondelete(at_uninstall=False)
     def _unlink_if_correct_states(self):
-        """Override to relax Odoo's deletion rules for two KSW cases.
+        """Override Odoo's deletion rules: one tightening, two relaxations.
 
+        0. A **finalised** request (validated, or a KSW chain past GM final
+           approval, or one carrying a confirmed payslip) can only be deleted
+           by the Settings Administrator — ahead of every branch below,
+           including Odoo's own Time-Off-Administrator bypass. A multi-step
+           request sits in ``state == 'confirm'`` even after GM final
+           approval, so the state checks further down would wave it through.
         1. KSW Supervisors/Officers may delete leaves that started in the
            past — they manage subordinate leaves that just started and need
            correction/deletion — and may also delete a **refused** request,
            which Odoo core reserves for Administrators.
-        2. Any employee may delete their **own** request as long as it is not
-           fully approved yet, whatever its start date. Odoo core blocks
-           non-Officer users from deleting a leave whose ``date_from`` is in
-           the past, which strands employees whose request is still crawling
-           through the multi-step approval chain past its own start date.
+        2. Any employee may delete their **own** request as long as no
+           approver has acted on it yet, whatever its start date. Odoo core
+           blocks non-Officer users from deleting a leave whose ``date_from``
+           is in the past, which strands employees whose request is still
+           crawling through the multi-step approval chain past its own start
+           date.
         """
+        self._check_final_reversal_rights(_('deleted'))
+
+        if self.env.user.has_group(SETTINGS_ADMIN_GROUP):
+            # The Settings Administrator owns every reversal route, so they
+            # must not be stopped by the state checks below. Spelled out
+            # rather than leaning on the Time-Off-Administrator bypass that
+            # follows: holding one group does not imply the other, and in
+            # KSWCO it is only ever true by coincidence of assignment.
+            return
+
         if self.env.user.has_group('hr_holidays.group_hr_holidays_manager'):
             # Core Time-Off Administrators have no restrictions at all (matches
             # Odoo core's own bypass) — don't let the KSW state check below
@@ -2142,10 +2427,24 @@ class HrLeave(models.Model):
                     raise UserError(error_message % {'state': state_description_values.get(holiday.state)})
             return # Bypass Odoo's core check
 
-        # Own, still-unapproved requests bypass core's past-date guard. The
-        # rest of the recordset still goes through Odoo's checks — never drop
-        # the complement (see July 2026 audit, mixed-batch filter drop).
-        own_pending = self.filtered(lambda l: l._is_own_unapproved_request())
+        # Own requests: still-untouched ones bypass core's past-date guard,
+        # but the window closes the moment an approver signs off a step —
+        # core would still allow deleting an own future 'validate1' leave, so
+        # refuse it explicitly instead of falling through. Refused/cancelled
+        # requests are not "approved" and keep their existing treatment.
+        own = self.filtered(
+            lambda l: l.employee_id.sudo().user_id == self.env.user)
+        own_touched = own.filtered(
+            lambda l: l.state not in ('refuse', 'cancel')
+            and l._has_approver_action())
+        if own_touched:
+            raise UserError(_(
+                'This time off request has already been approved by one of '
+                'the approvers and can no longer be deleted. Ask HR to '
+                'refuse it instead.'))
+        # The rest of the recordset still goes through Odoo's checks — never
+        # drop the complement (see July 2026 audit, mixed-batch filter drop).
+        own_pending = own.filtered(lambda l: l._is_own_untouched_request())
         remaining = self - own_pending
         if remaining:
             return super(HrLeave, remaining)._unlink_if_correct_states()

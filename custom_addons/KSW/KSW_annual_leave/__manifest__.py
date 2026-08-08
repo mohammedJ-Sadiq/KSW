@@ -1,6 +1,6 @@
 {
     'name': 'KSW Annual Leave',
-    'version': '19.0.1.5.0',
+    'version': '19.0.1.6.0',
     'author': 'Mohammed Albadr',
     'category': 'Human Resources',
     'summary': 'Auto-computed annual leave allocation dashboard',
@@ -19,6 +19,11 @@
     'depends': [
         'hr_holidays',
         'KSW_attendance_leave',
+        # For the Manager Assistant delegation (res.users.x_assistant_ids
+        # and group_manager_assistant) referenced by the record rules in
+        # security/security.xml. KSW_base_security has no KSW dependency
+        # of its own, so this introduces no cycle.
+        'KSW_base_security',
     ],
     'data': [
         'security/security.xml',
@@ -31,6 +36,7 @@
         'wizard/gm_return_approver_wizard_views.xml',
         'wizard/ksw_leave_attendance_wizard_views.xml',
         'wizard/ksw_hr_confirm_signature_wizard_views.xml',
+        'data/leave_return_steps.xml',
         'data/cron.xml',
     ],
     'installable': True,

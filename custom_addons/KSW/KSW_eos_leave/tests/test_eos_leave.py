@@ -673,7 +673,8 @@ class TestEosLeave(TransactionCase):
         wizard = self.env['ksw.gm.return.approver.wizard'].with_user(
             self.user_gm).sudo().create({
                 'leave_id': leave.id,
-                'target_state': 'pending_hr',
+                'target_step_id': self.env.ref(
+                    'KSW_annual_leave.return_step_pending_hr').id,
                 'reason': 'Wrong termination reason — please correct.',
             })
         wizard.action_confirm()

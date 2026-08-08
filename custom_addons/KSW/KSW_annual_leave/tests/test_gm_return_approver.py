@@ -103,13 +103,17 @@ class TestGmReturnApprover(TransactionCase):
             if leave.x_annual_approval_state == target_state:
                 break
 
+    def _step(self, code):
+        """The return-target record for a chain state."""
+        return self.env.ref('KSW_annual_leave.return_step_%s' % code)
+
     def _return_via_wizard(self, leave, target_state, reason='Fix this.'):
         """Open and confirm the return wizard as the GM user."""
         wiz = self.env['ksw.gm.return.approver.wizard'].with_user(
             self.user_gm
         ).create({
             'leave_id': leave.id,
-            'target_state': target_state,
+            'target_step_id': self._step(target_state).id,
             'reason': reason,
         })
         wiz.action_confirm()
@@ -147,7 +151,7 @@ class TestGmReturnApprover(TransactionCase):
         # sudo() to bypass wizard ACL so we can test the method-level guard
         wiz = self.env['ksw.gm.return.approver.wizard'].sudo().create({
             'leave_id': leave.id,
-            'target_state': 'pending_hr',
+            'target_step_id': self._step('pending_hr').id,
             'reason': 'Fix it.',
         })
         with self.assertRaises(UserError):
@@ -159,7 +163,7 @@ class TestGmReturnApprover(TransactionCase):
         self._advance_to(leave, 'pending_gm_initial')
         wiz = self.env['ksw.gm.return.approver.wizard'].sudo().create({
             'leave_id': leave.id,
-            'target_state': 'pending_dm',
+            'target_step_id': self._step('pending_dm').id,
             'reason': 'Fix it.',
         })
         with self.assertRaises(UserError):
@@ -171,7 +175,7 @@ class TestGmReturnApprover(TransactionCase):
         self._advance_to(leave, 'pending_gm_final')
         wiz = self.env['ksw.gm.return.approver.wizard'].sudo().create({
             'leave_id': leave.id,
-            'target_state': 'pending_hr',
+            'target_step_id': self._step('pending_hr').id,
             'reason': 'Fix it.',
         })
         with self.assertRaises(UserError):

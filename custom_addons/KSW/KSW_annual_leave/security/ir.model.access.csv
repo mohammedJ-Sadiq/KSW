@@ -15,6 +15,10 @@ access_deduction_line_officer,hr.leave.deduction.line.officer,model_hr_leave_ded
 access_opening_balance_wizard_hr,opening.balance.wizard.hr,model_opening_balance_wizard,KSW_annual_leave.group_annual_leave_hr,1,1,1,1
 access_opening_balance_wizard_line_hr,opening.balance.wizard.line.hr,model_opening_balance_wizard_line,KSW_annual_leave.group_annual_leave_hr,1,1,1,1
 access_gm_return_approver_wizard_gm,ksw.gm.return.approver.wizard.gm,model_ksw_gm_return_approver_wizard,KSW_annual_leave.group_annual_leave_gm,1,1,1,1
+access_gm_return_approver_wizard_admin,ksw.gm.return.approver.wizard.admin,model_ksw_gm_return_approver_wizard,base.group_system,1,1,1,1
 access_leave_attendance_wizard_user,ksw.leave.attendance.wizard.user,model_ksw_leave_attendance_wizard,base.group_user,1,1,1,1
 access_hr_confirm_signature_wizard_hr,ksw.hr.confirm.signature.wizard.hr,model_ksw_hr_confirm_signature_wizard,KSW_annual_leave.group_annual_leave_hr,1,1,1,1
-
+access_leave_return_step_user,ksw.leave.return.step.user,model_ksw_leave_return_step,base.group_user,1,0,0,0
+access_ksw_annual_leave_manager_assistant,ksw.annual.leave.manager.assistant,model_ksw_annual_leave,KSW_base_security.group_manager_assistant,1,0,0,0
+access_commission_line_manager_assistant,hr.leave.commission.line.manager.assistant,model_hr_leave_commission_line,KSW_base_security.group_manager_assistant,1,0,0,0
+access_deduction_line_manager_assistant,hr.leave.deduction.line.manager.assistant,model_hr_leave_deduction_line,KSW_base_security.group_manager_assistant,1,0,0,0

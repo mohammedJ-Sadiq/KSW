@@ -341,6 +341,73 @@
         <field name="perm_unlink" eval="False"/>
     </record>
 
+    <!-- ================================================================ -->
+    <!-- Manager Assistant: prepare loans for a delegated manager's team   -->
+    <!-- ================================================================ -->
+    <!--
+        The assistant nominated on res.users.x_assistant_ids
+        (KSW_base_security) may raise and edit a loan request for the
+        direct subordinates of that manager, up until the manager
+        performs the DM approval. They never approve anything:
+        _compute_x_can_dm_approve does not consult this group, and this
+        group must never imply group_deduction_officer, which IS an
+        unconditional DM-approve override there.
+
+        Scope is LOANS ONLY, deliberately. Non-loan deductions belong to
+        the accounting data-entry team and go draft -> active with no DM
+        step at all, so delegating them would produce records the manager
+        could never approve. This mirrors exactly what the manager
+        themselves can raise today (see _check_acc_data_entry_ownership).
+
+        Read and prepare are split so the assistant can follow the loan
+        through the whole approval chain but only edit it while it is
+        still at the DM step. A loan's `state` stays 'draft' for the
+        entire DM -> HR -> Acc -> GM chain, so `approval_state` is what
+        actually gates the edit window.
+
+        No unlink on either rule: withdrawing a request is not delegated.
+    -->
+    <record id="ksw_deduction_rule_manager_assistant_read" model="ir.rule">
+        <field name="name">Deduction: manager assistant reads delegated teams' loans</field>
+        <field name="model_id" ref="model_ksw_deduction"/>
+        <field name="groups" eval="[(4, ref('KSW_base_security.group_manager_assistant'))]"/>
+        <field name="domain_force">[('is_loan', '=', True),
+            ('employee_id.parent_id.user_id', 'in', user._ksw_assisted_manager_ids())]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="ksw_deduction_rule_manager_assistant_prepare" model="ir.rule">
+        <field name="name">Deduction: manager assistant prepares loans before DM approval</field>
+        <field name="model_id" ref="model_ksw_deduction"/>
+        <field name="groups" eval="[(4, ref('KSW_base_security.group_manager_assistant'))]"/>
+        <field name="domain_force">[('is_loan', '=', True),
+            ('state', '=', 'draft'),
+            ('approval_state', 'in', [False, 'pending_dm']),
+            ('employee_id.parent_id.user_id', 'in', user._ksw_assisted_manager_ids())]</field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- The deduction form reads the full hr.employee record of its
+         employee; without this the assistant hits "Access Denied by record
+         rules ... on hr.employee" the moment the form opens. Scoped to the
+         delegated team, unlike the blanket officer rule above. -->
+    <record id="rule_hr_employee_manager_assistant_deduction" model="ir.rule">
+        <field name="name">Employee: manager assistant sees delegated teams' employees</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="groups" eval="[(4, ref('KSW_base_security.group_manager_assistant'))]"/>
+        <field name="domain_force">[('parent_id.user_id', 'in', user._ksw_assisted_manager_ids())]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
 </odoo>
 
 

@@ -666,6 +666,25 @@ class HrLeave(models.Model):
         return vals_list
 
     # ------------------------------------------------------------------
+    # Finalised requests (KSW_annual_leave._check_final_reversal_rights)
+    # ------------------------------------------------------------------
+
+    def _has_confirmed_payslip(self):
+        """True when the EOS settlement payslip is confirmed."""
+        if super()._has_confirmed_payslip():
+            return True
+        slip = self.sudo().x_eos_payslip_id
+        return bool(slip and slip.state == 'done')
+
+    def _is_finalised(self):
+        """An EOS request whose payslip is confirmed is finalised.
+
+        Same rule as the vacation payslip in KSW_payroll — once the
+        settlement is paid, reversing the leave would cancel a paid slip.
+        """
+        return super()._is_finalised() or self._has_confirmed_payslip()
+
+    # ------------------------------------------------------------------
     # Cancel EOS payslip on refuse / reset-to-draft / back-to-approval
     # ------------------------------------------------------------------
 

@@ -13,7 +13,21 @@
                         <field name="current_state_label" string="Currently At" readonly="1"/>
                     </group>
                     <group string="Return Settings">
-                        <field name="target_state" widget="radio" string="Return To"/>
+                        <field name="is_admin_mode" invisible="1"/>
+                        <div class="alert alert-warning" role="alert"
+                             colspan="2" invisible="not is_admin_mode">
+                            You are returning this request as the system
+                            administrator. Only the steps the request has
+                            already passed are listed. Everything the approvers
+                            entered is kept — only the stamps from the step you
+                            pick onward are cleared.
+                        </div>
+                        <field name="leave_id" invisible="1"/>
+                        <field name="allowed_step_ids" invisible="1"/>
+                        <field name="target_step_id" widget="radio"
+                               string="Return To"
+                               domain="[('id', 'in', allowed_step_ids)]"
+                               options="{'no_create': True, 'no_open': True, 'no_quick_create': True}"/>
                         <field name="reason" string="Message to Approver"
                                placeholder="Describe what needs to be corrected..."
                                nolabel="1"/>

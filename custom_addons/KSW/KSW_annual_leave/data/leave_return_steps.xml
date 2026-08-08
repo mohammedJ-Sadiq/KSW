@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!--
+        Reference data for the return wizard's "Return To" radio. Kept
+        updatable (no noupdate) so the labels can be corrected on upgrade;
+        `code` is what the wizard matches on and must not be edited.
+    -->
+
+    <record id="return_step_pending_dm" model="ksw.leave.return.step">
+        <field name="code">pending_dm</field>
+        <field name="name">Direct Manager</field>
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="return_step_pending_hr" model="ksw.leave.return.step">
+        <field name="code">pending_hr</field>
+        <field name="name">HR Approver</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <record id="return_step_pending_gm_initial" model="ksw.leave.return.step">
+        <field name="code">pending_gm_initial</field>
+        <field name="name">GM (Initial Review)</field>
+        <field name="sequence">30</field>
+    </record>
+
+    <record id="return_step_pending_acc" model="ksw.leave.return.step">
+        <field name="code">pending_acc</field>
+        <field name="name">Accounting</field>
+        <field name="sequence">40</field>
+    </record>
+
+    <record id="return_step_pending_gm_final" model="ksw.leave.return.step">
+        <field name="code">pending_gm_final</field>
+        <field name="name">GM (Final Approval)</field>
+        <field name="sequence">50</field>
+    </record>
+
+    <record id="return_step_pending_employee_signature" model="ksw.leave.return.step">
+        <field name="code">pending_employee_signature</field>
+        <field name="name">HR Confirmation</field>
+        <field name="sequence">60</field>
+    </record>
+
+    <!-- Only ever offered on a leave type with no KSW chain, where the Odoo
+         state name "To Approve" says nothing about who is being asked to act. -->
+    <record id="return_step_confirm" model="ksw.leave.return.step">
+        <field name="code">confirm</field>
+        <field name="name">Back to Approval</field>
+        <field name="sequence">70</field>
+    </record>
+
+</odoo>

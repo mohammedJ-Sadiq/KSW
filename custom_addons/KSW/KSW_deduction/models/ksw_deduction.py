@@ -722,8 +722,39 @@ class KswDeduction(models.Model):
                         code = 'ksw.deduction.regular'
                 vals['name'] = Seq.next_by_code(code) or 'New'
         self._check_acc_data_entry_ownership(vals_list)
+        for vals in vals_list:
+            if vals.get('employee_id'):
+                self._check_assistant_employee_scope(vals['employee_id'])
         records = super().create(vals_list)
         return records
+
+    @api.model
+    def _check_assistant_employee_scope(self, employee_id):
+        """Keep a Manager Assistant inside their delegation.
+
+        Record rules are evaluated on the PRE-write values only, so the
+        scope-gated prepare rule cannot stop an assistant re-pointing an
+        in-scope loan at somebody else's employee. Called from create()
+        too, so an out-of-scope create surfaces as an explanatory
+        UserError rather than a bare AccessError (Pitfalls #12).
+        """
+        if self.env.su:
+            return
+        user = self.env.user
+        if not user.has_group('KSW_base_security.group_manager_assistant'):
+            return
+        if user.has_group('KSW_deduction.group_deduction_officer'):
+            return
+        employee = self.env['hr.employee'].sudo().browse(employee_id)
+        if employee.user_id == user:
+            return
+        if employee.parent_id.user_id == user:
+            return
+        if employee.parent_id.user_id.id in user._ksw_assisted_manager_ids():
+            return
+        raise UserError(_(
+            "You may only raise requests for the direct subordinates of "
+            "the managers you assist."))
 
     @api.model
     def _check_acc_data_entry_ownership(self, vals_list):
@@ -819,7 +850,9 @@ class KswDeduction(models.Model):
                         rec.approval_state, rec.approval_state),
                 ))
             # Scope guard: non-officers can only submit loans for
-            # themselves or (supervisors) for direct subordinates.
+            # themselves, (supervisors) for direct subordinates, or
+            # (manager assistants) for the direct subordinates of a
+            # manager who nominated them.
             if rec.is_loan and not self.env.su:
                 user = self.env.user
                 is_officer = user.has_group(
@@ -828,11 +861,15 @@ class KswDeduction(models.Model):
                     is_own = (rec.employee_id.user_id == user)
                     is_subordinate = (
                         rec.employee_id.parent_id.user_id == user)
-                    if not (is_own or is_subordinate):
+                    is_assistant = (
+                        rec.employee_id.parent_id.user_id.id
+                        in user._ksw_assisted_manager_ids())
+                    if not (is_own or is_subordinate or is_assistant):
                         raise UserError(_(
                             "You can only submit loan requests for "
-                            "yourself or, as a supervisor, for your "
-                            "direct subordinates."
+                            "yourself, as a supervisor for your direct "
+                            "subordinates, or as an assistant for the "
+                            "direct subordinates of a manager you assist."
                         ))
             if rec.amount <= 0:
                 raise ValidationError(_("Amount must be greater than zero."))
@@ -1450,6 +1487,13 @@ class KswDeduction(models.Model):
     # ==================================================================
 
     def write(self, vals):
+        # Record rules only see the pre-write values, so re-pointing a
+        # loan at somebody outside the delegation would otherwise slip
+        # past the scope-gated manager-assistant rule. The view's
+        # readonly="state != 'draft'" on employee_id is cosmetic.
+        if vals.get('employee_id'):
+            self._check_assistant_employee_scope(vals['employee_id'])
+
         # Block edits to core loan terms once the GM has approved and sent
         # to disbursement. The loan is still state='draft' at that point,
         # so the normal "state != draft" guard doesn't protect these fields.
@@ -1585,6 +1629,8 @@ class KswDeduction(models.Model):
         - Deduction officers/managers (any employee)
         - The record's creator
         - Supervisors submitting for a direct subordinate
+        - Manager assistants submitting for a delegated manager's direct
+          subordinate
         """
         user = self.env.user
         officer_grp = self.env.ref(
@@ -1593,17 +1639,22 @@ class KswDeduction(models.Model):
         is_officer = bool(officer_grp and user in officer_grp.user_ids)
         is_supervisor = user.has_group(
             'KSW_deduction.group_deduction_supervisor')
+        assisted_manager_ids = user._ksw_assisted_manager_ids()
         uid = self.env.uid
         for rec in self:
             is_subordinate = (
                 is_supervisor
                 and rec.employee_id.parent_id.user_id.id == uid
             )
+            is_assistant = (
+                rec.employee_id.parent_id.user_id.id in assisted_manager_ids
+            )
             rec.x_can_submit = (
                 is_officer
                 or (rec.create_uid and rec.create_uid.id == uid)
                 or not rec.id  # new record being composed
                 or is_subordinate
+                or is_assistant
             )
 
     @api.depends_context('uid')
@@ -1614,6 +1665,10 @@ class KswDeduction(models.Model):
             or user.has_group('KSW_deduction.group_loan_acc')
             or user.has_group('KSW_deduction.group_deduction_officer')
             or user.has_group('KSW_deduction.group_deduction_supervisor')
+            # Required, not cosmetic: without it the type_id view domain
+            # stays [('is_loan','=',False)] and an assistant literally
+            # cannot pick a Loan type.
+            or user.has_group('KSW_base_security.group_manager_assistant')
         )
         for rec in self:
             rec.x_can_select_loan_type = can
@@ -1631,6 +1686,13 @@ class KswDeduction(models.Model):
              (covers admin / HR ops scenarios where the manager is
              unavailable).
           3. Superuser / odoo-bot.
+
+        A Manager Assistant is deliberately NOT an authority source: they
+        prepare the request, the manager approves it. That is the whole
+        point of the delegation, so never add the group here — and never
+        let group_manager_assistant imply group_deduction_officer, which
+        would grant it through source 2. Locked by
+        test_manager_assistant_loans.
         """
         uid = self.env.uid
         is_officer = self.env.user.has_group(

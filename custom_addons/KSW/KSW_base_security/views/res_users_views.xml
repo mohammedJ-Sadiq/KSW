@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Manager delegation needs TWO keys and neither works alone:
+          1. this tab  : which managers' teams this user may prepare for
+          2. Access Rights : Manager Delegation = Manager Assistant
+
+        Both halves are settable from EITHER user's form, because whoever is
+        granting the access right is looking at the assistant's record and
+        should not have to go hunting for each manager's record. The warning
+        below exists because a right granted with no delegation is completely
+        inert and gives no other feedback: the employee picker simply stays
+        empty and looks like a bug.
+
+        Gated to base.group_erp_manager because writing res.users requires it
+        anyway; showing these to anyone else only produces an AccessError on
+        save.
+    -->
+    <record id="view_users_form_ksw_manager_assistant" model="ir.ui.view">
+        <field name="name">res.users.form.ksw.manager.assistant</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="ksw_manager_delegation"
+                      string="Manager Delegation"
+                      groups="base.group_erp_manager">
+                    <field name="x_has_manager_assistant_right" invisible="1"/>
+
+                    <div class="alert alert-success" role="status"
+                         invisible="not x_effective_managers_display">
+                        Currently assists:
+                        <b><field name="x_effective_managers_display" readonly="1" nolabel="1"/></b>
+                        &#8212; and can prepare requests for their direct reports.
+                    </div>
+                    <div class="alert alert-warning" role="status"
+                         invisible="not x_has_manager_assistant_right or x_effective_managers_display">
+                        This user holds the <b>Manager Assistant</b> access right
+                        but assists nobody, so it currently does nothing. Their
+                        own manager is picked up automatically &#8212; set
+                        <b>Manager</b> on their employee record, or name the
+                        manager(s) explicitly below.
+                    </div>
+                    <div class="alert alert-info" role="status"
+                         invisible="x_has_manager_assistant_right or not x_assisted_manager_ids">
+                        These delegations are inactive: this user does not hold
+                        the <b>Manager Assistant</b> access right. Grant it under
+                        <b>Access Rights → Manager Delegation</b>.
+                    </div>
+
+                    <group>
+                        <group string="Additional Managers Assisted">
+                            <field name="x_assisted_manager_ids"
+                                   widget="many2many_tags"
+                                   options="{'no_create': True}"
+                                   nolabel="1" colspan="2"
+                                   placeholder="Only needed for managers this user does NOT report to..."/>
+                        </group>
+                        <group string="My Assistants">
+                            <field name="x_assistant_ids"
+                                   widget="many2many_tags"
+                                   options="{'no_create': True}"
+                                   nolabel="1" colspan="2"
+                                   placeholder="Users who may prepare requests for this user's team..."/>
+                        </group>
+                    </group>
+
+                    <div class="text-muted">
+                        An assistant may create and edit time off (any type) and
+                        loan requests for the <b>direct reports</b> of the
+                        managers they assist, and only until the first approver
+                        signs off. They can never approve, refuse or delete a
+                        request &#8212; the manager still does that personally.
+                        <br/>
+                        Their own manager is included automatically; the list
+                        above is only for managers they do not report to.
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

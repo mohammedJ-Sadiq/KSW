@@ -2234,3 +2234,18 @@ msgstr ""
 #: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_type__managed_by__accounting
 msgid "Accounting (Loans)"
 msgstr ""
+
+#. module: KSW_deduction
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"You can only submit loan requests for yourself, as a supervisor for your "
+"direct subordinates, or as an assistant for the direct subordinates of a "
+"manager you assist."
+msgstr ""
+
+#. module: KSW_deduction
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"You may only raise requests for the direct subordinates of the managers you "
+"assist."
+msgstr ""

@@ -140,4 +140,85 @@
     <record id="utm.menu_link_tracker_root" model="ir.ui.menu">
         <field name="group_ids" eval="[(6, 0, [ref('base.group_system')])]"/>
     </record>
+
+    <!-- ================================================================ -->
+    <!-- Manager Delegation: the "Manager Assistant" capability            -->
+    <!-- ================================================================ -->
+    <!--
+        A direct manager nominates assistants on their user record
+        (res.users.x_assistant_ids). The assistant may PREPARE requests
+        for that manager's direct reports; the manager still performs
+        every approval step personally.
+
+        Two keys are required and neither works alone:
+          1. the manager names the assistant (res.users.x_assistant_ids)
+          2. an administrator grants this group
+
+        The group carries a privilege_id on purpose: a res.groups record
+        with no privilege renders only in debug mode (the web client
+        emits its "Extra Rights" block behind `odoo.debug`), so an
+        admin would never find it on the user form. It gets its OWN
+        privilege rather than becoming a fifth tier of KSW Leaves'
+        "Leave Management", because a privilege renders as a
+        single-select: "assistant" is orthogonal to the
+        Self/Supervisor/Cascading/Officer ladder. It is about WHOSE
+        scope, not HOW MUCH.
+    -->
+    <record id="privilege_manager_delegation" model="res.groups.privilege">
+        <field name="name">Manager Delegation</field>
+        <field name="sequence">12</field>
+        <field name="category_id" ref="base.module_category_human_resources"/>
+    </record>
+
+    <!--
+        hr_holidays.group_hr_holidays_responsible is MANDATORY, not a
+        convenience: the stock manager leave form gates the employee_id
+        field itself on it (hr_holidays/views/hr_leave_views.xml), as
+        does the whole Time Off > Management menu. Without it the
+        assistant has no Employee selector and cannot file for anyone.
+        It is safe to imply here because KSW_annual_leave neutralises
+        both hr.leave rules that group carries, and its one allocation
+        rule matches only records where the user is the employee or the
+        leave_manager_id: never true for an assistant.
+
+        NEVER add to implied_ids:
+          * hr_holidays.group_hr_holidays_user
+          * KSW_annual_leave.group_leave_officer
+          * KSW_deduction.group_deduction_officer
+        Record rules OR together across a user's groups, so any one of
+        these would dissolve the "before approval" state gate; and the
+        last one makes ksw.deduction.x_can_dm_approve unconditionally
+        True, handing over the exact step this feature exists to protect.
+        Locked by test_group_implications.
+    -->
+    <record id="group_manager_assistant" model="res.groups">
+        <field name="name">Manager Assistant</field>
+        <field name="sequence">1</field>
+        <field name="privilege_id" ref="privilege_manager_delegation"/>
+        <field name="implied_ids" eval="[
+            (4, ref('base.group_user')),
+            (4, ref('hr_holidays.group_hr_holidays_responsible')),
+        ]"/>
+        <field name="comment">Prepare and edit time off and loan requests on behalf of the direct reports of the managers who listed this user as their assistant. Can never approve, refuse or delete a request.</field>
+    </record>
+
+    <!--
+        Inert for an assistant holding no tier in the Employees privilege:
+        their hr.employee queries are answered by hr.employee.public
+        instead. It matters when the assistant ALSO holds
+        group_hr_employee_subordinate/_supervisor, where the self and
+        supervisor rules above would otherwise hide the delegated team.
+    -->
+    <record id="rule_hr_employee_manager_assistant" model="ir.rule">
+        <field name="name">Manager Assistant: assisted managers' direct reports (read)</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="groups" eval="[(4, ref('group_manager_assistant'))]"/>
+        <field name="domain_force">['|',
+            ('parent_id.user_id', 'in', user._ksw_assisted_manager_ids()),
+            ('leave_manager_id', 'in', user._ksw_assisted_manager_ids())]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
 </odoo>

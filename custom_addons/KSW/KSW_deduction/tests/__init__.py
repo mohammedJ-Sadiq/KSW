@@ -14,3 +14,4 @@ from . import test_waiting_for_me
 
 
 from . import test_employee_identifier_search
+from . import test_manager_assistant_loans

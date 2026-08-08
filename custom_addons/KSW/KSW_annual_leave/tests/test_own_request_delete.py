@@ -1,5 +1,5 @@
-"""Tests: an employee may delete their own time-off request until it is
-fully approved.
+"""Tests: an employee may delete their own time-off request until an
+approver acts on it.
 
 Odoo core lets an employee delete an own request only while it is in
 confirm/validate1 AND its start date is still in the future
@@ -10,9 +10,10 @@ neither approve nor remove.
 
 What the override guarantees:
 
-  - own request, still pending  -> deletable, whatever the start date
-  - own request, mid-chain      -> deletable (any x_annual_approval_state
-                                   short of 'approved')
+  - own request, untouched      -> deletable, whatever the start date
+  - own request, a step signed  -> refused (UserError): the request stopped
+                                   being the employee's the moment an
+                                   approver acted on it (August 2026)
   - own request, fully approved -> refused (record rule, AccessError)
   - somebody else's request     -> refused (record rule, AccessError)
   - applies to plain leave types too, not just the annual chain
@@ -98,17 +99,27 @@ class TestOwnRequestDelete(TransactionCase):
         leave.with_user(self.user_emp).unlink()
         self.assertFalse(leave.exists())
 
-    def test_delete_own_request_mid_approval_chain(self):
-        """Deletable at every step of the chain short of final approval."""
-        for step in ('pending_dm', 'pending_hr', 'pending_gm_initial',
-                     'pending_acc', 'pending_gm_final',
-                     'pending_employee_signature'):
-            leave = self._leave(start=date.today() - timedelta(days=2))
+    def test_delete_own_request_at_first_chain_step(self):
+        """Deletable while the chain is still waiting on the first approver."""
+        leave = self._leave(start=date.today() - timedelta(days=2))
+        leave.sudo().write({'x_annual_approval_state': 'pending_dm'})
+        leave.with_user(self.user_emp).unlink()
+        self.assertFalse(leave.exists())
+
+    def test_cannot_delete_own_request_once_a_step_is_signed(self):
+        """The window closes as soon as an approver has acted."""
+        steps = ('pending_hr', 'pending_gm_initial', 'pending_acc',
+                 'pending_gm_final')
+        for offset, step in enumerate(steps):
+            # These leaves survive the test — keep them off each other's dates.
+            leave = self._leave(
+                start=date.today() + timedelta(days=100 + 10 * offset))
             leave.sudo().write({'x_annual_approval_state': step})
-            leave.with_user(self.user_emp).unlink()
-            self.assertFalse(
+            with self.assertRaises(UserError):
+                leave.with_user(self.user_emp).unlink()
+            self.assertTrue(
                 leave.exists(),
-                'Employee should be able to delete an own request at %s' % step)
+                'Employee must not delete an own request at %s' % step)
 
     def test_delete_own_plain_leave_type(self):
         """Not annual-chain specific — any leave type behaves the same."""

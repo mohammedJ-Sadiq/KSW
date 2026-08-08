@@ -363,12 +363,16 @@ class HrLeaveUnpaid(models.Model):
         for leave in (unpaid | annual):
             self._unlock_attendance_sheet_lines(leave)
 
-        if unpaid_multi:
+        # See the KSW_annual_leave override: a targeted admin return keeps the
+        # approval data and picks its own target state.
+        keep_data = self.env.context.get('ksw_keep_approval_data')
+
+        if unpaid_multi and not keep_data:
             unpaid_multi._reset_annual_multi_fields()
 
         result = super()._move_validate_leave_to_confirm()
 
-        if unpaid_multi:
+        if unpaid_multi and not keep_data:
             unpaid_multi.write({'x_annual_approval_state': 'pending_dm'})
 
         if unpaid_emp_ids:

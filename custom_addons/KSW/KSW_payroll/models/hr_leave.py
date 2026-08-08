@@ -601,6 +601,33 @@ class HrLeave(models.Model):
         return len(months)
 
     # ------------------------------------------------------------------
+    # Finalised requests (KSW_annual_leave._check_final_reversal_rights)
+    # ------------------------------------------------------------------
+
+    def _has_confirmed_payslip(self):
+        """True when this leave's vacation payslip is confirmed.
+
+        sudo(): ``x_vacation_payslip_ids`` carries a model-level ``groups=``,
+        and this runs for every caller.
+        """
+        if super()._has_confirmed_payslip():
+            return True
+        return any(
+            slip.state == 'done'
+            for slip in self.sudo().x_vacation_payslip_ids
+        )
+
+    def _is_finalised(self):
+        """A leave whose vacation payslip is confirmed is finalised.
+
+        The money is out of the door at that point, so undoing the leave
+        would cancel a paid payslip — exactly the class of damage that cost
+        KSWCO SLIP/11307 (a cancelled *paid* slip re-collects its deductions
+        the following month).
+        """
+        return super()._is_finalised() or self._has_confirmed_payslip()
+
+    # ------------------------------------------------------------------
     # Cancel vacation payslip on refuse / reset-to-draft
     # ------------------------------------------------------------------
 

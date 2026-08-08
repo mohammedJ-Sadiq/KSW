@@ -844,3 +844,106 @@ allocation is needed. All test leave types that do not require allocation must u
     compute the pass reads from the DB; and pass `commit=False`, because the
     pass commits per employee as a cron checkpoint and you are inside an open
     HTTP transaction.
+
+37. **A finalised record has more than one way out — guarding the button you
+    were shown is not locking it.** Locking approved time off (Aug 2026) meant
+    closing **six** routes, not one: `action_refuse`, `action_draft`,
+    `_move_validate_leave_to_confirm` ("Back to Approval"), the Cancel wizard
+    (`_action_user_cancel` → `_force_cancel`), `unlink`
+    (`_unlink_if_correct_states`), and a raw `write({'state': 'refuse'})` over
+    RPC — core's `_check_approval_update` lets the employee's own
+    `leave_manager_id` do that last one on a *validated* leave. Two subtleties:
+    `_force_cancel` writes the state through `sudo()`, so a `write()` guard
+    that exempts `env.su` (as it must, or crons break) never sees the Cancel
+    wizard — it needs its own override; and the KSW chains keep
+    `state == 'confirm'` all the way past GM final approval, so any
+    `state`-based check waves a fully-approved request straight through.
+    Pattern: **one predicate, one guard, called from every route** —
+    `hr.leave._is_finalised()` (extended by KSW_payroll / KSW_eos_leave to
+    cover a `done` payslip) + `_check_final_reversal_rights(what)` gating on
+    `base.group_system`, with `env.su` exempt. Button-visibility computes
+    (`can_refuse`, `can_cancel`, `can_back_to_approve`) follow the guard and
+    need `@api.depends_context('uid')` (gotcha #14). Audit command before
+    declaring a state locked:
+    ```bash
+    grep -rn "def action_.*\(refuse\|cancel\|draft\|reject\|reset\|reopen\)" custom_addons/KSW --include=*.py
+    grep -rn "_unlink_if_correct_states\|_force_cancel\|write({'state'" addons/<core_module>
+    ```
+
+38. **Authority in Python and scope in `ir.rule` are different systems — a guard
+    that names a group is worthless if that group cannot reach the records.**
+    `KSW_annual_leave/security/security.xml` deliberately neutralises Odoo's own
+    `hr.leave` rules (the stock *Time Off Administrator* rule is rewritten to
+    `[(0, '=', 1)]`) so the KSW tiers own 100% of the CRUD scope, and it
+    compensated by writing `group_leave_officer` onto **`base.user_root` and
+    `base.user_admin` via `user_ids`** — the two built-in accounts only. So
+    `base.group_system`, made the sole holder of the leave-reversal rights in
+    Aug 2026, had no `hr.leave` access whatsoever; `admin` only worked because
+    it happens to be one of those two accounts. Before making a group the sole
+    holder of an action, verify it can reach the model — and note an
+    `ir.model.access` row reading `1,1,1,1` proves nothing when an `ir.rule`
+    is neutralised:
+    ```bash
+    psql -d odoo_dev -c "select r.name, r.domain_force, r.perm_unlink from ir_rule r \
+      join ir_model m on m.id=r.model_id where m.model='hr.leave' and r.active;"
+    ```
+    Fix with an **implication**, not a per-user patch: `user_ids` covers the
+    accounts that exist today, `implied_ids` covers the role
+    (`base.group_system` now implies `group_leave_officer`). Same pass: a wizard
+    opened to a new audience needs its **own `ir.model.access` row** (record
+    rules are not the only gate), and any flow that posts to the chatter needs
+    `sudo()` after the auth check because `mail.message` create is gated on
+    access to the document (gotcha #11).
+
+39. **A dynamic `selection=` method cannot depend on the record — the web
+    client strips the context and caches the payload.**
+    `view_service.js::loadViews` filters the context down to `lang` and
+    `*_view_ref` before calling `get_views`, then caches the result on disk
+    (IndexedDB) per model. So `fields.Selection(selection='_method')` reading
+    `default_x_id` from `self.env.context` always takes its no-context branch,
+    and even if a key survived, the second dialog in a session would reuse the
+    first one's options. **This is invisible from `odoo shell`**: calling
+    `Model.with_context(default_x_id=1).get_views(...)` by hand returns a
+    perfectly filtered list and "proves" a feature that is broken in the
+    browser — when verifying view-layer behaviour from the shell, strip the
+    context exactly as the client does.
+    **Fix: make it relational.** `radio_field.js` reads
+    `record.fields[name].selection` for a Selection (cached), but calls
+    `getFieldDomain(props.record, ...)` for a Many2one — resolved against the
+    record, every time:
+    ```python
+    allowed_step_ids = fields.Many2many('ksw.leave.return.step', compute='...')
+    target_step_id = fields.Many2one(
+        'ksw.leave.return.step', required=True,
+        domain="[('id', 'in', allowed_step_ids)]")
+    ```
+    Costs a small reference model + data file; per-record correct. Options that
+    vary per *record* need a relational field with a domain; a dynamic
+    `selection=` may only vary by what survives into `get_views` (user, groups,
+    `lang`, installed modules). The client's disk cache is namespaced by
+    `session.registry_hash`, which changes on `-u`, so a page reload suffices
+    after an upgrade — but a tab left open across it keeps the old view.
+
+40. **A wizard compute that depends on a field needs that field in the form
+    arch — `default_x_id` reaching `default_get` is not the same as reaching
+    the client's record.** The client builds its record from the fields the
+    *view* asks for. `ksw.gm.return.approver.wizard` never listed `leave_id`
+    in its arch: harmless for a year, because `action_confirm` reads
+    `self.leave_id` off the **saved** record where `default_get` does apply the
+    default — but the moment a *computed* field depended on it at render time,
+    the dialog went blank. The client's onchange simply omitted `leave_id`, so
+    the compute ran against an empty leave and returned nothing. Fix:
+    `<field name="leave_id" invisible="1"/>`.
+    **Every shell probe passed** (`create({'leave_id': ...})`,
+    `new(default_get(...))`, `onchange(...)` with an explicit spec) because
+    they all supplied `leave_id` themselves. To verify a dialog, drive it:
+    `HttpCase.browser_js` runs real Chrome, but needs `websocket-client`, which
+    lives **only in the project `.venv`** — with `odoo19env` the test *silently
+    skips* and prints "0 failed":
+    ```bash
+    .venv/bin/python odoo-bin -c KSW_dev.conf --http-port=18077 --test-enable \
+      --test-tags /KSW_annual_leave:TestReturnWizardUI -u KSW_annual_leave --stop-after-init
+    ```
+    The run's CDP log contains the client's exact RPC payloads — that is where
+    the missing `leave_id` was visible. Pattern in
+    `KSW_annual_leave/tests/test_return_wizard_ui.py`.

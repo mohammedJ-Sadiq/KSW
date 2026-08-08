@@ -51,7 +51,7 @@
               name="Operations"
               parent="menu_ksw_deduction_root"
               sequence="10"
-              groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_deduction_supervisor,KSW_deduction.group_acc_data_entry,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm"/>
+              groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_deduction_supervisor,KSW_deduction.group_acc_data_entry,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_base_security.group_manager_assistant"/>
 
     <menuitem id="menu_ksw_deduction_all"
               name="All Deductions"
@@ -67,7 +67,7 @@
               parent="menu_ksw_deduction_operations"
               action="action_ksw_deduction_loans"
               sequence="20"
-              groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_deduction_supervisor,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm"/>
+              groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_deduction_supervisor,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_base_security.group_manager_assistant"/>
 
     <!-- Accounting data entry: single consolidated view of the non-loan
          deductions they own (mirrors "Loans" for approvers) -->

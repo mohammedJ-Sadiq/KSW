@@ -197,6 +197,80 @@
     </record>
 
     <!-- ============================================================ -->
+    <!-- Record Rules — hr.leave, Manager Assistant (delegated)        -->
+    <!-- ============================================================ -->
+    <!--
+        The assistant is NOT a tier on the ladder above. Their scope
+        comes from a delegation named by the manager
+        (res.users.x_assistant_ids, KSW_base_security), so the domain
+        resolves `user._ksw_assisted_manager_ids()` to a flat id list at
+        rule-compile time. An undelegated user gets [], i.e. matches
+        nothing — the correct fallback.
+
+        Read and write are split into two rules (the same pattern as
+        ksw_deduction_rule_officer / _officer_write) so the assistant
+        can FOLLOW a request through the whole chain but only EDIT it
+        while it is still at its first pending step:
+
+          * ('state', 'in', ['draft', 'confirm'])
+                does the work for ordinary leave types, whose progress
+                lives in `state`.
+          * ('x_annual_approval_state', 'in', [False, 'pending_dm'])
+                does the work for the KSW multi-step chains, whose
+                `state` stays 'confirm' all the way past GM final
+                approval, and whose progress lives here instead.
+                Ordinary types leave this field NULL (it has no
+                default), so the clause is vacuously true for them.
+
+        The two clauses are AND-ed, never OR-ed: OR would wave a
+        pending_gm_final annual leave straight through. And the
+        positive `in [False, ...]` form is deliberate — `not in` on a
+        nullable column is the classic SQL trap (NULL NOT IN (...)
+        is NULL, not TRUE).
+
+        Both the parent_id and the leave_manager_id disjunct are needed:
+        action_dm_approve keys on leave_manager_id while the tier rules
+        key on parent_id. They usually coincide, but where they diverge
+        the assistant must still cover everything their manager will be
+        asked to approve.
+
+        There is deliberately NO ('employee_id.user_id', 'in', ...)
+        disjunct — the manager's own requests are out of scope; the
+        manager files those personally.
+
+        perm_unlink is False on both: withdrawing/deleting a request is
+        not delegated.
+    -->
+    <record id="hr_leave_rule_manager_assistant_read" model="ir.rule">
+        <field name="name">KSW Leave: manager assistant (delegated team, read all states)</field>
+        <field name="model_id" ref="hr_holidays.model_hr_leave"/>
+        <field name="groups" eval="[(4, ref('KSW_base_security.group_manager_assistant'))]"/>
+        <field name="domain_force">['|',
+            ('employee_id.parent_id.user_id', 'in', user._ksw_assisted_manager_ids()),
+            ('employee_id.leave_manager_id', 'in', user._ksw_assisted_manager_ids())]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="hr_leave_rule_manager_assistant_prepare" model="ir.rule">
+        <field name="name">KSW Leave: manager assistant (prepare/edit before any approval)</field>
+        <field name="model_id" ref="hr_holidays.model_hr_leave"/>
+        <field name="groups" eval="[(4, ref('KSW_base_security.group_manager_assistant'))]"/>
+        <field name="domain_force">[
+            ('state', 'in', ['draft', 'confirm']),
+            ('x_annual_approval_state', 'in', [False, 'pending_dm']),
+            '|',
+                ('employee_id.parent_id.user_id', 'in', user._ksw_assisted_manager_ids()),
+                ('employee_id.leave_manager_id', 'in', user._ksw_assisted_manager_ids())]</field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- ============================================================ -->
     <!-- Record Rules — hr.leave.allocation (read cascade)             -->
     <!-- ============================================================ -->
     <!--
@@ -247,6 +321,25 @@
         <field name="perm_unlink" eval="False"/>
     </record>
 
+    <!--
+        Same reason as the supervisor rule above: without read on the
+        delegated team's allocations, `has_valid_allocation` silently
+        drops annual-vacation types from the leave-type dropdown and
+        the assistant simply cannot file one.
+    -->
+    <record id="hr_leave_allocation_rule_view_manager_assistant" model="ir.rule">
+        <field name="name">KSW Allocation: view manager assistant (delegated team)</field>
+        <field name="model_id" ref="hr_holidays.model_hr_leave_allocation"/>
+        <field name="groups" eval="[(4, ref('KSW_base_security.group_manager_assistant'))]"/>
+        <field name="domain_force">['|',
+            ('employee_id.parent_id.user_id', 'in', user._ksw_assisted_manager_ids()),
+            ('employee_id.leave_manager_id', 'in', user._ksw_assisted_manager_ids())]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
 
     <!-- ============================================================ -->
     <!-- Record Rules — ksw.annual.leave (Dashboard)                   -->
@@ -277,6 +370,22 @@
         <field name="model_id" ref="model_ksw_annual_leave"/>
         <field name="groups" eval="[(4, ref('group_leave_officer'))]"/>
         <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <!-- Explicit read-only, unlike the tier rules above which leave the
+         perm_* flags at their default and rely on the ACL alone. The
+         assistant tier is display-only on every satellite model. -->
+    <record id="ksw_annual_leave_rule_manager_assistant" model="ir.rule">
+        <field name="name">KSW Annual Leave: manager assistant (delegated team)</field>
+        <field name="model_id" ref="model_ksw_annual_leave"/>
+        <field name="groups" eval="[(4, ref('KSW_base_security.group_manager_assistant'))]"/>
+        <field name="domain_force">['|',
+            ('employee_id.parent_id.user_id', 'in', user._ksw_assisted_manager_ids()),
+            ('employee_id.leave_manager_id', 'in', user._ksw_assisted_manager_ids())]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
     </record>
 
     <!-- ============================================================ -->
@@ -310,6 +419,19 @@
         <field name="domain_force">[(1, '=', 1)]</field>
     </record>
 
+    <record id="hr_leave_commission_line_rule_manager_assistant" model="ir.rule">
+        <field name="name">KSW Leave Commission: manager assistant (delegated team)</field>
+        <field name="model_id" ref="model_hr_leave_commission_line"/>
+        <field name="groups" eval="[(4, ref('KSW_base_security.group_manager_assistant'))]"/>
+        <field name="domain_force">['|',
+            ('leave_id.employee_id.parent_id.user_id', 'in', user._ksw_assisted_manager_ids()),
+            ('leave_id.employee_id.leave_manager_id', 'in', user._ksw_assisted_manager_ids())]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
     <!-- ============================================================ -->
     <!-- Record Rules — hr.leave.deduction.line                        -->
     <!-- Mirrors the commission-line rules exactly.                    -->
@@ -340,6 +462,19 @@
         <field name="model_id" ref="model_hr_leave_deduction_line"/>
         <field name="groups" eval="[(4, ref('group_leave_officer'))]"/>
         <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <record id="hr_leave_deduction_line_rule_manager_assistant" model="ir.rule">
+        <field name="name">KSW Leave Other Deduction: manager assistant (delegated team)</field>
+        <field name="model_id" ref="model_hr_leave_deduction_line"/>
+        <field name="groups" eval="[(4, ref('KSW_base_security.group_manager_assistant'))]"/>
+        <field name="domain_force">['|',
+            ('leave_id.employee_id.parent_id.user_id', 'in', user._ksw_assisted_manager_ids()),
+            ('leave_id.employee_id.leave_manager_id', 'in', user._ksw_assisted_manager_ids())]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
     </record>
 
     <!-- ============================================================ -->
@@ -480,6 +615,21 @@
     <function model="res.groups" name="write">
         <value eval="[ref('group_leave_officer')]"/>
         <value eval="{'user_ids': [(4, ref('base.user_root')), (4, ref('base.user_admin'))]}"/>
+    </function>
+
+    <!--
+        Same problem, structurally: the Settings Administrator is the only
+        role allowed to reverse a finalised request
+        (hr.leave._check_final_reversal_rights) or return one to any
+        approval step, so it must be able to *reach* every request. The
+        user_ids write above only covers the two built-in accounts and says
+        nothing about an administrator created later, who would hold the
+        authority in Python and no record-rule scope to exercise it on.
+        Implying the Officer tier closes that gap once and for all.
+    -->
+    <function model="res.groups" name="write">
+        <value eval="[ref('base.group_system')]"/>
+        <value eval="{'implied_ids': [(4, ref('group_leave_officer'))]}"/>
     </function>
 
 </odoo>
