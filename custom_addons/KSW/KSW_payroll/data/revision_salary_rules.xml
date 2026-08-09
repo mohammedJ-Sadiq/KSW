@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data noupdate="0">
+
+        <!-- ========================================================= -->
+        <!-- Already Paid (Previous Payslips) — PRIOR_NET (DED)         -->
+        <!--                                                            -->
+        <!-- Only fires on a revision payslip. The revision recomputes  -->
+        <!-- the WHOLE period as if it were the single payslip of that  -->
+        <!-- month (full HRA, full GOSI, the installments actually      -->
+        <!-- collected), then this rule subtracts everything already    -->
+        <!-- paid for the period, so NET is the difference still owed.  -->
+        <!--                                                            -->
+        <!-- Sequence 180: after every other deduction                  -->
+        <!-- (ATTDED=150, GOSI=160, KSW_DEDUCTIONS=170 … 173) and       -->
+        <!-- before NET=200, so categories.DED already carries it.      -->
+        <!-- ========================================================= -->
+        <record id="hr_rule_prior_net" model="hr.salary.rule">
+            <field name="name">Already Paid (Previous Payslips)</field>
+            <field name="sequence" eval="180"/>
+            <field name="code">PRIOR_NET</field>
+            <field name="category_id" ref="om_hr_payroll.DED"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = any(i.code == 'PRIOR_NET' for i in (payslip.input_line_ids or []))</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = -sum(i.amount for i in (payslip.input_line_ids or []) if i.code == 'PRIOR_NET')</field>
+            <field name="appears_on_payslip" eval="True"/>
+            <field name="note">Total NET already paid to the employee for this period by the
+payslip(s) this revision supersedes. Set as a PRIOR_NET input line by
+hr.payslip.action_issue_revision(); never present on an ordinary payslip.</field>
+        </record>
+
+        <record id="om_hr_payroll.structure_base" model="hr.payroll.structure">
+            <field name="rule_ids" eval="[(4, ref('hr_rule_prior_net'))]"/>
+        </record>
+
+        <!-- Re-run the legacy-structure sync so ATTSHEET / Executive /
+             NoFin / OCIR pick up PRIOR_NET too. Idempotent: the method
+             only adds rules a structure does not already carry. -->
+        <function model="hr.salary.rule"
+                  name="_ksw_migrate_structures_to_new_system"/>
+
+    </data>
+
+</odoo>

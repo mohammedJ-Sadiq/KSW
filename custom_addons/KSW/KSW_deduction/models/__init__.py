@@ -4,5 +4,6 @@ from . import ksw_deduction
 from . import hr_payslip
 from . import hr_employee
 from . import ir_ui_menu
+from . import res_config_settings
 
 

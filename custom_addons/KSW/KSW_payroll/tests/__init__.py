@@ -18,6 +18,7 @@ from . import test_vacation_attendance_cap
 from . import test_supervisor_refuse_delete
 from . import test_payslip_reversal_rights
 from . import test_leave_payslip_lock
+from . import test_payslip_revision
 
 
 

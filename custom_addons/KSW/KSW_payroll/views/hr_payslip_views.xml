@@ -36,12 +36,66 @@
                 <attribute name="groups">om_hr_payroll.group_hr_payroll_manager</attribute>
             </xpath>
 
+            <!-- ── Issue Revision ──
+                 Re-issues a confirmed period: recomputes it with current
+                 data and pays only the difference. Additive rather than
+                 destructive, so it sits with the Officer tier, not the
+                 Manager tier that owns Cancel / Set to Draft / Refund.
+                 The server-side guard is
+                 hr.payslip._check_payroll_officer. -->
+            <xpath expr="//header/button[@name='refund_sheet']"
+                   position="after">
+                <button string="Issue Revision" name="action_issue_revision"
+                        type="object" class="btn-primary"
+                        invisible="state != 'done' or x_is_revision or credit_note"
+                        groups="om_hr_payroll.group_hr_payroll_user"
+                        help="Recompute this period with current data and pay the employee the difference."/>
+            </xpath>
+
             <!-- ── Flag provisional (mid-approval) vacation calculations ── -->
             <xpath expr="//sheet" position="inside">
                 <field name="x_is_vacation_preview" invisible="1"/>
+                <field name="x_is_revision" invisible="1"/>
                 <widget name="web_ribbon" title="Provisional"
                         bg_color="text-bg-warning"
                         invisible="not x_is_vacation_preview"/>
+                <widget name="web_ribbon" title="Revision"
+                        bg_color="text-bg-info"
+                        invisible="not x_is_revision"/>
+            </xpath>
+
+            <!-- ── Revisions of this payslip ── -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_open_revisions" type="object"
+                        class="oe_stat_button" icon="fa-refresh"
+                        invisible="x_revision_count == 0"
+                        groups="om_hr_payroll.group_hr_payroll_user">
+                    <field name="x_revision_count" widget="statinfo"
+                           string="Revisions"/>
+                </button>
+            </xpath>
+
+            <!-- ── Revision summary: deserved vs already paid vs owed ──
+                 Placed before the notebook (sheet level). Inserting after a
+                 field inside the col="4" group would land inside that grid
+                 and break the Period / Credit Note row (pitfall #21). -->
+            <xpath expr="//notebook" position="before">
+                <group string="Revision Summary" invisible="not x_is_revision"
+                       groups="om_hr_payroll.group_hr_payroll_user">
+                    <group>
+                        <field name="x_revised_payslip_id" readonly="1"/>
+                        <field name="x_deserved_net" readonly="1"
+                               string="Deserved Net (whole period)"/>
+                    </group>
+                    <group>
+                        <field name="x_prior_net_paid" readonly="1"
+                               string="Already Paid"/>
+                        <field name="x_net_wage" readonly="1"
+                               string="Difference Payable"
+                               decoration-danger="x_net_wage &lt; 0"
+                               decoration-bf="1"/>
+                    </group>
+                </group>
             </xpath>
 
             <!-- ── Replace the entire worked-days list with a styled one ── -->

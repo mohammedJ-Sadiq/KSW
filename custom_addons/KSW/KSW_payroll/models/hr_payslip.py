@@ -1,11 +1,18 @@
+import logging
 from calendar import monthrange
 from datetime import datetime, time, timedelta
+
+from markupsafe import Markup
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 
+_logger = logging.getLogger(__name__)
+
 # Group allowed to reverse a payslip (reject / reset to draft / refund).
 PAYROLL_MANAGER_GROUP = 'om_hr_payroll.group_hr_payroll_manager'
+# Group allowed to issue a revision (additive — pays a shortfall).
+PAYROLL_OFFICER_GROUP = 'om_hr_payroll.group_hr_payroll_user'
 
 
 def _days_in_month(d):
@@ -131,6 +138,59 @@ class HrPayslip(models.Model):
     )
 
     # ------------------------------------------------------------------
+    # Revision payslip — re-issue a period that was already paid
+    # ------------------------------------------------------------------
+    # None of these carry a model-level ``groups=``: ``x_is_revision`` is
+    # referenced in ``invisible=`` on the header button, which would trip
+    # the OWL "field is undefined" crash for any user who can see the
+    # button but not the field (pitfall #31).  Visibility is view-level.
+
+    x_is_revision = fields.Boolean(
+        string='Revision', readonly=True, copy=False,
+        help='This payslip re-issues a period that was already confirmed '
+             'and paid.  It recomputes the whole period with current data '
+             'and subtracts everything already paid, so its NET is the '
+             'difference still owed to the employee.',
+    )
+
+    x_revised_payslip_id = fields.Many2one(
+        'hr.payslip', string='Revision Of', readonly=True, copy=False,
+        help='The confirmed payslip this revision was issued from.',
+    )
+
+    x_revision_ids = fields.One2many(
+        'hr.payslip', 'x_revised_payslip_id', string='Revisions',
+        readonly=True, copy=False,
+    )
+
+    x_revision_count = fields.Integer(
+        string='Revision Count', compute='_compute_revision_count',
+    )
+
+    x_prior_net_paid = fields.Float(
+        string='Already Paid', readonly=True, copy=False, digits=(16, 0),
+        help='Total NET already paid to the employee for this period by '
+             'the payslip(s) this revision supersedes.',
+    )
+
+    x_deserved_net = fields.Float(
+        string='Deserved Net', compute='_compute_deserved_net',
+        digits=(16, 0),
+        help='What the employee should have received for this period in '
+             'total — the difference payable plus what was already paid.',
+    )
+
+    @api.depends('x_revision_ids')
+    def _compute_revision_count(self):
+        for slip in self:
+            slip.x_revision_count = len(slip.x_revision_ids)
+
+    @api.depends('x_net_wage', 'x_prior_net_paid')
+    def _compute_deserved_net(self):
+        for slip in self:
+            slip.x_deserved_net = slip.x_net_wage + slip.x_prior_net_paid
+
+    # ------------------------------------------------------------------
     # Daily / Hourly wage (read-only info fields)
     # ------------------------------------------------------------------
 
@@ -227,8 +287,11 @@ class HrPayslip(models.Model):
             #  - there is a vacation return (use return date as new start), OR
             #  - the structure is absence-only, OR
             #  - this is a vacation/EOS payslip (attendance window must be
-            #    capped to the day before leave starts)
-            if (return_date or absence_only or effective_to is not None) \
+            #    capped to the day before leave starts), OR
+            #  - this is a revision — re-reading live attendance is the
+            #    entire point of re-issuing the period.
+            if (return_date or absence_only or effective_to is not None
+                    or payslip.x_is_revision) \
                     and payslip.worked_days_line_ids:
                 payslip.worked_days_line_ids.unlink()
 
@@ -237,7 +300,12 @@ class HrPayslip(models.Model):
                                          effective_to=effective_to,
                                          absence_only=absence_only)
 
-            self._inject_prior_hra_input(payslip)
+            # A revision recomputes the whole period as if it were the
+            # single payslip of that month, and then subtracts the total
+            # already paid via PRIOR_NET.  PRIOR_HRA / PRIOR_GOSI would
+            # subtract the same HRA and GOSI a second time.
+            if not payslip.x_is_revision:
+                self._inject_prior_hra_input(payslip)
         res = super().compute_sheet()
         # Re-derive NET from the already-rounded (digits=(16,0)) GROSS and DED
         # line amounts.  The base engine accumulates categories using
@@ -434,6 +502,10 @@ class HrPayslip(models.Model):
             ('state', 'in', ('verify', 'done')),
             ('date_from', '<=', payslip.date_to),
             ('date_to', '>=', payslip.date_from),
+            # A revision re-states the whole period rather than adding to
+            # it; its HRA/GOSI are the same ones this payslip already
+            # carries, so counting them as "prior" would subtract twice.
+            ('x_is_revision', '=', False),
         ]
         if payslip.id:
             domain.append(('id', '!=', payslip.id))
@@ -1425,9 +1497,414 @@ class HrPayslip(models.Model):
         rows.sort(key=lambda r: r['date'])
         return rows
 
+    # ==================================================================
+    # Revision payslips
+    # ==================================================================
+    #
+    # Problem.  A payslip is confirmed and paid; the employee complains it
+    # was short; the complaint turns out to be justified (a time-off
+    # request approved late, a lost weekend grant, attendance that had not
+    # synced yet).  Simply issuing a second payslip for the month does not
+    # work: HRA and GOSI are per-period amounts that have already been
+    # paid/deducted once, the loan installments have already been
+    # collected, and nothing states the one number that matters — how much
+    # more the employee is owed.
+    #
+    # A revision rebuilds the payslip the employee *should* have received
+    # for the period, using today's data and including the deductions that
+    # were legitimately collected, then subtracts everything already paid
+    # via the PRIOR_NET rule.  Its NET line *is* the difference payable.
+
+    def _overlapping_slips_domain(self, states=None):
+        """Domain for other payslips of the same employee covering any part
+        of this payslip's period.  ``self`` is always excluded."""
+        self.ensure_one()
+        domain = [
+            ('employee_id', '=', self.employee_id.id),
+            ('date_from', '<=', self.date_to),
+            ('date_to', '>=', self.date_from),
+        ]
+        if states:
+            domain.append(('state', 'in', list(states)))
+        if self.id:
+            domain.append(('id', '!=', self.id))
+        return domain
+
+    # ------------------------------------------------------------------
+    # A period can only be confirmed once
+    # ------------------------------------------------------------------
+
+    def _check_duplicate_done_period(self):
+        """Refuse to confirm a second payslip for a period that already has
+        a confirmed one.
+
+        Called from every route into ``done`` (``action_payslip_done`` goes
+        through ``write``), because view-level guards and a single button
+        are not the only way in — see pitfall #37.
+
+        Three exemptions:
+
+        * the slip being confirmed is a **revision** — that is the
+          sanctioned way to re-issue a paid period;
+        * **every** blocking slip is an auto-generated vacation / EOS
+          payslip whose leave return has been confirmed by the employee's
+          direct manager (``x_return_state == 'hr_confirmed'`` — the value
+          is historically named for HR but is written by
+          ``action_confirm_return_manager``).  The employee is back, so the
+          rest of the month is genuinely owed as a separate payslip;
+        * ``self.env.su`` — consistent with ``_check_payroll_manager``, so
+          crons and migrations are not broken.
+        """
+        if self.env.su:
+            return
+        for slip in self:
+            if slip.x_is_revision or not slip.employee_id:
+                continue
+            blocking = self.sudo().search(
+                slip._overlapping_slips_domain(states=('done',)))
+            if not blocking:
+                continue
+            unresolved = blocking.filtered(
+                lambda s: not s._is_settled_vacation_payslip())
+            if not unresolved:
+                continue
+            raise UserError(_(
+                "A confirmed payslip already exists for %(employee)s "
+                "covering %(date_from)s → %(date_to)s: %(slips)s.\n\n"
+                "A period cannot be confirmed twice. If that payslip was "
+                "wrong, open it and press \"Issue Revision\" — the revision "
+                "recomputes the period with current data and pays only the "
+                "difference.",
+                employee=slip.employee_id.name,
+                date_from=slip.date_from,
+                date_to=slip.date_to,
+                slips=', '.join(
+                    s.number or s.name or str(s.id) for s in unresolved),
+            ))
+
+    def _is_settled_vacation_payslip(self):
+        """True when this payslip is a definitive vacation / EOS payslip
+        whose leave return has been confirmed by the direct manager."""
+        self.ensure_one()
+        leave = self.sudo().x_leave_id
+        return bool(
+            leave
+            and not self.x_is_vacation_preview
+            and leave.x_return_state == 'hr_confirmed'
+        )
+
+    # ------------------------------------------------------------------
+    # Issue a revision
+    # ------------------------------------------------------------------
+
+    def action_issue_revision(self):
+        """Create (or reopen) the revision payslip for this period."""
+        self.ensure_one()
+        self._check_payroll_officer(_('issue a payslip revision'))
+
+        if self.state != 'done':
+            raise UserError(_(
+                'Only a confirmed payslip can be revised. This payslip is '
+                'in state "%s".'
+            ) % self.state)
+        if self.credit_note:
+            raise UserError(_('A refund payslip cannot be revised.'))
+        if self.x_is_revision:
+            raise UserError(_(
+                'This payslip is itself a revision. Confirm it first, then '
+                'revise it again if a further correction is needed.'))
+
+        # One open revision at a time — reopen rather than fork the period.
+        existing = self.sudo().search(
+            self._overlapping_slips_domain(states=('draft', 'verify'))
+            + [('x_is_revision', '=', True)], limit=1)
+        if existing:
+            return self._action_open_payslip(
+                existing, _('Revision (already open)'))
+
+        revision = self._create_revision_payslip()
+        return self._action_open_payslip(revision, _('Payslip Revision'))
+
+    def _create_revision_payslip(self):
+        """Build the revision: same period and structure, the one-time
+        inputs of every superseded payslip, the installments those payslips
+        already collected (frozen), and a PRIOR_NET line for the total
+        already paid."""
+        self.ensure_one()
+        Payslip = self.env['hr.payslip'].sudo()
+        InputLine = self.env['hr.payslip.input'].sudo()
+
+        prior_slips = self._revision_prior_slips()
+        prior_net = sum(
+            self._get_net_total(slip) for slip in prior_slips)
+        slip_refs = ', '.join(
+            s.number or s.name or str(s.id) for s in prior_slips)
+
+        version = (
+            self.version_id
+            or self.employee_id.sudo().current_version_id
+        )
+        revision = Payslip.create({
+            'employee_id': self.employee_id.id,
+            'name': _('Revision — %(employee)s — %(month)s/%(year)s (of %(source)s)',
+                      employee=self.employee_id.name,
+                      month=self.date_from.month,
+                      year=self.date_from.year,
+                      source=self.number or self.name or self.id),
+            'date_from': self.date_from,
+            'date_to': self.date_to,
+            'struct_id': self.struct_id.id,
+            'version_id': version.id,
+            'company_id': self.company_id.id,
+            # Preserve the vacation/EOS link so the attendance window is
+            # capped exactly as it was on the payslip being revised.
+            'x_leave_id': self.sudo().x_leave_id.id,
+            'x_is_revision': True,
+            'x_revised_payslip_id': self.id,
+            'x_prior_net_paid': prior_net,
+        })
+
+        input_vals = self._build_revision_inputs(
+            revision, prior_slips, prior_net, slip_refs)
+        if input_vals:
+            InputLine.create(input_vals)
+
+        revision.compute_sheet()
+
+        self.sudo().message_post(
+            body=Markup(
+                '<strong>🧾 Revision issued</strong><br/>'
+                '<b>Revision:</b> %(revision)s<br/>'
+                '<b>Already paid this period:</b> %(paid).2f<br/>'
+                '<b>By:</b> %(user)s'
+            ) % {
+                'revision': revision.name,
+                'paid': prior_net,
+                'user': self.env.user.name,
+            },
+            subtype_xmlid='mail.mt_note',
+        )
+        return revision
+
+    def _revision_prior_slips(self):
+        """Every payslip whose NET this revision must subtract: the payslip
+        being revised, any vacation payslip for the same period, and any
+        earlier confirmed revision.
+
+        Including earlier revisions is what makes a revision-of-a-revision
+        self-consistent — the second one subtracts the original *and* the
+        first one, so its NET is again the outstanding difference.
+        """
+        self.ensure_one()
+        others = self.sudo().search(
+            self._overlapping_slips_domain(states=('verify', 'done')))
+        return (self | others).sudo()
+
+    @api.model
+    def _get_net_total(self, payslip):
+        net_lines = payslip.sudo().line_ids.filtered(lambda l: l.code == 'NET')
+        return sum(net_lines.mapped('total'))
+
+    def _build_revision_inputs(self, revision, prior_slips, prior_net,
+                               slip_refs):
+        """Input lines for a revision payslip.
+
+        Three groups:
+
+        1. **One-time inputs** carried over from every superseded payslip
+           (VACATION_BAL, FLIGHT_TICKET, PENALTY, commissions, EOS…),
+           summed per code — the revision re-states the whole period, so
+           each of these must appear exactly once.
+        2. **Frozen installments** ``KSW_DEDP_<line_id>`` for every
+           installment the superseded payslips already collected.  The
+           deliberate ``P`` keeps them clear of ``'KSW_DED_'``, which
+           ``_inject_ksw_deduction_inputs``, ``_ksw_apply_deduction_priority``
+           and ``_sync_deductions_on_done`` all key off — so they count
+           towards the deserved net without the ledger being touched.
+           Installments still *pending* are injected separately by
+           KSW_deduction as ordinary ``KSW_DED_`` inputs and are collected
+           out of the difference.
+        3. **PRIOR_NET** — everything already paid for the period.
+        """
+        self.ensure_one()
+        version_id = (
+            revision.version_id.id
+            or (self.employee_id.sudo().current_version_id
+                and self.employee_id.sudo().current_version_id.id)
+        )
+        if not version_id:
+            return []
+
+        skip_codes = ('PRIOR_HRA', 'PRIOR_GOSI', 'PRIOR_NET')
+        carried = {}  # code -> {'name': str, 'amount': float, 'sequence': int}
+        for slip in prior_slips:
+            for inp in slip.sudo().input_line_ids:
+                code = inp.code or ''
+                if not code or code in skip_codes or code.startswith('KSW_DED'):
+                    continue
+                entry = carried.setdefault(
+                    code, {'name': inp.name, 'amount': 0.0,
+                           'sequence': inp.sequence})
+                entry['amount'] += inp.amount
+
+        vals = [
+            {
+                'payslip_id': revision.id,
+                'version_id': version_id,
+                'name': entry['name'],
+                'code': code,
+                'amount': entry['amount'],
+                'sequence': entry['sequence'],
+            }
+            for code, entry in carried.items()
+        ]
+
+        vals += self._revision_frozen_deduction_inputs(
+            revision, prior_slips, version_id)
+
+        if prior_net:
+            vals.append({
+                'payslip_id': revision.id,
+                'version_id': version_id,
+                'name': _('Already paid in %s') % slip_refs,
+                'code': 'PRIOR_NET',
+                'amount': prior_net,
+                'sequence': 190,
+            })
+        return vals
+
+    def _revision_frozen_deduction_inputs(self, revision, prior_slips,
+                                          version_id):
+        """Input values reproducing the installments the superseded payslips
+        already collected.
+
+        Hook only — ``ksw.deduction.line`` lives in KSW_deduction, which
+        depends on this module.  It is also not yet in the registry while
+        this module's own tests run, so it must never be referenced from
+        here directly.  See the override in
+        ``KSW_deduction/models/hr_payslip.py``.
+        """
+        return []
+
+    def _action_open_payslip(self, payslip, name):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': name,
+            'res_model': 'hr.payslip',
+            'view_mode': 'form',
+            'res_id': payslip.id,
+            'target': 'current',
+        }
+
+    def action_open_revisions(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Revisions'),
+            'res_model': 'hr.payslip',
+            'view_mode': 'list,form',
+            'domain': [('id', 'in', self.x_revision_ids.ids)],
+        }
+
+    # ------------------------------------------------------------------
+    # Over-payment: never pay a negative net, recover it instead
+    # ------------------------------------------------------------------
+
+    def _overpaid_revisions(self):
+        """Revisions whose recomputation shows the employee was over-paid."""
+        return self.filtered(
+            lambda s: s.x_is_revision and s.x_net_wage < 0)
+
+    def _handle_overpaid_revisions(self):
+        """Cancel each over-paid revision and open a draft deduction to
+        recover the difference.
+
+        Deliberately does **not** raise: a ``UserError`` would roll the
+        transaction back, taking the ``ksw.deduction`` we just created with
+        it.  The batch-generation wizard uses the same
+        cancel-and-notify shape.
+        """
+        recovered = []
+        for slip in self:
+            amount = abs(slip.x_net_wage)
+            deduction = slip._create_overpayment_deduction(amount)
+            slip.sudo().write({'state': 'cancel'})
+            slip.sudo().message_post(
+                body=Markup(
+                    '<strong>⚠️ Over-payment — revision cancelled</strong><br/>'
+                    'Recomputing this period shows the employee was '
+                    '<b>over-paid by %(amount).2f</b>. A payslip cannot pay '
+                    'a negative amount, so this revision was cancelled and a '
+                    'recovery deduction was opened instead.<br/>'
+                    '<b>Recovery deduction:</b> %(deduction)s<br/>'
+                    '<b>By:</b> %(user)s'
+                ) % {
+                    'amount': amount,
+                    'deduction': deduction.name if deduction
+                                 else _('could not be created'),
+                    'user': self.env.user.name,
+                },
+                subtype_xmlid='mail.mt_note',
+            )
+            recovered.append((slip, amount, deduction))
+
+        details = '\n'.join(
+            '• %s — %.2f (%s)' % (
+                s.employee_id.name, amt,
+                d.name if d else _('deduction not created — set the '
+                                   'recovery type in Payroll Settings'))
+            for s, amt, d in recovered
+        )
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Over-payment — %d revision(s) cancelled')
+                         % len(recovered),
+                'message': _(
+                    'The recomputed period is lower than what was already '
+                    'paid, so nothing is payable. A draft recovery '
+                    'deduction was opened instead:\n%s'
+                ) % details,
+                'type': 'warning',
+                'sticky': True,
+            },
+        }
+
+    def _create_overpayment_deduction(self, amount):
+        """Open a deduction recovering an over-payment.
+
+        Hook only — ``ksw.deduction`` lives in KSW_deduction, which depends
+        on this module, so the real implementation is the override in
+        ``KSW_deduction/models/hr_payslip.py``.  Same shape as
+        ``_create_vacation_payslip``, whose no-op hook sits in
+        KSW_annual_leave.  Returning a falsy value is handled by the caller.
+        """
+        self.ensure_one()
+        _logger.warning(
+            'KSW_deduction is not installed — revision %s cancelled '
+            'without a recovery deduction for %.2f.', self.id, amount)
+        return None
+
     # ------------------------------------------------------------------
     # Reversal actions restricted to the Payroll Manager
     # ------------------------------------------------------------------
+
+    def _check_payroll_officer(self, what):
+        """Guard actions open to the whole payroll team.
+
+        Issuing a revision is additive — it pays a shortfall rather than
+        undoing a confirmed payslip — so it sits with the Officer tier, not
+        the Manager tier that owns Cancel / Set to Draft / Refund.  The
+        view-level ``groups=`` is cosmetic; this is the check that holds
+        over RPC (pitfall #15).
+        """
+        if self.env.su:
+            return
+        if not self.env.user.has_group(PAYROLL_OFFICER_GROUP):
+            raise UserError(_(
+                'Only the payroll team may %s.'
+            ) % what)
 
     def _check_payroll_manager(self, what):
         """Guard the three actions that undo a payslip.
@@ -1463,21 +1940,64 @@ class HrPayslip(models.Model):
     # ------------------------------------------------------------------
 
     def action_payslip_done(self):
-        res = super().action_payslip_done()
-        self._send_auto_payslip_email()
+        # Revisions carry the over-payment check.  Recompute them first so
+        # the decision is made on final figures, not on whatever was on
+        # screen when the officer opened the form.
+        revisions = self.filtered('x_is_revision')
+        overpaid = self.env['hr.payslip']
+        notification = None
+        if revisions:
+            revisions.compute_sheet()
+            overpaid = revisions._overpaid_revisions()
+            if overpaid:
+                notification = overpaid._handle_overpaid_revisions()
+
+        payable = self - overpaid
+        if not payable:
+            return notification
+        res = super(HrPayslip, payable).action_payslip_done()
+        payable._send_auto_payslip_email()
         if not self.env.context.get('_ksw_skip_bank_refresh'):
-            runs = self.mapped('payslip_run_id').filtered(bool)
+            runs = payable.mapped('payslip_run_id').filtered(bool)
             if runs:
                 runs._refresh_bank_totals()
-        return res
+        # A partly over-paid batch: the warning is the more useful return.
+        return notification or res
 
     def write(self, vals):
+        # Guard both routes into `done` from one place — `action_payslip_done`
+        # lands here too (pitfall #37).
+        if vals.get('state') == 'done':
+            entering = self.filtered(lambda s: s.state != 'done')
+            if entering:
+                entering._check_duplicate_done_period()
+                entering._check_revision_payable()
         res = super().write(vals)
         if 'payslip_run_id' in vals:
             runs = self.mapped('payslip_run_id').filtered(bool)
             if runs:
                 runs._refresh_bank_totals()
         return res
+
+    def _check_revision_payable(self):
+        """Backstop for the raw ``write({'state': 'done'})`` RPC route.
+
+        ``action_payslip_done`` handles an over-paid revision gracefully
+        (cancel + recovery deduction + notification).  A direct write
+        cannot return a notification, so it simply refuses — the outcome
+        that matters is the same: a negative net is never confirmed.
+        """
+        if self.env.su:
+            return
+        overpaid = self._overpaid_revisions()
+        if overpaid:
+            raise UserError(_(
+                "This revision shows the employee was over-paid by "
+                "%(amount).2f, so there is nothing to pay.\n\n"
+                "Use the \"Confirm\" button on the revision instead — it "
+                "opens a recovery deduction for the amount automatically.",
+                amount=abs(overpaid[0].x_net_wage),
+            ))
 
     def unlink(self):
         runs = self.mapped('payslip_run_id').filtered(bool)

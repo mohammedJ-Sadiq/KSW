@@ -34,6 +34,10 @@ class HrPayslipEmployees(models.TransientModel):
         Checks (in order):
         1. No active contract / version for the period.
         2. Unresolved annual-leave return pending HR confirmation.
+        3. A confirmed payslip already covers the period — the slip would
+           be created but could never be confirmed
+           (``hr.payslip._check_duplicate_done_period``).  Corrections go
+           through "Issue Revision" on the confirmed payslip instead.
         """
         HrPayslip = self.env['hr.payslip']
 
@@ -58,6 +62,25 @@ class HrPayslipEmployees(models.TransientModel):
                 for l in unresolved
             )
             return _('Unresolved vacation return pending HR confirmation: %s') % details
+
+        # -- Already-confirmed period ----------------------------------------
+        # Mirrors hr.payslip._check_duplicate_done_period: a confirmed
+        # vacation payslip whose return the direct manager has confirmed
+        # does not block the rest of the month.
+        confirmed = HrPayslip.sudo().search([
+            ('employee_id', '=', employee.id),
+            ('state', '=', 'done'),
+            ('date_from', '<=', to_date),
+            ('date_to', '>=', from_date),
+        ])
+        blocking = confirmed.filtered(
+            lambda s: not s._is_settled_vacation_payslip())
+        if blocking:
+            return _(
+                'A confirmed payslip already exists for this period (%s). '
+                'Use "Issue Revision" on it if a correction is needed.'
+            ) % ', '.join(
+                s.number or s.name or str(s.id) for s in blocking)
 
         return ''
 

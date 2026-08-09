@@ -1,4 +1,8 @@
-from odoo import api, fields, models
+import logging
+
+from odoo import api, fields, models, _
+
+_logger = logging.getLogger(__name__)
 
 # Order in which pending installments are collected: penalties / advances
 # before loans (lower payroll_priority first), then oldest period, then
@@ -190,3 +194,112 @@ class HrPayslip(models.Model):
 
     def _sync_deductions_on_reset(self, payslip):
         self.env['ksw.deduction'].sudo()._unmark_lines_paid(payslip)
+
+    # ------------------------------------------------------------------
+    # Revision support (hooks defined in KSW_payroll)
+    # ------------------------------------------------------------------
+
+    def _revision_frozen_deduction_inputs(self, revision, prior_slips,
+                                          version_id):
+        """Reproduce, on a revision, the installments the payslip(s) it
+        supersedes already collected.
+
+        A revision re-states the whole period, so the deserved net must
+        include the deductions that were legitimately taken — otherwise the
+        difference comes out too high by exactly the amount collected.
+
+        The code prefix is `KSW_DEDP_`, NOT `KSW_DED_`. That single letter
+        is load-bearing: `_inject_ksw_deduction_inputs`,
+        `_ksw_apply_deduction_priority` and `_sync_deductions_on_done` all
+        test `startswith('KSW_DED_')`, which `'KSW_DEDP_5'` fails — so these
+        rows are invisible to the injector, to the shortfall capper and to
+        the settlement pass. The KSW_DEDUCTIONS salary rule sums the shorter
+        `'KSW_DED'` prefix, so they still reach the payslip total. Net
+        effect: they count towards the deserved net and the deduction ledger
+        is left untouched by the revision. Installments still *pending* are
+        picked up normally as `KSW_DED_` and are collected out of the
+        difference.
+        """
+        collected = self.env['ksw.deduction.line'].sudo().search([
+            ('payslip_id', 'in', prior_slips.ids),
+            ('state', '=', 'paid'),
+        ])
+        vals = []
+        seq = 90
+        for line in collected:
+            ded = line.deduction_id
+            vals.append({
+                'payslip_id': revision.id,
+                'version_id': version_id,
+                'name': _(
+                    '%(type)s [%(ref)s] inst %(n)s/%(total)s — already '
+                    'collected in %(slip)s',
+                    type=ded.type_id.name, ref=ded.name,
+                    n=line.sequence, total=ded.installments,
+                    slip=(line.payslip_id.number
+                          or line.payslip_id.display_name)),
+                'code': 'KSW_DEDP_%d' % line.id,
+                'amount': line.amount,
+                'sequence': seq,
+            })
+            seq += 1
+        return vals
+
+    # ------------------------------------------------------------------
+    # Over-payment recovery (hook defined in KSW_payroll)
+    # ------------------------------------------------------------------
+
+    def _create_overpayment_deduction(self, amount):
+        """Open a draft deduction recovering an over-paid revision.
+
+        A revision whose recomputed period comes out *below* what was
+        already paid cannot be confirmed — a payslip has no way to pay a
+        negative amount, and the bank export drops negative-NET rows
+        silently. Instead the revision is cancelled and the difference is
+        scheduled for recovery from a later payroll run.
+
+        `sudo()` is required, not merely convenient: `ksw.deduction.create()`
+        calls `_check_acc_data_entry_ownership()`, which rejects a payroll
+        officer creating an accounting-data-entry type. Authorisation was
+        already established by `hr.payslip._check_payroll_officer` on the
+        way in.
+        """
+        self.ensure_one()
+        ded_type = self._overpayment_deduction_type()
+        if not ded_type:
+            _logger.warning(
+                'No over-payment recovery deduction type configured — '
+                'revision %s cancelled without a recovery deduction.',
+                self.id)
+            return self.env['ksw.deduction']
+        source = self.x_revised_payslip_id
+        return self.env['ksw.deduction'].sudo().create({
+            'employee_id': self.employee_id.id,
+            'type_id': ded_type.id,
+            'amount': amount,
+            'installments': 1,
+            'start_month': fields.Date.context_today(self).replace(day=1),
+            'reason': _('Salary over-payment for %(date_from)s → %(date_to)s',
+                        date_from=self.date_from, date_to=self.date_to),
+            'description': _(
+                'Automatically opened from payslip revision %(revision)s '
+                '(revision of %(source)s). Recomputing the period with '
+                'current data produced a net %(amount).2f lower than the '
+                'amount already paid to the employee.',
+                revision=self.name or self.id,
+                source=(source.number or source.name or '') if source else '',
+                amount=amount),
+        })
+
+    def _overpayment_deduction_type(self):
+        """Configured recovery type, defaulting to Salary Advance."""
+        param = self.env['ir.config_parameter'].sudo().get_param(
+            'ksw_payroll.overpay_recovery_type_id')
+        DedType = self.env['ksw.deduction.type'].sudo()
+        if param:
+            ded_type = DedType.browse(int(param)).exists()
+            if ded_type:
+                return ded_type
+        return self.env.ref(
+            'KSW_deduction.type_advance',
+            raise_if_not_found=False) or DedType.browse()

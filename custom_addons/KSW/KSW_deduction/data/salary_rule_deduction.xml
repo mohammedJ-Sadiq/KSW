@@ -4,8 +4,25 @@
 
         <!-- ============================================================ -->
         <!-- KSW Deductions salary rule                                   -->
-        <!-- Sums every payslip input whose code starts with KSW_DED_     -->
+        <!-- Sums every payslip input whose code starts with KSW_DED      -->
         <!-- and produces a single negative deduction line.                -->
+        <!--                                                              -->
+        <!-- The prefix is 'KSW_DED' WITHOUT the trailing underscore, so   -->
+        <!-- it catches two distinct kinds of input:                       -->
+        <!--   KSW_DED_<line_id>   installments this payslip collects.     -->
+        <!--                       Injected by _inject_ksw_deduction_      -->
+        <!--                       inputs, capped by _ksw_apply_deduction_ -->
+        <!--                       priority, settled by _sync_deductions_  -->
+        <!--                       on_done.                                -->
+        <!--   KSW_DEDP_<line_id>  installments a SUPERSEDED payslip       -->
+        <!--                       already collected, reproduced frozen on -->
+        <!--                       a revision payslip so its deserved NET  -->
+        <!--                       is right. All three helpers above key   -->
+        <!--                       off the literal 'KSW_DED_', which       -->
+        <!--                       'KSW_DEDP_x' does not match — that is   -->
+        <!--                       exactly what keeps the deduction ledger -->
+        <!--                       untouched by a revision. Do not "fix"   -->
+        <!--                       the missing underscore here.            -->
         <!-- ============================================================ -->
         <record id="hr_rule_ksw_deductions" model="hr.salary.rule">
             <field name="name">KSW Deductions</field>
@@ -13,16 +30,18 @@
             <field name="code">KSW_DEDUCTIONS</field>
             <field name="category_id" ref="om_hr_payroll.DED"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = any(i.code and i.code.startswith('KSW_DED_') for i in (payslip.input_line_ids or []))</field>
+            <field name="condition_python">result = any(i.code and i.code.startswith('KSW_DED') for i in (payslip.input_line_ids or []))</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-total = sum(i.amount for i in (payslip.input_line_ids or []) if i.code and i.code.startswith('KSW_DED_'))
+total = sum(i.amount for i in (payslip.input_line_ids or []) if i.code and i.code.startswith('KSW_DED'))
 result = -total
             </field>
             <field name="appears_on_payslip" eval="True"/>
             <field name="note">Aggregated deduction total from all active KSW deductions
 (loans, advances, penalties). Individual installment lines are
-listed transparently in "Other Inputs" with codes KSW_DED_*.</field>
+listed transparently in "Other Inputs" with codes KSW_DED_* (collected
+by this payslip) and KSW_DEDP_* (already collected by the payslip a
+revision supersedes).</field>
         </record>
 
         <!-- Attach to base structure so it applies everywhere -->

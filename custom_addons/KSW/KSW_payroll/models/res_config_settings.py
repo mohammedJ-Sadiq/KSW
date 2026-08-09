@@ -11,5 +11,3 @@ class ResConfigSettings(models.TransientModel):
         config_parameter='ksw_payroll.gosi_rate',
         default=9.75,
     )
-
-
