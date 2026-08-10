@@ -98,7 +98,7 @@ def migrate(cr, version):
          "l.employee_id, s.period, NULL::date AS entry_date, 0 AS quantity, "
          "0 AS quantity_ref, 0 AS amount, NULL AS reason, NULL AS details, "
          "NULL::integer AS location_id, 'MEALS' AS component_code, "
-         "s.department_id, NULL::integer AS site_id"),
+         "l.department_id, NULL::integer AS site_id"),
         ('ksw_driver_commission_line',
          "l.employee_id, s.period, NULL::date AS entry_date, "
          "l.multiplied_trips AS quantity, l.actual_trips AS quantity_ref, "
@@ -133,7 +133,7 @@ def migrate(cr, version):
         cr.execute("""
             CREATE TABLE {snap}_meals AS
             SELECT l.employee_id, s.period, s.state AS sheet_state,
-                   s.department_id,
+                   l.department_id,
                    COALESCE(l.breakfast_qty, 0) AS breakfast_qty,
                    COALESCE(l.lunch_qty, 0)     AS lunch_qty,
                    COALESCE(l.dinner_qty, 0)    AS dinner_qty
