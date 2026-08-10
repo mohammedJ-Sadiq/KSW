@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_ksw_pay_run_form" model="ir.ui.view">
+        <field name="name">ksw.pay.run.form</field>
+        <field name="model">ksw.pay.run</field>
+        <field name="arch" type="xml">
+            <form string="Monthly Pay Run">
+                <field name="state" invisible="1"/>
+                <field name="x_can_submit" invisible="1"/>
+                <field name="x_can_submit_mine" invisible="1"/>
+                <field name="x_can_approve" invisible="1"/>
+                <field name="x_can_reopen" invisible="1"/>
+                <field name="x_can_export" invisible="1"/>
+                <field name="pending_department_count" invisible="1"/>
+                <field name="submitted_department_count" invisible="1"/>
+
+                <header>
+                    <!-- The supervisor's button. It submits HIS departments
+                         and nothing else — the month is shared, so closing
+                         it wholesale was never his to do. -->
+                    <button name="action_submit_my_departments"
+                            string="Submit My Entries"
+                            type="object" class="btn-primary"
+                            groups="KSW_commissions.group_commission_supervisor"
+                            invisible="not x_can_submit_mine"
+                            confirm="This hands your department's commissions to the General Manager and freezes your batches. Continue?"/>
+                    <button name="action_open_my_submission"
+                            string="My Department"
+                            type="object" class="btn-secondary"
+                            groups="KSW_commissions.group_commission_supervisor"
+                            invisible="x_can_submit_mine or not x_my_submission_ids"/>
+                    <button name="action_approve" string="Approve"
+                            type="object" class="btn-primary"
+                            groups="KSW_commissions.group_commission_gm"
+                            confirm="Approving builds the payment register, settles the parked loan installments and locks the month. Continue?"
+                            invisible="not x_can_approve"/>
+                    <button name="action_submit" string="Close the Month"
+                            type="object" class="btn-secondary"
+                            groups="KSW_commissions.group_commission_officer"
+                            invisible="state != 'open' or not submitted_department_count"
+                            title="Mark the month as handed over even though some departments have not submitted"/>
+                    <button name="action_open_export_wizard"
+                            string="Export Bank File"
+                            type="object" class="btn-primary"
+                            groups="KSW_commissions.group_commission_accountant"
+                            invisible="not x_can_export"/>
+                    <button name="action_mark_paid" string="Mark Paid"
+                            type="object" class="btn-secondary"
+                            groups="KSW_commissions.group_commission_accountant"
+                            invisible="state != 'approved'"/>
+                    <button name="action_reopen" string="Reopen"
+                            type="object" class="btn-secondary"
+                            groups="KSW_commissions.group_commission_gm"
+                            confirm="Reopening discards the payment register and returns the settled loan installments to pending. Continue?"
+                            invisible="not x_can_reopen"/>
+                    <statusbar statusfield="state"
+                               statusbar_visible="open,submitted,approved,paid"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_batches" type="object"
+                                class="oe_stat_button" icon="fa-list">
+                            <field name="batch_count" widget="statinfo"
+                                   string="Batches"/>
+                        </button>
+                        <button name="action_open_register" type="object"
+                                class="oe_stat_button" icon="fa-money"
+                                title="Who gets paid, grouped by department">
+                            <field name="employee_count" widget="statinfo"
+                                   string="Employees"/>
+                        </button>
+                        <button name="action_open_batches" type="object"
+                                class="oe_stat_button"
+                                icon="fa-exclamation-triangle"
+                                invisible="not draft_batch_count">
+                            <field name="draft_batch_count" widget="statinfo"
+                                   string="Still Draft"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <div class="alert alert-info" role="alert"
+                         invisible="state != 'open' or not pending_department_count"
+                         groups="KSW_commissions.group_commission_gm">
+                        <strong>Still waiting on
+                        <field name="pending_department_count" nolabel="1"
+                               readonly="1" class="oe_inline"/>
+                        department(s):</strong>
+                        <field name="pending_department_names" nolabel="1"
+                               readonly="1" class="oe_inline"/>
+                        <div class="text-muted">
+                            You can approve without them — only what has been
+                            handed over gets paid, and the rest stays in draft
+                            for next month.
+                        </div>
+                    </div>
+
+                    <group>
+                        <group string="Month">
+                            <field name="period" options="{'min_precision': 'months'}"
+                                   readonly="state != 'open'"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Approval">
+                            <field name="submitted_by" readonly="1"
+                                   invisible="not submitted_by"/>
+                            <field name="approved_by" readonly="1"
+                                   invisible="not approved_by"/>
+                            <field name="approved_date" readonly="1"
+                                   invisible="not approved_date"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <!-- The GM's first question is never "which batch?"
+                             but "which departments are in, and for how
+                             much?". Rule-scoped through a computed field:
+                             reading a plain one2many does not apply the
+                             comodel's record rules, so a supervisor would
+                             otherwise see every department here. -->
+                        <page string="By Department" name="departments">
+                            <field name="x_my_submission_ids" invisible="1"/>
+                            <field name="x_visible_submission_ids" nolabel="1"
+                                   readonly="1">
+                                <list decoration-success="state in ['submitted', 'approved']"
+                                      decoration-warning="state == 'returned'"
+                                      decoration-muted="not batch_count">
+                                    <field name="display_name"
+                                           string="Department"/>
+                                    <field name="responsible_id"
+                                           string="Supervisor"/>
+                                    <field name="submitted_by"
+                                           optional="hide"/>
+                                    <field name="submitted_date"
+                                           optional="show"/>
+                                    <field name="batch_count"
+                                           string="Batches"/>
+                                    <field name="entry_count"
+                                           string="Records"/>
+                                    <field name="employee_count"/>
+                                    <field name="total_amount" sum="Total"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state in ['submitted', 'approved']"
+                                           decoration-warning="state == 'returned'"/>
+                                    <field name="currency_id"
+                                           column_invisible="1"/>
+                                </list>
+                            </field>
+                            <div class="text-muted mt-2">
+                                One row per department. Open a row to see its
+                                batches, its employees and the reason it was
+                                returned, if it was.
+                            </div>
+                        </page>
+
+                        <page string="Batches" name="batches">
+                            <field name="batch_ids" nolabel="1" readonly="1">
+                                <list decoration-info="state == 'submitted'"
+                                      decoration-muted="state == 'approved'">
+                                    <field name="name"/>
+                                    <field name="component_id"/>
+                                    <field name="department_id"/>
+                                    <field name="site_id" optional="hide"/>
+                                    <field name="entry_count" string="Records"/>
+                                    <field name="employee_count"/>
+                                    <field name="total_amount" sum="Total"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="currency_id"
+                                           column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- Visible from the moment a department hands over,
+                             not only after approval: knowing WHO is about to
+                             be paid, and what their loans consume, is what
+                             makes the review a review. Rule-scoped for the
+                             same reason as the page above — a supervisor
+                             sees his own people, the GM sees everyone. -->
+                        <page string="Who Gets Paid" name="register">
+                            <div class="alert alert-info" role="alert"
+                                 invisible="state not in ['open', 'submitted']">
+                                <strong>Preview.</strong>
+                                These are the figures as they stand: earnings
+                                from every department that has handed over,
+                                and an estimate of the loan installments they
+                                would settle. Approving the month makes them
+                                final.
+                            </div>
+                            <field name="x_visible_line_ids" nolabel="1"
+                                   readonly="1">
+                                <list create="false" delete="false"
+                                      decoration-danger="net_payable &lt; 0">
+                                    <field name="employee_id"/>
+                                    <field name="department_id"
+                                           optional="show"/>
+                                    <field name="earnings" sum="Earnings"/>
+                                    <field name="loan_offset" sum="Loans"/>
+                                    <field name="net_payable" sum="Payable"/>
+                                    <field name="bank_account_id"
+                                           optional="hide"/>
+                                    <button name="action_open_entries"
+                                            type="object" icon="fa-search-plus"
+                                            title="Show the entries behind this figure"/>
+                                    <field name="currency_id"
+                                           column_invisible="1"/>
+                                </list>
+                            </field>
+                            <div class="text-muted mt-2">
+                                One line per employee. The magnifier shows
+                                every entry behind a figure. Use the
+                                <b>Employees</b> button above to open the same
+                                register grouped by department — that is also
+                                where the accountant corrects a loan offset.
+                            </div>
+                        </page>
+
+                        <page string="Bank Export" name="bank"
+                              groups="KSW_commissions.group_commission_accountant">
+                            <group>
+                                <field name="x_salary_bank_account_id"
+                                       options="{'no_create': True}"/>
+                            </group>
+                        </page>
+
+                        <page string="Notes" name="notes">
+                            <field name="note" nolabel="1"/>
+                        </page>
+                    </notebook>
+
+                    <!-- Company-wide totals are for the roles that own the
+                         company-wide view. A supervisor gets his own subtotal
+                         from the sums on the register list above. -->
+                    <group class="oe_subtotal_footer oe_right"
+                           groups="KSW_commissions.group_commission_officer">
+                        <field name="employee_count" readonly="1"/>
+                        <field name="total_earnings" readonly="1"/>
+                        <field name="total_loan_offset" readonly="1"/>
+                        <field name="total_payable" readonly="1"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_run_list" model="ir.ui.view">
+        <field name="name">ksw.pay.run.list</field>
+        <field name="model">ksw.pay.run</field>
+        <field name="arch" type="xml">
+            <list decoration-info="state == 'submitted'"
+                  decoration-success="state == 'approved'"
+                  decoration-muted="state in ['open', 'paid']">
+                <field name="name"/>
+                <field name="period" options="{'min_precision': 'months'}"/>
+                <field name="submitted_department_count"
+                       string="Departments In"/>
+                <field name="pending_department_count" string="Waiting On"/>
+                <field name="batch_count"/>
+                <field name="employee_count"/>
+                <field name="total_earnings" sum="Earnings"/>
+                <field name="total_payable" sum="Payable"/>
+                <field name="approved_by" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'submitted'"
+                       decoration-success="state == 'approved'"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_run_search" model="ir.ui.view">
+        <field name="name">ksw.pay.run.search</field>
+        <field name="model">ksw.pay.run</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="period" options="{'min_precision': 'months'}"/>
+                <filter name="open" string="Open"
+                        domain="[('state','=','open')]"/>
+                <filter name="submitted" string="Awaiting GM"
+                        domain="[('state','=','submitted')]"/>
+                <filter name="approved" string="Approved"
+                        domain="[('state','=','approved')]"/>
+                <group>
+                    <filter string="Period" name="grp_period" domain="[]"
+                            context="{'group_by': 'period'}"/>
+                    <filter string="Status" name="grp_state" domain="[]"
+                            context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_pay_run" model="ir.actions.act_window">
+        <field name="name">Monthly Pay Run</field>
+        <field name="res_model">ksw.pay.run</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ksw_pay_run_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Open this month's pay run
+            </p>
+            <p>
+                One run per month. Supervisors submit their batches into it,
+                the General Manager approves the month in one action, and the
+                accountant exports the bank file.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_ksw_pay_run_line" model="ir.actions.act_window">
+        <field name="name">Payment Register</field>
+        <field name="res_model">ksw.pay.run.line</field>
+        <field name="view_mode">list</field>
+        <field name="context">{'search_default_grp_period': 1}</field>
+    </record>
+
+    <record id="view_ksw_pay_run_line_list" model="ir.ui.view">
+        <field name="name">ksw.pay.run.line.list</field>
+        <field name="model">ksw.pay.run.line</field>
+        <field name="arch" type="xml">
+            <list create="false" delete="false">
+                <field name="employee_id"/>
+                <field name="department_id" optional="show"/>
+                <field name="period" options="{'min_precision': 'months'}"/>
+                <field name="earnings" sum="Earnings"/>
+                <field name="loan_offset" sum="Loans"/>
+                <field name="net_payable" sum="Payable"/>
+                <field name="state" widget="badge" optional="show"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_run_line_search" model="ir.ui.view">
+        <field name="name">ksw.pay.run.line.search</field>
+        <field name="model">ksw.pay.run.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <field name="period" options="{'min_precision': 'months'}"/>
+                <group>
+                    <filter string="Period" name="grp_period" domain="[]"
+                            context="{'group_by': 'period'}"/>
+                    <filter string="Department" name="grp_department"
+                            domain="[]"
+                            context="{'group_by': 'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+</odoo>

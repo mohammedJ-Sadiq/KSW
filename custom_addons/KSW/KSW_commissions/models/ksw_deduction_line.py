@@ -6,7 +6,7 @@ Adds three fields used by KSW_commissions:
   the originally-scheduled installment amount (kept for traceability
   even though the new "park-for-commission" flow no longer relies on
   it for the live loans figure).
-* ``x_paid_via_commission_sheet_id`` — set on each pending installment
+* ``x_paid_via_pay_run_line_id`` — set on each pending installment
   when a commission sheet's ``done`` action consumes it. Lets the
   reset path unwind the offset cleanly.
 * ``x_awaiting_commission`` — accountant-set Boolean on a PENDING line
@@ -34,13 +34,13 @@ class KswDeductionLine(models.Model):
              'a slice of this month is being routed to the commission '
              'sheet — this field is kept purely for traceability.',
     )
-    x_paid_via_commission_sheet_id = fields.Many2one(
-        'ksw.commission.sheet', readonly=True, copy=False,
+    x_paid_via_pay_run_line_id = fields.Many2one(
+        'ksw.pay.run.line', readonly=True, copy=False,
         ondelete='restrict',
-        string='Paid via Commission Sheet',
-        help='Set when a KSW Commissions sheet finalised this '
-             'installment as paid. Lets the sheet reset path unwind '
-             'the offset.',
+        string='Paid via Pay Run',
+        help='Set when an approved monthly pay run settled this '
+             'installment out of the commission payment. Lets the '
+             'reopen path unwind the offset.',
     )
     x_awaiting_commission = fields.Boolean(
         string='Awaiting Commission',
@@ -57,25 +57,25 @@ class KswDeductionLine(models.Model):
     # awaiting-commission line (matched by employee + year + month).
     # Computed only when ``x_awaiting_commission`` is True and the
     # line is still pending — once finalise stamps
-    # ``x_paid_via_commission_sheet_id``, that field is the
+    # ``x_paid_via_pay_run_line_id``, that field is the
     # authoritative link instead.
-    x_pending_commission_sheet_id = fields.Many2one(
-        'ksw.commission.sheet',
-        string='Pending Commission Sheet',
-        compute='_compute_pending_commission_sheet', store=True,
-        help='The (existing) commission sheet that will settle this '
-             'parked installment when finalised. Empty if no sheet '
-             'exists yet for that employee/month.',
+    x_pending_pay_run_id = fields.Many2one(
+        'ksw.pay.run',
+        string='Pending Pay Run',
+        compute='_compute_pending_pay_run', store=True,
+        help='The (existing) monthly pay run that will settle this '
+             'parked installment when approved. Empty if no run '
+             'exists yet for that month.',
     )
 
     @api.depends('x_awaiting_commission', 'state', 'employee_id',
                  'year', 'month')
-    def _compute_pending_commission_sheet(self):
-        Sheet = self.env['ksw.commission.sheet'].sudo()
+    def _compute_pending_pay_run(self):
+        Run = self.env['ksw.pay.run'].sudo()
         # Group lines by (employee_id, year, month) for batched search.
         by_key = {}
         for line in self:
-            line.x_pending_commission_sheet_id = False
+            line.x_pending_pay_run_id = False
             if not (line.x_awaiting_commission and line.state == 'pending'
                     and line.employee_id and line.year and line.month):
                 continue
@@ -84,54 +84,50 @@ class KswDeductionLine(models.Model):
                     '%04d-%02d-01' % (line.year, line.month))
             except ValueError:
                 continue
-            by_key.setdefault(
-                (line.employee_id.id, period), self.browse()
-            )
-            by_key[(line.employee_id.id, period)] |= line
+            by_key.setdefault(period, self.browse())
+            by_key[period] |= line
         if not by_key:
             return
-        # One search per distinct (employee, period) — typically very
-        # few keys per recordset render.
-        for (emp_id, period), lines in by_key.items():
-            sheet = Sheet.search([
-                ('employee_id', '=', emp_id),
-                ('period', '=', period),
-            ], limit=1)
+        # One search per distinct period — the run is per month, not per
+        # employee, so this is a handful of queries at most.
+        for period, lines in by_key.items():
+            run = Run.search([('period', '=', period)], limit=1)
             for line in lines:
-                line.x_pending_commission_sheet_id = sheet.id or False
+                line.x_pending_pay_run_id = run.id or False
 
     # ------------------------------------------------------------------
     # Settlement label override — show parked / commission-paid states.
     # ------------------------------------------------------------------
-    @api.depends('x_awaiting_commission', 'x_paid_via_commission_sheet_id',
-                 'x_paid_via_commission_sheet_id.name',
-                 'x_pending_commission_sheet_id',
-                 'x_pending_commission_sheet_id.name')
+    @api.depends('x_awaiting_commission', 'x_paid_via_pay_run_line_id',
+                 'x_paid_via_pay_run_line_id.display_name',
+                 'x_pending_pay_run_id',
+                 'x_pending_pay_run_id.display_name')
     def _compute_settlement_label(self):
         super()._compute_settlement_label()
         for line in self:
             # 1) Already finalised by a commission sheet — overrides
             #    every other label, including the parent's "Manual
-            #    by ..." since x_paid_via_commission_sheet_id is the
+            #    by ..." since x_paid_via_pay_run_line_id is the
             #    authoritative settlement.
-            if line.x_paid_via_commission_sheet_id:
+            if line.x_paid_via_pay_run_line_id:
                 line.settlement_label = _(
-                    'Paid via Commission Sheet %s',
-                    line.x_paid_via_commission_sheet_id.name or '',
+                    'Paid via the %s commission run',
+                    line.x_paid_via_pay_run_line_id.run_id.display_name or '',
                 )
                 continue
             # 2) Pending and parked for the commission — show the
             #    matching sheet ref if one exists, otherwise just
             #    flag it as awaiting.
             if line.x_awaiting_commission and line.state == 'pending':
-                sheet = line.x_pending_commission_sheet_id
-                if sheet:
+                run = line.x_pending_pay_run_id
+                if run:
                     line.settlement_label = _(
-                        'Awaiting Commission Sheet %s', sheet.name or '',
+                        'Awaiting the %s commission run',
+                        run.display_name or '',
                     )
                 else:
                     line.settlement_label = _(
-                        'Awaiting Commission Sheet (not yet created)',
+                        'Awaiting the commission run (not yet created)',
                     )
 
     # ------------------------------------------------------------------

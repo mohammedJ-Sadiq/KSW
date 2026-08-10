@@ -71,13 +71,13 @@ class HrEmployee(models.Model):
                                          and l.dayofweek == str(d.weekday())
                 )
                 if day_lines:
-                    day_work = sum(l.hour_to - l.hour_from for l in day_lines)
+                    day_work = day_lines._duration_hours()
                     day_break_lines = break_lines.filtered(
                         lambda l, d=current: (not l.start_date or l.start_date <= d)
                                              and (not l.end_date or l.end_date >= d)
                                              and l.dayofweek == str(d.weekday())
                     )
-                    day_break = sum(l.hour_to - l.hour_from for l in day_break_lines)
+                    day_break = day_break_lines._duration_hours()
                     total_days += 1
                     total_hours += day_work - day_break
             current += timedelta(days=1)

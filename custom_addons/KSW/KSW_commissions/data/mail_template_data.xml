@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!--
+        Sent to the General Manager the moment a department hands its
+        commissions over. The chatter message is the audit trail on the
+        record; this is what reaches him when he is not in Odoo.
+    -->
+    <record id="mail_template_submission_to_gm" model="mail.template">
+        <field name="name">Commissions: Department Submitted for Approval</field>
+        <field name="model_id" ref="model_ksw_pay_submission"/>
+        <field name="subject">Commissions — {{ object.display_name }} submitted for approval</field>
+        <field name="auto_delete" eval="False"/>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                <p>Hello,</p>
+                <p>
+                    <t t-out="object.submitted_by.name or ''">A supervisor</t>
+                    has submitted the commissions for
+                    <strong><t t-out="object.display_name or ''">Department</t></strong>
+                    and they are waiting for your approval.
+                </p>
+                <table style="border-collapse: collapse; margin: 12px 0;">
+                    <tr>
+                        <td style="padding: 4px 16px 4px 0;">Batches</td>
+                        <td style="padding: 4px 0;"><strong><t t-out="object.batch_count or 0">0</t></strong></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px 16px 4px 0;">Records</td>
+                        <td style="padding: 4px 0;"><strong><t t-out="object.entry_count or 0">0</t></strong></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px 16px 4px 0;">Employees</td>
+                        <td style="padding: 4px 0;"><strong><t t-out="object.employee_count or 0">0</t></strong></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px 16px 4px 0;">Total</td>
+                        <td style="padding: 4px 0;">
+                            <strong><t t-out="'%.2f' % (object.total_amount or 0.0)">0.00</t>
+                            <t t-out="object.currency_id.name or ''">SAR</t></strong>
+                        </td>
+                    </tr>
+                </table>
+                <p>
+                    Open the Monthly Pay Run to see which departments are in,
+                    who is due to be paid and what their loans consume, then
+                    approve the month.
+                </p>
+            </div>
+        </field>
+        <field name="lang">{{ object.env.user.lang }}</field>
+    </record>
+
+</odoo>

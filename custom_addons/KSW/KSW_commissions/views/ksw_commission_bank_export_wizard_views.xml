@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <form string="Export Bank File">
                 <group>
-                    <field name="batch_id" readonly="1"/>
+                    <field name="run_id" readonly="1"/>
                     <field name="export_mode" widget="radio"/>
                     <field name="bank_account_id"
                            invisible="export_mode not in ('specific_excel','specific_txt')"

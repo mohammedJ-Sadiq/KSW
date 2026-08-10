@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from datetime import timedelta
+
 import pytz
 from markupsafe import Markup
 
@@ -81,6 +83,8 @@ class HrLeave(models.Model):
 
         calendar = self.resource_calendar_id or self.env.company.resource_calendar_id
         new_lines = []
+        all_from = []
+        all_to = []
 
         for att in self.x_attendance_ids:
             # Ensure we have a real DB id (not a NewId from the onchange cache)
@@ -100,35 +104,46 @@ class HrLeave(models.Model):
                 sched_start = 8.0
                 sched_end = 17.0
 
+            # A night shift is stored wrapped (21:00 -> 5:00).  Unwrap it so the
+            # window stays monotonic while minutes are sliced off either end;
+            # without this, `sched_end - early_minutes` goes negative and
+            # hr.leave._to_utc raises "hour must be in 0..23".
+            if sched_end <= sched_start:
+                sched_end += 24.0
+
             if att.x_late_minutes > 0:
                 hour_from = sched_start
                 hour_to = sched_start + att.x_late_minutes / 60.0
+                all_from.append(hour_from)
+                all_to.append(hour_to)
                 new_lines.append((0, 0, {
                     'attendance_id': att_id,
                     'issue_type': 'late',
-                    'hour_from': hour_from,
-                    'hour_to': hour_to,
+                    'hour_from': hour_from % 24.0,
+                    'hour_to': hour_to % 24.0,
                     'accepted_minutes': att.x_late_minutes,
                 }))
 
             if att.x_early_leave_minutes > 0:
                 hour_from = sched_end - att.x_early_leave_minutes / 60.0
                 hour_to = sched_end
+                all_from.append(hour_from)
+                all_to.append(hour_to)
                 new_lines.append((0, 0, {
                     'attendance_id': att_id,
                     'issue_type': 'early_leave',
-                    'hour_from': hour_from,
-                    'hour_to': hour_to,
+                    'hour_from': hour_from % 24.0,
+                    'hour_to': hour_to % 24.0,
                     'accepted_minutes': att.x_early_leave_minutes,
                 }))
 
         self.x_attendance_line_ids = new_lines
 
         # Update request_hour_from / request_hour_to so _compute_date_from_to
-        # produces a reasonable date range for the leave record.
+        # produces a reasonable date range for the leave record.  These keep the
+        # *unwrapped* hours — a value past 24 (or below 0) is how the window says
+        # "the next/previous calendar day", and _to_utc rolls the date over.
         if new_lines:
-            all_from = [l[2]['hour_from'] for l in new_lines]
-            all_to = [l[2]['hour_to'] for l in new_lines]
             self.request_hour_from = min(all_from)
             self.request_hour_to = max(all_to)
 
@@ -337,8 +352,8 @@ class HrLeave(models.Model):
             break_lines = calendar_groups.mapped('line_ids').filtered(
                 lambda l: l.day_period == 'break'
             )
-            total_weekly_hours = sum(l.hour_to - l.hour_from for l in all_lines)
-            total_weekly_breaks = sum(l.hour_to - l.hour_from for l in break_lines)
+            total_weekly_hours = all_lines._duration_hours()
+            total_weekly_breaks = break_lines._duration_hours()
             work_days_count = len(set(all_lines.mapped('dayofweek')))
             if work_days_count:
                 return (total_weekly_hours - total_weekly_breaks) / work_days_count
@@ -347,7 +362,7 @@ class HrLeave(models.Model):
         # Get break lines for the same day to deduct
         break_hours = self._get_break_hours_for_calendar(calendar, target_date=check_in_date)
 
-        return sum(l.hour_to - l.hour_from for l in lines) - break_hours
+        return lines._duration_hours() - break_hours
 
     def _get_break_hours_for_calendar(self, calendar, target_date=None):
         """Return total break hours from resource.calendar.group.line
@@ -371,7 +386,7 @@ class HrLeave(models.Model):
             day_of_week = str(target_date.weekday())
             break_lines = break_lines.filtered(lambda l: l.dayofweek == day_of_week)
 
-        return sum(l.hour_to - l.hour_from for l in break_lines)
+        return break_lines._duration_hours()
 
     # ──────────────────────────────────────────────────────────────────
     # Override _get_hour_from_to to use resource.calendar.group.line
@@ -415,11 +430,38 @@ class HrLeave(models.Model):
                 )
             else:
                 hour_to = max(to_lines.mapped('hour_to'))
+            # A night shift is stored wrapped (21:00 -> 5:00), so the day's end
+            # is really 05:00 the *next* morning.  Only the full-shift case can
+            # be read off the lines like this — a half-day request substitutes
+            # 12.0 above, which says nothing about whether the shift wraps.
+            if not day_period and hour_to <= min(to_lines.mapped('hour_from')):
+                hour_to += 24.0
         else:
             fallback = self._get_group_lines_for_calendar(calendar, day_period=day_period)
             hour_to = max(fallback.mapped('hour_to'), default=24.0)
 
+        # Whatever the unit, the window must never close before it opens:
+        # _check_date rejects that with "The start date must be before or equal
+        # to the end date".  _to_utc turns the 24+ hour back into a next-day
+        # datetime.
+        if hour_to <= hour_from:
+            hour_to += 24.0
+
         return (hour_from, hour_to)
+
+    def _to_utc(self, date, hour, resource):
+        """Roll hours outside 0..24 onto the neighbouring calendar day.
+
+        Core calls `float_to_time(hour)`, which raises `ValueError: hour must be
+        in 0..23` for anything at or past midnight.  Overnight schedules produce
+        exactly that: a 21:00-05:00 shift ends at hour 29.0 of its start day, and
+        an excuse slicing minutes off such a shift can land before hour 0.  Both
+        simply mean "the next / previous day".
+        """
+        day_offset, hour = divmod(float(hour), 24.0)
+        if day_offset:
+            date = date + timedelta(days=int(day_offset))
+        return super()._to_utc(date, hour, resource)
 
     # ──────────────────────────────────────────────────────────────────
     # Override duration computation for attendance-based leaves
@@ -459,6 +501,10 @@ class HrLeave(models.Model):
                     check_date = att.check_in.date() if att.check_in else None
                     daily_hours_list.append(leave._get_daily_work_hours(leave.employee_id, check_date))
                 avg_daily = sum(daily_hours_list) / len(daily_hours_list) if daily_hours_list else 8.0
+                # A schedule that measures to nothing must not divide by zero or
+                # flip the sign of number_of_days (its SQL constraint is >= 0).
+                if avg_daily <= 0:
+                    avg_daily = 8.0
                 leave.number_of_days = total_hours / avg_daily
                 leave.number_of_hours = total_hours
             else:

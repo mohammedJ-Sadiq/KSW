@@ -44,6 +44,13 @@
               action="action_ksw_loan_request"
               sequence="20"/>
 
+    <!-- Every deduction taken off my salary, not just my loans. -->
+    <menuitem id="menu_ksw_my_deductions"
+              name="My Deductions"
+              parent="menu_ksw_deduction_self_service"
+              action="action_ksw_my_deductions"
+              sequence="30"/>
+
     <!-- ============================================================ -->
     <!-- 3. Operations (officers + approvers + supervisors)             -->
     <!-- ============================================================ -->

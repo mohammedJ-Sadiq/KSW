@@ -4,6 +4,19 @@ from odoo.exceptions import ValidationError
 from odoo.tools.translate import _
 
 
+def _issue_minutes(hour_from, hour_to):
+    """Length of [hour_from, hour_to) in minutes, wrapping past midnight.
+
+    Hours are real clock times, so a night-shift issue may wrap: 20:55 -> 05:00
+    is 8h05, not minus 15h55.  Unlike `_shift_duration` in
+    `biometric_schedule_helper`, an empty range stays 0 rather than a full day.
+    """
+    delta = hour_to - hour_from
+    if delta < 0:
+        delta += 24.0
+    return round(delta * 60.0, 1)
+
+
 class HrLeaveAttendanceLine(models.Model):
     _name = 'hr.leave.attendance.line'
     _description = 'Leave Attendance Issue Hours'
@@ -53,7 +66,7 @@ class HrLeaveAttendanceLine(models.Model):
     @api.depends('hour_from', 'hour_to')
     def _compute_duration_minutes(self):
         for line in self:
-            line.duration_minutes = round((line.hour_to - line.hour_from) * 60.0, 1)
+            line.duration_minutes = _issue_minutes(line.hour_from, line.hour_to)
 
     @api.constrains('accepted_minutes', 'duration_minutes')
     def _check_accepted_minutes(self):
@@ -74,7 +87,7 @@ class HrLeaveAttendanceLine(models.Model):
         """Clamp accepted_minutes so it never exceeds duration or goes negative."""
         if self.accepted_minutes < 0:
             self.accepted_minutes = 0
-        duration = round((self.hour_to - self.hour_from) * 60.0, 1)
+        duration = _issue_minutes(self.hour_from, self.hour_to)
         if self.accepted_minutes > duration:
             self.accepted_minutes = duration
             return {

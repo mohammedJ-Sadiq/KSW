@@ -13,9 +13,8 @@ Covers:
   • Revoke override: commission drops when condition fails without override
   • Duplicate employee line (no split) rejected
   • Non-negative constraint on achieved/target amounts
-  • Confirm syncs sales/collection amounts to commission sheet
-  • Reset clears amounts on commission sheet
-  • Auto-creates commission sheet on confirm if none exists
+  • Confirm does NOT touch the commission sheet: as of 19.0.2.0.0 sales
+    and collection are paid separately and are not an entry type
 """
 from odoo.exceptions import ValidationError
 from odoo.tests.common import TransactionCase
@@ -221,59 +220,54 @@ class TestSalesCommissionSheet(TransactionCase):
         with self.assertRaises(ValidationError):
             self._sc_line(sheet, self.emp_sales, achieved_sales=-100.0)
 
-    def test_12_confirm_syncs_to_commission_sheet(self):
-        """Confirming the sales sheet pushes amounts to commission sheet."""
+    def test_12_confirm_creates_no_pay_entries(self):
+        """Sales and collection are paid separately.
+
+        Confirming this sheet used to push amounts onto the employee's
+        commission sheet. Since 19.0.3.0.0 there is no commission sheet at
+        all, and sales must not reach the pay entries either.
+        """
         emp = self.env['hr.employee'].sudo().create({
             'name': 'SC Sync Emp', 'x_is_attendance_sheet': True,
         })
-        # Ensure commission sheet exists
-        comm = self.env['ksw.commission.sheet'].sudo().create({
-            'employee_id': emp.id,
-            'period': '2025-12-01',
-        })
-        sc_sheet = self._sc_sheet(period='2025-12-01')
+        sc_sheet = self._sc_sheet(period='2028-12-01')
         self._sc_line(sc_sheet, emp, achieved_sales=5000.0, role='sales')
         sc_sheet.sudo().action_confirm()
 
-        comm.sudo()._compute_sales_commission()
-        comm.sudo().flush_recordset(['sales_commission_amount'])
-        self.assertGreater(comm.sales_commission_amount, 0.0)
+        self.assertFalse(
+            self.env['ksw.pay.entry'].sudo().search([
+                ('employee_id', '=', emp.id), ('period', '=', '2028-12-01'),
+            ]),
+            'sales commission must not create pay entries')
 
-    def test_13_reset_clears_sales_commission_on_comm_sheet(self):
-        """Reset sales sheet → commission sheet amounts drop to 0."""
+    def test_13_sales_sheet_keeps_its_own_totals(self):
+        """Detaching it must not stop it computing what it owes."""
         emp = self.env['hr.employee'].sudo().create({
             'name': 'SC Reset Emp', 'x_is_attendance_sheet': True,
         })
-        comm = self.env['ksw.commission.sheet'].sudo().create({
-            'employee_id': emp.id,
-            'period': '2024-12-01',
-        })
-        sc_sheet = self._sc_sheet(period='2024-12-01')
+        sc_sheet = self._sc_sheet(period='2028-11-01')
         self._sc_line(sc_sheet, emp, achieved_sales=5000.0, role='sales')
         sc_sheet.sudo().action_confirm()
-
-        comm.sudo()._compute_sales_commission()
-        self.assertGreater(comm.sales_commission_amount, 0.0)
-
+        self.assertEqual(sc_sheet.state, 'confirmed')
+        self.assertTrue(sc_sheet.is_locked)
         sc_sheet.sudo().action_reset_to_draft()
-        comm.sudo()._compute_sales_commission()
-        comm.sudo().flush_recordset(['sales_commission_amount'])
-        self.assertAlmostEqual(comm.sales_commission_amount, 0.0)
+        self.assertEqual(sc_sheet.state, 'draft')
+        self.assertFalse(sc_sheet.is_locked)
 
-    def test_14_auto_creates_commission_sheet_on_confirm(self):
-        """Confirm auto-creates a draft commission sheet if missing."""
+    def test_14_confirm_creates_no_payment_register_line(self):
+        """It must not appear in the monthly commission payment either."""
         emp = self.env['hr.employee'].sudo().create({
             'name': 'SC AutoCreate Emp', 'x_is_attendance_sheet': True,
         })
-        sc_sheet = self._sc_sheet(period='2024-11-01')
+        sc_sheet = self._sc_sheet(period='2028-10-01')
         self._sc_line(sc_sheet, emp, achieved_sales=5000.0, role='sales')
         sc_sheet.sudo().action_confirm()
 
-        comm = self.env['ksw.commission.sheet'].sudo().search([
-            ('employee_id', '=', emp.id),
-            ('period', '=', '2024-11-01'),
-        ])
-        self.assertTrue(comm, 'Commission sheet should be auto-created on confirm.')
+        self.assertFalse(
+            self.env['ksw.pay.run.line'].sudo().search([
+                ('employee_id', '=', emp.id), ('period', '=', '2028-10-01'),
+            ]),
+            'a sales sheet must not create a payment register line')
 
     def test_15_sheet_total_commission_is_sum_of_lines(self):
         """total_commission = sum of all line totals."""

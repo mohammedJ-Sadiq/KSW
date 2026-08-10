@@ -241,16 +241,90 @@
     <!-- Record Rules                                                  -->
     <!-- ============================================================ -->
     <!--
-        User rule: a plain user sees
-          (a) their own deductions, and
+        User rule: a plain user READS
+          (a) their own deductions — every type, not just loans, so an
+              employee can look up the penalty or advance being taken off
+              their salary, and
           (b) deductions of any employee whose direct manager is them.
         Department membership is NOT used.
+
+        READ ONLY since August 2026. This rule used to carry all four
+        permissions, which mattered the moment the ACL row for
+        group_deduction_user gained write/unlink (self-service edits
+        below): it would have handed every internal user write access to
+        their own — and their subordinates' — penalties, in any state.
+        Write scope now comes from a rule per role: supervisor,
+        self-service, and the officer/manager/approver rules further down.
     -->
     <record id="ksw_deduction_rule_user" model="ir.rule">
-        <field name="name">Deduction: own + subordinates</field>
+        <field name="name">Deduction: own + subordinates (read)</field>
         <field name="model_id" ref="model_ksw_deduction"/>
         <field name="groups" eval="[(4, ref('group_deduction_user'))]"/>
         <field name="domain_force">['|', ('employee_id.user_id', '=', user.id), ('employee_id.parent_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!--
+        Supervisors keep the full own + subordinates scope the read rule
+        above used to give them: they raise and edit loan requests on
+        behalf of their direct reports (ACL grants read/write/create, no
+        unlink).
+    -->
+    <record id="ksw_deduction_rule_supervisor" model="ir.rule">
+        <field name="name">Deduction: supervisor manages own + subordinates</field>
+        <field name="model_id" ref="model_ksw_deduction"/>
+        <field name="groups" eval="[(4, ref('group_deduction_supervisor'))]"/>
+        <field name="domain_force">['|', ('employee_id.user_id', '=', user.id), ('employee_id.parent_id.user_id', '=', user.id)]</field>
+    </record>
+
+    <!--
+        Self-service: an employee may correct or withdraw their OWN loan
+        request until the first approver signs.
+
+        `state` stays 'draft' for the whole DM → HR → Acc → GM chain, so
+        `approval_state` is the real gate: False (not submitted yet) or
+        'pending_dm' (submitted, nobody has signed) — the same window the
+        manager-assistant prepare rule uses.
+
+        Loans only, and never create: penalties and advances belong to the
+        accounting data-entry team, and the only route into a new loan is
+        the self-service wizard (which creates via sudo). What may be SET
+        on these records is whitelisted server-side in
+        ksw.deduction._check_employee_self_write.
+    -->
+    <record id="ksw_deduction_rule_user_self_service" model="ir.rule">
+        <field name="name">Deduction: employee edits own request before approval</field>
+        <field name="model_id" ref="model_ksw_deduction"/>
+        <field name="groups" eval="[(4, ref('group_deduction_user'))]"/>
+        <field name="domain_force">[('is_loan', '=', True),
+            ('state', '=', 'draft'),
+            ('approval_state', 'in', [False, 'pending_dm']),
+            ('employee_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!--
+        Loan Modification = "Delete only" / "Edit and Delete" / "Full"
+        grants an unlink ACL on its own (access_ksw_deduction_loan_delete).
+        Its scope used to ride on the user rule above; now that that rule
+        is read-only, restate it here so a holder without a management
+        role keeps exactly the reach they had.
+    -->
+    <record id="ksw_deduction_rule_loan_delete_scope" model="ir.rule">
+        <field name="name">Deduction: loan-delete privilege scope (own + subordinates)</field>
+        <field name="model_id" ref="model_ksw_deduction"/>
+        <field name="groups" eval="[(4, ref('group_loan_delete'))]"/>
+        <field name="domain_force">['|', ('employee_id.user_id', '=', user.id), ('employee_id.parent_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="True"/>
     </record>
 
     <!-- Officers READ everything (loans and non-loan alike). -->

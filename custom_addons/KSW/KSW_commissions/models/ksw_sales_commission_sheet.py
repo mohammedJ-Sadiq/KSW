@@ -5,9 +5,11 @@ amounts. Each month the accountant opens (or auto-creates) one sheet
 and adds one row per salesperson with the achieved sales /
 collection amounts pulled from their external accountant module.
 
-On confirm, the per-line amounts are pushed to the matching
-``ksw.commission.sheet`` (mirror of the driver-commission +
-location-allowance flow).
+**Not part of the commission request.** Until 19.0.2.0.0 confirming this
+sheet pushed its amounts onto the employee's ``ksw.commission.sheet``, so
+sales commission was paid on the general commission bank file. It is now
+managed and paid separately: nothing here reaches the commission sheet, and
+this is not an entry type on the Monthly Commission Run.
 """
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
@@ -16,6 +18,24 @@ from .ksw_salesperson_profile import ROLE_SELECTION
 
 
 class KswSalesCommissionSheet(models.Model):
+    """Sales / collection commission — deliberately NOT a commission entry type.
+
+    This used to push its amounts onto the employee's monthly
+    ``ksw.commission.sheet``, so it was paid on the general commission bank
+    file. As of 19.0.2.0.0 sales and collection are **not part of the
+    commission request**: the sheet stands alone, it contributes nothing, and
+    it is not a card on the Monthly Commission Run.
+
+    Concretely that means this model does *not* inherit
+    ``ksw.commission.source.mixin`` — inheriting it IS the registration — and
+    keeps its own sequence / state / confirm-reset implementation below.
+
+    Historical amounts are untouched: the three deprecated
+    ``*_commission_amount`` shims on ``ksw.commission.sheet`` are still
+    backfilled by migration 19.0.2.0.0, so sheets that already included a
+    sales commission keep the total they were paid on. Only new
+    contributions stop.
+    """
     _name = 'ksw.sales.commission.sheet'
     _description = 'KSW Sales / Collection Commission Sheet'
     _inherit = ['mail.thread', 'mail.activity.mixin']
@@ -32,12 +52,13 @@ class KswSalesCommissionSheet(models.Model):
         default='draft', required=True, copy=False, tracking=True,
     )
     is_locked = fields.Boolean(readonly=True, copy=False)
+    currency_id = fields.Many2one(
+        'res.currency', required=True,
+        default=lambda s: s.env.company.currency_id,
+    )
+
     line_ids = fields.One2many(
         'ksw.sales.commission.line', 'sheet_id', copy=True,
-    )
-    currency_id = fields.Many2one(
-        'res.currency', default=lambda s: s.env.company.currency_id,
-        required=True,
     )
     total_commission = fields.Monetary(
         compute='_compute_total', store=True,
@@ -72,42 +93,45 @@ class KswSalesCommissionSheet(models.Model):
             rec.total_commission = sum(
                 rec.line_ids.mapped('total_commission'))
 
+    # ------------------------------------------------------------------
+    # CRUD + state (standalone — this model is not an entry type)
+    # ------------------------------------------------------------------
     @api.model_create_multi
     def create(self, vals_list):
         Seq = self.env['ir.sequence']
         for v in vals_list:
             if not v.get('name') or v['name'] == 'New':
                 v['name'] = (
-                    Seq.next_by_code('ksw.sales.commission.sheet')
-                    or 'New'
-                )
+                    Seq.next_by_code('ksw.sales.commission.sheet') or 'New')
             if v.get('period'):
-                d = fields.Date.to_date(v['period'])
-                v['period'] = d.replace(day=1)
+                v['period'] = fields.Date.to_date(
+                    v['period']).replace(day=1)
         return super().create(vals_list)
 
-    # ------------------------------------------------------------------
-    # State transitions
-    # ------------------------------------------------------------------
+    def _check_sales_sheet_group(self):
+        if self.env.su or self.env.user.has_group(
+                'KSW_commissions.group_entry_sales'):
+            return
+        raise UserError(_(
+            "You are not allowed to confirm or reset a sales/collection "
+            "commission sheet."))
+
     def action_confirm(self):
+        self._check_sales_sheet_group()
         for rec in self:
             if rec.state != 'draft':
-                raise UserError(_(
-                    "Only draft sheets can be confirmed."))
+                raise UserError(_("Only draft sheets can be confirmed."))
             rec.write({'state': 'confirmed', 'is_locked': True})
-            rec._sync_to_commission_sheets()
             rec.message_post(
-                body=_(
-                    'Sales/collection commission sheet confirmed. '
-                    'Total: %(t).2f', t=rec.total_commission,
-                ),
+                body=_('Sales/collection commission sheet confirmed. '
+                       'Total: %(t).2f', t=rec.total_commission),
                 subtype_xmlid='mail.mt_note',
             )
 
     def action_reset_to_draft(self):
+        self._check_sales_sheet_group()
         for rec in self:
             rec.write({'state': 'draft', 'is_locked': False})
-            rec._sync_to_commission_sheets()
 
     def action_open_import_wizard(self):
         """Open the Excel import wizard pre-filled with this sheet."""
@@ -122,35 +146,6 @@ class KswSalesCommissionSheet(models.Model):
                 'default_sheet_id': self.id,
             },
         }
-
-    # ------------------------------------------------------------------
-    # Commission-sheet sync
-    # ------------------------------------------------------------------
-    def _sync_to_commission_sheets(self):
-        """Recompute sales / collection / combined amounts on the
-        matching commission sheets. Auto-creates a draft commission
-        sheet for any newly added salesperson lacking one this period.
-        """
-        Sheet = self.env['ksw.commission.sheet']
-        for rec in self:
-            for line in rec.line_ids:
-                if not line.employee_id:
-                    continue
-                sheet = Sheet.sudo().search([
-                    ('employee_id', '=', line.employee_id.id),
-                    ('period', '=', rec.period),
-                ], limit=1)
-                if not sheet:
-                    sheet = Sheet.sudo().create({
-                        'employee_id': line.employee_id.id,
-                        'period': rec.period,
-                    })
-                sheet.sudo()._compute_sales_commission()
-                sheet.sudo().flush_recordset([
-                    'sales_commission_amount',
-                    'collection_commission_amount',
-                    'combined_commission_amount',
-                ])
 
 
 class KswSalesCommissionLine(models.Model):
@@ -429,36 +424,9 @@ class KswSalesCommissionLine(models.Model):
             rec.combined_commission_amount = comb_amt
             rec.total_commission = sales_amt + coll_amt + comb_amt
 
-    # ------------------------------------------------------------------
-    # CRUD — auto-sync confirmed sheets when achieved figures change
-    # ------------------------------------------------------------------
-    @api.model_create_multi
-    def create(self, vals_list):
-        lines = super().create(vals_list)
-        confirmed = lines.mapped('sheet_id').filtered(
-            lambda s: s.state == 'confirmed')
-        confirmed._sync_to_commission_sheets()
-        return lines
-
-    def write(self, vals):
-        res = super().write(vals)
-        watched = {
-            'achieved_sales', 'achieved_collection',
-            'target_sales', 'target_collection',
-            'employee_id', 'partner_id', 'split_id', 'role',
-        }
-        if watched & set(vals):
-            confirmed = self.mapped('sheet_id').filtered(
-                lambda s: s.state == 'confirmed')
-            confirmed._sync_to_commission_sheets()
-        return res
-
-    def unlink(self):
-        confirmed_sheets = self.mapped('sheet_id').filtered(
-            lambda s: s.state == 'confirmed')
-        res = super().unlink()
-        confirmed_sheets._sync_to_commission_sheets()
-        return res
+    # No _ksw_contributions and no CRUD sync: sales and collection are paid
+    # outside the commission request, so nothing here reaches
+    # ksw.commission.sheet.
 
     # ------------------------------------------------------------------
     # Validation
@@ -527,10 +495,6 @@ class KswSalesCommissionLine(models.Model):
                 ),
                 subtype_xmlid='mail.mt_note',
             )
-        # Re-sync any commission sheets that were already pushed.
-        confirmed = self.mapped('sheet_id').filtered(
-            lambda s: s.state == 'confirmed')
-        confirmed._sync_to_commission_sheets()
 
     def _apply_override(self, reason):
         """Internal: stamp the override fields and chatter the sheet.
@@ -555,8 +519,6 @@ class KswSalesCommissionLine(models.Model):
             ),
             subtype_xmlid='mail.mt_note',
         )
-        if self.sheet_id.state == 'confirmed':
-            self.sheet_id._sync_to_commission_sheets()
 
 
 

@@ -23,6 +23,13 @@ DEFAULT_BREAKFAST = 10.0
 DEFAULT_LUNCH = 20.0
 DEFAULT_DINNER = 15.0
 
+# Overtime: basic salary ÷ divisor × factor = the hourly overtime rate.
+PARAM_OT_DIVISOR = 'KSW_commissions.overtime_divisor'
+PARAM_OT_FACTOR = 'KSW_commissions.overtime_factor'
+
+DEFAULT_OT_DIVISOR = 240.0
+DEFAULT_OT_FACTOR = 1.5
+
 
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
@@ -49,9 +56,46 @@ class ResConfigSettings(models.TransientModel):
              'technician location-allowance line.',
     )
 
+    ksw_overtime_divisor = fields.Float(
+        string='Overtime Hours Divisor',
+        config_parameter=PARAM_OT_DIVISOR,
+        default=DEFAULT_OT_DIVISOR,
+        help='Monthly hours the basic salary is divided by to get the '
+             'plain hourly rate. KSW uses 240.',
+    )
+    ksw_overtime_factor = fields.Float(
+        string='Overtime Factor',
+        config_parameter=PARAM_OT_FACTOR,
+        default=DEFAULT_OT_FACTOR,
+        help='Multiplier applied to the hourly rate for overtime. Saudi '
+             'Labour Law art. 107 sets this at 1.5.',
+    )
+
     # ------------------------------------------------------------------
     # Helpers (used by ksw.location.allowance.line computes)
     # ------------------------------------------------------------------
+    def _ksw_read_param(self, key, default):
+        """Read a float ``ir.config_parameter``, falling back on default."""
+        raw = self.env['ir.config_parameter'].sudo().get_param(key)
+        if raw in (False, None, ''):
+            return default
+        try:
+            return float(raw)
+        except (TypeError, ValueError):
+            return default
+
+    @api.model
+    def _get_overtime_params(self):
+        """Return ``(divisor, factor)`` for the overtime hourly rate.
+
+        A zero or missing divisor falls back to the default rather than
+        returning 0 — the caller would otherwise have to guard against a
+        division by zero on every line.
+        """
+        divisor = self._ksw_read_param(PARAM_OT_DIVISOR, DEFAULT_OT_DIVISOR)
+        factor = self._ksw_read_param(PARAM_OT_FACTOR, DEFAULT_OT_FACTOR)
+        return (divisor or DEFAULT_OT_DIVISOR, factor)
+
     @api.model
     def _get_meal_prices(self):
         """Return ``(breakfast, lunch, dinner)`` floats from the

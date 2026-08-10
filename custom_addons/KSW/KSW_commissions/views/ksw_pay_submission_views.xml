@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- ================================================================ -->
+    <!-- Department submission — the supervisor's handover to the GM       -->
+    <!-- ================================================================ -->
+    <record id="view_ksw_pay_submission_form" model="ir.ui.view">
+        <field name="name">ksw.pay.submission.form</field>
+        <field name="model">ksw.pay.submission</field>
+        <field name="arch" type="xml">
+            <form string="Department Submission">
+                <field name="x_can_submit" invisible="1"/>
+                <field name="x_can_return" invisible="1"/>
+                <field name="state" invisible="1"/>
+
+                <header>
+                    <button name="action_submit" string="Submit to GM"
+                            type="object" class="btn-primary"
+                            invisible="not x_can_submit"
+                            confirm="This hands your department's commissions to the General Manager and freezes your batches. Continue?"/>
+                    <button name="action_reset_to_draft"
+                            string="Take Back" type="object"
+                            class="btn-secondary"
+                            invisible="state != 'submitted'"
+                            groups="KSW_commissions.group_commission_supervisor"
+                            confirm="Take the submission back so you can keep editing? The General Manager will no longer see it as handed over."/>
+                    <button name="action_return" string="Return for Correction"
+                            type="object" class="btn-secondary"
+                            groups="KSW_commissions.group_commission_gm"
+                            invisible="not x_can_return"/>
+                    <statusbar statusfield="state"
+                               statusbar_visible="draft,submitted,approved"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_batches" type="object"
+                                class="oe_stat_button" icon="fa-list">
+                            <field name="batch_count" widget="statinfo"
+                                   string="Batches"/>
+                        </button>
+                        <button name="action_open_entries" type="object"
+                                class="oe_stat_button" icon="fa-users"
+                                title="Every entry, grouped per employee">
+                            <field name="employee_count" widget="statinfo"
+                                   string="Employees"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1><field name="display_name" readonly="1"/></h1>
+                    </div>
+
+                    <div class="alert alert-warning" role="alert"
+                         invisible="state != 'returned'">
+                        <strong>Returned by the General Manager:</strong>
+                        <field name="return_reason" readonly="1" nolabel="1"/>
+                    </div>
+
+                    <group>
+                        <group string="Scope">
+                            <field name="run_id" readonly="1"/>
+                            <field name="department_id" readonly="1"
+                                   invisible="not department_id"/>
+                            <field name="site_id" readonly="1"
+                                   invisible="not site_id"/>
+                            <field name="responsible_id" readonly="1"
+                                   invisible="not responsible_id"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Handover">
+                            <field name="submitted_by" readonly="1"
+                                   invisible="not submitted_by"/>
+                            <field name="submitted_date" readonly="1"
+                                   invisible="not submitted_date"/>
+                            <field name="entry_count" readonly="1"/>
+                            <field name="total_amount" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <!-- The GM types the reason here, then presses Return.
+                         Readonly for everyone else so it reads as a record
+                         of what happened rather than an editable note. -->
+                    <group string="Return Reason"
+                           invisible="state != 'submitted'"
+                           groups="KSW_commissions.group_commission_gm">
+                        <field name="return_reason" nolabel="1"
+                               placeholder="What has to be corrected before this can be approved?"/>
+                    </group>
+
+                    <notebook>
+                        <page string="Batches" name="batches">
+                            <field name="batch_ids" nolabel="1" readonly="1">
+                                <list decoration-info="state == 'submitted'"
+                                      decoration-muted="state == 'approved'">
+                                    <field name="name"/>
+                                    <field name="component_id"/>
+                                    <field name="entry_count" string="Records"/>
+                                    <field name="employee_count"/>
+                                    <field name="total_amount" sum="Total"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="currency_id"
+                                           column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_submission_list" model="ir.ui.view">
+        <field name="name">ksw.pay.submission.list</field>
+        <field name="model">ksw.pay.submission</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state in ['submitted', 'approved']"
+                  decoration-warning="state == 'returned'"
+                  decoration-muted="state == 'draft' and not batch_count">
+                <field name="display_name" string="Department"/>
+                <field name="responsible_id" string="Supervisor"
+                       optional="show"/>
+                <field name="submitted_by" optional="hide"/>
+                <field name="submitted_date" optional="show"/>
+                <field name="batch_count" string="Batches"/>
+                <field name="entry_count" string="Records"/>
+                <field name="employee_count"/>
+                <field name="total_amount" sum="Total"/>
+                <field name="state" widget="badge"
+                       decoration-success="state in ['submitted', 'approved']"
+                       decoration-warning="state == 'returned'"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_submission_search" model="ir.ui.view">
+        <field name="name">ksw.pay.submission.search</field>
+        <field name="model">ksw.pay.submission</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="department_id"/>
+                <field name="site_id"/>
+                <field name="period" options="{'min_precision': 'months'}"/>
+                <field name="submitted_by"/>
+                <filter name="submitted" string="Submitted"
+                        domain="[('state','=','submitted')]"/>
+                <filter name="pending" string="Not Submitted Yet"
+                        domain="[('state','in',['draft','returned']),('batch_count','&gt;',0)]"/>
+                <group>
+                    <filter string="Month" name="grp_period" domain="[]"
+                            context="{'group_by': 'period'}"/>
+                    <filter string="Department" name="grp_department"
+                            domain="[]"
+                            context="{'group_by': 'department_id'}"/>
+                    <filter string="Status" name="grp_state" domain="[]"
+                            context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_pay_submission" model="ir.actions.act_window">
+        <field name="name">Department Submissions</field>
+        <field name="res_model">ksw.pay.submission</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ksw_pay_submission_search"/>
+        <field name="context">{'search_default_grp_period': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Nothing has been handed over yet
+            </p>
+            <p>
+                One row per department per month: who is responsible, what
+                they recorded, and whether they have submitted it for
+                approval.
+            </p>
+        </field>
+    </record>
+
+</odoo>

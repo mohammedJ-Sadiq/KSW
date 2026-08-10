@@ -18,6 +18,46 @@ LOAN_APPROVAL_STATES = [
     ('refused', 'Refused'),
 ]
 
+# Every group that carries a *scope* on ksw.deduction (a management role,
+# an approval role, a delegation, or a Loan Modification level). A user
+# holding none of these reaches deductions solely through the self-service
+# record rule, and is the only audience of the self-service write/unlink
+# guards below. Keep in sync with security/security.xml.
+PRIVILEGED_DEDUCTION_GROUPS = (
+    'KSW_deduction.group_deduction_officer',
+    'KSW_deduction.group_deduction_manager',
+    'KSW_deduction.group_deduction_supervisor',
+    'KSW_deduction.group_acc_data_entry',
+    'KSW_deduction.group_loan_hr',
+    'KSW_deduction.group_loan_acc',
+    'KSW_deduction.group_loan_gm',
+    'KSW_deduction.group_loan_disbursement',
+    'KSW_deduction.group_loan_edit',
+    'KSW_deduction.group_loan_delete',
+    'KSW_deduction.group_installment_edit',
+    'KSW_base_security.group_manager_assistant',
+)
+
+# What a plain employee may change on their own not-yet-approved request.
+# Everything else (state, approval_state, employee_id, the approval
+# stamps, the installment lines) is off-limits — the record rule already
+# scopes *which* records they reach, this scopes *what* they may set.
+# `type_id` is deliberately absent: a plain user's type dropdown is
+# filtered to NON-loan types (x_can_select_loan_type), so letting them
+# set it would turn their loan into a penalty.
+SELF_SERVICE_WRITABLE_FIELDS = frozenset({
+    'amount', 'installments', 'start_month',
+    'reason', 'description', 'attachment_ids', 'currency_id',
+})
+
+# mail.thread / mail.activity.mixin bookkeeping. Following a thread or
+# posting in the chatter writes these; they are not business edits and
+# must stay available for the whole life of the record.
+MAIL_BOOKKEEPING_FIELDS = frozenset({
+    'message_ids', 'message_follower_ids', 'message_partner_ids',
+    'message_main_attachment_id', 'activity_ids',
+})
+
 
 class KswDeduction(models.Model):
     _name = 'ksw.deduction'
@@ -215,6 +255,20 @@ class KswDeduction(models.Model):
     #   mandatory reason) instead of cancelling.
     # - Non-loans: Deduction Officer/Manager only.
     x_can_cancel = fields.Boolean(compute='_compute_x_can_cancel')
+
+    # Self-service edit window. True only for a plain employee (no
+    # management, approval, delegation or Loan Modification group) looking
+    # at their OWN request while no approver has acted on it yet. Backs
+    # the `readonly=` expressions that keep employee_id / type_id fixed on
+    # the form, and mirrors the record rule + Python guards that let them
+    # correct or withdraw the request.
+    x_can_employee_edit = fields.Boolean(
+        string='Employee May Edit',
+        compute='_compute_x_can_employee_edit',
+        help='True when you may still correct or delete this request '
+             'yourself, because it is your own and no approver has acted '
+             'on it yet.',
+    )
 
     # ------------------------------------------------------------------
     # Refusal tracking (loan only — any approval step)
@@ -793,6 +847,13 @@ class KswDeduction(models.Model):
         # Block deletion if any installment has been paid (linked to a confirmed payslip)
         # and honour the per-record "Allow deletion" override.
         is_super = self.env.su
+        # Requests the current user is deleting purely as the employee
+        # who raised them: allowed inside the pre-approval window, and
+        # exempt from the Loan Modification privilege below (an employee
+        # withdrawing their own unapproved request is not "loan
+        # modification"). Raises for anything outside that window.
+        self_service = self.browse() if is_super else \
+            self._check_employee_self_unlink()
         for rec in self:
             paid_lines = rec.line_ids.filtered(lambda l: l.state == 'paid')
             if paid_lines:
@@ -811,7 +872,8 @@ class KswDeduction(models.Model):
             # non-loan) without inheriting loan-delete rights, and a
             # non-Manager loan approver can be granted loan-delete via
             # Loan Modification = Delete only / Edit and Delete.
-            if rec.is_loan and not rec.x_allow_delete and not is_super:
+            if (rec.is_loan and not rec.x_allow_delete and not is_super
+                    and rec not in self_service):
                 raise UserError(_(
                     "You are not allowed to delete loan deduction "
                     "%(name)s. Deleting loans requires the "
@@ -858,12 +920,11 @@ class KswDeduction(models.Model):
                 is_officer = user.has_group(
                     'KSW_deduction.group_deduction_officer')
                 if not is_officer:
-                    is_own = (rec.employee_id.user_id == user)
-                    is_subordinate = (
-                        rec.employee_id.parent_id.user_id == user)
+                    mgr_user_id = rec._manager_user_id()
+                    is_own = (rec._employee_user_id() == user.id)
+                    is_subordinate = (mgr_user_id == user.id)
                     is_assistant = (
-                        rec.employee_id.parent_id.user_id.id
-                        in user._ksw_assisted_manager_ids())
+                        mgr_user_id in user._ksw_assisted_manager_ids())
                     if not (is_own or is_subordinate or is_assistant):
                         raise UserError(_(
                             "You can only submit loan requests for "
@@ -921,10 +982,7 @@ class KswDeduction(models.Model):
             if rec.state == 'completed':
                 raise UserError(
                     _("Completed deductions cannot be cancelled."))
-            is_employee_owner = bool(
-                rec.employee_id.user_id
-                and rec.employee_id.user_id.id == self.env.uid
-            )
+            is_employee_owner = (rec._employee_user_id() == self.env.uid)
             if rec.is_loan and not self.env.su and not is_employee_owner:
                 raise UserError(_(
                     "Only the employee who submitted the loan request "
@@ -966,10 +1024,7 @@ class KswDeduction(models.Model):
                     "Cannot reset to draft: some installments are already paid."))
             target = rec
             if rec.approval_state == 'refused' and not self.env.su:
-                is_employee_owner = bool(
-                    rec.employee_id.user_id
-                    and rec.employee_id.user_id.id == self.env.uid
-                )
+                is_employee_owner = (rec._employee_user_id() == self.env.uid)
                 is_officer = self.env.user.has_group(
                     'KSW_deduction.group_deduction_officer')
                 if not (is_employee_owner or is_officer):
@@ -1449,7 +1504,9 @@ class KswDeduction(models.Model):
             return
 
         if pending_state == 'pending_dm':
-            mgr_user = self.employee_id.parent_id.user_id
+            # sudo: the caller may be the requesting employee or the DM,
+            # neither of whom can read the manager's employee record.
+            mgr_user = self.employee_id.sudo().parent_id.user_id
             if mgr_user and mgr_user.partner_id:
                 partner_ids = [mgr_user.partner_id.id]
             else:
@@ -1474,7 +1531,7 @@ class KswDeduction(models.Model):
                 'This loan request is awaiting your approval.'
             ) % {
                 'label': config['label'],
-                'employee': self.employee_id.name,
+                'employee': self.employee_id.sudo().name,
                 'amount': self.amount,
                 'inst': self.installments,
             },
@@ -1493,6 +1550,11 @@ class KswDeduction(models.Model):
         # readonly="state != 'draft'" on employee_id is cosmetic.
         if vals.get('employee_id'):
             self._check_assistant_employee_scope(vals['employee_id'])
+
+        # Plain employees may correct their own request until the first
+        # approver signs — and nothing else (see the guard's docstring).
+        if not self.env.su:
+            self._check_employee_self_write(vals)
 
         # Block edits to core loan terms once the GM has approved and sent
         # to disbursement. The loan is still state='draft' at that point,
@@ -1642,13 +1704,9 @@ class KswDeduction(models.Model):
         assisted_manager_ids = user._ksw_assisted_manager_ids()
         uid = self.env.uid
         for rec in self:
-            is_subordinate = (
-                is_supervisor
-                and rec.employee_id.parent_id.user_id.id == uid
-            )
-            is_assistant = (
-                rec.employee_id.parent_id.user_id.id in assisted_manager_ids
-            )
+            mgr_user_id = rec._manager_user_id()
+            is_subordinate = is_supervisor and mgr_user_id == uid
+            is_assistant = mgr_user_id in assisted_manager_ids
             rec.x_can_submit = (
                 is_officer
                 or (rec.create_uid and rec.create_uid.id == uid)
@@ -1699,12 +1757,77 @@ class KswDeduction(models.Model):
             'KSW_deduction.group_deduction_officer')
         is_super = self.env.su or uid == self.env.ref('base.user_root').id
         for rec in self:
-            mgr_user = rec.employee_id.parent_id.user_id
+            mgr_user_id = rec._manager_user_id()
             rec.x_can_dm_approve = (
                 is_super
                 or is_officer
-                or (mgr_user and mgr_user.id == uid)
+                or (mgr_user_id and mgr_user_id == uid)
             )
+
+    # ------------------------------------------------------------------
+    # GM: Return to Approver (loan chain only)
+    # ------------------------------------------------------------------
+    # No model-level groups= on purpose: both are read by an invisible=
+    # expression on a button every user can see (Odoo 19 Pitfalls #31).
+    x_can_gm_return = fields.Boolean(compute='_compute_return_role_gates')
+    x_can_admin_return = fields.Boolean(
+        compute='_compute_return_role_gates',
+        help='True for a Deduction Manager, who may return a loan request '
+             'to any earlier approval step, from any step it has already '
+             'reached (except once fully disbursed). Deliberately gated on '
+             'group_deduction_manager rather than the Settings '
+             'Administrator group: this module never grants the latter any '
+             'ksw.deduction access (unlike hr.leave), while Deduction '
+             'Manager already has unconditional read/write on every '
+             'deduction — see ksw_deduction_rule_manager_all.',
+    )
+
+    @api.depends_context('uid')
+    @api.depends('is_loan', 'approval_state')
+    def _compute_return_role_gates(self):
+        is_gm = self.env.user.has_group('KSW_deduction.group_loan_gm')
+        is_admin = self.env.su or self.env.user.has_group(
+            'KSW_deduction.group_deduction_manager')
+        wizard = self.env['ksw.loan.return.approver.wizard']
+        for rec in self:
+            has_id = bool(rec.id)
+            rec.x_can_gm_return = (
+                is_gm and rec.approval_state == 'pending_gm' and has_id)
+            # The Deduction Manager may return a request from any state it
+            # has reached — but only where there is somewhere earlier to
+            # send it back to. A request still at the first step has no
+            # return target, so the button stays hidden.
+            rec.x_can_admin_return = bool(
+                is_admin and has_id and wizard._allowed_targets(rec))
+
+    def action_open_loan_return_wizard(self):
+        """Open the return wizard — two audiences, one button.
+
+        The GM may return a loan request to an earlier approver only from
+        their own step (pending_gm). A Deduction Manager may return any loan
+        request to any earlier step it has already reached; the wizard
+        itself decides which targets each role may pick.
+        """
+        self.ensure_one()
+        is_admin = self.env.su or self.env.user.has_group(
+            'KSW_deduction.group_deduction_manager')
+        if not is_admin:
+            if not self.env.user.has_group('KSW_deduction.group_loan_gm'):
+                raise UserError(_(
+                    'Only the General Manager can return a loan request to '
+                    'an approver.'))
+            if self.approval_state != 'pending_gm':
+                raise UserError(_(
+                    'The loan must be at the GM Final Approval step to use '
+                    'this action.'))
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Return to Approver'),
+            'res_model': 'ksw.loan.return.approver.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_deduction_id': self.id},
+        }
 
     x_is_pending_my_action = fields.Boolean(
         compute='_compute_is_pending_my_action',
@@ -1734,10 +1857,10 @@ class KswDeduction(models.Model):
             if not s or not rec.id:
                 rec.x_is_pending_my_action = False
             elif s == 'pending_dm':
-                mgr_user = rec.employee_id.parent_id.user_id
+                mgr_user_id = rec._manager_user_id()
                 rec.x_is_pending_my_action = bool(
-                    (mgr_user and mgr_user.id == uid)
-                    or (not mgr_user and is_officer)
+                    (mgr_user_id and mgr_user_id == uid)
+                    or (not mgr_user_id and is_officer)
                 )
             elif s == 'pending_hr':
                 rec.x_is_pending_my_action = is_hr
@@ -1821,12 +1944,136 @@ class KswDeduction(models.Model):
                 continue
             if rec.is_loan:
                 rec.x_can_cancel = (
-                    is_super
-                    or (rec.employee_id.user_id
-                        and rec.employee_id.user_id.id == uid)
+                    is_super or rec._employee_user_id() == uid
                 )
             else:
                 rec.x_can_cancel = is_super or is_officer
+
+    # ------------------------------------------------------------------
+    # Employee / manager identity (always read with sudo)
+    # ------------------------------------------------------------------
+    # Every authorisation check below asks "whose request is this?" and
+    # "who is their manager?". Both answers live on hr.employee, whose
+    # own record rule ("Employee: Own records only", KSW_base_security)
+    # stops a plain employee from reading ANY employee but themselves —
+    # including their own manager. Reading `employee_id.parent_id.user_id`
+    # unelevated therefore took the whole deduction form down with an
+    # AccessError on hr.employee for every employee holding the
+    # Employees→Employee privilege. Identity is not confidential data;
+    # sudo() it here and let the record rules do the scoping.
+    def _employee_user_id(self):
+        """Id of the user behind ``employee_id`` (0 when unlinked)."""
+        self.ensure_one()
+        return self.employee_id.sudo().user_id.id or 0
+
+    def _manager_user_id(self):
+        """Id of the user behind the employee's direct manager (0 when
+        there is no manager, or the manager has no user account)."""
+        self.ensure_one()
+        return self.employee_id.sudo().parent_id.user_id.id or 0
+
+    # ==================================================================
+    # Employee self-service (own request, before the first approval)
+    # ==================================================================
+
+    @api.model
+    def _is_plain_deduction_user(self):
+        """True when the current user holds no deduction *scope* group.
+
+        Such a user reaches ksw.deduction only through the self-service
+        record rule, so the guards below are the whole of their write /
+        unlink authorisation. Everybody else (officer, supervisor,
+        approver, accounting, assistant, Loan Modification holder) keeps
+        the rights their own rules already grant.
+        """
+        if self.env.su:
+            return False
+        user = self.env.user
+        return not any(
+            user.has_group(xmlid) for xmlid in PRIVILEGED_DEDUCTION_GROUPS
+        )
+
+    def _is_own_request_before_approval(self):
+        """The self-service window: my own loan request, on which no
+        approver has acted yet.
+
+        A loan stays ``state == 'draft'`` for the entire DM → HR → Acc →
+        GM chain, so ``approval_state`` — not ``state`` — is what says
+        whether anybody has signed. 'pending_dm' means submitted and
+        waiting for the first signature, which still counts as "no
+        approval happened".
+
+        Scoped to loans on purpose: they are the only deduction an
+        employee raises. Penalties and advances belong to the accounting
+        data-entry team, and a draft penalty must never be editable by
+        the employee it is aimed at.
+        """
+        self.ensure_one()
+        return bool(
+            self.is_loan
+            and self.state == 'draft'
+            and self.approval_state in (False, 'pending_dm')
+            and self._employee_user_id() == self.env.uid
+        )
+
+    @api.depends_context('uid')
+    @api.depends('is_loan', 'state', 'approval_state', 'employee_id.user_id')
+    def _compute_x_can_employee_edit(self):
+        is_plain = self._is_plain_deduction_user()
+        for rec in self:
+            rec.x_can_employee_edit = (
+                is_plain and rec._is_own_request_before_approval()
+            )
+
+    def _check_employee_self_write(self, vals):
+        """Server-side half of the self-service edit window.
+
+        The record rule already decides WHICH records a plain employee
+        may write; this decides WHAT they may set on them, and raises an
+        explanatory UserError instead of the ORM's bare AccessError
+        (Odoo 19 Pitfalls #12). Without the field whitelist, write access
+        on their own draft loan would let an employee push
+        ``approval_state`` straight to 'pending_gm' over RPC and skip
+        three approvers (Pitfalls #15).
+        """
+        if not self._is_plain_deduction_user():
+            return
+        business_vals = set(vals) - MAIL_BOOKKEEPING_FIELDS
+        if not business_vals:
+            return
+        forbidden = sorted(business_vals - SELF_SERVICE_WRITABLE_FIELDS)
+        if forbidden:
+            raise UserError(_(
+                "You may only change the amount, installments, start "
+                "month, reason, description and attachments of your own "
+                "loan request. Not allowed here: %(fields)s.",
+                fields=', '.join(forbidden),
+            ))
+        for rec in self:
+            if not rec._is_own_request_before_approval():
+                raise UserError(_(
+                    "%(name)s can no longer be edited. A request can only "
+                    "be changed by the employee who raised it, and only "
+                    "while it is still waiting for the first approval.",
+                    name=rec.name or '',
+                ))
+
+    def _check_employee_self_unlink(self):
+        """Same window, for deletion. Returns the records the current
+        user is deleting purely as their own requester, so ``unlink()``
+        can skip the Loan Modification privilege check for them."""
+        if not self._is_plain_deduction_user():
+            return self.browse()
+        for rec in self:
+            if not rec._is_own_request_before_approval():
+                raise UserError(_(
+                    "%(name)s can no longer be deleted. You may delete "
+                    "your own request only while it is still waiting for "
+                    "the first approval — afterwards use Cancel, which "
+                    "keeps a trace of the request.",
+                    name=rec.name or '',
+                ))
+        return self
 
     def action_create_new_penalty(self):
         """Open the deductions form pre-filled for a new penalty record

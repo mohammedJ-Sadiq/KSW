@@ -34,18 +34,9 @@ class HrEmployee(models.Model):
              'explicitly for the pull to find the driver\'s loads.',
     )
 
-    # ------------------------------------------------------------------
-    # Auto-create the current-month commission sheet when an HR officer
-    # toggles ``x_is_attendance_sheet`` ON. Mirrors the pattern in
-    # KSW_attendance_sheet but is **independent** — commission sheets
-    # have their own draft/confirmed/done lifecycle separate from
-    # attendance-sheet lifecycle.
-    # ------------------------------------------------------------------
-    def write(self, vals):
-        res = super().write(vals)
-        if vals.get('x_is_attendance_sheet'):
-            # Only employees that just transitioned to True need a sheet.
-            self.env['ksw.commission.sheet']._ensure_current_period_sheets(
-                self.filtered(lambda e: e.x_is_attendance_sheet))
-        return res
+    # No write() hook any more. It used to pre-create an empty commission
+    # sheet for every employee flagged x_is_attendance_sheet. Since
+    # 19.0.3.0.0 there is nothing to pre-create: an employee appears in the
+    # payment register precisely when somebody records a pay entry for him,
+    # so blank per-employee documents no longer exist to be created.
 

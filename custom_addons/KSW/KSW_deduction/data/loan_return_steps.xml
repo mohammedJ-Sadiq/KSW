@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!--
+        Reference data for the loan return wizard's "Return To" radio. Kept
+        updatable (no noupdate) so the labels can be corrected on upgrade;
+        `code` is what the wizard matches on and must not be edited.
+    -->
+
+    <record id="loan_return_step_pending_dm" model="ksw.loan.return.step">
+        <field name="code">pending_dm</field>
+        <field name="name">Direct Manager</field>
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="loan_return_step_pending_hr" model="ksw.loan.return.step">
+        <field name="code">pending_hr</field>
+        <field name="name">HR Approver</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <record id="loan_return_step_pending_acc" model="ksw.loan.return.step">
+        <field name="code">pending_acc</field>
+        <field name="name">Accounting</field>
+        <field name="sequence">30</field>
+    </record>
+
+    <!-- Only ever offered to the Settings Administrator, returning from
+         pending_disbursement — the GM cannot target their own step. -->
+    <record id="loan_return_step_pending_gm" model="ksw.loan.return.step">
+        <field name="code">pending_gm</field>
+        <field name="name">GM Final Approval</field>
+        <field name="sequence">40</field>
+    </record>
+
+</odoo>

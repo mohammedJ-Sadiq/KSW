@@ -104,6 +104,111 @@
     </record>
 
     <!-- ============================================================ -->
+    <!-- Layer 3: Groups — Entry types (one opt-in group per type)     -->
+    <!-- ============================================================ -->
+    <!--
+        A supervisor should only see the kinds of entry they actually do.
+        One group per entry type, ticked per user; the hub cards, the menus
+        and the records all follow it, so a supervisor who only handles
+        driver commissions sees only that.
+
+        EACH GROUP GETS ITS OWN PRIVILEGE ON PURPOSE. In Odoo 19 the groups
+        sharing a privilege render as a single-select on the user form, so
+        putting all four under one privilege would make them mutually
+        exclusive — the opposite of what is wanted. One group per privilege
+        renders as an independent checkbox. (A group with no privilege at
+        all only renders in debug mode — see Odoo 19 Pitfalls #55.)
+
+        These are deliberately NOT implied by group_commission_supervisor:
+        the supervisor tier is the *scope*, these are the *opt-in*. Officer
+        implies all four, so Officer / Accountant / GM keep seeing
+        everything.
+    -->
+    <record id="privilege_entry_overtime" model="res.groups.privilege">
+        <field name="name">Entry: Overtime</field>
+        <field name="sequence">50</field>
+        <field name="category_id" ref="module_category_ksw_commissions"/>
+    </record>
+    <record id="group_entry_overtime" model="res.groups">
+        <field name="name">Overtime Entry</field>
+        <field name="privilege_id" ref="privilege_entry_overtime"/>
+        <field name="comment">Record overtime for the supervisor's own department.</field>
+    </record>
+
+    <record id="privilege_entry_driver" model="res.groups.privilege">
+        <field name="name">Entry: Driver Commission</field>
+        <field name="sequence">51</field>
+        <field name="category_id" ref="module_category_ksw_commissions"/>
+    </record>
+    <record id="group_entry_driver" model="res.groups">
+        <field name="name">Driver Commission Entry</field>
+        <field name="privilege_id" ref="privilege_entry_driver"/>
+        <field name="comment">Record driver trips and pull them from BAS.</field>
+    </record>
+
+    <record id="privilege_entry_location" model="res.groups.privilege">
+        <field name="name">Entry: Location Allowance</field>
+        <field name="sequence">52</field>
+        <field name="category_id" ref="module_category_ksw_commissions"/>
+    </record>
+    <record id="group_entry_location" model="res.groups">
+        <field name="name">Location Allowance Entry</field>
+        <field name="privilege_id" ref="privilege_entry_location"/>
+        <field name="comment">Record technician meal occurrences for the supervisor's own department.</field>
+    </record>
+
+    <record id="privilege_entry_sales" model="res.groups.privilege">
+        <field name="name">Entry: Sales &amp; Collection</field>
+        <field name="sequence">53</field>
+        <field name="category_id" ref="module_category_ksw_commissions"/>
+    </record>
+    <record id="group_entry_sales" model="res.groups">
+        <field name="name">Sales &amp; Collection Entry</field>
+        <field name="privilege_id" ref="privilege_entry_sales"/>
+        <field name="comment">Maintain the monthly sales/collection commission sheet. Paid separately — not part of the commission request.</field>
+    </record>
+
+    <!-- Officer sees every entry type. -->
+    <function model="res.groups" name="write">
+        <value eval="[ref('group_commission_officer')]"/>
+        <value eval="{'implied_ids': [
+            (4, ref('group_entry_overtime')),
+            (4, ref('group_entry_driver')),
+            (4, ref('group_entry_location')),
+            (4, ref('group_entry_sales')),
+        ]}"/>
+    </function>
+
+    <!-- ============================================================ -->
+    <!-- Layer 3: Groups — Final Approval (General Manager)            -->
+    <!-- ============================================================ -->
+    <!--
+        Its OWN privilege, deliberately not privilege_commission_approval:
+        in Odoo 19 a privilege renders as a single-select on the user form,
+        so sharing one with the Accountant would make the two roles mutually
+        exclusive — and the GM must be assignable alongside anything else.
+
+        implied_ids → Officer is what actually gives the GM reach. Naming a
+        group in a Python guard is worthless if no ir.rule lets it see the
+        records (CLAUDE.md gotcha #38); the Officer rule is [(1,'=',1)] on
+        all four verbs, and the entry sheets have officer ACL rows with no
+        narrowing rule, so the implication covers everything the GM must
+        approve.
+    -->
+    <record id="privilege_commission_gm" model="res.groups.privilege">
+        <field name="name">Commission Final Approval</field>
+        <field name="sequence">25</field>
+        <field name="category_id" ref="module_category_ksw_commissions"/>
+    </record>
+
+    <record id="group_commission_gm" model="res.groups">
+        <field name="name">General Manager</field>
+        <field name="privilege_id" ref="privilege_commission_gm"/>
+        <field name="implied_ids" eval="[(4, ref('group_commission_officer'))]"/>
+        <field name="comment">Approves the Monthly Commission Run. Approval finalises every employee sheet in the run and locks the period; the GM is also the only role that can reopen it.</field>
+    </record>
+
+    <!-- ============================================================ -->
     <!-- Layer 3: Groups — Commission Configuration                    -->
     <!-- ============================================================ -->
     <record id="group_commission_admin" model="res.groups">
@@ -124,37 +229,192 @@
     <!-- ============================================================ -->
     <!-- Record Rules — ksw.commission.sheet                            -->
     <!-- ============================================================ -->
-    <record id="commission_sheet_rule_self" model="ir.rule">
-        <field name="name">KSW Commission Sheet: Self</field>
-        <field name="model_id" ref="model_ksw_commission_sheet"/>
-        <field name="groups" eval="[(4, ref('group_commission_self'))]"/>
-        <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+
+
+
+    <!-- ============================================================ -->
+    <!-- Record Rules — ksw.commission.sheet.line                       -->
+    <!-- ============================================================ -->
+    <!--
+        These were missing entirely: the sheet was row-scoped but its
+        lines were not, so anyone holding the line ACL could read (and a
+        supervisor could write) the lines of a sheet they cannot open.
+        The lines simply follow their parent sheet's scope.
+    -->
+
+
+
+    <!-- ============================================================ -->
+    <!-- Record Rules — entry sheets: a supervisor sees only his own    -->
+    <!-- ============================================================ -->
+    <!--
+        A department manager is responsible for his subordinates and
+        nobody else's entries: showing him the rest only makes his job
+        harder. Every entry sheet is therefore scoped, and the entry-type
+        group above decides which kinds he sees at all.
+
+        Scoping note — check the data before writing the domain.
+        hr.department.manager_id is empty on every real department here,
+        and no supervisor has x_site_id set, so a domain built on either
+        would grant NOBODY anything and look like a permissions bug. What
+        IS populated is the employee parent_id chain (44/44 across
+        Maintenance + Workshop, every manager holding a user account) and
+        the supervisor's own department. Each rule ORs:
+
+          • the supervisor's own department (how the Maintenance and
+            Workshop supervisors reach theirs, and what lets them create
+            a sheet before it has any lines);
+          • a sheet holding one of their own subordinates (for the two
+            supervisors who sit in a different department from the people
+            they manage); and
+          • create_uid — you can always see what you created, even while
+            it is still empty. This is what makes a per-site sheet like
+            Driver Commission workable without any site configuration.
+    -->
+
+    <!-- Overtime (per department) -->
+
+
+    <!-- Driver Commission (per site — scoped by subordinates + creator) -->
+
+
+    <!-- Location Allowance (per department since 19.0.2.0.0) -->
+
+
+    <!-- Officer / GM see every entry sheet of every type. -->
+
+
+
+
+
+
+    <!-- ============================================================ -->
+    <!-- Record Rule — ksw.commission.run.source                        -->
+    <!-- ============================================================ -->
+    <!--
+        The Monthly Commission Run is one shared record per month, so its
+        entry-type cards are shared rows. This is what makes them follow
+        each user's access rights: a card is visible only when the user
+        holds the entry type's group.
+    -->
+
+    <!-- ============================================================ -->
+    <!-- Record Rules — ksw.pay.batch / ksw.pay.entry                   -->
+    <!-- ============================================================ -->
+    <!--
+        A supervisor runs his own department and sees nobody else's entries.
+        Two ways in, matching ksw.pay.batch._allowed_departments():
+
+          • he is the department's manager (hr.department.manager_id);
+          • he assists that manager — the two-key delegation from
+            KSW_base_security, where x_assisted_manager_ids lists the managers
+            a user may prepare work for but never approve for;
+          • create_uid, so he can always see what he created — which is also
+            what makes a per-SITE batch like Driver Trips workable, since a
+            site has no department to match on.
+
+        NOTE FOR DEPLOYMENT: this depends on hr.department.manager_id being
+        set. Only 2 of 26 departments have one today, so the managers must be
+        filled in or supervisors will correctly see nothing.
+    -->
+    <record id="pay_batch_rule_supervisor" model="ir.rule">
+        <field name="name">KSW Pay Batch: departments I manage or assist, or created by me</field>
+        <field name="model_id" ref="model_ksw_pay_batch"/>
+        <field name="groups" eval="[(4, ref('group_commission_supervisor'))]"/>
+        <field name="domain_force">['|', '|', ('create_uid', '=', user.id), ('department_id.manager_id.user_id', '=', user.id), ('department_id.manager_id.user_id', 'in', user.x_assisted_manager_ids.ids)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="pay_batch_rule_officer" model="ir.rule">
+        <field name="name">KSW Pay Batch: Officer (all)</field>
+        <field name="model_id" ref="model_ksw_pay_batch"/>
+        <field name="groups" eval="[(4, ref('group_commission_officer'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="pay_entry_rule_supervisor" model="ir.rule">
+        <field name="name">KSW Pay Entry: departments I manage or assist, or created by me</field>
+        <field name="model_id" ref="model_ksw_pay_entry"/>
+        <field name="groups" eval="[(4, ref('group_commission_supervisor'))]"/>
+        <field name="domain_force">['|', '|', ('batch_id.create_uid', '=', user.id), ('batch_id.department_id.manager_id.user_id', '=', user.id), ('batch_id.department_id.manager_id.user_id', 'in', user.x_assisted_manager_ids.ids)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="pay_entry_rule_officer" model="ir.rule">
+        <field name="name">KSW Pay Entry: Officer (all)</field>
+        <field name="model_id" ref="model_ksw_pay_entry"/>
+        <field name="groups" eval="[(4, ref('group_commission_officer'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Record Rules — ksw.pay.submission                              -->
+    <!-- ============================================================ -->
+    <!--
+        A supervisor sees the handover for the departments he runs, plus any
+        scope he has actually recorded a batch in — which is what makes a
+        per-SITE submission (driver trips) reachable, since a site has no
+        manager to match on.
+    -->
+    <record id="pay_submission_rule_supervisor" model="ir.rule">
+        <field name="name">KSW Pay Submission: my departments</field>
+        <field name="model_id" ref="model_ksw_pay_submission"/>
+        <field name="groups" eval="[(4, ref('group_commission_supervisor'))]"/>
+        <field name="domain_force">['|', '|', ('department_id.manager_id.user_id', '=', user.id), ('department_id.manager_id.user_id', 'in', user.x_assisted_manager_ids.ids), ('batch_ids.create_uid', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="pay_submission_rule_officer" model="ir.rule">
+        <field name="name">KSW Pay Submission: Officer (all)</field>
+        <field name="model_id" ref="model_ksw_pay_submission"/>
+        <field name="groups" eval="[(4, ref('group_commission_officer'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Record Rules — ksw.pay.run.line (the payment register)         -->
+    <!-- ============================================================ -->
+    <!--
+        The register is now visible before approval, so it has to be scoped:
+        a supervisor checks who in HIS department is about to be paid, and
+        the GM sees everyone. Read-only for the supervisor — the figures are
+        derived from entries he already owns.
+    -->
+    <record id="pay_run_line_rule_supervisor" model="ir.rule">
+        <field name="name">KSW Payment Register: my people</field>
+        <field name="model_id" ref="model_ksw_pay_run_line"/>
+        <field name="groups" eval="[(4, ref('group_commission_supervisor'))]"/>
+        <field name="domain_force">['|', '|', '|', ('employee_id.user_id', '=', user.id), ('employee_id.parent_id.user_id', '=', user.id), ('department_id.manager_id.user_id', '=', user.id), ('department_id.manager_id.user_id', 'in', user.x_assisted_manager_ids.ids)]</field>
         <field name="perm_read" eval="True"/>
         <field name="perm_write" eval="False"/>
         <field name="perm_create" eval="False"/>
         <field name="perm_unlink" eval="False"/>
     </record>
 
-    <record id="commission_sheet_rule_supervisor" model="ir.rule">
-        <field name="name">KSW Commission Sheet: Supervisor (subordinates with attendance sheet)</field>
-        <field name="model_id" ref="model_ksw_commission_sheet"/>
-        <field name="groups" eval="[(4, ref('group_commission_supervisor'))]"/>
-        <field name="domain_force">[
-            '&amp;',
-            ('employee_id.x_is_attendance_sheet', '=', True),
-            '|',
-                ('employee_id.user_id', '=', user.id),
-                ('employee_id', 'child_of', user.employee_ids.ids),
-        ]</field>
-        <field name="perm_read" eval="True"/>
-        <field name="perm_write" eval="True"/>
-        <field name="perm_create" eval="True"/>
-        <field name="perm_unlink" eval="False"/>
-    </record>
-
-    <record id="commission_sheet_rule_officer" model="ir.rule">
-        <field name="name">KSW Commission Sheet: Officer (all)</field>
-        <field name="model_id" ref="model_ksw_commission_sheet"/>
+    <record id="pay_run_line_rule_officer" model="ir.rule">
+        <field name="name">KSW Payment Register: Officer (all)</field>
+        <field name="model_id" ref="model_ksw_pay_run_line"/>
         <field name="groups" eval="[(4, ref('group_commission_officer'))]"/>
         <field name="domain_force">[(1, '=', 1)]</field>
         <field name="perm_read" eval="True"/>
@@ -182,6 +442,10 @@
     </function>
     <function model="res.groups" name="write">
         <value eval="[ref('group_sales_commission_manager')]"/>
+        <value eval="{'user_ids': [(4, ref('base.user_root')), (4, ref('base.user_admin'))]}"/>
+    </function>
+    <function model="res.groups" name="write">
+        <value eval="[ref('group_commission_gm')]"/>
         <value eval="{'user_ids': [(4, ref('base.user_root')), (4, ref('base.user_admin'))]}"/>
     </function>
 

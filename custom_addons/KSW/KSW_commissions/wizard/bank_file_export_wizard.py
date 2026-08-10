@@ -1,9 +1,8 @@
-"""Bank-file export wizard for KSW Commission batches.
+"""Bank-file export wizard for the monthly commission payment.
 
-Generates WPS Excel / Kawthar TXT files from the ``total_payable`` on
-each ``ksw.commission.sheet`` in the batch. Reuses the same file formats
-as ``KSW_payroll`` but the data source is the commission sheet totals
-(not payslip lines).
+Generates WPS Excel / Kawthar TXT files from ``net_payable`` on each
+``ksw.pay.run.line`` — the payment register built when the General Manager
+approves the month. Same file formats as ``KSW_payroll``; different source.
 """
 import base64
 import io
@@ -31,8 +30,8 @@ class KswCommissionBankExportWizard(models.TransientModel):
     _name = 'ksw.commission.bank.export.wizard'
     _description = 'KSW Commission Bank File Export Wizard'
 
-    batch_id = fields.Many2one(
-        'ksw.commission.batch', required=True, readonly=True,
+    run_id = fields.Many2one(
+        'ksw.pay.run', required=True, readonly=True,
     )
     export_mode = fields.Selection(
         EXPORT_MODES, required=True, default='all_excel',
@@ -54,7 +53,7 @@ class KswCommissionBankExportWizard(models.TransientModel):
         default='2', string='Kawthar Operation',
     )
 
-    @api.depends('batch_id')
+    @api.depends('run_id')
     def _compute_company_partner(self):
         for rec in self:
             rec.company_partner_id = rec.env.company.partner_id
@@ -64,16 +63,16 @@ class KswCommissionBankExportWizard(models.TransientModel):
     # ------------------------------------------------------------------
 
     def _group_and_validate(self, require_type=None):
-        batch = self.batch_id
-        if not batch.sheet_ids:
-            raise UserError(_('No sheets in this batch to export.'))
-        groups = batch._group_sheets_by_bank_account()
+        run = self.run_id
+        if not run.line_ids:
+            raise UserError(_('The payment register is empty — there is nothing to export.'))
+        groups = run._group_lines_by_bank_account()
         no_bank = groups.pop(self.env['res.partner.bank'], None)
         if no_bank:
             names = ', '.join(no_bank.mapped('employee_id.name'))
             raise UserError(_(
                 'The following employees have no bank account and no '
-                'batch-level fallback:\n%s', names))
+                'run-level fallback:\n%s', names))
         no_type = [b for b in groups if not b.x_file_type]
         if no_type:
             accs = ', '.join(b.acc_number or str(b.id) for b in no_type)
@@ -84,7 +83,7 @@ class KswCommissionBankExportWizard(models.TransientModel):
         return groups
 
     def _batch_label(self):
-        return (self.batch_id.name or '').replace(' ', '_').replace('/', '-')
+        return (self.run_id.name or '').replace(' ', '_').replace('/', '-')
 
     def _bank_label(self, bank):
         return (bank.acc_number or bank.bank_id.name or str(bank.id)
@@ -93,7 +92,7 @@ class KswCommissionBankExportWizard(models.TransientModel):
     def _bundle_and_download(self, files):
         if not files:
             raise UserError(_('No files were generated.'))
-        batch = self.batch_id
+        run = self.run_id
         if len(files) == 1:
             fname, data = files[0]
             mimetype = (
@@ -105,7 +104,7 @@ class KswCommissionBankExportWizard(models.TransientModel):
                 'name': fname, 'type': 'binary',
                 'datas': base64.b64encode(data),
                 'mimetype': mimetype,
-                'res_model': batch._name, 'res_id': batch.id,
+                'res_model': run._name, 'res_id': run.id,
             })
         else:
             buf = io.BytesIO()
@@ -117,7 +116,7 @@ class KswCommissionBankExportWizard(models.TransientModel):
                 'type': 'binary',
                 'datas': base64.b64encode(buf.getvalue()),
                 'mimetype': 'application/zip',
-                'res_model': batch._name, 'res_id': batch.id,
+                'res_model': run._name, 'res_id': run.id,
             })
         return {
             'type': 'ir.actions.act_url',
@@ -127,7 +126,7 @@ class KswCommissionBankExportWizard(models.TransientModel):
 
     # --- Excel generation --------------------------------------------------
 
-    def _make_comm_summary_excel(self, wb, sheets):
+    def _make_comm_summary_excel(self, wb, lines):
         """Fill a summary worksheet (mirrors payroll summary but for commissions)."""
         ws = wb.active
         ws.title = 'Commission Summary'
@@ -139,7 +138,7 @@ class KswCommissionBankExportWizard(models.TransientModel):
         hdr_fill = PatternFill('solid', fgColor='D9E1F2')
         headers = [
             'Employee', 'SSN', 'Department',
-            'Lines Total', 'Driver Commission', 'Gross Total',
+            'Manual Lines', 'Entry Sheets', 'Gross Total',
             'Loans Deduction', 'Bank Transfer Amount',
             'Bank Account', 'Bank Name',
         ]
@@ -149,19 +148,17 @@ class KswCommissionBankExportWizard(models.TransientModel):
             c.fill = hdr_fill
             c.border = thin
             c.alignment = Alignment(horizontal='center', wrap_text=True)
-        for ri, sheet in enumerate(
-                sheets.sorted(lambda s: s.employee_id.name or ''), 2):
-            emp = sheet.employee_id.sudo()
+        for ri, line in enumerate(
+                lines.sorted(lambda s: s.employee_id.name or ''), 2):
+            emp = line.employee_id.sudo()
             bank = getattr(emp, 'x_salary_bank_account_id', False)
             row = [
                 emp.name or '',
                 emp.identification_id or '',
                 emp.department_id.name if emp.department_id else '',
-                sheet.lines_subtotal,
-                sheet.driver_commission_amount,
-                sheet.total,
-                sheet.x_loans_amount_locked,
-                sheet.total_payable,
+                line.earnings,
+                line.loan_offset,
+                line.net_payable,
                 bank.acc_number if bank else '',
                 bank.bank_id.name if bank and bank.bank_id else '',
             ]
@@ -169,11 +166,11 @@ class KswCommissionBankExportWizard(models.TransientModel):
                 c = ws.cell(row=ri, column=ci, value=v)
                 c.border = thin
 
-    def _make_wps_excel(self, bank, sheets):
+    def _make_wps_excel(self, bank, lines):
         if not openpyxl:
             raise UserError(_('openpyxl is required for Excel export.'))
         wb = openpyxl.Workbook()
-        self._make_comm_summary_excel(wb, sheets)
+        self._make_comm_summary_excel(wb, lines)
 
         ws = wb.create_sheet('WPS Bank File')
         thin = Border(left=Side('thin'), right=Side('thin'),
@@ -207,11 +204,11 @@ class KswCommissionBankExportWizard(models.TransientModel):
             c.alignment = Alignment(horizontal='center')
 
         ri = 7
-        for sheet in sheets.sorted(lambda s: s.employee_id.name or ''):
-            amt = sheet.total_payable
+        for line in lines.sorted(lambda s: s.employee_id.name or ''):
+            amt = line.net_payable
             if not amt:
                 continue
-            emp = sheet.employee_id.sudo()
+            emp = line.employee_id.sudo()
             emp_bank = getattr(emp, 'x_salary_bank_account_id', False)
             row = [
                 emp_bank.bank_id.name if emp_bank and emp_bank.bank_id else '',
@@ -220,10 +217,10 @@ class KswCommissionBankExportWizard(models.TransientModel):
                 emp.barcode or '',
                 emp.identification_id or '',
                 amt,
-                sheet.wage,
+                line.earnings,
                 0.0,  # HRA not applicable in commissions
-                sheet.lines_subtotal + sheet.driver_commission_amount,
-                sheet.x_loans_amount_locked,
+                line.earnings,
+                line.loan_offset,
                 emp.department_id.name if emp.department_id else '',
             ]
             for ci, v in enumerate(row, 1):
@@ -238,20 +235,20 @@ class KswCommissionBankExportWizard(models.TransientModel):
 
     # --- TXT generation (Kawthar format) -----------------------------------
 
-    def _make_kawthar_txt(self, bank, sheets):
+    def _make_kawthar_txt(self, bank, lines):
         """Generate Kawthar fixed-width 194-char TXT file for commissions."""
         lines = []
         op = (self.operation_code or '2')
         vd = (self.value_date or fields.Date.context_today(self))
         vd_str = vd.strftime('%Y%m%d') if hasattr(vd, 'strftime') else str(vd).replace('-', '')
 
-        for sheet in sheets.sorted(lambda s: s.employee_id.name or ''):
-            amt_halala = int(round(sheet.total_payable * 100))
+        for line in lines.sorted(lambda s: s.employee_id.name or ''):
+            amt_halala = int(round((line.net_payable or 0.0) * 100))
             if amt_halala <= 0:
                 continue
-            emp = sheet.employee_id.sudo()
+            emp = line.employee_id.sudo()
             emp_bank = getattr(emp, 'x_salary_bank_account_id', False)
-            basic_halala = int(round((sheet.wage or 0.0) * 100))
+            basic_halala = int(round((line.earnings or 0.0) * 100))
 
             barcode = (emp.barcode or '').ljust(12)[:12]
             cic = (bank.x_wps_cic_number or '').ljust(10)[:10]
@@ -261,10 +258,13 @@ class KswCommissionBankExportWizard(models.TransientModel):
             net_str = str(amt_halala).zfill(15)
             basic_str = str(basic_halala).zfill(12)
             housing_str = '0' * 12
-            other_str = str(int(round(
-                (sheet.lines_subtotal + sheet.driver_commission_amount) * 100
-            ))).zfill(12)
-            ded_str = str(int(round(sheet.x_loans_amount_locked * 100))).zfill(12)
+            # Everything earned this month, not just the manual lines plus
+            # the driver commission. The old expression silently omitted
+            # location allowance, sales, collection and combined, so the
+            # breakdown never reconciled with the NET it sits next to.
+            # line.total covers every contribution, present and future.
+            other_str = str(int(round((line.earnings or 0.0) * 100))).zfill(12)
+            ded_str = str(int(round((line.loan_offset or 0.0) * 100))).zfill(12)
 
             row = (
                 barcode + cic + card_no + emp_name + nat_id
@@ -295,10 +295,10 @@ class KswCommissionBankExportWizard(models.TransientModel):
         groups = self._group_and_validate(require_type=None)
         files = []
         bl = self._batch_label()
-        for bank, sheets in groups.items():
+        for bank, lines in groups.items():
             label = self._bank_label(bank)
             if bank.x_file_type in ('wps', 'kawthar'):
-                data = self._make_wps_excel(bank, sheets)
+                data = self._make_wps_excel(bank, lines)
                 files.append(('Commissions_%s_%s.xlsx' % (bl, label), data))
         if not files:
             raise UserError(_('No Excel files could be generated.'))
@@ -310,9 +310,9 @@ class KswCommissionBankExportWizard(models.TransientModel):
         bl = self._batch_label()
         vd = (self.value_date or fields.Date.context_today(self)
               ).strftime('%Y%m%d')
-        for bank, sheets in groups.items():
+        for bank, lines in groups.items():
             label = self._bank_label(bank)
-            data = self._make_kawthar_txt(bank, sheets).encode('utf-8')
+            data = self._make_kawthar_txt(bank, lines).encode('utf-8')
             files.append(('Commissions_%s_%s_%s.txt' % (bl, label, vd), data))
         if not files:
             raise UserError(_('No text files could be generated.'))
@@ -323,12 +323,12 @@ class KswCommissionBankExportWizard(models.TransientModel):
             raise UserError(_('Please select a bank account.'))
         bank = self.bank_account_id
         groups = self._group_and_validate()
-        sheets = groups.get(bank)
-        if not sheets:
-            raise UserError(_('No sheets are assigned to the selected bank.'))
+        lines = groups.get(bank)
+        if not lines:
+            raise UserError(_('No lines are assigned to the selected bank.'))
         bl = self._batch_label()
         label = self._bank_label(bank)
-        data = self._make_wps_excel(bank, sheets)
+        data = self._make_wps_excel(bank, lines)
         return self._bundle_and_download(
             [('Commissions_%s_%s.xlsx' % (bl, label), data)])
 
@@ -339,13 +339,13 @@ class KswCommissionBankExportWizard(models.TransientModel):
             raise UserError(_('Please set a value date for the text file.'))
         bank = self.bank_account_id
         groups = self._group_and_validate()
-        sheets = groups.get(bank)
-        if not sheets:
-            raise UserError(_('No sheets are assigned to the selected bank.'))
+        lines = groups.get(bank)
+        if not lines:
+            raise UserError(_('No lines are assigned to the selected bank.'))
         bl = self._batch_label()
         label = self._bank_label(bank)
         vd = self.value_date.strftime('%Y%m%d')
-        data = self._make_kawthar_txt(bank, sheets).encode('utf-8')
+        data = self._make_kawthar_txt(bank, lines).encode('utf-8')
         return self._bundle_and_download(
             [('Commissions_%s_%s_%s.txt' % (bl, label, vd), data)])
 

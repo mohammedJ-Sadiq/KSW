@@ -1,126 +1,133 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- ── App root ──────────────────────────────────────────────── -->
+    <!--
+        Four top-level items. A supervisor lands on Pay Entries and works
+        there; the run, the reports and the configuration are for the roles
+        that need them.
+
+        Every <menuitem> repeats BOTH name= and parent=, including on
+        overrides: _tag_menuitem defaults parent_id to False and name to the
+        literal xml id whenever the attribute is absent, which silently
+        detaches the menu into its own app (CLAUDE.md gotcha #1).
+    -->
+
     <menuitem id="menu_ksw_commissions_root"
               name="Commissions"
               sequence="85"
               web_icon="KSW_commissions,static/description/icon.png"/>
 
-    <!-- ══ 1. Commissions and Other Allowances ══════════════════════ -->
-    <menuitem id="menu_ksw_commissions_section"
-              name="Commissions and Other Allowances"
+    <!-- ══ 1. Where the supervisor works ════════════════════════════ -->
+    <menuitem id="menu_ksw_pay_entries_section"
+              name="Pay Entries"
               parent="menu_ksw_commissions_root"
-              sequence="10"/>
-
-    <menuitem id="menu_ksw_commissions_my"
-              name="My Subordinates' Sheets"
-              parent="menu_ksw_commissions_section"
-              action="action_ksw_commission_sheet_my"
               sequence="10"
               groups="KSW_commissions.group_commission_supervisor"/>
 
-    <menuitem id="menu_ksw_commissions_all"
-              name="All Sheets"
-              parent="menu_ksw_commissions_section"
-              action="action_ksw_commission_sheet_all"
+    <menuitem id="menu_ksw_pay_batch"
+              name="My Batches"
+              parent="menu_ksw_pay_entries_section"
+              action="action_ksw_pay_batch"
+              sequence="10"
+              groups="KSW_commissions.group_commission_supervisor"/>
+
+    <menuitem id="menu_ksw_pay_entry_all"
+              name="All Entries"
+              parent="menu_ksw_pay_entries_section"
+              action="action_ksw_pay_entry"
               sequence="20"
               groups="KSW_commissions.group_commission_officer"/>
 
-    <menuitem id="menu_ksw_commission_batches"
-              name="Commission Batches"
-              parent="menu_ksw_commissions_section"
-              action="action_ksw_commission_batch"
+    <!-- ══ 2. The month ═════════════════════════════════════════════ -->
+    <menuitem id="menu_ksw_pay_run"
+              name="Monthly Pay Run"
+              parent="menu_ksw_commissions_root"
+              action="action_ksw_pay_run"
+              sequence="20"
+              groups="KSW_commissions.group_commission_supervisor"/>
+
+    <menuitem id="menu_ksw_pay_submission"
+              name="Department Submissions"
+              parent="menu_ksw_commissions_root"
+              action="action_ksw_pay_submission"
+              sequence="25"
+              groups="KSW_commissions.group_commission_supervisor"/>
+
+    <!-- ══ 3. Reports ═══════════════════════════════════════════════ -->
+    <menuitem id="menu_ksw_reports_section"
+              name="Reports"
+              parent="menu_ksw_commissions_root"
               sequence="30"
-              groups="KSW_commissions.group_commission_accountant"/>
+              groups="KSW_commissions.group_commission_officer"/>
 
-    <menuitem id="menu_ksw_commissions_templates"
-              name="Commission Templates"
-              parent="menu_ksw_commissions_section"
-              action="action_ksw_commission_template"
-              sequence="40"
-              groups="KSW_commissions.group_commission_supervisor"/>
-
-    <!-- ══ 2. Driver Commissions ════════════════════════════════════ -->
-    <menuitem id="menu_ksw_driver_section"
-              name="Driver Commissions"
-              parent="menu_ksw_commissions_root"
-              sequence="20"/>
-
-    <menuitem id="menu_ksw_driver_commission"
-              name="Driver Commission Sheets"
-              parent="menu_ksw_driver_section"
-              action="action_ksw_driver_commission_sheet"
+    <menuitem id="menu_ksw_pay_run_line"
+              name="Payment Register"
+              parent="menu_ksw_reports_section"
+              action="action_ksw_pay_run_line"
               sequence="10"
-              groups="KSW_commissions.group_commission_supervisor"/>
+              groups="KSW_commissions.group_commission_officer"/>
 
-    <!-- ══ 2b. Technician Location Allowance ════════════════════════ -->
-    <menuitem id="menu_ksw_location_allowance_section"
-              name="Technician Location Allowance"
-              parent="menu_ksw_commissions_root"
-              sequence="25"/>
-
-    <menuitem id="menu_ksw_location_allowance_sheet"
-              name="Location Allowance Sheets"
-              parent="menu_ksw_location_allowance_section"
-              action="action_ksw_location_allowance_sheet"
-              sequence="10"
-              groups="KSW_commissions.group_commission_supervisor"/>
-
-    <!-- ══ 2c. Sales / Collection Commissions ═══════════════════════ -->
+    <!-- ══ 4. Sales & Collection — paid separately, not a component ══ -->
     <menuitem id="menu_ksw_sales_commission_section"
-              name="Sales &amp; Collection Commissions"
+              name="Sales &amp; Collection"
               parent="menu_ksw_commissions_root"
-              sequence="30"/>
+              sequence="40"
+              groups="KSW_commissions.group_entry_sales"/>
 
     <menuitem id="menu_ksw_sales_commission_sheet"
               name="Monthly Sheets"
               parent="menu_ksw_sales_commission_section"
               action="action_ksw_sales_commission_sheet"
               sequence="10"
-              groups="KSW_commissions.group_commission_accountant"/>
+              groups="KSW_commissions.group_entry_sales"/>
 
-    <menuitem id="menu_ksw_salesperson_profile"
-              name="Salesperson Profiles"
-              parent="menu_ksw_sales_commission_section"
-              action="action_ksw_salesperson_profile"
-              sequence="20"
-              groups="KSW_commissions.group_commission_admin"/>
-
-    <!-- ══ 3. Configuration ══════════════════════════════════════════ -->
+    <!-- ══ 5. Configuration ═════════════════════════════════════════ -->
     <menuitem id="menu_ksw_commissions_config"
               name="Configuration"
               parent="menu_ksw_commissions_root"
               sequence="100"
               groups="KSW_commissions.group_commission_admin"/>
 
-    <menuitem id="menu_ksw_commissions_categories"
-              name="Commission Categories"
+    <menuitem id="menu_ksw_pay_component"
+              name="Pay Components"
               parent="menu_ksw_commissions_config"
-              action="action_ksw_commission_category"
+              action="action_ksw_pay_component"
               sequence="10"
               groups="KSW_commissions.group_commission_admin"/>
+
+    <menuitem id="menu_ksw_pay_recurring"
+              name="Recurring Entries"
+              parent="menu_ksw_commissions_config"
+              action="action_ksw_pay_recurring"
+              sequence="20"
+              groups="KSW_commissions.group_commission_officer"/>
 
     <menuitem id="menu_ksw_commissions_sites"
               name="Work Sites"
               parent="menu_ksw_commissions_config"
               action="action_ksw_site"
-              sequence="20"
+              sequence="30"
+              groups="KSW_commissions.group_commission_admin"/>
+
+    <menuitem id="menu_ksw_salesperson_profile"
+              name="Salesperson Profiles"
+              parent="menu_ksw_commissions_config"
+              action="action_ksw_salesperson_profile"
+              sequence="40"
               groups="KSW_commissions.group_commission_admin"/>
 
     <menuitem id="menu_ksw_sales_commission_rules"
               name="Sales/Collection Commission Rules"
               parent="menu_ksw_commissions_config"
               action="action_ksw_sales_commission_rule"
-              sequence="25"
+              sequence="50"
               groups="KSW_commissions.group_commission_admin"/>
 
     <menuitem id="menu_ksw_commissions_settings"
               name="General Settings"
               parent="menu_ksw_commissions_config"
               action="action_ksw_commissions_config_settings"
-              sequence="30"
+              sequence="60"
               groups="KSW_commissions.group_commission_admin"/>
 
 </odoo>
-

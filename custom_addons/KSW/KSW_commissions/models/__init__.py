@@ -1,18 +1,17 @@
-from . import ksw_commission_category
-from . import ksw_site
-from . import ksw_commission_template     # template → auto-fill lines on new sheets
+from . import ksw_commission_lock         # period lock predicate + guard (no models)
+from . import ksw_site                    # work sites (used by entries and tiers)
+from . import ksw_pay_component           # the catalog: a pay type is data, not code
 from . import hr_employee
-from . import ksw_driver_commission    # site driver commission sheet + line
-from . import ksw_location_allowance   # technician meals (breakfast/lunch/dinner) sheet
-from . import ksw_meal_settings        # res.config.settings: meal unit prices
-from . import ksw_salesperson_profile  # yearly target + client splits
-from . import ksw_sales_commission_rule  # rule + tier catalog
-from . import ksw_sales_commission_sheet  # monthly accountant entry sheet
-from . import res_partner               # commission import name alias
-from . import ksw_commission_batch     # commission batch (payslip.run mirror)
-from . import ksw_deduction            # adds awaiting-commission helpers
-from . import ksw_deduction_line       # adds x_original_amount / x_awaiting_commission / paid-via-commission link
-from . import hr_payslip               # filters parked KSW_DED_* inputs out of payslips
-from . import ksw_commission_sheet
-from . import ksw_commission_sheet_line
-
+from . import ksw_pay_batch               # batches + entries: the supervisor's screen
+from . import ksw_pay_recurring           # SAP infotype 0014 equivalent
+from . import ksw_pay_submission          # one department's handover to the GM
+from . import ksw_pay_run                 # the month, its approval and the register
+from . import ksw_pay_import_bas          # the one importer: driver trips from BAS
+from . import ksw_meal_settings           # res.config.settings: overtime params
+from . import ksw_salesperson_profile     # sales: yearly target + client splits
+from . import ksw_sales_commission_rule   # sales: rule + tier catalog
+from . import ksw_sales_commission_sheet  # sales: paid separately, not an entry type
+from . import res_partner                 # commission import name alias
+from . import ksw_deduction               # adds awaiting-commission helpers
+from . import ksw_deduction_line          # parked installments + pay-run settlement link
+from . import hr_payslip                  # filters parked KSW_DED_* inputs out of payslips

@@ -69,6 +69,17 @@
                             class="btn-danger"
                             groups="KSW_deduction.group_loan_gm"
                             invisible="not is_loan or approval_state != 'pending_gm'"/>
+                    <!-- Return to Approver: two audiences, one button (no
+                         groups= — both gate fields are read by this
+                         invisible= and must stay fetchable for every user
+                         who can see the button, Odoo 19 Pitfalls #31).
+                         GM: only from their own step (pending_gm).
+                         Admin: from any step the loan has already reached,
+                         chosen by x_can_admin_return itself. -->
+                    <button name="action_open_loan_return_wizard" type="object"
+                            string="↩ Return to Approver"
+                            class="btn-warning"
+                            invisible="not x_can_gm_return and not x_can_admin_return"/>
                     <button name="action_disbursement_confirm" type="object"
                             string="✅ Confirm Disbursement"
                             class="btn-success"
@@ -182,10 +193,30 @@
                         </div>
                     </div>
 
+                    <!-- Self-service window: the requester's own loan,
+                         still waiting for its first approval. Tells the
+                         employee what they may still do themselves
+                         instead of leaving them to discover it. -->
+                    <div role="status" invisible="not x_can_employee_edit"
+                         class="alert alert-info">
+                        <strong>You can still change this request.</strong>
+                        The amount, installments, start month and
+                        justification stay editable, and you can delete the
+                        request entirely, until the first approver acts on
+                        it. After that, use <b>Cancel</b> — it keeps a trace
+                        of the request.
+                    </div>
+
                     <group>
                         <group string="Employee">
+                            <!-- The employee may edit their own request in
+                                 the pre-approval window, but never re-point
+                                 it at somebody else (the server-side
+                                 whitelist in _check_employee_self_write
+                                 refuses employee_id / type_id outright —
+                                 this keeps the form honest about it). -->
                             <field name="employee_id"
-                                   readonly="state != 'draft'"/>
+                                   readonly="state != 'draft' or x_can_employee_edit"/>
                             <field name="department_id" readonly="1"/>
                             <field name="manager_id" readonly="1"/>
                             <!-- Identifiers are sudo-computed mirrors, so
@@ -204,7 +235,7 @@
                             <field name="x_can_select_loan_type" invisible="1"/>
                             <field name="type_id"
                                    domain="[] if x_can_select_loan_type else [('is_loan', '=', False)]"
-                                   readonly="state != 'draft'"/>
+                                   readonly="state != 'draft' or x_can_employee_edit"/>
                             <field name="category" readonly="1"/>
                             <field name="is_loan" invisible="1"/>
                         </group>
@@ -236,6 +267,9 @@
                             <field name="x_can_dm_approve" invisible="1"/>
                             <field name="x_can_cancel" invisible="1"/>
                             <field name="x_can_edit_installments" invisible="1"/>
+                            <field name="x_can_employee_edit" invisible="1"/>
+                            <field name="x_can_gm_return" invisible="1"/>
+                            <field name="x_can_admin_return" invisible="1"/>
                             <!-- Per-user permission mirrors (computed from
                                  res.users). Loaded invisible because the
                                  readonly expressions above reference them. -->
@@ -700,6 +734,29 @@
         <field name="view_mode">kanban,graph,pivot,list,form</field>
         <field name="search_view_id" ref="ksw_deduction_view_search"/>
         <field name="context">{'search_default_active': 1, 'search_default_group_type': 1}</field>
+    </record>
+
+    <!-- Self-service: everything being deducted from MY salary.
+         Wider than "My Loans" on purpose — an employee should be able to
+         look up the penalty or salary advance behind a payslip line, not
+         just their loan requests. Read-only in practice: the ACL grants
+         no create, and the record rules only let them write their own
+         loan request while it is still awaiting the first approval. -->
+    <record id="action_ksw_my_deductions" model="ir.actions.act_window">
+        <field name="name">My Deductions</field>
+        <field name="res_model">ksw.deduction</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="ksw_deduction_view_search"/>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Nothing is being deducted from your salary
+            </p>
+            <p>
+                Loans, salary advances and penalties recorded against you
+                appear here, with the installment schedule of each.
+            </p>
+        </field>
     </record>
 
     <!-- Operations: all deductions (kanban-first for scanability) -->

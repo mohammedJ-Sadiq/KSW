@@ -24,10 +24,10 @@
             </xpath>
             <xpath expr="//field[@name='line_ids'][@readonly='1']/list/field[@name='settlement_label']"
                    position="after">
-                <field name="x_paid_via_commission_sheet_id"
+                <field name="x_paid_via_pay_run_line_id"
                        string="Paid via Sheet"
                        optional="show"/>
-                <field name="x_pending_commission_sheet_id"
+                <field name="x_pending_pay_run_id"
                        string="Awaiting Sheet"
                        optional="hide"/>
             </xpath>
@@ -41,10 +41,10 @@
             </xpath>
             <xpath expr="//field[@name='line_ids'][not(@readonly='1')]/list/field[@name='settlement_label']"
                    position="after">
-                <field name="x_paid_via_commission_sheet_id"
+                <field name="x_paid_via_pay_run_line_id"
                        string="Paid via Sheet"
                        readonly="1" optional="show"/>
-                <field name="x_pending_commission_sheet_id"
+                <field name="x_pending_pay_run_id"
                        string="Awaiting Sheet"
                        readonly="1" optional="hide"/>
             </xpath>

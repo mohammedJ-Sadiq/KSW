@@ -7,10 +7,12 @@ class KswLoanRequestWizard(models.TransientModel):
     """Self-service loan-request wizard for plain employees.
 
     Plain employees (`group_deduction_user` only, no officer / approver
-    role) have read-only access to `ksw.deduction`. They cannot create
-    deduction records directly — creating any deduction is a privileged
-    action reserved for officers. This wizard is the ONLY route they
-    have to submit a loan request for themselves.
+    role) cannot create deduction records directly — creating any
+    deduction is a privileged action reserved for officers. This wizard
+    is the ONLY route they have to submit a loan request for themselves.
+    (They may edit or delete the resulting request afterwards, but only
+    while it is still waiting for the first approval — see
+    ksw.deduction._is_own_request_before_approval.)
 
     Flow:
       1. User opens the wizard via the "Request a Loan" menu (visible

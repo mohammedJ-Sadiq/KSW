@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- ================================================================ -->
+    <!-- Pay Batch — the one screen a supervisor works in                  -->
+    <!-- ================================================================ -->
+    <record id="view_ksw_pay_batch_form" model="ir.ui.view">
+        <field name="name">ksw.pay.batch.form</field>
+        <field name="model">ksw.pay.batch</field>
+        <field name="arch" type="xml">
+            <form string="Pay Entries">
+                <field name="state" invisible="1"/>
+                <field name="is_locked" invisible="1"/>
+                <field name="scope" invisible="1"/>
+                <field name="calculation" invisible="1"/>
+                <field name="needs_date" invisible="1"/>
+                <field name="needs_location" invisible="1"/>
+                <field name="importer" invisible="1"/>
+                <field name="x_can_reopen" invisible="1"/>
+                <field name="submission_state" invisible="1"/>
+
+                <header>
+                    <button name="action_submit" string="Submit"
+                            type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_add_recurring" string="Add Recurring"
+                            type="object" class="btn-secondary"
+                            invisible="state != 'draft'"
+                            title="Pull in this component's recurring entries for the month"/>
+                    <button name="action_import" string="Import"
+                            type="object" class="btn-secondary"
+                            invisible="state != 'draft' or not importer"/>
+                    <!-- Correcting your own work before anyone has looked at
+                         it should not need a request, so this stays open to
+                         the supervisor right up until his department is
+                         handed over. After that it is the GM's to return. -->
+                    <button name="action_reset_to_draft" string="Reopen"
+                            type="object" class="btn-secondary"
+                            invisible="not x_can_reopen"/>
+                    <statusbar statusfield="state"
+                               statusbar_visible="draft,submitted,approved"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not return_reason or state != 'draft'">
+                        <strong>Returned by the General Manager:</strong>
+                        <field name="return_reason" readonly="1" nolabel="1"/>
+                    </div>
+
+                    <div class="alert alert-info" role="alert"
+                         invisible="submission_state != 'submitted' or state == 'approved'">
+                        <strong>Handed over to the General Manager.</strong>
+                        This batch is frozen because
+                        <field name="submission_id" readonly="1" nolabel="1"
+                               class="oe_inline"/>
+                        has been submitted. Open it to take the submission
+                        back, or ask the GM to return it.
+                    </div>
+
+                    <group>
+                        <group string="What and when">
+                            <field name="component_id" readonly="is_locked"
+                                   options="{'no_create': True}"/>
+                            <field name="period" options="{'min_precision': 'months'}" readonly="is_locked"/>
+                        </group>
+                        <group string="For whom">
+                            <field name="allowed_department_ids" invisible="1"/>
+                            <field name="department_locked" invisible="1"/>
+                            <!-- Narrowed to the departments this user runs;
+                                 when there is only one it is chosen for him
+                                 and locked, because one option is not a
+                                 choice. -->
+                            <field name="department_id"
+                                   readonly="is_locked or department_locked"
+                                   invisible="scope != 'department'"
+                                   required="scope == 'department'"
+                                   options="{'no_create': True}"/>
+                            <field name="site_id"
+                                   readonly="is_locked"
+                                   invisible="scope != 'site'"
+                                   required="scope == 'site'"
+                                   options="{'no_create': True}"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Entries" name="entries">
+                            <field name="entry_ids" readonly="is_locked"
+                                   context="{'default_batch_id': id}">
+                                <list editable="bottom"
+                                      decoration-warning="is_overridden">
+                                    <!-- Carries the picker's domain: the
+                                         batch's own scope plus whoever
+                                         reports to this supervisor. -->
+                                    <field name="allowed_employee_ids"
+                                           column_invisible="1"/>
+                                    <field name="employee_id"
+                                           options="{'no_create': True}"/>
+                                    <field name="date"
+                                           column_invisible="not parent.needs_date"/>
+                                    <field name="quantity_ref"
+                                           column_invisible="not parent.qty_ref_label"
+                                           optional="show"/>
+                                    <field name="quantity"
+                                           column_invisible="parent.calculation == 'fixed'"
+                                           sum="Total"/>
+                                    <field name="threshold_qty"
+                                           column_invisible="parent.calculation != 'tiered'"
+                                           optional="show"/>
+                                    <field name="location_id"
+                                           column_invisible="not parent.needs_location"
+                                           options="{'no_create': True}"/>
+                                    <field name="reason"/>
+                                    <field name="details" optional="hide"/>
+                                    <field name="rate" readonly="1"
+                                           column_invisible="parent.calculation == 'fixed'"
+                                           optional="show"/>
+                                    <field name="amount_computed" readonly="1"
+                                           column_invisible="parent.calculation == 'fixed'"
+                                           optional="hide"/>
+                                    <field name="amount_override"
+                                           column_invisible="parent.calculation == 'fixed'"
+                                           optional="hide"/>
+                                    <field name="is_overridden"
+                                           column_invisible="1"/>
+                                    <field name="amount"
+                                           readonly="parent.calculation != 'fixed'"
+                                           sum="Total Amount"/>
+                                    <button name="action_explain" type="object"
+                                            icon="fa-calculator"
+                                            title="How was this worked out?"
+                                            column_invisible="parent.calculation == 'fixed'"/>
+                                    <button name="action_duplicate_line"
+                                            type="object" icon="fa-copy"
+                                            title="Duplicate this line"
+                                            invisible="parent.state != 'draft'"/>
+                                    <field name="currency_id"
+                                           column_invisible="1"/>
+                                </list>
+                            </field>
+                            <div class="text-muted mt-2"
+                                 invisible="calculation == 'fixed'">
+                                Each new line starts as a copy of the one
+                                before it — change what differs. The
+                                <b>calculator</b> icon shows how an amount was
+                                worked out; <b>Override Amount</b> pays a
+                                different figure and survives a later edit to
+                                the quantity.
+                            </div>
+                        </page>
+
+                        <page string="By Employee" name="by_employee">
+                            <field name="entry_ids" readonly="1" nolabel="1">
+                                <list create="false" delete="false"
+                                      default_group_by="employee_id">
+                                    <field name="employee_id"/>
+                                    <field name="date" optional="show"/>
+                                    <field name="quantity" sum="Total"/>
+                                    <field name="reason" optional="show"/>
+                                    <field name="amount" sum="Total Amount"/>
+                                    <field name="currency_id"
+                                           column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Notes" name="notes">
+                            <field name="note" nolabel="1"
+                                   readonly="is_locked"
+                                   placeholder="Anything the approver should know…"/>
+                        </page>
+                    </notebook>
+
+                    <group class="oe_subtotal_footer oe_right">
+                        <field name="entry_count" string="Entries" readonly="1"/>
+                        <field name="employee_count" string="Employees" readonly="1"/>
+                        <field name="total_quantity" readonly="1"
+                               invisible="calculation == 'fixed'"/>
+                        <field name="total_amount" readonly="1"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_batch_list" model="ir.ui.view">
+        <field name="name">ksw.pay.batch.list</field>
+        <field name="model">ksw.pay.batch</field>
+        <field name="arch" type="xml">
+            <list string="Pay Entry Batches"
+                  decoration-muted="state == 'approved'"
+                  decoration-info="state == 'submitted'">
+                <field name="name"/>
+                <field name="component_id"/>
+                <field name="department_id" optional="show"/>
+                <field name="site_id" optional="hide"/>
+                <field name="period" options="{'min_precision': 'months'}"/>
+                <field name="entry_count" string="Records"/>
+                <field name="employee_count" string="Employees" optional="show"/>
+                <field name="total_amount" sum="Total"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'submitted'"
+                       decoration-success="state == 'approved'"/>
+                <field name="submission_state" widget="badge" optional="show"
+                       decoration-success="submission_state in ['submitted', 'approved']"
+                       decoration-warning="submission_state == 'returned'"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_batch_search" model="ir.ui.view">
+        <field name="name">ksw.pay.batch.search</field>
+        <field name="model">ksw.pay.batch</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="component_id"/>
+                <field name="department_id"/>
+                <field name="period" options="{'min_precision': 'months'}"/>
+                <filter name="draft" string="Draft"
+                        domain="[('state','=','draft')]"/>
+                <filter name="submitted" string="Submitted"
+                        domain="[('state','=','submitted')]"/>
+                <group>
+                    <filter string="Period" name="grp_period" domain="[]"
+                            context="{'group_by': 'period'}"/>
+                    <filter string="Component" name="grp_component" domain="[]"
+                            context="{'group_by': 'component_id'}"/>
+                    <filter string="Department" name="grp_department" domain="[]"
+                            context="{'group_by': 'department_id'}"/>
+                    <filter string="Status" name="grp_state" domain="[]"
+                            context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_pay_batch" model="ir.actions.act_window">
+        <field name="name">Pay Entries</field>
+        <field name="res_model">ksw.pay.batch</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ksw_pay_batch_search"/>
+        <field name="context">{'search_default_grp_period': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Record this month's extra pay
+            </p>
+            <p>
+                A batch covers one kind of pay for one month — Overtime for
+                Maintenance in August, say. Add a row per occurrence, then
+                submit it for the General Manager to approve with the rest of
+                the month.
+            </p>
+        </field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- "How was this worked out?" — the justification behind an amount   -->
+    <!-- ================================================================ -->
+    <record id="view_ksw_pay_entry_explain_form" model="ir.ui.view">
+        <field name="name">ksw.pay.entry.explain.form</field>
+        <field name="model">ksw.pay.entry</field>
+        <field name="arch" type="xml">
+            <form string="How this amount was worked out" create="false"
+                  edit="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id" readonly="1"/>
+                            <field name="component_id" readonly="1"/>
+                            <field name="date" readonly="1"
+                                   invisible="not date"/>
+                        </group>
+                        <group>
+                            <field name="location_id" readonly="1"
+                                   invisible="not location_id"/>
+                            <field name="reason" readonly="1"
+                                   invisible="not reason"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="explanation" nolabel="1" readonly="1"/>
+                </sheet>
+                <footer>
+                    <button string="Close" class="btn-primary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Pay Entry — standalone list, for reporting across batches         -->
+    <!-- ================================================================ -->
+    <record id="view_ksw_pay_entry_list" model="ir.ui.view">
+        <field name="name">ksw.pay.entry.list</field>
+        <field name="model">ksw.pay.entry</field>
+        <field name="arch" type="xml">
+            <list string="Pay Entries" create="false">
+                <field name="employee_id"/>
+                <field name="component_id"/>
+                <field name="department_id" optional="show"/>
+                <field name="period" options="{'min_precision': 'months'}"/>
+                <field name="date" optional="hide"/>
+                <field name="quantity" sum="Total"/>
+                <field name="reason" optional="hide"/>
+                <field name="amount" sum="Total Amount"/>
+                <field name="state" widget="badge" optional="show"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_entry_search" model="ir.ui.view">
+        <field name="name">ksw.pay.entry.search</field>
+        <field name="model">ksw.pay.entry</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="component_id"/>
+                <field name="department_id"/>
+                <field name="period" options="{'min_precision': 'months'}"/>
+                <group>
+                    <filter string="Employee" name="grp_employee" domain="[]"
+                            context="{'group_by': 'employee_id'}"/>
+                    <filter string="Component" name="grp_component" domain="[]"
+                            context="{'group_by': 'component_id'}"/>
+                    <filter string="Department" name="grp_department" domain="[]"
+                            context="{'group_by': 'department_id'}"/>
+                    <filter string="Period" name="grp_period" domain="[]"
+                            context="{'group_by': 'period'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_pay_entry" model="ir.actions.act_window">
+        <field name="name">All Entries</field>
+        <field name="res_model">ksw.pay.entry</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ksw_pay_entry_search"/>
+        <field name="context">{'search_default_grp_employee': 1}</field>
+    </record>
+
+</odoo>

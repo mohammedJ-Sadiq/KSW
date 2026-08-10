@@ -1,25 +1,30 @@
 {
     'name': 'KSW Commissions & Other Allowances',
-    'version': '19.0.1.0.0',
-    'summary': 'Monthly commission and allowance sheets for non-biometric '
-               '(attendance-sheet) employees, with smart loan-shortfall '
-               'recovery from KSW_deduction.',
+    'version': '19.0.3.1.0',
+    'summary': 'Commissions and allowances on the ERP element model: a '
+               'configurable pay-component catalog, one entry screen per '
+               'department, and a monthly run the General Manager approves.',
     'description': """
-Per-employee monthly Commissions & Other Allowances sheet for the
-``x_is_attendance_sheet`` workforce. Supervisors fill in dynamic
-allowance/commission lines from admin-managed categories; the sheet
-automatically pulls any *deduction shortfall* from KSW_deduction
-(installments the accountant reduced for a given month) and offers
-it as a deductible from the bank-transfer total.
+Extra pay — overtime, driver trips, meals, allowances, bonuses — recorded
+the way the large HR systems do it: the *type* is configuration data (SAP's
+wage type, Oracle's element), not code, so adding a new kind of pay is a
+catalog record rather than a model.
 
-State machine:
-  draft (supervisor edits) → confirmed (accountant reviews loans
-  line) → done (sheet locked; manual paid line written back to
-  KSW_deduction; pending shortfall reduced).
+  ksw.pay.component   the catalog: fixed | qty x rate | wage-derived | tiered
+  ksw.pay.entry       the only fact — one occurrence for one employee
+  ksw.pay.batch       one component, one scope, one month: the entry screen
+  ksw.pay.submission  one department's handover to the General Manager
+  ksw.pay.run         the month, its approval and the period lock
+  ksw.pay.run.line    the payment register, generated, feeding the bank file
 
-Phase A delivers the main sheet + KSW_deduction shortfall flow.
-Phase B will add driver-commission sub-form, commission batches,
-WPS / Kawthar bank-file export, and the PDF report.
+Each supervisor records and submits only his own department; the General
+Manager sees which departments are in, who is due to be paid and what their
+parked loan installments consume, and approves the month in one action.
+Approval settles those installments against KSW_deduction and locks the
+period.
+
+Sales & collection commission is computed here but paid separately — it is
+not part of the commission request.
 """,
     'author': 'KSW',
     'category': 'Human Resources',
@@ -35,27 +40,22 @@ WPS / Kawthar bank-file export, and the PDF report.
         'security/security.xml',
         'security/ir.model.access.csv',
         'data/sequence.xml',
-        'data/category_data.xml',
-        'data/ir_cron.xml',
-        'views/ksw_commission_category_views.xml',
+        'data/pay_component_data.xml',
+        'data/mail_template_data.xml',
         'views/ksw_site_views.xml',
-        'views/ksw_commission_template_views.xml',
-        'reports/report_commission_sheet.xml',
-        'reports/report_commissions_summary.xml',
-        'reports/report_driver_commission_sheet.xml',
-        'views/ksw_driver_commission_views.xml',
-        'views/ksw_location_allowance_views.xml',
+        'views/ksw_pay_component_views.xml',
+        'views/ksw_pay_batch_views.xml',
+        'views/ksw_pay_submission_views.xml',
+        'views/ksw_pay_run_views.xml',
         'views/ksw_salesperson_profile_views.xml',
         'views/ksw_sales_commission_rule_views.xml',
         'views/ksw_sales_commission_sheet_views.xml',
         'wizard/sales_commission_override_wizard_views.xml',
         'wizard/sales_commission_import_wizard_views.xml',
-        'views/ksw_commission_batch_views.xml',
         'views/ksw_commission_bank_export_wizard_views.xml',
         'views/hr_employee_views.xml',
         'views/res_partner_views.xml',
         'views/ksw_deduction_views.xml',
-        'views/ksw_commission_sheet_views.xml',
         'views/res_config_settings_views.xml',
         'views/menu.xml',
     ],

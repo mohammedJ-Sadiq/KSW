@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--
+        The pay component catalog.
+
+        Everything KSW pays on top of salary is a row here. Adding another one
+        is a configuration record — no model, no view, no menu, no access
+        group, no record rule. That is the whole point of the redesign.
+
+        noupdate="1" so an admin's edits to rates survive an upgrade. New
+        components added in a later version simply appear; existing ones are
+        never overwritten.
+    -->
+    <data noupdate="1">
+
+        <!-- ── Overtime ─────────────────────────────────────────────── -->
+        <record id="pay_component_overtime" model="ksw.pay.component">
+            <field name="name">Overtime</field>
+            <field name="code">OT</field>
+            <field name="kind">earning</field>
+            <field name="calculation">wage_rate</field>
+            <field name="divisor">240.0</field>
+            <field name="factor">1.5</field>
+            <field name="qty_label">Hours</field>
+            <field name="scope">department</field>
+            <field name="needs_date" eval="True"/>
+            <field name="needs_location" eval="True"/>
+            <field name="needs_reason" eval="True"/>
+            <field name="sequence">10</field>
+            <field name="description">Basic salary ÷ 240 × hours × 1.5, per Saudi Labour Law art. 107. Recorded per occurrence with the date, where it was worked and why.</field>
+        </record>
+
+        <!-- ── Driver trips ─────────────────────────────────────────── -->
+        <record id="pay_component_driver_trips" model="ksw.pay.component">
+            <field name="name">Driver Trips</field>
+            <field name="code">TRIPS</field>
+            <field name="kind">earning</field>
+            <field name="calculation">tiered</field>
+            <field name="qty_label">Weighted Trips</field>
+            <field name="qty_ref_label">Actual Trips</field>
+            <field name="scope">site</field>
+            <field name="importer">bas_trips</field>
+            <field name="sequence">20</field>
+            <field name="description">الرد المضاعف — loads weighted by each destination's distance factor. The free allowance on each entry is the driver's required trips pro-rated to the days he worked; everything above it waterfalls through the site's tiers.</field>
+            <!--
+                Default ladder, matching the ksw.site defaults it replaces
+                (40 trips at 10, then 40 at 15, then 40 at 20, remainder at
+                25). Seeded inline because the tiered constraint is checked
+                as soon as the component is created. Leave site_id empty to
+                apply everywhere; add site-specific rows to override.
+            -->
+            <field name="tier_ids" eval="[
+                (0, 0, {'name': 'Tier 2', 'sequence': 10, 'width': 40.0, 'rate': 10.0}),
+                (0, 0, {'name': 'Tier 3', 'sequence': 20, 'width': 40.0, 'rate': 15.0}),
+                (0, 0, {'name': 'Tier 4', 'sequence': 30, 'width': 40.0, 'rate': 20.0}),
+                (0, 0, {'name': 'Tier 5', 'sequence': 40, 'width': 0.0,  'rate': 25.0}),
+            ]"/>
+        </record>
+
+        <!-- ── Meals ────────────────────────────────────────────────── -->
+        <record id="pay_component_meal_breakfast" model="ksw.pay.component">
+            <field name="name">Breakfast</field>
+            <field name="code">MEAL_B</field>
+            <field name="calculation">qty_rate</field>
+            <field name="rate">10.0</field>
+            <field name="qty_label">Meals</field>
+            <field name="scope">department</field>
+            <field name="sequence">30</field>
+        </record>
+        <record id="pay_component_meal_lunch" model="ksw.pay.component">
+            <field name="name">Lunch</field>
+            <field name="code">MEAL_L</field>
+            <field name="calculation">qty_rate</field>
+            <field name="rate">20.0</field>
+            <field name="qty_label">Meals</field>
+            <field name="scope">department</field>
+            <field name="sequence">31</field>
+        </record>
+        <record id="pay_component_meal_dinner" model="ksw.pay.component">
+            <field name="name">Dinner</field>
+            <field name="code">MEAL_D</field>
+            <field name="calculation">qty_rate</field>
+            <field name="rate">15.0</field>
+            <field name="qty_label">Meals</field>
+            <field name="scope">department</field>
+            <field name="sequence">32</field>
+        </record>
+
+        <!-- ── Fixed allowances ─────────────────────────────────────── -->
+        <record id="pay_component_project_management" model="ksw.pay.component">
+            <field name="name">Project Management Allowance</field>
+            <field name="code">ALW_PROJECT</field>
+            <field name="calculation">fixed</field>
+            <field name="scope">department</field>
+            <field name="sequence">40</field>
+        </record>
+        <record id="pay_component_location_allowance" model="ksw.pay.component">
+            <field name="name">Location Allowance</field>
+            <field name="code">ALW_LOCATION</field>
+            <field name="calculation">fixed</field>
+            <field name="scope">department</field>
+            <field name="needs_location" eval="True"/>
+            <field name="sequence">41</field>
+        </record>
+        <record id="pay_component_data_entry" model="ksw.pay.component">
+            <field name="name">Data Entry Allowance</field>
+            <field name="code">ALW_DATA_ENTRY</field>
+            <field name="calculation">fixed</field>
+            <field name="scope">department</field>
+            <field name="sequence">42</field>
+        </record>
+        <record id="pay_component_mobile" model="ksw.pay.component">
+            <field name="name">Mobile Phone Allowance</field>
+            <field name="code">ALW_MOBILE</field>
+            <field name="calculation">fixed</field>
+            <field name="scope">department</field>
+            <field name="sequence">43</field>
+        </record>
+
+        <!-- ── Friday work ──────────────────────────────────────────── -->
+        <record id="pay_component_friday" model="ksw.pay.component">
+            <field name="name">Friday Work Allowance</field>
+            <field name="code">FRIDAY</field>
+            <field name="calculation">qty_rate</field>
+            <field name="rate">100.0</field>
+            <field name="qty_label">Days</field>
+            <field name="scope">department</field>
+            <field name="needs_date" eval="True"/>
+            <field name="sequence">50</field>
+        </record>
+
+        <!-- ── Holiday bonuses: one component per paid holiday ───────── -->
+        <record id="pay_component_bonus_foundation" model="ksw.pay.component">
+            <field name="name">Foundation Day Bonus</field>
+            <field name="code">BONUS_FOUNDATION</field>
+            <field name="calculation">fixed</field>
+            <field name="scope">department</field>
+            <field name="sequence">60</field>
+        </record>
+        <record id="pay_component_bonus_national" model="ksw.pay.component">
+            <field name="name">National Day Bonus</field>
+            <field name="code">BONUS_NATIONAL</field>
+            <field name="calculation">fixed</field>
+            <field name="scope">department</field>
+            <field name="sequence">61</field>
+        </record>
+        <record id="pay_component_bonus_fitr" model="ksw.pay.component">
+            <field name="name">Eid Al-Fitr Bonus</field>
+            <field name="code">BONUS_FITR</field>
+            <field name="calculation">fixed</field>
+            <field name="scope">department</field>
+            <field name="sequence">62</field>
+        </record>
+        <record id="pay_component_bonus_adha" model="ksw.pay.component">
+            <field name="name">Eid Al-Adha Bonus</field>
+            <field name="code">BONUS_ADHA</field>
+            <field name="calculation">fixed</field>
+            <field name="scope">department</field>
+            <field name="sequence">63</field>
+        </record>
+
+        <!-- ── Employee bonus / catch-all ───────────────────────────── -->
+        <record id="pay_component_employee_bonus" model="ksw.pay.component">
+            <field name="name">Employee Bonus</field>
+            <field name="code">BONUS_EMPLOYEE</field>
+            <field name="calculation">fixed</field>
+            <field name="scope">department</field>
+            <field name="needs_reason" eval="True"/>
+            <field name="sequence">70</field>
+        </record>
+        <record id="pay_component_other" model="ksw.pay.component">
+            <field name="name">Other</field>
+            <field name="code">OTHER</field>
+            <field name="calculation">fixed</field>
+            <field name="scope">department</field>
+            <field name="needs_reason" eval="True"/>
+            <field name="sequence">200</field>
+        </record>
+
+        <!-- ── Sequence for batches ─────────────────────────────────── -->
+        <record id="seq_ksw_pay_batch" model="ir.sequence">
+            <field name="name">KSW Pay Entry Batch</field>
+            <field name="code">ksw.pay.batch</field>
+            <field name="prefix">PB</field>
+            <field name="padding">6</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+    </data>
+
+    <!--
+        Fields added to already-seeded components after the first install.
+        A <record> override targeting a noupdate="1" block is silently
+        skipped on every upgrade after that install (CLAUDE.md gotcha #2);
+        <function> calls write() directly and is not subject to that gate.
+    -->
+    <function model="ksw.pay.component" name="write">
+        <value eval="[ref('pay_component_driver_trips')]"/>
+        <value eval="{'qty_ref_label': 'Actual Trips'}"/>
+    </function>
+</odoo>

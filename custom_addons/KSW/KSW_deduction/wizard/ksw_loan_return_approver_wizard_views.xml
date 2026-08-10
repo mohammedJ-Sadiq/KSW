@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_ksw_loan_return_approver_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.loan.return.approver.wizard.form</field>
+        <field name="model">ksw.loan.return.approver.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Return Loan Request for Revision">
+                <sheet>
+                    <group string="Loan Summary" col="2">
+                        <field name="employee_name" string="Employee" readonly="1"/>
+                        <field name="amount" readonly="1"/>
+                        <field name="installments" readonly="1"/>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="current_state_label" string="Currently At" readonly="1"/>
+                    </group>
+                    <group string="Return Settings">
+                        <field name="is_admin_mode" invisible="1"/>
+                        <div class="alert alert-warning" role="alert"
+                             colspan="2" invisible="not is_admin_mode">
+                            You are returning this request as a Deduction
+                            Manager. Only the steps the request has already
+                            passed are listed. Everything the approvers
+                            entered is kept — only the stamps from the step
+                            you pick onward are cleared.
+                        </div>
+                        <field name="deduction_id" invisible="1"/>
+                        <field name="allowed_step_ids" invisible="1"/>
+                        <field name="target_step_id" widget="radio"
+                               string="Return To"
+                               domain="[('id', 'in', allowed_step_ids)]"
+                               options="{'no_create': True, 'no_open': True, 'no_quick_create': True}"/>
+                        <field name="reason" string="Message to Approver"
+                               placeholder="Describe what needs to be corrected..."
+                               nolabel="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Return for Revision"
+                            name="action_confirm"
+                            type="object"
+                            class="btn-warning"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ksw_loan_return_approver_wizard" model="ir.actions.act_window">
+        <field name="name">Return to Approver</field>
+        <field name="res_model">ksw.loan.return.approver.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

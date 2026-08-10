@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- ================================================================ -->
+    <!-- Pay Component — the catalog. Adding a pay type happens here.       -->
+    <!-- ================================================================ -->
+    <record id="view_ksw_pay_component_form" model="ir.ui.view">
+        <field name="name">ksw.pay.component.form</field>
+        <field name="model">ksw.pay.component</field>
+        <field name="arch" type="xml">
+            <form string="Pay Component">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="Overtime"/></h1>
+                        <h3><field name="code" placeholder="OT"/></h3>
+                    </div>
+                    <field name="active" invisible="1"/>
+                    <field name="calculation" invisible="1"/>
+
+                    <group>
+                        <group string="What it is">
+                            <field name="kind"/>
+                            <field name="scope"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group string="How it is worked out">
+                            <field name="calculation" nolabel="0"/>
+                            <field name="rate"
+                                   invisible="calculation != 'qty_rate'"
+                                   required="calculation == 'qty_rate'"/>
+                            <field name="divisor"
+                                   invisible="calculation != 'wage_rate'"
+                                   required="calculation == 'wage_rate'"/>
+                            <field name="factor"
+                                   invisible="calculation != 'wage_rate'"/>
+                            <field name="qty_label"
+                                   invisible="calculation == 'fixed'"/>
+                        </group>
+                    </group>
+
+                    <div class="alert alert-info" role="alert"
+                         invisible="calculation != 'wage_rate'">
+                        Amount = basic salary ÷ divisor × factor × quantity,
+                        computed in one expression so the rate is never rounded
+                        before it is multiplied.
+                    </div>
+
+                    <notebook>
+                        <page string="Entry Screen" name="entry">
+                            <group>
+                                <group string="What to ask for">
+                                    <field name="needs_date"/>
+                                    <field name="needs_location"/>
+                                    <field name="needs_reason"/>
+                                </group>
+                                <group string="Extras">
+                                    <field name="importer"/>
+                                </group>
+                            </group>
+                            <field name="description" nolabel="1"
+                                   placeholder="What this component is for…"/>
+                        </page>
+
+                        <page string="Rate Tiers" name="tiers"
+                              invisible="calculation != 'tiered'">
+                            <field name="tier_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="site_id"
+                                           options="{'no_create': True}"/>
+                                    <field name="width"/>
+                                    <field name="rate"/>
+                                </list>
+                            </field>
+                            <div class="text-muted mt-2">
+                                Quantity above the entry's free allowance
+                                waterfalls down these bands in order. Leave the
+                                last band's size at 0 so it absorbs the
+                                remainder.
+                            </div>
+                        </page>
+
+                        <page string="Who May Record It" name="access">
+                            <field name="entry_group_ids" widget="many2many_tags"
+                                   nolabel="1"/>
+                            <div class="text-muted mt-2">
+                                Leave empty and any commission supervisor may
+                                record it. Set it only when you actually need
+                                the distinction — no group has to exist
+                                otherwise.
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_component_list" model="ir.ui.view">
+        <field name="name">ksw.pay.component.list</field>
+        <field name="model">ksw.pay.component</field>
+        <field name="arch" type="xml">
+            <list string="Pay Components" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="kind"/>
+                <field name="calculation"/>
+                <field name="rate" optional="show"/>
+                <field name="qty_label" optional="hide"/>
+                <field name="scope" optional="show"/>
+                <field name="importer" optional="hide"/>
+                <field name="active" widget="boolean_toggle" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_component_search" model="ir.ui.view">
+        <field name="name">ksw.pay.component.search</field>
+        <field name="model">ksw.pay.component</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <filter name="earnings" string="Earnings"
+                        domain="[('kind','=','earning')]"/>
+                <filter name="deductions" string="Deductions"
+                        domain="[('kind','=','deduction')]"/>
+                <separator/>
+                <filter name="inactive" string="Archived"
+                        domain="[('active','=',False)]"/>
+                <group>
+                    <filter string="Calculation" name="grp_calc" domain="[]"
+                            context="{'group_by': 'calculation'}"/>
+                    <filter string="Scope" name="grp_scope" domain="[]"
+                            context="{'group_by': 'scope'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_pay_component" model="ir.actions.act_window">
+        <field name="name">Pay Components</field>
+        <field name="res_model">ksw.pay.component</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ksw_pay_component_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Define a kind of extra pay
+            </p>
+            <p>
+                Overtime, driver trips, meals, allowances and bonuses are all
+                rows here. Adding one is configuration — it needs no
+                development, no new screen and no new access group.
+            </p>
+        </field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Recurring entries — SAP infotype 0014, the repeating half          -->
+    <!-- ================================================================ -->
+    <record id="view_ksw_pay_recurring_list" model="ir.ui.view">
+        <field name="name">ksw.pay.recurring.list</field>
+        <field name="model">ksw.pay.recurring</field>
+        <field name="arch" type="xml">
+            <list string="Recurring Entries" editable="bottom">
+                <field name="employee_id" options="{'no_create': True}"/>
+                <field name="component_id" options="{'no_create': True}"/>
+                <field name="department_id" optional="show" readonly="1"/>
+                <field name="quantity"/>
+                <field name="amount"/>
+                <field name="reason" optional="hide"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="active" widget="boolean_toggle" optional="hide"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_recurring_search" model="ir.ui.view">
+        <field name="name">ksw.pay.recurring.search</field>
+        <field name="model">ksw.pay.recurring</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="component_id"/>
+                <field name="department_id"/>
+                <group>
+                    <filter string="Component" name="grp_component" domain="[]"
+                            context="{'group_by': 'component_id'}"/>
+                    <filter string="Department" name="grp_department" domain="[]"
+                            context="{'group_by': 'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_pay_recurring" model="ir.actions.act_window">
+        <field name="name">Recurring Entries</field>
+        <field name="res_model">ksw.pay.recurring</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ksw_pay_recurring_search"/>
+        <field name="context">{'search_default_grp_component': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Set up pay that repeats every month
+            </p>
+            <p>
+                A mobile-phone allowance, a project-management allowance. The
+                supervisor pulls these into the month's batch with one button
+                instead of typing them twelve times a year.
+            </p>
+        </field>
+    </record>
+
+</odoo>

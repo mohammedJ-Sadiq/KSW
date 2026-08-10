@@ -247,8 +247,7 @@ class KswAttendanceSheet(models.Model):
                     return {
                         'hour_from': work_lines[0].hour_from,
                         'hour_to': work_lines[-1].hour_to,
-                        'break_hours': sum(
-                            l.hour_to - l.hour_from for l in break_lines),
+                        'break_hours': break_lines._duration_hours(),
                     }
             # Calendar has groups but this day is not scheduled → not a
             # workday, UNLESS this calendar forces Saturday to be required

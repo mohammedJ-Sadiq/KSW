@@ -37,7 +37,7 @@
                     </div>
                     <group>
                         <group>
-                            <field name="period"
+                            <field name="period" options="{'min_precision': 'months'}"
                                    readonly="state != 'draft'"/>
                         </group>
                         <group>
@@ -201,7 +201,7 @@
                   decoration-muted="state == 'draft'"
                   import="0">
                 <field name="name"/>
-                <field name="period"/>
+                <field name="period" options="{'min_precision': 'months'}"/>
                 <field name="total_sales_commission" sum="Sales"/>
                 <field name="total_collection_commission" sum="Collection"/>
                 <field name="total_combined_commission" sum="Combined" optional="show"/>
@@ -217,7 +217,7 @@
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
-                <field name="period"/>
+                <field name="period" options="{'min_precision': 'months'}"/>
                 <filter name="draft" string="Draft"
                         domain="[('state', '=', 'draft')]"/>
                 <filter name="confirmed" string="Confirmed"

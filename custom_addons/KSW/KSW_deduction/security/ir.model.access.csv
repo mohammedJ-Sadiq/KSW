@@ -1,7 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_ksw_deduction_type_user,ksw.deduction.type.user,model_ksw_deduction_type,base.group_user,1,0,0,0
 access_ksw_deduction_type_manager,ksw.deduction.type.manager,model_ksw_deduction_type,KSW_deduction.group_deduction_manager,1,1,1,1
-access_ksw_deduction_user,ksw.deduction.user,model_ksw_deduction,KSW_deduction.group_deduction_user,1,0,0,0
+access_ksw_deduction_user,ksw.deduction.user,model_ksw_deduction,KSW_deduction.group_deduction_user,1,1,0,1
 access_ksw_deduction_supervisor,ksw.deduction.supervisor,model_ksw_deduction,KSW_deduction.group_deduction_supervisor,1,1,1,0
 access_ksw_deduction_line_supervisor,ksw.deduction.line.supervisor,model_ksw_deduction_line,KSW_deduction.group_deduction_supervisor,1,1,1,0
 access_ksw_deduction_officer,ksw.deduction.officer,model_ksw_deduction,KSW_deduction.group_deduction_officer,1,1,1,0
@@ -23,5 +23,7 @@ access_ksw_loan_refuse_wizard_user,ksw.loan.refuse.wizard.user,model_ksw_loan_re
 access_ksw_loan_payment_wizard,ksw.loan.payment.wizard,model_ksw_loan_payment_wizard,KSW_deduction.group_installment_edit,1,1,1,1
 access_ksw_loan_payment_wizard_acc_data_entry,ksw.loan.payment.wizard.acc.data.entry,model_ksw_loan_payment_wizard,KSW_deduction.group_acc_data_entry,1,1,1,1
 access_ksw_deduction_manager_assistant,ksw.deduction.manager.assistant,model_ksw_deduction,KSW_base_security.group_manager_assistant,1,1,1,0
+access_ksw_loan_return_step_user,ksw.loan.return.step.user,model_ksw_loan_return_step,base.group_user,1,0,0,0
+access_ksw_loan_return_approver_wizard_user,ksw.loan.return.approver.wizard.user,model_ksw_loan_return_approver_wizard,base.group_user,1,1,1,1
 
 
