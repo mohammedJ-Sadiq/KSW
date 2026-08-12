@@ -5,6 +5,22 @@ from odoo import models, fields, api
 _logger = logging.getLogger(__name__)
 
 _SYNC_DAYS = 90
+# BAS allows a voucher to be posted/edited with a FDATE earlier than when
+# it was actually entered (backdated corrections, batch entry). A pure
+# forward watermark (`FDATE >= last_sync`) permanently misses those once
+# the watermark has advanced past that date — confirmed live 2026-08-11:
+# 122 live receipts on 2026-07-21 vs only 77 in the mirror. Always
+# re-scanning the trailing window catches them; the upsert-by-bas_key
+# write path already makes this idempotent (re-syncing a day just
+# reconfirms/fills it in, never duplicates).
+_LOOKBACK_DAYS = 30
+
+
+def _fiscal_year_start(now):
+    """`bas9ss` only ever holds the current fiscal year — see
+    bas_invoice.py's copy of this helper for why a first-run sync should
+    cover from Jan 1, not just a trailing N-day window."""
+    return min(now - timedelta(days=_SYNC_DAYS), datetime(now.year, 1, 1))
 
 
 class BASPayment(models.Model):
@@ -33,10 +49,13 @@ class BASPayment(models.Model):
     def sync_from_bas(self):
         param = self.env['ir.config_parameter'].sudo()
         last_sync_str = param.get_param('ksw_bas.last_sync_payment')
+        now = datetime.now()
         if last_sync_str:
-            since = datetime.fromisoformat(last_sync_str)
+            since = min(
+                datetime.fromisoformat(last_sync_str),
+                now - timedelta(days=_LOOKBACK_DAYS))
         else:
-            since = datetime.now() - timedelta(days=_SYNC_DAYS)
+            since = _fiscal_year_start(now)
 
         try:
             conn = self._bas_connect()

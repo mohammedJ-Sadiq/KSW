@@ -9,14 +9,14 @@ class HrEmployee(models.Model):
     # avoid AccessError on prefetch for non-HR users.
     x_site_id = fields.Many2one(
         'ksw.site', string='Work Site',
-        groups='hr.group_hr_user',
+        groups='hr.group_hr_user,base.group_system',
         help='Site assignment used by the KSW driver-commission '
              'sub-form. Site change mid-month: the driver line is '
              'recorded on the month-end site only.',
     )
     x_commission_import_name = fields.Char(
         string='Commission Import Name',
-        groups='hr.group_hr_user',
+        groups='hr.group_hr_user,base.group_system',
         help='Name exactly as it appears in the accountant\'s monthly '
              'Sales / Collection Excel files (column "البائع" / '
              '"مندوب التحصيل"). Used by the Excel import wizard to '
@@ -25,7 +25,7 @@ class HrEmployee(models.Model):
     )
     x_bas_driver_cost_center = fields.Char(
         string='BAS Driver Cost Center',
-        groups='hr.group_hr_user',
+        groups='hr.group_hr_user,base.group_system',
         help='Exact "مركز تكلفة الموظف" value for this driver in BAS '
              '(e.g. "WAHAB JAN1387"). Used by the driver-commission '
              '"Pull from BAS" button to match BAS trip rows '

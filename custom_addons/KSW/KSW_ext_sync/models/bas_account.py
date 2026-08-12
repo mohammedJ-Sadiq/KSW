@@ -113,6 +113,7 @@ class BASAccount(models.Model):
     def action_sync_all(self):
         _logger.info('KSW BAS: starting full sync')
         self.sync_from_bas()
+        self.env['ksw.bas.customer'].sync_from_bas()
         self.env['ksw.bas.invoice'].sync_from_bas()
         self.env['ksw.bas.payment'].sync_from_bas()
         _logger.info('KSW BAS: sync complete')

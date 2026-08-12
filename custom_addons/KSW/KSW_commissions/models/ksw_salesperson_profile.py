@@ -11,6 +11,8 @@ numbers immediately sees the achievement percentage.
 """
 from datetime import date
 
+from dateutil.relativedelta import relativedelta
+
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
@@ -31,7 +33,6 @@ class KswSalespersonProfile(models.Model):
 
     employee_id = fields.Many2one(
         'hr.employee', required=True, ondelete='restrict', tracking=True,
-        domain="[('x_is_attendance_sheet', '=', True)]",
     )
     year = fields.Integer(
         required=True, tracking=True,
@@ -96,6 +97,20 @@ class KswSalespersonProfile(models.Model):
     active = fields.Boolean(default=True)
     note = fields.Text()
 
+    x_bas_collection_target_today = fields.Monetary(
+        string='BAS Collection Target (Today)',
+        compute='_compute_bas_collection_target_today',
+        help='Live reference figure: the aged (overdue, past each '
+             'customer\'s own BAS credit term) open balance across every '
+             'customer this employee currently collects for, as of today. '
+             'This is what actually feeds the Collection Target on the '
+             'monthly commission sheet (via the "Pull from BAS" button) — '
+             'the Annual Collection Target / monthly split below are no '
+             'longer used for that calculation, kept only for historical '
+             'reference. Limited to this fiscal year\'s BAS data — debt '
+             'carried over from before Jan 1 is not visible here.',
+    )
+
     display_name = fields.Char(compute='_compute_display_name', store=True)
 
     _unique_employee_year = models.Constraint(
@@ -110,6 +125,14 @@ class KswSalespersonProfile(models.Model):
                 f"{rec.employee_id.name or ''} — {rec.year}"
                 if rec.employee_id else (str(rec.year) if rec.year else '')
             )
+
+    def _compute_bas_collection_target_today(self):
+        BasCustomer = self.env['ksw.bas.customer']
+        today = fields.Date.context_today(self)
+        for rec in self:
+            rec.x_bas_collection_target_today = (
+                BasCustomer._compute_collection_target(rec.employee_id, today)
+                if rec.employee_id else 0.0)
 
     # ------------------------------------------------------------------
     # CRUD — seed 12 monthly rows on create / when annual totals change
@@ -161,7 +184,18 @@ class KswSalespersonProfile(models.Model):
     def _get_targets(self, employee, period):
         """Return ``(sales_target, collection_target, profile)`` for the
         given employee/period. ``period`` is a date (first-of-month).
-        Falls back to ``(0, 0, False)`` when no profile is found.
+
+        ``sales_target`` still comes from the manually-entered monthly
+        split on the profile (``target_line_ids`` / ``annual_sales_target``
+        even split), unchanged.
+
+        ``collection_target`` is derived live from BAS AR aging — the sum
+        of overdue balance (past each customer's own BAS credit term)
+        across every customer this employee collects for, as of the last
+        day of ``period`` — see ``ksw.bas.customer._compute_collection_target``.
+        It does NOT depend on a ``ksw.salesperson.profile`` existing, so an
+        employee with no profile record can still show a computed
+        collection target (their sales target is then 0, as before).
         """
         if not employee or not period:
             return (0.0, 0.0, self.browse())
@@ -171,22 +205,21 @@ class KswSalespersonProfile(models.Model):
             ('year', '=', period.year),
             ('active', '=', True),
         ], limit=1)
-        if not profile:
-            return (0.0, 0.0, self.browse())
-        line = profile.target_line_ids.filtered(
-            lambda l: l.month == str(period.month))
-        if line:
-            return (
-                line[0].sales_target or 0.0,
-                line[0].collection_target or 0.0,
-                profile,
-            )
-        # No row for that month — fall back to even split.
-        return (
-            (profile.annual_sales_target or 0.0) / 12.0,
-            (profile.annual_collection_target or 0.0) / 12.0,
-            profile,
-        )
+
+        if profile:
+            line = profile.target_line_ids.filtered(
+                lambda l: l.month == str(period.month))
+            sales_target = (
+                line[0].sales_target if line
+                else (profile.annual_sales_target or 0.0) / 12.0)
+        else:
+            sales_target = 0.0
+
+        period_end = period + relativedelta(months=1) - relativedelta(days=1)
+        collection_target = self.env['ksw.bas.customer']._compute_collection_target(
+            employee, period_end)
+
+        return (sales_target, collection_target, profile)
 
 
 class KswSalespersonTargetLine(models.Model):

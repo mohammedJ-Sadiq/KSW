@@ -8,6 +8,7 @@
         'security/ir.model.access.csv',
         'data/cron.xml',
         'views/bas_account_views.xml',
+        'views/bas_customer_views.xml',
         'views/bas_invoice_views.xml',
         'views/bas_payment_views.xml',
         'views/menus.xml',

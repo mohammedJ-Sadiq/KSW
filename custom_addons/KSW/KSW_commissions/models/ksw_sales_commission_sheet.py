@@ -11,6 +11,11 @@ sales commission was paid on the general commission bank file. It is now
 managed and paid separately: nothing here reaches the commission sheet, and
 this is not an entry type on the Monthly Commission Run.
 """
+from datetime import timedelta
+
+from dateutil.relativedelta import relativedelta
+from markupsafe import Markup, escape
+
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
@@ -147,6 +152,449 @@ class KswSalesCommissionSheet(models.Model):
             },
         }
 
+    # ------------------------------------------------------------------
+    # Pull achieved sales/collection directly from BAS
+    # ------------------------------------------------------------------
+    def action_pull_from_bas(self):
+        """Pull achieved sales & collection for this sheet's period from
+        the BAS-synced mirror models (``ksw.bas.invoice`` /
+        ``ksw.bas.payment``, kept live by KSW_ext_sync's 10-minute cron —
+        no direct SQL Server query needed here).
+
+        Customers are matched to employees via
+        ``ksw.bas.customer.effective_sales_rep_id`` / ``effective_collector_id``
+        — resolved (and kept fresh on every sync) from BAS's OWN
+        per-customer rep assignment (COD10.SELLER / SELLER2), with a
+        manual override on the linked contact's ``x_sales_rep_id`` /
+        ``x_collection_rep_id`` taking priority when set. Verified
+        2026-08-11: a customer's real transaction history (``vou10.SELLER``
+        on its actual invoices/receipts) always matches its
+        ``cod10.SELLER``/``SELLER2``, so this needs no manual per-customer
+        setup — unlike driver trips, which have no equivalent BAS-native
+        field and must use ``hr.employee.x_bas_driver_cost_center``.
+
+        Targets are left untouched: BAS has no target/quota table, so
+        ``target_sales`` / ``target_collection`` keep coming from
+        ``ksw.salesperson.profile`` as usual.
+        """
+        self.ensure_one()
+        if self.state != 'draft':
+            raise UserError(_(
+                'The commission sheet must be in draft state to pull '
+                'from BAS.'))
+        if not self.period:
+            raise UserError(_('Set the period before pulling from BAS.'))
+
+        date_from = fields.Date.to_date(self.period).replace(day=1)
+        date_to = date_from + relativedelta(months=1)
+
+        BasInvoice = self.env['ksw.bas.invoice']
+        BasPayment = self.env['ksw.bas.payment']
+        BasCustomer = self.env['ksw.bas.customer']
+
+        # -- aggregate BAS mirror rows by customer account ---------------
+        # NOTE: on INV10, TCODE (-> to_account) is the revenue GL account
+        # credited by the sale (e.g. "مبيعات فرع تبوك 2 التريلات",
+        # DACC_TYPE='08') — NOT the customer. FCODE (-> from_account) is
+        # the customer's AR account actually debited (DACC_TYPE='01',
+        # same '1201*'/'1203*' format as x_client_account_number).
+        # Verified 2026-08-11 against live-synced ksw.bas.invoice data.
+        sales_by_account = {}
+        for inv in BasInvoice.search([
+            ('invoice_date', '>=', date_from),
+            ('invoice_date', '<', date_to),
+        ]):
+            acc = (inv.from_account or '').strip()
+            if not acc:
+                continue
+            sales_by_account[acc] = (
+                sales_by_account.get(acc, 0.0) + inv.subtotal)
+
+        collection_by_account = {}
+        for pay in BasPayment.search([
+            ('payment_date', '>=', date_from),
+            ('payment_date', '<', date_to),
+        ]):
+            acc = (pay.to_account or '').strip()
+            if not acc:
+                continue
+            collection_by_account[acc] = (
+                collection_by_account.get(acc, 0.0) + pay.amount)
+
+        # -- BAS customer master: identity + resolved effective reps ------
+        # (effective_sales_rep_id/effective_collector_id already fold in
+        # the partner-level manual override — see
+        # ksw.bas.customer._recompute_effective_reps in KSW_commissions).
+        customer_by_code = {c.bas_code: c for c in BasCustomer.search([])}
+
+        # -- attribute to employees via BAS's own rep assignment ---------
+        sales_by_employee = {}
+        unmatched_sales_accounts = []
+        for acc, amount in sales_by_account.items():
+            customer = customer_by_code.get(acc)
+            rep = customer.effective_sales_rep_id if customer else False
+            if not rep:
+                label = (
+                    f"{acc} — {customer.seller_name}"
+                    if customer and customer.seller_name else acc)
+                unmatched_sales_accounts.append(label)
+                continue
+            bucket = sales_by_employee.setdefault(
+                rep, {'total': 0.0, 'by_account': {}, 'by_customer': {}})
+            bucket['total'] += amount
+            bucket['by_account'][acc.lower()] = (
+                bucket['by_account'].get(acc.lower(), 0.0) + amount)
+
+        collection_by_employee = {}
+        unmatched_collection_accounts = []
+        grand_collected = 0.0
+        for acc, amount in collection_by_account.items():
+            customer = customer_by_code.get(acc)
+            if not customer:
+                # Not a known customer account (e.g. an employee advance,
+                # bank, or other GL account) — not part of collection
+                # commission.
+                continue
+            grand_collected += amount
+            rep = customer.effective_collector_id
+            if not rep:
+                label = (
+                    f"{acc} — {customer.collector_name}"
+                    if customer.collector_name else acc)
+                unmatched_collection_accounts.append(label)
+                continue
+            bucket = collection_by_employee.setdefault(
+                rep, {'collected': 0.0, 'target': None})
+            bucket['collected'] += amount
+
+        imported_lines = self._apply_commission_data(
+            sales_by_employee, collection_by_employee,
+            collection_grand_totals=(grand_collected, None))
+
+        self._post_bas_pull_summary(
+            date_from, date_to, imported_lines,
+            unmatched_sales_accounts, unmatched_collection_accounts)
+
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'ksw.sales.commission.sheet',
+            'res_id': self.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
+    # ------------------------------------------------------------------
+    # Shared upsert logic — used by both the Excel import wizard and
+    # action_pull_from_bas().
+    # ------------------------------------------------------------------
+    def _apply_commission_data(self, sales_by_employee, collection_by_employee,
+                                collection_grand_totals=None):
+        """Upsert commission lines from aggregated sales/collection data.
+
+        ``sales_by_employee``: ``{hr.employee: {'total': float,
+        'by_account': {account_lower: amt}, 'by_customer': {name_lower: amt}}}``
+
+        ``collection_by_employee``: ``{hr.employee: {'collected': float,
+        'target': float or None}}`` — ``target`` is ``None`` when the data
+        source (e.g. BAS) has no target concept; the existing
+        ``target_collection`` value (computed from the salesperson
+        profile) is then left untouched.
+
+        ``collection_grand_totals``: optional ``(collected, target)`` tuple
+        used for the "Collection Based on Total" manager pass — the target
+        may be ``None`` for the same reason as above.
+
+        Returns the ``imported_lines`` list consumed by
+        :meth:`_format_commission_lines_html` for the caller's chatter
+        summary.
+        """
+        self.ensure_one()
+        Line = self.env['ksw.sales.commission.line']
+        Profile = self.env['ksw.salesperson.profile']
+        imported_lines = []
+        sheet_year = (
+            fields.Date.to_date(self.period).year if self.period else None
+        )
+        all_employees = set(sales_by_employee) | set(collection_by_employee)
+
+        for employee in sorted(all_employees, key=lambda e: e.name or ''):
+            emp_sales = sales_by_employee.get(employee)
+            coll_data = collection_by_employee.get(employee)
+            coll_amt = coll_data['collected'] if coll_data else None
+            target_amt = coll_data.get('target') if coll_data else None
+
+            # ----------------------------------------------------------
+            # Fetch profile splits for this employee / year
+            # ----------------------------------------------------------
+            splits = self.env['ksw.salesperson.profile.client.split']
+            if sheet_year:
+                profile = Profile.sudo().search([
+                    ('employee_id', '=', employee.id),
+                    ('year', '=', sheet_year),
+                    ('active', '=', True),
+                ], limit=1)
+                if profile:
+                    splits = profile.split_ids
+
+            # ----------------------------------------------------------
+            # Handle split lines (each covers a named client bucket)
+            # ----------------------------------------------------------
+            for split in splits:
+                acc_keys = {}    # acc_lower → partner display label
+                name_keys = {}   # name_lower → partner display label
+                for p in split.rule_id.partner_ids:
+                    acc = (p.x_client_account_number or '').strip().lower()
+                    alias = (p.x_commission_import_name or '').strip().lower()
+                    pname = (p.name or '').strip().lower()
+                    if p.x_client_account_number:
+                        label = f"{p.x_client_account_number} — {p.name or ''}"
+                    else:
+                        label = p.name or '?'
+                    if acc:
+                        acc_keys[acc] = label
+                    elif alias:
+                        name_keys[alias] = label
+                    elif pname:
+                        name_keys[pname] = label
+
+                split_sales = 0.0
+                matched_detail = []
+                unmatched_partners = [
+                    p.x_client_account_number or p.name
+                    for p in split.rule_id.partner_ids
+                ]
+                if emp_sales:
+                    for acc_lower, amt in emp_sales.get('by_account', {}).items():
+                        if acc_lower in acc_keys:
+                            split_sales += amt
+                            lbl = acc_keys[acc_lower]
+                            matched_detail.append((lbl, amt))
+                            if lbl in unmatched_partners:
+                                unmatched_partners.remove(lbl)
+                    for cust_lower, amt in emp_sales.get('by_customer', {}).items():
+                        if cust_lower in name_keys:
+                            split_sales += amt
+                            lbl = name_keys[cust_lower]
+                            matched_detail.append((lbl, amt))
+                            if lbl in unmatched_partners:
+                                unmatched_partners.remove(lbl)
+
+                existing_split = Line.search([
+                    ('sheet_id', '=', self.id),
+                    ('employee_id', '=', employee.id),
+                    ('split_id', '=', split.id),
+                ], limit=1)
+                split_vals = {}
+                if emp_sales is not None:
+                    split_vals['achieved_sales'] = split_sales
+
+                if existing_split:
+                    if split_vals:
+                        existing_split.write(split_vals)
+                    status = 'updated (split)'
+                else:
+                    new_line = Line.create({
+                        'sheet_id': self.id,
+                        'employee_id': employee.id,
+                        'split_id': split.id,
+                    })
+                    if split_vals:
+                        new_line.write(split_vals)
+                    status = 'created (split)'
+                imported_lines.append((
+                    f"{employee.display_name} [{split.label}]",
+                    split_sales if emp_sales is not None else None,
+                    None, None, status,
+                    matched_detail, unmatched_partners,
+                ))
+
+            # ----------------------------------------------------------
+            # General line — receives the FULL total sales (not reduced)
+            # and all collection data.  The split lines calculate extra
+            # commission on their client subset independently.
+            # ----------------------------------------------------------
+            general_sales = None
+            if emp_sales is not None:
+                general_sales = emp_sales['total']
+
+            existing_general = Line.search([
+                ('sheet_id', '=', self.id),
+                ('employee_id', '=', employee.id),
+                ('split_id', '=', False),
+            ], limit=1)
+
+            gen_vals = {}
+            if general_sales is not None:
+                gen_vals['achieved_sales'] = general_sales
+            if coll_amt is not None:
+                gen_vals['achieved_collection'] = coll_amt
+            if target_amt is not None:
+                gen_vals['target_collection'] = target_amt
+
+            if gen_vals:
+                if existing_general:
+                    existing_general.write(gen_vals)
+                    imported_lines.append((
+                        employee.display_name, general_sales,
+                        coll_amt, target_amt, 'updated', [], []))
+                else:
+                    new_line = Line.create({
+                        'sheet_id': self.id,
+                        'employee_id': employee.id,
+                    })
+                    new_line.write(gen_vals)
+                    imported_lines.append((
+                        employee.display_name, general_sales,
+                        coll_amt, target_amt, 'created', [], []))
+
+        # -- Collection Manager: total-collection pass --------------------
+        # Employees whose profile has x_collection_based_on_total=True
+        # receive the grand total of ALL collections (and targets, when
+        # known) for the period, regardless of which rep each collection
+        # was attributed to.
+        if collection_grand_totals and sheet_year:
+            grand_collected, grand_target = collection_grand_totals
+            mgr_profiles = Profile.sudo().search([
+                ('year', '=', sheet_year),
+                ('active', '=', True),
+                ('x_collection_based_on_total', '=', True),
+            ])
+            for profile in mgr_profiles:
+                employee = profile.employee_id
+                existing = Line.search([
+                    ('sheet_id', '=', self.id),
+                    ('employee_id', '=', employee.id),
+                    ('split_id', '=', False),
+                ], limit=1)
+                mgr_vals = {'achieved_collection': grand_collected}
+                if grand_target is not None:
+                    mgr_vals['target_collection'] = grand_target
+                if existing:
+                    existing.write(mgr_vals)
+                    action_lbl = 'updated'
+                else:
+                    new_line = Line.create({
+                        'sheet_id': self.id,
+                        'employee_id': employee.id,
+                    })
+                    new_line.write(mgr_vals)
+                    action_lbl = 'created'
+                imported_lines.append((
+                    f"{employee.display_name} [Total Collection]",
+                    None, grand_collected, grand_target,
+                    action_lbl, [], [],
+                ))
+
+        return imported_lines
+
+    # ------------------------------------------------------------------
+    # Chatter summaries
+    # ------------------------------------------------------------------
+    def _format_commission_lines_html(self, imported_lines):
+        """Shared <ul> renderer for import/pull chatter summaries."""
+        self.ensure_one()
+        lines_html = Markup('')
+        for entry in imported_lines:
+            emp_name, sales, coll, target, action = entry[:5]
+            matched_detail = entry[5] if len(entry) > 5 else []
+            unmatched_partners = entry[6] if len(entry) > 6 else []
+
+            s_str = f'SAR {sales:,.2f}' if sales is not None else '—'
+            c_str = f'SAR {coll:,.2f}' if coll is not None else '—'
+            t_str = f'SAR {target:,.2f}' if target is not None else '—'
+
+            # Per-client breakdown for split lines (skip zero-amount rows)
+            detail_html = Markup('')
+            active_rows = [(lbl, amt) for lbl, amt in matched_detail if amt]
+            if active_rows:
+                rows = Markup('').join(
+                    Markup(
+                        '<tr>'
+                        '<td style="padding:2px 10px;">{lbl}</td>'
+                        '<td style="padding:2px 10px;text-align:right;'
+                        'font-family:monospace;">SAR {amt}</td>'
+                        '</tr>'
+                    ).format(lbl=lbl, amt=f'{amt:,.2f}')
+                    for lbl, amt in sorted(active_rows, key=lambda x: -x[1])
+                )
+                detail_html += Markup(
+                    '<table style="margin:4px 0 4px 16px;font-size:0.9em;'
+                    'border-collapse:collapse;">'
+                    '<thead><tr style="border-bottom:1px solid #ccc;">'
+                    '<th style="text-align:left;padding:2px 10px;">'
+                    'Client</th>'
+                    '<th style="text-align:right;padding:2px 10px;">'
+                    'Amount</th>'
+                    '</tr></thead>'
+                    '<tbody>{rows}</tbody>'
+                    '</table>'
+                ).format(rows=rows)
+            if unmatched_partners:
+                missing = Markup(', ').join(
+                    escape(str(x)) for x in unmatched_partners
+                )
+                detail_html += Markup(
+                    '<div style="margin-left:16px;font-size:0.85em;'
+                    'color:#c0392b;">⚠ Not found in source: {m}</div>'
+                ).format(m=missing)
+
+            lines_html += Markup(
+                '<li><b>{name}</b> [{action}] '
+                'Sales: {s} | Target Coll: {t} | Collected: {c}'
+                '{detail}</li>'
+            ).format(
+                name=escape(emp_name), action=escape(action),
+                s=s_str, t=t_str, c=c_str,
+                detail=detail_html,
+            )
+        return lines_html
+
+    def _post_bas_pull_summary(self, date_from, date_to, imported_lines,
+                                unmatched_sales_accounts,
+                                unmatched_collection_accounts):
+        """Post a chatter note summarising an action_pull_from_bas() run."""
+        self.ensure_one()
+        lines_html = self._format_commission_lines_html(imported_lines)
+
+        warn_html = Markup('')
+        if unmatched_sales_accounts or unmatched_collection_accounts:
+            warn_html = Markup('<br/>')
+            if unmatched_sales_accounts:
+                items = Markup('').join(
+                    Markup('<li>{n}</li>').format(n=escape(n))
+                    for n in sorted(set(unmatched_sales_accounts)))
+                warn_html += Markup(
+                    '<b>⚠ Sales with no Sales Rep set on the customer:</b>'
+                    '<ul>{items}</ul>'
+                ).format(items=items)
+            if unmatched_collection_accounts:
+                items = Markup('').join(
+                    Markup('<li>{n}</li>').format(n=escape(n))
+                    for n in sorted(set(unmatched_collection_accounts)))
+                warn_html += Markup(
+                    '<b>⚠ Collections with no Collection Rep set on the '
+                    'customer:</b><ul>{items}</ul>'
+                ).format(items=items)
+            warn_html += Markup(
+                'Set the <i>Sales Rep</i> / <i>Collection Rep</i> field on '
+                'the corresponding customer record(s) to fix the '
+                'attribution.')
+
+        body = Markup(
+            '<b>🔄 BAS Pull completed</b> '
+            '(Period: {frm} – {to})<br/>'
+            '<b>{n} line(s) updated/created:</b>'
+            '<ul>{lines}</ul>'
+            '{warn}'
+        ).format(
+            frm=date_from.strftime('%Y-%m-%d'),
+            to=(date_to - timedelta(days=1)).strftime('%Y-%m-%d'),
+            n=len(imported_lines),
+            lines=lines_html,
+            warn=warn_html,
+        )
+        self.message_post(body=body, subtype_xmlid='mail.mt_note')
+
 
 class KswSalesCommissionLine(models.Model):
     _name = 'ksw.sales.commission.line'
@@ -160,7 +608,6 @@ class KswSalesCommissionLine(models.Model):
     sequence = fields.Integer(default=10)
     employee_id = fields.Many2one(
         'hr.employee', required=True, ondelete='restrict',
-        domain="[('x_is_attendance_sheet', '=', True)]",
     )
     department_id = fields.Many2one(
         related='employee_id.department_id', store=True, readonly=True,

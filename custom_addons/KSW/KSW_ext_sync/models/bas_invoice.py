@@ -13,6 +13,22 @@ _SALES_FTYPES = (
     ('600', 3),   # POS sale variant
 )
 _SYNC_DAYS = 90  # Sync last N days on first run; incremental after
+# See KSW_ext_sync/models/bas_payment.py _LOOKBACK_DAYS for why this
+# exists: BAS allows backdated postings, so a pure forward watermark
+# permanently misses entries dated before it but posted after it.
+_LOOKBACK_DAYS = 30
+
+
+def _fiscal_year_start(now):
+    """`bas9ss` only ever holds the current fiscal year (see
+    BAS_DATABASE_REFERENCE.md — closed years live in separate archive
+    databases this connector doesn't reach). A first-run sync should
+    therefore always cover from Jan 1 of the current year, not just a
+    trailing N-day window — needed for whole-year AR aging (see
+    KSW_commissions "Collection Target from BAS Aging"), and it's free:
+    querying earlier than Jan 1 would just return nothing anyway.
+    """
+    return min(now - timedelta(days=_SYNC_DAYS), datetime(now.year, 1, 1))
 
 
 class BASInvoice(models.Model):
@@ -47,10 +63,13 @@ class BASInvoice(models.Model):
     def sync_from_bas(self):
         param = self.env['ir.config_parameter'].sudo()
         last_sync_str = param.get_param('ksw_bas.last_sync_invoice')
+        now = datetime.now()
         if last_sync_str:
-            since = datetime.fromisoformat(last_sync_str)
+            since = min(
+                datetime.fromisoformat(last_sync_str),
+                now - timedelta(days=_LOOKBACK_DAYS))
         else:
-            since = datetime.now() - timedelta(days=_SYNC_DAYS)
+            since = _fiscal_year_start(now)
 
         try:
             conn = self._bas_connect()

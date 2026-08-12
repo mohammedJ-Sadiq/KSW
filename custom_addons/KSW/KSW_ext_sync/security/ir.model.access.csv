@@ -5,3 +5,5 @@ access_bas_invoice,ksw.bas.invoice,model_ksw_bas_invoice,base.group_user,1,0,0,0
 access_bas_invoice_manager,ksw.bas.invoice.manager,model_ksw_bas_invoice,base.group_system,1,1,1,1
 access_bas_payment,ksw.bas.payment,model_ksw_bas_payment,base.group_user,1,0,0,0
 access_bas_payment_manager,ksw.bas.payment.manager,model_ksw_bas_payment,base.group_system,1,1,1,1
+access_bas_customer,ksw.bas.customer,model_ksw_bas_customer,base.group_user,1,0,0,0
+access_bas_customer_manager,ksw.bas.customer.manager,model_ksw_bas_customer,base.group_system,1,1,1,1

@@ -12,6 +12,7 @@ from . import ksw_salesperson_profile     # sales: yearly target + client splits
 from . import ksw_sales_commission_rule   # sales: rule + tier catalog
 from . import ksw_sales_commission_sheet  # sales: paid separately, not an entry type
 from . import res_partner                 # commission import name alias
+from . import ksw_bas_customer            # BAS-native rep resolution + AR aging target
 from . import ksw_deduction               # adds awaiting-commission helpers
 from . import ksw_deduction_line          # parked installments + pay-run settlement link
 from . import hr_payslip                  # filters parked KSW_DED_* inputs out of payslips

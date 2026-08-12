@@ -14,6 +14,12 @@
                 <field name="x_commission_import_name"
                        string="Commission Import Name"
                        placeholder="Customer name as in col 1 of the Excel Sales file (fallback if account# blank)"/>
+                <field name="x_sales_rep_id"
+                       string="Sales Rep"
+                       placeholder="Employee who earns sales commission on this customer's BAS invoices"/>
+                <field name="x_collection_rep_id"
+                       string="Collection Rep"
+                       placeholder="Employee who earns collection commission on this customer's BAS receipts"/>
             </xpath>
         </field>
     </record>

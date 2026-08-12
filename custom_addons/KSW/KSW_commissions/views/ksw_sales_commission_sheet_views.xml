@@ -22,12 +22,18 @@
                             type="object" class="btn-secondary"
                             invisible="state == 'draft'"
                             groups="KSW_commissions.group_commission_accountant"/>
+                    <button name="action_pull_from_bas"
+                            string="Pull from BAS"
+                            type="object" class="btn-secondary"
+                            icon="fa-refresh"
+                            invisible="state != 'draft'"
+                            title="Pull achieved sales &amp; collection for this period directly from BAS (customers must have Sales Rep / Collection Rep set)"/>
                     <button name="action_open_import_wizard"
                             string="Import from Excel"
                             type="object" class="btn-secondary"
                             icon="fa-upload"
                             invisible="state != 'draft'"
-                            title="Import achieved sales &amp; collection amounts from the accountant's Excel files"/>
+                            title="Fallback: import achieved sales &amp; collection amounts from the accountant's Excel files"/>
                     <statusbar statusfield="state"
                                statusbar_visible="draft,confirmed"/>
                 </header>

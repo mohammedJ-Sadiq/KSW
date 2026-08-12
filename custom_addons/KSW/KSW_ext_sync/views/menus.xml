@@ -12,6 +12,12 @@
         action="action_bas_account"
         sequence="10"/>
 
+    <menuitem id="menu_bas_customers"
+        name="Customers"
+        parent="menu_bas_root"
+        action="action_bas_customer"
+        sequence="5"/>
+
     <menuitem id="menu_bas_invoices"
         name="Sales Invoices"
         parent="menu_bas_root"

@@ -9,13 +9,12 @@
             <!-- Add work-site and import-alias fields next to the attendance-sheet toggle -->
             <field name="x_is_attendance_sheet" position="after">
                 <field name="x_site_id"
-                       groups="hr.group_hr_user"
+                       groups="hr.group_hr_user,base.group_system"
                        invisible="not x_is_attendance_sheet"/>
                 <field name="x_commission_import_name"
-                       groups="hr.group_hr_user"
-                       invisible="not x_is_attendance_sheet"/>
+                       groups="hr.group_hr_user,base.group_system"/>
                 <field name="x_bas_driver_cost_center"
-                       groups="hr.group_hr_user"
+                       groups="hr.group_hr_user,base.group_system"
                        invisible="not x_is_attendance_sheet"/>
             </field>
         </field>

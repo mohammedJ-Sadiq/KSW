@@ -31,10 +31,26 @@
                         </group>
                         <group>
                             <field name="annual_sales_target"/>
-                            <field name="annual_collection_target"/>
+                            <field name="x_bas_collection_target_today"
+                                   invisible="role == 'sales'"
+                                   widget="monetary"/>
                             <field name="currency_id" invisible="1"/>
                         </group>
                     </group>
+                    <div class="alert alert-warning col-12" role="alert"
+                         invisible="role == 'sales'"
+                         style="margin-bottom:8px;">
+                        <i class="fa fa-exclamation-triangle me-2"/>
+                        <b>Collection Target is now derived from BAS</b> —
+                        the sum of overdue balance (past each customer's own
+                        BAS credit term) across every customer this employee
+                        collects for. <b>Annual Collection Target</b> and the
+                        monthly split on the <i>Monthly Targets</i> tab
+                        below are <b>no longer used</b> for the actual
+                        calculation; they're kept only as historical
+                        reference. Limited to this fiscal year's BAS data —
+                        debt carried over from before Jan 1 isn't visible.
+                    </div>
                     <group string="Commission Rules">
                         <div class="alert alert-info col-12" role="alert"
                              style="margin-bottom:8px;">
@@ -97,6 +113,15 @@
                             </field>
                         </page>
                         <page string="Monthly Targets">
+                            <div class="alert alert-info col-12" role="alert"
+                                 style="margin-bottom:8px;">
+                                <i class="fa fa-info-circle me-2"/>
+                                <b>Sales Target</b> below still feeds the
+                                commission sheet directly. <b>Collection
+                                Target</b> is historical only — the sheet
+                                now computes it live from BAS AR aging
+                                instead (see the warning banner above).
+                            </div>
                             <field name="target_line_ids">
                                 <list editable="bottom">
                                     <field name="month"/>

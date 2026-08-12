@@ -133,10 +133,21 @@ This is BAS's unified chart of accounts. It serves triple duty:
 
 #### DACC_TYPE Values (Account Types)
 
+**Correction (verified live 2026-08-11, for the `ksw.bas.customer` sync in `KSW_ext_sync`):**
+`DACC_TYPE='10'` is **NOT** customer accounts — it's depreciation accounts
+(`اهلاك ...`). The real trade-customer ledger is **`DACC_TYPE='01' AND
+DLEVEL=5 AND DCODE1 LIKE '1203%'`** (762 leaf rows) — spot-checked 25
+random rows, all genuine companies/shops/institutions. `DACC_TYPE='01'`
+alone is not sufficient (it also covers internal cash/treasury accounts
+under `1201*` and unrelated personal-debt/accident accounts under
+`1207*`, both leaf-level, same type). The counts below are kept for
+reference but the "Meaning" column for `01`/`10` was wrong in the
+original write-up.
+
 | Code | Count | Meaning |
 |---|---|---|
-| `01` | 1,419 | General ledger accounts (revenue, AR, cash, etc.) |
-| `10` | 782 | Customer accounts |
+| `01` | 1,419 | General ledger accounts — a mix of cash/treasury (`1201*`), **customer accounts (`1203*` leaf only)**, other receivables (`1207*` etc.) |
+| `10` | 782 | Depreciation accounts (`اهلاك ...`) — **not customers**, despite the name suggesting otherwise |
 | `14` | 782 | Unknown (same count as type 10 — likely matched pairs) |
 | `02` | 782 | Supplier/vendor accounts |
 | `03` | 385 | Liability accounts (loans, payables) |
@@ -148,12 +159,21 @@ This is BAS's unified chart of accounts. It serves triple duty:
 
 #### Account Ranges Relevant to Odoo Integration
 
+**Correction (verified live 2026-08-11):** the original `1201*`/`1203*` labels
+below were swapped relative to reality. `1201*` leaf accounts are internal
+cash/treasury (`حساب الصندوق`, `عهدة الصندوق`, `شيكات بالخزينة`) — **not**
+customers. `1203*` leaf accounts (`DACC_TYPE='01', DLEVEL=5`) are the real
+customer ledger, synced into Odoo as `ksw.bas.customer` and matched/created
+as `res.partner` records (`res.partner.x_client_account_number`) via
+"Match / Create Contacts" on **BAS Sync > Customers**.
+
 | Account Prefix | Arabic Name | Purpose |
 |---|---|---|
 | `120501*` | سلف العاملين شركة الكوثر | **Employee salary advances** (the KSW deduction source) |
-| `1201*` | مديني المبيعات | Accounts receivable (customer accounts) |
+| `1201*` | — | Internal cash/treasury accounts (main safe, branch petty cash, cheques in treasury) — **not customers** |
 | `1202*` | البنوك | Bank accounts (e.g., 1202010015 = specific bank account) |
-| `1203*` | Other current assets | |
+| `1203*` | مديني المبيعات | **Accounts receivable — the real customer ledger** (`ksw.bas.customer` source, 762 leaf accounts) |
+| `1207*` | — | Vehicle-accident liability / individual "مديونية" debt accounts — not trade customers, excluded from the customer sync |
 | `2102*` | قروض قصيرة الاجل | **Short-term bank loans** |
 | `2102010001` | قرض الرياض مليون ريال | Riyad Bank loan 1M SAR |
 | `2105*` | قروض طويلة الاجل | Long-term bank loans |
@@ -615,8 +635,15 @@ ORDER BY DCODE1
 | Odoo Model | Source Tables | Filter | Rows Synced |
 |---|---|---|---|
 | `ksw.bas.account` | `cod10` | DCODE1 LIKE '120501%' OR '2102%' OR '2105%' | ~333 accounts |
+| `ksw.bas.customer` | `cod10` | DACC_TYPE='01', DLEVEL=5, DCODE1 LIKE '1203%' | 762 customers (added 2026-08-11) |
 | `ksw.bas.invoice` | `inv10` + `str10` (600) + `vou10` (001) | FTYPE IN ('600','001'), DATE1 >= last_sync | ~109K+ invoices |
 | `ksw.bas.payment` | `vou10` | FTYPE IN ('018','015'), TCODE NOT NULL | ~8,392 payments |
+
+**Note on `ksw.bas.invoice.to_account`/`from_account` (verified 2026-08-11):**
+for sales, the *customer* is `from_account` (FCODE, `1203*` format) — `to_account`
+(TCODE) is the revenue GL account credited (e.g. `4101*`), not the customer.
+For `ksw.bas.payment`, `to_account` (TCODE) *is* the customer/account credited,
+consistent with the original documentation.
 
 ---
 

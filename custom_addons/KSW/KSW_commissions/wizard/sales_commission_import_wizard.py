@@ -121,200 +121,28 @@ class KswSalesCommissionImportWizard(models.TransientModel):
         # -- build employee map ------------------------------------------
         all_names_lower = set(sales_data) | set(collection_totals)
         emp_map = self._build_employee_map(all_names_lower)
-
-        # -- upsert lines ------------------------------------------------
-        Line = self.env['ksw.sales.commission.line']
-        Profile = self.env['ksw.salesperson.profile']
-        imported_lines = []
         unmatched = sorted(n for n in all_names_lower if n not in emp_map)
-        sheet_year = (
-            fields.Date.to_date(sheet.period).year if sheet.period else None
-        )
 
-        for name_lower in sorted(all_names_lower):
-            employee = emp_map.get(name_lower)
-            if not employee:
-                continue
-
-            emp_sales = sales_data.get(name_lower)   # dict or None
-            coll_data = collection_totals.get(name_lower)  # dict or None
-            coll_amt = coll_data['collected'] if coll_data else None
-            target_amt = coll_data['target'] if coll_data else None
-
-            # ----------------------------------------------------------
-            # Fetch profile splits for this employee / year
-            # ----------------------------------------------------------
-            splits = self.env['ksw.salesperson.profile.client.split']
-            if sheet_year:
-                profile = Profile.sudo().search([
-                    ('employee_id', '=', employee.id),
-                    ('year', '=', sheet_year),
-                    ('active', '=', True),
-                ], limit=1)
-                if profile:
-                    splits = profile.split_ids
-
-            # ----------------------------------------------------------
-            # Handle split lines (each covers a named client bucket)
-            # ----------------------------------------------------------
-            for split in splits:
-                # Build lookup sets + reverse map for chatter detail.
-                # Priority per partner:
-                #   1. x_client_account_number (most stable — col 0 of Excel)
-                #   2. x_commission_import_name (name alias — col 1)
-                #   3. partner.name             (last resort — col 1)
-                acc_keys = {}    # acc_lower → partner display label
-                name_keys = {}   # name_lower → partner display label
-                for p in split.rule_id.partner_ids:
-                    acc = (p.x_client_account_number or '').strip().lower()
-                    alias = (p.x_commission_import_name or '').strip().lower()
-                    pname = (p.name or '').strip().lower()
-                    # Human-readable label: "AccNo — Partner Name" or just name
-                    if p.x_client_account_number:
-                        label = f"{p.x_client_account_number} — {p.name or ''}"
-                    else:
-                        label = p.name or '?'
-                    if acc:
-                        acc_keys[acc] = label
-                    elif alias:
-                        name_keys[alias] = label
-                    elif pname:
-                        name_keys[pname] = label
-
-                # Sum matching customers' sales — track per-client detail
-                split_sales = 0.0
-                matched_detail = []   # [(label, amount), ...]
-                unmatched_partners = [
-                    p.x_client_account_number or p.name
-                    for p in split.rule_id.partner_ids
-                ]
-                if emp_sales:
-                    for acc_lower, amt in emp_sales['by_account'].items():
-                        if acc_lower in acc_keys:
-                            split_sales += amt
-                            lbl = acc_keys[acc_lower]
-                            matched_detail.append((lbl, amt))
-                            if lbl in unmatched_partners:
-                                unmatched_partners.remove(lbl)
-                    for cust_lower, amt in emp_sales['by_customer'].items():
-                        if cust_lower in name_keys:
-                            split_sales += amt
-                            lbl = name_keys[cust_lower]
-                            matched_detail.append((lbl, amt))
-                            if lbl in unmatched_partners:
-                                unmatched_partners.remove(lbl)
-
-                # Find or create the split line
-                existing_split = Line.search([
-                    ('sheet_id', '=', sheet.id),
-                    ('employee_id', '=', employee.id),
-                    ('split_id', '=', split.id),
-                ], limit=1)
-                split_vals = {}
-                if emp_sales is not None:
-                    split_vals['achieved_sales'] = split_sales
-
-                if existing_split:
-                    if split_vals:
-                        existing_split.write(split_vals)
-                    status = 'updated (split)'
-                else:
-                    new_line = Line.create({
-                        'sheet_id': sheet.id,
-                        'employee_id': employee.id,
-                        'split_id': split.id,
-                    })
-                    if split_vals:
-                        new_line.write(split_vals)
-                    status = 'created (split)'
-                imported_lines.append((
-                    f"{employee.display_name} [{split.label}]",
-                    split_sales if emp_sales is not None else None,
-                    None, None, status,
-                    matched_detail, unmatched_partners,
-                ))
-
-            # ----------------------------------------------------------
-            # General line — receives the FULL total sales (not reduced)
-            # and all collection data.  The split lines calculate extra
-            # commission on their client subset independently.
-            # ----------------------------------------------------------
-            general_sales = None
-            if emp_sales is not None:
-                general_sales = emp_sales['total']
-
-            existing_general = Line.search([
-                ('sheet_id', '=', sheet.id),
-                ('employee_id', '=', employee.id),
-                ('split_id', '=', False),
-            ], limit=1)
-
-            gen_vals = {}
-            if general_sales is not None:
-                gen_vals['achieved_sales'] = general_sales
-            if coll_amt is not None:
-                gen_vals['achieved_collection'] = coll_amt
-            if target_amt is not None:
-                gen_vals['target_collection'] = target_amt
-
-            if gen_vals:
-                if existing_general:
-                    existing_general.write(gen_vals)
-                    imported_lines.append((
-                        employee.display_name, general_sales,
-                        coll_amt, target_amt, 'updated', [], []))
-                else:
-                    new_line = Line.create({
-                        'sheet_id': sheet.id,
-                        'employee_id': employee.id,
-                    })
-                    new_line.write(gen_vals)
-                    imported_lines.append((
-                        employee.display_name, general_sales,
-                        coll_amt, target_amt, 'created', [], []))
-
-        # -- Collection Manager: total-collection pass -------------------
-        # Employees whose profile has x_collection_based_on_total=True
-        # receive the grand total of ALL collections (and targets) from
-        # the collection file, regardless of what name appears in the file.
-        if self.collection_file and sheet_year:
-            grand_collected = sum(
-                v['collected'] for v in collection_totals.values()
+        # -- re-key by employee and delegate the upsert to the sheet -----
+        # (shared with action_pull_from_bas() on ksw.sales.commission.sheet)
+        sales_by_employee = {
+            emp_map[name]: data
+            for name, data in sales_data.items() if name in emp_map
+        }
+        collection_by_employee = {
+            emp_map[name]: data
+            for name, data in collection_totals.items() if name in emp_map
+        }
+        collection_grand_totals = None
+        if self.collection_file:
+            collection_grand_totals = (
+                sum(v['collected'] for v in collection_totals.values()),
+                sum(v['target'] for v in collection_totals.values()),
             )
-            grand_target = sum(
-                v['target'] for v in collection_totals.values()
-            )
-            mgr_profiles = Profile.sudo().search([
-                ('year', '=', sheet_year),
-                ('active', '=', True),
-                ('x_collection_based_on_total', '=', True),
-            ])
-            for profile in mgr_profiles:
-                employee = profile.employee_id
-                existing = Line.search([
-                    ('sheet_id', '=', sheet.id),
-                    ('employee_id', '=', employee.id),
-                    ('split_id', '=', False),
-                ], limit=1)
-                mgr_vals = {
-                    'achieved_collection': grand_collected,
-                    'target_collection': grand_target,
-                }
-                if existing:
-                    existing.write(mgr_vals)
-                    action_lbl = 'updated'
-                else:
-                    new_line = Line.create({
-                        'sheet_id': sheet.id,
-                        'employee_id': employee.id,
-                    })
-                    new_line.write(mgr_vals)
-                    action_lbl = 'created'
-                imported_lines.append((
-                    f"{employee.display_name} [Total Collection]",
-                    None, grand_collected, grand_target,
-                    action_lbl, [], [],
-                ))
+
+        imported_lines = sheet._apply_commission_data(
+            sales_by_employee, collection_by_employee,
+            collection_grand_totals=collection_grand_totals)
 
         # -- chatter summary ----------------------------------------------
         self._post_import_summary(sheet, imported_lines, unmatched)
@@ -507,60 +335,7 @@ class KswSalesCommissionImportWizard(models.TransientModel):
     # ------------------------------------------------------------------
     def _post_import_summary(self, sheet, imported_lines, unmatched):
         """Post a chatter note with a full import summary."""
-        lines_html = Markup('')
-        for entry in imported_lines:
-            emp_name, sales, coll, target, action = entry[:5]
-            matched_detail = entry[5] if len(entry) > 5 else []
-            unmatched_partners = entry[6] if len(entry) > 6 else []
-
-            s_str = f'SAR {sales:,.2f}' if sales is not None else '—'
-            c_str = f'SAR {coll:,.2f}' if coll is not None else '—'
-            t_str = f'SAR {target:,.2f}' if target is not None else '—'
-
-            # Per-client breakdown for split lines (skip zero-amount rows)
-            detail_html = Markup('')
-            active_rows = [(lbl, amt) for lbl, amt in matched_detail if amt]
-            if active_rows:
-                rows = Markup('').join(
-                    Markup(
-                        '<tr>'
-                        '<td style="padding:2px 10px;">{lbl}</td>'
-                        '<td style="padding:2px 10px;text-align:right;'
-                        'font-family:monospace;">SAR {amt}</td>'
-                        '</tr>'
-                    ).format(lbl=lbl, amt=f'{amt:,.2f}')
-                    for lbl, amt in sorted(active_rows, key=lambda x: -x[1])
-                )
-                detail_html += Markup(
-                    '<table style="margin:4px 0 4px 16px;font-size:0.9em;'
-                    'border-collapse:collapse;">'
-                    '<thead><tr style="border-bottom:1px solid #ccc;">'
-                    '<th style="text-align:left;padding:2px 10px;">'
-                    'Client</th>'
-                    '<th style="text-align:right;padding:2px 10px;">'
-                    'Amount</th>'
-                    '</tr></thead>'
-                    '<tbody>{rows}</tbody>'
-                    '</table>'
-                ).format(rows=rows)
-            if unmatched_partners:
-                missing = Markup(', ').join(
-                    escape(str(x)) for x in unmatched_partners
-                )
-                detail_html += Markup(
-                    '<div style="margin-left:16px;font-size:0.85em;'
-                    'color:#c0392b;">⚠ Not found in Excel: {m}</div>'
-                ).format(m=missing)
-
-            lines_html += Markup(
-                '<li><b>{name}</b> [{action}] '
-                'Sales: {s} | Target Coll: {t} | Collected: {c}'
-                '{detail}</li>'
-            ).format(
-                name=escape(emp_name), action=escape(action),
-                s=s_str, t=t_str, c=c_str,
-                detail=detail_html,
-            )
+        lines_html = sheet._format_commission_lines_html(imported_lines)
 
         warn_html = Markup('')
         if unmatched:
