@@ -687,6 +687,29 @@ class KswSalesCommissionLine(models.Model):
     notes = fields.Char()
 
     # ------------------------------------------------------------------
+    # Accountant-entered manual adjustments — one-off bonus/reward
+    # additions and penalty/correction deductions on top of the
+    # rule-computed commission. Mirrors the "Additional Commissions
+    # Detail" / "Additional Deductions Detail" pattern already used on
+    # annual leave / EOS approval (KSW_annual_leave hr_leave_commission_line
+    # / hr_leave_deduction_line).
+    # ------------------------------------------------------------------
+    x_addition_line_ids = fields.One2many(
+        'ksw.sales.commission.addition.line', 'line_id', copy=False,
+        string='Addition Lines',
+    )
+    x_total_additions = fields.Monetary(
+        compute='_compute_adjustment_totals', store=True,
+    )
+    x_deduction_line_ids = fields.One2many(
+        'ksw.sales.commission.deduction.line', 'line_id', copy=False,
+        string='Deduction Lines',
+    )
+    x_total_deductions = fields.Monetary(
+        compute='_compute_adjustment_totals', store=True,
+    )
+
+    # ------------------------------------------------------------------
     # Sales-manager override
     # ------------------------------------------------------------------
     # When True, the rule's condition gate is bypassed in
@@ -805,10 +828,16 @@ class KswSalesCommissionLine(models.Model):
         # Fall back to generic scope-based resolution.
         return Rule._resolve_rule(rec.employee_id, kind, rec.partner_id)
 
+    @api.depends('x_addition_line_ids.amount', 'x_deduction_line_ids.amount')
+    def _compute_adjustment_totals(self):
+        for rec in self:
+            rec.x_total_additions = sum(rec.x_addition_line_ids.mapped('amount'))
+            rec.x_total_deductions = sum(rec.x_deduction_line_ids.mapped('amount'))
+
     @api.depends('role', 'target_sales', 'target_collection',
                  'achieved_sales', 'achieved_collection',
                  'employee_id', 'partner_id', 'split_id', 'sheet_id.period',
-                 'x_condition_override')
+                 'x_condition_override', 'x_total_additions', 'x_total_deductions')
     def _compute_commission(self):
         Rule = self.env['ksw.sales.commission.rule']
         for rec in self:
@@ -869,7 +898,9 @@ class KswSalesCommissionLine(models.Model):
             rec.sales_commission_amount = sales_amt
             rec.collection_commission_amount = coll_amt
             rec.combined_commission_amount = comb_amt
-            rec.total_commission = sales_amt + coll_amt + comb_amt
+            rec.total_commission = (
+                sales_amt + coll_amt + comb_amt
+                + rec.x_total_additions - rec.x_total_deductions)
 
     # No _ksw_contributions and no CRUD sync: sales and collection are paid
     # outside the commission request, so nothing here reaches
@@ -900,6 +931,29 @@ class KswSalesCommissionLine(models.Model):
         raise UserError(_(
             "Only a Sales Manager can override the commission "
             "condition on a line."))
+
+    def action_open_full_form(self):
+        """Open this line on its own full page (target='current'), not as
+        a dialog nested inside the sheet's ``line_ids`` — a one2many field
+        (Addition/Deduction Lines) nested two levels deep inside that
+        dialog hits an Odoo web-client bug ("View props should have a
+        resModel key"). A real top-level page keeps the nesting to one
+        level and renders fine.
+        """
+        self.ensure_one()
+        return {
+            'name': _("Sales/Collection Commission Line"),
+            'type': 'ir.actions.act_window',
+            'res_model': 'ksw.sales.commission.line',
+            'res_id': self.id,
+            'view_mode': 'form',
+            'views': [
+                (self.env.ref(
+                    'KSW_commissions.view_ksw_sales_commission_line_form_full'
+                ).id, 'form'),
+            ],
+            'target': 'current',
+        }
 
     def action_open_override_wizard(self):
         """Open the override-reason wizard for the manager to capture

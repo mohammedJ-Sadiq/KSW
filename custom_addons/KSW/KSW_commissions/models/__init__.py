@@ -11,6 +11,8 @@ from . import ksw_meal_settings           # res.config.settings: overtime params
 from . import ksw_salesperson_profile     # sales: yearly target + client splits
 from . import ksw_sales_commission_rule   # sales: rule + tier catalog
 from . import ksw_sales_commission_sheet  # sales: paid separately, not an entry type
+from . import ksw_sales_commission_addition_line   # accountant manual bonus/reward lines
+from . import ksw_sales_commission_deduction_line  # accountant manual penalty/correction lines
 from . import res_partner                 # commission import name alias
 from . import ksw_bas_customer            # BAS-native rep resolution + AR aging target
 from . import ksw_deduction               # adds awaiting-commission helpers

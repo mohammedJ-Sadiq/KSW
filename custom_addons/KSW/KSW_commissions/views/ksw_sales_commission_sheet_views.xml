@@ -106,6 +106,11 @@
                                             class="text-muted"
                                             invisible="not x_condition_override"
                                             groups="KSW_commissions.group_sales_commission_manager"/>
+                                    <button name="action_open_full_form"
+                                            string="Adjustments"
+                                            type="object"
+                                            icon="fa-external-link"
+                                            title="Open this line's own page to add addition/deduction lines"/>
                                     <field name="sales_rule_id"
                                            string="Sales Rule" optional="hide"/>
                                     <field name="collection_rule_id"
@@ -129,6 +134,12 @@
                                                 class="btn-secondary"
                                                 invisible="not x_condition_override"
                                                 groups="KSW_commissions.group_sales_commission_manager"/>
+                                        <button name="action_open_full_form"
+                                                string="Open Adjustments"
+                                                type="object"
+                                                class="btn-secondary"
+                                                icon="fa-external-link"
+                                                title="Open this line on its own page to add addition/deduction lines"/>
                                     </header>
                                     <sheet>
                                         <div class="alert alert-warning"
@@ -176,9 +187,16 @@
                                                 <field name="sales_commission_amount" readonly="1"/>
                                                 <field name="collection_commission_amount" readonly="1"/>
                                                 <field name="combined_commission_amount" readonly="1"/>
+                                                <field name="x_total_additions" readonly="1"/>
+                                                <field name="x_total_deductions" readonly="1"/>
                                                 <field name="total_commission" readonly="1"/>
                                             </group>
                                         </group>
+                                        <div class="alert alert-info col-12" role="alert">
+                                            <i class="fa fa-info-circle me-2"/>
+                                            Use <b>Open Adjustments</b> above to add addition/deduction lines
+                                            on this employee's own page.
+                                        </div>
                                         <field name="notes"/>
                                         <field name="currency_id" invisible="1"/>
                                     </sheet>
@@ -195,6 +213,103 @@
                     </group>
                 </sheet>
                 <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Commission Line — standalone full-page form (Adjustments)        -->
+    <!-- Opened via action_open_full_form(), NOT nested inside the        -->
+    <!-- sheet's line_ids dialog: a one2many field (Addition/Deduction    -->
+    <!-- Lines) nested two levels deep inside that dialog hits an Odoo    -->
+    <!-- web-client bug ("View props should have a resModel key"). A      -->
+    <!-- real top-level page keeps the nesting to one level and renders   -->
+    <!-- fine. See KSW-Brain Odoo 19 Pitfalls.                            -->
+    <!-- ================================================================ -->
+    <record id="view_ksw_sales_commission_line_form_full" model="ir.ui.view">
+        <field name="name">ksw.sales.commission.line.form.full</field>
+        <field name="model">ksw.sales.commission.line</field>
+        <field name="arch" type="xml">
+            <form string="Sales/Collection Commission Line">
+                <header>
+                    <button name="action_open_override_wizard"
+                            string="Override Condition"
+                            type="object"
+                            class="btn-warning"
+                            invisible="x_condition_override"
+                            groups="KSW_commissions.group_sales_commission_manager"/>
+                    <button name="action_revoke_override"
+                            string="Revoke Override"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="not x_condition_override"
+                            groups="KSW_commissions.group_sales_commission_manager"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="employee_id" readonly="1"/>
+                        </h1>
+                        <field name="period" readonly="1"/>
+                    </div>
+                    <div class="alert alert-warning"
+                         role="alert"
+                         invisible="not x_condition_override">
+                        <i class="fa fa-shield me-2"
+                           title="Override" role="img" aria-label="Override"/>
+                        <strong>Condition overridden by Sales Manager.</strong>
+                        <field name="x_override_by" readonly="1" nolabel="1" class="d-inline ms-2"/>
+                        <span class="mx-1">·</span>
+                        <field name="x_override_date" readonly="1" nolabel="1" class="d-inline"/>
+                        <br/>
+                        <b>Reason:</b>
+                        <field name="x_override_reason" readonly="1" nolabel="1" class="d-inline ms-1"/>
+                    </div>
+                    <field name="x_condition_override" invisible="1"/>
+                    <field name="sheet_id" invisible="1"/>
+                    <group>
+                        <group string="Targets &amp; Achieved">
+                            <field name="target_sales"/>
+                            <field name="achieved_sales"/>
+                            <field name="sales_pct" readonly="1"/>
+                            <field name="target_collection"/>
+                            <field name="achieved_collection"/>
+                            <field name="collection_pct" readonly="1"/>
+                        </group>
+                        <group string="Computed Amounts">
+                            <field name="sales_commission_amount" readonly="1"/>
+                            <field name="collection_commission_amount" readonly="1"/>
+                            <field name="combined_commission_amount" readonly="1"/>
+                            <field name="x_total_additions" readonly="1"/>
+                            <field name="x_total_deductions" readonly="1"/>
+                            <field name="total_commission" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Adjustments">
+                            <separator string="Additions"/>
+                            <field name="x_addition_line_ids" nolabel="1">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name" string="Description"/>
+                                    <field name="amount" sum="Total"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                </list>
+                            </field>
+                            <separator string="Deductions"/>
+                            <field name="x_deduction_line_ids" nolabel="1">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name" string="Description"/>
+                                    <field name="amount" sum="Total"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                    <field name="notes"/>
+                    <field name="currency_id" invisible="1"/>
+                </sheet>
             </form>
         </field>
     </record>
