@@ -33,6 +33,18 @@ class HrEmployee(models.Model):
              'differs from the employee\'s Odoo name, so this must be set '
              'explicitly for the pull to find the driver\'s loads.',
     )
+    x_deduct_commission_priority = fields.Boolean(
+        string='Settle Deductions from Commission First',
+        default=True,
+        groups='hr.group_hr_user,base.group_system',
+        help="When enabled (default), each month this employee's pending "
+             "loan/deduction installments are settled from their commission "
+             "pay run first; any amount the commission can't cover falls "
+             "through to payroll as usual (and if payroll can't cover it "
+             "either, the remainder rolls to next month exactly as it does "
+             "today). When disabled, deductions are taken from payroll "
+             "only — commission pay is never touched.",
+    )
 
     # No write() hook any more. It used to pre-create an empty commission
     # sheet for every employee flagged x_is_attendance_sheet. Since

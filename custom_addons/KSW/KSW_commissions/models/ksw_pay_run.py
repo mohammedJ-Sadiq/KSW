@@ -400,12 +400,14 @@ class KswPayRun(models.Model):
             submitted.mapped('batch_ids').sudo().write({'state': 'approved'})
             submitted.sudo().write({'state': 'approved'})
             rec._build_register()
+            auto_ids = rec.line_ids.sudo()._auto_flag_priority_installments()
             rec.write({
                 'state': 'approved',
                 'approved_by': self.env.uid,
                 'approved_date': fields.Datetime.now(),
             })
             rec.line_ids.sudo()._apply_loan_offset()
+            rec.line_ids.sudo()._unflag_uncovered_auto_installments(auto_ids)
             body = Markup(
                 '<strong>✅ Approved</strong><br/>'
                 '<b>Departments:</b> %(depts)s<br/>'
@@ -745,6 +747,52 @@ class KswPayRunLine(models.Model):
         )._get_pending_commission_lines_for_period(
             self.employee_id, self.period)
         return total
+
+    def _auto_flag_priority_installments(self):
+        """Park this period's pending installments for every employee who
+        has 'Settle Deductions from Commission First' enabled, so
+        ``_apply_loan_offset`` settles them out of commission before
+        anything reaches payroll.
+
+        Only lines not already parked are touched. Returns the ids this
+        call flagged, so the caller can tell them apart afterwards from
+        lines an accountant had already parked manually — those must keep
+        waiting for a future commission run if commission falls short,
+        exactly as today, while ours must fall straight through to this
+        month's payslip instead.
+        """
+        Line = self.env['ksw.deduction.line'].sudo()
+        Ded = self.env['ksw.deduction'].sudo()
+        auto_ids = []
+        for rec in self:
+            if not rec.employee_id.x_deduct_commission_priority:
+                continue
+            year, month = Ded._period_to_year_month(rec.period)
+            lines = Line.search([
+                ('employee_id', '=', rec.employee_id.id),
+                ('state', '=', 'pending'),
+                ('year', '=', year), ('month', '=', month),
+                ('x_awaiting_commission', '=', False),
+                ('deduction_id.state', '=', 'active'),
+            ])
+            if lines:
+                lines.write({'x_awaiting_commission': True})
+                auto_ids += lines.ids
+        return auto_ids
+
+    def _unflag_uncovered_auto_installments(self, auto_ids):
+        """Undo the flag on any auto-flagged line ``_apply_loan_offset``
+        did not fully consume (still pending afterward), so it falls into
+        this month's payslip immediately instead of waiting on a future
+        commission run.
+        """
+        if not auto_ids:
+            return
+        leftover = self.env['ksw.deduction.line'].sudo().browse(
+            auto_ids).exists().filtered(
+                lambda l: l.state == 'pending' and l.x_awaiting_commission)
+        if leftover:
+            leftover.write({'x_awaiting_commission': False})
 
     def _apply_loan_offset(self):
         """Settle parked installments out of the commission payment.
