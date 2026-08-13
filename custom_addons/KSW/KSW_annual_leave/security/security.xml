@@ -238,8 +238,15 @@
         disjunct — the manager's own requests are out of scope; the
         manager files those personally.
 
-        perm_unlink is False on both: withdrawing/deleting a request is
-        not delegated.
+        perm_unlink is False on the read rule (August 2026: still not
+        delegated for every state — an assistant has no business undoing
+        something already approved). It is True on the prepare rule below:
+        an assistant who raised a request on their manager's behalf may
+        also withdraw it, but only while it is still sitting at its first
+        pending step (same domain as edit — before the DM, or before the
+        first KSW chain step, has acted). Once that step is signed off the
+        domain here no longer matches and deletion falls back to whatever
+        broader tier (if any) the assistant separately holds.
     -->
     <record id="hr_leave_rule_manager_assistant_read" model="ir.rule">
         <field name="name">KSW Leave: manager assistant (delegated team, read all states)</field>
@@ -267,7 +274,7 @@
         <field name="perm_read" eval="False"/>
         <field name="perm_write" eval="True"/>
         <field name="perm_create" eval="True"/>
-        <field name="perm_unlink" eval="False"/>
+        <field name="perm_unlink" eval="True"/>
     </record>
 
     <!-- ============================================================ -->

@@ -24,21 +24,6 @@ class HrLeave(models.Model):
 
         return super().action_approve(check_state=check_state)
 
-    def action_validate(self):
-        """Enforce configured HR Manager approval for non-annual leaves."""
-        for leave in self:
-            if not leave._is_annual_leave_logic():
-                hr_manager = leave.company_id.x_hr_leave_manager_id
-                
-                if leave.state == 'validate1':
-                    if not self.env.su:
-                        if not hr_manager:
-                            raise UserError(_("HR Leave Manager is not configured in settings."))
-                        if self.env.user != hr_manager:
-                            raise UserError(_("Only the configured HR Manager (%s) can approve this step.") % hr_manager.name)
-
-        return super().action_validate()
-
     def _action_approve_attendance_based(self, check_state=True):
         """Override KSW_attendance_leave to remove second-step bypass."""
         attendance_leaves = self.filtered('x_attendance_ids')
@@ -71,7 +56,28 @@ class HrLeave(models.Model):
                 super(HrLeave, leave)._action_approve_attendance_based(check_state=check_state)
 
     def _action_validate(self, check_state=True):
-        """Override KSW_attendance_leave to ensure strict 2nd step for attendance leaves."""
+        """Override KSW_attendance_leave to ensure strict 2nd step for attendance leaves.
+
+        This is the single choke point every route uses to finalise a leave
+        into 'validate' — action_approve() calls it directly whenever
+        can_validate is already True, which core grants to anyone holding
+        hr_holidays.group_hr_holidays_user/_manager (is_officer) regardless
+        of the current state. That let a Direct Manager who also happens to
+        hold a Time-Off Officer/Administrator group jump confirm -> validate
+        (or even refuse -> validate) in one click, completely skipping the
+        HR Manager. The check below is therefore unconditional and applies
+        before any state-specific branching, not just to the validate1 ->
+        validate transition.
+        """
+        if not self.env.su:
+            for leave in self:
+                if not leave._is_annual_leave_logic() and leave.validation_type == 'both':
+                    hr_manager = leave.company_id.x_hr_leave_manager_id
+                    if not hr_manager:
+                        raise UserError(_("HR Leave Manager is not configured in settings."))
+                    if self.env.user != hr_manager:
+                        raise UserError(_("Only the configured HR Manager (%s) can give the final approval.") % hr_manager.name)
+
         attendance_leaves = self.filtered('x_attendance_ids')
         non_attendance = self - attendance_leaves
 
@@ -80,12 +86,6 @@ class HrLeave(models.Model):
 
         for leave in attendance_leaves:
             if not leave._is_annual_leave_logic():
-                # Enforce HR Manager check for validate1 -> validate
-                if leave.state == 'validate1':
-                    hr_manager = leave.company_id.x_hr_leave_manager_id
-                    if hr_manager and self.env.user != hr_manager and not self.env.su:
-                        raise UserError(_("Only the configured HR Manager (%s) can approve this step.") % hr_manager.name)
-
                 # Now replicate the write to 'validate' but correctly
                 current_employee = self.env.user.employee_id
                 att_no_track = leave.with_context(tracking_disable=True)
@@ -115,3 +115,49 @@ class HrLeave(models.Model):
                 if hr_manager:
                     return hr_manager
         return super()._get_responsible_for_approval()
+
+    # ==================================================================
+    # Deletion — the request may be withdrawn as long as the next
+    # approver in the DM -> HR chain hasn't acted yet.
+    # ==================================================================
+
+    @api.ondelete(at_uninstall=False)
+    def _unlink_if_correct_states(self):
+        """Let whoever is waiting on the next step withdraw the request.
+
+        - state == 'confirm' (DM hasn't approved yet): the creator of the
+          request may delete it. This covers a supervisor/assistant who
+          raised the leave on the employee's behalf, not just the employee
+          themselves (Odoo core's own-leave rule only recognises
+          employee_id.user_id == env.user).
+        - state == 'validate1' (DM approved, HR hasn't yet): the DM may
+          delete it, since they are the one who put it there and can
+          equally decide to withdraw it instead of waiting on HR.
+
+        Leaves that don't qualify (wrong state, wrong user, annual leaves —
+        handled by KSW_annual_leave's own chain-aware override) fall
+        through to super(), which still grants its own bypasses (Settings
+        Administrator, Time Off Administrator, own-untouched-request, etc.)
+        — never dropped, per the mixed-batch filter rule.
+        """
+        remaining = self.browse()
+        for leave in self:
+            if leave._is_annual_leave_logic() or leave.state not in ('confirm', 'validate1'):
+                remaining += leave
+                continue
+
+            user = self.env.user
+            manager_user = leave.employee_id.leave_manager_id or leave.employee_id.parent_id.user_id
+            hr_manager = leave.company_id.x_hr_leave_manager_id
+
+            if leave.state == 'confirm':
+                allowed = user == leave.create_uid or (manager_user and user == manager_user)
+            else:  # validate1
+                allowed = (manager_user and user == manager_user) or (hr_manager and user == hr_manager)
+
+            if not allowed:
+                remaining += leave
+
+        if remaining:
+            return super(HrLeave, remaining)._unlink_if_correct_states()
+        return None

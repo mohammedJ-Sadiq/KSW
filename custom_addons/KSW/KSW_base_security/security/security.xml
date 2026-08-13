@@ -199,7 +199,7 @@
             (4, ref('base.group_user')),
             (4, ref('hr_holidays.group_hr_holidays_responsible')),
         ]"/>
-        <field name="comment">Prepare and edit time off and loan requests on behalf of the direct reports of the managers who listed this user as their assistant. Can never approve, refuse or delete a request.</field>
+        <field name="comment">Prepare and edit time off and loan requests on behalf of the direct reports of the managers who listed this user as their assistant. Can never approve or refuse a request. May delete a request they prepared only while it is still awaiting the manager's own first approval — the window closes the moment the manager (or the first KSW chain step) acts.</field>
     </record>
 
     <!--

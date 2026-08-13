@@ -14,7 +14,10 @@ The invariants pinned down here:
     type: the multi-step chains keep `state == 'confirm'` past GM final
     approval, so the gate has to read `x_annual_approval_state` for those and
     `state` for ordinary types;
-  * the assistant can never approve, refuse, delete or confirm a return;
+  * the assistant can never approve, refuse or confirm a return; they may
+    delete a request they prepared, but only before the manager's own first
+    approval — the window closes the moment that step (or the DM step of a
+    plain leave type) is signed off (August 2026);
   * an undelegated holder of the group sees nothing, because
     `_ksw_assisted_manager_ids()` returns an empty list;
   * `employee_id` cannot be re-pointed out of the delegation — record rules
@@ -273,8 +276,26 @@ class TestManagerAssistantDelegation(TransactionCase):
         with self.assertRaises(UserError):
             leave.with_user(self.user_asst).action_refuse()
 
-    def test_cannot_delete(self):
+    def test_can_delete_before_dm_approval(self):
+        """August 2026: the assistant may withdraw a request they prepared
+        as long as the manager hasn't acted on it yet — same window as
+        edit (test_edit_while_pending_dm)."""
         leave = self._leave_as(self.user_asst, self.emp_r1)
+        leave_id = leave.id
+        leave.with_user(self.user_asst).unlink()
+        self.assertFalse(self.env['hr.leave'].sudo().browse(leave_id).exists())
+
+    def test_cannot_delete_after_dm_approval(self):
+        leave = self._leave_as(self.user_asst, self.emp_r1)
+        leave.with_user(self.user_mgr).sudo().action_dm_approve()
+        self.assertEqual(leave.sudo().x_annual_approval_state, 'pending_hr')
+        with self.assertRaises(AccessError):
+            leave.with_user(self.user_asst).unlink()
+
+    def test_cannot_delete_plain_leave_after_first_approval(self):
+        """Ordinary types progress via `state`, not the KSW chain."""
+        leave = self._leave_as(self.user_asst, self.emp_r1, self.plain_type)
+        leave.sudo().write({'state': 'validate'})
         with self.assertRaises(AccessError):
             leave.with_user(self.user_asst).unlink()
 
