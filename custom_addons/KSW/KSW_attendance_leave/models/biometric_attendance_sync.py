@@ -449,6 +449,14 @@ class BiometricAttendanceSyncKSW(models.AbstractModel):
         if not leaves:
             return {'created': 0, 'revoked': 0}
 
+        # This is a system bookkeeping pass triggered by an already-authorised
+        # action (leave approve/refuse/draft), not a user-facing read. Run it
+        # sudo'd throughout: the chain below (main_calendar_id,
+        # biometric_user_id, and anything get_employee_day_schedule reads) is
+        # all groups='hr.group_hr_user'-gated, and the caller is frequently a
+        # Direct Manager who lacks that group.
+        leaves = leaves.sudo()
+
         yesterday = fields.Date.context_today(self) - timedelta(days=1)
         created = revoked = 0
 

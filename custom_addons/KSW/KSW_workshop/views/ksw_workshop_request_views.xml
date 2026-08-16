@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ================================================================ -->
+    <!-- Form                                                              -->
+    <!-- ================================================================ -->
+    <record id="view_ksw_workshop_request_form" model="ir.ui.view">
+        <field name="name">ksw.workshop.request.form</field>
+        <field name="model">ksw.workshop.request</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_start" type="object"
+                            string="Start"
+                            class="oe_highlight"
+                            groups="KSW_workshop.group_workshop_manager"
+                            invisible="state != 'new'"/>
+                    <button name="action_complete" type="object"
+                            string="Complete"
+                            class="oe_highlight"
+                            groups="KSW_workshop.group_workshop_manager"
+                            invisible="state != 'in_progress'"/>
+                    <button name="action_reject" type="object"
+                            string="Reject"
+                            class="btn-danger"
+                            groups="KSW_workshop.group_workshop_manager"
+                            invisible="state != 'new'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="new,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Requester">
+                            <field name="employee_id" readonly="1"/>
+                            <field name="department_id" readonly="1"/>
+                            <field name="job_title" readonly="1"/>
+                            <field name="work_email" readonly="1"/>
+                            <field name="mobile_phone" readonly="1"/>
+                        </group>
+                        <group string="Vehicle">
+                            <field name="vehicle_id" readonly="state != 'new'"/>
+                            <field name="driver_id" readonly="state != 'new'"/>
+                        </group>
+                    </group>
+                    <group string="Request">
+                        <field name="description" nolabel="1" readonly="state != 'new'"/>
+                    </group>
+                    <notebook>
+                        <page string="Repair Report"
+                              groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_manager">
+                            <group>
+                                <group>
+                                    <field name="entry_datetime" readonly="state != 'in_progress'"/>
+                                    <field name="exit_datetime" readonly="state != 'in_progress'"/>
+                                    <field name="odometer_reading" readonly="state != 'in_progress'"/>
+                                    <field name="technician_id" readonly="state != 'in_progress'"/>
+                                </group>
+                                <group>
+                                    <field name="tire_pressure" readonly="state != 'in_progress'"/>
+                                    <field name="tire_bolts" readonly="state != 'in_progress'"/>
+                                    <field name="parts_cost" readonly="state != 'in_progress'"/>
+                                    <field name="labor_cost" readonly="state != 'in_progress'"/>
+                                </group>
+                            </group>
+                            <group string="Work">
+                                <field name="work_statement" readonly="state != 'in_progress'"/>
+                                <field name="repairs_parts" readonly="state != 'in_progress'"/>
+                            </group>
+                        </page>
+                        <page string="Internal" groups="KSW_workshop.group_workshop_manager">
+                            <group>
+                                <field name="note"/>
+                                <field name="note_to_requester"/>
+                                <field name="rejection_reason" invisible="state not in ('new', 'rejected')"/>
+                                <field name="completion_date" readonly="1"/>
+                                <field name="duration_days" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- List                                                              -->
+    <!-- ================================================================ -->
+    <record id="view_ksw_workshop_request_list" model="ir.ui.view">
+        <field name="name">ksw.workshop.request.list</field>
+        <field name="model">ksw.workshop.request</field>
+        <field name="arch" type="xml">
+            <list string="Workshop Requests" decoration-danger="state == 'rejected'" decoration-success="state == 'completed'" decoration-info="state == 'in_progress'">
+                <field name="name"/>
+                <field name="create_date" string="Date"/>
+                <field name="employee_id"/>
+                <field name="vehicle_id"/>
+                <field name="description"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Kanban                                                            -->
+    <!-- ================================================================ -->
+    <record id="view_ksw_workshop_request_kanban" model="ir.ui.view">
+        <field name="name">ksw.workshop.request.kanban</field>
+        <field name="model">ksw.workshop.request</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" records_draggable="0">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="vehicle_id"/>
+                <field name="description"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <strong><field name="name"/></strong>
+                            <div><field name="vehicle_id"/></div>
+                            <div class="text-muted"><field name="description"/></div>
+                            <div class="text-muted"><field name="employee_id"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Search                                                            -->
+    <!-- ================================================================ -->
+    <record id="view_ksw_workshop_request_search" model="ir.ui.view">
+        <field name="name">ksw.workshop.request.search</field>
+        <field name="model">ksw.workshop.request</field>
+        <field name="arch" type="xml">
+            <search string="Workshop Requests">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="vehicle_id"/>
+                <field name="description"/>
+                <filter string="New" name="filter_new" domain="[('state', '=', 'new')]"/>
+                <filter string="In Progress" name="filter_in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Completed" name="filter_completed" domain="[('state', '=', 'completed')]"/>
+                <filter string="Rejected" name="filter_rejected" domain="[('state', '=', 'rejected')]"/>
+                <separator/>
+                <filter string="My Requests" name="filter_mine" domain="[('employee_id.user_id', '=', uid)]"/>
+                <group>
+                    <filter string="Status" name="groupby_state" context="{'group_by': 'state'}"/>
+                    <filter string="Vehicle" name="groupby_vehicle" context="{'group_by': 'vehicle_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Actions                                                           -->
+    <!-- ================================================================ -->
+    <record id="action_ksw_workshop_request_my" model="ir.actions.act_window">
+        <field name="name">My Requests</field>
+        <field name="res_model">ksw.workshop.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ksw_workshop_request_search"/>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Submit a new workshop service request
+            </p>
+        </field>
+    </record>
+
+    <record id="action_ksw_workshop_request_all" model="ir.actions.act_window">
+        <field name="name">All Requests</field>
+        <field name="res_model">ksw.workshop.request</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_ksw_workshop_request_search"/>
+        <field name="context">{'search_default_filter_new': 1, 'search_default_filter_in_progress': 1}</field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Menus                                                             -->
+    <!-- ================================================================ -->
+    <menuitem id="menu_ksw_workshop_root" name="Workshop" sequence="60"/>
+    <menuitem id="menu_ksw_workshop_my" name="My Requests"
+              parent="menu_ksw_workshop_root" action="action_ksw_workshop_request_my" sequence="10"/>
+    <menuitem id="menu_ksw_workshop_all" name="All Requests"
+              parent="menu_ksw_workshop_root" action="action_ksw_workshop_request_all" sequence="20"
+              groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_manager"/>
+    <menuitem id="menu_ksw_workshop_configuration" name="Configuration"
+              parent="menu_ksw_workshop_root" sequence="90"
+              groups="KSW_workshop.group_workshop_manager"/>
+
+</odoo>

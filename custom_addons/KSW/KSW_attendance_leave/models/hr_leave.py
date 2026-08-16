@@ -22,7 +22,9 @@ class HrLeave(models.Model):
                "('x_is_covered', '=', False),"
                "('check_in', '>=', request_date_from), "
                "('check_in', '<=', request_date_to)] + "
-               "(['|', ('x_late_minutes', '>', 0), ('x_early_leave_minutes', '>', 0)] "
+               "(['|', ('x_late_minutes', '>', 0), "
+               "'&', ('x_early_leave_minutes', '>', 0), "
+               "('check_in', '<', context_today().strftime('%Y-%m-%d'))] "
                "if request_unit_hours else [('x_is_absent', '=', True)])",
         help="Select the attendance records with issues (late, early leave, or absence) "
              "that this time-off request is meant to cover.",
@@ -82,6 +84,7 @@ class HrLeave(models.Model):
             return
 
         calendar = self.resource_calendar_id or self.env.company.resource_calendar_id
+        today = fields.Date.context_today(self)
         new_lines = []
         all_from = []
         all_to = []
@@ -124,7 +127,12 @@ class HrLeave(models.Model):
                     'accepted_minutes': att.x_late_minutes,
                 }))
 
-            if att.x_early_leave_minutes > 0:
+            # Early-leave is only meaningful once the workday has actually
+            # ended -- while it's still in progress, the employee has only
+            # checked in, so x_early_leave_minutes is computed against a
+            # placeholder check-out and does not reflect a real early leave.
+            # The employee can still file this once the day is over.
+            if att.x_early_leave_minutes > 0 and check_date < today:
                 hour_from = sched_end - att.x_early_leave_minutes / 60.0
                 hour_to = sched_end
                 all_from.append(hour_from)

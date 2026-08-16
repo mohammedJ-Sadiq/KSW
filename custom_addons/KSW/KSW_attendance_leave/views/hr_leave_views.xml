@@ -39,8 +39,10 @@
                         <field name="attendance_id" readonly="1" force_save="1" column_invisible="True"/>
                         <field name="date" readonly="1" force_save="1"/>
                         <field name="issue_type" readonly="1" force_save="1"/>
-                        <field name="hour_from" widget="float_time" readonly="1" force_save="1"/>
-                        <field name="hour_to" widget="float_time" readonly="1" force_save="1"/>
+                        <field name="hour_from" widget="float_time" readonly="1" force_save="1"
+                               help="Late: scheduled shift start. Early Leave: the employee's check-out time."/>
+                        <field name="hour_to" widget="float_time" readonly="1" force_save="1"
+                               help="Late: the employee's check-in time. Early Leave: the scheduled shift end -- this already accounts for any unpaid break built into the shift (e.g. lunch), so it reflects net working hours, not just a clock time the employee missed by."/>
                         <field name="duration_minutes" readonly="1" string="Minutes"/>
                         <field name="accepted_minutes" string="✔ Accepted" force_save="1"
                                class="fw-bold text-primary"/>

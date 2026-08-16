@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_ksw_workshop_vehicles" name="Vehicles"
+              parent="menu_ksw_workshop_configuration"
+              action="KSW_fleet.action_ksw_fleet_vehicle"
+              sequence="10"/>
+
+</odoo>

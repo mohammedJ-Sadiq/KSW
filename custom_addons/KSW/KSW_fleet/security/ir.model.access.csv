@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ksw_fleet_vehicle_user,ksw.fleet.vehicle.user,model_ksw_fleet_vehicle,base.group_user,1,0,0,0
+access_ksw_fleet_vehicle_hr,ksw.fleet.vehicle.hr,model_ksw_fleet_vehicle,hr.group_hr_user,1,1,1,1

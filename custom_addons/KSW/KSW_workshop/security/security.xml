@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- Layer 1: Module Category                                      -->
+    <!-- ============================================================ -->
+    <record id="module_category_ksw_workshop" model="ir.module.category">
+        <field name="name">KSW Workshop</field>
+        <field name="sequence">210</field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Layer 2: Privilege                                             -->
+    <!-- ============================================================ -->
+    <!--
+        Single ladder: Technician < Manager. A Manager also gets everything
+        a Technician can do (implied_ids), since managing the queue
+        naturally includes being able to fill in a repair report too.
+        Every internal employee can still submit/see their own requests
+        via base.group_user — this privilege only governs who can triage
+        the queue and/or edit the repair report on ANY request.
+    -->
+    <record id="privilege_workshop_management" model="res.groups.privilege">
+        <field name="name">Workshop Management</field>
+        <field name="sequence">10</field>
+        <field name="category_id" ref="module_category_ksw_workshop"/>
+    </record>
+
+    <record id="group_workshop_technician" model="res.groups">
+        <field name="name">Technician</field>
+        <field name="privilege_id" ref="privilege_workshop_management"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="group_workshop_manager" model="res.groups">
+        <field name="name">Manager</field>
+        <field name="privilege_id" ref="privilege_workshop_management"/>
+        <field name="implied_ids" eval="[(4, ref('group_workshop_technician'))]"/>
+        <field name="sequence">20</field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Layer 3: Record Rules                                         -->
+    <!-- ============================================================ -->
+    <record id="rule_ksw_workshop_request_own" model="ir.rule">
+        <field name="name">Workshop Request: own records only</field>
+        <field name="model_id" ref="model_ksw_workshop_request"/>
+        <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="rule_ksw_workshop_request_technician" model="ir.rule">
+        <field name="name">Workshop Request: technician sees in-progress + own assignments</field>
+        <field name="model_id" ref="model_ksw_workshop_request"/>
+        <field name="domain_force">['|', ('state', '=', 'in_progress'), ('technician_id.user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_workshop_technician'))]"/>
+    </record>
+
+    <record id="rule_ksw_workshop_request_manager" model="ir.rule">
+        <field name="name">Workshop Request: manager sees all</field>
+        <field name="model_id" ref="model_ksw_workshop_request"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_workshop_manager'))]"/>
+    </record>
+
+</odoo>
