@@ -33,6 +33,7 @@
                             <field name="name" readonly="1"/>
                         </h1>
                     </div>
+                    <field name="x_can_toggle_cash_customer" invisible="1"/>
                     <group>
                         <group string="Requester">
                             <field name="employee_id" readonly="1"/>
@@ -42,11 +43,53 @@
                             <field name="mobile_phone" readonly="1"/>
                         </group>
                         <group string="Vehicle">
-                            <field name="vehicle_id" readonly="state != 'new'"/>
-                            <field name="driver_id" readonly="state != 'new'"/>
+                            <field name="is_cash_customer"
+                                   readonly="not x_can_toggle_cash_customer or state != 'new'"/>
+                            <field name="client_id"
+                                   invisible="is_cash_customer"
+                                   required="not is_cash_customer"
+                                   readonly="state != 'new'"/>
+                            <field name="vehicle_type"
+                                   invisible="is_cash_customer"
+                                   readonly="state != 'new'"/>
+                            <field name="vehicle_id"
+                                   context="{'default_client_id': client_id, 'default_vehicle_type': vehicle_type}"
+                                   invisible="is_cash_customer"
+                                   required="not is_cash_customer"
+                                   readonly="state != 'new'"/>
+                            <field name="driver_id"
+                                   invisible="is_cash_customer"
+                                   readonly="state != 'new'"/>
+                            <field name="x_cash_customer_name"
+                                   invisible="not is_cash_customer"
+                                   required="is_cash_customer"
+                                   readonly="state != 'new'"/>
+                            <field name="x_cash_vehicle_number"
+                                   invisible="not is_cash_customer"
+                                   required="is_cash_customer"
+                                   readonly="state != 'new'"/>
+                            <field name="x_cash_tank_number"
+                                   invisible="not is_cash_customer"
+                                   readonly="state != 'new'"/>
+                            <field name="x_cash_plate_number"
+                                   invisible="not is_cash_customer"
+                                   readonly="state != 'new'"/>
+                            <field name="x_cash_driver_name"
+                                   invisible="not is_cash_customer"
+                                   readonly="state != 'new'"/>
+                            <field name="x_cash_brand"
+                                   invisible="not is_cash_customer"
+                                   readonly="state != 'new'"/>
+                            <field name="x_cash_model"
+                                   invisible="not is_cash_customer"
+                                   readonly="state != 'new'"/>
+                            <field name="x_cash_year"
+                                   invisible="not is_cash_customer"
+                                   readonly="state != 'new'"/>
                         </group>
                     </group>
                     <group string="Request">
+                        <field name="request_type" required="1" readonly="state != 'new'"/>
                         <field name="description" nolabel="1" readonly="state != 'new'"/>
                     </group>
                     <notebook>
@@ -62,13 +105,37 @@
                                 <group>
                                     <field name="tire_pressure" readonly="state != 'in_progress'"/>
                                     <field name="tire_bolts" readonly="state != 'in_progress'"/>
-                                    <field name="parts_cost" readonly="state != 'in_progress'"/>
+                                    <field name="part_lines_cost" readonly="1"/>
+                                    <field name="parts_extra_cost" readonly="state != 'in_progress'"/>
+                                    <field name="parts_cost" readonly="1"/>
                                     <field name="labor_cost" readonly="state != 'in_progress'"/>
                                 </group>
                             </group>
                             <group string="Work">
                                 <field name="work_statement" readonly="state != 'in_progress'"/>
                                 <field name="repairs_parts" readonly="state != 'in_progress'"/>
+                            </group>
+                            <group string="Spare Parts Used">
+                                <field name="part_line_ids" nolabel="1" colspan="2"
+                                       readonly="state != 'in_progress'"
+                                       context="{'default_request_id': id}">
+                                    <list editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="part_id"
+                                               domain="['|', ('state', '=', 'confirmed'), ('id', '=', part_id)]"/>
+                                        <field name="qty_available" readonly="1"/>
+                                        <field name="quantity"/>
+                                        <field name="unit_cost"/>
+                                        <field name="returned_qty" readonly="1"
+                                               column_invisible="parent.state == 'in_progress'"/>
+                                        <field name="subtotal" readonly="1" sum="Total"/>
+                                        <field name="note"/>
+                                        <button name="action_return_to_stock" type="object"
+                                                string="Return" icon="fa-undo"
+                                                groups="KSW_workshop.group_workshop_manager"
+                                                invisible="parent.state == 'in_progress' or returned_qty &gt;= quantity"/>
+                                    </list>
+                                </field>
                             </group>
                         </page>
                         <page string="Internal" groups="KSW_workshop.group_workshop_manager">
@@ -78,6 +145,11 @@
                                 <field name="rejection_reason" invisible="state not in ('new', 'rejected')"/>
                                 <field name="completion_date" readonly="1"/>
                                 <field name="duration_days" readonly="1"/>
+                            </group>
+                            <group string="Legacy Import" invisible="not x_imported">
+                                <field name="x_legacy_uid" readonly="1"/>
+                                <field name="x_legacy_requester_name" readonly="1"/>
+                                <field name="x_legacy_requester_email" readonly="1"/>
                             </group>
                         </page>
                     </notebook>
@@ -98,7 +170,9 @@
                 <field name="name"/>
                 <field name="create_date" string="Date"/>
                 <field name="employee_id"/>
+                <field name="client_id"/>
                 <field name="vehicle_id"/>
+                <field name="request_type"/>
                 <field name="description"/>
                 <field name="state" widget="badge"/>
             </list>
@@ -115,14 +189,21 @@
             <kanban default_group_by="state" records_draggable="0">
                 <field name="name"/>
                 <field name="employee_id"/>
+                <field name="client_id"/>
                 <field name="vehicle_id"/>
+                <field name="is_cash_customer"/>
+                <field name="x_cash_customer_name"/>
+                <field name="x_cash_vehicle_number"/>
                 <field name="description"/>
                 <field name="state"/>
                 <templates>
                     <t t-name="card">
                         <div class="oe_kanban_card oe_kanban_global_click">
                             <strong><field name="name"/></strong>
-                            <div><field name="vehicle_id"/></div>
+                            <div t-if="!record.is_cash_customer.raw_value"><field name="vehicle_id"/></div>
+                            <div t-if="record.is_cash_customer.raw_value">
+                                <field name="x_cash_customer_name"/> — <field name="x_cash_vehicle_number"/>
+                            </div>
                             <div class="text-muted"><field name="description"/></div>
                             <div class="text-muted"><field name="employee_id"/></div>
                         </div>
@@ -142,6 +223,7 @@
             <search string="Workshop Requests">
                 <field name="name"/>
                 <field name="employee_id"/>
+                <field name="client_id"/>
                 <field name="vehicle_id"/>
                 <field name="description"/>
                 <filter string="New" name="filter_new" domain="[('state', '=', 'new')]"/>
@@ -150,9 +232,12 @@
                 <filter string="Rejected" name="filter_rejected" domain="[('state', '=', 'rejected')]"/>
                 <separator/>
                 <filter string="My Requests" name="filter_mine" domain="[('employee_id.user_id', '=', uid)]"/>
+                <filter string="Cash Customer" name="filter_cash_customer" domain="[('is_cash_customer', '=', True)]"/>
                 <group>
                     <filter string="Status" name="groupby_state" context="{'group_by': 'state'}"/>
+                    <filter string="Client" name="groupby_client" context="{'group_by': 'client_id'}"/>
                     <filter string="Vehicle" name="groupby_vehicle" context="{'group_by': 'vehicle_id'}"/>
+                    <filter string="Request Type" name="groupby_request_type" context="{'group_by': 'request_type'}"/>
                 </group>
             </search>
         </field>

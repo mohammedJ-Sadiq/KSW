@@ -8,5 +8,12 @@
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
         </record>
+        <record id="seq_ksw_workshop_part_move" model="ir.sequence">
+            <field name="name">KSW Workshop Part Movement Reference</field>
+            <field name="code">ksw.workshop.part.move</field>
+            <field name="prefix">WSM</field>
+            <field name="padding">6</field>
+            <field name="company_id" eval="False"/>
+        </record>
     </data>
 </odoo>

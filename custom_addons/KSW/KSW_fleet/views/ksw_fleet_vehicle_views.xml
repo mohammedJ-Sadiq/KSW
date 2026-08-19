@@ -5,11 +5,17 @@
         <field name="name">ksw.fleet.vehicle.list</field>
         <field name="model">ksw.fleet.vehicle</field>
         <field name="arch" type="xml">
-            <list string="Vehicles">
+            <list string="Vehicles" decoration-muted="state == 'draft'">
                 <field name="name"/>
-                <field name="vehicle_model"/>
+                <field name="client_id"/>
+                <field name="vehicle_type"/>
+                <field name="tank_number"/>
                 <field name="plate_number"/>
-                <field name="driver_id"/>
+                <field name="brand"/>
+                <field name="model"/>
+                <field name="year"/>
+                <field name="driver_name"/>
+                <field name="state" widget="badge"/>
             </list>
         </field>
     </record>
@@ -19,16 +25,53 @@
         <field name="model">ksw.fleet.vehicle</field>
         <field name="arch" type="xml">
             <form string="Vehicle">
+                <header>
+                    <button name="action_confirm" type="object"
+                            string="Confirm"
+                            class="oe_highlight"
+                            groups="hr.group_hr_user"
+                            invisible="state != 'draft'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
                 <sheet>
                     <group>
-                        <field name="name"/>
-                        <field name="vehicle_model"/>
-                        <field name="plate_number"/>
-                        <field name="driver_id"/>
-                        <field name="active"/>
+                        <group string="Identification">
+                            <field name="name"/>
+                            <field name="client_id"/>
+                            <field name="vehicle_type"/>
+                            <field name="tank_number"/>
+                            <field name="plate_number"/>
+                        </group>
+                        <group string="Details">
+                            <field name="brand"/>
+                            <field name="model"/>
+                            <field name="year"/>
+                            <field name="driver_id"/>
+                            <field name="driver_name"/>
+                        </group>
                     </group>
+                    <field name="active" invisible="1"/>
                 </sheet>
             </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_fleet_vehicle_search" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.search</field>
+        <field name="model">ksw.fleet.vehicle</field>
+        <field name="arch" type="xml">
+            <search string="Vehicles">
+                <field name="name"/>
+                <field name="client_id"/>
+                <field name="plate_number"/>
+                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Confirmed" name="filter_confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <group>
+                    <filter string="Client" name="groupby_client" context="{'group_by': 'client_id'}"/>
+                    <filter string="Vehicle Type" name="groupby_type" context="{'group_by': 'vehicle_type'}"/>
+                    <filter string="Status" name="groupby_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
         </field>
     </record>
 
@@ -36,6 +79,7 @@
         <field name="name">Vehicles</field>
         <field name="res_model">ksw.fleet.vehicle</field>
         <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ksw_fleet_vehicle_search"/>
     </record>
 
 </odoo>

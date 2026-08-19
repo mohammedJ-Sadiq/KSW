@@ -812,7 +812,14 @@ class KswDeduction(models.Model):
 
     @api.model
     def _check_acc_data_entry_ownership(self, vals_list):
-        """Non-loan deductions belong to the accounting data-entry team.
+        """Non-loan deductions belong to the accounting data-entry team;
+        loan-tier (managed_by='accounting') deductions belong to Officer /
+        Loan Modification: Full / Manager. Both directions must be checked
+        per-type here — exempting a role wholesale (instead of checking the
+        specific type being created) lets e.g. an Accounting Data Entry user
+        fall through to a bare AccessError from the record rules when the
+        type they picked is actually loan-tier (CLAUDE.md gotcha #26: a
+        guard covering only one direction is not a guard).
 
         The record rules already block the write, but they surface as a
         bare AccessError; raise the explanatory message first (Odoo 19
@@ -821,12 +828,11 @@ class KswDeduction(models.Model):
         if self.env.su:
             return
         user = self.env.user
-        if (
-            user.has_group('KSW_deduction.group_acc_data_entry')
-            or user.has_group('KSW_deduction.group_installment_edit')
-            or user.has_group('KSW_deduction.group_deduction_manager')
-        ):
-            return
+        is_acc_data_entry = user.has_group('KSW_deduction.group_acc_data_entry')
+        is_full_loan_mod = user.has_group('KSW_deduction.group_installment_edit')
+        is_manager = user.has_group('KSW_deduction.group_deduction_manager')
+        is_officer = user.has_group('KSW_deduction.group_deduction_officer')
+        is_supervisor = user.has_group('KSW_deduction.group_deduction_supervisor')
         DeductionType = self.env['ksw.deduction.type']
         for vals in vals_list:
             type_id = vals.get('type_id')
@@ -834,14 +840,25 @@ class KswDeduction(models.Model):
                 continue
             ded_type = DeductionType.browse(type_id).sudo()
             if ded_type.managed_by == 'acc_data_entry':
-                raise UserError(_(
-                    "'%(type)s' deductions are handled by the Accounting "
-                    "Data Entry team. Ask an administrator to grant you "
-                    "Settings → Users → Access Rights → KSW Deductions → "
-                    "Deduction Management = Accounting Data Entry "
-                    "(Non-Loan).",
-                    type=ded_type.name,
-                ))
+                if not (is_acc_data_entry or is_full_loan_mod or is_manager):
+                    raise UserError(_(
+                        "'%(type)s' deductions are handled by the Accounting "
+                        "Data Entry team. Ask an administrator to grant you "
+                        "Settings → Users → Access Rights → KSW Deductions → "
+                        "Deduction Management = Accounting Data Entry "
+                        "(Non-Loan).",
+                        type=ded_type.name,
+                    ))
+            elif ded_type.managed_by == 'accounting':
+                if not (is_full_loan_mod or is_manager or is_officer or is_supervisor):
+                    raise UserError(_(
+                        "'%(type)s' deductions are handled by the Officer / "
+                        "Accounting (Loans) team. Ask an administrator to "
+                        "grant you Settings → Users → Access Rights → KSW "
+                        "Deductions → Deduction Management = Officer, or "
+                        "Loan Modification = Full.",
+                        type=ded_type.name,
+                    ))
 
     def unlink(self):
         # Block deletion if any installment has been paid (linked to a confirmed payslip)

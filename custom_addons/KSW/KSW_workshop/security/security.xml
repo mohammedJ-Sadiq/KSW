@@ -36,7 +36,15 @@
     <record id="group_workshop_manager" model="res.groups">
         <field name="name">Manager</field>
         <field name="privilege_id" ref="privilege_workshop_management"/>
-        <field name="implied_ids" eval="[(4, ref('group_workshop_technician'))]"/>
+        <!--
+            hr.group_hr_user is implied too: KSW_fleet (a lower-level module
+            KSW_workshop depends on, never the reverse) gates its own
+            draft-vehicle "action_confirm" on hr.group_hr_user, since it
+            can't reference this module's group. Every Workshop Manager
+            needs that right, so it's granted here rather than inverting
+            the dependency graph.
+        -->
+        <field name="implied_ids" eval="[(4, ref('group_workshop_technician')), (4, ref('hr.group_hr_user'))]"/>
         <field name="sequence">20</field>
     </record>
 
@@ -60,6 +68,38 @@
     <record id="rule_ksw_workshop_request_manager" model="ir.rule">
         <field name="name">Workshop Request: manager sees all</field>
         <field name="model_id" ref="model_ksw_workshop_request"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_workshop_manager'))]"/>
+    </record>
+
+    <!--
+        Part lines mirror the ksw.workshop.request rules one-for-one — anyone
+        entitled to see a request via the rules above is entitled to see its
+        part lines. These rules only matter for a direct search()/RPC call;
+        reading part_line_ids as a one2many off an already-visible request is
+        unaffected either way.
+    -->
+    <record id="rule_ksw_workshop_part_line_own" model="ir.rule">
+        <field name="name">Workshop Part Line: own requests only</field>
+        <field name="model_id" ref="model_ksw_workshop_part_line"/>
+        <field name="domain_force">[('request_id.employee_id.user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_ksw_workshop_part_line_technician" model="ir.rule">
+        <field name="name">Workshop Part Line: technician sees in-progress + own assignments</field>
+        <field name="model_id" ref="model_ksw_workshop_part_line"/>
+        <field name="domain_force">['|', ('request_state', '=', 'in_progress'), ('request_id.technician_id.user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_workshop_technician'))]"/>
+    </record>
+
+    <record id="rule_ksw_workshop_part_line_manager" model="ir.rule">
+        <field name="name">Workshop Part Line: manager sees all</field>
+        <field name="model_id" ref="model_ksw_workshop_part_line"/>
         <field name="domain_force">[(1, '=', 1)]</field>
         <field name="groups" eval="[(4, ref('group_workshop_manager'))]"/>
     </record>

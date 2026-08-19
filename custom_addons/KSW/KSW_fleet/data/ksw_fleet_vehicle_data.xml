@@ -1,0 +1,701 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="vehicle_is042" model="ksw.fleet.vehicle">
+            <field name="name">IS042</field>
+        </record>
+        <record id="vehicle_is168" model="ksw.fleet.vehicle">
+            <field name="name">IS168</field>
+        </record>
+        <record id="vehicle_is187" model="ksw.fleet.vehicle">
+            <field name="name">IS187</field>
+        </record>
+        <record id="vehicle_is210" model="ksw.fleet.vehicle">
+            <field name="name">IS210</field>
+        </record>
+        <record id="vehicle_is233" model="ksw.fleet.vehicle">
+            <field name="name">IS233</field>
+        </record>
+        <record id="vehicle_is244" model="ksw.fleet.vehicle">
+            <field name="name">IS244</field>
+        </record>
+        <record id="vehicle_is245" model="ksw.fleet.vehicle">
+            <field name="name">IS245</field>
+        </record>
+        <record id="vehicle_is247" model="ksw.fleet.vehicle">
+            <field name="name">IS247</field>
+        </record>
+        <record id="vehicle_is253" model="ksw.fleet.vehicle">
+            <field name="name">IS253</field>
+        </record>
+        <record id="vehicle_is257" model="ksw.fleet.vehicle">
+            <field name="name">IS257</field>
+        </record>
+        <record id="vehicle_is262" model="ksw.fleet.vehicle">
+            <field name="name">IS262</field>
+        </record>
+        <record id="vehicle_is264" model="ksw.fleet.vehicle">
+            <field name="name">IS264</field>
+        </record>
+        <record id="vehicle_is265" model="ksw.fleet.vehicle">
+            <field name="name">IS265</field>
+        </record>
+        <record id="vehicle_is267" model="ksw.fleet.vehicle">
+            <field name="name">IS267</field>
+        </record>
+        <record id="vehicle_is268" model="ksw.fleet.vehicle">
+            <field name="name">IS268</field>
+        </record>
+        <record id="vehicle_is269" model="ksw.fleet.vehicle">
+            <field name="name">IS269</field>
+        </record>
+        <record id="vehicle_is270" model="ksw.fleet.vehicle">
+            <field name="name">IS270</field>
+        </record>
+        <record id="vehicle_is271" model="ksw.fleet.vehicle">
+            <field name="name">IS271</field>
+        </record>
+        <record id="vehicle_is272" model="ksw.fleet.vehicle">
+            <field name="name">IS272</field>
+        </record>
+        <record id="vehicle_is273" model="ksw.fleet.vehicle">
+            <field name="name">IS273</field>
+        </record>
+        <record id="vehicle_is274" model="ksw.fleet.vehicle">
+            <field name="name">IS274</field>
+        </record>
+        <record id="vehicle_is275" model="ksw.fleet.vehicle">
+            <field name="name">IS275</field>
+        </record>
+        <record id="vehicle_is276" model="ksw.fleet.vehicle">
+            <field name="name">IS276</field>
+        </record>
+        <record id="vehicle_is278" model="ksw.fleet.vehicle">
+            <field name="name">IS278</field>
+        </record>
+        <record id="vehicle_is279" model="ksw.fleet.vehicle">
+            <field name="name">IS279</field>
+        </record>
+        <record id="vehicle_is280" model="ksw.fleet.vehicle">
+            <field name="name">IS280</field>
+        </record>
+        <record id="vehicle_is281" model="ksw.fleet.vehicle">
+            <field name="name">IS281</field>
+        </record>
+        <record id="vehicle_is282" model="ksw.fleet.vehicle">
+            <field name="name">IS282</field>
+        </record>
+        <record id="vehicle_is283" model="ksw.fleet.vehicle">
+            <field name="name">IS283</field>
+        </record>
+        <record id="vehicle_is285" model="ksw.fleet.vehicle">
+            <field name="name">IS285</field>
+        </record>
+        <record id="vehicle_is286" model="ksw.fleet.vehicle">
+            <field name="name">IS286</field>
+        </record>
+        <record id="vehicle_is287" model="ksw.fleet.vehicle">
+            <field name="name">IS287</field>
+        </record>
+        <record id="vehicle_is288" model="ksw.fleet.vehicle">
+            <field name="name">IS288</field>
+        </record>
+        <record id="vehicle_is289" model="ksw.fleet.vehicle">
+            <field name="name">IS289</field>
+        </record>
+        <record id="vehicle_is290" model="ksw.fleet.vehicle">
+            <field name="name">IS290</field>
+        </record>
+        <record id="vehicle_is291" model="ksw.fleet.vehicle">
+            <field name="name">IS291</field>
+        </record>
+        <record id="vehicle_is292" model="ksw.fleet.vehicle">
+            <field name="name">IS292</field>
+        </record>
+        <record id="vehicle_is295" model="ksw.fleet.vehicle">
+            <field name="name">IS295</field>
+        </record>
+        <record id="vehicle_is296" model="ksw.fleet.vehicle">
+            <field name="name">IS296</field>
+        </record>
+        <record id="vehicle_is297" model="ksw.fleet.vehicle">
+            <field name="name">IS297</field>
+        </record>
+        <record id="vehicle_is298" model="ksw.fleet.vehicle">
+            <field name="name">IS298</field>
+        </record>
+        <record id="vehicle_is299" model="ksw.fleet.vehicle">
+            <field name="name">IS299</field>
+        </record>
+        <record id="vehicle_is300" model="ksw.fleet.vehicle">
+            <field name="name">IS300</field>
+        </record>
+        <record id="vehicle_is301" model="ksw.fleet.vehicle">
+            <field name="name">IS301</field>
+        </record>
+        <record id="vehicle_is302" model="ksw.fleet.vehicle">
+            <field name="name">IS302</field>
+        </record>
+        <record id="vehicle_is303" model="ksw.fleet.vehicle">
+            <field name="name">IS303</field>
+        </record>
+        <record id="vehicle_is304" model="ksw.fleet.vehicle">
+            <field name="name">IS304</field>
+        </record>
+        <record id="vehicle_is305" model="ksw.fleet.vehicle">
+            <field name="name">IS305</field>
+        </record>
+        <record id="vehicle_is306" model="ksw.fleet.vehicle">
+            <field name="name">IS306</field>
+        </record>
+        <record id="vehicle_is307" model="ksw.fleet.vehicle">
+            <field name="name">IS307</field>
+        </record>
+        <record id="vehicle_is308" model="ksw.fleet.vehicle">
+            <field name="name">IS308</field>
+        </record>
+        <record id="vehicle_is309" model="ksw.fleet.vehicle">
+            <field name="name">IS309</field>
+        </record>
+        <record id="vehicle_is310" model="ksw.fleet.vehicle">
+            <field name="name">IS310</field>
+        </record>
+        <record id="vehicle_is311" model="ksw.fleet.vehicle">
+            <field name="name">IS311</field>
+        </record>
+        <record id="vehicle_is312" model="ksw.fleet.vehicle">
+            <field name="name">IS312</field>
+        </record>
+        <record id="vehicle_is313" model="ksw.fleet.vehicle">
+            <field name="name">IS313</field>
+        </record>
+        <record id="vehicle_is314" model="ksw.fleet.vehicle">
+            <field name="name">IS314</field>
+        </record>
+        <record id="vehicle_is315" model="ksw.fleet.vehicle">
+            <field name="name">IS315</field>
+        </record>
+        <record id="vehicle_is316" model="ksw.fleet.vehicle">
+            <field name="name">IS316</field>
+        </record>
+        <record id="vehicle_is317" model="ksw.fleet.vehicle">
+            <field name="name">IS317</field>
+        </record>
+        <record id="vehicle_is318" model="ksw.fleet.vehicle">
+            <field name="name">IS318</field>
+        </record>
+        <record id="vehicle_is320" model="ksw.fleet.vehicle">
+            <field name="name">IS320</field>
+        </record>
+        <record id="vehicle_is321" model="ksw.fleet.vehicle">
+            <field name="name">IS321</field>
+        </record>
+        <record id="vehicle_is322" model="ksw.fleet.vehicle">
+            <field name="name">IS322</field>
+        </record>
+        <record id="vehicle_is323" model="ksw.fleet.vehicle">
+            <field name="name">IS323</field>
+        </record>
+        <record id="vehicle_is324" model="ksw.fleet.vehicle">
+            <field name="name">IS324</field>
+        </record>
+        <record id="vehicle_is325" model="ksw.fleet.vehicle">
+            <field name="name">IS325</field>
+        </record>
+        <record id="vehicle_is326" model="ksw.fleet.vehicle">
+            <field name="name">IS326</field>
+        </record>
+        <record id="vehicle_is327" model="ksw.fleet.vehicle">
+            <field name="name">IS327</field>
+        </record>
+        <record id="vehicle_is328" model="ksw.fleet.vehicle">
+            <field name="name">IS328</field>
+        </record>
+        <record id="vehicle_is329" model="ksw.fleet.vehicle">
+            <field name="name">IS329</field>
+        </record>
+        <record id="vehicle_is330" model="ksw.fleet.vehicle">
+            <field name="name">IS330</field>
+        </record>
+        <record id="vehicle_is331" model="ksw.fleet.vehicle">
+            <field name="name">IS331</field>
+        </record>
+        <record id="vehicle_is332" model="ksw.fleet.vehicle">
+            <field name="name">IS332</field>
+        </record>
+        <record id="vehicle_is333" model="ksw.fleet.vehicle">
+            <field name="name">IS333</field>
+        </record>
+        <record id="vehicle_is334" model="ksw.fleet.vehicle">
+            <field name="name">IS334</field>
+        </record>
+        <record id="vehicle_is335" model="ksw.fleet.vehicle">
+            <field name="name">IS335</field>
+        </record>
+        <record id="vehicle_is336" model="ksw.fleet.vehicle">
+            <field name="name">IS336</field>
+        </record>
+        <record id="vehicle_is337" model="ksw.fleet.vehicle">
+            <field name="name">IS337</field>
+        </record>
+        <record id="vehicle_is338" model="ksw.fleet.vehicle">
+            <field name="name">IS338</field>
+        </record>
+        <record id="vehicle_is339" model="ksw.fleet.vehicle">
+            <field name="name">IS339</field>
+        </record>
+        <record id="vehicle_is340" model="ksw.fleet.vehicle">
+            <field name="name">IS340</field>
+        </record>
+        <record id="vehicle_is341" model="ksw.fleet.vehicle">
+            <field name="name">IS341</field>
+        </record>
+        <record id="vehicle_is342" model="ksw.fleet.vehicle">
+            <field name="name">IS342</field>
+        </record>
+        <record id="vehicle_is343" model="ksw.fleet.vehicle">
+            <field name="name">IS343</field>
+        </record>
+        <record id="vehicle_is344" model="ksw.fleet.vehicle">
+            <field name="name">IS344</field>
+        </record>
+        <record id="vehicle_is345" model="ksw.fleet.vehicle">
+            <field name="name">IS345</field>
+        </record>
+        <record id="vehicle_is346" model="ksw.fleet.vehicle">
+            <field name="name">IS346</field>
+        </record>
+        <record id="vehicle_is347" model="ksw.fleet.vehicle">
+            <field name="name">IS347</field>
+        </record>
+        <record id="vehicle_is348" model="ksw.fleet.vehicle">
+            <field name="name">IS348</field>
+        </record>
+        <record id="vehicle_is349" model="ksw.fleet.vehicle">
+            <field name="name">IS349</field>
+        </record>
+        <record id="vehicle_is350" model="ksw.fleet.vehicle">
+            <field name="name">IS350</field>
+        </record>
+        <record id="vehicle_is351" model="ksw.fleet.vehicle">
+            <field name="name">IS351</field>
+        </record>
+        <record id="vehicle_is352" model="ksw.fleet.vehicle">
+            <field name="name">IS352</field>
+        </record>
+        <record id="vehicle_is353" model="ksw.fleet.vehicle">
+            <field name="name">IS353</field>
+        </record>
+        <record id="vehicle_is354" model="ksw.fleet.vehicle">
+            <field name="name">IS354</field>
+        </record>
+        <record id="vehicle_is355" model="ksw.fleet.vehicle">
+            <field name="name">IS355</field>
+        </record>
+        <record id="vehicle_is356" model="ksw.fleet.vehicle">
+            <field name="name">IS356</field>
+        </record>
+        <record id="vehicle_is357" model="ksw.fleet.vehicle">
+            <field name="name">IS357</field>
+        </record>
+        <record id="vehicle_is358" model="ksw.fleet.vehicle">
+            <field name="name">IS358</field>
+        </record>
+        <record id="vehicle_t048" model="ksw.fleet.vehicle">
+            <field name="name">T048</field>
+        </record>
+        <record id="vehicle_t055" model="ksw.fleet.vehicle">
+            <field name="name">T055</field>
+        </record>
+        <record id="vehicle_t057" model="ksw.fleet.vehicle">
+            <field name="name">T057</field>
+        </record>
+        <record id="vehicle_t058" model="ksw.fleet.vehicle">
+            <field name="name">T058</field>
+        </record>
+        <record id="vehicle_t062" model="ksw.fleet.vehicle">
+            <field name="name">T062</field>
+        </record>
+        <record id="vehicle_t063" model="ksw.fleet.vehicle">
+            <field name="name">T063</field>
+        </record>
+        <record id="vehicle_t068" model="ksw.fleet.vehicle">
+            <field name="name">T068</field>
+        </record>
+        <record id="vehicle_t069" model="ksw.fleet.vehicle">
+            <field name="name">T069</field>
+        </record>
+        <record id="vehicle_t073" model="ksw.fleet.vehicle">
+            <field name="name">T073</field>
+        </record>
+        <record id="vehicle_t074" model="ksw.fleet.vehicle">
+            <field name="name">T074</field>
+        </record>
+        <record id="vehicle_t076" model="ksw.fleet.vehicle">
+            <field name="name">T076</field>
+        </record>
+        <record id="vehicle_t077" model="ksw.fleet.vehicle">
+            <field name="name">T077</field>
+        </record>
+        <record id="vehicle_t078" model="ksw.fleet.vehicle">
+            <field name="name">T078</field>
+        </record>
+        <record id="vehicle_t079" model="ksw.fleet.vehicle">
+            <field name="name">T079</field>
+        </record>
+        <record id="vehicle_t080" model="ksw.fleet.vehicle">
+            <field name="name">T080</field>
+        </record>
+        <record id="vehicle_t081" model="ksw.fleet.vehicle">
+            <field name="name">T081</field>
+        </record>
+        <record id="vehicle_t082" model="ksw.fleet.vehicle">
+            <field name="name">T082</field>
+        </record>
+        <record id="vehicle_t083" model="ksw.fleet.vehicle">
+            <field name="name">T083</field>
+        </record>
+        <record id="vehicle_t085" model="ksw.fleet.vehicle">
+            <field name="name">T085</field>
+        </record>
+        <record id="vehicle_t086" model="ksw.fleet.vehicle">
+            <field name="name">T086</field>
+        </record>
+        <record id="vehicle_t087" model="ksw.fleet.vehicle">
+            <field name="name">T087</field>
+        </record>
+        <record id="vehicle_t088" model="ksw.fleet.vehicle">
+            <field name="name">T088</field>
+        </record>
+        <record id="vehicle_t089" model="ksw.fleet.vehicle">
+            <field name="name">T089</field>
+        </record>
+        <record id="vehicle_t090" model="ksw.fleet.vehicle">
+            <field name="name">T090</field>
+        </record>
+        <record id="vehicle_t091" model="ksw.fleet.vehicle">
+            <field name="name">T091</field>
+        </record>
+        <record id="vehicle_t092" model="ksw.fleet.vehicle">
+            <field name="name">T092</field>
+        </record>
+        <record id="vehicle_t093" model="ksw.fleet.vehicle">
+            <field name="name">T093</field>
+        </record>
+        <record id="vehicle_t094" model="ksw.fleet.vehicle">
+            <field name="name">T094</field>
+        </record>
+        <record id="vehicle_t095" model="ksw.fleet.vehicle">
+            <field name="name">T095</field>
+        </record>
+        <record id="vehicle_t096" model="ksw.fleet.vehicle">
+            <field name="name">T096</field>
+        </record>
+        <record id="vehicle_t097" model="ksw.fleet.vehicle">
+            <field name="name">T097</field>
+        </record>
+        <record id="vehicle_t098" model="ksw.fleet.vehicle">
+            <field name="name">T098</field>
+        </record>
+        <record id="vehicle_t099" model="ksw.fleet.vehicle">
+            <field name="name">T099</field>
+        </record>
+        <record id="vehicle_t100" model="ksw.fleet.vehicle">
+            <field name="name">T100</field>
+        </record>
+        <record id="vehicle_t101" model="ksw.fleet.vehicle">
+            <field name="name">T101</field>
+        </record>
+        <record id="vehicle_t102" model="ksw.fleet.vehicle">
+            <field name="name">T102</field>
+        </record>
+        <record id="vehicle_t103" model="ksw.fleet.vehicle">
+            <field name="name">T103</field>
+        </record>
+        <record id="vehicle_t104" model="ksw.fleet.vehicle">
+            <field name="name">T104</field>
+        </record>
+        <record id="vehicle_t105" model="ksw.fleet.vehicle">
+            <field name="name">T105</field>
+        </record>
+        <record id="vehicle_t106" model="ksw.fleet.vehicle">
+            <field name="name">T106</field>
+        </record>
+        <record id="vehicle_t107" model="ksw.fleet.vehicle">
+            <field name="name">T107</field>
+        </record>
+        <record id="vehicle_t108" model="ksw.fleet.vehicle">
+            <field name="name">T108</field>
+        </record>
+        <record id="vehicle_t109" model="ksw.fleet.vehicle">
+            <field name="name">T109</field>
+        </record>
+        <record id="vehicle_t110" model="ksw.fleet.vehicle">
+            <field name="name">T110</field>
+        </record>
+        <record id="vehicle_t111" model="ksw.fleet.vehicle">
+            <field name="name">T111</field>
+        </record>
+        <record id="vehicle_t112" model="ksw.fleet.vehicle">
+            <field name="name">T112</field>
+        </record>
+        <record id="vehicle_t113" model="ksw.fleet.vehicle">
+            <field name="name">T113</field>
+        </record>
+        <record id="vehicle_t114" model="ksw.fleet.vehicle">
+            <field name="name">T114</field>
+        </record>
+        <record id="vehicle_t115" model="ksw.fleet.vehicle">
+            <field name="name">T115</field>
+        </record>
+        <record id="vehicle_t116" model="ksw.fleet.vehicle">
+            <field name="name">T116</field>
+        </record>
+        <record id="vehicle_t117" model="ksw.fleet.vehicle">
+            <field name="name">T117</field>
+        </record>
+        <record id="vehicle_t118" model="ksw.fleet.vehicle">
+            <field name="name">T118</field>
+        </record>
+        <record id="vehicle_t120" model="ksw.fleet.vehicle">
+            <field name="name">T120</field>
+        </record>
+        <record id="vehicle_t121" model="ksw.fleet.vehicle">
+            <field name="name">T121</field>
+        </record>
+        <record id="vehicle_t122" model="ksw.fleet.vehicle">
+            <field name="name">T122</field>
+        </record>
+        <record id="vehicle_t123" model="ksw.fleet.vehicle">
+            <field name="name">T123</field>
+        </record>
+        <record id="vehicle_t124" model="ksw.fleet.vehicle">
+            <field name="name">T124</field>
+        </record>
+        <record id="vehicle_t125" model="ksw.fleet.vehicle">
+            <field name="name">T125</field>
+        </record>
+        <record id="vehicle_t126" model="ksw.fleet.vehicle">
+            <field name="name">T126</field>
+        </record>
+        <record id="vehicle_t127" model="ksw.fleet.vehicle">
+            <field name="name">T127</field>
+        </record>
+        <record id="vehicle_t128" model="ksw.fleet.vehicle">
+            <field name="name">T128</field>
+        </record>
+        <record id="vehicle_t130" model="ksw.fleet.vehicle">
+            <field name="name">T130</field>
+        </record>
+        <record id="vehicle_t131" model="ksw.fleet.vehicle">
+            <field name="name">T131</field>
+        </record>
+        <record id="vehicle_t132" model="ksw.fleet.vehicle">
+            <field name="name">T132</field>
+        </record>
+        <record id="vehicle_t133" model="ksw.fleet.vehicle">
+            <field name="name">T133</field>
+        </record>
+        <record id="vehicle_t134" model="ksw.fleet.vehicle">
+            <field name="name">T134</field>
+        </record>
+        <record id="vehicle_t135" model="ksw.fleet.vehicle">
+            <field name="name">T135</field>
+        </record>
+        <record id="vehicle_t136" model="ksw.fleet.vehicle">
+            <field name="name">T136</field>
+        </record>
+        <record id="vehicle_t137" model="ksw.fleet.vehicle">
+            <field name="name">T137</field>
+        </record>
+        <record id="vehicle_t138" model="ksw.fleet.vehicle">
+            <field name="name">T138</field>
+        </record>
+        <record id="vehicle_t139" model="ksw.fleet.vehicle">
+            <field name="name">T139</field>
+        </record>
+        <record id="vehicle_t140" model="ksw.fleet.vehicle">
+            <field name="name">T140</field>
+        </record>
+        <record id="vehicle_t141" model="ksw.fleet.vehicle">
+            <field name="name">T141</field>
+        </record>
+        <record id="vehicle_t142" model="ksw.fleet.vehicle">
+            <field name="name">T142</field>
+        </record>
+        <record id="vehicle_t143" model="ksw.fleet.vehicle">
+            <field name="name">T143</field>
+        </record>
+        <record id="vehicle_t144" model="ksw.fleet.vehicle">
+            <field name="name">T144</field>
+        </record>
+        <record id="vehicle_t145" model="ksw.fleet.vehicle">
+            <field name="name">T145</field>
+        </record>
+        <record id="vehicle_t146" model="ksw.fleet.vehicle">
+            <field name="name">T146</field>
+        </record>
+        <record id="vehicle_t147" model="ksw.fleet.vehicle">
+            <field name="name">T147</field>
+        </record>
+        <record id="vehicle_t148" model="ksw.fleet.vehicle">
+            <field name="name">T148</field>
+        </record>
+        <record id="vehicle_t149" model="ksw.fleet.vehicle">
+            <field name="name">T149</field>
+        </record>
+        <record id="vehicle_t150" model="ksw.fleet.vehicle">
+            <field name="name">T150</field>
+        </record>
+        <record id="vehicle_t151" model="ksw.fleet.vehicle">
+            <field name="name">T151</field>
+        </record>
+        <record id="vehicle_t152" model="ksw.fleet.vehicle">
+            <field name="name">T152</field>
+        </record>
+        <record id="vehicle_t153" model="ksw.fleet.vehicle">
+            <field name="name">T153</field>
+        </record>
+        <record id="vehicle_t154" model="ksw.fleet.vehicle">
+            <field name="name">T154</field>
+        </record>
+        <record id="vehicle_t155" model="ksw.fleet.vehicle">
+            <field name="name">T155</field>
+        </record>
+        <record id="vehicle_t156" model="ksw.fleet.vehicle">
+            <field name="name">T156</field>
+        </record>
+        <record id="vehicle_t157" model="ksw.fleet.vehicle">
+            <field name="name">T157</field>
+        </record>
+        <record id="vehicle_t158" model="ksw.fleet.vehicle">
+            <field name="name">T158</field>
+        </record>
+        <record id="vehicle_t159" model="ksw.fleet.vehicle">
+            <field name="name">T159</field>
+        </record>
+        <record id="vehicle_t160" model="ksw.fleet.vehicle">
+            <field name="name">T160</field>
+        </record>
+        <record id="vehicle_t161" model="ksw.fleet.vehicle">
+            <field name="name">T161</field>
+        </record>
+        <record id="vehicle_t162" model="ksw.fleet.vehicle">
+            <field name="name">T162</field>
+        </record>
+        <record id="vehicle_t163" model="ksw.fleet.vehicle">
+            <field name="name">T163</field>
+        </record>
+        <record id="vehicle_t164" model="ksw.fleet.vehicle">
+            <field name="name">T164</field>
+        </record>
+        <record id="vehicle_t165" model="ksw.fleet.vehicle">
+            <field name="name">T165</field>
+        </record>
+        <record id="vehicle_t166" model="ksw.fleet.vehicle">
+            <field name="name">T166</field>
+        </record>
+        <record id="vehicle_t167" model="ksw.fleet.vehicle">
+            <field name="name">T167</field>
+        </record>
+        <record id="vehicle_t168" model="ksw.fleet.vehicle">
+            <field name="name">T168</field>
+        </record>
+        <record id="vehicle_t169" model="ksw.fleet.vehicle">
+            <field name="name">T169</field>
+        </record>
+        <record id="vehicle_t170" model="ksw.fleet.vehicle">
+            <field name="name">T170</field>
+        </record>
+        <record id="vehicle_t171" model="ksw.fleet.vehicle">
+            <field name="name">T171</field>
+        </record>
+        <record id="vehicle_t172" model="ksw.fleet.vehicle">
+            <field name="name">T172</field>
+        </record>
+        <record id="vehicle_t173" model="ksw.fleet.vehicle">
+            <field name="name">T173</field>
+        </record>
+        <record id="vehicle_t174" model="ksw.fleet.vehicle">
+            <field name="name">T174</field>
+        </record>
+        <record id="vehicle_t175" model="ksw.fleet.vehicle">
+            <field name="name">T175</field>
+        </record>
+        <record id="vehicle_t176" model="ksw.fleet.vehicle">
+            <field name="name">T176</field>
+        </record>
+        <record id="vehicle_t177" model="ksw.fleet.vehicle">
+            <field name="name">T177</field>
+        </record>
+        <record id="vehicle_t178" model="ksw.fleet.vehicle">
+            <field name="name">T178</field>
+        </record>
+        <record id="vehicle_t179" model="ksw.fleet.vehicle">
+            <field name="name">T179</field>
+        </record>
+        <record id="vehicle_t180" model="ksw.fleet.vehicle">
+            <field name="name">T180</field>
+        </record>
+        <record id="vehicle_t181" model="ksw.fleet.vehicle">
+            <field name="name">T181</field>
+        </record>
+        <record id="vehicle_t182" model="ksw.fleet.vehicle">
+            <field name="name">T182</field>
+        </record>
+        <record id="vehicle_t183" model="ksw.fleet.vehicle">
+            <field name="name">T183</field>
+        </record>
+        <record id="vehicle_t184" model="ksw.fleet.vehicle">
+            <field name="name">T184</field>
+        </record>
+        <record id="vehicle_t185" model="ksw.fleet.vehicle">
+            <field name="name">T185</field>
+        </record>
+        <record id="vehicle_t186" model="ksw.fleet.vehicle">
+            <field name="name">T186</field>
+        </record>
+        <record id="vehicle_t187" model="ksw.fleet.vehicle">
+            <field name="name">T187</field>
+        </record>
+        <record id="vehicle_t188" model="ksw.fleet.vehicle">
+            <field name="name">T188</field>
+        </record>
+        <record id="vehicle_t189" model="ksw.fleet.vehicle">
+            <field name="name">T189</field>
+        </record>
+        <record id="vehicle_t190" model="ksw.fleet.vehicle">
+            <field name="name">T190</field>
+        </record>
+        <record id="vehicle_t191" model="ksw.fleet.vehicle">
+            <field name="name">T191</field>
+        </record>
+        <record id="vehicle_t192" model="ksw.fleet.vehicle">
+            <field name="name">T192</field>
+        </record>
+        <record id="vehicle_t193" model="ksw.fleet.vehicle">
+            <field name="name">T193</field>
+        </record>
+        <record id="vehicle_t194" model="ksw.fleet.vehicle">
+            <field name="name">T194</field>
+        </record>
+        <record id="vehicle_t195" model="ksw.fleet.vehicle">
+            <field name="name">T195</field>
+        </record>
+        <record id="vehicle_t196" model="ksw.fleet.vehicle">
+            <field name="name">T196</field>
+        </record>
+        <record id="vehicle_t197" model="ksw.fleet.vehicle">
+            <field name="name">T197</field>
+        </record>
+        <record id="vehicle_t198" model="ksw.fleet.vehicle">
+            <field name="name">T198</field>
+        </record>
+        <record id="vehicle_t199" model="ksw.fleet.vehicle">
+            <field name="name">T199</field>
+        </record>
+        <record id="vehicle_t200" model="ksw.fleet.vehicle">
+            <field name="name">T200</field>
+        </record>
+    </data>
+</odoo>

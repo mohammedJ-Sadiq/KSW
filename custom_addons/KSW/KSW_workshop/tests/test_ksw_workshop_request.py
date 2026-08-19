@@ -1,4 +1,4 @@
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from odoo.tests.common import TransactionCase
 
 
@@ -42,7 +42,11 @@ class TestKswWorkshopRequest(TransactionCase):
             'name': 'WS Technician', 'user_id': cls.user_technician.id,
         })
 
-        cls.vehicle = cls.env['ksw.fleet.vehicle'].create({'name': 'WS-152', 'vehicle_model': 'سياب'})
+        cls.vehicle = cls.env['ksw.fleet.vehicle'].create({'name': 'WS-152', 'vehicle_type': 'isuzu'})
+        cls.other_client = cls.env['res.partner'].create({'name': 'WS Other Client'})
+        cls.other_client_vehicle = cls.env['ksw.fleet.vehicle'].create({
+            'name': 'WS-153', 'vehicle_type': 'trailer', 'client_id': cls.other_client.id,
+        })
 
     def _make_request(self, employee_user=None, **kwargs):
         vals = {
@@ -150,7 +154,10 @@ class TestKswWorkshopRequest(TransactionCase):
     def test_manager_can_also_edit_report_while_in_progress(self):
         request = self._make_request(employee_user=self.user_employee)
         request.with_user(self.user_manager).action_start()
-        request.with_user(self.user_manager).write({'parts_cost': 250.0})
+        request.with_user(self.user_manager).write({'parts_extra_cost': 250.0})
+        self.assertEqual(request.parts_extra_cost, 250.0)
+        # parts_cost is now a computed total (part_lines_cost + parts_extra_cost);
+        # with no part lines on this request, it should equal the manual figure.
         self.assertEqual(request.parts_cost, 250.0)
 
     # ------------------------------------------------------------------
@@ -232,3 +239,111 @@ class TestKswWorkshopRequest(TransactionCase):
         new_msgs = request.message_ids.filtered(lambda m: m.id not in existing_ids)
         notified = new_msgs.filtered(lambda m: self.user_employee.partner_id in m.partner_ids)
         self.assertTrue(notified)
+
+    # ------------------------------------------------------------------
+    # Client / Vehicle cascade
+    # ------------------------------------------------------------------
+    def test_client_defaults_to_company(self):
+        request = self._make_request(employee_user=self.user_employee)
+        self.assertEqual(request.client_id, self.env.company.partner_id)
+
+    def test_vehicle_auto_clears_and_blocks_save_on_client_change_alone(self):
+        # Changing client_id without also picking a new vehicle for it is
+        # exactly the "saved mid-cascade" case: the compute clears the now
+        # mismatched vehicle_id, and _check_vehicle_and_cash_customer then
+        # correctly refuses the save until a new vehicle is picked (the
+        # real form only ever reaches write() with both changes together,
+        # since onchange-style computes apply before the user clicks Save).
+        request = self._make_request(employee_user=self.user_employee)
+        with self.assertRaises(ValidationError):
+            request.with_user(self.user_manager).write({'client_id': self.other_client.id})
+
+    def test_vehicle_domain_resets_on_client_change(self):
+        request = self._make_request(employee_user=self.user_employee)
+        request.with_user(self.user_manager).write({
+            'client_id': self.other_client.id, 'vehicle_id': self.other_client_vehicle.id,
+        })
+        self.assertEqual(request.vehicle_id, self.other_client_vehicle)
+
+    def test_vehicle_client_mismatch_rejected_via_constrains(self):
+        request = self._make_request(employee_user=self.user_employee)
+        with self.assertRaises(ValidationError):
+            request.with_user(self.user_manager).write({
+                'client_id': self.other_client.id, 'vehicle_id': self.vehicle.id,
+            })
+
+    def test_new_draft_vehicle_visible_only_on_own_request(self):
+        draft_vehicle = self.env['ksw.fleet.vehicle'].with_user(self.user_employee).create({
+            'name': 'WS-DRAFT-1',
+            'client_id': self.env.company.partner_id.id,
+            'vehicle_type': 'other',
+        })
+        self.assertEqual(draft_vehicle.state, 'draft')
+        own_request = self._make_request(employee_user=self.user_employee, vehicle_id=draft_vehicle.id)
+        self.assertEqual(own_request.vehicle_id, draft_vehicle)
+
+        other_visible = self.env['ksw.fleet.vehicle'].with_user(self.user_employee).search([
+            ('id', '=', draft_vehicle.id),
+            ('client_id', '=', self.env.company.partner_id.id),
+            ('vehicle_type', '=', 'other'),
+            '|', ('state', '=', 'confirmed'), ('id', '=', False),
+        ])
+        self.assertFalse(other_visible)
+
+    # ------------------------------------------------------------------
+    # Cash Customer
+    # ------------------------------------------------------------------
+    def test_employee_cannot_toggle_cash_customer(self):
+        request = self._make_request(employee_user=self.user_employee)
+        with self.assertRaises(UserError):
+            request.with_user(self.user_employee).write({'is_cash_customer': True})
+
+    def test_manager_can_toggle_cash_customer(self):
+        request = self._make_request(employee_user=self.user_employee)
+        request.with_user(self.user_manager).write({
+            'is_cash_customer': True,
+            'x_cash_customer_name': 'Walk-in Co',
+            'x_cash_vehicle_number': '999',
+        })
+        self.assertTrue(request.is_cash_customer)
+
+    def test_cash_customer_bypasses_vehicle_requirement(self):
+        # client_id's default (env.company.partner_id) still fires on a raw
+        # create() — the onchange that clears it only runs in the
+        # interactive form flow. That leftover value is harmless: the
+        # constrains skip the client/vehicle checks entirely whenever
+        # is_cash_customer is True. vehicle_id has no default, so it's a
+        # clean way to prove the requirement was genuinely bypassed.
+        request = self.env['ksw.workshop.request'].with_user(self.user_manager).create({
+            'description': 'Walk-in repair',
+            'is_cash_customer': True,
+            'x_cash_customer_name': 'Walk-in Co',
+            'x_cash_vehicle_number': '999',
+        })
+        self.assertFalse(request.vehicle_id)
+
+    def test_cash_customer_requires_name_and_vehicle_number(self):
+        with self.assertRaises(ValidationError):
+            self.env['ksw.workshop.request'].with_user(self.user_manager).create({
+                'description': 'Walk-in repair',
+                'is_cash_customer': True,
+            })
+
+    def test_regular_request_requires_client_and_vehicle(self):
+        with self.assertRaises(ValidationError):
+            self.env['ksw.workshop.request'].with_user(self.user_manager).create({
+                'description': 'Missing vehicle',
+                'employee_id': self.employee.id,
+                'client_id': False,
+                'vehicle_id': False,
+            })
+
+    def test_employee_created_request_forces_cash_customer_false(self):
+        request = self.env['ksw.workshop.request'].with_user(self.user_employee).create({
+            'description': 'Battery problem',
+            'vehicle_id': self.vehicle.id,
+            'is_cash_customer': True,
+            'x_cash_customer_name': 'Should be ignored',
+            'x_cash_vehicle_number': '999',
+        })
+        self.assertFalse(request.is_cash_customer)
