@@ -18,6 +18,7 @@ attendance and commission sheets.
 | Mark my team's monthly attendance (non-biometric staff) | [Attendance sheets](03-attendance-sheets.md) |
 | Record my team's commissions & allowances | [Commission sheets](04-commission-sheets.md) |
 | See my team's payslips | [View team payslips](05-view-team-payslips.md) |
+| Raise an IT support ticket for a team member | [IT ticket for a team member](07-ticket-for-team-member.md) |
 
 ## The golden rules
 

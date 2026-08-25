@@ -1,0 +1,115 @@
+<!doctype html><html lang="en" dir="ltr"><head>
+<meta charset="utf-8"><title>Raising an IT Ticket for a Team Member</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "DejaVu Sans",Arial,sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: left; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-left: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">Raising an IT Ticket for a Team Member</div>
+  <div class="meta">User Training Guide<br/>KSW HR &amp; Payroll · 2026-08-25</div>
+</div>
+<section id="g-supervisor-07-ticket-for-team-member"><h1>Raising an IT Ticket for a Team Member</h1>
+<p><strong>Who is this for:</strong> Supervisor / any manager with direct reports
+<strong>How long it takes:</strong> 2 minutes</p>
+<h2>What this does</h2>
+<p>Lets you raise an IT support ticket <strong>on behalf of someone who reports to
+you</strong> — typically a field or workshop employee who has no login, or someone
+who is away from a computer while their machine is down.</p>
+<p>The ticket belongs to that employee: their name, department, job title and
+contact details appear on it as the <strong>Caller</strong>, so IT knows who to call. You
+stay on the ticket as its author and follow it to closure.</p>
+<h2>Before you start</h2>
+<ul>
+<li>The person must be your <strong>direct report</strong> (their <strong>Manager</strong> field on the
+employee record points at you). The system only offers you yourself and your
+direct reports — nobody else.</li>
+<li>Get the details from them first: what happens, since when, and which device.</li>
+</ul>
+<h2>Steps</h2>
+<ol>
+<li><p><strong>Open the Helpdesk app → My Tickets</strong> and click <strong>New</strong>.</p>
+</li>
+<li><p><strong>Change &quot;Reported By&quot;</strong> from yourself to the team member.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/ticket-01.png" alt="Reported By — pick a direct report">
+The <strong>Caller</strong> panel refills with their job title, department, email and
+phone numbers.</p>
+</li>
+<li><p><strong>Fill in the ticket as usual</strong> — Incident or Service Request, a clear short
+description, the Category, the Related Asset if it is about their device,
+the Priority, and a detailed description.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/ticket-02.png" alt="Ticket for a team member"></p>
+</li>
+<li><p><strong>Save.</strong> IT is notified.</p>
+</li>
+</ol>
+<h2>What happens next</h2>
+<ul>
+<li>The ticket appears in <strong>your</strong> My Tickets list and in the employee&#39;s, and both
+of you can follow it and reply in the message box.</li>
+<li>IT contacts the <strong>Caller</strong> — the employee — using the details on the ticket,
+not you. Make sure their work phone/mobile on the employee record is current.</li>
+<li>Everything else works exactly as it does for your own tickets: see
+<span class="xref">Raising an IT support ticket</span> for the
+full walk-through of the fields, the two kinds, and the closing feedback.</li>
+</ul>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>The employee isn&#39;t in the <strong>Reported By</strong> list</td>
+<td>They are not your direct report in the system</td>
+<td>Ask HR to set their <strong>Manager</strong> on the employee record</td>
+</tr>
+<tr>
+<td>&quot;You can only create or edit tickets for yourself or your direct reports&quot;</td>
+<td>Same cause — the reporting line isn&#39;t set</td>
+<td>As above; meanwhile raise it under your own name and explain who it is for</td>
+</tr>
+<tr>
+<td>The Caller panel is empty</td>
+<td>The employee record has no job title/department/contact details</td>
+<td>Ask HR to complete the employee record</td>
+</tr>
+<tr>
+<td>I can&#39;t see a ticket my team member raised themselves</td>
+<td>You see your direct reports&#39; tickets — check you are their manager, not only their leave approver</td>
+<td>Ask HR to confirm the <strong>Manager</strong> field</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><span class="xref">Raising an IT support ticket</span> — the full field-by-field guide</li>
+<li><span class="xref">Approving time off</span></li>
+</ul>
+</section>
+</body></html>

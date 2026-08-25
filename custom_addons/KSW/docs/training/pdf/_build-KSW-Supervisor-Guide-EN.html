@@ -30,7 +30,7 @@
 <div class="cover">
   <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
   <div class="role">Supervisor Guide</div>
-  <div class="meta">User Training Guide<br/>KSW HR &amp; Payroll · 2026-07-21</div>
+  <div class="meta">User Training Guide<br/>KSW HR &amp; Payroll · 2026-08-24</div>
 </div>
 <section id="g-supervisor-readme"><h1>Supervisor Guides</h1>
 <p>For <strong>direct managers</strong> — anyone who has staff reporting to them. You are the
@@ -58,7 +58,7 @@ those guides too. And start with the <strong>General guide</strong> (<span class
 </tr>
 <tr>
 <td>Record a team member&#39;s return from vacation</td>
-<td><a href="#g-supervisor-01-approve-time-off">Approve time off</a></td>
+<td><a href="#g-supervisor-06-confirm-return">Confirming a return</a></td>
 </tr>
 <tr>
 <td>Approve (or refuse) my team&#39;s loan requests</td>
@@ -75,6 +75,10 @@ those guides too. And start with the <strong>General guide</strong> (<span class
 <tr>
 <td>See my team&#39;s payslips</td>
 <td><a href="#g-supervisor-05-view-team-payslips">View team payslips</a></td>
+</tr>
+<tr>
+<td>Raise an IT support ticket for a team member</td>
+<td><a href="#g-supervisor-07-ticket-for-team-member">IT ticket for a team member</a></td>
 </tr>
 </tbody></table>
 <h2>The golden rules</h2>
@@ -135,17 +139,9 @@ HR like any other.</li>
 </ol>
 <h2>Confirming an employee&#39;s return</h2>
 <p>When one of your team returns from <strong>annual</strong> leave, you record their return —
-the employee does not do this themselves:</p>
-<ol>
-<li>Open the approved leave (it shows an <strong>On Vacation</strong> ribbon).</li>
-<li>Fill in the employee&#39;s actual <strong>Return Date</strong>.</li>
-<li>Click <strong>Confirm Return</strong>.</li>
-</ol>
-<blockquote>
-<p><strong>Why this matters:</strong> payroll is <strong>blocked</strong> for an employee with an
-unconfirmed annual-leave return. Confirming promptly keeps their next payslip
-on time.</p>
-</blockquote>
+the employee does not do this themselves, and their next payslip is blocked
+until you (or HR) do. See the dedicated guide:
+<a href="#g-supervisor-06-confirm-return">Confirming a Return from Annual Leave</a>.</p>
 <h2>What happens next</h2>
 <ul>
 <li><strong>Approved</strong> annual leave → moves to <strong>Pending HR Approval</strong>, then continues
@@ -430,6 +426,179 @@ payslips.</p>
 <h2>Related guides</h2>
 <ul>
 <li><span class="xref">View my payslip</span></li>
+</ul>
+</section>
+<section id="g-supervisor-06-confirm-return"><h1>Confirming a Return from Annual Leave</h1>
+<p><strong>Who is this for:</strong> Supervisor / Direct Manager
+<strong>How long it takes:</strong> 1 minute per employee</p>
+<h2>What this does</h2>
+<p>Records the date one of your team actually came back to work after <strong>annual</strong>
+leave, and closes out that leave&#39;s return status. This is a separate step
+from approving the leave itself — it happens <em>after</em> the leave is fully
+approved and the employee has already gone on vacation.</p>
+<h2>Why this matters</h2>
+<ul>
+<li><strong>Payroll is blocked</strong> for any employee whose annual leave still shows as
+&quot;On Vacation&quot; with no confirmed return. If you don&#39;t confirm it, that
+employee&#39;s payslip cannot be generated — even if they are already back at
+work and being paid as normal.</li>
+<li>It gives HR and Accounting a reliable record of who has actually returned,
+separate from the dates on the original request (people sometimes come
+back early or late).</li>
+<li><strong>This is exclusively your responsibility.</strong> Odoo only lets the leave&#39;s
+<strong>Direct Manager</strong> confirm a return — not the employee, and not HR. If you
+don&#39;t do it, no one else will.</li>
+</ul>
+<h2>Before you start</h2>
+<ul>
+<li>The leave must already be <strong>fully approved</strong> — the record shows an
+<strong>🏖️ On Vacation</strong> ribbon.</li>
+<li>You need the employee&#39;s actual return date on hand (it may differ from the
+date originally requested).</li>
+<li>The <strong>Confirm Return</strong> button only appears for the leave&#39;s own <strong>Direct
+Manager</strong> — if you don&#39;t manage that employee, you won&#39;t see it.</li>
+</ul>
+<h2>Where to find it</h2>
+<p>Two ways to reach it:</p>
+<ul>
+<li><strong>Fastest:</strong> open the <strong>Time Off</strong> app → <strong>Management → Return
+Confirmation</strong>. This list shows only leaves that are currently &quot;On
+Vacation&quot; and still need a return date — for yourself and your direct
+reports. Nothing else clutters the list.</li>
+<li><strong>Alternative:</strong> open the leave directly from <strong>Management → Time Off</strong>,
+the same place you go to approve any other request.</li>
+</ul>
+<h2>Steps</h2>
+<ol>
+<li><strong>Open the employee&#39;s leave</strong> from <strong>Management → Return Confirmation</strong>
+(or <strong>Management → Time Off</strong>).</li>
+<li><strong>Check the Return Date field</strong> and fill in the employee&#39;s actual return
+date if it isn&#39;t already set.</li>
+<li><strong>Click Confirm Return.</strong> The leave&#39;s Return Status changes to
+<strong>✅ Return Confirmed</strong>.</li>
+</ol>
+<h2>What happens next</h2>
+<ul>
+<li>The leave&#39;s <strong>Return Status</strong> badge changes from <strong>🏖️ On Vacation</strong> to
+<strong>✅ Return Confirmed</strong>.</li>
+<li>The employee&#39;s <strong>next payslip is no longer blocked</strong> by this leave.</li>
+<li>A note is posted on the leave&#39;s chatter recording who confirmed the return
+and when — useful if HR or Accounting ask about it later.</li>
+</ul>
+<h2>A note on the Refuse button</h2>
+<p>Once a leave has cleared the <strong>General Manager&#39;s final approval</strong> —
+including while it is waiting on HR&#39;s final document confirmation — the
+<strong>Refuse</strong> button is no longer available on it. At that stage the only
+action left is confirming the return date; refusing an already-approved,
+already-taken vacation doesn&#39;t make sense.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>I don&#39;t see <strong>Confirm Return</strong> on the leave</td>
+<td>The leave isn&#39;t fully approved yet, no return date is set, or you&#39;re not this employee&#39;s Direct Manager</td>
+<td>Fill in the <strong>Return Date</strong> field first; if the button still doesn&#39;t appear, check that you&#39;re set as their Direct Manager</td>
+</tr>
+<tr>
+<td>The leave doesn&#39;t appear in <strong>Return Confirmation</strong></td>
+<td>It&#39;s already confirmed, or it isn&#39;t a fully-approved annual leave</td>
+<td>Check <strong>Management → Time Off</strong> and the leave&#39;s status bar</td>
+</tr>
+<tr>
+<td>I can&#39;t confirm a leave that isn&#39;t mine or my team&#39;s</td>
+<td>Only the employee&#39;s Direct Manager can confirm a return — there is no other route</td>
+<td>If their Direct Manager is unavailable, ask HR to update the employee&#39;s Direct Manager field first</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-supervisor-01-approve-time-off">Approve time off</a></li>
+</ul>
+</section>
+<section id="g-supervisor-07-ticket-for-team-member"><h1>Raising an IT Ticket for a Team Member</h1>
+<p><strong>Who is this for:</strong> Supervisor / any manager with direct reports
+<strong>How long it takes:</strong> 2 minutes</p>
+<h2>What this does</h2>
+<p>Lets you raise an IT support ticket <strong>on behalf of someone who reports to
+you</strong> — typically a field or workshop employee who has no login, or someone
+who is away from a computer while their machine is down.</p>
+<p>The ticket belongs to that employee: their name, department, job title and
+contact details appear on it as the <strong>Caller</strong>, so IT knows who to call. You
+stay on the ticket as its author and follow it to closure.</p>
+<h2>Before you start</h2>
+<ul>
+<li>The person must be your <strong>direct report</strong> (their <strong>Manager</strong> field on the
+employee record points at you). The system only offers you yourself and your
+direct reports — nobody else.</li>
+<li>Get the details from them first: what happens, since when, and which device.</li>
+</ul>
+<h2>Steps</h2>
+<ol>
+<li><p><strong>Open the Helpdesk app → My Tickets</strong> and click <strong>New</strong>.</p>
+</li>
+<li><p><strong>Change &quot;Reported By&quot;</strong> from yourself to the team member.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/ticket-01.png" alt="Reported By — pick a direct report">
+The <strong>Caller</strong> panel refills with their job title, department, email and
+phone numbers.</p>
+</li>
+<li><p><strong>Fill in the ticket as usual</strong> — Incident or Service Request, a clear short
+description, the Category, the Related Asset if it is about their device,
+the Priority, and a detailed description.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/ticket-02.png" alt="Ticket for a team member"></p>
+</li>
+<li><p><strong>Save.</strong> IT is notified.</p>
+</li>
+</ol>
+<h2>What happens next</h2>
+<ul>
+<li>The ticket appears in <strong>your</strong> My Tickets list and in the employee&#39;s, and both
+of you can follow it and reply in the message box.</li>
+<li>IT contacts the <strong>Caller</strong> — the employee — using the details on the ticket,
+not you. Make sure their work phone/mobile on the employee record is current.</li>
+<li>Everything else works exactly as it does for your own tickets: see
+<span class="xref">Raising an IT support ticket</span> for the
+full walk-through of the fields, the two kinds, and the closing feedback.</li>
+</ul>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>The employee isn&#39;t in the <strong>Reported By</strong> list</td>
+<td>They are not your direct report in the system</td>
+<td>Ask HR to set their <strong>Manager</strong> on the employee record</td>
+</tr>
+<tr>
+<td>&quot;You can only create or edit tickets for yourself or your direct reports&quot;</td>
+<td>Same cause — the reporting line isn&#39;t set</td>
+<td>As above; meanwhile raise it under your own name and explain who it is for</td>
+</tr>
+<tr>
+<td>The Caller panel is empty</td>
+<td>The employee record has no job title/department/contact details</td>
+<td>Ask HR to complete the employee record</td>
+</tr>
+<tr>
+<td>I can&#39;t see a ticket my team member raised themselves</td>
+<td>You see your direct reports&#39; tickets — check you are their manager, not only their leave approver</td>
+<td>Ask HR to confirm the <strong>Manager</strong> field</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><span class="xref">Raising an IT support ticket</span> — the full field-by-field guide</li>
+<li><a href="#g-supervisor-01-approve-time-off">Approving time off</a></li>
 </ul>
 </section>
 </body></html>

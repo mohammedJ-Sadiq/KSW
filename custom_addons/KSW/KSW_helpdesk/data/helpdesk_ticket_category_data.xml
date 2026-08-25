@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1">
+
+    <!-- ============================================================ -->
+    <!-- Incident categories                                            -->
+    <!-- These 5 pre-date the Incident/Request split and were created
+         without a ticket_type. Since they sit in a noupdate block,
+         editing their <record> values would be silently ignored on
+         upgrade (CLAUDE.md gotcha #2) - use <function> write instead,
+         which runs on every load. -->
+    <!-- ============================================================ -->
+    <record id="ticket_category_hardware" model="helpdesk.ticket.category">
+        <field name="name">Hardware</field>
+        <field name="sequence">10</field>
+        <field name="icon">fa-desktop</field>
+        <field name="color">4</field>
+    </record>
+    <record id="ticket_category_software" model="helpdesk.ticket.category">
+        <field name="name">Software</field>
+        <field name="sequence">20</field>
+        <field name="icon">fa-cogs</field>
+        <field name="color">6</field>
+    </record>
+    <record id="ticket_category_network" model="helpdesk.ticket.category">
+        <field name="name">Network &amp; Internet</field>
+        <field name="sequence">30</field>
+        <field name="icon">fa-wifi</field>
+        <field name="color">5</field>
+    </record>
+    <record id="ticket_category_access" model="helpdesk.ticket.category">
+        <field name="name">Access &amp; Permissions</field>
+        <field name="sequence">40</field>
+        <field name="icon">fa-key</field>
+        <field name="color">3</field>
+    </record>
+    <record id="ticket_category_other" model="helpdesk.ticket.category">
+        <field name="name">Other</field>
+        <field name="sequence">90</field>
+        <field name="icon">fa-question-circle</field>
+        <field name="color">8</field>
+    </record>
+
+    <function model="helpdesk.ticket.category" name="write">
+        <value eval="[
+            ref('ticket_category_hardware'),
+            ref('ticket_category_software'),
+            ref('ticket_category_network'),
+            ref('ticket_category_access'),
+            ref('ticket_category_other'),
+        ]"/>
+        <value eval="{'ticket_type': 'incident'}"/>
+    </function>
+
+    <record id="ticket_category_email" model="helpdesk.ticket.category">
+        <field name="name">Email</field>
+        <field name="ticket_type">incident</field>
+        <field name="sequence">50</field>
+        <field name="icon">fa-envelope</field>
+        <field name="color">2</field>
+    </record>
+    <record id="ticket_category_printer" model="helpdesk.ticket.category">
+        <field name="name">Printer</field>
+        <field name="ticket_type">incident</field>
+        <field name="sequence">60</field>
+        <field name="icon">fa-print</field>
+        <field name="color">1</field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Service Request categories                                     -->
+    <!-- ============================================================ -->
+    <record id="ticket_category_new_hardware" model="helpdesk.ticket.category">
+        <field name="name">New Hardware Request</field>
+        <field name="ticket_type">request</field>
+        <field name="sequence">10</field>
+        <field name="icon">fa-desktop</field>
+        <field name="color">4</field>
+    </record>
+    <record id="ticket_category_new_software" model="helpdesk.ticket.category">
+        <field name="name">New Software Installation</field>
+        <field name="ticket_type">request</field>
+        <field name="sequence">20</field>
+        <field name="icon">fa-download</field>
+        <field name="color">6</field>
+    </record>
+    <record id="ticket_category_access_request" model="helpdesk.ticket.category">
+        <field name="name">Access / Permission Request</field>
+        <field name="ticket_type">request</field>
+        <field name="sequence">30</field>
+        <field name="icon">fa-key</field>
+        <field name="color">3</field>
+    </record>
+    <record id="ticket_category_password_reset" model="helpdesk.ticket.category">
+        <field name="name">Password Reset</field>
+        <field name="ticket_type">request</field>
+        <field name="sequence">40</field>
+        <field name="icon">fa-lock</field>
+        <field name="color">5</field>
+    </record>
+    <record id="ticket_category_information" model="helpdesk.ticket.category">
+        <field name="name">Information / How-To</field>
+        <field name="ticket_type">request</field>
+        <field name="sequence">50</field>
+        <field name="icon">fa-info-circle</field>
+        <field name="color">2</field>
+    </record>
+    <record id="ticket_category_request_other" model="helpdesk.ticket.category">
+        <field name="name">Other</field>
+        <field name="ticket_type">request</field>
+        <field name="sequence">90</field>
+        <field name="icon">fa-question-circle</field>
+        <field name="color">8</field>
+    </record>
+
+</odoo>

@@ -33,6 +33,14 @@ class SubmissionCommon(TransactionCase):
         cls.sup_a = cls._supervisor('sub_sup_a', cls.dept_a)
         cls.sup_b = cls._supervisor('sub_sup_b', cls.dept_b)
         cls.gm = cls._user('sub_gm', 'KSW_commissions.group_commission_gm')
+        # Approval follows hr.department.x_effective_gm_id now, not the GM
+        # group, so this fixture's GM has to be named on both departments to
+        # keep the "one GM over everything" shape these tests assume. See
+        # tests/test_department_gm.py for the per-department contract.
+        cls.gm_employee = cls.env['hr.employee'].sudo().create({
+            'name': 'Sub GM Emp', 'user_id': cls.gm.id})
+        (cls.dept_a | cls.dept_b).sudo().write(
+            {'x_gm_id': cls.gm_employee.id})
 
         cls.emp_a = cls._employee('Sub Emp A', cls.dept_a, 7200.0)
         cls.emp_b = cls._employee('Sub Emp B', cls.dept_b, 4800.0)

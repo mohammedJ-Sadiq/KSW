@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        The GM sits next to the Manager on purpose: they are the two people
+        answerable for the department and they are normally NOT the same
+        person, which is exactly the confusion this feature exists to fix.
+    -->
+    <record id="hr_department_view_form_gm" model="ir.ui.view">
+        <field name="name">hr.department.form.inherit.ksw.gm</field>
+        <field name="model">hr.department</field>
+        <field name="inherit_id" ref="hr.view_department_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='manager_id']" position="after">
+                <field name="x_gm_id"
+                       placeholder="Inherited from the parent department"/>
+                <field name="x_effective_gm_id" readonly="1"
+                       invisible="x_gm_id or not x_effective_gm_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_department_view_tree_gm" model="ir.ui.view">
+        <field name="name">hr.department.list.inherit.ksw.gm</field>
+        <field name="model">hr.department</field>
+        <field name="inherit_id" ref="hr.view_department_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='manager_id']" position="after">
+                <field name="x_effective_gm_id" string="General Manager"
+                       optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="res_config_settings_view_form_gm" model="ir.ui.view">
+        <field name="name">res.config.settings.form.inherit.ksw.gm</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="hr.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='employees_setting_container']" position="after">
+                <block title="Approvals" name="ksw_approval_setting_container">
+                    <setting id="ksw_default_gm_setting"
+                             string="Default General Manager"
+                             help="Approves the GM step for departments with no GM of their own, and for employees with no department.">
+                        <field name="x_default_gm_id"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -110,6 +110,15 @@ class HrPayslipLine(models.Model):
     quantity = fields.Float(digits=(16, 0))
     total = fields.Float(digits=(16, 0))
 
+    department_id = fields.Many2one(
+        'hr.department', related='employee_id.department_id', store=True,
+        help='Mirrors the employee\'s department for pivot/graph grouping.',
+    )
+    payslip_date = fields.Date(
+        related='slip_id.date_from', store=True,
+        help='Mirrors the payslip start date for date-range filtering.',
+    )
+
 
 # ======================================================================
 # Payslip: worked-day population + vacation-return guard
@@ -117,6 +126,11 @@ class HrPayslipLine(models.Model):
 
 class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
+
+    department_id = fields.Many2one(
+        'hr.department', related='employee_id.department_id', store=True,
+        help='Mirrors the employee\'s department for pivot/graph grouping.',
+    )
 
     # ------------------------------------------------------------------
     # Reverse link to the leave that generated this vacation payslip

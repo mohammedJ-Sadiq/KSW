@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1">
+
+    <record id="stage_new" model="helpdesk.ticket.stage">
+        <field name="name">New</field>
+        <field name="sequence">10</field>
+        <field name="fold">False</field>
+        <field name="is_closed">False</field>
+    </record>
+    <record id="stage_in_progress" model="helpdesk.ticket.stage">
+        <field name="name">In Progress</field>
+        <field name="sequence">20</field>
+        <field name="fold">False</field>
+        <field name="is_closed">False</field>
+    </record>
+    <record id="stage_on_hold" model="helpdesk.ticket.stage">
+        <field name="name">On Hold</field>
+        <field name="sequence">30</field>
+        <field name="fold">False</field>
+        <field name="is_closed">False</field>
+    </record>
+    <record id="stage_closed" model="helpdesk.ticket.stage">
+        <field name="name">Closed</field>
+        <field name="sequence">40</field>
+        <field name="fold">True</field>
+        <field name="is_closed">True</field>
+    </record>
+
+</odoo>

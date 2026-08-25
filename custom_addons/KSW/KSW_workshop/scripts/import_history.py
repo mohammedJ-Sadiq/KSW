@@ -69,6 +69,15 @@ STATE_MAP = {
 
 UNSPECIFIED_VEHICLE_CODE = 'UNSPECIFIED'
 
+# Supervisors who write a bare fleet number always mean an Isuzu, so '370'
+# from them is 'IS370' (user rule, 2026-08-23). Keyed on the source sheet's
+# email rather than the resolved employee: two hr.employee records share
+# tareq@alkawthersw.com, so employee lookup is not a stable identifier.
+IS_REQUESTER_EMAILS = {
+    'tareq990040@gmail.com', 'tareq@alkawthersw.com',
+    'm.disouky20@gmail.com', 'm.disouky@alkawthersw.com',
+}
+
 # Known cases where the legacy form was submitted from a personal address
 # instead of the employee's real one — confirmed by the user (2026-08-16).
 EMAIL_REMAP = {
@@ -101,7 +110,12 @@ def _parse_date(value):
     value = (value or '').strip()
     if not value:
         return None
-    for fmt in ('%m/%d/%Y %I:%M:%S %p', '%m/%d/%Y'):
+    # The year files write 12-hour with AM/PM ('9/12/2022 2:55:53 PM'); the
+    # master file's Timestamp is 24-hour ('8/25/2022 16:38:23'). Missing the
+    # second format silently returned None for every master-file row, so
+    # _import_row skipped its create_date stamping and all 3,598 of the 2026
+    # requests were dated the moment of import instead of when they happened.
+    for fmt in ('%m/%d/%Y %I:%M:%S %p', '%m/%d/%Y %H:%M:%S', '%m/%d/%Y'):
         try:
             return datetime.strptime(value, fmt)
         except ValueError:
@@ -142,8 +156,13 @@ class _Caches:
         if not email:
             return None
         if email not in self.employees_by_email:
-            self.employees_by_email[email] = self.env['hr.employee'].search(
-                [('work_email', '=ilike', email)], limit=1) or None
+            # order by id so a work_email shared by two employees always
+            # resolves to the same one; an unordered limit=1 silently
+            # attributed 4,304 rows to a different person on dev than on
+            # prod (tareq@alkawthersw.com is on two hr.employee records).
+            matches = self.env['hr.employee'].search(
+                [('work_email', '=ilike', email)], order='id')
+            self.employees_by_email[email] = matches[0] if matches else None
         return self.employees_by_email[email]
 
     def employee_by_name(self, name):
@@ -178,14 +197,19 @@ class _Caches:
             self.placeholder_employees[cache_key] = employee
         return self.placeholder_employees[cache_key], True
 
-    def vehicle_by_code(self, code):
+    def vehicle_by_code(self, code, vehicle_type=None):
         code = code.strip().upper()
         if code not in self.vehicles_by_code:
             vehicle = self.env['ksw.fleet.vehicle'].search([('name', '=', code)], limit=1)
             created = False
             if not vehicle:
-                vehicle = self.env['ksw.fleet.vehicle'].create({'name': code})
+                vals = {'name': code}
+                if vehicle_type:
+                    vals['vehicle_type'] = vehicle_type
+                vehicle = self.env['ksw.fleet.vehicle'].create(vals)
                 created = True
+            elif vehicle_type and not vehicle.vehicle_type:
+                vehicle.vehicle_type = vehicle_type
             self.vehicles_by_code[code] = (vehicle, created)
         return self.vehicles_by_code[code]
 
@@ -196,7 +220,7 @@ class _Caches:
         return self.unspecified_vehicle
 
 
-def _resolve_vehicle(caches, explicit_code, fallback_text):
+def _resolve_vehicle(caches, explicit_code, fallback_text, requester_email=None):
     """Returns (vehicle, flag_message_or_None)."""
     explicit_code = (explicit_code or '').strip().upper().replace(' ', '')
     if explicit_code and EXPLICIT_CODE_RE.match(explicit_code):
@@ -214,8 +238,24 @@ def _resolve_vehicle(caches, explicit_code, fallback_text):
             code = is_code if is_vehicle else t_code
             vehicle, _created = caches.vehicle_by_code(code)
             return vehicle, None
-        # ambiguous (matches both) or matches neither — use the bare
-        # number, no guessing which prefix it was (per user instruction)
+        # Ambiguous (matches both) or matches neither. A bare number is not
+        # a usable fleet code, so resolve it by who submitted the row:
+        #   - the Isuzu supervisors always mean an Isuzu
+        #   - otherwise, when both series carry the number, it is the trailer
+        # Anything else still falls back to the bare number rather than
+        # inventing a vehicle in a series that does not have it.
+        # More than 3 digits is not a fleet number — the real series run to
+        # ~400. Those are plate numbers or odometer readings typed into the
+        # vehicle field, so no prefix is invented for them.
+        plausible = num <= 999
+        email = (requester_email or '').strip().lower()
+        if plausible and email in IS_REQUESTER_EMAILS:
+            vehicle, created = caches.vehicle_by_code(is_code, vehicle_type='isuzu')
+            flag = None if not created else f"created new vehicle {is_code!r}"
+            return vehicle, flag
+        if plausible and is_vehicle and t_vehicle:
+            vehicle, _created = caches.vehicle_by_code(t_code, vehicle_type='trailer')
+            return vehicle, None
         vehicle, created = caches.vehicle_by_code(str(num))
         flag = f"vehicle code ambiguous/unlisted — used bare number {num!r}"
         return vehicle, flag
@@ -252,7 +292,8 @@ def _import_row(env, caches, seen_uids, report, *, uid, employee_email, employee
     if is_placeholder:
         flags.append(f'no Odoo account for requester: linked to placeholder {employee.name!r}')
 
-    vehicle, vflag = _resolve_vehicle(caches, explicit_vehicle_code, vehicle_fallback_text)
+    vehicle, vflag = _resolve_vehicle(
+        caches, explicit_vehicle_code, vehicle_fallback_text, requester_email=employee_email)
     if vflag:
         flags.append(vflag)
 
@@ -282,10 +323,7 @@ def _import_row(env, caches, seen_uids, report, *, uid, employee_email, employee
         'work_statement': (work_statement or '').strip() or False,
         'repairs_parts': (repairs_parts or '').strip() or False,
         'technician_id': technician.id if technician else False,
-        # parts_cost became a readonly stored compute (part_lines_cost +
-        # parts_extra_cost) in 19.0.3.0.0 — this import predates part lines,
-        # so the imported figure belongs entirely in parts_extra_cost.
-        'parts_extra_cost': _float(parts_cost),
+        'parts_cost': _float(parts_cost),
         'labor_cost': _float(labor_cost),
         'x_legacy_uid': uid or False,
         'x_imported': True,

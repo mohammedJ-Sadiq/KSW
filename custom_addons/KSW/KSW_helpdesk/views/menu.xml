@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <menuitem id="menu_helpdesk_root"
+              name="Helpdesk"
+              sequence="96"
+              web_icon="KSW_helpdesk,static/description/icon.png"/>
+
+    <!-- Self-Service (every internal user) -->
+    <menuitem id="menu_helpdesk_my_tickets"
+              name="My Tickets"
+              parent="menu_helpdesk_root"
+              action="action_helpdesk_ticket_my_tickets"
+              sequence="1"/>
+
+    <!-- Operations (agents + managers) -->
+    <menuitem id="menu_helpdesk_all_tickets"
+              name="All Tickets"
+              parent="menu_helpdesk_root"
+              action="action_helpdesk_ticket_all"
+              sequence="10"
+              groups="KSW_helpdesk.group_helpdesk_agent"/>
+
+    <menuitem id="menu_helpdesk_history"
+              name="Ticket History"
+              parent="menu_helpdesk_root"
+              action="action_helpdesk_ticket_history"
+              sequence="12"
+              groups="KSW_helpdesk.group_helpdesk_agent"/>
+
+    <menuitem id="menu_helpdesk_reporting"
+              name="Reporting"
+              parent="menu_helpdesk_root"
+              action="action_helpdesk_ticket_reporting"
+              sequence="15"
+              groups="KSW_helpdesk.group_helpdesk_agent"/>
+
+    <!-- IT Assets (IT Team only - no other role, manager or not, can see
+         this branch; employees only ever interact with assets indirectly
+         through the optional "Related Asset" field on their own ticket). -->
+    <menuitem id="menu_helpdesk_assets"
+              name="Assets"
+              parent="menu_helpdesk_root"
+              sequence="50"
+              groups="KSW_helpdesk.group_helpdesk_agent"/>
+
+    <menuitem id="menu_helpdesk_assets_all"
+              name="Assets"
+              parent="menu_helpdesk_assets"
+              action="action_it_asset_all"
+              sequence="10"/>
+
+    <menuitem id="menu_helpdesk_assets_assignments"
+              name="Assignments"
+              parent="menu_helpdesk_assets"
+              action="it_asset_assignment_action"
+              sequence="20"/>
+
+    <menuitem id="menu_helpdesk_assets_maintenance"
+              name="Maintenance"
+              parent="menu_helpdesk_assets"
+              action="it_asset_maintenance_action"
+              sequence="30"/>
+
+    <!-- Configuration (IT Team only) -->
+    <menuitem id="menu_helpdesk_config"
+              name="Configuration"
+              parent="menu_helpdesk_root"
+              sequence="90"
+              groups="KSW_helpdesk.group_helpdesk_agent"/>
+
+    <menuitem id="menu_helpdesk_stages"
+              name="Ticket Stages"
+              parent="menu_helpdesk_config"
+              action="helpdesk_ticket_stage_action"
+              sequence="10"/>
+
+    <menuitem id="menu_helpdesk_categories"
+              name="Ticket Categories"
+              parent="menu_helpdesk_config"
+              action="helpdesk_ticket_category_action"
+              sequence="20"/>
+
+    <menuitem id="menu_helpdesk_asset_categories"
+              name="Asset Categories"
+              parent="menu_helpdesk_config"
+              action="it_asset_category_action"
+              sequence="30"/>
+
+</odoo>

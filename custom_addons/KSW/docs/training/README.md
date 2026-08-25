@@ -27,6 +27,7 @@ You may hold more than one role. Read every persona that matches what you do.
 | I run the monthly payroll — generate payslip batches, export the bank file | **Payroll** → [`en/payroll/`](en/payroll/) |
 | I manage deductions across the company / configure deduction types | **Deduction Officer** → [`en/admin/deductions.md`](en/admin/) |
 | I configure commissions — categories, sites, rules, salespeople | **Commission Admin** → [`en/admin/commissions.md`](en/admin/) |
+| I am on the IT team — I handle support tickets and the IT asset register | **IT Team** → [`en/it/`](en/it/) |
 
 > **New to the system? Start here regardless of role:**
 > [Getting Started](en/00-getting-started.md) — login, navigation, notifications,
@@ -63,8 +64,26 @@ basics everyone needs. Give each person their role handbook + the General one.
 | `pdf/KSW-GM-Guide-EN.pdf` | Initial/final approvals, return-to-approver |
 | `pdf/KSW-Payroll-Guide-EN.pdf` | Generate batch, skipped employees, bank file export |
 | `pdf/KSW-Admin-Guide-EN.pdf` | Deduction & commission configuration |
+| `pdf/KSW-IT-Guide-EN.pdf` | Ticket queue, resolving & closing, IT asset register, reporting, helpdesk configuration |
 
-Rebuild them any time (picks up guide edits and new screenshots):
+### Standalone single-topic handouts
+
+Some topics are also built as their own small PDF, for handing out on their
+own without the whole role handbook:
+
+| Handout | Covers |
+|---|---|
+| `pdf/KSW-Return-Confirmation-Guide-{EN,AR}.pdf` | Confirming an employee's return from annual leave |
+| `pdf/KSW-Raise-Support-Ticket-Guide-{EN,AR}.pdf` | Raising an IT support ticket (any employee) |
+| `pdf/KSW-Ticket-For-Team-Member-Guide-{EN,AR}.pdf` | Raising an IT ticket for a direct report (managers) |
+
+```bash
+node build_pdf.mjs single <relPath> <slug> "<Title EN>" "<Title AR>"
+# e.g. node build_pdf.mjs single employee/05-raise-support-ticket.md \
+#        Raise-Support-Ticket "Raising an IT Support Ticket" "رفع تذكرة دعم فني"
+```
+
+Rebuild the role handbooks any time (picks up guide edits and new screenshots):
 
 ```bash
 cd tools

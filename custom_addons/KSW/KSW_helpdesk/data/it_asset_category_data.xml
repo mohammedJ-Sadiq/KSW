@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1">
+
+    <record id="category_laptop" model="it.asset.category">
+        <field name="name">Laptop</field>
+        <field name="sequence">10</field>
+        <field name="icon">fa-laptop</field>
+        <field name="color">4</field>
+    </record>
+    <record id="category_desktop" model="it.asset.category">
+        <field name="name">Desktop</field>
+        <field name="sequence">20</field>
+        <field name="icon">fa-desktop</field>
+        <field name="color">6</field>
+    </record>
+    <record id="category_monitor" model="it.asset.category">
+        <field name="name">Monitor</field>
+        <field name="sequence">30</field>
+        <field name="icon">fa-television</field>
+        <field name="color">1</field>
+    </record>
+    <record id="category_mobile" model="it.asset.category">
+        <field name="name">Mobile Phone</field>
+        <field name="sequence">40</field>
+        <field name="icon">fa-mobile</field>
+        <field name="color">3</field>
+    </record>
+    <record id="category_printer" model="it.asset.category">
+        <field name="name">Printer</field>
+        <field name="sequence">50</field>
+        <field name="icon">fa-print</field>
+        <field name="color">2</field>
+    </record>
+    <record id="category_network" model="it.asset.category">
+        <field name="name">Networking Equipment</field>
+        <field name="sequence">60</field>
+        <field name="icon">fa-wifi</field>
+        <field name="color">5</field>
+    </record>
+    <record id="category_software" model="it.asset.category">
+        <field name="name">Software License</field>
+        <field name="sequence">70</field>
+        <field name="icon">fa-key</field>
+        <field name="color">7</field>
+    </record>
+    <record id="category_accessory" model="it.asset.category">
+        <field name="name">Accessory</field>
+        <field name="sequence">80</field>
+        <field name="icon">fa-plug</field>
+        <field name="color">8</field>
+    </record>
+
+</odoo>

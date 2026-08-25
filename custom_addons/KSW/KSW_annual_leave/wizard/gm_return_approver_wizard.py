@@ -74,11 +74,11 @@ _TARGET_LABELS = {
     _PLAIN_RETURN_TARGET: 'Back to Approval',
 }
 
+# The two GM steps are absent on purpose: they route to one named person
+# (the department's GM), not to a group — see `_notify_return`.
 _TARGET_GROUP = {
     'pending_hr':        'KSW_annual_leave.group_annual_leave_hr',
-    'pending_gm_initial': 'KSW_annual_leave.group_annual_leave_gm',
     'pending_acc':       'KSW_annual_leave.group_annual_leave_acc',
-    'pending_gm_final':  'KSW_annual_leave.group_annual_leave_gm',
     'pending_employee_signature': 'KSW_annual_leave.group_annual_leave_hr',
 }
 
@@ -197,10 +197,10 @@ class GmReturnApproverWizard(models.TransientModel):
         target = self.target_step_id.code
         is_admin = self.env.su or self.env.user.has_group(SETTINGS_ADMIN_GROUP)
 
-        if not is_admin and not self.env.user.has_group(
-                'KSW_annual_leave.group_annual_leave_gm'):
-            raise UserError(
-                'Only the General Manager can return a leave request to an approver.')
+        if not is_admin:
+            # Being a GM somewhere is not enough — it has to be this
+            # employee's department. Same predicate the approve buttons use.
+            leave._check_department_gm(leave)
 
         if is_admin:
             # Authorisation is settled; elevate for the rest. The
@@ -284,6 +284,14 @@ class GmReturnApproverWizard(models.TransientModel):
             dm_user = leave.employee_id.leave_manager_id
             partner_ids = (
                 [dm_user.partner_id.id] if dm_user and dm_user.partner_id else []
+            )
+        elif target in _GM_RETURN_STATES:
+            # Sending a request back to a GM step means one person: that
+            # department's GM. Notifying the whole GM group would be the very
+            # broadcast this feature exists to stop.
+            gm_user = leave._department_gm_user(leave)
+            partner_ids = (
+                [gm_user.partner_id.id] if gm_user and gm_user.partner_id else []
             )
         else:
             group_xmlid = _TARGET_GROUP.get(target)

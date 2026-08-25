@@ -36,6 +36,7 @@ const SHOTS = {
     ['loan-01',       'KSW_deduction.action_ksw_my_loans'],
     ['payslip-01',    'om_hr_payroll.action_view_hr_payslip_form'],
     ['commission-01', 'KSW_commissions.action_ksw_commission_sheet_my'],
+    ['ticket-01',     'KSW_helpdesk.action_helpdesk_ticket_my_tickets'],
   ],
   supervisor: [
     ['leave-approve-01', 'hr_holidays.hr_leave_action_action_approve_department'],
@@ -61,6 +62,17 @@ const SHOTS = {
   payroll: [
     ['batch-01', 'om_hr_payroll.action_hr_payslip_run_tree'],
   ],
+  it: [
+    ['queue-01',   'KSW_helpdesk.action_helpdesk_ticket_all'],
+    ['history-01', 'KSW_helpdesk.action_helpdesk_ticket_history'],
+    ['report-01',  'KSW_helpdesk.action_helpdesk_ticket_reporting'],
+    ['asset-01',   'KSW_helpdesk.action_it_asset_all'],
+    ['assign-02',  'KSW_helpdesk.it_asset_assignment_action'],
+    ['maint-01',   'KSW_helpdesk.it_asset_maintenance_action'],
+    ['config-01',  'KSW_helpdesk.helpdesk_ticket_stage_action'],
+    ['config-02',  'KSW_helpdesk.helpdesk_ticket_category_action'],
+    ['config-03',  'KSW_helpdesk.it_asset_category_action'],
+  ],
   admin: [
     ['ded-dashboard-01', 'KSW_deduction.action_ksw_deduction_dashboard'],
     ['comm-config-01',   'KSW_commissions.action_ksw_commission_category'],
@@ -81,7 +93,7 @@ async function shoot(page, persona, name, action) {
   await page.goto(`${BASE}/odoo/action-${action}`, { waitUntil: 'domcontentloaded' });
   // wait for any main view to render
   await page.waitForSelector(
-    '.o_list_view, .o_kanban_view, .o_form_view, .o_calendar_view, .o_dashboard',
+    '.o_list_view, .o_kanban_view, .o_form_view, .o_calendar_view, .o_dashboard, .o_graph_view, .o_pivot_view',
     { timeout: 20000 });
   await page.waitForTimeout(1200); // let data/labels settle
   const err = await detectError(page);

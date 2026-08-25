@@ -1,4 +1,5 @@
 import calendar as _cal
+from datetime import timedelta
 
 from markupsafe import Markup
 
@@ -788,12 +789,13 @@ class HrLeave(models.Model):
     )
 
     @api.depends_context('uid')
-    @api.depends('x_annual_approval_state', 'employee_id', 'employee_id.leave_manager_id')
+    @api.depends('x_annual_approval_state', 'employee_id',
+                 'employee_id.leave_manager_id',
+                 'employee_id.department_id.x_effective_gm_id')
     def _compute_is_pending_my_action(self):
         user = self.env.user
         uid = user.id
         is_hr = user.has_group('KSW_annual_leave.group_annual_leave_hr')
-        is_gm = user.has_group('KSW_annual_leave.group_annual_leave_gm')
         is_acc = user.has_group('KSW_annual_leave.group_annual_leave_acc')
         for leave in self:
             s = leave.x_annual_approval_state
@@ -808,7 +810,8 @@ class HrLeave(models.Model):
             elif s == 'pending_hr':
                 leave.x_is_pending_my_action = is_hr
             elif s in ('pending_gm_initial', 'pending_gm_final'):
-                leave.x_is_pending_my_action = is_gm
+                leave.x_is_pending_my_action = (
+                    self._department_gm_user(leave) == user)
             elif s == 'pending_acc':
                 leave.x_is_pending_my_action = is_acc
             elif s == 'pending_employee_signature':
@@ -837,13 +840,19 @@ class HrLeave(models.Model):
         user = self.env.user
         uid = user.id
         is_hr = user.has_group('KSW_annual_leave.group_annual_leave_hr')
-        is_gm = user.has_group('KSW_annual_leave.group_annual_leave_gm')
         is_acc = user.has_group('KSW_annual_leave.group_annual_leave_acc')
 
         parts = [
             # DM step: current user is the configured leave manager
             [('x_annual_approval_state', '=', 'pending_dm'),
              ('employee_id.leave_manager_id', '=', uid)],
+            # GM steps: not "am I a GM" but "am I THIS department's GM".
+            # No group gate — being named on the department is the whole
+            # qualification, and x_effective_gm_id is stored so this is a
+            # plain join rather than a Python-built id list.
+            [('x_annual_approval_state', 'in',
+              ['pending_gm_initial', 'pending_gm_final']),
+             ('employee_id.department_id.x_effective_gm_id.user_id', '=', uid)],
         ]
         if is_hr:
             parts.extend([
@@ -853,8 +862,6 @@ class HrLeave(models.Model):
                 [('x_annual_approval_state', '=', 'pending_hr')],
                 [('x_annual_approval_state', '=', 'pending_employee_signature')],
             ])
-        if is_gm:
-            parts.append([('x_annual_approval_state', 'in', ['pending_gm_initial', 'pending_gm_final'])])
         if is_acc:
             parts.append([('x_annual_approval_state', '=', 'pending_acc')])
 
@@ -865,12 +872,13 @@ class HrLeave(models.Model):
         return [('id', 'not in', matching_ids)]
 
     @api.depends_context('uid')
-    @api.depends('x_annual_approval_state', 'state', 'holiday_status_id')
+    @api.depends('x_annual_approval_state', 'state', 'holiday_status_id',
+                 'employee_id',
+                 'employee_id.department_id.x_effective_gm_id')
     def _compute_approval_role_gates(self):
         user = self.env.user
         is_hr = user.has_group('KSW_annual_leave.group_annual_leave_hr')
         is_acc = user.has_group('KSW_annual_leave.group_annual_leave_acc')
-        is_gm = user.has_group('KSW_annual_leave.group_annual_leave_gm')
         is_admin = self.env.su or user.has_group(SETTINGS_ADMIN_GROUP)
         wizard = self.env['ksw.gm.return.approver.wizard']
         for leave in self:
@@ -882,6 +890,10 @@ class HrLeave(models.Model):
             # no return target, so the button stays hidden.
             leave.x_can_admin_return = bool(
                 is_admin and has_id and wizard._allowed_targets(leave))
+            # Per record, not per user: whether this caller is a GM at all is
+            # the wrong question — the only one that matters is whether he is
+            # the GM of THIS employee's department.
+            is_gm = has_id and self._department_gm_user(leave) == user
             leave.x_can_hr_approve = is_hr and s == 'pending_hr' and has_id
             leave.x_can_gm_initial_approve = is_gm and s == 'pending_gm_initial' and has_id
             leave.x_can_acc_approve = is_acc and s == 'pending_acc' and has_id
@@ -1106,6 +1118,16 @@ class HrLeave(models.Model):
         help='True for the employee leave manager, who may correct the '
              'return date even after the return has been confirmed.',
     )
+    x_return_reminder_last_sent = fields.Date(
+        string='Return Reminder Last Sent',
+        readonly=True, copy=False,
+        help='Last day the direct manager was reminded to confirm this '
+             'return. Stops the daily cron sending twice in one day.',
+    )
+    x_return_reminder_count = fields.Integer(
+        string='Return Reminders Sent',
+        readonly=True, copy=False, default=0,
+    )
 
     @api.depends('state', 'x_return_state')
     def _compute_is_on_vacation(self):
@@ -1145,6 +1167,209 @@ class HrLeave(models.Model):
                     manager.name if manager else 'the leave manager'
                 )
             )
+
+    # Figures that represent money already paid out. They are restored
+    # verbatim after the request period is corrected — see
+    # _shorten_to_confirmed_return.
+    _PAID_DURATION_FIELDS = (
+        'number_of_days', 'number_of_hours', 'x_annual_portion_days',
+        'x_unpaid_portion_days', 'x_clearance_balance',
+    )
+
+    def _shorten_to_confirmed_return(self):
+        """End the vacation on the day the employee actually came back.
+
+        The employee is paid up front for every day requested, so an early
+        return refunds nothing — **the money figures are not recomputed**.
+        What does change is the period the request *covers*: from the
+        confirmed return date the employee is attending and is paid as
+        attended, not as on vacation.
+
+        It also has to change, or the balance can never recover: a request
+        that still covers those days keeps consuming the restarted
+        allocation, pinning the remaining balance at zero (KSWCO leave 4787
+        would have read 0 for ~14 months).
+
+        Writing `request_date_to` re-runs `_compute_duration`, which
+        re-derives the charged days from *today's* already-depleted balance
+        (measured on 4787: 46.7671 → 0.8028 days). So the paid figures are
+        captured first and written straight back afterwards.
+
+        Returns the previous end date when it shortened, else False.
+        """
+        self.ensure_one()
+        if not (self.x_return_date and self.request_date_from
+                and self.request_date_to):
+            return False
+        if not self._is_annual_leave(self):
+            return False
+
+        new_end = self.x_return_date - timedelta(days=1)
+        if new_end >= self.request_date_to:
+            # Returned on or after the planned end — nothing to shorten, and
+            # a late return is not a vacation extension.
+            return False
+        if new_end < self.request_date_from:
+            # Returned before the vacation started; too odd to fix silently.
+            return False
+
+        old_end = self.request_date_to
+        leave = self.sudo()
+        paid = {f: leave[f] for f in self._PAID_DURATION_FIELDS}
+
+        leave.write({'request_date_to': new_end})
+        leave.env.flush_all()
+
+        restore = dict(paid)
+        restore['x_actual_vacation_days'] = (
+            new_end - self.request_date_from).days + 1
+        leave.write(restore)
+        return old_end
+
+    def _apply_confirmed_return(self):
+        """Make the whole record agree with the date the manager confirmed.
+
+        Order matters: the request period is corrected first (it needs the
+        pre-restart allocation to still cover the leave), then the accrual is
+        restarted on the return date.
+        """
+        self.ensure_one()
+        old_end = self._shorten_to_confirmed_return()
+        if old_end:
+            self.sudo().message_post(
+                body=Markup(
+                    '<strong>✂️ Vacation Period Shortened to the Actual '
+                    'Return</strong><br/>'
+                    '<b>Ends:</b> %(old_end)s → %(new_end)s<br/>'
+                    '<b>Days on vacation:</b> %(actual).0f<br/>'
+                    '<i>Paid days are unchanged (%(paid).4f charged to the '
+                    'balance): the employee was paid up front for the days '
+                    'requested, and an early return refunds nothing. From '
+                    '%(return_date)s the employee is recorded as attending, '
+                    'so the request no longer covers those days.</i>'
+                ) % {
+                    'old_end': old_end,
+                    'new_end': self.request_date_to,
+                    'actual': self.x_actual_vacation_days,
+                    'paid': self.number_of_days,
+                    'return_date': self.x_return_date,
+                },
+                subtype_xmlid='mail.mt_note',
+            )
+        # Compare against the period as requested, not as just shortened:
+        # otherwise the reset this very call is about to write looks like a
+        # "more recent" one and the guard below rejects it.
+        self._sync_opening_reset_to_return(period_end=old_end or None)
+
+    def _sync_opening_reset_to_return(self, period_end=None):
+        """Move the employee's accrual restart date onto the confirmed return.
+
+        HR sets ``ksw.annual.leave.x_opening_reset_date`` when it settles a
+        vacation, using the *planned* return (``request_date_to + 1``).  When
+        the manager confirms a different actual return date, the accrual would
+        otherwise keep restarting on the planned date — an employee who came
+        back early loses those days of accrual (and one who came back late
+        gains them).
+
+        The annual vacation is the settlement: its duration is capped at the
+        employee's balance (`_get_number_of_days`), so taking it consumes the
+        entitlement.  Accrual therefore **restarts from zero on the confirmed
+        return date, always** — `x_opening_reset_date` is set to it and
+        `x_opening_extra_days` cleared.
+
+        Chosen deliberately over the safer variants (restart only when the
+        balance is used up; or carry the unused days into
+        `x_opening_extra_days`): an employee who took only *part* of their
+        entitlement loses the remainder here.  That is the accepted trade-off,
+        not an oversight.
+
+        The single exception is a reset dated *after* this vacation — it
+        belongs to a more recent settlement, and letting an old leave (or a
+        late amendment to one) rewrite it would corrupt the newer return date
+        rather than protect an old balance.
+
+        `x_opening_is_locked` does not block the write.  That lock guards
+        against accidental manual edits to the go-live figures; a restart onto
+        a date the manager explicitly confirmed is not one, and 75% of the
+        balance records are locked.  The override is named in the note.
+        """
+        self.ensure_one()
+        if not (self.x_return_date
+                and self.request_date_from
+                and self.request_date_to):
+            return
+        if not self._is_annual_leave(self):
+            return
+
+        ksw_rec = self._get_ksw_annual_rec(self.employee_id)
+        if not ksw_rec:
+            return
+
+        current = ksw_rec.x_opening_reset_date
+        # ``period_end`` is the vacation's end *as requested*; the caller
+        # passes it when the period has just been shortened to the return.
+        planned_return = (period_end or self.request_date_to) + timedelta(days=1)
+        if current and current == self.x_return_date:
+            # Already aligned — nothing to do and nothing to report.
+            return
+
+        if current and current > planned_return:
+            # A later settlement already governs the balance — never let an
+            # older vacation (or a late amendment to one) walk it back.
+            self.sudo().message_post(
+                body=Markup(
+                    '<strong>ℹ️ Balance Restart Date Unchanged</strong><br/>'
+                    '<b>Accrual restarts on:</b> %(current)s<br/>'
+                    '<b>Confirmed return date:</b> %(return_date)s<br/>'
+                    '<i>The restart date is later than this vacation, so it '
+                    'belongs to a more recent return and was left '
+                    'untouched.</i>'
+                ) % {
+                    'current': current,
+                    'return_date': self.x_return_date,
+                },
+                subtype_xmlid='mail.mt_note',
+            )
+            return
+
+        was_locked = ksw_rec.x_opening_is_locked
+        dropped = ksw_rec.x_opening_extra_days or 0.0
+
+        # This write() triggers _refresh_accrual(), which resyncs
+        # x_effective_start_date, total_accrued_days and the allocation.
+        # The context key lets it through the opening-data lock — see the
+        # docstring for why that is the right call here.
+        ksw_rec.sudo().with_context(
+            ksw_allow_locked_opening_write=True,
+        ).write({
+            'x_opening_reset_date': self.x_return_date,
+            'x_opening_extra_days': 0.0,
+        })
+
+        body = Markup(
+            '<strong>🔄 Accrual Restarted on the Confirmed Return</strong><br/>'
+            '<b>Was:</b> %(old)s<br/>'
+            '<b>Now:</b> %(new)s<br/>'
+            '<b>Remaining balance:</b> %(balance).4f days<br/>'
+            '<i>The vacation settles the entitlement, so the annual leave '
+            'balance now accrues from the confirmed return date.</i><br/>'
+        ) % {
+            'old': current or _('not set'),
+            'new': self.x_return_date,
+            'balance': ksw_rec.remaining_balance or 0.0,
+        }
+        if dropped:
+            body += Markup(
+                '<i>⚠️ %(dropped).4f carry-over day(s) were cleared by the '
+                'restart.</i><br/>'
+            ) % {'dropped': dropped}
+        if was_locked:
+            body += Markup(
+                '<i>⚠️ The balance record was locked; the restart date was '
+                'updated anyway because the direct manager confirmed this '
+                'return date.</i>'
+            )
+        self.sudo().message_post(body=body, subtype_xmlid='mail.mt_note')
 
     def action_confirm_return_manager(self):
         for leave in self:
@@ -1186,6 +1411,112 @@ class HrLeave(models.Model):
                 },
                 subtype_xmlid='mail.mt_note',
             )
+            # Shorten first, then restart the accrual: while the request
+            # still covers the days after the return it consumes the new
+            # allocation, and the shortening itself needs the old allocation
+            # to still cover the leave.
+            leave._apply_confirmed_return()
+
+    # ------------------------------------------------------------------
+    # Daily reminder: confirm the return
+    # ------------------------------------------------------------------
+
+    # Days past the expected return after which HR is copied on the
+    # reminder as well as the direct manager.
+    _RETURN_REMINDER_ESCALATE_DAYS = 7
+
+    @api.model
+    def _cron_return_confirmation_reminders(self, commit=True):
+        """Remind each direct manager to confirm an employee's return.
+
+        Only leaves still sitting in ``x_return_state = 'on_vacation'`` are
+        picked up, so a manager who already confirmed — including one who
+        confirmed an *early* return before the expected date — is never
+        reminded.  The reminder repeats daily until the return is confirmed,
+        because an unconfirmed return blocks that employee's monthly payslip.
+
+        ``commit`` is a cron progress checkpoint; tests pass False (Odoo
+        forbids committing from inside a test).
+        """
+        today = fields.Date.context_today(self)
+        leaves = self.sudo().search([
+            ('state', '=', 'validate'),
+            ('x_return_state', '=', 'on_vacation'),
+            ('holiday_status_id.is_annual_leave', '=', True),
+            ('request_date_to', '<', today),
+            '|', ('x_return_reminder_last_sent', '=', False),
+                 ('x_return_reminder_last_sent', '<', today),
+        ], order='request_date_to')
+
+        hr_group = self.env.ref(
+            'KSW_annual_leave.group_annual_leave_hr',
+            raise_if_not_found=False,
+        )
+        hr_partners = (
+            hr_group.user_ids.partner_id if hr_group
+            else self.env['res.partner']
+        )
+
+        sent = 0
+        for leave in leaves:
+            planned_return = leave.request_date_to + timedelta(days=1)
+            overdue = (today - planned_return).days
+
+            manager_partner = leave.employee_id.leave_manager_id.partner_id
+            escalated = (
+                overdue >= self._RETURN_REMINDER_ESCALATE_DAYS
+                or not manager_partner
+            )
+            partners = manager_partner
+            if escalated:
+                partners |= hr_partners
+            if not partners:
+                # Nobody to tell — don't burn the daily stamp on it.
+                continue
+
+            body = Markup(
+                '<strong>⏰ Return Confirmation Pending</strong><br/>'
+                '<b>Employee:</b> %(employee)s<br/>'
+                '<b>Vacation:</b> %(date_from)s → %(date_to)s<br/>'
+                '<b>Expected Return:</b> %(planned)s<br/>'
+                '<b>Days Overdue:</b> %(overdue)s<br/>'
+                '<i>Open this request, set <b>Return Date</b> to the date the '
+                'employee actually resumed work — it may be earlier than the '
+                'expected date — then click <b>Confirm Return</b>. The '
+                'employee\'s monthly payslip stays blocked until this is '
+                'confirmed.</i>'
+            ) % {
+                'employee': leave.employee_id.name,
+                'date_from': leave.request_date_from,
+                'date_to': leave.request_date_to,
+                'planned': planned_return,
+                'overdue': overdue,
+            }
+            if escalated:
+                body += Markup(
+                    '<br/><i>HR has been copied on this reminder%(reason)s.'
+                    '</i>'
+                ) % {
+                    'reason': (
+                        Markup(' because the employee has no Direct Manager set')
+                        if not manager_partner else Markup('')
+                    ),
+                }
+
+            leave.sudo().message_post(
+                body=body,
+                partner_ids=partners.ids,
+                subtype_xmlid='mail.mt_comment',
+            )
+            leave.sudo().write({
+                'x_return_reminder_last_sent': today,
+                'x_return_reminder_count': leave.x_return_reminder_count + 1,
+            })
+            sent += 1
+            if commit:
+                self.env.cr.commit()
+
+        return sent
 
     # ==================================================================
     # Multi-Step Approval: can_approve / can_validate overrides
@@ -1505,6 +1836,9 @@ class HrLeave(models.Model):
                 },
                 subtype_xmlid='mail.mt_note',
             )
+            # A corrected return date moves the covered period and the
+            # accrual restart with it.
+            leave._apply_confirmed_return()
 
         # Keep the multi-step chain in sync with the leave type. Runs AFTER
         # super() so holiday_status_id (and the stored relateds derived from
@@ -1848,12 +2182,9 @@ class HrLeave(models.Model):
 
     def action_gm_initial_approve(self):
         """Step 3: GM gives initial approval (read-only review)."""
-        self._check_group(
-            'KSW_annual_leave.group_annual_leave_gm',
-            'Only the General Manager can approve this step.',
-        )
         self._check_annual_approval_can_advance()
         for leave in self:
+            self._check_department_gm(leave)
             if leave.x_annual_approval_state != 'pending_gm_initial':
                 raise UserError(
                     'This leave is not pending GM initial approval.')
@@ -1932,12 +2263,9 @@ class HrLeave(models.Model):
         The final Odoo validation (state → validate) happens only after
         HR confirms the document upload in Step 6.
         """
-        self._check_group(
-            'KSW_annual_leave.group_annual_leave_gm',
-            'Only the General Manager can give final approval.',
-        )
         self._check_annual_approval_can_advance()
         for leave in self:
+            self._check_department_gm(leave)
             if leave.x_annual_approval_state != 'pending_gm_final':
                 raise UserError(
                     'This leave is not pending GM final approval.')
@@ -1975,10 +2303,7 @@ class HrLeave(models.Model):
         self.ensure_one()
         is_admin = self.env.su or self.env.user.has_group(SETTINGS_ADMIN_GROUP)
         if not is_admin:
-            if not self.env.user.has_group(
-                    'KSW_annual_leave.group_annual_leave_gm'):
-                raise UserError(
-                    'Only the General Manager can return a leave to an approver.')
+            self._check_department_gm(self)
             if self.x_annual_approval_state not in (
                     'pending_gm_initial', 'pending_gm_final'):
                 raise UserError(
@@ -2075,6 +2400,59 @@ class HrLeave(models.Model):
         if not self.env.user.has_group(group_xmlid):
             raise UserError(message)
 
+    # ------------------------------------------------------------------
+    # Department GM
+    # ------------------------------------------------------------------
+    #
+    # A group answers "may you act as a GM at all"; it can never answer
+    # "for whom". `_check_group` does not even iterate `self` -- it is
+    # blind to the record -- which is exactly how one GM group came to
+    # mean one GM over the whole company. The department carries the
+    # answer instead: `hr.department.x_effective_gm_id`, seeded to the
+    # sitting GM and editable per department.
+    #
+    # There is deliberately NO company-wide override here. A GM who is not
+    # named on a department cannot approve its requests, whoever he is.
+
+    @api.model
+    def _department_gm_user(self, leave):
+        """The user who must clear the GM steps for this request.
+
+        sudo() throughout: the acting user has no `hr.employee` model
+        access, so reading the requester's department is impossible in
+        their own right. This is an identity read, not a scope one --
+        the same reason `_manager_user_id` in KSW_deduction is sudo'd.
+        """
+        employee = leave.employee_id.sudo()
+        gm = employee.department_id.x_effective_gm_id
+        if not gm:
+            # No department at all -- 103 active employees are in that
+            # position -- so the company default is the only answer left.
+            gm = (leave.company_id or self.env.company).sudo().x_default_gm_id
+        return gm.sudo().user_id
+
+    def _check_department_gm(self, leave):
+        """Raise unless the caller is this request's department GM."""
+        if self.env.su:
+            return
+        gm_user = self._department_gm_user(leave)
+        if not gm_user:
+            raise UserError(_(
+                "No General Manager is set for %(dept)s, so this step "
+                "cannot be approved. Ask HR to set the department's "
+                "General Manager.",
+                dept=(leave.employee_id.sudo().department_id.display_name
+                      or _('this employee')),
+            ))
+        if self.env.user != gm_user:
+            raise UserError(_(
+                "Only %(gm)s, the General Manager of %(dept)s, can approve "
+                "this step.",
+                gm=gm_user.name,
+                dept=(leave.employee_id.sudo().department_id.display_name
+                      or _('this department')),
+            ))
+
     def _mark_attendance_sheet_leave_absent(self):
         """Mark remaining attended workday lines absent on draft attendance sheets.
 
@@ -2119,12 +2497,16 @@ class HrLeave(models.Model):
                 subtype_xmlid='mail.mt_note',
             )
 
+    # 'department_gm' marks the steps whose recipient is one named person
+    # derived from the request, not a whole group. Data-driven rather than a
+    # state-name test in the body, so a new GM-style step cannot be added
+    # without deciding how it routes.
     _ANNUAL_MULTI_STEP_CONFIG = {
         'pending_dm':                 {'label': 'Direct Manager Approval',  'group': None},
         'pending_hr':                 {'label': 'HR Approval',              'group': 'KSW_annual_leave.group_annual_leave_hr'},
-        'pending_gm_initial':         {'label': 'GM Initial Approval',      'group': 'KSW_annual_leave.group_annual_leave_gm'},
+        'pending_gm_initial':         {'label': 'GM Initial Approval',      'group': None, 'department_gm': True},
         'pending_acc':                {'label': 'Accounting Approval',      'group': 'KSW_annual_leave.group_annual_leave_acc'},
-        'pending_gm_final':           {'label': 'GM Final Approval',        'group': 'KSW_annual_leave.group_annual_leave_gm'},
+        'pending_gm_final':           {'label': 'GM Final Approval',        'group': None, 'department_gm': True},
         'pending_employee_signature': {'label': 'HR Confirmation',           'group': 'KSW_annual_leave.group_annual_leave_hr'},
     }
 
@@ -2137,6 +2519,12 @@ class HrLeave(models.Model):
         if pending_state == 'pending_dm':
             dm_user = leave.employee_id.leave_manager_id  # res.users
             partner_ids = [dm_user.partner_id.id] if dm_user and dm_user.partner_id else []
+        elif config.get('department_gm'):
+            gm_user = self._department_gm_user(leave)
+            partner_ids = (
+                [gm_user.partner_id.id]
+                if gm_user and gm_user.partner_id else []
+            )
         else:
             group = self.env.ref(config['group'], raise_if_not_found=False)
             partner_ids = group.user_ids.mapped('partner_id').ids if group else []
@@ -2259,6 +2647,8 @@ class HrLeave(models.Model):
                 'x_manager_return_date': False,
                 'x_hr_return_confirmed_by': False,
                 'x_hr_return_date': False,
+                'x_return_reminder_last_sent': False,
+                'x_return_reminder_count': 0,
             })
 
         # A *targeted* return (the admin wizard picking a specific step) keeps
@@ -2308,6 +2698,8 @@ class HrLeave(models.Model):
                 'x_manager_return_date': False,
                 'x_hr_return_confirmed_by': False,
                 'x_hr_return_date': False,
+                'x_return_reminder_last_sent': False,
+                'x_return_reminder_count': 0,
             })
 
         if annual_multi:

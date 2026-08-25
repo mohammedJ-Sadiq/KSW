@@ -17,6 +17,18 @@ class TestPeriodLock(TransactionCase):
         env = cls.env
         cls.period = '2028-10-01'
         cls.dept = env['hr.department'].create({'name': 'Lock Dept'})
+        # Approval and reopening both key on a GM now: the department's own
+        # for approving, the company's for reopening and locking. One person
+        # holds both here, which is the shape these lock tests assume.
+        cls.gm = env['res.users'].sudo().create({
+            'name': 'lock_dept_gm', 'login': 'lock_dept_gm',
+            'group_ids': [(6, 0, [env.ref('base.group_user').id])],
+        })
+        cls.gm_employee = env['hr.employee'].sudo().create({
+            'name': 'Lock GM Emp', 'user_id': cls.gm.id})
+        cls.dept.sudo().write({'x_gm_id': cls.gm_employee.id})
+        env.company.sudo().x_default_gm_id = cls.gm_employee.id
+
         cls.emp = env['hr.employee'].sudo().create({
             'name': 'Lock Emp', 'department_id': cls.dept.id,
         })
@@ -59,7 +71,9 @@ class TestPeriodLock(TransactionCase):
         self._entry(batch)
         batch.submission_id.sudo().action_submit()
         run = batch.submission_id.run_id
-        run.action_approve()
+        # Approve as the department's GM: approval is per department now, so
+        # the acting user has to be one.
+        run.with_user(self.gm).sudo().action_approve()
         return run, batch
 
     # ------------------------------------------------------------------
@@ -162,13 +176,8 @@ class TestPeriodLock(TransactionCase):
         self.assertEqual(batch.note, 'fine now')
 
     def test_12_gm_is_not_blocked_by_the_lock(self):
-        gm = self.env['res.users'].sudo().create({
-            'name': 'lock_gm', 'login': 'lock_gm',
-            'group_ids': [(6, 0, [
-                self.env.ref('base.group_user').id,
-                self.env.ref('KSW_commissions.group_commission_gm').id,
-            ])],
-        })
+        # self.gm is the department's GM, which is what grants the reach —
+        # holding group_commission_gm on its own no longer does.
         _run, batch = self._lock_the_period()
-        batch.with_user(gm).write({'note': 'GM correction'})
+        batch.with_user(self.gm).write({'note': 'GM correction'})
         self.assertEqual(batch.note, 'GM correction')

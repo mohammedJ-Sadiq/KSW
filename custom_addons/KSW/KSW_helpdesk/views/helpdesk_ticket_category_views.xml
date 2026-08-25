@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="helpdesk_ticket_category_view_list" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.category.list</field>
+        <field name="model">helpdesk.ticket.category</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" default_group_by="ticket_type">
+                <field name="ticket_type" widget="badge"/>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="icon"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="helpdesk_ticket_category_view_form" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.category.form</field>
+        <field name="model">helpdesk.ticket.category</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="ticket_type" widget="radio"/>
+                        <field name="icon" placeholder="fa-question-circle"/>
+                        <field name="color" widget="color_picker"/>
+                        <field name="active" invisible="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="helpdesk_ticket_category_view_search" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.category.search</field>
+        <field name="model">helpdesk.ticket.category</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <filter string="Incident" name="incident" domain="[('ticket_type', '=', 'incident')]"/>
+                <filter string="Service Request" name="request" domain="[('ticket_type', '=', 'request')]"/>
+                <group>
+                    <filter string="Ticket Type" name="group_type" context="{'group_by': 'ticket_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="helpdesk_ticket_category_action" model="ir.actions.act_window">
+        <field name="name">Categories</field>
+        <field name="res_model">helpdesk.ticket.category</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_group_type': 1}</field>
+    </record>
+
+</odoo>

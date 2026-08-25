@@ -1261,10 +1261,7 @@ class KswDeduction(models.Model):
         The Loan Disbursement Officer triggers generation in the next step.
         """
         self._check_loan()
-        if not self.env.su and not self.env.user.has_group(
-            'KSW_deduction.group_loan_gm'
-        ):
-            raise UserError(_('Only GM Final Approvers can approve at the GM step.'))
+        self._check_department_gm()
         for rec in self:
             if rec.approval_state != 'pending_gm':
                 raise UserError(_("Not pending GM final approval."))
@@ -1454,10 +1451,9 @@ class KswDeduction(models.Model):
                     "Only Accounting Approvers can refuse at the "
                     "Accounting step."))
         elif step == 'pending_gm':
-            if not user.has_group('KSW_deduction.group_loan_gm'):
-                raise UserError(_(
-                    "Only GM Final Approvers can refuse at the GM "
-                    "step."))
+            # Refusing is as much an act of authority as approving, and it is
+            # the same authority: this department's GM, not any GM.
+            self._check_department_gm()
         else:
             raise UserError(_("Invalid refusal step."))
 
@@ -1498,9 +1494,12 @@ class KswDeduction(models.Model):
         'pending_acc': {
             'label': 'Accounting Approval',
             'group': 'KSW_deduction.group_loan_acc'},
+        # 'department_gm': one named person derived from the request, not a
+        # group. Data-driven so a new GM-style step cannot be added without
+        # deciding how it routes.
         'pending_gm': {
             'label': 'GM Final Approval',
-            'group': 'KSW_deduction.group_loan_gm'},
+            'group': None, 'department_gm': True},
         'pending_disbursement': {
             'label': 'Disbursement Confirmation',
             'group': 'KSW_deduction.group_loan_disbursement'},
@@ -1532,6 +1531,12 @@ class KswDeduction(models.Model):
                     'KSW_deduction.group_deduction_officer',
                     raise_if_not_found=False)
                 partner_ids = group.user_ids.partner_id.ids if group else []
+        elif config.get('department_gm'):
+            gm_user = self._department_gm_user()
+            partner_ids = (
+                [gm_user.partner_id.id]
+                if gm_user and gm_user.partner_id else []
+            )
         else:
             group = self.env.ref(config['group'], raise_if_not_found=False)
             partner_ids = group.user_ids.partner_id.ids if group else []
@@ -1800,16 +1805,19 @@ class KswDeduction(models.Model):
     )
 
     @api.depends_context('uid')
-    @api.depends('is_loan', 'approval_state')
+    @api.depends('is_loan', 'approval_state', 'employee_id',
+                 'employee_id.department_id.x_effective_gm_id')
     def _compute_return_role_gates(self):
-        is_gm = self.env.user.has_group('KSW_deduction.group_loan_gm')
-        is_admin = self.env.su or self.env.user.has_group(
+        user = self.env.user
+        is_admin = self.env.su or user.has_group(
             'KSW_deduction.group_deduction_manager')
         wizard = self.env['ksw.loan.return.approver.wizard']
         for rec in self:
             has_id = bool(rec.id)
             rec.x_can_gm_return = (
-                is_gm and rec.approval_state == 'pending_gm' and has_id)
+                has_id
+                and rec.approval_state == 'pending_gm'
+                and rec._department_gm_user() == user)
             # The Deduction Manager may return a request from any state it
             # has reached — but only where there is somewhere earlier to
             # send it back to. A request still at the first step has no
@@ -1854,7 +1862,8 @@ class KswDeduction(models.Model):
 
     @api.depends_context('uid')
     @api.depends('approval_state', 'employee_id',
-                 'employee_id.parent_id.user_id')
+                 'employee_id.parent_id.user_id',
+                 'employee_id.department_id.x_effective_gm_id')
     def _compute_is_pending_my_action(self):
         """True when the current loan approval step requires the current
         user's action. Backs the "Waiting For Me" search filter.
@@ -1867,7 +1876,6 @@ class KswDeduction(models.Model):
         is_officer = user.has_group('KSW_deduction.group_deduction_officer')
         is_hr = user.has_group('KSW_deduction.group_loan_hr')
         is_acc = user.has_group('KSW_deduction.group_loan_acc')
-        is_gm = user.has_group('KSW_deduction.group_loan_gm')
         is_disb = user.has_group('KSW_deduction.group_loan_disbursement')
         for rec in self:
             s = rec.approval_state
@@ -1884,7 +1892,8 @@ class KswDeduction(models.Model):
             elif s == 'pending_acc':
                 rec.x_is_pending_my_action = is_acc
             elif s == 'pending_gm':
-                rec.x_is_pending_my_action = is_gm
+                rec.x_is_pending_my_action = (
+                    rec._department_gm_user() == user)
             elif s == 'pending_disbursement':
                 rec.x_is_pending_my_action = is_disb
             else:
@@ -1912,6 +1921,12 @@ class KswDeduction(models.Model):
             # DM step: current user is the employee's direct manager
             [('approval_state', '=', 'pending_dm'),
              ('employee_id.parent_id.user_id', '=', uid)],
+            # GM step: not "am I a GM" but "am I THIS department's GM".
+            # No group gate — being named on the department is the whole
+            # qualification, and x_effective_gm_id is stored so this stays
+            # one join rather than a Python-built id list.
+            [('approval_state', '=', 'pending_gm'),
+             ('employee_id.department_id.x_effective_gm_id.user_id', '=', uid)],
         ]
         if user.has_group('KSW_deduction.group_deduction_officer'):
             # Officer fallback when no manager user is configured —
@@ -1927,7 +1942,6 @@ class KswDeduction(models.Model):
         for group_xmlid, state in (
             ('KSW_deduction.group_loan_hr', 'pending_hr'),
             ('KSW_deduction.group_loan_acc', 'pending_acc'),
-            ('KSW_deduction.group_loan_gm', 'pending_gm'),
             ('KSW_deduction.group_loan_disbursement', 'pending_disbursement'),
         ):
             if user.has_group(group_xmlid):
@@ -1988,6 +2002,49 @@ class KswDeduction(models.Model):
         there is no manager, or the manager has no user account)."""
         self.ensure_one()
         return self.employee_id.sudo().parent_id.user_id.id or 0
+
+    # ------------------------------------------------------------------
+    # Department GM (loan chain)
+    # ------------------------------------------------------------------
+    #
+    # `group_loan_gm` says whether you may act as a GM at all; it cannot say
+    # for whom, because `has_group` never sees the record. The department
+    # carries that: `hr.department.x_effective_gm_id`, which already folds in
+    # the parent-department climb and the company default. Same predicate as
+    # the leave chain (KSW_annual_leave.hr_leave._department_gm_user), and
+    # sudo() for the same reason as `_manager_user_id` above -- identity is
+    # not confidential data, and an approver has no hr.employee scope of his
+    # own.
+
+    def _department_gm_user(self):
+        """The user who must clear the GM step for this request."""
+        self.ensure_one()
+        employee = self.employee_id.sudo()
+        gm = employee.department_id.x_effective_gm_id
+        if not gm:
+            # ksw.deduction carries no company_id of its own — the employee's
+            # is the only one available, and the env's is the fallback.
+            gm = (employee.company_id or self.env.company).sudo().x_default_gm_id
+        return gm.sudo().user_id
+
+    def _check_department_gm(self):
+        """Raise unless the caller is this request's department GM."""
+        if self.env.su:
+            return
+        for rec in self:
+            gm_user = rec._department_gm_user()
+            dept = (rec.employee_id.sudo().department_id.display_name
+                    or _('this department'))
+            if not gm_user:
+                raise UserError(_(
+                    "No General Manager is set for %(dept)s, so this step "
+                    "cannot be approved. Ask HR to set the department's "
+                    "General Manager.", dept=dept))
+            if self.env.user != gm_user:
+                raise UserError(_(
+                    "Only %(gm)s, the General Manager of %(dept)s, can act "
+                    "at the GM step of this request.",
+                    gm=gm_user.name, dept=dept))
 
     # ==================================================================
     # Employee self-service (own request, before the first approval)

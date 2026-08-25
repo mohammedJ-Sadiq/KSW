@@ -184,6 +184,54 @@
         groups="KSW_attendance_sheet.group_attendance_sheet_supervisor"
         sequence="30"/>
 
+    <!-- ============================================================ -->
+    <!-- Pivot + Graph (dashboard data source)                        -->
+    <!-- ============================================================ -->
+    <record id="ksw_attendance_sheet_view_pivot" model="ir.ui.view">
+        <field name="name">ksw.attendance.sheet.pivot</field>
+        <field name="model">ksw.attendance.sheet</field>
+        <field name="arch" type="xml">
+            <pivot string="Attendance Sheets" sample="1">
+                <field name="department_id" type="row"/>
+                <field name="month" type="col"/>
+                <field name="total_absent" type="measure"/>
+                <field name="total_attended" type="measure"/>
+                <field name="total_days" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="ksw_attendance_sheet_view_graph" model="ir.ui.view">
+        <field name="name">ksw.attendance.sheet.graph</field>
+        <field name="model">ksw.attendance.sheet</field>
+        <field name="arch" type="xml">
+            <graph string="Attendance Sheets" type="line" sample="1">
+                <field name="month"/>
+                <field name="total_absent" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_ksw_attendance_sheet_overview" model="ir.actions.act_window">
+        <field name="name">Attendance Overview</field>
+        <field name="res_model">ksw.attendance.sheet</field>
+        <field name="view_mode">pivot,graph,list,form</field>
+    </record>
+
+    <record id="action_ksw_attendance_sheet_overview_view_pivot" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="ksw_attendance_sheet_view_pivot"/>
+        <field name="act_window_id" ref="action_ksw_attendance_sheet_overview"/>
+    </record>
+
+    <record id="action_ksw_attendance_sheet_overview_view_graph" model="ir.actions.act_window.view">
+        <field name="sequence">2</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="ksw_attendance_sheet_view_graph"/>
+        <field name="act_window_id" ref="action_ksw_attendance_sheet_overview"/>
+    </record>
+
 </odoo>
 
 

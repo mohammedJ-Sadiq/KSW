@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="it_asset_assign_wizard_view_form" model="ir.ui.view">
+        <field name="name">it.asset.assign.wizard.form</field>
+        <field name="model">it.asset.assign.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Assign Asset">
+                <group>
+                    <field name="asset_id" invisible="1"/>
+                    <field name="employee_id" options="{'no_create': True}"/>
+                    <field name="date_assigned"/>
+                    <field name="condition_out"/>
+                    <field name="notes"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" type="object" string="Assign"
+                            class="btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

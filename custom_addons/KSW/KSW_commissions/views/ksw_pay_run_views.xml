@@ -10,7 +10,9 @@
                 <field name="x_can_submit" invisible="1"/>
                 <field name="x_can_submit_mine" invisible="1"/>
                 <field name="x_can_approve" invisible="1"/>
+                <field name="x_can_close_month" invisible="1"/>
                 <field name="x_can_reopen" invisible="1"/>
+                <field name="x_gm_submission_ids" invisible="1"/>
                 <field name="x_can_export" invisible="1"/>
                 <field name="pending_department_count" invisible="1"/>
                 <field name="submitted_department_count" invisible="1"/>
@@ -30,11 +32,23 @@
                             type="object" class="btn-secondary"
                             groups="KSW_commissions.group_commission_supervisor"
                             invisible="x_can_submit_mine or not x_my_submission_ids"/>
-                    <button name="action_approve" string="Approve"
+                    <!-- No groups= filter: x_can_approve already answers
+                         "have I got departments waiting", and a coarser
+                         groups= would have to be a superset of what the
+                         compute can grant or the field goes missing from
+                         fields_get() and the client crashes (gotcha #31). -->
+                    <button name="action_approve" string="Approve My Departments"
                             type="object" class="btn-primary"
-                            groups="KSW_commissions.group_commission_gm"
-                            confirm="Approving builds the payment register, settles the parked loan installments and locks the month. Continue?"
+                            confirm="Approve the departments you are General Manager of? The month locks itself once no department is left waiting."
                             invisible="not x_can_approve"/>
+                    <!-- Distinct from "Close the Month" (action_submit)
+                         below, which only marks the handover complete. This
+                         one builds the register and locks the period. -->
+                    <button name="action_close_month" string="Lock the Month Now"
+                            type="object" class="btn-secondary"
+                            confirm="Lock the month now? Departments still waiting on their General Manager will NOT be paid this month."
+                            invisible="not x_can_close_month"
+                            title="Lock the month even though some departments have not been approved by their General Manager"/>
                     <button name="action_submit" string="Close the Month"
                             type="object" class="btn-secondary"
                             groups="KSW_commissions.group_commission_officer"
@@ -51,7 +65,6 @@
                             invisible="state != 'approved'"/>
                     <button name="action_reopen" string="Reopen"
                             type="object" class="btn-secondary"
-                            groups="KSW_commissions.group_commission_gm"
                             confirm="Reopening discards the payment register and returns the settled loan installments to pending. Continue?"
                             invisible="not x_can_reopen"/>
                     <statusbar statusfield="state"

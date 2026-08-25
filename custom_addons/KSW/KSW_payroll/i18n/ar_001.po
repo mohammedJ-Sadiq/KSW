@@ -1547,3 +1547,13 @@ msgstr "تفاصيل حسب فئات قواعد الراتب"
 #: model:ir.model.fields,field_description:om_hr_payroll.field_hr_salary_rule__parent_rule_id
 msgid "Parent Salary Rule"
 msgstr "قاعدة الراتب الأصل"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.view_hr_payslip_filter_inherit_ksw
+msgid "Hide Rejected"
+msgstr "إخفاء المرفوضة"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.view_hr_payslip_filter_inherit_ksw
+msgid "Hide rejected / cancelled payslips"
+msgstr "إخفاء كشوف الراتب المرفوضة أو الملغاة"

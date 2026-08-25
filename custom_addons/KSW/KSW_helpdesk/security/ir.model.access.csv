@@ -1,0 +1,14 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_helpdesk_ticket_stage_user,helpdesk.ticket.stage.user,model_helpdesk_ticket_stage,base.group_user,1,0,0,0
+access_helpdesk_ticket_stage_agent,helpdesk.ticket.stage.agent,model_helpdesk_ticket_stage,group_helpdesk_agent,1,1,1,1
+access_helpdesk_ticket_category_user,helpdesk.ticket.category.user,model_helpdesk_ticket_category,base.group_user,1,0,0,0
+access_helpdesk_ticket_category_agent,helpdesk.ticket.category.agent,model_helpdesk_ticket_category,group_helpdesk_agent,1,1,1,1
+access_helpdesk_ticket_user,helpdesk.ticket.user,model_helpdesk_ticket,group_helpdesk_user,1,1,1,0
+access_helpdesk_ticket_agent,helpdesk.ticket.agent,model_helpdesk_ticket,group_helpdesk_agent,1,1,1,1
+access_it_asset_category_agent,it.asset.category.agent,model_it_asset_category,group_helpdesk_agent,1,1,1,1
+access_it_asset_user,it.asset.user,model_it_asset,group_helpdesk_user,1,0,0,0
+access_it_asset_agent,it.asset.agent,model_it_asset,group_helpdesk_agent,1,1,1,1
+access_it_asset_assignment_agent,it.asset.assignment.agent,model_it_asset_assignment,group_helpdesk_agent,1,1,1,1
+access_it_asset_maintenance_agent,it.asset.maintenance.agent,model_it_asset_maintenance,group_helpdesk_agent,1,1,1,1
+access_it_asset_assign_wizard,it.asset.assign.wizard,model_it_asset_assign_wizard,group_helpdesk_agent,1,1,1,1
+access_it_asset_return_wizard,it.asset.return.wizard,model_it_asset_return_wizard,group_helpdesk_agent,1,1,1,1

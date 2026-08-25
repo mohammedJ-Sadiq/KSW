@@ -154,10 +154,7 @@ class TestKswWorkshopRequest(TransactionCase):
     def test_manager_can_also_edit_report_while_in_progress(self):
         request = self._make_request(employee_user=self.user_employee)
         request.with_user(self.user_manager).action_start()
-        request.with_user(self.user_manager).write({'parts_extra_cost': 250.0})
-        self.assertEqual(request.parts_extra_cost, 250.0)
-        # parts_cost is now a computed total (part_lines_cost + parts_extra_cost);
-        # with no part lines on this request, it should equal the manual figure.
+        request.with_user(self.user_manager).write({'parts_cost': 250.0})
         self.assertEqual(request.parts_cost, 250.0)
 
     # ------------------------------------------------------------------

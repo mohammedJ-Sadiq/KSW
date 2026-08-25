@@ -13,6 +13,7 @@ matter your department. You only ever see and act on your **own** records.
 | Request annual, sick, unpaid or other leave | [Request time off](02-request-time-off.md) |
 | Ask for a loan and track its approval | [Request a loan](03-request-a-loan.md) |
 | View and download my payslip | [View my payslip](04-view-payslip.md) |
+| Report an IT problem or ask IT for something | [Raise an IT support ticket](05-raise-support-ticket.md) |
 
 ## The golden rules
 

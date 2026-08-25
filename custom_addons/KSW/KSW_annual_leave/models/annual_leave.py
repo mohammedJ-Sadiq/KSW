@@ -113,7 +113,15 @@ class KswAnnualLeave(models.Model):
     # ------------------------------------------------------------------
     def write(self, vals):
         opening_keys = {'x_opening_reset_date', 'x_opening_extra_days'}
-        if opening_keys & vals.keys():
+        # The lock guards against accidental *manual* edits to the go-live
+        # figures. hr.leave._sync_opening_reset_to_return sets this key to
+        # realign the restart date onto a return the direct manager
+        # explicitly confirmed, which is not an accidental edit — and 75% of
+        # these records are locked, so honouring it there would make the
+        # realignment a no-op for most employees. The override is recorded
+        # in the leave's chatter.
+        allow_locked = self.env.context.get('ksw_allow_locked_opening_write')
+        if opening_keys & vals.keys() and not allow_locked:
             for rec in self:
                 if rec.x_opening_is_locked:
                     raise UserError(

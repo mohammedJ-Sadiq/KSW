@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1">
+
+    <record id="seq_helpdesk_ticket_incident" model="ir.sequence">
+        <field name="name">Helpdesk Ticket - Incident</field>
+        <field name="code">helpdesk.ticket.incident</field>
+        <field name="prefix">INC</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_helpdesk_ticket_request" model="ir.sequence">
+        <field name="name">Helpdesk Ticket - Service Request</field>
+        <field name="code">helpdesk.ticket.request</field>
+        <field name="prefix">REQ</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_it_asset" model="ir.sequence">
+        <field name="name">IT Asset Tag</field>
+        <field name="code">it.asset</field>
+        <field name="prefix">IT/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,1112 @@
+<!doctype html><html lang="en" dir="ltr"><head>
+<meta charset="utf-8"><title>IT Team Guide</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "DejaVu Sans",Arial,sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: left; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-left: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">IT Team Guide</div>
+  <div class="meta">User Training Guide<br/>KSW HR &amp; Payroll · 2026-08-24</div>
+</div>
+<section id="g-it-readme"><h1>IT Team Guides</h1>
+<p>For the <strong>IT Team</strong> — the people who receive, triage and resolve support
+tickets, and who own the IT asset register.</p>
+<blockquote>
+<p>First time in the system? Read the <strong>General guide</strong>
+(<span class="xref">Getting Started</span>) first.</p>
+</blockquote>
+<h2>What you can do</h2>
+<table>
+<thead>
+<tr>
+<th>I want to…</th>
+<th>Guide</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Triage the incoming queue, assign and prioritise tickets</td>
+<td><a href="#g-it-01-ticket-queue">Working the ticket queue</a></td>
+</tr>
+<tr>
+<td>Work a ticket, close it, reopen it</td>
+<td><a href="#g-it-02-resolve-and-close">Resolving and closing a ticket</a></td>
+</tr>
+<tr>
+<td>Register laptops, phones and other equipment</td>
+<td><a href="#g-it-03-asset-register">The IT asset register</a></td>
+</tr>
+<tr>
+<td>Hand a device to an employee and take it back</td>
+<td><a href="#g-it-04-assign-and-return-assets">Assigning and returning assets</a></td>
+</tr>
+<tr>
+<td>Send equipment for repair, write off losses, track warranties</td>
+<td><a href="#g-it-05-maintenance-and-warranty">Maintenance, loss and warranty</a></td>
+</tr>
+<tr>
+<td>See what we solved, and how fast</td>
+<td><a href="#g-it-06-reporting-and-history">Reporting and ticket history</a></td>
+</tr>
+<tr>
+<td>Change the stages, categories and asset categories</td>
+<td><a href="#g-it-07-configuration">Configuration</a></td>
+</tr>
+</tbody></table>
+<h2>How the app is laid out</h2>
+<table>
+<thead>
+<tr>
+<th>Menu</th>
+<th>Who sees it</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>My Tickets</strong></td>
+<td>Everyone — your own tickets, like any employee</td>
+</tr>
+<tr>
+<td><strong>All Tickets</strong></td>
+<td>IT Team — the queue, as a kanban board</td>
+</tr>
+<tr>
+<td><strong>Ticket History</strong></td>
+<td>IT Team — every closed ticket</td>
+</tr>
+<tr>
+<td><strong>Reporting</strong></td>
+<td>IT Team — volume, mix and resolution time</td>
+</tr>
+<tr>
+<td><strong>Assets → Assets / Assignments / Maintenance</strong></td>
+<td>IT Team only</td>
+</tr>
+<tr>
+<td><strong>Configuration → Ticket Stages / Ticket Categories / Asset Categories</strong></td>
+<td>IT Team only</td>
+</tr>
+</tbody></table>
+<h2>The golden rules</h2>
+<ul>
+<li><strong>Two kinds of ticket, and the kind is permanent.</strong> An <strong>Incident</strong> is
+something broken (<code>INC…</code>); a <strong>Service Request</strong> is something needed
+(<code>REQ…</code>). It sets the ticket number and cannot be changed afterwards.</li>
+<li><strong>The ticket is the record.</strong> A phone call that isn&#39;t written on the ticket
+did not happen. Post with <strong>External</strong> to talk to the employee, <strong>Note</strong> for
+internal record-keeping.</li>
+<li><strong>Only the IT Team moves a ticket.</strong> Stage, assignee and the blocked/ready
+marker are yours; employees can see them but never set them.</li>
+<li><strong>Assets are IT-only, and custody is a workflow.</strong> Never type into
+<strong>Assigned To</strong> — hand over and take back through <strong>Assign to Employee</strong> and
+<strong>Return</strong>, so the history stays true.</li>
+<li><strong>Close tickets when the work ends.</strong> Resolution time is measured from
+creation to closing, and every report is built on it.</li>
+</ul>
+</section>
+<section id="g-it-01-ticket-queue"><h1>Working the Ticket Queue</h1>
+<p><strong>Who is this for:</strong> IT Team
+<strong>How long it takes:</strong> a few minutes per triage round</p>
+<h2>What this does</h2>
+<p>The queue is the IT team&#39;s single inbox. Everything employees report — from
+every department — lands here in the <strong>New</strong> stage, and triage is the act of
+turning that pile into work: what is it, how urgent is it, who owns it, and
+when is it due.</p>
+<h2>Before you start</h2>
+<ul>
+<li>You need the <strong>IT Team</strong> role. It is the only helpdesk role besides the
+ordinary employee one, and it gives you everything: every ticket, the asset
+register, and the configuration menus.</li>
+<li>Employees see only their own tickets (and their direct reports&#39;). You see all
+of them.</li>
+</ul>
+<h2>The board</h2>
+<p>Open <strong>Helpdesk → All Tickets</strong>. It opens as a kanban board, grouped by stage,
+already filtered to <strong>Open</strong> tickets.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/it/queue-01.png" alt="All Tickets board"></p>
+<p>The four stages are:</p>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>New</strong></td>
+<td>Nobody has picked it up yet</td>
+</tr>
+<tr>
+<td><strong>In Progress</strong></td>
+<td>Being worked on</td>
+</tr>
+<tr>
+<td><strong>On Hold</strong></td>
+<td>Parked — waiting for a part, a vendor, a budget approval</td>
+</tr>
+<tr>
+<td><strong>Closed</strong></td>
+<td>Resolved. Folds away on the board</td>
+</tr>
+</tbody></table>
+<p>Each card carries everything you need to triage at a glance: the ticket number
+badged <strong>red for an Incident</strong> and <strong>blue for a Service Request</strong>, the short
+description, the stage and category, an <strong>Overdue</strong> badge if the deadline has
+passed, the priority stars, and the assignee&#39;s avatar.</p>
+<p><strong>Drag a card to another stage</strong> to move it — as IT Team you can; employees see
+the same board read-only.</p>
+<h2>Steps — triaging a new ticket</h2>
+<ol>
+<li><p><strong>Open the ticket</strong> from the <strong>New</strong> column.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/it/ticket-01.png" alt="Ticket form"></p>
+</li>
+<li><p><strong>Read the Caller panel</strong> on the left — job title, department, email, work
+phone and mobile, pulled live from the employee record. That is who you call.</p>
+</li>
+<li><p><strong>Check the kind and category.</strong> Employees often file a service request as an
+incident. The category you can correct; the <strong>kind is fixed</strong> (it set the
+ticket number), so if it is badly wrong, close it with a note and ask for a
+new one.</p>
+</li>
+<li><p><strong>Set the Priority.</strong> Stars on the form, or straight from the card.</p>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Use it for</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Urgent</strong></td>
+<td>Work is stopped for a person or a team right now</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td>Significant impact, a workaround exists</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td>Normal — the default</td>
+</tr>
+<tr>
+<td><strong>Low</strong></td>
+<td>Nice to have, no impact</td>
+</tr>
+</tbody></table>
+</li>
+<li><p><strong>Take it — or give it.</strong> Click <strong>Assign to Me</strong> in the header, or set
+<strong>Assigned To</strong> to another team member. Only IT Team members can be assigned;
+the field will not accept anyone else. The moment someone is assigned, they
+start following the ticket and are notified of every message on it.</p>
+</li>
+<li><p><strong>Set a Deadline</strong> if the ticket has one. Once that date passes and the ticket
+is still open, it turns red in the list, gets an <strong>Overdue</strong> badge on the
+card and an <strong>Overdue</strong> ribbon on the form, and can be pulled up with the
+<strong>Overdue</strong> filter. Deadlines also show on the <strong>Calendar</strong> view of the
+queue.</p>
+</li>
+<li><p><strong>Move it to In Progress</strong> — click the stage in the status bar at the top of
+the form, or drag the card.</p>
+</li>
+</ol>
+<h2>Finding things fast</h2>
+<p>The search panel gives you the filters triage actually needs:</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/it/queue-02.png" alt="Filters"></p>
+<ul>
+<li><strong>Assigned to Me</strong> — your own workload</li>
+<li><strong>Unassigned</strong> — the triage pile: what nobody owns yet</li>
+<li><strong>Incidents</strong> / <strong>Service Requests</strong> — split the two kinds</li>
+<li><strong>Open</strong> / <strong>Closed</strong> / <strong>Overdue</strong></li>
+<li><strong>High Priority</strong> — High and Urgent together</li>
+<li>Group by <strong>Stage</strong>, <strong>Type</strong>, <strong>Category</strong>, <strong>Assigned To</strong> or <strong>Priority</strong></li>
+</ul>
+<p>Typing in the search box matches the <strong>ticket number, the title and the
+description</strong> at once, so <code>INC00042</code>, <code>printer</code> and a phrase from the body all
+work.</p>
+<h2>The blocked / ready marker</h2>
+<p>Separately from the stage, each ticket carries a small three-state marker
+(<strong>In Progress</strong>, <strong>Blocked</strong>, <strong>Ready</strong>) — the coloured dot on the card, the
+radio buttons on the form. Use it to say <em>why</em> a ticket is sitting still:</p>
+<ul>
+<li><strong>Blocked</strong> — you are waiting on someone: the employee, a vendor, a budget.
+Say who in a message so the ticket explains itself.</li>
+<li><strong>Ready</strong> — the work is done and it is waiting only for confirmation or
+hand-over.</li>
+</ul>
+<p>Employees see the marker but cannot set it.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>&quot;Tickets can only be assigned to an IT Helpdesk agent or manager&quot;</td>
+<td>The chosen user isn&#39;t in the <strong>IT Team</strong> group</td>
+<td>Add them to IT Team first (<strong>Settings → Users</strong>), or pick someone else</td>
+</tr>
+<tr>
+<td>A colleague can&#39;t drag cards</td>
+<td>They are not in the IT Team group</td>
+<td>Only IT Team may change stage, assignee and the blocked/ready marker</td>
+</tr>
+<tr>
+<td>The board looks empty</td>
+<td>The action opens filtered to <strong>Open</strong></td>
+<td>Remove the <strong>Open</strong> filter, or use <strong>Ticket History</strong> for closed ones</td>
+</tr>
+<tr>
+<td>The category is wrong for the kind</td>
+<td>Categories belong to one kind</td>
+<td>Correct the category; the kind itself cannot be changed after creation</td>
+</tr>
+<tr>
+<td>A ticket shows no caller details</td>
+<td>The employee record has no contact details</td>
+<td>Complete the employee record in HR</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-it-02-resolve-and-close">Resolving and closing a ticket</a></li>
+<li><a href="#g-it-06-reporting-and-history">Reporting and ticket history</a></li>
+<li><a href="#g-it-07-configuration">Configuring stages and categories</a></li>
+</ul>
+</section>
+<section id="g-it-02-resolve-and-close"><h1>Resolving and Closing a Ticket</h1>
+<p><strong>Who is this for:</strong> IT Team
+<strong>How long it takes:</strong> 1 minute to close, once the work is done</p>
+<h2>What this does</h2>
+<p>Takes a ticket from &quot;assigned to me&quot; to a clean, closed record: the
+conversation kept on the ticket, the fix documented, the closing stamped with
+the date and your name, and the employee invited to rate the result.</p>
+<h2>Before you start</h2>
+<ul>
+<li>The ticket should be <strong>assigned to you</strong> (or you are closing on behalf of the
+team). Use <strong>Assign to Me</strong> if it is still unassigned.</li>
+<li>Anything you did outside the system — a phone call, a visit to the desk, a
+part ordered — belongs in the ticket as a message. The ticket is the record.</li>
+</ul>
+<h2>Steps</h2>
+<ol>
+<li><p><strong>Work the ticket in the message box at the bottom</strong> (the chatter). Which
+button you use decides who hears about it:</p>
+<table>
+<thead>
+<tr>
+<th>Button</th>
+<th>Who is notified</th>
+<th>Use it for</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>External</strong></td>
+<td>Everyone following the ticket — whoever raised it, and the assigned agent</td>
+<td>Questions to the employee, progress updates, &quot;please try this and tell me&quot;</td>
+</tr>
+<tr>
+<td><strong>Internal</strong></td>
+<td>The internal followers only</td>
+<td>Handing over to a colleague, asking a teammate to look</td>
+</tr>
+<tr>
+<td><strong>Note</strong></td>
+<td>Nobody</td>
+<td>Diagnostics, part numbers, serials, what you tried — the written record</td>
+</tr>
+<tr>
+<td><strong>Activity</strong></td>
+<td>The person you assign it to</td>
+<td>Scheduling a follow-up: &quot;call back Sunday&quot;, &quot;chase the vendor&quot;</td>
+</tr>
+</tbody></table>
+<p>Attach screenshots, photos or logs to any of them.</p>
+<blockquote>
+<p><strong>Who is actually following?</strong> The person who created the ticket and the
+assigned agent. If a supervisor raised the ticket for someone else, the
+employee themself is <strong>not</strong> a follower — add them with the followers
+(person) icon at the top-right of the chatter before you expect them to
+see your messages.</p>
+</blockquote>
+</li>
+<li><p><strong>Park it honestly if you are waiting.</strong> Move it to <strong>On Hold</strong> and set the
+marker to <strong>Blocked</strong>, with a message saying what you are waiting for. A
+ticket that sits in In Progress for a week with no note is the thing this
+system exists to prevent.</p>
+</li>
+<li><p><strong>Fix it, and write down what you did.</strong> One message describing the actual
+resolution — the setting you changed, the part you replaced, the account you
+unlocked. This is what makes <strong>Ticket History</strong> worth searching next time.</p>
+</li>
+<li><p><strong>Update the asset if the fix involved one.</strong> Replaced a laptop? Send the old
+one to maintenance or mark it lost, and assign the new one — see
+<a href="#g-it-04-assign-and-return-assets">Assigning and returning assets</a>. The
+ticket&#39;s <strong>Related Asset</strong> link is what ties the two records together.</p>
+</li>
+<li><p><strong>Click Close Ticket</strong> in the header.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/it/ticket-close-01.png" alt="Close Ticket"></p>
+<p>Closing does four things at once: moves the ticket to the <strong>Closed</strong> stage,
+stamps the <strong>Closing Date</strong>, records <strong>Closed By</strong> as you, and sets the
+marker to <strong>Ready</strong>.</p>
+</li>
+</ol>
+<h2>What happens next</h2>
+<ul>
+<li>The ticket leaves the open board (the <strong>Closed</strong> column is folded) and appears
+in <strong>Ticket History</strong> and in <strong>Reporting</strong>.</li>
+<li><strong>Resolution Time</strong> is computed automatically — the hours between creation and
+closing. It is the measure the reports run on, which is why closing at the
+right moment matters more than it looks.</li>
+<li>A <strong>Resolution Feedback</strong> box appears on the ticket for the employee:
+<strong>Great</strong>, <strong>Okay</strong>, <strong>Not Good</strong>. Ask for it when you hand the work over —
+it is the only satisfaction signal in the system.</li>
+</ul>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/it/ticket-closed-01.png" alt="A closed ticket"></p>
+<h2>Reopening</h2>
+<p>If the problem comes back, open the closed ticket and click <strong>Reopen</strong>. It
+returns to the <strong>New</strong> stage, the closing date and closer are cleared, and the
+marker goes back to In Progress. The whole conversation is preserved.</p>
+<p>Reopen rather than raising a duplicate when it is genuinely the same problem —
+the history stays in one place. Raise a new ticket when it is a new problem
+that merely looks similar.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Close Ticket</strong> isn&#39;t in the header</td>
+<td>The ticket is already closed</td>
+<td>The <strong>Reopen</strong> button is there instead</td>
+</tr>
+<tr>
+<td><strong>Assign to Me</strong> isn&#39;t there</td>
+<td>Someone is already assigned, or the ticket is closed</td>
+<td>Change <strong>Assigned To</strong> directly</td>
+</tr>
+<tr>
+<td>The employee says they weren&#39;t told</td>
+<td>You used <strong>Note</strong> (notifies nobody) instead of <strong>External</strong> — or they are not a follower</td>
+<td>Post with <strong>External</strong>, and add them as a follower if the ticket was raised on their behalf</td>
+</tr>
+<tr>
+<td>Closed the wrong ticket</td>
+<td>—</td>
+<td><strong>Reopen</strong> it; nothing is lost</td>
+</tr>
+<tr>
+<td>Resolution Time looks wrong</td>
+<td>It measures creation → closing, wall-clock, not working hours</td>
+<td>Close tickets when the work actually ends, not in a weekly clean-up sweep</td>
+</tr>
+<tr>
+<td>No feedback ever arrives</td>
+<td>Employees don&#39;t know to rate it</td>
+<td>Mention it when you hand over the fix</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-it-01-ticket-queue">Working the ticket queue</a></li>
+<li><a href="#g-it-06-reporting-and-history">Reporting and ticket history</a></li>
+<li><a href="#g-it-04-assign-and-return-assets">Assigning and returning assets</a></li>
+</ul>
+</section>
+<section id="g-it-03-asset-register"><h1>The IT Asset Register</h1>
+<p><strong>Who is this for:</strong> IT Team (nobody else can see this menu)
+<strong>How long it takes:</strong> 2 minutes to register an asset</p>
+<h2>What this does</h2>
+<p>Keeps one authoritative list of every piece of IT equipment the company owns —
+laptops, desktops, monitors, phones, printers, networking gear, software
+licenses, accessories — with what it is, what it cost, whether it is still
+under warranty, and <strong>who is holding it right now</strong>.</p>
+<p>It also feeds the helpdesk: the <strong>Related Asset</strong> field on a ticket offers an
+employee only the equipment currently registered to them, so a ticket about
+&quot;my laptop&quot; points at a specific serial number.</p>
+<h2>Before you start</h2>
+<ul>
+<li><strong>Assets are IT Team only.</strong> No other role — manager or not — has the menu,
+the list or the reports. The single exception: an employee can read the
+asset(s) currently in their own custody, purely so the ticket field works.</li>
+<li>Have the device in hand: brand, model, serial number (or IMEI), where it came
+from and when, and the warranty end date if there is one.</li>
+</ul>
+<h2>The register</h2>
+<p>Open <strong>Helpdesk → Assets → Assets</strong>. It opens as a kanban grouped by category,
+each card showing the photo, name, asset tag, category and current status.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/it/asset-01.png" alt="Asset register"></p>
+<p>An asset is always in exactly one status:</p>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Available</strong></td>
+<td>In the store, ready to hand out</td>
+</tr>
+<tr>
+<td><strong>Assigned</strong></td>
+<td>In an employee&#39;s custody</td>
+</tr>
+<tr>
+<td><strong>In Maintenance</strong></td>
+<td>Out for repair</td>
+</tr>
+<tr>
+<td><strong>Retired</strong></td>
+<td>End of life. Archived — hidden unless you filter for it</td>
+</tr>
+<tr>
+<td><strong>Lost / Stolen</strong></td>
+<td>Unaccounted for</td>
+</tr>
+</tbody></table>
+<h2>Steps — registering a new asset</h2>
+<ol>
+<li><p><strong>Open Helpdesk → Assets → Assets</strong> and click <strong>New</strong>.</p>
+</li>
+<li><p><strong>Name it as a person would say it</strong> — <em>&quot;Dell Latitude 5420 Laptop&quot;</em>, not
+<em>&quot;asset 14&quot;</em>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/it/asset-02.png" alt="Asset form"></p>
+</li>
+<li><p><strong>Pick the Category</strong> (Laptop, Desktop, Monitor, Mobile Phone, Printer,
+Networking Equipment, Software License, Accessory). Required — it drives the
+grouping, the colour and every report.</p>
+</li>
+<li><p><strong>Fill in the identity:</strong> Brand, Model, and the <strong>Serial / IMEI</strong>. The serial
+is what you will search by when someone reads a sticker over the phone, so
+type it carefully.</p>
+</li>
+<li><p><strong>Set the Location</strong> — where it physically lives when nobody holds it, e.g.
+<em>&quot;HQ – 3rd Floor Store&quot;</em>.</p>
+</li>
+<li><p><strong>Record the purchase:</strong> Vendor, Purchase Date, Purchase Value, and the
+<strong>Warranty Expiry Date</strong>. The warranty date is worth the ten seconds — see
+<a href="#g-it-05-maintenance-and-warranty">Maintenance, loss and warranty</a>.</p>
+</li>
+<li><p><strong>Add a photo</strong> (top-right image box) if it helps identify the unit, and any
+internal remarks on the <strong>Notes</strong> tab.</p>
+</li>
+<li><p><strong>Save.</strong> The asset gets its permanent tag — <code>IT/00001</code>, <code>IT/00002</code>, … — and
+starts as <strong>Available</strong>.</p>
+</li>
+</ol>
+<h2>Finding an asset</h2>
+<p>The search box matches the <strong>name, the asset tag and the serial number</strong> at
+once. Beyond that:</p>
+<ul>
+<li>Filters for <strong>Available</strong>, <strong>Assigned</strong>, <strong>In Maintenance</strong>, <strong>Lost /
+Stolen</strong>, <strong>Retired</strong>, <strong>Archived</strong></li>
+<li><strong>Warranty Expiring Soon</strong> and <strong>Warranty Expired</strong></li>
+<li>Group by <strong>Category</strong>, <strong>Status</strong>, <strong>Assigned To</strong> or <strong>Department</strong></li>
+<li><strong>Calendar</strong> view plots warranty expiry dates by month; <strong>Graph</strong> and <strong>Pivot</strong>
+break the fleet down by category and status</li>
+</ul>
+<p>The two buttons at the top of an asset form — <strong>Assignments</strong> and
+<strong>Maintenance</strong> — open its full history: everyone who has held it, and every
+repair it has been through.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>&quot;This asset tag already exists&quot;</td>
+<td>Tags are unique and generated automatically</td>
+<td>Don&#39;t type tags by hand; let the sequence assign one</td>
+</tr>
+<tr>
+<td>An asset vanished from the list</td>
+<td>It was retired, which archives it</td>
+<td>Add the <strong>Archived</strong> or <strong>Retired</strong> filter</td>
+</tr>
+<tr>
+<td><strong>Assigned To</strong> won&#39;t let me type in it</td>
+<td>It is set by the assign/return workflow, never by hand</td>
+<td>Use <strong>Assign to Employee</strong> — see <a href="#g-it-04-assign-and-return-assets">Assigning and returning assets</a></td>
+</tr>
+<tr>
+<td>An employee can&#39;t pick their device on a ticket</td>
+<td>The asset isn&#39;t assigned to them in the register</td>
+<td>Assign it properly; the ticket field follows custody</td>
+</tr>
+<tr>
+<td>A colleague says the Assets menu isn&#39;t there</td>
+<td>They are not in the <strong>IT Team</strong> group</td>
+<td>That is by design — assets are IT-only</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-it-04-assign-and-return-assets">Assigning and returning assets</a></li>
+<li><a href="#g-it-05-maintenance-and-warranty">Maintenance, loss and warranty</a></li>
+<li><a href="#g-it-07-configuration">Configuring stages and categories</a></li>
+</ul>
+</section>
+<section id="g-it-04-assign-and-return-assets"><h1>Assigning and Returning Assets</h1>
+<p><strong>Who is this for:</strong> IT Team
+<strong>How long it takes:</strong> 1 minute each way</p>
+<h2>What this does</h2>
+<p>Records custody: which employee is holding which device, from when, in what
+condition — and closes that record when they hand it back. Every hand-over and
+return is kept as a dated line, so any asset can answer &quot;who had this, and
+when?&quot; years later, and any employee can be checked out on their last day.</p>
+<h2>Before you start</h2>
+<ul>
+<li>The asset must be <strong>Available</strong> to be assigned. If it is already with someone,
+return it first; if it is out for repair, bring it back from maintenance first.</li>
+<li>Agree the <strong>condition</strong> with the employee at hand-over — that is the number
+that protects both sides on the way back.</li>
+</ul>
+<h2>Steps — assigning</h2>
+<ol>
+<li><p><strong>Open the asset</strong> (<strong>Helpdesk → Assets → Assets</strong>) and click <strong>Assign to
+Employee</strong> in the header.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/it/assign-01.png" alt="Assign wizard"></p>
+</li>
+<li><p><strong>Pick the Employee</strong>, check the <strong>Date</strong> (defaults to today), and set the
+<strong>Condition</strong> you are handing it over in — New, Good, Fair or Poor.</p>
+</li>
+<li><p><strong>Add Notes</strong> if anything is worth recording — accessories included, a
+scratch on the lid, a temporary loan with a return date agreed.</p>
+</li>
+<li><p><strong>Click Assign.</strong> The asset switches to <strong>Assigned</strong>, <strong>Assigned To</strong> shows
+the employee, their department is filled in, and a new line opens in the
+assignment history.</p>
+</li>
+</ol>
+<p>From that moment the employee can select this device as the <strong>Related Asset</strong> on
+their support tickets.</p>
+<h2>Steps — returning</h2>
+<ol>
+<li><p><strong>Open the asset</strong> and click <strong>Return</strong> in the header.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/it/return-01.png" alt="Return wizard"></p>
+</li>
+<li><p><strong>Check the Date</strong>, and record the <strong>Condition it came back in</strong>. This is the
+whole point of the return step: comparing condition out against condition in
+is how damage gets noticed at the right moment.</p>
+</li>
+<li><p><strong>Add Notes</strong> — missing charger, cracked screen, wiped and reimaged.</p>
+</li>
+<li><p><strong>Click Return.</strong> The open assignment line is closed with the return date and
+condition, the asset goes back to <strong>Available</strong>, and <strong>Assigned To</strong> is
+cleared.</p>
+</li>
+</ol>
+<h2>The custody history</h2>
+<p><strong>Helpdesk → Assets → Assignments</strong> lists every hand-over ever recorded, across
+all assets — searchable by employee, by asset, by category, and by <strong>Active</strong> or
+<strong>Returned</strong>.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/it/assign-02.png" alt="Assignments"></p>
+<p>Two things it answers directly:</p>
+<ul>
+<li><strong>Off-boarding.</strong> Filter by the employee and by <strong>Active</strong> — what is still in
+their custody, and therefore what must come back before their last day.</li>
+<li><strong>Device history.</strong> From an asset&#39;s form, the <strong>Assignments</strong> button opens the
+same list for that one device: every holder, every date, condition out and in.</li>
+</ul>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>&quot;Only an available asset can be assigned. Return or repair it first.&quot;</td>
+<td>It is already assigned, in maintenance, retired or lost</td>
+<td>Return it, or bring it back from maintenance, first</td>
+</tr>
+<tr>
+<td>&quot;This asset is not currently assigned.&quot;</td>
+<td>You clicked <strong>Return</strong> on something nobody holds</td>
+<td>Check the status bar</td>
+</tr>
+<tr>
+<td><strong>Assign to Employee</strong> isn&#39;t in the header</td>
+<td>The asset isn&#39;t Available</td>
+<td>Same as above</td>
+</tr>
+<tr>
+<td>I assigned it to the wrong person</td>
+<td>—</td>
+<td><strong>Return</strong> it (same day, same condition), then assign it correctly. Both lines stay in the history, which is honest and harmless</td>
+</tr>
+<tr>
+<td>The employee left and the asset is still on them</td>
+<td>Nobody ran the return</td>
+<td>Return it now with the real date; the history keeps the true dates</td>
+</tr>
+<tr>
+<td>An employee still can&#39;t pick their device on a ticket</td>
+<td>Assignment not saved, or the ticket&#39;s employee is someone else</td>
+<td>Confirm <strong>Assigned To</strong> on the asset matches <strong>Reported By</strong> on the ticket</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-it-03-asset-register">The IT asset register</a></li>
+<li><a href="#g-it-05-maintenance-and-warranty">Maintenance, loss and warranty</a></li>
+</ul>
+</section>
+<section id="g-it-05-maintenance-and-warranty"><h1>Maintenance, Loss, Retirement and Warranty</h1>
+<p><strong>Who is this for:</strong> IT Team
+<strong>How long it takes:</strong> 1 minute per action</p>
+<h2>What this does</h2>
+<p>Covers the rest of an asset&#39;s life after it has been bought and handed out:
+sending it for repair and bringing it back, writing off what is lost or stolen,
+retiring what has reached end of life, and staying ahead of warranty expiry so
+repairs are claimed rather than paid for.</p>
+<h2>Before you start</h2>
+<ul>
+<li>All of these actions need the asset to be in the right status; the buttons
+appear and disappear accordingly. <strong>An asset in an employee&#39;s custody must be
+returned first</strong> — you cannot send it to maintenance while it is assigned.</li>
+<li>Know whether the device is still under warranty before you commit to a paid
+repair. The asset form tells you: a <strong>Warranty Expiring</strong> or <strong>Warranty
+Expired</strong> ribbon across the top, and a colour-coded status in the list.</li>
+</ul>
+<h2>Sending an asset for repair</h2>
+<ol>
+<li><p><strong>Return it from the employee first</strong> if someone holds it — see
+<a href="#g-it-04-assign-and-return-assets">Assigning and returning assets</a>.</p>
+</li>
+<li><p><strong>Click Send to Maintenance</strong> in the header. The asset switches to <strong>In
+Maintenance</strong> and a maintenance record is opened for it.</p>
+</li>
+<li><p><strong>Fill in the maintenance record</strong> — <strong>Helpdesk → Assets → Maintenance</strong>, or
+the <strong>Maintenance</strong> button on the asset itself. Describe the <strong>Issue</strong>, set
+<strong>Repaired By</strong> (the vendor), and enter the <strong>Cost</strong> when you know it.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/it/maint-01.png" alt="Maintenance"></p>
+</li>
+<li><p><strong>When it comes back</strong>, open the asset and click <strong>Return from
+Maintenance</strong>. The open maintenance record is marked <strong>Done</strong> with today&#39;s
+date, and the asset becomes <strong>Available</strong> again — ready to hand out.</p>
+</li>
+</ol>
+<p>The <strong>Maintenance</strong> button on any asset shows every repair it has ever had, with
+costs. Two or three expensive repairs on one machine is the argument for
+replacing it.</p>
+<h2>Lost or stolen</h2>
+<p>Click <strong>Mark as Lost / Stolen</strong> (you will be asked to confirm). Use it when a
+device genuinely cannot be accounted for — the status is visible in red across
+the register and in every report.</p>
+<blockquote>
+<p>If the device was in someone&#39;s custody when it went missing, <strong>return it from
+them first</strong>, noting the circumstances in the return notes, then mark it lost.
+That way the custody record closes properly and the history reads correctly.</p>
+</blockquote>
+<p>If it turns up, click <strong>Retire</strong> and then <strong>Reactivate</strong>, or simply reactivate
+it from the archived list — it returns as <strong>Available</strong>.</p>
+<h2>Retiring an asset</h2>
+<p><strong>Retire</strong> is for end of life: written off, disposed of, sold, replaced. The
+asset must be <strong>Available</strong> or <strong>Lost / Stolen</strong> first, so nothing gets retired
+out from under an employee.</p>
+<p>Retiring <strong>archives</strong> the asset: it keeps its full history but disappears from
+the normal list. Find it again with the <strong>Archived</strong> or <strong>Retired</strong> filter; the
+<strong>Reactivate</strong> button brings it back as Available if you retire one by mistake.</p>
+<p>Prefer retiring to deleting. A deleted asset takes its custody and repair
+history with it.</p>
+<h2>Warranty tracking</h2>
+<p>Fill in <strong>Warranty Expiry Date</strong> when you register an asset, and the system
+watches it for you:</p>
+<table>
+<thead>
+<tr>
+<th>Warranty status</th>
+<th>When</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Valid</strong></td>
+<td>More than 30 days left</td>
+</tr>
+<tr>
+<td><strong>Expiring Soon</strong></td>
+<td>30 days or fewer — amber badge, amber ribbon on the form</td>
+</tr>
+<tr>
+<td><strong>Expired</strong></td>
+<td>The date has passed — red badge, red ribbon</td>
+</tr>
+<tr>
+<td><strong>No Warranty</strong></td>
+<td>No date recorded</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>Filters:</strong> <em>Warranty Expiring Soon</em> and <em>Warranty Expired</em> on the asset
+list.</li>
+<li><strong>Calendar view:</strong> every warranty expiry plotted by month — the quickest way
+to see what is about to run out.</li>
+<li><strong>Automatic reminder:</strong> exactly <strong>30 days before</strong> an asset&#39;s warranty
+expires, the system schedules a to-do activity for <strong>every member of the IT
+Team</strong>. It shows up in your <strong>Activities</strong> (the clock icon in the top bar) and
+names the asset and the date.</li>
+</ul>
+<p>That reminder is the point of filling the date in: it is the moment to raise
+any pending repair with the vendor while it is still free.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>&quot;Only an available asset can be sent to maintenance.&quot;</td>
+<td>It is assigned, retired or already in maintenance</td>
+<td>Return it from the employee first</td>
+</tr>
+<tr>
+<td>&quot;This asset is not in maintenance.&quot;</td>
+<td>You clicked <strong>Return from Maintenance</strong> on something that isn&#39;t out for repair</td>
+<td>Check the status bar</td>
+</tr>
+<tr>
+<td>&quot;Return or repair this asset before retiring it.&quot;</td>
+<td>Retire only works from <strong>Available</strong> or <strong>Lost / Stolen</strong></td>
+<td>Return it, or bring it back from maintenance, first</td>
+</tr>
+<tr>
+<td>A retired asset disappeared</td>
+<td>Retiring archives it</td>
+<td>Filter by <strong>Archived</strong> / <strong>Retired</strong>, then <strong>Reactivate</strong></td>
+</tr>
+<tr>
+<td>No warranty reminders arrive</td>
+<td>No expiry date on the asset, or the person isn&#39;t in the IT Team group</td>
+<td>Fill in <strong>Warranty Expiry Date</strong>; the reminder goes to IT Team members only</td>
+</tr>
+<tr>
+<td>The reminder came too late to be useful</td>
+<td>It fires 30 days ahead, once</td>
+<td>Also use the <strong>Warranty Expiring Soon</strong> filter as part of your monthly routine</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-it-03-asset-register">The IT asset register</a></li>
+<li><a href="#g-it-04-assign-and-return-assets">Assigning and returning assets</a></li>
+</ul>
+</section>
+<section id="g-it-06-reporting-and-history"><h1>Reporting and Ticket History</h1>
+<p><strong>Who is this for:</strong> IT Team
+<strong>How long it takes:</strong> 5 minutes</p>
+<h2>What this does</h2>
+<p>Turns the closed tickets into two things you can act on: a <strong>searchable record</strong>
+of what was solved and how (History), and <strong>numbers</strong> on volume, mix and speed
+(Reporting).</p>
+<p>Both look only at <strong>closed</strong> tickets — the work that is actually finished.</p>
+<h2>Ticket History — &quot;have we seen this before?&quot;</h2>
+<p><strong>Helpdesk → Ticket History</strong> is every closed ticket as a list.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/it/history-01.png" alt="Ticket History"></p>
+<p>The search box matches the <strong>ticket number, title and description</strong> together, so
+searching <code>VPN</code> finds every VPN problem ever closed, including the message
+threads that solved them. Before you start diagnosing something unfamiliar,
+search the history first — the answer is often three months old.</p>
+<p>Useful columns are hidden by default; add them from the <strong>⚙ / optional columns</strong>
+toggle at the right of the header row: <strong>Category</strong>, <strong>Deadline</strong>, <strong>Created
+on</strong>, <strong>Closing Date</strong>, <strong>Closed By</strong>, <strong>Resolution (h)</strong> and <strong>Satisfaction</strong>.</p>
+<h2>Reporting — the numbers</h2>
+<p><strong>Helpdesk → Reporting</strong> opens the same closed tickets as a chart, with the
+<strong>Pivot</strong> and <strong>List</strong> views one click away.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/it/report-01.png" alt="Reporting"></p>
+<p>Two measures are available: the <strong>count</strong> of tickets and <strong>Resolution Time
+(h)</strong> — the hours between a ticket&#39;s creation and its closing.</p>
+<p>Questions it answers directly:</p>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>How</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>What do we actually spend our time on?</td>
+<td>Group rows by <strong>Category</strong>, measure <strong>Count</strong></td>
+</tr>
+<tr>
+<td>Incidents vs service requests</td>
+<td>Group by <strong>Type</strong></td>
+</tr>
+<tr>
+<td>Who closes what</td>
+<td>Group by <strong>Assigned To</strong></td>
+</tr>
+<tr>
+<td>Where are we slow?</td>
+<td>Group by <strong>Category</strong>, measure <strong>Resolution Time (h)</strong>, switch to average</td>
+</tr>
+<tr>
+<td>Is it getting better?</td>
+<td>Pivot with <strong>Closing Date : Month</strong> as columns</td>
+</tr>
+<tr>
+<td>Which department raises the most?</td>
+<td>Group by the caller&#39;s department</td>
+</tr>
+</tbody></table>
+<p>In the <strong>Pivot</strong> view, use the <strong>Measures</strong> menu to switch between Count and
+Resolution Time (and to switch Resolution Time to an average rather than a
+sum — a sum of hours across 200 tickets means nothing; the average is the
+service level). <strong>Download to Excel</strong> from the pivot&#39;s toolbar when you need it
+in a report.</p>
+<blockquote>
+<p><strong>Read resolution time honestly.</strong> It is wall-clock time, including nights and
+weekends, measured from creation to closing. A ticket raised on a Thursday
+evening and closed Sunday morning reads as ~40 hours of &quot;slow service&quot;. Use it
+to compare categories and months against each other, not as a contractual SLA.</p>
+</blockquote>
+<h2>The open picture</h2>
+<p>Reporting covers finished work. For the live one, use the queue itself:</p>
+<ul>
+<li><strong>All Tickets → Overdue</strong> — everything past its deadline</li>
+<li><strong>All Tickets → Unassigned</strong> — nothing should sit here long</li>
+<li><strong>All Tickets</strong> grouped by <strong>Assigned To</strong> — current workload per person</li>
+<li>The <strong>Calendar</strong> view — deadlines across the month</li>
+</ul>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A ticket I closed isn&#39;t in the reports</td>
+<td>It was reopened, so it is open again</td>
+<td>Close it when it is genuinely done</td>
+</tr>
+<tr>
+<td>Resolution times look far too high</td>
+<td>Wall-clock, including weekends — and tickets closed in a late clean-up sweep</td>
+<td>Close tickets when the work ends; compare relative, not absolute</td>
+</tr>
+<tr>
+<td>The chart is empty</td>
+<td>No closed tickets in the period you filtered</td>
+<td>Widen the period</td>
+</tr>
+<tr>
+<td>Satisfaction is blank almost everywhere</td>
+<td>Employees rate only if asked</td>
+<td>Ask for the rating when you hand over the fix</td>
+</tr>
+<tr>
+<td>I need this in Excel</td>
+<td>—</td>
+<td>Use the <strong>Pivot</strong> view&#39;s download button</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-it-01-ticket-queue">Working the ticket queue</a></li>
+<li><a href="#g-it-02-resolve-and-close">Resolving and closing a ticket</a></li>
+</ul>
+</section>
+<section id="g-it-07-configuration"><h1>Configuring Stages, Categories and Asset Categories</h1>
+<p><strong>Who is this for:</strong> IT Team
+<strong>How long it takes:</strong> 5 minutes</p>
+<h2>What this does</h2>
+<p>Three short configuration lists shape the whole app: the <strong>stages</strong> a ticket
+moves through, the <strong>categories</strong> employees choose from when raising one, and
+the <strong>categories</strong> the asset register is organised by. All three live under
+<strong>Helpdesk → Configuration</strong> and are IT Team only.</p>
+<p>The system ships with all three already filled in sensibly. Change them when
+your process changes — not before.</p>
+<h2>Ticket stages</h2>
+<p><strong>Helpdesk → Configuration → Ticket Stages</strong> — the columns of the kanban board.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/it/config-01.png" alt="Ticket stages"></p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Name</strong></td>
+<td>The column header on the board</td>
+</tr>
+<tr>
+<td><strong>Sequence</strong></td>
+<td>Left-to-right order</td>
+</tr>
+<tr>
+<td><strong>Fold</strong></td>
+<td>Folds the column on the board when empty — set on <strong>Closed</strong></td>
+</tr>
+<tr>
+<td><strong>Is Closed</strong></td>
+<td><strong>The important one.</strong> Tickets here count as resolved</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Shown as a tooltip on the board — use it to say what the stage means</td>
+</tr>
+</tbody></table>
+<p><strong>Is Closed</strong> is what the rest of the app keys on: the <strong>Close Ticket</strong> button
+sends the ticket to the <strong>first stage with Is Closed ticked</strong>, and <strong>Reopen</strong>
+sends it back to the <strong>first stage without it</strong>. Reporting, Ticket History, the
+Open/Closed filters and the overdue calculation all read the same flag.</p>
+<p>Two rules worth respecting:</p>
+<ul>
+<li><strong>Keep exactly one closed stage</strong> unless you have a real reason for more.
+With two, &quot;closed&quot; stops being one number.</li>
+<li><strong>A stage that is in use cannot be deleted</strong> — the system blocks it to protect
+the tickets sitting in it. Rename it, or move the tickets out first.</li>
+</ul>
+<h2>Ticket categories</h2>
+<p><strong>Helpdesk → Configuration → Ticket Categories</strong> — what an employee picks on the
+form.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/it/config-02.png" alt="Ticket categories"></p>
+<p>Every category belongs to <strong>one kind</strong>, and that is what makes the form behave:
+choosing <strong>Incident</strong> offers only incident categories, choosing <strong>Service
+Request</strong> only service-request ones.</p>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Shipped categories</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Incident</strong></td>
+<td>Hardware · Software · Network &amp; Internet · Email · Printer · Access &amp; Permissions · Other</td>
+</tr>
+<tr>
+<td><strong>Service Request</strong></td>
+<td>New Hardware Request · New Software Installation · Access / Permission Request · Password Reset · Information / How-To · Other</td>
+</tr>
+</tbody></table>
+<ul>
+<li>The same <strong>name may exist once per kind</strong> — which is why &quot;Other&quot; appears in
+both lists — but not twice within one kind.</li>
+<li><strong>Colour</strong> tints the ticket cards on the board; <strong>Sequence</strong> orders the
+dropdown, so put the common ones first.</li>
+<li>To stop offering a category without losing the tickets filed under it,
+<strong>archive</strong> it rather than deleting it.</li>
+</ul>
+<p>Categories are the axis every report is grouped by. Adding one splits your
+history; keep the list short and meaningful.</p>
+<h2>Asset categories</h2>
+<p><strong>Helpdesk → Configuration → Asset Categories</strong> — how the register is organised.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/it/config-03.png" alt="Asset categories"></p>
+<p>Shipped with <strong>Laptop, Desktop, Monitor, Mobile Phone, Printer, Networking
+Equipment, Software License</strong> and <strong>Accessory</strong>. Each has a name, a sequence, a
+colour (which tints the asset cards) and an icon, and shows how many assets are
+filed under it — click through to see them.</p>
+<p>Names are unique per company. Archive rather than delete when a category falls
+out of use.</p>
+<h2>Who can do all this</h2>
+<p>There are only two roles in the whole app:</p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Can</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>User</strong> (every employee, automatically)</td>
+<td>Raise tickets for themselves or a direct report, follow them, comment, rate the resolution. No assets, no configuration</td>
+</tr>
+<tr>
+<td><strong>IT Team</strong></td>
+<td>Everything: every ticket, stage/assignee/marker changes, the asset register, and these configuration lists</td>
+</tr>
+</tbody></table>
+<p>Roles are granted in <strong>Settings → Users &amp; Companies → Users</strong>, under the
+<strong>Helpdesk</strong> section of the user&#39;s form. Every internal user is a Helpdesk
+<strong>User</strong> already — you never need to grant that; you only add people to <strong>IT
+Team</strong>.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Closing a ticket sends it to the wrong stage</td>
+<td>More than one stage has <strong>Is Closed</strong> ticked</td>
+<td>Keep one; <strong>Close</strong> picks the first by sequence</td>
+</tr>
+<tr>
+<td><strong>Reopen</strong> lands the ticket in an odd stage</td>
+<td>It goes to the first stage <strong>without</strong> Is Closed</td>
+<td>Check the sequence of your open stages</td>
+</tr>
+<tr>
+<td>A stage won&#39;t delete</td>
+<td>Tickets still reference it</td>
+<td>Move them out, or archive/rename the stage instead</td>
+</tr>
+<tr>
+<td>&quot;A category with this name already exists for this ticket type.&quot;</td>
+<td>Names are unique per kind</td>
+<td>Rename, or check whether it already exists under the other kind</td>
+</tr>
+<tr>
+<td>An employee can&#39;t see the category I added</td>
+<td>It belongs to the other kind</td>
+<td>Categories follow the Incident / Service Request choice</td>
+</tr>
+<tr>
+<td>A new IT colleague sees only their own tickets</td>
+<td>They aren&#39;t in the <strong>IT Team</strong> group yet</td>
+<td>Add them in <strong>Settings → Users</strong></td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-it-01-ticket-queue">Working the ticket queue</a></li>
+<li><a href="#g-it-03-asset-register">The IT asset register</a></li>
+</ul>
+</section>
+</body></html>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="it_asset_category_view_list" model="ir.ui.view">
+        <field name="name">it.asset.category.list</field>
+        <field name="model">it.asset.category</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="icon"/>
+                <field name="asset_count"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="it_asset_category_view_form" model="ir.ui.view">
+        <field name="name">it.asset.category.form</field>
+        <field name="model">it.asset.category</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object"
+                                name="action_view_assets" icon="fa-laptop">
+                            <field name="asset_count" widget="statinfo" string="Assets"/>
+                        </button>
+                    </div>
+                    <group>
+                        <field name="name"/>
+                        <field name="icon" placeholder="fa-laptop"/>
+                        <field name="color" widget="color_picker"/>
+                        <field name="active" invisible="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="it_asset_category_action" model="ir.actions.act_window">
+        <field name="name">Asset Categories</field>
+        <field name="res_model">it.asset.category</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

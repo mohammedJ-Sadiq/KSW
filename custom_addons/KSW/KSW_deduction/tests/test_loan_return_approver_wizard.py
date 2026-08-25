@@ -36,6 +36,12 @@ class TestLoanReturnApproverWizard(DeductionCommon):
         cls.gm_emp = cls.env['hr.employee'].create({'name': 'KSWDED Return GM'})
         cls.user_gm = _mk('kswded_return_gm', 'KSW_deduction.group_loan_gm',
                            employee=cls.gm_emp)
+        # The GM step follows the employee's department, not the GM group:
+        # holding group_loan_gm authorises nothing on its own. Both fixture
+        # departments get this GM so the loans built here (dept A) and any
+        # cross-department probe (dept B) both reach him.
+        # See tests/test_department_gm.py for the per-department contract.
+        (cls.dept_a | cls.dept_b).sudo().write({'x_gm_id': cls.gm_emp.id})
 
         cls.user_plain = _mk(
             'kswded_return_plain', 'KSW_deduction.group_deduction_user')

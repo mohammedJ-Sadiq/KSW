@@ -51,10 +51,18 @@ class TestAdminReturnAnyState(TransactionCase):
         cls.user_admin = _mkuser('Ret Sys Admin', 'adminret_admin',
                                  ('base.group_system',))
 
+        # The GM steps follow the employee's department, not the GM group.
+        # The fixture GM must be named on the requester's department or he
+        # authorises nothing — see tests/test_department_gm.py.
+        cls.emp_gm = cls.env['hr.employee'].create({
+            'name': 'Ret GM Emp', 'user_id': cls.user_gm.id})
+        cls.department = cls.env['hr.department'].create({
+            'name': 'Admin Return Test Dept', 'x_gm_id': cls.emp_gm.id})
         cls.employee = cls.env['hr.employee'].create({
             'name': 'Ret Requesting Employee',
             'user_id': _mkuser('Ret Emp', 'adminret_emp').id,
             'leave_manager_id': cls.user_dm.id,
+            'department_id': cls.department.id,
         })
         cls.user_emp = cls.employee.user_id
 

@@ -364,13 +364,45 @@
         <field name="domain_force">[(1, '=', 1)]</field>
     </record>
 
-    <!-- Loan approvers (HR/Accounting/GM/Disbursement) see all loan deductions
-         so they can act on the ones pending their step. -->
+    <!-- Loan approvers (HR/Accounting/Disbursement) see all loan deductions
+         so they can act on the ones pending their step.
+
+         The GM is deliberately NOT in this list any more. His authority
+         comes from hr.department.x_effective_gm_id, so his scope has to
+         follow it — leaving him here would hand every GM every department's
+         loans, which is the behaviour the department GM replaces. -->
     <record id="ksw_deduction_rule_loan_approvers" model="ir.rule">
         <field name="name">Deduction: loan approvers see all loans</field>
         <field name="model_id" ref="model_ksw_deduction"/>
-        <field name="groups" eval="[(4, ref('group_loan_hr')), (4, ref('group_loan_acc')), (4, ref('group_loan_gm')), (4, ref('group_loan_disbursement'))]"/>
+        <field name="groups" eval="[(6, 0, [ref('group_loan_hr'), ref('group_loan_acc'), ref('group_loan_disbursement')])]"/>
         <field name="domain_force">[('is_loan', '=', True)]</field>
+    </record>
+
+    <!-- The GM sees the loans of the departments he is General Manager of,
+         and nothing else. x_effective_gm_id is a stored compute that already
+         folds in the parent-department climb and the company default, so
+         this is a plain join with no OR branch for the fallback.
+
+         Employees with no department at all resolve to the company default
+         GM in Python; there is no department row to join here, so they get
+         their own rule below. -->
+    <record id="ksw_deduction_rule_loan_department_gm" model="ir.rule">
+        <field name="name">Deduction: department GM sees his departments' loans</field>
+        <field name="model_id" ref="model_ksw_deduction"/>
+        <field name="groups" eval="[(4, ref('group_loan_gm'))]"/>
+        <field name="domain_force">[
+            ('is_loan', '=', True),
+            ('employee_id.department_id.x_effective_gm_id.user_id', '=', user.id)]</field>
+    </record>
+
+    <record id="ksw_deduction_rule_loan_default_gm" model="ir.rule">
+        <field name="name">Deduction: default GM sees loans of employees with no department</field>
+        <field name="model_id" ref="model_ksw_deduction"/>
+        <field name="groups" eval="[(4, ref('group_loan_gm'))]"/>
+        <field name="domain_force">[
+            ('is_loan', '=', True),
+            ('employee_id.department_id', '=', False),
+            ('employee_id.company_id.x_default_gm_id.user_id', '=', user.id)]</field>
     </record>
 
     <!-- Deduction officers and all loan-workflow groups need to read the full

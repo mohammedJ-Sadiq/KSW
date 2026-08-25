@@ -111,8 +111,16 @@ class KswPayRun(models.Model):
     # what it may actually do.
     x_can_submit = fields.Boolean(compute='_compute_permissions')
     x_can_approve = fields.Boolean(compute='_compute_permissions')
+    x_can_close_month = fields.Boolean(compute='_compute_permissions')
     x_can_reopen = fields.Boolean(compute='_compute_permissions')
     x_can_export = fields.Boolean(compute='_compute_permissions')
+
+    # The submitted departments this user is the GM of — what his Approve
+    # button will actually act on, and the list the form shows him.
+    x_gm_submission_ids = fields.Many2many(
+        'ksw.pay.submission', compute='_compute_visible_submissions',
+        string='Awaiting My Approval',
+    )
 
     _unique_period = models.Constraint(
         'UNIQUE(period)', 'There is already a pay run for that month.')
@@ -132,15 +140,18 @@ class KswPayRun(models.Model):
                 batches.filtered(lambda b: b.state == 'draft'))
 
     @api.depends_context('uid')
-    @api.depends('submission_ids.state')
+    @api.depends('submission_ids.state', 'submission_ids.gm_id')
     def _compute_visible_submissions(self):
         Submission = self.env['ksw.pay.submission']
         allowed = self.env['ksw.pay.batch']._allowed_departments()
         is_officer = self.env.user.has_group(
             'KSW_commissions.group_commission_officer')
+        user = self.env.user
         for rec in self:
             visible = Submission.search([('run_id', '=', rec.id)])
             rec.x_visible_submission_ids = visible
+            rec.x_gm_submission_ids = visible.filtered(
+                lambda s: s.state == 'submitted' and s.gm_id == user)
             # "Mine" is narrower than "visible": an officer sees every
             # department but hands over none of them.
             mine = visible if not is_officer else visible.filtered(
@@ -179,23 +190,32 @@ class KswPayRun(models.Model):
             rec.total_payable = sum(rec.line_ids.mapped('net_payable'))
 
     @api.depends_context('uid')
-    @api.depends('state', 'submitted_department_count')
+    @api.depends('state', 'submitted_department_count', 'x_gm_submission_ids',
+                 'submission_ids.state')
     def _compute_permissions(self):
         user = self.env.user
         is_supervisor = user.has_group(
             'KSW_commissions.group_commission_supervisor')
         is_accountant = user.has_group(
             'KSW_commissions.group_commission_accountant')
-        is_gm = user.has_group('KSW_commissions.group_commission_gm')
+        is_closer = self._is_month_closer()
         for rec in self:
             rec.x_can_submit = is_supervisor and rec.state == 'open'
-            # The month may be approved as soon as at least one department
-            # has handed over. Waiting for every department would let one
-            # late supervisor hold up everybody else's pay.
-            rec.x_can_approve = (
-                is_gm and rec.state not in LOCKING_STATES
-                and rec.submitted_department_count > 0)
-            rec.x_can_reopen = is_gm and rec.state in LOCKING_STATES
+            # Approve now means "approve MY departments". A GM with nothing
+            # of his own waiting has nothing to approve, however senior he is.
+            rec.x_can_approve = bool(
+                rec.state not in LOCKING_STATES and rec.x_gm_submission_ids)
+            # Closing is the separate, deliberate act of declaring the month
+            # finished while some department never handed over. It is not
+            # any single GM's call, so it belongs to whoever owns the month.
+            rec.x_can_close_month = bool(
+                is_closer
+                and rec.state not in LOCKING_STATES
+                and rec.submission_ids.filtered(
+                    lambda s: s.state == 'approved')
+                and rec.submission_ids.filtered(
+                    lambda s: s.state == 'submitted'))
+            rec.x_can_reopen = is_closer and rec.state in LOCKING_STATES
             rec.x_can_export = is_accountant and rec.state in LOCKING_STATES
 
     @api.depends('period')
@@ -269,14 +289,25 @@ class KswPayRun(models.Model):
         return self.env['ksw.pay.entry'].sudo().search([
             ('period', '=', self.period)])
 
-    def _payable_batches(self):
+    def _payable_batches(self, settled_only=False):
         """The batches whose entries are actually going to be paid.
 
         A batch counts only once its **department** has been handed over —
         a submitted batch on its own is just a supervisor who has finished
         typing, not a department declaring itself complete.
+
+        `settled_only` is the difference between the preview and the real
+        thing. The preview shows every handed-over department, because
+        knowing who is *about* to be paid is the point of showing it early.
+        The register built at finalisation may only contain departments
+        their own General Manager actually approved — otherwise closing a
+        month would pay a department whose GM never looked at it, which is
+        precisely what splitting the approval was meant to prevent.
         """
         self.ensure_one()
+        if settled_only:
+            return self._all_batches().filtered(
+                lambda b: b.submission_id.state == 'approved')
         return self._all_batches().filtered(
             lambda b: b.state == 'approved' or (
                 b.state == 'submitted'
@@ -376,64 +407,151 @@ class KswPayRun(models.Model):
             subtype_xmlid='mail.mt_comment',
         )
 
+    @api.model
+    def _is_month_closer(self):
+        """Who may declare the month finished and lock it.
+
+        Approving is now per department, so no single GM owns the month any
+        more — but somebody still has to decide that a department which never
+        handed over will not be paid, and to lock the period. That is a
+        company-level call, and it stays with the company's General Manager
+        (`res.company.x_default_gm_id`) — the person who was doing all of
+        this before the split.
+
+        Deliberately NOT the Commission Officer: reopening a month unwinds
+        the loan offsets of every department at once, and that has never
+        been the Officer's to do (tests/test_period_lock.py
+        ::test_10_only_the_gm_reopens).
+        """
+        if self.env.su:
+            return True
+        default_gm = self.env.company.sudo().x_default_gm_id
+        return bool(default_gm and default_gm.sudo().user_id == self.env.user)
+
     def action_approve(self):
-        """submitted → approved. Builds the register and locks the month."""
-        self._check_group(
-            'KSW_commissions.group_commission_gm',
-            _("Only the General Manager can approve the month."))
+        """The GM approves **his own** departments' handovers.
+
+        Approval used to be one atomic act over every submitted department,
+        which only made sense while one GM answered for all of them. Each GM
+        now signs off what is his; the month finalises by itself as soon as
+        nothing is left waiting, and otherwise waits for a deliberate close.
+        """
         for rec in self:
             if rec.state in LOCKING_STATES:
                 raise UserError(_(
                     "%(name)s has already been approved.",
                     name=rec.display_name))
-            submitted = rec.submission_ids.filtered(
-                lambda s: s.state == 'submitted')
-            if not submitted:
+            mine = rec.x_gm_submission_ids
+            if not mine:
+                waiting = rec.submission_ids.filtered(
+                    lambda s: s.state == 'submitted')
+                if not waiting:
+                    raise UserError(_(
+                        "No department has submitted its commissions for "
+                        "%(period)s, so there is nothing to approve.",
+                        period=rec.display_name))
                 raise UserError(_(
-                    "No department has submitted its commissions for "
-                    "%(period)s, so there is nothing to approve.",
-                    period=rec.display_name))
-            # Only what was handed over gets paid. A department that has not
-            # submitted keeps its work in draft rather than being swept into
-            # a month it never declared itself ready for.
-            left_out = rec.pending_department_names
-            submitted.mapped('batch_ids').sudo().write({'state': 'approved'})
-            submitted.sudo().write({'state': 'approved'})
-            rec._build_register()
-            auto_ids = rec.line_ids.sudo()._auto_flag_priority_installments()
-            rec.write({
-                'state': 'approved',
-                'approved_by': self.env.uid,
-                'approved_date': fields.Datetime.now(),
-            })
-            rec.line_ids.sudo()._apply_loan_offset()
-            rec.line_ids.sudo()._unflag_uncovered_auto_installments(auto_ids)
-            body = Markup(
-                '<strong>✅ Approved</strong><br/>'
-                '<b>Departments:</b> %(depts)s<br/>'
-                '<b>Employees:</b> %(count)s<br/>'
-                '<b>Earnings:</b> %(earn).2f<br/>'
-                '<b>Loans settled:</b> %(loans).2f<br/>'
-                '<b>Payable:</b> %(pay).2f<br/>'
-                '<i>%(period)s is now locked.</i>'
-            ) % {'depts': len(submitted), 'count': rec.employee_count,
-                 'earn': rec.total_earnings or 0.0,
-                 'loans': rec.total_loan_offset or 0.0,
-                 'pay': rec.total_payable or 0.0,
-                 'period': rec.display_name}
-            if left_out:
-                body += Markup(
-                    '<br/><b>⚠ Not included</b> (never submitted): '
-                    '%(names)s'
-                ) % {'names': left_out}
-            rec.sudo().message_post(body=body, subtype_xmlid='mail.mt_note')
+                    "None of the departments waiting on %(period)s are "
+                    "yours to approve. Still waiting on their own General "
+                    "Managers: %(names)s.",
+                    period=rec.display_name,
+                    names=', '.join(waiting.mapped('display_name'))))
+            mine.action_approve()
+
+            still_waiting = rec.submission_ids.filtered(
+                lambda s: s.state == 'submitted')
+            if still_waiting:
+                rec.sudo().message_post(
+                    body=Markup(
+                        '<strong>✅ %(mine)s department(s) approved by '
+                        '%(user)s</strong><br/>'
+                        '<i>%(period)s stays open — still waiting on: '
+                        '%(names)s.</i>'
+                    ) % {'mine': len(mine), 'user': self.env.user.name,
+                         'period': rec.display_name,
+                         'names': ', '.join(
+                             still_waiting.mapped('display_name'))},
+                    subtype_xmlid='mail.mt_note',
+                )
+                rec._refresh_register()
+                continue
+            rec._finalise_month()
+        return True
+
+    def action_close_month(self):
+        """Lock the month with some departments still not handed over.
+
+        The deliberate counterpart to the automatic finalisation above: only
+        what was approved gets paid, and a department that never submitted
+        keeps its work in draft rather than being swept into a month it
+        never declared itself ready for.
+        """
+        if not self._is_month_closer():
+            raise UserError(_(
+                "Only the company's General Manager can close a month "
+                "while departments are still outstanding."))
+        for rec in self:
+            if rec.state in LOCKING_STATES:
+                raise UserError(_(
+                    "%(name)s has already been approved.",
+                    name=rec.display_name))
+            if not rec.submission_ids.filtered(
+                    lambda s: s.state == 'approved'):
+                raise UserError(_(
+                    "No department has been approved for %(period)s, so "
+                    "there is nothing to pay.", period=rec.display_name))
+            rec._finalise_month()
+        return True
+
+    def _finalise_month(self):
+        """Build the register, settle the loans and lock the period."""
+        self.ensure_one()
+        approved = self.submission_ids.filtered(
+            lambda s: s.state == 'approved')
+        never_submitted = self.pending_department_names
+        unapproved = self.submission_ids.filtered(
+            lambda s: s.state == 'submitted')
+        self._build_register()
+        auto_ids = self.line_ids.sudo()._auto_flag_priority_installments()
+        self.write({
+            'state': 'approved',
+            'approved_by': self.env.uid,
+            'approved_date': fields.Datetime.now(),
+        })
+        self.line_ids.sudo()._apply_loan_offset()
+        self.line_ids.sudo()._unflag_uncovered_auto_installments(auto_ids)
+        body = Markup(
+            '<strong>✅ Approved</strong><br/>'
+            '<b>Departments:</b> %(depts)s<br/>'
+            '<b>Employees:</b> %(count)s<br/>'
+            '<b>Earnings:</b> %(earn).2f<br/>'
+            '<b>Loans settled:</b> %(loans).2f<br/>'
+            '<b>Payable:</b> %(pay).2f<br/>'
+            '<i>%(period)s is now locked.</i>'
+        ) % {'depts': len(approved), 'count': self.employee_count,
+             'earn': self.total_earnings or 0.0,
+             'loans': self.total_loan_offset or 0.0,
+             'pay': self.total_payable or 0.0,
+             'period': self.display_name}
+        if never_submitted:
+            body += Markup(
+                '<br/><b>⚠ Not included</b> (never submitted): %(names)s'
+            ) % {'names': never_submitted}
+        if unapproved:
+            body += Markup(
+                '<br/><b>⚠ Not included</b> (submitted but never approved '
+                'by their General Manager): %(names)s'
+            ) % {'names': ', '.join(unapproved.mapped('display_name'))}
+        self.sudo().message_post(body=body, subtype_xmlid='mail.mt_note')
         return True
 
     def action_return_to_supervisors(self):
         """submitted → open, so corrections can be made."""
-        self._check_group(
-            'KSW_commissions.group_commission_gm',
-            _("Only the General Manager can return the month."))
+        if not self._is_month_closer():
+            raise UserError(_(
+                "Only the company's General Manager can return the whole "
+                "month. To send back one department, use Return on its own "
+                "submission."))
         for rec in self:
             if rec.state != 'submitted':
                 raise UserError(_(
@@ -479,10 +597,16 @@ class KswPayRun(models.Model):
         }
 
     def action_reopen(self):
-        """Unlock an approved month. GM only — they signed it off."""
-        self._check_group(
-            'KSW_commissions.group_commission_gm',
-            _("Only the General Manager can reopen an approved month."))
+        """Unlock an approved month.
+
+        Whoever owns the month, not any single department GM: reopening
+        unwinds the loan offsets for every department at once, including
+        ones that are none of his.
+        """
+        if not self._is_month_closer():
+            raise UserError(_(
+                "Only the company's General Manager can reopen an "
+                "approved month."))
         for rec in self:
             if rec.state not in LOCKING_STATES:
                 raise UserError(_(
@@ -544,7 +668,7 @@ class KswPayRun(models.Model):
         Line = self.env['ksw.pay.run.line'].sudo()
 
         totals = {}
-        for batch in self._payable_batches():
+        for batch in self._payable_batches(settled_only=not preview):
             for entry in batch.sudo().entry_ids:
                 if not entry.employee_id:
                     continue

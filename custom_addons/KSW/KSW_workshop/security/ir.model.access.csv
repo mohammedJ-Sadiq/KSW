@@ -1,11 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_ksw_workshop_request_user,ksw.workshop.request.user,model_ksw_workshop_request,base.group_user,1,1,1,0
 access_ksw_workshop_request_manager,ksw.workshop.request.manager,model_ksw_workshop_request,group_workshop_manager,1,1,1,1
-access_ksw_workshop_part_user,ksw.workshop.part.user,model_ksw_workshop_part,base.group_user,1,0,0,0
-access_ksw_workshop_part_technician,ksw.workshop.part.technician,model_ksw_workshop_part,group_workshop_technician,1,0,1,0
-access_ksw_workshop_part_manager,ksw.workshop.part.manager,model_ksw_workshop_part,group_workshop_manager,1,1,1,1
-access_ksw_workshop_part_move_technician,ksw.workshop.part.move.technician,model_ksw_workshop_part_move,group_workshop_technician,1,0,0,0
-access_ksw_workshop_part_move_manager,ksw.workshop.part.move.manager,model_ksw_workshop_part_move,group_workshop_manager,1,1,1,1
-access_ksw_workshop_part_line_user,ksw.workshop.part.line.user,model_ksw_workshop_part_line,base.group_user,1,0,0,0
-access_ksw_workshop_part_line_technician,ksw.workshop.part.line.technician,model_ksw_workshop_part_line,group_workshop_technician,1,1,1,1
-access_ksw_workshop_part_line_manager,ksw.workshop.part.line.manager,model_ksw_workshop_part_line,group_workshop_manager,1,1,1,1

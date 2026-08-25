@@ -282,6 +282,63 @@ const SHOTS = [
   { tag: 'accounting/comm-03', persona: 'accounting', run: async (page) => {
       await openRecord(page, 'KSW_commissions.action_ksw_commission_batch', IDS.comm_batch);
   }},
+  // ---- Helpdesk (KSW_helpdesk) -------------------------------------
+  { tag: 'employee/ticket-02', persona: 'employee', post: discardForm, run: async (page) => {
+      await page.goto(`${BASE}/odoo/action-KSW_helpdesk.action_helpdesk_ticket_my_tickets/new`, { waitUntil: 'domcontentloaded' });
+      await page.waitForSelector('.o_form_view', { timeout: 12000 });
+      await page.waitForTimeout(800);
+  }},
+  { tag: 'employee/ticket-03', persona: 'employee', post: discardForm, run: async (page) => {
+      await page.goto(`${BASE}/odoo/action-KSW_helpdesk.action_helpdesk_ticket_my_tickets/new`, { waitUntil: 'domcontentloaded' });
+      await page.waitForSelector('.o_form_view', { timeout: 12000 });
+      await page.waitForTimeout(600);
+      await page.evaluate(() => { const el = document.querySelector('.o_content'); if (el) el.scrollTop = el.scrollHeight; });
+      await page.waitForTimeout(600);
+  }},
+  { tag: 'employee/ticket-04', persona: 'employee', run: async (page) => {
+      await openRecord(page, 'KSW_helpdesk.action_helpdesk_ticket_my_tickets', IDS.ticket_new);
+  }},
+  { tag: 'supervisor/ticket-01', persona: 'supervisor', post: discardForm, run: async (page) => {
+      await page.goto(`${BASE}/odoo/action-KSW_helpdesk.action_helpdesk_ticket_my_tickets/new`, { waitUntil: 'domcontentloaded' });
+      await page.waitForSelector('.o_form_view', { timeout: 12000 });
+      const fld = await page.$('.o_field_widget[name="employee_id"] input');
+      if (fld) { await fld.click(); await fld.fill(''); await page.waitForTimeout(900); }
+  }},
+  { tag: 'supervisor/ticket-02', persona: 'supervisor', run: async (page) => {
+      await openRecord(page, 'KSW_helpdesk.action_helpdesk_ticket_my_tickets', IDS.ticket_new);
+  }},
+  { tag: 'it/ticket-01', persona: 'it', run: async (page) => {
+      await openRecord(page, 'KSW_helpdesk.action_helpdesk_ticket_all', IDS.ticket_new);
+  }},
+  { tag: 'it/ticket-close-01', persona: 'it', run: async (page) => {
+      await openRecord(page, 'KSW_helpdesk.action_helpdesk_ticket_all', IDS.ticket_in_progress);
+  }},
+  { tag: 'it/ticket-closed-01', persona: 'it', run: async (page) => {
+      await openRecord(page, 'KSW_helpdesk.action_helpdesk_ticket_all', IDS.ticket_closed);
+  }},
+  { tag: 'it/queue-02', persona: 'it', run: async (page) => {
+      await gotoAction(page, 'KSW_helpdesk.action_helpdesk_ticket_all');
+      await page.waitForSelector('.o_kanban_view, .o_list_view', { timeout: 15000 });
+      await page.click('.o_searchview_dropdown_toggler, .o_searchview button');
+      await page.waitForTimeout(700);
+  }},
+  { tag: 'it/asset-02', persona: 'it', run: async (page) => {
+      await openRecord(page, 'KSW_helpdesk.action_it_asset_all', IDS.asset_laptop);
+  }},
+  { tag: 'it/assign-01', persona: 'it', run: async (page) => {
+      await openRecord(page, 'KSW_helpdesk.action_it_asset_all', IDS.asset_monitor);
+      // "Assign to Employee" / "تسليم عهدة لموظف"
+      await page.getByRole('button', { name: /Assign to Employee|تسليم عهدة/i }).first().click();
+      await page.waitForSelector('.modal .o_form_view', { timeout: 12000 });
+      await page.waitForTimeout(700);
+  }},
+  { tag: 'it/return-01', persona: 'it', run: async (page) => {
+      await openRecord(page, 'KSW_helpdesk.action_it_asset_all', IDS.asset_laptop);
+      // header "Return" / "استرجاع العهدة" (must not match "Return from Maintenance")
+      await page.getByRole('button', { name: /^(Return|استرجاع العهدة)$/i }).first().click();
+      await page.waitForSelector('.modal .o_form_view', { timeout: 12000 });
+      await page.waitForTimeout(700);
+  }},
   { tag: 'admin/comm-override-01', persona: 'accounting', run: async (page) => {
       await openRecord(page, 'KSW_commissions.action_ksw_sales_commission_sheet', IDS.sales_sheet);
   }},

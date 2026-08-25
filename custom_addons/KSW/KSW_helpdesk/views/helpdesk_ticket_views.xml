@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- =============================================================== -->
+    <!-- KANBAN                                                            -->
+    <!-- =============================================================== -->
+    <record id="helpdesk_ticket_view_kanban" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.kanban</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_small_column" sample="1"
+                    records_draggable="0" quick_create="0">
+                <field name="stage_id" options="{'group_by_tooltip': {'description': 'Description'}}"/>
+                <field name="priority"/>
+                <field name="kanban_state"/>
+                <field name="is_overdue"/>
+                <field name="is_closed"/>
+                <field name="ticket_type"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="text-muted small">
+                                <span t-att-class="'badge ' + (record.ticket_type.raw_value == 'incident' and 'text-bg-danger' or 'text-bg-info')">
+                                    <field name="ticket_ref"/>
+                                </span>
+                            </div>
+                            <field name="kanban_state" widget="state_selection"
+                                   groups="KSW_helpdesk.group_helpdesk_agent"/>
+                            <span groups="!KSW_helpdesk.group_helpdesk_agent"
+                                  t-att-class="'badge rounded-pill ' + (record.kanban_state.raw_value == 'blocked' and 'text-bg-danger' or record.kanban_state.raw_value == 'done' and 'text-bg-success' or 'text-bg-light')">
+                                &#160;
+                            </span>
+                        </div>
+                        <div class="fw-bold"><field name="name"/></div>
+                        <div class="mt-1">
+                            <span t-att-class="'badge ' + (record.is_closed.raw_value and 'text-bg-success' or 'text-bg-primary')">
+                                <field name="stage_id"/>
+                            </span>
+                            <span t-if="record.category_id.raw_value" class="badge text-bg-light ms-1">
+                                <field name="category_id"/>
+                            </span>
+                            <span t-if="record.is_overdue.raw_value" class="badge text-bg-danger ms-1">Overdue</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <field name="priority" widget="priority"/>
+                            <field name="user_id" widget="many2one_avatar_user"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Agents (and managers, via implied_ids) may drag cards between stages;
+         other employees get a read-only board (see the write() guard on
+         stage_id/kanban_state/user_id in the model for the real enforcement -
+         this view change is just so non-agents aren't shown a drag handle
+         that would fail). -->
+    <record id="helpdesk_ticket_view_kanban_agent" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.kanban.agent</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="inherit_id" ref="helpdesk_ticket_view_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes" groups="KSW_helpdesk.group_helpdesk_agent">
+                <attribute name="records_draggable">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- =============================================================== -->
+    <!-- LIST                                                              -->
+    <!-- =============================================================== -->
+    <record id="helpdesk_ticket_view_list" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.list</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="is_overdue" decoration-muted="is_closed">
+                <field name="ticket_ref"/>
+                <field name="ticket_type" widget="badge"
+                       decoration-danger="ticket_type == 'incident'"
+                       decoration-info="ticket_type == 'request'"/>
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="category_id" optional="hide"/>
+                <field name="stage_id"/>
+                <field name="user_id"/>
+                <field name="priority" widget="priority"/>
+                <field name="deadline" optional="hide"/>
+                <field name="is_overdue" invisible="1"/>
+                <field name="is_closed" invisible="1"/>
+                <field name="create_date" optional="hide"/>
+                <field name="close_date" optional="hide"/>
+                <field name="closed_by" optional="hide"/>
+                <field name="resolution_hours" optional="hide" string="Resolution (h)"/>
+                <field name="satisfaction" optional="hide" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- =============================================================== -->
+    <!-- FORM                                                              -->
+    <!-- =============================================================== -->
+    <record id="helpdesk_ticket_view_form" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.form</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_assign_to_me" type="object"
+                            string="Assign to Me"
+                            invisible="user_id != False or is_closed"
+                            groups="KSW_helpdesk.group_helpdesk_agent"/>
+                    <button name="action_close" type="object"
+                            string="Close Ticket" class="oe_highlight"
+                            invisible="is_closed"
+                            groups="KSW_helpdesk.group_helpdesk_agent"/>
+                    <button name="action_reopen" type="object"
+                            string="Reopen"
+                            invisible="not is_closed"
+                            groups="KSW_helpdesk.group_helpdesk_agent"/>
+                    <field name="stage_id" widget="statusbar"
+                           options="{'clickable': '1'}"
+                           groups="KSW_helpdesk.group_helpdesk_agent"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Overdue" bg_color="text-bg-danger"
+                            invisible="not is_overdue"/>
+                    <div class="alert alert-info d-flex align-items-start" role="alert" invisible="id">
+                        <i class="fa fa-lightbulb-o fa-lg me-2 mt-1" title="Tip"/>
+                        <div>
+                            <strong>Quick tips for a faster fix:</strong> choose whether
+                            this is an <strong>Incident</strong> (something broken) or a
+                            <strong>Service Request</strong> (something you need), pick the
+                            matching <strong>Category</strong>, describe the issue with as
+                            much detail as you can, and link the <strong>Related Asset</strong>
+                            if it applies. The IT team is notified the moment you save.
+                        </div>
+                    </div>
+                    <div class="oe_title">
+                        <div class="mb-2">
+                            <field name="ticket_type" widget="radio" widget_options="{'horizontal': true}"
+                                   readonly="id"/>
+                        </div>
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Briefly describe the issue..."/></h1>
+                        <h3><field name="ticket_ref" readonly="1"/></h3>
+                    </div>
+                    <group>
+                        <group string="Caller">
+                            <field name="employee_id" widget="many2one_avatar_employee"
+                                   options="{'display_avatar_name': True}"
+                                   readonly="is_closed"/>
+                            <field name="caller_job_title" readonly="1" invisible="not caller_job_title"/>
+                            <field name="caller_department_id" readonly="1" invisible="not caller_department_id"/>
+                            <field name="caller_email" readonly="1" invisible="not caller_email" widget="email"/>
+                            <field name="caller_work_phone" readonly="1" invisible="not caller_work_phone" widget="phone"/>
+                            <field name="caller_mobile_phone" readonly="1" invisible="not caller_mobile_phone" widget="phone"/>
+                        </group>
+                        <group string="Ticket Details">
+                            <field name="category_id"/>
+                            <field name="asset_id"/>
+                            <field name="priority" widget="priority"/>
+                            <field name="user_id" groups="KSW_helpdesk.group_helpdesk_agent"/>
+                            <field name="kanban_state" widget="radio" widget_options="{'horizontal': true}"
+                                   groups="KSW_helpdesk.group_helpdesk_agent"/>
+                            <field name="deadline"/>
+                            <field name="close_date" invisible="not is_closed" readonly="1"/>
+                            <field name="closed_by" invisible="not is_closed" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Resolution Feedback" invisible="not is_closed">
+                        <field name="satisfaction" widget="radio" widget_options="{'horizontal': true}" nolabel="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Detailed Description">
+                            <field name="description" placeholder="Describe the issue in as much detail as possible..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- =============================================================== -->
+    <!-- SEARCH                                                            -->
+    <!-- =============================================================== -->
+    <record id="helpdesk_ticket_view_search" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.search</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Ticket"
+                       filter_domain="['|', '|', ('name', 'ilike', self), ('ticket_ref', 'ilike', self), ('description', 'ilike', self)]"/>
+                <field name="employee_id"/>
+                <field name="user_id"/>
+                <field name="category_id"/>
+                <field name="ticket_type"/>
+                <filter string="My Tickets" name="my_tickets" domain="[('employee_id.user_id', '=', uid)]"/>
+                <filter string="Assigned to Me" name="assigned_to_me" domain="[('user_id', '=', uid)]"/>
+                <filter string="Unassigned" name="unassigned" domain="[('user_id', '=', False)]"/>
+                <separator/>
+                <filter string="Incidents" name="incidents" domain="[('ticket_type', '=', 'incident')]"/>
+                <filter string="Service Requests" name="requests" domain="[('ticket_type', '=', 'request')]"/>
+                <separator/>
+                <filter string="Open" name="open" domain="[('is_closed', '=', False)]"/>
+                <filter string="Closed" name="closed" domain="[('is_closed', '=', True)]"/>
+                <filter string="Overdue" name="overdue" domain="[('is_overdue', '=', True)]"/>
+                <separator/>
+                <filter string="High Priority" name="high_priority" domain="[('priority', 'in', ('2', '3'))]"/>
+                <group>
+                    <filter string="Type" name="group_type" context="{'group_by': 'ticket_type'}"/>
+                    <filter string="Stage" name="group_stage" context="{'group_by': 'stage_id'}"/>
+                    <filter string="Category" name="group_category" context="{'group_by': 'category_id'}"/>
+                    <filter string="Assigned To" name="group_user" context="{'group_by': 'user_id'}"/>
+                    <filter string="Priority" name="group_priority" context="{'group_by': 'priority'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- =============================================================== -->
+    <!-- CALENDAR                                                          -->
+    <!-- =============================================================== -->
+    <record id="helpdesk_ticket_view_calendar" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.calendar</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="arch" type="xml">
+            <calendar date_start="deadline" string="Ticket Deadlines" color="category_id" mode="month">
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="category_id"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- =============================================================== -->
+    <!-- GRAPH / PIVOT                                                     -->
+    <!-- =============================================================== -->
+    <record id="helpdesk_ticket_view_graph" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.graph</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="arch" type="xml">
+            <graph string="Tickets by Category" type="bar">
+                <field name="ticket_type"/>
+                <field name="category_id"/>
+                <field name="stage_id"/>
+                <field name="resolution_hours" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="helpdesk_ticket_view_pivot" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.pivot</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="arch" type="xml">
+            <pivot string="Tickets Analysis">
+                <field name="ticket_type" type="row"/>
+                <field name="category_id" type="row"/>
+                <field name="stage_id" type="col"/>
+                <field name="resolution_hours" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- =============================================================== -->
+    <!-- ACTIONS                                                           -->
+    <!-- =============================================================== -->
+    <record id="action_helpdesk_ticket_all" model="ir.actions.act_window">
+        <field name="name">All Tickets</field>
+        <field name="res_model">helpdesk.ticket</field>
+        <field name="view_mode">kanban,list,form,calendar,graph,pivot</field>
+        <field name="context">{'search_default_open': 1, 'group_by': 'stage_id'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No tickets yet
+            </p>
+            <p>
+                Tickets raised by employees will show up here for triage.
+            </p>
+        </field>
+    </record>
+
+    <!-- My Tickets: deliberately NOT grouped by stage (see the shared kanban
+         view - grouping is only added via action context, e.g. above), so a
+         brand-new employee with zero tickets gets Odoo's friendly "no
+         content yet" screen below instead of a wall of empty stage columns. -->
+    <record id="action_helpdesk_ticket_my_tickets" model="ir.actions.act_window">
+        <field name="name">My Tickets</field>
+        <field name="res_model">helpdesk.ticket</field>
+        <field name="view_mode">kanban,list,form,calendar</field>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+        <field name="help" type="html">
+            <div class="text-center" style="max-width: 480px; margin: 0 auto;">
+                <p class="o_view_nocontent_smiling_face">
+                    You have no support tickets yet
+                </p>
+                <p class="text-muted">
+                    Need help with hardware, software, network access, or
+                    anything else IT-related? Here's how to get help fast:
+                </p>
+                <div class="text-start d-inline-block mt-3">
+                    <p><strong>1.</strong> Click <strong>New</strong> above.</p>
+                    <p><strong>2.</strong> Choose <strong>Incident</strong> (something
+                        broken) or <strong>Service Request</strong> (something you need).</p>
+                    <p><strong>3.</strong> Give it a short, clear subject
+                        (e.g. "Laptop won't turn on") and pick a
+                        <strong>Category</strong>.</p>
+                    <p><strong>4.</strong> Describe the issue with as much
+                        detail as you can, and link the affected asset if any.</p>
+                    <p><strong>5.</strong> Click <strong>Save</strong> — the
+                        IT team is notified automatically and you can track
+                        progress right here.</p>
+                </div>
+            </div>
+        </field>
+    </record>
+
+    <!-- Reporting: charts/pivot on solved tickets (volume, category mix,
+         resolution time). Agents and managers only - see menu.xml. -->
+    <record id="action_helpdesk_ticket_reporting" model="ir.actions.act_window">
+        <field name="name">Reporting</field>
+        <field name="res_model">helpdesk.ticket</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="domain">[('is_closed', '=', True)]</field>
+        <field name="context">{'search_default_closed': 1, 'pivot_measures': ['__count', 'resolution_hours']}</field>
+    </record>
+
+    <!-- History: every closed ticket, as a searchable/sortable list (not a
+         chart) - "what did we solve, for who, how long did it take". -->
+    <record id="action_helpdesk_ticket_history" model="ir.actions.act_window">
+        <field name="name">Ticket History</field>
+        <field name="res_model">helpdesk.ticket</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="domain">[('is_closed', '=', True)]</field>
+        <field name="context">{'search_default_closed': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No closed tickets yet
+            </p>
+            <p>
+                Every ticket that has been resolved and closed shows up
+                here for reference.
+            </p>
+        </field>
+    </record>
+
+</odoo>

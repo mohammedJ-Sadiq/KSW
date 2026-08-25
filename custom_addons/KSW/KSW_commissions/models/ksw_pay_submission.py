@@ -78,6 +78,15 @@ class KswPaySubmission(models.Model):
         'res.users', compute='_compute_responsible', store=True,
         string='Supervisor',
     )
+
+    # Who approves this department's handover. A different person from
+    # `responsible_id` above: that is the DM who prepares the work, this is
+    # the GM who signs it off. Conflating the two is exactly the confusion
+    # the department GM exists to remove.
+    gm_id = fields.Many2one(
+        'res.users', compute='_compute_gm', store=True,
+        string='General Manager',
+    )
     submitted_by = fields.Many2one('res.users', readonly=True, copy=False)
     submitted_date = fields.Datetime(readonly=True, copy=False)
     returned_by = fields.Many2one('res.users', readonly=True, copy=False)
@@ -95,6 +104,7 @@ class KswPaySubmission(models.Model):
 
     x_can_submit = fields.Boolean(compute='_compute_permissions')
     x_can_return = fields.Boolean(compute='_compute_permissions')
+    x_can_approve = fields.Boolean(compute='_compute_permissions')
 
     # ------------------------------------------------------------------
     # Computes
@@ -104,6 +114,43 @@ class KswPaySubmission(models.Model):
         for rec in self:
             manager = rec.department_id.sudo().manager_id
             rec.responsible_id = manager.user_id if manager else False
+
+    @api.depends('department_id', 'department_id.x_effective_gm_id')
+    def _compute_gm(self):
+        """The GM answerable for this scope.
+
+        A site-scoped submission (driver trips) has no department at all, so
+        it falls back to the company default GM — same rule the leave and
+        loan chains apply to employees with no department. ksw.pay.run is
+        single-company and carries no company_id, so the environment's is the
+        only one available.
+        """
+        default_gm = self.env.company.sudo().x_default_gm_id
+        for rec in self:
+            gm = rec.department_id.sudo().x_effective_gm_id or default_gm
+            rec.gm_id = gm.sudo().user_id
+
+    def _check_is_my_department(self):
+        """Refuse unless the caller is this scope's General Manager.
+
+        The record rule filters what a GM sees; this is what stops the RPC.
+        No blanket override for the sitting GM: if he is not named on the
+        department, it is not his to approve.
+        """
+        if self.env.su:
+            return
+        user = self.env.user
+        for rec in self:
+            if rec.gm_id and rec.gm_id == user:
+                continue
+            if rec.gm_id:
+                raise UserError(_(
+                    "Only %(gm)s, the General Manager of %(scope)s, can act "
+                    "on this submission.",
+                    gm=rec.gm_id.name, scope=rec.display_name))
+            raise UserError(_(
+                "No General Manager is set for %(scope)s. Ask HR to set the "
+                "department's General Manager.", scope=rec.display_name))
 
     @api.depends('batch_ids.state', 'batch_ids.total_amount',
                  'batch_ids.entry_count', 'batch_ids.employee_count',
@@ -120,18 +167,22 @@ class KswPaySubmission(models.Model):
             rec.total_amount = sum(batches.mapped('total_amount'))
 
     @api.depends_context('uid')
-    @api.depends('state', 'run_id.state')
+    @api.depends('state', 'run_id.state', 'gm_id')
     def _compute_permissions(self):
         user = self.env.user
-        is_gm = user.has_group('KSW_commissions.group_commission_gm')
         for rec in self:
             locked = rec.run_id.state in LOCKING_STATES
+            # Per record, not per user: being a GM somewhere says nothing
+            # about whether this department is his.
+            is_my_gm = bool(rec.gm_id) and rec.gm_id == user
             rec.x_can_submit = (
                 not locked
                 and rec.state in ('draft', 'returned')
                 and bool(rec.batch_ids)
             )
-            rec.x_can_return = is_gm and not locked \
+            rec.x_can_return = is_my_gm and not locked \
+                and rec.state == 'submitted'
+            rec.x_can_approve = is_my_gm and not locked \
                 and rec.state == 'submitted'
 
     @api.depends('department_id', 'site_id', 'period')
@@ -265,13 +316,52 @@ class KswPaySubmission(models.Model):
         self.mapped('run_id')._refresh_register()
         return True
 
+    def action_approve(self):
+        """The GM signs off his own department, on its own.
+
+        Approval used to be one atomic act on the month: every submitted
+        department at once, then build the register and lock. With a GM per
+        department that is nobody's decision to make — so each department is
+        approved by its own GM here, and closing the month becomes a separate
+        act (see ksw.pay.run.action_approve / action_close_month).
+        """
+        self._check_is_my_department()
+        for rec in self:
+            check_period_unlocked(
+                self.env, rec.period, _("Approving this department"))
+            if rec.state == 'approved':
+                raise UserError(_(
+                    "%(name)s has already been approved.",
+                    name=rec.display_name))
+            if rec.state != 'submitted':
+                raise UserError(_(
+                    "%(name)s has not been submitted yet, so there is "
+                    "nothing to approve.", name=rec.display_name))
+            rec.batch_ids.filtered(
+                lambda b: b.state == 'submitted').sudo().write(
+                    {'state': 'approved'})
+            rec.sudo().write({'state': 'approved'})
+            # sudo(): mail.message create is gated on access to the document,
+            # and a GM's scope here is one department. Authorisation was
+            # settled by _check_is_my_department above.
+            rec.sudo().message_post(
+                body=Markup(
+                    '<strong>✅ Approved</strong><br/>'
+                    '<b>Department:</b> %(scope)s<br/>'
+                    '<b>By:</b> %(user)s<br/>'
+                    '<b>Employees:</b> %(emp)s · <b>Total:</b> %(total).2f'
+                ) % {'scope': rec.display_name, 'user': self.env.user.name,
+                     'emp': rec.employee_count,
+                     'total': rec.total_amount or 0.0},
+                subtype_xmlid='mail.mt_note',
+            )
+        self.mapped('run_id')._sync_state()
+        self.mapped('run_id')._refresh_register()
+        return True
+
     def action_return(self):
         """GM sends the department back, with the reason on every batch."""
-        if not self.env.su and not self.env.user.has_group(
-                'KSW_commissions.group_commission_gm'):
-            raise UserError(_(
-                "Only the General Manager can return a submitted "
-                "department."))
+        self._check_is_my_department()
         for rec in self:
             if rec.state != 'submitted':
                 raise UserError(_(
@@ -322,11 +412,12 @@ class KswPaySubmission(models.Model):
     # Notification
     # ------------------------------------------------------------------
     def _gm_partners(self):
-        group = self.env.ref('KSW_commissions.group_commission_gm',
-                             raise_if_not_found=False)
-        if not group:
-            return self.env['res.partner']
-        return group.sudo().all_user_ids.partner_id
+        """This scope's GM — one person, not the whole GM group.
+
+        Mailing the group meant every GM was told about every department's
+        handover, which is the broadcast the department GM replaces.
+        """
+        return self.mapped('gm_id').partner_id
 
     def _supervisor_partners(self):
         self.ensure_one()

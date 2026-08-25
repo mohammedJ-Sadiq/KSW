@@ -18,5 +18,22 @@
   "payslip": 16260,
   "comm_batch": 10,
   "sales_sheet": 6,
-  "payslip_batch": 240
+  "payslip_batch": 240,
+  "it_user": 9129,
+  "asset_laptop": 1,
+  "asset_printer": 2,
+  "asset_monitor": 3,
+  "asset_phone": 4,
+  "asset_maintenance": 5,
+  "asset_switch": 6,
+  "ticket_new": 1,
+  "ticket_in_progress": 2,
+  "ticket_blocked": 3,
+  "ticket_overdue": 4,
+  "ticket_request": 5,
+  "ticket_request_access": 6,
+  "ticket_closed": 7,
+  "ticket_closed_2": 8,
+  "ticket_closed_3": 9,
+  "ticket_closed_4": 10
 }

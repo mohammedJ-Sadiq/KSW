@@ -130,6 +130,28 @@ class ResUsers(models.Model):
         manager_ids.discard(self.id)
         return sorted(manager_ids)
 
+    def _ksw_gm_department_ids(self):
+        """Ids of the departments this user is the effective GM of.
+
+        The counterpart of `_ksw_assisted_manager_ids` for the other KSW
+        delegation axis. Record-rule domains read the stored path
+        (`department_id.x_effective_gm_id.user_id`) directly and do NOT go
+        through here -- one SQL join beats a Python-computed id list that
+        grows with the department count. This helper exists for the Python
+        guards and for the error messages that have to name what the user
+        CAN reach.
+
+        sudo() because a GM has no `hr.department` model access of his own;
+        reading who he is responsible for is an identity question, not a
+        scope one.
+        """
+        self.ensure_one()
+        if not self.id:
+            return []
+        return self.env['hr.department'].sudo().with_context(
+            active_test=False,
+        ).search([('x_effective_gm_id.user_id', '=', self.id)]).ids
+
     # Both sides listed: the link is writable from either, and a constrains
     # only fires for the field actually present in vals.
     @api.constrains('x_assistant_ids', 'x_assisted_manager_ids')

@@ -269,10 +269,7 @@ class HrLeaveUnpaid(models.Model):
 
         if unpaid:
             for leave in unpaid:
-                self._check_group(
-                    'KSW_annual_leave.group_annual_leave_gm',
-                    'Only the General Manager can give final approval.',
-                )
+                self._check_department_gm(leave)
                 if leave.x_annual_approval_state != 'pending_gm_final':
                     raise UserError(
                         'This leave is not pending GM final approval.')

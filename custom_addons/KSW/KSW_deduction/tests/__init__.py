@@ -18,3 +18,4 @@ from . import test_manager_assistant_loans
 from . import test_payslip_revision_deductions
 from . import test_employee_self_service
 from . import test_loan_return_approver_wizard
+from . import test_department_gm

@@ -40,9 +40,19 @@ class TestGmReturnApprover(TransactionCase):
         cls.emp_hr  = cls.env['hr.employee'].create({'name': 'Ret HR Emp',  'user_id': cls.user_hr.id})
         cls.emp_acc = cls.env['hr.employee'].create({'name': 'Ret Acc Emp', 'user_id': cls.user_acc.id})
         cls.emp_gm  = cls.env['hr.employee'].create({'name': 'Ret GM Emp',  'user_id': cls.user_gm.id})
+
+        # The GM steps follow the employee's department, not the GM group, so
+        # the fixture GM has to be named on the department the requester sits
+        # in — holding group_annual_leave_gm alone no longer authorises
+        # anything. See tests/test_department_gm.py for that contract.
+        cls.department = cls.env['hr.department'].create({
+            'name': 'GM Return Test Dept',
+            'x_gm_id': cls.emp_gm.id,
+        })
         cls.employee = cls.env['hr.employee'].create({
             'name': 'Requesting Employee Return',
             'leave_manager_id': cls.user_dm.id,
+            'department_id': cls.department.id,
         })
 
         # requires_allocation=False (bool) so _check_validity skips the

@@ -22,3 +22,6 @@ access_leave_return_step_user,ksw.leave.return.step.user,model_ksw_leave_return_
 access_ksw_annual_leave_manager_assistant,ksw.annual.leave.manager.assistant,model_ksw_annual_leave,KSW_base_security.group_manager_assistant,1,0,0,0
 access_commission_line_manager_assistant,hr.leave.commission.line.manager.assistant,model_hr_leave_commission_line,KSW_base_security.group_manager_assistant,1,0,0,0
 access_deduction_line_manager_assistant,hr.leave.deduction.line.manager.assistant,model_hr_leave_deduction_line,KSW_base_security.group_manager_assistant,1,0,0,0
+access_ksw_annual_leave_department_gm,ksw.annual.leave.department.gm,model_ksw_annual_leave,KSW_annual_leave.group_annual_leave_gm,1,0,0,0
+access_commission_line_department_gm,hr.leave.commission.line.department.gm,model_hr_leave_commission_line,KSW_annual_leave.group_annual_leave_gm,1,0,0,0
+access_deduction_line_department_gm,hr.leave.deduction.line.department.gm,model_hr_leave_deduction_line,KSW_annual_leave.group_annual_leave_gm,1,0,0,0

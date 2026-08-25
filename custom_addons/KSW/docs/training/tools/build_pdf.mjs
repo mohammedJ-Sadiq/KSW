@@ -20,7 +20,7 @@ const ROOT = resolve(__dirname, '..');            // docs/training
 const OUT = join(ROOT, 'pdf');
 mkdirSync(OUT, { recursive: true });
 
-const PERSONAS = ['employee', 'supervisor', 'hr', 'accounting', 'gm', 'payroll', 'admin'];
+const PERSONAS = ['employee', 'supervisor', 'hr', 'accounting', 'gm', 'payroll', 'it', 'admin'];
 
 function personaFiles(lang, persona) {
   const dir = join(ROOT, lang, persona);
@@ -108,6 +108,7 @@ const PERSONA_DOCS = {
   accounting: ['Accounting', 'Accounting Guide',       'دليل المحاسبة'],
   gm:         ['GM',         'General Manager Guide',  'دليل المدير العام'],
   payroll:    ['Payroll',    'Payroll Guide',          'دليل الرواتب'],
+  it:         ['IT',         'IT Team Guide',          'دليل فريق تقنية المعلومات'],
   admin:      ['Admin',      'Administrator Guide',    'دليل المسؤولين'],
 };
 

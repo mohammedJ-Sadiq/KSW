@@ -135,11 +135,29 @@
         <field name="comment">Can approve annual leave requests at the accounting step (additional commissions, remaining loans).</field>
     </record>
 
+    <!--
+        The GM tier is the one approval group that is NOT company-wide.
+        Authority comes from `hr.department.x_effective_gm_id`, so scope has
+        to follow it: `group_leave_officer` is deliberately NOT implied here,
+        because its rule is [(1,'=',1)] and would hand every GM every
+        department's requests — the exact behaviour this tier replaces.
+
+        `(6, 0, [...])` rather than `(4, ...)`: an implication already
+        written to the database survives its removal from this file, so the
+        list must be set outright to actively drop `group_leave_officer`
+        (Odoo 19 Pitfalls #3). `hr_holidays.group_hr_holidays_user` is named
+        explicitly because it used to arrive via the Officer tier and carries
+        the Time Off menus and the hr.leave ACL — losing it would leave the
+        GM with a scoped rule over a model he cannot open.
+    -->
     <record id="group_annual_leave_gm" model="res.groups">
         <field name="name">GM Approver</field>
         <field name="privilege_id" ref="privilege_annual_leave_approval"/>
-        <field name="implied_ids" eval="[(4, ref('base.group_user')), (4, ref('group_leave_officer'))]"/>
-        <field name="comment">Can perform Initial and Final approval of annual leave requests.</field>
+        <field name="implied_ids" eval="[(6, 0, [
+            ref('base.group_user'),
+            ref('hr_holidays.group_hr_holidays_user'),
+        ])]"/>
+        <field name="comment">Can perform Initial and Final approval of annual leave requests, for the departments they are set as General Manager of.</field>
     </record>
 
     <!-- ============================================================ -->
@@ -194,6 +212,102 @@
         <field name="perm_write" eval="True"/>
         <field name="perm_create" eval="True"/>
         <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Record Rules — hr.leave, Department GM                        -->
+    <!-- ============================================================ -->
+    <!--
+        The GM's scope is the departments he is General Manager of, and
+        nothing else. There is no company-wide fallback on purpose: a GM who
+        is not named on a department has no business reading its requests,
+        which is the same answer the approve buttons give.
+
+        `x_effective_gm_id` is a stored compute on hr.department, so this is
+        a plain join. It already folds in the parent-department climb and the
+        company default, so a department left blank still resolves to
+        somebody and the domain needs no OR branch for it.
+
+        Employees with NO department are reachable through the company
+        default GM only, and that cannot be expressed here (there is no
+        department row to join). They are covered by the second rule below.
+
+        Write, not just read: the GM has to stamp the approval state. No
+        create and no unlink — a GM approves requests, he does not raise or
+        destroy them.
+    -->
+    <record id="hr_leave_rule_department_gm" model="ir.rule">
+        <field name="name">KSW Leave: department GM (own departments)</field>
+        <field name="model_id" ref="hr_holidays.model_hr_leave"/>
+        <field name="groups" eval="[(4, ref('group_annual_leave_gm'))]"/>
+        <field name="domain_force">[('employee_id.department_id.x_effective_gm_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!--
+        103 active employees have no department at all. Their requests fall
+        back to the company default GM in `_department_gm_user`, so the same
+        person must be able to see them here or the chain stalls on a
+        request nobody can open.
+    -->
+    <record id="hr_leave_rule_department_gm_no_department" model="ir.rule">
+        <field name="name">KSW Leave: default GM (employees with no department)</field>
+        <field name="model_id" ref="hr_holidays.model_hr_leave"/>
+        <field name="groups" eval="[(4, ref('group_annual_leave_gm'))]"/>
+        <field name="domain_force">[
+            ('employee_id.department_id', '=', False),
+            ('company_id.x_default_gm_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="hr_leave_allocation_rule_view_department_gm" model="ir.rule">
+        <field name="name">KSW Allocation: department GM (own departments)</field>
+        <field name="model_id" ref="hr_holidays.model_hr_leave_allocation"/>
+        <field name="groups" eval="[(4, ref('group_annual_leave_gm'))]"/>
+        <field name="domain_force">[('employee_id.department_id.x_effective_gm_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="ksw_annual_leave_rule_department_gm" model="ir.rule">
+        <field name="name">KSW Annual Leave: department GM (own departments)</field>
+        <field name="model_id" ref="model_ksw_annual_leave"/>
+        <field name="groups" eval="[(4, ref('group_annual_leave_gm'))]"/>
+        <field name="domain_force">[('employee_id.department_id.x_effective_gm_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="hr_leave_commission_line_rule_department_gm" model="ir.rule">
+        <field name="name">KSW Leave Commission: department GM (own departments)</field>
+        <field name="model_id" ref="model_hr_leave_commission_line"/>
+        <field name="groups" eval="[(4, ref('group_annual_leave_gm'))]"/>
+        <field name="domain_force">[('leave_id.employee_id.department_id.x_effective_gm_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="hr_leave_deduction_line_rule_department_gm" model="ir.rule">
+        <field name="name">KSW Leave Other Deduction: department GM (own departments)</field>
+        <field name="model_id" ref="model_hr_leave_deduction_line"/>
+        <field name="groups" eval="[(4, ref('group_annual_leave_gm'))]"/>
+        <field name="domain_force">[('leave_id.employee_id.department_id.x_effective_gm_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
     </record>
 
     <!-- ============================================================ -->

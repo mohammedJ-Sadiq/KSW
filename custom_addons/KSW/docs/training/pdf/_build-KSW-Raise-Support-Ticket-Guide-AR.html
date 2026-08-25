@@ -1,0 +1,170 @@
+<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"><title>رفع تذكرة دعم فني</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "Noto Naskh Arabic","Noto Sans Arabic UI","DejaVu Sans",sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: right; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-right: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">رفع تذكرة دعم فني</div>
+  <div class="meta">دليل تدريب المستخدم<br/>KSW HR &amp; Payroll · 2026-08-25</div>
+</div>
+<section id="g-employee-05-raise-support-ticket"><h1>رفع تذكرة دعم فني</h1>
+<p><strong>الفئة المستهدفة:</strong> الموظف (لنفسه)
+<strong>الوقت المقدّر:</strong> دقيقتان</p>
+<hr>
+<h2>ما الذي تفعله هذه الشاشة</h2>
+<p>ترفع مشكلتك التقنية — أو طلبك من فريق تقنية المعلومات — على هيئة <strong>تذكرة
+موثّقة</strong> بدل الاتصال الهاتفي أو الرسالة العابرة. يُشعَر الفريق فور حفظ التذكرة،
+وتتابع أنت مسار معالجتها من الشاشة نفسها حتى الإغلاق.</p>
+<p>لكل تذكرة <strong>نوع واحد</strong> تختاره أنت:</p>
+<table>
+<thead>
+<tr>
+<th>النوع</th>
+<th>متى تستخدمه</th>
+<th>رقم التذكرة</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>عُطل</strong></td>
+<td>حين يكون هناك شيء معطّل أو لا يعمل كما يُفترض: الحاسب لا يعمل، لا يوجد إنترنت، الطابعة تحشر الورق، البريد لا يُرسل</td>
+<td><code>INC00001</code></td>
+</tr>
+<tr>
+<td><strong>طلب خدمة</strong></td>
+<td>حين لا يوجد عطل، بل أنت بحاجة إلى شيء: برنامج جديد، جهاز جديد، صلاحية على مجلد، إعادة تعيين كلمة مرور، أو استفسار</td>
+<td><code>REQ00001</code></td>
+</tr>
+</tbody></table>
+<p>النوع الذي تختاره يحدّد <strong>التصنيفات</strong> المعروضة عليك، وهو <strong>ثابت بعد إنشاء
+التذكرة</strong> لأنه يحدّد بادئة رقمها. فإن أخطأت في اختياره، أغلق التذكرة وارفع
+واحدة جديدة بالنوع الصحيح.</p>
+<hr>
+<h2>قبل أن تبدأ</h2>
+<ul>
+<li>ترفع التذكرة <strong>لنفسك</strong>. وإن كنت مديرًا لموظفين، يمكنك رفعها لأحد موظفيك
+المباشرين — راجع
+<span class="xref">رفع تذكرة نيابة عن أحد موظفيك</span>.</li>
+<li>جهّز التفاصيل: ما الذي يحدث بالضبط، ومتى بدأ، ونص رسالة الخطأ إن وُجدت،
+والجهاز المعني.</li>
+</ul>
+<hr>
+<h2>الخطوات</h2>
+<p>١. <strong>افتح تطبيق الدعم الفني</strong> ثم <strong>تذاكري</strong>. تعرض هذه القائمة كل تذاكرك،
+   المفتوحة والمغلقة.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/employee/ticket-01.png" alt="قائمة تذاكري"></p>
+<p>٢. اضغط <strong>جديد</strong>.</p>
+<p>٣. <strong>اختر نوع التذكرة</strong> في أعلى النموذج: <strong>عُطل</strong> أو <strong>طلب خدمة</strong>.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/employee/ticket-02.png" alt="نموذج تذكرة جديدة"></p>
+<p>٤. <strong>اكتب وصفًا مختصرًا</strong> في سطر العنوان — جملة واحدة واضحة مثل:
+   «الحاسب المحمول لا يعمل»، لا «مشكلة عاجلة».</p>
+<p>٥. <strong>اختر التصنيف</strong> المناسب (أجهزة، برامج، الشبكة والإنترنت، البريد
+   الإلكتروني، الطابعات، الوصول والصلاحيات، أخرى — ولطلبات الخدمة: طلب جهاز
+   جديد، طلب تثبيت برنامج، طلب وصول أو صلاحية، إعادة تعيين كلمة المرور،
+   استفسار أو إرشاد). لا تُعرض عليك إلا التصنيفات التابعة للنوع الذي اخترته.</p>
+<p>٦. <strong>اربط الأصل التقني المرتبط</strong> إن كانت التذكرة تخصّ جهازًا بعينه. لا تعرض
+   القائمة إلا الأجهزة المسجّلة <strong>بعهدتك</strong> أنت: حاسبك، جوالك، شاشتك. اتركه
+   فارغًا إن لم ينطبق.</p>
+<p>٧. <strong>حدّد الأولوية</strong> بصدق (منخفضة / متوسطة / مرتفعة / عاجلة). القيمة
+   الافتراضية «متوسطة» وهي المناسبة لأغلب التذاكر.</p>
+<p>٨. <strong>عبّئ تبويب «الوصف التفصيلي»</strong> — وهو حقل إلزامي، وهو ما يُسرّع المعالجة
+   فعلًا. اذكر ما كنت تفعله، ونص رسالة الخطأ حرفيًا، وهل تتكرر المشكلة في كل
+   مرة.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/employee/ticket-03.png" alt="الوصف التفصيلي"></p>
+<p>٩. <strong>احفظ.</strong> تحصل التذكرة على رقمها (<code>INC…</code> أو <code>REQ…</code>) وتدخل مرحلة
+   <strong>جديدة</strong>.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/employee/ticket-04.png" alt="التذكرة بعد الحفظ"></p>
+<hr>
+<h2>ما الذي يحدث بعد ذلك</h2>
+<ul>
+<li>تصل تذكرتك إلى قائمة فريق تقنية المعلومات في مرحلة <strong>جديدة</strong>. وحين يتسلّمها
+أحد أعضاء الفريق تنتقل إلى <strong>قيد المعالجة</strong> ويظهر اسمه في حقل <strong>المكلَّف
+بالمعالجة</strong>.</li>
+<li><strong>تواصل مع الفريق داخل التذكرة نفسها.</strong> في صندوق الرسائل أسفل التذكرة اضغط
+<strong>خارجي</strong> ثم اكتب رسالتك — يصل الإشعار إلى كل متابعي التذكرة. أرفق صورة
+للشاشة أو للخطأ بالطريقة نفسها. بهذا يبقى سجل الحالة كاملًا في مكان واحد.</li>
+<li>إن احتاج الفريق شيئًا منك ولم يستطع المتابعة، يضع التذكرة في حالة
+<strong>متوقّفة</strong>، وتظهر عليها علامة حمراء.</li>
+<li>عند انتهاء المعالجة يُغلق الفريق التذكرة: تنتقل إلى <strong>مغلقة</strong>، ويُسجَّل تاريخ
+الإغلاق ومن أغلقها، ويظهر لك في التذكرة قسم <strong>تقييم المعالجة</strong>: <strong>ممتاز</strong> أو
+<strong>مقبول</strong> أو <strong>غير مُرضٍ</strong>. نرجو تعبئته — فهو التقييم الوحيد الذي يصل الفريق.</li>
+</ul>
+<blockquote>
+<p><strong>ما الذي يمكنك تعديله وما لا يمكنك.</strong> أنت صاحب محتوى التذكرة: العنوان
+والوصف والتصنيف والأصل المرتبط والأولوية والموعد النهائي. أما <strong>المرحلة</strong>
+و<strong>المكلَّف بالمعالجة</strong> و<strong>حالة المعالجة</strong> فهي من صلاحية فريق تقنية
+المعلومات وحده؛ تراها ولا تغيّرها.</p>
+</blockquote>
+<hr>
+<h2>أسئلة ومشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>ما تراه</th>
+<th>السبب</th>
+<th>المعالجة</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>قائمة التصنيفات فارغة أو ينقصها التصنيف الذي أريده</td>
+<td>التصنيفات مقسّمة حسب النوع</td>
+<td>راجع اختيار <strong>عُطل / طلب خدمة</strong> في الأعلى؛ تتغيّر القائمة بتغيّره</td>
+</tr>
+<tr>
+<td>لا أستطيع تحويل «عُطل» إلى «طلب خدمة»</td>
+<td>النوع ثابت بعد الإنشاء لأنه يحدّد رقم التذكرة</td>
+<td>أغلق التذكرة وارفع أخرى بالنوع الصحيح</td>
+</tr>
+<tr>
+<td><strong>الأصل التقني المرتبط</strong> لا يعرض حاسبي</td>
+<td>الجهاز غير مسجّل بعهدتك في النظام</td>
+<td>ارفع التذكرة بدونه واذكر الجهاز في الوصف، وسيصحّح الفريق السجل</td>
+</tr>
+<tr>
+<td>لا أستطيع تغيير المرحلة أو تكليف أحد بالتذكرة</td>
+<td>هذه صلاحية فريق تقنية المعلومات</td>
+<td>اكتب طلبك في صندوق رسائل التذكرة؛ يصل الفريق إشعار به</td>
+</tr>
+<tr>
+<td>تظهر رسالة: لا يمكنك إنشاء أو تعديل تذاكر إلا لنفسك أو لموظفيك المباشرين</td>
+<td>حقل <strong>صاحب الطلب</strong> يشير إلى شخص ليس أنت ولا أحد موظفيك</td>
+<td>أعِد <strong>صاحب الطلب</strong> إلى اسمك</td>
+</tr>
+<tr>
+<td>لا أرى تذكرة رفعها زميلي</td>
+<td>لا ترى إلا تذاكرك (وتذاكر موظفيك المباشرين)</td>
+<td>هذا هو السلوك المقصود</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li><span class="xref">رفع تذكرة نيابة عن أحد موظفيك</span> — للمديرين</li>
+<li><span class="xref">البدء في استخدام النظام</span> — الدخول والتنقّل والإشعارات</li>
+</ul>
+</section>
+</body></html>

@@ -61,6 +61,10 @@ PERSONAS = {
         "base.group_user",
         "om_hr_payroll.group_hr_payroll_user",
     ],
+    "it": [
+        "base.group_user",
+        "KSW_helpdesk.group_helpdesk_agent",
+    ],
     "admin": [
         "base.group_user",
         "KSW_deduction.group_deduction_manager",

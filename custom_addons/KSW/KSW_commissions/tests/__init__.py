@@ -6,3 +6,4 @@ from . import test_salesperson_profile
 from . import test_sales_commission_sheet
 from . import test_client_splits
 from . import test_commission_priority_deduction
+from . import test_department_gm

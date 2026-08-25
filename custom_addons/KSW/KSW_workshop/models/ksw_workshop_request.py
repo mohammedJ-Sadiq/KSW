@@ -3,6 +3,32 @@ from markupsafe import Markup
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
+# Keyword -> request_type, used to classify the legacy Google-Sheet history,
+# whose `request_type` was empty on all 17,079 rows (the sheet never had the
+# column). Ordered: the FIRST entry whose pattern matches wins, so the most
+# specific/most common work goes first — ~400 rows mention more than one of
+# these and would otherwise classify arbitrarily.
+#
+# Patterns are POSIX regex fragments fed to SQL `~*` by the 19.0.6.0.0
+# migration, so they must stay valid PostgreSQL regexes. Arabic misspellings
+# are deliberate: `زبت` for `زيت` and `chance oil` for `change oil` are how the
+# supervisors actually typed them, and together they are hundreds of rows.
+#
+# Coverage on the KSWCO corpus is ~74%; the remaining ~26% is a long tail of
+# one-off free text and is deliberately left NULL ("Unclassified") rather than
+# swept into a catch-all, so a report never implies a classification nobody made.
+REQUEST_TYPE_KEYWORDS = [
+    ('oil_filters', r'زيت|زبت|فلتر|فلاتر|change oil|chance oil|chang oil|oil change'),
+    ('tyres', r'اطار|إطار|كفر|بنشر|كاوتش'),
+    ('brakes', r'فرامل|بريك|قماشات'),
+    ('electrical', r'كهرب|دينامو|بطاري|سلف|مولد'),
+    ('bodywork', r'لحام|سمكر|دهان|بوية'),
+    ('water_pump', r'موتور|طرمبة|مضخة'),
+    ('hoses', r'هوز|خرطوم'),
+    ('mechanical', r'كلتش|جير|دبرياج|عفشة|رديتر|مكيف|دنجل'),
+    ('inspection', r'فحص دوري|الفحص الدوري|استمارة'),
+]
+
 
 class KswWorkshopRequest(models.Model):
     _name = 'ksw.workshop.request'
@@ -20,7 +46,7 @@ class KswWorkshopRequest(models.Model):
     _REPORT_FIELDS = {
         'entry_datetime', 'exit_datetime', 'odometer_reading', 'tire_pressure',
         'tire_bolts', 'work_statement', 'repairs_parts', 'technician_id',
-        'parts_cost', 'parts_extra_cost', 'labor_cost',
+        'parts_cost', 'labor_cost',
     }
     _REQUESTER_FIELDS = {
         'client_id', 'vehicle_type', 'vehicle_id', 'driver_id', 'description', 'request_type',
@@ -40,12 +66,27 @@ class KswWorkshopRequest(models.Model):
     mobile_phone = fields.Char(related='employee_id.mobile_phone', readonly=True)
     job_title = fields.Char(related='employee_id.job_title', readonly=True)
 
+    # The four original values keep their keys; the rest were added once the
+    # 17k imported descriptions showed what the workshop actually does — tyres
+    # and brakes alone are ~2,150 requests that used to collapse into
+    # "Mechanical". See REQUEST_TYPE_KEYWORDS below for how history was
+    # classified.
     request_type = fields.Selection([
-        ('mechanical', 'Mechanical'),
-        ('bodywork', 'Bodywork / Welding'),
         ('oil_filters', 'Oil & Filters'),
+        ('tyres', 'Tyres'),
+        ('brakes', 'Brakes'),
         ('electrical', 'Electrical'),
+        ('bodywork', 'Bodywork / Welding'),
+        ('water_pump', 'Water Pump / Motor'),
+        ('hoses', 'Hoses'),
+        ('mechanical', 'Mechanical'),
+        ('inspection', 'Periodic Inspection'),
     ], string='Request Type', tracking=True)
+    x_request_type_derived = fields.Boolean(
+        string='Type Derived from Description', readonly=True, copy=False,
+        help="Set by the history backfill when the request type was inferred from the "
+             "description text rather than chosen by a person. Lets a report separate "
+             "derived values from entered ones.")
 
     is_cash_customer = fields.Boolean(string='Cash Customer', tracking=True, copy=False)
     x_can_toggle_cash_customer = fields.Boolean(
@@ -102,7 +143,10 @@ class KswWorkshopRequest(models.Model):
     note_to_requester = fields.Text(string='Note to Requester')
     rejection_reason = fields.Text()
     completion_date = fields.Datetime(readonly=True, copy=False)
-    duration_days = fields.Integer(compute='_compute_duration_days')
+    # store=True so it can be used as a pivot/graph measure — an unstored
+    # compute cannot be grouped, sorted or measured. Same reason as
+    # helpdesk.ticket.resolution_hours.
+    duration_days = fields.Integer(compute='_compute_duration_days', store=True)
 
     # --- Repair report (workshop technician / manager only) ---
     entry_datetime = fields.Datetime(string='Entry Date/Time')
@@ -113,22 +157,22 @@ class KswWorkshopRequest(models.Model):
     work_statement = fields.Text(string='Statement of Required Work')
     repairs_parts = fields.Text(string='Repairs & Spare Parts')
     technician_id = fields.Many2one('hr.employee', string='Technician')
-    part_line_ids = fields.One2many(
-        'ksw.workshop.part.line', 'request_id', string='Spare Parts Used', copy=False,
-    )
-    part_lines_cost = fields.Float(
-        string='Catalogued Parts', compute='_compute_part_lines_cost', store=True, readonly=True,
-        help='Sum of the Spare Parts Used lines below. Read-only — it mirrors that table.',
-    )
-    parts_extra_cost = fields.Float(
-        string='Other Parts Cost',
-        help='Cost of one-off / uncatalogued items described in Repairs & Spare Parts.',
-    )
-    parts_cost = fields.Float(
-        string='Spare Parts Cost', compute='_compute_parts_cost', store=True, readonly=True,
-        help='Catalogued Parts + Other Parts Cost.',
-    )
+    x_legacy_technician_name = fields.Char(
+        string='Technician Name (as recorded)', readonly=True, copy=False,
+        help="The technician name written on the legacy sheet. Those names are bare "
+             "first names that match no single hr.employee, so they could not become "
+             "technician_id — this keeps them rather than losing them.")
+    technician_label = fields.Char(
+        string='Technician (report)', compute='_compute_technician_label', store=True,
+        help="Single grouping axis for technician reporting: the linked employee for "
+             "new requests, the legacy name for imported history.")
+    parts_cost = fields.Float(string='Spare Parts Cost')
     labor_cost = fields.Float(string='Labor Cost')
+    total_cost = fields.Float(
+        string='Total Cost', compute='_compute_total_cost', store=True,
+        help="Spare parts plus labor. Note the legacy history barely carries costs "
+             "(878 rows have a parts cost, 4 have a labor cost), so this is only "
+             "meaningful for requests recorded in Odoo.")
 
     # --- History import bookkeeping ---
     x_legacy_uid = fields.Char(string='Legacy UID', readonly=True, copy=False)
@@ -142,19 +186,17 @@ class KswWorkshopRequest(models.Model):
         help="The email address the legacy form was submitted from, kept for "
              "reference regardless of whether it matched an Odoo user.")
 
-    @api.depends('part_line_ids.subtotal')
-    def _compute_part_lines_cost(self):
-        totals = {r.id: 0.0 for r in self}
-        for request, total in self.env['ksw.workshop.part.line'].sudo()._read_group(
-                [('request_id', 'in', self.ids)], ['request_id'], ['subtotal:sum']):
-            totals[request.id] = total
+    @api.depends('technician_id', 'technician_id.name', 'x_legacy_technician_name')
+    def _compute_technician_label(self):
         for request in self:
-            request.part_lines_cost = totals.get(request.id, 0.0)
+            request.technician_label = (
+                request.technician_id.name or request.x_legacy_technician_name or False
+            )
 
-    @api.depends('part_lines_cost', 'parts_extra_cost')
-    def _compute_parts_cost(self):
+    @api.depends('parts_cost', 'labor_cost')
+    def _compute_total_cost(self):
         for request in self:
-            request.parts_cost = request.part_lines_cost + request.parts_extra_cost
+            request.total_cost = (request.parts_cost or 0.0) + (request.labor_cost or 0.0)
 
     @api.depends('completion_date', 'create_date')
     def _compute_duration_days(self):
@@ -247,10 +289,8 @@ class KswWorkshopRequest(models.Model):
     def _check_report_edit_rights(self):
         """May the caller edit this request's repair report right now?
 
-        Single source of truth: called both from write() below (for
-        _REPORT_FIELDS) and from ksw.workshop.part.line's create/write/unlink
-        guard, so the Spare Parts Used table can never drift out of sync
-        with the rest of the repair report.
+        Single source of truth: called from write() below — kept as its own
+        method so it stays the one place this rule is expressed.
         """
         if self.env.su:
             return
@@ -262,8 +302,7 @@ class KswWorkshopRequest(models.Model):
         # and this caller isn't its assigned technician, the technician
         # record rule hides the row entirely, and a plain (non-sudo) read
         # of .state would raise Odoo's generic ir.rule "not found" error
-        # instead of this method's clean UserError — same message either
-        # way the caller reached this check (write() vs. a part line).
+        # instead of this method's clean UserError.
         for request in self.sudo():
             if request.state != 'in_progress':
                 raise UserError(_('The repair report can only be edited while the request is In Progress.'))
@@ -296,14 +335,6 @@ class KswWorkshopRequest(models.Model):
                         raise UserError(_('You can only edit your own request while it is New.'))
 
         return super().write(vals)
-
-    def unlink(self):
-        # part_line_ids uses ondelete='cascade' — a DB-level cascade that
-        # skips ksw.workshop.part.line's Python unlink(), so its movements
-        # (and thus qty_on_hand) would go stale. Go through the ORM first;
-        # ksw.workshop.part.line.unlink() takes care of its own moves.
-        self.mapped('part_line_ids').sudo().unlink()
-        return super().unlink()
 
     # ------------------------------------------------------------------
     # Workflow

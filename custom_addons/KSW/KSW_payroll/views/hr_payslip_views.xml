@@ -342,4 +342,90 @@
         </field>
     </record>
 
+    <!-- ============================================================ -->
+    <!-- Payslip: pivot + graph (dashboard data source)                -->
+    <!-- ============================================================ -->
+    <record id="hr_payslip_view_pivot" model="ir.ui.view">
+        <field name="name">hr.payslip.pivot.ksw</field>
+        <field name="model">hr.payslip</field>
+        <field name="arch" type="xml">
+            <pivot string="Payslips" sample="1">
+                <field name="department_id" type="row"/>
+                <field name="state" type="col"/>
+                <field name="x_net_wage" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="hr_payslip_view_graph" model="ir.ui.view">
+        <field name="name">hr.payslip.graph.ksw</field>
+        <field name="model">hr.payslip</field>
+        <field name="arch" type="xml">
+            <graph string="Payslips" type="bar" sample="1">
+                <field name="department_id"/>
+                <field name="state"/>
+                <field name="x_net_wage" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Payslip Line: pivot + graph (dashboard data source)           -->
+    <!-- ============================================================ -->
+    <record id="hr_payslip_line_view_pivot" model="ir.ui.view">
+        <field name="name">hr.payslip.line.pivot.ksw</field>
+        <field name="model">hr.payslip.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Payslip Lines" sample="1">
+                <field name="department_id" type="row"/>
+                <field name="category_id" type="col"/>
+                <field name="total" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="hr_payslip_line_view_graph" model="ir.ui.view">
+        <field name="name">hr.payslip.line.graph.ksw</field>
+        <field name="model">hr.payslip.line</field>
+        <field name="arch" type="xml">
+            <graph string="Payslip Lines" type="bar" sample="1">
+                <field name="department_id"/>
+                <field name="category_id"/>
+                <field name="total" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Payslip Search: hide Rejected (cancelled) slips by default    -->
+    <!-- ============================================================ -->
+    <!-- The filter sits behind its own <separator/> so it lands in a
+         separate filter group and is AND:ed with Draft/Done instead of
+         OR:ed with them (adjacent filters in one group are OR:ed). -->
+    <record id="view_hr_payslip_filter_inherit_ksw" model="ir.ui.view">
+        <field name="name">hr.payslip.select.inherit.ksw</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="om_hr_payroll.view_hr_payslip_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='done']" position="after">
+                <separator/>
+                <filter string="Hide Rejected"
+                        name="hide_rejected"
+                        domain="[('state', '!=', 'cancel')]"
+                        help="Hide rejected / cancelled payslips"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Turn the filter on by default on every payslip list.
+         om_hr_payroll's actions are NOT inside a noupdate block, so a plain
+         <record> override is applied on every upgrade (pitfall #2). -->
+    <record id="om_hr_payroll.action_view_hr_payslip_form" model="ir.actions.act_window">
+        <field name="context">{'search_default_hide_rejected': 1}</field>
+    </record>
+
+    <record id="om_hr_payroll.act_hr_employee_payslip_list" model="ir.actions.act_window">
+        <field name="context">{'search_default_employee_id': [active_id], 'default_employee_id': active_id, 'search_default_hide_rejected': 1}</field>
+    </record>
+
 </odoo>

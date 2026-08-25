@@ -188,12 +188,22 @@
         so sharing one with the Accountant would make the two roles mutually
         exclusive — and the GM must be assignable alongside anything else.
 
-        implied_ids → Officer is what actually gives the GM reach. Naming a
-        group in a Python guard is worthless if no ir.rule lets it see the
-        records (CLAUDE.md gotcha #38); the Officer rule is [(1,'=',1)] on
-        all four verbs, and the entry sheets have officer ACL rows with no
-        narrowing rule, so the implication covers everything the GM must
-        approve.
+        The GM no longer implies Officer. It used to, because one GM
+        answered for the whole company and the Officer rule [(1,'=',1)] was
+        the simplest way to give him reach. Authority now comes from
+        hr.department.x_effective_gm_id, so scope has to follow it: the
+        department-scoped rules below are what give a GM his records, and
+        keeping the Officer implication would silently hand every GM every
+        department — the behaviour this replaces.
+
+        `(6, 0, [...])` rather than `(4, ...)`: an implication already
+        written to the database survives its removal from this file, so the
+        list must be set outright (Odoo 19 Pitfalls #3). base.group_user is
+        named explicitly because it used to arrive through Officer.
+
+        Naming a group in a Python guard is still worthless if no ir.rule
+        lets it see the records (gotcha #38) — hence a rule per model below,
+        not just the ACL rows.
     -->
     <record id="privilege_commission_gm" model="res.groups.privilege">
         <field name="name">Commission Final Approval</field>
@@ -204,8 +214,8 @@
     <record id="group_commission_gm" model="res.groups">
         <field name="name">General Manager</field>
         <field name="privilege_id" ref="privilege_commission_gm"/>
-        <field name="implied_ids" eval="[(4, ref('group_commission_officer'))]"/>
-        <field name="comment">Approves the Monthly Commission Run. Approval finalises every employee sheet in the run and locks the period; the GM is also the only role that can reopen it.</field>
+        <field name="implied_ids" eval="[(6, 0, [ref('base.group_user')])]"/>
+        <field name="comment">Approves the monthly commission handover of the departments they are set as General Manager of. Closing and reopening the month belong to the Commission Officer or the company's General Manager, since they affect every department.</field>
     </record>
 
     <!-- ============================================================ -->
@@ -421,6 +431,75 @@
         <field name="perm_write" eval="True"/>
         <field name="perm_create" eval="True"/>
         <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Record Rules — Department GM                                  -->
+    <!-- ============================================================ -->
+    <!--
+        The GM sees the departments he is General Manager of, and nothing
+        else. `x_effective_gm_id` is a stored compute on hr.department that
+        already folds in the parent-department climb and the company
+        default, so each of these is one join with no OR branch for the
+        fallback.
+
+        The submission rule reads its stored `gm_id` rather than joining the
+        department: that field has already resolved the site-scoped case
+        (driver trips have no department at all, exactly as for the
+        supervisor rules above) down to the company's default GM.
+
+        Write but not create/unlink on the submission and its batches: a GM
+        approves and returns a handover, and may correct a batch on the way
+        (matching the batch ACL row, which is 1,1,1,0), but he never raises
+        or destroys one. Entries stay read-only to him, as their ACL row
+        already says — he is reviewing a supervisor's work, not retyping it.
+    -->
+    <record id="pay_submission_rule_department_gm" model="ir.rule">
+        <field name="name">KSW Pay Submission: department GM</field>
+        <field name="model_id" ref="model_ksw_pay_submission"/>
+        <field name="groups" eval="[(4, ref('group_commission_gm'))]"/>
+        <field name="domain_force">[('gm_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="pay_batch_rule_department_gm" model="ir.rule">
+        <field name="name">KSW Pay Batch: department GM</field>
+        <field name="model_id" ref="model_ksw_pay_batch"/>
+        <field name="groups" eval="[(4, ref('group_commission_gm'))]"/>
+        <field name="domain_force">['|',
+            ('department_id.x_effective_gm_id.user_id', '=', user.id),
+            ('submission_id.gm_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="pay_entry_rule_department_gm" model="ir.rule">
+        <field name="name">KSW Pay Entry: department GM (read-only)</field>
+        <field name="model_id" ref="model_ksw_pay_entry"/>
+        <field name="groups" eval="[(4, ref('group_commission_gm'))]"/>
+        <field name="domain_force">['|',
+            ('batch_id.department_id.x_effective_gm_id.user_id', '=', user.id),
+            ('batch_id.submission_id.gm_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="pay_run_line_rule_department_gm" model="ir.rule">
+        <field name="name">KSW Payment Register: department GM</field>
+        <field name="model_id" ref="model_ksw_pay_run_line"/>
+        <field name="groups" eval="[(4, ref('group_commission_gm'))]"/>
+        <field name="domain_force">[('department_id.x_effective_gm_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
     </record>
 
     <!--

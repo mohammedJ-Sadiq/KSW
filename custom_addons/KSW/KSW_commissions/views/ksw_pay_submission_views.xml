@@ -11,6 +11,7 @@
             <form string="Department Submission">
                 <field name="x_can_submit" invisible="1"/>
                 <field name="x_can_return" invisible="1"/>
+                <field name="x_can_approve" invisible="1"/>
                 <field name="state" invisible="1"/>
 
                 <header>
@@ -24,9 +25,17 @@
                             invisible="state != 'submitted'"
                             groups="KSW_commissions.group_commission_supervisor"
                             confirm="Take the submission back so you can keep editing? The General Manager will no longer see it as handed over."/>
+                    <!-- No groups= on either button: x_can_approve /
+                         x_can_return already answer "is this department
+                         mine", and a groups= filter that is narrower than
+                         the compute would hide the button from a GM who is
+                         genuinely responsible. -->
+                    <button name="action_approve" string="Approve"
+                            type="object" class="btn-primary"
+                            invisible="not x_can_approve"
+                            confirm="Approve this department's commissions? Its batches are locked once you do."/>
                     <button name="action_return" string="Return for Correction"
                             type="object" class="btn-secondary"
-                            groups="KSW_commissions.group_commission_gm"
                             invisible="not x_can_return"/>
                     <statusbar statusfield="state"
                                statusbar_visible="draft,submitted,approved"/>
@@ -66,6 +75,8 @@
                                    invisible="not site_id"/>
                             <field name="responsible_id" readonly="1"
                                    invisible="not responsible_id"/>
+                            <field name="gm_id" readonly="1"
+                                   invisible="not gm_id"/>
                             <field name="currency_id" invisible="1"/>
                         </group>
                         <group string="Handover">
@@ -120,6 +131,8 @@
                   decoration-muted="state == 'draft' and not batch_count">
                 <field name="display_name" string="Department"/>
                 <field name="responsible_id" string="Supervisor"
+                       optional="show"/>
+                <field name="gm_id" string="General Manager"
                        optional="show"/>
                 <field name="submitted_by" optional="hide"/>
                 <field name="submitted_date" optional="show"/>

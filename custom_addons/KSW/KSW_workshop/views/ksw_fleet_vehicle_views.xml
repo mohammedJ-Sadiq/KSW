@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Workshop-side additions to the fleet vehicle form. The base form has
+         no button box, so one is created here rather than xpath'd into. -->
+    <record id="view_ksw_fleet_vehicle_form_workshop" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.form.workshop</field>
+        <field name="model">ksw.fleet.vehicle</field>
+        <field name="inherit_id" ref="KSW_fleet.view_ksw_fleet_vehicle_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group[1]" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_workshop_requests" type="object"
+                            class="oe_stat_button" icon="fa-wrench"
+                            groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_manager">
+                        <field name="workshop_request_count" widget="statinfo" string="Workshop Visits"/>
+                    </button>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Vehicles are worth analysing in their own right (visits per type,
+         per client), so give the fleet action the same charting surface. -->
+    <record id="view_ksw_fleet_vehicle_pivot" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.pivot</field>
+        <field name="model">ksw.fleet.vehicle</field>
+        <field name="arch" type="xml">
+            <pivot string="Fleet Analysis" sample="1">
+                <field name="vehicle_type" type="row"/>
+                <field name="state" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+</odoo>

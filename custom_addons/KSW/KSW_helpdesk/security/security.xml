@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- Module Category / Privilege                                   -->
+    <!-- ============================================================ -->
+    <record id="module_category_ksw_helpdesk" model="ir.module.category">
+        <field name="name">Helpdesk</field>
+        <field name="sequence">211</field>
+    </record>
+
+    <record id="privilege_helpdesk_management" model="res.groups.privilege">
+        <field name="name">Helpdesk Management</field>
+        <field name="sequence">10</field>
+        <field name="category_id" ref="module_category_ksw_helpdesk"/>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Groups                                                        -->
+    <!-- ============================================================ -->
+    <!-- Two tiers only: every employee submits tickets for themselves
+         (or a direct report); the IT Team handles everything else,
+         including the asset register (see below), which no other role
+         can see at all. -->
+    <record id="group_helpdesk_user" model="res.groups">
+        <field name="name">User</field>
+        <field name="sequence">1</field>
+        <field name="privilege_id" ref="privilege_helpdesk_management"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">Submit tickets and follow up on their own, or a direct report's.</field>
+    </record>
+
+    <function model="res.groups" name="write">
+        <value eval="[ref('base.group_user')]"/>
+        <value eval="{'implied_ids': [(4, ref('group_helpdesk_user'))]}"/>
+    </function>
+
+    <record id="group_helpdesk_agent" model="res.groups">
+        <field name="name">IT Team</field>
+        <field name="sequence">2</field>
+        <field name="privilege_id" ref="privilege_helpdesk_management"/>
+        <field name="implied_ids" eval="[(4, ref('group_helpdesk_user'))]"/>
+        <field name="comment">Full access: manage every ticket (assign, change stage, close, delete), configure stages/categories, and manage the IT asset register.</field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Record Rules — helpdesk.ticket                                 -->
+    <!-- ============================================================ -->
+    <!-- Own tickets, plus tickets reported for a direct report (managers
+         may create/view a ticket on behalf of someone who reports to them -
+         see employee_id's domain and _check_employee_scope() on the model,
+         which further narrow WHO qualifies as "own or direct report" for
+         writes; this rule only grants the row-level visibility they need). -->
+    <record id="helpdesk_ticket_rule_user_own" model="ir.rule">
+        <field name="name">Helpdesk Ticket: employees see their own + direct reports' tickets</field>
+        <field name="model_id" ref="model_helpdesk_ticket"/>
+        <field name="groups" eval="[(4, ref('group_helpdesk_user'))]"/>
+        <field name="domain_force">['|', ('employee_id.user_id', '=', user.id), ('employee_id.parent_id.user_id', '=', user.id)]</field>
+    </record>
+
+    <record id="helpdesk_ticket_rule_agent_all" model="ir.rule">
+        <field name="name">Helpdesk Ticket: IT Team full access</field>
+        <field name="model_id" ref="model_helpdesk_ticket"/>
+        <field name="groups" eval="[(4, ref('group_helpdesk_agent'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Record Rules — it.asset / it.asset.assignment                  -->
+    <!-- Assets live entirely under IT Team control. The one exception:
+         an employee may read (never write) the asset(s) currently
+         assigned to them or a direct report, purely so the optional
+         "Related Asset" field on their own ticket keeps working -
+         there is no menu, list, or other way for them to browse the
+         asset register itself. -->
+    <record id="it_asset_rule_user_own" model="ir.rule">
+        <field name="name">IT Asset: employees read their own + direct reports' assigned assets</field>
+        <field name="model_id" ref="model_it_asset"/>
+        <field name="groups" eval="[(4, ref('group_helpdesk_user'))]"/>
+        <field name="domain_force">['|', ('employee_id.user_id', '=', user.id), ('employee_id.parent_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="it_asset_rule_agent_all" model="ir.rule">
+        <field name="name">IT Asset: IT Team full access</field>
+        <field name="model_id" ref="model_it_asset"/>
+        <field name="groups" eval="[(4, ref('group_helpdesk_agent'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <record id="it_asset_assignment_rule_agent_all" model="ir.rule">
+        <field name="name">IT Asset Assignment: IT Team full access</field>
+        <field name="model_id" ref="model_it_asset_assignment"/>
+        <field name="groups" eval="[(4, ref('group_helpdesk_agent'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <record id="it_asset_maintenance_rule_agent_all" model="ir.rule">
+        <field name="name">IT Asset Maintenance: IT Team full access</field>
+        <field name="model_id" ref="model_it_asset_maintenance"/>
+        <field name="groups" eval="[(4, ref('group_helpdesk_agent'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+</odoo>

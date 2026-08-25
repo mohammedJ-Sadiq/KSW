@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="spreadsheet_dashboard_ksw_hr" model="spreadsheet.dashboard">
+        <field name="name">KSW HR Overview</field>
+        <field name="spreadsheet_binary_data" type="base64"
+               file="KSW_hr_dashboard/data/files/ksw_hr_dashboard.json"/>
+        <field name="main_data_model_ids" eval="[
+            (4, ref('om_hr_payroll.model_hr_payslip')),
+            (4, ref('hr_holidays.model_hr_leave')),
+            (4, ref('KSW_attendance_sheet.model_ksw_attendance_sheet')),
+            (4, ref('KSW_deduction.model_ksw_deduction')),
+        ]"/>
+        <field name="dashboard_group_id"
+               ref="spreadsheet_dashboard.spreadsheet_dashboard_group_hr"/>
+        <field name="group_ids" eval="[
+            Command.link(ref('hr.group_hr_manager')),
+            Command.link(ref('om_hr_payroll.group_hr_payroll_manager')),
+            Command.link(ref('KSW_annual_leave.group_annual_leave_hr')),
+            Command.link(ref('KSW_attendance_sheet.group_attendance_sheet_manager')),
+            Command.link(ref('KSW_deduction.group_deduction_manager')),
+        ]"/>
+        <field name="sequence">10</field>
+        <field name="is_published">True</field>
+    </record>
+
+</odoo>

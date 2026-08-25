@@ -1,3 +1,4 @@
+from . import hr_department
 from . import ksw_commission_lock         # period lock predicate + guard (no models)
 from . import ksw_site                    # work sites (used by entries and tiers)
 from . import ksw_pay_component           # the catalog: a pay type is data, not code

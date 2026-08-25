@@ -157,10 +157,10 @@ class KswLoanReturnApproverWizard(models.TransientModel):
         target = self.target_step_id.code
         is_admin = self.env.su or self.env.user.has_group(ADMIN_OVERRIDE_GROUP)
 
-        if not is_admin and not self.env.user.has_group(
-                'KSW_deduction.group_loan_gm'):
-            raise UserError(
-                'Only the General Manager can return a loan request to an approver.')
+        if not is_admin:
+            # Being a GM somewhere is not enough — it has to be this
+            # employee's department. Same predicate the approve button uses.
+            deduction._check_department_gm()
 
         if is_admin:
             deduction = deduction.sudo()

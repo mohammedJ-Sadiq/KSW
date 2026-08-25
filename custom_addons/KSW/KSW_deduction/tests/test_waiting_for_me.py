@@ -32,7 +32,14 @@ class TestWaitingForMe(DeductionCommon):
                                'KSW_deduction.group_deduction_officer')
         cls.user_hr = _mk('kswwfm_hr', 'KSW_deduction.group_loan_hr')
         cls.user_acc = _mk('kswwfm_acc', 'KSW_deduction.group_loan_acc')
-        cls.user_gm = _mk('kswwfm_gm', 'KSW_deduction.group_loan_gm')
+        # The GM step follows the employee's department, not the GM group, so
+        # this GM needs an employee record and a department to be GM of —
+        # holding group_loan_gm authorises nothing on its own. See
+        # tests/test_department_gm.py for the per-department contract.
+        cls.gm_emp = cls.env['hr.employee'].create({'name': 'KSWWFM GM'})
+        cls.user_gm = _mk('kswwfm_gm', 'KSW_deduction.group_loan_gm',
+                          employee=cls.gm_emp)
+        (cls.dept_a | cls.dept_b).sudo().write({'x_gm_id': cls.gm_emp.id})
         cls.user_disb = _mk('kswwfm_disb',
                             'KSW_deduction.group_loan_disbursement')
         cls.mt_comment = cls.env.ref('mail.mt_comment')
