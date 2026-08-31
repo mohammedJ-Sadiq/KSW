@@ -8,7 +8,7 @@
             <list decoration-info="state == 'in_progress'">
                 <field name="asset_id"/>
                 <field name="issue"/>
-                <field name="vendor_id" optional="hide"/>
+                <field name="vendor_id" optional="hide" context="{'res_partner_search_mode': 'supplier'}"/>
                 <field name="date_start"/>
                 <field name="date_end"/>
                 <field name="cost" sum="Total Cost"/>
@@ -29,7 +29,7 @@
                         <group>
                             <field name="asset_id"/>
                             <field name="issue"/>
-                            <field name="vendor_id"/>
+                            <field name="vendor_id" context="{'res_partner_search_mode': 'supplier'}"/>
                             <field name="state" widget="badge"/>
                         </group>
                         <group>

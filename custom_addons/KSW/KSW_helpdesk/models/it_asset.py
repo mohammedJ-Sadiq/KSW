@@ -57,7 +57,12 @@ class ItAsset(models.Model):
     # Procurement / warranty
     # ------------------------------------------------------------------
     location = fields.Char(help="Physical location, e.g. 'HQ - 3rd Floor Store'.")
-    supplier_id = fields.Many2one('res.partner', string='Vendor')
+    # The vendor role on res.partner, Odoo's native marker — the supplier-side
+    # twin of the customer_rank domain on the KSW client pickers.
+    supplier_id = fields.Many2one(
+        'res.partner', string='Vendor',
+        domain="[('supplier_rank', '>', 0)]",
+    )
     purchase_date = fields.Date()
     currency_id = fields.Many2one(related='company_id.currency_id')
     purchase_value = fields.Monetary(currency_field='currency_id')

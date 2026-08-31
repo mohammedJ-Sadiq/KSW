@@ -45,7 +45,14 @@
                         <group string="Vehicle">
                             <field name="is_cash_customer"
                                    readonly="not x_can_toggle_cash_customer or state != 'new'"/>
+                            <!-- Static context dict on the view tag, never a
+                                 dynamic one on the field definition (see the
+                                 note above vehicle_id in the model). It orders
+                                 the picker by customer rank and stamps
+                                 customer_rank=1 on anything quick-created
+                                 from it. -->
                             <field name="client_id"
+                                   context="{'res_partner_search_mode': 'customer'}"
                                    invisible="is_cash_customer"
                                    required="not is_cash_customer"
                                    readonly="state != 'new'"/>

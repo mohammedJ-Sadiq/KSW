@@ -8,8 +8,13 @@ class KswFleetVehicle(models.Model):
     _order = 'name'
 
     name = fields.Char(string='Fleet No.', required=True)
+    # A client is a res.partner carrying the customer role, exactly as in
+    # Odoo core (sale/repair/pos) and in KSW_commissions. The company's own
+    # partner is stamped customer_rank=1 by _post_init_hook / the 19.0.2.1.0
+    # migration so the default below stays inside this domain.
     client_id = fields.Many2one(
         'res.partner', string='Client', required=True,
+        domain="[('customer_rank', '>', 0)]",
         default=lambda self: self.env.company.partner_id,
     )
     vehicle_type = fields.Selection([

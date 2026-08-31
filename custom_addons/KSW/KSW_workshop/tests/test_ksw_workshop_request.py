@@ -43,7 +43,12 @@ class TestKswWorkshopRequest(TransactionCase):
         })
 
         cls.vehicle = cls.env['ksw.fleet.vehicle'].create({'name': 'WS-152', 'vehicle_type': 'isuzu'})
-        cls.other_client = cls.env['res.partner'].create({'name': 'WS Other Client'})
+        # customer_rank=1 is what makes a partner a client — the same marker
+        # client_id's domain filters on. A fixture without it would not model
+        # a real client.
+        cls.other_client = cls.env['res.partner'].create({
+            'name': 'WS Other Client', 'customer_rank': 1,
+        })
         cls.other_client_vehicle = cls.env['ksw.fleet.vehicle'].create({
             'name': 'WS-153', 'vehicle_type': 'trailer', 'client_id': cls.other_client.id,
         })

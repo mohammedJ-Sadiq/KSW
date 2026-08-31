@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <list string="Vehicles" decoration-muted="state == 'draft'">
                 <field name="name"/>
-                <field name="client_id"/>
+                <field name="client_id" context="{'res_partner_search_mode': 'customer'}"/>
                 <field name="vehicle_type"/>
                 <field name="tank_number"/>
                 <field name="plate_number"/>
@@ -37,7 +37,11 @@
                     <group>
                         <group string="Identification">
                             <field name="name"/>
-                            <field name="client_id"/>
+                            <!-- res_partner_search_mode orders the picker by
+                                 customer rank AND stamps customer_rank=1 on
+                                 anything quick-created from it, so "client not
+                                 in the list" needs no wizard. -->
+                            <field name="client_id" context="{'res_partner_search_mode': 'customer'}"/>
                             <field name="vehicle_type"/>
                             <field name="tank_number"/>
                             <field name="plate_number"/>

@@ -21,7 +21,11 @@ class TestKswFleetVehicle(TransactionCase):
         cls.user_hr = _mkuser(
             'Fleet HR', 'fleettest_hr', group_xmlids=('base.group_user', 'hr.group_hr_user'),
         )
-        cls.other_client = cls.env['res.partner'].create({'name': 'Fleet Test Other Client'})
+        # customer_rank=1 is the client-role marker client_id's domain filters
+        # on — a fixture without it would not model a real client.
+        cls.other_client = cls.env['res.partner'].create({
+            'name': 'Fleet Test Other Client', 'customer_rank': 1,
+        })
 
     # Fixture vehicle names are prefixed "FLEETTEST-" rather than bare
     # numbers: the history-imported fleet already contains real vehicles

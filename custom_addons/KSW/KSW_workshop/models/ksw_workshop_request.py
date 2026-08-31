@@ -103,8 +103,14 @@ class KswWorkshopRequest(models.Model):
         compute='_compute_x_can_toggle_cash_customer', compute_sudo=True,
     )
 
+    # A client is a res.partner carrying the customer role — Odoo's native
+    # marker, the same one KSW_commissions and the BAS customer importer
+    # already use. Without this domain the picker offered every contact in
+    # the database, employees included. KSW's own fleet stays a valid client:
+    # KSW_fleet stamps customer_rank=1 on env.company.partner_id.
     client_id = fields.Many2one(
         'res.partner', string='Client', tracking=True,
+        domain="[('customer_rank', '>', 0)]",
         default=lambda self: self.env.company.partner_id,
     )
     vehicle_type = fields.Selection([

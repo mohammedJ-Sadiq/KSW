@@ -9,7 +9,10 @@ class ItAssetMaintenance(models.Model):
     asset_id = fields.Many2one('it.asset', required=True, ondelete='cascade', index=True)
     category_id = fields.Many2one(related='asset_id.category_id', store=True, readonly=True)
     issue = fields.Char(required=True)
-    vendor_id = fields.Many2one('res.partner', string='Repaired By')
+    vendor_id = fields.Many2one(
+        'res.partner', string='Repaired By',
+        domain="[('supplier_rank', '>', 0)]",
+    )
     date_start = fields.Date(default=fields.Date.context_today, required=True)
     date_end = fields.Date()
     currency_id = fields.Many2one(related='asset_id.currency_id')

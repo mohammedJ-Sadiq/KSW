@@ -164,7 +164,7 @@
                         <group>
                             <field name="employee_id" readonly="1"/>
                             <field name="department_id" readonly="1" invisible="not employee_id"/>
-                            <field name="supplier_id"/>
+                            <field name="supplier_id" context="{'res_partner_search_mode': 'supplier'}"/>
                             <field name="purchase_date"/>
                             <field name="currency_id" invisible="1"/>
                             <field name="purchase_value"/>

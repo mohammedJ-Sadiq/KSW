@@ -1,6 +1,6 @@
 {
     'name': 'KSW Helpdesk',
-    'version': '19.0.1.2.0',
+    'version': '19.0.1.3.0',
     'summary': 'Internal IT support ticketing system and asset register for employees',
     'description': """
 Helpdesk / IT Ticketing for KSW
@@ -42,6 +42,9 @@ assets already assigned to that employee (or their direct report).
     'depends': [
         'hr',
         'mail',
+        # supplier_rank — the vendor-role marker used by the vendor pickers'
+        # domains — is defined in account (addons/account/models/partner.py).
+        'account',
     ],
     'data': [
         'security/security.xml',

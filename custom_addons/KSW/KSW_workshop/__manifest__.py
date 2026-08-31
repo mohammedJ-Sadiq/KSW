@@ -1,6 +1,6 @@
 {
     'name': 'KSW Workshop',
-    'version': '19.0.7.0.0',
+    'version': '19.0.7.1.0',
     'summary': 'Workshop service requests: submission, triage, and repair report',
     'description': """
 Workshop Service Requests
@@ -21,6 +21,10 @@ notes kept in the KSW-Brain vault for a future resumption.
     'depends': [
         'hr',
         'mail',
+        # customer_rank — the client-role marker used by client_id's domain.
+        # Reachable transitively (KSW_base_security -> sale -> account, and
+        # KSW_fleet -> account), but declared so the reliance is honest.
+        'account',
         'KSW_base_security',
         'KSW_fleet',
     ],

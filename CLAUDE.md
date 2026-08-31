@@ -986,3 +986,34 @@ allocation is needed. All test leave types that do not require allocation must u
     in a new context, check what it does with `env.su`, not just what it
     returns. And assert the *negative* in the test (`assertNotIn(outsider, …)`)
     — the positive half passed throughout.
+
+43. **A client is a *role on `res.partner`*, never a second table and never an
+    app-owned checkbox.** SAP S/4HANA (one Business Partner + additive **BP
+    roles** `FLCU00`/`FLVN00`/`BUP003`), Oracle Fusion TCA (one `HZ_PARTIES`
+    row + **party usages**), Dynamics 365 (`DirPartyTable` + `CustTable`/
+    `VendTable`/`HcmWorker`) and Odoo all converge on **one party master, many
+    roles** — because a client can also be a vendor and an employee can also be
+    a customer. Odoo deleted the `customer`/`supplier` booleans in v13 for
+    exactly this reason. **Every KSW partner picker uses Odoo's native marker:**
+    ```python
+    # model — single source of truth
+    client_id = fields.Many2one(
+        'res.partner', domain="[('customer_rank', '>', 0)]")   # vendors: supplier_rank
+    ```
+    ```xml
+    <!-- view — a STATIC context dict; a dynamic context on the field
+         definition crashes web_read during onchange -->
+    <field name="client_id" context="{'res_partner_search_mode': 'customer'}"/>
+    ```
+    `res_partner_search_mode` both orders the picker by rank **and** stamps
+    `customer_rank = 1` on anything quick-created from it
+    (`addons/account/models/partner.py:356-363` and `:769-780`), so "the client
+    isn't in the list" needs no wizard. Never add
+    `x_is_<app>_client` — Accounting, Supply Chain and Production would each
+    repeat it. Three traps: `customer_rank` lives in **`account`**, so a module
+    depending only on `hr` must add it; a field defaulting to
+    `env.company.partner_id` falls **outside its own domain** unless that
+    partner is stamped (`KSW_fleet._post_init_hook` does this for every
+    `res.company`, not just `env.company`); and a Many2one `domain=` is a UI
+    hint, not an ORM constraint — test the **domain and what it selects**, not
+    a write that fails. Full writeup: Odoo 19 Pitfalls #101.
