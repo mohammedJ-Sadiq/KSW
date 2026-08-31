@@ -587,7 +587,7 @@ class TestAttendanceSheet(TransactionCase):
         ])
         existing.unlink()
 
-        self.env['ksw.attendance.sheet']._cron_generate_sheets()
+        self.env['ksw.attendance.sheet']._cron_generate_sheets(commit=False)
 
         sheets = self.env['ksw.attendance.sheet'].search([
             ('employee_id', '=', self.employee.id),
@@ -596,24 +596,31 @@ class TestAttendanceSheet(TransactionCase):
         ])
         self.assertEqual(len(sheets), 1)
 
-    def test_cron_autoconfirms_past_month_drafts(self):
-        """Cron should auto-confirm draft sheets from previous months."""
-        # Create a sheet for a past month
+    def test_cron_leaves_past_month_drafts_unconfirmed(self):
+        """The cron must NOT confirm on the supervisor's behalf.
+
+        It used to (test_cron_autoconfirms_past_month_drafts), which meant a
+        supervisor who never opened the sheet still produced a full month of
+        paid attendance signed by nobody. Unconfirmed months are now read by
+        payroll as zero attendance instead.
+        """
         past_sheet = self.env['ksw.attendance.sheet'].create({
             'employee_id': self.employee.id,
             'month': '12',  # December
             'year': 2025,
         })
         self.assertEqual(past_sheet.state, 'draft')
+        existing_ids = past_sheet.message_ids.ids
 
-        self.env['ksw.attendance.sheet']._cron_generate_sheets()
+        self.env['ksw.attendance.sheet']._cron_generate_sheets(commit=False)
 
         past_sheet.invalidate_recordset()
-        self.assertEqual(
-            past_sheet.state, 'confirmed',
-            "Past-month draft sheets should be auto-confirmed by the cron.",
+        self.assertEqual(past_sheet.state, 'draft')
+        self.assertFalse(past_sheet.is_locked)
+        self.assertTrue(
+            past_sheet.message_ids.filtered(lambda m: m.id not in existing_ids),
+            "Closing an unconfirmed month must be recorded on the sheet.",
         )
-        self.assertTrue(past_sheet.is_locked)
 
     def test_cron_does_not_duplicate_sheets(self):
         """Cron should not create a sheet if one already exists."""
@@ -621,8 +628,8 @@ class TestAttendanceSheet(TransactionCase):
         today = fields.Date.context_today(self.env['hr.employee'])
 
         # Run cron twice
-        self.env['ksw.attendance.sheet']._cron_generate_sheets()
-        self.env['ksw.attendance.sheet']._cron_generate_sheets()
+        self.env['ksw.attendance.sheet']._cron_generate_sheets(commit=False)
+        self.env['ksw.attendance.sheet']._cron_generate_sheets(commit=False)
 
         sheets = self.env['ksw.attendance.sheet'].search([
             ('employee_id', '=', self.employee.id),
@@ -710,7 +717,7 @@ class TestAttendanceSheet(TransactionCase):
     # ------------------------------------------------------------------
 
     def test_cron_savepoint_resilience(self):
-        """A sheet that errors during confirmation must not block the rest."""
+        """One bad sheet must not abort the whole close-out pass."""
         from unittest.mock import patch
 
         emp2 = self.env['hr.employee'].create({
@@ -720,26 +727,28 @@ class TestAttendanceSheet(TransactionCase):
         sheet_bad = self._create_sheet(month='12', year=2025)
         sheet_good = self._create_sheet(employee=emp2, month='12', year=2025)
         bad_id = sheet_bad.id
+        good_existing = sheet_good.message_ids.ids
 
         Model = type(sheet_bad)
-        orig = Model._do_confirm
+        orig = Model._post_unconfirmed_close_note
 
         def patched(inner_self):
             if inner_self.id == bad_id:
                 raise ValueError('forced failure')
             return orig(inner_self)
 
-        with patch.object(Model, '_do_confirm', patched):
-            self.env['ksw.attendance.sheet']._cron_generate_sheets()
+        with patch.object(Model, '_post_unconfirmed_close_note', patched):
+            self.env['ksw.attendance.sheet']._cron_generate_sheets(
+                commit=False)
 
-        sheet_bad.invalidate_recordset()
         sheet_good.invalidate_recordset()
-        self.assertEqual(sheet_bad.state, 'draft',
-                         "Failed sheet must remain draft (savepoint rolled it back)")
-        self.assertEqual(sheet_good.state, 'confirmed',
-                         "Good sheet must be confirmed despite the other failing")
+        self.assertTrue(
+            sheet_good.message_ids.filtered(
+                lambda m: m.id not in good_existing),
+            "The good sheet must still be processed despite the other failing",
+        )
 
-    def test_cron_confirm_skips_insync_lines(self):
+    def test_confirm_skips_insync_lines(self):
         """_do_confirm must not create duplicate attendance records for in-sync lines."""
         sheet = self._create_sheet(month='12', year=2025)
         # action_generate_lines (called on create) already synced all attended lines
@@ -748,7 +757,7 @@ class TestAttendanceSheet(TransactionCase):
         ])
         self.assertGreater(att_count_before, 0, "Lines should have auto-generated attendance records")
 
-        self.env['ksw.attendance.sheet']._cron_generate_sheets()
+        sheet._do_confirm()
 
         att_count_after = self.env['hr.attendance'].search_count([
             ('employee_id', '=', self.employee.id),

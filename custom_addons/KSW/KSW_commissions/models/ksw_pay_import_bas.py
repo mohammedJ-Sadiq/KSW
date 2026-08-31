@@ -16,7 +16,7 @@ import logging
 
 from dateutil.relativedelta import relativedelta
 
-from odoo import _, models
+from odoo import _, fields, models
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -58,19 +58,40 @@ class KswPayBatchBasImport(models.Model):
         matched = 0
         unmapped = self.env['hr.employee']
         no_data = self.env['hr.employee']
+        kept = self.env['hr.employee']
         commands = []
         for employee in employees:
             cost_center = (employee.x_bas_driver_cost_center or '').strip()
             data = bas_data.get(self._norm_cc(cost_center)) \
                 if cost_center else None
+
+            entry = existing.get(employee.id)
+            if not data:
+                # Nothing to import for this driver. Writing a zero-quantity
+                # entry is not an option — ksw.pay.entry._check_quantity
+                # rejects it and the ValidationError would roll back the whole
+                # import, so a single unmapped driver would cost every other
+                # driver his trips and report nobody by name. Skip him and say
+                # so in the summary instead.
+                if not cost_center:
+                    unmapped |= employee
+                else:
+                    no_data |= employee
+                # A line already in the batch is left alone: it may hold a
+                # figure someone entered or reviewed, and this importer cannot
+                # tell. It is named in the summary so it gets a second look.
+                if entry:
+                    kept |= employee
+                continue
+
             worked = self._get_worked_days_from_sheet(employee, self.period)
             required = self._bas_required_trips(worked)
             vals = {
                 # الرد المضاعف — what the tiers are calculated on.
-                'quantity': data['mult'] if data else 0.0,
+                'quantity': data['mult'],
                 # عدد الردود — the raw count, kept so the amount can be
                 # justified at review rather than appearing from nowhere.
-                'quantity_ref': float(data['loads']) if data else 0.0,
+                'quantity_ref': float(data['loads']),
                 'threshold_qty': required,
                 'details': _(
                     'Worked days: %(days)s. Required trips before earning: '
@@ -78,14 +99,7 @@ class KswPayBatchBasImport(models.Model):
                     days=worked if worked is not None else _('not recorded'),
                     required=required),
             }
-            if data:
-                matched += 1
-            elif not cost_center:
-                unmapped |= employee
-            else:
-                no_data |= employee
-
-            entry = existing.get(employee.id)
+            matched += 1
             if entry:
                 commands.append((1, entry.id, vals))
             else:
@@ -100,13 +114,28 @@ class KswPayBatchBasImport(models.Model):
             message += _(
                 "\n%(count)s have no BAS cost centre set: %(names)s",
                 count=len(unmapped),
-                names=', '.join(unmapped[:5].mapped('name')))
+                names=self._name_list(unmapped))
         if no_data:
             message += _(
-                "\n%(count)s had no trips in BAS this month.",
-                count=len(no_data))
+                "\n%(count)s had no trips in BAS this month: %(names)s",
+                count=len(no_data),
+                names=self._name_list(no_data))
+        if kept:
+            message += _(
+                "\n%(count)s already had a line in this batch and were left "
+                "unchanged: %(names)s",
+                count=len(kept),
+                names=self._name_list(kept))
         self.sudo().message_post(body=message, subtype_xmlid='mail.mt_note')
         return self._notify(message, title=_('Imported from BAS'))
+
+    @staticmethod
+    def _name_list(employees, limit=5):
+        """First few employee names, with a count of the rest."""
+        names = ', '.join(employees[:limit].mapped('name'))
+        if len(employees) > limit:
+            names += _(' and %(more)s more', more=len(employees) - limit)
+        return names
 
     def _bas_required_trips(self, worked_days):
         """The free allowance: required trips pro-rated to days worked.

@@ -1,0 +1,974 @@
+<!doctype html><html lang="en" dir="ltr"><head>
+<meta charset="utf-8"><title>Commissions & Allowances — Complete Guide</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "DejaVu Sans",Arial,sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: left; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-left: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">Commissions & Allowances — Complete Guide</div>
+  <div class="meta">Commissions & Allowances · excludes Sales & Collection<br/>KSW HR &amp; Payroll · 2026-08-30</div>
+</div>
+<section id="g-supervisor-04-commission-pay-entries"><h1>Recording Extra Pay — Pay Entries</h1>
+<p><strong>Who is this for:</strong> Supervisor / Direct Manager
+<strong>How long it takes:</strong> 10–20 minutes per month, per kind of pay</p>
+<h2>What this does</h2>
+<p>Everything your team earns <strong>on top of the basic salary</strong> — overtime, driver
+trips, meals, allowances, Friday work, bonuses — is recorded in the
+<strong>Commissions</strong> app as <strong>pay entries</strong>, then handed to the General Manager once a
+month and paid on its own bank transfer.</p>
+<p>This page covers the entry screen itself and how to deal with <strong>each kind of pay</strong>.
+The two pages after it cover pay that repeats every month
+(<a href="#g-supervisor-05-commission-recurring">Recurring entries</a>) and the month as a whole
+(<a href="#g-supervisor-06-commission-monthly-cycle">The monthly cycle</a>).</p>
+<blockquote>
+<p><strong>Sales &amp; Collection is not part of this.</strong> Sales and collection commission is
+calculated on its own page (<strong>Commissions → Sales &amp; Collection</strong>), is handled by
+the sales roles, and is paid separately. Nothing on these three pages applies to it.</p>
+</blockquote>
+<h2>Before you start</h2>
+<ul>
+<li>You must be set as the <strong>manager of your department</strong> (or as an assistant to its
+manager). If you are not, the app will tell you so and you will see nothing to
+record — ask HR to set it.</li>
+<li>You are ticked for the <strong>kinds of pay you handle</strong> (Overtime, Driver Commission,
+Location Allowance). If a component you expect is missing, ask the Commission
+Admin to tick it for you.</li>
+<li>Know the month you are recording for. A batch always covers <strong>one whole month</strong>.</li>
+</ul>
+<h2>The three words you need</h2>
+<table>
+<thead>
+<tr>
+<th>Word</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Component</strong></td>
+<td>A kind of pay — Overtime, Meals, Mobile Phone Allowance. The catalog.</td>
+</tr>
+<tr>
+<td><strong>Entry</strong></td>
+<td>One row: one employee, one occurrence, one amount.</td>
+</tr>
+<tr>
+<td><strong>Batch</strong></td>
+<td>One component, one department (or work site), one month. Your screen.</td>
+</tr>
+</tbody></table>
+<p><strong>One batch per component per month.</strong> Overtime for Maintenance in August is one
+batch (<code>PB000123</code>); meals for the same department and month is a different one.
+That is what lets each screen show only the columns that kind of pay needs.</p>
+<h2>Steps</h2>
+<ol>
+<li><p><strong>Open Commissions → Pay Entries → My Batches.</strong> The list is grouped by month.
+You only ever see batches for departments you run.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/pay-01.png" alt="My batches"></p>
+</li>
+<li><p><strong>Create the batch.</strong> Click <strong>New</strong>, then choose:</p>
+<ul>
+<li><strong>Component</strong> — the kind of pay.</li>
+<li><strong>Period</strong> — the picker opens on a month grid; click the month.</li>
+<li><strong>Department</strong> — if you run only one, it is filled in and locked for you.
+Driver Trips asks for a <strong>Work Site</strong> instead, because it is paid per site.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/pay-02.png" alt="New batch header"></li>
+</ul>
+</li>
+<li><p><strong>Add the rows</strong> in the <strong>Entries</strong> tab. The columns change to fit the
+component — see the table below for what each kind asks for.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/pay-03.png" alt="Entering rows"></p>
+<p>Two things that save a lot of typing:</p>
+<ul>
+<li><strong>Every new line starts as a copy of the line before it.</strong> Just click
+<em>Add a line</em> and change what differs — the employee, the date, the hours.</li>
+<li>The <strong>copy</strong> icon at the end of a row duplicates that row.</li>
+</ul>
+</li>
+<li><p><strong>Check the amounts.</strong> Click the <strong>calculator</strong> icon on any row to see exactly
+how the figure was reached — the salary, the divisor, the overtime factor, or
+every tier band with its quantity and rate.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/pay-04.png" alt="How this amount was worked out"></p>
+</li>
+<li><p><strong>Submit</strong> the batch when you have finished typing it.</p>
+</li>
+</ol>
+<h2>How to deal with each kind of component</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>How the amount is worked out</th>
+<th>What you type</th>
+<th>What else the row asks for</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Overtime</strong></td>
+<td>Basic salary ÷ 240 × hours × 1.5 (Saudi Labour Law art. 107)</td>
+<td><strong>Hours</strong></td>
+<td><strong>Date</strong>, <strong>Location</strong> and <strong>Reason</strong> — all three are required on every row</td>
+</tr>
+<tr>
+<td><strong>Driver Trips</strong></td>
+<td>Tiered: the trips above the free allowance fall through the site&#39;s rate bands</td>
+<td><strong>Weighted Trips</strong> (الرد المضاعف)</td>
+<td><strong>Actual Trips</strong> (for justification only), <strong>Free Allowance</strong> = the driver&#39;s required trips for the days he actually worked. Recorded <strong>per work site</strong>, and there is an <strong>Import</strong> button that pulls the month&#39;s trips from BAS</td>
+</tr>
+<tr>
+<td><strong>Meals</strong></td>
+<td>Quantity × the rate of the meal you pick</td>
+<td><strong>Meals</strong> (the count)</td>
+<td><strong>Type</strong> — Breakfast, Lunch or Dinner. One Meals batch covers all three; do <strong>not</strong> look for three separate components</td>
+</tr>
+<tr>
+<td><strong>Friday Work Allowance</strong></td>
+<td>Days × 100</td>
+<td><strong>Days</strong></td>
+<td><strong>Date</strong></td>
+</tr>
+<tr>
+<td><strong>Fixed allowances</strong> — Project Management, Location, Data Entry, Mobile Phone</td>
+<td>Nothing is calculated</td>
+<td><strong>Amount</strong></td>
+<td>Location Allowance also asks <strong>where</strong></td>
+</tr>
+<tr>
+<td><strong>Holiday bonuses</strong> — Foundation Day, National Day, Eid Al-Fitr, Eid Al-Adha</td>
+<td>Nothing is calculated</td>
+<td><strong>Amount</strong></td>
+<td>— one component per holiday, on purpose</td>
+</tr>
+<tr>
+<td><strong>Employee Bonus</strong> and <strong>Other</strong></td>
+<td>Nothing is calculated</td>
+<td><strong>Amount</strong></td>
+<td><strong>Reason</strong> is required — this is what the approver reads</td>
+</tr>
+</tbody></table>
+<p><strong>Overriding an amount.</strong> If a calculated figure has to be something else, type it
+into <strong>Override Amount</strong>. The row turns amber, the original figure is kept, and the
+explanation says it was overridden. Unlike simply retyping the amount, an override
+survives a later change to the quantity.</p>
+<h2>What happens next</h2>
+<p>The batch moves <strong>Draft → Submitted</strong>. That only means <em>&quot;I have finished typing
+this one&quot;</em> — it is <strong>not</strong> yet with the General Manager, and you can still press
+<strong>Reopen</strong> to correct it.</p>
+<p>Your department only reaches the GM when you hand it over. See
+<a href="#g-supervisor-06-commission-monthly-cycle">The monthly cycle</a>.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>&quot;You are not set as the manager of any department&quot;</td>
+<td><code>Department Manager</code> is empty on your department</td>
+<td>Ask HR to set you as the manager, or as an assistant to it</td>
+</tr>
+<tr>
+<td>An employee is not in the picker</td>
+<td>They are not in this batch&#39;s department/site and do not report to you</td>
+<td>Record them in the right department&#39;s batch, or ask HR to fix the reporting line</td>
+</tr>
+<tr>
+<td>&quot;already covers this component for this scope and month&quot;</td>
+<td>You already have a batch for that component, scope and month</td>
+<td>Open the existing one and add your rows there</td>
+</tr>
+<tr>
+<td>&quot;Hours must be greater than zero&quot;</td>
+<td>A row was left at 0 on a calculated component</td>
+<td>Type the quantity, or delete the row</td>
+</tr>
+<tr>
+<td>&quot;…is outside the batch period&quot;</td>
+<td>A dated row carries a date from another month</td>
+<td>Fix the date, or move the row to that month&#39;s batch</td>
+</tr>
+<tr>
+<td>&quot;Every Meals row has to say which one it is&quot;</td>
+<td>The <strong>Type</strong> column is empty</td>
+<td>Pick Breakfast / Lunch / Dinner on the row</td>
+</tr>
+<tr>
+<td>&quot;Batch … has been submitted&quot; when editing</td>
+<td>The batch is no longer in Draft</td>
+<td>Press <strong>Reopen</strong> — or, if your department is already handed over, <strong>Take Back</strong> the submission or ask the GM to return it</td>
+</tr>
+<tr>
+<td>The component I need is not in the list</td>
+<td>You are not ticked for that kind of pay, or it does not exist yet</td>
+<td>Ask the Commission Admin</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-supervisor-05-commission-recurring">Recurring entries</a> — pay that repeats every month</li>
+<li><a href="#g-supervisor-06-commission-monthly-cycle">The monthly cycle</a> — submitting, approval and payment</li>
+<li><span class="xref">Attendance sheets</span></li>
+</ul>
+</section>
+<section id="g-supervisor-05-commission-recurring"><h1>Recurring Entries — Pay That Repeats Every Month</h1>
+<p><strong>Who is this for:</strong> Supervisor / Direct Manager
+<strong>How long it takes:</strong> 2 minutes to set one up; it then saves you that every month</p>
+<h2>What this does</h2>
+<p>A <strong>recurring entry</strong> is a standing instruction: <em>&quot;this employee gets this
+component, at this amount, from this date until that one.&quot;</em> Instead of typing a
+mobile-phone allowance for the same eleven people twelve times a year, you record
+it once and pull it into each month&#39;s batch with one button.</p>
+<blockquote>
+<p><strong>A recurring entry is an instruction, not a payment.</strong> Nothing is paid until you
+pull it into a batch and submit that batch. That is deliberate — you stay
+answerable for what you hand over, and you can still adjust the figure in a month
+where it changed.</p>
+</blockquote>
+<h2>Before you start</h2>
+<ul>
+<li>You maintain recurring entries <strong>for your own team only</strong> — the employee picker
+shows the people in the departments you run plus everyone in your reporting line.</li>
+<li>Have the figure and the <strong>start date</strong> ready. The start date is what decides which
+month it first appears in.</li>
+</ul>
+<h2>When to create one — and when not to</h2>
+<p><strong>Create a recurring entry when all three are true:</strong></p>
+<ul>
+<li>it is the <strong>same employee</strong>, month after month;</li>
+<li>it is the <strong>same component</strong> at the <strong>same figure</strong>;</li>
+<li>it needs <strong>no per-occurrence justification</strong> — no date, no reason, no location.</li>
+</ul>
+<p>Typical cases: a mobile-phone allowance, a project-management allowance, a
+data-entry allowance, a standing meal entitlement.</p>
+<p><strong>Do not create one for pay that varies.</strong> Overtime, driver trips, Friday work and
+one-off bonuses change every month and carry a date and a reason — they are typed
+per occurrence in the batch itself. A recurring entry there would only give you a
+wrong figure to correct twelve times a year.</p>
+<p><strong>When to record it: before you build the month&#39;s batch.</strong> The pull only picks up
+entries whose <strong>Start Date</strong> is on or before the month you are recording, and whose
+<strong>End Date</strong> is empty or on or after it. An allowance you add on the 20th, dated the
+1st, is picked up for that month; one dated next month is not.</p>
+<h2>Steps</h2>
+<ol>
+<li><p><strong>Open Commissions → Pay Entries → Recurring Entries.</strong> The list is grouped by
+component.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/recurring-01.png" alt="Recurring entries list"></p>
+</li>
+<li><p><strong>Add a line</strong> and fill in:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>What to put</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Employee</strong></td>
+<td>Your team member.</td>
+</tr>
+<tr>
+<td><strong>Component</strong></td>
+<td>The kind of pay.</td>
+</tr>
+<tr>
+<td><strong>Type</strong></td>
+<td>Only for a component that has choices (Meals) — which one repeats.</td>
+</tr>
+<tr>
+<td><strong>Quantity</strong></td>
+<td>For a <em>quantity × rate</em> component — e.g. 22 lunches a month.</td>
+</tr>
+<tr>
+<td><strong>Amount</strong></td>
+<td>For a <em>fixed</em> component — what to pay each month.</td>
+</tr>
+<tr>
+<td><strong>Reason</strong></td>
+<td>Optional, but it is what a later approver reads. Say why.</td>
+</tr>
+<tr>
+<td><strong>Start Date</strong></td>
+<td>Defaults to the 1st of this month. The first month it applies to.</td>
+</tr>
+<tr>
+<td><strong>End Date</strong></td>
+<td>Leave empty to run indefinitely.</td>
+</tr>
+</tbody></table>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/recurring-02.png" alt="Adding a recurring entry"></p>
+</li>
+<li><p><strong>Save.</strong> Nothing else happens — the instruction is now on file.</p>
+</li>
+<li><p><strong>Each month, pull it in.</strong> Open (or create) that month&#39;s batch for the same
+component and click <strong>Add Recurring</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/recurring-03.png" alt="Add Recurring on the batch"></p>
+<p>The missing rows appear. It is safe to press it more than once: an employee who
+already has a row in the batch is skipped, so nothing is duplicated and nothing
+you typed by hand is overwritten.</p>
+</li>
+<li><p><strong>Adjust anything that changed</strong> for this month, then submit the batch as usual.</p>
+</li>
+</ol>
+<h2>Ending or changing one</h2>
+<ul>
+<li><strong>To stop it: set the End Date. Do not delete the entry.</strong> The end date stops it
+cleanly from the next month, and the record of why the allowance was paid stays.
+Deleting throws that history away.</li>
+<li><strong>To change the figure permanently:</strong> edit the amount or quantity. It applies to
+every month you pull from then on; months already submitted are untouched.</li>
+<li><strong>To change it for one month only:</strong> leave the recurring entry alone and edit the
+row in that month&#39;s batch after pulling it in.</li>
+<li><strong>Created in error?</strong> Untick <strong>Active</strong> (or delete it if it has never been pulled
+into a batch).</li>
+</ul>
+<h2>What happens next</h2>
+<p>Nothing, until you pull it into a batch. The pulled rows behave like any other
+entry from that point on: they are submitted with the batch, handed over with the
+department, approved by the GM and paid on the commission transfer.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Add Recurring</strong> added nothing</td>
+<td>The dates do not cover this month, the rows are already in the batch, or the employee is outside the batch&#39;s scope</td>
+<td>Check <strong>Start Date</strong> / <strong>End Date</strong>, and check the batch&#39;s department or site</td>
+</tr>
+<tr>
+<td>An employee is not in the picker</td>
+<td>They are not in a department you run and do not report to you</td>
+<td>Ask HR to correct the department or the reporting line</td>
+</tr>
+<tr>
+<td>&quot;…already has a recurring … starting on that date&quot;</td>
+<td>There is already an entry for that employee, component, type and start date</td>
+<td>Edit the existing one instead of adding a second</td>
+</tr>
+<tr>
+<td>&quot;A recurring Meals has to say which one it is&quot;</td>
+<td>The component has choices and <strong>Type</strong> is empty</td>
+<td>Pick Breakfast / Lunch / Dinner</td>
+</tr>
+<tr>
+<td>&quot;The end date cannot be before the start date&quot;</td>
+<td>Dates the wrong way round</td>
+<td>Fix the dates</td>
+</tr>
+<tr>
+<td>The pulled row shows the wrong amount</td>
+<td>The component is calculated, not fixed — the amount comes from the quantity</td>
+<td>Correct the <strong>Quantity</strong>, or override the amount on the batch row</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-supervisor-04-commission-pay-entries">Recording extra pay</a></li>
+<li><a href="#g-supervisor-06-commission-monthly-cycle">The monthly cycle</a></li>
+</ul>
+</section>
+<section id="g-supervisor-06-commission-monthly-cycle"><h1>The Monthly Cycle — Submitting and Getting Paid</h1>
+<p><strong>Who is this for:</strong> Supervisor / Direct Manager
+<strong>How long it takes:</strong> 10 minutes at the end of the month</p>
+<h2>What this does</h2>
+<p>Explains what happens to your entries after you have typed them: how your
+department is handed over, who approves it, how the payment is worked out, and what
+locks when.</p>
+<h2>The chain, once</h2>
+<pre><code>your entries  →  Submit the batch      (&quot;I have finished typing this one&quot;)
+              →  Submit My Entries     (your DEPARTMENT goes to the GM)
+              →  the GM approves your department
+              →  the month locks and the Payment Register is built
+              →  Accounting exports the bank file
+</code></pre>
+<h2>The two Submits are not the same thing</h2>
+<p>This is the single most common confusion in the app.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Submit</strong> on a batch</th>
+<th><strong>Submit My Entries</strong> / <strong>Submit to GM</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>What it means</td>
+<td>I have finished typing this one batch</td>
+<td>My whole department is complete — please approve</td>
+</tr>
+<tr>
+<td>Who sees it</td>
+<td>Nobody yet</td>
+<td>The General Manager, in his inbox and by email</td>
+</tr>
+<tr>
+<td>Can you undo it?</td>
+<td>Yes — <strong>Reopen</strong>, on your own</td>
+<td>Only <strong>Take Back</strong> (while the GM has not acted), or he <strong>Returns</strong> it</td>
+</tr>
+<tr>
+<td>Effect on your batches</td>
+<td>None — still yours</td>
+<td><strong>Frozen.</strong> You cannot edit them</td>
+</tr>
+</tbody></table>
+<p>So a batch sitting in <em>Submitted</em> is <strong>not</strong> with the GM. Until you hand the
+department over, your work is still on your desk.</p>
+<h2>Steps</h2>
+<ol>
+<li><p><strong>Finish and submit every batch</strong> for the month.</p>
+</li>
+<li><p><strong>Check the money before you hand over.</strong> Open <strong>Commissions → Monthly Pay Run</strong>,
+pick the month, and open the <strong>Who Gets Paid</strong> tab. You see your own people:
+what they earned, what their loan installments will take, and the net.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/payrun-01.png" alt="Who gets paid"></p>
+<p>While the month is open these figures are a <strong>preview</strong> — an estimate of what
+would be settled. Approval turns them into the real settlement.</p>
+</li>
+<li><p><strong>Hand the department over.</strong> On the same screen, click <strong>Submit My Entries</strong>.
+It submits any batch you left in Draft on the way through, and it moves <strong>only
+your</strong> departments — never anyone else&#39;s.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/payrun-02.png" alt="Submit my entries"></p>
+<p>The same button exists as <strong>Submit to GM</strong> on
+<strong>Commissions → Department Submissions</strong>, if you prefer to work from there.</p>
+</li>
+<li><p><strong>Wait for the General Manager.</strong> He approves your department, or returns it.</p>
+</li>
+</ol>
+<h2>How the payment is worked out</h2>
+<ul>
+<li>Extra pay is paid on <strong>its own bank transfer</strong>. It does not go through the
+payslip.</li>
+<li>For each employee: <strong>Net payable = earnings − loan recovery.</strong></li>
+<li>The <strong>loan recovery</strong> is the installments parked against commission for that
+month. They are settled oldest-first out of the commission; if the commission only
+partly covers an installment, that installment is split and the rest keeps waiting.</li>
+<li>Employees flagged <strong>Settle Deductions from Commission First</strong> have that month&#39;s
+installments parked automatically when the month is approved. Anything the
+commission does not cover falls straight into that month&#39;s payslip instead of
+waiting for a future commission run.</li>
+</ul>
+<h2>If it comes back</h2>
+<p>A returned department carries the GM&#39;s <strong>reason</strong>, shown in an amber banner on the
+department submission <strong>and on every batch in it</strong>. Fix what he asked for, then press
+<strong>Submit My Entries</strong> again.</p>
+<h2>Once the month is locked</h2>
+<p>When the month is approved, the period is closed. Nothing in it can be created,
+edited, deleted, submitted or reopened — every attempt gives you a message naming the
+month and telling you to ask the General Manager. <strong>Anything you missed goes into
+next month&#39;s batch.</strong></p>
+<h2>What happens next</h2>
+<p>The Payment Register is built from the approved departments only, the loan
+installments are settled, and Accounting exports the bank file and marks the month
+paid. A department that never handed over is simply not paid this month; its work
+stays in Draft for you to submit next month.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>No <strong>Submit My Entries</strong> button</td>
+<td>You have nothing outstanding — either nothing recorded, or already submitted</td>
+<td>Check <strong>Department Submissions</strong> for the month&#39;s status</td>
+</tr>
+<tr>
+<td>&quot;There is nothing to submit — no entries have been recorded&quot;</td>
+<td>Your batches are empty</td>
+<td>Fill them in, or delete the empty ones</td>
+</tr>
+<tr>
+<td>&quot;These batches have no entries&quot;</td>
+<td>An empty batch is blocking the handover</td>
+<td>Delete it or fill it in</td>
+</tr>
+<tr>
+<td>I need to correct a submitted batch</td>
+<td>Your department is already handed over</td>
+<td><strong>Take Back</strong> the submission if the GM has not acted, otherwise ask him to Return it</td>
+</tr>
+<tr>
+<td>&quot;has been approved and is locked&quot;</td>
+<td>The month is closed</td>
+<td>Record it in next month&#39;s batch</td>
+</tr>
+<tr>
+<td>The register shows figures I did not expect</td>
+<td>It is a preview until approval, and it includes every handed-over department of yours</td>
+<td>Open a line&#39;s entries to see exactly what made the figure</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-supervisor-04-commission-pay-entries">Recording extra pay</a></li>
+<li><a href="#g-supervisor-05-commission-recurring">Recurring entries</a></li>
+<li><span class="xref">View team payslips</span></li>
+</ul>
+</section>
+<section id="g-gm-04-commission-approval"><h1>Approving the Month&#39;s Commissions &amp; Allowances</h1>
+<p><strong>Who is this for:</strong> General Manager (department GM), and the company&#39;s General Manager for the last two sections
+<strong>How long it takes:</strong> 10–15 minutes a month</p>
+<h2>What this does</h2>
+<p>Each month your supervisors record what their teams earned on top of salary —
+overtime, driver trips, meals, allowances, bonuses — and hand their department over
+to you. You review it, then approve or send it back. Your approval is what turns the
+figures into money: it settles the employees&#39; parked loan installments and locks the
+month for payment.</p>
+<blockquote>
+<p><strong>Sales &amp; Collection is not part of this.</strong> It is calculated on its own page and
+paid separately; it never reaches your approval here.</p>
+</blockquote>
+<h2>Before you start</h2>
+<ul>
+<li>You approve <strong>only the departments you are set as General Manager of</strong>. A
+department whose GM is somebody else stays with them, however senior you are.</li>
+<li>A department reaches you only when its supervisor presses <strong>Submit My Entries</strong>.
+A batch marked <em>Submitted</em> is not yet handed over.</li>
+</ul>
+<h2>Steps</h2>
+<ol>
+<li><p><strong>Open Commissions → Monthly Pay Run</strong> and pick the month. The <strong>By Department</strong>
+tab is one row per department: the supervisor&#39;s name, how many records, how many
+employees, the total, the status and when it arrived.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/gm/comm-01.png" alt="By department"></p>
+<p>You are also told, in a blue banner, which departments have <strong>not</strong> handed over yet.</p>
+</li>
+<li><p><strong>Review before you approve.</strong></p>
+<ul>
+<li><strong>Who Gets Paid</strong> lists every employee due to be paid: earnings, the loan
+recovery about to be taken, and the net.</li>
+<li>Open any department row → <strong>Employees</strong> to see the entries behind its total.</li>
+<li>On any entry, the <strong>calculator</strong> icon shows exactly how the amount was reached —
+the salary, divisor and overtime factor, or every trip tier with its rate.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/gm/comm-02.png" alt="Who gets paid"></li>
+</ul>
+</li>
+<li><p><strong>Approve.</strong> Either <strong>Approve</strong> on a single department&#39;s submission, or
+<strong>Approve My Departments</strong> on the pay run to clear all of yours at once.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/gm/comm-03.png" alt="Approve my departments"></p>
+</li>
+<li><p><strong>Or send it back.</strong> On the department&#39;s submission, type the <strong>Return Reason</strong>,
+then click <strong>Return for Correction</strong>. The reason is required — the supervisor
+needs to know what to fix.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/gm/comm-04.png" alt="Return for correction"></p>
+</li>
+</ol>
+<h2>What happens next</h2>
+<ul>
+<li><strong>Returned:</strong> the department goes back to the supervisor, the reason is written
+onto every batch in it, and he is notified in his inbox.</li>
+<li><strong>Approved, with other departments still waiting:</strong> your departments are locked
+and the month stays open for the others.</li>
+<li><strong>Approved, and nothing is left waiting:</strong> the month finalises itself. The
+<strong>Payment Register</strong> is built from the approved departments only, the parked loan
+installments are settled out of the commission, and the period <strong>locks</strong> — no
+supervisor can add or change anything in it. Accounting then exports the bank file.</li>
+</ul>
+<h2>Closing a month that is still incomplete — the company&#39;s General Manager only</h2>
+<p>If a department never hands over, someone still has to decide the month is finished.
+That is a company-level call and it belongs to the <strong>company&#39;s General Manager</strong>, not
+to a department GM:</p>
+<ul>
+<li><strong>Lock the Month Now</strong> — pays only what was approved. A department that never
+submitted keeps its work in Draft for next month.</li>
+<li><strong>Reopen</strong> — unlocks an approved month, returns the settled loan installments to
+pending and turns the register back into a preview. It unwinds <strong>every</strong>
+department&#39;s settlement at once, which is why no single department GM can do it.</li>
+</ul>
+<p>If you need either and the button is not there, ask the company&#39;s General Manager.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>No <strong>Approve</strong> button on a department</td>
+<td>It is not yours — its GM is someone else</td>
+<td>The message names who it is waiting on</td>
+</tr>
+<tr>
+<td>&quot;None of the departments waiting … are yours to approve&quot;</td>
+<td>Same as above, from the pay-run button</td>
+<td>Approve from your own departments, or ask the named GM</td>
+</tr>
+<tr>
+<td>&quot;No General Manager is set for …&quot;</td>
+<td>The department has no GM and the company has no default</td>
+<td>Ask HR to set the department&#39;s General Manager</td>
+</tr>
+<tr>
+<td><strong>Return for Correction</strong> refuses</td>
+<td>The Return Reason is empty</td>
+<td>Type the reason in the field above the button first</td>
+</tr>
+<tr>
+<td>A department is missing from the month</td>
+<td>It has not handed over</td>
+<td>The blue banner lists them; chase the supervisor</td>
+</tr>
+<tr>
+<td>The register looks wrong after approval</td>
+<td>Only <strong>approved</strong> departments are included</td>
+<td>Check the chatter message — it lists what was left out and why</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li>Supervisor: <a href="#g-supervisor-06-commission-monthly-cycle">The monthly cycle</a></li>
+<li>Accounting: <a href="#g-accounting-04-commission-export">Commissions: bank export</a></li>
+<li><span class="xref">Returning a request to an earlier approver</span></li>
+</ul>
+</section>
+<section id="g-accounting-04-commission-export"><h1>Commissions: Bank Export</h1>
+<p><strong>Who is this for:</strong> Accounting (commission accountant)
+<strong>How long it takes:</strong> 5–10 minutes per month</p>
+<h2>What this does</h2>
+<p>Once the General Managers have approved the month&#39;s commissions and allowances,
+you check the <strong>Payment Register</strong>, export the <strong>bank transfer file</strong> and mark the
+month <strong>Paid</strong>.</p>
+<blockquote>
+<p><strong>This replaced the old commission sheets.</strong> There are no longer per-employee
+commission sheets to <em>Finalise</em>, and no commission <em>batch</em> to <em>Close</em>. The
+Payment Register is generated automatically when the month is approved — one line
+per employee, never typed by hand.</p>
+</blockquote>
+<blockquote>
+<p><strong>Sales &amp; Collection is not in this file.</strong> It is calculated on its own page and
+paid separately.</p>
+</blockquote>
+<h2>Before you start</h2>
+<ul>
+<li>The month must be <strong>Approved</strong>. If it is still Open or Submitted, a General
+Manager has not finished — the <strong>Export Bank File</strong> button will not be there.</li>
+<li>Employees are paid to their own salary bank account; anyone without one falls back
+to the run&#39;s <strong>Default Paying Bank Account</strong>. Set that on the pay run before
+exporting if you have such employees.</li>
+</ul>
+<h2>Steps</h2>
+<ol>
+<li><p><strong>Open Commissions → Monthly Pay Run</strong> and pick the approved month.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/accounting/comm-01.png" alt="Approved pay run"></p>
+</li>
+<li><p><strong>Check the register.</strong> The <strong>Who Gets Paid</strong> tab lists every employee:
+<strong>Earnings</strong>, <strong>Loans Deduction</strong> and <strong>Net Payable</strong> (earnings − loans).
+Open a line&#39;s entries to see exactly what produced the earnings.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/accounting/comm-02.png" alt="Payment register"></p>
+</li>
+<li><p><strong>Correct the loan figure if it is wrong.</strong> You can still adjust an employee&#39;s
+<strong>Loans Deduction</strong> on an approved month before the file goes out; the net
+recalculates.</p>
+</li>
+<li><p><strong>Export Bank File.</strong> Choose the format in the wizard and download it. Lines are
+grouped by the employee&#39;s paying bank account.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/accounting/comm-03.png" alt="Export bank file"></p>
+</li>
+<li><p><strong>Mark Paid</strong> once the transfer has gone out.</p>
+</li>
+</ol>
+<h2>Reporting</h2>
+<p><strong>Commissions → Reports → Payment Register</strong> is the same data as a searchable list
+across months, groupable by department — use it for reconciliation rather than
+opening each run.</p>
+<h2>What happens next</h2>
+<p>The month stays locked. The settled loan installments are already marked paid
+against the employees&#39; loans, so nothing has to be recorded twice.</p>
+<p>If a genuine correction is needed after approval, only the <strong>company&#39;s General
+Manager</strong> can <strong>Reopen</strong> the month — that returns the settled installments to
+pending and turns the register back into a preview. Ask rather than working around it.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>No <strong>Export Bank File</strong> button</td>
+<td>The month is not approved yet</td>
+<td>A GM still has departments to approve — check <strong>By Department</strong></td>
+</tr>
+<tr>
+<td>An employee is missing from the register</td>
+<td>Their department was never approved, or never handed over</td>
+<td>The approval chatter message lists exactly which departments were left out and why</td>
+</tr>
+<tr>
+<td>An employee has no bank account on the file</td>
+<td>No salary bank account on their record</td>
+<td>Set the run&#39;s <strong>Default Paying Bank Account</strong>, or ask HR to add the employee&#39;s</td>
+</tr>
+<tr>
+<td>The net is not what the supervisor expected</td>
+<td>Loan installments were settled out of the commission</td>
+<td>Open the line&#39;s entries and the employee&#39;s loan to see what was taken</td>
+</tr>
+<tr>
+<td>I need to change an amount</td>
+<td>The month is locked</td>
+<td>Only the company&#39;s General Manager can reopen it</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li>Supervisor: <a href="#g-supervisor-06-commission-monthly-cycle">The monthly cycle</a></li>
+<li>GM: <a href="#g-gm-04-commission-approval">Approving the month&#39;s commissions</a></li>
+<li>Payroll: <span class="xref">Bank file export</span></li>
+</ul>
+</section>
+<section id="g-admin-commissions"><h1>Commissions Configuration &amp; the Officer&#39;s View</h1>
+<p><strong>Who is this for:</strong> Commission Admin (configuration) and Commission Officer (company-wide view)
+<strong>How long it takes:</strong> varies</p>
+<h2>What this does</h2>
+<p>Everything KSW pays on top of salary is a <strong>configuration record</strong>, not a
+programmed feature. Adding a new kind of pay — a new allowance, a new bonus — is a
+row in the <strong>Pay Components</strong> catalog: no development, no new menu, no new access
+group. This page covers that catalog, the work sites behind it, and the
+company-wide screens the Commission Officer works from.</p>
+<blockquote>
+<p><strong>Sales &amp; Collection has its own configuration</strong> (rules, salesperson profiles)
+and is paid separately from the commission run. It is not a pay component and is
+not covered here.</p>
+</blockquote>
+<h2>Pay Components — the catalog</h2>
+<p><strong>Commissions → Configuration → Pay Components.</strong></p>
+<p>Everything reduces to <strong>quantity × rate → amount</strong>. Four calculation methods cover
+every case:</p>
+<table>
+<thead>
+<tr>
+<th>Calculation</th>
+<th>What it does</th>
+<th>Used by</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Fixed amount</strong></td>
+<td>Nothing is derived — the supervisor types the amount</td>
+<td>Allowances, holiday bonuses, Other</td>
+</tr>
+<tr>
+<td><strong>Quantity × rate</strong></td>
+<td>The rate configured on the component (or on the chosen option)</td>
+<td>Meals, Friday Work</td>
+</tr>
+<tr>
+<td><strong>Quantity × salary-derived rate</strong></td>
+<td>basic salary ÷ <strong>divisor</strong> × <strong>factor</strong> × quantity</td>
+<td>Overtime (divisor 240, factor 1.5 — Labour Law art. 107)</td>
+</tr>
+<tr>
+<td><strong>Tiered on quantity</strong></td>
+<td>A waterfall through the rate tiers, above a per-entry free allowance</td>
+<td>Driver Trips</td>
+</tr>
+</tbody></table>
+<p><div class="ph">📷 Pay component form <span>(image pending capture)</span></div></p>
+<h3>Options — one component, several rates</h3>
+<p>If the <em>only</em> difference between two kinds of pay is the unit rate, they are
+<strong>options</strong> of one component, not two components. Meals is one component with
+Breakfast (10), Lunch (20) and Dinner (15) inside it — so a supervisor records the
+month&#39;s meals on one screen and picks the meal on each row, instead of opening,
+submitting and having three batches approved.</p>
+<p>Anything that genuinely differs — a different scope, a different calculation, a
+different person allowed to record it — stays a component of its own.</p>
+<blockquote>
+<p>Options only work with <strong>Quantity × rate</strong>; each option carries its own rate.</p>
+</blockquote>
+<h3>Rate tiers — for tiered components</h3>
+<p>Each tier has a <strong>Band Size</strong> and a <strong>Rate</strong>, consumed in sequence.
+<strong>Leave the Band Size at 0 on the last tier</strong> so it absorbs everything above the
+previous bands. Add a <strong>Work Site</strong> to a tier to give that site its own ladder; a
+site with no tiers of its own uses the ones with no site set.</p>
+<h3>What an entry looks like</h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Effect on the entry screen</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Quantity Label</strong></td>
+<td>What the quantity column is called — Hours, Trips, Meals, Days</td>
+</tr>
+<tr>
+<td><strong>Reference Quantity Label</strong></td>
+<td>Shows a second, informational column (the driver&#39;s raw trip count). Leave empty to hide it</td>
+</tr>
+<tr>
+<td><strong>Per Occurrence</strong></td>
+<td>Each row is a dated occurrence and the date is required</td>
+</tr>
+<tr>
+<td><strong>Ask for Location</strong></td>
+<td>Shows and asks for the location</td>
+</tr>
+<tr>
+<td><strong>Ask for a Reason</strong></td>
+<td>A short justification is required on every row</td>
+</tr>
+<tr>
+<td><strong>Scope</strong></td>
+<td>What a batch covers: <strong>Department</strong>, <strong>Work Site</strong> or <strong>Company-wide</strong></td>
+</tr>
+<tr>
+<td><strong>Restricted To</strong></td>
+<td>Leave empty for any commission supervisor; set it to limit the component to particular roles</td>
+</tr>
+<tr>
+<td><strong>Import Source</strong></td>
+<td>Adds an <strong>Import</strong> button on batches of this component (Driver trips from BAS)</td>
+</tr>
+</tbody></table>
+<h3>Adding a new kind of pay</h3>
+<ol>
+<li><strong>New</strong>, give it a name and a unique <strong>Code</strong> (the code is what exports and
+reports key on — pick it once and leave it alone).</li>
+<li>Choose <strong>Earning</strong> or <strong>Deduction</strong>, the <strong>calculation</strong>, and the <strong>scope</strong>.</li>
+<li>Fill in the rate / divisor and factor / tiers the calculation needs.</li>
+<li>Set the entry-shape flags above so the supervisor is asked for exactly what the
+pay needs — no more.</li>
+<li>Tell the supervisors it exists.</li>
+</ol>
+<p>Existing components are never overwritten by an upgrade, so rates you edit here
+survive.</p>
+<h2>Who may record what — the opt-in entry groups</h2>
+<p>The <strong>Supervisor</strong> tier is the <em>scope</em> (which departments). The per-kind entry
+groups — <strong>Overtime Entry</strong>, <strong>Driver Commission Entry</strong>, <strong>Location Allowance
+Entry</strong> — are the <em>opt-in</em>, and they are <strong>not</strong> implied by the Supervisor tier.</p>
+<blockquote>
+<p><strong>Every supervisor must be ticked for the kinds of pay he handles</strong>, on his user
+record, or he will correctly see nothing. This is the most common &quot;the app is
+broken&quot; report after a new supervisor is set up.</p>
+</blockquote>
+<p>The Officer tier implies all of them, so Officers, Accountants and GMs keep seeing
+everything.</p>
+<h2>Work Sites</h2>
+<p><strong>Commissions → Configuration → Work Sites.</strong> A site is the scope of a
+site-scoped component (Driver Trips) and the key the BAS trip import matches on.
+Site-specific rate tiers live on the component, pointing at the site.</p>
+<h2>Recurring entries</h2>
+<p>Standing monthly instructions (a mobile-phone allowance, a project-management
+allowance) are now maintained by <strong>supervisors for their own teams</strong>, under
+<strong>Commissions → Pay Entries → Recurring Entries</strong>. The Officer keeps the
+company-wide view of the same list and can correct any row.</p>
+<p>See the supervisor guide, <a href="#g-supervisor-05-commission-recurring">Recurring entries</a>,
+for what they are and when to create one.</p>
+<h2>The Commission Officer&#39;s company-wide screens</h2>
+<table>
+<thead>
+<tr>
+<th>Screen</th>
+<th>What it is for</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Pay Entries → All Entries</strong></td>
+<td>Every entry company-wide, grouped by employee. Search and reconciliation</td>
+</tr>
+<tr>
+<td><strong>Reports → Payment Register</strong></td>
+<td>One line per employee per month: earnings, loan recovery, net</td>
+</tr>
+<tr>
+<td><strong>Monthly Pay Run → Close the Month</strong></td>
+<td>Marks the month as handed over when a department never submitted. It does <strong>not</strong> lock the period and it does <strong>not</strong> pay anything — that is the GM&#39;s approval</td>
+</tr>
+</tbody></table>
+<p><strong>Locking and reopening a month belong to the company&#39;s General Manager</strong>, not to
+the Officer: reopening unwinds every department&#39;s loan settlement at once.</p>
+<h2>Deployment prerequisite</h2>
+<p>Supervisor scope keys on <strong><code>hr.department</code> → Manager</strong>. A department with no
+manager set gives its supervisor nothing to record, with a clear message telling him
+to ask HR. Check every department has a manager before rolling the app out to a new
+team. (This is the <strong>direct manager</strong>, a different person from the department&#39;s
+<strong>General Manager</strong>, which is its own field and drives approval.)</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A supervisor sees no components</td>
+<td>He is not ticked for any entry type</td>
+<td>Tick the entry groups on his user record</td>
+</tr>
+<tr>
+<td>A supervisor sees nothing to record at all</td>
+<td>His department has no Manager</td>
+<td>Set <code>hr.department</code> → Manager, or add him as an assistant to it</td>
+</tr>
+<tr>
+<td>&quot;…has options, so its amount has to be a quantity × rate&quot;</td>
+<td>Options were added to a fixed or tiered component</td>
+<td>Options only apply to Quantity × rate</td>
+</tr>
+<tr>
+<td>&quot;…is tiered but has no rate tiers configured&quot;</td>
+<td>A tiered component was saved with an empty ladder</td>
+<td>Add the tiers, last one with Band Size 0</td>
+</tr>
+<tr>
+<td>A tiered amount stops short</td>
+<td>The last tier has a Band Size</td>
+<td>Set the last tier&#39;s Band Size to 0</td>
+</tr>
+<tr>
+<td>A new component does not appear for anyone</td>
+<td><strong>Restricted To</strong> was filled in</td>
+<td>Clear it, or add the supervisors&#39; groups</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li>Supervisor: <a href="#g-supervisor-04-commission-pay-entries">Recording extra pay</a></li>
+<li>GM: <a href="#g-gm-04-commission-approval">Approving the month&#39;s commissions</a></li>
+<li>Accounting: <a href="#g-accounting-04-commission-export">Commissions: bank export</a></li>
+<li><span class="xref">Deductions configuration</span></li>
+</ul>
+</section>
+</body></html>

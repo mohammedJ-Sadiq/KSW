@@ -1,6 +1,6 @@
 {
     'name': 'KSW Deductions',
-    'version': '19.0.1.4.0',
+    'version': '19.0.1.5.3',
     'summary': 'Manage employee deductions (loans, penalties, advances, etc.)',
     'description': """
 Centralized deduction management for KSW payroll.
@@ -32,6 +32,11 @@ via the KSW_DEDUCTIONS salary rule (regular + vacation payslips).
         'data/salary_rule_deduction.xml',
         'data/loan_return_steps.xml',
         'views/ksw_deduction_type_views.xml',
+        # Loaded before the deduction and employee forms: both carry a
+        # "Statement of Account" button that resolves this action's xml id
+        # at load time via %(...)d, which fails if the record does not
+        # exist yet.
+        'wizard/ksw_deduction_statement_wizard_views.xml',
         'views/ksw_deduction_views.xml',
         'views/ksw_deduction_line_views.xml',
         'views/hr_employee_views.xml',
@@ -40,6 +45,7 @@ via the KSW_DEDUCTIONS salary rule (regular + vacation payslips).
         'wizard/loan_refuse_wizard_views.xml',
         'wizard/ksw_loan_payment_wizard_views.xml',
         'wizard/ksw_loan_return_approver_wizard_views.xml',
+        'report/ksw_deduction_statement_templates.xml',
         'views/menu.xml',
     ],
     'installable': True,

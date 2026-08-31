@@ -60,6 +60,10 @@ import csv
 import re
 from datetime import datetime
 
+from odoo.addons.KSW_workshop.models.ksw_workshop_request import (
+    LEGACY_PLACEHOLDER_SUFFIX,
+)
+
 STATE_MAP = {
     'جديد': 'new',
     'قيد العمل': 'in_progress',
@@ -189,11 +193,20 @@ class _Caches:
             return employee, False
 
         raw_name = (name or '').strip() or (email or '').strip() or 'Unknown Requester'
-        placeholder_name = f"{raw_name} (Legacy Import - No Odoo Account)"
+        placeholder_name = f"{raw_name}{LEGACY_PLACEHOLDER_SUFFIX}"
         cache_key = placeholder_name.lower()
         if cache_key not in self.placeholder_employees:
-            existing = self.env['hr.employee'].search([('name', '=', placeholder_name)], limit=1)
-            employee = existing or self.env['hr.employee'].create({'name': placeholder_name})
+            # active_test=False on the lookup and active=False on the create:
+            # placeholders are archived on sight so they never reach the
+            # Employees list, the headcount, or an hr.employee picker. They
+            # are FK anchors only. See the 19.0.7.0.0 migration, which
+            # archived the 83 this import already created.
+            Employee = self.env['hr.employee'].with_context(active_test=False)
+            existing = Employee.search([('name', '=', placeholder_name)], limit=1)
+            employee = existing or Employee.create({
+                'name': placeholder_name,
+                'active': False,
+            })
             self.placeholder_employees[cache_key] = employee
         return self.placeholder_employees[cache_key], True
 

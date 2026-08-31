@@ -174,6 +174,31 @@ class KswDeduction(models.Model):
     )
 
     # ------------------------------------------------------------------
+    # Ledger dates (Statement of Account)
+    # ------------------------------------------------------------------
+    # The statement is a ledger, and a ledger needs a date on every
+    # movement. `state` alone cannot say *when* the deduction was charged
+    # to the employee or *when* an unrecoverable remainder was written
+    # off, so both are stamped here at the single transition that causes
+    # them. Cleared together by `action_reset_to_draft`, which returns
+    # the record to a state where neither movement has happened yet.
+    #
+    # No model-level `groups=` on purpose: these are read by the
+    # statement's `invisible=` expressions for roles outside
+    # hr.group_hr_user (see Odoo 19 Pitfalls #31).
+    x_charge_date = fields.Date(
+        string='Charge Date', readonly=True, copy=False,
+        help='Date the deduction was charged to the employee — i.e. when it '
+             'went active. The debit side of the Statement of Account.',
+    )
+    x_writeoff_date = fields.Date(
+        string='Write-off Date', readonly=True, copy=False,
+        help='Date the deduction was cancelled and its still-pending '
+             'installments written off. Without it a cancelled deduction '
+             'would carry its unrecovered balance forever on the statement.',
+    )
+
+    # ------------------------------------------------------------------
     # Installment schedule
     # ------------------------------------------------------------------
     line_ids = fields.One2many('ksw.deduction.line', 'deduction_id',
@@ -1011,9 +1036,28 @@ class KswDeduction(models.Model):
             # ksw.deduction (record rule lets them see their own), so
             # elevate to write the cancel transition.
             target = rec.sudo() if rec.is_loan else rec
+            # Order matters, and it was wrong here: skipping the pending
+            # lines first fired `_check_total_matches_deduction_amount`
+            # while the deduction was still 'active', where
+            # `_validate_installments_total` demands
+            # Σ(pending+paid) == amount — which skipping them has just
+            # broken. Cancelling an active deduction therefore always
+            # raised ValidationError, from the button as well as from
+            # code. Moving the state write first puts the record outside
+            # that check (it only guards 'active'/'completed') before the
+            # lines change, which is the state the check itself already
+            # documents as the cancelled case.
+            #
+            # `x_writeoff_date` dates the write-off so the Statement of
+            # Account can credit the uncollected balance back out instead
+            # of carrying a phantom debt for the rest of time.
+            target.write({
+                'state': 'cancelled',
+                'approval_state': False,
+                'x_writeoff_date': fields.Date.context_today(self),
+            })
             target.line_ids.filtered(
                 lambda l: l.state == 'pending').write({'state': 'skipped'})
-            target.write({'state': 'cancelled', 'approval_state': False})
             target.message_post(
                 body=Markup(
                     '<strong>⛔ Cancelled by %s</strong>'
@@ -1070,6 +1114,11 @@ class KswDeduction(models.Model):
                 'x_refused_by': False,
                 'x_refused_date': False,
                 'x_refused_at_step': False,
+                # Neither movement has happened any more: the record is
+                # back to being an un-charged request. A re-activation
+                # re-stamps `x_charge_date` from _activate_and_generate_lines.
+                'x_charge_date': False,
+                'x_writeoff_date': False,
             })
 
     # ==================================================================
@@ -2182,7 +2231,15 @@ class KswDeduction(models.Model):
             # Already generated (shouldn't happen normally)
             self.line_ids.unlink()
         self._generate_installment_lines()
-        self.write({'state': 'active'})
+        # `x_charge_date` is the debit date on the Statement of Account.
+        # This is the one place both loans (via disbursement confirmation)
+        # and non-loans (via action_submit) go active, so stamping here
+        # covers every route without a second guess.
+        self.write({
+            'state': 'active',
+            'x_charge_date': fields.Date.context_today(self),
+            'x_writeoff_date': False,
+        })
 
     def _generate_installment_lines(self):
         """Create one ksw.deduction.line per month starting from start_month.
@@ -2234,6 +2291,10 @@ class KswDeduction(models.Model):
             the remainder as a new pending line that points back at the
             origin (so a payslip reset can merge it back).
         """
+        # The payslip period end is when the money actually left the
+        # employee's pay, which is the date the Statement of Account
+        # credits — not the installment's scheduled `period_date`.
+        settled_on = payslip.date_to
         for ded in lines.mapped('deduction_id'):
             cur = ded.currency_id
             commands = []
@@ -2244,13 +2305,17 @@ class KswDeduction(models.Model):
                     continue  # nothing collected; stays pending
                 if cur.compare_amounts(collected, original) >= 0:
                     commands.append((1, line.id, {
-                        'state': 'paid', 'payslip_id': payslip.id}))
+                        'state': 'paid',
+                        'payslip_id': payslip.id,
+                        'x_settlement_date': settled_on,
+                    }))
                 else:
                     remainder = cur.round(original - collected)
                     commands.append((1, line.id, {
                         'amount': collected,
                         'state': 'paid',
                         'payslip_id': payslip.id,
+                        'x_settlement_date': settled_on,
                     }))
                     commands.append((0, 0, {
                         'sequence': line.sequence,
@@ -2295,7 +2360,11 @@ class KswDeduction(models.Model):
         # Phase A: revert paid lines (state/payslip only — not an edit key,
         # so the per-line write guard is not triggered).
         if paid:
-            paid.write({'state': 'pending', 'payslip_id': False})
+            paid.write({
+                'state': 'pending',
+                'payslip_id': False,
+                'x_settlement_date': False,
+            })
         # Phase B: merge each split remainder back into its (now pending)
         # origin line and delete the remainder. Batched per deduction so
         # the total-consistency check validates once on the final state.

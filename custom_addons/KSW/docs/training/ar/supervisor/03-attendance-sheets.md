@@ -52,6 +52,6 @@
 ## أدلة ذات صلة
 
 - [اعتماد الإجازات](01-approve-time-off.md)
-- [كشوف العمولات](04-commission-sheets.md)
+- [تسجيل المستحقات الإضافية](04-commission-pay-entries.md)
 
 </div>

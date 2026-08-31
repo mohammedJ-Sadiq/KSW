@@ -1,0 +1,133 @@
+<!doctype html><html lang="en" dir="ltr"><head>
+<meta charset="utf-8"><title>Commissions — Accounting Guide</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "DejaVu Sans",Arial,sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: left; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-left: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">Commissions — Accounting Guide</div>
+  <div class="meta">Commissions & Allowances · excludes Sales & Collection<br/>KSW HR &amp; Payroll · 2026-08-30</div>
+</div>
+<section id="g-accounting-04-commission-export"><h1>Commissions: Bank Export</h1>
+<p><strong>Who is this for:</strong> Accounting (commission accountant)
+<strong>How long it takes:</strong> 5–10 minutes per month</p>
+<h2>What this does</h2>
+<p>Once the General Managers have approved the month&#39;s commissions and allowances,
+you check the <strong>Payment Register</strong>, export the <strong>bank transfer file</strong> and mark the
+month <strong>Paid</strong>.</p>
+<blockquote>
+<p><strong>This replaced the old commission sheets.</strong> There are no longer per-employee
+commission sheets to <em>Finalise</em>, and no commission <em>batch</em> to <em>Close</em>. The
+Payment Register is generated automatically when the month is approved — one line
+per employee, never typed by hand.</p>
+</blockquote>
+<blockquote>
+<p><strong>Sales &amp; Collection is not in this file.</strong> It is calculated on its own page and
+paid separately.</p>
+</blockquote>
+<h2>Before you start</h2>
+<ul>
+<li>The month must be <strong>Approved</strong>. If it is still Open or Submitted, a General
+Manager has not finished — the <strong>Export Bank File</strong> button will not be there.</li>
+<li>Employees are paid to their own salary bank account; anyone without one falls back
+to the run&#39;s <strong>Default Paying Bank Account</strong>. Set that on the pay run before
+exporting if you have such employees.</li>
+</ul>
+<h2>Steps</h2>
+<ol>
+<li><p><strong>Open Commissions → Monthly Pay Run</strong> and pick the approved month.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/accounting/comm-01.png" alt="Approved pay run"></p>
+</li>
+<li><p><strong>Check the register.</strong> The <strong>Who Gets Paid</strong> tab lists every employee:
+<strong>Earnings</strong>, <strong>Loans Deduction</strong> and <strong>Net Payable</strong> (earnings − loans).
+Open a line&#39;s entries to see exactly what produced the earnings.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/accounting/comm-02.png" alt="Payment register"></p>
+</li>
+<li><p><strong>Correct the loan figure if it is wrong.</strong> You can still adjust an employee&#39;s
+<strong>Loans Deduction</strong> on an approved month before the file goes out; the net
+recalculates.</p>
+</li>
+<li><p><strong>Export Bank File.</strong> Choose the format in the wizard and download it. Lines are
+grouped by the employee&#39;s paying bank account.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/accounting/comm-03.png" alt="Export bank file"></p>
+</li>
+<li><p><strong>Mark Paid</strong> once the transfer has gone out.</p>
+</li>
+</ol>
+<h2>Reporting</h2>
+<p><strong>Commissions → Reports → Payment Register</strong> is the same data as a searchable list
+across months, groupable by department — use it for reconciliation rather than
+opening each run.</p>
+<h2>What happens next</h2>
+<p>The month stays locked. The settled loan installments are already marked paid
+against the employees&#39; loans, so nothing has to be recorded twice.</p>
+<p>If a genuine correction is needed after approval, only the <strong>company&#39;s General
+Manager</strong> can <strong>Reopen</strong> the month — that returns the settled installments to
+pending and turns the register back into a preview. Ask rather than working around it.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>No <strong>Export Bank File</strong> button</td>
+<td>The month is not approved yet</td>
+<td>A GM still has departments to approve — check <strong>By Department</strong></td>
+</tr>
+<tr>
+<td>An employee is missing from the register</td>
+<td>Their department was never approved, or never handed over</td>
+<td>The approval chatter message lists exactly which departments were left out and why</td>
+</tr>
+<tr>
+<td>An employee has no bank account on the file</td>
+<td>No salary bank account on their record</td>
+<td>Set the run&#39;s <strong>Default Paying Bank Account</strong>, or ask HR to add the employee&#39;s</td>
+</tr>
+<tr>
+<td>The net is not what the supervisor expected</td>
+<td>Loan installments were settled out of the commission</td>
+<td>Open the line&#39;s entries and the employee&#39;s loan to see what was taken</td>
+</tr>
+<tr>
+<td>I need to change an amount</td>
+<td>The month is locked</td>
+<td>Only the company&#39;s General Manager can reopen it</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li>Supervisor: <span class="xref">The monthly cycle</span></li>
+<li>GM: <span class="xref">Approving the month&#39;s commissions</span></li>
+<li>Payroll: <span class="xref">Bank file export</span></li>
+</ul>
+</section>
+</body></html>

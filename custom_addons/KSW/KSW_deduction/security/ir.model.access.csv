@@ -25,5 +25,17 @@ access_ksw_loan_payment_wizard_acc_data_entry,ksw.loan.payment.wizard.acc.data.e
 access_ksw_deduction_manager_assistant,ksw.deduction.manager.assistant,model_ksw_deduction,KSW_base_security.group_manager_assistant,1,1,1,0
 access_ksw_loan_return_step_user,ksw.loan.return.step.user,model_ksw_loan_return_step,base.group_user,1,0,0,0
 access_ksw_loan_return_approver_wizard_user,ksw.loan.return.approver.wizard.user,model_ksw_loan_return_approver_wizard,base.group_user,1,1,1,1
+access_ksw_statement_wizard_officer,ksw.deduction.statement.wizard.officer,model_ksw_deduction_statement_wizard,KSW_deduction.group_deduction_officer,1,1,1,1
+access_ksw_statement_wizard_acc_data_entry,ksw.deduction.statement.wizard.acc.data.entry,model_ksw_deduction_statement_wizard,KSW_deduction.group_acc_data_entry,1,1,1,1
+access_ksw_statement_wizard_loan_hr,ksw.deduction.statement.wizard.loan.hr,model_ksw_deduction_statement_wizard,KSW_deduction.group_loan_hr,1,1,1,1
+access_ksw_statement_wizard_loan_acc,ksw.deduction.statement.wizard.loan.acc,model_ksw_deduction_statement_wizard,KSW_deduction.group_loan_acc,1,1,1,1
+access_ksw_statement_wizard_loan_gm,ksw.deduction.statement.wizard.loan.gm,model_ksw_deduction_statement_wizard,KSW_deduction.group_loan_gm,1,1,1,1
+access_ksw_statement_wizard_installment_edit,ksw.deduction.statement.wizard.installment.edit,model_ksw_deduction_statement_wizard,KSW_deduction.group_installment_edit,1,1,1,1
+access_ksw_statement_line_officer,ksw.deduction.statement.line.officer,model_ksw_deduction_statement_line,KSW_deduction.group_deduction_officer,1,1,1,1
+access_ksw_statement_line_acc_data_entry,ksw.deduction.statement.line.acc.data.entry,model_ksw_deduction_statement_line,KSW_deduction.group_acc_data_entry,1,1,1,1
+access_ksw_statement_line_loan_hr,ksw.deduction.statement.line.loan.hr,model_ksw_deduction_statement_line,KSW_deduction.group_loan_hr,1,1,1,1
+access_ksw_statement_line_loan_acc,ksw.deduction.statement.line.loan.acc,model_ksw_deduction_statement_line,KSW_deduction.group_loan_acc,1,1,1,1
+access_ksw_statement_line_loan_gm,ksw.deduction.statement.line.loan.gm,model_ksw_deduction_statement_line,KSW_deduction.group_loan_gm,1,1,1,1
+access_ksw_statement_line_installment_edit,ksw.deduction.statement.line.installment.edit,model_ksw_deduction_statement_line,KSW_deduction.group_installment_edit,1,1,1,1
 
 

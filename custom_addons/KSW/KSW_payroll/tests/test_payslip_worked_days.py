@@ -295,6 +295,8 @@ class TestPayslipWorkedDays(TransactionCase):
         for line in sheet.line_ids:
             if line.date in absent_dates:
                 line.is_attended = False
+        # Payroll only reads a month the supervisor has released.
+        sheet.sudo().action_supervisor_confirm()
 
         # Count actually attended (have hr.attendance records)
         attended = self.env['hr.attendance'].search_count([
@@ -332,6 +334,7 @@ class TestPayslipWorkedDays(TransactionCase):
         for line in sheet.line_ids:
             if line.date in absent_dates:
                 line.is_attended = False
+        sheet.sudo().action_supervisor_confirm()
 
         wd_vals = self.env['hr.payslip'].get_worked_day_lines(
             self.ver_sheet, d_from, d_to)
@@ -571,6 +574,7 @@ class TestPayslipWorkedDays(TransactionCase):
         for line in sheet.line_ids:
             if line.date in absent_dates:
                 line.is_attended = False
+        sheet.sudo().action_supervisor_confirm()
 
         ps = self._payslip(self.emp_sheet, d_from, d_to)
         ps.compute_sheet()

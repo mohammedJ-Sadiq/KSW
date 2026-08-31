@@ -79,6 +79,23 @@ class KswDeductionLine(models.Model):
         help='Free-text note for the manual payment (reference '
              'number, collection channel, etc.).',
     )
+    # When the money actually moved — as opposed to `period_date`, which
+    # is the month the installment was *scheduled* for. The two diverge
+    # routinely: a shortfall forwards a remainder that keeps its original
+    # period but is collected months later, and a manual settlement has
+    # nothing to do with any payroll month at all.
+    #
+    # Stored rather than computed so the Statement of Account's opening
+    # balance is a plain SQL domain, and so the report never has to read
+    # `payslip_id.date_to` — which would demand payroll access from an
+    # accounting user (the same reasoning behind `settlement_label`).
+    # No model-level `groups=` (see Odoo 19 Pitfalls #31).
+    x_settlement_date = fields.Date(
+        string='Settled On', readonly=True, copy=False,
+        help='Date the installment was actually settled: the payslip period '
+             'end for payroll-collected lines, the collection date for manual '
+             'ones. Empty while the installment is still pending.',
+    )
     # Combined display used in the "Settlement" column of the
     # installments list: either the payslip name (for auto-paid
     # lines) or "Manual by <user> on <date>" (for manual lines).
@@ -449,6 +466,9 @@ class KswDeductionLine(models.Model):
             vals['state'] = 'paid'
             vals.setdefault('manual_by', user.id)
             vals.setdefault('manual_date', today)
+            # A manual line is born settled, so the ledger date follows
+            # the collection date the accountant recorded.
+            vals.setdefault('x_settlement_date', vals['manual_date'])
             if 'sequence' not in vals:
                 ded_id = vals.get('deduction_id')
                 if ded_id:
@@ -564,6 +584,7 @@ class KswDeductionLine(models.Model):
                 'is_manual': True,
                 'manual_by': user.id,
                 'manual_date': today,
+                'x_settlement_date': today,
             })
             ded = line.deduction_id
             ded.sudo().message_post(

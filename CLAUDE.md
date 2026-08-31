@@ -947,3 +947,42 @@ allocation is needed. All test leave types that do not require allocation must u
     The run's CDP log contains the client's exact RPC payloads — that is where
     the missing `leave_id` was visible. Pattern in
     `KSW_annual_leave/tests/test_return_wizard_ui.py`.
+
+41. **A menu's effective `groups=` is the INTERSECTION of its own and every
+    ancestor's — a child under a narrower parent is orphaned.**
+    `ir_ui_menu._visible_menu_ids` walks a menu's ancestors into the visible
+    set with `while menu_id not in visible_ids and menu_id in menu_ids`, where
+    `menu_ids` is already filtered by the user's groups. A parent that failed
+    that filter is not in `menu_ids`, the walk stops, and the child — still in
+    `visible_ids` — has no visible parent to render under. Hit by
+    `menu_ksw_pay_recurring`, which was `groups=group_commission_officer` under
+    a Configuration parent gated to `group_commission_admin`: **an Officer who
+    was not an Admin never saw it**, with nothing in the data or logs to say
+    so. Symptom: "role X can't find the menu", while the ACL, the record rules
+    and the item's own `groups=` all name role X. Before putting an item under
+    an existing section, walk `parent=` upward and check every `groups=` on the
+    way. Related to gotcha #1 (menuitem overrides) and #38 (a group in a guard
+    with no rule to reach the records).
+
+42. **Inside a `compute_sudo` compute, `env.su` is not evidence of privilege —
+    and neither is any helper you call from it.** The module already knew to
+    read authority from the user's *group* rather than `env.su` in such a
+    compute (gotcha in `ksw.pay.batch._allowed_employees`). The part that bites
+    is one level down: `ksw.pay.batch._allowed_departments()` opens with
+    `if self.env.su or user.has_group(officer): return <every department>`, so
+    calling it from a `compute_sudo` field handed every supervisor all ~400
+    employees — inverting the very picker the field exists to narrow.
+    ```python
+    # WRONG inside a compute_sudo compute — env.su is true for everybody
+    departments = self.env['ksw.pay.batch']._allowed_departments()
+    # RIGHT — ask the authority question as the user; the reads inside are
+    # already sudo()'d, so nothing is lost
+    Batch = self.env['ksw.pay.batch'].with_env(self.env(su=False))
+    departments = Batch._allowed_departments()
+    ```
+    `ksw.pay.batch` never hit it because its own `_allowed_employees` branches
+    on `self.department_id` first and only reaches the helper in the fallback
+    branch — **the trap was dormant, not absent**. When reusing a scope helper
+    in a new context, check what it does with `env.su`, not just what it
+    returns. And assert the *negative* in the test (`assertNotIn(outsider, …)`)
+    — the positive half passed throughout.

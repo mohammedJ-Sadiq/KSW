@@ -53,7 +53,7 @@ request for them and then approve the manager step yourself:
 When one of your team returns from **annual** leave, you record their return —
 the employee does not do this themselves, and their next payslip is blocked
 until you (or HR) do. See the dedicated guide:
-[Confirming a Return from Annual Leave](06-confirm-return.md).
+[Confirming a Return from Annual Leave](08-confirm-return.md).
 
 ## What happens next
 

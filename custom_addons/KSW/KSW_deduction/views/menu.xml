@@ -88,11 +88,22 @@
     <!-- ============================================================ -->
     <!-- 5. Reports (officers + approvers + supervisors)                -->
     <!-- ============================================================ -->
+    <!--
+        A child menu's EFFECTIVE groups are the intersection of its own and
+        every ancestor's: `_visible_menu_ids` stops walking upward at a
+        parent the user cannot see, and the child is silently orphaned with
+        nothing in the data or the logs to say so. `group_installment_edit`
+        (accounting, "Loan Modification: Full") and `group_loan_disbursement`
+        imply none of the groups previously listed here, so the Statement of
+        Account below could not have reached them. Widened here rather than
+        narrowing the statement, because both roles work with deductions
+        daily and belong in Reports on their own merits.
+    -->
     <menuitem id="menu_ksw_deduction_reports"
               name="Reports"
               parent="menu_ksw_deduction_root"
               sequence="30"
-              groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_deduction_supervisor,KSW_deduction.group_acc_data_entry,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm"/>
+              groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_deduction_supervisor,KSW_deduction.group_acc_data_entry,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_installment_edit,KSW_deduction.group_loan_disbursement"/>
 
     <menuitem id="menu_ksw_deduction_report_by_employee"
               name="By Employee"
@@ -117,6 +128,18 @@
               parent="menu_ksw_deduction_reports"
               action="action_ksw_deduction_installment_schedule"
               sequence="40"/>
+
+    <!-- Every group here is also on the parent, or the item is orphaned.
+         Supervisors are deliberately left out: the statement is an
+         accounting/HR document. Adding group_deduction_supervisor later
+         needs no other change — the record rules already scope them to
+         their own reports. -->
+    <menuitem id="menu_ksw_deduction_statement"
+              name="Statement of Account"
+              parent="menu_ksw_deduction_reports"
+              action="action_ksw_deduction_statement"
+              sequence="50"
+              groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_acc_data_entry,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_installment_edit"/>
 
     <!-- ============================================================ -->
     <!-- 6. Configuration (managers only)                               -->

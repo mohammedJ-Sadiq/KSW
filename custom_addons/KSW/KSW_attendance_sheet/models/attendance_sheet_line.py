@@ -74,7 +74,29 @@ class KswAttendanceSheetLine(models.Model):
             if workday_changes:
                 workday_changes.mapped('sheet_id')._recompute_off_day_pay(
                     workday_changes)
+            # A system write (leave approval, off-day re-derivation) is the
+            # only thing that can reach an already-confirmed sheet. When it
+            # does, the figures the supervisor released to payroll are no
+            # longer the figures on the sheet — withdraw the confirmation.
+            self._reopen_confirmed_sheets(old_values)
+            # Toggling a day can create or clear a contradiction with an
+            # approved leave, so the "needs attention" flags follow it.
+            self.mapped('sheet_id')._recompute_blocked()
         return result
+
+    def _reopen_confirmed_sheets(self, old_values):
+        """Withdraw confirmation on any confirmed sheet whose days changed."""
+        changed = self.filtered(
+            lambda l: old_values.get(l.id) != l.is_attended)
+        for sheet in changed.mapped('sheet_id').filtered(
+                lambda s: s.state == 'confirmed'):
+            dates = sorted(
+                changed.filtered(lambda l: l.sheet_id == sheet).mapped('date'))
+            sheet._reopen_for_change(_(
+                '%(count)s day(s) changed after confirmation: %(days)s',
+                count=len(dates),
+                days=', '.join(d.strftime('%d %b') for d in dates),
+            ))
 
     def _log_attendance_change(self, old_values):
         """Post a chatter message on the sheet for each day that changed."""

@@ -49,3 +49,20 @@ class DeductionCommon(TransactionCase):
         ded.x_acc_budget_confirmed = True
         ded.action_acc_approve()
         return ded
+
+    def _activate(self, ded):
+        """Take any deduction all the way to `active`, whatever its type.
+
+        A non-loan activates on submit; a loan has to walk the whole
+        approval chain and is only activated by the disbursement
+        confirmation (GM approval alone leaves it at
+        `pending_disbursement` with no installment lines yet).
+        """
+        if ded.is_loan:
+            self._walk_loan_to_pending_gm(ded)
+            ded.action_gm_approve()
+            ded.action_disbursement_confirm()
+        else:
+            ded.action_submit()
+        self.assertEqual(ded.state, 'active')
+        return ded

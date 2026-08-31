@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-10 11:56+0000\n"
-"PO-Revision-Date: 2026-08-10 11:56+0000\n"
+"POT-Creation-Date: 2026-08-30 12:00+0000\n"
+"PO-Revision-Date: 2026-08-30 12:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -35,6 +35,13 @@ msgstr ""
 msgid ""
 "<br/>\n"
 "                                            <b>Reason:</b>"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_line_form_full
+msgid ""
+"<br/>\n"
+"                        <b>Reason:</b>"
 msgstr ""
 
 #. module: KSW_commissions
@@ -114,12 +121,46 @@ msgid ""
 msgstr ""
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_salesperson_profile_form
+msgid ""
+"<i class=\"fa fa-exclamation-triangle me-2\"/>\n"
+"                        <b>Collection Target is now derived from BAS</b> —\n"
+"                        the sum of overdue balance (past each customer's own\n"
+"                        BAS credit term) across every customer this employee\n"
+"                        collects for. <b>Annual Collection Target</b> and the\n"
+"                        monthly split on the <i>Monthly Targets</i> tab\n"
+"                        below are <b>no longer used</b> for the actual\n"
+"                        calculation; they're kept only as historical\n"
+"                        reference. Limited to this fiscal year's BAS data —\n"
+"                        debt carried over from before Jan 1 isn't visible."
+msgstr ""
+
+#. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_import_wizard_form
 msgid ""
 "<i class=\"fa fa-info-circle me-2\" title=\"Info\" role=\"img\" aria-label=\"Info\"/>\n"
 "                        Upload the monthly Excel files produced by the accountant application.\n"
 "                        You may upload one or both files — only the uploaded file(s) will update\n"
 "                        the corresponding achieved amounts. The other column is left unchanged."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid ""
+"<i class=\"fa fa-info-circle me-2\"/>\n"
+"                                            Use <b>Open Adjustments</b> above to add addition/deduction lines\n"
+"                                            on this employee's own page."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_salesperson_profile_form
+msgid ""
+"<i class=\"fa fa-info-circle me-2\"/>\n"
+"                                <b>Sales Target</b> below still feeds the\n"
+"                                commission sheet directly. <b>Collection\n"
+"                                Target</b> is historical only — the sheet\n"
+"                                now computes it live from BAS AR aging\n"
+"                                instead (see the warning banner above)."
 msgstr ""
 
 #. module: KSW_commissions
@@ -170,6 +211,14 @@ msgid ""
 msgstr ""
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_line_form_full
+msgid ""
+"<i class=\"fa fa-shield me-2\" title=\"Override\" role=\"img\" aria-label=\"Override\"/>\n"
+"                        <strong>Condition overridden by Sales Manager.</strong>"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_line_form_full
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
 msgid "<span class=\"mx-1\">·</span>"
 msgstr ""
@@ -238,16 +287,6 @@ msgid "Account no. as in col 0 of the Excel Sales file (primary match key)"
 msgstr ""
 
 #. module: KSW_commissions
-#: model:ir.model.fields,help:KSW_commissions.field_res_partner__x_client_account_number
-#: model:ir.model.fields,help:KSW_commissions.field_res_users__x_client_account_number
-msgid ""
-"Account number exactly as it appears in col 0 of the accountant's monthly "
-"Sales Excel file. Used by the import wizard as the primary key to match this"
-" customer to the correct commission split bucket. Takes priority over the "
-"Commission Import Name."
-msgstr ""
-
-#. module: KSW_commissions
 #: model:res.groups,name:KSW_commissions.group_commission_accountant
 msgid "Accountant"
 msgstr ""
@@ -278,6 +317,7 @@ msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_component__active
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_option__active
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring__active
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__active
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__active
@@ -341,11 +381,27 @@ msgid ""
 msgstr ""
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__x_addition_line_ids
+msgid "Addition Lines"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_line_form_full
+msgid "Additions"
+msgstr ""
+
+#. module: KSW_commissions
 #: model:res.groups,comment:KSW_commissions.group_commission_accountant
 msgid ""
 "Adjust the locked loans amount on confirmed sheets and finalise (state "
 "done). Implicitly grants Officer scope so the accountant can see every "
 "confirmed sheet."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_line_form_full
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Adjustments"
 msgstr ""
 
 #. module: KSW_commissions
@@ -372,6 +428,8 @@ msgstr ""
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__amount
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring__amount
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_addition_line__amount
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_deduction_line__amount
 msgid "Amount"
 msgstr ""
 
@@ -431,8 +489,26 @@ msgid "Approval"
 msgstr ""
 
 #. module: KSW_commissions
-#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_form
 msgid "Approve"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
+msgid "Approve My Departments"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
+msgid ""
+"Approve the departments you are General Manager of? The month locks itself "
+"once no department is left waiting."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_form
+msgid ""
+"Approve this department's commissions? Its batches are locked once you do."
 msgstr ""
 
 #. module: KSW_commissions
@@ -456,16 +532,10 @@ msgstr ""
 #. module: KSW_commissions
 #: model:res.groups,comment:KSW_commissions.group_commission_gm
 msgid ""
-"Approves the Monthly Commission Run. Approval finalises every employee sheet"
-" in the run and locks the period; the GM is also the only role that can "
-"reopen it."
-msgstr ""
-
-#. module: KSW_commissions
-#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
-msgid ""
-"Approving builds the payment register, settles the parked loan installments "
-"and locks the month. Continue?"
+"Approves the monthly commission handover of the departments they are set as "
+"General Manager of. Closing and reopening the month belong to the Commission"
+" Officer or the company's General Manager, since they affect every "
+"department."
 msgstr ""
 
 #. module: KSW_commissions
@@ -527,8 +597,23 @@ msgid "Awaiting GM"
 msgstr ""
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run__x_gm_submission_ids
+msgid "Awaiting My Approval"
+msgstr ""
+
+#. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_form_inherit_awaiting_commission
 msgid "Awaiting Sheet"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__x_bas_collection_target_today
+msgid "BAS Collection Target (Today)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_bas_customer
+msgid "BAS Customer Account"
 msgstr ""
 
 #. module: KSW_commissions
@@ -589,6 +674,7 @@ msgstr ""
 
 #. module: KSW_commissions
 #: model:ksw.pay.component,name:KSW_commissions.pay_component_meal_breakfast
+#: model:ksw.pay.option,name:KSW_commissions.pay_option_meal_breakfast
 msgid "Breakfast"
 msgstr ""
 
@@ -637,8 +723,6 @@ msgid "Client"
 msgstr ""
 
 #. module: KSW_commissions
-#: model:ir.model.fields,field_description:KSW_commissions.field_res_partner__x_client_account_number
-#: model:ir.model.fields,field_description:KSW_commissions.field_res_users__x_client_account_number
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_partner_form_ksw_commission
 msgid "Client Account Number"
 msgstr ""
@@ -679,6 +763,7 @@ msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_component__code
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_option__code
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__code
 msgid "Code"
 msgstr ""
@@ -757,6 +842,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__collection_min_pct
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_form
 msgid "Collection Min %"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_res_partner__x_collection_rep_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_res_users__x_collection_rep_id
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_partner_form_ksw_commission
+msgid "Collection Rep"
 msgstr ""
 
 #. module: KSW_commissions
@@ -841,6 +933,12 @@ msgid "Commission Import Name"
 msgstr ""
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_addition_line__line_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_deduction_line__line_id
+msgid "Commission Line"
+msgstr ""
+
+#. module: KSW_commissions
 #: model:res.groups.privilege,name:KSW_commissions.privilege_commission_management
 msgid "Commission Management"
 msgstr ""
@@ -907,6 +1005,7 @@ msgstr ""
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_batch__component_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__component_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_option__component_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_rate_tier__component_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring__component_id
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_batch_search
@@ -916,6 +1015,7 @@ msgid "Component"
 msgstr ""
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_line_form_full
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
 msgid "Computed Amounts"
 msgstr ""
@@ -990,11 +1090,14 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_batch__create_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_component__create_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__create_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_option__create_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_rate_tier__create_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring__create_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run__create_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__create_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__create_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_addition_line__create_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_deduction_line__create_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_import_wizard__create_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__create_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_override_wizard__create_uid
@@ -1013,11 +1116,14 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_batch__create_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_component__create_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__create_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_option__create_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_rate_tier__create_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring__create_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run__create_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__create_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__create_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_addition_line__create_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_deduction_line__create_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_import_wizard__create_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__create_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_override_wizard__create_date
@@ -1038,6 +1144,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run__currency_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__currency_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__currency_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_addition_line__currency_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_deduction_line__currency_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__currency_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__currency_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__currency_id
@@ -1102,7 +1210,13 @@ msgid "Deduction"
 msgstr ""
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__x_deduction_line_ids
+msgid "Deduction Lines"
+msgstr ""
+
+#. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_component_search
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_line_form_full
 msgid "Deductions"
 msgstr ""
 
@@ -1125,6 +1239,7 @@ msgid "Define a kind of extra pay"
 msgstr ""
 
 #. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_hr_department
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_batch__department_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__department_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring__department_id
@@ -1177,14 +1292,18 @@ msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_component__description
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_addition_line__name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_deduction_line__name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__description
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_tier__description
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_line_form_full
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_form
 msgid "Description"
 msgstr ""
 
 #. module: KSW_commissions
 #: model:ksw.pay.component,name:KSW_commissions.pay_component_meal_dinner
+#: model:ksw.pay.option,name:KSW_commissions.pay_option_meal_dinner
 msgid "Dinner"
 msgstr ""
 
@@ -1195,19 +1314,24 @@ msgid "Dinner Price"
 msgstr ""
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_hr_department__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_hr_employee__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_hr_payslip__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_bas_customer__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_bank_export_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_line__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_batch__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_component__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_option__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_rate_tier__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_addition_line__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_deduction_line__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_import_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_override_wizard__display_name
@@ -1266,6 +1390,16 @@ msgstr ""
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_batch_form
 msgid "Duplicate this line"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_addition_line__name
+msgid "E.g. \"Reward for closing the ACME deal\", \"Feb 2026 bonus\"."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_deduction_line__name
+msgid "E.g. \"Traffic fine Jan 2026\", \"Shortfall correction\"."
 msgstr ""
 
 #. module: KSW_commissions
@@ -1330,6 +1464,16 @@ msgid ""
 msgstr ""
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_bas_customer__effective_collector_id
+msgid "Effective Collection Rep"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_bas_customer__effective_sales_rep_id
+msgid "Effective Sales Rep"
+msgstr ""
+
+#. module: KSW_commissions
 #: model:ksw.pay.component,name:KSW_commissions.pay_component_bonus_adha
 msgid "Eid Al-Adha Bonus"
 msgstr ""
@@ -1370,6 +1514,37 @@ msgid "Employee Count"
 msgstr ""
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_partner_form_ksw_commission
+msgid ""
+"Employee who earns collection commission on this customer's BAS receipts"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_res_partner__x_collection_rep_id
+#: model:ir.model.fields,help:KSW_commissions.field_res_users__x_collection_rep_id
+msgid ""
+"Employee who earns collection commission on this customer's BAS receipts. "
+"Used by \"Pull from BAS\" on the Sales/Collection Commission Sheet to "
+"attribute achieved collection to the right employee. Not restricted to "
+"attendance-sheet employees — most sales/collection reps are not that type."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_partner_form_ksw_commission
+msgid "Employee who earns sales commission on this customer's BAS invoices"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_res_partner__x_sales_rep_id
+#: model:ir.model.fields,help:KSW_commissions.field_res_users__x_sales_rep_id
+msgid ""
+"Employee who earns sales commission on this customer's BAS invoices. Used by"
+" \"Pull from BAS\" on the Sales/Collection Commission Sheet to attribute "
+"achieved sales to the right employee. Not restricted to attendance-sheet "
+"employees — most sales/collection reps are not that type."
+msgstr ""
+
+#. module: KSW_commissions
 #: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_rule__scope__employee
 msgid "Employee-specific"
 msgstr ""
@@ -1380,6 +1555,13 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_form
 msgid "Employees"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_batch__allowed_employee_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__allowed_employee_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring__allowed_employee_ids
+msgid "Employees I May Record For"
 msgstr ""
 
 #. module: KSW_commissions
@@ -1495,6 +1677,13 @@ msgid "Fallback for employees with no personal salary bank account."
 msgstr ""
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid ""
+"Fallback: import achieved sales & collection amounts from the accountant's "
+"Excel files"
+msgstr ""
+
+#. module: KSW_commissions
 #: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_salesperson_target_line__month__2
 msgid "February"
 msgstr ""
@@ -1591,7 +1780,9 @@ msgid "General (default)"
 msgstr ""
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__gm_id
 #: model:res.groups,name:KSW_commissions.group_commission_gm
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_list
 msgid "General Manager"
 msgstr ""
 
@@ -1623,6 +1814,15 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__has_message
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__has_message
 msgid "Has Message"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_batch__has_options
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_component__has_options
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__has_options
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring__has_options
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_component_list
+msgid "Has Options"
 msgstr ""
 
 #. module: KSW_commissions
@@ -1660,19 +1860,24 @@ msgid "How was this worked out?"
 msgstr ""
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_hr_department__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_hr_employee__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_hr_payslip__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_bas_customer__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_bank_export_wizard__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_line__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_batch__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_component__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_option__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_rate_tier__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_addition_line__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_deduction_line__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_import_wizard__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_override_wizard__id
@@ -1749,12 +1954,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_batch__importer
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_component__importer
 msgid "Import Source"
-msgstr ""
-
-#. module: KSW_commissions
-#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
-msgid ""
-"Import achieved sales & collection amounts from the accountant's Excel files"
 msgstr ""
 
 #. module: KSW_commissions
@@ -1854,6 +2053,11 @@ msgid "KSW Pay Component"
 msgstr ""
 
 #. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_pay_option
+msgid "KSW Pay Component Option"
+msgstr ""
+
+#. module: KSW_commissions
 #: model:ir.model,name:KSW_commissions.model_ksw_pay_entry
 msgid "KSW Pay Entry"
 msgstr ""
@@ -1945,11 +2149,14 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_batch__write_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_component__write_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__write_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_option__write_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_rate_tier__write_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring__write_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run__write_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__write_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__write_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_addition_line__write_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_deduction_line__write_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_import_wizard__write_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__write_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_override_wizard__write_uid
@@ -1968,11 +2175,14 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_batch__write_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_component__write_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__write_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_option__write_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_rate_tier__write_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring__write_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run__write_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__write_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__write_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_addition_line__write_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_deduction_line__write_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_import_wizard__write_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__write_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_override_wizard__write_date
@@ -2025,6 +2235,18 @@ msgid "Lines"
 msgstr ""
 
 #. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__x_bas_collection_target_today
+msgid ""
+"Live reference figure: the aged (overdue, past each customer's own BAS "
+"credit term) open balance across every customer this employee currently "
+"collects for, as of today. This is what actually feeds the Collection Target"
+" on the monthly commission sheet (via the \"Pull from BAS\" button) — the "
+"Annual Collection Target / monthly split below are no longer used for that "
+"calculation, kept only for historical reference. Limited to this fiscal "
+"year's BAS data — debt carried over from before Jan 1 is not visible here."
+msgstr ""
+
+#. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__loan_offset
 msgid "Loan Offset"
 msgstr ""
@@ -2051,7 +2273,27 @@ msgid "Location Allowance Entry"
 msgstr ""
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
+msgid "Lock the Month Now"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
+msgid ""
+"Lock the month even though some departments have not been approved by their "
+"General Manager"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
+msgid ""
+"Lock the month now? Departments still waiting on their General Manager will "
+"NOT be paid this month."
+msgstr ""
+
+#. module: KSW_commissions
 #: model:ksw.pay.component,name:KSW_commissions.pay_component_meal_lunch
+#: model:ksw.pay.option,name:KSW_commissions.pay_option_meal_lunch
 msgid "Lunch"
 msgstr ""
 
@@ -2098,9 +2340,16 @@ msgid "May"
 msgstr ""
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.res_config_settings_view_form_ksw_commissions
+msgid "Meal Prices"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ksw.pay.component,name:KSW_commissions.pay_component_meals
 #: model:ksw.pay.component,qty_label:KSW_commissions.pay_component_meal_breakfast
 #: model:ksw.pay.component,qty_label:KSW_commissions.pay_component_meal_dinner
 #: model:ksw.pay.component,qty_label:KSW_commissions.pay_component_meal_lunch
+#: model:ksw.pay.component,qty_label:KSW_commissions.pay_component_meals
 msgid "Meals"
 msgstr ""
 
@@ -2215,6 +2464,7 @@ msgstr ""
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_batch__name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_component__name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_option__name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_rate_tier__name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run__name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__name
@@ -2423,6 +2673,21 @@ msgid "Open"
 msgstr ""
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Open Adjustments"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Open this line on its own page to add addition/deduction lines"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Open this line's own page to add addition/deduction lines"
+msgstr ""
+
+#. module: KSW_commissions
 #: model_terms:ir.actions.act_window,help:KSW_commissions.action_ksw_pay_run
 msgid "Open this month's pay run"
 msgstr ""
@@ -2469,6 +2734,12 @@ msgid ""
 msgstr ""
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_component__option_ids
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_component_form
+msgid "Options"
+msgstr ""
+
+#. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_line__x_original_amount
 msgid "Originally Scheduled Amount"
 msgstr ""
@@ -2494,6 +2765,7 @@ msgid "Override Commission Condition"
 msgstr ""
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_line_form_full
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
 msgid "Override Condition"
 msgstr ""
@@ -2670,6 +2942,16 @@ msgid "Period"
 msgstr ""
 
 #. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_addition_line__amount
+msgid "Positive amount. Added to this employee's total commission."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_deduction_line__amount
+msgid "Positive amount. Deducted from this employee's total commission."
+msgstr ""
+
+#. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.res_config_settings_view_form_ksw_commissions
 msgid "Price (SAR) per breakfast occurrence."
 msgstr ""
@@ -2698,6 +2980,18 @@ msgstr ""
 #. module: KSW_commissions
 #: model:ksw.pay.component,name:KSW_commissions.pay_component_project_management
 msgid "Project Management Allowance"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid ""
+"Pull achieved sales & collection for this period directly from BAS "
+"(customers must have Sales Rep / Collection Rep set)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
+msgid "Pull from BAS"
 msgstr ""
 
 #. module: KSW_commissions
@@ -2756,6 +3050,7 @@ msgstr ""
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_component__rate
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__rate
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_option__rate
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_rate_tier__rate
 msgid "Rate"
 msgstr ""
@@ -2956,6 +3251,7 @@ msgid "Revoke"
 msgstr ""
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_line_form_full
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
 msgid "Revoke Override"
 msgstr ""
@@ -3105,6 +3401,13 @@ msgid "Sales Override"
 msgstr ""
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_res_partner__x_sales_rep_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_res_users__x_sales_rep_id
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_partner_form_ksw_commission
+msgid "Sales Rep"
+msgstr ""
+
+#. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__sales_rule_id
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
 msgid "Sales Rule"
@@ -3122,6 +3425,7 @@ msgid "Sales-Manager Commission Condition Override Wizard"
 msgstr ""
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_line_form_full
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
 msgid "Sales/Collection Commission Line"
 msgstr ""
@@ -3135,6 +3439,16 @@ msgstr ""
 #. module: KSW_commissions
 #: model:ir.actions.act_window,name:KSW_commissions.action_ksw_sales_commission_sheet
 msgid "Sales/Collection Commission Sheets"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_sales_commission_addition_line
+msgid "Sales/Collection Commission — Addition Line"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_sales_commission_deduction_line
+msgid "Sales/Collection Commission — Deduction Line"
 msgstr ""
 
 #. module: KSW_commissions
@@ -3169,6 +3483,13 @@ msgid "Salesperson Profiles"
 msgstr ""
 
 #. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_bas_customer__effective_collector_id
+msgid ""
+"Same resolution as effective_sales_rep_id, for collection "
+"(x_collection_rep_id override, else collector_name)."
+msgstr ""
+
+#. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_batch__scope
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_component__scope
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__scope
@@ -3195,12 +3516,25 @@ msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_component__sequence
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_option__sequence
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_rate_tier__sequence
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_addition_line__sequence
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_deduction_line__sequence
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__sequence
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__sequence
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_tier__sequence
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_client_split__sequence
 msgid "Sequence"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_batch__has_options
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_component__has_options
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_entry__has_options
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_recurring__has_options
+msgid ""
+"Set automatically: this component is recorded by choosing one of its options"
+" on every entry."
 msgstr ""
 
 #. module: KSW_commissions
@@ -3222,6 +3556,11 @@ msgstr ""
 msgid ""
 "Set when an approved monthly pay run settled this installment out of the "
 "commission payment. Lets the reopen path unwind the offset."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_hr_employee__x_deduct_commission_priority
+msgid "Settle Deductions from Commission First"
 msgstr ""
 
 #. module: KSW_commissions
@@ -3275,6 +3614,7 @@ msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_component__code
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_option__code
 msgid "Stable identifier used in exports and reports."
 msgstr ""
 
@@ -3412,13 +3752,9 @@ msgid "Target Sales"
 msgstr ""
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_line_form_full
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
 msgid "Targets & Achieved"
-msgstr ""
-
-#. module: KSW_commissions
-#: model_terms:ir.ui.view,arch_db:KSW_commissions.res_config_settings_view_form_ksw_commissions
-msgid "Technician Location Allowance"
 msgstr ""
 
 #. module: KSW_commissions
@@ -3433,6 +3769,15 @@ msgstr ""
 msgid ""
 "The day this occurred. Used when the component is recorded per occurrence; "
 "must fall inside the batch period."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_bas_customer__effective_sales_rep_id
+msgid ""
+"The employee actually credited with sales commission on this customer: "
+"partner_id.x_sales_rep_id if explicitly set (manual override), else "
+"seller_name resolved to an hr.employee via x_commission_import_name / name. "
+"Recomputed on every sync."
 msgstr ""
 
 #. module: KSW_commissions
@@ -3455,13 +3800,6 @@ msgstr ""
 #. module: KSW_commissions
 #: model:ir.model.constraint,message:KSW_commissions.constraint_ksw_pay_run_unique_period
 msgid "There is already a pay run for that month."
-msgstr ""
-
-#. module: KSW_commissions
-#: model:ir.model.constraint,message:KSW_commissions.constraint_ksw_pay_recurring_unique_employee_component
-msgid ""
-"This employee already has a recurring entry for that component starting on "
-"that date."
 msgstr ""
 
 #. module: KSW_commissions
@@ -3596,6 +3934,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_list
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_line_form_full
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_list
 msgid "Total"
@@ -3668,40 +4007,24 @@ msgid ""
 msgstr ""
 
 #. module: KSW_commissions
+#: model:ir.model.constraint,message:KSW_commissions.constraint_ksw_pay_option_unique_code
+msgid "Two options of the same component cannot share a code."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__option_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring__option_id
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_entry_search
+msgid "Type"
+msgstr ""
+
+#. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_batch__activity_exception_decoration
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_run__activity_exception_decoration
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_submission__activity_exception_decoration
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_sheet__activity_exception_decoration
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr ""
-
-#. module: KSW_commissions
-#: model:ir.model.fields,help:KSW_commissions.field_res_config_settings__ksw_meal_breakfast_price
-msgid ""
-"Unit price (SAR) per breakfast occurrence on a technician location-allowance"
-" line."
-msgstr ""
-
-#. module: KSW_commissions
-#: model:ir.model.fields,help:KSW_commissions.field_res_config_settings__ksw_meal_dinner_price
-msgid ""
-"Unit price (SAR) per dinner occurrence on a technician location-allowance "
-"line."
-msgstr ""
-
-#. module: KSW_commissions
-#: model:ir.model.fields,help:KSW_commissions.field_res_config_settings__ksw_meal_lunch_price
-msgid ""
-"Unit price (SAR) per lunch occurrence on a technician location-allowance "
-"line."
-msgstr ""
-
-#. module: KSW_commissions
-#: model_terms:ir.ui.view,arch_db:KSW_commissions.res_config_settings_view_form_ksw_commissions
-msgid ""
-"Unit prices used by the Technician Location Allowance calculator. Changing "
-"these values updates every line on every existing sheet on next read."
 msgstr ""
 
 #. module: KSW_commissions
@@ -3721,6 +4044,25 @@ msgstr ""
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_bank_export_wizard__value_date
 msgid "Value Date"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_component_form
+msgid ""
+"Variants of the same pay, differing only in\n"
+"                                what a unit is worth — Breakfast, Lunch,\n"
+"                                Dinner. The supervisor picks one per row on a\n"
+"                                single screen instead of opening a batch per\n"
+"                                variant. Leave this empty when the component\n"
+"                                has one rate; anything that differs in more\n"
+"                                than the rate is a component of its own."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_component__option_ids
+msgid ""
+"Variants of the same pay, each with its own rate — Breakfast, Lunch, Dinner."
+" Leave empty when the component has a single rate."
 msgstr ""
 
 #. module: KSW_commissions
@@ -3779,6 +4121,43 @@ msgid "What kind of pay this batch records."
 msgstr ""
 
 #. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_res_config_settings__ksw_meal_breakfast_price
+msgid ""
+"What one breakfast is worth (SAR). The same figure as the Breakfast option "
+"on the Meals pay component."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_res_config_settings__ksw_meal_dinner_price
+msgid ""
+"What one dinner is worth (SAR). The same figure as the Dinner option on the "
+"Meals pay component."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_res_config_settings__ksw_meal_lunch_price
+msgid ""
+"What one lunch is worth (SAR). The same figure as the Lunch option on the "
+"Meals pay component."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.res_config_settings_view_form_ksw_commissions
+msgid ""
+"What one meal is worth. These are the Breakfast, Lunch and Dinner options of"
+" the Meals pay component — the same records the Configuration > Pay "
+"Components screen edits, and what a pay entry resolves its rate from. "
+"Changing one re-prices every entry that uses it, approved months included — "
+"exactly as editing the component's rate always has, so change a price "
+"between runs rather than during one."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_option__rate
+msgid "What one unit of this choice is worth — 20.00 per lunch."
+msgstr ""
+
+#. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_batch__qty_label
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_component__qty_label
 msgid ""
@@ -3804,6 +4183,17 @@ msgid ""
 msgstr ""
 
 #. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_hr_employee__x_deduct_commission_priority
+msgid ""
+"When enabled (default), each month this employee's pending loan/deduction "
+"installments are settled from their commission pay run first; any amount the"
+" commission can't cover falls through to payroll as usual (and if payroll "
+"can't cover it either, the remainder rolls to next month exactly as it does "
+"today). When disabled, deductions are taken from payroll only — commission "
+"pay is never touched."
+msgstr ""
+
+#. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__x_collection_based_on_total
 msgid ""
 "When enabled, the Excel import sets this employee's Achieved Collection to "
@@ -3826,6 +4216,19 @@ msgid ""
 "Which metric the single threshold is checked against. \"Sales %\" compares "
 "sales_pct ≥ Sales Min %. \"Collection %\" compares collection_pct ≥ "
 "Collection Min %. Only used when Condition Type = Single Threshold."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_recurring__option_id
+msgid ""
+"Which of the component's choices repeats — a monthly lunch allowance rather "
+"than meals in general."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_entry__option_id
+msgid ""
+"Which of this component's choices this row is — the rate comes from it."
 msgstr ""
 
 #. module: KSW_commissions
@@ -3868,7 +4271,13 @@ msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run__x_can_approve
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__x_can_approve
 msgid "X Can Approve"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run__x_can_close_month
+msgid "X Can Close Month"
 msgstr ""
 
 #. module: KSW_commissions
@@ -3896,6 +4305,16 @@ msgstr ""
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run__x_can_submit_mine
 msgid "X Can Submit Mine"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__x_total_additions
+msgid "X Total Additions"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__x_total_deductions
+msgid "X Total Deductions"
 msgstr ""
 
 #. module: KSW_commissions
@@ -3961,4 +4380,885 @@ msgstr ""
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_form
 msgid "result = sales_pct >= 50 and collection_pct >= 60"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_commission_lock.py:0
+msgid ""
+"The pay run for %(period)s has been approved and is locked. %(what)s is no "
+"longer possible. Ask the General Manager to reopen it."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_deduction_line.py:0
+msgid "Paid via the %s commission run"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_deduction_line.py:0
+msgid "Awaiting the %s commission run"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_deduction_line.py:0
+msgid "Awaiting the commission run (not yet created)"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_deduction_line.py:0
+msgid ""
+"Adding an 'Awaiting Commission' installment requires the 'Loan Installment "
+"Modification' privilege. Ask an administrator to grant it."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_deduction_line.py:0
+msgid ""
+"An 'Awaiting Commission' installment cannot be linked to a payslip — it "
+"represents a slice routed to the commission sheet."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "%(count)s recurring entr%(plural)s added."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "Adding an entry"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "Editing an entry"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "Deleting an entry"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "Company"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "Creating a batch"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "Deleting this batch"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "Submitting"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "Reopening this batch"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "%(name)s has no import source configured."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "The import source '%(src)s' is not available."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "Step"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "The computed amount was overridden by hand (computed: %(computed).2f)."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "'%(name)s' is recorded per department, so this batch needs one."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "'%(name)s' is recorded per work site, so this batch needs one."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "%(existing)s already covers %(component)s for this scope and month."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "Changing this batch"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "Only a draft batch can be deleted. %(name)s is %(state)s."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "You are not allowed to record %(component)s."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "You may only record pay for %(allowed)s."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "Only a draft batch can be submitted."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "There is nothing to submit — %(name)s has no entries."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "Only a submitted batch can be returned."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "%(name)s has been approved. Only the General Manager can reopen it."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid ""
+"%(scope)s has already been submitted to the General Manager, so its batches "
+"are frozen. Ask him to return it — or, if he has not looked yet, take the "
+"submission back from the Monthly Pay Run."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "%(label)s must be greater than zero."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "Every %(name)s row has to say which one it is: %(options)s."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "'%(option)s' is not one of %(name)s's choices."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "%(date)s is outside the batch period %(period)s."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "%(name)s is recorded per occurrence, so each entry needs a date."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "%(name)s needs a reason on every entry."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid ""
+"Batch %(name)s has been submitted. %(what)s is only possible while it is in "
+"Draft."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid ""
+"%(employee)s is not in %(scope)s and does not report to you, so you cannot "
+"record pay for them."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid ""
+"Batch %(name)s has been submitted. Ask the General Manager to return it "
+"before changing it."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid ""
+"You are not set as the manager of any department, so there is nothing you "
+"can record pay for. Ask HR to set you as the manager of your department, or "
+"to make you an assistant to its manager."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "y"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "ies"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "your departments"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+msgid "A fixed amount, entered by hand."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+msgid "%(option)s at the configured rate"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+msgid "%(label)s at the configured rate"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+msgid ""
+"Computed in one expression so the hourly rate is never rounded before it is "
+"multiplied."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+msgid "Recorded %(label)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+msgid "Earning quantity"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+msgid "No rate tiers apply, so nothing is earned."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+msgid ""
+"'%(name)s' has options, so its amount has to be a quantity × rate — each "
+"option carries its own rate."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+msgid ""
+"'%(name)s' derives its rate from the salary, so it needs a divisor (KSW uses"
+" 240)."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+msgid "'%(name)s' is tiered but has no rate tiers configured."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+msgid "Basic salary"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+msgid "÷ %(divisor).0f = plain hourly rate"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+msgid "× %(factor).2f overtime factor"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+msgid "× %(qty).2f %(label)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+msgid "Free allowance (required before earning)"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+msgid "Using the rates set for %(site)s."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+msgid "Using the default rates — %(site)s has none of its own."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+msgid "An option's rate cannot be negative."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+msgid "A band size cannot be negative."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+msgid "A tier rate cannot be negative."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+msgid "Tier %(n)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+msgid "quantity"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_import_bas.py:0
+msgid "%(matched)s driver(s) filled from BAS."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_import_bas.py:0
+msgid ""
+"\n"
+"%(count)s have no BAS cost centre set: %(names)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_import_bas.py:0
+msgid ""
+"\n"
+"%(count)s had no trips in BAS this month: %(names)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_import_bas.py:0
+msgid ""
+"\n"
+"%(count)s already had a line in this batch and were left unchanged: %(names)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_import_bas.py:0
+msgid " and %(more)s more"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_import_bas.py:0
+msgid "Import is only available while the batch is in Draft."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_import_bas.py:0
+msgid "Select a Work Site on the batch before importing."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_import_bas.py:0
+msgid "No employees are assigned to %(site)s."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_import_bas.py:0
+msgid "Worked days: %(days)s. Required trips before earning: %(required).0f."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_import_bas.py:0
+msgid "Imported from BAS"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_import_bas.py:0
+msgid "not recorded"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_recurring.py:0
+msgid ""
+"%(employee)s does not report to you and is not in a department you manage, "
+"so you cannot set up recurring pay for them."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_recurring.py:0
+msgid "%(employee)s already has a recurring %(what)s starting on that date."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_recurring.py:0
+msgid "A recurring %(name)s has to say which one it is: %(options)s."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_recurring.py:0
+msgid "The end date cannot be before the start date."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid "%(count)s department(s) submitted to the General Manager."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid ""
+"Only a Commission Officer can close the month by hand. Supervisors submit "
+"their own department."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid "Payment Register — %(name)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid "Only the Commission Accountant can mark the month paid."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid "Only the Commission Accountant can export the bank file."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid "Entries for %(name)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid ""
+"You have nothing to submit for %(period)s. Record your entries first — or "
+"they have already been submitted."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid ""
+"Only the company's General Manager can close a month while departments are "
+"still outstanding."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid ""
+"Only the company's General Manager can return the whole month. To send back "
+"one department, use Return on its own submission."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid ""
+"You have no department on %(period)s. Record an entry first — or ask HR to "
+"set you as your department's manager."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid "Only the company's General Manager can reopen an approved month."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid "The bank file can only be exported once the month has been approved."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid "An approved pay run cannot be deleted: %(names)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid "Only an open pay run can be submitted."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid "No department has submitted anything for %(period)s yet."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid "%(name)s has already been approved."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid ""
+"None of the departments waiting on %(period)s are yours to approve. Still "
+"waiting on their own General Managers: %(names)s."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid ""
+"No department has been approved for %(period)s, so there is nothing to pay."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid "Only a submitted pay run can be returned."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid "%(name)s is not approved, so there is nothing to reopen."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid "Only an approved pay run can be marked paid."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid "%(name)s has been approved. Reopen it before changing it."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid ""
+"No department has submitted its commissions for %(period)s, so there is "
+"nothing to approve."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid ""
+"Cannot reopen: the unwind snapshot for %(name)s is corrupted. Manual cleanup"
+" required."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid "Batches — %(name)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid "Entries — %(name)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid ""
+"No General Manager is set for %(scope)s. Ask HR to set the department's "
+"General Manager."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid "%(name)s is not yours to submit."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid "Submitting this department"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid "Approving this department"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid "Reopening this department"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid ""
+"Only %(gm)s, the General Manager of %(scope)s, can act on this submission."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid "Only a submission still being prepared can be deleted: %(names)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid "%(name)s has already been submitted."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid ""
+"There is nothing to submit — no entries have been recorded for %(name)s."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid ""
+"These batches have no entries. Delete them or fill them in before submitting:\n"
+"%(names)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid "%(name)s has not been submitted yet, so there is nothing to approve."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid "Only a submitted department can be returned."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid ""
+"Say why it is being returned — the supervisor needs to know what to fix. "
+"Type it in 'Return Reason' first."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid ""
+"%(name)s has been approved. Only the General Manager can reopen the month."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid "%(name)s has been approved and can no longer be changed."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_sales_commission_rule.py:0
+msgid "Rule '%(n)s' has scope %(s)s but no employee."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_sales_commission_rule.py:0
+msgid "Rule '%(n)s' has scope %(s)s but no clients selected."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_sales_commission_rule.py:0
+msgid "Rule '%(n)s' uses 'Custom Formula' but no formula was provided."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_sales_commission_rule.py:0
+msgid "Rule '%(n)s' must define at least one tier."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_sales_commission_rule.py:0
+msgid "Tier percentages and rates must be non-negative."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_sales_commission_rule.py:0
+msgid ""
+"Tier 'To %%' (%(to)s) must be greater than or equal to 'From %%' (%(fr)s)."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_sales_commission_rule.py:0
+msgid "Reduced Rate Up To %% must be non-negative."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_sales_commission_rule.py:0
+msgid "Reduced Rate Multiplier must be non-negative."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_sales_commission_rule.py:0
+msgid ""
+"Formula on rule '%(n)s' could not be evaluated:\n"
+"%(err)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_sales_commission_sheet.py:0
+msgid ""
+"You are not allowed to confirm or reset a sales/collection commission sheet."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_sales_commission_sheet.py:0
+msgid "Only a Sales Manager can override the commission condition on a line."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_sales_commission_sheet.py:0
+msgid "The commission sheet must be in draft state to pull from BAS."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_sales_commission_sheet.py:0
+msgid "Set the period before pulling from BAS."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_sales_commission_sheet.py:0
+msgid ""
+"✔ Commission-condition <b>override granted</b> on line for <b>%(emp)s</b> by"
+" <b>%(user)s</b>.<br/><b>Reason:</b> %(reason)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_sales_commission_sheet.py:0
+msgid "Only draft sheets can be confirmed."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_sales_commission_sheet.py:0
+msgid "Sales/collection commission sheet confirmed. Total: %(t).2f"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_sales_commission_sheet.py:0
+msgid "Achieved and target amounts must be zero or positive."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_sales_commission_sheet.py:0
+msgid ""
+"↩ Override revoked on line for <b>%(emp)s</b> by <b>%(user)s</b>. Previous "
+"reason: <i>%(reason)s</i>"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_sales_commission_sheet.py:0
+msgid "A split line '%(s)s' already exists for %(e)s on this sheet."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_sales_commission_sheet.py:0
+msgid "A general commission line for %(e)s already exists on this sheet."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_salesperson_profile.py:0
+msgid "Monthly targets must be zero or positive."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/wizard/bank_file_export_wizard.py:0
+msgid "The payment register is empty — there is nothing to export."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/wizard/bank_file_export_wizard.py:0
+msgid ""
+"The following employees have no bank account and no run-level fallback:\n"
+"%s"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/wizard/bank_file_export_wizard.py:0
+msgid ""
+"These bank accounts have no Payroll File Type set:\n"
+"%s"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/wizard/bank_file_export_wizard.py:0
+msgid "No files were generated."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/wizard/bank_file_export_wizard.py:0
+msgid "openpyxl is required for Excel export."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/wizard/bank_file_export_wizard.py:0
+msgid "No Excel files could be generated."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/wizard/bank_file_export_wizard.py:0
+msgid "No text files could be generated."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/wizard/bank_file_export_wizard.py:0
+msgid "Please select a bank account."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/wizard/bank_file_export_wizard.py:0
+msgid "No lines are assigned to the selected bank."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/wizard/bank_file_export_wizard.py:0
+msgid "Please set a value date for the text file."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/wizard/sales_commission_import_wizard.py:0
+msgid "openpyxl is required for Excel import."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/wizard/sales_commission_import_wizard.py:0
+msgid "Please upload at least one Excel file (Sales and/or Collection)."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/wizard/sales_commission_import_wizard.py:0
+msgid "The commission sheet must be in draft state to import data."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/wizard/sales_commission_import_wizard.py:0
+msgid ""
+"No data rows could be read from the Sales file. Check that the column layout"
+" matches the expected format (Account · Customer · Sales · Pre-tax · "
+"Salesman)."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/wizard/sales_commission_import_wizard.py:0
+msgid ""
+"No data rows could be read from the Collection file. Check that the column "
+"layout matches the expected format (Account · Customer · Balance · Aging · "
+"Target · Collected · Rep · %)."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/wizard/sales_commission_override_wizard.py:0
+msgid "A reason is required to override the commission condition."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/wizard/sales_commission_override_wizard.py:0
+msgid "Sales & Coll. Comm."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/wizard/sales_commission_override_wizard.py:0
+msgid "Commission"
 msgstr ""

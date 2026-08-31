@@ -1118,15 +1118,12 @@ class HrLeave(models.Model):
         help='True for the employee leave manager, who may correct the '
              'return date even after the return has been confirmed.',
     )
-    x_return_reminder_last_sent = fields.Date(
-        string='Return Reminder Last Sent',
+    x_return_punch_notified_on = fields.Datetime(
+        string='Employee Notified of Unconfirmed Return',
         readonly=True, copy=False,
-        help='Last day the direct manager was reminded to confirm this '
-             'return. Stops the daily cron sending twice in one day.',
-    )
-    x_return_reminder_count = fields.Integer(
-        string='Return Reminders Sent',
-        readonly=True, copy=False, default=0,
+        help='When the employee was told that they had punched in while '
+             'this vacation was still open. Stamped once per leave so a '
+             'bulk device sync cannot send the same alert repeatedly.',
     )
 
     @api.depends('state', 'x_return_state')
@@ -1214,7 +1211,18 @@ class HrLeave(models.Model):
             return False
 
         old_end = self.request_date_to
-        leave = self.sudo()
+        # _skip_toggle_validity: suppress the _check_validity re-run this
+        # module's own write() does on a date change.  That check asks "does
+        # this request fit the employee's allocation", which is a question
+        # for a new or edited *request* — not for recording that the employee
+        # came back early.  It cannot pass here anyway: once the balance has
+        # been settled at the planned return, the allocation starts *after*
+        # the vacation began (true for 8 of 9 KSWCO records), so any write
+        # touching these dates raises "You do not have any allocation for
+        # this time off type" for reasons that predate the correction.
+        # Shortening the covered period can only reduce what the leave
+        # consumes, and the charged days are restored verbatim below.
+        leave = self.sudo().with_context(_skip_toggle_validity=True)
         paid = {f: leave[f] for f in self._PAID_DURATION_FIELDS}
 
         leave.write({'request_date_to': new_end})
@@ -1418,105 +1426,83 @@ class HrLeave(models.Model):
             leave._apply_confirmed_return()
 
     # ------------------------------------------------------------------
-    # Daily reminder: confirm the return
+    # The employee punched in while the vacation is still open
     # ------------------------------------------------------------------
 
-    # Days past the expected return after which HR is copied on the
-    # reminder as well as the direct manager.
-    _RETURN_REMINDER_ESCALATE_DAYS = 7
+    def _notify_unconfirmed_return_punch(self, attendance):
+        """Tell the EMPLOYEE their return has not been confirmed.
 
-    @api.model
-    def _cron_return_confirmation_reminders(self, commit=True):
-        """Remind each direct manager to confirm an employee's return.
+        The punch is the evidence: the employee is physically back, but the
+        record still says they are away, and the payslip stays blocked until
+        the direct manager confirms the return date. Chasing the manager was
+        the old design and it failed for the obvious reason — the manager is
+        the party already not acting. The employee has the incentive, so the
+        employee gets told.
 
-        Only leaves still sitting in ``x_return_state = 'on_vacation'`` are
-        picked up, so a manager who already confirmed — including one who
-        confirmed an *early* return before the expected date — is never
-        reminded.  The reminder repeats daily until the return is confirmed,
-        because an unconfirmed return blocks that employee's monthly payslip.
-
-        ``commit`` is a cron progress checkpoint; tests pass False (Odoo
-        forbids committing from inside a test).
+        Sent once per leave, stamped by x_return_punch_notified_on, so a
+        bulk historical device sync cannot fire the same alert repeatedly.
         """
-        today = fields.Date.context_today(self)
-        leaves = self.sudo().search([
-            ('state', '=', 'validate'),
-            ('x_return_state', '=', 'on_vacation'),
-            ('holiday_status_id.is_annual_leave', '=', True),
-            ('request_date_to', '<', today),
-            '|', ('x_return_reminder_last_sent', '=', False),
-                 ('x_return_reminder_last_sent', '<', today),
-        ], order='request_date_to')
+        self.ensure_one()
+        if self.x_return_punch_notified_on:
+            return False
 
-        hr_group = self.env.ref(
-            'KSW_annual_leave.group_annual_leave_hr',
+        employee = self.employee_id
+        partner = employee.sudo().user_id.partner_id
+        manager = employee.sudo().leave_manager_id
+        punch_date = attendance.check_in.date() if attendance.check_in else None
+
+        body = Markup(
+            '<strong>\u23f0 Your Return Has Not Been Confirmed</strong><br/>'
+            '<b>Attendance recorded:</b> %(punch)s<br/>'
+            '<b>Your vacation:</b> %(date_from)s \u2192 %(date_to)s<br/>'
+            '<i>The system still shows you as on vacation. Your direct '
+            'manager, %(manager)s, has to confirm the date you actually '
+            'returned. Until they do, your monthly payslip cannot be '
+            'processed \u2014 please ask them to open this request and '
+            'press <b>Confirm Return</b>.</i>'
+        ) % {
+            'punch': punch_date or '',
+            'date_from': self.request_date_from,
+            'date_to': self.request_date_to,
+            'manager': manager.name if manager else _('your direct manager'),
+        }
+
+        notified = False
+        if partner:
+            # Inbox item on the leave itself, so the employee can open it.
+            self.sudo().message_notify(
+                partner_ids=partner.ids,
+                subject=_('Your return from vacation is not confirmed'),
+                body=body,
+            )
+            notified = True
+
+        # message_notify delivers to inbox OR email depending on the
+        # recipient's notification_type, so the email is sent separately to
+        # reach an employee who never signs in to Odoo.
+        notified = self._send_return_punch_email(punch_date) or notified
+
+        if notified:
+            self.sudo().write({
+                'x_return_punch_notified_on': fields.Datetime.now(),
+            })
+        return notified
+
+    def _send_return_punch_email(self, punch_date):
+        """Email the employee's work address. False when there is none."""
+        self.ensure_one()
+        if not self.employee_id.sudo().work_email:
+            return False
+        template = self.env.ref(
+            'KSW_annual_leave.mail_template_return_punch_unconfirmed',
             raise_if_not_found=False,
         )
-        hr_partners = (
-            hr_group.user_ids.partner_id if hr_group
-            else self.env['res.partner']
-        )
-
-        sent = 0
-        for leave in leaves:
-            planned_return = leave.request_date_to + timedelta(days=1)
-            overdue = (today - planned_return).days
-
-            manager_partner = leave.employee_id.leave_manager_id.partner_id
-            escalated = (
-                overdue >= self._RETURN_REMINDER_ESCALATE_DAYS
-                or not manager_partner
-            )
-            partners = manager_partner
-            if escalated:
-                partners |= hr_partners
-            if not partners:
-                # Nobody to tell — don't burn the daily stamp on it.
-                continue
-
-            body = Markup(
-                '<strong>⏰ Return Confirmation Pending</strong><br/>'
-                '<b>Employee:</b> %(employee)s<br/>'
-                '<b>Vacation:</b> %(date_from)s → %(date_to)s<br/>'
-                '<b>Expected Return:</b> %(planned)s<br/>'
-                '<b>Days Overdue:</b> %(overdue)s<br/>'
-                '<i>Open this request, set <b>Return Date</b> to the date the '
-                'employee actually resumed work — it may be earlier than the '
-                'expected date — then click <b>Confirm Return</b>. The '
-                'employee\'s monthly payslip stays blocked until this is '
-                'confirmed.</i>'
-            ) % {
-                'employee': leave.employee_id.name,
-                'date_from': leave.request_date_from,
-                'date_to': leave.request_date_to,
-                'planned': planned_return,
-                'overdue': overdue,
-            }
-            if escalated:
-                body += Markup(
-                    '<br/><i>HR has been copied on this reminder%(reason)s.'
-                    '</i>'
-                ) % {
-                    'reason': (
-                        Markup(' because the employee has no Direct Manager set')
-                        if not manager_partner else Markup('')
-                    ),
-                }
-
-            leave.sudo().message_post(
-                body=body,
-                partner_ids=partners.ids,
-                subtype_xmlid='mail.mt_comment',
-            )
-            leave.sudo().write({
-                'x_return_reminder_last_sent': today,
-                'x_return_reminder_count': leave.x_return_reminder_count + 1,
-            })
-            sent += 1
-            if commit:
-                self.env.cr.commit()
-
-        return sent
+        if not template:
+            return False
+        template.sudo().with_context(
+            ksw_punch_date=punch_date,
+        ).send_mail(self.id, force_send=False)
+        return True
 
     # ==================================================================
     # Multi-Step Approval: can_approve / can_validate overrides
@@ -2459,6 +2445,13 @@ class HrLeave(models.Model):
         Called at final validation as a safety net. If the DM already marked
         the lines via the wizard, this search returns nothing and is a no-op.
         Only acts when KSW_attendance_sheet is installed.
+
+        Confirmed sheets are deliberately NOT excluded. A leave approved
+        after the supervisor already released the month still has to correct
+        those days — and doing so withdraws the confirmation
+        (ksw.attendance.sheet.line._reopen_confirmed_sheets), so the
+        supervisor is asked to look again rather than payroll silently
+        keeping figures that no longer match the leave record.
         """
         if 'ksw.attendance.sheet' not in self.env:
             return
@@ -2469,7 +2462,6 @@ class HrLeave(models.Model):
                 continue
             lines = Line.search([
                 ('sheet_id.employee_id', '=', emp.id),
-                ('sheet_id.state', '=', 'draft'),
                 ('date', '>=', leave.request_date_from),
                 ('date', '<=', leave.request_date_to),
                 ('is_workday', '=', True),
@@ -2647,8 +2639,7 @@ class HrLeave(models.Model):
                 'x_manager_return_date': False,
                 'x_hr_return_confirmed_by': False,
                 'x_hr_return_date': False,
-                'x_return_reminder_last_sent': False,
-                'x_return_reminder_count': 0,
+                'x_return_punch_notified_on': False,
             })
 
         # A *targeted* return (the admin wizard picking a specific step) keeps
@@ -2698,8 +2689,7 @@ class HrLeave(models.Model):
                 'x_manager_return_date': False,
                 'x_hr_return_confirmed_by': False,
                 'x_hr_return_date': False,
-                'x_return_reminder_last_sent': False,
-                'x_return_reminder_count': 0,
+                'x_return_punch_notified_on': False,
             })
 
         if annual_multi:

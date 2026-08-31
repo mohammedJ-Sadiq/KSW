@@ -19,6 +19,7 @@ approval to chase.
 """
 import json
 
+from dateutil.relativedelta import relativedelta
 from markupsafe import Markup
 
 from odoo import _, api, fields, models
@@ -941,6 +942,14 @@ class KswPayRunLine(models.Model):
             paid_ids, splits = [], []
             remaining = amount
             touched = self.env['ksw.deduction']
+            # Settling out of commission is a third collection route
+            # alongside payroll and manual payment, so it dates its
+            # credits on the Statement of Account the same way a payslip
+            # does: the end of the period being paid.
+            settled_on = (
+                rec.period.replace(day=1) + relativedelta(months=1, days=-1)
+                if rec.period else fields.Date.context_today(rec)
+            )
 
             for line in lines:
                 if remaining <= 1e-6:
@@ -953,6 +962,7 @@ class KswPayRunLine(models.Model):
                         'state': 'paid',
                         'x_paid_via_pay_run_line_id': rec.id,
                         'x_awaiting_commission': False,
+                        'x_settlement_date': settled_on,
                     })
                     paid_ids.append(line.id)
                     touched |= line.deduction_id
@@ -973,6 +983,7 @@ class KswPayRunLine(models.Model):
                         'x_awaiting_commission': False,
                         'x_paid_via_pay_run_line_id': rec.id,
                         'x_original_amount': take,
+                        'x_settlement_date': settled_on,
                     })
                     line.with_context(
                         _skip_installment_total_check=True,
@@ -1011,6 +1022,7 @@ class KswPayRunLine(models.Model):
                     'state': 'pending',
                     'x_paid_via_pay_run_line_id': False,
                     'x_awaiting_commission': True,
+                    'x_settlement_date': False,
                 })
                 touched |= line.deduction_id
 

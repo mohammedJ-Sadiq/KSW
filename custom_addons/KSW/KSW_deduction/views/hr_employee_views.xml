@@ -13,6 +13,18 @@
                     <field name="x_deduction_count" widget="statinfo"
                            string="Deductions"/>
                 </button>
+                <!-- Next to the count, the account behind it. `type="action"`
+                     passes active_id; the wizard's default_get reads it to
+                     preselect this employee. -->
+                <button class="oe_stat_button" type="action"
+                        name="%(KSW_deduction.action_ksw_deduction_statement)d"
+                        icon="fa-list-alt"
+                        groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_acc_data_entry,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_installment_edit">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Statement</span>
+                        <span class="o_stat_text">of Account</span>
+                    </div>
+                </button>
             </xpath>
             <xpath expr="//page[@name='hr_settings']" position="inside">
                 <separator string="Loans"/>

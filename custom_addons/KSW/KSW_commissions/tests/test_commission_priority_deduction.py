@@ -40,7 +40,7 @@ class CommissionPriorityCommon(SubmissionCommon):
         the component's normal quantity/rate math.
         """
         batch = self._batch(self.sup_a, employee.department_id,
-                            component=self.lunch)
+                            component=self.meals)
         return self._entry(batch, employee, user=self.sup_a,
                            quantity=1.0, amount_override=amount)
 

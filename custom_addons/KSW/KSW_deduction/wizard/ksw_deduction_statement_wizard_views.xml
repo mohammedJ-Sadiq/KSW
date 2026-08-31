@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- ================================================================ -->
+    <!-- STATEMENT OF ACCOUNT                                               -->
+    <!-- The dialog answers the question before anything is printed: the    -->
+    <!-- summary block updates as the filters change, so "what does he      -->
+    <!-- still owe" is one screen, and the three outputs are for taking it  -->
+    <!-- somewhere else.                                                    -->
+    <!-- ================================================================ -->
+
+    <record id="ksw_deduction_statement_wizard_view_form" model="ir.ui.view">
+        <field name="name">ksw.deduction.statement.wizard.form</field>
+        <field name="model">ksw.deduction.statement.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Statement of Account">
+                <sheet>
+                    <group>
+                        <group string="Account">
+                            <field name="employee_id"
+                                   options="{'no_create': True}"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Period">
+                            <field name="date_from"
+                                   placeholder="From the beginning"/>
+                            <field name="date_to"/>
+                        </group>
+                    </group>
+
+                    <group string="Scope">
+                        <field name="type_ids" widget="many2many_tags"
+                               options="{'no_create': True}"
+                               placeholder="All deduction types"/>
+                        <field name="group_by_type"/>
+                    </group>
+
+                    <!-- A truncated ledger presented as a complete one is
+                         the failure mode worth shouting about. -->
+                    <div class="alert alert-warning" role="alert"
+                         invisible="out_of_scope_count == 0">
+                        <field name="out_of_scope_count" invisible="1"/>
+                        This employee has deductions your access rights do
+                        not cover. They are excluded from every figure
+                        below, so this is a partial statement.
+                    </div>
+
+                    <div class="alert alert-danger" role="alert"
+                         invisible="not reconciliation_warning">
+                        <field name="reconciliation_warning" nolabel="1"
+                               readonly="1"/>
+                    </div>
+
+                    <separator string="Summary"/>
+                    <group invisible="not employee_id">
+                        <group>
+                            <field name="opening_balance"/>
+                            <field name="total_charged" string="Charged"/>
+                            <field name="total_settled" string="Collected"/>
+                            <field name="total_written_off"
+                                   string="Written Off"
+                                   invisible="total_written_off == 0"/>
+                        </group>
+                        <group>
+                            <field name="closing_balance"
+                                   class="oe_subtotal_footer_separator"/>
+                            <field name="overdue_amount"
+                                   string="Of which overdue"
+                                   invisible="overdue_amount == 0"/>
+                            <field name="movement_count"
+                                   string="Movements"/>
+                        </group>
+                    </group>
+
+                    <div class="text-muted"
+                         invisible="movement_count != 0 or not employee_id">
+                        No movements in this period. The opening and closing
+                        balances still tell you where the account stands.
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_view" type="object" string="View"
+                            class="btn-primary"
+                            invisible="not employee_id"/>
+                    <button name="action_print" type="object" string="Print"
+                            class="btn-secondary" icon="fa-file-pdf-o"
+                            invisible="not employee_id"/>
+                    <button name="action_export_xlsx" type="object"
+                            string="Export Excel" class="btn-secondary"
+                            icon="fa-file-excel-o"
+                            invisible="not employee_id"/>
+                    <button string="Close" class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ksw_deduction_statement" model="ir.actions.act_window">
+        <field name="name">Statement of Account</field>
+        <field name="res_model">ksw.deduction.statement.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- THE LEDGER ITSELF                                                  -->
+    <!-- Balance rows carry no debit/credit, so the column sums stay        -->
+    <!-- correct; `balance` is deliberately NOT summed — a running balance  -->
+    <!-- has no meaningful total.                                           -->
+    <!-- ================================================================ -->
+
+    <record id="ksw_deduction_statement_line_view_list" model="ir.ui.view">
+        <field name="name">ksw.deduction.statement.line.list</field>
+        <field name="model">ksw.deduction.statement.line</field>
+        <field name="arch" type="xml">
+            <list string="Statement of Account"
+                  create="false" edit="false" delete="false"
+                  decoration-bf="is_balance_row"
+                  decoration-info="row_kind in ('opening', 'closing')"
+                  decoration-muted="row_kind == 'writeoff'">
+                <!-- `display="always"` is required: a list header button
+                     defaults to display="selection" and would only appear
+                     once a row is ticked, which is useless here — the rows
+                     are a report, nobody selects them. -->
+                <header>
+                    <button name="action_reopen_wizard" type="object"
+                            string="New Statement"
+                            class="btn-primary"
+                            icon="fa-sliders"
+                            display="always"
+                            title="Open a blank Statement of Account dialog, the same as Deductions → Reports → Statement of Account"/>
+                </header>
+                <field name="date"/>
+                <field name="ref" string="Reference"/>
+                <field name="type_id" optional="show"/>
+                <field name="label" string="Description"/>
+                <field name="debit" string="Charge" sum="Total charged"/>
+                <field name="credit" string="Collected" sum="Total collected"/>
+                <field name="balance" string="Balance"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="is_balance_row" column_invisible="1"/>
+                <field name="row_kind" column_invisible="1"/>
+                <button name="action_open_deduction" type="object"
+                        string="Open" icon="fa-external-link"
+                        title="Open the deduction behind this movement"
+                        invisible="is_balance_row"/>
+            </list>
+        </field>
+    </record>
+
+</odoo>

@@ -22,7 +22,9 @@ class PayEntryCommon(TransactionCase):
         cls.emp2 = cls._employee('Pay Emp 2', cls.dept, 4500.0)
 
         cls.c_overtime = env.ref('KSW_commissions.pay_component_overtime')
-        cls.c_lunch = env.ref('KSW_commissions.pay_component_meal_lunch')
+        cls.c_meals = env.ref('KSW_commissions.pay_component_meals')
+        cls.o_breakfast = env.ref('KSW_commissions.pay_option_meal_breakfast')
+        cls.o_lunch = env.ref('KSW_commissions.pay_option_meal_lunch')
         cls.c_trips = env.ref('KSW_commissions.pay_component_driver_trips')
         cls.c_mobile = env.ref('KSW_commissions.pay_component_mobile')
 
@@ -56,6 +58,8 @@ class PayEntryCommon(TransactionCase):
             vals.setdefault('date', self.period)
         if batch.component_id.needs_reason:
             vals.setdefault('reason', 'test')
+        if batch.component_id.has_options:
+            vals.setdefault('option_id', batch.component_id.option_ids[0].id)
         vals.update(kwargs)
         return self.env['ksw.pay.entry'].sudo().create(vals)
 
@@ -85,8 +89,8 @@ class TestPayResolver(PayEntryCommon):
 
     def test_04_qty_rate(self):
         """3 lunches at 20.00 = 60.00."""
-        batch = self._batch(component=self.c_lunch)
-        entry = self._entry(batch, quantity=3.0)
+        batch = self._batch(component=self.c_meals)
+        entry = self._entry(batch, quantity=3.0, option_id=self.o_lunch.id)
         self.assertAlmostEqual(entry.amount, 60.0, places=2)
 
     def test_05_fixed_keeps_what_was_typed(self):
@@ -163,7 +167,7 @@ class TestPayBatch(PayEntryCommon):
 
     def test_05_another_component_same_month_is_fine(self):
         self._batch()
-        self.assertTrue(self._batch(component=self.c_lunch))
+        self.assertTrue(self._batch(component=self.c_meals))
 
     def test_06_totals(self):
         batch = self._batch()
@@ -501,3 +505,100 @@ class TestPayEntryUX(PayEntryCommon):
             officer)._allowed_departments()
         self.assertIn(self.dept, allowed)
         self.assertIn(self.other_dept, allowed)
+
+
+class TestComponentOptions(PayEntryCommon):
+    """Meals: one component, three choices.
+
+    Breakfast, Lunch and Dinner used to be three components, which meant
+    three batches to open and three submissions to make for one day's
+    meals. They differ in nothing but the rate — which is what an option
+    is — so they are one component now, picked per row.
+    """
+
+    def test_01_one_batch_carries_every_meal(self):
+        batch = self._batch(component=self.c_meals)
+        breakfast = self._entry(batch, quantity=2.0,
+                                option_id=self.o_breakfast.id)
+        lunch = self._entry(batch, employee=self.emp2, quantity=3.0,
+                            option_id=self.o_lunch.id)
+        self.assertAlmostEqual(breakfast.amount, 20.0, places=2)
+        self.assertAlmostEqual(lunch.amount, 60.0, places=2)
+        self.assertAlmostEqual(batch.total_amount, 80.0, places=2)
+
+    def test_02_the_rate_comes_from_the_option(self):
+        batch = self._batch(component=self.c_meals)
+        entry = self._entry(batch, quantity=1.0, option_id=self.o_lunch.id)
+        self.assertAlmostEqual(entry.rate, 20.0, places=2)
+        entry.write({'option_id': self.o_breakfast.id})
+        self.assertAlmostEqual(entry.rate, 10.0, places=2)
+        self.assertAlmostEqual(entry.amount, 10.0, places=2)
+
+    def test_03_a_row_must_say_which_meal(self):
+        batch = self._batch(component=self.c_meals)
+        with self.assertRaises(ValidationError):
+            self.env['ksw.pay.entry'].sudo().create({
+                'batch_id': batch.id,
+                'employee_id': self.emp.id,
+                'quantity': 1.0,
+            })
+
+    def test_04_an_option_of_another_component_is_refused(self):
+        other = self.env['ksw.pay.option'].sudo().create({
+            'component_id': self.env['ksw.pay.component'].sudo().create({
+                'name': 'Other qty', 'code': 'OPT_TEST',
+                'calculation': 'qty_rate', 'rate': 1.0,
+            }).id,
+            'name': 'Elsewhere', 'rate': 5.0,
+        })
+        batch = self._batch(component=self.c_meals)
+        with self.assertRaises(ValidationError):
+            self._entry(batch, quantity=1.0, option_id=other.id)
+
+    def test_05_a_component_without_options_needs_none(self):
+        batch = self._batch(component=self.c_mobile)
+        entry = self._entry(batch, quantity=1.0, amount=100.0)
+        self.assertFalse(entry.option_id)
+
+    def test_06_options_only_make_sense_on_quantity_times_rate(self):
+        component = self.env['ksw.pay.component'].sudo().create({
+            'name': 'Fixed with options', 'code': 'OPT_FIXED',
+            'calculation': 'fixed',
+        })
+        with self.assertRaises(ValidationError):
+            component.write({
+                'option_ids': [(0, 0, {'name': 'A', 'rate': 1.0})],
+            })
+
+    def test_07_the_explanation_names_the_meal(self):
+        batch = self._batch(component=self.c_meals)
+        entry = self._entry(batch, quantity=2.0, option_id=self.o_lunch.id)
+        self.assertIn('Lunch', entry.explanation)
+        self.assertIn('40.00', entry.explanation)
+
+    def test_08_the_next_line_copies_the_meal(self):
+        batch = self._batch(component=self.c_meals)
+        self._entry(batch, quantity=2.0, option_id=self.o_breakfast.id)
+        defaults = self.env['ksw.pay.entry'].sudo().with_context(
+            default_batch_id=batch.id).default_get(
+                ['employee_id', 'option_id', 'quantity'])
+        self.assertEqual(defaults.get('option_id'), self.o_breakfast.id)
+
+    def test_09_recurring_meals_repeat_per_meal(self):
+        Recurring = self.env['ksw.pay.recurring'].sudo()
+        for option in (self.o_breakfast, self.o_lunch):
+            Recurring.create({
+                'employee_id': self.emp.id,
+                'component_id': self.c_meals.id,
+                'option_id': option.id,
+                'quantity': 2.0,
+                'date_from': self.period,
+            })
+        batch = self._batch(component=self.c_meals)
+        created = self.env['ksw.pay.recurring']._apply_to_batch(batch)
+        self.assertEqual(len(created), 2)
+        self.assertEqual(created.mapped('option_id'),
+                         self.o_breakfast | self.o_lunch)
+        # Idempotent: pressing the button twice adds nothing.
+        self.assertFalse(
+            self.env['ksw.pay.recurring']._apply_to_batch(batch))

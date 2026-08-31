@@ -92,6 +92,91 @@ async function detectError(page) {
 // each: { tag:'persona/name', persona, run:async(page)=>{} }  (run leaves the
 // target screen ready; save() is called after)
 const SHOTS = [
+  // ── the rebuilt commission app (Aug 2026) ───────────────────────────────
+  // Data staged by stage_commissions.py. Two batches on purpose: the Overtime
+  // one is submitted with its department (frozen — the handover shots), the
+  // Meals one is draft, which is the only way to shoot an editable entry grid
+  // with the Type column showing.
+  { tag: 'supervisor/pay-01', persona: 'supervisor', run: async (page) => {
+      await gotoAction(page, 'KSW_commissions.action_ksw_pay_batch');
+      await page.waitForSelector('.o_list_view', { timeout: 15000 });
+      await page.waitForTimeout(900);
+  }},
+  { tag: 'supervisor/pay-02', persona: 'supervisor', post: discardForm, run: async (page) => {
+      await page.goto(`${BASE}/odoo/action-KSW_commissions.action_ksw_pay_batch/new`, { waitUntil: 'domcontentloaded' });
+      await page.waitForSelector('.o_form_view', { timeout: 15000 });
+      await page.waitForTimeout(1200);
+  }},
+  { tag: 'supervisor/pay-03', persona: 'supervisor', run: async (page) => {
+      await openRecord(page, 'KSW_commissions.action_ksw_pay_batch', IDS.comm_batch_meals);
+      await page.waitForTimeout(1200);
+  }},
+  { tag: 'supervisor/pay-04', persona: 'supervisor', run: async (page) => {
+      await openRecord(page, 'KSW_commissions.action_ksw_pay_batch', IDS.comm_batch_draft);
+      await page.waitForTimeout(900);
+      const calc = page.locator('button[name="action_explain"]').first();
+      if (await calc.count()) { await calc.click(); await page.waitForSelector('.modal', { timeout: 10000 }); }
+      await page.waitForTimeout(800);
+  }},
+  { tag: 'supervisor/recurring-01', persona: 'supervisor', run: async (page) => {
+      await gotoAction(page, 'KSW_commissions.action_ksw_pay_recurring');
+      await page.waitForSelector('.o_list_view', { timeout: 15000 });
+      await page.waitForTimeout(900);
+  }},
+  { tag: 'supervisor/recurring-02', persona: 'supervisor', run: async (page) => {
+      await gotoAction(page, 'KSW_commissions.action_ksw_pay_recurring');
+      await page.waitForSelector('.o_list_view', { timeout: 15000 });
+      const row = page.locator('.o_data_row').first();
+      if (await row.count()) { await row.locator('td').nth(1).click(); await page.waitForTimeout(900); }
+  }},
+  { tag: 'supervisor/recurring-03', persona: 'supervisor', run: async (page) => {
+      await openRecord(page, 'KSW_commissions.action_ksw_pay_batch', IDS.comm_batch_meals);
+      await page.waitForTimeout(1000);
+  }},
+  { tag: 'supervisor/payrun-01', persona: 'supervisor', run: async (page) => {
+      await openRecord(page, 'KSW_commissions.action_ksw_pay_run', IDS.comm_run);
+      await page.waitForTimeout(900);
+      const tab = page.locator('a.nav-link', { hasText: /Who Gets Paid|يُصرَف/ }).first();
+      if (await tab.count()) { await tab.click(); await page.waitForTimeout(900); }
+  }},
+  { tag: 'supervisor/payrun-02', persona: 'supervisor', run: async (page) => {
+      await openRecord(page, 'KSW_commissions.action_ksw_pay_run', IDS.comm_run);
+      await page.waitForTimeout(1000);
+  }},
+  { tag: 'gm/comm-01', persona: 'gm', run: async (page) => {
+      await openRecord(page, 'KSW_commissions.action_ksw_pay_run', IDS.comm_run);
+      await page.waitForTimeout(1200);
+  }},
+  { tag: 'gm/comm-02', persona: 'gm', run: async (page) => {
+      await openRecord(page, 'KSW_commissions.action_ksw_pay_run', IDS.comm_run);
+      await page.waitForTimeout(900);
+      const tab = page.locator('a.nav-link', { hasText: /Who Gets Paid|يُصرَف/ }).first();
+      if (await tab.count()) { await tab.click(); await page.waitForTimeout(900); }
+  }},
+  { tag: 'gm/comm-03', persona: 'gm', run: async (page) => {
+      await openRecord(page, 'KSW_commissions.action_ksw_pay_run', IDS.comm_run);
+      await page.waitForTimeout(1000);
+  }},
+  { tag: 'gm/comm-04', persona: 'gm', run: async (page) => {
+      await openRecord(page, 'KSW_commissions.action_ksw_pay_submission', IDS.comm_submission);
+      await page.waitForTimeout(1200);
+  }},
+  { tag: 'accounting/comm-01', persona: 'accounting', run: async (page) => {
+      await openRecord(page, 'KSW_commissions.action_ksw_pay_run', IDS.comm_run);
+      await page.waitForTimeout(1000);
+  }},
+  { tag: 'accounting/comm-02', persona: 'accounting', run: async (page) => {
+      await gotoAction(page, 'KSW_commissions.action_ksw_pay_run_line');
+      await page.waitForSelector('.o_list_view', { timeout: 15000 });
+      await page.waitForTimeout(900);
+  }},
+  { tag: 'admin/comp-01', persona: 'admin', run: async (page) => {
+      await gotoAction(page, 'KSW_commissions.action_ksw_pay_component');
+      await page.waitForSelector('.o_list_view', { timeout: 15000 });
+      const row = page.locator('.o_data_row').first();
+      if (await row.count()) { await row.click(); await page.waitForSelector('.o_form_view', { timeout: 12000 }); }
+      await page.waitForTimeout(900);
+  }},
   { tag: 'common/language-01', persona: 'employee', run: async (page) => {
       await page.click('.o_user_menu');
       await page.waitForTimeout(500);

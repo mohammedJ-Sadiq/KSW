@@ -103,6 +103,10 @@ class HelpdeskTicket(models.Model):
     active = fields.Boolean(default=True)
     color = fields.Integer(related='category_id.color', store=True, readonly=True)
     company_id = fields.Many2one('res.company', default=lambda self: self.env.company)
+    attachment_ids = fields.Many2many(
+        'ir.attachment', string='Attachments',
+        help="Screenshots, error logs, or any other file that helps explain the issue.",
+    )
     resolution_hours = fields.Float(
         string='Resolution Time (h)', compute='_compute_resolution_hours', store=True,
         help="Hours between creation and closing. Used for reporting on solved tickets.",
@@ -197,6 +201,7 @@ class HelpdeskTicket(models.Model):
             self._check_employee_scope(vals.get('employee_id'))
         tickets = super().create(vals_list)
         tickets._notify_assignment()
+        tickets._relink_orphan_attachments()
         return tickets
 
     def write(self, vals):
@@ -217,6 +222,17 @@ class HelpdeskTicket(models.Model):
         if 'user_id' in vals:
             self._notify_assignment()
         return result
+
+    def _relink_orphan_attachments(self):
+        # Files added via the Attachments tab before the ticket's first save
+        # are uploaded with res_id=0 (the ticket doesn't exist yet). ir.attachment
+        # treats a falsy res_id as "no linked document" and restricts access to
+        # the creator only (see ir.attachment._check_access), so IT agents can't
+        # see them unless we re-stamp res_id once the ticket has a real one.
+        for ticket in self:
+            orphans = ticket.attachment_ids.filtered(lambda a: not a.res_id)
+            if orphans:
+                orphans.sudo().write({'res_model': 'helpdesk.ticket', 'res_id': ticket.id})
 
     def _check_employee_scope(self, employee_id):
         if not employee_id or self.env.su or self.env.user.has_group('KSW_helpdesk.group_helpdesk_agent'):
@@ -265,6 +281,16 @@ class HelpdeskTicket(models.Model):
                 'closed_by': self.env.user.id,
                 'kanban_state': 'done',
             })
+        self._send_close_notification()
+
+    def _send_close_notification(self):
+        template = self.env.ref(
+            'KSW_helpdesk.mail_template_ticket_closed', raise_if_not_found=False)
+        if not template:
+            return
+        for ticket in self:
+            if ticket.caller_email:
+                template.sudo().send_mail(ticket.id, force_send=True)
 
     def action_reopen(self):
         self._check_agent()

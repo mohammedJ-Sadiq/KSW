@@ -16,7 +16,9 @@ Two deliberate choices, both explained at length in the design spec:
   occurrence, which a flat row already carries.
 * **One component per batch**, so the columns can adapt: Overtime shows hours,
   location and reason; Meals shows a count; Import appears only where the
-  component declares an importer.
+  component declares an importer. A component's *options* live inside the
+  batch, not beside it — Breakfast, Lunch and Dinner are one Meals batch with
+  a Type column, not three batches to open, submit and approve separately.
 """
 from markupsafe import Markup
 
@@ -119,6 +121,8 @@ class KswPayBatch(models.Model):
     qty_ref_label = fields.Char(
         related='component_id.qty_ref_label', readonly=True)
     scope = fields.Selection(related='component_id.scope', readonly=True)
+    has_options = fields.Boolean(
+        related='component_id.has_options', readonly=True)
     needs_date = fields.Boolean(
         related='component_id.needs_date', readonly=True)
     needs_location = fields.Boolean(
@@ -613,6 +617,17 @@ class KswPayBatch(models.Model):
         return getattr(self, method)()
 
     def _notify(self, message, title=None):
+        """Toast the outcome, then refresh the form.
+
+        Every caller has just written entries, and returning an action
+        *replaces* the reload the web client does for a button that returns
+        nothing — so without the chained ``soft_reload`` the new lines sit in
+        the database while the Entries tab still shows the old ones until the
+        user reloads the page by hand. ``display_notification`` returns
+        ``params['next']`` to the action service (see ``client_actions.js``),
+        and ``soft_reload`` restores the current controller without a full
+        browser reload.
+        """
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
@@ -621,6 +636,7 @@ class KswPayBatch(models.Model):
                 'message': message,
                 'type': 'success',
                 'sticky': False,
+                'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'},
             },
         }
 
@@ -663,6 +679,18 @@ class KswPayEntry(models.Model):
         'hr.employee', required=True, ondelete='restrict', index=True,
         domain="[('id', 'in', allowed_employee_ids)]",
     )
+    # The component's own choices — the Meals batch's Breakfast / Lunch /
+    # Dinner. Relational with a domain rather than a Selection: the options
+    # vary per record, and a dynamic `selection=` cannot (the web client
+    # strips the context and caches the payload).
+    option_id = fields.Many2one(
+        'ksw.pay.option', string='Type', ondelete='restrict', index=True,
+        domain="[('component_id', '=', component_id)]",
+        help='Which of this component\'s choices this row is — the rate '
+             'comes from it.',
+    )
+    has_options = fields.Boolean(
+        related='component_id.has_options', readonly=True)
     date = fields.Date(
         help='The day this occurred. Used when the component is recorded per '
              'occurrence; must fall inside the batch period.',
@@ -702,7 +730,8 @@ class KswPayEntry(models.Model):
                  'component_id', 'component_id.calculation',
                  'component_id.rate', 'component_id.divisor',
                  'component_id.factor', 'component_id.tier_ids.rate',
-                 'component_id.tier_ids.width', 'site_id')
+                 'component_id.tier_ids.width', 'site_id',
+                 'option_id', 'option_id.rate')
     def _compute_amount(self):
         for rec in self:
             component = rec.component_id
@@ -712,6 +741,7 @@ class KswPayEntry(models.Model):
                     quantity=rec.quantity,
                     site=rec.site_id or rec.location_id,
                     threshold=rec.threshold_qty,
+                    option=rec.option_id,
                 )
             else:
                 rate, amount = 0.0, 0.0
@@ -726,12 +756,12 @@ class KswPayEntry(models.Model):
             else:
                 rec.amount = amount
 
-    @api.depends('employee_id', 'component_id', 'date')
+    @api.depends('employee_id', 'component_id', 'option_id', 'date')
     def _compute_display_name(self):
         for rec in self:
+            what = rec.option_id.name or rec.component_id.name or ''
             rec.display_name = '%s — %s' % (
-                rec.employee_id.display_name or '',
-                rec.component_id.name or '')
+                rec.employee_id.display_name or '', what)
 
     # ------------------------------------------------------------------
     # "Why is it this much?"
@@ -742,7 +772,8 @@ class KswPayEntry(models.Model):
     )
 
     @api.depends('amount', 'quantity', 'quantity_ref', 'threshold_qty',
-                 'rate', 'amount_override', 'component_id', 'employee_id')
+                 'rate', 'amount_override', 'component_id', 'option_id',
+                 'employee_id')
     def _compute_explanation(self):
         """Render the derivation as a table.
 
@@ -765,6 +796,7 @@ class KswPayEntry(models.Model):
             quantity=self.quantity,
             site=self.site_id or self.location_id,
             threshold=self.threshold_qty,
+            option=self.option_id,
         )
 
         if self.quantity_ref and component.qty_ref_label:
@@ -839,6 +871,23 @@ class KswPayEntry(models.Model):
                     "%(label)s must be greater than zero.",
                     label=rec.component_id.qty_label or _('Quantity')))
 
+    @api.constrains('option_id', 'component_id')
+    def _check_option(self):
+        for rec in self:
+            component = rec.component_id
+            if not component:
+                continue
+            if component.has_options and not rec.option_id:
+                raise ValidationError(_(
+                    "Every %(name)s row has to say which one it is: "
+                    "%(options)s.",
+                    name=component.name,
+                    options=', '.join(component.option_ids.mapped('name'))))
+            if rec.option_id and rec.option_id.component_id != component:
+                raise ValidationError(_(
+                    "'%(option)s' is not one of %(name)s's choices.",
+                    option=rec.option_id.name, name=component.name))
+
     @api.constrains('date', 'batch_id')
     def _check_date_in_period(self):
         import calendar
@@ -891,8 +940,8 @@ class KswPayEntry(models.Model):
     # Doing it in default_get means the plain "Add a line" already produces a
     # copy — no shortcut to learn, nothing to click.
     _COPY_FORWARD = (
-        'employee_id', 'date', 'quantity', 'quantity_ref', 'threshold_qty',
-        'location_id', 'reason', 'details',
+        'employee_id', 'option_id', 'date', 'quantity', 'quantity_ref',
+        'threshold_qty', 'location_id', 'reason', 'details',
     )
 
     @api.model

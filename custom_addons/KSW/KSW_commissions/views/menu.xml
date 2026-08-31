@@ -38,6 +38,35 @@
               sequence="20"
               groups="KSW_commissions.group_commission_officer"/>
 
+    <!--
+        Recurring entries live here, with the supervisor who maintains them,
+        and NOT under Configuration. A menu whose parent is filtered out by
+        groups is orphaned: _visible_menu_ids only walks an ancestor into the
+        visible set `while … menu_id in menu_ids`, so a Configuration parent
+        gated to Admin hid this item even from the Officer it was gated to.
+        Check the whole ancestor chain, not just the item.
+    -->
+    <menuitem id="menu_ksw_pay_recurring"
+              name="Recurring Entries"
+              parent="menu_ksw_pay_entries_section"
+              action="action_ksw_pay_recurring"
+              sequence="30"
+              groups="KSW_commissions.group_commission_supervisor"/>
+
+    <!--
+        `groups=` on a menuitem is ADDITIVE — _tag_menuitem emits (4, id) per
+        group — so the Officer group this menu used to carry survives its
+        removal from the file (CLAUDE.md gotcha #3), and the DB ends up saying
+        "Supervisor, Officer" while the file says "Supervisor". Harmless here
+        (Officer implies Supervisor), but a file and a database that disagree
+        is how the next person loses an afternoon. Set the list outright.
+    -->
+    <function model="ir.ui.menu" name="write">
+        <value eval="[ref('menu_ksw_pay_recurring')]"/>
+        <value eval="{'group_ids': [(6, 0, [
+            ref('KSW_commissions.group_commission_supervisor')])]}"/>
+    </function>
+
     <!-- ══ 2. The month ═════════════════════════════════════════════ -->
     <menuitem id="menu_ksw_pay_run"
               name="Monthly Pay Run"
@@ -94,13 +123,6 @@
               action="action_ksw_pay_component"
               sequence="10"
               groups="KSW_commissions.group_commission_admin"/>
-
-    <menuitem id="menu_ksw_pay_recurring"
-              name="Recurring Entries"
-              parent="menu_ksw_commissions_config"
-              action="action_ksw_pay_recurring"
-              sequence="20"
-              groups="KSW_commissions.group_commission_officer"/>
 
     <menuitem id="menu_ksw_commissions_sites"
               name="Work Sites"

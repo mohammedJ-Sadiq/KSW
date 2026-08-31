@@ -1,4 +1,5 @@
 from . import annual_leave
+from . import hr_attendance
 from . import hr_department
 from . import hr_leave
 from . import hr_leave_commission_line

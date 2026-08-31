@@ -19,6 +19,7 @@
                     </div>
                     <field name="active" invisible="1"/>
                     <field name="calculation" invisible="1"/>
+                    <field name="has_options" invisible="1"/>
 
                     <group>
                         <group string="What it is">
@@ -28,9 +29,12 @@
                         </group>
                         <group string="How it is worked out">
                             <field name="calculation" nolabel="0"/>
+                            <!-- With options the rate lives on each of
+                                 them, so asking for one here would be a
+                                 second, contradictory answer. -->
                             <field name="rate"
-                                   invisible="calculation != 'qty_rate'"
-                                   required="calculation == 'qty_rate'"/>
+                                   invisible="calculation != 'qty_rate' or has_options"
+                                   required="calculation == 'qty_rate' and not has_options"/>
                             <field name="divisor"
                                    invisible="calculation != 'wage_rate'"
                                    required="calculation == 'wage_rate'"/>
@@ -62,6 +66,30 @@
                             </group>
                             <field name="description" nolabel="1"
                                    placeholder="What this component is for…"/>
+                        </page>
+
+                        <page string="Options" name="options"
+                              invisible="calculation != 'qty_rate'">
+                            <field name="option_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="code" optional="show"/>
+                                    <field name="rate"/>
+                                    <field name="active"
+                                           widget="boolean_toggle"
+                                           optional="hide"/>
+                                </list>
+                            </field>
+                            <div class="text-muted mt-2">
+                                Variants of the same pay, differing only in
+                                what a unit is worth — Breakfast, Lunch,
+                                Dinner. The supervisor picks one per row on a
+                                single screen instead of opening a batch per
+                                variant. Leave this empty when the component
+                                has one rate; anything that differs in more
+                                than the rate is a component of its own.
+                            </div>
                         </page>
 
                         <page string="Rate Tiers" name="tiers"
@@ -111,6 +139,7 @@
                 <field name="kind"/>
                 <field name="calculation"/>
                 <field name="rate" optional="show"/>
+                <field name="has_options" string="Has Options" optional="hide"/>
                 <field name="qty_label" optional="hide"/>
                 <field name="scope" optional="show"/>
                 <field name="importer" optional="hide"/>
@@ -168,8 +197,14 @@
         <field name="model">ksw.pay.recurring</field>
         <field name="arch" type="xml">
             <list string="Recurring Entries" editable="bottom">
+                <!-- Carries the picker's domain: the departments this user
+                     runs plus his cascading reporting chain. -->
+                <field name="allowed_employee_ids" column_invisible="1"/>
                 <field name="employee_id" options="{'no_create': True}"/>
                 <field name="component_id" options="{'no_create': True}"/>
+                <field name="has_options" column_invisible="1"/>
+                <field name="option_id" options="{'no_create': True}"
+                       required="has_options" optional="show"/>
                 <field name="department_id" optional="show" readonly="1"/>
                 <field name="quantity"/>
                 <field name="amount"/>

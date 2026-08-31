@@ -1,6 +1,6 @@
 {
     'name': 'KSW Annual Leave',
-    'version': '19.0.1.9.0',
+    'version': '19.0.1.10.0',
     'author': 'Mohammed Albadr',
     'category': 'Human Resources',
     'summary': 'Auto-computed annual leave allocation dashboard',
@@ -38,6 +38,7 @@
         'wizard/ksw_hr_confirm_signature_wizard_views.xml',
         'data/leave_return_steps.xml',
         'data/cron.xml',
+        'data/mail_template_return_punch.xml',
     ],
     'installable': True,
     'application': False,

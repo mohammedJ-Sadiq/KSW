@@ -242,11 +242,17 @@ class KswLoanPaymentWizard(models.TransientModel):
         today = self.payment_date
         note = (self.note or '').strip()
         user = self.env.user
+        # Every branch below builds its paid-line vals from this dict, so
+        # `x_settlement_date` only has to be set once to date the credit
+        # correctly on the Statement of Account for full, sequential and
+        # redistribute payments alike. The sequential branch's pending
+        # remainder is built WITHOUT `stamp` and correctly gets none.
         stamp = {
             'is_manual': True,
             'manual_by': user.id,
             'manual_date': today,
             'manual_note': note,
+            'x_settlement_date': today,
         }
         commands = []
         is_full = cur.compare_amounts(payment, outstanding) == 0

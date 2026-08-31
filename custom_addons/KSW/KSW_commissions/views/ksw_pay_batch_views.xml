@@ -13,6 +13,7 @@
                 <field name="is_locked" invisible="1"/>
                 <field name="scope" invisible="1"/>
                 <field name="calculation" invisible="1"/>
+                <field name="has_options" invisible="1"/>
                 <field name="needs_date" invisible="1"/>
                 <field name="needs_location" invisible="1"/>
                 <field name="importer" invisible="1"/>
@@ -102,6 +103,17 @@
                                            column_invisible="1"/>
                                     <field name="employee_id"
                                            options="{'no_create': True}"/>
+                                    <!-- Off the parent, not off the line's
+                                         own component_id: that one is a
+                                         stored related, and a line the user
+                                         has not saved yet has no batch to
+                                         read it from — the picker would come
+                                         up empty exactly when it is needed. -->
+                                    <field name="option_id"
+                                           domain="[('component_id', '=', parent.component_id)]"
+                                           column_invisible="not parent.has_options"
+                                           required="parent.has_options"
+                                           options="{'no_create': True}"/>
                                     <field name="date"
                                            column_invisible="not parent.needs_date"/>
                                     <field name="quantity_ref"
@@ -160,6 +172,8 @@
                                 <list create="false" delete="false"
                                       default_group_by="employee_id">
                                     <field name="employee_id"/>
+                                    <field name="option_id" optional="show"
+                                           column_invisible="not parent.has_options"/>
                                     <field name="date" optional="show"/>
                                     <field name="quantity" sum="Total"/>
                                     <field name="reason" optional="show"/>
@@ -276,6 +290,8 @@
                         <group>
                             <field name="employee_id" readonly="1"/>
                             <field name="component_id" readonly="1"/>
+                            <field name="option_id" readonly="1"
+                                   invisible="not option_id"/>
                             <field name="date" readonly="1"
                                    invisible="not date"/>
                         </group>
@@ -307,6 +323,7 @@
             <list string="Pay Entries" create="false">
                 <field name="employee_id"/>
                 <field name="component_id"/>
+                <field name="option_id" optional="show"/>
                 <field name="department_id" optional="show"/>
                 <field name="period" options="{'min_precision': 'months'}"/>
                 <field name="date" optional="hide"/>
@@ -326,6 +343,7 @@
             <search>
                 <field name="employee_id"/>
                 <field name="component_id"/>
+                <field name="option_id"/>
                 <field name="department_id"/>
                 <field name="period" options="{'min_precision': 'months'}"/>
                 <group>
@@ -333,6 +351,8 @@
                             context="{'group_by': 'employee_id'}"/>
                     <filter string="Component" name="grp_component" domain="[]"
                             context="{'group_by': 'component_id'}"/>
+                    <filter string="Type" name="grp_option" domain="[]"
+                            context="{'group_by': 'option_id'}"/>
                     <filter string="Department" name="grp_department" domain="[]"
                             context="{'group_by': 'department_id'}"/>
                     <filter string="Period" name="grp_period" domain="[]"

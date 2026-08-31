@@ -321,6 +321,51 @@ class TestReturnBalanceSync(TransactionCase):
         self.assertEqual(leave.request_date_to, self.VAC_TO)
 
     # ==================================================================
+    # The prod shape: balance already settled at the planned return
+    # ==================================================================
+
+    def test_confirm_works_when_allocation_starts_after_the_leave(self):
+        """KSWCO shape: HR reset the balance at the planned return, so the
+        allocation begins *after* the vacation started and the leave is
+        covered by nothing. Confirming a return must still work — this
+        raised ValidationError("You do not have any allocation for this
+        time off type") on 8 of 9 prod records."""
+        alloc_type = self.env['hr.leave.type'].create({
+            'name': 'Annual Leave Alloc Required Test',
+            'requires_allocation': True,
+            'leave_validation_type': 'annual_multi',
+            'is_annual_leave': True,
+        })
+        rec = self._balance_record(reset_date=self.PLANNED_RETURN)
+        alloc = self.env['hr.leave.allocation'].sudo().create({
+            'employee_id': self.employee.id,
+            'holiday_status_id': alloc_type.id,
+            'number_of_days': 30.0,
+            'date_from': self.VAC_FROM,
+        })
+        alloc.action_approve()
+        leave = self.env['hr.leave'].sudo().create({
+            'employee_id': self.employee.id,
+            'holiday_status_id': alloc_type.id,
+            'request_date_from': self.VAC_FROM,
+            'request_date_to': self.VAC_TO,
+        })
+        leave.sudo().write({
+            'state': 'validate',
+            'x_annual_approval_state': 'approved',
+            'x_return_state': 'on_vacation',
+        })
+        # HR settles the balance at the planned return: the allocation now
+        # opens *after* the vacation started, leaving the leave uncovered.
+        alloc.sudo().write({'date_from': self.PLANNED_RETURN})
+
+        self._confirm(leave, self.EARLY_RETURN)   # must not raise
+
+        self.assertEqual(
+            leave.request_date_to, self.EARLY_RETURN - timedelta(days=1))
+        self.assertEqual(rec.x_opening_reset_date, self.EARLY_RETURN)
+
+    # ==================================================================
     # Amendment path
     # ==================================================================
 

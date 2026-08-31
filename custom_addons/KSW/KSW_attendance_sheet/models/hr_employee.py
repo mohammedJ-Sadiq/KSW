@@ -47,7 +47,13 @@ class HrEmployee(models.Model):
         res = super().write(vals)
 
         if newly_enabled:
-            Sheet = self.env['ksw.attendance.sheet']
+            # sudo: opening the employee's first sheet is a side effect of
+            # an edit already authorised on hr.employee, not an act on the
+            # sheet itself. Sheet access is scoped to the employee's own
+            # manager, so without this an HR user enabling the flag for
+            # somebody else's report would be refused by the create rule —
+            # and the employee would silently have no sheet at all.
+            Sheet = self.env['ksw.attendance.sheet'].sudo()
             today = fields.Date.context_today(self)
             month = str(today.month)
             year = today.year

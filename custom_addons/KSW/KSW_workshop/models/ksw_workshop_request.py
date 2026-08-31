@@ -3,6 +3,16 @@ from markupsafe import Markup
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
+# Suffix stamped on the bare hr.employee records the legacy history import
+# creates for requesters who never had an Odoo account (scripts/import_history.py).
+# They exist only to satisfy ksw.workshop.request.employee_id (required) — the
+# real submitted name and email live on the request itself in
+# x_legacy_requester_name / x_legacy_requester_email, so nothing depends on
+# them being visible. They are created archived and the 19.0.7.0.0 migration
+# archives the ones already in the database: 83 of them were inflating the
+# employee headcount and turning up in every employee picker.
+LEGACY_PLACEHOLDER_SUFFIX = ' (Legacy Import - No Odoo Account)'
+
 # Keyword -> request_type, used to classify the legacy Google-Sheet history,
 # whose `request_type` was empty on all 17,079 rows (the sheet never had the
 # column). Ordered: the FIRST entry whose pattern matches wins, so the most

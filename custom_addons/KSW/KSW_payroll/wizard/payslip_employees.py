@@ -84,6 +84,38 @@ class HrPayslipEmployees(models.TransientModel):
 
         return ''
 
+    @api.model
+    def _check_employee_warnings(self, employee, from_date, to_date):
+        """Return a warning string for an employee that WILL be processed
+        but whose figures need a human look, or '' when there is nothing
+        to flag.
+
+        Unlike _check_employee_for_batch this never skips anyone — the
+        payslip is still generated. It exists so payroll can see *why* a net
+        collapsed, instead of discovering it on the bank file.
+        """
+        if not employee.sudo().x_is_attendance_sheet:
+            return ''
+
+        sheet = self.env['ksw.attendance.sheet'].sudo().search([
+            ('employee_id', '=', employee.id),
+            ('month', '=', str(from_date.month)),
+            ('year', '=', from_date.year),
+        ], limit=1)
+        if sheet and sheet.state == 'confirmed':
+            return ''
+
+        manager = sheet.manager_id.name if sheet else ''
+        if not sheet:
+            return _(
+                'No attendance sheet exists for this month — the payslip '
+                'was computed as zero attendance.')
+        return _(
+            'Attendance sheet not sent to payroll%(by)s — the payslip was '
+            'computed as zero attendance.',
+            by=(' (%s)' % manager) if manager else '',
+        )
+
     # ------------------------------------------------------------------
     # Override generate action
     # ------------------------------------------------------------------
@@ -111,7 +143,8 @@ class HrPayslipEmployees(models.TransientModel):
         run.x_skip_line_ids.unlink()
 
         payslips = payslip_model
-        skipped = []  # list of (employee, reason)
+        skipped = []   # list of (employee, reason)
+        warned = []    # list of (employee, reason) — processed anyway
 
         is_admin = self.env.user.has_group('base.group_system')
         for employee in self.env['hr.employee'].browse(data['employee_ids']):
@@ -121,6 +154,11 @@ class HrPayslipEmployees(models.TransientModel):
             if reason:
                 skipped.append((employee, reason))
                 continue
+
+            warning = self._check_employee_warnings(
+                employee, from_date, to_date)
+            if warning:
+                warned.append((employee, warning))
 
             # Employee is eligible — create the payslip
             slip_data = payslip_model.onchange_employee_id(
@@ -146,29 +184,46 @@ class HrPayslipEmployees(models.TransientModel):
         if payslips:
             payslips.compute_sheet()
 
-        # Persist skip log on the batch
-        if skipped:
-            skip_vals = [
-                {
-                    'run_id': active_id,
-                    'employee_id': emp.id,
-                    'reason': rsn,
-                }
-                for emp, rsn in skipped
-            ]
-            self.env['ksw.payslip.run.skip.line'].create(skip_vals)
+        # Persist skip + warning log on the batch
+        log_vals = [
+            {
+                'run_id': active_id,
+                'employee_id': emp.id,
+                'reason': rsn,
+                'line_type': line_type,
+            }
+            for entries, line_type in ((skipped, 'skipped'),
+                                       (warned, 'warning'))
+            for emp, rsn in entries
+        ]
+        if log_vals:
+            self.env['ksw.payslip.run.skip.line'].create(log_vals)
 
+        if skipped or warned:
             # Return a sticky warning notification so the user notices
-            skipped_names = ', '.join(e.name for e, _ in skipped)
+            parts = []
+            if skipped:
+                parts.append(_(
+                    'Skipped (no payslip): %s',
+                    ', '.join(e.name for e, _r in skipped)))
+            if warned:
+                parts.append(_(
+                    'Paid as zero attendance (sheet not confirmed): %s',
+                    ', '.join(e.name for e, _r in warned)))
             return {
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
                 'params': {
-                    'title': _('Batch Generated — %d Employee(s) Skipped') % len(skipped),
-                    'message': _(
-                        'The following employee(s) were skipped: %s.\n'
-                        'Open the "Skipped Employees" tab on the batch for details.'
-                    ) % skipped_names,
+                    'title': _(
+                        'Batch Generated — %(skipped)d Skipped, '
+                        '%(warned)d Need Review',
+                        skipped=len(skipped), warned=len(warned),
+                    ),
+                    'message': '%s\n%s' % (
+                        '\n'.join(parts),
+                        _('Open the "Skipped Employees" tab on the batch '
+                          'for details.'),
+                    ),
                     'type': 'warning',
                     'sticky': True,
                     'next': {'type': 'ir.actions.act_window_close'},

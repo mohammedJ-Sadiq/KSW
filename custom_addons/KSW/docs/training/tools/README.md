@@ -22,9 +22,18 @@ system (`localhost:8070` / `odoo_dev`) — never production.
 
 ```bash
 cd custom_addons/KSW/docs/training/tools
-node build_pdf.mjs        # both languages -> ../pdf/KSW-User-Manual-EN.pdf, -AR.pdf
-node build_pdf.mjs en     # one language
+node build_pdf.mjs             # per-role handbooks, both languages -> ../pdf/
+node build_pdf.mjs en          # one language
+node build_pdf.mjs full        # one comprehensive all-roles manual
+node build_pdf.mjs commission  # commission-only, per role -> ../pdf/commission/
 ```
+
+`commission` is a **bundle**: it gathers the commission pages out of the role
+folders into their own set of PDFs (`COMMISSION_DOCS` / `COMMISSION_ORDER` in
+`build_pdf.mjs`), for handing to someone trained on the commission app alone.
+`renderDoc` takes an `outDir` so a bundle can write outside `pdf/` without
+disturbing the per-role handbooks. To add another bundle, copy that pattern —
+a doc map, an order, and one `buildX(lang)`.
 
 Uses `google-chrome-stable` (RTL-aware, embeds screenshots; Arabic uses the
 Noto Naskh Arabic font). Screenshots not yet captured render as a labelled
@@ -75,6 +84,33 @@ Navigation is by **action XML id** (`/odoo/action-<xmlid>`), which is stable
 across upgrades. Each shot is best-effort — a failure is logged and the run
 continues. Re-running overwrites existing PNGs. Regenerate after any UI change
 that affects a documented screen.
+
+## ⚠ Pending capture — the rebuilt commission app (Aug 2026)
+
+The commission guides were rewritten for the ERP-element rebuild
+(`ksw.pay.batch` / `ksw.pay.recurring` / `ksw.pay.run`). Their screenshots are
+**not captured yet** — they render as labelled "image pending capture" boxes in
+the PDFs, which build fine. The old commission shots referenced a dead action
+(`action_ksw_commission_sheet_my`) and are no longer used.
+
+To capture, stage a month in `odoo_dev` (a draft batch with rows, a recurring
+entry, a submitted department, an approved run) and shoot these paths in both
+`screenshots/` and `screenshots-ar/`:
+
+| Path | Screen |
+|---|---|
+| `supervisor/pay-01` | Pay Entries → My Batches (list) |
+| `supervisor/pay-02` | New batch header (component / period / department) |
+| `supervisor/pay-03` | Entries tab with rows |
+| `supervisor/pay-04` | The "how this amount was worked out" dialog |
+| `supervisor/recurring-01` | Recurring Entries list |
+| `supervisor/recurring-02` | Adding a recurring line |
+| `supervisor/recurring-03` | **Add Recurring** on a batch |
+| `supervisor/payrun-01` | Monthly Pay Run → Who Gets Paid |
+| `supervisor/payrun-02` | **Submit My Entries** |
+| `gm/comm-01` … `gm/comm-04` | By Department, Who Gets Paid, Approve My Departments, Return for Correction |
+| `accounting/comm-01` … `comm-03` | Approved run, Payment Register, Export Bank File |
+| `admin/comp-01` | Pay Component form |
 
 ## Coverage status — 63 / 63 + 32 helpdesk captured ✅
 

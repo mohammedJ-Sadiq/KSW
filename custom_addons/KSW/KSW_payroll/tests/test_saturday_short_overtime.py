@@ -180,9 +180,19 @@ class TestSaturdayShortOvertime(TransactionCase):
     def test_sheet_employee_excluded(self):
         """Attendance-sheet employees are supervisor-marked, so the Saturday
         short-shift deduction/overtime must NOT apply even on a flagged
-        calendar (Standard 44).  No SAT_OT, no gap ATT_DED."""
+        calendar (Standard 44).  No SAT_OT, no gap ATT_DED.
+
+        The sheet must be confirmed: payroll reads an unreleased month as
+        zero attendance, which would produce an ATT_DED for the whole
+        window and mask what this test is actually about.
+        """
         emp, ver = self._employee(self.cal_44, is_sheet=True)
         self._cover_week(emp)          # would trigger SAT_OT if not excluded
+        sheet = self.env['ksw.attendance.sheet'].sudo().create({
+            'employee_id': emp.id, 'month': '3', 'year': 2026,
+        })
+        sheet.action_supervisor_confirm()
+
         wd = self._wd(ver)
         self.assertNotIn('SAT_OT', wd)
         self.assertNotIn('ATT_DED', wd)

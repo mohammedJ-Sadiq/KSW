@@ -428,8 +428,8 @@
                        decoration-warning="x_return_state == 'on_vacation'"
                        decoration-success="x_return_state == 'hr_confirmed'"/>
                 <field name="x_return_date" optional="hidden" string="Return Date"/>
-                <field name="x_return_reminder_count" optional="hidden"
-                       string="Reminders Sent"/>
+                <field name="x_return_punch_notified_on" optional="hidden"
+                       string="Employee Alerted"/>
             </xpath>
         </field>
     </record>

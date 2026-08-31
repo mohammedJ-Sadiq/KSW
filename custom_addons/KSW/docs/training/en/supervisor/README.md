@@ -13,12 +13,14 @@ attendance and commission sheets.
 |---|---|
 | Approve (or refuse) my team's time-off requests | [Approve time off](01-approve-time-off.md) |
 | Request leave for a team member without a login | [Approve time off](01-approve-time-off.md#requesting-leave-for-someone-without-a-system-account) |
-| Record a team member's return from vacation | [Confirming a return](06-confirm-return.md) |
+| Record a team member's return from vacation | [Confirming a return](08-confirm-return.md) |
 | Approve (or refuse) my team's loan requests | [Approve a loan](02-approve-loan.md) |
 | Mark my team's monthly attendance (non-biometric staff) | [Attendance sheets](03-attendance-sheets.md) |
-| Record my team's commissions & allowances | [Commission sheets](04-commission-sheets.md) |
-| See my team's payslips | [View team payslips](05-view-team-payslips.md) |
-| Raise an IT support ticket for a team member | [IT ticket for a team member](07-ticket-for-team-member.md) |
+| Record my team's overtime, trips, meals, allowances & bonuses | [Recording extra pay](04-commission-pay-entries.md) |
+| Set up an allowance that repeats every month | [Recurring entries](05-commission-recurring.md) |
+| Submit the month and understand how it gets paid | [The monthly cycle](06-commission-monthly-cycle.md) |
+| See my team's payslips | [View team payslips](07-view-team-payslips.md) |
+| Raise an IT support ticket for a team member | [IT ticket for a team member](09-ticket-for-team-member.md) |
 
 ## The golden rules
 
@@ -29,3 +31,5 @@ attendance and commission sheets.
   **loan** requests live in **Loans → Operations → Loans**.
 - Every approval/refusal is recorded with your name; a refusal always needs a
   **reason**, which the employee sees.
+- On commissions, **submitting a batch is not the handover.** Your department only
+  reaches the General Manager when you press **Submit My Entries**.

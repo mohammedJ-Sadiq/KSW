@@ -44,12 +44,38 @@
     <!-- ============================================================ -->
     <!-- 4. Record Rules (noupdate so manual edits are preserved)      -->
     <!-- ============================================================ -->
-    <!-- HR Officers: full access to all sheets (outside noupdate so it applies on every upgrade) -->
+    <!-- HR Officers: own team only, same scope as a supervisor.
+         (Outside noupdate so it applies on every upgrade.)
+
+         This used to be [(1, '=', 1)] read/write/create over every sheet in
+         the database. `hr.group_hr_user` is held by 14 users here, several
+         of them line supervisors (one with 90 direct reports) who hold it
+         for unrelated HR reasons — so it silently handed a third of the
+         supervisor population sight of, and edit rights over, every other
+         team's attendance.
+
+         Scoping this in the RULE rather than in a default search filter is
+         the point: a `search_default_my_team` context is a suggestion the
+         user can clear from the search bar in one click, not a boundary.
+         Everything that decides what a supervisor may see has to live here.
+
+         HR staff who genuinely need the whole company — to chase, review or
+         confirm a closed month — belong in the Attendance Sheet Manager
+         group below, whose [(1,'=',1)] rule is unchanged and whose
+         membership is an explicit decision (3 users) rather than a side
+         effect of holding an HR group.
+
+         All four perms stay on ONE rule on purpose: ir.rule only ever
+         restricts, so an operation with no matching rule is UNRESTRICTED.
+         Splitting read from write here would leave read unscoped for a
+         user whose other groups carry no read rule — the exact inverse of
+         the intent. (Unlink is denied at the ACL level instead; see
+         ir.model.access.csv.) -->
     <record id="rule_attendance_sheet_hr_officer" model="ir.rule">
-        <field name="name">Attendance Sheet: HR Officer full access</field>
+        <field name="name">Attendance Sheet: HR Officer sees own subordinates</field>
         <field name="model_id" ref="model_ksw_attendance_sheet"/>
         <field name="groups" eval="[(4, ref('hr.group_hr_user'))]"/>
-        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="domain_force">[('manager_id.user_id', '=', user.id)]</field>
         <field name="perm_read" eval="1"/>
         <field name="perm_write" eval="1"/>
         <field name="perm_create" eval="1"/>
@@ -57,10 +83,10 @@
     </record>
 
     <record id="rule_attendance_sheet_line_hr_officer" model="ir.rule">
-        <field name="name">Attendance Sheet Line: HR Officer full access</field>
+        <field name="name">Attendance Sheet Line: HR Officer sees own subordinates</field>
         <field name="model_id" ref="model_ksw_attendance_sheet_line"/>
         <field name="groups" eval="[(4, ref('hr.group_hr_user'))]"/>
-        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="domain_force">[('sheet_id.manager_id.user_id', '=', user.id)]</field>
         <field name="perm_read" eval="1"/>
         <field name="perm_write" eval="1"/>
         <field name="perm_create" eval="1"/>

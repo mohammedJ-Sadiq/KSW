@@ -13,4 +13,4 @@ from . import test_return_wizard_ui
 from . import test_manager_assistant_delegation
 from . import test_department_gm
 from . import test_return_balance_sync
-from . import test_return_reminder
+from . import test_return_punch_notification

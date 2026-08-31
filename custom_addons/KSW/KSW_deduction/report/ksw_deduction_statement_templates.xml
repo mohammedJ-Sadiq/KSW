@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="action_report_deduction_statement" model="ir.actions.report">
+        <field name="name">Statement of Account</field>
+        <field name="model">ksw.deduction.statement.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">KSW_deduction.report_deduction_statement</field>
+        <field name="report_file">KSW_deduction.report_deduction_statement</field>
+        <field name="print_report_name">'Statement of Account - %s - %s' % (object.employee_id.name or '', object.date_to)</field>
+    </record>
+
+    <!--
+        Text is kept out of styled spans on purpose: QWeb literals are
+        extracted for translation as whole `model_terms` blocks, and wrapping
+        them in inline-styled markup produces .pot entries nobody can
+        translate (the reason KSW_attendance_report's Arabic is still 60
+        untranslated blobs). Colour comes from Bootstrap classes instead.
+    -->
+    <template id="report_deduction_statement">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-set="rd" t-value="o.get_report_data()"/>
+                <t t-call="web.external_layout">
+                    <div class="page">
+
+                        <h4 class="text-center mb-1">Statement of Account</h4>
+                        <p class="text-center text-muted mb-4">
+                            Employee deductions — loans, advances and penalties
+                        </p>
+
+                        <table class="table table-sm table-bordered mb-4">
+                            <tr>
+                                <td style="width:20%"><strong>Employee</strong></td>
+                                <td style="width:30%"><span t-out="rd['employee'].name or '—'"/></td>
+                                <td style="width:20%"><strong>Employee No.</strong></td>
+                                <td style="width:30%"><span t-out="rd['employee'].sudo().x_employee_no or '—'"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Department</strong></td>
+                                <td><span t-out="rd['employee'].sudo().department_id.name or '—'"/></td>
+                                <td><strong>Job Position</strong></td>
+                                <td><span t-out="rd['employee'].sudo().job_title or '—'"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Period</strong></td>
+                                <td>
+                                    <span t-if="rd['date_from']" t-out="rd['date_from']"/>
+                                    <span t-else="">From the beginning</span>
+                                    to
+                                    <span t-out="rd['date_to']"/>
+                                </td>
+                                <td><strong>Deduction Types</strong></td>
+                                <td>
+                                    <span t-if="rd['types']" t-out="', '.join(rd['types'].mapped('name'))"/>
+                                    <span t-else="">All types</span>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div t-if="o.reconciliation_warning"
+                             class="alert alert-danger" role="alert">
+                            <span t-out="o.reconciliation_warning"/>
+                        </div>
+
+                        <div t-if="o.out_of_scope_count" class="alert alert-warning" role="alert">
+                            This is a partial statement: some of this
+                            employee's deductions are outside your access
+                            rights and are excluded from every figure below.
+                        </div>
+
+                        <h5 class="border-bottom pb-1 mb-2">Movements</h5>
+                        <table class="table table-sm table-bordered mb-4">
+                            <thead>
+                                <tr>
+                                    <th style="width:11%">Date</th>
+                                    <th style="width:13%">Reference</th>
+                                    <th>Description</th>
+                                    <th class="text-end" style="width:14%">Charge</th>
+                                    <th class="text-end" style="width:14%">Collected</th>
+                                    <th class="text-end" style="width:16%">Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="rd['lines']" t-as="line"
+                                    t-att-class="'fw-bold table-light' if line.is_balance_row else ''">
+                                    <td><span t-if="line.date" t-out="line.date"/></td>
+                                    <td><span t-out="line.ref or ''"/></td>
+                                    <td><span t-out="line.label or ''"/></td>
+                                    <td class="text-end">
+                                        <span t-if="line.debit" t-out="'%.2f' % line.debit"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-if="line.credit" t-out="'%.2f' % line.credit"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-out="'%.2f' % line.balance"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div style="page-break-inside: avoid">
+                            <h5 class="border-bottom pb-1 mb-2">Summary</h5>
+                            <table class="table table-sm table-bordered mb-4"
+                                   style="width:60%">
+                                <tr>
+                                    <td>Opening balance</td>
+                                    <td class="text-end">
+                                        <span t-out="'%.2f' % rd['opening_balance']"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Charged during the period</td>
+                                    <td class="text-end">
+                                        <span t-out="'%.2f' % rd['total_charged']"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Collected during the period</td>
+                                    <td class="text-end text-success">
+                                        <span t-out="'%.2f' % rd['total_settled']"/>
+                                    </td>
+                                </tr>
+                                <tr t-if="rd['total_written_off']">
+                                    <td>Written off</td>
+                                    <td class="text-end text-muted">
+                                        <span t-out="'%.2f' % rd['total_written_off']"/>
+                                    </td>
+                                </tr>
+                                <tr class="fw-bold">
+                                    <td>Closing balance
+                                        (<span t-out="rd['currency'].name or ''"/>)</td>
+                                    <td class="text-end">
+                                        <span t-out="'%.2f' % rd['closing_balance']"/>
+                                    </td>
+                                </tr>
+                                <tr t-if="rd['overdue_amount']">
+                                    <td>Of which overdue</td>
+                                    <td class="text-end text-danger">
+                                        <span t-out="'%.2f' % rd['overdue_amount']"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div style="page-break-inside: avoid">
+                            <div class="row mt-5 text-center">
+                                <div class="col-4">
+                                    <div style="border-top: 1px solid #000; padding-top: 4px;">
+                                        Employee
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div style="border-top: 1px solid #000; padding-top: 4px;">
+                                        Accounting
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div style="border-top: 1px solid #000; padding-top: 4px;">
+                                        Human Resources
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="text-muted mt-4" style="font-size: 9px;">
+                            Issued by <span t-out="rd['printed_by'].name or ''"/>
+                            on <span t-out="rd['printed_on']"/>.
+                            Balances are stated as at
+                            <span t-out="rd['date_to']"/>.
+                        </p>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

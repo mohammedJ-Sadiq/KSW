@@ -35,5 +35,13 @@
   "ticket_closed": 7,
   "ticket_closed_2": 8,
   "ticket_closed_3": 9,
-  "ticket_closed_4": 10
+  "ticket_closed_4": 10,
+  "comm_dept": 3101,
+  "comm_supervisor_emp": 12174,
+  "comm_team_emp": 12175,
+  "comm_batch_draft": 2481,
+  "comm_recurring": 137,
+  "comm_submission": 2045,
+  "comm_run": 2,
+  "comm_batch_meals": 2482
 }

@@ -20,6 +20,11 @@ cover every case KSW has:
     A waterfall over :class:`KswPayRateTier`, optionally per site, with a
     per-entry free threshold. Driver trips.
 
+A component may also carry **options** (:class:`KswPayComponentOption`) — the
+same kind of pay with more than one unit rate. Meals are one component with
+Breakfast, Lunch and Dinner inside it, not three components: a supervisor
+records the month's meals on one screen and picks the meal on each row.
+
 Two rules learned the hard way and encoded here:
 
 * The amount is computed in **one unrounded expression**. Never
@@ -88,6 +93,17 @@ class KswPayComponent(models.Model):
     tier_ids = fields.One2many(
         'ksw.pay.rate.tier', 'component_id', string='Rate Tiers',
     )
+    option_ids = fields.One2many(
+        'ksw.pay.option', 'component_id', string='Options',
+        help='Variants of the same pay, each with its own rate — Breakfast, '
+             'Lunch, Dinner. Leave empty when the component has a single '
+             'rate.',
+    )
+    has_options = fields.Boolean(
+        compute='_compute_has_options', store=True,
+        help='Set automatically: this component is recorded by choosing one '
+             'of its options on every entry.',
+    )
 
     # ------------------------------------------------------------------
     # What an entry looks like
@@ -155,9 +171,23 @@ class KswPayComponent(models.Model):
             rec.display_name = '%s (%s)' % (rec.name, rec.code) \
                 if rec.code else rec.name
 
+    @api.depends('option_ids')
+    def _compute_has_options(self):
+        for rec in self:
+            rec.has_options = bool(rec.option_ids)
+
     # ------------------------------------------------------------------
     # Validation
     # ------------------------------------------------------------------
+    @api.constrains('calculation', 'option_ids')
+    def _check_options(self):
+        for rec in self:
+            if rec.option_ids and rec.calculation != 'qty_rate':
+                raise ValidationError(_(
+                    "'%(name)s' has options, so its amount has to be a "
+                    "quantity × rate — each option carries its own rate.",
+                    name=rec.name))
+
     @api.constrains('calculation', 'divisor', 'rate', 'tier_ids')
     def _check_calculation(self):
         for rec in self:
@@ -173,7 +203,22 @@ class KswPayComponent(models.Model):
     # ------------------------------------------------------------------
     # The resolver — the whole point of this model
     # ------------------------------------------------------------------
-    def _resolve(self, employee, quantity=0.0, site=None, threshold=0.0):
+    def _unit_rate(self, option=None):
+        """The per-unit rate for one entry.
+
+        The option's own rate when the entry names one — a lunch is 20 and a
+        breakfast 10 within the same Meals component — otherwise the
+        component's single rate. An option belonging to a different
+        component is ignored rather than trusted; the entry constraint
+        rejects it, and a rate is not the place to find out.
+        """
+        self.ensure_one()
+        if option and option.component_id == self:
+            return option.rate or 0.0
+        return self.rate or 0.0
+
+    def _resolve(self, employee, quantity=0.0, site=None, threshold=0.0,
+                 option=None):
         """Return ``(rate, amount)`` for one entry.
 
         ``rate`` is informational and may be fractional; ``amount`` is the
@@ -188,7 +233,8 @@ class KswPayComponent(models.Model):
             return 0.0, 0.0
 
         if self.calculation == 'qty_rate':
-            return self.rate, (self.rate or 0.0) * quantity
+            rate = self._unit_rate(option)
+            return rate, rate * quantity
 
         if self.calculation == 'wage_rate':
             # sudo(): hr.version.wage is group-restricted.
@@ -208,7 +254,7 @@ class KswPayComponent(models.Model):
         return 0.0, 0.0
 
     def _resolve_detail(self, employee, quantity=0.0, site=None,
-                        threshold=0.0):
+                        threshold=0.0, option=None):
         """Return ``(rows, notes)`` explaining how the amount was reached.
 
         ``rows`` are dicts of ``label`` / ``quantity`` / ``rate`` / ``amount``
@@ -226,12 +272,17 @@ class KswPayComponent(models.Model):
             return rows, notes
 
         if self.calculation == 'qty_rate':
+            rate = self._unit_rate(option)
+            named = option if option and option.component_id == self else None
+            label = _('%(option)s at the configured rate', option=named.name) \
+                if named else \
+                _('%(label)s at the configured rate',
+                  label=self.qty_label or _('Quantity'))
             rows.append({
-                'label': _('%(label)s at the configured rate',
-                           label=self.qty_label or _('Quantity')),
+                'label': label,
                 'quantity': quantity,
-                'rate': self.rate,
-                'amount': (self.rate or 0.0) * quantity,
+                'rate': rate,
+                'amount': rate * quantity,
             })
             return rows, notes
 
@@ -371,6 +422,47 @@ class KswPayComponent(models.Model):
     def _entered_by_current_user(self):
         """Components the current user may record — used to scope pickers."""
         return self.search([]).filtered(lambda c: c._check_may_enter())
+
+
+class KswPayComponentOption(models.Model):
+    """One choice inside a component — Breakfast, Lunch, Dinner.
+
+    Meals were three components, so recording a month's meals meant three
+    batches, three submissions and three lines on the register for what a
+    supervisor thinks of as one thing. An option is the same pay at a
+    different unit rate: one component, one screen, one column to pick from.
+
+    Anything that is genuinely a *different* kind of pay — different scope,
+    different calculation, a different person allowed to record it — stays a
+    component of its own. Options only ever vary the rate.
+    """
+    _name = 'ksw.pay.option'
+    _description = 'KSW Pay Component Option'
+    _order = 'component_id, sequence, id'
+
+    component_id = fields.Many2one(
+        'ksw.pay.component', required=True, ondelete='cascade', index=True,
+    )
+    name = fields.Char(required=True, translate=True)
+    code = fields.Char(
+        help='Stable identifier used in exports and reports.',
+    )
+    sequence = fields.Integer(default=10)
+    rate = fields.Float(
+        digits=(16, 4), required=True,
+        help='What one unit of this choice is worth — 20.00 per lunch.',
+    )
+    active = fields.Boolean(default=True)
+
+    _unique_code = models.Constraint(
+        'UNIQUE(component_id, code)',
+        'Two options of the same component cannot share a code.')
+
+    @api.constrains('rate')
+    def _check_rate(self):
+        for rec in self:
+            if rec.rate < 0:
+                raise ValidationError(_("An option's rate cannot be negative."))
 
 
 class KswPayRateTier(models.Model):

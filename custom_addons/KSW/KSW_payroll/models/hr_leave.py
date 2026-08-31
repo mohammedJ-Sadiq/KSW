@@ -653,6 +653,34 @@ class HrLeave(models.Model):
             'x_vacation_payslip_id': False,
         })
 
+    # ------------------------------------------------------------------
+    # Attendance-sheet "needs attention" flags
+    # ------------------------------------------------------------------
+
+    def _refresh_sheet_blocked_flags(self):
+        """Re-derive the blocked flags of any attendance sheet this leave
+        affects.
+
+        A leave decision changes whether a sheet can be sent to payroll
+        without writing anything on the sheet, so nothing else refreshes
+        it. The flags are display-only (the confirm guard always
+        re-evaluates live), but a stale "Needs Attention" badge is exactly
+        the sort of thing that trains people to ignore the badge.
+        """
+        if 'ksw.attendance.sheet' not in self.env:
+            return
+        self.env['ksw.attendance.sheet']._refresh_blocked_for_leaves(self)
+
+    def action_confirm_return_manager(self):
+        result = super().action_confirm_return_manager()
+        self._refresh_sheet_blocked_flags()
+        return result
+
+    def _action_validate(self, check_state=True):
+        result = super()._action_validate(check_state=check_state)
+        self._refresh_sheet_blocked_flags()
+        return result
+
     def action_refuse(self):
         annual_multi = self.filtered(
             lambda l: l.holiday_status_id
@@ -661,6 +689,7 @@ class HrLeave(models.Model):
         result = super().action_refuse()
         if annual_multi:
             annual_multi._cancel_vacation_payslips()
+        self._refresh_sheet_blocked_flags()
         return result
 
     def _move_validate_leave_to_confirm(self):

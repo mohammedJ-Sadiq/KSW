@@ -102,6 +102,23 @@
                             groups="KSW_deduction.group_installment_edit,KSW_deduction.group_acc_data_entry,KSW_deduction.group_deduction_manager"
                             invisible="state != 'active' or total_pending == 0 or not x_can_edit_installments"/>
 
+                    <!-- The question this form prompts most often is "and
+                         what else does he owe?" — so the employee's full
+                         deduction ledger is one click from here, not a trip
+                         back out to the Reports menu. `type="action"` passes
+                         active_id, which the wizard's default_get reads to
+                         preselect the employee.
+                         No invisible= referencing a groups-gated field here
+                         (Odoo 19 Pitfalls #31): the button is filtered by
+                         groups= alone, and the wizard scopes itself. -->
+                    <button name="%(KSW_deduction.action_ksw_deduction_statement)d"
+                            type="action"
+                            string="Statement of Account"
+                            class="btn-secondary"
+                            icon="fa-list-alt"
+                            groups="KSW_deduction.group_deduction_officer,KSW_deduction.group_acc_data_entry,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_installment_edit"
+                            invisible="state == 'draft'"/>
+
                     <!-- Cancel / Reset
                          Cancel is gated by x_can_cancel:
                            - Loans: only the requesting employee may cancel.

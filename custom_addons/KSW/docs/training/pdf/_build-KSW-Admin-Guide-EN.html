@@ -30,7 +30,7 @@
 <div class="cover">
   <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
   <div class="role">Administrator Guide</div>
-  <div class="meta">User Training Guide<br/>KSW HR &amp; Payroll · 2026-08-24</div>
+  <div class="meta">User Training Guide<br/>KSW HR &amp; Payroll · 2026-08-30</div>
 </div>
 <section id="g-admin-readme"><h1>Administrator Guides</h1>
 <p>For staff who <strong>configure and oversee</strong> whole areas of the system rather than
@@ -63,49 +63,174 @@ categories, rules) deliberately.</li>
 area of responsibility.</li>
 </ul>
 </section>
-<section id="g-admin-commissions"><h1>Commissions Administration</h1>
-<p><strong>Who is this for:</strong> Commission Admin (and Sales Commission Manager)
+<section id="g-admin-commissions"><h1>Commissions Configuration &amp; the Officer&#39;s View</h1>
+<p><strong>Who is this for:</strong> Commission Admin (configuration) and Commission Officer (company-wide view)
 <strong>How long it takes:</strong> varies</p>
 <h2>What this does</h2>
-<p>Lets you configure the building blocks the commission sheets rely on:
-categories, work sites/trip tiers, sales &amp; collection rules, and salesperson
-profiles. Sales managers can additionally override a commission condition on an
-individual sales line.</p>
-<h2>Before you start</h2>
-<ul>
-<li>These are <strong>configuration</strong> items — changes affect every future commission
-sheet. Change them deliberately.</li>
-</ul>
-<h2>Steps — Configure the catalog</h2>
+<p>Everything KSW pays on top of salary is a <strong>configuration record</strong>, not a
+programmed feature. Adding a new kind of pay — a new allowance, a new bonus — is a
+row in the <strong>Pay Components</strong> catalog: no development, no new menu, no new access
+group. This page covers that catalog, the work sites behind it, and the
+company-wide screens the Commission Officer works from.</p>
+<blockquote>
+<p><strong>Sales &amp; Collection has its own configuration</strong> (rules, salesperson profiles)
+and is paid separately from the commission run. It is not a pay component and is
+not covered here.</p>
+</blockquote>
+<h2>Pay Components — the catalog</h2>
+<p><strong>Commissions → Configuration → Pay Components.</strong></p>
+<p>Everything reduces to <strong>quantity × rate → amount</strong>. Four calculation methods cover
+every case:</p>
+<table>
+<thead>
+<tr>
+<th>Calculation</th>
+<th>What it does</th>
+<th>Used by</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Fixed amount</strong></td>
+<td>Nothing is derived — the supervisor types the amount</td>
+<td>Allowances, holiday bonuses, Other</td>
+</tr>
+<tr>
+<td><strong>Quantity × rate</strong></td>
+<td>The rate configured on the component (or on the chosen option)</td>
+<td>Meals, Friday Work</td>
+</tr>
+<tr>
+<td><strong>Quantity × salary-derived rate</strong></td>
+<td>basic salary ÷ <strong>divisor</strong> × <strong>factor</strong> × quantity</td>
+<td>Overtime (divisor 240, factor 1.5 — Labour Law art. 107)</td>
+</tr>
+<tr>
+<td><strong>Tiered on quantity</strong></td>
+<td>A waterfall through the rate tiers, above a per-entry free allowance</td>
+<td>Driver Trips</td>
+</tr>
+</tbody></table>
+<p><div class="ph">📷 Pay component form <span>(image pending capture)</span></div></p>
+<h3>Options — one component, several rates</h3>
+<p>If the <em>only</em> difference between two kinds of pay is the unit rate, they are
+<strong>options</strong> of one component, not two components. Meals is one component with
+Breakfast (10), Lunch (20) and Dinner (15) inside it — so a supervisor records the
+month&#39;s meals on one screen and picks the meal on each row, instead of opening,
+submitting and having three batches approved.</p>
+<p>Anything that genuinely differs — a different scope, a different calculation, a
+different person allowed to record it — stays a component of its own.</p>
+<blockquote>
+<p>Options only work with <strong>Quantity × rate</strong>; each option carries its own rate.</p>
+</blockquote>
+<h3>Rate tiers — for tiered components</h3>
+<p>Each tier has a <strong>Band Size</strong> and a <strong>Rate</strong>, consumed in sequence.
+<strong>Leave the Band Size at 0 on the last tier</strong> so it absorbs everything above the
+previous bands. Add a <strong>Work Site</strong> to a tier to give that site its own ladder; a
+site with no tiers of its own uses the ones with no site set.</p>
+<h3>What an entry looks like</h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Effect on the entry screen</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Quantity Label</strong></td>
+<td>What the quantity column is called — Hours, Trips, Meals, Days</td>
+</tr>
+<tr>
+<td><strong>Reference Quantity Label</strong></td>
+<td>Shows a second, informational column (the driver&#39;s raw trip count). Leave empty to hide it</td>
+</tr>
+<tr>
+<td><strong>Per Occurrence</strong></td>
+<td>Each row is a dated occurrence and the date is required</td>
+</tr>
+<tr>
+<td><strong>Ask for Location</strong></td>
+<td>Shows and asks for the location</td>
+</tr>
+<tr>
+<td><strong>Ask for a Reason</strong></td>
+<td>A short justification is required on every row</td>
+</tr>
+<tr>
+<td><strong>Scope</strong></td>
+<td>What a batch covers: <strong>Department</strong>, <strong>Work Site</strong> or <strong>Company-wide</strong></td>
+</tr>
+<tr>
+<td><strong>Restricted To</strong></td>
+<td>Leave empty for any commission supervisor; set it to limit the component to particular roles</td>
+</tr>
+<tr>
+<td><strong>Import Source</strong></td>
+<td>Adds an <strong>Import</strong> button on batches of this component (Driver trips from BAS)</td>
+</tr>
+</tbody></table>
+<h3>Adding a new kind of pay</h3>
 <ol>
-<li><p><strong>Open Commissions → Configuration.</strong> From here you manage:</p>
-<ul>
-<li><strong>Commission Categories</strong> — the allowance/commission types supervisors pick
-on a sheet line.</li>
-<li><strong>Work Sites</strong> — sites and their trip tiers (for location/driver
-allowances).</li>
-<li><strong>Sales / Collection Commission Rules</strong> — thresholds and conditions.
-<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/admin/comm-config-01.png" alt="Commissions configuration menu"></li>
-</ul>
-</li>
-<li><p>Add or edit an item and save. It becomes available on new sheets.</p>
-</li>
+<li><strong>New</strong>, give it a name and a unique <strong>Code</strong> (the code is what exports and
+reports key on — pick it once and leave it alone).</li>
+<li>Choose <strong>Earning</strong> or <strong>Deduction</strong>, the <strong>calculation</strong>, and the <strong>scope</strong>.</li>
+<li>Fill in the rate / divisor and factor / tiers the calculation needs.</li>
+<li>Set the entry-shape flags above so the supervisor is asked for exactly what the
+pay needs — no more.</li>
+<li>Tell the supervisors it exists.</li>
 </ol>
-<h2>Steps — Salesperson profiles</h2>
-<ol>
-<li><strong>Open Commissions → Sales &amp; Collection → Salespeople</strong> to maintain each
-salesperson&#39;s profile used by the sales/collection commission rules.</li>
-</ol>
-<h2>Steps — Override a sales-line condition (Sales Manager)</h2>
-<ol>
-<li>On a sales/collection commission line that falls below the rule threshold,
-use the override to <strong>grant</strong> the commission anyway. The override is recorded
-with an audit trail.
-<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/admin/comm-override-01.png" alt="Sales line override"></li>
-</ol>
-<h2>What happens next</h2>
-<p>New categories/sites/rules appear on the next commission sheets supervisors
-create. Existing confirmed sheets are unaffected.</p>
+<p>Existing components are never overwritten by an upgrade, so rates you edit here
+survive.</p>
+<h2>Who may record what — the opt-in entry groups</h2>
+<p>The <strong>Supervisor</strong> tier is the <em>scope</em> (which departments). The per-kind entry
+groups — <strong>Overtime Entry</strong>, <strong>Driver Commission Entry</strong>, <strong>Location Allowance
+Entry</strong> — are the <em>opt-in</em>, and they are <strong>not</strong> implied by the Supervisor tier.</p>
+<blockquote>
+<p><strong>Every supervisor must be ticked for the kinds of pay he handles</strong>, on his user
+record, or he will correctly see nothing. This is the most common &quot;the app is
+broken&quot; report after a new supervisor is set up.</p>
+</blockquote>
+<p>The Officer tier implies all of them, so Officers, Accountants and GMs keep seeing
+everything.</p>
+<h2>Work Sites</h2>
+<p><strong>Commissions → Configuration → Work Sites.</strong> A site is the scope of a
+site-scoped component (Driver Trips) and the key the BAS trip import matches on.
+Site-specific rate tiers live on the component, pointing at the site.</p>
+<h2>Recurring entries</h2>
+<p>Standing monthly instructions (a mobile-phone allowance, a project-management
+allowance) are now maintained by <strong>supervisors for their own teams</strong>, under
+<strong>Commissions → Pay Entries → Recurring Entries</strong>. The Officer keeps the
+company-wide view of the same list and can correct any row.</p>
+<p>See the supervisor guide, <span class="xref">Recurring entries</span>,
+for what they are and when to create one.</p>
+<h2>The Commission Officer&#39;s company-wide screens</h2>
+<table>
+<thead>
+<tr>
+<th>Screen</th>
+<th>What it is for</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Pay Entries → All Entries</strong></td>
+<td>Every entry company-wide, grouped by employee. Search and reconciliation</td>
+</tr>
+<tr>
+<td><strong>Reports → Payment Register</strong></td>
+<td>One line per employee per month: earnings, loan recovery, net</td>
+</tr>
+<tr>
+<td><strong>Monthly Pay Run → Close the Month</strong></td>
+<td>Marks the month as handed over when a department never submitted. It does <strong>not</strong> lock the period and it does <strong>not</strong> pay anything — that is the GM&#39;s approval</td>
+</tr>
+</tbody></table>
+<p><strong>Locking and reopening a month belong to the company&#39;s General Manager</strong>, not to
+the Officer: reopening unwinds every department&#39;s loan settlement at once.</p>
+<h2>Deployment prerequisite</h2>
+<p>Supervisor scope keys on <strong><code>hr.department</code> → Manager</strong>. A department with no
+manager set gives its supervisor nothing to record, with a clear message telling him
+to ask HR. Check every department has a manager before rolling the app out to a new
+team. (This is the <strong>direct manager</strong>, a different person from the department&#39;s
+<strong>General Manager</strong>, which is its own field and drives approval.)</p>
 <h2>Common issues</h2>
 <table>
 <thead>
@@ -116,20 +241,42 @@ create. Existing confirmed sheets are unaffected.</p>
 </tr>
 </thead>
 <tbody><tr>
-<td>A supervisor can&#39;t find a category</td>
-<td>Not added to the catalog</td>
-<td>Add it under <strong>Commission Categories</strong></td>
+<td>A supervisor sees no components</td>
+<td>He is not ticked for any entry type</td>
+<td>Tick the entry groups on his user record</td>
 </tr>
 <tr>
-<td>Override option missing</td>
-<td>You&#39;re not a sales commission manager</td>
-<td>It&#39;s restricted to that role</td>
+<td>A supervisor sees nothing to record at all</td>
+<td>His department has no Manager</td>
+<td>Set <code>hr.department</code> → Manager, or add him as an assistant to it</td>
+</tr>
+<tr>
+<td>&quot;…has options, so its amount has to be a quantity × rate&quot;</td>
+<td>Options were added to a fixed or tiered component</td>
+<td>Options only apply to Quantity × rate</td>
+</tr>
+<tr>
+<td>&quot;…is tiered but has no rate tiers configured&quot;</td>
+<td>A tiered component was saved with an empty ladder</td>
+<td>Add the tiers, last one with Band Size 0</td>
+</tr>
+<tr>
+<td>A tiered amount stops short</td>
+<td>The last tier has a Band Size</td>
+<td>Set the last tier&#39;s Band Size to 0</td>
+</tr>
+<tr>
+<td>A new component does not appear for anyone</td>
+<td><strong>Restricted To</strong> was filled in</td>
+<td>Clear it, or add the supervisors&#39; groups</td>
 </tr>
 </tbody></table>
 <h2>Related guides</h2>
 <ul>
-<li>Supervisor: <span class="xref">Commission sheets</span></li>
-<li>Accounting: <span class="xref">Commissions: finalise &amp; batch</span></li>
+<li>Supervisor: <span class="xref">Recording extra pay</span></li>
+<li>GM: <span class="xref">Approving the month&#39;s commissions</span></li>
+<li>Accounting: <span class="xref">Commissions: bank export</span></li>
+<li><a href="#g-admin-deductions">Deductions configuration</a></li>
 </ul>
 </section>
 <section id="g-admin-deductions"><h1>Deductions Administration</h1>

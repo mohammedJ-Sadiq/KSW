@@ -16,7 +16,9 @@ RUN usermod -u 1000 odoo \
  && chown -R 1000:1000 /var/lib/odoo /etc/odoo /mnt/extra-addons 2>/dev/null || true
 
 # pyzk: required by hr_biometric_attendance (cybrosys) to talk to ZKTeco devices
-RUN pip install --no-cache-dir --break-system-packages pyzk
+# pymssql: required by KSW_ext_sync/KSW_commissions to read the BAS SQL Server
+# (wheel bundles FreeTDS, so no freetds-dev/build-essential needed)
+RUN pip install --no-cache-dir --break-system-packages pyzk pymssql
 
 COPY --chmod=755 docker-entrypoint.sh /entrypoint.sh
 

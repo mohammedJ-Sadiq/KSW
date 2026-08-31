@@ -30,12 +30,12 @@
 <div class="cover">
   <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
   <div class="role">Accounting Guide</div>
-  <div class="meta">User Training Guide<br/>KSW HR &amp; Payroll · 2026-08-24</div>
+  <div class="meta">User Training Guide<br/>KSW HR &amp; Payroll · 2026-08-30</div>
 </div>
 <section id="g-accounting-readme"><h1>Accounting Guides</h1>
 <p>For <strong>Accounting staff</strong>. You approve loans and leave at the <strong>Accounting step</strong>,
-confirm loan <strong>disbursement</strong>, create <strong>penalties</strong>, and <strong>finalise</strong> commission
-sheets into payment batches.</p>
+confirm loan <strong>disbursement</strong>, create <strong>penalties</strong>, and export the monthly
+<strong>commission bank file</strong>.</p>
 <blockquote>
 <p>You also do everything an <span class="xref">Employee</span> does. Start with
 the <strong>General guide</strong> (<span class="xref">Getting Started</span>).</p>
@@ -61,8 +61,8 @@ the <strong>General guide</strong> (<span class="xref">Getting Started</span>).<
 <td><a href="#g-accounting-05-create-penalties">Create a penalty</a></td>
 </tr>
 <tr>
-<td>Finalise commission sheets &amp; close the batch</td>
-<td><a href="#g-accounting-04-commission-finalise-batch">Commissions: finalise &amp; batch</a></td>
+<td>Export the month&#39;s commission bank file</td>
+<td><a href="#g-accounting-04-commission-export">Commissions: bank export</a></td>
 </tr>
 </tbody></table>
 <h2>The golden rules</h2>
@@ -73,8 +73,10 @@ financial impact (remaining loans, commissions, flight tickets).</li>
 its installments start.</li>
 <li><strong>Penalties</strong> (government + internal) are yours to create. <strong>Salary advances</strong>
 and <strong>all installment changes</strong> are handled by <strong>HR</strong>.</li>
-<li>The <strong>bank file export</strong> (salaries and commissions) is performed by <strong>HR</strong>,
-not Accounting — you finalise and close the batch; HR runs the export.</li>
+<li>Commissions are <strong>no longer</strong> per-employee sheets you finalise into a batch.
+The Payment Register is generated when the General Managers approve the month;
+your work is checking it, exporting the file and marking it paid.</li>
+<li>For <strong>salaries</strong>, the bank file export is performed by <strong>HR</strong>, not Accounting.</li>
 <li><strong>Loans</strong> live in <strong>Loans → Operations → Loans</strong> (opens on <strong>Waiting For
 Me</strong>); <strong>time-off</strong> approvals live in <strong>Time Off → Management → Time Off</strong>.</li>
 </ul>
@@ -205,50 +207,62 @@ later pays outside payroll, that&#39;s handled by HR — see
 <li><a href="#g-accounting-05-create-penalties">Create a penalty</a></li>
 </ul>
 </section>
-<section id="g-accounting-04-commission-finalise-batch"><h1>Commissions: Finalise &amp; Bank Export</h1>
+<section id="g-accounting-04-commission-export"><h1>Commissions: Bank Export</h1>
 <p><strong>Who is this for:</strong> Accounting (commission accountant)
-<strong>How long it takes:</strong> 5 minutes per period</p>
+<strong>How long it takes:</strong> 5–10 minutes per month</p>
 <h2>What this does</h2>
-<p>Lets you take supervisor-confirmed commission sheets, <strong>finalise</strong> them, group
-them into a <strong>batch</strong>, and export the <strong>bank transfer file</strong> for payment.</p>
+<p>Once the General Managers have approved the month&#39;s commissions and allowances,
+you check the <strong>Payment Register</strong>, export the <strong>bank transfer file</strong> and mark the
+month <strong>Paid</strong>.</p>
+<blockquote>
+<p><strong>This replaced the old commission sheets.</strong> There are no longer per-employee
+commission sheets to <em>Finalise</em>, and no commission <em>batch</em> to <em>Close</em>. The
+Payment Register is generated automatically when the month is approved — one line
+per employee, never typed by hand.</p>
+</blockquote>
+<blockquote>
+<p><strong>Sales &amp; Collection is not in this file.</strong> It is calculated on its own page and
+paid separately.</p>
+</blockquote>
 <h2>Before you start</h2>
 <ul>
-<li>Sheets must be <strong>Confirmed</strong> by the supervisor before you finalise them.</li>
-<li>You can adjust the frozen <strong>Loans Deduction</strong> on a confirmed sheet before
-finalising, if needed.</li>
+<li>The month must be <strong>Approved</strong>. If it is still Open or Submitted, a General
+Manager has not finished — the <strong>Export Bank File</strong> button will not be there.</li>
+<li>Employees are paid to their own salary bank account; anyone without one falls back
+to the run&#39;s <strong>Default Paying Bank Account</strong>. Set that on the pay run before
+exporting if you have such employees.</li>
 </ul>
-<h2>Steps — Finalise a sheet</h2>
+<h2>Steps</h2>
 <ol>
-<li><p><strong>Open Commissions → All Sheets</strong> and filter to <strong>Awaiting Accountant</strong>
-(Confirmed) sheets.
-<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/accounting/comm-01.png" alt="Sheets awaiting accountant"></p>
+<li><p><strong>Open Commissions → Monthly Pay Run</strong> and pick the approved month.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/accounting/comm-01.png" alt="Approved pay run"></p>
 </li>
-<li><p>Open a sheet, review the totals (and adjust the <strong>Loans Deduction</strong> if
-required), then click <strong>Finalise</strong>.
-<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/accounting/comm-02.png" alt="Finalise sheet"></p>
-<p>The sheet moves to <strong>Done</strong>, and any manual loan-recovery lines are written
-back to the employee&#39;s loan.</p>
+<li><p><strong>Check the register.</strong> The <strong>Who Gets Paid</strong> tab lists every employee:
+<strong>Earnings</strong>, <strong>Loans Deduction</strong> and <strong>Net Payable</strong> (earnings − loans).
+Open a line&#39;s entries to see exactly what produced the earnings.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/accounting/comm-02.png" alt="Payment register"></p>
+</li>
+<li><p><strong>Correct the loan figure if it is wrong.</strong> You can still adjust an employee&#39;s
+<strong>Loans Deduction</strong> on an approved month before the file goes out; the net
+recalculates.</p>
+</li>
+<li><p><strong>Export Bank File.</strong> Choose the format in the wizard and download it. Lines are
+grouped by the employee&#39;s paying bank account.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/accounting/comm-03.png" alt="Export bank file"></p>
+</li>
+<li><p><strong>Mark Paid</strong> once the transfer has gone out.</p>
 </li>
 </ol>
-<h2>Steps — Close the batch</h2>
-<ol>
-<li><p><strong>Open Commissions → Commission Batches</strong> and create/open a batch for the
-period; add the finalised sheets.
-<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/accounting/comm-03.png" alt="Commission batch"></p>
-</li>
-<li><p>Click <strong>Close Batch</strong> to consolidate the totals.</p>
-</li>
-</ol>
-<blockquote>
-<p><strong>The bank file itself is exported by HR, not Accounting.</strong> Once you&#39;ve closed
-the batch, HR runs the export and uploads it to the bank — see
-<span class="xref">Payroll → Bank file export</span>. Your job ends
-at a closed, reconciled batch.</p>
-</blockquote>
+<h2>Reporting</h2>
+<p><strong>Commissions → Reports → Payment Register</strong> is the same data as a searchable list
+across months, groupable by department — use it for reconciliation rather than
+opening each run.</p>
 <h2>What happens next</h2>
-<p>HR exports the bank file from the closed batch and uploads it to pay the
-commissions. The <strong>Bank Transfer Amount</strong> per employee = Gross Total − Loans
-Deduction.</p>
+<p>The month stays locked. The settled loan installments are already marked paid
+against the employees&#39; loans, so nothing has to be recorded twice.</p>
+<p>If a genuine correction is needed after approval, only the <strong>company&#39;s General
+Manager</strong> can <strong>Reopen</strong> the month — that returns the settled installments to
+pending and turns the register back into a preview. Ask rather than working around it.</p>
 <h2>Common issues</h2>
 <table>
 <thead>
@@ -259,24 +273,35 @@ Deduction.</p>
 </tr>
 </thead>
 <tbody><tr>
-<td>Can&#39;t finalise a sheet</td>
-<td>It&#39;s still Draft</td>
-<td>The supervisor must <strong>Confirm</strong> it first</td>
+<td>No <strong>Export Bank File</strong> button</td>
+<td>The month is not approved yet</td>
+<td>A GM still has departments to approve — check <strong>By Department</strong></td>
 </tr>
 <tr>
-<td>Sheet not in the batch</td>
-<td>Not finalised (Done)</td>
-<td>Finalise it before adding to the batch</td>
+<td>An employee is missing from the register</td>
+<td>Their department was never approved, or never handed over</td>
+<td>The approval chatter message lists exactly which departments were left out and why</td>
 </tr>
 <tr>
-<td>HR can&#39;t export</td>
-<td>Batch not closed</td>
-<td>Close the batch first, then hand off to HR</td>
+<td>An employee has no bank account on the file</td>
+<td>No salary bank account on their record</td>
+<td>Set the run&#39;s <strong>Default Paying Bank Account</strong>, or ask HR to add the employee&#39;s</td>
+</tr>
+<tr>
+<td>The net is not what the supervisor expected</td>
+<td>Loan installments were settled out of the commission</td>
+<td>Open the line&#39;s entries and the employee&#39;s loan to see what was taken</td>
+</tr>
+<tr>
+<td>I need to change an amount</td>
+<td>The month is locked</td>
+<td>Only the company&#39;s General Manager can reopen it</td>
 </tr>
 </tbody></table>
 <h2>Related guides</h2>
 <ul>
-<li>Supervisor: <span class="xref">Commission sheets</span></li>
+<li>Supervisor: <span class="xref">The monthly cycle</span></li>
+<li>GM: <span class="xref">Approving the month&#39;s commissions</span></li>
 <li>Payroll: <span class="xref">Bank file export</span></li>
 </ul>
 </section>

@@ -93,7 +93,7 @@ class TestPeriodLock(TransactionCase):
     # -- batch routes ---------------------------------------------------
     def test_01_cannot_create_a_batch(self):
         self._lock_the_period()
-        other = self.env.ref('KSW_commissions.pay_component_meal_lunch')
+        other = self.env.ref('KSW_commissions.pay_component_meals')
         with self.assertRaises(UserError):
             self.env['ksw.pay.batch'].with_user(self.officer).create({
                 'component_id': other.id, 'department_id': self.dept.id,

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-26 12:33+0000\n"
-"PO-Revision-Date: 2026-07-26 12:33+0000\n"
+"POT-Creation-Date: 2026-08-31 06:36+0000\n"
+"PO-Revision-Date: 2026-08-31 06:36+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -23,6 +23,20 @@ msgid ""
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.actions.report,print_report_name:KSW_deduction.action_report_deduction_statement
+msgid ""
+"'Statement of Account - %s - %s' % (object.employee_id.name or '', "
+"object.date_to)"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid ""
+".\n"
+"                            Balances are stated as at"
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "<b>At step:</b>"
 msgstr ""
@@ -30,6 +44,13 @@ msgstr ""
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "<b>Reason:</b>"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
+msgid ""
+"<br/>Later installments keep their original\n"
+"                                amounts and dates."
 msgstr ""
 
 #. module: KSW_deduction
@@ -57,7 +78,14 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 msgid ""
 "<i class=\"fa fa-info-circle me-1\"/>\n"
-"                                <strong>Partial payment</strong> — remaining"
+"                                <strong>Redistribute</strong> — remaining"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
+msgid ""
+"<i class=\"fa fa-info-circle me-1\"/>\n"
+"                                <strong>Settle earliest first</strong> —"
 msgstr ""
 
 #. module: KSW_deduction
@@ -91,8 +119,45 @@ msgid ""
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_employee_view_form_inherit_ksw_deduction
+msgid ""
+"<span class=\"o_stat_text\">Statement</span>\n"
+"                        <span class=\"o_stat_text\">of Account</span>"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "<strong>Deduction Types</strong>"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "<strong>Department</strong>"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "<strong>Employee No.</strong>"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "<strong>Employee</strong>"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "<strong>Job Position</strong>"
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "<strong>Loan Approval:</strong>"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "<strong>Period</strong>"
 msgstr ""
 
 #. module: KSW_deduction
@@ -123,6 +188,17 @@ msgstr ""
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_refuse_wizard_form
 msgid "<strong>You are about to refuse this loan request.</strong>"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid ""
+"<strong>You can still change this request.</strong>\n"
+"                        The amount, installments, start month and\n"
+"                        justification stay editable, and you can delete the\n"
+"                        request entirely, until the first approver acts on\n"
+"                        it. After that, use <b>Cancel</b> — it keeps a trace\n"
+"                        of the request."
 msgstr ""
 
 #. module: KSW_deduction
@@ -159,14 +235,25 @@ msgid "Acc Original Installments"
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid "Account"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_line__manual_by
 msgid "Accountant who recorded this manual payment."
 msgstr ""
 
 #. module: KSW_deduction
-#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_type__managed_by__accounting
+#: model:ksw.loan.return.step,name:KSW_deduction.loan_return_step_pending_acc
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
 msgid "Accounting"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_type__managed_by__accounting
+msgid "Accounting (Loans)"
 msgstr ""
 
 #. module: KSW_deduction
@@ -177,6 +264,16 @@ msgstr ""
 #. module: KSW_deduction
 #: model:res.groups,name:KSW_deduction.group_loan_acc
 msgid "Accounting Approver"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_type__managed_by__acc_data_entry
+msgid "Accounting Data Entry"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:res.groups,name:KSW_deduction.group_acc_data_entry
+msgid "Accounting Data Entry (Non-Loan)"
 msgstr ""
 
 #. module: KSW_deduction
@@ -261,6 +358,17 @@ msgid "Additional notes..."
 msgstr ""
 
 #. module: KSW_deduction
+#: model:res.groups,comment:KSW_deduction.group_deduction_manager
+msgid ""
+"Administrator role: full access to every deduction including delete, so the "
+"system stays administrable when the accounting data-entry staff are "
+"unavailable. Loan-specific edit/delete still requires the dedicated \"Loan "
+"Modification\" privilege — Manager does NOT auto-grant it, so an HR/Admin "
+"can be Deduction Manager without being able to touch loan "
+"amount/installments or delete loans."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.actions.act_window,name:KSW_deduction.action_ksw_deduction_advances
 msgid "Advances & Other"
 msgstr ""
@@ -269,6 +377,11 @@ msgstr ""
 #: model:ir.actions.act_window,name:KSW_deduction.action_ksw_deduction_all
 #: model:ir.ui.menu,name:KSW_deduction.menu_ksw_deduction_all
 msgid "All Deductions"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid "All deduction types"
 msgstr ""
 
 #. module: KSW_deduction
@@ -286,10 +399,16 @@ msgid ""
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "All types"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__amount
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__amount
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__amount
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__amount
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__amount
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_kanban
 msgid "Amount"
 msgstr ""
@@ -302,6 +421,11 @@ msgstr ""
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Annual Vacation Balance"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__application_mode
+msgid "Application Method"
 msgstr ""
 
 #. module: KSW_deduction
@@ -360,6 +484,13 @@ msgstr ""
 msgid ""
 "Automatically set to the current user's employee. A user can only request a "
 "loan for themselves."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__balance
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Balance"
 msgstr ""
 
 #. module: KSW_deduction
@@ -424,6 +555,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_refuse_wizard_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_request_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_return_approver_wizard_form
 msgid "Cancel"
 msgstr ""
 
@@ -442,8 +574,59 @@ msgid "Category"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__debit
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_statement_line__row_kind__charge
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Charge"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_charge_date
+msgid "Charge Date"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid "Charged"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Charged during the period"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid "Close"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__closing_balance
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_statement_line__row_kind__closing
+msgid "Closing Balance"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid ""
+"Closing balance\n"
+"                                        ("
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__code
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_step__code
 msgid "Code"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__credit
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_statement_line__row_kind__credit
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Collected"
 msgstr ""
 
 #. module: KSW_deduction
@@ -454,6 +637,11 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__manual_date
 msgid "Collected On"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Collected during the period"
 msgstr ""
 
 #. module: KSW_deduction
@@ -474,6 +662,11 @@ msgid "Completed"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model,name:KSW_deduction.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.ui.menu,name:KSW_deduction.menu_ksw_deduction_config
 msgid "Configuration"
 msgstr ""
@@ -491,45 +684,61 @@ msgstr ""
 #. module: KSW_deduction
 #: model:res.groups,comment:KSW_deduction.group_deduction_officer
 msgid ""
-"Create and edit deductions for all employees (loans and non-loan). Implies "
-"\"HR Officer (Non-Loan)\" since the full Officer scope is a superset of it."
+"Create and edit loan deductions for all employees, and read every deduction."
+" Non-loan (Accounting Data Entry) deductions are read-only for this role."
 msgstr ""
 
 #. module: KSW_deduction
-#: model:res.groups,comment:KSW_deduction.group_hr_deduction_officer
+#: model:res.groups,comment:KSW_deduction.group_acc_data_entry
 msgid ""
-"Create and manage HR-managed non-loan deductions (penalties, salary "
-"advances) for all employees. Does NOT grant loan visibility or loan-approval"
-" rights."
+"Create and manage non-loan deductions (penalties, salary advances) for all "
+"employees — the accounting data-entry role. Does NOT grant loan visibility "
+"or loan-approval rights."
 msgstr ""
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__create_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__create_uid
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__create_uid
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__create_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__create_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__create_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__create_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_step__create_uid
 msgid "Created by"
 msgstr ""
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__create_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__create_date
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__create_date
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__create_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__create_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__create_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__create_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_step__create_date
 msgid "Created on"
 msgstr ""
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__currency_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__currency_id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__currency_id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__currency_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__currency_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__currency_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__currency_id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__currency_id
 msgid "Currency"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__current_state_label
+msgid "Current State Label"
 msgstr ""
 
 #. module: KSW_deduction
@@ -553,6 +762,11 @@ msgid "Current user may edit installments"
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_return_approver_wizard_form
+msgid "Currently At"
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "DM"
 msgstr ""
@@ -569,6 +783,35 @@ msgid "Dashboard"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__date
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Date"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_writeoff_date
+msgid ""
+"Date the deduction was cancelled and its still-pending installments written "
+"off. Without it a cancelled deduction would carry its unrecovered balance "
+"forever on the statement."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_charge_date
+msgid ""
+"Date the deduction was charged to the employee — i.e. when it went active. "
+"The debit side of the Statement of Account."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_line__x_settlement_date
+msgid ""
+"Date the installment was actually settled: the payslip period end for "
+"payroll-collected lines, the collection date for manual ones. Empty while "
+"the installment is still pending."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_line__manual_date
 msgid "Date the manual payment was recorded."
 msgstr ""
@@ -580,9 +823,11 @@ msgstr ""
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__deduction_id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__deduction_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__deduction_id
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_list
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_search
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 msgid "Deduction"
 msgstr ""
 
@@ -592,14 +837,34 @@ msgid "Deduction Management"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model,name:KSW_deduction.model_ksw_deduction_statement_line
+msgid "Deduction Statement Line"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model,name:KSW_deduction.model_ksw_deduction_statement_wizard
+msgid "Deduction Statement of Account"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.actions.act_window,name:KSW_deduction.action_ksw_deduction_type
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__type_ids
 #: model:ir.ui.menu,name:KSW_deduction.menu_ksw_deduction_types
 msgid "Deduction Types"
 msgstr ""
 
 #. module: KSW_deduction
-#: model:ir.actions.act_window,name:KSW_deduction.action_ksw_deduction_hr_managed
-#: model:ir.ui.menu,name:KSW_deduction.menu_ksw_deduction_hr_managed
+#: model:ir.model.fields,help:KSW_deduction.field_res_config_settings__ksw_overpay_recovery_type_id
+msgid ""
+"Deduction type used when a payslip revision shows the employee was over-"
+"paid. Confirming such a revision cancels it and opens a draft deduction of "
+"this type for the difference, so the amount is recovered from a later "
+"payroll run instead of a negative net being paid."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.actions.act_window,name:KSW_deduction.action_ksw_deduction_acc_data_entry
+#: model:ir.ui.menu,name:KSW_deduction.menu_ksw_deduction_acc_data_entry
 #: model:ir.ui.menu,name:KSW_deduction.menu_ksw_deduction_root
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_employee_view_form_inherit_ksw_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_graph
@@ -610,6 +875,13 @@ msgstr ""
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_kanban
 msgid "Deductions This Month"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_statement_wizard__out_of_scope_count
+msgid ""
+"Deductions this employee has that your access rights do not let you see. "
+"They are excluded from every figure here."
 msgstr ""
 
 #. module: KSW_deduction
@@ -628,6 +900,7 @@ msgid "Delete only"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model,name:KSW_deduction.model_hr_department
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__department_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__department_id
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_search
@@ -636,16 +909,29 @@ msgid "Department"
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_return_approver_wizard_form
+msgid "Describe what needs to be corrected..."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__description
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__label
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__description
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__description
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_type_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
 msgid "Description"
 msgstr ""
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Details"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ksw.loan.return.step,name:KSW_deduction.loan_return_step_pending_dm
+msgid "Direct Manager"
 msgstr ""
 
 #. module: KSW_deduction
@@ -659,15 +945,22 @@ msgid "Disbursement Confirmed Date"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_department__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_employee_public__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_payslip__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_ir_ui_menu__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__display_name
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__display_name
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_step__display_name
+#: model:ir.model.fields,field_description:KSW_deduction.field_res_config_settings__display_name
 msgid "Display Name"
 msgstr ""
 
@@ -698,6 +991,11 @@ msgid "EOS — Termination (Art. 84)"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.constraint,message:KSW_deduction.constraint_ksw_loan_return_step_code_uniq
+msgid "Each return step must have a unique code."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:res.groups,name:KSW_deduction.group_loan_edit_delete
 msgid "Edit and Delete"
 msgstr ""
@@ -719,6 +1017,7 @@ msgstr ""
 #: model:ir.model,name:KSW_deduction.model_hr_employee
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__employee_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__employee_id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__employee_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__employee_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__employee_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__employee_id
@@ -727,7 +1026,19 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_kanban
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_search
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_return_approver_wizard_form
 msgid "Employee"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_can_employee_edit
+msgid "Employee May Edit"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__employee_name
+msgid "Employee Name"
 msgstr ""
 
 #. module: KSW_deduction
@@ -737,8 +1048,12 @@ msgid "Employee No."
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Employee deductions — loans, advances and penalties"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_hr_employee__x_loan_acc_no
-#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_emp_loan_acc_no
 msgid "Employee loan account number in BAS (bank loan/financing system)."
 msgstr ""
 
@@ -778,6 +1093,11 @@ msgstr ""
 msgid ""
 "Explain clearly why this loan request is being refused. The employee will "
 "see this reason."
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid "Export Excel"
 msgstr ""
 
 #. module: KSW_deduction
@@ -823,17 +1143,19 @@ msgid ""
 msgstr ""
 
 #. module: KSW_deduction
-#: model:res.groups,name:KSW_deduction.group_installment_edit
-msgid "Full (incl. active installments)"
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__date_from
+msgid "From"
 msgstr ""
 
 #. module: KSW_deduction
-#: model:res.groups,comment:KSW_deduction.group_deduction_manager
-msgid ""
-"Full access to non-loan deductions including delete. Loan-specific "
-"edit/delete still requires the dedicated \"Loan Modification\" privilege — "
-"Manager does NOT auto-grant it, so an HR/Admin can be Deduction Manager "
-"without being able to touch loan amount/installments or delete loans."
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "From the beginning"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:res.groups,name:KSW_deduction.group_installment_edit
+msgid "Full (incl. active installments)"
 msgstr ""
 
 #. module: KSW_deduction
@@ -843,12 +1165,18 @@ msgstr ""
 
 #. module: KSW_deduction
 #: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_loan_refuse_wizard__step__pending_gm
+#: model:ksw.loan.return.step,name:KSW_deduction.loan_return_step_pending_gm
 msgid "GM Final Approval"
 msgstr ""
 
 #. module: KSW_deduction
 #: model:res.groups,name:KSW_deduction.group_loan_gm
 msgid "GM Final Approver"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model,name:KSW_deduction.model_ksw_loan_return_approver_wizard
+msgid "GM: Return Loan Request to Approver"
 msgstr ""
 
 #. module: KSW_deduction
@@ -883,6 +1211,11 @@ msgid "Gross Salary"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__group_by_type
+msgid "Group by Type"
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "HR"
 msgstr ""
@@ -893,18 +1226,9 @@ msgid "HR Approval"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ksw.loan.return.step,name:KSW_deduction.loan_return_step_pending_hr
 #: model:res.groups,name:KSW_deduction.group_loan_hr
 msgid "HR Approver"
-msgstr ""
-
-#. module: KSW_deduction
-#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_type__managed_by__hr
-msgid "HR Department"
-msgstr ""
-
-#. module: KSW_deduction
-#: model:res.groups,name:KSW_deduction.group_hr_deduction_officer
-msgid "HR Officer (Non-Loan)"
 msgstr ""
 
 #. module: KSW_deduction
@@ -925,6 +1249,16 @@ msgid "Has Message"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_payment_wizard__application_mode
+msgid ""
+"How the payment is applied to the schedule.\n"
+"\n"
+"• Settle earliest installments first: closes the nearest due installments one by one. The installment the payment lands inside is split — the covered part is marked paid and the remainder stays pending in the same month. Later installments keep their original amounts and dates.\n"
+"\n"
+"• Redistribute across remaining installments: records the payment as one manual line and spreads the remaining balance evenly over every pending installment."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__hr_approved_by
 msgid "Hr Approved By"
 msgstr ""
@@ -935,20 +1269,32 @@ msgid "Hr Approved Date"
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Human Resources"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_vac_balance_breakdown
 msgid "Human-readable per-version daily-rate breakdown."
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_department__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_employee__id
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_employee_public__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_payslip__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ir_ui_menu__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_step__id
+#: model:ir.model.fields,field_description:KSW_deduction.field_res_config_settings__id
 msgid "ID"
 msgstr ""
 
@@ -1009,8 +1355,14 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__installments
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__installments
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__installments
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__installments
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Installments"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__seq_settled_count
+msgid "Installments Fully Settled"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1019,8 +1371,13 @@ msgid "Internal Penalty"
 msgstr ""
 
 #. module: KSW_deduction
-#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_emp_employee_no
-msgid "Internal employee number used by HR."
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__is_admin_mode
+msgid "Is Admin Mode"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__is_balance_row
+msgid "Is Balance Row"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1031,6 +1388,11 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__is_full_payment
 msgid "Is Full Payment"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Issued by"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1067,20 +1429,28 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__write_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__write_uid
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__write_uid
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__write_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__write_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__write_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__write_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_step__write_uid
 msgid "Last Updated by"
 msgstr ""
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__write_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__write_date
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__write_date
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__write_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__write_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__write_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__write_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_step__write_date
 msgid "Last Updated on"
 msgstr ""
 
@@ -1090,9 +1460,22 @@ msgid "Last Wage"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_statement_wizard__type_ids
+msgid ""
+"Leave empty for every type. Pick one to state a single account — a loan, the"
+" penalties, the salary advances."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_statement_wizard__date_from
+msgid ""
+"Leave empty to start from the very first movement. When set, everything "
+"before it is folded into the opening balance."
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_kanban
-#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 msgid "Loan"
 msgstr ""
 
@@ -1135,7 +1518,18 @@ msgstr ""
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__deduction_id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__deduction_id
 msgid "Loan Request"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model,name:KSW_deduction.model_ksw_loan_return_step
+msgid "Loan Request Return Target"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_return_approver_wizard_form
+msgid "Loan Summary"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1154,6 +1548,13 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_employee_view_form_inherit_ksw_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_search
 msgid "Loans"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.actions.act_window,help:KSW_deduction.action_ksw_my_deductions
+msgid ""
+"Loans, salary advances and penalties recorded against you\n"
+"                appear here, with the installment schedule of each."
 msgstr ""
 
 #. module: KSW_deduction
@@ -1206,6 +1607,11 @@ msgid "Mark this installment as settled outside payroll"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_return_step__code
+msgid "Matches the ksw.deduction.approval_state value this step returns to."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:res.groups,comment:KSW_deduction.group_loan_delete
 msgid ""
 "May delete deductions (subject to the \"no paid installments\" guard). "
@@ -1227,6 +1633,12 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__message_has_error
 msgid "Message Delivery error"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__reason
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_return_approver_wizard_form
+msgid "Message to Approver"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1270,6 +1682,11 @@ msgid "Month number (1-12)"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_payment_wizard__seq_partial_label
+msgid "Month of the installment the payment lands inside, if any."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_employee__x_deduction_monthly_total
 msgid "Monthly Deduction Total"
 msgstr ""
@@ -1280,8 +1697,25 @@ msgid "Monthly Impact (other)"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__movement_count
+msgid "Movement Count"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Movements"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__my_activity_date_deadline
 msgid "My Activity Deadline"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.actions.act_window,name:KSW_deduction.action_ksw_my_deductions
+#: model:ir.ui.menu,name:KSW_deduction.menu_ksw_my_deductions
+msgid "My Deductions"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1298,6 +1732,7 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__name
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__name
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_step__name
 msgid "Name"
 msgstr ""
 
@@ -1327,6 +1762,13 @@ msgid "Next Activity Type"
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid ""
+"No movements in this period. The opening and closing\n"
+"                        balances still tell you where the account stands."
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_search
 msgid "Non-loans"
 msgstr ""
@@ -1336,6 +1778,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_list
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Note"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.actions.act_window,help:KSW_deduction.action_ksw_my_deductions
+msgid "Nothing is being deducted from your salary"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1366,7 +1813,21 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__installments
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_refuse_wizard__installments
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_return_approver_wizard__installments
 msgid "Number of monthly installments. Defaults to the type suggestion."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_statement_wizard__overdue_amount
+msgid ""
+"Of the closing balance, how much was scheduled for a month that has already "
+"passed and is still pending."
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Of which overdue"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1381,6 +1842,7 @@ msgstr ""
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_list
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
 msgid "Open"
 msgstr ""
 
@@ -1390,8 +1852,24 @@ msgid "Open Deduction"
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
+msgid "Open the deduction behind this movement"
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_list
 msgid "Open the deduction this installment belongs to"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__opening_balance
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_statement_line__row_kind__opening
+msgid "Opening Balance"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Opening balance"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1434,6 +1912,11 @@ msgid "Other Active Deductions (same employee)"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__out_of_scope_count
+msgid "Out Of Scope Count"
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 msgid "Outstanding Balance"
 msgstr ""
@@ -1449,9 +1932,19 @@ msgid "Outstanding Deduction Total"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_res_config_settings__ksw_overpay_recovery_type_id
+msgid "Over-payment Recovery Type"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__x_is_overdue
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_search
 msgid "Overdue"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__overdue_amount
+msgid "Overdue Amount"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1464,6 +1957,16 @@ msgstr ""
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Paid / Total"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__seq_partial_paid
+msgid "Paid on That Installment"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__seq_partial_label
+msgid "Partially Settled Installment"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1501,6 +2004,11 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__payslip_id
 msgid "Payslip"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.res_config_settings_view_form_ksw_deduction
+msgid "Payslip Revisions"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1592,20 +2100,27 @@ msgid "Pending installment whose scheduled month has already passed."
 msgstr ""
 
 #. module: KSW_deduction
-#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_emp_monthly_total
+#: model:ir.model.fields,help:KSW_deduction.field_hr_employee__x_deduction_monthly_total
 msgid ""
-"Pending installments of this employee falling in the current month, across "
-"every active deduction (this one included)."
+"Pending installments this month's payroll will collect: those scheduled for "
+"the current month plus any still pending from earlier months."
 msgstr ""
 
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_payment_wizard__new_installment_amount
-msgid "Pending installments will each be reduced to this amount."
+msgid ""
+"Pending installments will each be reduced to this amount (redistribute mode "
+"only)."
 msgstr ""
 
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__progress_percent
 msgid "Percentage of the total amount already paid."
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid "Period"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1619,6 +2134,11 @@ msgid "Personal Loan"
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid "Print"
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Progress %"
 msgstr ""
@@ -1629,8 +2149,18 @@ msgid "Progress Percent"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model,name:KSW_deduction.model_hr_employee_public
+msgid "Public Employee"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__rating_ids
 msgid "Ratings"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__allowed_step_ids
+msgid "Reachable Steps"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1675,14 +2205,31 @@ msgid "Receipt number, bank reference, or any other identifier."
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__reconciliation_warning
+msgid "Reconciliation Warning"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model,name:KSW_deduction.model_ksw_loan_payment_wizard
-#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
-msgid "Record Loan Payment"
+msgid "Record Deduction Payment"
 msgstr ""
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 msgid "Record Payment"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_loan_payment_wizard__application_mode__redistribute
+msgid "Redistribute across remaining installments"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__ref
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Reference"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1764,6 +2311,37 @@ msgid "Result"
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_return_approver_wizard_form
+msgid "Return Loan Request for Revision"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_return_approver_wizard_form
+msgid "Return Settings"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__target_step_id
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_return_approver_wizard_form
+msgid "Return To"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_return_approver_wizard_form
+msgid "Return for Revision"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.actions.act_window,name:KSW_deduction.action_ksw_loan_return_approver_wizard
+msgid "Return to Approver"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__row_kind
+msgid "Row Kind"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr ""
@@ -1784,18 +2362,35 @@ msgid "Schedule"
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid "Scope"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.ui.menu,name:KSW_deduction.menu_ksw_deduction_self_service
 msgid "Self-Service"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__sequence
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__sequence
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_step__sequence
 msgid "Sequence"
 msgstr ""
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_eos_service_years
 msgid "Service Years"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_loan_payment_wizard__application_mode__sequential
+msgid "Settle earliest installments first"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__x_settlement_date
+msgid "Settled On"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1828,11 +2423,6 @@ msgid "Skipped"
 msgstr ""
 
 #. module: KSW_deduction
-#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_emp_ssnid
-msgid "Social Security Number"
-msgstr ""
-
-#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__split_origin_id
 msgid "Split Origin"
 msgstr ""
@@ -1852,12 +2442,40 @@ msgid "State"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_statement_wizard__group_by_type
+msgid ""
+"State each deduction type as its own account, with its own opening balance "
+"and subtotal, instead of one combined ledger."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__line_ids
+msgid "Statement Lines"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.actions.act_window,name:KSW_deduction.action_ksw_deduction_statement
+#: model:ir.actions.report,name:KSW_deduction.action_report_deduction_statement
+#: model:ir.ui.menu,name:KSW_deduction.menu_ksw_deduction_statement
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Statement of Account"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__activity_state
 msgid ""
 "Status based on activities\n"
 "Overdue: Due date is already passed\n"
 "Today: Activity date is today\n"
 "Planned: Future activities."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__seq_partial_remainder
+msgid "Still Pending in That Month"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1871,10 +2489,21 @@ msgid "Submit Request"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_statement_line__row_kind__subtotal
+msgid "Subtotal"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_type__default_installments
 msgid ""
 "Suggested number of installments when creating a new deduction of this type."
 " Can be overridden per record."
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Summary"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1894,12 +2523,33 @@ msgid "The deduction type code must be unique."
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_statement_wizard__employee_id
+msgid "The employee whose deduction account is being stated."
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_refuse_wizard_form
 msgid ""
 "The reason you provide below\n"
 "                                <b>will be shown to the employee</b>\n"
 "                                and recorded permanently in the approval\n"
 "                                history. Please be clear and respectful."
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid ""
+"This employee has deductions your access rights do\n"
+"                        not cover. They are excluded from every figure\n"
+"                        below, so this is a partial statement."
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid ""
+"This is a partial statement: some of this\n"
+"                            employee's deductions are outside your access\n"
+"                            rights and are excluded from every figure below."
 msgstr ""
 
 #. module: KSW_deduction
@@ -1910,9 +2560,19 @@ msgid ""
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__date_to
+msgid "To"
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_list
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_list
 msgid "Total"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__total_charged
+msgid "Total Charged"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1943,9 +2603,42 @@ msgid "Total Pending"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__total_settled
+msgid "Total Settled"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__total_written_off
+msgid "Total Written Off"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__amount
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_refuse_wizard__amount
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_return_approver_wizard__amount
 msgid "Total amount of the deduction."
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
+msgid "Total charged"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
+msgid "Total collected"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_can_admin_return
+msgid ""
+"True for a Deduction Manager, who may return a loan request to any earlier "
+"approval step, from any step it has already reached (except once fully "
+"disbursed). Deliberately gated on group_deduction_manager rather than the "
+"Settings Administrator group: this module never grants the latter any "
+"ksw.deduction access (unlike hr.leave), while Deduction Manager already has "
+"unconditional read/write on every deduction — see "
+"ksw_deduction_rule_manager_all."
 msgstr ""
 
 #. module: KSW_deduction
@@ -1984,8 +2677,16 @@ msgid "True when payment_amount covers the full outstanding balance."
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_can_employee_edit
+msgid ""
+"True when you may still correct or delete this request yourself, because it "
+"is your own and no approver has acted on it yet."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__type_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__type_id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__type_id
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_search
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_kanban
@@ -2033,6 +2734,11 @@ msgid "Vacation Balance Value"
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid "View"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_eos_last_wage
 msgid "Wage of the current active version."
 msgstr ""
@@ -2053,6 +2759,23 @@ msgid "Website communication history"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_emp_monthly_total
+msgid ""
+"What this month's payroll will collect from this employee across every "
+"active deduction (this one included): installments scheduled for the current"
+" month plus any left pending from earlier months."
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.res_config_settings_view_form_ksw_deduction
+msgid ""
+"When a revision shows the employee was over-paid it cannot\n"
+"                                be confirmed. It is cancelled instead, and a draft deduction\n"
+"                                of this type is opened for the difference so it is recovered\n"
+"                                from a later payroll run."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__is_loan
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_type__is_loan
 msgid ""
@@ -2070,14 +2793,41 @@ msgstr ""
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__managed_by
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_type__managed_by
 msgid ""
-"Which department can manually close (mark as paid) deductions of this type "
-"outside payroll. HR: gov. penalties, internal penalties, salary advances. "
-"Accounting: loans."
+"Who can create and manually close (mark as paid) deductions of this type "
+"outside payroll. Accounting Data Entry: gov. penalties, internal penalties, "
+"salary advances. Accounting (Loans): loans, which additionally require the "
+"\"Loan Modification: Full\" privilege."
 msgstr ""
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_request_wizard_form
 msgid "Why do you need this loan? (required)"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__wizard_id
+msgid "Wizard"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_writeoff_date
+msgid "Write-off Date"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_statement_line__row_kind__writeoff
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid "Written Off"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Written off"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_can_admin_return
+msgid "X Can Admin Return"
 msgstr ""
 
 #. module: KSW_deduction
@@ -2093,6 +2843,11 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_can_edit_installments
 msgid "X Can Edit Installments"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_can_gm_return
+msgid "X Can Gm Return"
 msgstr ""
 
 #. module: KSW_deduction
@@ -2133,6 +2888,16 @@ msgid "You are requesting"
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_return_approver_wizard_form
+msgid ""
+"You are returning this request as a Deduction\n"
+"                            Manager. Only the steps the request has already\n"
+"                            passed are listed. Everything the approvers\n"
+"                            entered is kept — only the stamps from the step\n"
+"                            you pick onward are cleared."
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.actions.act_window,help:KSW_deduction.action_ksw_my_loans
 msgid "You have no loan requests yet"
 msgstr ""
@@ -2153,9 +2918,19 @@ msgstr ""
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
+msgid "installment(s) will be fully settled."
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 msgid ""
 "installment(s):\n"
 "                                each becomes"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
+msgid "is partially settled:"
 msgstr ""
 
 #. module: KSW_deduction
@@ -2166,8 +2941,18 @@ msgid ""
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "on"
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_request_wizard_form
 msgid "over"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
+msgid "paid,"
 msgstr ""
 
 #. module: KSW_deduction
@@ -2182,7 +2967,22 @@ msgstr ""
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
+msgid "stays pending in the same month."
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "to"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 msgid "will be redistributed across"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid "↩ Return to Approver"
 msgstr ""
 
 #. module: KSW_deduction
@@ -2218,34 +3018,4 @@ msgstr ""
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "➕ Record New Penalty"
-msgstr ""
-
-#. module: KSW_deduction
-#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_type__managed_by__acc_data_entry
-msgid "Accounting Data Entry"
-msgstr ""
-
-#. module: KSW_deduction
-#: model:res.groups,name:KSW_deduction.group_acc_data_entry
-msgid "Accounting Data Entry (Non-Loan)"
-msgstr ""
-
-#. module: KSW_deduction
-#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_type__managed_by__accounting
-msgid "Accounting (Loans)"
-msgstr ""
-
-#. module: KSW_deduction
-#: code:addons/KSW_deduction/models/ksw_deduction.py:0
-msgid ""
-"You can only submit loan requests for yourself, as a supervisor for your "
-"direct subordinates, or as an assistant for the direct subordinates of a "
-"manager you assist."
-msgstr ""
-
-#. module: KSW_deduction
-#: code:addons/KSW_deduction/models/ksw_deduction.py:0
-msgid ""
-"You may only raise requests for the direct subordinates of the managers you "
-"assist."
 msgstr ""

@@ -372,6 +372,51 @@
     </record>
 
     <!-- ============================================================ -->
+    <!-- Record Rules — ksw.pay.recurring                               -->
+    <!-- ============================================================ -->
+    <!--
+        A supervisor maintains his own team's standing instructions
+        (19.0.3.5.0). Before that he had read on the model and no rule at
+        all, which was harmless only because he could not write; granting
+        create/write without scoping would have let any supervisor edit
+        every employee's recurring pay company-wide.
+
+        The branches mirror ksw.pay.batch's, one level down — the employee's
+        department rather than the batch's — plus the direct reporting line,
+        for the supervisors whose people sit in another department, and
+        create_uid so you can always see what you created.
+
+        The Officer rule is not optional: Officer implies Supervisor, so
+        without a rule of its own the narrow one above would be the only one
+        that applies to him.
+    -->
+    <record id="pay_recurring_rule_supervisor" model="ir.rule">
+        <field name="name">KSW Recurring Pay: my team</field>
+        <field name="model_id" ref="model_ksw_pay_recurring"/>
+        <field name="groups" eval="[(4, ref('group_commission_supervisor'))]"/>
+        <field name="domain_force">['|', '|', '|',
+            ('create_uid', '=', user.id),
+            ('employee_id.parent_id.user_id', '=', user.id),
+            ('employee_id.department_id.manager_id.user_id', '=', user.id),
+            ('employee_id.department_id.manager_id.user_id', 'in', user.x_assisted_manager_ids.ids)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="pay_recurring_rule_officer" model="ir.rule">
+        <field name="name">KSW Recurring Pay: Officer (all)</field>
+        <field name="model_id" ref="model_ksw_pay_recurring"/>
+        <field name="groups" eval="[(4, ref('group_commission_officer'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- ============================================================ -->
     <!-- Record Rules — ksw.pay.submission                              -->
     <!-- ============================================================ -->
     <!--

@@ -58,32 +58,44 @@
         </record>
 
         <!-- ── Meals ────────────────────────────────────────────────── -->
-        <record id="pay_component_meal_breakfast" model="ksw.pay.component">
-            <field name="name">Breakfast</field>
-            <field name="code">MEAL_B</field>
+        <!--
+            One component, three choices. Breakfast, Lunch and Dinner were
+            three components until Aug 2026, which meant three batches to
+            open, submit and have approved to record one day's meals. They
+            differ in nothing but the rate, which is exactly what an option
+            is for. The old three are archived by migration 19.0.3.4.0 and
+            their entries moved here.
+        -->
+        <record id="pay_component_meals" model="ksw.pay.component">
+            <field name="name">Meals</field>
+            <field name="code">MEAL</field>
+            <field name="kind">earning</field>
             <field name="calculation">qty_rate</field>
-            <field name="rate">10.0</field>
             <field name="qty_label">Meals</field>
             <field name="scope">department</field>
             <field name="sequence">30</field>
+            <field name="description">Meals provided on duty. Pick the meal on each row — the rate comes from it.</field>
         </record>
-        <record id="pay_component_meal_lunch" model="ksw.pay.component">
+        <record id="pay_option_meal_breakfast" model="ksw.pay.option">
+            <field name="component_id" ref="pay_component_meals"/>
+            <field name="name">Breakfast</field>
+            <field name="code">MEAL_B</field>
+            <field name="rate">10.0</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="pay_option_meal_lunch" model="ksw.pay.option">
+            <field name="component_id" ref="pay_component_meals"/>
             <field name="name">Lunch</field>
             <field name="code">MEAL_L</field>
-            <field name="calculation">qty_rate</field>
             <field name="rate">20.0</field>
-            <field name="qty_label">Meals</field>
-            <field name="scope">department</field>
-            <field name="sequence">31</field>
+            <field name="sequence">20</field>
         </record>
-        <record id="pay_component_meal_dinner" model="ksw.pay.component">
+        <record id="pay_option_meal_dinner" model="ksw.pay.option">
+            <field name="component_id" ref="pay_component_meals"/>
             <field name="name">Dinner</field>
             <field name="code">MEAL_D</field>
-            <field name="calculation">qty_rate</field>
             <field name="rate">15.0</field>
-            <field name="qty_label">Meals</field>
-            <field name="scope">department</field>
-            <field name="sequence">32</field>
+            <field name="sequence">30</field>
         </record>
 
         <!-- ── Fixed allowances ─────────────────────────────────────── -->

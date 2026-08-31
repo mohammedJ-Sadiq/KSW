@@ -1,0 +1,128 @@
+<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"><title>دليل العمولات — المحاسبة</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "Noto Naskh Arabic","Noto Sans Arabic UI","DejaVu Sans",sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: right; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-right: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">دليل العمولات — المحاسبة</div>
+  <div class="meta">العمولات والمستحقات الإضافية · لا تشمل المبيعات والتحصيل<br/>KSW HR &amp; Payroll · 2026-08-30</div>
+</div>
+<section id="g-accounting-04-commission-export"><h1>تصدير العمولات والمستحقات (المحاسبة)</h1>
+<p><strong>الفئة المستهدفة:</strong> المحاسبة (محاسب العمولات)
+<strong>الوقت المقدّر:</strong> ٥–١٠ دقائق شهريًا</p>
+<h2>نظرة عامة</h2>
+<p>بعد أن يعتمد المديرون العامّون عمولات الشهر ومستحقاته، تُراجع <strong>سجل الصرف</strong>،
+وتُصدّر <strong>ملف التحويل البنكي</strong>، ثم تُعلّم الشهر <strong>مصروفًا</strong>.</p>
+<blockquote>
+<p><strong>هذا حلّ محلّ كشوف العمولات القديمة.</strong> لم تعد هناك كشوف عمولات لكل موظف
+تُعتمَد، ولا دفعة عمولات تُقفَل. يُبنى سجل الصرف تلقائيًا
+عند اعتماد الشهر — سطر واحد لكل موظف، لا يُكتَب يدويًا.</p>
+</blockquote>
+<blockquote>
+<p><strong>عمولات المبيعات والتحصيل ليست في هذا الملف.</strong> تُحتسَب في صفحتها الخاصة
+وتُصرَف بشكل منفصل.</p>
+</blockquote>
+<h2>ملاحظات أولية</h2>
+<ul>
+<li>يجب أن يكون الشهر في حالة <strong>معتمد</strong>. فإن كان ما زال مفتوحًا أو مُقدَّمًا،
+فهناك مدير عام لم يُنهِ اعتماده — ولن يظهر زر <strong>تصدير ملف التحويل البنكي</strong>.</li>
+<li>يُصرَف للموظفين على حساباتهم البنكية الخاصة بالراتب؛ ومن ليس له حساب يُصرَف له
+على <strong>الحساب البنكي الصارف الافتراضي</strong> المحدّد في الشهر. اضبطه قبل التصدير إن كان
+لديك موظفون من هذا النوع.</li>
+</ul>
+<h2>الخطوات</h2>
+<ol>
+<li><p><strong>افتح العمولات ← دورة المستحقات الشهرية</strong> واختر الشهر المعتمد.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/accounting/comm-01.png" alt="شهر معتمد"></p>
+</li>
+<li><p><strong>راجع السجل.</strong> يعرض تبويب <strong>من سيُصرَف له</strong> كل موظف: <strong>المستحقات</strong>
+و<strong>استرداد القروض</strong> و<strong>صافي المستحق</strong> (= المستحقات − استرداد القروض). افتح إدخالات السطر لترى بالتفصيل ما كوّن المستحقات.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/accounting/comm-02.png" alt="سجل الصرف"></p>
+</li>
+<li><p><strong>صحّح مبلغ القرض إن كان خاطئًا.</strong> ما زال بإمكانك تعديل <strong>استرداد القروض</strong>
+لموظف في شهر معتمد قبل إصدار الملف؛ ويُعاد احتساب الصافي.</p>
+</li>
+<li><p>اضغط <strong>تصدير ملف التحويل البنكي</strong>، واختر الصيغة في النافذة
+ونزّل الملف. تُجمَّع الأسطر حسب الحساب البنكي الصارف لكل موظف.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/accounting/comm-03.png" alt="تصدير ملف التحويل البنكي"></p>
+</li>
+<li><p>اضغط <strong>تعليم كمصروف</strong> بعد تنفيذ التحويل.</p>
+</li>
+</ol>
+<h2>التقارير</h2>
+<p><strong>العمولات ← التقارير ← سجل الصرف</strong> هو البيانات نفسها في قائمة قابلة
+للبحث عبر الأشهر ومُجمَّعة حسب القسم — استخدمها للمطابقة بدل فتح كل شهر على حدة.</p>
+<h2>ما يحدث بعد ذلك</h2>
+<p>يبقى الشهر مُقفَلًا. وأقساط القروض المُسوّاة صارت مُعلَّمة مسدَّدة على قروض
+الموظفين، فلا حاجة إلى تسجيلها مرتين.</p>
+<p>وإن لزم تصحيح حقيقي بعد الاعتماد، فلا يستطيع <strong>إعادة فتح</strong> الشهر إلا <strong>المدير
+العام للشركة</strong> — وهو ما يُعيد الأقساط المُسوّاة إلى «منتظِرة» ويُحوّل السجل إلى
+معاينة. اطلب ذلك بدل الالتفاف عليه.</p>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>العَرَض</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>لا يظهر زر <strong>تصدير ملف التحويل البنكي</strong></td>
+<td>الشهر غير معتمد بعد</td>
+<td>ما زال لدى أحد المديرين العامّين أقسام لاعتمادها — راجع <strong>حسب القسم</strong></td>
+</tr>
+<tr>
+<td>موظف غائب عن السجل</td>
+<td>قسمه لم يُعتمَد أو لم يُسلَّم أصلًا</td>
+<td>رسالة الاعتماد في المحادثة تذكر الأقسام المستبعدة وسببها</td>
+</tr>
+<tr>
+<td>موظف بلا حساب بنكي في الملف</td>
+<td>لا يوجد حساب راتب في سجله</td>
+<td>اضبط <strong>الحساب البنكي الصارف الافتراضي</strong> للشهر، أو اطلب من الموارد البشرية إضافة حسابه</td>
+</tr>
+<tr>
+<td>الصافي غير ما توقّعه المشرف</td>
+<td>سُوّيت أقساط قروض من العمولة</td>
+<td>افتح إدخالات السطر وقرض الموظف لترى ما استُقطع</td>
+</tr>
+<tr>
+<td>أحتاج تعديل مبلغ</td>
+<td>الشهر مُقفَل</td>
+<td>لا يُعيد فتحه إلا المدير العام للشركة</td>
+</tr>
+</tbody></table>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li>المشرف: <span class="xref">الدورة الشهرية</span></li>
+<li>المدير العام: <span class="xref">اعتماد عمولات الشهر</span></li>
+<li>الرواتب: <span class="xref">تصدير ملف التحويل البنكي</span></li>
+</ul>
+</section>
+</body></html>

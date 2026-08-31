@@ -25,7 +25,7 @@ close the ticket and raise a new one of the right kind.
 
 - You can raise a ticket **for yourself**. (If you manage people, you may also
   raise one for a direct report — see
-  [Raising a ticket for a team member](../supervisor/07-ticket-for-team-member.md).)
+  [Raising a ticket for a team member](../supervisor/09-ticket-for-team-member.md).)
 - Have the details ready: what exactly happens, when it started, any error
   message, and which device it concerns.
 
@@ -100,5 +100,5 @@ close the ticket and raise a new one of the right kind.
 
 ## Related guides
 
-- [Raising a ticket for a team member](../supervisor/07-ticket-for-team-member.md) — managers
+- [Raising a ticket for a team member](../supervisor/09-ticket-for-team-member.md) — managers
 - [Getting Started](../00-getting-started.md) — login, navigation, notifications

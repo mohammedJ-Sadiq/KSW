@@ -984,11 +984,30 @@ class HrPayslip(models.Model):
     def _worked_day_lines_sheet(self, version, employee, attendances,
                                 date_from, date_to):
         """For attendance-sheet employees only attended vs absent matters.
-        No late / early-leave tracking."""
+        No late / early-leave tracking.
+
+        A sheet-employee's month is a supervisor's assertion, not a
+        measurement — there are no punches behind it. So it only counts once
+        the supervisor has actually made that assertion by confirming the
+        sheet. An unconfirmed (or missing) sheet is read as **zero
+        attendance**: every calendar day in the window becomes absent.
+        Nothing should be paid on attendance nobody signed for.
+        """
         lines = []
 
-        attended_count = len(attendances)
-        attended_hours = sum(a.worked_hours or 0.0 for a in attendances)
+        sheet = self.env['ksw.attendance.sheet'].sudo().search([
+            ('employee_id', '=', employee.id),
+            ('month', '=', str(date_from.month)),
+            ('year', '=', date_from.year),
+        ], limit=1)
+        sheet_released = bool(sheet) and sheet.state == 'confirmed'
+
+        if sheet_released:
+            attended_count = len(attendances)
+            attended_hours = sum(a.worked_hours or 0.0 for a in attendances)
+        else:
+            attended_count = 0
+            attended_hours = 0.0
 
         lines.append({
             'name': _('Attended Days'),
@@ -1002,17 +1021,11 @@ class HrPayslip(models.Model):
         # --- Absent days ---
         # Prefer the attendance-sheet lines for accuracy; fall back to a
         # simple calendar-days-minus-attended calculation.
-        sheet = self.env['ksw.attendance.sheet'].sudo().search([
-            ('employee_id', '=', employee.id),
-            ('month', '=', str(date_from.month)),
-            ('year', '=', date_from.year),
-        ], limit=1)
-
         calendar = self.env['ksw.attendance.sheet']._get_employee_calendar(
             employee)
         sat_required = bool(calendar and calendar.x_saturday_required)
 
-        if sheet:
+        if sheet_released:
             absent_lines = sheet.line_ids.filtered(
                 lambda l: date_from <= l.date <= date_to
                 and not l.is_attended
@@ -1023,6 +1036,8 @@ class HrPayslip(models.Model):
                 if sat_required else 0
             )
         else:
+            # No sheet, or one the supervisor never released. attended_count
+            # is 0 in the unconfirmed case, so this is the whole window.
             calendar_days = (date_to - date_from).days + 1
             absent_count = max(0, calendar_days - attended_count)
             sat_absent_count = 0

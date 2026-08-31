@@ -14,6 +14,7 @@ outright.
 | Give initial and final approval on annual leave | [Leave: GM approvals](01-leave-gm-approvals.md) |
 | Send a request back to an earlier approver | [Return to approver](02-return-to-approver.md) |
 | Give final approval on a loan | [Loan: GM final approval](03-loan-gm-approval.md) |
+| Approve my departments' monthly commissions & allowances | [Commissions: monthly approval](04-commission-approval.md) |
 
 ## The golden rules
 
@@ -24,3 +25,6 @@ outright.
 - **Time-off** approvals live in **Time Off → Management → Time Off**;
   **loan** approvals live in **Loans → Operations → Loans** (opens on
   **Waiting For Me**).
+- On **commissions** you approve only the departments you are General Manager
+  of, in **Commissions → Monthly Pay Run**. Locking or reopening a whole month
+  belongs to the **company's** General Manager.

@@ -74,8 +74,13 @@ class KswPayslipRunBankTotal(models.Model):
 
 
 class KswPayslipRunSkipLine(models.Model):
-    """Records employees that were skipped during batch payslip generation,
-    along with the reason they were excluded."""
+    """Records employees the batch could not process normally.
+
+    Two kinds of row, told apart by ``line_type`` — a skipped employee has
+    no payslip at all, a warned one has a payslip that is very likely wrong.
+    They must not be conflated: the export's "no payslip in this batch"
+    section is built from the skipped rows only.
+    """
     _name = 'ksw.payslip.run.skip.line'
     _description = 'Payslip Batch — Skipped Employee Log'
     _order = 'employee_id'
@@ -89,6 +94,10 @@ class KswPayslipRunSkipLine(models.Model):
         required=True, ondelete='cascade',
     )
     reason = fields.Char(string='Reason', required=True)
+    line_type = fields.Selection([
+        ('skipped', 'Skipped — no payslip generated'),
+        ('warning', 'Processed — figures need review'),
+    ], string='Outcome', default='skipped', required=True)
 
 
 class HrPayslipRun(models.Model):
@@ -514,12 +523,15 @@ class HrPayslipRun(models.Model):
 
         # Employees that never got a payslip in this batch. They have no
         # resolved paying bank, so they cannot be attributed to a single bank
-        # file — they belong on this internal sheet only.
-        if self.x_skip_line_ids:
+        # file — they belong on this internal sheet only. Warning rows are
+        # excluded: those employees DO have a payslip, listed above.
+        skipped_lines = self.x_skip_line_ids.filtered(
+            lambda l: l.line_type != 'warning')
+        if skipped_lines:
             ri = self._write_export_banner(
                 ws, ri, _('Employees with no payslip in this batch'),
             )
-            for line in self.x_skip_line_ids:
+            for line in skipped_lines:
                 ws.cell(ri, 1, line.employee_id.name or '').border = thin
                 ws.cell(ri, len(headers), line.reason or '').border = thin
                 self._style_export_row(

@@ -54,4 +54,4 @@ manager** can Reset it to Draft (see the HR guide).
 ## Related guides
 
 - [Approve time off](01-approve-time-off.md)
-- [Commission sheets](04-commission-sheets.md)
+- [Recording extra pay](04-commission-pay-entries.md)

@@ -18,6 +18,7 @@ assign and resolve it:
 - Kanban board grouped by stage with priority stars, blocked/ready state
   and overdue badges
 - Automatic notification to the assigned agent
+- Automatic email to the requester when their ticket is closed
 - Reporting (pivot/graph) and a calendar of ticket deadlines
 
 Just two roles: every employee submits tickets (for themselves, or a
@@ -49,6 +50,7 @@ assets already assigned to that employee (or their direct report).
         'data/helpdesk_ticket_stage_data.xml',
         'data/helpdesk_ticket_category_data.xml',
         'data/it_asset_category_data.xml',
+        'data/mail_template_ticket_closed.xml',
         'data/ir_cron_data.xml',
         'views/helpdesk_ticket_stage_views.xml',
         'views/helpdesk_ticket_category_views.xml',

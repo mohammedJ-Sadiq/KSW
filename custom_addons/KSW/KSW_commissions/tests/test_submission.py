@@ -25,7 +25,8 @@ class SubmissionCommon(TransactionCase):
         env = cls.env
         cls.period = '2029-03-01'
         cls.component = env.ref('KSW_commissions.pay_component_overtime')
-        cls.lunch = env.ref('KSW_commissions.pay_component_meal_lunch')
+        cls.meals = env.ref('KSW_commissions.pay_component_meals')
+        cls.o_lunch = env.ref('KSW_commissions.pay_option_meal_lunch')
 
         cls.dept_a = env['hr.department'].create({'name': 'Sub Dept A'})
         cls.dept_b = env['hr.department'].create({'name': 'Sub Dept B'})
@@ -90,6 +91,8 @@ class SubmissionCommon(TransactionCase):
                 'quantity': 4.0, 'reason': 'probe'}
         if batch.component_id.needs_date:
             vals['date'] = batch.period
+        if batch.component_id.has_options:
+            vals['option_id'] = batch.component_id.option_ids[0].id
         vals.update(kwargs)
         model = self.env['ksw.pay.entry']
         return (model.with_user(user) if user else model.sudo()).create(vals)
@@ -156,7 +159,7 @@ class TestDepartmentScope(SubmissionCommon):
     def test_11_one_submission_per_department_not_per_batch(self):
         first = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)
         second = self._filled_batch(
-            self.sup_a, self.dept_a, self.emp_a, component=self.lunch)
+            self.sup_a, self.dept_a, self.emp_a, component=self.meals)
         self.assertEqual(first.submission_id, second.submission_id)
         self.assertEqual(first.submission_id.batch_count, 2)
 

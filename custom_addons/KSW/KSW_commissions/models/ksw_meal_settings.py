@@ -1,23 +1,24 @@
-"""KSW Commissions general settings — meal allowance unit prices.
+"""KSW Commissions general settings — meal prices and the overtime rate.
 
-Extends ``res.config.settings`` with three configurable unit prices
-used by the Technician Location Allowance calculator:
+The three meal prices are the rates of the **Meals** component's options
+(Breakfast, Lunch, Dinner). They are shown here because this is where
+people look for a price, but the option is the single place the figure
+lives — a pay entry resolves its rate from it, so a second copy in
+``ir.config_parameter`` would be a number that agrees with the payslip
+only by luck. Editing either screen edits the same record.
 
-  * Breakfast (default 10 SAR)
-  * Lunch     (default 20 SAR)
-  * Dinner    (default 15 SAR)
-
-Storage is delegated to ``ir.config_parameter`` so the values are
-global, persistent and easy to change at any time without code
-changes.  Future general configuration toggles for KSW_commissions
-can live on this same settings record.
+The overtime divisor and factor are still plain parameters: they are read
+by the legacy overtime helpers, not by a component.
 """
 from odoo import api, fields, models
 
 
-PARAM_BREAKFAST = 'KSW_commissions.meal_breakfast_price'
-PARAM_LUNCH = 'KSW_commissions.meal_lunch_price'
-PARAM_DINNER = 'KSW_commissions.meal_dinner_price'
+# The Meals component's options, in the order they are shown.
+MEAL_OPTIONS = (
+    ('ksw_meal_breakfast_price', 'KSW_commissions.pay_option_meal_breakfast'),
+    ('ksw_meal_lunch_price', 'KSW_commissions.pay_option_meal_lunch'),
+    ('ksw_meal_dinner_price', 'KSW_commissions.pay_option_meal_dinner'),
+)
 
 DEFAULT_BREAKFAST = 10.0
 DEFAULT_LUNCH = 20.0
@@ -35,26 +36,40 @@ class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
     ksw_meal_breakfast_price = fields.Float(
-        string='Breakfast Price',
-        config_parameter=PARAM_BREAKFAST,
-        default=DEFAULT_BREAKFAST,
-        help='Unit price (SAR) per breakfast occurrence on a '
-             'technician location-allowance line.',
+        string='Breakfast Price', readonly=False,
+        compute='_compute_meal_prices', inverse='_inverse_meal_prices',
+        help='What one breakfast is worth (SAR). The same figure as the '
+             'Breakfast option on the Meals pay component.',
     )
     ksw_meal_lunch_price = fields.Float(
-        string='Lunch Price',
-        config_parameter=PARAM_LUNCH,
-        default=DEFAULT_LUNCH,
-        help='Unit price (SAR) per lunch occurrence on a '
-             'technician location-allowance line.',
+        string='Lunch Price', readonly=False,
+        compute='_compute_meal_prices', inverse='_inverse_meal_prices',
+        help='What one lunch is worth (SAR). The same figure as the Lunch '
+             'option on the Meals pay component.',
     )
     ksw_meal_dinner_price = fields.Float(
-        string='Dinner Price',
-        config_parameter=PARAM_DINNER,
-        default=DEFAULT_DINNER,
-        help='Unit price (SAR) per dinner occurrence on a '
-             'technician location-allowance line.',
+        string='Dinner Price', readonly=False,
+        compute='_compute_meal_prices', inverse='_inverse_meal_prices',
+        help='What one dinner is worth (SAR). The same figure as the Dinner '
+             'option on the Meals pay component.',
     )
+
+    def _meal_option(self, xmlid):
+        """The option record behind one of the three prices, if it exists."""
+        return self.env.ref(xmlid, raise_if_not_found=False)
+
+    def _compute_meal_prices(self):
+        for rec in self:
+            for field, xmlid in MEAL_OPTIONS:
+                option = rec._meal_option(xmlid)
+                rec[field] = option.rate if option else 0.0
+
+    def _inverse_meal_prices(self):
+        for rec in self:
+            for field, xmlid in MEAL_OPTIONS:
+                option = rec._meal_option(xmlid)
+                if option and option.rate != rec[field]:
+                    option.sudo().write({'rate': rec[field]})
 
     ksw_overtime_divisor = fields.Float(
         string='Overtime Hours Divisor',
@@ -98,24 +113,16 @@ class ResConfigSettings(models.TransientModel):
 
     @api.model
     def _get_meal_prices(self):
-        """Return ``(breakfast, lunch, dinner)`` floats from the
-        ``ir.config_parameter`` store, falling back to the defaults
-        when a key is missing or non-numeric.
+        """Return ``(breakfast, lunch, dinner)`` — the option rates.
+
+        Falls back to the seeded defaults only when an option is missing,
+        which can only happen on a database where the Meals component was
+        deleted by hand.
         """
-        ICP = self.env['ir.config_parameter'].sudo()
-
-        def _read(key, default):
-            raw = ICP.get_param(key)
-            if raw in (False, None, ''):
-                return default
-            try:
-                return float(raw)
-            except (TypeError, ValueError):
-                return default
-
-        return (
-            _read(PARAM_BREAKFAST, DEFAULT_BREAKFAST),
-            _read(PARAM_LUNCH, DEFAULT_LUNCH),
-            _read(PARAM_DINNER, DEFAULT_DINNER),
-        )
+        defaults = (DEFAULT_BREAKFAST, DEFAULT_LUNCH, DEFAULT_DINNER)
+        prices = []
+        for (_field, xmlid), default in zip(MEAL_OPTIONS, defaults):
+            option = self.env.ref(xmlid, raise_if_not_found=False)
+            prices.append(option.rate if option else default)
+        return tuple(prices)
 

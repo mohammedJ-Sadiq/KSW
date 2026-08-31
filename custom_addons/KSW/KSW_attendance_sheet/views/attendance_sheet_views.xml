@@ -9,25 +9,38 @@
         <field name="model">ksw.attendance.sheet</field>
         <field name="arch" type="xml">
             <list string="Attendance Sheets"
-                  decoration-info="state == 'draft'"
+                  decoration-danger="x_is_blocked"
+                  decoration-bf="x_is_blocked"
                   decoration-success="state == 'confirmed'">
                 <header>
+                    <button name="action_confirm_my_team" type="object"
+                            string="✓ Confirm &amp; Send to Payroll"
+                            class="btn-primary" display="always"/>
+                    <button name="action_apply_approved_leave" type="object"
+                            string="⚡ Apply Approved Time Off"
+                            confirm="This marks every day covered by an approved time-off request as absent on the selected sheets. Continue?"/>
                     <button name="action_generate_all_sheets" type="object"
                             string="⟳ Generate All Sheets"
-                            class="btn-primary"/>
+                            groups="KSW_attendance_sheet.group_attendance_sheet_manager"/>
                 </header>
+                <field name="x_is_blocked" column_invisible="True"/>
                 <field name="employee_id"/>
-                <field name="department_id"/>
+                <field name="x_blocked_reason" string="⚠ Needs Attention"/>
+                <field name="x_action_owner_id" string="Waiting On"
+                       optional="show"/>
+                <field name="department_id" optional="hide"/>
                 <field name="manager_id"/>
                 <field name="month"/>
                 <field name="year"/>
-                <field name="total_days"/>
+                <field name="total_days" optional="hide"/>
                 <field name="total_attended"
                        decoration-success="total_attended > 0"/>
                 <field name="total_absent"
                        decoration-danger="total_absent > 0"/>
-                <field name="state" widget="badge"
-                       decoration-info="state == 'draft'"
+                <field name="x_confirmed_by" optional="hide"/>
+                <field name="x_confirmed_on" optional="hide"/>
+                <field name="state" widget="badge" string="Payroll"
+                       decoration-warning="state == 'draft'"
                        decoration-success="state == 'confirmed'"/>
             </list>
         </field>
@@ -42,6 +55,11 @@
         <field name="arch" type="xml">
             <form string="Attendance Sheet">
                 <header>
+                    <button name="action_supervisor_confirm" type="object"
+                            string="✓ Confirm &amp; Send to Payroll"
+                            invisible="not x_can_confirm"
+                            confirm="This releases the month's attendance to payroll. Continue?"
+                            class="btn-primary"/>
                     <button name="action_mark_all_absent" type="object"
                             string="✗ All Absent"
                             invisible="not is_editable_period"
@@ -62,6 +80,39 @@
                     <widget name="web_ribbon" title="Review Only"
                             bg_color="text-bg-info"
                             invisible="is_editable_period"/>
+                    <field name="x_is_blocked" invisible="1"/>
+                    <div class="alert alert-danger" role="alert"
+                         invisible="not x_is_blocked">
+                        <h5 class="alert-heading mb-2">
+                            ⚠ This month cannot be sent to payroll yet
+                        </h5>
+                        <field name="x_blocked_reason" nolabel="1"
+                               readonly="1" widget="text"/>
+                        <div class="mt-2">
+                            <b>Waiting on:</b>
+                            <field name="x_action_owner_id" nolabel="1"
+                                   readonly="1" class="d-inline-block"/>
+                        </div>
+                        <hr/>
+                        <small>
+                            Until this is resolved and the month is
+                            confirmed, payroll will pay this employee as
+                            <b>zero attendance</b>.
+                        </small>
+                        <div class="mt-2">
+                            <button name="action_apply_approved_leave"
+                                    type="object"
+                                    string="Apply Approved Time Off"
+                                    class="btn-sm btn-danger"
+                                    icon="fa-magic"
+                                    confirm="This marks every day covered by an approved time-off request as absent, matching the time-off record. Continue?"/>
+                            <small class="ms-2 text-muted">
+                                Marks the clashing days absent to match the
+                                approved request. Does not affect a pending
+                                return confirmation.
+                            </small>
+                        </div>
+                    </div>
                     <group>
                         <group>
                             <field name="employee_id"
@@ -74,6 +125,16 @@
                             <field name="year" readonly="1"/>
                             <field name="is_locked" invisible="1"/>
                             <field name="is_editable_period" invisible="1"/>
+                            <field name="x_can_confirm" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Sent to Payroll"
+                           invisible="state != 'confirmed'">
+                        <group>
+                            <field name="x_confirmed_by"/>
+                        </group>
+                        <group>
+                            <field name="x_confirmed_on"/>
                         </group>
                     </group>
                     <group string="Summary">
@@ -128,13 +189,27 @@
                 <field name="manager_id"/>
                 <field name="month"/>
                 <field name="year"/>
+                <field name="x_action_owner_id"/>
                 <filter name="my_team" string="My Team"
                         domain="[('manager_id.user_id', '=', uid)]"/>
+                <filter name="waiting_on_me" string="Waiting On Me"
+                        domain="[('x_action_owner_id', '=', uid)]"/>
                 <separator/>
-                <filter name="draft" string="Draft"
+                <filter name="blocked" string="⚠ Needs Attention"
+                        domain="[('x_is_blocked', '=', True)]"/>
+                <separator/>
+                <filter name="draft" string="Not Sent to Payroll"
                         domain="[('state', '=', 'draft')]"/>
-                <filter name="confirmed" string="Confirmed"
+                <filter name="confirmed" string="Sent to Payroll"
                         domain="[('state', '=', 'confirmed')]"/>
+                <separator/>
+                <!-- No "current month" filter: `month` is a Selection of
+                     strings and search-view domains are evaluated by the
+                     client's py.js, which has no str(). The list is already
+                     ordered year desc, month desc, so the current month
+                     sits at the top. -->
+                <filter name="current_year" string="This Year"
+                        domain="[('year', '=', context_today().year)]"/>
                 <group>
                     <filter string="Employee" name="group_employee"
                             domain="[]"
@@ -151,6 +226,9 @@
                     <filter string="Status" name="group_state"
                             domain="[]"
                             context="{'group_by': 'state'}"/>
+                    <filter string="Waiting On" name="group_owner"
+                            domain="[]"
+                            context="{'group_by': 'x_action_owner_id'}"/>
                 </group>
             </search>
         </field>
@@ -163,7 +241,15 @@
         <field name="name">Attendance Sheets</field>
         <field name="res_model">ksw.attendance.sheet</field>
         <field name="view_mode">list,form</field>
-        <field name="context">{}</field>
+        <!-- Land on what is still owed to payroll this year.
+             Deliberately NO search_default_my_team: scoping a supervisor to
+             their own team is the record rules' job now
+             (rule_attendance_sheet_supervisor / _hr_officer), and a default
+             filter is only a suggestion the user can clear in one click.
+             Leaving it here would also strand the Attendance Sheet Managers,
+             who manage almost nobody directly and need the overview. -->
+        <field name="context">{'search_default_current_year': 1,
+                               'search_default_draft': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 No attendance sheets yet.

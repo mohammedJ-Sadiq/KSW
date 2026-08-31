@@ -113,7 +113,10 @@ const PERSONA_DOCS = {
 };
 
 // render a set of markdown files into one PDF
-function renderDoc(lang, files, outBase, title, subtitle) {
+// `outDir` lets a bundle write somewhere other than pdf/ (see the commission
+// bundle below) without disturbing the per-role handbooks.
+function renderDoc(lang, files, outBase, title, subtitle, outDir = OUT) {
+  mkdirSync(outDir, { recursive: true });
   const rtl = lang === 'ar';
   const langRoot = join(ROOT, lang);
   const validIds = new Set(files.map(f => sectionId(langRoot, f)));
@@ -160,8 +163,8 @@ function renderDoc(lang, files, outBase, title, subtitle) {
 ${body}
 </body></html>`;
 
-  const htmlPath = join(OUT, `_build-${outBase}.html`);
-  const pdfPath = join(OUT, `${outBase}.pdf`);
+  const htmlPath = join(outDir, `_build-${outBase}.html`);
+  const pdfPath = join(outDir, `${outBase}.pdf`);
   writeFileSync(htmlPath, html);
   execFileSync('google-chrome-stable', [
     '--headless', '--no-sandbox', '--disable-gpu', '--no-pdf-header-footer',
@@ -204,6 +207,64 @@ function buildFull(lang) {
   renderDoc(lang, orderedFiles(lang), `KSW-User-Manual-${lang.toUpperCase()}`, title, sub);
 }
 
+// ---- the commission bundle ---------------------------------------------
+// The commission workflow spans four roles, and each role's own handbook mixes
+// it in with time off, attendance and tickets. This builds the commission
+// content on its own, per role, into pdf/commission/ — what you hand to
+// somebody who is being trained on the commission app and nothing else.
+//
+// Sales & Collection is deliberately absent: it is computed on its own page,
+// handled by the sales roles and paid separately.
+const COMMISSION_DOCS = {
+  supervisor: ['Supervisor', [
+    'supervisor/04-commission-pay-entries.md',
+    'supervisor/05-commission-recurring.md',
+    'supervisor/06-commission-monthly-cycle.md',
+  ], 'Commissions — Supervisor Guide', 'دليل العمولات — المشرف'],
+  gm: ['GM', [
+    'gm/04-commission-approval.md',
+  ], 'Commissions — General Manager Guide', 'دليل العمولات — المدير العام'],
+  accounting: ['Accounting', [
+    'accounting/04-commission-export.md',
+  ], 'Commissions — Accounting Guide', 'دليل العمولات — المحاسبة'],
+  admin: ['Configuration', [
+    'admin/commissions.md',
+  ], 'Commissions — Configuration Guide', 'دليل العمولات — التهيئة والإشراف'],
+};
+
+// Order matters: it is the order the work actually happens in, so the
+// all-roles edition reads as one process and its cross-links resolve.
+const COMMISSION_ORDER = ['supervisor', 'gm', 'accounting', 'admin'];
+
+function buildCommission(lang) {
+  const outDir = join(OUT, 'commission');
+  const sub = lang === 'ar'
+    ? 'العمولات والمستحقات الإضافية · لا تشمل المبيعات والتحصيل'
+    : 'Commissions & Allowances · excludes Sales & Collection';
+
+  const every = [];
+  for (const role of COMMISSION_ORDER) {
+    const [slug, rel, titleEn, titleAr] = COMMISSION_DOCS[role];
+    const files = rel.map(r => join(ROOT, lang, r)).filter(f => {
+      if (existsSync(f)) return true;
+      console.warn(`  ! missing ${f}, skipped`);
+      return false;
+    });
+    if (!files.length) continue;
+    every.push(...files);
+    renderDoc(lang, files, `KSW-Commission-${slug}-${lang.toUpperCase()}`,
+              lang === 'ar' ? titleAr : titleEn, sub, outDir);
+  }
+
+  // …and one that carries the whole process end to end.
+  if (every.length) {
+    renderDoc(lang, every, `KSW-Commission-All-Roles-${lang.toUpperCase()}`,
+              lang === 'ar' ? 'العمولات والمستحقات — الدليل الشامل'
+                            : 'Commissions & Allowances — Complete Guide',
+              sub, outDir);
+  }
+}
+
 // one standalone PDF for a single guide page (both languages), independent
 // of the per-persona handbooks — doesn't touch any other PDF output.
 function buildSingle(relPath, slug, titleEn, titleAr) {
@@ -222,6 +283,9 @@ function buildSingle(relPath, slug, titleEn, titleAr) {
 // node build_pdf.mjs en                            -> per-persona PDFs, English only
 // node build_pdf.mjs full                          -> comprehensive manual, both languages
 // node build_pdf.mjs full en                       -> comprehensive manual, English only
+// node build_pdf.mjs commission                    -> commission-only PDFs per role,
+//                                                      both languages, into pdf/commission/
+// node build_pdf.mjs commission en                 -> …English only
 // node build_pdf.mjs single <relPath> <slug> <titleEn> <titleAr>
 //                                                   -> one standalone PDF (both languages)
 //                                                      built from a single guide page, e.g.:
@@ -229,7 +293,14 @@ function buildSingle(relPath, slug, titleEn, titleAr) {
 //     "Confirming a Return from Annual Leave" "تأكيد مباشرة الموظف من إجازته السنوية"
 const args = process.argv.slice(2);
 
-if (args[0] === 'single') {
+if (args[0] === 'commission') {
+  const lang = args.find(a => a === 'en' || a === 'ar');
+  for (const l of (lang ? [lang] : ['en', 'ar'])) {
+    console.log(`\n[${l}] commission bundle`);
+    buildCommission(l);
+  }
+  console.log('\nDone.');
+} else if (args[0] === 'single') {
   const [, relPath, slug, titleEn, titleAr] = args;
   if (!relPath || !slug || !titleEn || !titleAr) {
     console.error('Usage: node build_pdf.mjs single <relPath> <slug> <titleEn> <titleAr>');
