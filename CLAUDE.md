@@ -1017,3 +1017,99 @@ allocation is needed. All test leave types that do not require allocation must u
     `res.company`, not just `env.company`); and a Many2one `domain=` is a UI
     hint, not an ORM constraint — test the **domain and what it selects**, not
     a write that fails. Full writeup: Odoo 19 Pitfalls #101.
+
+44. **"Covered by Time Off" answers two questions at once — so an unpaid leave
+    paid the employee in full.** `_auto_link_absence_attendance()` links the
+    absence rows of *any* validated non-attendance-issue leave to that leave,
+    and the link sets `hr.attendance.x_is_covered`, which payroll reads as
+    **excused *and paid***: `x_net_is_absent` clears, a full scheduled day is
+    credited to `x_net_worked_hours`, `x_deduction_amount` goes to 0, and
+    `_worked_day_lines_biometric` counts the day in **WORK100** instead of
+    `ATT_ABS`. Unpaid leave travelled that path unchanged (KSWCO payslip 18099
+    / leave 4838: WORK100 24 days, ATT_ABS 7 — the whole point of the leave
+    inverted), and the Fridays inside the block were granted on top, because
+    `_generate_weekend_records` counts a *covered* absence as an attended
+    adjacent workday (#36).
+    **The link is right; only the payment half was wrong.** Attaching the
+    absence says *why the day is empty*; that is not the same question as
+    *is he paid for it*. Split them with a hook — `is_unpaid_leave` lives on
+    `hr.leave.type` in KSW_unpaid_leave, which **depends on**
+    KSW_attendance_leave, so the compute cannot name the flag:
+    ```python
+    # KSW_attendance_leave/models/hr_leave.py — every type pays by default
+    def _excuses_absence(self):
+        return self
+    # KSW_unpaid_leave/models/hr_leave.py — this one does not
+    def _excuses_absence(self):
+        return super()._excuses_absence().filtered(
+            lambda l: not self._is_unpaid_leave(l))
+    ```
+    `_compute_is_covered` / `_compute_net_minutes` run the validated leaves
+    through it; `x_attendance_ids` stays populated either way. Two follow-ons:
+    `x_is_covered` is a **stored** compute, so old rows keep the wrong value
+    until something recomputes them (`KSW_unpaid_leave/migrations/19.0.1.2.0`
+    re-runs `_recompute_deductions()` + `_regenerate_weekends_for_leaves()`),
+    and a `done` payslip is a paid document — repairing one is a Payslip
+    Revision, not a data fix. Same pass: `_validate_leave_request` gated on
+    `self.filtered('x_attendance_ids')` instead of `_attendance_issue_leaves()`
+    (#33), so an ordinary leave validated a *second* time skipped `super()`.
+
+45. **A `post-migrate` runs right after its OWN module is loaded, so a field
+    declared by a module further down the dependency chain is not in the
+    registry — `modified()` notifies nothing and raises nothing.** The
+    KSW_unpaid_leave `19.0.1.2.0` post-migrate un-covered 38 KSWCO attendance
+    rows and called `_recompute_deductions()`; the flags came out right and
+    `x_deduction_amount` stayed **0** on every one of them, because that field
+    belongs to `KSW_payroll`, which loads later in the same run
+    (`Loading module KSW_unpaid_leave (105/110)` … `KSW_payroll` after it).
+    Half a repair reads exactly like a whole one until you check the value the
+    consumer reads rather than the flag you set.
+    **Use `end-migrate` for anything touching a lower module** — it runs after
+    *every* module is loaded (`odoo/modules/loading.py`, "STEP 3.5: execute
+    migration end-scripts"). Ask "which module declares this field?" before
+    choosing `pre`/`post`/`end`, and guard it anyway:
+    ```python
+    if 'x_deduction_amount' not in env['hr.attendance']._fields:
+        _logger.info('KSW_payroll not loaded yet — end-migrate finishes this.')
+    ```
+    Migrations fire only on a **version change**, so finishing a job that
+    already ran needs a new version folder (`19.0.1.2.1/end-migrate.py`); write
+    the pass idempotent and running both costs nothing.
+
+46. **`x_return_state` is the return-confirmation gate for ANY leave type, not
+    just annual — never re-add a `holiday_status_id.is_annual_leave` clause
+    next to it.** `hr.payslip._get_unresolved_vacation_leaves` is read by three
+    places at once (the `compute_sheet` guard, the batch skip in
+    `hr.payslip.employees._check_employee_for_batch`, and the attendance
+    sheet's `_confirmation_blockers`), and its type clause made all three blind
+    to unpaid leave: an employee was paid for a month nobody had confirmed he
+    came back from. The field only ever leaves `'not_applicable'` on a type
+    that uses the system, so **the state is the filter** — that is also why the
+    punch alert (`KSW_annual_leave/models/hr_attendance.py`) and
+    `attendance_sheet._leave_coverage_end` no longer name a type.
+    Unpaid leave (Sep 2026) stamps `on_vacation` in `_action_validate` and
+    calls `_notify_return_confirmation_due()` — one message to the DM at
+    approval, never a recurring chase.
+    **The two flows differ on exactly one thing: what shortening means.** An
+    annual vacation is paid up front, so `_shorten_to_confirmed_return`
+    deliberately preserves the duration and only moves the covered period; an
+    unpaid leave is deducted in arrears, so its duration **must** shrink —
+    every trimmed day is a day paid again. And
+    `KSW_unpaid_leave._apply_confirmed_return` must **never** call
+    `_sync_opening_reset_to_return`: that restarts the annual accrual from zero
+    on the return date, which is right for a vacation and would wipe an
+    employee's whole balance for taking leave that paid them nothing. A type
+    flagged both annual and unpaid keeps the annual path —
+    `_uses_unpaid_return()` is the switch.
+
+47. **View inheritance may not use a translated attribute as an xpath
+    selector.** `//widget[@name='web_ribbon'][@title='🏖️ On Vacation']` raises
+    `ValidationError: View inheritance may not use attribute 'title' as a
+    selector` — `ir_ui_view._valid_inheritance` rejects `TRANSLATED_ATTRS`
+    (`title`, `string`, `help`, `placeholder`, `confirm`…) because the selector
+    would stop matching in Arabic and fail silently in that language only.
+    Give the target a non-translated handle in the view that owns it
+    (`class="o_ksw_ribbon_on_vacation"`) and select with `hasclass()` — not
+    `[@class='…']`, which Odoo warns about separately since a class list is not
+    an identity. Comment it as a selector handle or the next reader deletes it
+    as dead CSS.

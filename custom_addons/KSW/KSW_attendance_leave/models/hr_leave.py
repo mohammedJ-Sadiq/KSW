@@ -277,6 +277,20 @@ class HrLeave(models.Model):
             )
         )
 
+    def _excuses_absence(self):
+        """Return the leaves that make a linked absent day a *paid* day.
+
+        Linking an absence to a leave answers "why was he away"; excusing it
+        answers "is he still paid for it".  They are not the same question.
+        Every leave type excuses by default — an unpaid one does not, and
+        KSW_unpaid_leave overrides this to take itself out of the set, so the
+        day stays absent and ATTDED deducts it.
+
+        Callers must keep filtering on ``state == 'validate'`` themselves;
+        this helper only answers the payment question.
+        """
+        return self
+
     @api.constrains('x_attendance_ids', 'holiday_status_id')
     def _check_attendance_ids_required(self):
         for leave in self:
@@ -975,7 +989,12 @@ class HrLeave(models.Model):
 
     def _validate_leave_request(self):
         """Override to post detailed approval message for attendance-based leaves."""
-        attendance_leaves = self.filtered('x_attendance_ids')
+        # Gate on the leave TYPE, not on the m2m being filled: an ordinary
+        # leave that was validated once already carries the absences linked by
+        # _auto_link_absence_attendance(), and would otherwise take the
+        # attendance-issue branch on every re-validation and never reach
+        # super() (gotcha #33).
+        attendance_leaves = self._attendance_issue_leaves()
         remaining = self - attendance_leaves
 
         if remaining:

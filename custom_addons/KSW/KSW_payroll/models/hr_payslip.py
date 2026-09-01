@@ -599,8 +599,16 @@ class HrPayslip(models.Model):
     @api.model
     def _get_unresolved_vacation_leaves(self, employee_id, date_to,
                                         exclude_payslip_id=None):
-        """Return validated annual-leave records whose return is still
-        pending (x_return_state == 'on_vacation').
+        """Return validated leaves whose return is still pending
+        (x_return_state == 'on_vacation').
+
+        No leave-type clause on purpose.  `x_return_state` only ever leaves
+        'not_applicable' on a type that uses the return system — annual
+        leave, and unpaid leave since Sep 2026 — so the state IS the filter,
+        and any type adopting the system is covered without touching this
+        query again.  Naming `is_annual_leave` here is what let a month of
+        unpaid leave through the batch with nobody confirming the employee
+        was ever back.
 
         :param employee_id: int — employee DB id
         :param date_to: date — payslip end date
@@ -613,7 +621,6 @@ class HrPayslip(models.Model):
         unresolved = self.env['hr.leave'].sudo().search([
             ('employee_id', '=', employee_id),
             ('state', '=', 'validate'),
-            ('holiday_status_id.is_annual_leave', '=', True),
             ('x_return_state', '=', 'on_vacation'),
             ('request_date_from', '<=', date_to),
         ])
@@ -646,15 +653,17 @@ class HrPayslip(models.Model):
                 )
                 for l in unresolved
             )
+            manager = payslip.employee_id.sudo().leave_manager_id
             raise ValidationError(_(
                 "Cannot compute payslip for %(employee)s.\n\n"
-                "The following annual leave(s) have not been fully "
-                "confirmed (HR return confirmation is still pending):\n"
+                "Nobody has confirmed that this employee came back from:\n"
                 "%(details)s\n\n"
-                "Please resolve the vacation return before processing "
-                "payroll.",
+                "Waiting on %(manager)s (the Time Off manager) to open the "
+                "request, set the Return Date and press \"Confirm Return\". "
+                "Until then the system does not know which days were worked.",
                 employee=payslip.employee_id.name,
                 details=details,
+                manager=manager.name if manager else _('the Time Off manager'),
             ))
 
     # ------------------------------------------------------------------

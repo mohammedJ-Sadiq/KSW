@@ -5,7 +5,7 @@ class HrPayslipEmployees(models.TransientModel):
     """Override the standard 'Generate Payslips' wizard to:
 
     1. Pre-check each employee for blocking conditions before creating a
-       payslip (no active contract, unresolved vacation return).
+       payslip (no active contract, unconfirmed return from leave).
     2. Skip problematic employees instead of raising a hard error for the
        whole batch.
     3. Record the skipped employees + reasons on the batch
@@ -33,7 +33,8 @@ class HrPayslipEmployees(models.TransientModel):
 
         Checks (in order):
         1. No active contract / version for the period.
-        2. Unresolved annual-leave return pending HR confirmation.
+        2. A leave (annual or unpaid) whose return the direct manager has
+           not confirmed — the system does not know which days were worked.
         3. A confirmed payslip already covers the period — the slip would
            be created but could never be confirmed
            (``hr.payslip._check_duplicate_done_period``).  Corrections go
@@ -61,7 +62,14 @@ class HrPayslipEmployees(models.TransientModel):
                 )
                 for l in unresolved
             )
-            return _('Unresolved vacation return pending HR confirmation: %s') % details
+            manager = employee.sudo().leave_manager_id
+            return _(
+                'Return not confirmed — waiting on %(manager)s to press '
+                '"Confirm Return" on: %(details)s',
+                manager=(manager.name if manager
+                         else _('the Time Off manager')),
+                details=details,
+            )
 
         # -- Already-confirmed period ----------------------------------------
         # Mirrors hr.payslip._check_duplicate_done_period: a confirmed

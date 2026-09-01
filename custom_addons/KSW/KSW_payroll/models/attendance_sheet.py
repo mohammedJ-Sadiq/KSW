@@ -11,7 +11,7 @@ class KswAttendanceSheet(models.Model):
     _inherit = 'ksw.attendance.sheet'
 
     def _unresolved_return_leaves(self):
-        """Overlapping annual leaves whose return nobody has confirmed."""
+        """Overlapping leaves whose return nobody has confirmed."""
         self.ensure_one()
         _date_from, date_to = self._period_bounds()
         return self.env['hr.payslip']._get_unresolved_vacation_leaves(
@@ -35,10 +35,10 @@ class KswAttendanceSheet(models.Model):
         end date takes over.
         """
         self.ensure_one()
-        is_open_return = (
-            leave.holiday_status_id.is_annual_leave
-            and leave.x_return_state == 'on_vacation'
-        )
+        # Any leave using the return system, not annual only: an unpaid
+        # leave whose return nobody confirmed leaves exactly the same hole —
+        # nobody knows when the employee came back.
+        is_open_return = leave.x_return_state == 'on_vacation'
         if is_open_return and leave.request_date_from:
             return max(period_end,
                        super()._leave_coverage_end(leave, period_end))

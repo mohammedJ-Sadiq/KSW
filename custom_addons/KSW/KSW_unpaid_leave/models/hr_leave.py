@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from markupsafe import Markup
 
 from odoo import api, fields, models
@@ -56,6 +58,121 @@ class HrLeaveUnpaid(models.Model):
             leave.holiday_status_id
             and leave.holiday_status_id.leave_validation_type == 'unpaid_multi'
         )
+
+    def _excuses_absence(self):
+        """An unpaid leave explains the absence but does not pay for it.
+
+        The absence records stay linked to the leave (so the attendance view
+        and the report still show which request the day belongs to), but they
+        must NOT be flagged covered: the day has to stay absent so ATT_ABS /
+        ATTDED deduct it on the payslip.  Before this, an unpaid month was
+        paid in full — the exact opposite of what was requested.
+        """
+        return super()._excuses_absence().filtered(
+            lambda l: not self._is_unpaid_leave(l))
+
+    # ------------------------------------------------------------------
+    # Return confirmation — the DM closes the leave on the actual date
+    # ------------------------------------------------------------------
+
+    def _uses_unpaid_return(self):
+        """True when the *unpaid* return handling applies to this leave.
+
+        A type flagged both `is_annual_leave` and `is_unpaid_leave`
+        ("Unpaid Vacation") keeps the annual behaviour end to end — it is
+        settled against the annual balance and its return drives the accrual
+        restart.  Only a purely unpaid leave takes the branch below.
+        """
+        self.ensure_one()
+        return (
+            self._is_unpaid_leave(self)
+            and not self._is_annual_leave(self)
+        )
+
+    def _shorten_to_confirmed_return(self):
+        """End the unpaid leave on the day the employee actually came back.
+
+        The opposite of the annual case in one decisive respect: there the
+        money is already paid and the duration is deliberately preserved, so
+        shortening only changes the period the request *covers*.  Unpaid days
+        are deducted in arrears, so here the duration **must** move — every
+        day trimmed off the end is a day the employee is paid for again.
+        `_compute_duration` re-derives it from the calendar, which is exactly
+        what we want, so no figures are captured or restored.
+        """
+        self.ensure_one()
+        if not self._uses_unpaid_return():
+            return super()._shorten_to_confirmed_return()
+        if not (self.x_return_date and self.request_date_from
+                and self.request_date_to):
+            return False
+
+        new_end = self.x_return_date - timedelta(days=1)
+        if new_end >= self.request_date_to:
+            # Back on or after the planned end — nothing to shorten, and a
+            # late return is not an extension of the leave.
+            return False
+        if new_end < self.request_date_from:
+            # Back before the leave began; too odd to fix silently.
+            return False
+
+        old_end = self.request_date_to
+        leave = self.sudo().with_context(_skip_toggle_validity=True)
+        leave.write({'request_date_to': new_end})
+        leave.env.flush_all()
+
+        # Absences after the return are no longer this leave's business —
+        # from that day the employee is attending, and any gap is an
+        # ordinary absence to be judged on its own.
+        stale = leave.x_attendance_ids.filtered(
+            lambda a: a.check_in and a.check_in.date() > new_end)
+        if stale:
+            leave.write({'x_attendance_ids': [(3, a.id) for a in stale]})
+            stale._recompute_deductions()
+
+        # Sheet employees: the lock was written for the original range.
+        # Unlock restores every line it owns, then re-lock marks only the
+        # shortened range absent — so the days after the return go back to
+        # attended.
+        self._unlock_attendance_sheet_lines(self)
+        self._lock_attendance_sheet_lines(self)
+        return old_end
+
+    def _apply_confirmed_return(self):
+        """Unpaid: correct the period, then refresh the accrual — nothing else.
+
+        Deliberately does NOT call `_sync_opening_reset_to_return`.  That
+        moves `ksw.annual.leave.x_opening_reset_date` onto the return date and
+        restarts the annual accrual **from zero**, which is right for a
+        vacation (taking it consumes the entitlement) and catastrophic for an
+        unpaid leave: the employee would lose their whole accrued balance for
+        having taken leave that paid them nothing.
+        """
+        self.ensure_one()
+        if not self._uses_unpaid_return():
+            return super()._apply_confirmed_return()
+
+        old_end = self._shorten_to_confirmed_return()
+        if old_end:
+            self.sudo().message_post(
+                body=Markup(
+                    '<strong>&#9986; Unpaid Period Shortened to the Actual '
+                    'Return</strong><br/>'
+                    '<b>Ends:</b> %(old_end)s &#8594; %(new_end)s<br/>'
+                    '<b>Unpaid days:</b> %(days).0f<br/>'
+                    '<i>The employee is recorded as attending from '
+                    '%(return_date)s, so those days are paid again.</i>'
+                ) % {
+                    'old_end': old_end,
+                    'new_end': self.request_date_to,
+                    'days': self.number_of_days,
+                    'return_date': self.x_return_date,
+                },
+                subtype_xmlid='mail.mt_note',
+            )
+        # Unpaid days reduce effective service, and there are now fewer.
+        self.env['ksw.annual.leave']._refresh_accrual_for_employees(
+            self.employee_id.ids)
 
     def _multi_step_validation_types(self):
         """Declare 'unpaid_multi' as a KSW multi-step chain.
@@ -319,6 +436,22 @@ class HrLeaveUnpaid(models.Model):
             self._lock_attendance_sheet_lines(leave)
 
         if unpaid:
+            # The return has to be confirmed by the direct manager, exactly
+            # like an annual vacation: nobody but the DM knows the day the
+            # employee actually came back, and on unpaid leave that date is
+            # the difference between a deducted day and a paid one.  Until
+            # it is confirmed the payslip batch skips the employee
+            # (hr.payslip._get_unresolved_vacation_leaves).
+            #
+            # Filtered on 'not_applicable' so a type flagged BOTH annual and
+            # unpaid ("Unpaid Vacation") is not stamped twice — the annual
+            # _action_validate above has already done it.
+            pending_return = unpaid.filtered(
+                lambda l: l.x_return_state == 'not_applicable')
+            if pending_return:
+                pending_return.write({'x_return_state': 'on_vacation'})
+                pending_return._notify_return_confirmation_due()
+
             # Refresh accrual — unpaid days now reduce effective service
             emp_ids = unpaid.mapped('employee_id').ids
             self.env['ksw.annual.leave']._refresh_accrual_for_employees(
@@ -341,6 +474,11 @@ class HrLeaveUnpaid(models.Model):
             self._unlock_attendance_sheet_lines(leave)
 
         result = super().action_refuse()
+
+        # There is no longer a return to confirm; leaving the stamp behind
+        # would block the employee's payslip over a refused request.
+        # (Annual leaves are reset by the super() call itself.)
+        (unpaid - annual)._reset_return_tracking()
 
         if unpaid_multi:
             unpaid_multi._reset_annual_multi_fields()
@@ -368,6 +506,8 @@ class HrLeaveUnpaid(models.Model):
             unpaid_multi._reset_annual_multi_fields()
 
         result = super()._move_validate_leave_to_confirm()
+
+        (unpaid - annual)._reset_return_tracking()
 
         if unpaid_multi and not keep_data:
             unpaid_multi.write({'x_annual_approval_state': 'pending_dm'})

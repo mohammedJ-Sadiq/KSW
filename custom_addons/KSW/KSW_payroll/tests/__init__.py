@@ -23,3 +23,6 @@ from . import test_payslip_revision
 
 
 from . import test_unconfirmed_sheet_zero
+
+from . import test_unpaid_leave_deduction
+from . import test_unpaid_return_gate

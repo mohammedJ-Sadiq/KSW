@@ -51,16 +51,22 @@ class HrAttendance(models.Model):
         help='Worked hours including time covered by approved time-off.',
     )
 
-    @api.depends('x_leave_ids', 'x_leave_ids.state')
+    @api.depends('x_leave_ids', 'x_leave_ids.state',
+                 'x_leave_ids.holiday_status_id')
     def _compute_is_covered(self):
         for att in self:
-            att.x_is_covered = bool(
-                att.x_leave_ids.filtered(lambda l: l.state == 'validate'))
+            validated = att.x_leave_ids.filtered(
+                lambda l: l.state == 'validate')
+            # "Covered" means the day is excused *and paid*.  An unpaid leave
+            # is linked to the absence too — that is how the day is explained —
+            # but it must stay absent so ATTDED deducts it.
+            att.x_is_covered = bool(validated._excuses_absence())
 
     @api.depends(
         'x_late_minutes', 'x_early_leave_minutes', 'x_is_absent', 'worked_hours',
         'employee_id.x_check_in_only',
         'x_leave_ids.state',
+        'x_leave_ids.holiday_status_id',
         'x_leave_ids.x_attendance_line_ids.accepted_minutes',
         'x_leave_ids.x_attendance_line_ids.issue_type',
         'x_leave_ids.x_attendance_line_ids.attendance_id',
@@ -76,9 +82,12 @@ class HrAttendance(models.Model):
             approved_leaves = att.x_leave_ids.filtered(
                 lambda l: l.state == 'validate'
             )
+            # Only a *paid* leave turns an absent day into a worked one.
+            excusing_leaves = approved_leaves._excuses_absence()
             for leave in approved_leaves:
                 # Check if this leave covers absence
-                if att.x_is_absent and not absent_covered:
+                if (att.x_is_absent and not absent_covered
+                        and leave in excusing_leaves):
                     if leave.x_attendance_ids and att.id in leave.x_attendance_ids.ids:
                         absent_covered = True
                         covering_leave = leave

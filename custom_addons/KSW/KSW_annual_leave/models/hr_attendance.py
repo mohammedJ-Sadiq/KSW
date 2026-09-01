@@ -51,10 +51,14 @@ class HrAttendance(models.Model):
         HrLeave = self.env['hr.leave'].sudo()
         # One query for the whole batch: a device sync imports hundreds of
         # punches at a time and must not run a search per record.
+        # No leave-type clause: `x_return_state` is only ever moved off
+        # 'not_applicable' by a type that uses the return system (annual, and
+        # unpaid since Sep 2026), so the state IS the filter.  Naming a type
+        # here would have quietly excluded unpaid leaves from the one alert
+        # that tells the employee their payslip is blocked.
         candidates = HrLeave.search([
             ('employee_id', 'in', punches.employee_id.ids),
             ('state', '=', 'validate'),
-            ('holiday_status_id.is_annual_leave', '=', True),
             ('x_return_state', '=', 'on_vacation'),
             ('x_return_punch_notified_on', '=', False),
         ])

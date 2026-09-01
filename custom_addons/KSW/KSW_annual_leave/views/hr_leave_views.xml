@@ -139,7 +139,12 @@
 
             <!-- Ribbons -->
             <xpath expr="//sheet" position="inside">
+                <!-- The class is a selector handle, not styling: `title` is a
+                     translated attribute and Odoo refuses translated
+                     attributes in an inherited view's xpath, so a dependent
+                     module has no other way to reach this one ribbon. -->
                 <widget name="web_ribbon" title="🏖️ On Vacation"
+                        class="o_ksw_ribbon_on_vacation"
                         bg_color="text-bg-warning"
                         invisible="x_return_state != 'on_vacation' or x_annual_approval_state == 'pending_employee_signature'"/>
                 <widget name="web_ribbon" title="⚠ Full Clearance"

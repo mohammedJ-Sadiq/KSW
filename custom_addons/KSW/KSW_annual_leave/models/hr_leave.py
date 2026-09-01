@@ -1153,6 +1153,70 @@ class HrLeave(models.Model):
                 and leave.employee_id.leave_manager_id.id == uid
             )
 
+    _RETURN_TRACKING_FIELDS = {
+        'x_return_state': 'not_applicable',
+        'x_return_date': False,
+        'x_manager_return_confirmed_by': False,
+        'x_manager_return_date': False,
+        'x_hr_return_confirmed_by': False,
+        'x_hr_return_date': False,
+        'x_return_punch_notified_on': False,
+    }
+
+    def _reset_return_tracking(self):
+        """Clear the return-confirmation stamps on these leaves.
+
+        The leave is no longer a granted absence (refused, sent back, reset),
+        so there is no return to confirm and nothing should be blocking the
+        employee's payslip.  Extracted from the two call sites below because
+        KSW_unpaid_leave now stamps the same fields — one dict, or the two
+        modules drift apart the first time a field is added here.
+        """
+        stamped = self.filtered(
+            lambda l: l.x_return_state != 'not_applicable')
+        if stamped:
+            stamped.write(dict(self._RETURN_TRACKING_FIELDS))
+
+    def _notify_return_confirmation_due(self):
+        """Tell the direct manager, once, that this return is theirs to close.
+
+        Not a chase — the daily manager reminder was deleted in Aug 2026
+        precisely because nagging the party who is already not acting achieves
+        nothing.  What was missing is telling them at the moment the leave is
+        granted: what they will have to do, and that payroll skips the
+        employee entirely until they do it.  After that the enforcement is
+        structural (the batch skip, and the employee's own punch alert), not
+        a reminder.
+        """
+        for leave in self:
+            dm_user = leave.employee_id.leave_manager_id
+            partner = dm_user.partner_id if dm_user else False
+            if not partner:
+                continue
+            leave.sudo().message_post(
+                body=Markup(
+                    '<strong>&#9203; Action Required — Confirm the Return'
+                    '</strong><br/>'
+                    '<b>Employee:</b> %(employee)s<br/>'
+                    '<b>Leave Type:</b> %(leave_type)s<br/>'
+                    '<b>Period:</b> %(date_from)s &#8594; %(date_to)s<br/>'
+                    '<br/>'
+                    'When %(employee)s is back at work, open this request, '
+                    'set the <b>Return Date</b> to the day they actually '
+                    'returned and press <b>Confirm Return</b>.<br/>'
+                    '<i>Until you do, payroll cannot produce a payslip for '
+                    'this employee at all — they are skipped from the '
+                    'monthly batch.</i>'
+                ) % {
+                    'employee': leave.employee_id.name or '',
+                    'leave_type': leave.holiday_status_id.display_name or '',
+                    'date_from': leave.request_date_from,
+                    'date_to': leave.request_date_to,
+                },
+                partner_ids=[partner.id],
+                subtype_xmlid='mail.mt_comment',
+            )
+
     def _check_can_edit_return_date(self):
         """Only the leave manager may amend an already-confirmed return date."""
         self.ensure_one()
@@ -2632,15 +2696,7 @@ class HrLeave(models.Model):
         annual_emp_ids = self.filtered(self._is_annual_leave).mapped('employee_id').ids
 
         if annual:
-            annual.write({
-                'x_return_state': 'not_applicable',
-                'x_return_date': False,
-                'x_manager_return_confirmed_by': False,
-                'x_manager_return_date': False,
-                'x_hr_return_confirmed_by': False,
-                'x_hr_return_date': False,
-                'x_return_punch_notified_on': False,
-            })
+            annual._reset_return_tracking()
 
         # A *targeted* return (the admin wizard picking a specific step) keeps
         # every figure the approvers already entered and sets its own target
@@ -2682,15 +2738,7 @@ class HrLeave(models.Model):
         result = super().action_refuse()
 
         if annual:
-            annual.write({
-                'x_return_state': 'not_applicable',
-                'x_return_date': False,
-                'x_manager_return_confirmed_by': False,
-                'x_manager_return_date': False,
-                'x_hr_return_confirmed_by': False,
-                'x_hr_return_date': False,
-                'x_return_punch_notified_on': False,
-            })
+            annual._reset_return_tracking()
 
         if annual_multi:
             annual_multi._reset_annual_multi_fields()

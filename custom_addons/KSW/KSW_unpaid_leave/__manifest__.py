@@ -1,6 +1,6 @@
 {
     'name': 'KSW Unpaid Leave',
-    'version': '19.0.1.1.0',
+    'version': '19.0.1.3.0',
     'category': 'Human Resources',
     'summary': 'Unpaid leave with multi-step approval and attendance sheet integration',
     'description': """

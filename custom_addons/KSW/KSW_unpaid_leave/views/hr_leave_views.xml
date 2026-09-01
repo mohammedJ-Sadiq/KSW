@@ -151,18 +151,48 @@
                         invisible="validation_type != 'unpaid_multi'"/>
             </xpath>
 
-            <!-- ===== Hide return confirmation fields for unpaid leaves
-                 and while the employee signature step is pending      ===== -->
-            <xpath expr="//field[@name='x_return_date']" position="attributes">
-                <attribute name="invisible">
-                    x_return_state == 'not_applicable' or x_is_unpaid_leave_type or x_annual_approval_state == 'pending_employee_signature'
-                </attribute>
+            <!-- ===== Return confirmation for unpaid leaves =====
+                 Unpaid leave now uses the same return-confirmation gate as
+                 annual: the direct manager records the day the employee came
+                 back, and payroll skips the employee until they do.
+
+                 The annual view's own Return Status group lives inside the
+                 <div invisible="not x_is_annual_leave_type"> info panel, so a
+                 purely unpaid leave can never see it — and the "Confirm
+                 Return" button in the header would have been pressable with
+                 nowhere to type the date it requires.  Hence a mirrored group
+                 here, for unpaid types that are not also annual ones (an
+                 "Unpaid Vacation" type carries both flags and keeps the
+                 annual panel). -->
+            <xpath expr="//group[@name='col_left']" position="after">
+                <group string="Return Status" name="unpaid_return_status"
+                       invisible="not x_is_unpaid_leave_type or x_is_annual_leave_type or x_return_state == 'not_applicable'">
+                    <field name="x_return_date"
+                           readonly="x_return_state == 'hr_confirmed' and not x_can_edit_return_date"
+                           required="x_return_state == 'on_vacation' and x_can_confirm_return_manager"
+                           help="The day the employee actually came back. Days after it are paid again."/>
+                    <field name="x_return_state" widget="badge"
+                           string="Return Status"
+                           decoration-warning="x_return_state == 'on_vacation'"
+                           decoration-success="x_return_state == 'hr_confirmed'"/>
+                    <field name="x_manager_return_confirmed_by"
+                           string="Confirmed By"
+                           invisible="x_return_state != 'hr_confirmed'"/>
+                </group>
             </xpath>
 
-            <xpath expr="//field[@name='x_return_state'][@widget='badge']" position="attributes">
+            <!-- "On Vacation" is the wrong word for unpaid leave; keep the
+                 ribbon's meaning (the return is still open) with the right one. -->
+            <xpath expr="//widget[hasclass('o_ksw_ribbon_on_vacation')]"
+                   position="attributes">
                 <attribute name="invisible">
-                    x_return_state == 'not_applicable' or x_is_unpaid_leave_type or x_annual_approval_state == 'pending_employee_signature'
+                    x_return_state != 'on_vacation' or x_annual_approval_state == 'pending_employee_signature' or (x_is_unpaid_leave_type and not x_is_annual_leave_type)
                 </attribute>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <widget name="web_ribbon" title="⏳ Return Not Confirmed"
+                        bg_color="text-bg-warning"
+                        invisible="x_return_state != 'on_vacation' or not x_is_unpaid_leave_type or x_is_annual_leave_type"/>
             </xpath>
 
         </field>
