@@ -68,33 +68,46 @@
     </function>
 
     <!-- ══ 2. The month ═════════════════════════════════════════════ -->
+    <!--
+        The month itself is everyone's: the supervisor hands his department
+        over here, the GM approves it and the accountant exports it. None of
+        the three had a menu of their own before: the GM and the accountant
+        reached it only through the Supervisor / Administrator groups they
+        happened to also hold, so a GM-only user opened the app to nothing.
+    -->
     <menuitem id="menu_ksw_pay_run"
               name="Monthly Pay Run"
               parent="menu_ksw_commissions_root"
               action="action_ksw_pay_run"
               sequence="20"
-              groups="KSW_commissions.group_commission_supervisor"/>
+              groups="KSW_commissions.group_commission_supervisor,KSW_commissions.group_commission_gm,KSW_commissions.group_commission_accountant"/>
 
     <menuitem id="menu_ksw_pay_submission"
               name="Department Submissions"
               parent="menu_ksw_commissions_root"
               action="action_ksw_pay_submission"
               sequence="25"
-              groups="KSW_commissions.group_commission_supervisor"/>
+              groups="KSW_commissions.group_commission_supervisor,KSW_commissions.group_commission_gm"/>
 
     <!-- ══ 3. Reports ═══════════════════════════════════════════════ -->
+    <!--
+        Widened together with the Payment Register below it: a menu's
+        effective groups are the INTERSECTION of its own and every
+        ancestor's, so a section still gated to Administrator would orphan
+        a register the GM and the accountant can now see (gotcha #41).
+    -->
     <menuitem id="menu_ksw_reports_section"
               name="Reports"
               parent="menu_ksw_commissions_root"
               sequence="30"
-              groups="KSW_commissions.group_commission_officer"/>
+              groups="KSW_commissions.group_commission_officer,KSW_commissions.group_commission_gm,KSW_commissions.group_commission_accountant"/>
 
     <menuitem id="menu_ksw_pay_run_line"
               name="Payment Register"
               parent="menu_ksw_reports_section"
               action="action_ksw_pay_run_line"
               sequence="10"
-              groups="KSW_commissions.group_commission_officer"/>
+              groups="KSW_commissions.group_commission_officer,KSW_commissions.group_commission_gm,KSW_commissions.group_commission_accountant"/>
 
     <!-- ══ 4. Sales & Collection — paid separately, not a component ══ -->
     <menuitem id="menu_ksw_sales_commission_section"
@@ -111,45 +124,58 @@
               groups="KSW_commissions.group_entry_sales"/>
 
     <!-- ══ 5. Configuration ═════════════════════════════════════════ -->
+    <!--
+        The database carries an extra Accountant group on this menu from an
+        earlier install. `groups=` is ADDITIVE, so removing it from the file
+        never removed it from the database (gotcha #3): set the list outright.
+        The accountant who maintains this sheet holds the Sales & Collection
+        privilege now, like everybody else who works on it.
+    -->
+    <function model="ir.ui.menu" name="write">
+        <value eval="[ref('menu_ksw_sales_commission_sheet')]"/>
+        <value eval="{'group_ids': [(6, 0, [
+            ref('KSW_commissions.group_entry_sales')])]}"/>
+    </function>
+
     <menuitem id="menu_ksw_commissions_config"
               name="Configuration"
               parent="menu_ksw_commissions_root"
               sequence="100"
-              groups="KSW_commissions.group_commission_admin"/>
+              groups="KSW_commissions.group_commission_officer"/>
 
     <menuitem id="menu_ksw_pay_component"
               name="Pay Components"
               parent="menu_ksw_commissions_config"
               action="action_ksw_pay_component"
               sequence="10"
-              groups="KSW_commissions.group_commission_admin"/>
+              groups="KSW_commissions.group_commission_officer"/>
 
     <menuitem id="menu_ksw_commissions_sites"
               name="Work Sites"
               parent="menu_ksw_commissions_config"
               action="action_ksw_site"
               sequence="30"
-              groups="KSW_commissions.group_commission_admin"/>
+              groups="KSW_commissions.group_commission_officer"/>
 
     <menuitem id="menu_ksw_salesperson_profile"
               name="Salesperson Profiles"
               parent="menu_ksw_commissions_config"
               action="action_ksw_salesperson_profile"
               sequence="40"
-              groups="KSW_commissions.group_commission_admin"/>
+              groups="KSW_commissions.group_commission_officer"/>
 
     <menuitem id="menu_ksw_sales_commission_rules"
               name="Sales/Collection Commission Rules"
               parent="menu_ksw_commissions_config"
               action="action_ksw_sales_commission_rule"
               sequence="50"
-              groups="KSW_commissions.group_commission_admin"/>
+              groups="KSW_commissions.group_commission_officer"/>
 
     <menuitem id="menu_ksw_commissions_settings"
               name="General Settings"
               parent="menu_ksw_commissions_config"
               action="action_ksw_commissions_config_settings"
               sequence="60"
-              groups="KSW_commissions.group_commission_admin"/>
+              groups="KSW_commissions.group_commission_officer"/>
 
 </odoo>

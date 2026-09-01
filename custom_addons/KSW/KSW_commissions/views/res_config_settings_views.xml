@@ -15,7 +15,7 @@
         <field name="arch" type="xml">
             <xpath expr="//form" position="inside">
                 <app data-string="KSW Commissions" string="KSW Commissions"
-                     name="ksw_commissions" groups="KSW_commissions.group_commission_admin">
+                     name="ksw_commissions" groups="KSW_commissions.group_commission_officer">
                     <block title="Meal Prices"
                            name="ksw_meal_settings"
                            help="What one meal is worth. These are the Breakfast, Lunch and Dinner options of the Meals pay component — the same records the Configuration &gt; Pay Components screen edits, and what a pay entry resolves its rate from. Changing one re-prices every entry that uses it, approved months included — exactly as editing the component's rate always has, so change a price between runs rather than during one.">

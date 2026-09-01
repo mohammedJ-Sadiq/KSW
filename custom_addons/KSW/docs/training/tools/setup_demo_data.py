@@ -25,7 +25,6 @@ PERSONAS = {
         "KSW_annual_leave.group_leave_self",
         "KSW_deduction.group_deduction_user",
         "KSW_payroll.group_hr_payroll_self",
-        "KSW_commissions.group_commission_self",
     ],
     "supervisor": [
         "base.group_user",
@@ -56,6 +55,7 @@ PERSONAS = {
         "base.group_user",
         "KSW_annual_leave.group_annual_leave_gm",
         "KSW_deduction.group_loan_gm",
+        "KSW_commissions.group_commission_gm",
     ],
     "payroll": [
         "base.group_user",
@@ -69,7 +69,7 @@ PERSONAS = {
         "base.group_user",
         "KSW_deduction.group_deduction_manager",
         "KSW_deduction.group_loan_edit_delete",
-        "KSW_commissions.group_commission_admin",
+        "KSW_commissions.group_commission_officer",
         "KSW_commissions.group_sales_commission_manager",
     ],
 }

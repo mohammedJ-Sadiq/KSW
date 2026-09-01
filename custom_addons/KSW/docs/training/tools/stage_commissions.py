@@ -48,11 +48,10 @@ def setup_supervisor():
     user = env["res.users"].search([("login", "=", "train.supervisor")], limit=1)
     if not user:
         raise Exception("train.supervisor does not exist — run setup_demo_data.py")
+    # One role each since 19.0.4.0.0: the per-entry-type groups are gone,
+    # a supervisor records every kind of entry for his own department.
     groups = [g for g in (
         ref("KSW_commissions.group_commission_supervisor"),
-        ref("KSW_commissions.group_entry_overtime"),
-        ref("KSW_commissions.group_entry_driver"),
-        ref("KSW_commissions.group_entry_location"),
     ) if g]
     user.sudo().write({"group_ids": [(4, g.id) for g in groups]})
 

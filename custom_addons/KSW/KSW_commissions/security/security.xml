@@ -5,20 +5,30 @@
     <!-- Layer 1: Module Category                                      -->
     <!-- ============================================================ -->
     <!--
-        Mirrors the layout of KSW_annual_leave / KSW_deduction:
-        a single row in the User form ("KSW Commissions") with two
-        privilege dropdowns:
+        TWO questions on the user form, and no more (19.0.4.0.0):
 
-          • Commission Management — tiered (Self / Supervisor /
-            Officer) for sheet CRUD scope.
-          • Commission Approval   — the Accountant role that
-            unlocks the loans-locked field on confirmed sheets and
-            can finalise (state confirmed → done).
+          • Commission Role      — who this person is in the monthly pay
+            cycle: Supervisor, General Manager, Accountant, Administrator.
+          • Sales & Collection   — the separate monthly sales sheet, paid
+            outside the pay run, so it is a separate question.
 
-        A separate "Commission Configuration" privilege gates
-        master-data (categories + sites) so that Officers can
-        manage day-to-day sheets without being able to alter the
-        catalog.
+        It used to be NINE controls. Four of them gated nothing at all —
+        Entry: Overtime / Driver Commission / Location Allowance and the
+        "Self" tier were left behind when the fourteen old commission
+        models were replaced by the five ksw.pay.* ones, and had no ACL
+        row, no record rule, no view groups= and no Python check between
+        them. Two more asked about things that are not roles: "Officer"
+        was scope (sees every department) and "Configuration" was the
+        catalog — both are now simply what Administrator means.
+
+        THE ROLES ARE MUTUALLY EXCLUSIVE ON PURPOSE. Sharing one privilege
+        renders them as a single-select, which is what enforces the
+        separation of duties the chain exists for: the person who records
+        an entry cannot approve it, and the person who approves it cannot
+        export the money. Administrator is the one tier that implies the
+        other three — "the system administrator can do everything" — so
+        stacking is expressed by picking the top of the ladder, never by
+        ticking two boxes.
     -->
     <record id="module_category_ksw_commissions" model="ir.module.category">
         <field name="name">KSW Commissions</field>
@@ -29,284 +39,140 @@
     <!-- Layer 2: Privileges                                           -->
     <!-- ============================================================ -->
     <record id="privilege_commission_management" model="res.groups.privilege">
-        <field name="name">Commission Management</field>
+        <field name="name">Commission Role</field>
         <field name="sequence">10</field>
         <field name="category_id" ref="module_category_ksw_commissions"/>
+        <field name="description">Where this person sits in the monthly pay cycle. One role each: the supervisor records, the General Manager approves, the accountant pays.</field>
     </record>
 
-    <record id="privilege_commission_approval" model="res.groups.privilege">
-        <field name="name">Commission Approval</field>
+    <record id="privilege_sales_override" model="res.groups.privilege">
+        <field name="name">Sales &amp; Collection</field>
         <field name="sequence">20</field>
         <field name="category_id" ref="module_category_ksw_commissions"/>
-    </record>
-
-    <record id="privilege_commission_configuration" model="res.groups.privilege">
-        <field name="name">Commission Configuration</field>
-        <field name="sequence">30</field>
-        <field name="category_id" ref="module_category_ksw_commissions"/>
-    </record>
-
-    <!-- Sales Override — gates the per-line "Override Condition" button on
-         ksw.sales.commission.line so that a sales manager can grant the
-         commission to a salesperson who didn't meet the threshold (with
-         a captured reason and audit trail). -->
-    <record id="privilege_sales_override" model="res.groups.privilege">
-        <field name="name">Sales Override</field>
-        <field name="sequence">40</field>
-        <field name="category_id" ref="module_category_ksw_commissions"/>
+        <field name="description">The monthly sales and collection commission sheet. Paid separately, outside the commission pay run, so it is asked separately.</field>
     </record>
 
     <!-- ============================================================ -->
-    <!-- Layer 3: Groups — Commission Management (tiered)              -->
+    <!-- Layer 3: Commission Role — the four tiers                     -->
     <!-- ============================================================ -->
-    <record id="group_commission_self" model="res.groups">
-        <field name="name">Self</field>
-        <field name="privilege_id" ref="privilege_commission_management"/>
-        <field name="comment">See own commission sheet only.</field>
-    </record>
+    <!--
+        The order below is the order they appear in the dropdown
+        (res.groups.sequence), not an inheritance chain: only
+        Administrator implies anything.
 
+        In particular General Manager does NOT imply Supervisor. He
+        approves a supervisor's work; handing him the supervisor's create
+        and write rights on the same entries would dissolve the very
+        review the submission step exists for. His reach comes from
+        hr.department.x_effective_gm_id through the department-scoped
+        rules further down — naming a group in a Python guard is worthless
+        if no ir.rule lets it see the records (CLAUDE.md gotcha #38).
+    -->
     <record id="group_commission_supervisor" model="res.groups">
         <field name="name">Supervisor</field>
+        <field name="sequence">10</field>
         <field name="privilege_id" ref="privilege_commission_management"/>
-        <field name="implied_ids" eval="[(4, ref('group_commission_self'))]"/>
-        <field name="comment">Edit commission sheets for direct subordinates with x_is_attendance_sheet=True.</field>
-    </record>
-
-    <record id="group_commission_officer" model="res.groups">
-        <field name="name">Officer</field>
-        <field name="privilege_id" ref="privilege_commission_management"/>
-        <field name="implied_ids" eval="[(4, ref('group_commission_supervisor'))]"/>
-        <field name="comment">Edit any commission sheet company-wide and reset confirmed sheets back to draft.</field>
-    </record>
-
-    <!-- Baseline: every internal user is implicitly Self. -->
-    <function model="res.groups" name="write">
-        <value eval="[ref('base.group_user')]"/>
-        <value eval="{'implied_ids': [(4, ref('group_commission_self'))]}"/>
-    </function>
-
-    <!-- ============================================================ -->
-    <!-- Layer 3: Groups — Commission Approval                         -->
-    <!-- ============================================================ -->
-    <!--
-        The Accountant who finalises commission sheets. Confers:
-          • write access to ``x_loans_amount_locked`` while the sheet
-            is in 'confirmed' state,
-          • permission to call ``action_done``,
-          • implicitly the Officer-tier viewing scope so the
-            accountant can see every sheet pending finalisation.
-    -->
-    <record id="group_commission_accountant" model="res.groups">
-        <field name="name">Accountant</field>
-        <field name="privilege_id" ref="privilege_commission_approval"/>
-        <field name="implied_ids" eval="[(4, ref('group_commission_officer'))]"/>
-        <field name="comment">Adjust the locked loans amount on confirmed sheets and finalise (state done). Implicitly grants Officer scope so the accountant can see every confirmed sheet.</field>
-    </record>
-
-    <!-- ============================================================ -->
-    <!-- Layer 3: Groups — Entry types (one opt-in group per type)     -->
-    <!-- ============================================================ -->
-    <!--
-        A supervisor should only see the kinds of entry they actually do.
-        One group per entry type, ticked per user; the hub cards, the menus
-        and the records all follow it, so a supervisor who only handles
-        driver commissions sees only that.
-
-        EACH GROUP GETS ITS OWN PRIVILEGE ON PURPOSE. In Odoo 19 the groups
-        sharing a privilege render as a single-select on the user form, so
-        putting all four under one privilege would make them mutually
-        exclusive — the opposite of what is wanted. One group per privilege
-        renders as an independent checkbox. (A group with no privilege at
-        all only renders in debug mode — see Odoo 19 Pitfalls #55.)
-
-        These are deliberately NOT implied by group_commission_supervisor:
-        the supervisor tier is the *scope*, these are the *opt-in*. Officer
-        implies all four, so Officer / Accountant / GM keep seeing
-        everything.
-    -->
-    <record id="privilege_entry_overtime" model="res.groups.privilege">
-        <field name="name">Entry: Overtime</field>
-        <field name="sequence">50</field>
-        <field name="category_id" ref="module_category_ksw_commissions"/>
-    </record>
-    <record id="group_entry_overtime" model="res.groups">
-        <field name="name">Overtime Entry</field>
-        <field name="privilege_id" ref="privilege_entry_overtime"/>
-        <field name="comment">Record overtime for the supervisor's own department.</field>
-    </record>
-
-    <record id="privilege_entry_driver" model="res.groups.privilege">
-        <field name="name">Entry: Driver Commission</field>
-        <field name="sequence">51</field>
-        <field name="category_id" ref="module_category_ksw_commissions"/>
-    </record>
-    <record id="group_entry_driver" model="res.groups">
-        <field name="name">Driver Commission Entry</field>
-        <field name="privilege_id" ref="privilege_entry_driver"/>
-        <field name="comment">Record driver trips and pull them from BAS.</field>
-    </record>
-
-    <record id="privilege_entry_location" model="res.groups.privilege">
-        <field name="name">Entry: Location Allowance</field>
-        <field name="sequence">52</field>
-        <field name="category_id" ref="module_category_ksw_commissions"/>
-    </record>
-    <record id="group_entry_location" model="res.groups">
-        <field name="name">Location Allowance Entry</field>
-        <field name="privilege_id" ref="privilege_entry_location"/>
-        <field name="comment">Record technician meal occurrences for the supervisor's own department.</field>
-    </record>
-
-    <record id="privilege_entry_sales" model="res.groups.privilege">
-        <field name="name">Entry: Sales &amp; Collection</field>
-        <field name="sequence">53</field>
-        <field name="category_id" ref="module_category_ksw_commissions"/>
-    </record>
-    <record id="group_entry_sales" model="res.groups">
-        <field name="name">Sales &amp; Collection Entry</field>
-        <field name="privilege_id" ref="privilege_entry_sales"/>
-        <field name="comment">Maintain the monthly sales/collection commission sheet. Paid separately — not part of the commission request.</field>
-    </record>
-
-    <!-- Officer sees every entry type. -->
-    <function model="res.groups" name="write">
-        <value eval="[ref('group_commission_officer')]"/>
-        <value eval="{'implied_ids': [
-            (4, ref('group_entry_overtime')),
-            (4, ref('group_entry_driver')),
-            (4, ref('group_entry_location')),
-            (4, ref('group_entry_sales')),
-        ]}"/>
-    </function>
-
-    <!-- ============================================================ -->
-    <!-- Layer 3: Groups — Final Approval (General Manager)            -->
-    <!-- ============================================================ -->
-    <!--
-        Its OWN privilege, deliberately not privilege_commission_approval:
-        in Odoo 19 a privilege renders as a single-select on the user form,
-        so sharing one with the Accountant would make the two roles mutually
-        exclusive — and the GM must be assignable alongside anything else.
-
-        The GM no longer implies Officer. It used to, because one GM
-        answered for the whole company and the Officer rule [(1,'=',1)] was
-        the simplest way to give him reach. Authority now comes from
-        hr.department.x_effective_gm_id, so scope has to follow it: the
-        department-scoped rules below are what give a GM his records, and
-        keeping the Officer implication would silently hand every GM every
-        department — the behaviour this replaces.
-
-        `(6, 0, [...])` rather than `(4, ...)`: an implication already
-        written to the database survives its removal from this file, so the
-        list must be set outright (Odoo 19 Pitfalls #3). base.group_user is
-        named explicitly because it used to arrive through Officer.
-
-        Naming a group in a Python guard is still worthless if no ir.rule
-        lets it see the records (gotcha #38) — hence a rule per model below,
-        not just the ACL rows.
-    -->
-    <record id="privilege_commission_gm" model="res.groups.privilege">
-        <field name="name">Commission Final Approval</field>
-        <field name="sequence">25</field>
-        <field name="category_id" ref="module_category_ksw_commissions"/>
+        <field name="implied_ids" eval="[(6, 0, [ref('base.group_user')])]"/>
+        <field name="comment">Records the pay entries for the departments they manage (or assist the manager of) and hands the month over to the General Manager.</field>
     </record>
 
     <record id="group_commission_gm" model="res.groups">
         <field name="name">General Manager</field>
-        <field name="privilege_id" ref="privilege_commission_gm"/>
+        <field name="sequence">20</field>
+        <field name="privilege_id" ref="privilege_commission_management"/>
         <field name="implied_ids" eval="[(6, 0, [ref('base.group_user')])]"/>
-        <field name="comment">Approves the monthly commission handover of the departments they are set as General Manager of. Closing and reopening the month belong to the Commission Officer or the company's General Manager, since they affect every department.</field>
+        <field name="comment">Approves the monthly handover of the departments they are General Manager of, and may return one to the supervisor. Read-only on the entries themselves. Closing and reopening the month belong to the Administrator, since that affects every department.</field>
+    </record>
+
+    <!--
+        The Accountant no longer implies the Administrator tier. He used
+        to, purely to borrow its [(1,'=',1)] rules, which also handed him
+        the configuration catalog and the right to reopen an approved
+        month. He gets his own company-wide READ rules below instead —
+        the register is his to export, not to rewrite.
+    -->
+    <record id="group_commission_accountant" model="res.groups">
+        <field name="name">Accountant</field>
+        <field name="sequence">30</field>
+        <field name="privilege_id" ref="privilege_commission_management"/>
+        <field name="implied_ids" eval="[(6, 0, [ref('base.group_user')])]"/>
+        <field name="comment">Once the General Manager has approved the month: exports the bank transfer file, corrects a loan offset on the register, and marks the month paid.</field>
+    </record>
+
+    <!--
+        Administrator = the old Officer tier (every department) MERGED with
+        the old Configuration tier (the pay component / rate tier / site /
+        salesperson catalog). Two dropdowns became one option.
+
+        IT DOES NOT IMPLY GENERAL MANAGER, however senior it sounds. GM is a
+        named per-department responsibility carried by
+        hr.department.x_effective_gm_id, not a capability tier, so implying
+        the group grants no scope at all — every GM rule keys on
+        `gm_id = user.id`. What it WOULD grant is the one thing the group
+        confers outside those rules: exemption from the period lock
+        (ksw_commission_lock.py), which exists solely because the GM is the
+        one who can reopen a month. Closing and reopening belong to
+        `res.company.x_default_gm_id` and have never been the Officer's
+        (tests/test_period_lock.py::test_10_only_the_gm_reopens), so handing
+        every Administrator the exemption would let him edit an approved
+        month he cannot reopen.
+
+        `(6, 0, [...])` rather than `(4, ...)`: an implication already
+        written to the database survives its removal from this file
+        (CLAUDE.md gotcha #3), so the list has to be set outright — this is
+        what drops the four dead Entry: implications the Officer tier used
+        to carry.
+    -->
+    <record id="group_commission_officer" model="res.groups">
+        <field name="name">Administrator</field>
+        <field name="sequence">40</field>
+        <field name="privilege_id" ref="privilege_commission_management"/>
+        <field name="implied_ids" eval="[(6, 0, [
+            ref('group_commission_supervisor'),
+            ref('group_commission_accountant'),
+        ])]"/>
+        <field name="comment">Every department, plus the configuration catalog: pay components, rate tiers, work sites and salesperson profiles. Not a General Manager — that is a responsibility named on the department itself.</field>
     </record>
 
     <!-- ============================================================ -->
-    <!-- Layer 3: Groups — Commission Configuration                    -->
+    <!-- Layer 3: Sales &amp; Collection — its own two tiers               -->
     <!-- ============================================================ -->
-    <record id="group_commission_admin" model="res.groups">
-        <field name="name">Admin</field>
-        <field name="privilege_id" ref="privilege_commission_configuration"/>
-        <field name="comment">Manage the commission/allowance category catalog and the site/trip-tier configuration. Independent of the Management/Approval scopes.</field>
-    </record>
+    <!--
+        A different sheet on a different payment path, so it is a second
+        question rather than an answer inside the first one: the accountant
+        who maintains it is usually also the Accountant of the pay run, and
+        under a single-select he could not be both.
 
-    <!-- ============================================================ -->
-    <!-- Layer 3: Groups — Sales Override                              -->
-    <!-- ============================================================ -->
-    <record id="group_sales_commission_manager" model="res.groups">
-        <field name="name">Sales Manager</field>
+        Manager implies Entry: the override is an extra right ON the sheet,
+        not an alternative to maintaining it.
+    -->
+    <record id="group_entry_sales" model="res.groups">
+        <field name="name">Entry</field>
+        <field name="sequence">10</field>
         <field name="privilege_id" ref="privilege_sales_override"/>
-        <field name="comment">Override the commission-rule condition on individual sales/collection commission lines (e.g. grant the commission to a salesperson who fell below the threshold).</field>
+        <field name="implied_ids" eval="[(6, 0, [ref('base.group_user')])]"/>
+        <field name="comment">Maintains the monthly sales/collection commission sheet.</field>
     </record>
 
-    <!-- ============================================================ -->
-    <!-- Record Rules — ksw.commission.sheet                            -->
-    <!-- ============================================================ -->
+    <record id="group_sales_commission_manager" model="res.groups">
+        <field name="name">Manager</field>
+        <field name="sequence">20</field>
+        <field name="privilege_id" ref="privilege_sales_override"/>
+        <field name="implied_ids" eval="[(6, 0, [
+            ref('base.group_user'), ref('group_entry_sales')])]"/>
+        <field name="comment">Maintains the sheet and may override the commission-rule condition on an individual line, e.g. grant the commission to a salesperson who fell below the threshold.</field>
+    </record>
 
-
-
-    <!-- ============================================================ -->
-    <!-- Record Rules — ksw.commission.sheet.line                       -->
-    <!-- ============================================================ -->
     <!--
-        These were missing entirely: the sheet was row-scoped but its
-        lines were not, so anyone holding the line ACL could read (and a
-        supervisor could write) the lines of a sheet they cannot open.
-        The lines simply follow their parent sheet's scope.
+        Administrator implies the Sales &amp; Collection Entry tier too, but
+        it has to be added here rather than listed in the record above:
+        ref() resolves against ir.model.data as the file loads, so a
+        forward reference to a group defined further down fails outright.
     -->
-
-
-
-    <!-- ============================================================ -->
-    <!-- Record Rules — entry sheets: a supervisor sees only his own    -->
-    <!-- ============================================================ -->
-    <!--
-        A department manager is responsible for his subordinates and
-        nobody else's entries: showing him the rest only makes his job
-        harder. Every entry sheet is therefore scoped, and the entry-type
-        group above decides which kinds he sees at all.
-
-        Scoping note — check the data before writing the domain.
-        hr.department.manager_id is empty on every real department here,
-        and no supervisor has x_site_id set, so a domain built on either
-        would grant NOBODY anything and look like a permissions bug. What
-        IS populated is the employee parent_id chain (44/44 across
-        Maintenance + Workshop, every manager holding a user account) and
-        the supervisor's own department. Each rule ORs:
-
-          • the supervisor's own department (how the Maintenance and
-            Workshop supervisors reach theirs, and what lets them create
-            a sheet before it has any lines);
-          • a sheet holding one of their own subordinates (for the two
-            supervisors who sit in a different department from the people
-            they manage); and
-          • create_uid — you can always see what you created, even while
-            it is still empty. This is what makes a per-site sheet like
-            Driver Commission workable without any site configuration.
-    -->
-
-    <!-- Overtime (per department) -->
-
-
-    <!-- Driver Commission (per site — scoped by subordinates + creator) -->
-
-
-    <!-- Location Allowance (per department since 19.0.2.0.0) -->
-
-
-    <!-- Officer / GM see every entry sheet of every type. -->
-
-
-
-
-
-
-    <!-- ============================================================ -->
-    <!-- Record Rule — ksw.commission.run.source                        -->
-    <!-- ============================================================ -->
-    <!--
-        The Monthly Commission Run is one shared record per month, so its
-        entry-type cards are shared rows. This is what makes them follow
-        each user's access rights: a card is visible only when the user
-        holds the entry type's group.
-    -->
+    <function model="res.groups" name="write">
+        <value eval="[ref('group_commission_officer')]"/>
+        <value eval="{'implied_ids': [(4, ref('group_entry_sales'))]}"/>
+    </function>
 
     <!-- ============================================================ -->
     <!-- Record Rules — ksw.pay.batch / ksw.pay.entry                   -->
@@ -547,21 +413,80 @@
         <field name="perm_unlink" eval="False"/>
     </record>
 
+
+    <!-- ============================================================ -->
+    <!-- Record Rules — Accountant                                     -->
+    <!-- ============================================================ -->
     <!--
-        Admin/root assignment: keep these users in every top tier
-        across the four privileges so module installation / -u runs
-        don't lock out the bootstrap admin.
+        These replace the Administrator implication the Accountant used to
+        carry. He needs the whole company in view — the bank file is one
+        file for every department — but only the register is his to touch:
+        a loan offset he has to correct against what the bank actually
+        collected. Everything upstream of the approval is read-only, which
+        is the half the borrowed [(1,'=',1)] Administrator rules got wrong.
+
+        ksw.pay.run itself has no rule on any group, so the ACL row is the
+        only gate there and no rule is needed for it here.
+    -->
+    <record id="pay_batch_rule_accountant" model="ir.rule">
+        <field name="name">KSW Pay Batch: Accountant (read-only, all)</field>
+        <field name="model_id" ref="model_ksw_pay_batch"/>
+        <field name="groups" eval="[(4, ref('group_commission_accountant'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="pay_entry_rule_accountant" model="ir.rule">
+        <field name="name">KSW Pay Entry: Accountant (read-only, all)</field>
+        <field name="model_id" ref="model_ksw_pay_entry"/>
+        <field name="groups" eval="[(4, ref('group_commission_accountant'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="pay_submission_rule_accountant" model="ir.rule">
+        <field name="name">KSW Pay Submission: Accountant (read-only, all)</field>
+        <field name="model_id" ref="model_ksw_pay_submission"/>
+        <field name="groups" eval="[(4, ref('group_commission_accountant'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="pay_run_line_rule_accountant" model="ir.rule">
+        <field name="name">KSW Payment Register: Accountant (all)</field>
+        <field name="model_id" ref="model_ksw_pay_run_line"/>
+        <field name="groups" eval="[(4, ref('group_commission_accountant'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!--
+        Admin/root: one group each now. Administrator implies Supervisor,
+        Accountant and Sales Entry, so the bootstrap admin keeps what he had
+        from ONE answer per question instead of nine. Sales Manager is the
+        second answer: the override right is a tier of its own privilege.
+        His General Manager row is left alone — Administrator does not imply
+        it, and `env.su` exempts him from every guard that names it anyway.
+
+        `(3, ...)` on the tiers he used to hold directly: those memberships
+        are in the database from earlier installs and would otherwise sit
+        there forever (CLAUDE.md gotcha #3), leaving the Commission Role
+        dropdown resolving off a direct row rather than the implication.
     -->
     <function model="res.groups" name="write">
         <value eval="[ref('group_commission_officer')]"/>
-        <value eval="{'user_ids': [(4, ref('base.user_root')), (4, ref('base.user_admin'))]}"/>
-    </function>
-    <function model="res.groups" name="write">
-        <value eval="[ref('group_commission_accountant')]"/>
-        <value eval="{'user_ids': [(4, ref('base.user_root')), (4, ref('base.user_admin'))]}"/>
-    </function>
-    <function model="res.groups" name="write">
-        <value eval="[ref('group_commission_admin')]"/>
         <value eval="{'user_ids': [(4, ref('base.user_root')), (4, ref('base.user_admin'))]}"/>
     </function>
     <function model="res.groups" name="write">
@@ -569,9 +494,8 @@
         <value eval="{'user_ids': [(4, ref('base.user_root')), (4, ref('base.user_admin'))]}"/>
     </function>
     <function model="res.groups" name="write">
-        <value eval="[ref('group_commission_gm')]"/>
-        <value eval="{'user_ids': [(4, ref('base.user_root')), (4, ref('base.user_admin'))]}"/>
+        <value eval="[ref('group_commission_accountant'), ref('group_commission_supervisor'), ref('group_entry_sales')]"/>
+        <value eval="{'user_ids': [(3, ref('base.user_root')), (3, ref('base.user_admin'))]}"/>
     </function>
 
 </odoo>
-

@@ -143,20 +143,31 @@ class TestLeaveApproval(TransactionCase):
         # At validate1 state, responsible should be HR Manager
         self.assertEqual(leave._get_responsible_for_approval(), self.hr_manager_user)
 
-    def test_03_officer_dm_cannot_skip_to_final_approval(self):
-        """Regression test — KSWCO leave 5008 (August 2026).
+    def test_03_officer_dm_does_step_one_only(self):
+        """Regression test — KSWCO leave 5008 (August 2026) and its sequel.
 
         A Direct Manager who ALSO holds a core Time-Off Officer/Administrator
         group (hr_holidays.group_hr_holidays_user or _manager) gets
         can_validate=True from core's own _get_next_states_by_state the
         moment the leave is at 'confirm', for a validation_type=='both' type
         — core lets an "officer" jump confirm -> validate directly, entirely
-        skipping validate1. Before the fix, action_approve() only checked
-        DM identity for the *state == 'confirm'* transition and then
-        delegated straight to core, which silently completed the ENTIRE
-        approval — DM step and HR step — in one call by the same person.
-        _action_validate() must now block that jump for anyone but the
-        configured HR Manager, regardless of which state it's called from.
+        skipping validate1.
+
+        Two failures came out of that single routing quirk:
+
+        1. Originally, action_approve() only checked DM identity for the
+           'confirm' transition and then delegated straight to core, which
+           silently completed the ENTIRE approval — DM step and HR step —
+           in one call by the same person.
+        2. Closing that with an unconditional guard in _action_validate()
+           over-corrected: the officer-DM's *first* step was routed to
+           _action_validate() too, so they were bounced with "Only the
+           configured HR Manager can give the final approval" and could no
+           longer approve at all.
+
+        Correct behaviour: the officer-DM's click performs the DM step and
+        stops at validate1; the HR step still belongs to the configured HR
+        Manager alone.
         """
         leave = self.env['hr.leave'].sudo().create({
             'name': 'Sick Leave',
@@ -173,10 +184,35 @@ class TestLeaveApproval(TransactionCase):
             leave.with_user(self.dm_officer_user).can_validate,
             "test setup must reproduce the is_officer direct-validate path")
 
+        # Step 1 goes through — and stops at validate1.
+        leave.with_user(self.dm_officer_user).action_approve()
+        self.assertEqual(
+            leave.state, 'validate1',
+            'the officer-DM must land on validate1, not skip to validate')
+        self.assertEqual(leave.first_approver_id, self.dm_officer_employee)
+
+        # Step 2 is still the HR Manager's alone.
         with self.assertRaises(UserError):
             leave.with_user(self.dm_officer_user).action_approve()
+        self.assertEqual(leave.state, 'validate1')
 
-        # Nothing was written — the guard fires before any state change.
+        leave.with_user(self.hr_manager_user).action_approve()
+        self.assertEqual(leave.state, 'validate')
+
+    def test_06_officer_non_dm_cannot_approve_step_one(self):
+        """Holding the core officer group is not a substitute for being the
+        Direct Manager — the confirm-state guard still names the DM."""
+        leave = self.env['hr.leave'].sudo().create({
+            'name': 'Sick Leave',
+            'holiday_status_id': self.leave_type.id,
+            'employee_id': self.employee.id,
+            'request_date_from': fields.Date.today(),
+            'request_date_to': fields.Date.today(),
+        })
+        # dm_officer_user is an officer, but manages other_employee — not
+        # this one.
+        with self.assertRaises(UserError):
+            leave.with_user(self.dm_officer_user).action_approve()
         self.assertEqual(leave.state, 'confirm')
 
     def test_04_dm_can_delete_before_hr_approves(self):

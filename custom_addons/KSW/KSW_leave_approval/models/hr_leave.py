@@ -9,7 +9,26 @@ class HrLeave(models.Model):
         return self.holiday_status_id and self.holiday_status_id.is_annual_leave
 
     def action_approve(self, check_state=True):
-        """Enforce Direct Manager approval for non-annual leaves."""
+        """Enforce Direct Manager approval for non-annual leaves.
+
+        Core's action_approve() dispatches on ``can_validate`` *first*, and
+        ``_get_next_states_by_state`` grants ``confirm -> validate`` to
+        anyone holding hr_holidays.group_hr_holidays_user/_manager
+        (is_officer) — so a Direct Manager who also holds a core Time-Off
+        Officer/Administrator group is routed straight to
+        _action_validate() while the request is still at 'confirm'.  That
+        used to let them complete BOTH steps in one click; since the guard
+        in _action_validate() closed that, the same routing bounced their
+        legitimate *first* step with "Only the configured HR Manager can
+        give the final approval" — the DM could no longer approve at all.
+
+        Pin the first step for our two-step types: hand that subset to
+        super() with ``check_state=False``, which is the flag core reads to
+        pick the validate1 branch by validation type instead of by
+        can_validate.  Everything else (validate1 -> validate, single-step
+        types, annual leaves) keeps core's own routing untouched.
+        """
+        first_step = self.browse()
         for leave in self:
             if not leave._is_annual_leave_logic() and leave.state == 'confirm':
                 # Direct manager is leave_manager_id or parent_id.user_id
@@ -22,7 +41,19 @@ class HrLeave(models.Model):
                     if self.env.user != manager_user:
                         raise UserError(_("Only the direct manager (%s) can approve this step.") % manager_user.name)
 
-        return super().action_approve(check_state=check_state)
+                if leave.validation_type == 'both':
+                    first_step |= leave
+
+        remaining = self - first_step
+        res = True
+        if remaining:
+            res = super(HrLeave, remaining).action_approve(check_state=check_state)
+        if first_step:
+            # The DM identity check above is the authority for this subset;
+            # it is stricter than core's own can_approve (which would let
+            # any officer through), so nothing is loosened by skipping it.
+            super(HrLeave, first_step).action_approve(check_state=False)
+        return res
 
     def _action_approve_attendance_based(self, check_state=True):
         """Override KSW_attendance_leave to remove second-step bypass."""
