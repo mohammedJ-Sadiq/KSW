@@ -9,3 +9,4 @@ from . import test_commission_priority_deduction
 from . import test_department_gm
 from . import test_recurring_access
 from . import test_bas_trips_import
+from . import test_bas_sync_override

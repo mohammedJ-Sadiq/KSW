@@ -1128,9 +1128,11 @@ class HrLeave(models.Model):
 
     @api.depends('state', 'x_return_state')
     def _compute_is_on_vacation(self):
+        # 'confirm' is in the list because a KSW chain stays there through
+        # pending_employee_signature — the employee is already away.
         for leave in self:
             leave.x_is_on_vacation = (
-                leave.state == 'validate'
+                leave.state in ('confirm', 'validate')
                 and leave.x_return_state == 'on_vacation'
             )
 
@@ -1176,6 +1178,54 @@ class HrLeave(models.Model):
             lambda l: l.x_return_state != 'not_applicable')
         if stamped:
             stamped.write(dict(self._RETURN_TRACKING_FIELDS))
+
+    def _is_past_gm_final(self):
+        """True while GM final approval stands on this request.
+
+        This — not the Odoo ``state`` — is the moment the employee actually
+        leaves: on the KSW chains the request sits in ``state == 'confirm'``
+        all the way through ``pending_employee_signature`` while HR files the
+        signed form, which can take days.  Leave types with no KSW chain have
+        no such gap, so for them the finish line is still ``validate``.
+
+        The three backwards states are named first because
+        ``x_annual_approval_state`` is *not* cleared by every route out —
+        a cancelled request keeps ``'approved'`` — so asking the chain alone
+        would report a terminated request as still running.
+        """
+        self.ensure_one()
+        if self.state in ('refuse', 'cancel', 'draft'):
+            return False
+        if self._uses_multi_step_chain(self):
+            return self.x_annual_approval_state in self._REFUSE_LOCKED_STATES
+        return self.state == 'validate'
+
+    def _sync_gm_final_state(self):
+        """Re-derive everything that begins at GM final approval.
+
+        Written as one desired-vs-actual rule rather than a stamp bolted onto
+        each step, because a finalised request has more than one way out
+        (refuse, cancel, back to approval, reset to draft, and the GM's
+        return-to-approver wizard) and remembering to undo the stamp on each
+        of them is exactly the bookkeeping that goes stale — gotcha #37.
+        Every one of those routes calls this instead, and asks the same
+        question again.
+
+        Here that means the vacation return: 'On Vacation' opens at GM final
+        approval and closes when the direct manager confirms the return.
+        KSW_eos_leave extends it with the employee archive, which starts at
+        the same point.
+
+        A return the manager has already confirmed is never re-opened.
+        """
+        for leave in self.filtered(self._is_annual_leave):
+            if leave.x_return_state == 'hr_confirmed':
+                continue
+            if leave._is_past_gm_final():
+                if leave.x_return_state != 'on_vacation':
+                    leave.write({'x_return_state': 'on_vacation'})
+            else:
+                leave._reset_return_tracking()
 
     def _notify_return_confirmation_due(self):
         """Tell the direct manager, once, that this return is theirs to close.
@@ -1705,6 +1755,22 @@ class HrLeave(models.Model):
         self.ensure_one()
         return False
 
+    def _release_payslips_for_reversal(self, what):
+        """Hook: clear a confirmed settlement payslip out of a reversal's way.
+
+        Base is a no-op — without payroll installed there is no payslip to
+        release. KSW_payroll (vacation) and KSW_eos_leave (EOS) override it
+        to **cancel an auto-confirmed settlement**, which puts its loan and
+        deduction installments back to pending so a later payroll run
+        collects them, and to **refuse outright** when a payroll officer
+        confirmed the slip by hand — that is a person asserting the money
+        was paid, and releasing those installments would re-collect them
+        from an employee who already paid (KSWCO SLIP/11307).
+
+        :param what: what the caller is doing, for the error message.
+        """
+        return
+
     def _has_approver_action(self):
         """True once any approver has confirmed a step on this request.
 
@@ -1760,8 +1826,15 @@ class HrLeave(models.Model):
             # gated on access to the document. The administrator's leave
             # scope depends on which HR tier they hold; this action must not
             # (auth was settled above — gotcha #11).
-            return super(HrLeave, self.sudo())._action_user_cancel(reason)
-        return super()._action_user_cancel(reason)
+            result = super(HrLeave, self.sudo())._action_user_cancel(reason)
+        else:
+            result = super()._action_user_cancel(reason)
+        # A cancelled request keeps its x_annual_approval_state ('approved'),
+        # so only the state change says GM final no longer stands — which is
+        # precisely what _is_past_gm_final reads first.  sudo() for the same
+        # reason as above: _force_cancel already ran elevated.
+        self.sudo()._sync_gm_final_state()
+        return result
 
     # ==================================================================
     # Write override — re-check allocation validity on toggle changes
@@ -2327,10 +2400,14 @@ class HrLeave(models.Model):
                 'x_gm_final_approved_date': fields.Datetime.now(),
             })
 
-            # Create vacation payslip now — all financial inputs are
-            # finalised and the payslip guard (x_return_state) has not
-            # been set yet (that happens in _action_validate / Step 6).
+            # Create the vacation payslip *before* opening the return:
+            # x_return_state is the payslip guard, and this slip is the one
+            # legitimate exception to it.
             leave._create_vacation_payslip()
+
+            # The employee leaves on the GM's signature, not on HR's filing
+            # of the signed form days later, so 'On Vacation' opens here.
+            leave._sync_gm_final_state()
 
             leave.message_post(
                 body=Markup(
@@ -2668,11 +2745,17 @@ class HrLeave(models.Model):
     # ==================================================================
 
     def _action_validate(self, check_state=True):
-        """Set return state to 'on_vacation' when annual leave validated."""
+        """Catch up the return state for annual types with no KSW chain.
+
+        On a multi-step request this is a no-op: 'On Vacation' was already
+        opened at GM final approval, days earlier (see
+        ``_sync_gm_final_state``).  A one/two-step annual type has no GM
+        final, so ``validate`` is its finish line and the stamp lands here.
+        """
         result = super()._action_validate(check_state=check_state)
         annual = self.filtered(self._is_annual_leave)
         if annual:
-            annual.write({'x_return_state': 'on_vacation'})
+            annual._sync_gm_final_state()
             # Refresh accrual — leaves_taken changed (leave now validated)
             emp_ids = annual.mapped('employee_id').ids
             self.env['ksw.annual.leave']._refresh_accrual_for_employees(emp_ids)
@@ -2721,6 +2804,10 @@ class HrLeave(models.Model):
         # revoke any weekend they had earned. Idempotent in both directions.
         self._recheck_weekend_grants()
 
+        # GM final approval no longer stands: close 'On Vacation' (and, in
+        # KSW_eos_leave, restore the archived employee).
+        self._sync_gm_final_state()
+
         return result
 
     def action_refuse(self):
@@ -2748,6 +2835,8 @@ class HrLeave(models.Model):
         if annual_emp_ids:
             self.env['ksw.annual.leave']._refresh_accrual_for_employees(annual_emp_ids)
 
+        self._sync_gm_final_state()
+
         return result
 
     # ==================================================================
@@ -2771,6 +2860,8 @@ class HrLeave(models.Model):
         # Refresh accrual — leaves_taken changed
         if annual_emp_ids:
             self.env['ksw.annual.leave'].with_user(1)._refresh_accrual_for_employees(annual_emp_ids)
+
+        self._sync_gm_final_state()
 
         return result
 

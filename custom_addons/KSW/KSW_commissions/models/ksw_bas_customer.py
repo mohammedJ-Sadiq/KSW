@@ -32,9 +32,13 @@ class KswBasCustomer(models.Model):
     )
 
     @api.model
-    def sync_from_bas(self):
-        super().sync_from_bas()
+    def sync_from_bas(self, deadline=None, commit=True):
+        # Signature and return value must track KSW_ext_sync's: the
+        # orchestrator passes a time budget and reads back whether the pass
+        # completed, so it knows not to advance the watermark.
+        done = super().sync_from_bas(deadline=deadline, commit=commit)
         self._recompute_effective_reps()
+        return done
 
     @api.model
     def action_match_or_create_partners(self, *args, **kwargs):

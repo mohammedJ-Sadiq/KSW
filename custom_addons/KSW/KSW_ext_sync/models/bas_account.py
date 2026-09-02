@@ -1,4 +1,6 @@
 import logging
+from time import monotonic
+
 from odoo import models, fields, api
 
 _logger = logging.getLogger(__name__)
@@ -41,14 +43,20 @@ class BASAccount(models.Model):
             credit = rec.current_credit or 0.0
             rec.balance = rec.opening_balance + debit - credit
 
+    # Everything but ``last_synced`` — see ``_bas_upsert``.
+    _COMPARE_FIELDS = (
+        'name_ar', 'name_en', 'acc_type', 'opening_balance',
+        'current_debit', 'current_credit', 'category',
+    )
+
     @api.model
-    def sync_from_bas(self):
+    def sync_from_bas(self, deadline=None, commit=True):
         try:
             conn = self._bas_connect()
             cursor = conn.cursor(as_dict=True)
         except Exception as e:
             _logger.error('KSW BAS account sync: connection failed: %s', e)
-            return
+            return False
 
         placeholders = ','.join(['%s'] * len(_ACCOUNT_PREFIXES))
         conditions = ' OR '.join(f"DCODE1 LIKE '{p}%'" for p in _ACCOUNT_PREFIXES)
@@ -67,25 +75,25 @@ class BASAccount(models.Model):
         except Exception as e:
             _logger.error('KSW BAS account sync: query failed: %s', e)
             conn.close()
-            return
+            return False
         finally:
             conn.close()
 
         now = fields.Datetime.now()
-        existing = {r.bas_code: r for r in self.search([])}
 
+        def _category(code):
+            if code.startswith('120501'):
+                return 'advance'
+            if code.startswith('2102') or code.startswith('2105'):
+                return 'loan'
+            return 'other'
+
+        vals_list = []
         for row in rows:
             code = (row['DCODE1'] or '').strip()
             if not code:
                 continue
-            if code.startswith('120501'):
-                category = 'advance'
-            elif code.startswith('2102') or code.startswith('2105'):
-                category = 'loan'
-            else:
-                category = 'other'
-
-            vals = {
+            vals_list.append({
                 'bas_code': code,
                 'name_ar': (row['DNAME'] or '').strip(),
                 'name_en': (row['DNAME2'] or '').strip(),
@@ -93,27 +101,69 @@ class BASAccount(models.Model):
                 'opening_balance': float(row['DOLDACC'] or 0),
                 'current_debit': float(row['DCURRENT1'] or 0),
                 'current_credit': float(row['DCURRENT2'] or 0),
-                'category': category,
+                'category': _category(code),
                 'last_synced': now,
-            }
-            if code in existing:
-                existing[code].write(vals)
-            else:
-                self.create(vals)
+            })
 
-        # Remove accounts that no longer exist in BAS
-        synced_codes = {(row['DCODE1'] or '').strip() for row in rows}
-        stale = self.search([('bas_code', 'not in', list(synced_codes))])
-        if stale:
-            stale.unlink()
+        created, updated, done = self._bas_upsert(
+            'bas_code', vals_list, self._COMPARE_FIELDS,
+            deadline=deadline, commit=commit)
 
-        _logger.info('KSW BAS: synced %d accounts', len(rows))
+        if done:
+            # Only prune on a complete pass — a partial read would delete
+            # every account the budget never got to.
+            synced_codes = [v['bas_code'] for v in vals_list]
+            stale = self.search([('bas_code', 'not in', synced_codes)])
+            if stale:
+                stale.unlink()
+
+        _logger.info(
+            'KSW BAS: accounts %s — %d read, %d created, %d updated',
+            'complete' if done else 'INCOMPLETE (time budget)',
+            len(rows), created, updated)
+        return done
+
+    # Well under `limit_time_real` (120s in prod).  A cron thread is NOT
+    # exempt from it — `limit_time_real_cron = -1` falls through to
+    # `limit_time_real`, and on `workers = 0` an overrun reloads the whole
+    # server.  See `ksw.bas.connector._bas_upsert`.
+    #
+    # The budget is checked *between* chunks and *before* each step, so the
+    # worst overshoot is one step's pre-work: querying BAS and building the
+    # vals list for a whole fiscal year measured at **27s** (284k invoices +
+    # 22k payments, Sep 2026).  A step starting at 69.9s therefore lands
+    # near 97s — still inside 120s, with the chunk loop stopping at once.
+    _SYNC_ALL_SECONDS = 70
 
     @api.model
-    def action_sync_all(self):
+    def action_sync_all(self, commit=True):
+        """Run every BAS mirror, newest-cheapest first, inside one budget.
+
+        Each step commits its own chunks, so a run that runs out of budget
+        keeps everything it managed to write and the next run continues from
+        there — instead of the previous behaviour, where the invoice step
+        overran, the cron was killed, and **the entire transaction rolled
+        back**.  That is why all four tables sat at 0 rows.
+        """
         _logger.info('KSW BAS: starting full sync')
-        self.sync_from_bas()
-        self.env['ksw.bas.customer'].sync_from_bas()
-        self.env['ksw.bas.invoice'].sync_from_bas()
-        self.env['ksw.bas.payment'].sync_from_bas()
-        _logger.info('KSW BAS: sync complete')
+        deadline = monotonic() + self._SYNC_ALL_SECONDS
+        steps = (
+            ('accounts', self),
+            ('customers', self.env['ksw.bas.customer']),
+            ('invoices', self.env['ksw.bas.invoice']),
+            ('payments', self.env['ksw.bas.payment']),
+        )
+        incomplete = []
+        for label, model in steps:
+            if monotonic() > deadline:
+                incomplete.append(label)
+                continue
+            if model.sync_from_bas(deadline=deadline, commit=commit) is False:
+                incomplete.append(label)
+        if incomplete:
+            _logger.info(
+                'KSW BAS: sync incomplete (%s) — continues on the next run.',
+                ', '.join(incomplete))
+        else:
+            _logger.info('KSW BAS: sync complete')
+        return not incomplete

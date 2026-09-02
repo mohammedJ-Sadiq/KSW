@@ -3,7 +3,7 @@ from datetime import date, timedelta
 
 from markupsafe import Markup
 
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -343,6 +343,14 @@ class HrLeave(models.Model):
             # Compute the payslip
             payslip.compute_sheet()
 
+            # The definitive run is confirmed as it is generated, so the
+            # loans and deductions it presents are actually consumed. A
+            # provisional preview stays in draft — it is regenerated on
+            # demand and settling installments off a draft calculation
+            # would collect money nobody has approved yet.
+            if not preview:
+                payslip._ksw_auto_confirm_leave_payslip()
+
             _logger.info(
                 '%s payslip #%s created for employee %s '
                 '(leave #%s, month %s/%s).',
@@ -647,11 +655,108 @@ class HrLeave(models.Model):
             payslips = leave.x_vacation_payslip_ids.filtered(
                 lambda p: p.state != 'cancel'
             )
-            if payslips:
-                payslips.write({'state': 'cancel'})
+            if not payslips:
+                continue
+            # A confirmed slip going to 'cancel' releases the installments it
+            # settled: hr.payslip.write in KSW_deduction sees done -> cancel
+            # and calls _sync_deductions_on_reset, which reverts the paid
+            # lines to pending and merges any forwarded remainder back. The
+            # money is un-collected, so say so in the chatter rather than
+            # leaving it to be discovered on next month's payslip.
+            settled = payslips.filtered(lambda p: p.state == 'done')
+            released = leave._released_installment_total(settled)
+            payslips.write({'state': 'cancel'})
+            if settled:
+                leave._post_installment_release_note(settled, released)
         records.filtered('x_vacation_payslip_id').write({
             'x_vacation_payslip_id': False,
         })
+
+    @staticmethod
+    def _released_installment_total(payslips):
+        """Total the cancelled payslips had actually collected.
+
+        Guarded on the field name: ``x_ksw_ded_collected`` is declared in
+        KSW_deduction, which **depends on** this module, so it is absent
+        whenever KSW_payroll runs without it.
+        """
+        if not payslips or 'x_ksw_ded_collected' not in payslips._fields:
+            return 0.0
+        return sum(payslips.mapped('x_ksw_ded_collected'))
+
+    def _post_installment_release_note(self, payslips, released):
+        """Record on the leave that a settlement was undone.
+
+        ``sudo()`` for the message itself (gotcha #11): this runs off refuse
+        / return / reset, which a direct manager may trigger, and
+        ``mail.message`` create is gated on access to the document.
+        """
+        self.ensure_one()
+        names = ', '.join(
+            p.number or p.name or str(p.id) for p in payslips)
+        body = Markup(
+            '<strong>&#8630; Settlement payslip cancelled</strong><br/>'
+            '<b>Payslip:</b> %(slips)s<br/>'
+        ) % {'slips': names}
+        if released:
+            body += Markup(
+                '<b>Deductions released back to pending:</b> '
+                '%(amt).2f SAR<br/>'
+                'These installments were <b>not</b> collected after all and '
+                'will be taken by a later payroll run.'
+            ) % {'amt': released}
+        else:
+            body += Markup(
+                'No deduction installments had been collected by it.')
+        self.sudo().message_post(body=body, subtype_xmlid='mail.mt_note')
+
+    def _release_payslips_for_reversal(self, what):
+        """Cancel an auto-confirmed vacation settlement so a reversal can run.
+
+        The definitive vacation payslip is confirmed the moment the chain
+        completes (``_ksw_auto_confirm_leave_payslip``) so its loans and
+        deductions are consumed. That makes ``_has_confirmed_payslip()``
+        true for every approved leave, which used to be an outright block on
+        the GM's return-to-approver wizard — so the block now applies only to
+        a payslip a **payroll officer** confirmed, which is a person
+        asserting the money was paid.
+        """
+        super()._release_payslips_for_reversal(what)
+        records = self.sudo()
+        # Only a **confirmed** payslip is released. A draft provisional
+        # calculation has settled nothing and is deliberately left alone —
+        # the definitive run supersedes it via
+        # `_cancel_preview_vacation_payslips`, and a mid-chain return that
+        # threw the approvers' figures away would be its own bug.
+        confirmed = {
+            leave.id: leave.x_vacation_payslip_ids.filtered(
+                lambda p: p.state == 'done')
+            for leave in records
+        }
+        # Fail fast, before anything is written.
+        for leave in records:
+            manual = confirmed[leave.id].filtered(
+                lambda p: not p.x_vacation_auto_confirmed)
+            if manual:
+                raise UserError(_(
+                    'This request has a payslip a payroll officer confirmed '
+                    'by hand (%(slips)s), so it is treated as paid. Handle '
+                    'the payslip first — cancelling a paid payslip releases '
+                    'its deductions and re-collects them on the next run. '
+                    'The request cannot be %(what)s until then.',
+                    slips=', '.join(
+                        p.number or p.name or str(p.id) for p in manual),
+                    what=what,
+                ))
+        for leave in records:
+            slips = confirmed[leave.id]
+            if not slips:
+                continue
+            released = leave._released_installment_total(slips)
+            slips.write({'state': 'cancel'})
+            leave._post_installment_release_note(slips, released)
+            if leave.x_vacation_payslip_id in slips:
+                leave.write({'x_vacation_payslip_id': False})
 
     # ------------------------------------------------------------------
     # Attendance-sheet "needs attention" flags
@@ -719,11 +824,14 @@ class HrLeave(models.Model):
         ``hr.payslip.x_leave_id`` is a plain many2one, so deleting the leave
         only NULLs it — the payslip (usually the provisional one produced by
         "Calculate Vacation") would survive as an orphan draft nobody can
-        trace back. Confirmed ('done') payslips are left alone: those are
-        already paid and must stay on the books.
+        trace back. A payslip a payroll officer confirmed by hand is left
+        alone: that is already paid and must stay on the books. One the
+        approval chain auto-confirmed is cancelled like any other, which
+        releases the installments it settled.
         """
         payslips = self.sudo().x_vacation_payslip_ids.filtered(
-            lambda p: p.state not in ('done', 'cancel')
+            lambda p: p.state != 'cancel'
+            and (p.state != 'done' or p.x_vacation_auto_confirmed)
         )
         if payslips:
             payslips.write({'state': 'cancel'})

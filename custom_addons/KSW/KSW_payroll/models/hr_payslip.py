@@ -1,6 +1,7 @@
 import logging
 from calendar import monthrange
 from datetime import datetime, time, timedelta
+from time import monotonic  # `time` above is datetime.time
 
 from markupsafe import Markup
 
@@ -151,6 +152,51 @@ class HrPayslip(models.Model):
              'payslip when the GM gives final approval.',
     )
 
+    # No model-level ``groups=``: referenced in ``invisible=`` on the
+    # payslip form ribbon, which leave approvers without payroll ACLs can
+    # reach (pitfall #31).
+    x_vacation_auto_confirmed = fields.Boolean(
+        string='Auto-confirmed at Approval', readonly=True, copy=False,
+        help='This vacation / EOS payslip was confirmed automatically the '
+             'moment the leave cleared its approval chain, so its loan and '
+             'deduction installments are consumed straight away. It was NOT '
+             'confirmed by a payroll officer asserting the money was paid — '
+             'which is why reversing the leave may release it again.',
+    )
+
+    def _ksw_auto_confirm_leave_payslip(self):
+        """Confirm a freshly generated definitive vacation / EOS payslip.
+
+        Left in draft, the payslip's KSW deduction inputs are computed but
+        never *settled*: ``_sync_deductions_on_done`` only fires on the
+        transition into ``done``, so the loans and deductions the leave
+        settlement is supposed to collect stay pending and get taken again
+        by the next monthly run. Confirming at generation is what consumes
+        them.
+
+        ``action_payslip_done`` is used rather than a raw state write so an
+        auto-confirmed payslip is indistinguishable from one a payroll
+        officer confirmed by hand: same guards, same payslip email (still
+        gated per employee by ``x_auto_send_payslip``), same bank totals.
+        The redundant ``compute_sheet`` it performs is idempotent.
+
+        ``sudo()`` throughout: the GM / HR approver who triggers the
+        approval chain holds no payroll ACLs, and the caller
+        (``_create_vacation_payslip``) already runs elevated.
+        """
+        for slip in self.sudo():
+            if slip.state == 'done':
+                continue
+            # Stamped first so anything reading it during the transition —
+            # the reversal hooks included — already sees how it got there.
+            slip.write({'x_vacation_auto_confirmed': True})
+            slip.action_payslip_done()
+            _logger.info(
+                'Vacation/EOS payslip #%s auto-confirmed on approval of '
+                'leave #%s; deduction installments settled.',
+                slip.id, slip.x_leave_id.id,
+            )
+
     # ------------------------------------------------------------------
     # Revision payslip — re-issue a period that was already paid
     # ------------------------------------------------------------------
@@ -179,6 +225,33 @@ class HrPayslip(models.Model):
 
     x_revision_count = fields.Integer(
         string='Revision Count', compute='_compute_revision_count',
+    )
+
+    # ------------------------------------------------------------------
+    # Auto-email queue
+    # ------------------------------------------------------------------
+    # No model-level ``groups=``: ``x_email_state`` is referenced in
+    # ``invisible=`` on the "Re-send Payslip Email" button, which would trip
+    # the OWL "field is undefined" crash for a user who can see the button
+    # but not the field (pitfall #31).  Visibility is view-level.
+
+    x_email_state = fields.Selection(
+        [
+            ('queued', 'Queued'),
+            ('sent', 'Sent'),
+            ('failed', 'Failed'),
+        ],
+        string='Payslip Email', readonly=True, copy=False, index=True,
+        help='Set to Queued when the payslip is confirmed for an employee '
+             'with Auto-Email Payslip enabled.  The "KSW Payroll: Send '
+             'queued payslip emails" cron renders the PDF and sends it, '
+             'then stamps Sent.  Empty means no email was ever asked for.',
+    )
+
+    x_email_error = fields.Char(
+        string='Email Error', readonly=True, copy=False,
+        help='Why the last send attempt failed.  Use "Re-send Payslip '
+             'Email" to put it back in the queue once the cause is fixed.',
     )
 
     x_prior_net_paid = fields.Float(
@@ -1994,7 +2067,7 @@ class HrPayslip(models.Model):
         if not payable:
             return notification
         res = super(HrPayslip, payable).action_payslip_done()
-        payable._send_auto_payslip_email()
+        payable._queue_auto_payslip_email()
         if not self.env.context.get('_ksw_skip_bank_refresh'):
             runs = payable.mapped('payslip_run_id').filtered(bool)
             if runs:
@@ -2044,13 +2117,115 @@ class HrPayslip(models.Model):
             runs._refresh_bank_totals()
         return res
 
-    def _send_auto_payslip_email(self):
+    # ------------------------------------------------------------------
+    # Auto-email queue
+    # ------------------------------------------------------------------
+    # ``send_mail`` renders the payslip PDF *synchronously* — ``force_send``
+    # defers delivery, not the attachment.  At ~3s a slip that is fine for
+    # one payslip and fatal for a batch: the August 2026 run (376 slips, 21
+    # of them auto-emailed) spent ~63s of its budget in wkhtmltopdf, blew
+    # through ``limit_time_real`` and, because prod runs ``workers = 0``,
+    # reloaded the entire server and rolled the whole confirmation back.
+    # So the button only stamps the queue; the cron does the rendering, a
+    # bounded slice at a time.
+    #
+    # The cron is NOT exempt from the limit.  ``limit_time_real_cron = -1``
+    # reads like "unlimited" and is not: ``server.py`` only substitutes it
+    # when it is ``> 0``, so -1 falls through to ``limit_time_real`` — the
+    # same 120s (and the prefork path spells it out:
+    # ``if self.cron_timeout == -1: self.cron_timeout = self.timeout``).
+    # Hence a wall-clock budget, not just a row count: whichever comes
+    # first, and the queue is drained over as many runs as it takes.
+
+    _EMAIL_CRON_BATCH = 30
+    _EMAIL_CRON_SECONDS = 60
+
+    def _queue_auto_payslip_email(self):
+        """Mark confirmed payslips for the emailing cron.
+
+        Nothing is rendered or sent here — see the note above.
+        """
+        to_queue = self.filtered(
+            lambda s: s.state == 'done'
+            and s.employee_id.sudo().x_auto_send_payslip
+            and s.employee_id.sudo().work_email
+        )
+        if to_queue:
+            to_queue.write({'x_email_state': 'queued', 'x_email_error': False})
+
+    @api.model
+    def _cron_send_payslip_emails(self, limit=None, commit=True):
+        """Render and send the payslips waiting in the queue.
+
+        Commits per slip so a reload costs at most one re-render: the state
+        is stamped in the same transaction as the send, so a slip is never
+        emailed twice.  One failing slip is recorded and stepped over rather
+        than stopping the queue behind it.
+
+        Stops at ``_EMAIL_CRON_BATCH`` slips or ``_EMAIL_CRON_SECONDS`` of
+        wall clock, whichever comes first, leaving headroom under
+        ``limit_time_real``; the rest waits for the next run.
+
+        ``commit=False`` for callers inside an HTTP request, and for tests,
+        where Odoo forbids committing outright (same convention as
+        ``biometric.attendance.sync._generate_absences_date_range``).
+        """
         template = self.env.ref(
             'KSW_payroll.mail_template_payslip_auto', raise_if_not_found=False)
         if not template:
-            return
+            _logger.warning(
+                'Payslip auto-email template is missing; queue not processed.')
+            return False
+        slips = self.search(
+            [('x_email_state', '=', 'queued'), ('state', '=', 'done')],
+            limit=limit or self._EMAIL_CRON_BATCH, order='id',
+        )
+        sent = 0
+        deadline = monotonic() + self._EMAIL_CRON_SECONDS
+        for slip in slips:
+            if monotonic() > deadline:
+                _logger.info(
+                    'Payslip email queue: time budget reached, %s slip(s) '
+                    'left for the next run.', len(slips) - sent)
+                break
+            sent += 1
+            try:
+                # A savepoint keeps the cursor usable so the failure below
+                # can actually be written.
+                with self.env.cr.savepoint():
+                    template.sudo().send_mail(slip.id, force_send=False)
+            except Exception as err:  # one bad slip must not block the queue
+                _logger.exception(
+                    'Payslip auto-email failed for %s (id %s)',
+                    slip.number, slip.id)
+                slip.write({
+                    'x_email_state': 'failed',
+                    'x_email_error': str(err)[:500],
+                })
+            else:
+                slip.write({'x_email_state': 'sent', 'x_email_error': False})
+            if commit:
+                self.env.cr.commit()
+        return True
+
+    def action_requeue_payslip_email(self):
+        """Put a confirmed payslip back in the emailing queue.
+
+        The route back after a failure, and the way to re-send a payslip the
+        employee never received.  Deliberately ignores
+        ``x_auto_send_payslip``: asking for this is an explicit act.
+        """
+        if not self.env.su and not self.env.user.has_group(
+                PAYROLL_OFFICER_GROUP):
+            raise UserError(_(
+                'Only a payroll user may re-send a payslip email.'))
         for slip in self:
-            employee = slip.employee_id
-            if slip.state == 'done' and employee.x_auto_send_payslip and employee.work_email:
-                template.sudo().send_mail(
-                    slip.id, force_send=False)
+            if slip.state != 'done':
+                raise UserError(_(
+                    'Only a confirmed payslip can be emailed.'))
+            if not slip.employee_id.sudo().work_email:
+                raise UserError(_(
+                    '%s has no Work Email address, so there is nowhere to '
+                    'send the payslip.', slip.employee_id.name))
+        self.write({'x_email_state': 'queued', 'x_email_error': False})
+        return True

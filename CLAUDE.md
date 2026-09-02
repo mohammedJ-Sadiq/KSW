@@ -1113,3 +1113,34 @@ allocation is needed. All test leave types that do not require allocation must u
     `[@class='…']`, which Odoo warns about separately since a class list is not
     an identity. Comment it as a selector handle or the next reader deletes it
     as dead CSS.
+
+48. **A status marker belongs where the real-world event happens, not where the
+    record finalises — and `x_annual_approval_state` outlives the request.**
+    `x_return_state = 'on_vacation'` was stamped in `_action_validate`, i.e. at
+    **Step 6** when HR files the signed form. The employee leaves at **Step 5**,
+    when the GM signs, and the KSW chain sits in `state == 'confirm'` across the
+    whole gap — so for days nothing flagged the employee as away: no ribbon, no
+    punch alert, and `attendance_sheet._leave_coverage_end` saw an ordinary
+    month. The two moments coincide on stock Odoo flows and never on a
+    multi-step chain. Two traps when fixing it:
+    ```python
+    def _is_past_gm_final(self):
+        if self.state in ('refuse', 'cancel', 'draft'):
+            return False   # a CANCELLED request still reads 'approved'
+        if self._uses_multi_step_chain(self):
+            return self.x_annual_approval_state in self._REFUSE_LOCKED_STATES
+        return self.state == 'validate'
+    ```
+    and: the forward stamp needs the same one-predicate-called-from-every-route
+    treatment as the backward guard (#37). Seven routes touch this state (GM
+    final, validate, refuse, draft, back to approval, the Cancel wizard, the GM
+    return wizard) — `_sync_gm_final_state()` re-derives it from all seven, so
+    "returning *to* Step 6 keeps the marker, every earlier target clears it"
+    falls out instead of being a seventh rule. When a sibling module has a side
+    effect at the same moment, hang it on the same hook: `KSW_eos_leave`
+    overrides `_sync_gm_final_state()` for the **employee archive** (which also
+    began at GM final and was never undone), guarded on a recorded
+    `x_eos_employee_archived` — never on `not employee.active`, or refusing a
+    stale draft resurrects someone HR archived for their own reasons. Order at
+    the set point: `_create_vacation_payslip()` runs **before** the stamp,
+    because `x_return_state` is the payslip guard.

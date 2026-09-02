@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ==================================================================
+         Deduction coverage on the payslip.
+
+         On a vacation / EOS payslip the whole pending obligation is shown
+         even when it drives the net negative (see
+         hr.payslip._ksw_apply_deduction_priority).  This block states, in
+         so many words, how much of it the pay actually absorbed and how
+         much is still owed — so nobody reads a negative net as "collected".
+         ================================================================== -->
+    <record id="view_hr_payslip_form_inherit_ksw_deduction_coverage"
+            model="ir.ui.view">
+        <field name="name">hr.payslip.form.inherit.ksw.deduction.coverage</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="om_hr_payroll.view_hr_payslip_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Sheet level, before the notebook.  Inserting after a field
+                 inside the col="4" group would land inside that grid and
+                 break its layout (pitfall #21). -->
+            <xpath expr="//notebook" position="before">
+                <div class="alert alert-warning" role="alert"
+                     invisible="x_ksw_ded_carried == 0">
+                    <strong>Deductions exceed this payslip.</strong>
+                    The full outstanding amount is shown below for review.
+                    Only the part marked <em>Collected by This Payslip</em>
+                    is settled as paid — the rest stays
+                    <strong>pending</strong> on the deduction schedule and is
+                    collected by a later payroll run.
+                </div>
+                <group string="Deduction Coverage" name="ksw_deduction_coverage"
+                       invisible="x_ksw_ded_presented == 0 and x_ksw_ded_outstanding == 0">
+                    <group>
+                        <field name="x_ksw_ded_presented" readonly="1"/>
+                        <field name="x_ksw_ded_collected" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="x_ksw_ded_carried" readonly="1"
+                               decoration-danger="x_ksw_ded_carried &gt; 0"
+                               decoration-bf="x_ksw_ded_carried &gt; 0"/>
+                        <field name="x_ksw_ded_outstanding" readonly="1"/>
+                    </group>
+                </group>
+            </xpath>
+
+            <!-- Per-installment shortfall in "Other Inputs". -->
+            <xpath expr="//field[@name='input_line_ids']/list/field[@name='amount']"
+                   position="after">
+                <field name="x_ksw_uncollected" string="Not Collected"
+                       optional="show" readonly="1"
+                       decoration-danger="x_ksw_uncollected &gt; 0"/>
+            </xpath>
+            <xpath expr="//field[@name='input_line_ids']/form//field[@name='amount']"
+                   position="after">
+                <field name="x_ksw_uncollected" readonly="1"/>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

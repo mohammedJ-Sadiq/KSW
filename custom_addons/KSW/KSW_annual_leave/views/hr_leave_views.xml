@@ -146,7 +146,7 @@
                 <widget name="web_ribbon" title="🏖️ On Vacation"
                         class="o_ksw_ribbon_on_vacation"
                         bg_color="text-bg-warning"
-                        invisible="x_return_state != 'on_vacation' or x_annual_approval_state == 'pending_employee_signature'"/>
+                        invisible="x_return_state != 'on_vacation'"/>
                 <widget name="web_ribbon" title="⚠ Full Clearance"
                         bg_color="text-bg-danger"
                         invisible="not x_is_full_clearance"/>

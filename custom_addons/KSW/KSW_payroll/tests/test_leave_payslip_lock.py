@@ -66,6 +66,13 @@ class TestLeavePayslipLock(TransactionCase):
         slip.write({'state': slip_state})
         return leave, slip
 
+    def _leave_with_auto_confirmed_payslip(self):
+        """The shape the approval chain now produces: a confirmed payslip
+        that was confirmed *by the chain*, not by a payroll officer."""
+        leave, slip = self._leave_with_payslip('done')
+        slip.write({'x_vacation_auto_confirmed': True})
+        return leave, slip
+
     def test_draft_payslip_leaves_the_request_reversible(self):
         """A provisional calculation must not lock the approval chain."""
         leave, _slip = self._leave_with_payslip('draft')
@@ -116,3 +123,21 @@ class TestLeavePayslipLock(TransactionCase):
         self.assertEqual(leave.x_annual_approval_state, 'pending_dm')
         self.assertEqual(slip.state, 'draft',
                          'a mid-chain return leaves the preview alone')
+
+    def test_admin_return_releases_an_auto_confirmed_payslip(self):
+        """The settlement the chain confirmed by itself is undone, not a
+        wall: cancelling it puts the deduction installments back to pending
+        so a later payroll run collects them."""
+        leave, slip = self._leave_with_auto_confirmed_payslip()
+        self._admin_return(leave, 'pending_dm')
+        self.assertEqual(leave.x_annual_approval_state, 'pending_dm')
+        self.assertEqual(slip.state, 'cancel')
+        self.assertFalse(leave.sudo().x_vacation_payslip_id)
+
+    def test_auto_confirmed_flag_does_not_unlock_ordinary_reversal(self):
+        """Only the admin return wizard releases it. A finalised request is
+        still out of an HR user's hands (KSW_annual_leave's lock)."""
+        leave, _slip = self._leave_with_auto_confirmed_payslip()
+        leave.sudo().write({'x_annual_approval_state': 'approved'})
+        with self.assertRaises(UserError):
+            leave.with_user(self.user_hr).action_refuse()

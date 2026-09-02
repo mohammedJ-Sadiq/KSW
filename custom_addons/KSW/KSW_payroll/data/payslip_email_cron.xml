@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1">
+
+    <!-- Confirming a payslip only queues the email; this cron does the
+         PDF rendering, where limit_time_real_cron = -1 means it cannot
+         time out and take the server down with it. -->
+    <record id="cron_send_payslip_emails" model="ir.cron">
+        <field name="name">KSW Payroll: Send queued payslip emails (every 10 minutes)</field>
+        <field name="model_id" ref="om_hr_payroll.model_hr_payslip"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_send_payslip_emails()</field>
+        <field name="active" eval="True"/>
+        <field name="interval_number">10</field>
+        <field name="interval_type">minutes</field>
+    </record>
+
+</odoo>

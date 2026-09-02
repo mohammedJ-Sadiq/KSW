@@ -694,3 +694,93 @@ class TestEosLeave(TransactionCase):
 
         self.assertEqual(leave.x_annual_approval_state, 'approved')
         self.assertFalse(leave.with_user(self.user_hr).x_eos_inputs_editable)
+
+    # ==================================================================
+    # Employee restoration when GM final approval is undone
+    # ==================================================================
+
+    def test_archive_is_stamped_on_the_request(self):
+        """The request records that it is what archived the employee.
+
+        Nothing else makes the restoration below safe: 'the employee is
+        inactive' is also true of everyone HR archived for their own reasons.
+        """
+        leave = self._make_leave(offset=27)
+        leave.sudo().write({'x_eos_termination_reason': '84'})
+        self._advance_to(leave, 'pending_employee_signature')
+        self.assertTrue(leave.x_eos_employee_archived)
+
+    def test_refuse_restores_the_employee(self):
+        leave = self._make_leave(offset=28)
+        leave.sudo().write({'x_eos_termination_reason': '84'})
+        self._advance_to(leave, 'pending_employee_signature')
+        emp = leave.employee_id.with_context(active_test=False)
+        self.assertFalse(emp.active)
+
+        leave.sudo().action_refuse()
+
+        self.assertTrue(emp.active)
+        self.assertFalse(emp.departure_reason_id)
+        self.assertFalse(emp.departure_date)
+        self.assertFalse(leave.x_eos_employee_archived)
+
+    def test_draft_restores_the_employee(self):
+        leave = self._make_leave(offset=29)
+        leave.sudo().write({'x_eos_termination_reason': '85'})
+        self._advance_to(leave, 'pending_employee_signature')
+        leave.sudo().action_draft()
+        self.assertTrue(leave.employee_id.with_context(active_test=False).active)
+
+    def test_cancel_restores_the_employee(self):
+        leave = self._make_leave(offset=30)
+        leave.sudo().write({'x_eos_termination_reason': '84'})
+        self._advance_to(leave, 'pending_employee_signature')
+        leave.sudo()._action_user_cancel('Termination called off.')
+        self.assertTrue(leave.employee_id.with_context(active_test=False).active)
+
+    def test_gm_return_restores_the_employee(self):
+        """Sent back for revision: the employee is on staff again meanwhile."""
+        leave = self._make_leave(offset=31)
+        leave.sudo().write({'x_eos_termination_reason': '84'})
+        self._advance_to(leave, 'pending_employee_signature')
+        wizard = self.env['ksw.gm.return.approver.wizard'].with_user(
+            self.user_gm).sudo().create({
+                'leave_id': leave.id,
+                'target_step_id': self.env.ref(
+                    'KSW_annual_leave.return_step_pending_hr').id,
+                'reason': 'Wrong termination reason — please correct.',
+            })
+        wizard.action_confirm()
+
+        self.assertEqual(leave.x_annual_approval_state, 'pending_hr')
+        self.assertTrue(leave.employee_id.with_context(active_test=False).active)
+        self.assertFalse(leave.x_eos_employee_archived)
+
+    def test_reapproval_archives_again(self):
+        leave = self._make_leave(offset=32)
+        leave.sudo().write({'x_eos_termination_reason': '84'})
+        self._advance_to(leave, 'pending_employee_signature')
+        leave.sudo().action_draft()
+        self.assertTrue(leave.employee_id.with_context(active_test=False).active)
+
+        leave.sudo().write({'x_eos_termination_reason': '84'})
+        self._advance_to(leave, 'pending_employee_signature')
+        self.assertFalse(leave.employee_id.with_context(active_test=False).active)
+        self.assertTrue(leave.x_eos_employee_archived)
+
+    def test_unrelated_archive_is_not_undone(self):
+        """An employee archived by HR is not resurrected by a stale EOS draft.
+
+        The flag is what authorises the restore, so a request that never got
+        as far as GM final approval leaves them exactly as they were.
+        """
+        leave = self._make_leave(offset=33)
+        leave.sudo().write({'x_eos_termination_reason': '84'})
+        self._advance_to(leave, 'pending_acc')
+        emp = leave.employee_id
+        emp.sudo().with_context(no_wizard=True).action_archive()
+
+        leave.sudo().action_refuse()
+
+        self.assertFalse(leave.x_eos_employee_archived)
+        self.assertFalse(emp.with_context(active_test=False).active)

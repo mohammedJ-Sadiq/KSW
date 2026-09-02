@@ -14,3 +14,4 @@ from . import test_manager_assistant_delegation
 from . import test_department_gm
 from . import test_return_balance_sync
 from . import test_return_punch_notification
+from . import test_on_vacation_at_gm_final

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ==================================================================
+         Full deduction picture on the leave's Accounting page.
+
+         Vacation / EOS approval is where accounting decides what the
+         employee walks away with, so the reviewer gets the WHOLE
+         obligation, not just the slice this payslip affords — and an
+         explicit statement of how much of it was actually consumed.
+
+         Read-only insight: nothing here changes what payroll collects.
+         ================================================================== -->
+    <record id="hr_leave_view_form_inherit_ksw_deduction_picture"
+            model="ir.ui.view">
+        <field name="name">hr.leave.form.inherit.ksw.deduction.picture</field>
+        <field name="model">hr.leave</field>
+        <field name="inherit_id"
+               ref="KSW_annual_leave.hr_leave_view_form_inherit_annual_return"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//page[@name='accounting_page']" position="inside">
+
+                <separator string="Employee Deduction Picture"
+                           name="ksw_deduction_picture_section"
+                           groups="hr.group_hr_user,om_hr_payroll.group_hr_payroll_user,KSW_annual_leave.group_annual_leave_hr,KSW_annual_leave.group_annual_leave_acc,KSW_annual_leave.group_annual_leave_gm,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_acc_data_entry,KSW_deduction.group_deduction_officer,KSW_deduction.group_deduction_manager,KSW_deduction.group_installment_edit"/>
+
+                <group name="ksw_deduction_picture"
+                       groups="hr.group_hr_user,om_hr_payroll.group_hr_payroll_user,KSW_annual_leave.group_annual_leave_hr,KSW_annual_leave.group_annual_leave_acc,KSW_annual_leave.group_annual_leave_gm,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_acc_data_entry,KSW_deduction.group_deduction_officer,KSW_deduction.group_deduction_manager,KSW_deduction.group_installment_edit">
+
+                    <group string="Still Owed">
+                        <div class="o_row">
+                            <field name="x_ksw_ded_outstanding" readonly="1"/>
+                            <button name="action_view_leave_outstanding_installments"
+                                    type="object" class="btn-link"
+                                    icon="fa-arrow-right"
+                                    title="Show the installments behind this total"
+                                    invisible="x_ksw_ded_outstanding == 0"/>
+                        </div>
+                        <div class="o_row">
+                            <field name="x_ksw_ded_month_total" readonly="1"/>
+                            <button name="action_view_leave_month_installments"
+                                    type="object" class="btn-link"
+                                    icon="fa-arrow-right"
+                                    title="Show the installments behind this total"
+                                    invisible="x_ksw_ded_month_total == 0"/>
+                        </div>
+                    </group>
+
+                    <group string="On the Vacation / EOS Payslip"
+                           invisible="not x_ksw_ded_has_calc">
+                        <field name="x_ksw_ded_has_calc" invisible="1"/>
+                        <field name="x_ksw_ded_shortfall" invisible="1"/>
+                        <field name="x_ksw_ded_presented" readonly="1"/>
+                        <field name="x_ksw_ded_collected" readonly="1"/>
+                        <field name="x_ksw_ded_carried" readonly="1"
+                               decoration-danger="x_ksw_ded_carried &gt; 0"
+                               decoration-bf="x_ksw_ded_carried &gt; 0"/>
+                    </group>
+
+                </group>
+
+                <div class="alert alert-danger" role="alert"
+                     invisible="not x_ksw_ded_manual_duplicate"
+                     groups="hr.group_hr_user,om_hr_payroll.group_hr_payroll_user,KSW_annual_leave.group_annual_leave_hr,KSW_annual_leave.group_annual_leave_acc,KSW_annual_leave.group_annual_leave_gm,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_acc_data_entry,KSW_deduction.group_deduction_officer,KSW_deduction.group_deduction_manager,KSW_deduction.group_installment_edit">
+                    <field name="x_ksw_ded_manual_duplicate" invisible="1"/>
+                    <strong>Possible double charge.</strong>
+                    Payroll now collects the employee's
+                    <strong>whole</strong> outstanding balance
+                    (<field name="x_ksw_ded_outstanding" readonly="1"
+                            class="oe_inline"/> SAR) on the settlement
+                    payslip automatically, including installments not yet
+                    due. This form also carries
+                    <field name="x_ksw_ded_manual_total" readonly="1"
+                           class="oe_inline"/> SAR typed by hand in
+                    <em>Remaining Loans</em> / <em>Additional Deductions</em>.
+                    If that was entered to make up for the balance not being
+                    taken, remove it — otherwise the employee is charged
+                    twice.
+                </div>
+
+                <div class="alert alert-warning" role="alert"
+                     invisible="not x_ksw_ded_shortfall"
+                     groups="hr.group_hr_user,om_hr_payroll.group_hr_payroll_user,KSW_annual_leave.group_annual_leave_hr,KSW_annual_leave.group_annual_leave_acc,KSW_annual_leave.group_annual_leave_gm,KSW_deduction.group_loan_hr,KSW_deduction.group_loan_acc,KSW_deduction.group_loan_gm,KSW_deduction.group_acc_data_entry,KSW_deduction.group_deduction_officer,KSW_deduction.group_deduction_manager,KSW_deduction.group_installment_edit">
+                    <strong>The payslip cannot cover every deduction.</strong>
+                    The full amount is shown so the employee's position is
+                    visible, which is why the net may be negative. Only the
+                    <em>Collected by the Payslip</em> part is settled as paid —
+                    the rest stays <strong>pending</strong> and is collected by
+                    a later payroll run.
+                </div>
+
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

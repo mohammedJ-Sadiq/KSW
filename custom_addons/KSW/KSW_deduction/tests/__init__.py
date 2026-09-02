@@ -20,3 +20,4 @@ from . import test_employee_self_service
 from . import test_loan_return_approver_wizard
 from . import test_department_gm
 from . import test_statement_of_account
+from . import test_vacation_full_deductions

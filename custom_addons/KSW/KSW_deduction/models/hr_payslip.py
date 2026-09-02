@@ -27,19 +27,28 @@ class HrPayslip(models.Model):
             super(HrPayslip, rerun).compute_sheet()
         return res
 
-    def _ksw_pending_lines_domain(self, employee_ids, date_to):
+    def _ksw_pending_lines_domain(self, employee_ids, date_to, full=False):
         """Pending installments collectable on a payslip ending `date_to`.
 
         No lower period bound: an installment left pending in an earlier
         month (because a past payslip could not afford it) is naturally
         picked up — i.e. the unaffordable remainder rolls forward.
+
+        `full=True` drops the UPPER bound as well, so installments not yet
+        due are pulled forward too. That is the vacation / EOS case: the
+        settlement is the last (or the only) chance to collect. An EOS
+        employee has no next payroll run at all, so anything left behind is
+        never collected — which is why accounting had taken to re-typing the
+        loan balance into "Other Deductions" by hand.
         """
-        return [
+        domain = [
             ('employee_id', 'in', employee_ids),
             ('state', '=', 'pending'),
-            ('period_date', '<=', date_to),
             ('deduction_id.state', '=', 'active'),
         ]
+        if not full:
+            domain.append(('period_date', '<=', date_to))
+        return domain
 
     @api.model
     def get_inputs(self, versions, date_from, date_to):
@@ -87,9 +96,12 @@ class HrPayslip(models.Model):
             lambda i: i.code and i.code.startswith('KSW_DED_'))
         if old:
             old.unlink()
+        # A vacation / EOS payslip settles the WHOLE obligation, including
+        # installments not yet due — see `_ksw_pending_lines_domain`.
+        full = payslip._ksw_shows_full_deductions()
         lines = self.env['ksw.deduction.line'].sudo().search(
             self._ksw_pending_lines_domain(
-                [payslip.employee_id.id], payslip.date_to),
+                [payslip.employee_id.id], payslip.date_to, full=full),
             order=_KSW_LINE_ORDER,
         )
         if not lines:
@@ -107,6 +119,11 @@ class HrPayslip(models.Model):
             ded = line.deduction_id
             label = '%s [%s] inst %d/%d' % (
                 ded.type_id.name, ded.name, line.sequence, ded.installments)
+            # Mark the ones pulled forward, so the reviewer can see at a
+            # glance which lines this settlement is collecting early.
+            if line.period_date and line.period_date > payslip.date_to:
+                label += _(' — pulled forward, due %(period)s',
+                           period=line.period_date.strftime('%m/%Y'))
             InputLine.create({
                 'payslip_id': payslip.id,
                 'version_id': version_id,
@@ -117,12 +134,49 @@ class HrPayslip(models.Model):
             })
             seq += 1
 
-    def _ksw_apply_deduction_priority(self):
-        """Cap KSW deduction inputs so the net pay never goes negative.
+    def _ksw_shows_full_deductions(self):
+        """Present the WHOLE pending obligation, even into a negative net?
 
-        Collects the affordable amount in priority order (penalties before
-        loans). Returns True if any input amount was reduced (caller must
-        recompute the payslip), False if the salary covered everything.
+        True for vacation / EOS payslips (those linked to a leave through
+        ``hr.payslip.x_leave_id``).  Accounting reviews the employee's whole
+        financial position at that moment, so a shortfall must be visible on
+        the document rather than silently capped away.  On an ordinary
+        monthly payslip the historical behaviour is kept: the inputs are
+        capped so the net never goes negative.
+
+        A **revision** is excluded even when it carries ``x_leave_id``
+        (``_create_revision`` copies it): a revision is a payment document
+        whose net IS the difference still owed, and
+        ``_overpaid_revisions`` reads a negative net there as "we over-paid
+        the employee" — ``_handle_overpaid_revisions`` then cancels the
+        revision and opens a recovery deduction. A deduction shortfall must
+        never be mistaken for an over-payment, so a revision keeps the
+        capping behaviour.
+
+        Either way only the affordable part is ever settled as paid — see
+        ``_sync_deductions_on_done``.
+        """
+        self.ensure_one()
+        return bool(self.x_leave_id) and not self.x_is_revision
+
+    def _ksw_apply_deduction_priority(self):
+        """Allocate the affordable pay across the pending KSW installments.
+
+        Collects in priority order (penalties before loans, oldest period
+        first).  Two presentation modes, one settlement rule:
+
+        * ordinary payslip — the input `amount` is CAPPED to what the pay
+          can absorb, so the net never goes negative.  Returns True when
+          something was reduced, and the caller recomputes the payslip.
+        * vacation / EOS payslip (`_ksw_shows_full_deductions`) — the input
+          keeps its FULL amount so the whole obligation shows on the
+          payslip and the net is allowed to go negative.  The unaffordable
+          part is recorded in `x_ksw_uncollected` instead, and no recompute
+          is needed (returns False).
+
+        In both modes `amount - x_ksw_uncollected` is the amount actually
+        consumed from this payslip, and it is the only part that is marked
+        paid.
         """
         self.ensure_one()
         inputs = self.input_line_ids.filtered(
@@ -137,7 +191,11 @@ class HrPayslip(models.Model):
         net = self.get_salary_line_total('NET')
         available = net + ksw_total
         if cur.compare_amounts(available, ksw_total) >= 0:
-            return False  # everything affordable, no capping
+            # Everything affordable: no capping, nothing carried forward.
+            stale = inputs.filtered(lambda i: i.x_ksw_uncollected)
+            if stale:
+                stale.write({'x_ksw_uncollected': 0.0})
+            return False
 
         # Order inputs by the underlying line's priority (penalties first).
         prio = {}
@@ -148,17 +206,79 @@ class HrPayslip(models.Model):
                 line.sequence)
         ordered = inputs.sorted(key=lambda i: prio[i.id])
 
+        full_view = self._ksw_shows_full_deductions()
         remaining = max(available, 0.0)
         changed = False
         for inp in ordered:
             full = inp.amount
-            alloc = min(full, remaining)
-            alloc = cur.round(alloc)
-            if cur.compare_amounts(alloc, full) != 0:
-                inp.amount = alloc
-                changed = True
+            alloc = cur.round(min(full, remaining))
+            if full_view:
+                # Keep the obligation on the document; record the shortfall.
+                uncollected = cur.round(full - alloc)
+                if cur.compare_amounts(
+                        inp.x_ksw_uncollected, uncollected) != 0:
+                    inp.x_ksw_uncollected = uncollected
+            else:
+                if inp.x_ksw_uncollected:
+                    inp.x_ksw_uncollected = 0.0
+                if cur.compare_amounts(alloc, full) != 0:
+                    inp.amount = alloc
+                    changed = True
             remaining = max(remaining - alloc, 0.0)
         return changed
+
+    # ------------------------------------------------------------------
+    # Deduction coverage summary (payslip form + leave accounting page)
+    # ------------------------------------------------------------------
+    # None of these carry a model-level ``groups=``: they are referenced in
+    # ``invisible=`` on view elements shown to leave approvers who are not
+    # payroll users, which would trip the OWL "field is undefined" crash
+    # (pitfall #31).  The computes read restricted data through ``sudo()``
+    # and visibility is controlled view-side only.
+
+    x_ksw_ded_presented = fields.Float(
+        string='Deductions Presented', digits=(16, 2),
+        compute='_compute_ksw_deduction_coverage',
+        help='Total of the KSW deduction installments shown on this '
+             'payslip.',
+    )
+    x_ksw_ded_collected = fields.Float(
+        string='Collected by This Payslip', digits=(16, 2),
+        compute='_compute_ksw_deduction_coverage',
+        help='The part of the presented deductions the pay could actually '
+             'absorb. Only this part is settled as paid.',
+    )
+    x_ksw_ded_carried = fields.Float(
+        string='Not Collected (Still Pending)', digits=(16, 2),
+        compute='_compute_ksw_deduction_coverage',
+        help='The part the pay could not cover. It stays pending on the '
+             'deduction schedule and is collected by a later payroll run.',
+    )
+    x_ksw_ded_outstanding = fields.Float(
+        string='Employee Total Outstanding', digits=(16, 2),
+        compute='_compute_ksw_deduction_coverage',
+        help='Every still-pending installment the employee owes across all '
+             'active deductions, whatever month it falls in.',
+    )
+
+    @api.depends('employee_id', 'input_line_ids.code', 'input_line_ids.amount',
+                 'input_line_ids.x_ksw_uncollected')
+    def _compute_ksw_deduction_coverage(self):
+        for slip in self:
+            inputs = slip.input_line_ids.filtered(
+                lambda i: i.code and i.code.startswith('KSW_DED_')
+                and i.code[8:].isdigit())
+            presented = sum(inputs.mapped('amount'))
+            carried = sum(i.x_ksw_uncollected or 0.0 for i in inputs)
+            slip.x_ksw_ded_presented = presented
+            slip.x_ksw_ded_carried = carried
+            slip.x_ksw_ded_collected = presented - carried
+            # sudo(): x_deduction_outstanding_total is gated behind
+            # hr.group_hr_user, and the loan/accounting approvers who read
+            # this summary are not necessarily HR users.
+            slip.x_ksw_ded_outstanding = (
+                slip.employee_id.sudo().x_deduction_outstanding_total
+                if slip.employee_id else 0.0)
 
     def write(self, vals):
         new_state = vals.get('state')
@@ -175,7 +295,7 @@ class HrPayslip(models.Model):
 
     def _sync_deductions_on_done(self, payslip):
         """Reconcile deduction lines with what the payslip actually
-        collected. Each KSW_DED_* input amount is the *capped* amount
+        collected — `amount - x_ksw_uncollected` per KSW_DED_* input
         (after `_ksw_apply_deduction_priority`):
           • full          → mark the line paid;
           • zero           → leave it pending (rolls forward next month);
@@ -186,7 +306,13 @@ class HrPayslip(models.Model):
         alloc = {}  # line_id -> collected amount
         for i in payslip.input_line_ids:
             if i.code and i.code.startswith('KSW_DED_') and i.code[8:].isdigit():
-                alloc[int(i.code[8:])] = i.amount
+                # On a vacation / EOS payslip the input carries the FULL
+                # obligation for visibility; what the pay actually absorbed
+                # is `amount - x_ksw_uncollected`. On an ordinary payslip
+                # (and on every payslip computed before that field existed)
+                # x_ksw_uncollected is 0, so this is the capped amount as
+                # before. Never settle money the payslip did not pay.
+                alloc[int(i.code[8:])] = i.amount - (i.x_ksw_uncollected or 0.0)
         if not alloc:
             return
         self.env['ksw.deduction'].sudo()._settle_payslip_lines(

@@ -39,6 +39,17 @@ class HrLeave(models.Model):
         help='True when the leave type is flagged as an EOS request.',
     )
 
+    x_eos_employee_archived = fields.Boolean(
+        string='Employee Archived by This Request',
+        readonly=True,
+        copy=False,
+        help='True when GM final approval on THIS request is what archived '
+             'the employee. Reversing the request restores the employee only '
+             'when this is set — an employee archived for any other reason '
+             'stays archived, because provenance is recorded here rather '
+             'than guessed from the fact that they are inactive.',
+    )
+
     # ------------------------------------------------------------------
     # HR-filled EOS fields (only writable by HR at pending_hr state)
     # ------------------------------------------------------------------
@@ -416,6 +427,9 @@ class HrLeave(models.Model):
                 'departure_reason_id': departure_reason.id if departure_reason else False,
                 'departure_date': termination_date,
             })
+            # Record that THIS request is what archived them — the only
+            # thing that makes the reversal below safe.
+            leave.sudo().write({'x_eos_employee_archived': True})
             leave.sudo().message_post(
                 body=Markup(
                     '<strong>🏢 Employee Archived</strong><br/>'
@@ -428,6 +442,46 @@ class HrLeave(models.Model):
                     'reason': departure_reason.name if departure_reason
                               else _('Not specified'),
                 },
+                subtype_xmlid='mail.mt_note',
+            )
+        return result
+
+    def _sync_gm_final_state(self):
+        """Put the employee back on staff when GM final approval is undone.
+
+        The archive is the EOS equivalent of 'On Vacation': it starts at GM
+        final approval, so it has to end wherever that approval does —
+        refuse, cancel, reset to draft, back to approval, or the GM returning
+        the request to an earlier step. Riding on the annual chain's rule
+        rather than repeating the list means a seventh route out only has to
+        be taught about ``_sync_gm_final_state``, once, for both.
+
+        Guarded on ``x_eos_employee_archived`` rather than on ``not
+        employee.active``: an employee archived by HR for an unrelated reason
+        must not be resurrected by someone rejecting a stale EOS draft.
+        """
+        result = super()._sync_gm_final_state()
+        for leave in self.filtered('x_eos_employee_archived'):
+            if leave._is_past_gm_final():
+                continue
+            employee = leave.employee_id.sudo()
+            if employee and not employee.active:
+                employee.with_context(no_wizard=True).action_unarchive()
+            if employee:
+                # Both were written by action_gm_final_approve on this same
+                # request; the employee has not left after all.
+                employee.write({
+                    'departure_reason_id': False,
+                    'departure_date': False,
+                })
+            leave.sudo().write({'x_eos_employee_archived': False})
+            leave.sudo().message_post(
+                body=Markup(
+                    '<strong>&#8617; Employee Restored</strong><br/>'
+                    '<b>Employee:</b> %(emp)s<br/>'
+                    '<b>Reason:</b> The End-of-Service request is no longer '
+                    'approved, so the termination has been undone.'
+                ) % {'emp': leave.employee_id.name},
                 subtype_xmlid='mail.mt_note',
             )
         return result
@@ -618,6 +672,13 @@ class HrLeave(models.Model):
 
             payslip.compute_sheet()
 
+            # Definitive EOS run: confirm on generation so the employee's
+            # outstanding loans and deductions are consumed by the final
+            # settlement. Previews stay draft — see the twin comment in
+            # KSW_payroll._create_vacation_payslip.
+            if not preview:
+                payslip._ksw_auto_confirm_leave_payslip()
+
             _logger.info(
                 'EOS payslip #%s created for employee %s '
                 '(leave #%s, month %s/%s).',
@@ -700,6 +761,33 @@ class HrLeave(models.Model):
             if leave.x_eos_payslip_id and leave.x_eos_payslip_id.state != 'cancel':
                 leave.x_eos_payslip_id.write({'state': 'cancel'})
             if leave.x_eos_payslip_id:
+                leave.write({'x_eos_payslip_id': False})
+
+    def _release_payslips_for_reversal(self, what):
+        """Same rule as the vacation settlement, for the EOS payslip.
+
+        ``super()`` (KSW_payroll) does the work — the EOS slip hangs off the
+        same ``x_leave_id`` one2many, so it is released there — but it does
+        not clear ``x_eos_payslip_id``, and the manual-confirmation refusal
+        reads better naming the EOS slip. ``_cancel_eos_payslip`` is
+        deliberately NOT called: it cancels the slip in any state, and a
+        draft provisional EOS calculation must survive a mid-chain return.
+        """
+        for leave in self.filtered('x_is_eos_leave').sudo():
+            slip = leave.x_eos_payslip_id
+            if (slip and slip.state == 'done'
+                    and not slip.x_vacation_auto_confirmed):
+                raise UserError(_(
+                    'This end-of-service request has a payslip a payroll '
+                    'officer confirmed by hand (%(slip)s), so it is treated '
+                    'as paid. Handle the payslip first — the request cannot '
+                    'be %(what)s until then.',
+                    slip=slip.number or slip.name or str(slip.id),
+                    what=what,
+                ))
+        super()._release_payslips_for_reversal(what)
+        for leave in self.filtered('x_is_eos_leave').sudo():
+            if leave.x_eos_payslip_id.state == 'cancel':
                 leave.write({'x_eos_payslip_id': False})
 
     def action_refuse(self):

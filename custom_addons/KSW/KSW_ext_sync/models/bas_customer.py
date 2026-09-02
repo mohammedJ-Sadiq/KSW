@@ -64,14 +64,21 @@ class BASCustomer(models.Model):
              'Contacts" rather than matched to a pre-existing one.',
     )
 
+    # Everything but ``last_synced`` and ``partner_id`` — the latter is
+    # linked by its own pass below, not by comparison.
+    _COMPARE_FIELDS = (
+        'name_ar', 'name_en', 'is_stopped', 'seller_code', 'seller_name',
+        'collector_code', 'collector_name', 'credit_term_days',
+    )
+
     @api.model
-    def sync_from_bas(self):
+    def sync_from_bas(self, deadline=None, commit=True):
         try:
             conn = self._bas_connect()
             cursor = conn.cursor(as_dict=True)
         except Exception as e:
             _logger.error('KSW BAS customer sync: connection failed: %s', e)
-            return
+            return False
 
         try:
             cursor.execute("""
@@ -106,7 +113,7 @@ class BASCustomer(models.Model):
         except Exception as e:
             _logger.error('KSW BAS customer sync: query failed: %s', e)
             conn.close()
-            return
+            return False
         finally:
             conn.close()
 
@@ -119,24 +126,15 @@ class BASCustomer(models.Model):
                 return str(value).strip()
 
         now = fields.Datetime.now()
-        existing = {r.bas_code: r for r in self.search([])}
-        # Contacts that already carry the account number get linked for
-        # free — safe, since it's an existing explicit assignment.
-        partners_by_code = {
-            (p.x_client_account_number or '').strip(): p
-            for p in self.env['res.partner'].search(
-                [('x_client_account_number', '!=', False)])
-        }
 
-        synced_codes = set()
+        vals_list = []
         for row in rows:
             code = (row['DCODE1'] or '').strip()
             if not code:
                 continue
-            synced_codes.add(code)
             seller_code = _seller_code(row['SELLER'])
             collector_code = _seller_code(row['SELLER2'])
-            vals = {
+            vals_list.append({
                 'bas_code': code,
                 'name_ar': (row['DNAME'] or '').strip(),
                 'name_en': (row['DNAME2'] or '').strip(),
@@ -147,22 +145,41 @@ class BASCustomer(models.Model):
                 'collector_name': seller_names.get(collector_code, ''),
                 'credit_term_days': int(row['LIMT_DAYS'] or 0),
                 'last_synced': now,
-            }
-            rec = existing.get(code)
-            if rec:
-                if not rec.partner_id and code in partners_by_code:
-                    vals['partner_id'] = partners_by_code[code].id
-                rec.write(vals)
-            else:
-                if code in partners_by_code:
-                    vals['partner_id'] = partners_by_code[code].id
-                self.create(vals)
+            })
 
-        stale = self.search([('bas_code', 'not in', list(synced_codes))])
-        if stale:
-            stale.unlink()
+        created, updated, done = self._bas_upsert(
+            'bas_code', vals_list, self._COMPARE_FIELDS,
+            deadline=deadline, commit=commit)
 
-        _logger.info('KSW BAS: synced %d customer accounts', len(rows))
+        # Contacts that already carry the account number get linked for
+        # free — safe, since it's an existing explicit assignment.  Kept a
+        # separate pass so `partner_id` never enters the change comparison:
+        # it is ours, not BAS's, and must never be overwritten from there.
+        partners_by_code = {
+            (p.x_client_account_number or '').strip(): p
+            for p in self.env['res.partner'].search(
+                [('x_client_account_number', '!=', False)])
+        }
+        if partners_by_code:
+            unlinked = self.search([
+                ('partner_id', '=', False),
+                ('bas_code', 'in', list(partners_by_code)),
+            ])
+            for rec in unlinked:
+                rec.partner_id = partners_by_code[rec.bas_code].id
+
+        if done:
+            # Only prune on a complete pass (see ksw.bas.account).
+            synced_codes = [v['bas_code'] for v in vals_list]
+            stale = self.search([('bas_code', 'not in', synced_codes)])
+            if stale:
+                stale.unlink()
+
+        _logger.info(
+            'KSW BAS: customers %s — %d read, %d created, %d updated',
+            'complete' if done else 'INCOMPLETE (time budget)',
+            len(rows), created, updated)
+        return done
 
     # ------------------------------------------------------------------
     # Manual, explicit bulk match/create — not run by the 10-min cron.

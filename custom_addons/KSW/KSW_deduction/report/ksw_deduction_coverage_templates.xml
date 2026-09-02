@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ==============================================================
+         The same story in every document a reviewer picks up: the whole
+         obligation, and how much of it the pay actually consumed.
+
+         A vacation / EOS payslip shows the FULL pending deductions even
+         when that drives the net negative, so a printed copy MUST say
+         which part was collected — otherwise the negative net reads as
+         "all of it was taken".
+         ============================================================== -->
+
+    <!-- Shared block, called with `o` = an hr.leave. -->
+    <template id="report_leave_deduction_picture">
+        <t t-if="o.x_ksw_ded_outstanding or o.x_ksw_ded_presented">
+            <h5 class="border-bottom pb-1 mb-2">Employee Deduction Picture</h5>
+            <table class="table table-sm table-bordered mb-2">
+                <tbody>
+                    <tr>
+                        <td style="width:60%">
+                            <strong>Outstanding Loans &amp; Deductions (all months)</strong>
+                        </td>
+                        <td class="text-end fw-bold"
+                            t-out="'%.2f' % (o.x_ksw_ded_outstanding or 0.0)"/>
+                    </tr>
+                    <tr>
+                        <td>Due at This Payroll Run</td>
+                        <td class="text-end"
+                            t-out="'%.2f' % (o.x_ksw_ded_month_total or 0.0)"/>
+                    </tr>
+                    <t t-if="o.x_ksw_ded_has_calc">
+                        <tr>
+                            <td>Presented on the Vacation / EOS Payslip</td>
+                            <td class="text-end"
+                                t-out="'%.2f' % (o.x_ksw_ded_presented or 0.0)"/>
+                        </tr>
+                        <tr>
+                            <td>Collected by the Payslip</td>
+                            <td class="text-end text-success fw-bold"
+                                t-out="'%.2f' % (o.x_ksw_ded_collected or 0.0)"/>
+                        </tr>
+                        <tr>
+                            <td>Not Collected — still pending</td>
+                            <td t-attf-class="text-end fw-bold #{'text-danger' if o.x_ksw_ded_carried else ''}"
+                                t-out="'%.2f' % (o.x_ksw_ded_carried or 0.0)"/>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+            <p t-if="o.x_ksw_ded_shortfall" class="small text-danger mb-4">
+                The payslip could not cover every deduction, which is why the
+                net may be negative. Only the collected part is settled as
+                paid — the rest stays pending and is collected by a later
+                payroll run.
+            </p>
+        </t>
+    </template>
+
+    <!-- Annual / EOS vacation approval sheet — before End-of-Service Data. -->
+    <template id="report_annual_vacation_deduction_picture"
+              inherit_id="KSW_payroll.report_annual_vacation">
+        <xpath expr="//t[@t-if='o.x_eos_service_years or o.x_eos_last_wage']"
+               position="before">
+            <t t-call="KSW_deduction.report_leave_deduction_picture"/>
+        </xpath>
+    </template>
+
+    <!-- Unpaid / combined leave approval sheet — before the signatures. -->
+    <template id="report_leave_approval_deduction_picture"
+              inherit_id="KSW_unpaid_leave.report_leave_approval">
+        <xpath expr="//div[hasclass('row')]" position="before">
+            <t t-call="KSW_deduction.report_leave_deduction_picture"/>
+        </xpath>
+    </template>
+
+    <!-- Payslip PDF — just before the Salary Computation section. -->
+    <template id="report_payslip_deduction_coverage"
+              inherit_id="KSW_payroll.report_payslip_override">
+        <xpath expr="//t[@t-set='basic_total']" position="before">
+            <t t-if="o.x_ksw_ded_presented or o.x_ksw_ded_outstanding">
+                <div style="page-break-inside: avoid">
+                    <h4 class="mt-4 border-bottom pb-1 mb-2">Deduction Coverage</h4>
+                    <table class="table table-sm table-bordered mb-2">
+                        <tbody>
+                            <tr>
+                                <td style="width:60%">Deductions presented on this payslip</td>
+                                <td class="text-end"
+                                    t-out="'%.2f' % (o.x_ksw_ded_presented or 0.0)"/>
+                            </tr>
+                            <tr>
+                                <td>Collected by this payslip</td>
+                                <td class="text-end text-success fw-bold"
+                                    t-out="'%.2f' % (o.x_ksw_ded_collected or 0.0)"/>
+                            </tr>
+                            <tr>
+                                <td>Not collected — still pending</td>
+                                <td t-attf-class="text-end fw-bold #{'text-danger' if o.x_ksw_ded_carried else ''}"
+                                    t-out="'%.2f' % (o.x_ksw_ded_carried or 0.0)"/>
+                            </tr>
+                            <tr>
+                                <td><strong>Employee total outstanding (all months)</strong></td>
+                                <td class="text-end fw-bold"
+                                    t-out="'%.2f' % (o.x_ksw_ded_outstanding or 0.0)"/>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p t-if="o.x_ksw_ded_carried" class="small text-danger mb-4">
+                        The pay could not cover every deduction shown. Only the
+                        collected amount is settled as paid — the rest stays
+                        pending and is collected by a later payroll run.
+                    </p>
+                </div>
+            </t>
+        </xpath>
+    </template>
+
+</odoo>

@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, timedelta
+from time import monotonic
 from odoo import models, fields, api
 
 _logger = logging.getLogger(__name__)
@@ -59,8 +60,15 @@ class BASInvoice(models.Model):
     def _make_key(ftype, ftype2, code2, number1):
         return f'{ftype}_{ftype2}_{code2}_{int(number1 or 0)}'
 
+    # Everything but ``last_synced`` — stamping that on an unchanged row
+    # would make every row look changed (see ``_bas_upsert``).
+    _COMPARE_FIELDS = (
+        'ftype', 'branch_code', 'number', 'invoice_date', 'from_account',
+        'to_account', 'subtotal', 'tax_amount', 'status',
+    )
+
     @api.model
-    def sync_from_bas(self):
+    def sync_from_bas(self, deadline=None, commit=True):
         param = self.env['ir.config_parameter'].sudo()
         last_sync_str = param.get_param('ksw_bas.last_sync_invoice')
         now = datetime.now()
@@ -76,7 +84,7 @@ class BASInvoice(models.Model):
             cursor = conn.cursor(as_dict=True)
         except Exception as e:
             _logger.error('KSW BAS invoice sync: connection failed: %s', e)
-            return
+            return False
 
         try:
             # FTYPE=600 (POS): amounts from STR10 lines
@@ -123,35 +131,37 @@ class BASInvoice(models.Model):
         except Exception as e:
             _logger.error('KSW BAS invoice sync: query failed: %s', e)
             conn.close()
-            return
+            return False
         finally:
             conn.close()
 
         now = fields.Datetime.now()
-        existing_keys = {
-            r.bas_key: r for r in self.search([])
-        }
+        vals_list = [{
+            'bas_key': self._make_key(
+                row['FTYPE'], row['FTYPE2'], row['CODE2'], row['NUMBER1']),
+            'ftype': f"{row['FTYPE']}/{row['FTYPE2']}",
+            'branch_code': (row['CODE2'] or '').strip(),
+            'number': str(int(row['NUMBER1'] or 0)),
+            'invoice_date': row['DATE1'].date() if row['DATE1'] else None,
+            'from_account': (row['FCODE'] or '').strip(),
+            'to_account': (row['TCODE'] or '').strip(),
+            'subtotal': float(row['SUBTOTAL'] or 0),
+            'tax_amount': float(row['TAXES_AMOUNT'] or 0),
+            'status': (row['STATUS_VOU'] or '').strip(),
+            'last_synced': now,
+        } for row in rows]
 
-        for row in rows:
-            key = self._make_key(row['FTYPE'], row['FTYPE2'], row['CODE2'], row['NUMBER1'])
-            inv_date = row['DATE1'].date() if row['DATE1'] else None
-            vals = {
-                'bas_key': key,
-                'ftype': f"{row['FTYPE']}/{row['FTYPE2']}",
-                'branch_code': (row['CODE2'] or '').strip(),
-                'number': str(int(row['NUMBER1'] or 0)),
-                'invoice_date': inv_date,
-                'from_account': (row['FCODE'] or '').strip(),
-                'to_account': (row['TCODE'] or '').strip(),
-                'subtotal': float(row['SUBTOTAL'] or 0),
-                'tax_amount': float(row['TAXES_AMOUNT'] or 0),
-                'status': (row['STATUS_VOU'] or '').strip(),
-                'last_synced': now,
-            }
-            if key in existing_keys:
-                existing_keys[key].write(vals)
-            else:
-                self.create(vals)
+        created, updated, done = self._bas_upsert(
+            'bas_key', vals_list, self._COMPARE_FIELDS,
+            deadline=deadline, commit=commit)
 
-        param.set_param('ksw_bas.last_sync_invoice', datetime.now().isoformat())
-        _logger.info('KSW BAS: synced %d invoices (since %s)', len(rows), since.date())
+        if done:
+            # Only advance the watermark on a complete pass, or the rows the
+            # budget cut off would never be revisited.
+            param.set_param(
+                'ksw_bas.last_sync_invoice', datetime.now().isoformat())
+        _logger.info(
+            'KSW BAS: invoices %s — %d read, %d created, %d updated (since %s)',
+            'complete' if done else 'INCOMPLETE (time budget)',
+            len(rows), created, updated, since.date())
+        return done

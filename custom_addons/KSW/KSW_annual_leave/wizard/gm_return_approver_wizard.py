@@ -220,15 +220,15 @@ class GmReturnApproverWizard(models.TransientModel):
             )
 
         if is_admin:
-            # A paid settlement must not be left hanging off a request that
-            # has been pushed back into the approval chain, and cancelling it
-            # would re-collect its installments next month (SLIP/11307).
-            if leave._has_confirmed_payslip():
-                raise UserError(
-                    'This request already has a confirmed (paid) payslip. '
-                    'Handle the payslip first — returning the request now '
-                    'would strand it, and cancelling a paid payslip '
-                    're-collects its deductions on the next run.')
+            # A settlement payslip must not be left hanging off a request
+            # that has been pushed back into the approval chain. The one the
+            # approval chain auto-confirmed is cancelled here, which releases
+            # the loan/deduction installments it consumed back to pending;
+            # one a payroll officer confirmed by hand is refused outright,
+            # because releasing installments that were really paid
+            # re-collects them next month (SLIP/11307).
+            leave._release_payslips_for_reversal(
+                'returned to an earlier approver')
             if leave.state != 'confirm':
                 # Undo the Odoo validation but keep every figure the
                 # approvers entered — see _move_validate_leave_to_confirm.
@@ -249,6 +249,14 @@ class GmReturnApproverWizard(models.TransientModel):
             write_vals['x_annual_approval_state'] = target
         if write_vals:
             leave.write(write_vals)
+
+        # The target step decides whether GM final approval still stands, so
+        # the side effects that hang off it are re-derived rather than listed
+        # here: returning to any step before it closes 'On Vacation' (and
+        # restores the archived employee on an EOS request), while returning
+        # *to* HR Confirmation leaves both alone — GM final was not undone.
+        # sudo(): the GM/administrator need not hold write scope on the leave.
+        leave.sudo()._sync_gm_final_state()
 
         target_label = _TARGET_LABELS[target]
         # A leave with no chain (or one already validated) has no chain state

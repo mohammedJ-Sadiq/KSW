@@ -52,6 +52,20 @@
                         help="Recompute this period with current data and pay the employee the difference."/>
             </xpath>
 
+            <!-- ── Re-send Payslip Email ──
+                 Confirming a payslip only queues the email; the cron renders
+                 the PDF.  This is the route back after a failure, and the
+                 way to re-send one the employee never received. -->
+            <xpath expr="//header/button[@name='action_issue_revision']"
+                   position="after">
+                <field name="x_email_state" invisible="1"/>
+                <button string="Re-send Payslip Email"
+                        name="action_requeue_payslip_email" type="object"
+                        invisible="state != 'done' or x_email_state == 'queued'"
+                        groups="om_hr_payroll.group_hr_payroll_user"
+                        help="Put this payslip back in the emailing queue. The cron sends it within 10 minutes."/>
+            </xpath>
+
             <!-- ── Flag provisional (mid-approval) vacation calculations ── -->
             <xpath expr="//sheet" position="inside">
                 <field name="x_is_vacation_preview" invisible="1"/>
@@ -62,6 +76,16 @@
                 <widget name="web_ribbon" title="Revision"
                         bg_color="text-bg-info"
                         invisible="not x_is_revision"/>
+            </xpath>
+
+            <!-- ── Payslip email queue state ── -->
+            <xpath expr="//notebook" position="before">
+                <div class="alert alert-warning" role="alert"
+                     invisible="x_email_state != 'failed'"
+                     groups="om_hr_payroll.group_hr_payroll_user">
+                    <strong>The payslip email could not be sent.</strong>
+                    <field name="x_email_error" readonly="1" nolabel="1"/>
+                </div>
             </xpath>
 
             <!-- ── Revisions of this payslip ── -->
@@ -153,6 +177,10 @@
             <xpath expr="//field[@name='credit_note']" position="after">
                 <field name="x_daily_wage" string="Daily Wage"/>
                 <field name="x_hourly_wage" string="Hourly Wage"/>
+                <field name="x_leave_id" readonly="1"
+                       invisible="not x_leave_id"/>
+                <field name="x_vacation_auto_confirmed" readonly="1"
+                       invisible="not x_vacation_auto_confirmed"/>
             </xpath>
 
             <!-- ── Replace the salary computation list with a styled one ── -->
@@ -249,6 +277,10 @@
         <field name="arch" type="xml">
             <xpath expr="//list/field[@name='state']" position="before">
                 <field name="x_net_wage" string="Net Salary" digits="[16,0]"/>
+            </xpath>
+            <xpath expr="//list/field[@name='state']" position="after">
+                <field name="x_email_state" optional="hide"
+                       groups="om_hr_payroll.group_hr_payroll_user"/>
             </xpath>
         </field>
     </record>

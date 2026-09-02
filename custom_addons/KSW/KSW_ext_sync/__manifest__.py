@@ -1,6 +1,7 @@
 {
     'name': 'KSW BAS External Sync',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.2.0',
+    'author': 'Mohammed Albadr',
     'category': 'Custom',
     'summary': 'Read-only sync from BAS (bas9ss) SQL Server accounting system',
     'depends': ['base', 'mail'],

@@ -186,7 +186,7 @@
             <xpath expr="//widget[hasclass('o_ksw_ribbon_on_vacation')]"
                    position="attributes">
                 <attribute name="invisible">
-                    x_return_state != 'on_vacation' or x_annual_approval_state == 'pending_employee_signature' or (x_is_unpaid_leave_type and not x_is_annual_leave_type)
+                    x_return_state != 'on_vacation' or (x_is_unpaid_leave_type and not x_is_annual_leave_type)
                 </attribute>
             </xpath>
             <xpath expr="//sheet" position="inside">

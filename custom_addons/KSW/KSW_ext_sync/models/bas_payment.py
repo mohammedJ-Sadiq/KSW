@@ -42,11 +42,29 @@ class BASPayment(models.Model):
     last_synced = fields.Datetime('Last Synced', readonly=True)
 
     @staticmethod
-    def _make_key(ftype, ftype2, code2, number1):
-        return f'{ftype}_{ftype2}_{code2}_{int(number1 or 0)}'
+    def _make_key(ftype, ftype2, code2, number1, serial=0):
+        """VOU10's real primary key includes SERIAL.
+
+        `BAS_DATABASE_REFERENCE.md`: "Primary Key: FTYPE + FTYPE2 + CODE2 +
+        NUMBER1 + SERIAL — Multiple rows per document (one per journal line
+        in double-entry bookkeeping)".  This model mirrors journal *lines*,
+        not vouchers: one receipt can carry 172 of them, and
+        `ksw.sales.commission.sheet.action_pull_from_bas` sums them per
+        customer account, so the lines must each keep their own values.
+
+        Leaving SERIAL out made `bas_key` non-unique, which silently let a
+        keyed upsert overwrite one line with another's amount and account.
+        """
+        return f'{ftype}_{ftype2}_{code2}_{int(number1 or 0)}_{int(serial or 0)}'
+
+    # Everything but ``last_synced`` — see ``_bas_upsert``.
+    _COMPARE_FIELDS = (
+        'ftype', 'branch_code', 'number', 'payment_date', 'from_account',
+        'to_account', 'amount', 'pay_mode', 'remark',
+    )
 
     @api.model
-    def sync_from_bas(self):
+    def sync_from_bas(self, deadline=None, commit=True):
         param = self.env['ir.config_parameter'].sudo()
         last_sync_str = param.get_param('ksw_bas.last_sync_payment')
         now = datetime.now()
@@ -62,7 +80,7 @@ class BASPayment(models.Model):
             cursor = conn.cursor(as_dict=True)
         except Exception as e:
             _logger.error('KSW BAS payment sync: connection failed: %s', e)
-            return
+            return False
 
         try:
             # FTYPE=018 = cash receipt, FTYPE=019 = cash payment, FTYPE=015 = bank receipt
@@ -70,7 +88,7 @@ class BASPayment(models.Model):
             # We pick the row that has a non-empty TCODE (the receivable/payable side)
             cursor.execute("""
                 SELECT
-                    FTYPE, FTYPE2, CODE2, NUMBER1,
+                    FTYPE, FTYPE2, CODE2, NUMBER1, SERIAL,
                     FDATE, FCODE, TCODE, AMOUNT, PAYMODE, REMARK
                 FROM VOU10
                 WHERE FTYPE IN ('018', '019', '015')
@@ -82,34 +100,38 @@ class BASPayment(models.Model):
         except Exception as e:
             _logger.error('KSW BAS payment sync: query failed: %s', e)
             conn.close()
-            return
+            return False
         finally:
             conn.close()
 
         now = fields.Datetime.now()
-        existing_keys = {r.bas_key: r for r in self.search([])}
-
         ftype_labels = {'018': 'Receipt', '019': 'Payment', '015': 'Bank Receipt'}
 
-        for row in rows:
-            key = self._make_key(row['FTYPE'], row['FTYPE2'], row['CODE2'], row['NUMBER1'])
-            vals = {
-                'bas_key': key,
-                'ftype': ftype_labels.get(row['FTYPE'], row['FTYPE']),
-                'branch_code': (row['CODE2'] or '').strip(),
-                'number': str(int(row['NUMBER1'] or 0)),
-                'payment_date': row['FDATE'],
-                'from_account': (row['FCODE'] or '').strip(),
-                'to_account': (row['TCODE'] or '').strip(),
-                'amount': float(row['AMOUNT'] or 0),
-                'pay_mode': (row['PAYMODE'] or '').strip(),
-                'remark': (row['REMARK'] or '').strip(),
-                'last_synced': now,
-            }
-            if key in existing_keys:
-                existing_keys[key].write(vals)
-            else:
-                self.create(vals)
+        vals_list = [{
+            'bas_key': self._make_key(
+                row['FTYPE'], row['FTYPE2'], row['CODE2'], row['NUMBER1'],
+                row['SERIAL']),
+            'ftype': ftype_labels.get(row['FTYPE'], row['FTYPE']),
+            'branch_code': (row['CODE2'] or '').strip(),
+            'number': str(int(row['NUMBER1'] or 0)),
+            'payment_date': row['FDATE'],
+            'from_account': (row['FCODE'] or '').strip(),
+            'to_account': (row['TCODE'] or '').strip(),
+            'amount': float(row['AMOUNT'] or 0),
+            'pay_mode': (row['PAYMODE'] or '').strip(),
+            'remark': (row['REMARK'] or '').strip(),
+            'last_synced': now,
+        } for row in rows]
 
-        param.set_param('ksw_bas.last_sync_payment', datetime.now().isoformat())
-        _logger.info('KSW BAS: synced %d payment vouchers (since %s)', len(rows), since.date())
+        created, updated, done = self._bas_upsert(
+            'bas_key', vals_list, self._COMPARE_FIELDS,
+            deadline=deadline, commit=commit)
+
+        if done:
+            param.set_param(
+                'ksw_bas.last_sync_payment', datetime.now().isoformat())
+        _logger.info(
+            'KSW BAS: payments %s — %d read, %d created, %d updated (since %s)',
+            'complete' if done else 'INCOMPLETE (time budget)',
+            len(rows), created, updated, since.date())
+        return done
