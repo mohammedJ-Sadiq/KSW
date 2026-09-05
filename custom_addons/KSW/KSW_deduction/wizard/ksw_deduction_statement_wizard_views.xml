@@ -132,19 +132,38 @@
                             title="Open a blank Statement of Account dialog, the same as Deductions → Reports → Statement of Account"/>
                 </header>
                 <field name="date"/>
-                <field name="ref" string="Reference"/>
+                <!-- A native many2one: blank on a balance row (no
+                     deduction_id), otherwise the same text `ref` used to
+                     show, now a blue/hoverable link straight to the loan.
+                     Safe to fetch directly — `_deductions()` already
+                     searched ksw.deduction AS THE USER, so read access to
+                     whatever deduction_id is set here is guaranteed.
+                     `widget="many2one"` is required, not decorative: a
+                     list field with no widget= takes the fast "plain
+                     text" render path (list_renderer.js#canUseFormatter)
+                     and skips the link entirely — text shows, but never
+                     as a clickable o_form_uri. -->
+                <field name="deduction_id" string="Reference" widget="many2one"/>
                 <field name="type_id" optional="show"/>
-                <field name="label" string="Description"/>
+                <!-- Plain text, except on a 'credit' row settled through
+                     payroll (payslip_id set): there it becomes a link to
+                     the payslip. Uses a custom widget rather than a
+                     many2one field for payslip_id itself, because that
+                     would fetch the payslip's display_name to render —
+                     and non-payroll roles have no read access to
+                     hr.payslip at all (see `payslip_id`'s help), which
+                     would crash the whole list on load, not just on
+                     click. -->
+                <field name="label" string="Description"
+                       widget="ksw_statement_link"
+                       options="{'id_field': 'payslip_id', 'method': 'action_open_payslip'}"/>
                 <field name="debit" string="Charge" sum="Total charged"/>
                 <field name="credit" string="Collected" sum="Total collected"/>
                 <field name="balance" string="Balance"/>
                 <field name="currency_id" column_invisible="1"/>
                 <field name="is_balance_row" column_invisible="1"/>
                 <field name="row_kind" column_invisible="1"/>
-                <button name="action_open_deduction" type="object"
-                        string="Open" icon="fa-external-link"
-                        title="Open the deduction behind this movement"
-                        invisible="is_balance_row"/>
+                <field name="payslip_id" column_invisible="1"/>
             </list>
         </field>
     </record>

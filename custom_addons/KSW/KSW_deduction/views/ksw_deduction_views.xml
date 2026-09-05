@@ -597,12 +597,14 @@
         <field name="model">ksw.deduction</field>
         <field name="arch" type="xml">
             <search>
-                <field name="name"/>
-                <!-- employee_id matches on name, SSN, iqama/ID, employee no.
-                     and badge — see hr.employee._search_display_name in
+                <!-- Listed first so it is the default field the search bar
+                     applies on Enter without the user picking a facet:
+                     matches on name, SSN, iqama/ID, employee no. and badge
+                     — see hr.employee._search_display_name in
                      KSW_deduction/models/hr_employee.py -->
                 <field name="employee_id"
                        filter_domain="[('employee_id', 'ilike', self)]"/>
+                <field name="name"/>
                 <field name="department_id"/>
                 <field name="type_id"/>
                 <filter string="Active Portfolio" name="active_portfolio"

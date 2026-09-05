@@ -221,6 +221,9 @@ class KswDeductionStatementWizard(models.TransientModel):
                     'date': settled_on,
                     'kind': 'credit',
                     'deduction': deduction,
+                    # Empty recordset for a manual (outside-payroll)
+                    # settlement — there is nothing to drill into.
+                    'payslip': line.payslip_id,
                     'label': self._credit_label(line),
                     'ref': ref,
                     'debit': 0.0,
@@ -499,11 +502,13 @@ class KswDeductionStatementWizard(models.TransientModel):
         }
 
     def _movement_row(self, mv, balance):
+        payslip = mv.get('payslip')
         return {
             'row_kind': mv['kind'],
             'date': mv['date'],
             'ref': mv['ref'],
             'deduction_id': mv['deduction'].id,
+            'payslip_id': payslip.id if payslip else False,
             'type_id': mv['deduction'].type_id.id,
             'label': mv['label'],
             'debit': mv['debit'],
@@ -702,6 +707,9 @@ class KswDeductionStatementLine(models.TransientModel):
     date = fields.Date()
     ref = fields.Char(string='Reference')
     deduction_id = fields.Many2one('ksw.deduction', string='Deduction')
+    # Only set on a 'credit' row settled through payroll (empty for
+    # manual/outside-payroll settlements and for charge/write-off rows).
+    payslip_id = fields.Many2one('hr.payslip', string='Payslip')
     type_id = fields.Many2one('ksw.deduction.type', string='Type')
     label = fields.Char(string='Description')
     debit = fields.Monetary(string='Charge')
@@ -758,30 +766,29 @@ class KswDeductionStatementLine(models.TransientModel):
         action['context'] = {}
         return action
 
-    def action_open_deduction(self):
-        """Drill from a statement row to the document behind it.
+    def action_open_payslip(self):
+        """Drill from a credit row to the payslip that collected it.
 
-        Mirrors `ksw.deduction.line.action_open_deduction`: a user can
-        legitimately see a movement whose parent their record rules will
-        not open, and a readable message beats an AccessError traceback.
+        Only set for installments settled through payroll — a manual
+        (outside-payroll) settlement has no payslip to open, and the
+        button stays hidden for those rows (see `payslip_id`'s help).
         """
         self.ensure_one()
-        deduction = self.deduction_id
-        if not deduction:
+        payslip = self.payslip_id
+        if not payslip:
             raise UserError(_(
-                'This is a balance line, not a transaction — there is no '
-                'document behind it.'))
+                'This movement was not settled through a payslip — '
+                'there is no payslip to open.'))
         try:
-            deduction.check_access('read')
+            payslip.check_access('read')
         except AccessError:
             raise UserError(_(
-                'You do not have access to deduction %(name)s.',
-                name=deduction.sudo().display_name))
-        return {
-            'type': 'ir.actions.act_window',
-            'name': deduction.display_name,
-            'res_model': 'ksw.deduction',
-            'res_id': deduction.id,
-            'view_mode': 'form',
-            'target': 'current',
-        }
+                'You do not have access to payslip %(name)s.',
+                name=payslip.sudo().display_name))
+        # `get_formview_action()` — the same call the native many2one
+        # widget makes to open a record — returns a fully-formed action
+        # (including `views`). A hand-built dict with only `view_mode`
+        # works when a `type="object"` button triggers it (the button
+        # flow fills in the rest) but crashes `action.doAction()` called
+        # directly from JS: `_preprocessAction` reads `action.views`.
+        return payslip.get_formview_action()

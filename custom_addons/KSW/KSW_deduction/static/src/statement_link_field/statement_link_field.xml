@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="KSW_deduction.StatementLinkField">
+        <a t-if="isLink" href="#" class="o_form_uri"
+           t-on-click.prevent.stop="onClick" t-esc="value"/>
+        <span t-else="" t-esc="value"/>
+    </t>
+</templates>

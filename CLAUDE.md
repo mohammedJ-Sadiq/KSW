@@ -336,6 +336,60 @@ KSW_payroll access-tier feature. Know them before doing similar work again.
     "Generate All Absences" (or call `sync._generate_weekend_records(employees,
     date_from, date_to)` directly in a shell) once all punch data is present.
 
+50. **A DB-level FK cascade still fires a compute's dependency trigger — a
+    field that must survive a related record's deletion cannot be a
+    `compute=` on a path through that relation, even with `ondelete='set
+    null'`.** `hr.leave.attendance.line.attendance_id` used `ondelete='cascade'`,
+    so deleting an `hr.attendance` row (the sanctioned repair: delete +
+    re-download a period) destroyed the line that recorded an HR-approved
+    late/early-leave excuse's `accepted_minutes` — and the m2m junction row
+    (`hr_leave_attendance_rel`, always `ON DELETE CASCADE` on both columns,
+    can't be changed) went with it regardless. The re-downloaded punch gets a
+    new id; nothing re-attaches the leave to it, so the excuse silently
+    stopped applying and its deduction came back (KSWCO leave 4839, employee
+    9940, 5 Jul 2026 — confirmed via `hr_leave_attendance_rel`/
+    `hr_leave_attendance_line` both empty for a leave still `state='validate'`).
+    Switching `attendance_id` to `ondelete='set null'` was only half the fix:
+    `Model.unlink()` calls `self.modified(self._fields, before=True)`
+    *before* the DB delete, which walks the dependency graph and re-triggers
+    every `compute=` reachable through the relation — so a `date = fields.Date
+    (compute='_compute_date', ..., depends='attendance_id.check_in')` field
+    got recomputed to `False` the moment `attendance_id` changed, even though
+    the column value itself would otherwise have survived untouched.
+    **Fix, two parts:**
+    ```python
+    # hr_leave_attendance_line.py — no compute, set once at creation
+    attendance_id = fields.Many2one('hr.attendance', ondelete='set null')  # was 'cascade'
+    date = fields.Date()  # was compute='_compute_date', store=True
+
+    # hr_leave.py::_generate_attendance_lines — the only place lines are built
+    new_lines.append((0, 0, {
+        'attendance_id': att_id, 'date': check_date, ...   # date added
+    }))
+
+    # hr_attendance.py — re-attach on the next real punch for that employee+date
+    def _relink_attendance_issue_lines(self):
+        orphans = Line.search([
+            ('attendance_id', '=', False), ('date', '=', att.check_in.date()),
+            ('leave_id.employee_id', '=', att.employee_id.id),
+            ('leave_id.state', '=', 'validate'),
+        ])
+        orphans.write({'attendance_id': att.id})
+        orphans.leave_id.sudo().write({'x_attendance_ids': [(4, att.id)]})
+    ```
+    called from `hr.attendance.create()` for every new non-absent record.
+    **Rule: any field whose only job is to survive a related record's
+    deletion and let you re-link later must be a plain field set explicitly
+    at creation — never `compute=` on a path through the relation being
+    deleted, even a stored one, even with `ondelete='set null'` on the FK.**
+    A day-based attendance-issue leave type (full-day absence excuse, no
+    `hr.leave.attendance.line` at all — just the bare `x_attendance_ids` m2m)
+    has the same exposure with *no* surviving row to relink from at all;
+    `KSW_attendance_leave._check_absence_for_date` already skips recreating
+    the absence when such a leave covers the date, so that day just goes
+    missing from the sheet instead of resurfacing a deduction — a different,
+    not-yet-fixed failure mode, flagged for follow-up rather than fixed here.
+
 ## KSW_deduction architecture notes
 
 ### managed_by field
@@ -1144,3 +1198,81 @@ allocation is needed. All test leave types that do not require allocation must u
     stale draft resurrects someone HR archived for their own reasons. Order at
     the set point: `_create_vacation_payslip()` runs **before** the stamp,
     because `x_return_state` is the payslip guard.
+
+49. **"Confirm" on a batch/action method must be idempotent — never assume
+    every record passed in is still in the state the method expects.**
+    `hr.payslip.run.done_payslip_run()` looped over `self.slip_ids`
+    unconditionally: `for line in self.slip_ids: line.action_payslip_done()`.
+    Reopening a *closed* batch back to `draft` (`draft_payslip_run`, Payroll
+    Manager only — e.g. to add one late employee) does **not** touch the
+    individual slips' own state; they stay `done`. Re-clicking "Mark As
+    Done" then swept every already-`done` slip through
+    `action_payslip_done()` again, which (base `om_hr_payroll`) always calls
+    `compute_sheet()` first. KSW_deduction's `compute_sheet()` override
+    unconditionally deletes+re-searches `KSW_DED_*` inputs, but only for
+    `state='pending'` installments — an installment already settled
+    (`state='paid'`, `payslip_id` set) doesn't match, so it silently
+    vanished from the payslip's Other Inputs and the recomputed NET, while
+    `ksw.deduction.line` kept correctly saying it was collected under that
+    exact payslip. Symptom: payslip shows no loan/deduction, but the
+    deduction record says the installment was settled by that very payslip
+    — the two disagreeing is the tell, not an error anywhere. Hit KSWCO
+    payslip 18441 (August 2026 batch) this way; confirmed via a full-batch
+    reconciliation query that only 1 of 376 slips was affected (the batch
+    hadn't been mass-reopened, just this one late addition).
+    **Fix, three independent layers (defense in depth — any one alone
+    would have prevented this incident, keep all three):**
+    ```python
+    # 1) KSW_payroll/models/hr_payslip_run.py — only confirm slips still
+    #    draft; an already-done slip inside a reopened batch is skipped.
+    def done_payslip_run(self):
+        pending = self.slip_ids.filtered(lambda s: s.state != 'done')
+        for line in pending:
+            line.with_context(_ksw_skip_bank_refresh=True).action_payslip_done()
+        ...
+
+    # 2) KSW_payroll/models/hr_payslip.py — action_payslip_done() is a
+    #    no-op on an already-done slip, from ANY caller, not just the batch.
+    payable = (self - overpaid).filtered(lambda s: s.state != 'done')
+    if not payable:
+        return notification
+
+    # 3) KSW_deduction/models/hr_payslip.py — the real backstop: even if
+    #    compute_sheet() DOES get called on a done payslip (any future
+    #    caller, not just these two), its KSW_DED_* inputs must never move.
+    live = self.filtered(lambda s: s.state != 'done')
+    for payslip in live:
+        self._inject_ksw_deduction_inputs(payslip)   # skipped when done
+    res = super().compute_sheet()   # still runs for ALL self — rebuilds
+    # other salary lines from the (untouched) existing inputs, so a done
+    # payslip's NET keeps reflecting a settlement it already made.
+    ```
+    Layer 3 is the one that actually matters long-term: layers 1–2 close
+    the two call paths found this time, but the next unknown caller of
+    `compute_sheet()` on a `done` payslip is neutralized by layer 3 alone.
+    **Test pattern** (`KSW_deduction/tests/test_critical_fixes.py::
+    TestPayrollPriority.test_done_payslip_recompute_preserves_settled_deduction`):
+    settle a line by a **raw** `write({'state': 'done'})` rather than
+    through `action_payslip_done()`'s own capping pass — this class's
+    fully-attended-sheet fixture currently can't produce an affordable NET
+    (pre-existing, unrelated staleness: ATTDED comes out as the whole
+    wage), so routing settlement through the real capping logic makes the
+    test fail for the wrong reason. Bypassing it isolates exactly the
+    property being guarded: does a second `compute_sheet()` /
+    `action_payslip_done()` on an already-`done` payslip leave a settled
+    installment alone. Verified via failing-set diff (gotcha-standard
+    practice): identical 14/57 pre-existing KSW_deduction/KSW_payroll
+    failures with or without the fix — this test is the only one whose
+    outcome flips (fails on baseline, passes fixed) — before touching
+    production. **Data repair for an already-corrupted payslip** (18441):
+    do **not** re-run `compute_sheet()` blindly — it won't re-inject a
+    `paid` installment either. Instead: temporarily reopen the installment
+    (`state='pending'`, clear `payslip_id`), run `compute_sheet()` (now
+    picks it up correctly and rebuilds NET), then re-settle via the
+    module's own `_sync_deductions_on_done(slip)` — reuses real ORM logic
+    instead of hand-writing `hr.payslip.line` rows (many required fields,
+    hidden invariants). Confirm which NET the bank actually paid **before**
+    touching any figure — this shop marks a payslip `done` only *after*
+    issuing the transfer, so `done` implies the stored NET matches what
+    left the bank; that ordering is what makes the repair safe rather than
+    a second, silent discrepancy.

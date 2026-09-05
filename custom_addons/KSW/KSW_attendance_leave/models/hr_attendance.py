@@ -123,7 +123,38 @@ class HrAttendance(models.Model):
         absent_new = records.filtered(lambda a: a.x_is_absent and a.check_in and a.employee_id)
         if absent_new:
             absent_new._auto_link_regular_leave_coverage()
+        real_new = records.filtered(
+            lambda a: a.check_in and a.employee_id and not a.x_is_absent)
+        if real_new:
+            real_new._relink_attendance_issue_lines()
         return records
+
+    def _relink_attendance_issue_lines(self):
+        """Re-attach orphaned late/early-leave excuse lines to a re-downloaded punch.
+
+        Deleting hr.attendance to clear-and-redownload a period cascades the
+        hr_leave_attendance_rel row (an ordinary m2m junction, always
+        ON DELETE CASCADE), and only sets hr.leave.attendance.line.attendance_id
+        to NULL (see that model: ondelete='set null') so the accepted_minutes
+        an HR user already approved is not destroyed along with it. The
+        re-downloaded punch gets a brand-new id, so without this nothing
+        re-attaches the still-validated leave to it — the excuse silently
+        stops applying and its deduction reappears. Matched on employee + the
+        line's stored `date` (survives the cascade because it's set by a raw
+        DB-level FK action, not an ORM write, so the compute never re-runs).
+        """
+        Line = self.env['hr.leave.attendance.line'].sudo()
+        for att in self:
+            orphans = Line.search([
+                ('attendance_id', '=', False),
+                ('date', '=', att.check_in.date()),
+                ('leave_id.employee_id', '=', att.employee_id.id),
+                ('leave_id.state', '=', 'validate'),
+            ])
+            if not orphans:
+                continue
+            orphans.write({'attendance_id': att.id})
+            orphans.leave_id.sudo().write({'x_attendance_ids': [(4, att.id)]})
 
     def _auto_link_regular_leave_coverage(self):
         """Link new absence records to any validated regular leave already covering the date.

@@ -51,6 +51,11 @@ via the KSW_DEDUCTIONS salary rule (regular + vacation payslips).
         'report/ksw_deduction_coverage_templates.xml',
         'views/menu.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'KSW_deduction/static/src/**/*',
+        ],
+    },
     'installable': True,
     'application': True,
     'license': 'LGPL-3',

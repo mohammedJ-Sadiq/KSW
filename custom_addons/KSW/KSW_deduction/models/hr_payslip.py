@@ -14,14 +14,26 @@ class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
 
     def compute_sheet(self):
-        for payslip in self:
+        # A `done` payslip's KSW deduction installments are already
+        # settled (state='paid', payslip_id set) — recomputing must never
+        # touch them, whatever calls compute_sheet() on it. Skipping
+        # injection/capping for those slips means `super().compute_sheet()`
+        # still rebuilds their other salary lines, but does so from their
+        # EXISTING (untouched) KSW_DED_* inputs, so KSW_DEDUCTIONS/NET keep
+        # reflecting the real settlement instead of the installment
+        # silently vanishing from the payslip. See CLAUDE.md pitfall #49 —
+        # this is what broke payslip 18441 in August 2026 when a reopened
+        # batch was re-confirmed.
+        live = self.filtered(lambda s: s.state != 'done')
+        for payslip in live:
             self._inject_ksw_deduction_inputs(payslip)
         res = super().compute_sheet()
         # Second pass: if the salary can't cover every KSW deduction,
         # cap the input amounts by priority (so the net never goes
         # negative) and recompute. `super()` is used for the rerun so we
-        # do not re-inject the full amounts.
-        rerun = self.filtered(
+        # do not re-inject the full amounts. Restricted to `live` for the
+        # same reason as above — a done payslip's inputs must not move.
+        rerun = live.filtered(
             lambda s: s._ksw_apply_deduction_priority())
         if rerun:
             super(HrPayslip, rerun).compute_sheet()

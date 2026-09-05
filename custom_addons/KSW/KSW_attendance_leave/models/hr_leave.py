@@ -121,6 +121,7 @@ class HrLeave(models.Model):
                 all_to.append(hour_to)
                 new_lines.append((0, 0, {
                     'attendance_id': att_id,
+                    'date': check_date,
                     'issue_type': 'late',
                     'hour_from': hour_from % 24.0,
                     'hour_to': hour_to % 24.0,
@@ -139,6 +140,7 @@ class HrLeave(models.Model):
                 all_to.append(hour_to)
                 new_lines.append((0, 0, {
                     'attendance_id': att_id,
+                    'date': check_date,
                     'issue_type': 'early_leave',
                     'hour_from': hour_from % 24.0,
                     'hour_to': hour_to % 24.0,

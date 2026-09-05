@@ -31,8 +31,13 @@ class HrLeaveAttendanceLine(models.Model):
     attendance_id = fields.Many2one(
         'hr.attendance',
         string='Attendance Record',
-        required=True,
-        ondelete='cascade',
+        ondelete='set null',
+        help='Deleting attendance for a re-download (the sanctioned repair: '
+             'clear + re-download) must not destroy the accepted_minutes an '
+             'HR user already approved here. The line survives as an orphan '
+             '(attendance_id = False, date/hour_from/hour_to/accepted_minutes '
+             'intact) and hr.attendance._relink_attendance_issue_lines() '
+             're-attaches it once the punch comes back under a new id.',
     )
     issue_type = fields.Selection([
         ('late', 'Late'),
@@ -40,8 +45,11 @@ class HrLeaveAttendanceLine(models.Model):
     ], string='Issue Type', required=True)
     date = fields.Date(
         string='Date',
-        compute='_compute_date',
-        store=True,
+        help='Set once at creation from attendance_id.check_in — plain, not '
+             'computed. attendance_id can later be nulled by a re-download '
+             '(see its ondelete help) and a compute depending on it would '
+             'wipe this back to False at that exact moment, destroying the '
+             'only way left to match the orphaned line back to its date.',
     )
     hour_from = fields.Float(string='From')
     hour_to = fields.Float(string='To')
@@ -54,14 +62,6 @@ class HrLeaveAttendanceLine(models.Model):
         string='Accepted (min)',
         help='The approved portion of this issue in minutes. Cannot exceed the total duration.',
     )
-
-    @api.depends('attendance_id.check_in')
-    def _compute_date(self):
-        for line in self:
-            if line.attendance_id and line.attendance_id.check_in:
-                line.date = line.attendance_id.check_in.date()
-            else:
-                line.date = False
 
     @api.depends('hour_from', 'hour_to')
     def _compute_duration_minutes(self):

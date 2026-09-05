@@ -2053,8 +2053,16 @@ class HrPayslip(models.Model):
     def action_payslip_done(self):
         # Revisions carry the over-payment check.  Recompute them first so
         # the decision is made on final figures, not on whatever was on
-        # screen when the officer opened the form.
-        revisions = self.filtered('x_is_revision')
+        # screen when the officer opened the form.  Already-`done` slips
+        # are excluded throughout this method — confirming is meant to be
+        # idempotent, and re-running it on a settled payslip would call
+        # `compute_sheet()` a second time on a document whose deduction
+        # installments (and, for a revision, its own collections) are
+        # already reconciled (pitfall #49). A caller that mixes draft and
+        # already-done slips (e.g. a batch reopened to add one late
+        # payslip) must only confirm the ones still pending.
+        revisions = self.filtered(
+            lambda s: s.x_is_revision and s.state != 'done')
         overpaid = self.env['hr.payslip']
         notification = None
         if revisions:
@@ -2063,7 +2071,7 @@ class HrPayslip(models.Model):
             if overpaid:
                 notification = overpaid._handle_overpaid_revisions()
 
-        payable = self - overpaid
+        payable = (self - overpaid).filtered(lambda s: s.state != 'done')
         if not payable:
             return notification
         res = super(HrPayslip, payable).action_payslip_done()

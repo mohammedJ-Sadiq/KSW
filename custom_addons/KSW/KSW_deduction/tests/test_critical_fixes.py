@@ -203,3 +203,60 @@ class TestPayrollPriority(DeductionCommon):
         may.compute_sheet()
         codes = [i.code for i in self._ksw_inputs(may)]
         self.assertIn(f'KSW_DED_{remainder.id}', codes)
+
+    def test_done_payslip_recompute_preserves_settled_deduction(self):
+        """Regression for the August-2026 payslip-18441 incident: a batch
+        reopened to `draft` and re-confirmed re-ran `action_payslip_done()`
+        (and therefore `compute_sheet()`) on slips that were already
+        `done`. The injector then dropped the KSW_DED_* input for an
+        installment already marked paid — it only searches for
+        `state='pending'` lines — while the ledger kept saying it was
+        settled under that payslip, so the payslip's own NET silently
+        stopped reflecting the deduction it had already collected.
+
+        This exercises the settle-then-recompute property directly rather
+        than through `compute_sheet()`'s own capping pass, which this
+        class's fully-attended-sheet fixture cannot currently satisfy
+        (ATTDED comes out as the whole wage here — a pre-existing, unrelated
+        staleness also hit by `test_priority_cap_forward_and_reset` in this
+        same class). Settling the line by hand keeps this test about the
+        actual regression: does a second `compute_sheet()` /
+        `action_payslip_done()` on an already-`done` payslip leave a
+        settled installment alone.
+        """
+        pen = self._make_deduction(self.type_gov_pen, amount=100.0,
+                                   installments=1,
+                                   start_month=date(2026, 4, 1))
+        pen.action_submit()
+        line = pen.line_ids
+
+        slip = self._make_payslip()
+        input_line = self.env['hr.payslip.input'].sudo().create({
+            'payslip_id': slip.id,
+            'version_id': self.version.id,
+            'name': 'Gov Penalty [%s] inst 1/1' % pen.name,
+            'code': 'KSW_DED_%d' % line.id,
+            'amount': line.amount,
+        })
+        # Raw state write — bypasses `action_payslip_done()`'s
+        # `compute_sheet()` call (and its NET-affordability capping pass)
+        # so the settlement below reflects the full, uncapped amount.
+        slip.sudo().write({'state': 'done'})
+        self.assertEqual(line.state, 'paid')
+        self.assertEqual(line.payslip_id, slip)
+        self.assertEqual(input_line.exists(), input_line)
+
+        # Simulate the trigger: something calls compute_sheet() /
+        # action_payslip_done() again on the already-done payslip (e.g. a
+        # reopened batch re-confirmed with this slip still inside it).
+        slip.compute_sheet()
+        slip.action_payslip_done()
+
+        self.assertEqual(slip.state, 'done')
+        self.assertEqual(
+            self._ksw_inputs(slip), input_line,
+            'KSW_DED_* input must survive a recompute of a done payslip '
+            '— it must not be deleted, nor replaced by a new record')
+        self.assertEqual(input_line.amount, line.amount)
+        self.assertEqual(line.state, 'paid')
+        self.assertEqual(line.payslip_id, slip)

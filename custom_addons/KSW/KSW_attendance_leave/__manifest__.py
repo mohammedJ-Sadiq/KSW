@@ -1,7 +1,7 @@
 {
     'name': 'KSW - attendance leave',
     'category': 'Human Resources',
-    'version': '19.0.1.3.3',
+    'version': '19.0.1.3.4',
     'sequence': 1,
     'author': 'Mohammed Albadr',
     'summary': 'HR Attendance Leave for Odoo 19 Community Edition',

@@ -189,8 +189,21 @@ class HrPayslipRun(models.Model):
     def done_payslip_run(self):
         """Override: suppress per-slip bank total refresh during bulk validation.
         Calls _refresh_bank_totals() once per batch instead of once per slip.
+
+        Only slips still in `draft` are confirmed. A batch can be reopened
+        to `draft` (`draft_payslip_run`, Payroll Manager only) while some of
+        its slips are already `done` — e.g. to add or fix one late payslip.
+        Re-confirming the whole batch must not re-run `action_payslip_done()`
+        on those already-done slips: it recomputes the sheet
+        (`compute_sheet()`), and by then their KSW deduction installments
+        are already settled (`state='paid'`), so the recompute silently
+        drops the KSW_DED_* input line from the payslip while the
+        installment still correctly points back at it (pitfall: "a done
+        payslip's loan/deduction line disappears, but the deduction record
+        still shows it settled under that payslip").
         """
-        for line in self.slip_ids:
+        pending = self.slip_ids.filtered(lambda s: s.state != 'done')
+        for line in pending:
             line.with_context(_ksw_skip_bank_refresh=True).action_payslip_done()
         self.write({'state': 'done'})
         self._refresh_bank_totals()
