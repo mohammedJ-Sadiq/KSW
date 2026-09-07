@@ -152,6 +152,29 @@ class HrLeave(models.Model):
             and leave.holiday_status_id.is_annual_leave
         )
 
+    def _settles_annual_balance(self):
+        """Leaves in ``self`` that are paid out of the annual leave balance.
+
+        Their end (or confirmed return) is a legitimate accrual restart
+        point: taking them consumes the entitlement. Read by
+        ``ksw.annual.leave._check_opening_reset_is_a_settlement``.
+        """
+        return self.filtered(self._is_annual_leave)
+
+    def _blocks_annual_reset(self):
+        """Leaves in ``self`` that must NEVER be used as a restart point.
+
+        Empty here: this module knows no leave type that gets mistaken for a
+        settlement. KSW_unpaid_leave adds the unpaid ones — an unpaid leave
+        pays the employee nothing, so it cannot have consumed a balance.
+
+        Kept separate from ``_settles_annual_balance`` on purpose: most leave
+        types (a missed punch, an early-leave excuse) are neither, and a
+        restart date that merely lands on one of those days is nobody's
+        business to block.
+        """
+        return self.browse()
+
     def _is_annual_multi(self, leave):
         """Check if the leave type uses multi-step approval."""
         return (

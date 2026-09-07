@@ -84,6 +84,7 @@
                         <field name="allocation_id"/>
                     </group>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>

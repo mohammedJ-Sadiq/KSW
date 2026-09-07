@@ -71,6 +71,26 @@ class HrLeaveUnpaid(models.Model):
         return super()._excuses_absence().filtered(
             lambda l: not self._is_unpaid_leave(l))
 
+    def _blocks_annual_reset(self):
+        """An unpaid leave can never be an accrual restart point.
+
+        The restart deletes everything accrued up to that date, on the
+        grounds that the vacation spent it. An unpaid leave spends nothing —
+        that is the whole point of taking it — so the balance survives it
+        untouched. Enforced in
+        ``ksw.annual.leave._check_opening_reset_is_a_settlement``, which is
+        the guard the *manual* edit needed: this module's own
+        ``_apply_confirmed_return`` already declines to move the date, but
+        HR reset KSWCO leave 4927's employee by hand anyway, following the
+        habit the annual flow teaches.
+
+        A type flagged both annual and unpaid ("Unpaid Vacation") is left
+        out: its annual portion is charged to the balance, so its return is
+        a real settlement — the same switch ``_uses_unpaid_return`` makes.
+        """
+        return super()._blocks_annual_reset() | self.filtered(
+            lambda l: self._is_unpaid_leave(l) and not self._is_annual_leave(l))
+
     # ------------------------------------------------------------------
     # Return confirmation — the DM closes the leave on the actual date
     # ------------------------------------------------------------------

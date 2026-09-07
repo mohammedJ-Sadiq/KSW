@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from odoo import api, fields, models
 from odoo.exceptions import MissingError, UserError
 from dateutil.relativedelta import relativedelta
@@ -6,6 +8,7 @@ from dateutil.relativedelta import relativedelta
 class KswAnnualLeave(models.Model):
     _name = 'ksw.annual.leave'
     _description = 'Annual Leave Dashboard'
+    _inherit = ['mail.thread']
     _order = 'employee_id'
     _rec_name = 'employee_id'
 
@@ -73,6 +76,7 @@ class KswAnnualLeave(models.Model):
     # ------------------------------------------------------------------
     x_opening_reset_date = fields.Date(
         string='Opening Reset Date',
+        tracking=True,
         help='Go-live baseline date. Accrual starts from this date '
              '(using the correct service-tier rate based on total employment '
              'duration). Only annual leaves validated on or after this date '
@@ -83,6 +87,7 @@ class KswAnnualLeave(models.Model):
         string='Opening Extra Days',
         digits=(10, 4),
         default=0.0,
+        tracking=True,
         help='One-time manual balance adjustment added at the opening reset '
              'date (e.g. carry-over days from a manual prior system, or a '
              'negative correction). Positive = extra days granted.',
@@ -90,6 +95,7 @@ class KswAnnualLeave(models.Model):
     x_opening_is_locked = fields.Boolean(
         string='Opening Data Locked',
         default=False,
+        tracking=True,
         help='Lock the Opening Reset Date and Opening Extra Days fields after '
              'go-live to prevent accidental changes. A manager can unlock if '
              'corrections are needed.',
@@ -129,10 +135,100 @@ class KswAnnualLeave(models.Model):
                         'Uncheck "Opening Data Locked" before making changes.'
                         % rec.employee_id.name
                     )
+        if 'x_opening_reset_date' in vals:
+            new_date = fields.Date.to_date(vals['x_opening_reset_date'])
+            for rec in self:
+                if rec.x_opening_reset_date != new_date:
+                    rec._check_opening_reset_is_a_settlement(new_date)
+
         result = super().write(vals)
         if opening_keys & vals.keys():
             self._refresh_accrual()
         return result
+
+    # ------------------------------------------------------------------
+    # The restart date must name a leave that actually spent the balance
+    # ------------------------------------------------------------------
+    def _check_opening_reset_is_a_settlement(self, new_date):
+        """Refuse a restart date that no leave in this employee's history paid for.
+
+        Moving ``x_opening_reset_date`` forward is a *settlement*: it asserts
+        that everything accrued up to that date has been consumed, and it
+        deletes it. A leave that charges nothing to the annual balance settles
+        nothing, so its return date is not a restart date — the employee kept
+        the entitlement precisely by not spending it.
+
+        KSWCO leave 4927 is why this exists. An employee refused his annual
+        request (4926) and took the same twelve days as *unpaid* leave. When
+        the manager confirmed his return on 22 Aug 2026, the balance record
+        was reset by hand onto that date — the habit the annual vacation flow
+        teaches — deleting 15.6 accrued days two days before his end-of-service
+        payout was computed from them (469 SAR paid where ~2,031 was owed).
+        The code never did it; nothing stopped a person from doing it either.
+
+        A date that a balance-consuming leave *also* governs is always
+        allowed: the settlement is real, whatever else happens to touch it.
+
+        Deliberately not exempt under ``self.env.su``. This asks whether the
+        figure is *correct*, not whether the caller is privileged, and no
+        automated writer produces a blocked value — ``_sync_opening_reset_to_
+        return`` only ever fires on an annual leave, which passes.
+        """
+        self.ensure_one()
+        if not (new_date and self.employee_id):
+            return
+        if self.x_opening_reset_date and new_date <= self.x_opening_reset_date:
+            # Only a *forward* move can destroy anything: it declares the days
+            # between the old baseline and the new one settled. Moving the
+            # baseline earlier gives accrual back, which is what repairing a
+            # wrong restart looks like — never block that.
+            return
+
+        # Leaves that "govern" the date: it falls inside the leave, is the
+        # day after its planned end (HR's settlement convention), or is the
+        # return the direct manager confirmed (which may be later still).
+        governing = self.env['hr.leave'].sudo().search([
+            ('employee_id', '=', self.employee_id.id),
+            ('state', 'in', ('confirm', 'validate')),
+            '|',
+            '&', ('request_date_from', '<=', new_date),
+                 ('request_date_to', '>=', new_date - timedelta(days=1)),
+            ('x_return_date', '=', new_date),
+        ])
+        # ``state`` alone would miss the annual side: on the KSW chains an
+        # approved request sits in 'confirm' until HR files the signed form
+        # (gotcha #48), so a real settlement would look pending and its
+        # unpaid neighbour would block it. ``state == 'validate'`` is kept as
+        # its own arm rather than left to ``_is_past_gm_final``, which reads
+        # the chain first and so answers False for a validated leave whose
+        # ``x_annual_approval_state`` was never walked (an imported or
+        # hand-validated record).
+        governing = governing.filtered(
+            lambda l: l.state == 'validate' or l._is_past_gm_final())
+        if not governing:
+            return
+        blockers = governing._blocks_annual_reset()
+        if not blockers or governing._settles_annual_balance():
+            return
+
+        leave = blockers[0]
+        raise UserError(
+            'The accrual for %(employee)s cannot restart on %(date)s.\n\n'
+            'That date belongs to "%(leave_type)s" (%(date_from)s → '
+            '%(date_to)s), which is not paid from the annual leave balance. '
+            'Restarting the accrual would delete %(balance).2f accrued day(s) '
+            'the employee never spent.\n\n'
+            'Use the return date of the annual vacation that actually '
+            'settled the balance, or leave the baseline where it is.'
+            % {
+                'employee': self.employee_id.name,
+                'date': new_date,
+                'leave_type': leave.holiday_status_id.display_name or '',
+                'date_from': leave.request_date_from,
+                'date_to': leave.request_date_to,
+                'balance': self.remaining_balance or 0.0,
+            }
+        )
 
     def unlink(self):
         """Delete linked allocations when dashboard record is deleted."""
