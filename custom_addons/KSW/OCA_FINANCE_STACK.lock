@@ -1,0 +1,24 @@
+# OCA Finance Stack — pinned commits (19.0 branches)
+# Regenerated 2026-09-05 08:20 UTC.
+# Restore: git clone --depth 1 -b 19.0 https://github.com/OCA/<repo>.git && git -C <repo> checkout <sha>
+
+REPO                             SHA                                        DATE         MODULES
+account-analytic                 a8b2b3400b114cfdb1e21950d662b53a32b416e9   2026-08-25   13
+account-budgeting                d811072d8e57f61f887e70e321fb8d2c640c6689   2026-07-26   1
+account-closing                  8ce0077fd0762d49e928ea7520555341d7936a9e   2026-07-01   2
+account-consolidation            38c5cc7b0d57076bae05303416d53e39badaee57   2025-09-30   0
+account-financial-reporting      fc820306102ef3ad855fa23c73057bbcd588c16a   2026-08-20   3
+account-financial-tools          f553f7642ab8ab8b73917bcb5a7361f8a560e0e6   2026-09-03   22
+account-fiscal-rule              947309ded32b94180cf177298ef9c1753e7a1b3d   2026-09-03   3
+account-invoice-reporting        f5ffaff86b1b57f31c91ab5bbde165a759f158c8   2026-08-20   4
+account-invoicing                6b641bb7604d797517dd2cb85d63263d875b2b55   2026-09-04   31
+account-payment                  5804fc18b27498854b53a8c80c2c749ebaeed250   2026-08-11   10
+account-reconcile                111955e97014433215e94387caa72dd7f534c6d4   2026-09-03   3
+bank-statement-import            65316c38d7a5586456bc751d8939b84f1cf0bc2e   2026-08-31   15
+credit-control                   153ffd6aebbc799127dfb3d0cef3b9dd6f66164c   2026-08-19   6
+currency                         2e53026930455187b7acbe1961ab0b524f29dbd6   2026-06-30   1
+mis-builder                      58a237a5dc85c06a911b87ea4cfca8175ad4a78a   2026-08-03   3
+partner-contact                  0d7278b3295534e3202f2f64c7e1616c98d136ce   2026-09-01   63
+reporting-engine                 b730d603317691d9608a8a3c5710286d9dbc81f1   2026-08-27   18
+server-tools                     028b450b06ebd70424534cbd89f37ed134f7200d   2026-08-27   28
+server-ux                        8e5120600987969156c2a59c1ad86bec37318966   2026-08-24   15

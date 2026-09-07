@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- Extend hr.leave FORM for the vacation extension              -->
+    <!--                                                              -->
+    <!-- Inherits KSW_unpaid_leave's view, not KSW_annual_leave's:    -->
+    <!-- the unpaid view already rewrote the five approval buttons'   -->
+    <!-- invisible= attributes, and two sibling views both doing      -->
+    <!-- position="attributes" on the same node would simply          -->
+    <!-- overwrite each other. Chaining keeps one expression that     -->
+    <!-- names all three validation types.                            -->
+    <!-- ============================================================ -->
+    <record id="hr_leave_view_form_inherit_extension" model="ir.ui.view">
+        <field name="name">hr.leave.form.inherit.extension</field>
+        <field name="model">hr.leave</field>
+        <field name="inherit_id" ref="KSW_unpaid_leave.hr_leave_view_form_inherit_unpaid"/>
+        <field name="arch" type="xml">
+
+            <!-- Hidden helper: stored related for reliable invisible -->
+            <xpath expr="//field[@name='x_is_unpaid_leave_type']" position="after">
+                <field name="x_is_leave_extension" invisible="1"/>
+            </xpath>
+
+            <!-- ===== Widen multi-step button visibility ===== -->
+
+            <xpath expr="//button[@name='action_dm_approve']" position="attributes">
+                <attribute name="invisible">
+                    (x_annual_approval_state != 'pending_dm') or not id or (validation_type != 'annual_multi' and validation_type != 'unpaid_multi' and validation_type != 'extension_multi')
+                </attribute>
+            </xpath>
+
+            <xpath expr="//button[@name='action_hr_approve']" position="attributes">
+                <attribute name="invisible">
+                    (x_annual_approval_state != 'pending_hr') or not id or (validation_type != 'annual_multi' and validation_type != 'unpaid_multi' and validation_type != 'extension_multi')
+                </attribute>
+            </xpath>
+
+            <xpath expr="//button[@name='action_gm_initial_approve']" position="attributes">
+                <attribute name="invisible">
+                    (x_annual_approval_state != 'pending_gm_initial') or not id or (validation_type != 'annual_multi' and validation_type != 'unpaid_multi' and validation_type != 'extension_multi')
+                </attribute>
+            </xpath>
+
+            <xpath expr="//button[@name='action_acc_approve']" position="attributes">
+                <attribute name="invisible">
+                    (x_annual_approval_state != 'pending_acc') or not id or (validation_type != 'annual_multi' and validation_type != 'unpaid_multi' and validation_type != 'extension_multi')
+                </attribute>
+            </xpath>
+
+            <xpath expr="//button[@name='action_gm_final_approve']" position="attributes">
+                <attribute name="invisible">
+                    (x_annual_approval_state != 'pending_gm_final') or not id or (validation_type != 'annual_multi' and validation_type != 'unpaid_multi' and validation_type != 'extension_multi')
+                </attribute>
+            </xpath>
+
+            <!-- The 7-step statusbar (annual's) is the right one here: the
+                 extension walks every step including HR Confirmation, so
+                 nothing needs changing. -->
+
+            <!-- ===== The vacation being extended ===== -->
+            <xpath expr="//group[@name='col_left']" position="after">
+                <group string="Vacation Extension" name="extension_link"
+                       invisible="not x_is_leave_extension">
+                    <field name="x_extended_leave_id"
+                           options="{'no_create': True, 'no_open': False}"
+                           domain="[('employee_id', '=', employee_id),
+                                    ('state', 'not in', ('refuse', 'cancel', 'draft')),
+                                    '|', '|',
+                                    ('holiday_status_id.is_annual_leave', '=', True),
+                                    ('holiday_status_id.is_unpaid_leave', '=', True),
+                                    ('holiday_status_id.is_leave_extension', '=', True)]"
+                           readonly="x_annual_approval_state not in (False, 'pending_dm')"
+                           required="x_is_leave_extension"
+                           help="The approved vacation this request continues."/>
+                    <field name="x_extension_ids" invisible="1"/>
+                </group>
+            </xpath>
+
+            <!-- ===== Return status, mirrored for extensions =====
+                 Annual's Return Status group lives inside the
+                 <div invisible="not x_is_annual_leave_type"> info panel and
+                 unpaid's mirror is gated on x_is_unpaid_leave_type, so an
+                 extension can see neither — and the header's "Confirm
+                 Return" button would be pressable with nowhere to type the
+                 date it requires. Same trap the unpaid module documented. -->
+            <xpath expr="//group[@name='col_left']" position="after">
+                <group string="Return Status" name="extension_return_status"
+                       invisible="not x_is_leave_extension or x_return_state == 'not_applicable'">
+                    <field name="x_return_date"
+                           readonly="x_return_state == 'hr_confirmed' and not x_can_edit_return_date"
+                           required="x_return_state == 'on_vacation' and x_can_confirm_return_manager"
+                           help="The day the employee actually came back. Days after it are paid again."/>
+                    <field name="x_return_state" widget="badge"
+                           string="Return Status"
+                           decoration-warning="x_return_state == 'on_vacation'"
+                           decoration-success="x_return_state == 'hr_confirmed'"/>
+                    <field name="x_manager_return_confirmed_by"
+                           string="Confirmed By"
+                           invisible="x_return_state != 'hr_confirmed'"/>
+                </group>
+            </xpath>
+
+            <!-- ===== HR fee sheet ===== -->
+            <!-- Annual's Penalty / Iqama panel does not apply to an
+                 extension: its fees are the ones below. -->
+            <xpath expr="//page[@name='hr_review']" position="attributes">
+                <attribute name="invisible">
+                    x_annual_approval_state == 'pending_dm' or x_is_leave_extension
+                </attribute>
+            </xpath>
+
+            <xpath expr="//page[@name='hr_review']" position="before">
+                <page string="🧾 Extension Fees" name="extension_fees"
+                      invisible="not x_is_leave_extension or x_annual_approval_state == 'pending_dm'">
+                    <group string="Fees Due from the Employee">
+                        <field name="x_ext_work_permit_fee"
+                               readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"/>
+                        <field name="x_ext_iqama_fee"
+                               readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"/>
+                        <field name="x_ext_bank_fee"
+                               readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"/>
+                        <field name="x_ext_passport_fee_applied"
+                               widget="boolean_toggle"
+                               readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"
+                               help="A fixed government charge of 120.00 SAR."/>
+                        <field name="x_ext_passport_fee" readonly="1"/>
+                        <field name="x_ext_violations_fee"
+                               readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"/>
+                        <field name="x_ext_extra_fee"
+                               readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"/>
+                    </group>
+                    <group class="fw-bold">
+                        <field name="x_ext_total_fees" readonly="1"/>
+                    </group>
+                </page>
+            </xpath>
+
+            <!-- ===== Accounting: hide the annual allowances, add the note ===== -->
+            <xpath expr="//group[@name='accounting_allowances']" position="attributes">
+                <attribute name="invisible">
+                    x_annual_approval_state in ('pending_hr', 'pending_gm_initial') or validation_type == 'unpaid_multi' or x_is_leave_extension
+                </attribute>
+            </xpath>
+            <xpath expr="//field[@name='x_flight_ticket_amount']/.." position="attributes">
+                <attribute name="invisible">
+                    x_annual_approval_state in ('pending_hr', 'pending_gm_initial') or validation_type == 'unpaid_multi' or x_is_leave_extension
+                </attribute>
+            </xpath>
+            <xpath expr="//separator[@name='commission_lines_section']" position="attributes">
+                <attribute name="invisible">
+                    x_annual_approval_state in ('pending_dm', 'pending_hr', 'pending_gm_initial') or not x_annual_approval_state or validation_type == 'unpaid_multi' or x_is_leave_extension
+                </attribute>
+            </xpath>
+            <xpath expr="//field[@name='x_commission_line_ids']" position="attributes">
+                <attribute name="invisible">
+                    x_annual_approval_state in ('pending_dm', 'pending_hr', 'pending_gm_initial') or not x_annual_approval_state or validation_type == 'unpaid_multi' or x_is_leave_extension
+                </attribute>
+            </xpath>
+            <xpath expr="//separator[@name='deduction_lines_section']" position="attributes">
+                <attribute name="invisible">
+                    x_annual_approval_state in ('pending_dm', 'pending_hr', 'pending_gm_initial') or not x_annual_approval_state or validation_type == 'unpaid_multi' or x_is_leave_extension
+                </attribute>
+            </xpath>
+            <xpath expr="//field[@name='x_deduction_line_ids']" position="attributes">
+                <attribute name="invisible">
+                    x_annual_approval_state in ('pending_dm', 'pending_hr', 'pending_gm_initial') or not x_annual_approval_state or validation_type == 'unpaid_multi' or x_is_leave_extension
+                </attribute>
+            </xpath>
+
+            <xpath expr="//group[@name='accounting_allowances']" position="after">
+                <group string="Accounting — Vacation Extension"
+                       name="extension_accounting"
+                       invisible="not x_is_leave_extension or x_annual_approval_state in ('pending_hr', 'pending_gm_initial')">
+                    <field name="x_ext_total_fees" string="Total Fees Due"
+                           readonly="1"/>
+                    <field name="x_ext_acc_note" nolabel="1" colspan="2"
+                           readonly="x_annual_approval_state != 'pending_acc' or not x_is_acc_approver"
+                           placeholder="Accounting remarks... Supporting documents go on the Attachments tab."/>
+                </group>
+            </xpath>
+
+            <!-- The extension is unpaid time and settles nothing, so it
+                 never produces a vacation payslip (see
+                 _create_vacation_payslip). Hide the panel that offers one. -->
+            <xpath expr="//page[@name='vacation_calculation']" position="attributes">
+                <attribute name="invisible">
+                    not x_annual_approval_state or x_is_leave_extension
+                </attribute>
+            </xpath>
+
+            <!-- ===== Ribbons ===== -->
+            <xpath expr="//sheet" position="inside">
+                <widget name="web_ribbon" title="➕ Vacation Extension"
+                        bg_color="text-bg-info"
+                        invisible="not x_is_leave_extension"/>
+                <widget name="web_ribbon" title="➕ Continued by Extension"
+                        bg_color="text-bg-info"
+                        invisible="x_return_state != 'extended'"/>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Extend hr.leave SEARCH: add the extension filter             -->
+    <!-- ============================================================ -->
+    <record id="hr_leave_view_search_inherit_extension" model="ir.ui.view">
+        <field name="name">hr.leave.search.inherit.extension</field>
+        <field name="model">hr.leave</field>
+        <field name="inherit_id" ref="hr_holidays.view_hr_holidays_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='refused_leaves']" position="after">
+                <separator/>
+                <filter string="➕ Vacation Extensions"
+                        name="leave_extensions"
+                        domain="[('holiday_status_id.is_leave_extension', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

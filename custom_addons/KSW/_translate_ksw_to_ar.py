@@ -46,6 +46,7 @@ KSW_MODULES = [
     'KSW_deduction',
     'KSW_eos_leave',
     'KSW_leave_approval',
+    'KSW_leave_extension',
     'KSW_unpaid_leave',
     'KSW_payroll',
     'KSW_attendance_leave',

@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ksw_bas_gl_import_mgr,ksw.bas.gl.import.manager,model_ksw_bas_gl_import,account.group_account_manager,1,1,1,1

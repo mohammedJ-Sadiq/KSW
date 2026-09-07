@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      Re-parenting is done with <function name="write"> rather than a <record>
+      override: a record override aimed at another module's data is silently
+      skipped on every upgrade after the first install (Odoo 19 Pitfalls #2),
+      whereas write() is called directly and always applies.
+    -->
+
+    <!-- Statement Reports: the core financial statements -->
+    <function model="ir.ui.menu" name="write">
+        <value eval="[
+            ref('account_financial_report.menu_trial_balance_wizard'),
+            ref('account_financial_report.menu_general_ledger_wizard'),
+            ref('account_financial_report.menu_journal_ledger_wizard'),
+        ]"/>
+        <value eval="{'parent_id': ref('account.account_reports_legal_statements_menu')}"/>
+    </function>
+
+    <!-- Partner Reports: what customers and suppliers owe -->
+    <function model="ir.ui.menu" name="write">
+        <value eval="[
+            ref('account_financial_report.menu_aged_partner_balance_wizard'),
+            ref('account_financial_report.menu_open_items_wizard'),
+        ]"/>
+        <value eval="{'parent_id': ref('account.account_reports_partners_reports_menu')}"/>
+    </function>
+
+    <!-- Taxes &amp; Fiscal: everything ZATCA and VAT -->
+    <function model="ir.ui.menu" name="write">
+        <value eval="[
+            ref('account_financial_report.menu_vat_report_wizard'),
+            ref('account_tax_balance.menu_action_open_tax_balances'),
+        ]"/>
+        <value eval="{'parent_id': ref('account.account_reports_taxes_and_fiscal_menu')}"/>
+    </function>
+
+    <!-- Management: analysis and the MIS statements a controller builds -->
+    <function model="ir.ui.menu" name="write">
+        <value eval="[
+            ref('mis_builder.mis_report_instance_view_menu'),
+            ref('mis_builder.last_wizard_mis_report_instance_view_menu'),
+            ref('mis_builder_budget.mis_budget_by_account_menu'),
+            ref('mis_builder_budget.mis_budget_menu'),
+        ]"/>
+        <value eval="{'parent_id': ref('account.account_reports_management_menu')}"/>
+    </function>
+
+    <!-- The now-empty vendor wrappers disappear -->
+    <function model="ir.ui.menu" name="write">
+        <value eval="[
+            ref('account_financial_report.menu_oca_reports'),
+            ref('account_tax_balance.menu_tax_balances'),
+            ref('mis_builder.mis_report_finance_menu'),
+        ]"/>
+        <value eval="{'active': False}"/>
+    </function>
+
+    <!-- A migration tool does not belong beside daily transactions -->
+    <function model="ir.ui.menu" name="write">
+        <value eval="[ref('KSW_bas_gl_import.menu_ksw_bas_gl_import')]"/>
+        <value eval="{'parent_id': ref('account.menu_finance_configuration')}"/>
+    </function>
+</odoo>

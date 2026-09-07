@@ -1,0 +1,266 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_leave_extension
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-07 09:00+0000\n"
+"PO-Revision-Date: 2026-09-07 09:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar_001\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
+"X-Generator: KSW ar-engine v2\n"
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave_type__is_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_is_leave_extension
+msgid "Is Vacation Extension"
+msgstr "تمديد إجازة"
+
+#. module: KSW_leave_extension
+#: model:hr.leave.type,name:KSW_leave_extension.leave_type_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "Vacation Extension"
+msgstr "تمديد الإجازة"
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields.selection,name:KSW_leave_extension.selection__hr_leave_type__leave_validation_type__extension_multi
+msgid "Vacation Extension – Multi-Step Approval"
+msgstr "تمديد الإجازة – اعتماد متعدد المراحل"
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_extended_leave_id
+msgid "Extends Vacation"
+msgstr "تمديد للإجازة"
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_extension_ids
+msgid "Extensions"
+msgstr "التمديدات"
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,help:KSW_leave_extension.field_hr_leave__x_extended_leave_id
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "The approved vacation this request continues."
+msgstr "الإجازة المعتمدة التي يكمّلها هذا الطلب."
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_ext_work_permit_fee
+msgid "Work Permit Fees"
+msgstr "رخصة العمل"
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_ext_iqama_fee
+msgid "Iqama Fees"
+msgstr "الإقامة"
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_ext_bank_fee
+msgid "Bank Fees"
+msgstr "رسوم البنك"
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_ext_passport_fee_applied
+msgid "Passport Fees Apply"
+msgstr "تطبيق رسوم الجوازات"
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_ext_passport_fee
+msgid "Passport Fees"
+msgstr "رسوم الجوازات"
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "A fixed government charge of 120.00 SAR."
+msgstr "رسوم حكومية ثابتة قدرها 120.00 ريال سعودي."
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_ext_violations_fee
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "Violations"
+msgstr "مخالفات"
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_ext_extra_fee
+msgid "Extra Fees"
+msgstr "رسوم إضافية"
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_ext_total_fees
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "Total Fees Due"
+msgstr "إجمالي الرسوم المستحقة"
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_ext_acc_note
+msgid "Accounting Note"
+msgstr "ملاحظات المحاسبة"
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "Accounting remarks... Supporting documents go on the Attachments tab."
+msgstr "ملاحظات المحاسبة... ترفق المستندات المؤيدة في تبويب المرفقات."
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields.selection,name:KSW_leave_extension.selection__hr_leave__x_return_state__extended
+msgid "Continued by Extension"
+msgstr "مستمرة بتمديد"
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "🧾 Extension Fees"
+msgstr "🧾 رسوم التمديد"
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "Fees Due from the Employee"
+msgstr "الرسوم المستحقة على الموظف"
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "Accounting — Vacation Extension"
+msgstr "المحاسبة — تمديد الإجازة"
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "Return Status"
+msgstr "حالة العودة"
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "The day the employee actually came back. Days after it are paid again."
+msgstr "اليوم الذي عاد فيه الموظف فعلياً. الأيام التي تليه تُصرف مرة أخرى."
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "➕ Vacation Extension"
+msgstr "➕ تمديد إجازة"
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "➕ Continued by Extension"
+msgstr "➕ مستمرة بتمديد"
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_search_inherit_extension
+msgid "➕ Vacation Extensions"
+msgstr "➕ تمديدات الإجازات"
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "A Vacation Extension must name the vacation it extends."
+msgstr "يجب تحديد الإجازة المراد تمديدها في طلب التمديد."
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "Only a Vacation Extension request can extend another vacation."
+msgstr "لا يمكن تمديد إجازة إلا من خلال طلب تمديد إجازة."
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "A request cannot extend itself."
+msgstr "لا يمكن للطلب أن يمدد نفسه."
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "This would make the extension chain loop back on itself."
+msgstr "هذا يجعل سلسلة التمديدات تدور على نفسها."
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid ""
+"The extension and the vacation it extends must belong to the same employee."
+msgstr "يجب أن يكون التمديد والإجازة الممددة لنفس الموظف."
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid ""
+"Only a vacation that has passed GM final approval can be extended. %(name)s "
+"is still being approved."
+msgstr ""
+"لا يمكن تمديد إلا إجازة اعتمدها المدير العام نهائياً. %(name)s ما زالت قيد "
+"الاعتماد."
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid ""
+"A Vacation Extension starts the day after the vacation it extends. Expected "
+"%(expected)s, got %(actual)s."
+msgstr ""
+"يبدأ تمديد الإجازة في اليوم التالي لانتهاء الإجازة الممددة. المتوقع "
+"%(expected)s، والمُدخل %(actual)s."
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid ""
+"%(name)s already has an extension (%(existing)s). Extend that one instead — "
+"extensions run one after another."
+msgstr ""
+"%(name)s لديها تمديد بالفعل (%(existing)s). قم بتمديد ذلك الطلب — التمديدات "
+"تتتابع الواحد تلو الآخر."
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid ""
+"The passport fee and the extension total are worked out from the fees above "
+"— they cannot be entered directly."
+msgstr ""
+"يتم احتساب رسوم الجوازات وإجمالي التمديد من الرسوم أعلاه — ولا يمكن إدخالهما "
+"مباشرة."
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "Only HR Approvers can fill the extension fees."
+msgstr "لا يمكن إدخال رسوم التمديد إلا لمعتمدي الموارد البشرية."
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid ""
+"The extension fees can only be filled while the request is at the HR "
+"Approval step. Ask the GM to return it to HR if a figure has to change."
+msgstr ""
+"لا يمكن إدخال رسوم التمديد إلا أثناء مرحلة اعتماد الموارد البشرية. اطلب من "
+"المدير العام إعادة الطلب إلى الموارد البشرية لتعديل أي مبلغ."
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "Only Accounting Approvers can fill the accounting note."
+msgstr "لا يمكن إدخال ملاحظات المحاسبة إلا لمعتمدي المحاسبة."
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid ""
+"The accounting note can only be filled while the request is at the "
+"Accounting step."
+msgstr "لا يمكن إدخال ملاحظات المحاسبة إلا أثناء مرحلة اعتماد المحاسبة."
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "Work Permit"
+msgstr "رخصة العمل"
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "Iqama"
+msgstr "الإقامة"
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "Bank"
+msgstr "البنك"
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "Passport"
+msgstr "الجوازات"
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "Extra"
+msgstr "إضافي"

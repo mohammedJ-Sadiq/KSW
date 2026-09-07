@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ksw_bas_gl_import_form" model="ir.ui.view">
+        <field name="name">ksw.bas.gl.import.form</field>
+        <field name="model">ksw.bas.gl.import</field>
+        <field name="arch" type="xml">
+            <form string="BAS GL Import">
+                <header>
+                    <button name="action_import" type="object" string="Import Ledger"
+                            class="btn-primary" invisible="state == 'done'"/>
+                    <button name="action_use_arabic_names" type="object"
+                            string="Chart Names: Arabic (default)"
+                            help="Show the BAS Arabic name in every language."/>
+                    <button name="action_activate_english_names" type="object"
+                            string="Activate English Names"
+                            help="Use BAS's English name in English where BAS has one (1,872 of 4,402); the rest keep their Arabic. Nothing is machine-translated."/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="company_id"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="branch_code" placeholder="all branches"/>
+                        </group>
+                        <group>
+                            <field name="voucher_count"/>
+                            <field name="move_count"/>
+                            <field name="skipped_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Problems">
+                            <field name="log" widget="text" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_bas_gl_import_list" model="ir.ui.view">
+        <field name="name">ksw.bas.gl.import.list</field>
+        <field name="model">ksw.bas.gl.import</field>
+        <field name="arch" type="xml">
+            <list string="BAS GL Imports">
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="branch_code"/>
+                <field name="voucher_count"/>
+                <field name="move_count"/>
+                <field name="skipped_count"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_ksw_bas_gl_import" model="ir.actions.act_window">
+        <field name="name">BAS GL Import</field>
+        <field name="res_model">ksw.bas.gl.import</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_ksw_bas_gl_import"
+              name="BAS GL Import"
+              parent="account.menu_finance_entries"
+              action="action_ksw_bas_gl_import"
+              sequence="99"/>
+</odoo>

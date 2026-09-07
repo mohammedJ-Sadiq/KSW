@@ -54,3 +54,7 @@ ksw_*.json
 /man/
 /share/
 /src/
+
+# OCA finance stack — vendored as pinned git clones, not tracked here.
+# The exact commits are recorded in custom_addons/KSW/OCA_FINANCE_STACK.lock
+/custom_addons/oca/
