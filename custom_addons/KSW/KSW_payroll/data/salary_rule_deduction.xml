@@ -8,6 +8,37 @@
         <!-- rules so they only appear when the value is non-zero.      -->
         <!-- ========================================================= -->
 
+        <!-- ========================================================= -->
+        <!-- Allowance categories must roll up into ALW.                -->
+        <!--                                                            -->
+        <!-- GROSS is `categories.BASIC + categories.ALW`, and          -->
+        <!-- _sum_salary_rule_category (om_hr_payroll/models/           -->
+        <!-- hr_payslip.py) walks parent_id upward when accumulating.   -->
+        <!-- A category with no parent therefore never reaches GROSS    -->
+        <!-- or NET: its line prints on the payslip and the employee    -->
+        <!-- is not paid for it.                                        -->
+        <!--                                                            -->
+        <!-- Upstream ships HRA, Other and Travel with no parent. HRA   -->
+        <!-- and Other were parented by hand in the UI (9 May 2026) and -->
+        <!-- existed only in the database, so a fresh install came up    -->
+        <!-- silently not paying them; Travel was never parented at all. -->
+        <!-- Declared here so the configuration is reproducible.         -->
+        <!--                                                            -->
+        <!-- Plain records are safe: the upstream block is noupdate="0"  -->
+        <!-- (the noupdate trap applies to noupdate="1" sources).        -->
+        <!-- ========================================================= -->
+        <record id="om_hr_payroll.HRA" model="hr.salary.rule.category">
+            <field name="parent_id" ref="om_hr_payroll.ALW"/>
+        </record>
+
+        <record id="om_hr_payroll.Other" model="hr.salary.rule.category">
+            <field name="parent_id" ref="om_hr_payroll.ALW"/>
+        </record>
+
+        <record id="om_hr_payroll.Travel" model="hr.salary.rule.category">
+            <field name="parent_id" ref="om_hr_payroll.ALW"/>
+        </record>
+
         <record id="om_hr_payroll.hr_rule_hra" model="hr.salary.rule">
             <field name="condition_select">python</field>
             <field name="condition_python">result = bool(contract.hra) and not payslip.x_leave_id</field>

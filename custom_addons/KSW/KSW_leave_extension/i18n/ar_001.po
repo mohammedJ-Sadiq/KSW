@@ -199,11 +199,73 @@ msgstr ""
 #. module: KSW_leave_extension
 #: code:addons/KSW_leave_extension/models/hr_leave.py:0
 msgid ""
-"%(name)s already has an extension (%(existing)s). Extend that one instead — "
-"extensions run one after another."
+"Only the current vacation can be extended, and that is %(current)s, not "
+"%(name)s. Extensions run one after another."
 msgstr ""
-"%(name)s لديها تمديد بالفعل (%(existing)s). قم بتمديد ذلك الطلب — التمديدات "
+"لا يمكن تمديد إلا الإجازة الحالية، وهي %(current)s وليست %(name)s. التمديدات "
 "تتتابع الواحد تلو الآخر."
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid ""
+"Only the current vacation can be extended, and that is %(current)s, not this "
+"one. Extend that request instead — extensions run one after another."
+msgstr ""
+"لا يمكن تمديد إلا الإجازة الحالية، وهي %(current)s وليست هذه. قم بتمديد ذلك "
+"الطلب — التمديدات تتتابع الواحد تلو الآخر."
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid ""
+"%(name)s can no longer be extended: the manager has already confirmed that "
+"the employee came back."
+msgstr "لم يعد بالإمكان تمديد %(name)s: فقد أكد المدير مباشرة الموظف للعمل."
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid ""
+"This vacation can no longer be extended: the manager has already confirmed "
+"that the employee came back."
+msgstr "لم يعد بالإمكان تمديد هذه الإجازة: فقد أكد المدير مباشرة الموظف للعمل."
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "A vacation can only be extended once it has passed GM final approval."
+msgstr "لا يمكن تمديد الإجازة إلا بعد اعتمادها نهائياً من المدير العام."
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "No Vacation Extension leave type is configured."
+msgstr "لا يوجد نوع إجازة معرّف لتمديد الإجازة."
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid ""
+"Only %(employee)s, their direct manager or HR can request an extension of "
+"this vacation."
+msgstr ""
+"لا يمكن طلب تمديد هذه الإجازة إلا من %(employee)s أو مديره المباشر أو "
+"الموارد البشرية."
+
+#. module: KSW_leave_extension
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "Extend Vacation"
+msgstr "تمديد الإجازة"
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "➕ Extend Vacation"
+msgstr "➕ تمديد الإجازة"
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_extendable_leave_ids
+msgid "Extendable Vacations"
+msgstr "الإجازات القابلة للتمديد"
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_can_extend
+msgid "Can Be Extended"
+msgstr "قابلة للتمديد"
 
 #. module: KSW_leave_extension
 #: code:addons/KSW_leave_extension/models/hr_leave.py:0

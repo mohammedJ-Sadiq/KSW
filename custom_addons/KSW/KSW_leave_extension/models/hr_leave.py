@@ -72,6 +72,19 @@ class HrLeaveExtension(models.Model):
         'hr.leave', 'x_extended_leave_id', string='Extensions',
         help='Extension requests that continue this vacation.',
     )
+    x_extendable_leave_ids = fields.Many2many(
+        'hr.leave', string='Extendable Vacations',
+        compute='_compute_extendable_leave_ids',
+        help='The vacation this request may extend — the employee\'s current '
+             'one, and only that. Published as a field because a Many2one '
+             'domain can name a field but cannot call a method.',
+    )
+    x_can_extend = fields.Boolean(
+        string='Can Be Extended',
+        compute='_compute_can_extend',
+        help='True on the one vacation the Extend button applies to, for a '
+             'user entitled to request the extension.',
+    )
 
     # ------------------------------------------------------------------
     # HR-filled fees (Step 2). Plain Floats, no model-level groups= :
@@ -344,6 +357,150 @@ class HrLeaveExtension(models.Model):
         return parent.request_date_to + timedelta(days=1)
 
     @api.model
+    def _extendable_vacation(self, employee, exclude=None):
+        """The one vacation of ``employee`` an extension may still attach to.
+
+        At most one record, ever — the employee's **current** granted vacation.
+        Anything older has been overtaken: a vacation followed by another
+        vacation is finished, whatever its own dates say. Offering the whole
+        history would be offering a list of wrong answers, and a picker is
+        never wider than the answer in this codebase.
+
+        A chained extension falls out of the same rule instead of needing one
+        of its own: an extension always ends after the vacation it continues,
+        so it is the current record and the one underneath it is not. That
+        also replaces the old "one live extension per parent" check — a parent
+        that already has one is, by construction, no longer current.
+        """
+        if not employee:
+            return self.browse()
+        candidates = self.sudo().search(
+            [
+                ('employee_id', '=', employee.id),
+                ('state', 'not in', ('refuse', 'cancel', 'draft')),
+                '|', '|',
+                ('holiday_status_id.is_annual_leave', '=', True),
+                ('holiday_status_id.is_unpaid_leave', '=', True),
+                ('holiday_status_id.is_leave_extension', '=', True),
+            ],
+            order='request_date_to desc, id desc',
+        )
+        if exclude:
+            candidates -= exclude
+        candidates = candidates.filtered(lambda l: l._is_past_gm_final())
+        if not candidates:
+            return self.browse()
+        current = candidates[0]
+        if current.x_return_state == 'hr_confirmed':
+            # The manager has recorded the employee back at work. There is no
+            # absence left to extend.
+            return self.browse()
+        return current
+
+    @api.model
+    def _extension_leave_type(self):
+        """The Vacation Extension leave type, by xml id then by flag.
+
+        The flag search is the fallback for a database where the seeded record
+        was renamed or replaced: the type is configuration, and the Extend
+        button must not die because somebody made their own.
+        """
+        leave_type = self.env.ref(
+            'KSW_leave_extension.leave_type_extension',
+            raise_if_not_found=False)
+        if leave_type and leave_type.active:
+            return leave_type
+        return self.env['hr.leave.type'].sudo().search(
+            [('is_leave_extension', '=', True)], limit=1)
+
+    @api.depends('employee_id', 'holiday_status_id')
+    def _compute_extendable_leave_ids(self):
+        """Drives the picker's domain.
+
+        A Many2one `domain=` has to name a field, not call a method, so the
+        one candidate is published as a relational field and resolved against
+        the record every time — a dynamic `selection=`/domain string would be
+        computed once and cached by the client (gotcha #39).
+        """
+        for leave in self:
+            if not leave._is_leave_extension(leave):
+                leave.x_extendable_leave_ids = False
+                continue
+            leave.x_extendable_leave_ids = leave._extendable_vacation(
+                leave.employee_id, exclude=leave)
+
+    @api.depends_context('uid')
+    @api.depends('employee_id', 'state', 'x_annual_approval_state',
+                 'x_return_state', 'holiday_status_id')
+    def _compute_can_extend(self):
+        user = self.env.user
+        has_type = bool(self._extension_leave_type())
+        is_hr = user.has_group('KSW_annual_leave.group_annual_leave_hr')
+        for leave in self:
+            if not (has_type and leave.id and leave.employee_id):
+                leave.x_can_extend = False
+                continue
+            if leave._extendable_vacation(leave.employee_id) != leave:
+                leave.x_can_extend = False
+                continue
+            # Identity through sudo(): an employee's own record rule forbids
+            # reading their manager, and this compute loads on their own form.
+            employee = leave.employee_id.sudo()
+            leave.x_can_extend = bool(
+                is_hr
+                or employee.user_id == user
+                or employee.leave_manager_id == user
+            )
+
+    def action_extend_vacation(self):
+        """Open a new extension request for this vacation.
+
+        `x_can_extend` only hides the button; an RPC caller reaches this method
+        whatever the view says, so the same questions are asked again here
+        (gotcha #15).
+        """
+        self.ensure_one()
+        leave_type = self._extension_leave_type()
+        if not leave_type:
+            raise UserError(_(
+                'No Vacation Extension leave type is configured.'))
+        current = self._extendable_vacation(self.employee_id)
+        if current != self:
+            if not self._is_past_gm_final():
+                raise UserError(_(
+                    'A vacation can only be extended once it has passed GM '
+                    'final approval.'))
+            if current:
+                raise UserError(_(
+                    'Only the current vacation can be extended, and that is '
+                    '%(current)s, not this one. Extend that request instead — '
+                    'extensions run one after another.',
+                    current=current.display_name))
+            raise UserError(_(
+                'This vacation can no longer be extended: the manager has '
+                'already confirmed that the employee came back.'))
+        if not self.x_can_extend:
+            raise UserError(_(
+                'Only %(employee)s, their direct manager or HR can request an '
+                'extension of this vacation.',
+                employee=self.employee_id.name or ''))
+        start = self._extension_start_after(self)
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Extend Vacation'),
+            'res_model': 'hr.leave',
+            'view_mode': 'form',
+            'target': 'current',
+            'context': {
+                'default_employee_id': self.employee_id.id,
+                'default_holiday_status_id': leave_type.id,
+                'default_x_extended_leave_id': self.id,
+                'default_request_date_from': start,
+                'default_request_date_to': start,
+            },
+        }
+
+    @api.model
     def _apply_extension_start_date(self, vals):
         """Force the start date onto the day after the extended vacation.
 
@@ -358,10 +515,21 @@ class HrLeaveExtension(models.Model):
         if start:
             vals['request_date_from'] = start
 
-    @api.onchange('x_extended_leave_id')
-    def _onchange_extended_leave_id(self):
-        """Show the forced start date as soon as the vacation is picked."""
+    @api.onchange('x_extended_leave_id', 'employee_id', 'holiday_status_id')
+    def _onchange_extension_link(self):
+        """Fill the vacation in, then show the start date it forces.
+
+        There is only ever one candidate, so it is preselected rather than
+        asked for — the picker stays on the form so the requester can see
+        *which* vacation they are extending, but its domain leaves nothing
+        else to choose.
+        """
         for leave in self:
+            if not leave._is_leave_extension(leave):
+                continue
+            if not leave.x_extended_leave_id:
+                leave.x_extended_leave_id = leave._extendable_vacation(
+                    leave.employee_id, exclude=leave)
             start = leave._extension_start_after(leave.x_extended_leave_id)
             if start:
                 leave.request_date_from = start
@@ -396,10 +564,27 @@ class HrLeaveExtension(models.Model):
                 raise ValidationError(_(
                     'The extension and the vacation it extends must belong to '
                     'the same employee.'))
-            if not parent._is_past_gm_final():
+            # The same predicate the picker and the Extend button use, so the
+            # three cannot drift. It subsumes "one live extension per parent":
+            # a vacation that already has one is no longer the current one.
+            extendable = leave._extendable_vacation(
+                leave.employee_id, exclude=leave)
+            if parent != extendable:
+                if not parent._is_past_gm_final():
+                    raise ValidationError(_(
+                        'Only a vacation that has passed GM final approval can '
+                        'be extended. %(name)s is still being approved.',
+                        name=parent.display_name))
+                if extendable:
+                    raise ValidationError(_(
+                        'Only the current vacation can be extended, and that '
+                        'is %(current)s, not %(name)s. Extensions run one '
+                        'after another.',
+                        current=extendable.display_name,
+                        name=parent.display_name))
                 raise ValidationError(_(
-                    'Only a vacation that has passed GM final approval can be '
-                    'extended. %(name)s is still being approved.',
+                    '%(name)s can no longer be extended: the manager has '
+                    'already confirmed that the employee came back.',
                     name=parent.display_name))
             start = leave._extension_start_after(parent)
             if start and leave.request_date_from != start:
@@ -407,17 +592,6 @@ class HrLeaveExtension(models.Model):
                     'A Vacation Extension starts the day after the vacation '
                     'it extends. Expected %(expected)s, got %(actual)s.',
                     expected=start, actual=leave.request_date_from))
-            # One live extension per vacation. That single rule is what makes
-            # the chain a chain: a further extension has to hang off the last
-            # one, so the periods stay contiguous and non-overlapping.
-            siblings = parent.x_extension_ids.filtered(
-                lambda e: e != leave and e.state not in ('refuse', 'cancel'))
-            if siblings:
-                raise ValidationError(_(
-                    '%(name)s already has an extension (%(existing)s). Extend '
-                    'that one instead — extensions run one after another.',
-                    name=parent.display_name,
-                    existing=siblings[0].display_name))
 
     # ==================================================================
     # Who may fill what, and when

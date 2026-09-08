@@ -3,6 +3,7 @@ from . import hr_attendance
 from . import hr_employee
 from . import hr_leave
 from . import hr_payslip
+from . import hr_payslip_input
 from . import hr_payslip_run
 from . import hr_salary_rule
 from . import hr_version

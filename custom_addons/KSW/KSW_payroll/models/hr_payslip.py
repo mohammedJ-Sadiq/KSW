@@ -1,6 +1,6 @@
 import logging
 from calendar import monthrange
-from datetime import datetime, time, timedelta
+from datetime import date, datetime, time, timedelta
 from time import monotonic  # `time` above is datetime.time
 
 from markupsafe import Markup
@@ -387,12 +387,13 @@ class HrPayslip(models.Model):
                                          effective_to=effective_to,
                                          absence_only=absence_only)
 
-            # A revision recomputes the whole period as if it were the
-            # single payslip of that month, and then subtracts the total
-            # already paid via PRIOR_NET.  PRIOR_HRA / PRIOR_GOSI would
-            # subtract the same HRA and GOSI a second time.
-            if not payslip.x_is_revision:
-                self._inject_prior_hra_input(payslip)
+            # PRIOR_NET already carries everything the revised payslip
+            # paid, so its own HRA / GOSI must not be subtracted twice —
+            # but an allowance paid by a *different* document (a vacation
+            # payslip's advance) is exactly what makes this month's HRA
+            # undeserved here.  _inject_prior_hra_input knows the
+            # difference; see its revision branch.
+            self._inject_prior_hra_input(payslip)
         res = super().compute_sheet()
         # Re-derive NET from the already-rounded (digits=(16,0)) GROSS and DED
         # line amounts.  The base engine accumulates categories using
@@ -620,7 +621,25 @@ class HrPayslip(models.Model):
                         and vac_slip.date_to >= payslip.date_from):
                     prior_slips |= vac_slip
 
-        if not prior_slips:
+        # A vacation payslip carries no HRA / GOSI line at all — both rules
+        # are suppressed on it (`not payslip.x_leave_id`).  Its housing
+        # allowance is one lump VACATION_HRA advance covering several
+        # months, and those months reach past its own period: a September
+        # vacation payslip can hold October's and November's housing.  So
+        # the advance is looked up by what it covers, not by period
+        # overlap — the search above would never return it.
+        this_month = (payslip.date_from.year, payslip.date_from.month)
+        advance_slips = self._ksw_advance_payslips(payslip, this_month)
+
+        if payslip.x_is_revision:
+            # A revision re-states the payslip it revises: everything that
+            # payslip paid is already subtracted through PRIOR_NET, so only
+            # a *different* document's advance may reduce what is deserved
+            # here — and never the revised payslip's own.
+            prior_slips = self.env['hr.payslip']
+            advance_slips -= payslip.x_revised_payslip_id
+
+        if not prior_slips and not advance_slips:
             return
 
         # Sum HRA and GOSI already paid in prior payslips
@@ -633,6 +652,11 @@ class HrPayslip(models.Model):
                 elif line.code == 'GOSI' and line.total < 0:
                     prior_gosi += line.total  # negative value
 
+        for slip in advance_slips:
+            prior_hra += slip._ksw_advance_share('VACATION_HRA', this_month)
+            # prior_gosi accumulates negatives; the advance is a deduction.
+            prior_gosi -= slip._ksw_advance_share('VACATION_GOSI', this_month)
+
         version_id = (
             payslip.version_id.id
             or (payslip.employee_id.current_version_id
@@ -641,7 +665,8 @@ class HrPayslip(models.Model):
         if not version_id:
             return
 
-        slip_refs = ', '.join(prior_slips.mapped('number') or prior_slips.mapped('name'))
+        settling = prior_slips | advance_slips
+        slip_refs = ', '.join(settling.mapped('number') or settling.mapped('name'))
 
         if prior_hra > 0:
             self.env['hr.payslip.input'].sudo().create({
@@ -664,6 +689,78 @@ class HrPayslip(models.Model):
                 'amount': abs(prior_gosi),
                 'sequence': 6,
             })
+
+    def _ksw_advance_payslips(self, payslip, month):
+        """Issued vacation payslips whose multi-month advance covers ``month``.
+
+        Searched by the leave payslips of the employee rather than by
+        period overlap, because an advance deliberately reaches forward
+        into months the payslip that carries it never covers.  The window
+        is a pre-filter only — ``_ksw_advance_share`` decides.
+
+        Revisions are excluded: ``x_leave_id`` is copied onto a revision,
+        so counting one would subtract the same advance twice.
+        """
+        # 18 months back from the month in question: comfortably longer
+        # than the longest leave that could still be advancing into it.
+        ordinal = month[0] * 12 + month[1] - 1 - 18
+        window_start = date(ordinal // 12, ordinal % 12 + 1, 1)
+        slips = self.env['hr.payslip'].sudo().search([
+            ('employee_id', '=', payslip.employee_id.id),
+            ('state', 'in', ('verify', 'done')),
+            ('x_leave_id', '!=', False),
+            ('x_is_vacation_preview', '=', False),
+            ('x_is_revision', '=', False),
+            ('date_from', '>=', window_start),
+            ('date_from', '<=', payslip.date_to),
+        ])
+        if payslip.id:
+            slips = slips.filtered(lambda s: s.id != payslip.id)
+        return slips.filtered(lambda s: (
+            s._ksw_advance_share('VACATION_HRA', month)
+            or s._ksw_advance_share('VACATION_GOSI', month)
+        ))
+
+    def _ksw_advance_months(self, code):
+        """The months a multi-month advance on this payslip pays for.
+
+        Read from the input line, which records them when the advance is
+        built.  An advance created before that field existed falls back to
+        the leave's span — what the builder used at the time.
+        """
+        self.ensure_one()
+        inp = self.input_line_ids.filtered(lambda i: i.code == code)[:1]
+        if inp and inp.x_ksw_advance_months:
+            return inp._ksw_advance_month_list()
+        leave = self.sudo().x_leave_id
+        if not leave:
+            return []
+        Leave = self.env['hr.leave']
+        return (Leave._paid_months(leave) if code == 'VACATION_HRA'
+                else Leave._all_vacation_months(leave))
+
+    def _ksw_advance_share(self, code, month):
+        """How much of a multi-month advance on this payslip belongs to
+        ``month`` — 0.0 when it carries no such advance, or the advance
+        does not cover that month.
+
+        Only an **issued** payslip settles anything.  A provisional
+        calculation, or a definitive vacation payslip still sitting in
+        draft, has paid nobody: counting it would zero the monthly
+        allowance against money that never left.
+        """
+        self.ensure_one()
+        if self.state not in ('verify', 'done') or self.x_is_vacation_preview:
+            return 0.0
+        if not self.sudo().x_leave_id:
+            return 0.0
+        line = self.line_ids.filtered(lambda l: l.code == code)[:1]
+        if not line or not line.total:
+            return 0.0
+        months = self._ksw_advance_months(code)
+        if month not in months:
+            return 0.0
+        return abs(line.total) / len(months)
 
     # ------------------------------------------------------------------
     # Vacation-return guard
@@ -1799,16 +1896,29 @@ class HrPayslip(models.Model):
 
     def _revision_prior_slips(self):
         """Every payslip whose NET this revision must subtract: the payslip
-        being revised, any vacation payslip for the same period, and any
-        earlier confirmed revision.
+        being revised and any earlier confirmed revision of it.
 
         Including earlier revisions is what makes a revision-of-a-revision
         self-consistent — the second one subtracts the original *and* the
         first one, so its NET is again the outstanding difference.
+
+        A **vacation payslip for the same period is deliberately excluded**,
+        even though it overlaps.  A revision answers one question — what
+        this payslip paid versus what it should have paid — and the two
+        documents are not two halves of one statement: each pays a full
+        gross and deducts the days the other covers, on its own attendance
+        window.  Folding the vacation payslip's NET into PRIOR_NET while
+        the recompute credits only this payslip's window subtracts a
+        fortnight of legitimately paid salary (KSWCO SLIP/13712 came out at
+        −2445 instead of −1000 that way).  What the vacation payslip paid
+        changes what is *deserved* here — its advance suppresses this
+        month's HRA via PRIOR_HRA — not what has been paid on this
+        document.
         """
         self.ensure_one()
         others = self.sudo().search(
-            self._overlapping_slips_domain(states=('verify', 'done')))
+            self._overlapping_slips_domain(states=('verify', 'done'))
+            + [('x_is_revision', '=', True)])
         return (self | others).sudo()
 
     @api.model

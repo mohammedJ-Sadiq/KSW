@@ -273,6 +273,114 @@ class TestLeaveExtension(TransactionCase):
             })
 
     # ==================================================================
+    # Only the current vacation may be extended
+    # ==================================================================
+
+    def test_only_the_current_vacation_is_offered(self):
+        """The whole history would be a list of wrong answers."""
+        old = self._finalise(self._make_vacation(offset=36))
+        current = self._finalise(self._make_vacation(offset=37))
+        Leave = self.env['hr.leave']
+        self.assertEqual(Leave._extendable_vacation(self.employee), current)
+
+    def test_the_picker_offers_exactly_one_vacation(self):
+        parent = self._finalise(self._make_vacation(offset=38))
+        ext = self._make_extension(parent)
+        self.assertEqual(ext.x_extendable_leave_ids, parent)
+
+    def test_extending_an_overtaken_vacation_is_refused(self):
+        old = self._finalise(self._make_vacation(offset=39))
+        self._finalise(self._make_vacation(offset=40))
+        with self.assertRaises(ValidationError):
+            self._make_extension(old)
+
+    def test_the_picker_moves_on_to_the_extension(self):
+        """Once an extension exists it is the current record, not its parent."""
+        parent = self._finalise(self._make_vacation(offset=41))
+        first = self._finalise(self._make_extension(parent))
+        Leave = self.env['hr.leave']
+        self.assertEqual(Leave._extendable_vacation(self.employee), first)
+
+    def test_a_confirmed_return_closes_the_door(self):
+        parent = self._finalise(self._make_vacation(offset=42))
+        return_date = parent.request_date_to + timedelta(days=1)
+        parent.sudo().write({'x_return_date': return_date})
+        parent.with_user(self.user_dm).sudo().action_confirm_return_manager()
+        Leave = self.env['hr.leave']
+        self.assertFalse(Leave._extendable_vacation(self.employee))
+
+    # ==================================================================
+    # The Extend button on the vacation itself
+    # ==================================================================
+
+    def test_can_extend_only_on_the_current_vacation(self):
+        old = self._finalise(self._make_vacation(offset=43))
+        current = self._finalise(self._make_vacation(offset=44))
+        self.assertFalse(old.with_user(self.user_hr).x_can_extend)
+        self.assertTrue(current.with_user(self.user_hr).x_can_extend)
+
+    def test_can_extend_is_false_for_an_unrelated_user(self):
+        current = self._finalise(self._make_vacation(offset=45))
+        self.assertFalse(current.with_user(self.user_acc).x_can_extend)
+        self.assertTrue(current.with_user(self.user_dm).x_can_extend)
+
+    def test_can_extend_is_false_while_still_being_approved(self):
+        leave = self._make_vacation(offset=46)
+        self._advance_to(leave, 'pending_acc')
+        self.assertFalse(leave.with_user(self.user_hr).x_can_extend)
+
+    def test_extend_button_opens_a_prefilled_extension(self):
+        parent = self._finalise(self._make_vacation(offset=47))
+        action = parent.with_user(self.user_hr).sudo().action_extend_vacation()
+        ctx = action['context']
+        self.assertEqual(ctx['default_x_extended_leave_id'], parent.id)
+        self.assertEqual(ctx['default_employee_id'], self.employee.id)
+        self.assertEqual(
+            ctx['default_request_date_from'],
+            parent.request_date_to + timedelta(days=1))
+        self.assertTrue(
+            self.env['hr.leave.type'].browse(
+                ctx['default_holiday_status_id']).is_leave_extension)
+
+    def test_extend_button_refuses_an_overtaken_vacation(self):
+        """The point of the button: an old vacation cannot be extended."""
+        old = self._finalise(self._make_vacation(offset=48))
+        current = self._finalise(self._make_vacation(offset=49))
+        with self.assertRaises(UserError):
+            old.with_user(self.user_hr).sudo().action_extend_vacation()
+
+    def test_extend_button_refuses_before_gm_final(self):
+        leave = self._make_vacation(offset=50)
+        self._advance_to(leave, 'pending_acc')
+        with self.assertRaises(UserError):
+            leave.with_user(self.user_hr).sudo().action_extend_vacation()
+
+    def test_extend_button_refuses_an_unrelated_user(self):
+        parent = self._finalise(self._make_vacation(offset=51))
+        with self.assertRaises(UserError):
+            parent.with_user(self.user_acc).action_extend_vacation()
+
+    def test_extend_button_chains_from_the_extension(self):
+        parent = self._finalise(self._make_vacation(offset=52))
+        first = self._finalise(self._make_extension(parent))
+        self.assertFalse(parent.with_user(self.user_hr).x_can_extend)
+        action = first.with_user(self.user_hr).sudo().action_extend_vacation()
+        self.assertEqual(action['context']['default_x_extended_leave_id'],
+                         first.id)
+
+    def test_the_vacation_is_preselected(self):
+        """One candidate, so it is filled in rather than asked for."""
+        parent = self._finalise(self._make_vacation(offset=53))
+        form = self.env['hr.leave'].sudo().new({
+            'employee_id': self.employee.id,
+            'holiday_status_id': self.ext_type.id,
+        })
+        form._onchange_extension_link()
+        self.assertEqual(form.x_extended_leave_id, parent)
+        self.assertEqual(form.request_date_from,
+                         parent.request_date_to + timedelta(days=1))
+
+    # ==================================================================
     # The fees
     # ==================================================================
 

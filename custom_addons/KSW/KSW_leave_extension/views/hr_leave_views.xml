@@ -20,6 +20,24 @@
             <!-- Hidden helper: stored related for reliable invisible -->
             <xpath expr="//field[@name='x_is_unpaid_leave_type']" position="after">
                 <field name="x_is_leave_extension" invisible="1"/>
+                <field name="x_extendable_leave_ids" invisible="1"/>
+                <field name="x_can_extend" invisible="1"/>
+            </xpath>
+
+            <!-- ===== Extend this vacation ===== -->
+            <!-- On the vacation itself, not only on a blank extension form:
+                 the person asking for more time is looking at the request
+                 they want to extend. x_can_extend is True on the employee's
+                 CURRENT vacation only, so an old one that has since been
+                 followed by another vacation simply has no button — and
+                 action_extend_vacation asks the same question again for the
+                 RPC caller who never saw the view. -->
+            <xpath expr="//button[@name='action_confirm_return_manager']" position="after">
+                <button string="➕ Extend Vacation"
+                        name="action_extend_vacation"
+                        type="object"
+                        class="btn-secondary"
+                        invisible="not x_can_extend"/>
             </xpath>
 
             <!-- ===== Widen multi-step button visibility ===== -->
@@ -62,14 +80,12 @@
             <xpath expr="//group[@name='col_left']" position="after">
                 <group string="Vacation Extension" name="extension_link"
                        invisible="not x_is_leave_extension">
+                    <!-- Only the employee's CURRENT vacation is ever offered:
+                         the whole history would be a list of wrong answers.
+                         x_extendable_leave_ids holds that one record. -->
                     <field name="x_extended_leave_id"
                            options="{'no_create': True, 'no_open': False}"
-                           domain="[('employee_id', '=', employee_id),
-                                    ('state', 'not in', ('refuse', 'cancel', 'draft')),
-                                    '|', '|',
-                                    ('holiday_status_id.is_annual_leave', '=', True),
-                                    ('holiday_status_id.is_unpaid_leave', '=', True),
-                                    ('holiday_status_id.is_leave_extension', '=', True)]"
+                           domain="[('id', 'in', x_extendable_leave_ids)]"
                            readonly="x_annual_approval_state not in (False, 'pending_dm')"
                            required="x_is_leave_extension"
                            help="The approved vacation this request continues."/>

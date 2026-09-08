@@ -1,4 +1,6 @@
+import calendar
 import logging
+import re
 from datetime import date, timedelta
 
 from markupsafe import Markup
@@ -7,6 +9,11 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
+
+
+def _plain_text(html):
+    """Tag-stripped, whitespace-collapsed text of an HTML body."""
+    return ' '.join(re.sub(r'<[^>]+>', ' ', str(html or '')).split())
 
 # Approval steps at which an approver may ask for a provisional
 # ("draft / incomplete") vacation calculation.  Everything from the
@@ -378,6 +385,7 @@ class HrLeave(models.Model):
         """Build the list of hr.payslip.input values for vacation items."""
         vals_list = []
         version_id = payslip.version_id.id
+        Input = self.env['hr.payslip.input']
 
         # 1. Vacation Balance Settlement (FIFO historical wage slicing)
         # For EOS and full-clearance leaves, pin the balance to the leave's
@@ -493,13 +501,25 @@ class HrLeave(models.Model):
                 'amount': visa_recovery,
             })
 
-        # 8. Multi-month HRA advance — PAID vacation months only.
+        # 8. Multi-month HRA advance — PAID vacation months the employee
+        #    has NOT already been paid for.
         #
         # The vacation payslip pays HRA up front for every paid
         # vacation month (including the month the vacation payslip
         # itself covers). The regular HRA salary rule is suppressed
         # on vacation payslips (see data/salary_rule_deduction.xml)
         # so the vac month is not double-paid.
+        #
+        # The advance only holds while the employee is actually away:
+        # the monthly batch skips an employee whose return is pending
+        # (_get_unresolved_vacation_leaves), so nothing else pays those
+        # months.  A request that stalls in the approval chain breaks
+        # that assumption — the employee stays at work, draws his
+        # ordinary payslips, and the months of the leave are settled in
+        # full before the chain ever completes.  Advancing them again
+        # pays HRA twice, so every month is checked against what has
+        # already been issued (KSWCO leave 4882: requested 29 Jul,
+        # approved in Sep, with July and August payslips already done).
         #
         # For combined annual + unpaid leaves (x_excess_days_accepted)
         # and full-balance-clearance leaves, months that fall entirely
@@ -510,17 +530,25 @@ class HrLeave(models.Model):
         #   - full clearance          → x_clearance_balance
         #   - excess accepted (combo) → x_annual_portion_days
         #   - simple annual           → calendar days of the leave
-        paid_months = self._paid_months_count(leave)
-        if paid_months > 0:
+        paid_months = self._paid_months(leave)
+        hra_settled = self._months_already_settled(
+            leave, employee, payslip, paid_months, 'hra')
+        hra_due = [m for m in paid_months if m not in hra_settled]
+        if hra_due:
             version = payslip.version_id or employee.current_version_id
             hra = version.hra or 0.0
             if hra > 0:
                 vals_list.append({
                     'payslip_id': payslip.id,
                     'version_id': version_id,
-                    'name': 'Advance HRA for %d paid vacation month(s)' % paid_months,
+                    'name': 'Advance HRA for %d paid vacation month(s): %s' % (
+                        len(hra_due), self._format_months(hra_due)),
                     'code': 'VACATION_HRA',
-                    'amount': hra * paid_months,
+                    'amount': hra * len(hra_due),
+                    # The monthly payslip of any of these months reads
+                    # this to subtract its own share (gotcha #124).
+                    'x_ksw_advance_months': Input._ksw_format_advance_months(
+                        hra_due),
                 })
 
         # 9. Multi-month GOSI advance — ALL vacation months (paid +
@@ -528,8 +556,15 @@ class HrLeave(models.Model):
         # and employee must pay every month regardless of whether the
         # employee is on paid or unpaid leave, so the unpaid portion
         # of a combined leave still accrues GOSI.
-        gosi_months = self._all_vacation_months_count(leave)
-        if gosi_months > 0:
+        #
+        # Same already-settled filter as the HRA advance above: a month
+        # whose ordinary payslip is already out has had its GOSI
+        # deducted, and charging it again takes the money twice.
+        gosi_months = self._all_vacation_months(leave)
+        gosi_settled = self._months_already_settled(
+            leave, employee, payslip, gosi_months, 'gosi')
+        gosi_due = [m for m in gosi_months if m not in gosi_settled]
+        if gosi_due:
             version = payslip.version_id or employee.current_version_id
             wage = version.wage or 0.0
             hra = version.hra or 0.0
@@ -542,17 +577,27 @@ class HrLeave(models.Model):
                     vals_list.append({
                         'payslip_id': payslip.id,
                         'version_id': version_id,
-                        'name': 'Advance GOSI for %d vacation month(s)' % gosi_months,
+                        'name': 'Advance GOSI for %d vacation month(s): %s' % (
+                            len(gosi_due), self._format_months(gosi_due)),
                         'code': 'VACATION_GOSI',
-                        'amount': gosi_per_month * gosi_months,
+                        'amount': gosi_per_month * len(gosi_due),
+                        'x_ksw_advance_months': (
+                            Input._ksw_format_advance_months(gosi_due)),
                     })
+
+        # Tell the approver why a month is missing from the advance.
+        # Guarded on the EOS flag because KSW_eos_leave reuses this
+        # builder and drops both advance codes from the result — an EOS
+        # payslip skipping them is by design, not a skipped month.
+        if (hra_settled or gosi_settled) and not getattr(leave, 'x_is_eos_leave', False):
+            self._post_settled_months_note(payslip, hra_settled, gosi_settled)
 
         return vals_list
 
     @staticmethod
-    def _paid_months_count(leave):
-        """Number of distinct calendar months spanned by the PAID portion
-        of ``leave``.
+    def _paid_months(leave):
+        """The distinct calendar months spanned by the PAID portion of
+        ``leave``, as a sorted list of ``(year, month)`` tuples.
 
         Unpaid-portion months (from x_excess_days_accepted) contribute
         nothing — those months must not receive HRA on the vacation
@@ -567,18 +612,24 @@ class HrLeave(models.Model):
         """
         paid_days = int(round(leave.number_of_days or 0))
         if paid_days <= 0 or not leave.request_date_from:
-            return 0
+            return []
 
         paid_start = leave.request_date_from
         paid_end = paid_start + timedelta(days=paid_days - 1)
-        return HrLeave._month_span(paid_start, paid_end)
+        return HrLeave._month_span_list(paid_start, paid_end)
 
     @staticmethod
-    def _all_vacation_months_count(leave):
-        """Number of distinct calendar months spanned by the ENTIRE
-        vacation (paid portion + any unpaid excess portion).
+    def _paid_months_count(leave):
+        """Number of months in :meth:`_paid_months`."""
+        return len(HrLeave._paid_months(leave))
 
-        Used for GOSI advance, which must cover every month the
+    @staticmethod
+    def _all_vacation_months(leave):
+        """The distinct calendar months spanned by the ENTIRE vacation
+        (paid portion + any unpaid excess portion), as a sorted list of
+        ``(year, month)`` tuples.
+
+        Used for the GOSI advance, which must cover every month the
         employee is on leave — GOSI is owed by law regardless of
         whether the month is paid or unpaid.
 
@@ -587,26 +638,150 @@ class HrLeave(models.Model):
             unpaid → 3 months (Apr, May, Jun).
           * 20-day full-clearance (Apr 15 → May 4) → 2 months.
         """
-        d_from = leave.request_date_from
-        d_to = leave.request_date_to
-        if not d_from or not d_to:
-            return 0
-        return HrLeave._month_span(d_from, d_to)
+        return HrLeave._month_span_list(
+            leave.request_date_from, leave.request_date_to)
 
     @staticmethod
-    def _month_span(d_from, d_to):
-        """Count distinct (year, month) tuples in the inclusive range."""
+    def _all_vacation_months_count(leave):
+        """Number of months in :meth:`_all_vacation_months`."""
+        return len(HrLeave._all_vacation_months(leave))
+
+    @staticmethod
+    def _month_span_list(d_from, d_to):
+        """The distinct ``(year, month)`` tuples in the inclusive range."""
         if not d_from or not d_to or d_from > d_to:
-            return 0
-        months = set()
+            return []
+        months = []
         cursor = d_from.replace(day=1)
         while cursor <= d_to:
-            months.add((cursor.year, cursor.month))
+            months.append((cursor.year, cursor.month))
             if cursor.month == 12:
                 cursor = cursor.replace(year=cursor.year + 1, month=1)
             else:
                 cursor = cursor.replace(month=cursor.month + 1)
-        return len(months)
+        return months
+
+    @staticmethod
+    def _month_span(d_from, d_to):
+        """Count distinct (year, month) tuples in the inclusive range."""
+        return len(HrLeave._month_span_list(d_from, d_to))
+
+    @staticmethod
+    def _format_months(months):
+        """'Jul 2026, Aug 2026' for a list of ``(year, month)`` tuples."""
+        return ', '.join(
+            '%s %d' % (calendar.month_abbr[m], y) for y, m in sorted(months))
+
+    def _months_already_settled(self, leave, employee, payslip, months, kind):
+        """Which of ``months`` the employee has already been settled for.
+
+        Returns ``{(year, month): payslip reference}`` — the months that
+        must be left out of the HRA (``kind='hra'``) or GOSI
+        (``kind='gosi'``) advance because an issued payslip already
+        carries them.
+
+        The advance exists because an employee who is away draws no
+        ordinary payslip for those months.  When the approval chain
+        stalls he never leaves, the monthly batch pays him as usual, and
+        by the time the chain completes the months are settled: paying
+        the advance on top hands him the housing allowance twice and
+        takes GOSI off him twice.  So the question is not "how many
+        months does the leave span" but "which of them did he actually
+        miss".
+
+        Only issued payslips count (``verify`` / ``done``); a draft is
+        not money out of the door.  Another leave's vacation payslip
+        counts for the months *its* advance covered, which is why the
+        span helpers are re-run against that leave.
+        """
+        months = set(months)
+        if not months or not employee:
+            return {}
+
+        first, last = min(months), max(months)
+        period_start = date(first[0], first[1], 1)
+        if last[1] == 12:
+            period_end = date(last[0] + 1, 1, 1) - timedelta(days=1)
+        else:
+            period_end = date(last[0], last[1] + 1, 1) - timedelta(days=1)
+
+        # sudo(): approvers running a provisional calculation have no
+        # payroll ACLs of their own.
+        slips = self.env['hr.payslip'].sudo().search([
+            ('employee_id', '=', employee.id),
+            ('state', 'in', ('verify', 'done')),
+            ('date_from', '<=', period_end),
+            ('date_to', '>=', period_start),
+            ('x_is_vacation_preview', '=', False),
+        ])
+
+        ordinary_code, advance_code = (
+            ('HRA', 'VACATION_HRA') if kind == 'hra'
+            else ('GOSI', 'VACATION_GOSI')
+        )
+
+        settled = {}
+        for slip in slips:
+            # This leave's own payslips are the ones being (re)built —
+            # they are not a second payment of anything.
+            if slip.id == payslip.id or slip.x_leave_id == leave:
+                continue
+            if slip.x_leave_id:
+                covered = (
+                    self._paid_months(slip.x_leave_id) if kind == 'hra'
+                    else self._all_vacation_months(slip.x_leave_id)
+                )
+                code = advance_code
+            else:
+                # An ordinary monthly payslip settles its own month.
+                covered = [(slip.date_from.year, slip.date_from.month)]
+                code = ordinary_code
+            # A zero line means the amount was suppressed (PRIOR_HRA, or
+            # a rule condition) — nothing was actually settled.
+            if not any(line.code == code and line.total for line in slip.line_ids):
+                continue
+            ref = slip.number or slip.name
+            for month in set(covered) & months:
+                settled.setdefault(month, ref)
+
+        if settled:
+            _logger.info(
+                'Leave #%s (%s): %s advance skips %s — already settled by %s.',
+                leave.id, employee.name, ordinary_code,
+                self._format_months(settled),
+                ', '.join(sorted(set(settled.values()))),
+            )
+        return settled
+
+    def _post_settled_months_note(self, payslip, hra_settled, gosi_settled):
+        """Chatter note naming the months left out of the advance and the
+        payslip that already settled each of them.
+
+        Without it a month simply disappears from the figure and the
+        approver has no way to tell a correct exclusion from a bug.
+
+        Posted at most once per payslip per distinct set of months: this
+        builder is re-run on **every** recompute of a vacation payslip
+        (``hr.payslip._refresh_vacation_bal_input`` calls it just to
+        re-derive VACATION_BAL), so a plain ``message_post`` would stack
+        an identical note on the chatter each time.
+        """
+        body = Markup(
+            '<strong>ℹ️ Advance skipped for already-paid month(s)</strong><br/>'
+        )
+        for label, settled in (('HRA', hra_settled), ('GOSI', gosi_settled)):
+            for month, ref in sorted(settled.items()):
+                body += Markup('<b>%(label)s</b> — %(month)s already in %(ref)s<br/>') % {
+                    'label': label,
+                    'month': self._format_months([month]),
+                    'ref': ref,
+                }
+        # Compare on stripped text: Odoo wraps a posted body in <span>, so
+        # the stored value is never byte-identical to what was passed in.
+        if any(_plain_text(m.body) == _plain_text(body)
+               for m in payslip.sudo().message_ids):
+            return
+        payslip.sudo().message_post(body=body, subtype_xmlid='mail.mt_note')
 
     # ------------------------------------------------------------------
     # Finalised requests (KSW_annual_leave._check_final_reversal_rights)
