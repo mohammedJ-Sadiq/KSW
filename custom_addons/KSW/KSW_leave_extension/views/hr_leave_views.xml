@@ -118,38 +118,49 @@
             </xpath>
 
             <!-- ===== HR fee sheet ===== -->
-            <!-- Annual's Penalty / Iqama panel does not apply to an
-                 extension: its fees are the ones below. -->
-            <xpath expr="//page[@name='hr_review']" position="attributes">
-                <attribute name="invisible">
-                    x_annual_approval_state == 'pending_dm' or x_is_leave_extension
-                </attribute>
+            <!-- The fees go INSIDE the existing HR Review page rather than
+                 into a second one, and annual's Penalty panel is hidden for
+                 an extension. One HR tab per request, holding whatever that
+                 request's HR step actually asks for.
+
+                 This deliberately does NOT set the page's own invisible=.
+                 KSW_eos_leave already owns that attribute (position=
+                 "attributes" on the same node) and, being applied after this
+                 view, silently wins: the combined arch keeps eos's expression
+                 and drops ours, with no error anywhere. Setting a DIFFERENT
+                 attribute on the same node composes fine; setting the same
+                 one is last-writer-wins, and the order is
+                 `ORDER BY priority, id` over a depth-first walk
+                 (ir_ui_view._get_inheriting_views / _combine), which this
+                 module does not control. -->
+            <xpath expr="//field[@name='x_penalty_amount']/.." position="attributes">
+                <attribute name="invisible">x_is_leave_extension</attribute>
             </xpath>
 
-            <xpath expr="//page[@name='hr_review']" position="before">
-                <page string="🧾 Extension Fees" name="extension_fees"
-                      invisible="not x_is_leave_extension or x_annual_approval_state == 'pending_dm'">
-                    <group string="Fees Due from the Employee">
-                        <field name="x_ext_work_permit_fee"
-                               readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"/>
-                        <field name="x_ext_iqama_fee"
-                               readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"/>
-                        <field name="x_ext_bank_fee"
-                               readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"/>
-                        <field name="x_ext_passport_fee_applied"
-                               widget="boolean_toggle"
-                               readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"
-                               help="A fixed government charge of 120.00 SAR."/>
-                        <field name="x_ext_passport_fee" readonly="1"/>
-                        <field name="x_ext_violations_fee"
-                               readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"/>
-                        <field name="x_ext_extra_fee"
-                               readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"/>
-                    </group>
-                    <group class="fw-bold">
-                        <field name="x_ext_total_fees" readonly="1"/>
-                    </group>
-                </page>
+            <xpath expr="//page[@name='hr_review']" position="inside">
+                <group string="Extension Fees — Due from the Employee"
+                       name="extension_fees"
+                       invisible="not x_is_leave_extension">
+                    <field name="x_ext_work_permit_fee"
+                           readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"/>
+                    <field name="x_ext_iqama_fee"
+                           readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"/>
+                    <field name="x_ext_bank_fee"
+                           readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"/>
+                    <field name="x_ext_passport_fee_applied"
+                           widget="boolean_toggle"
+                           readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"
+                           help="A fixed government charge of 120.00 SAR."/>
+                    <field name="x_ext_passport_fee" readonly="1"/>
+                    <field name="x_ext_violations_fee"
+                           readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"/>
+                    <field name="x_ext_extra_fee"
+                           readonly="x_annual_approval_state != 'pending_hr' or not x_is_hr_approver"/>
+                </group>
+                <group class="fw-bold" name="extension_fees_total"
+                       invisible="not x_is_leave_extension">
+                    <field name="x_ext_total_fees" readonly="1"/>
+                </group>
             </xpath>
 
             <!-- ===== Accounting: hide the annual allowances, add the note ===== -->
@@ -190,9 +201,19 @@
                        invisible="not x_is_leave_extension or x_annual_approval_state in ('pending_hr', 'pending_gm_initial')">
                     <field name="x_ext_total_fees" string="Total Fees Due"
                            readonly="1"/>
+                    <separator string="Accounting Comment"/>
                     <field name="x_ext_acc_note" nolabel="1" colspan="2"
                            readonly="x_annual_approval_state != 'pending_acc' or not x_is_acc_approver"
-                           placeholder="Accounting remarks... Supporting documents go on the Attachments tab."/>
+                           placeholder="Comment on the extension fees, the settlement, or anything the GM should read before final approval..."/>
+                    <!-- The same x_attachment_ids as the 📎 Attachments tab,
+                         surfaced here so Accounting can attach at the step
+                         they are actually standing on rather than hunting for
+                         another tab. One field, one value — both widgets edit
+                         the same records. -->
+                    <separator string="Accounting Documents"/>
+                    <field name="x_attachment_ids" widget="many2many_binary"
+                           nolabel="1" colspan="2"
+                           readonly="x_annual_approval_state != 'pending_acc' or not x_is_acc_approver"/>
                 </group>
             </xpath>
 

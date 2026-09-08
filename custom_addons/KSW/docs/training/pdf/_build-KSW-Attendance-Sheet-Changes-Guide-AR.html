@@ -1,0 +1,176 @@
+<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"><title>ما الذي تغيّر في كشف الحضور</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "Noto Naskh Arabic","Noto Sans Arabic UI","DejaVu Sans",sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: right; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-right: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">ما الذي تغيّر في كشف الحضور</div>
+  <div class="meta">دليل تدريب المستخدم<br/>KSW HR &amp; Payroll · 2026-09-08</div>
+</div>
+<section id="g-whatsnew-attendance-sheet-changes"><h1>ما الذي تغيّر في كشف الحضور</h1>
+<p><strong>الفئة المستهدفة:</strong> المشرفون / المديرون المباشرون
+<strong>ساري المفعول منذ:</strong> ١ سبتمبر ٢٠٢٦
+<strong>وقت القراءة:</strong> ٣ دقائق</p>
+<blockquote>
+<p><strong>ملاحظة عن الواجهة:</strong> أسماء الأزرار في هذه الشاشة تظهر بالإنجليزية حتى في
+واجهة اللغة العربية، لذلك ذُكرت هنا كما تراها على الشاشة تمامًا، مع شرحها
+بالعربية.</p>
+</blockquote>
+<h2>الخلاصة في سطر واحد</h2>
+<p>لم يعد الشهر <strong>يُرسَل إلى الرواتب من تلقاء نفسه</strong>. عليك الضغط على
+<strong>✓ Confirm &amp; Send to Payroll</strong> (اعتماد الشهر وإرساله إلى الرواتب) قبل نهاية
+الشهر — والشهر الذي لا يعتمده أحد يُحتسب في الراتب بوصفه <strong>صفر أيام حضور</strong>.</p>
+<h2>أوجه الاختلاف</h2>
+<table>
+<thead>
+<tr>
+<th>سابقًا</th>
+<th>الآن</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>يُقفَل الكشف ويُرسَل إلى الرواتب تلقائيًا عند انتهاء الشهر</td>
+<td>لا يصل شيء إلى الرواتب حتى <strong>تضغط أنت</strong> على <strong>✓ Confirm &amp; Send to Payroll</strong></td>
+</tr>
+<tr>
+<td>الشهر الذي لم يفتحه أحد كان يُصرَف بوصفه حضورًا كاملًا</td>
+<td>الشهر غير المعتمَد يُقرأ <strong>صفر أيام حضور</strong> — أي لا يُصرف للموظف أي يوم عمل</td>
+</tr>
+<tr>
+<td>كان بالإمكان اعتماد كشف يخالف إجازة معتمدة</td>
+<td>يُرفض الاعتماد ما دام هناك يوم مُعلَّم «حاضر» داخل إجازة معتمدة، أو ما دامت مباشرة الموظف بعد إجازته غير مؤكَّدة</td>
+</tr>
+<tr>
+<td>الإجازة التي تُعتمد بعد انتهائك من الكشف لا تُغيّر شيئًا فيه</td>
+<td>الإجازة اللاحقة <strong>تسحب اعتمادك</strong>: يعود الكشف إلى <strong>مسودة</strong> ويُطلب منك اعتماده من جديد</td>
+</tr>
+<tr>
+<td>كانت القائمة تعرض كشوفًا خارج نطاق فريقك</td>
+<td>ترى <strong>موظفيك أنت فقط</strong>، والكشوف التي تحتاج إلى إجراء تظهر في <strong>أعلى القائمة باللون الأحمر</strong></td>
+</tr>
+<tr>
+<td>كانت أيام الراحة (الجمعة/السبت) ضمن ما تُعلِّمه بنفسك</td>
+<td>أصبح النظام <strong>يحتسب أيام الراحة تلقائيًا</strong> ولا يمكن تغييرها يدويًا</td>
+</tr>
+</tbody></table>
+<p><strong>إضافات جديدة على الشاشة:</strong> زر <strong>⚡ Apply Approved Time Off</strong> (تطبيق الإجازات
+المعتمدة)، ومرشّحا <strong>⚠ Needs Attention</strong> (يحتاج إلى إجراء) و<strong>Waiting On Me</strong>
+(بانتظار إجرائي)، وعمود <strong>Waiting On</strong> (بانتظار)، ورسالة تذكير في <strong>آخر يوم من
+الشهر</strong>.</p>
+<h2>ما المطلوب منك شهريًا</h2>
+<p>١. افتح <strong>الحضور والانصراف ← Attendance Sheets (كشوف الحضور)</strong>. تفتح القائمة
+   على كشوف السنة الحالية التي لم تُرسَل بعد.</p>
+<p>٢. علّم الأيام: <strong>✓ All Present</strong> (الجميع حاضرون) أو <strong>✗ All Absent</strong> (الجميع
+   غائبون)، ثم صحّح الاستثناءات. أيام الراحة والأيام المشمولة بإجازة تُعبّأ
+   تلقائيًا.</p>
+<p>٣. إن ظهر التنبيه الأحمر على الكشف، عالجه — راجع الفقرة التالية.</p>
+<p>٤. اضغط <strong>✓ Confirm &amp; Send to Payroll</strong>.</p>
+<ul>
+<li>لاعتماد الفريق كاملًا دفعةً واحدة: اضغط الزر نفسه في أعلى القائمة. فإن لم
+تُحدِّد أي سطر، يعتمد <strong>جميع كشوفك غير المعتمَدة لهذا الشهر</strong>؛ وإن حدّدت
+أسطرًا، يعتمد المحدَّد منها فقط.</li>
+</ul>
+<p>٥. يتحوّل عمود <strong>Payroll</strong> إلى اللون الأخضر ويصبح <strong>Sent to Payroll</strong> (أُرسل إلى
+   الرواتب). بذلك اكتمل عملك.</p>
+<blockquote>
+<p><strong>الموعد النهائي هو نهاية الشهر.</strong> صلاحية المشرف محصورة بالشهر الجاري. وبعد
+انتهاء الشهر لا يستطيع الاعتماد سوى الموارد البشرية / مسؤول كشوف الحضور —
+وإلى أن يفعلوا، يُصرف للموظف صفر أيام.</p>
+</blockquote>
+<h2>التنبيه الأحمر — «لا يمكن إرسال هذا الشهر إلى الرواتب بعد»</h2>
+<p>يذكر التنبيه سببه، ويذكر تحت <strong>Waiting on</strong> (بانتظار) الشخصَ المطلوب منه
+الإجراء. والسبب أحد اثنين:</p>
+<table>
+<thead>
+<tr>
+<th>نص التنبيه</th>
+<th>الإجراء المطلوب</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><em>عدد ن من الأيام مُعلَّمة «حاضر» بينما توجد إجازة معتمدة من ... إلى ...</em></td>
+<td>اضغط <strong>⚡ Apply Approved Time Off</strong>. يُعلِّم الأيامَ المشمولة بالإجازة المعتمدة غيابًا مطابقةً للطلب المعتمد، ولا يغيّر شيئًا آخر.</td>
+</tr>
+<tr>
+<td><em>ON VACATION — لم تُسجَّل مباشرة الموظف بعد إجازته</em></td>
+<td>لا يمكن معالجته من الكشف. على مدير الإجازات المذكور فتح الطلب والضغط على <strong>Confirm Return</strong> (تأكيد المباشرة). وإلى أن يتم ذلك لا تستطيع الرواتب معالجة هذا الموظف إطلاقًا.</td>
+</tr>
+</tbody></table>
+<h2>إذا عاد إليك كشف سبق أن اعتمدته</h2>
+<p>عند اعتماد إجازة تشمل يومًا سبق أن اعتمدته، يسحب النظام الاعتماد: يعود الكشف
+إلى <strong>مسودة</strong>، ويظهر في سجل الكشف <strong>↩ Confirmation Withdrawn</strong> (سُحب الاعتماد)
+مع السبب، وتصلك رسالة بذلك. افتح الكشف، وراجع الأيام، ثم اضغط
+<strong>✓ Confirm &amp; Send to Payroll</strong> مرة أخرى. وإلى أن تفعل، يُقرأ الشهر صفر أيام
+حضور.</p>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>العَرَض</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>زر <strong>Confirm &amp; Send to Payroll</strong> غير ظاهر في الكشف</td>
+<td>لست المدير المباشر للموظف، أو انتهى الشهر، أو الكشف معتمَد أصلًا</td>
+<td>راجع حقل <strong>Manager</strong> في الكشف؛ وإن كان الشهر منتهيًا فاطلب ذلك من الموارد البشرية</td>
+</tr>
+<tr>
+<td>زر أعلى القائمة يقول إنه لا يوجد ما يُعتمَد</td>
+<td>إمّا أن كشوفك كلها أُرسلت، وإمّا أنه لا يوجد موظف أنت <strong>Manager</strong> له</td>
+<td>نص الرسالة نفسه يوضّح أيّ الحالتين هي</td>
+</tr>
+<tr>
+<td>يوم لا يقبل التغيير</td>
+<td>إمّا أنه يوم راحة (جمعة/سبت) يُحتسب تلقائيًا، وإمّا أنه مشمول بإجازة معتمدة</td>
+<td>هذا متوقَّع — اتركه كما هو</td>
+</tr>
+<tr>
+<td>الكشف عاد إلى مسودة من تلقاء نفسه</td>
+<td>اعتُمدت إجازة تشمل يومًا سبق اعتماده</td>
+<td>اعتمده مرة أخرى</td>
+</tr>
+<tr>
+<td>ظهور رسالة «ن أُرسلت — م رُفضت» بعد الاعتماد الجماعي</td>
+<td>الكشوف المرفوضة لا تزال تخالف إجازات معتمدة</td>
+<td>المعتمَدة محفوظة؛ عالج المذكورة في الرسالة ثم اعتمدها</td>
+</tr>
+<tr>
+<td>صُرف للموظف صفر أيام</td>
+<td>الشهر لم يُعتمَد إطلاقًا</td>
+<td>تستطيع الموارد البشرية / مسؤول كشوف الحضور اعتماد شهر منتهٍ</td>
+</tr>
+</tbody></table>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li><span class="xref">كشوف الحضور — الدليل الكامل</span></li>
+<li><span class="xref">تأكيد مباشرة الموظف بعد إجازته</span></li>
+</ul>
+</section>
+</body></html>

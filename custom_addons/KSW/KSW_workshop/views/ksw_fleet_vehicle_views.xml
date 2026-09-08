@@ -20,6 +20,21 @@
         </field>
     </record>
 
+    <!-- Same reason as on the request form: a contact created from this
+         picker would carry the customer role but no workshop registration,
+         so it would be saved on the vehicle and then vanish from every
+         picker. Clients are added in one place, Configuration -> Clients. -->
+    <record id="view_ksw_fleet_vehicle_form_workshop_client" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.form.workshop.client</field>
+        <field name="model">ksw.fleet.vehicle</field>
+        <field name="inherit_id" ref="KSW_fleet.view_ksw_fleet_vehicle_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='client_id']" position="attributes">
+                <attribute name="options">{'no_create': True}</attribute>
+            </xpath>
+        </field>
+    </record>
+
     <!-- Vehicles are worth analysing in their own right (visits per type,
          per client), so give the fleet action the same charting surface. -->
     <record id="view_ksw_fleet_vehicle_pivot" model="ir.ui.view">

@@ -429,13 +429,47 @@ class HrLeaveExtension(models.Model):
             leave.x_extendable_leave_ids = leave._extendable_vacation(
                 leave.employee_id, exclude=leave)
 
+    def _may_request_extension_for(self, employee):
+        """Who may raise an extension on ``employee``'s behalf.
+
+        Pressing Extend *initiates a request*; it does not approve one. So the
+        list is the initiating tiers, not the approving ones: the employee,
+        their direct manager, a Manager Assistant delegated for them (that tier
+        exists precisely to prepare the requests a manager's reports need), HR,
+        and the administrator, which is already the override tier for time off.
+
+        Initiating and later approving the same request is not a conflict here
+        — a direct manager already both raises requests for their reports and
+        signs Step 1.
+        """
+        if not employee:
+            return False
+        if self.env.su:
+            return True
+        user = self.env.user
+        if user.has_group('KSW_annual_leave.group_annual_leave_hr'):
+            return True
+        # Mirrors KSW_annual_leave's SETTINGS_ADMIN_GROUP — the tier that owns
+        # every other override on a finalised request.
+        if user.has_group('base.group_system'):
+            return True
+        # Identity through sudo(): an employee's own record rule forbids
+        # reading their manager, and this loads on their own form.
+        employee = employee.sudo()
+        if employee.user_id == user or employee.leave_manager_id == user:
+            return True
+        if user.has_group('KSW_base_security.group_manager_assistant'):
+            # Same domain the assistant's own picker uses, so the button and
+            # `_check_assistant_employee_scope` cannot disagree.
+            return bool(self.env['hr.employee'].sudo().search_count(
+                self._get_employee_domain() + [('id', '=', employee.id)]))
+        return False
+
     @api.depends_context('uid')
     @api.depends('employee_id', 'state', 'x_annual_approval_state',
                  'x_return_state', 'holiday_status_id')
     def _compute_can_extend(self):
-        user = self.env.user
         has_type = bool(self._extension_leave_type())
-        is_hr = user.has_group('KSW_annual_leave.group_annual_leave_hr')
         for leave in self:
             if not (has_type and leave.id and leave.employee_id):
                 leave.x_can_extend = False
@@ -443,14 +477,8 @@ class HrLeaveExtension(models.Model):
             if leave._extendable_vacation(leave.employee_id) != leave:
                 leave.x_can_extend = False
                 continue
-            # Identity through sudo(): an employee's own record rule forbids
-            # reading their manager, and this compute loads on their own form.
-            employee = leave.employee_id.sudo()
-            leave.x_can_extend = bool(
-                is_hr
-                or employee.user_id == user
-                or employee.leave_manager_id == user
-            )
+            leave.x_can_extend = leave._may_request_extension_for(
+                leave.employee_id)
 
     def action_extend_vacation(self):
         """Open a new extension request for this vacation.
@@ -479,7 +507,7 @@ class HrLeaveExtension(models.Model):
             raise UserError(_(
                 'This vacation can no longer be extended: the manager has '
                 'already confirmed that the employee came back.'))
-        if not self.x_can_extend:
+        if not self._may_request_extension_for(self.employee_id):
             raise UserError(_(
                 'Only %(employee)s, their direct manager or HR can request an '
                 'extension of this vacation.',

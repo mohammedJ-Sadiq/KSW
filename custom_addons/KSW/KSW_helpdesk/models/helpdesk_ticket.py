@@ -1,4 +1,6 @@
-from odoo import _, api, fields, models
+from markupsafe import Markup
+
+from odoo import SUPERUSER_ID, _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 STATUS_FIELDS = {'stage_id', 'kanban_state', 'user_id'}
@@ -200,6 +202,7 @@ class HelpdeskTicket(models.Model):
             self._check_assignee(vals.get('user_id'))
             self._check_employee_scope(vals.get('employee_id'))
         tickets = super().create(vals_list)
+        tickets._notify_new_ticket()
         tickets._notify_assignment()
         tickets._relink_orphan_attachments()
         return tickets
@@ -218,9 +221,12 @@ class HelpdeskTicket(models.Model):
             self._check_assignee(vals['user_id'])
         if 'employee_id' in vals:
             self._check_employee_scope(vals['employee_id'])
+        was_closed = {ticket.id: ticket.is_closed for ticket in self}
+        previous_assignee = {ticket.id: ticket.user_id.id for ticket in self}
         result = super().write(vals)
         if 'user_id' in vals:
-            self._notify_assignment()
+            self._notify_assignment(previous_assignee)
+        self._sync_close_state(was_closed)
         return result
 
     def _relink_orphan_attachments(self):
@@ -253,10 +259,167 @@ class HelpdeskTicket(models.Model):
                 'Tickets can only be assigned to an IT Helpdesk agent or manager.'
             ))
 
-    def _notify_assignment(self):
+    # ------------------------------------------------------------------
+    # Notifications
+    #
+    # Everything goes through message_post(partner_ids=..., subtype_xmlid=
+    # 'mail.mt_comment'), the house pattern in this codebase (see
+    # KSW_annual_leave._notify_pending_approvers): it lands in the
+    # recipient's Odoo inbox AND is emailed to them according to their own
+    # notification preference, without forcing them to become a follower.
+    # sudo() is used for the chatter write only - authorisation is already
+    # settled by the time we get here, and a plain employee raising a ticket
+    # may not otherwise create a mail.message naming IT Team partners
+    # (CLAUDE.md gotcha #11).
+    # ------------------------------------------------------------------
+    def _helpdesk_agent_partners(self):
+        """Partners of every active IT Team member, minus the acting user."""
+        group = self.env.ref(
+            'KSW_helpdesk.group_helpdesk_agent', raise_if_not_found=False)
+        if not group:
+            return self.env['res.partner']
+        agents = self.env['res.users'].sudo().search([
+            ('all_group_ids', 'in', group.id),
+            ('share', '=', False),
+            ('id', '!=', SUPERUSER_ID),
+        ])
+        return (agents - self.env.user).partner_id
+
+    def _requester_partner(self):
+        """The partner to notify for the employee the ticket was raised for.
+
+        Their user account's partner when they have one, otherwise the HR
+        work contact - an employee with no Odoo login still gets the email.
+        """
+        self.ensure_one()
+        employee = self.employee_id.sudo()
+        return employee.user_id.partner_id or employee.work_contact_id
+
+    def _notify_new_ticket(self):
+        """Tell the whole IT Team a ticket has come in."""
+        agent_partners = self._helpdesk_agent_partners()
         for ticket in self:
-            if ticket.user_id and ticket.user_id.partner_id:
-                ticket.message_subscribe(partner_ids=ticket.user_id.partner_id.ids)
+            requester = ticket._requester_partner()
+            if requester:
+                # so the requester sees every reply on their own ticket
+                ticket.sudo().message_subscribe(partner_ids=requester.ids)
+            recipients = agent_partners - requester - ticket.user_id.partner_id
+            if not recipients:
+                continue
+            ticket.sudo().message_post(
+                body=Markup(
+                    '<strong>&#127915; New %(type)s — %(ref)s</strong><br/>'
+                    '<b>Subject:</b> %(subject)s<br/>'
+                    '<b>Reported by:</b> %(employee)s%(department)s<br/>'
+                    '<b>Category:</b> %(category)s<br/>'
+                    '<b>Priority:</b> %(priority)s<br/>'
+                    'A new ticket is waiting to be picked up by the IT Team.'
+                ) % {
+                    'type': ticket._ticket_type_label(),
+                    'ref': ticket.ticket_ref,
+                    'subject': ticket.name,
+                    'employee': ticket.employee_id.display_name,
+                    'department': (
+                        ' (%s)' % ticket.caller_department_id.display_name
+                        if ticket.caller_department_id else ''
+                    ),
+                    'category': ticket.category_id.display_name,
+                    'priority': dict(
+                        ticket._fields['priority'].selection).get(ticket.priority, ''),
+                },
+                partner_ids=recipients.ids,
+                subtype_xmlid='mail.mt_comment',
+            )
+
+    def _notify_assignment(self, previous_assignee=None):
+        """Subscribe the assignee, and notify them when they are new to it.
+
+        ``previous_assignee`` maps ticket id -> the user_id before the write,
+        so re-saving a ticket without changing its assignee stays silent.
+        """
+        for ticket in self:
+            partner = ticket.user_id.partner_id
+            if not partner:
+                continue
+            ticket.sudo().message_subscribe(partner_ids=partner.ids)
+            if previous_assignee and previous_assignee.get(ticket.id) == ticket.user_id.id:
+                continue
+            if ticket.user_id == self.env.user:
+                continue  # "Assign to me" - no point notifying yourself
+            ticket.sudo().message_post(
+                body=Markup(
+                    '<strong>&#128100; Ticket assigned to you — %(ref)s</strong><br/>'
+                    '<b>Subject:</b> %(subject)s<br/>'
+                    '<b>Reported by:</b> %(employee)s<br/>'
+                    '<b>Priority:</b> %(priority)s'
+                ) % {
+                    'ref': ticket.ticket_ref,
+                    'subject': ticket.name,
+                    'employee': ticket.employee_id.display_name,
+                    'priority': dict(
+                        ticket._fields['priority'].selection).get(ticket.priority, ''),
+                },
+                partner_ids=partner.ids,
+                subtype_xmlid='mail.mt_comment',
+            )
+
+    def _ticket_type_label(self):
+        self.ensure_one()
+        return dict(self._fields['ticket_type'].selection).get(self.ticket_type, '')
+
+    def _sync_close_state(self, was_closed):
+        """Stamp and notify on the close/reopen *transition*, from any route.
+
+        A ticket is closed by the Close button, by dragging its kanban card
+        into the Closed column, or by any RPC write on stage_id. Hooking the
+        transition rather than the one button we were shown is the same rule
+        as CLAUDE.md gotcha #37.
+        """
+        newly_closed = self.filtered(lambda t: t.is_closed and not was_closed.get(t.id))
+        newly_reopened = self.filtered(
+            lambda t: not t.is_closed and was_closed.get(t.id))
+        if newly_closed:
+            unstamped = newly_closed.filtered(lambda t: not t.close_date)
+            if unstamped:
+                # super() so this second write does not re-enter the guard
+                # or re-trigger the transition detection
+                super(HelpdeskTicket, unstamped).write({
+                    'close_date': fields.Datetime.now(),
+                    'closed_by': self.env.user.id,
+                })
+            newly_closed._notify_ticket_closed()
+        if newly_reopened:
+            super(HelpdeskTicket, newly_reopened).write({
+                'close_date': False,
+                'closed_by': False,
+            })
+
+    def _notify_ticket_closed(self):
+        """Tell the person who raised the ticket that it has been resolved."""
+        for ticket in self:
+            body = Markup(
+                '<strong>&#9989; Ticket closed — %(ref)s</strong><br/>'
+                '<b>Subject:</b> %(subject)s<br/>'
+                '<b>Closed by:</b> %(closed_by)s<br/>'
+                'If the issue is not fully resolved, reply here and the IT '
+                'Team will follow up.'
+            ) % {
+                'ref': ticket.ticket_ref,
+                'subject': ticket.name,
+                'closed_by': (ticket.closed_by or self.env.user).display_name,
+            }
+            partner = ticket._requester_partner()
+            if partner:
+                ticket.sudo().message_post(
+                    body=body,
+                    partner_ids=partner.ids,
+                    subtype_xmlid='mail.mt_comment',
+                )
+            else:
+                # No partner to notify at all: log it on the thread and fall
+                # back to the plain email template addressed to work_email.
+                ticket.sudo().message_post(body=body, subtype_xmlid='mail.mt_note')
+                ticket._send_close_email()
 
     # ------------------------------------------------------------------
     # Actions
@@ -270,37 +433,41 @@ class HelpdeskTicket(models.Model):
         self.write({'user_id': self.env.user.id})
 
     def action_close(self):
+        """Move to the closing stage. The stamping and the notification to
+        the requester are done by _sync_close_state() in write(), so dragging
+        the card into the Closed column behaves exactly the same."""
         self._check_agent()
         closed_stage = self.env['helpdesk.ticket.stage'].search(
             [('is_closed', '=', True)], order='sequence', limit=1,
         )
-        for ticket in self:
-            ticket.write({
-                'stage_id': closed_stage.id if closed_stage else ticket.stage_id.id,
-                'close_date': fields.Datetime.now(),
-                'closed_by': self.env.user.id,
-                'kanban_state': 'done',
-            })
-        self._send_close_notification()
+        if not closed_stage:
+            raise UserError(_(
+                'No closing stage is configured. Tick "Is Closed" on the '
+                'stage that ends a ticket first.'
+            ))
+        self.write({'stage_id': closed_stage.id, 'kanban_state': 'done'})
 
-    def _send_close_notification(self):
+    def _send_close_email(self):
+        """Fallback for a requester with no partner: the plain email template.
+
+        Reachable in practice - hr.employee.create() always builds a work
+        contact, but hr.employee._remove_work_contact_id() clears it again
+        when that user account is moved to another employee record.
+        """
         template = self.env.ref(
             'KSW_helpdesk.mail_template_ticket_closed', raise_if_not_found=False)
         if not template:
             return
+        force_send = self.env.context.get('mail_notify_force_send', True)
         for ticket in self:
             if ticket.caller_email:
-                template.sudo().send_mail(ticket.id, force_send=True)
+                template.sudo().send_mail(ticket.id, force_send=force_send)
 
     def action_reopen(self):
         self._check_agent()
         open_stage = self.env['helpdesk.ticket.stage'].search(
             [('is_closed', '=', False)], order='sequence', limit=1,
         )
-        for ticket in self:
-            ticket.write({
-                'stage_id': open_stage.id if open_stage else ticket.stage_id.id,
-                'close_date': False,
-                'closed_by': False,
-                'kanban_state': 'normal',
-            })
+        if not open_stage:
+            raise UserError(_('No open stage is configured.'))
+        self.write({'stage_id': open_stage.id, 'kanban_state': 'normal'})

@@ -56,7 +56,7 @@ class KswWorkshopRequest(models.Model):
     _REPORT_FIELDS = {
         'entry_datetime', 'exit_datetime', 'odometer_reading', 'tire_pressure',
         'tire_bolts', 'work_statement', 'repairs_parts', 'technician_id',
-        'parts_cost', 'labor_cost',
+        'parts_cost', 'labor_cost', 'part_line_ids',
     }
     _REQUESTER_FIELDS = {
         'client_id', 'vehicle_type', 'vehicle_id', 'driver_id', 'description', 'request_type',
@@ -108,9 +108,18 @@ class KswWorkshopRequest(models.Model):
     # already use. Without this domain the picker offered every contact in
     # the database, employees included. KSW's own fleet stays a valid client:
     # KSW_fleet stamps customer_rank=1 on env.company.partner_id.
+    #
+    # The customer role alone stopped being enough once the BAS sync landed:
+    # 819 partners carry it and one of them owns a vehicle. So the picker is
+    # narrowed a second time, to the clients the workshop manager registered
+    # under Configuration -> Clients (ksw.workshop.client — a role assignment,
+    # not a flag on the party). ksw.fleet.vehicle.client_id carries the exact
+    # same domain, applied from this module; a test asserts they stay equal,
+    # because a client pickable here whose vehicles are not pickable there
+    # would be a dead end on this very form.
     client_id = fields.Many2one(
         'res.partner', string='Client', tracking=True,
-        domain="[('customer_rank', '>', 0)]",
+        domain="[('customer_rank', '>', 0), ('x_workshop_client_ids.active', '=', True)]",
         default=lambda self: self.env.company.partner_id,
     )
     vehicle_type = fields.Selection([
@@ -182,13 +191,26 @@ class KswWorkshopRequest(models.Model):
         string='Technician (report)', compute='_compute_technician_label', store=True,
         help="Single grouping axis for technician reporting: the linked employee for "
              "new requests, the legacy name for imported history.")
-    parts_cost = fields.Float(string='Spare Parts Cost')
+    # --- Spare parts issued (pass-through inventory) ---
+    part_line_ids = fields.One2many(
+        'ksw.workshop.part.line', 'request_id', string='Spare Parts Used')
+    part_lines_cost = fields.Float(
+        string='Spare Parts (Listed)', compute='_compute_part_lines_cost', store=True,
+        help="Sum of the spare parts listed on this repair.")
+    # Deliberately keeps its column and all 17,079 imported values — only its
+    # label narrowed. Splitting the total this way (rather than turning
+    # parts_cost itself into the computed total) is what makes this change
+    # migration-free.
+    parts_cost = fields.Float(
+        string='Other Parts Cost',
+        help="Free-typed figure for uncatalogued or one-off items that were not "
+             "listed above. This is where the legacy history's parts costs live.")
     labor_cost = fields.Float(string='Labor Cost')
     total_cost = fields.Float(
         string='Total Cost', compute='_compute_total_cost', store=True,
-        help="Spare parts plus labor. Note the legacy history barely carries costs "
-             "(878 rows have a parts cost, 4 have a labor cost), so this is only "
-             "meaningful for requests recorded in Odoo.")
+        help="Listed spare parts, plus other parts, plus labor. Note the legacy "
+             "history barely carries costs (878 rows have a parts cost, 4 have a "
+             "labor cost), so this is only meaningful for requests recorded in Odoo.")
 
     # --- History import bookkeeping ---
     x_legacy_uid = fields.Char(string='Legacy UID', readonly=True, copy=False)
@@ -202,6 +224,18 @@ class KswWorkshopRequest(models.Model):
         help="The email address the legacy form was submitted from, kept for "
              "reference regardless of whether it matched an Odoo user.")
 
+    # --- "This year" history panel (see _compute_history) ---
+    x_vehicle_history_ids = fields.Many2many(
+        'ksw.workshop.request', string='Same Vehicle (This Year)', compute='_compute_history')
+    x_driver_history_ids = fields.Many2many(
+        'ksw.workshop.request', string='Same Driver (This Year)', compute='_compute_history')
+    x_vehicle_history_count = fields.Integer(
+        string='Visits This Year', compute='_compute_history')
+    x_driver_history_count = fields.Integer(
+        string='Driver Jobs This Year', compute='_compute_history')
+    x_vehicle_history_cost = fields.Float(
+        string='Spent on This Vehicle', compute='_compute_history')
+
     @api.depends('technician_id', 'technician_id.name', 'x_legacy_technician_name')
     def _compute_technician_label(self):
         for request in self:
@@ -209,10 +243,19 @@ class KswWorkshopRequest(models.Model):
                 request.technician_id.name or request.x_legacy_technician_name or False
             )
 
-    @api.depends('parts_cost', 'labor_cost')
+    @api.depends('part_line_ids.subtotal')
+    def _compute_part_lines_cost(self):
+        for request in self:
+            request.part_lines_cost = sum(request.part_line_ids.mapped('subtotal'))
+
+    @api.depends('parts_cost', 'part_lines_cost', 'labor_cost')
     def _compute_total_cost(self):
         for request in self:
-            request.total_cost = (request.parts_cost or 0.0) + (request.labor_cost or 0.0)
+            request.total_cost = (
+                (request.parts_cost or 0.0)
+                + (request.part_lines_cost or 0.0)
+                + (request.labor_cost or 0.0)
+            )
 
     @api.depends('completion_date', 'create_date')
     def _compute_duration_days(self):
@@ -221,6 +264,71 @@ class KswWorkshopRequest(models.Model):
                 request.duration_days = (request.completion_date - request.create_date).days
             else:
                 request.duration_days = 0
+
+    # How many past jobs the panel will show inline. The busiest vehicles in
+    # the imported history run to a few hundred visits a year, and the point of
+    # the panel is insight while triaging, not an archive — the "Workshop
+    # Visits" stat button on the vehicle form is the uncapped route.
+    _HISTORY_LIMIT = 100
+
+    @api.depends('vehicle_id', 'driver_id', 'client_id', 'create_date')
+    def _compute_history(self):
+        """Past jobs on this vehicle, and for this driver under this client, this year.
+
+        The workshop's equivalent of the Time Off form's "<employee>'s summary
+        (2026)" panel. Computed with sudo() so the figures are complete: it is
+        shown only to technicians and managers (the page carries the groups=),
+        and a partial history that looks complete is worse than none.
+
+        Not @api.depends_context('uid') on purpose — the result is the same for
+        every user precisely because it is sudo'd, so sharing the cache entry
+        across users is correct here.
+        """
+        today = fields.Date.context_today(self)
+        Request = self.sudo()
+        for request in self:
+            # A brand-new form has a NewId, which no domain can express. This
+            # guard is the only reason the panel does not crash on the one
+            # screen it exists for.
+            this_id = request.id if isinstance(request.id, int) else 0
+            reference = request.create_date.date() if request.create_date else today
+            year_start = reference.replace(month=1, day=1)
+            year_end = reference.replace(month=12, day=31)
+            common = [
+                ('id', '!=', this_id),
+                ('state', '!=', 'rejected'),
+                ('create_date', '>=', fields.Datetime.to_datetime(year_start)),
+                ('create_date', '<=', fields.Datetime.to_datetime(year_end).replace(
+                    hour=23, minute=59, second=59)),
+            ]
+
+            vehicle_history = Request.browse()
+            if request.vehicle_id:
+                # A vehicle belongs to exactly one client, so "under this
+                # client" is already implied here.
+                vehicle_history = Request.search(
+                    common + [('vehicle_id', '=', request.vehicle_id.id)],
+                    order='create_date desc', limit=self._HISTORY_LIMIT,
+                )
+
+            driver_history = Request.browse()
+            if request.driver_id and request.client_id:
+                # The driver half does need the client stated: a driver can
+                # move between clients, and mixing them would misread as one
+                # relationship's history.
+                driver_history = Request.search(
+                    common + [
+                        ('driver_id', '=', request.driver_id.id),
+                        ('client_id', '=', request.client_id.id),
+                    ],
+                    order='create_date desc', limit=self._HISTORY_LIMIT,
+                )
+
+            request.x_vehicle_history_ids = vehicle_history
+            request.x_driver_history_ids = driver_history
+            request.x_vehicle_history_count = len(vehicle_history)
+            request.x_driver_history_count = len(driver_history)
+            request.x_vehicle_history_cost = sum(vehicle_history.mapped('total_cost'))
 
     @api.depends_context('uid')
     def _compute_x_can_toggle_cash_customer(self):

@@ -17,6 +17,8 @@ import base64
 from datetime import date, timedelta
 from unittest.mock import patch
 
+from lxml import etree
+
 from odoo.addons.KSW_payroll.models.hr_leave import HrLeave as PayrollHrLeave
 from odoo.exceptions import UserError, ValidationError
 from odoo.tests.common import TransactionCase
@@ -324,6 +326,19 @@ class TestLeaveExtension(TransactionCase):
         self.assertFalse(current.with_user(self.user_acc).x_can_extend)
         self.assertTrue(current.with_user(self.user_dm).x_can_extend)
 
+    def test_the_administrator_can_extend(self):
+        """The tier that owns every other override on a finalised request."""
+        admin = self.env['res.users'].create({
+            'name': 'Ext Admin', 'login': 'ext_admin',
+            'email': 'ext_admin@ext.test',
+            'group_ids': [(6, 0, [
+                self.env.ref('base.group_user').id,
+                self.env.ref('base.group_system').id,
+            ])],
+        })
+        current = self._finalise(self._make_vacation(offset=54))
+        self.assertTrue(current.with_user(admin).x_can_extend)
+
     def test_can_extend_is_false_while_still_being_approved(self):
         leave = self._make_vacation(offset=46)
         self._advance_to(leave, 'pending_acc')
@@ -379,6 +394,58 @@ class TestLeaveExtension(TransactionCase):
         self.assertEqual(form.x_extended_leave_id, parent)
         self.assertEqual(form.request_date_from,
                          parent.request_date_to + timedelta(days=1))
+
+    # ==================================================================
+    # The form: one HR tab, and Accounting's own comment box
+    # ==================================================================
+
+    def _form_arch(self):
+        return etree.fromstring(
+            self.env['hr.leave'].get_view(view_type='form')['arch'].encode())
+
+    def test_the_hr_review_page_carries_the_fees_not_the_penalty(self):
+        """One HR tab per request: the fees sit inside HR Review and annual's
+        Penalty panel is hidden for an extension."""
+        arch = self._form_arch()
+        fees = arch.xpath(
+            "//page[@name='hr_review']//group[@name='extension_fees']")
+        self.assertTrue(fees, 'the fee group is not inside the HR Review page')
+        self.assertEqual(fees[0].get('invisible'), 'not x_is_leave_extension')
+        penalty = arch.xpath("//field[@name='x_penalty_amount']/..")
+        self.assertEqual(penalty[0].get('invisible'), 'x_is_leave_extension')
+
+    def test_this_module_does_not_clobber_the_eos_page_rule(self):
+        """KSW_eos_leave owns hr_review's invisible= and is applied after this
+        view, so setting the same attribute here silently drops its clause —
+        which is exactly what happened before the fees moved inside the page.
+        """
+        if 'x_is_eos_leave' not in self.env['hr.leave']._fields:
+            self.skipTest('KSW_eos_leave is not installed')
+        page = self._form_arch().xpath("//page[@name='hr_review']")[0]
+        self.assertIn('x_is_eos_leave', page.get('invisible') or '')
+
+    def test_accounting_gets_a_comment_and_somewhere_to_attach(self):
+        group = self._form_arch().xpath(
+            "//group[@name='extension_accounting']")[0]
+        self.assertTrue(group.xpath(".//field[@name='x_ext_acc_note']"))
+        self.assertTrue(group.xpath(".//field[@name='x_attachment_ids']"))
+
+    def test_accounting_can_attach_at_its_own_step(self):
+        parent = self._finalise(self._make_vacation(offset=55))
+        ext = self._make_extension(parent)
+        self._advance_to(ext, 'pending_acc')
+        att = self.env['ir.attachment'].sudo().create({
+            'name': 'acc_evidence.pdf',
+            'datas': base64.b64encode(b'stub'),
+            'res_model': 'hr.leave', 'res_id': ext.id,
+        })
+        ext.with_user(self.user_acc).write({
+            'x_attachment_ids': [(4, att.id)],
+            'x_ext_acc_note': 'Fees verified against the ledger.',
+        })
+        self.assertIn(att, ext.x_attachment_ids)
+        self.assertEqual(ext.x_ext_acc_note,
+                         'Fees verified against the ledger.')
 
     # ==================================================================
     # The fees

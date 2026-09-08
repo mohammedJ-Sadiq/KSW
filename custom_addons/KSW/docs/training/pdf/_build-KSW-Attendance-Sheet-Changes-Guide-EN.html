@@ -1,0 +1,170 @@
+<!doctype html><html lang="en" dir="ltr"><head>
+<meta charset="utf-8"><title>What Changed on the Attendance Sheet</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "DejaVu Sans",Arial,sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: left; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-left: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">What Changed on the Attendance Sheet</div>
+  <div class="meta">User Training Guide<br/>KSW HR &amp; Payroll · 2026-09-08</div>
+</div>
+<section id="g-whatsnew-attendance-sheet-changes"><h1>What Changed on the Attendance Sheet</h1>
+<p><strong>Who is this for:</strong> Supervisors / Direct Managers
+<strong>In effect since:</strong> 1 September 2026
+<strong>Reading time:</strong> 3 minutes</p>
+<h2>The one sentence that matters</h2>
+<p>The month <strong>no longer goes to payroll by itself</strong>. You must press
+<strong>✓ Confirm &amp; Send to Payroll</strong> before the month ends — and a month nobody
+confirms is paid as <strong>zero attendance</strong>.</p>
+<h2>What is different</h2>
+<table>
+<thead>
+<tr>
+<th>Before</th>
+<th>Now</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>The sheet closed and was sent to payroll automatically at month end</td>
+<td>Nothing reaches payroll until <strong>you</strong> press <strong>✓ Confirm &amp; Send to Payroll</strong></td>
+</tr>
+<tr>
+<td>A month nobody opened was still paid as attended</td>
+<td>An unconfirmed month is read as <strong>zero attendance</strong> — the employee is paid for no working days</td>
+</tr>
+<tr>
+<td>A sheet could be confirmed even when it contradicted an approved leave</td>
+<td>Confirmation is <strong>refused</strong> while a day is marked Attended inside an approved time off, or while a vacation return is still unconfirmed</td>
+</tr>
+<tr>
+<td>A leave approved after you finished changed nothing on the sheet</td>
+<td>A later leave <strong>withdraws your confirmation</strong>: the sheet returns to Draft and you are asked to confirm it again</td>
+</tr>
+<tr>
+<td>The list showed sheets beyond your own team</td>
+<td>You see <strong>only the employees you manage</strong>. Sheets needing action sort to the top in <strong>red</strong></td>
+</tr>
+<tr>
+<td>Friday / Saturday rest days were part of what you marked</td>
+<td>Rest days are now <strong>calculated by the system</strong> and cannot be toggled by hand</td>
+</tr>
+</tbody></table>
+<p>New on the screen: the <strong>⚡ Apply Approved Time Off</strong> button, the
+<strong>⚠ Needs Attention</strong> and <strong>Waiting On Me</strong> filters, a <strong>Waiting On</strong> column,
+and a reminder message on the <strong>last day of the month</strong>.</p>
+<h2>What you have to do every month</h2>
+<ol>
+<li>Open <strong>Attendance → Attendance Sheets</strong>. The list opens on this year&#39;s
+sheets that have not been sent yet.</li>
+<li>Mark the days: <strong>✓ All Present</strong> or <strong>✗ All Absent</strong>, then correct the
+exceptions. Rest days and leave-covered days fill themselves.</li>
+<li>If the red banner appears on a sheet, clear it — see the next section.</li>
+<li>Press <strong>✓ Confirm &amp; Send to Payroll</strong>.<ul>
+<li>To do the whole team at once: press the same button in the list header.
+With no rows ticked it confirms <strong>all of your unconfirmed sheets for this
+month</strong>; tick rows first to confirm only those.</li>
+</ul>
+</li>
+<li>The <strong>Payroll</strong> column turns green and reads <strong>Sent to Payroll</strong>. Done.</li>
+</ol>
+<blockquote>
+<p><strong>The deadline is the end of the month.</strong> A supervisor can only act on the
+current month. Once the month closes, only HR / the Attendance Sheet Manager
+can confirm it for you — and until they do, that employee is paid zero days.</p>
+</blockquote>
+<h2>The red banner — &quot;This month cannot be sent to payroll yet&quot;</h2>
+<p>The banner names the reason and, under <strong>Waiting on</strong>, the person who has to
+act. There are two reasons:</p>
+<table>
+<thead>
+<tr>
+<th>What it says</th>
+<th>What to do</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><em>N day(s) are marked Attended while &lt;leave type&gt; is approved</em></td>
+<td>Press <strong>⚡ Apply Approved Time Off</strong>. It marks exactly the days covered by the approved request as absent, to match the request. It changes nothing else.</td>
+</tr>
+<tr>
+<td><em>ON VACATION — &lt;employee&gt; has not been marked as returned</em></td>
+<td>You cannot clear this from the sheet. The named Time Off manager must open the request and press <strong>Confirm Return</strong>. Until then payroll cannot process this employee at all.</td>
+</tr>
+</tbody></table>
+<h2>If a sheet you already sent comes back</h2>
+<p>When a time-off request is approved for a day you had already confirmed, the
+system withdraws the confirmation: the sheet goes back to <strong>Draft</strong>, its
+history shows <strong>↩ Confirmation Withdrawn</strong> with the reason, and you get a
+message. Open it, check the days, and press <strong>✓ Confirm &amp; Send to Payroll</strong>
+again. Until you do, that month is read as zero attendance.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>No <strong>Confirm &amp; Send to Payroll</strong> button on the sheet</td>
+<td>You are not the employee&#39;s direct manager, the month has closed, or the sheet is already confirmed</td>
+<td>Check the <strong>Manager</strong> field on the sheet; for a closed month ask HR</td>
+</tr>
+<tr>
+<td>The header button says you have nothing to confirm</td>
+<td>Everything of yours is already sent, or no employee has you as their <strong>Manager</strong></td>
+<td>The message tells you which of the two it is</td>
+</tr>
+<tr>
+<td>A day will not toggle</td>
+<td>It is a Friday/Saturday rest day (calculated), or it is covered by an approved leave</td>
+<td>Expected — leave it alone</td>
+</tr>
+<tr>
+<td>The sheet went back to Draft on its own</td>
+<td>A leave was approved for a day you had confirmed</td>
+<td>Re-confirm it</td>
+</tr>
+<tr>
+<td>&quot;N Sent to Payroll — M Refused&quot; after a bulk confirm</td>
+<td>The refused sheets still contradict approved time off</td>
+<td>The confirmed ones are kept; fix the listed ones and confirm them</td>
+</tr>
+<tr>
+<td>The employee was paid zero days</td>
+<td>The month was never confirmed</td>
+<td>HR / the Attendance Sheet Manager can still confirm a closed month</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><span class="xref">Attendance sheets — full guide</span></li>
+<li><span class="xref">Confirming a return from leave</span></li>
+</ul>
+</section>
+</body></html>

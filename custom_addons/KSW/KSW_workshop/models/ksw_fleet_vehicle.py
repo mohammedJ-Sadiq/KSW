@@ -10,6 +10,16 @@ class KswFleetVehicle(models.Model):
     """
     _inherit = 'ksw.fleet.vehicle'
 
+    # Narrowed to registered workshop clients, from this side of the
+    # dependency: ksw.workshop.client is this module's model, so KSW_fleet
+    # cannot express the domain itself. It must stay byte-identical to
+    # ksw.workshop.request.client_id's — vehicle_id's domain joins on
+    # client_id, so a client offered on one form and not the other would be a
+    # picker that leads nowhere. A test asserts the equality.
+    client_id = fields.Many2one(
+        domain="[('customer_rank', '>', 0), ('x_workshop_client_ids.active', '=', True)]",
+    )
+
     workshop_request_count = fields.Integer(
         string='Workshop Visits', compute='_compute_workshop_request_count',
     )

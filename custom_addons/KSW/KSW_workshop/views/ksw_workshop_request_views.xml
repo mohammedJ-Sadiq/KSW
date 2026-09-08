@@ -47,12 +47,16 @@
                                    readonly="not x_can_toggle_cash_customer or state != 'new'"/>
                             <!-- Static context dict on the view tag, never a
                                  dynamic one on the field definition (see the
-                                 note above vehicle_id in the model). It orders
-                                 the picker by customer rank and stamps
-                                 customer_rank=1 on anything quick-created
-                                 from it. -->
+                                 note above vehicle_id in the model).
+                                 no_create: a contact created from here would
+                                 carry the customer role but no workshop
+                                 registration, so it would be saved on this
+                                 request and then vanish from every picker.
+                                 Clients are added in one place —
+                                 Configuration -> Clients. -->
                             <field name="client_id"
                                    context="{'res_partner_search_mode': 'customer'}"
+                                   options="{'no_create': True}"
                                    invisible="is_cash_customer"
                                    required="not is_cash_customer"
                                    readonly="state != 'new'"/>
@@ -114,15 +118,81 @@
                                 <group>
                                     <field name="tire_pressure" readonly="state != 'in_progress'"/>
                                     <field name="tire_bolts" readonly="state != 'in_progress'"/>
+                                    <field name="part_lines_cost" readonly="1"/>
                                     <field name="parts_cost" readonly="state != 'in_progress'"/>
                                     <field name="labor_cost" readonly="state != 'in_progress'"/>
                                     <field name="total_cost" readonly="1"/>
                                 </group>
                             </group>
+                            <!-- Pass-through parts: listing an item here IS
+                                 issuing it. No stock balance is kept, by
+                                 design. -->
+                            <group string="Spare Parts Used">
+                                <field name="part_line_ids" nolabel="1" colspan="2"
+                                       readonly="state != 'in_progress'">
+                                    <list editable="bottom">
+                                        <field name="part_id"/>
+                                        <field name="description"/>
+                                        <field name="quantity"/>
+                                        <field name="unit_cost"/>
+                                        <field name="subtotal" sum="Total"/>
+                                        <field name="issue_date" optional="hide"/>
+                                    </list>
+                                </field>
+                            </group>
                             <group string="Work">
                                 <field name="work_statement" readonly="state != 'in_progress'"/>
                                 <field name="repairs_parts" readonly="state != 'in_progress'"/>
                             </group>
+                        </page>
+                        <!-- The workshop's equivalent of the Time Off form's
+                             "<employee>'s summary (2026)" panel. Technician and
+                             manager only: a plain requester's record rule is
+                             own-records-only, so the same panel would show them
+                             a partial history that looks complete. The compute
+                             is sudo'd, which is why none of these fields needs
+                             a model-level groups= (that would strip them from
+                             fields_get and break the invisible= below). -->
+                        <page string="History (This Year)"
+                              groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_manager">
+                            <group>
+                                <group string="This Vehicle">
+                                    <field name="x_vehicle_history_count" readonly="1"/>
+                                    <field name="x_vehicle_history_cost" readonly="1"/>
+                                </group>
+                                <group string="This Driver">
+                                    <field name="x_driver_history_count" readonly="1"/>
+                                </group>
+                            </group>
+                            <separator string="Past jobs on this vehicle"/>
+                            <div class="text-muted"
+                                 invisible="vehicle_id or is_cash_customer">
+                                Pick a vehicle to see what it already had done this year.
+                            </div>
+                            <field name="x_vehicle_history_ids" nolabel="1" readonly="1"
+                                   invisible="not x_vehicle_history_ids">
+                                <list>
+                                    <field name="create_date" string="Date"/>
+                                    <field name="name"/>
+                                    <field name="request_type"/>
+                                    <field name="description"/>
+                                    <field name="technician_label"/>
+                                    <field name="total_cost" sum="Total"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                            <separator string="Past jobs for this driver, under this client"/>
+                            <field name="x_driver_history_ids" nolabel="1" readonly="1"
+                                   invisible="not x_driver_history_ids">
+                                <list>
+                                    <field name="create_date" string="Date"/>
+                                    <field name="name"/>
+                                    <field name="vehicle_id"/>
+                                    <field name="request_type"/>
+                                    <field name="description"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
                         </page>
                         <page string="Internal" groups="KSW_workshop.group_workshop_manager">
                             <group>

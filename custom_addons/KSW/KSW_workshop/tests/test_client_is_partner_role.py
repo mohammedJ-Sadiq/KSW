@@ -25,6 +25,10 @@ class TestWorkshopClientIsPartnerRole(TransactionCase):
         cls.client_partner = cls.Partner.create({
             'name': 'WS Role Test Client', 'customer_rank': 1,
         })
+        # The customer role is now necessary but no longer sufficient — the
+        # picker also requires a workshop registration. See
+        # test_workshop_client_registry.py for that half of the rule.
+        cls.env['ksw.workshop.client'].create({'partner_id': cls.client_partner.id})
         cls.employee_partner = cls.Partner.create({
             'name': 'WS Role Test Employee Contact',
         })

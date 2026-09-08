@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ================================================================ -->
+    <!-- Spare part items (the catalog)                                    -->
+    <!-- ================================================================ -->
+    <record id="view_ksw_workshop_part_list" model="ir.ui.view">
+        <field name="name">ksw.workshop.part.list</field>
+        <field name="model">ksw.workshop.part</field>
+        <field name="arch" type="xml">
+            <list string="Spare Part Items" editable="bottom">
+                <field name="name"/>
+                <field name="description"/>
+                <field name="supplier_id" optional="show"
+                       context="{'res_partner_search_mode': 'supplier'}"/>
+                <field name="invoice_ref" optional="show"/>
+                <field name="standard_cost"/>
+                <field name="issued_qty" readonly="1" optional="show"/>
+                <field name="issued_value" readonly="1" optional="show"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_workshop_part_form" model="ir.ui.view">
+        <field name="name">ksw.workshop.part.form</field>
+        <field name="model">ksw.workshop.part</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name" string="Item No."/>
+                        <h1><field name="name" placeholder="e.g. 90915-YZZD4"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="description"/>
+                            <field name="standard_cost"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group string="Where it came from">
+                            <field name="supplier_id"
+                                   context="{'res_partner_search_mode': 'supplier'}"/>
+                            <field name="invoice_ref"/>
+                        </group>
+                    </group>
+                    <group string="Issued to date">
+                        <field name="issued_qty" readonly="1"/>
+                        <field name="issued_value" readonly="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Issues">
+                            <field name="line_ids" readonly="1">
+                                <list>
+                                    <field name="issue_date"/>
+                                    <field name="request_id"/>
+                                    <field name="vehicle_id"/>
+                                    <field name="quantity"/>
+                                    <field name="unit_cost"/>
+                                    <field name="subtotal" sum="Total"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_workshop_part_search" model="ir.ui.view">
+        <field name="name">ksw.workshop.part.search</field>
+        <field name="model">ksw.workshop.part</field>
+        <field name="arch" type="xml">
+            <search string="Spare Part Items">
+                <field name="name"/>
+                <field name="description"/>
+                <field name="supplier_id"/>
+                <field name="invoice_ref"/>
+                <filter string="Archived" name="filter_inactive" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter string="Supplier" name="groupby_supplier"
+                            context="{'group_by': 'supplier_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_workshop_part" model="ir.actions.act_window">
+        <field name="name">Items</field>
+        <field name="res_model">ksw.workshop.part</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ksw_workshop_part_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add a spare part item
+            </p><p>
+                An item is identified by its number on the purchase invoice.
+                Nothing here holds a stock balance: parts are issued as they
+                are listed on a repair, and this screen shows what went out.
+            </p>
+        </field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Issued parts (the pass-through ledger)                            -->
+    <!-- ================================================================ -->
+    <record id="view_ksw_workshop_part_line_list" model="ir.ui.view">
+        <field name="name">ksw.workshop.part.line.list</field>
+        <field name="model">ksw.workshop.part.line</field>
+        <field name="arch" type="xml">
+            <list string="Issued Parts" create="0">
+                <field name="issue_date"/>
+                <field name="part_id"/>
+                <field name="description"/>
+                <field name="request_id"/>
+                <field name="vehicle_id"/>
+                <field name="client_id" optional="show"/>
+                <field name="technician_id" optional="show"/>
+                <field name="quantity" sum="Qty"/>
+                <field name="unit_cost"/>
+                <field name="subtotal" sum="Total"/>
+                <field name="state" widget="badge" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_workshop_part_line_search" model="ir.ui.view">
+        <field name="name">ksw.workshop.part.line.search</field>
+        <field name="model">ksw.workshop.part.line</field>
+        <field name="arch" type="xml">
+            <search string="Issued Parts">
+                <field name="part_id"/>
+                <field name="request_id"/>
+                <field name="vehicle_id"/>
+                <field name="client_id"/>
+                <field name="technician_id"/>
+                <filter string="This Month" name="filter_this_month"
+                        domain="[('issue_date', '&gt;=', context_today().strftime('%Y-%m-01'))]"/>
+                <filter string="This Year" name="filter_this_year"
+                        domain="[('issue_date', '&gt;=', context_today().strftime('%Y-01-01'))]"/>
+                <group>
+                    <filter string="Item" name="groupby_part" context="{'group_by': 'part_id'}"/>
+                    <filter string="Vehicle" name="groupby_vehicle" context="{'group_by': 'vehicle_id'}"/>
+                    <filter string="Client" name="groupby_client" context="{'group_by': 'client_id'}"/>
+                    <filter string="Technician" name="groupby_technician" context="{'group_by': 'technician_id'}"/>
+                    <separator/>
+                    <filter string="Month" name="groupby_month" domain="[]"
+                            context="{'group_by': 'issue_date:month'}"/>
+                    <filter string="Year" name="groupby_year" domain="[]"
+                            context="{'group_by': 'issue_date:year'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_ksw_workshop_part_line_pivot" model="ir.ui.view">
+        <field name="name">ksw.workshop.part.line.pivot</field>
+        <field name="model">ksw.workshop.part.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Issued Parts" sample="1">
+                <field name="part_id" type="row"/>
+                <field name="issue_date" interval="month" type="col"/>
+                <field name="quantity" type="measure"/>
+                <field name="subtotal" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_ksw_workshop_part_line_graph" model="ir.ui.view">
+        <field name="name">ksw.workshop.part.line.graph</field>
+        <field name="model">ksw.workshop.part.line</field>
+        <field name="arch" type="xml">
+            <graph string="Issued Parts" type="bar" sample="1">
+                <field name="issue_date" interval="month"/>
+                <field name="subtotal" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_ksw_workshop_part_line" model="ir.actions.act_window">
+        <field name="name">Issued Parts</field>
+        <field name="res_model">ksw.workshop.part.line</field>
+        <field name="view_mode">list,pivot,graph</field>
+        <field name="search_view_id" ref="view_ksw_workshop_part_line_search"/>
+        <field name="context">{}</field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Menus                                                             -->
+    <!-- ================================================================ -->
+    <!-- The parent's groups must stay a SUPERSET of every child's, or the
+         child renders with no visible parent to sit under. -->
+    <menuitem id="menu_ksw_workshop_inventory" name="Inventory"
+              parent="menu_ksw_workshop_root" sequence="40"
+              groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_manager"/>
+    <menuitem id="menu_ksw_workshop_parts" name="Items"
+              parent="menu_ksw_workshop_inventory" action="action_ksw_workshop_part"
+              sequence="10"
+              groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_manager"/>
+    <!-- Manager-only for the same reason the Reporting menu is: the
+         technician record rule would make this pivot a silently partial
+         aggregate that looks complete. -->
+    <menuitem id="menu_ksw_workshop_parts_issued" name="Issued Parts"
+              parent="menu_ksw_workshop_inventory" action="action_ksw_workshop_part_line"
+              sequence="20"
+              groups="KSW_workshop.group_workshop_manager"/>
+
+</odoo>

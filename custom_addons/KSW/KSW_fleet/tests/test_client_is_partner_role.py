@@ -31,6 +31,14 @@ class TestClientIsPartnerRole(TransactionCase):
         cls.client_partner = cls.Partner.create({
             'name': 'Role Test Client', 'customer_rank': 1,
         })
+        # KSW_workshop, when installed, narrows this same picker a second time
+        # to the clients registered with the workshop. Satisfy that extra
+        # clause when the model is there, so these tests keep asserting THIS
+        # module's rule — the customer role — rather than accidentally
+        # asserting the other module's. KSW_fleet still knows nothing about
+        # ksw.workshop.client: the dependency runs the other way.
+        if 'ksw.workshop.client' in cls.env:
+            cls.env['ksw.workshop.client'].create({'partner_id': cls.client_partner.id})
         cls.plain_partner = cls.Partner.create({'name': 'Role Test Plain'})
         cls.employee_partner = cls.Partner.create({
             'name': 'Role Test Employee Contact',

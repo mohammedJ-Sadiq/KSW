@@ -103,24 +103,33 @@ msgid "Accounting Note"
 msgstr "ملاحظات المحاسبة"
 
 #. module: KSW_leave_extension
-#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
-msgid "Accounting remarks... Supporting documents go on the Attachments tab."
-msgstr "ملاحظات المحاسبة... ترفق المستندات المؤيدة في تبويب المرفقات."
-
-#. module: KSW_leave_extension
 #: model:ir.model.fields.selection,name:KSW_leave_extension.selection__hr_leave__x_return_state__extended
 msgid "Continued by Extension"
 msgstr "مستمرة بتمديد"
 
 #. module: KSW_leave_extension
 #: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
-msgid "🧾 Extension Fees"
-msgstr "🧾 رسوم التمديد"
+msgid "Extension Fees — Due from the Employee"
+msgstr "رسوم التمديد — المستحقة على الموظف"
 
 #. module: KSW_leave_extension
 #: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
-msgid "Fees Due from the Employee"
-msgstr "الرسوم المستحقة على الموظف"
+msgid "Accounting Comment"
+msgstr "ملاحظة المحاسبة"
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "Accounting Documents"
+msgstr "مستندات المحاسبة"
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid ""
+"Comment on the extension fees, the settlement, or anything the GM should "
+"read before final approval..."
+msgstr ""
+"ملاحظة على رسوم التمديد أو التسوية أو أي أمر ينبغي أن يطلع عليه المدير العام "
+"قبل الاعتماد النهائي..."
 
 #. module: KSW_leave_extension
 #: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension

@@ -12,7 +12,8 @@ feeds payroll (uncovered absences cause deductions).
 ## Before you start
 
 - This is only for **non-biometric** employees who report to you.
-- You edit a sheet during its month; once the month closes it becomes read-only.
+- You edit **and confirm** a sheet during its month; once the month closes it
+  becomes read-only and only HR can act on it.
 - Days already covered by an **approved leave** are **locked** — you can't (and
   shouldn't) change them.
 
@@ -34,14 +35,20 @@ feeds payroll (uncovered absences cause deductions).
    ![Marking daily attendance](../../screenshots/supervisor/attsheet-02.png)
 
 5. Days with a linked **approved leave** are already filled and locked — leave
-   them as they are.
+   them as they are. Friday/Saturday rest days are calculated by the system and
+   cannot be toggled.
+
+6. **Press ✓ Confirm & Send to Payroll** before the month ends. Nothing reaches
+   payroll until you do — see [What changed on the attendance sheet](../whatsnew/attendance-sheet-changes.md).
 
 ## What happens next
 
-The sheet stays editable through the current month, then is confirmed (locked)
-when the month ends. Approved leaves automatically lock and fill the relevant
-days. If a sheet needs reopening after it's locked, an **HR / attendance
-manager** can Reset it to Draft (see the HR guide).
+Once you confirm it, the sheet is locked and payroll reads it. **A month you do
+not confirm is paid as zero attendance** — it is never confirmed for you. If a
+leave is approved afterwards for a day you had confirmed, the confirmation is
+withdrawn and you are asked to confirm again. If a confirmed sheet needs
+reopening, an **HR / attendance manager** can Reset it to Draft (see the HR
+guide).
 
 ## Common issues
 
@@ -50,8 +57,10 @@ manager** can Reset it to Draft (see the HR guide).
 | A day won't toggle | It's covered by an approved leave (locked) | That's expected — don't change it |
 | No sheet for an employee | Not generated yet | Use **Generate All Sheets** |
 | The sheet is read-only | The month has closed | Ask HR to Reset to Draft if a correction is genuinely needed |
+| The employee was paid zero days | The month was never confirmed | Confirm it — after the month closes only HR can |
 
 ## Related guides
 
+- [What changed on the attendance sheet](../whatsnew/attendance-sheet-changes.md)
 - [Approve time off](01-approve-time-off.md)
 - [Recording extra pay](04-commission-pay-entries.md)

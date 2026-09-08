@@ -1,6 +1,6 @@
 from dateutil.relativedelta import relativedelta
 
-from odoo import _, api, fields, models
+from odoo import SUPERUSER_ID, _, api, fields, models
 from odoo.exceptions import UserError
 
 WARRANTY_WARNING_DAYS = 30
@@ -57,12 +57,7 @@ class ItAsset(models.Model):
     # Procurement / warranty
     # ------------------------------------------------------------------
     location = fields.Char(help="Physical location, e.g. 'HQ - 3rd Floor Store'.")
-    # The vendor role on res.partner, Odoo's native marker — the supplier-side
-    # twin of the customer_rank domain on the KSW client pickers.
-    supplier_id = fields.Many2one(
-        'res.partner', string='Vendor',
-        domain="[('supplier_rank', '>', 0)]",
-    )
+    supplier_id = fields.Many2one('res.partner', string='Vendor')
     purchase_date = fields.Date()
     currency_id = fields.Many2one(related='company_id.currency_id')
     purchase_value = fields.Monetary(currency_field='currency_id')
@@ -128,9 +123,21 @@ class ItAsset(models.Model):
                 asset.warranty_status = 'valid'
 
     def _search_warranty_status(self, operator, value):
+        # Odoo 19 rewrites '=' / '!=' into 'in' / 'not in' with an OrderedSet
+        # value before a search= method is reached (CLAUDE.md gotcha #24).
+        # OrderedSet is a MutableSet, NOT a set, so an isinstance(value, set)
+        # test is False and the whole search silently matched nothing - which
+        # is exactly what the "Warranty Expiring Soon" filter used to do.
+        if operator in ('in', 'not in'):
+            wanted = list(value)
+            negate = operator == 'not in'
+        elif operator in ('=', '!='):
+            wanted = [value]
+            negate = operator == '!='
+        else:
+            return NotImplemented
         today = fields.Date.context_today(self)
         warn_before = today + relativedelta(days=WARRANTY_WARNING_DAYS)
-        wanted = list(value) if isinstance(value, (list, tuple, set)) else [value]
         domains = []
         if 'none' in wanted:
             domains.append([('warranty_expiry_date', '=', False)])
@@ -141,13 +148,13 @@ class ItAsset(models.Model):
         if 'valid' in wanted:
             domains.append([('warranty_expiry_date', '>', warn_before)])
         if not domains:
-            return [('id', '=', False)]
+            # No recognised status asked for: match nothing, or - negated -
+            # everything. Returning [] here would mean "match every record".
+            return [(1, '=', 1)] if negate else [(0, '=', 1)]
         domain = domains[0]
         for extra in domains[1:]:
             domain = ['|'] + domain + extra
-        if operator in ('not in', '!='):
-            return ['!'] + domain
-        return domain
+        return ['!'] + domain if negate else domain
 
     # ------------------------------------------------------------------
     # CRUD
@@ -251,7 +258,14 @@ class ItAsset(models.Model):
         target_date = fields.Date.context_today(self) + relativedelta(days=WARRANTY_WARNING_DAYS)
         assets = self.search([('warranty_expiry_date', '=', target_date), ('active', '=', True)])
         it_group = self.env.ref('KSW_helpdesk.group_helpdesk_agent', raise_if_not_found=False)
-        users = it_group.users if it_group else self.env['res.users']
+        # res.groups has no `users` field in Odoo 19 (it is user_ids /
+        # all_user_ids); search on all_group_ids so a member who only holds
+        # the group through an implication is reminded too.
+        users = self.env['res.users'].sudo().search([
+            ('all_group_ids', 'in', it_group.id),
+            ('share', '=', False),
+            ('id', '!=', SUPERUSER_ID),
+        ]) if it_group else self.env['res.users']
         for asset in assets:
             for user in users:
                 asset.activity_schedule(

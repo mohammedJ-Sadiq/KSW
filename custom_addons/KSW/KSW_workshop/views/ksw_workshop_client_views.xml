@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ksw_workshop_client_list" model="ir.ui.view">
+        <field name="name">ksw.workshop.client.list</field>
+        <field name="model">ksw.workshop.client</field>
+        <field name="arch" type="xml">
+            <!-- editable="bottom": registering a client is one field, so it
+                 should be one row, not a dialog. ("0" is not a valid value
+                 for this attribute; omit it for a read-only list.) -->
+            <list string="Workshop Clients" editable="bottom">
+                <!-- The static context orders the picker by customer rank and
+                     stamps customer_rank=1 on anything quick-created from it,
+                     so a client the workshop knows and Accounting does not
+                     still takes one step to add. -->
+                <field name="partner_id"
+                       context="{'res_partner_search_mode': 'customer'}"/>
+                <field name="note" optional="show"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_workshop_client_form" model="ir.ui.view">
+        <field name="name">ksw.workshop.client.form</field>
+        <field name="model">ksw.workshop.client</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <group>
+                        <field name="partner_id"
+                               context="{'res_partner_search_mode': 'customer'}"/>
+                        <field name="note"/>
+                        <field name="active" invisible="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_workshop_client_search" model="ir.ui.view">
+        <field name="name">ksw.workshop.client.search</field>
+        <field name="model">ksw.workshop.client</field>
+        <field name="arch" type="xml">
+            <search string="Workshop Clients">
+                <field name="partner_id"/>
+                <filter string="Archived" name="filter_inactive" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_workshop_client" model="ir.actions.act_window">
+        <field name="name">Clients</field>
+        <field name="res_model">ksw.workshop.client</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ksw_workshop_client_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Register a workshop client
+            </p><p>
+                Only the clients listed here are offered on a workshop request
+                and on a fleet vehicle. Archive a row to retire a client
+                without touching its past requests.
+            </p>
+        </field>
+    </record>
+
+    <!-- No groups= of its own: the parent Configuration menu is already
+         manager-only, and a menu's effective groups are the intersection
+         with every ancestor's. -->
+    <menuitem id="menu_ksw_workshop_clients" name="Clients"
+              parent="menu_ksw_workshop_configuration"
+              action="action_ksw_workshop_client"
+              sequence="5"/>
+
+</odoo>
