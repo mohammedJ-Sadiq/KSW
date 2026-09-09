@@ -23,29 +23,42 @@ _CHAIN_ORDER = ('pending_dm', 'pending_hr', 'pending_acc', 'pending_gm',
 # The only step at which the GM (non-admin) may use the wizard.
 _GM_RETURN_STATE = 'pending_gm'
 
+# Returning to step X clears X's own stamps and every later one; anything
+# earlier stands. The concurrent-loan acceptance is a per-step decision like
+# the HR/Accounting confirmations, so it is cleared on the same rule — a step
+# that has to be re-approved has to re-accept the exposure too.
 _CLEAR_STAMPS = {
     'pending_dm': {
         'dm_approved_by': False, 'dm_approved_date': False,
         'hr_approved_by': False, 'hr_approved_date': False,
         'x_hr_no_penalties_confirmed': False,
+        'x_concurrent_ack_hr': False,
         'acc_approved_by': False, 'acc_approved_date': False,
         'x_acc_budget_confirmed': False,
+        'x_concurrent_ack_acc': False,
         'gm_approved_by': False, 'gm_approved_date': False,
+        'x_concurrent_ack_gm': False,
     },
     'pending_hr': {
         'hr_approved_by': False, 'hr_approved_date': False,
         'x_hr_no_penalties_confirmed': False,
+        'x_concurrent_ack_hr': False,
         'acc_approved_by': False, 'acc_approved_date': False,
         'x_acc_budget_confirmed': False,
+        'x_concurrent_ack_acc': False,
         'gm_approved_by': False, 'gm_approved_date': False,
+        'x_concurrent_ack_gm': False,
     },
     'pending_acc': {
         'acc_approved_by': False, 'acc_approved_date': False,
         'x_acc_budget_confirmed': False,
+        'x_concurrent_ack_acc': False,
         'gm_approved_by': False, 'gm_approved_date': False,
+        'x_concurrent_ack_gm': False,
     },
     'pending_gm': {
         'gm_approved_by': False, 'gm_approved_date': False,
+        'x_concurrent_ack_gm': False,
     },
 }
 

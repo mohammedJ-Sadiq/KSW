@@ -69,6 +69,19 @@
                             class="btn-danger"
                             groups="KSW_deduction.group_loan_gm"
                             invisible="not is_loan or approval_state != 'pending_gm'"/>
+                    <!-- Concurrent-loan override. Not a shortcut past the
+                         approval: it records that the role acting at this
+                         step accepted that the employee already carries
+                         another personal loan. x_concurrent_ack_pending
+                         carries the state test AND the role test, so the
+                         button needs no groups= of its own and the field
+                         stays fetchable for everyone who can see it
+                         (Odoo 19 Pitfalls #31). -->
+                    <button name="action_bypass_concurrent_loan" type="object"
+                            string="⚠ Accept Concurrent Loan"
+                            class="btn-warning"
+                            confirm="This employee already has another personal loan in progress. Accepting records that you approved the additional exposure at your step. Continue?"
+                            invisible="not x_concurrent_ack_pending"/>
                     <!-- Return to Approver: two audiences, one button (no
                          groups= — both gate fields are read by this
                          invisible= and must stay fetchable for every user
@@ -187,6 +200,26 @@
                     <div role="status" invisible="not is_loan or not approval_state or approval_state == 'refused'" class="alert alert-info">
                         <strong>Loan Approval:</strong>
                         <field name="approval_state" readonly="1" nolabel="1"/>
+                    </div>
+
+                    <!-- Concurrent personal loan: a warning, not a block.
+                         Shown to everyone who can open the record (the
+                         requester included) for the whole approval chain. -->
+                    <div role="alert" class="alert alert-warning"
+                         invisible="not is_loan or not x_has_concurrent_loan or approval_state not in ('pending_dm', 'pending_hr', 'pending_acc', 'pending_gm', 'pending_disbursement')">
+                        <strong>⚠️ This employee already has another personal loan</strong>
+                        <div class="mt-1">
+                            <field name="x_concurrent_loan_count" readonly="1" nolabel="1" class="oe_inline"/>
+                            <span class="mx-1">loan(s) still in progress, of which</span>
+                            <field name="x_concurrent_loan_outstanding" readonly="1" nolabel="1" class="oe_inline"/>
+                            <span class="mx-1">is still outstanding.</span>
+                        </div>
+                        <field name="x_concurrent_loan_summary" readonly="1" nolabel="1"/>
+                        <div class="mt-1">
+                            The request can still go through — but HR, Accounting and
+                            the GM must each click <b>⚠ Accept Concurrent Loan</b>
+                            before their own approval will be accepted.
+                        </div>
                     </div>
 
                     <!-- Refusal banner — visible to everyone (including
@@ -515,6 +548,23 @@
                                     <field name="x_acc_budget_confirmed"
                                            readonly="approval_state != 'pending_acc'"/>
                                 </group>
+                            </group>
+                            <!-- Concurrent-loan acceptance trail. Read-only
+                                 here: it is only ever stamped by the header
+                                 button, which checks the step and the role. -->
+                            <group string="Concurrent Personal Loan"
+                                   invisible="not x_has_concurrent_loan">
+                                <group>
+                                    <field name="x_concurrent_loan_count" readonly="1"/>
+                                    <field name="x_concurrent_loan_outstanding" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="x_concurrent_ack_hr" readonly="1"/>
+                                    <field name="x_concurrent_ack_acc" readonly="1"/>
+                                    <field name="x_concurrent_ack_gm" readonly="1"/>
+                                </group>
+                                <field name="x_concurrent_loan_summary"
+                                       readonly="1" nolabel="1" colspan="2"/>
                             </group>
                             <group>
                                 <group string="End-of-Service (Saudi Art. 84–88)">

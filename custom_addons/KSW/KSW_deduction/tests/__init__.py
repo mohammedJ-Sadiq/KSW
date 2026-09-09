@@ -22,3 +22,4 @@ from . import test_department_gm
 from . import test_statement_of_account
 from . import test_vacation_full_deductions
 from . import test_statement_ui
+from . import test_concurrent_loan_override

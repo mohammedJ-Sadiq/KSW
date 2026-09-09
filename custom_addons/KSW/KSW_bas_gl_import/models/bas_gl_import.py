@@ -1,6 +1,9 @@
 import logging
 import re
 from collections import defaultdict
+from datetime import date, timedelta
+
+from dateutil.relativedelta import relativedelta
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
@@ -66,6 +69,7 @@ _JOURNAL_BY_FTYPE = {
     '015': ('BASBNK', 'BAS Bank Receipts',   'general'),
     '006': ('BASMSC', 'BAS Miscellaneous',   'general'),
     'OPEN': ('BASOP', 'BAS Opening Balances', 'general'),
+    'DEPR': ('BASDP', 'BAS Depreciation', 'general'),
 }
 _DEFAULT_JOURNAL = ('BASMSC', 'BAS Miscellaneous', 'general')
 
@@ -1038,6 +1042,320 @@ class BasGlImport(models.Model):
                 lines.reconcile()
 
     # ------------------------------------------------------------------
+    # Reconciliation against BAS -- the ledger is a MIRROR, not a one-shot
+    # ------------------------------------------------------------------
+    # ``action_import`` is create-only: it skips any voucher whose x_bas_key
+    # already exists, which is what makes it resumable.  The cost is that BAS
+    # keeps moving after a month has been imported, and nothing ever notices:
+    #
+    #   * a voucher POSTED after that month's run is never picked up
+    #     (155 of them, 6,063,008.99 SAR of August 2026 alone, found
+    #      2026-09-08 -- all dated in August, all entered in BAS after the
+    #      August run of 2026-09-06);
+    #   * a voucher EDITED after its run keeps Odoo's stale figure forever
+    #     (018/0/010/26008005, the August payroll journal: BAS 966,035.07,
+    #      Odoo 768,972.07 -- 197,063.00 of salary expense simply absent).
+    #
+    # Both are invisible from inside Odoo: the entry is there, posted and
+    # balanced, just not what BAS says.  The only way to see it is to ask BAS
+    # for the totals and diff them, which is what this does.  Run it before
+    # trusting any comparison against BAS9's own trial balance.
+    #
+    # Tolerance is 0.011: a voucher balanced at source to the half-halala has
+    # its rounding residue pushed onto the largest line (see _voucher_to_move),
+    # so a legitimate one-halala difference is expected and is not drift.
+    _RECONCILE_TOLERANCE = 0.011
+
+    @api.model
+    def action_reconcile_vouchers(self, date_from, date_to, company=None,
+                                  branch_code=None, fix=False):
+        """Diff Odoo's journal entries against vou10 for a period.
+
+        Returns the vouchers BAS has and Odoo does not, and the ones both have
+        with different totals.  With ``fix=True`` the drifted entries are
+        deleted and the whole window re-imported, which also brings in the
+        missing ones.  Converted documents (invoices, refunds, payments) are
+        reported but never touched -- re-importing one would post the sale
+        twice.
+        """
+        company = company or self.env.company
+        conn = self._bas_connect()
+        cur = conn.cursor(as_dict=True)
+        params = [date_from, date_to]
+        branch_sql = ''
+        if branch_code:
+            branch_sql = ' AND RTRIM(CODE2) = %s'
+            params.append(branch_code)
+        skip = "','".join(sorted(_NON_POSTING_FTYPES))
+        cur.execute(f"""
+            SELECT FTYPE, FTYPE2, RTRIM(CODE2) CODE2, NUMBER1,
+                   SUM(CASE WHEN RTRIM(FCODE) <> '' THEN AMOUNT ELSE 0 END) DR
+            FROM vou10
+            WHERE FDATE >= %s AND FDATE < DATEADD(day, 1, %s){branch_sql}
+              AND FTYPE NOT IN ('{skip}')
+            GROUP BY FTYPE, FTYPE2, CODE2, NUMBER1
+        """, tuple(params))
+        bas = {}
+        for r in cur.fetchall():
+            key = "%s/%s/%s/%.0f" % (r['FTYPE'], r['FTYPE2'], r['CODE2'], r['NUMBER1'])
+            bas[key] = round(float(r['DR'] or 0.0), 2)
+        conn.close()
+
+        moves = self.env['account.move'].search([
+            ('company_id', '=', company.id),
+            ('x_bas_key', '!=', False),
+            ('date', '>=', date_from), ('date', '<=', date_to),
+            ('state', '=', 'posted'),
+        ])
+        odoo, kinds = {}, {}
+        for m in moves:
+            odoo[m.x_bas_key] = round(sum(m.line_ids.mapped('debit')), 2)
+            kinds[m.x_bas_key] = m.move_type
+
+        missing = sorted(k for k in bas if k not in odoo)
+        drift = sorted(
+            k for k in bas if k in odoo
+            and abs(odoo[k] - bas[k]) > self._RECONCILE_TOLERANCE
+        )
+        # A voucher DELETED in BAS after import leaves a phantom entry that
+        # nothing else would ever catch -- it is posted, balanced, and simply
+        # describes a document that no longer exists (018/0/010/26008162, a
+        # 1,273.50 purchases voucher, found this way on 2026-09-08).
+        extra = sorted(k for k in odoo if k not in bas)
+        converted = [k for k in drift + extra if kinds.get(k) != 'entry']
+        fixable = [k for k in drift if kinds.get(k) == 'entry']
+        removable = [k for k in extra if kinds.get(k) == 'entry']
+
+        res = {
+            'bas_vouchers': len(bas),
+            'odoo_moves': len(odoo),
+            'missing': len(missing),
+            'missing_debit': round(sum(bas[k] for k in missing), 2),
+            'drifted': len(drift),
+            'drifted_delta': round(sum(odoo[k] - bas[k] for k in drift), 2),
+            'drifted_not_entries': len(converted),
+            'deleted_in_bas': len(extra),
+            'deleted_in_bas_debit': round(sum(odoo[k] for k in extra), 2),
+            'sample_missing': [(k, bas[k]) for k in missing[:10]],
+            'sample_drifted': [(k, bas[k], odoo[k]) for k in drift[:10]],
+            'sample_deleted': [(k, odoo[k]) for k in extra[:10]],
+        }
+        if not fix:
+            _logger.info('BAS reconcile %s..%s: %s', date_from, date_to, res)
+            return res
+
+        if fixable or removable:
+            stale = self.env['account.move'].search(
+                [('x_bas_key', 'in', fixable + removable)])
+            stale.button_draft()
+            stale.unlink()
+        imp = self.create({
+            'company_id': company.id, 'date_from': date_from, 'date_to': date_to,
+            'branch_code': branch_code or False,
+        })
+        imp.action_import()
+        res.update({'redownloaded': len(fixable), 'removed': len(removable),
+                    'reimported': imp.move_count,
+                    'import_id': imp.id, 'import_log': imp.log})
+        _logger.info('BAS reconcile+fix %s..%s: %s', date_from, date_to, res)
+        return res
+
+    # ------------------------------------------------------------------
+    # Per-ACCOUNT reconciliation -- totals can tie while the subledger is wrong
+    # ------------------------------------------------------------------
+    # ``action_reconcile_vouchers`` compares each voucher's TOTAL debit, and
+    # that is not enough.  Reported 2026-09-09: account ``120301194`` missing
+    # from the Trial Balance.  Its voucher was present, posted, and balanced to
+    # the halala -- the money had simply landed on a different account.
+    #
+    # BAS's 002/3 monthly batches are CONSOLIDATED invoices: serial 1 carries
+    # the header on one receivable, and serials 21..37 debit 10-22 INDIVIDUAL
+    # customer sub-accounts (120301041, 120301194, ...).  An Odoo invoice has
+    # exactly one partner, so ``action_convert_invoices`` put the whole
+    # BAMOUNT on the header's account: 8 vouchers moved 2,705,334.75 off 50
+    # customer accounts onto ``120303006``, an account BAS never posts to.
+    # Every voucher total still tied, so the per-voucher check saw nothing.
+    #
+    # A total is not a reconciliation.  Whenever a document is RESHAPED rather
+    # than copied, the only check that means anything is per-account.
+    @api.model
+    def action_reconcile_accounts(self, date_from, date_to, company=None,
+                                  threshold=0.02, fix=False):
+        """Diff Odoo's per-account debit/credit against vou10 for a period.
+
+        Excludes the opening entry and the BASDP depreciation journal, neither
+        of which exists in ``vou10``.
+        """
+        company = company or self.env.company
+        conn = self._bas_connect()
+        cur = conn.cursor()
+        skip = "','".join(sorted(_NON_POSTING_FTYPES))
+        cur.execute(f"""
+            SELECT code, SUM(dr), SUM(cr) FROM (
+              SELECT RTRIM(FCODE) code, SUM(AMOUNT) dr, 0 cr FROM vou10
+               WHERE FDATE >= %s AND FDATE < DATEADD(day, 1, %s)
+                 AND FTYPE NOT IN ('{skip}') AND RTRIM(FCODE) <> ''
+               GROUP BY RTRIM(FCODE)
+              UNION ALL
+              SELECT RTRIM(TCODE), 0, SUM(AMOUNT) FROM vou10
+               WHERE FDATE >= %s AND FDATE < DATEADD(day, 1, %s)
+                 AND FTYPE NOT IN ('{skip}') AND RTRIM(TCODE) <> ''
+               GROUP BY RTRIM(TCODE)
+            ) t GROUP BY code
+        """, (date_from, date_to, date_from, date_to))
+        bas = {(r[0] or '').strip(): (round(float(r[1] or 0.0), 2),
+                                      round(float(r[2] or 0.0), 2))
+               for r in cur.fetchall()}
+        conn.close()
+
+        self.env.cr.execute("""
+            SELECT a.x_bas_code,
+                   ROUND(SUM(l.debit)::numeric, 2), ROUND(SUM(l.credit)::numeric, 2)
+            FROM account_move_line l
+            JOIN account_account a ON a.id = l.account_id
+            JOIN account_move m ON m.id = l.move_id AND m.state = 'posted'
+            JOIN account_journal j ON j.id = m.journal_id
+            WHERE a.x_bas_code IS NOT NULL
+              AND m.company_id = %s
+              AND m.date >= %s AND m.date <= %s
+              AND j.code <> 'BASDP'
+              AND (m.x_bas_key IS NULL OR m.x_bas_key NOT LIKE 'OPENING%%')
+            GROUP BY a.x_bas_code
+        """, (company.id, date_from, date_to))
+        odoo = {r[0]: (float(r[1]), float(r[2])) for r in self.env.cr.fetchall()}
+
+        diffs = []
+        for code in sorted(set(bas) | set(odoo)):
+            b = bas.get(code, (0.0, 0.0))
+            o = odoo.get(code, (0.0, 0.0))
+            dd, dc = round(o[0] - b[0], 2), round(o[1] - b[1], 2)
+            if abs(dd) > threshold or abs(dc) > threshold:
+                diffs.append((code, b[0], b[1], o[0], o[1], dd, dc))
+        gross = round(sum(abs(d[5]) + abs(d[6]) for d in diffs), 2)
+        if fix and diffs:
+            # Re-import every voucher that touches a differing account.  A
+            # per-account difference with matching voucher totals means BAS
+            # RECLASSIFIED a line -- same amount, different account -- which is
+            # the staleness problem of ``action_reconcile_vouchers`` one level
+            # down, and invisible to it.  Converted documents are left alone:
+            # re-importing an out_invoice as an entry is a separate decision
+            # (``action_revert_consolidated_conversions``).
+            keys = self._voucher_keys_for_accounts(
+                [d[0] for d in diffs], date_from, date_to)
+            stale = self.env['account.move'].search([
+                ('company_id', '=', company.id), ('x_bas_key', 'in', keys),
+                ('move_type', '=', 'entry')])
+            n = len(stale)
+            if stale:
+                stale.button_draft()
+                stale.unlink()
+                imp = self.create({'company_id': company.id,
+                                   'date_from': date_from, 'date_to': date_to})
+                imp.action_import()
+                res_fix = {'redownloaded': n, 'reimported': imp.move_count,
+                           'import_log': imp.log}
+            else:
+                res_fix = {'redownloaded': 0, 'reimported': 0}
+        else:
+            res_fix = {}
+        res = {
+            'accounts_compared': len(set(bas) | set(odoo)),
+            'accounts_differing': len(diffs),
+            'gross_difference': gross,
+            'net_debit_delta': round(sum(d[5] for d in diffs), 2),
+            'net_credit_delta': round(sum(d[6] for d in diffs), 2),
+            'worst': sorted(diffs, key=lambda d: -(abs(d[5]) + abs(d[6])))[:10],
+        }
+        res.update(res_fix)
+        _logger.info('BAS account reconcile %s..%s: %s differing, %.2f gross',
+                     date_from, date_to, len(diffs), gross)
+        return res
+
+    @api.model
+    def _voucher_keys_for_accounts(self, codes, date_from, date_to):
+        """Every BAS voucher key touching any of ``codes`` in the period."""
+        if not codes:
+            return []
+        conn = self._bas_connect()
+        cur = conn.cursor()
+        skip = "','".join(sorted(_NON_POSTING_FTYPES))
+        placeholders = ','.join(['%s'] * len(codes))
+        cur.execute(f"""
+            SELECT DISTINCT FTYPE, FTYPE2, RTRIM(CODE2), CAST(NUMBER1 AS BIGINT)
+            FROM vou10
+            WHERE FDATE >= %s AND FDATE < DATEADD(day, 1, %s)
+              AND FTYPE NOT IN ('{skip}')
+              AND (RTRIM(FCODE) IN ({placeholders})
+                   OR RTRIM(TCODE) IN ({placeholders}))
+        """, tuple([date_from, date_to] + list(codes) + list(codes)))
+        keys = ['%s/%s/%s/%s' % r for r in cur.fetchall()]
+        conn.close()
+        return keys
+
+    @api.model
+    def _consolidated_conversions(self, date_from, date_to, company=None):
+        """Converted documents whose BAS voucher debits >1 receivable account.
+
+        An ``account.move`` of type ``out_invoice`` has one partner and one
+        receivable; a BAS voucher that debits 22 customers cannot be one.
+        """
+        company = company or self.env.company
+        conn = self._bas_connect()
+        cur = conn.cursor()
+        skip = "','".join(sorted(_NON_POSTING_FTYPES))
+        cur.execute(f"""
+            SELECT FTYPE, FTYPE2, RTRIM(CODE2), CAST(NUMBER1 AS BIGINT),
+                   COUNT(DISTINCT RTRIM(FCODE)), SUM(AMOUNT)
+            FROM vou10
+            WHERE FDATE >= %s AND FDATE < DATEADD(day, 1, %s)
+              AND FTYPE NOT IN ('{skip}')
+              AND LEFT(RTRIM(FCODE), 4) = '1203' AND AMOUNT <> 0
+            GROUP BY FTYPE, FTYPE2, RTRIM(CODE2), CAST(NUMBER1 AS BIGINT)
+            HAVING COUNT(DISTINCT RTRIM(FCODE)) > 1
+        """, (date_from, date_to))
+        multi = {'%s/%s/%s/%s' % r[:4]: (r[4], round(float(r[5] or 0.0), 2))
+                 for r in cur.fetchall()}
+        conn.close()
+        if not multi:
+            return self.env['account.move'], {}
+        moves = self.env['account.move'].search([
+            ('company_id', '=', company.id),
+            ('x_bas_key', 'in', list(multi)),
+            ('move_type', '!=', 'entry'),
+        ])
+        return moves, multi
+
+    @api.model
+    def action_revert_consolidated_conversions(self, date_from, date_to,
+                                               company=None, fix=False):
+        """Put consolidated batch invoices back to the journal entry BAS has.
+
+        The entry importer reproduces every customer line exactly; the invoice
+        converter cannot, because the shape does not fit.  Reverting is not a
+        step backwards -- it is refusing to convert a document that is not a
+        single-customer invoice.
+        """
+        company = company or self.env.company
+        moves, multi = self._consolidated_conversions(date_from, date_to, company)
+        keys = sorted(moves.mapped('x_bas_key'))
+        res = {'consolidated_vouchers': len(multi),
+               'converted_documents': len(moves),
+               'receivable_moved': round(sum(multi[k][1] for k in keys), 2),
+               'customers_per_voucher': sorted({multi[k][0] for k in keys}),
+               'keys': keys[:10]}
+        if not fix or not moves:
+            return res
+        moves.button_draft()
+        moves.unlink()
+        imp = self.create({'company_id': company.id,
+                           'date_from': date_from, 'date_to': date_to})
+        imp.action_import()
+        res.update({'reimported_as_entries': imp.move_count,
+                    'import_log': imp.log, 'import_id': imp.id})
+        _logger.info('BAS consolidated conversions reverted: %s', res)
+        return res
+
+    # ------------------------------------------------------------------
     # Opening balances
     # ------------------------------------------------------------------
     # Importing vou10 gives 2026 MOVEMENT only.  Without the opening balances
@@ -1048,14 +1366,46 @@ class BasGlImport(models.Model):
     # sum -0.00, with zero P&L accounts carrying an opening (as it should be).
     #
     # Sign convention is CREDIT-POSITIVE: assets come through negative.
+    #
+    # DATE: the entry is dated the LAST DAY OF THE PRECEDING FISCAL YEAR, not
+    # 1 January.  A brought-forward dated *inside* the year it opens is, to
+    # every report, ordinary movement of that year: the OCA Trial Balance
+    # (``_get_initial_balances_bs_ml_domain`` -> ``date < date_from``) leaves
+    # the Initial Balance column at 0.00 and puts all 201,771,314.76 in the
+    # Debit column, which is exactly how it stopped tying to BAS9's own
+    # trial balance.  Dating it 2025-12-31 puts it where BAS shows it -- in
+    # the opening column -- and changes nothing else: no P&L account carries
+    # an opening (verified: the entry touches roots 1 and 2 only), so no
+    # prior-year result is created and nothing lands in unaffected earnings.
+    #
+    # The KEY still names the year being OPENED, not the year the entry sits
+    # in, so 'OPENING/2026' keeps identifying the same thing before and after
+    # this change -- reconciliations that exclude it, and the idempotency
+    # check below, both keep working.
     @api.model
-    def action_import_opening_balances(self, company=None, date='2026-01-01'):
+    def action_import_opening_balances(self, company=None, date='2025-12-31'):
         company = company or self.env.company
         Move = self.env['account.move'].with_context(
             tracking_disable=True, check_move_validity=False).with_company(company)
-        key = f'OPENING/{date[:4]}'
-        if Move.search_count([('x_bas_key', '=', key)]):
-            return {'skipped': 'already imported'}
+        open_date = fields.Date.to_date(date)
+        fy = (open_date + timedelta(days=1)).year
+        key = f'OPENING/{fy}'
+        existing = Move.search([('x_bas_key', '=', key)])
+        if existing:
+            if existing.date == open_date:
+                return {'skipped': 'already imported'}
+            # Same brought-forward, wrong date -- move it rather than making
+            # the caller delete a posted 1,954-line entry by hand.
+            existing.button_draft()
+            # The sequence number encodes the period, so Odoo refuses a date
+            # that no longer matches it ("isn't aligned with the existing
+            # sequence number").  Clearing name lets _post reassign it.
+            existing.write({'name': '/', 'date': open_date,
+                            'ref': 'BAS opening balances %s' % fy})
+            existing.line_ids.write({'name': 'Opening balance %s' % fy})
+            existing._post(soft=False)
+            _logger.info('BAS opening balances: re-dated %s to %s', key, open_date)
+            return {'redated': str(open_date), 'lines': len(existing.line_ids)}
 
         accounts = {a.x_bas_code: a for a in self.env['account.account'].search(
             [('x_bas_code', '!=', False)])}
@@ -1080,7 +1430,7 @@ class BasGlImport(models.Model):
             credit += c
             lines.append((0, 0, {
                 'account_id': acc.id, 'debit': d, 'credit': c,
-                'name': 'Opening balance %s' % date[:4],
+                'name': 'Opening balance %s' % fy,
             }))
         if round(debit - credit, 2):
             raise UserError(_('Opening balances do not balance: %(d).2f vs %(c).2f',
@@ -1088,8 +1438,8 @@ class BasGlImport(models.Model):
         journal = self._journal('OPEN', company)
         move = Move.create({
             'move_type': 'entry', 'journal_id': journal.id,
-            'company_id': company.id, 'date': date,
-            'ref': 'BAS opening balances %s' % date[:4],
+            'company_id': company.id, 'date': open_date,
+            'ref': 'BAS opening balances %s' % fy,
             'x_bas_key': key, 'x_bas_ftype': 'OPENING',
             'line_ids': lines,
         })
@@ -1334,16 +1684,64 @@ class BasGlImport(models.Model):
         n = (name or '').strip().replace('مجمع اهلاك', '').replace('مجمع إهلاك', '')
         return re.sub(r'\s+', ' ', n).strip()
 
-    def _depreciation_map(self):
-        """{asset 19xx code: accumulated depreciation} consuming each 24xx ONCE.
+    @api.model
+    def _bas_asset_account_map(self):
+        """{19xx asset code: (24xx accumulated code, 33xx expense code)}.
 
-        Matching per-asset in a loop double-counts: a 24xx account that is the
-        suffix pair of one asset can also be the name match of another, and both
-        then claim it -- that overstated the register by 8,065,717.36. The map is
-        therefore built globally: suffix pairs are authoritative and claimed
-        first, and only the leftovers are offered to name matching.
+        **BAS states both pairings itself** -- ``COD10.ACCUMULATECODE`` and
+        ``COD10.DDEP_CODE``, populated on all 733 asset accounts, 733 distinct
+        values each, a clean 1:1:1.  Nothing here needs to be guessed.
+
+        This replaces the suffix-then-name heuristic ``_depreciation_map`` used
+        to run.  That heuristic had already been caught overstating the
+        register by 8,065,717.36 once (hence its careful "claim each 24xx ONCE"
+        logic), and it was still wrong on 2026-09-09: name matching handed
+        ``1906020135``'s accumulated depreciation of 4,760,363.31 to
+        ``1906030135``, an asset that cost 70,833.30 -- a 68x mis-assignment.
+        Two assets whose Arabic names differ only in punctuation are
+        indistinguishable to a normaliser and obvious to the source system.
+        **Ask the source before inferring.**
+        """
+        conn = self._bas_connect()
+        cur = conn.cursor(as_dict=True)
+        cur.execute("""
+            SELECT RTRIM(DCODE1) code, RTRIM(ISNULL(ACCUMULATECODE, '')) accum,
+                   RTRIM(ISNULL(DDEP_CODE, '')) dep
+            FROM COD10 WHERE DLEVEL = 5 AND LEFT(RTRIM(DCODE1), 2) = '19'
+        """)
+        out = {(r['code'] or '').strip(): ((r['accum'] or '').strip(),
+                                           (r['dep'] or '').strip())
+               for r in cur.fetchall()}
+        conn.close()
+        return out
+
+    def _depreciation_map(self):
+        """{asset 19xx code: accumulated depreciation}, paired as BAS pairs it.
+
+        Was a suffix-then-name heuristic; now reads ``ACCUMULATECODE``. The old
+        fallback is kept only for an asset BAS has no pairing for, which is
+        currently none of them.
         """
         Account = self.env['account.account']
+        pairs = self._bas_asset_account_map()
+        if pairs:
+            bal_by_code = {}
+            self.env.cr.execute("""
+                SELECT a.x_bas_code, COALESCE(SUM(l.credit - l.debit), 0)
+                FROM account_account a
+                LEFT JOIN account_move_line l ON l.account_id = a.id
+                LEFT JOIN account_move m ON m.id = l.move_id AND m.state = 'posted'
+                WHERE a.x_bas_code LIKE '24%%'
+                GROUP BY a.x_bas_code
+            """)
+            bal_by_code = dict(self.env.cr.fetchall())
+            out = {}
+            for code, (accum_code, _dep) in pairs.items():
+                v = float(bal_by_code.get(accum_code) or 0.0)
+                if v:
+                    out[code] = v
+            if out:
+                return out
         assets = Account.search([('x_bas_code', '=like', '19%')])
         deps = Account.search([('x_bas_code', '=like', '24%')])
         asset_codes = {a.x_bas_code for a in assets}
@@ -1443,6 +1841,225 @@ class BasGlImport(models.Model):
                 made_a += 1
         _logger.info('BAS asset register: %s profiles, %s assets', made_p, made_a)
         return {'profiles': made_p, 'assets': made_a}
+
+    # ------------------------------------------------------------------
+    # Depreciation -- the half of the fixed assets that vou10 never carries
+    # ------------------------------------------------------------------
+    # Reported 2026-09-09: group 33 (اهلاك الاصول الثابتة) missing from the
+    # Trial Balance.  It is missing from the GL because BAS never journalises
+    # it: **zero rows touch a 33* code in any voucher table, ever**
+    # (vou10/15/20/25/30/35/40/50/55/61, VOUMIRROR10, VOUDEL10).  BAS charges
+    # depreciation once, at year-end closing; mid-year its own trial balance
+    # shows a figure computed from the asset register.  An importer that reads
+    # vou10 reproduces vou10 -- it cannot see this by construction.
+    #
+    # BAS holds the whole thing as configuration, and all of it is real:
+    #
+    #   COD10.DDEP_CODE    each 19xx asset names its OWN 33xx expense account
+    #                      (1906020135 -> 3306020121) -- 733 assets, 733 codes
+    #   COD10.DDEP_PER     straight-line % of COST (verified: DEP_AMOUNT =
+    #                      FIX_AMOUNT * DEP_PER / 100 on 729 of 734 rows)
+    #   COD10.DDEP_AMOUNT  the annual charge, 13,926,163.00 across 710 assets
+    #   FIXVOU10           the asset register: FIX_TYPE 03 = the asset (734),
+    #                      01 = additions (26, cost 766,584.80 -- exactly the
+    #                      2026 debit movement on 19xx in the GL), 02 =
+    #                      disposals (14; DEP_AMOUNT 962,185.09 -- exactly the
+    #                      2026 debit movement on 24xx).  Those two ties are
+    #                      what prove FIXVOU10 is the live register and not a
+    #                      stale export.
+    #
+    # 3301 (اراضي, land) has DDEP_AMOUNT = 0 on every asset.  Land does not
+    # depreciate, which is why Mohammed named 3302-3306 and not 3301.
+    #
+    # FIXVOU10.FDATE is NOT an acquisition date -- 732 of 734 rows sit on
+    # 2026-01-01, i.e. the register was reloaded at the start of the year.  The
+    # original start is instead DERIVED from what has already been depreciated:
+    # accumulated / annual = years elapsed.  That is inference from real
+    # figures, not invention, and it is what makes the schedule END at the
+    # right time.  It matters: 45 assets are ALREADY FULLY DEPRECIATED and
+    # still carry an annual charge of 420,283.85 in BAS's configuration.  A
+    # flat "post DDEP_AMOUNT" would write them down past zero.
+    _FY_LOCK_HINT = ('account_asset_management flags a computed line as history '
+                     '(init_entry) when its date is on or before the company '
+                     'fiscalyear_lock_date -- that is the supported way to take '
+                     'over an asset mid-life, so the lock date must be set to '
+                     'the last day of the preceding year before computing.')
+
+    @api.model
+    def _bas_depreciation_config(self):
+        """{19xx code: {dep_code, pct, annual, start}} straight from BAS."""
+        conn = self._bas_connect()
+        cur = conn.cursor(as_dict=True)
+        cur.execute("""
+            SELECT RTRIM(c.DCODE1) code, RTRIM(c.DDEP_CODE) dep_code,
+                   c.DDEP_PER pct, c.DDEP_AMOUNT annual, f.FDATE start_date
+            FROM COD10 c
+            LEFT JOIN FIXVOU10 f
+                   ON RTRIM(f.DCODE1) = RTRIM(c.DCODE1) AND f.FIX_TYPE = '03'
+            WHERE c.DLEVEL = 5 AND LEFT(RTRIM(c.DCODE1), 2) = '19'
+              AND c.DDEP_AMOUNT <> 0 AND c.DDEP_PER > 0
+        """)
+        out = {}
+        for r in cur.fetchall():
+            code = (r['code'] or '').strip()
+            # LEFT JOIN can duplicate if a code appears twice in FIXVOU10;
+            # keep the earliest start.
+            prev = out.get(code)
+            start = r['start_date'].date() if r['start_date'] else None
+            if prev and prev['start'] and start and prev['start'] <= start:
+                continue
+            out[code] = {
+                'dep_code': (r['dep_code'] or '').strip(),
+                'pct': float(r['pct'] or 0.0),
+                'annual': round(float(r['annual'] or 0.0), 2),
+                'start': start,
+            }
+        conn.close()
+        return out
+
+    @api.model
+    def action_load_depreciation_schedule(self, company=None, fy=2026):
+        """Give every asset BAS's own rate, life and accounts, then build the board.
+
+        Does NOT post anything -- ``action_post_depreciation`` does that.
+        """
+        company = company or self.env.company
+        fy_start = date(fy, 1, 1)
+        lock = fy_start - timedelta(days=1)
+        if company.fiscalyear_lock_date != lock:
+            # See _FY_LOCK_HINT.  Harmless for the GL import: every imported
+            # voucher is dated in fy, and the opening entry is already posted.
+            company.sudo().write({'fiscalyear_lock_date': lock})
+
+        # Depreciation gets its own journal.  The asset profiles were built
+        # pointing at BASOP (opening balances); leaving them there would file
+        # ~6,000 monthly charges under "opening", which is neither true nor
+        # searchable.
+        journal = self._journal('DEPR', company)
+        self.env['account.asset.profile'].search(
+            [('company_id', '=', company.id),
+             ('name', '=like', 'BAS %')]).write({'journal_id': journal.id})
+
+        cfg = self._bas_depreciation_config()
+        accounts = {a.x_bas_code: a for a in self.env['account.account'].search(
+            [('x_bas_code', '!=', False)])}
+        accum_map = self._depreciation_map()
+        pairs = self._bas_asset_account_map()
+
+        Asset = self.env['account.asset']
+        assets = Asset.search([('company_id', '=', company.id),
+                               ('code', '!=', False)])
+        done = skipped = fully = 0
+        reasons = defaultdict(int)
+        for asset in assets:
+            c = cfg.get(asset.code)
+            if not c:
+                reasons['no depreciation configured in BAS'] += 1
+                skipped += 1
+                continue
+            cost = asset.purchase_value
+            if cost <= 0:
+                reasons['asset has no cost in the GL'] += 1
+                skipped += 1
+                continue
+            # Months of life at BAS's own straight-line rate.  Doing it in
+            # MONTHS rather than years is what preserves the rate exactly:
+            # method_time='year' takes an INTEGER number of years, and 15%
+            # is 6.67 years -- rounding that to 7 silently restates the
+            # charge as 14.29%.  1200/pct months keeps 15% at 15%.
+            months_total = int(round(1200.0 / c['pct'])) if c['pct'] else 0
+            if months_total <= 0:
+                reasons['unusable BAS rate'] += 1
+                skipped += 1
+                continue
+            monthly = cost / months_total
+
+            # An addition made during fy starts when BAS says it started;
+            # everything else is mid-life and its start is derived from what
+            # has already been written off.
+            start = c['start']
+            if start and start > fy_start:
+                months_elapsed = 0
+                date_start = start
+            else:
+                accum = min(max(accum_map.get(asset.code, 0.0), 0.0), cost)
+                months_elapsed = int(round(accum / monthly)) if monthly else 0
+                months_elapsed = max(0, min(months_elapsed, months_total))
+                date_start = fy_start - relativedelta(months=months_elapsed)
+            if months_elapsed >= months_total:
+                fully += 1
+
+            exp = accounts.get(c['dep_code'])
+            dep = accounts.get(pairs.get(asset.code, ('', ''))[0])
+            asset.write({
+                'method': 'linear',
+                'method_time': 'number',
+                'method_period': 'month',
+                'method_number': months_total,
+                'date_start': date_start,
+                # MUST be True.  With prorata False,
+                # ``_get_depreciation_start_date`` snaps the start to the
+                # beginning of the fiscal year containing date_start, which
+                # invents up to 11 extra months of history per asset -- it
+                # overstated the brought-forward by 4,674,666.02 across 627
+                # assets before this was set.
+                'prorata': True,
+                'salvage_value': 0.0,
+                'x_bas_annual_rate': c['pct'],
+                'x_bas_expense_account_id': exp.id if exp else False,
+                'x_bas_depreciation_account_id': dep.id if dep else False,
+            })
+            # The register was built with a single hand-made "accumulated
+            # brought forward" init line.  The computed board now produces its
+            # own init lines for every pre-fy period, so the old one would be
+            # counted twice.
+            asset.depreciation_line_ids.filtered(
+                lambda l: l.type == 'depreciate' and l.init_entry
+                and not l.move_id).unlink()
+            asset.compute_depreciation_board()
+            done += 1
+
+        lines = self.env['account.asset.line'].search([
+            ('asset_id', 'in', assets.ids), ('type', '=', 'depreciate')])
+        hist = sum(lines.filtered('init_entry').mapped('amount'))
+        future = sum(lines.filtered(
+            lambda l: not l.init_entry and not l.move_id).mapped('amount'))
+        res = {'assets_scheduled': done, 'skipped': skipped,
+               'already_fully_depreciated': fully,
+               'reasons': dict(reasons),
+               'history_lines_total': round(hist, 2),
+               'postable_lines_total': round(future, 2),
+               'accumulated_in_gl': round(sum(accum_map.values()), 2)}
+        _logger.info('BAS depreciation schedule: %s', res)
+        return res
+
+    @api.model
+    def action_post_depreciation(self, date_to, company=None, limit=None):
+        """Post every computed, unposted depreciation line up to ``date_to``."""
+        company = company or self.env.company
+        Line = self.env['account.asset.line']
+        domain = [
+            ('asset_id.company_id', '=', company.id),
+            ('type', '=', 'depreciate'),
+            ('init_entry', '=', False),
+            ('move_id', '=', False),
+            ('line_date', '<=', date_to),
+        ]
+        lines = Line.search(domain, order='line_date, id', limit=limit)
+        total = posted = 0.0
+        n = 0
+        # One move per asset per period is what account_asset_management does;
+        # commit in batches so a run of several thousand is resumable.
+        for i in range(0, len(lines), 200):
+            chunk = lines[i:i + 200]
+            chunk.create_move()
+            n += len(chunk)
+            posted += sum(chunk.mapped('amount'))
+            self.env.cr.commit()
+        res = {'lines_posted': n, 'amount_posted': round(posted, 2),
+               'date_to': str(date_to)}
+        _logger.info('BAS depreciation posted: %s', res)
+        return res
 
     # ------------------------------------------------------------------
     # Units of measure

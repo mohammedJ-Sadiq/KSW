@@ -252,6 +252,58 @@ class KswDeduction(models.Model):
              'the approved envelope.',
     )
 
+    # ------------------------------------------------------------------
+    # Concurrent personal loans
+    # ------------------------------------------------------------------
+    # Policy up to Sep 2026 was one personal loan at a time, enforced as a
+    # hard block at submission. It is now an *overridable warning*: the
+    # second request goes through the chain like any other, but every
+    # approver from HR to GM Final has to accept the concurrent loan before
+    # their own Approve button will run. The acceptance is per step and is
+    # stamped on the record, so the audit trail says which role took on the
+    # extra exposure, not just that somebody did.
+    #
+    # No model-level groups= on any of these: they are read by `invisible=`
+    # expressions on a banner and a header button that every user who can
+    # open the record may see (Odoo 19 Pitfalls #31).
+    x_has_concurrent_loan = fields.Boolean(
+        string='Employee Has Another Loan',
+        compute='_compute_concurrent_loans',
+    )
+    x_concurrent_loan_count = fields.Integer(
+        string='Other Loans in Progress',
+        compute='_compute_concurrent_loans',
+    )
+    x_concurrent_loan_outstanding = fields.Monetary(
+        string='Other Loans Outstanding',
+        compute='_compute_concurrent_loans',
+        currency_field='currency_id',
+    )
+    x_concurrent_loan_summary = fields.Html(
+        string='Concurrent Loans Breakdown',
+        compute='_compute_concurrent_loans',
+        sanitize=False,
+    )
+    x_concurrent_ack_hr = fields.Boolean(
+        string='HR: Concurrent loan accepted',
+        tracking=True, copy=False, readonly=True,
+    )
+    x_concurrent_ack_acc = fields.Boolean(
+        string='Accounting: Concurrent loan accepted',
+        tracking=True, copy=False, readonly=True,
+    )
+    x_concurrent_ack_gm = fields.Boolean(
+        string='GM: Concurrent loan accepted',
+        tracking=True, copy=False, readonly=True,
+    )
+    x_concurrent_ack_pending = fields.Boolean(
+        string='Concurrent Loan Awaiting My Acceptance',
+        compute='_compute_x_concurrent_ack_pending',
+        help='True when the employee carries another personal loan, the '
+             'request sits at a step that must accept it, and the current '
+             'user is the role acting at that step.',
+    )
+
     # Who can manually close installments on this deduction (add manual
     # paid lines or edit year/month/amount on pending lines):
     #   - group_installment_edit: accounting — can close ANY type
@@ -980,10 +1032,10 @@ class KswDeduction(models.Model):
                 raise ValidationError(
                     _("Installments must be at least 1."))
             if rec.is_loan:
-                # One personal loan at a time: block if the employee
-                # already has a loan in the approval chain or an active
-                # loan with an outstanding balance.
-                rec._check_no_pending_loan()
+                # More than one personal loan at a time is allowed, but
+                # never silently: the request carries a warning that each
+                # approver from HR to GM Final has to accept explicitly
+                # (`_check_concurrent_loan_ack`).
                 rec.write({'approval_state': 'pending_dm'})
                 rec.message_post(
                     body=Markup(
@@ -998,6 +1050,23 @@ class KswDeduction(models.Model):
                     },
                     subtype_xmlid='mail.mt_note',
                 )
+                if rec.x_has_concurrent_loan:
+                    rec.message_post(
+                        body=Markup(
+                            '<strong>⚠️ Concurrent Personal Loan</strong><br/>'
+                            '%(emp)s already has %(n)d other personal '
+                            'loan(s) in progress, %(out).2f still '
+                            'outstanding. Every approver from HR to GM '
+                            'Final must accept this before approving.'
+                            '%(list)s'
+                        ) % {
+                            'emp': rec.employee_id.name,
+                            'n': rec.x_concurrent_loan_count,
+                            'out': rec.x_concurrent_loan_outstanding,
+                            'list': rec.x_concurrent_loan_summary or Markup(''),
+                        },
+                        subtype_xmlid='mail.mt_note',
+                    )
                 rec._notify_pending_approvers('pending_dm')
             else:
                 rec._activate_and_generate_lines()
@@ -1110,6 +1179,9 @@ class KswDeduction(models.Model):
                 'acc_original_amount': 0.0, 'acc_original_installments': 0,
                 'x_hr_no_penalties_confirmed': False,
                 'x_acc_budget_confirmed': False,
+                'x_concurrent_ack_hr': False,
+                'x_concurrent_ack_acc': False,
+                'x_concurrent_ack_gm': False,
                 'x_refusal_reason': False,
                 'x_refused_by': False,
                 'x_refused_date': False,
@@ -1153,31 +1225,166 @@ class KswDeduction(models.Model):
                 raise UserError(_(
                     "This action is only available for loan-type deductions."))
 
-    def _check_no_pending_loan(self):
-        """Block a new personal loan while the employee still has one
-        in progress: any loan currently in the approval chain, or an
-        active loan with an outstanding (pending) balance. Saudi policy
-        allows only one personal loan at a time."""
-        for rec in self.filtered('is_loan'):
-            if not rec.employee_id:
+    # A loan is "in progress" for concurrency purposes while it is
+    # anywhere in the approval chain, or active with money still owed.
+    # A cancelled or completed request is neither, whatever approval_state
+    # it was left holding.
+    _CONCURRENT_LOAN_CHAIN = (
+        'pending_dm', 'pending_hr', 'pending_acc', 'pending_gm',
+        'pending_disbursement',
+    )
+
+    # The steps that must accept a concurrent loan before approving, and
+    # the role acting at each: {approval_state: (ack field, group, label)}.
+    # The DM step is deliberately absent — the warning is raised from HR
+    # up to GM Final, which is where the exposure is actually judged.
+    _CONCURRENT_ACK_STEPS = {
+        'pending_hr': ('x_concurrent_ack_hr',
+                       'KSW_deduction.group_loan_hr', 'HR Approver'),
+        'pending_acc': ('x_concurrent_ack_acc',
+                        'KSW_deduction.group_loan_acc', 'Accounting Approver'),
+        'pending_gm': ('x_concurrent_ack_gm',
+                       'KSW_deduction.group_loan_gm', 'General Manager'),
+    }
+
+    def _concurrent_loan_domain(self):
+        """Other personal loans of the same employee that are still live."""
+        self.ensure_one()
+        return [
+            ('employee_id', '=', self.employee_id.id),
+            ('is_loan', '=', True),
+            ('id', '!=', self.id if isinstance(self.id, int) else 0),
+            ('state', 'not in', ('cancelled', 'completed')),
+            '|',
+                ('approval_state', 'in', list(self._CONCURRENT_LOAN_CHAIN)),
+                '&', ('state', '=', 'active'), ('total_pending', '>', 0),
+        ]
+
+    def _concurrent_loans(self):
+        """The live loans this request would run alongside."""
+        self.ensure_one()
+        if not (self.is_loan and self.employee_id):
+            return self.browse()
+        return self.sudo().search(self._concurrent_loan_domain())
+
+    @api.depends('employee_id', 'is_loan', 'state', 'approval_state')
+    def _compute_concurrent_loans(self):
+        state_labels = dict(LOAN_APPROVAL_STATES)
+        for rec in self:
+            others = rec._concurrent_loans()
+            rec.x_concurrent_loan_count = len(others)
+            rec.x_has_concurrent_loan = bool(others)
+            rec.x_concurrent_loan_outstanding = sum(
+                others.mapped('total_pending'))
+            items = []
+            for other in others:
+                if other.state == 'active':
+                    status = _('active')
+                else:
+                    status = state_labels.get(
+                        other.approval_state, other.approval_state or '')
+                items.append(Markup(
+                    '<li><b>%(name)s</b> — %(amt).2f over %(inst)d '
+                    'installment(s), %(out).2f still outstanding '
+                    '(%(status)s)</li>'
+                ) % {
+                    'name': other.name or '',
+                    'amt': other.amount,
+                    'inst': other.installments,
+                    'out': other.total_pending,
+                    'status': status,
+                })
+            rec.x_concurrent_loan_summary = (
+                Markup('<ul>') + Markup('').join(items) + Markup('</ul>')
+                if items else ''
+            )
+
+    # Per-user: only the role acting at the current step sees the button.
+    @api.depends_context('uid')
+    @api.depends('is_loan', 'approval_state', 'x_has_concurrent_loan',
+                 'x_concurrent_ack_hr', 'x_concurrent_ack_acc',
+                 'x_concurrent_ack_gm')
+    def _compute_x_concurrent_ack_pending(self):
+        user = self.env.user
+        for rec in self:
+            step = self._CONCURRENT_ACK_STEPS.get(rec.approval_state)
+            if not (rec.is_loan and rec.x_has_concurrent_loan and step):
+                rec.x_concurrent_ack_pending = False
                 continue
-            dom = [
-                ('employee_id', '=', rec.employee_id.id),
-                ('is_loan', '=', True),
-                ('id', '!=', rec.id),
-                '|',
-                    ('approval_state', 'in', [
-                        'pending_dm', 'pending_hr', 'pending_acc', 'pending_gm',
-                        'pending_disbursement']),
-                    '&', ('state', '=', 'active'), ('total_pending', '>', 0),
-            ]
-            if self.env['ksw.deduction'].sudo().search_count(dom):
+            ack_field, group, _label = step
+            rec.x_concurrent_ack_pending = bool(
+                not rec[ack_field]
+                and (self.env.su or user.has_group(group))
+            )
+
+    def action_bypass_concurrent_loan(self):
+        """Accept the concurrent-loan warning at the current step.
+
+        This is not a shortcut past the approval: it only records that the
+        approver acting at this step has seen that the employee is already
+        carrying another personal loan and chose to continue anyway. Their
+        own Approve button stays exactly where it was, and refuses to run
+        until this is stamped (`_check_concurrent_loan_ack`).
+        """
+        self._check_loan()
+        for rec in self:
+            step = self._CONCURRENT_ACK_STEPS.get(rec.approval_state)
+            if not step:
                 raise UserError(_(
-                    "%(emp)s already has a personal loan in progress. A "
-                    "new loan can only be requested once the current one "
-                    "is fully paid.",
-                    emp=rec.employee_id.name,
-                ))
+                    "The concurrent-loan warning is only accepted between "
+                    "the HR and the GM Final approval steps."))
+            ack_field, group, label = step
+            if not rec.x_has_concurrent_loan:
+                raise UserError(_(
+                    "%(emp)s has no other personal loan in progress — there "
+                    "is nothing to accept.", emp=rec.employee_id.name))
+            if not self.env.su and not self.env.user.has_group(group):
+                raise UserError(_(
+                    "Only the %(role)s can accept the concurrent-loan "
+                    "warning at this step.", role=label))
+            if rec.approval_state == 'pending_gm':
+                # Being a GM somewhere is not enough — same predicate the
+                # GM approve button uses.
+                rec._check_department_gm()
+            if rec[ack_field]:
+                continue
+            rec.write({ack_field: True})
+            rec.message_post(
+                body=Markup(
+                    '<strong>⚠️ Concurrent Loan Accepted — %(role)s</strong>'
+                    '<br/>'
+                    '<b>By:</b> %(user)s<br/>'
+                    '<b>Other loans in progress:</b> %(n)d '
+                    '(%(out).2f outstanding)<br/>'
+                    'This request may now be approved at this step despite '
+                    'the employee already carrying another personal loan.'
+                ) % {
+                    'role': label,
+                    'user': self.env.user.name,
+                    'n': rec.x_concurrent_loan_count,
+                    'out': rec.x_concurrent_loan_outstanding,
+                },
+                subtype_xmlid='mail.mt_note',
+            )
+
+    def _check_concurrent_loan_ack(self, step_state):
+        """Block this step's approval until the warning has been accepted."""
+        self.ensure_one()
+        if not self.x_has_concurrent_loan:
+            return
+        ack_field, _group, label = self._CONCURRENT_ACK_STEPS[step_state]
+        if not self[ack_field]:
+            raise ValidationError(_(
+                "%(emp)s already has %(n)d other personal loan(s) in "
+                "progress, with %(out).2f still outstanding. This request "
+                "can still be approved, but the %(role)s must click "
+                "'⚠ Accept Concurrent Loan' first so the decision is on "
+                "record.",
+                emp=self.employee_id.name,
+                n=self.x_concurrent_loan_count,
+                out=self.x_concurrent_loan_outstanding,
+                role=label,
+            ))
 
     def action_dm_approve(self):
         """Step 1: DM (direct manager) approval.
@@ -1231,6 +1438,7 @@ class KswDeduction(models.Model):
                     "in the Decision Support tab. If a penalty is "
                     "pending, create it first via 'New Penalty'."
                 ))
+            rec._check_concurrent_loan_ack('pending_hr')
             rec.write({
                 'approval_state': 'pending_acc',
                 'hr_approved_by': self.env.user.employee_id.id,
@@ -1261,6 +1469,7 @@ class KswDeduction(models.Model):
                     "'Budget confirmed' is ticked in the Decision "
                     "Support tab."
                 ))
+            rec._check_concurrent_loan_ack('pending_acc')
             # Log any modification done during pending_acc
             modified = []
             if (rec.acc_original_amount
@@ -1314,6 +1523,7 @@ class KswDeduction(models.Model):
         for rec in self:
             if rec.approval_state != 'pending_gm':
                 raise UserError(_("Not pending GM final approval."))
+            rec._check_concurrent_loan_ack('pending_gm')
             # Log any modification
             modified = []
             if (rec.gm_original_amount

@@ -1,57 +1,64 @@
 # -*- coding: utf-8 -*-
 """Tests for the deduction critical fixes:
-  1. Blocking a new personal loan while one is already in progress.
+  1. A concurrent personal loan warns instead of blocking (Sep 2026).
   2. Prioritised, capped, carry-forward payroll deduction collection.
 """
 from datetime import date
 
-from odoo.exceptions import UserError
-
 from .common import DeductionCommon
 
 
-class TestLoanBlock(DeductionCommon):
-    def _activate_loan(self, amount=2000.0, installments=4):
-        ded = self._make_deduction(self.type_loan, amount=amount,
-                                   installments=installments)
-        self._walk_loan_to_pending_gm(ded)
-        ded.action_gm_approve()
-        self.assertEqual(ded.state, 'active')
-        return ded
+class TestConcurrentLoan(DeductionCommon):
+    """A second personal loan is a warning to accept, not a wall.
 
-    def test_block_when_active_loan_outstanding(self):
-        self._activate_loan()
-        second = self._make_deduction(self.type_loan, amount=500.0,
-                                      installments=2)
-        with self.assertRaises(UserError):
-            second.action_submit()
+    Until Sep 2026 `action_submit` refused outright when the employee already
+    had a live loan. It now goes through, and each of HR / Accounting / GM has
+    to stamp its own acceptance before that step's approval will run. This
+    class pins the *submit* half and what counts as "concurrent";
+    `test_concurrent_loan_override` covers the role matrix.
+    """
 
-    def test_block_when_loan_in_approval(self):
+    def _second_loan(self):
+        return self._make_deduction(self.type_loan, amount=500.0,
+                                    installments=2)
+
+    def test_submit_allowed_while_a_loan_is_in_approval(self):
         first = self._make_deduction(self.type_loan, amount=1000.0,
                                      installments=2)
         first.action_submit()  # pending_dm
-        second = self._make_deduction(self.type_loan, amount=500.0,
-                                      installments=2)
-        with self.assertRaises(UserError):
-            second.action_submit()
+        second = self._second_loan()
+        second.action_submit()
+        self.assertEqual(second.approval_state, 'pending_dm')
+        self.assertTrue(second.x_has_concurrent_loan)
+        self.assertIn(first.name, second.x_concurrent_loan_summary)
 
-    def test_allowed_after_first_fully_paid(self):
-        first = self._activate_loan(amount=1000.0, installments=2)
+    def test_submit_allowed_while_a_loan_is_active(self):
+        self._activate(self._make_deduction(self.type_loan, amount=2000.0,
+                                            installments=4))
+        second = self._second_loan()
+        second.action_submit()
+        self.assertEqual(second.approval_state, 'pending_dm')
+        self.assertTrue(second.x_has_concurrent_loan)
+
+    def test_fully_paid_loan_is_not_concurrent(self):
+        first = self._activate(self._make_deduction(
+            self.type_loan, amount=1000.0, installments=2))
         first.line_ids.write({'state': 'paid'})
         first.invalidate_recordset(['total_pending'])
         self.assertEqual(first.total_pending, 0.0)
-        second = self._make_deduction(self.type_loan, amount=500.0,
-                                      installments=2)
-        # Should not raise.
+        second = self._second_loan()
         second.action_submit()
-        self.assertEqual(second.approval_state, 'pending_dm')
+        self.assertFalse(second.x_has_concurrent_loan,
+                         'nothing outstanding is nothing to warn about')
 
-    def test_non_loan_not_blocked(self):
-        self._activate_loan()
+    def test_non_loan_never_warns(self):
+        self._activate(self._make_deduction(self.type_loan, amount=2000.0,
+                                            installments=4))
         adv = self._make_deduction(self.type_advance, amount=300.0,
                                    installments=1)
-        adv.action_submit()  # advances are not loans → no block
+        adv.action_submit()  # advances are not loans → activate immediately
         self.assertEqual(adv.state, 'active')
+        self.assertFalse(adv.x_has_concurrent_loan)
 
 
 class TestPayrollPriority(DeductionCommon):
