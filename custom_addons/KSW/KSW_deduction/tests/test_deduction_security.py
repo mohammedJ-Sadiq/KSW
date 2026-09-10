@@ -213,3 +213,56 @@ class TestDeductionSecurity(DeductionCommon):
         g = self.env.ref(
             'KSW_deduction.group_loan_dm', raise_if_not_found=False)
         self.assertFalse(g, "group_loan_dm must be removed.")
+
+    # ------------------------------------------------------------------
+    # Loan approvers have no payroll access — nothing they read may
+    # demand it (Sep 2026)
+    # ------------------------------------------------------------------
+    @mute_logger('odoo.addons.base.models.ir_model')
+    def test_loan_approver_reads_non_loan_deduction(self):
+        """`group_loan_acc` reads non-loan deductions, and writes none.
+
+        The Accounting Approver judges the employee's total exposure at
+        their own step, so `ksw_deduction_rule_non_loan_readonly` covers
+        them as well as HR — the loan-approvers rule alone scopes them to
+        `is_loan=True`.
+        """
+        ded = self._make_deduction(self.type_advance)
+        as_acc = ded.with_user(self.user_acc)
+        as_acc.invalidate_recordset()
+        self.assertEqual(as_acc.read(['name'])[0]['name'], ded.name)
+        with self.assertRaises(AccessError):
+            as_acc.write({'reason': 'nope'})
+
+    @mute_logger('odoo.addons.base.models.ir_model')
+    def test_loan_approver_reads_deduction_settled_by_payslip(self):
+        """Reading a deduction whose installment payroll collected must
+        not demand `hr.payslip` access.
+
+        `settlement_label` names the settling payslip in the Installments
+        list. It read `payslip_id.number` directly, which raises
+        `AccessError` for every loan-approval role (none of them holds a
+        payroll group) — and because the o2m is read inline, it took the
+        whole parent record's `web_read` down with it, so the form would
+        not open at all.
+        """
+        self.assertFalse(
+            self.user_acc.has_group('om_hr_payroll.group_hr_payroll_user'),
+            "fixture must NOT have payroll access, or this proves nothing")
+        ded = self._activate(self._make_deduction(self.type_advance))
+        slip = self.env['hr.payslip'].sudo().create({
+            'employee_id': self.employee.id,
+            'name': 'KSWDED Payroll Slip',
+            'date_from': self.this_month,
+            'date_to': self.next_month,
+        })
+        ded.line_ids[0].sudo().write({
+            'payslip_id': slip.id, 'state': 'paid'})
+        as_acc = ded.with_user(self.user_acc)
+        as_acc.invalidate_recordset()
+        data = as_acc.web_read({
+            'id': {},
+            'line_ids': {'fields': {'settlement_label': {}, 'state': {}}},
+        })
+        labels = [l['settlement_label'] for l in data[0]['line_ids']]
+        self.assertIn('KSWDED Payroll Slip', labels)

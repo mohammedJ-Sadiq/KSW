@@ -27,6 +27,30 @@
         <field name="comment">The user can read his own payslips and the payslips of every employee below him in the management hierarchy, at any depth.</field>
     </record>
 
+    <!-- Tier 4: every payslip in the company, read-only.
+
+         Asked for (Sep 2026) by accounting, who review payslips but must
+         not be able to produce or change one. Officer was the only tier
+         that sees the whole company, and Officer is the payroll OPERATOR
+         role: full CRUD on payslips, batches and the salary rules
+         themselves, plus the WPS / bank export wizards. The three tiers
+         below are read-only but scoped by hierarchy (`child_of
+         user.employee_ids`), so a reviewer who manages nobody sees one
+         payslip: their own. Nothing in between existed.
+
+         Read-only is enforced twice, exactly as for the tiers below: the
+         ACL rows grant `1,0,0,0` and the ir.rules carry perm_read only.
+         The payslip form needs no button work, because KSW already gates
+         its whole `<header>` to Officer for these very tiers; the batch
+         form's buttons are gated in views/hr_payslip_views.xml. -->
+    <record id="group_hr_payroll_reviewer" model="res.groups">
+        <field name="name">Reviewer (All)</field>
+        <field name="sequence">35</field>
+        <field name="privilege_id" ref="om_hr_payroll.privilege_payroll"/>
+        <field name="implied_ids" eval="[(4, ref('group_hr_payroll_supervisor_cascade'))]"/>
+        <field name="comment">The user can read every employee's payslips and payslip batches, company-wide, and change nothing: no create, edit or delete, no payroll configuration, no bank/WPS export.</field>
+    </record>
+
     <!--
         Fold Officer/Administrator into the same selection, ordered after
         the tiers above. om_hr_payroll.group_hr_payroll_user/manager were
@@ -39,7 +63,7 @@
     -->
     <function model="res.groups" name="write">
         <value eval="[ref('om_hr_payroll.group_hr_payroll_user')]"/>
-        <value eval="{'sequence': 40, 'implied_ids': [(4, ref('group_hr_payroll_supervisor_cascade'))]}"/>
+        <value eval="{'sequence': 40, 'implied_ids': [(4, ref('group_hr_payroll_supervisor_cascade')), (4, ref('group_hr_payroll_reviewer'))]}"/>
     </function>
 
     <function model="res.groups" name="write">
@@ -67,15 +91,40 @@
     <!-- Payslip Batches: previously had no menu-level group restriction at
          all, yet only Administrator had real model access underneath (see
          the access row added below): Officers got a menu entry that
-         always errored. Restricting the menu to Officer+ now matches the
-         access we're granting them. -->
+         always errored. Restricting the menu to the tiers that really hold
+         the access now matches what we grant them. Reviewer (All) reads
+         batches and Officer implies Reviewer, so this one group covers
+         both: reviewing a month means reviewing its run, since the bank
+         totals and the skipped-employee log live here and nowhere else. -->
     <menuitem id="om_hr_payroll.menu_hr_payslip_run"
               name="Payslips Batches"
               parent="om_hr_payroll.menu_hr_payroll_root"
-              groups="om_hr_payroll.group_hr_payroll_user"/>
+              groups="group_hr_payroll_reviewer"/>
 
     <!-- Configuration menu is intentionally left untouched: stays
          Administrator-only, exactly as om_hr_payroll ships it. -->
+
+    <!-- The stock "Payslip Details" and "Contribution Register" reports
+         print `employee_id.identification_id`, a field carrying
+         `groups="hr.group_hr_user"`, so they raise AccessError inside QWeb
+         for anybody who is not an HR Officer (pitfall #5). That has always
+         been true for the read-only tiers — they were simply never used to
+         print. No ACL can fix a *field*-level gate, and these are
+         third-party templates we don't own, so restrict the Print entry to
+         the tier that can actually render it rather than leave a menu item
+         that only ever errors. KSW's own payslip PDF (which replaces
+         `om_hr_payroll.report_payslip`) reads the employee through
+         `sudo()` and stays open to every tier.
+
+         `<function>` rather than `<record>`: an override of another
+         module's record is silently skipped on every upgrade after the
+         first install when the target sits in a noupdate block, and using
+         it unconditionally costs nothing (pitfall #2). -->
+    <function model="ir.actions.report" name="write">
+        <value eval="[ref('om_hr_payroll.payslip_details_report'),
+                      ref('om_hr_payroll.action_contribution_register')]"/>
+        <value eval="{'group_ids': [(6, 0, [ref('om_hr_payroll.group_hr_payroll_user')])]}"/>
+    </function>
 
     <data noupdate="1">
 
@@ -250,6 +299,64 @@
             <field name="model_id" ref="om_hr_payroll.model_hr_payslip_input"/>
             <field name="domain_force">[(1, '=', 1)]</field>
             <field name="groups" eval="[(4, ref('om_hr_payroll.group_hr_payroll_user')), (4, ref('om_hr_payroll.group_hr_payroll_manager'))]"/>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- Reviewer (All): every row, read only                          -->
+        <!-- ============================================================ -->
+        <!--
+            Same unrestricted domain as the officer rules above, with the
+            three write permissions switched off. Odoo ORs rules per user
+            AND per operation, so a reviewer who is also a supervisor still
+            writes nothing here, and an Officer (who implies this group)
+            keeps every right their own rule grants — a rule can only ever
+            add rows to what a group may reach, never take any away.
+
+            The ACL rows (1,0,0,0) in ir.model.access.csv are the other
+            half: a rule filters rows, it does not grant the operation.
+        -->
+        <record id="hr_payslip_rule_reviewer_all" model="ir.rule">
+            <field name="name">Payroll: reviewer all (read only)</field>
+            <field name="model_id" ref="om_hr_payroll.model_hr_payslip"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_hr_payroll_reviewer'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <record id="hr_payslip_line_rule_reviewer_all" model="ir.rule">
+            <field name="name">Payroll lines: reviewer all (read only)</field>
+            <field name="model_id" ref="om_hr_payroll.model_hr_payslip_line"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_hr_payroll_reviewer'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <record id="hr_payslip_worked_days_rule_reviewer_all" model="ir.rule">
+            <field name="name">Payroll worked days: reviewer all (read only)</field>
+            <field name="model_id" ref="om_hr_payroll.model_hr_payslip_worked_days"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_hr_payroll_reviewer'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <record id="hr_payslip_input_rule_reviewer_all" model="ir.rule">
+            <field name="name">Payroll inputs: reviewer all (read only)</field>
+            <field name="model_id" ref="om_hr_payroll.model_hr_payslip_input"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_hr_payroll_reviewer'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
         </record>
 
     </data>

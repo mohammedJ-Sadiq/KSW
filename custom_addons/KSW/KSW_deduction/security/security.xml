@@ -431,15 +431,23 @@
         <field name="domain_force">[('managed_by', '=', 'acc_data_entry')]</field>
     </record>
 
-    <!-- HR Approvers keep VISIBILITY of non-loan deductions (they still need
+    <!-- Loan approvers keep VISIBILITY of non-loan deductions (they still need
          the employee's full deduction picture when approving a loan) but may
          no longer touch them — read-only since August 2026. Odoo ORs rules per
-         user and per operation, so group_loan_hr reads is_loan=True OR
-         managed_by='acc_data_entry', and writes only is_loan=True. -->
+         user and per operation, so these groups read is_loan=True OR
+         managed_by='acc_data_entry', and write only is_loan=True.
+
+         group_loan_acc joined the rule in September 2026: the Accounting
+         Approver judges the employee's total exposure at their own step, and
+         the loan-approvers rule above scopes that group to is_loan=True, so
+         the non-loan half of that picture was invisible. Same read-only
+         terms as HR — the non-loan types belong to group_acc_data_entry.
+         (6, 0, [...]) rather than (4, ...) so removing a group from this
+         list actually removes it on upgrade — see Odoo 19 Pitfalls #3. -->
     <record id="ksw_deduction_rule_non_loan_readonly" model="ir.rule">
-        <field name="name">Deduction: HR approvers read non-loan deductions</field>
+        <field name="name">Deduction: loan approvers read non-loan deductions</field>
         <field name="model_id" ref="model_ksw_deduction"/>
-        <field name="groups" eval="[(4, ref('group_loan_hr'))]"/>
+        <field name="groups" eval="[(6, 0, [ref('group_loan_hr'), ref('group_loan_acc')])]"/>
         <field name="domain_force">[('managed_by', '=', 'acc_data_entry')]</field>
         <field name="perm_read" eval="True"/>
         <field name="perm_write" eval="False"/>

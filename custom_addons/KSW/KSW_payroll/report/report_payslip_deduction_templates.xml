@@ -18,27 +18,40 @@
                 <h2 class="mb-1">Payslip</h2>
                 <p class="text-muted mb-3" t-out="o.name"/>
 
-                <!-- ── Employee info ── -->
+                <!-- ── Employee info ──
+                     One sudo'd handle for every employee read below, rather
+                     than sudo per expression. In Odoo 19 `job_id`,
+                     `department_id` and `ssnid` all live on **hr.version**
+                     and reach hr.employee through `_inherits`, so each of
+                     them dereferences `hr.employee.version_id`, which
+                     carries `groups="hr.group_hr_user"` — an AccessError
+                     inside a QWeb report, not just in the UI (pitfall #5).
+                     Only the payroll Officer tier escaped it, by implying
+                     hr.group_hr_user; every read-only tier (Only Self,
+                     Supervisor, Reviewer) got the access dialog instead of
+                     a PDF. Whoever may open the payslip may see whose it
+                     is, so identity is not the thing being protected here. -->
+                <t t-set="emp" t-value="o.employee_id.sudo()"/>
                 <table class="table table-sm table-bordered mb-4">
                     <tr>
                         <td style="width:20%"><strong>Employee</strong></td>
-                        <td style="width:30%" t-out="o.employee_id.name"/>
+                        <td style="width:30%" t-out="emp.name"/>
                         <td style="width:20%"><strong>Designation</strong></td>
-                        <td style="width:30%" t-out="o.employee_id.job_id.name or ''"/>
+                        <td style="width:30%" t-out="emp.job_id.name or ''"/>
                     </tr>
                     <tr>
                         <td><strong>Department</strong></td>
-                        <td t-out="o.employee_id.department_id.name or ''"/>
+                        <td t-out="emp.department_id.name or ''"/>
                         <td><strong>ID No.</strong></td>
-                        <td t-out="o.employee_id.ssnid or o.employee_id.sudo().identification_id or ''"/>
+                        <td t-out="emp.ssnid or emp.identification_id or ''"/>
                     </tr>
                     <tr>
                         <td><strong>Reference</strong></td>
                         <td t-out="o.number or ''"/>
                         <td><strong>Bank Account</strong></td>
                         <td>
-                            <t t-if="o.employee_id.sudo().bank_account_ids">
-                                <span t-out="o.employee_id.sudo().bank_account_ids[0].acc_number"/>
+                            <t t-if="emp.bank_account_ids">
+                                <span t-out="emp.bank_account_ids[0].acc_number"/>
                             </t>
                         </td>
                     </tr>

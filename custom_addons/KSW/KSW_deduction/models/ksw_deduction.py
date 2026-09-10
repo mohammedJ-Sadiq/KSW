@@ -1,3 +1,5 @@
+import logging
+
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
@@ -6,6 +8,9 @@ from markupsafe import Markup
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.osv import expression as odoo_expr
+from odoo.tools import float_compare
+
+_logger = logging.getLogger(__name__)
 
 
 LOAN_APPROVAL_STATES = [
@@ -2450,6 +2455,108 @@ class KswDeduction(models.Model):
             'x_charge_date': fields.Date.context_today(self),
             'x_writeoff_date': False,
         })
+        self._refresh_draft_payslips()
+
+    def _refresh_draft_payslips(self):
+        """Pull a newly activated deduction into any DRAFT payslip that
+        could already have collected it.
+
+        `_inject_ksw_deduction_inputs` only runs inside `compute_sheet()`,
+        and a payslip batch is normally computed once — at generation. A
+        deduction activated after that moment therefore stays invisible
+        until something recomputes the slip, and the one thing that always
+        does is `action_payslip_done()`, i.e. **confirmation** — which in
+        this shop happens *after* the bank file has been exported and paid.
+
+        Batch 250 (August 2026) lost 2,550 SAR exactly that way: three loans
+        disbursement-confirmed 12 minutes after the batch was generated
+        surfaced on the payslips only when the batch was confirmed, a day
+        after the transfer had gone out. The installments were then marked
+        collected against money that had never been withheld. See CLAUDE.md
+        pitfall #120.
+
+        Recomputing here closes that window: the installment lands in the
+        draft batch immediately, so whatever is exported already carries it.
+        Only `draft` payslips are touched — a `done` payslip has been paid
+        and is never restated by a later deduction (that is a Payslip
+        Revision decision), and `compute_sheet()` skips done slips anyway.
+        """
+        self.ensure_one()
+        pending = self.line_ids.filtered(lambda l: l.state == 'pending')
+        if not pending or not self.employee_id:
+            return
+        # A pending installment has no lower period bound in
+        # `_ksw_pending_lines_domain` — any payslip ending on or after its
+        # own period can collect it, so that is the window to refresh.
+        earliest = min(date(l.year, l.month, 1) for l in pending)
+        slips = self.env['hr.payslip'].sudo().search([
+            ('employee_id', '=', self.employee_id.id),
+            ('state', '=', 'draft'),
+            ('date_to', '>=', earliest),
+            # A revision restates a period that was already paid; the
+            # installments it reproduces are frozen (`KSW_DEDP_`, see
+            # `_revision_frozen_deduction_inputs`). Leave it alone.
+            ('x_is_revision', '=', False),
+        ])
+        if not slips:
+            return
+
+        touched = self.env['hr.payslip'].sudo()
+        for slip in slips:
+            # A slip that was never computed has no NET to have exported, so
+            # it is refreshed silently — there is nothing to warn about.
+            was_computed = bool(slip.line_ids)
+            net_before = slip._ksw_net_amount()
+            try:
+                # One savepoint per slip: a payslip that cannot be recomputed
+                # (stale data, a blocking guard) must not abort the
+                # disbursement that triggered this.
+                with self.env.cr.savepoint():
+                    slip.compute_sheet()
+            except Exception:  # noqa: BLE001 - logged, never fatal here
+                # A savepoint rollback does not clear the ORM cache, so drop
+                # it before touching anything else.
+                self.env.invalidate_all()
+                _logger.exception(
+                    'KSW_deduction: could not refresh draft payslip %s after '
+                    'activating deduction %s', slip.number or slip.id, self.name)
+                continue
+            if was_computed and float_compare(
+                    slip._ksw_net_amount(), net_before, precision_digits=2) != 0:
+                touched |= slip
+                slip.sudo().message_post(body=Markup(
+                    '<strong>&#8635; Recomputed &mdash; %(ded)s was activated'
+                    '</strong><br/>'
+                    'This payslip is still a draft, so the new installment(s) '
+                    'were pulled in now rather than at confirmation.<br/>'
+                    '<b>NET:</b> %(before).2f &rarr; %(after).2f SAR<br/>'
+                    '<b>Re-export the bank file</b> if it was already '
+                    'generated for this batch.'
+                ) % {
+                    'ded': self.name,
+                    'before': net_before,
+                    'after': slip._ksw_net_amount(),
+                }, subtype_xmlid='mail.mt_note')
+
+        for run in touched.mapped('payslip_run_id'):
+            run_slips = touched.filtered(lambda s: s.payslip_run_id == run)
+            run.sudo().message_post(body=Markup(
+                '<strong>&#9888; A deduction was activated after this batch '
+                'was generated</strong><br/>'
+                '<b>%(ded)s</b> (%(emp)s) was activated today and has been '
+                'pulled into %(n)d draft payslip(s) in this batch: %(slips)s.'
+                '<br/><b>If a bank file has already been exported for this '
+                'batch, export it again</b> &mdash; the figures have changed.'
+            ) % {
+                'ded': self.name,
+                'emp': self.employee_id.name,
+                'n': len(run_slips),
+                # `number` is only stamped at confirmation — a draft slip
+                # falls back to the employee it belongs to.
+                'slips': ', '.join(
+                    s.number or s.employee_id.name or str(s.id)
+                    for s in run_slips),
+            }, subtype_xmlid='mail.mt_note')
 
     def _generate_installment_lines(self):
         """Create one ksw.deduction.line per month starting from start_month.

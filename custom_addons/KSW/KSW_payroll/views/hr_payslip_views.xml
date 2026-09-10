@@ -298,7 +298,32 @@
                 <button name="action_open_export_wizard" type="object"
                         string="Export Bank File"
                         icon="fa-download"
-                        class="btn-secondary"/>
+                        class="btn-secondary"
+                        groups="om_hr_payroll.group_hr_payroll_user"/>
+            </xpath>
+
+            <!-- ── Everything that CHANGES the batch: Officer and up ──
+                 Reviewer (All) reads batches company-wide and writes
+                 nothing, so these buttons would only ever raise
+                 AccessError for them — the same dead-menu problem noted
+                 above the Batches menuitem, one level down. The statusbar
+                 is deliberately left ungated: a reviewer needs to see
+                 whether the run is draft or closed. Unlike the payslip
+                 form, the header itself is NOT gated for that reason.
+                 `draft_payslip_run` keeps its own Manager-only attribute
+                 block below — never set the same attribute on one node
+                 twice, last writer wins silently (pitfall #124). -->
+            <xpath expr="//header/button[@type='action']"
+                   position="attributes">
+                <attribute name="groups">om_hr_payroll.group_hr_payroll_user</attribute>
+            </xpath>
+            <xpath expr="//header/button[@name='done_payslip_run']"
+                   position="attributes">
+                <attribute name="groups">om_hr_payroll.group_hr_payroll_user</attribute>
+            </xpath>
+            <xpath expr="//header/button[@name='close_payslip_run']"
+                   position="attributes">
+                <attribute name="groups">om_hr_payroll.group_hr_payroll_user</attribute>
             </xpath>
 
             <!-- Reopening a closed batch: Payroll Manager only (guarded in
@@ -316,7 +341,8 @@
                 <div>
                     <button name="action_refresh_bank_totals" type="object"
                             string="Refresh Totals" icon="fa-refresh"
-                            class="btn-sm btn-secondary"/>
+                            class="btn-sm btn-secondary"
+                            groups="om_hr_payroll.group_hr_payroll_user"/>
                 </div>
                 <separator string="NET Totals by Bank Account"
                            invisible="not x_bank_total_ids"/>
@@ -345,6 +371,11 @@
                         icon="fa-search"
                         class="btn-secondary"/>
             </xpath>
+            <!-- A batch had no audit trail at all; see pitfall #120. -->
+            <xpath expr="//sheet" position="after">
+                <chatter/>
+            </xpath>
+
             <!-- Skipped employees log below the payslips list -->
             <xpath expr="//field[@name='slip_ids']" position="after">
                 <separator string="⚠ Skipped Employees &amp; Warnings"
@@ -373,6 +404,7 @@
                             string="Clear Skip Log"
                             icon="fa-trash"
                             class="btn-sm btn-secondary"
+                            groups="om_hr_payroll.group_hr_payroll_user"
                             confirm="Remove all skipped-employee entries from this batch?"/>
                 </div>
             </xpath>

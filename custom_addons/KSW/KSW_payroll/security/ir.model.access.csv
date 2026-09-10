@@ -19,3 +19,14 @@ access_hr_payslip_worked_days_supervisor_cascade,hr.payslip.worked.days.ksw.supe
 access_hr_payslip_input_self,hr.payslip.input.ksw.self,om_hr_payroll.model_hr_payslip_input,group_hr_payroll_self,1,0,0,0
 access_hr_payslip_input_supervisor,hr.payslip.input.ksw.supervisor,om_hr_payroll.model_hr_payslip_input,group_hr_payroll_supervisor,1,0,0,0
 access_hr_payslip_input_supervisor_cascade,hr.payslip.input.ksw.supervisor.cascade,om_hr_payroll.model_hr_payslip_input,group_hr_payroll_supervisor_cascade,1,0,0,0
+
+access_hr_payslip_reviewer,hr.payslip.ksw.reviewer,om_hr_payroll.model_hr_payslip,group_hr_payroll_reviewer,1,0,0,0
+access_hr_payslip_line_reviewer,hr.payslip.line.ksw.reviewer,om_hr_payroll.model_hr_payslip_line,group_hr_payroll_reviewer,1,0,0,0
+access_hr_payslip_worked_days_reviewer,hr.payslip.worked.days.ksw.reviewer,om_hr_payroll.model_hr_payslip_worked_days,group_hr_payroll_reviewer,1,0,0,0
+access_hr_payslip_input_reviewer,hr.payslip.input.ksw.reviewer,om_hr_payroll.model_hr_payslip_input,group_hr_payroll_reviewer,1,0,0,0
+access_hr_payslip_run_reviewer,hr.payslip.run.ksw.reviewer,om_hr_payroll.model_hr_payslip_run,group_hr_payroll_reviewer,1,0,0,0
+access_ksw_payslip_run_bank_total_reviewer,ksw.payslip.run.bank.total.ksw.reviewer,model_ksw_payslip_run_bank_total,group_hr_payroll_reviewer,1,0,0,0
+access_ksw_payslip_run_skip_line_reviewer,ksw.payslip.run.skip.line.ksw.reviewer,model_ksw_payslip_run_skip_line,group_hr_payroll_reviewer,1,0,0,0
+access_hr_salary_rule_category_reviewer,hr.salary.rule.category.ksw.reviewer,om_hr_payroll.model_hr_salary_rule_category,group_hr_payroll_reviewer,1,0,0,0
+access_hr_contribution_register_reviewer,hr.contribution.register.ksw.reviewer,om_hr_payroll.model_hr_contribution_register,group_hr_payroll_reviewer,1,0,0,0
+access_hr_payroll_structure_reviewer,hr.payroll.structure.ksw.reviewer,om_hr_payroll.model_hr_payroll_structure,group_hr_payroll_reviewer,1,0,0,0

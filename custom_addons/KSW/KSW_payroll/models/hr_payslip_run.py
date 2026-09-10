@@ -1,5 +1,8 @@
+from markupsafe import Markup
+
 from odoo import fields, models, _
 from odoo.exceptions import UserError
+from odoo.tools import float_compare
 
 try:
     import openpyxl
@@ -101,7 +104,13 @@ class KswPayslipRunSkipLine(models.Model):
 
 
 class HrPayslipRun(models.Model):
-    _inherit = 'hr.payslip.run'
+    # A payslip batch is a money document — it decides what leaves the bank
+    # — and the base model carries no audit trail at all. That is part of
+    # why the August 2026 confirmation could move three NETs after the bank
+    # file had been exported with nothing anywhere recording it
+    # (CLAUDE.md pitfall #120).
+    _name = 'hr.payslip.run'
+    _inherit = ['hr.payslip.run', 'mail.thread']
 
     x_salary_bank_account_id = fields.Many2one(
         'res.partner.bank',
@@ -203,11 +212,61 @@ class HrPayslipRun(models.Model):
         still shows it settled under that payslip").
         """
         pending = self.slip_ids.filtered(lambda s: s.state != 'done')
+        # Confirming recomputes every slip, so the figures can still move
+        # here — after a bank file may already have been exported and paid.
+        # Snapshot them and report anything that shifted (see
+        # `_ksw_report_confirm_net_changes`).
+        net_before = {s.id: s._ksw_net_amount() for s in pending}
         for line in pending:
             line.with_context(_ksw_skip_bank_refresh=True).action_payslip_done()
         self.write({'state': 'done'})
         self._refresh_bank_totals()
+        for run in self:
+            run._ksw_report_confirm_net_changes(
+                pending.filtered(lambda s: s.payslip_run_id == run), net_before)
         return True
+
+    def _ksw_report_confirm_net_changes(self, slips, net_before):
+        """Record any NET that moved while the batch was being confirmed.
+
+        `action_payslip_done()` calls `compute_sheet()`, so "Mark as Done"
+        is a recompute — the numbers are fixed at the moment the button is
+        pressed, not when the batch was generated. Anything that became
+        true in between (a loan disbursed, attendance backfilled, a leave
+        validated) lands here, silently.
+
+        That is how batch 250 (August 2026) came to disagree with the bank
+        by 2,550 SAR: three loans disbursed after generation appeared only
+        at confirmation, a day after the transfer had gone out, and nothing
+        anywhere said so. `ksw.deduction._refresh_draft_payslips` now closes
+        that particular window at the source; this is the general backstop —
+        whatever the cause, a change at confirmation is written to the
+        batch's chatter where payroll will see it.
+        """
+        self.ensure_one()
+        moved = []
+        for slip in slips:
+            before = net_before.get(slip.id, 0.0)
+            after = slip._ksw_net_amount()
+            if float_compare(after, before, precision_digits=2) != 0:
+                moved.append((slip, before, after))
+        if not moved:
+            return
+        rows = Markup('').join(
+            Markup('<li>%(emp)s (%(num)s): %(before).2f &rarr; %(after).2f '
+                   '(%(delta)+.2f)</li>') % {
+                'emp': s.employee_id.name, 'num': s.number or '',
+                'before': b, 'after': a, 'delta': a - b}
+            for s, b, a in moved)
+        self.sudo().message_post(body=Markup(
+            '<strong>&#9888; %(n)d payslip(s) changed while this batch was '
+            'being confirmed</strong><br/>'
+            'Confirming recomputes every payslip, so these figures were not '
+            'final until now.<br/>'
+            '<b>If a bank file was already exported for this batch, it is out '
+            'of date &mdash; export it again before paying.</b>'
+            '<ul>%(rows)s</ul>'
+        ) % {'n': len(moved), 'rows': rows}, subtype_xmlid='mail.mt_note')
 
     def action_refresh_bank_totals(self):
         self.ensure_one()

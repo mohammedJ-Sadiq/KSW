@@ -30,3 +30,5 @@ from . import test_unpaid_leave_deduction
 from . import test_unpaid_return_gate
 
 from . import test_payslip_email_queue
+
+from . import test_payroll_reviewer

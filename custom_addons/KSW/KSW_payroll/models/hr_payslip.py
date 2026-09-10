@@ -107,6 +107,23 @@ class HrPayslipWorkedDays(models.Model):
 class HrPayslipLine(models.Model):
     _inherit = 'hr.payslip.line'
 
+    # om_hr_payroll orders payslip lines by `version_id, sequence`, and
+    # ordering on a Many2one falls through to the comodel's own `_order`
+    # — `hr.version._order` is `date_version`, a field carrying
+    # `groups="hr.group_hr_user"`. The ORDER BY therefore runs
+    # `_check_field_access` on a restricted field, so **reading
+    # `payslip.line_ids` at all** raises AccessError for every user who is
+    # not an HR Officer: the payroll Officer tier only escapes it because
+    # it implies `hr.group_hr_user`. That silently broke the read-only
+    # tiers (Only Self / Supervisor / Cascade) — an ordinary employee
+    # opening their own payslip saw no lines, just the access dialog.
+    # Ordering by the payslip instead dereferences `hr.payslip._order`
+    # ('id desc'), which is unrestricted, and matches what the sibling
+    # models (worked days, inputs) already do. Within one payslip the
+    # displayed order is unchanged: `version_id` is constant there, so
+    # `sequence` decides either way.
+    _order = 'slip_id, sequence'
+
     amount = fields.Float(digits=(16, 0))
     quantity = fields.Float(digits=(16, 0))
     total = fields.Float(digits=(16, 0))
@@ -2155,6 +2172,17 @@ class HrPayslip(models.Model):
     def refund_sheet(self):
         self._check_payroll_manager(_('refund a payslip'))
         return super().refund_sheet()
+
+    def _ksw_net_amount(self):
+        """The payslip's NET as currently stored, 0.0 if not computed yet.
+
+        Used to tell whether a recompute actually moved the money — the
+        figure that reaches the bank file, and the only one worth warning
+        a payroll officer about.
+        """
+        self.ensure_one()
+        return float(sum(
+            self.line_ids.filtered(lambda l: l.code == 'NET').mapped('amount')))
 
     # ------------------------------------------------------------------
     # Auto-email payslip PDF on confirmation

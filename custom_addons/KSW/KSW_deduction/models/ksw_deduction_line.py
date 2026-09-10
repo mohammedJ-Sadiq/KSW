@@ -183,10 +183,17 @@ class KswDeductionLine(models.Model):
                     d=(' on %s' % when) if when else '',
                 )
             elif line.payslip_id:
+                # sudo(): the whole point of this column is to name the
+                # settlement WITHOUT demanding payroll access — the same
+                # reasoning that made x_settlement_date a stored field.
+                # A loan approver has no hr.payslip ACL, so reading the
+                # number directly raised AccessError and killed the
+                # web_read of the parent deduction, o2m lines and all.
+                # Only the payslip's own reference is exposed; nothing
+                # about the wage it carries.
+                slip = line.payslip_id.sudo()
                 line.settlement_label = (
-                    line.payslip_id.number
-                    or line.payslip_id.display_name
-                    or ''
+                    slip.number or slip.display_name or ''
                 )
             else:
                 line.settlement_label = ''
@@ -655,7 +662,10 @@ class KswDeductionLine(models.Model):
                     "%(slip)s and cannot be deleted. Reset the "
                     "payslip to draft first if you need to undo it.",
                     label=line.display_name,
-                    slip=line.payslip_id.display_name or '',
+                    # sudo(): same reason as _compute_settlement_label —
+                    # naming the payslip in the refusal must not itself
+                    # raise AccessError for a non-payroll caller.
+                    slip=line.payslip_id.sudo().display_name or '',
                 ))
             if not line.is_manual and not su:
                 raise UserError(_(
