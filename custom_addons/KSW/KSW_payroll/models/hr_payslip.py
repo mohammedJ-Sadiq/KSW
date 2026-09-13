@@ -2185,6 +2185,51 @@ class HrPayslip(models.Model):
             self.line_ids.filtered(lambda l: l.code == 'NET').mapped('amount')))
 
     # ------------------------------------------------------------------
+    # Which bank account actually paid this payslip
+    # ------------------------------------------------------------------
+    # Deliberately a plain stored field stamped once at confirmation, NOT a
+    # related/computed reach through `employee_id.x_salary_bank_account_id`.
+    # The employee field is *current* configuration; this one is *history*.
+    #
+    # KSWCO batch 250: EMAD ALY was paid 800 SAR from Kawther Raj Cards in the
+    # 2 Sep file, then moved to a Kawther WPS IBAN on 6 Sep. Because every
+    # consumer resolved the account live off the employee, an already-paid
+    # August payslip silently changed bank file four days after the money
+    # left — the card total lost 800 and the WPS total gained it, and no
+    # re-export could ever reproduce the file that was actually sent.
+    # A field whose whole job is to survive a later change to its source must
+    # never be a compute over that source (same rule as pitfall #50).
+    x_paid_bank_account_id = fields.Many2one(
+        'res.partner.bank', string='Paid From (Bank Account)',
+        readonly=True, copy=False, ondelete='restrict', index=True,
+        help='The company bank account this payslip was actually paid from, '
+             'stamped when it was confirmed. Changing the employee\'s salary '
+             'paying account afterwards does not move an already-paid '
+             'payslip to another bank file.',
+    )
+
+    def _stamp_paid_bank_account(self):
+        """Freeze the paying bank account on slips entering `done`.
+
+        Called from `write()` so it covers both routes in — the button and a
+        raw `write({'state': 'done'})`, which is how a historical payslip is
+        restored (see pitfall #49's repair notes). Never overwrites an
+        existing stamp: re-confirming a reopened batch must not restate
+        where a payment already went.
+        """
+        for slip in self:
+            if slip.x_paid_bank_account_id:
+                continue
+            bank = (
+                slip.employee_id.sudo().x_salary_bank_account_id
+                or slip.payslip_run_id.x_salary_bank_account_id
+            )
+            if bank:
+                slip.with_context(
+                    _ksw_skip_bank_refresh=True,
+                ).sudo().x_paid_bank_account_id = bank.id
+
+    # ------------------------------------------------------------------
     # Auto-email payslip PDF on confirmation
     # ------------------------------------------------------------------
 
@@ -2224,12 +2269,18 @@ class HrPayslip(models.Model):
     def write(self, vals):
         # Guard both routes into `done` from one place — `action_payslip_done`
         # lands here too (pitfall #37).
+        entering_done = self.env['hr.payslip']
         if vals.get('state') == 'done':
             entering = self.filtered(lambda s: s.state != 'done')
             if entering:
                 entering._check_duplicate_done_period()
                 entering._check_revision_payable()
+                entering_done = entering
         res = super().write(vals)
+        # After super(), so the slip is really `done` before its payment
+        # history is frozen — and after the guards above, which can refuse.
+        if entering_done:
+            entering_done._stamp_paid_bank_account()
         if 'payslip_run_id' in vals:
             runs = self.mapped('payslip_run_id').filtered(bool)
             if runs:

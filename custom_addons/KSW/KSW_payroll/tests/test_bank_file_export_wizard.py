@@ -1008,3 +1008,214 @@ class TestBankFileExportWizard(TransactionCase):
             'the totals block must warn that it is not part of the upload',
         )
 
+
+    # ================================================================
+    # Tests — cancelled payslips (KSWCO Sep 2026, MD KAJOL MIA)
+    #
+    # A transfer was refused by the bank and the payslip cancelled. Nothing
+    # in the export path checked `state`, so the slip stayed in the batch
+    # total AND would have been written into the bank file again on the next
+    # export. See Odoo 19 Pitfalls #121.
+    # ================================================================
+
+    GREY = 'D9D9D9'
+
+    def _cancel(self, slip):
+        slip.write({'state': 'cancel'})
+        return slip
+
+    def test_cancelled_slip_is_not_written_to_the_kawthar_text_file(self):
+        """The one that matters: a cancelled payslip must never reach the bank.
+
+        Driven through `_make_kawthar_txt`, the same delegation the export
+        button uses, so the sub-wizard's real predicate is what is under test.
+        """
+        self._cancel(self.slip_kaw_1)
+        wiz = self._make_wizard(mode='specific_txt', bank=self.kawthar_bank_1)
+        kaw_slips = self.batch.slip_ids.filtered(
+            lambda s: s.employee_id == self.emp_kaw_1)
+        with self.assertRaises(UserError):
+            # kawthar_bank_1 holds only this employee, so once the cancelled
+            # slip is dropped there is nothing payable left - which is the
+            # proof it was dropped. Before the fix this returned a file.
+            wiz._make_kawthar_txt(self.kawthar_bank_1, kaw_slips)
+
+    def test_cancelled_slip_is_not_written_to_the_wps_text_file(self):
+        emp = self._add_wps_employee('REFUSED TRANSFER', '931', '9009009031',
+                                     net=2050, iban='SA31111111111111111W0031')
+        self._cancel(self.batch.slip_ids.filtered(
+            lambda s: s.employee_id == emp))
+
+        wiz = self._make_wizard(mode='specific_txt', bank=self.wps_bank)
+        wps_slips = self.batch.slip_ids.filtered(
+            lambda s: s.employee_id.sudo().x_salary_bank_account_id
+            == self.wps_bank)
+        content = wiz._make_wps_txt(self.wps_bank, wps_slips).decode('utf-8')
+
+        self.assertNotIn('REFUSED TRANSFER', content,
+                         'a cancelled payslip must not reach the bank file')
+        self.assertIn('AHMED WPS EMPLOYEE', content,
+                      'the payable rows must still be there')
+        # The header total must not carry the cancelled amount either.
+        self.assertNotIn('2050', content.split('\n')[0])
+
+    def test_cancelled_slip_leaves_the_payable_total_and_is_reported_apart(self):
+        """`total_net` is the current figure; the original stays recoverable."""
+        emp = self._add_wps_employee('REFUSED TRANSFER', '932', '9009009032',
+                                     net=2050, iban='SA32111111111111111W0032')
+        self.batch._refresh_bank_totals()
+        total = self.env['ksw.payslip.run.bank.total'].search([
+            ('run_id', '=', self.batch.id),
+            ('bank_account_id', '=', self.wps_bank.id)])
+        before, count_before = total.total_net, total.payable_count
+        self.assertEqual(total.cancelled_count, 0)
+
+        self._cancel(self.batch.slip_ids.filtered(
+            lambda s: s.employee_id == emp))
+        self.batch._refresh_bank_totals()
+        total = self.env['ksw.payslip.run.bank.total'].search([
+            ('run_id', '=', self.batch.id),
+            ('bank_account_id', '=', self.wps_bank.id)])
+
+        self.assertEqual(total.total_net, before - 2050,
+                         'the cancelled slip must leave what the bank will debit')
+        self.assertEqual(total.payable_count, count_before - 1)
+        self.assertEqual(total.cancelled_count, 1)
+        self.assertEqual(total.cancelled_net, 2050)
+        self.assertEqual(total.total_net_before_cancel, before,
+                         'the figure the bank was actually sent must survive')
+
+    def test_cancelled_drilldown_returns_only_that_banks_cancelled_slips(self):
+        emp = self._add_wps_employee('REFUSED TRANSFER', '933', '9009009033',
+                                     net=2050, iban='SA33111111111111111W0033')
+        slip = self.batch.slip_ids.filtered(lambda s: s.employee_id == emp)
+        self._cancel(slip)
+        self._cancel(self.slip_kaw_1)          # a different bank account
+        self.batch._refresh_bank_totals()
+
+        wps_total = self.env['ksw.payslip.run.bank.total'].search([
+            ('run_id', '=', self.batch.id),
+            ('bank_account_id', '=', self.wps_bank.id)])
+        action = wps_total.action_open_cancelled_payslips()
+        ids = action['domain'][0][2]
+        self.assertEqual(ids, slip.ids,
+                         'the drill-down must be scoped to its own bank file')
+
+    def test_cancelled_row_moves_out_of_the_wps_upload_block(self):
+        """On an upload sheet an un-deleted row is a payment instruction."""
+        emp = self._add_wps_employee('REFUSED TRANSFER', '934', '9009009034',
+                                     net=2050, iban='SA34111111111111111W0034')
+        self._cancel(self.batch.slip_ids.filtered(
+            lambda s: s.employee_id == emp))
+
+        ws = self._export_wb('specific_excel', self.wps_bank)['WPS Bank File']
+        rows = self._sheet_rows(ws, 3, 8)
+        self.assertIn('REFUSED TRANSFER', rows,
+                      'it must still be listed - that is the audit trail')
+        r = rows['REFUSED TRANSFER']
+        self.assertEqual(self._fill_rgb(ws.cell(r, 1)), self.GREY)
+
+        # It must sit BELOW its own banner, not in the upload block.
+        banners = [
+            ws.cell(x, 1).value for x in range(1, r)
+            if isinstance(ws.cell(x, 1).value, str)
+            and 'Cancelled payslips' in ws.cell(x, 1).value
+        ]
+        self.assertTrue(banners, 'cancelled rows need their own section banner')
+
+        # And the payable row must be above that banner.
+        paid = rows['AHMED WPS EMPLOYEE']
+        self.assertLess(paid, r)
+
+    def test_cancelled_totals_state_both_figures(self):
+        emp = self._add_wps_employee('REFUSED TRANSFER', '935', '9009009035',
+                                     net=2050, iban='SA35111111111111111W0035')
+        self._cancel(self.batch.slip_ids.filtered(
+            lambda s: s.employee_id == emp))
+
+        ws = self._export_wb('specific_excel', self.wps_bank)['WPS Bank File']
+        self.assertEqual(
+            self._totals_row(ws, 'Total written to the bank file', 6), 11000,
+            'payable total must exclude the cancelled slip')
+        self.assertEqual(
+            self._totals_row(ws, 'Cancelled after export', 6), 2050)
+        self.assertEqual(
+            self._totals_row(ws, 'Originally exported to the bank', 6), 13050,
+            'the accounts team reconciles against what was actually sent')
+
+    def test_no_cancelled_section_when_nothing_is_cancelled(self):
+        """The normal case must not grow a new empty block."""
+        ws = self._export_wb('specific_excel', self.wps_bank)['WPS Bank File']
+        labels = [
+            ws.cell(r, 1).value for r in range(1, ws.max_row + 1)
+            if isinstance(ws.cell(r, 1).value, str)
+        ]
+        self.assertFalse([l for l in labels if 'Cancelled' in l])
+
+    # ================================================================
+    # Tests — the paying bank account is history, not configuration
+    #
+    # KSWCO batch 250: EMAD ALY was paid 800 from Kawther Raj Cards on 2 Sep,
+    # then moved to a WPS IBAN on 6 Sep. Every consumer resolved the account
+    # live off the employee, so an already-paid August payslip changed bank
+    # file four days after the money left.
+    # ================================================================
+
+    def test_paying_account_is_stamped_on_confirmation(self):
+        self.assertFalse(self.slip_kaw_1.x_paid_bank_account_id)
+        self.slip_kaw_1.write({'state': 'done'})
+        self.assertEqual(self.slip_kaw_1.x_paid_bank_account_id,
+                         self.kawthar_bank_1)
+
+    def test_changing_the_employee_account_does_not_move_a_paid_payslip(self):
+        """The actual EMAD ALY case."""
+        self.slip_kaw_1.write({'state': 'done'})
+        self.batch._refresh_bank_totals()
+
+        # Four days later he is moved to the WPS account.
+        self.emp_kaw_1.sudo().write(
+            {'x_salary_bank_account_id': self.wps_bank.id})
+        self.batch._refresh_bank_totals()
+
+        kaw = self.env['ksw.payslip.run.bank.total'].search([
+            ('run_id', '=', self.batch.id),
+            ('bank_account_id', '=', self.kawthar_bank_1.id)])
+        self.assertTrue(
+            kaw, 'the paid payslip must stay on the account that paid it')
+        self.assertEqual(kaw.total_net, 6500)
+        self.assertEqual(
+            self.batch._resolve_slip_bank_account(self.slip_kaw_1),
+            self.kawthar_bank_1)
+
+    def test_a_draft_payslip_still_follows_the_employee(self):
+        """Not yet paid, so current configuration is the right answer."""
+        self.assertEqual(self.slip_kaw_1.state, 'draft')
+        self.emp_kaw_1.sudo().write(
+            {'x_salary_bank_account_id': self.wps_bank.id})
+        self.assertEqual(
+            self.batch._resolve_slip_bank_account(self.slip_kaw_1),
+            self.wps_bank)
+
+    def test_stamp_is_never_overwritten(self):
+        """Re-confirming a reopened batch must not restate where money went."""
+        self.slip_kaw_1.write({'state': 'done'})
+        self.emp_kaw_1.sudo().write(
+            {'x_salary_bank_account_id': self.wps_bank.id})
+        self.slip_kaw_1.write({'state': 'draft'})
+        self.slip_kaw_1.write({'state': 'done'})
+        self.assertEqual(self.slip_kaw_1.x_paid_bank_account_id,
+                         self.kawthar_bank_1,
+                         'the original payment account must survive a reopen')
+
+    def test_backfill_stamps_only_confirmed_unstamped_slips(self):
+        self.slip_kaw_1.write({'state': 'done'})          # already stamped
+        self.slip_kaw_2.write({'state': 'done'})
+        self.slip_kaw_2.sudo().x_paid_bank_account_id = False   # simulate legacy
+        self.assertEqual(self.slip_wps.state, 'draft')
+
+        self.batch.action_stamp_paid_bank_accounts()
+
+        self.assertEqual(self.slip_kaw_2.x_paid_bank_account_id,
+                         self.kawthar_bank_2)
+        self.assertFalse(self.slip_wps.x_paid_bank_account_id,
+                         'a draft payslip has not been paid - leave it alone')

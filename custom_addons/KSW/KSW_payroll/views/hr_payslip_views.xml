@@ -78,6 +78,17 @@
                         invisible="not x_is_revision"/>
             </xpath>
 
+            <!-- ── Which bank account actually paid this payslip ──
+                 History, not configuration: it is stamped at confirmation and
+                 does not follow a later change to the employee's salary
+                 account. Shown read-only, and only once it exists. -->
+            <xpath expr="//notebook" position="before">
+                <group invisible="not x_paid_bank_account_id"
+                       groups="om_hr_payroll.group_hr_payroll_user">
+                    <field name="x_paid_bank_account_id" readonly="1"/>
+                </group>
+            </xpath>
+
             <!-- ── Payslip email queue state ── -->
             <xpath expr="//notebook" position="before">
                 <div class="alert alert-warning" role="alert"
@@ -343,6 +354,14 @@
                             string="Refresh Totals" icon="fa-refresh"
                             class="btn-sm btn-secondary"
                             groups="om_hr_payroll.group_hr_payroll_user"/>
+                    <!-- Backfill for slips confirmed before
+                         x_paid_bank_account_id existed. Manager-only: it
+                         writes payment history. -->
+                    <button name="action_stamp_paid_bank_accounts" type="object"
+                            string="Record Paying Account" icon="fa-lock"
+                            class="btn-sm btn-secondary"
+                            groups="om_hr_payroll.group_hr_payroll_manager"
+                            confirm="This records, on every confirmed payslip in this batch that has none yet, the bank account it was paid from — using today's setup. For any employee whose salary account changed after the batch was paid, the archived bank export is the authority, not this."/>
                 </div>
                 <separator string="NET Totals by Bank Account"
                            invisible="not x_bank_total_ids"/>
@@ -353,9 +372,28 @@
                         <field name="slip_count" string="Employees" width="90px"/>
                         <field name="payable_count" string="In Bank File"
                                width="90px"/>
-                        <field name="total_net" string="Total NET (Paid)"
+                        <field name="total_net" string="Total NET (Payable Now)"
                                digits="[16,2]" width="150px"
                                decoration-bf="True"/>
+                        <!-- Before / after a cancellation. `total_net` is the
+                             current figure; these two say what the file that
+                             actually went to the bank carried, and the button
+                             opens the payslips that explain the difference.
+                             All three are hidden until something is cancelled
+                             so the normal case stays a clean three columns. -->
+                        <button name="action_open_cancelled_payslips"
+                                type="object" icon="fa-ban"
+                                title="Show the cancelled payslips behind this difference"
+                                class="btn-link text-danger"
+                                invisible="cancelled_count == 0"/>
+                        <field name="cancelled_count" string="Cancelled"
+                               width="90px" widget="badge"
+                               decoration-danger="cancelled_count &gt; 0"
+                               invisible="cancelled_count == 0"/>
+                        <field name="total_net_before_cancel"
+                               string="Originally Exported"
+                               digits="[16,2]" width="150px"
+                               invisible="cancelled_count == 0"/>
                         <field name="excluded_count" string="Excluded"
                                width="90px"
                                decoration-danger="excluded_count &gt; 0"/>

@@ -86,7 +86,10 @@ class WpsFileWizard(models.TransientModel):
     # Text-file builders
     # ------------------------------------------------------------------
     def _build_wps_text(self, bank_account, slips):
-        valid = self.payslip_run_id._sorted_export_slips(slips.filtered(
+        # `_drop_unpayable_slips` first: a cancelled payslip must never be
+        # written to the bank, whatever its NET says (see that method).
+        payable = self.payslip_run_id._drop_unpayable_slips(slips)
+        valid = self.payslip_run_id._sorted_export_slips(payable.filtered(
             lambda s: self._get_line_total(s, 'NET') > 0
         ))
         if not valid:

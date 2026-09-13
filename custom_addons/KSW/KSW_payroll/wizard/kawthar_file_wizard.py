@@ -4,7 +4,7 @@ import io
 from odoo import fields, models, _
 from odoo.exceptions import UserError
 
-from ..models.hr_payslip_run import EXCLUDED_STATUSES
+from ..models.hr_payslip_run import CANCELLED_STATUSES, EXCLUDED_STATUSES
 
 try:
     import openpyxl
@@ -257,8 +257,13 @@ class KawtharFileWizard(models.TransientModel):
         op_label = OPERATION_CODE_LABEL.get(self.operation_code, '')
         batch = self.payslip_run_id
         classified = batch._classify_export_slips(slips, 'kawthar')
-        included = [r for r in classified if r[1] not in EXCLUDED_STATUSES]
+        # Three buckets, not two. A cancelled row must leave the upload block:
+        # on this sheet an un-deleted row IS a payment instruction, and the
+        # sequence in column A must stay 1..N over genuinely payable rows.
+        included = [r for r in classified
+                    if r[1] not in EXCLUDED_STATUSES + CANCELLED_STATUSES]
         excluded = [r for r in classified if r[1] in EXCLUDED_STATUSES]
+        cancelled = [r for r in classified if r[1] in CANCELLED_STATUSES]
 
         def _write(row_idx, slip, status, reason, seq):
             emp = slip.employee_id
@@ -312,6 +317,15 @@ class KawtharFileWizard(models.TransientModel):
                 _write(ri, slip, status, reason, '')
                 ri += 1
 
+        if cancelled:
+            ri = batch._write_export_banner(ws, ri - 1, _(
+                'Cancelled payslips — were carried by the exported bank file, '
+                'NOT payable now. Review only, delete before uploading'
+            ))
+            for slip, status, reason in cancelled:
+                _write(ri, slip, status, reason, '')
+                ri += 1
+
         # 'Amount (15N)' is column 5 — see `en_headers` above.
         batch._write_export_totals(
             ws, ri - 1, 5,
@@ -320,6 +334,9 @@ class KawtharFileWizard(models.TransientModel):
             len(excluded), sum(self._get_line_total(r[0], 'NET')
                                for r in excluded),
             banner=True,
+            cancelled_count=len(cancelled),
+            cancelled_net=sum(self._get_line_total(r[0], 'NET')
+                              for r in cancelled),
         )
 
         # ── Auto-width columns ──
@@ -348,7 +365,10 @@ class KawtharFileWizard(models.TransientModel):
           Basic in halalas (12N) | Housing in halalas (12N) |
           Other allowance in halalas (12N) | Deductions in halalas (12N)
         """
-        valid = self.payslip_run_id._sorted_export_slips(slips.filtered(
+        # `_drop_unpayable_slips` first: a cancelled payslip must never be
+        # written to the bank, whatever its NET and card say (see that method).
+        payable = self.payslip_run_id._drop_unpayable_slips(slips)
+        valid = self.payslip_run_id._sorted_export_slips(payable.filtered(
             lambda s: s.employee_id.sudo().primary_bank_account_id
             and self._get_line_total(s, 'NET') > 0
         ))

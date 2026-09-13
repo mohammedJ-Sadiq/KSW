@@ -268,7 +268,17 @@ class KswPayBatch(models.Model):
         elif privileged:
             return Employee.search([])
         else:
-            departments = self._allowed_departments()
+            # …and for the same reason the authority question has to be
+            # asked with su dropped: `_allowed_departments` short-circuits
+            # on `env.su` to *every* department, which inside this
+            # compute_sudo field hands each supervisor all 400-odd
+            # employees — the exact picker this method exists to narrow.
+            # The trap was dormant while a batch always had a scope; it
+            # goes off the moment one does not, which is every new batch
+            # before its site is chosen (KSWCO, Sep 2026). The reads
+            # inside are sudo()'d, so nothing is lost.
+            batch = self.with_env(self.env(su=False))
+            departments = batch._allowed_departments()
             in_scope = Employee.search(
                 [('department_id', 'in', departments.ids)]
             ) if departments else Employee.browse()
@@ -280,8 +290,19 @@ class KswPayBatch(models.Model):
     @api.depends_context('uid')
     @api.depends('department_id', 'site_id')
     def _compute_allowed_employees(self):
+        # Only for the roles that actually type an entry. A General Manager
+        # or an Accountant opens this form to read it, and filling a picker
+        # he will never use is not free: reading an x2many back filters it
+        # on `active` in the *reader's* environment
+        # (Many2many.convert_to_record), so a single employee his role has
+        # no hr.employee rule for raises AccessError for the whole form.
+        # Same uid-not-su reasoning as _allowed_employees above.
+        may_record = self.env.uid == SUPERUSER_ID or self.env.user.has_group(
+            'KSW_commissions.group_commission_supervisor')
         for rec in self:
-            rec.allowed_employee_ids = rec._allowed_employees()
+            rec.allowed_employee_ids = (
+                rec._allowed_employees() if may_record
+                else self.env['hr.employee'])
 
     @api.model
     def default_get(self, fields_list):

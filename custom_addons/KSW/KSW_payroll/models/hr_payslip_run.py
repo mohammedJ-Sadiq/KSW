@@ -16,9 +16,18 @@ EXPORT_ROW_STYLES = {
     'excluded_zero': ('FFC7CE', '9C0006'),   # red   — NET <= 0, not payable
     'excluded_other': ('FFEB9C', '9C6500'),  # amber — dropped for another reason
     'warning': ('FFEB9C', '9C6500'),         # amber — in the file but needs a look
+    'cancelled': ('D9D9D9', '595959'),       # grey  — payslip cancelled, not paid
 }
 
 EXCLUDED_STATUSES = ('excluded_zero', 'excluded_other')
+
+# A cancelled payslip is its own bucket, NOT one of EXCLUDED_STATUSES. The
+# excluded rows are ones the batch never paid; a cancelled row is one it paid
+# and then pulled back (a refused transfer, a correction), so the reviewer
+# needs both figures: what the bank file carried at the time, and what stands
+# now. Keeping it separate is what lets `total_net` mean "current" while
+# `total_net_before_cancel` still reproduces the exported file.
+CANCELLED_STATUSES = ('cancelled',)
 
 
 class KswPayslipRunBankTotal(models.Model):
@@ -74,6 +83,43 @@ class KswPayslipRunBankTotal(models.Model):
         help='Sum of NET on the dropped rows. Negative when an employee was '
              'over-deducted.',
     )
+    cancelled_count = fields.Integer(
+        string='Cancelled',
+        help='Payslips in this batch that were cancelled after the bank file '
+             'was exported — a refused transfer, or a correction.',
+    )
+    cancelled_net = fields.Float(
+        string='Cancelled NET', digits=(16, 2),
+        help='Sum of NET on the cancelled payslips. This money was in the '
+             'exported bank file but is not payable any more.',
+    )
+    total_net_before_cancel = fields.Float(
+        string='Originally Exported', digits=(16, 2),
+        help='What this bank file totalled before any payslip was cancelled — '
+             'i.e. the figure on the file that was actually sent to the bank. '
+             'Equals Total NET + Cancelled NET.',
+    )
+
+    def action_open_cancelled_payslips(self):
+        """Drill down from the summary line to the cancelled payslips.
+
+        This is the "how it was before / how it is now" answer: the list shows
+        exactly which payslips account for the difference between
+        `total_net_before_cancel` and `total_net`.
+        """
+        self.ensure_one()
+        slips = self.run_id.slip_ids.filtered(
+            lambda s: s.state == 'cancel'
+            and self.run_id._resolve_slip_bank_account(s) == self.bank_account_id
+        )
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Cancelled — was in the exported file, not payable now'),
+            'res_model': 'hr.payslip',
+            'domain': [('id', 'in', slips.ids)],
+            'view_mode': 'list,form',
+            'context': {'create': False},
+        }
 
 
 class KswPayslipRunSkipLine(models.Model):
@@ -161,12 +207,16 @@ class HrPayslipRun(models.Model):
             for bank, slips in run._group_slips_by_bank_account().items():
                 payable_count = payable_net = 0
                 excluded_count = excluded_net = 0
+                cancelled_count = cancelled_net = 0
                 classified = run._classify_export_slips(
                     slips, bank.x_file_type or 'wps',
                 )
                 for slip, status, _reason in classified:
                     net = run._get_line_total(slip, 'NET')
-                    if status in EXCLUDED_STATUSES:
+                    if status in CANCELLED_STATUSES:
+                        cancelled_count += 1
+                        cancelled_net += net
+                    elif status in EXCLUDED_STATUSES:
                         excluded_count += 1
                         excluded_net += net
                     else:
@@ -180,6 +230,12 @@ class HrPayslipRun(models.Model):
                     'total_net': payable_net,
                     'excluded_count': excluded_count,
                     'excluded_net': excluded_net,
+                    'cancelled_count': cancelled_count,
+                    'cancelled_net': cancelled_net,
+                    # What the file said when it was sent. Cancelling a slip
+                    # moves money out of `total_net` and into here, so the two
+                    # columns side by side are the before/after.
+                    'total_net_before_cancel': payable_net + cancelled_net,
                 })
 
     def draft_payslip_run(self):
@@ -340,16 +396,82 @@ class HrPayslipRun(models.Model):
         empty recordset key so callers can report them.
         """
         groups = {}
-        bank_model = self.env['res.partner.bank']
         for slip in self.slip_ids:
-            bank = (
-                slip.employee_id.sudo().x_salary_bank_account_id
-                or self.x_salary_bank_account_id
-                or bank_model
-            )
+            bank = self._resolve_slip_bank_account(slip)
             groups.setdefault(bank, self.env['hr.payslip'])
             groups[bank] |= slip
         return groups
+
+    def action_stamp_paid_bank_accounts(self):
+        """Backfill `x_paid_bank_account_id` on this batch's confirmed slips.
+
+        For payslips confirmed before the field existed. It stamps **today's**
+        resolution, which is the right answer for every employee whose salary
+        account has not moved since — and the wrong one for any who has, so it
+        reports what it did rather than working silently. The authoritative
+        record for an already-sent file is the archived export attachment.
+        """
+        stamped = self.env['hr.payslip']
+        for run in self:
+            todo = run.slip_ids.filtered(
+                lambda s: s.state == 'done' and not s.x_paid_bank_account_id)
+            todo._stamp_paid_bank_account()
+            stamped |= todo.filtered('x_paid_bank_account_id')
+        if stamped:
+            self._refresh_bank_totals()
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Paying account recorded'),
+                'message': _(
+                    '%(n)s confirmed payslip(s) now carry the bank account '
+                    'they were paid from. Changing an employee\'s salary '
+                    'account will no longer move them to another bank file.',
+                    n=len(stamped)),
+                'type': 'success',
+                'sticky': False,
+            },
+        }
+
+    def _resolve_slip_bank_account(self, slip):
+        """The paying bank account for one slip, or an empty recordset.
+
+        Extracted so the grouping and every drill-down that has to answer
+        "which bank file is this slip in?" resolve it identically — the
+        classifier and the text builders having kept separate predicates is
+        what let a cancelled payslip stay in both the summary total and the
+        bank file.
+
+        ``x_paid_bank_account_id`` wins when it is set, i.e. once the payslip
+        has been confirmed. It is the account the money actually went out of;
+        the employee's own field is only *current* configuration and may have
+        moved since. A draft slip has no stamp yet, so it resolves live —
+        which is right, it has not been paid.
+        """
+        return (
+            slip.x_paid_bank_account_id
+            or slip.employee_id.sudo().x_salary_bank_account_id
+            or self.x_salary_bank_account_id
+            or self.env['res.partner.bank']
+        )
+
+    def _drop_unpayable_slips(self, slips):
+        """Strip slips no bank file may carry, whatever its format.
+
+        A **cancelled** payslip is money that was pulled back: the bank refused
+        the transfer, or payroll corrected the run. It must never reach a text
+        file, and it must not be counted in what the bank will debit. Both
+        text builders and the classifier go through here so the rule lives in
+        one place.
+
+        KSWCO, Sep 2026: MD KAJOL MIA's transfer (2,050 SAR) was refused and
+        his payslip cancelled, yet he stayed in the batch total AND would have
+        been written into the file again on the next export, because
+        `_classify_export_slips`, `_build_kawthar_text` and `_build_wps_text`
+        each filtered on NET and bank account only, and none of them on state.
+        """
+        return slips.filtered(lambda s: s.state != 'cancel')
 
     def _sorted_export_slips(self, slips):
         """Sort slips by configured employee export order, then name.
@@ -393,7 +515,15 @@ class HrPayslipRun(models.Model):
         for slip in self._sorted_export_slips(slips):
             net = self._get_line_total(slip, 'NET')
             bank = slip.employee_id.sudo().primary_bank_account_id
-            if not net:
+            if slip.state == 'cancel':
+                # Checked FIRST and independently of net/bank: a cancelled
+                # payslip is out of the file whatever its figures say. It is
+                # still classified (rather than dropped) so the Excel can list
+                # it in its own section — that section is the record of what
+                # the exported file carried before the cancellation.
+                status = 'cancelled'
+                reason = _('Payslip cancelled — was exported, not paid')
+            elif not net:
                 status = 'excluded_zero'
                 reason = _('Zero net salary — fully absorbed by deductions')
             elif net < 0:
@@ -439,13 +569,20 @@ class HrPayslipRun(models.Model):
     def _write_export_totals(self, ws, last_row, money_col,
                              payable_count, payable_net,
                              excluded_count, excluded_net,
-                             banner=False):
-        """Write the payable / excluded / batch totals under a data block.
+                             banner=False,
+                             cancelled_count=0, cancelled_net=0.0):
+        """Write the payable / cancelled / excluded / batch totals under a block.
 
         The payable line is the only one that matches the bank text file, so
         it is stated separately from the batch total instead of leaving the
         reader to sum the money column — that sum silently nets the negative
         (over-deducted) rows off the amount the bank will actually debit.
+
+        When any payslip was **cancelled** the block also states what the file
+        totalled *before* the cancellation, because that — not the current
+        figure — is what the bank was actually sent and what the accounts
+        department reconciles against. Both numbers, one above the other, so
+        neither has to be reconstructed by hand.
 
         ``banner`` adds the review-only warning used on the bank upload
         sheets, where every row below the payable block must be deleted
@@ -462,6 +599,17 @@ class HrPayslipRun(models.Model):
             _('Total written to the bank file (%s rows)', payable_count),
             payable_net,
         )]
+        if cancelled_count:
+            rows.append((
+                _('Cancelled after export — not paid (%s rows)',
+                  cancelled_count),
+                cancelled_net,
+            ))
+            rows.append((
+                _('Originally exported to the bank (%s rows)',
+                  payable_count + cancelled_count),
+                payable_net + cancelled_net,
+            ))
         if excluded_count:
             rows.append((
                 _('Excluded from the bank file (%s rows)', excluded_count),
@@ -469,14 +617,39 @@ class HrPayslipRun(models.Model):
             ))
             rows.append((
                 _('Batch total (all %s rows)',
-                  payable_count + excluded_count),
-                payable_net + excluded_net,
+                  payable_count + excluded_count + cancelled_count),
+                payable_net + excluded_net + cancelled_net,
             ))
         for label, amount in rows:
             ws.cell(ri, 1, label).font = bold
             ws.cell(ri, money_col, amount).font = bold
             ri += 1
         return ri - 1
+
+    def _write_cancelled_section(self, ws, last_row, ncols, cancelled_rows,
+                                 name_col=1, money_col=None, reason_col=None):
+        """Write the "Cancelled payslips" block below a data block.
+
+        Its own section rather than a grey row inside the payable list: these
+        rows were in the file that went to the bank, so they explain a
+        difference the accounts team is looking at, and mixing them into the
+        payable block is how they got paid twice over in the first place.
+
+        ``cancelled_rows`` is ``[(slip, reason)]``. Returns the first free row.
+        """
+        if not cancelled_rows:
+            return last_row
+        ri = self._write_export_banner(ws, last_row, _(
+            'Cancelled payslips — carried by the exported bank file, '
+            'NOT payable now'))
+        for slip, reason in cancelled_rows:
+            ws.cell(ri, name_col, slip.employee_id.name or '')
+            if money_col:
+                ws.cell(ri, money_col, self._get_line_total(slip, 'NET'))
+            ws.cell(ri, reason_col or ncols, reason or '')
+            self._style_export_row(ws, ri, ncols, 'cancelled')
+            ri += 1
+        return ri
 
     # ------------------------------------------------------------------
     # Sheet 1 — Internal payroll summary
@@ -515,6 +688,7 @@ class HrPayslipRun(models.Model):
         ri = 1
         payable_count = payable_net = 0
         excluded_count = excluded_net = 0
+        cancelled_count = cancelled_net = 0
         for slip, status, reason in self._classify_export_slips(
             slips, file_type,
         ):
@@ -580,7 +754,10 @@ class HrPayslipRun(models.Model):
                 c.border = thin
             self._style_export_row(ws, ri, len(headers), status)
 
-            if status in EXCLUDED_STATUSES:
+            if status in CANCELLED_STATUSES:
+                cancelled_count += 1
+                cancelled_net += net
+            elif status in EXCLUDED_STATUSES:
                 excluded_count += 1
                 excluded_net += net
             else:
@@ -588,9 +765,14 @@ class HrPayslipRun(models.Model):
                 payable_net += net
 
         # 'Net Salary' is column 15 — see `headers` above.
+        # Cancelled rows stay listed inline on this internal sheet (greyed,
+        # with the reason in the status column) because it is the full-picture
+        # employee list. They are pulled OUT of the payable block on the bank
+        # upload sheets instead, where an un-deleted row becomes a payment.
         ri = self._write_export_totals(
             ws, ri, 15, payable_count, payable_net,
             excluded_count, excluded_net,
+            cancelled_count=cancelled_count, cancelled_net=cancelled_net,
         )
 
         # Employees that never got a payslip in this batch. They have no
@@ -712,8 +894,12 @@ class HrPayslipRun(models.Model):
         # a trailing block behind a banner, keeping the top of the sheet
         # upload-ready.
         classified = self._classify_export_slips(slips, 'wps')
-        included = [r for r in classified if r[1] not in EXCLUDED_STATUSES]
+        # Three buckets, not two. A cancelled row must leave the upload block:
+        # on this sheet an un-deleted row IS a payment instruction.
+        included = [r for r in classified
+                    if r[1] not in EXCLUDED_STATUSES + CANCELLED_STATUSES]
         excluded = [r for r in classified if r[1] in EXCLUDED_STATUSES]
+        cancelled = [r for r in classified if r[1] in CANCELLED_STATUSES]
 
         def _write(row_idx, slip, status, reason):
             emp = slip.employee_id
@@ -770,6 +956,15 @@ class HrPayslipRun(models.Model):
                 _write(ri, slip, status, reason)
                 ri += 1
 
+        if cancelled:
+            ri = self._write_export_banner(ws, ri - 1, _(
+                'Cancelled payslips — were carried by the exported bank file, '
+                'NOT payable now. Review only, delete before uploading'
+            ))
+            for slip, status, reason in cancelled:
+                _write(ri, slip, status, reason)
+                ri += 1
+
         # 'Salary (15N)' is column 6 — see `en_headers` above.
         self._write_export_totals(
             ws, ri - 1, 6,
@@ -778,6 +973,9 @@ class HrPayslipRun(models.Model):
             len(excluded), sum(self._get_line_total(r[0], 'NET')
                                for r in excluded),
             banner=True,
+            cancelled_count=len(cancelled),
+            cancelled_net=sum(self._get_line_total(r[0], 'NET')
+                              for r in cancelled),
         )
 
         # Auto-width columns

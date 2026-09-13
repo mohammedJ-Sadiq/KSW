@@ -472,6 +472,72 @@
         <field name="perm_unlink" eval="False"/>
     </record>
 
+    <!-- ============================================================ -->
+    <!-- Record Rules - hr.employee                                     -->
+    <!-- ============================================================ -->
+    <!--
+        A supervisor has to be able to READ whoever he may pay.
+
+        The picker (ksw.pay.batch.allowed_employee_ids) is computed sudo, so
+        it names the employees his *pay* authority covers: the departments he
+        manages or assists, his reporting chain, and the workers of a site a
+        site-scoped batch covers. His hr.employee scope from
+        KSW_base_security is a different question entirely and answers only
+        "the people whose parent_id is me" - so the two disagreed, and the
+        disagreement was not survivable: reading an x2many filters it on
+        `active` in the reader's own environment
+        (odoo/orm/fields_relational.py, Many2many.convert_to_record), so one
+        employee outside his HR scope raised AccessError for the whole batch
+        form, and the employee dropdown, whose name search also runs as the
+        user, would have come up empty anyway (KSWCO, Sep 2026).
+
+        So the read scope mirrors the pay scope branch for branch - naming a
+        group in a Python guard is worthless if no ir.rule lets it see the
+        records (CLAUDE.md gotcha #38). READ ONLY: everything else about an
+        employee record stays HR's.
+
+        A rule, and deliberately NOT an ir.model.access row. Model-level read
+        on hr.employee is what decides whether a user is answered by
+        hr.employee or by hr.employee.public (CLAUDE.md gotcha #34): granting
+        it would move a supervisor who holds no HR group off the public
+        model, where he reads names company-wide today, and onto these rules
+        - taking away more than it gives. The rule only widens the scope of
+        those already on the hr.employee path, which in KSWCO is everyone
+        carrying the HR "Employee" group.
+    -->
+    <record id="rule_hr_employee_pay_supervisor" model="ir.rule">
+        <field name="name">Employee: whoever a pay supervisor may record for</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="groups" eval="[(4, ref('group_commission_supervisor'))]"/>
+        <field name="domain_force">['|', '|', '|',
+            ('department_id.manager_id.user_id', '=', user.id),
+            ('department_id.manager_id.user_id', 'in', user.x_assisted_manager_ids.ids),
+            ('id', 'child_of', user.employee_ids.ids),
+            ('x_site_id', '!=', False)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!--
+        The Administrator's picker is every employee (_allowed_employees
+        returns the lot for him), so his read scope has to be too, or the
+        same AccessError comes back on the first batch he opens. Still read
+        only - this grants the names behind the figures he already sees, not
+        the right to touch an employee record.
+    -->
+    <record id="rule_hr_employee_pay_officer" model="ir.rule">
+        <field name="name">Employee: Commissions Administrator (read, all)</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="groups" eval="[(4, ref('group_commission_officer'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
     <!--
         Admin/root: one group each now. Administrator implies Supervisor,
         Accountant and Sales Entry, so the bootstrap admin keeps what he had
