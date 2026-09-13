@@ -47,6 +47,38 @@
                 </div>
             </xpath>
 
+            <!-- ===== Right column: balance panel instead of the summary ===== -->
+            <!-- The annual view replaced Odoo's hr_leave_stats widget with a
+                 pair of divs switched on x_is_annual_leave_type.  An EOS type
+                 is NOT flagged annual, so it fell through to the generic
+                 summary — which reports an allocation an EOS type does not
+                 use (requires_allocation=False) and says nothing about the
+                 balance being settled.  Hand EOS the annual panel instead. -->
+            <xpath expr="//div[@name='ksw_core_leave_stats']" position="attributes">
+                <attribute name="invisible">x_is_annual_leave_type or x_is_eos_leave</attribute>
+            </xpath>
+            <xpath expr="//div[@name='ksw_annual_info_panel']" position="attributes">
+                <attribute name="invisible">not x_is_annual_leave_type and not x_is_eos_leave</attribute>
+            </xpath>
+
+            <!-- "Total Days Requested" is the span the employee asked to be
+                 away.  An EOS request is a single termination date, so the
+                 figure is always 1 and reads as a mistake next to a 38-day
+                 balance.  Hide it rather than explain it. -->
+            <xpath expr="//group[@name='ksw_annual_balance']/field[@name='x_requested_days']"
+                   position="attributes">
+                <attribute name="invisible">x_is_eos_leave</attribute>
+            </xpath>
+
+            <!-- Options are request-time choices about a vacation period:
+                 Full Balance Clearance and Accept Excess as Unpaid.  Neither
+                 exists for EOS — _build_vacation_input_lines pays out the
+                 whole remaining balance unconditionally on the EOS branch, so
+                 the toggles would be controls that change nothing. -->
+            <xpath expr="//group[@name='ksw_annual_options']" position="attributes">
+                <attribute name="invisible">x_is_eos_leave</attribute>
+            </xpath>
+
             <!-- ===== Hide the standard HR Review tab for EOS leaves ===== -->
             <!-- EOS has its own dedicated tab instead. -->
             <xpath expr="//page[@name='hr_review']" position="attributes">

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="ksw_deduction_reschedule_wizard_view_form" model="ir.ui.view">
+        <field name="name">ksw.deduction.reschedule.wizard.form</field>
+        <field name="model">ksw.deduction.reschedule.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reschedule Installments">
+                <sheet>
+                    <!--
+                        Loaded for the invisible= expressions below.
+                        `deduction_id` in particular MUST be in the arch:
+                        the client builds its record from the fields the
+                        VIEW asks for, so a compute depending on it runs
+                        against an empty record if it is missing and the
+                        whole dialog renders blank (Odoo 19 Pitfalls #40).
+                    -->
+                    <field name="deduction_id" invisible="1"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="has_siblings" invisible="1"/>
+                    <field name="available_sibling_ids" invisible="1"/>
+
+                    <div class="alert alert-info" role="status">
+                        <i class="fa fa-info-circle me-1" title="Info" role="img" aria-label="Info"/>
+                        Only the <b>outstanding</b> balance is re-spread.
+                        Installments already collected stay exactly as they
+                        are, and the total amount of each deduction does not
+                        change &#8212; this changes the plan, not the debt.
+                    </div>
+
+                    <group string="Employee">
+                        <group>
+                            <field name="employee_id" readonly="1"/>
+                            <field name="gross_salary" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="total_outstanding" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Deductions to Reschedule"
+                           invisible="not has_siblings">
+                        <field name="sibling_ids" nolabel="1" colspan="2"
+                               widget="many2many_tags"
+                               domain="[('id', 'in', available_sibling_ids)]"
+                               options="{'no_create': True}"/>
+                        <div colspan="2" class="text-muted">
+                            <i class="fa fa-lightbulb-o me-1" title="Tip" role="img" aria-label="Tip"/>
+                            A monthly figure is a decision about the
+                            <b>employee</b>, not about one contract. Leave
+                            these selected to bring the whole outstanding book
+                            down to a single monthly total; each deduction
+                            still keeps its own reference and ledger.
+                        </div>
+                    </group>
+
+                    <separator string="New Plan"/>
+
+                    <group>
+                        <group>
+                            <field name="plan_by" widget="radio"/>
+                            <field name="installments"
+                                   invisible="plan_by != 'months'"
+                                   required="plan_by == 'months'"/>
+                            <field name="target_monthly"
+                                   invisible="plan_by != 'monthly'"
+                                   required="plan_by == 'monthly'"/>
+                            <field name="start_month"/>
+                            <field name="reason"
+                                   placeholder="e.g. Agreed with the employee to clear both loans by March"/>
+                        </group>
+                        <group string="Result">
+                            <field name="effective_installments" readonly="1"/>
+                            <field name="monthly_total" readonly="1"/>
+                            <field name="end_month" readonly="1"/>
+                            <field name="pct_of_gross" readonly="1"
+                                   widget="percentage"
+                                   invisible="not gross_salary"/>
+                        </group>
+                    </group>
+
+                    <div invisible="not effective_installments">
+                        <separator string="Allocation"/>
+                        <field name="allocation_html" nolabel="1" readonly="1"/>
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_confirm" type="object"
+                            string="Reschedule"
+                            class="btn-primary"
+                            invisible="not effective_installments or not reason"/>
+                    <button string="Cancel" class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

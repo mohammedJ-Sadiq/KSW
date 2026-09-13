@@ -945,10 +945,16 @@ class KswPayRunLine(models.Model):
             # Settling out of commission is a third collection route
             # alongside payroll and manual payment, so it dates its
             # credits on the Statement of Account the same way a payslip
-            # does: the end of the period being paid.
+            # does: the end of the period being paid — capped at today,
+            # for the same reason `_settle_payslip_lines` caps it. A run
+            # paid mid-period would otherwise stamp a settlement date in
+            # the future, and the statement silently drops every movement
+            # dated after the day it is stated as of.
+            today = fields.Date.context_today(rec)
             settled_on = (
-                rec.period.replace(day=1) + relativedelta(months=1, days=-1)
-                if rec.period else fields.Date.context_today(rec)
+                min(rec.period.replace(day=1)
+                    + relativedelta(months=1, days=-1), today)
+                if rec.period else today
             )
 
             for line in lines:

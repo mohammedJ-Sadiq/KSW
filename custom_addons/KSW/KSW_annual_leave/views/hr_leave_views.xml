@@ -17,6 +17,11 @@
     <!-- Anchors preserved for inheriting views:                      -->
     <!--   * field     x_is_annual_leave_type        (KSW_unpaid)     -->
     <!--   * group     name="accounting_allowances"  (KSW_unpaid)     -->
+    <!--   * div       name="ksw_core_leave_stats"     (KSW_eos)      -->
+    <!--   * div       name="ksw_annual_info_panel"   (KSW_eos)      -->
+    <!--   * group     name="ksw_annual_balance"      (KSW_eos)      -->
+    <!--   * group     name="ksw_annual_options"      (KSW_eos)      -->
+    <!--   * group     name="ksw_annual_return_status"               -->
     <!--   * separator name="commission_lines_section"                -->
     <!--   * field     x_commission_line_ids                          -->
     <!--   * separator name="deduction_lines_section"                 -->
@@ -161,14 +166,14 @@
             <xpath expr="//widget[@name='hr_leave_stats']" position="replace">
 
                 <!-- Non-annual leave types: keep the standard Odoo balance summary -->
-                <div invisible="x_is_annual_leave_type">
+                <div name="ksw_core_leave_stats" invisible="x_is_annual_leave_type">
                     <widget name="hr_leave_stats"/>
                 </div>
 
                 <!-- Annual leave types: KSW custom info panel -->
-                <div invisible="not x_is_annual_leave_type">
+                <div name="ksw_annual_info_panel" invisible="not x_is_annual_leave_type">
 
-                    <group string="Annual Leave Balance">
+                    <group name="ksw_annual_balance" string="Annual Leave Balance">
                         <field name="x_balance_at_request"
                                string="Balance at Request (Days)"
                                readonly="1"/>
@@ -183,7 +188,7 @@
                                readonly="1"/>
                     </group>
 
-                    <group string="Options">
+                    <group name="ksw_annual_options" string="Options">
                         <!-- Full clearance toggle (when balance covers the request) -->
                         <field name="x_is_full_clearance" widget="boolean_toggle"
                                string="Full Balance Clearance"
@@ -209,7 +214,7 @@
                                invisible="not x_excess_days_accepted or x_unpaid_portion_days == 0"/>
                     </group>
 
-                    <group string="Return Status"
+                    <group name="ksw_annual_return_status" string="Return Status"
                            invisible="x_return_state == 'not_applicable' or x_annual_approval_state == 'pending_employee_signature'">
                         <field name="x_return_date"
                                readonly="x_return_state == 'hr_confirmed' and not x_can_edit_return_date"

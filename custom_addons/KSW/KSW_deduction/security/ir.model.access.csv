@@ -37,5 +37,6 @@ access_ksw_statement_line_loan_hr,ksw.deduction.statement.line.loan.hr,model_ksw
 access_ksw_statement_line_loan_acc,ksw.deduction.statement.line.loan.acc,model_ksw_deduction_statement_line,KSW_deduction.group_loan_acc,1,1,1,1
 access_ksw_statement_line_loan_gm,ksw.deduction.statement.line.loan.gm,model_ksw_deduction_statement_line,KSW_deduction.group_loan_gm,1,1,1,1
 access_ksw_statement_line_installment_edit,ksw.deduction.statement.line.installment.edit,model_ksw_deduction_statement_line,KSW_deduction.group_installment_edit,1,1,1,1
-
-
+access_ksw_reschedule_wizard_installment_edit,ksw.deduction.reschedule.wizard.installment.edit,model_ksw_deduction_reschedule_wizard,KSW_deduction.group_installment_edit,1,1,1,1
+access_ksw_reschedule_wizard_acc_data_entry,ksw.deduction.reschedule.wizard.acc.data.entry,model_ksw_deduction_reschedule_wizard,KSW_deduction.group_acc_data_entry,1,1,1,1
+access_ksw_reschedule_wizard_manager,ksw.deduction.reschedule.wizard.manager,model_ksw_deduction_reschedule_wizard,KSW_deduction.group_deduction_manager,1,1,1,1

@@ -24,3 +24,4 @@ from . import test_vacation_full_deductions
 from . import test_statement_ui
 from . import test_concurrent_loan_override
 from . import test_draft_payslip_refresh
+from . import test_reschedule_wizard

@@ -3,4 +3,4 @@ from . import loan_refuse_wizard
 from . import ksw_loan_payment_wizard
 from . import ksw_loan_return_approver_wizard
 from . import ksw_deduction_statement_wizard
-
+from . import ksw_deduction_reschedule_wizard

@@ -51,6 +51,27 @@ class HrLeave(models.Model):
     )
 
     # ------------------------------------------------------------------
+    # Annual leave balance panel (right column)
+    # ------------------------------------------------------------------
+    # An EOS request consumes no balance — it settles all of it in cash as
+    # the VACATION_BAL line on the terminal payslip.  The approver therefore
+    # needs the same balance panel the annual form shows, in place of Odoo's
+    # generic leave-stats summary (which reports an allocation an EOS type
+    # does not even use).  Both hooks live in KSW_annual_leave.
+    # ------------------------------------------------------------------
+
+    def _shows_annual_balance(self, leave):
+        return super()._shows_annual_balance(leave) or leave.x_is_eos_leave
+
+    def _balance_panel_as_of(self, leave):
+        if leave.x_is_eos_leave:
+            # Same pin as _build_vacation_input_lines: accrue to the
+            # termination date, so the number the GM approved is the number
+            # the payslip pays, however long the chain took.
+            return leave.request_date_from
+        return super()._balance_panel_as_of(leave)
+
+    # ------------------------------------------------------------------
     # HR-filled EOS fields (only writable by HR at pending_hr state)
     # ------------------------------------------------------------------
 

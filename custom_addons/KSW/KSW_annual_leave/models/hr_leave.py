@@ -265,15 +265,40 @@ class HrLeave(models.Model):
              'deducted by this leave.',
     )
 
-    @api.depends('employee_id', 'holiday_status_id', 'state', 'number_of_days')
+    def _shows_annual_balance(self, leave):
+        """True when the balance panel is meaningful for this leave.
+
+        An annual request is judged against the balance it consumes.
+        KSW_eos_leave widens this to EOS requests, which consume no balance
+        but settle all of it in cash on the terminal payslip — so the figure
+        is what the approver is actually signing off on.
+        """
+        return self._is_annual_leave(leave)
+
+    def _balance_panel_as_of(self, leave):
+        """Date the panel's balance figure is accrued up to (None = today).
+
+        An ordinary request is judged on today's accrual. KSW_eos_leave pins
+        it to the termination date so the panel shows the same figure
+        ``_build_vacation_input_lines`` settles as VACATION_BAL, rather than
+        drifting upward every day the request sits in the chain.
+        """
+        return None
+
+    @api.depends('employee_id', 'holiday_status_id', 'state', 'number_of_days',
+                 'request_date_from')
     def _compute_balance_at_request(self):
         for leave in self:
-            if not leave.employee_id or not self._is_annual_leave(leave):
+            if not leave.employee_id or not self._shows_annual_balance(leave):
                 leave.x_balance_at_request = 0.0
                 continue
-            raw = self._get_remaining_balance(leave)
-            if leave.state == 'validate':
-                # Allocation already deducted — add back to show pre-request balance
+            raw = self._get_remaining_balance(
+                leave, self._balance_panel_as_of(leave))
+            if leave.state == 'validate' and self._is_annual_leave(leave):
+                # Allocation already deducted — add back to show pre-request
+                # balance.  Only annual types deduct: an EOS type carries
+                # requires_allocation=False, so adding its one calendar day
+                # back would inflate the figure by a day that never left.
                 leave.x_balance_at_request = raw + leave.number_of_days
             else:
                 leave.x_balance_at_request = raw

@@ -1,6 +1,6 @@
 {
     'name': 'KSW End of Service Leave',
-    'version': '19.0.1.2.0',
+    'version': '19.0.1.3.0',
     'author': 'Mohammed Albadr',
     'category': 'Human Resources',
     'summary': 'End-of-Service request leave type with 6-step approval and EOS payslip',

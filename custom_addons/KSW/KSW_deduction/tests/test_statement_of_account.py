@@ -17,6 +17,7 @@ from datetime import date
 
 from dateutil.relativedelta import relativedelta
 
+from odoo import fields
 from odoo.service.model import call_kw
 
 from .common import DeductionCommon
@@ -604,3 +605,105 @@ class TestStatementOverdue(StatementCommon):
         wizard = self._statement()
         self.assertAlmostEqual(wizard.overdue_amount, 0.0, places=2)
         self.assertAlmostEqual(wizard.closing_balance, 1000.0, places=2)
+
+
+class TestStatementFutureDatedSettlement(StatementCommon):
+    """A collection made today must appear on today's statement.
+
+    `_settle_payslip_lines` runs on the payslip's `state -> done`
+    transition, so a slip confirmed BEFORE its period closes — a mid-month
+    run, an off-cycle or arrears slip — used to stamp `x_settlement_date`
+    at `payslip.date_to`, i.e. in the future. `_split_movements` then
+    dropped the credit silently (it drops everything after the day the
+    statement is stated as of) while the charge row, dated at activation,
+    stayed — overstating the balance by exactly what had just been
+    collected.
+
+    The 28 tests that shipped with the feature could not see this: their
+    `_statement()` helper passes `date_to=2099-12-31`, where no date is
+    ever in the future. These build the wizard from `default_get`, which
+    is the `date_to` the user actually gets.
+    """
+
+    def _open_period(self):
+        """A pay period that has not closed yet, whenever this runs."""
+        today = fields.Date.context_today(self.env.user)
+        start = today.replace(day=1)
+        end = start + relativedelta(months=1, days=-1)
+        if end <= today:      # the suite is running on the last day
+            start = end + relativedelta(days=1)
+            end = start + relativedelta(months=1, days=-1)
+        return today, start, end
+
+    def _statement_as_the_user_gets_it(self):
+        """The wizard the menu builds — `date_to` defaulted, not passed."""
+        Wizard = self.env['ksw.deduction.statement.wizard']
+        defaults = Wizard.default_get(
+            ['employee_id', 'date_from', 'date_to', 'group_by_type'])
+        wizard = Wizard.create(dict(defaults, employee_id=self.employee.id))
+        # Says out loud what this test rests on.
+        self.assertEqual(wizard.date_to,
+                         fields.Date.context_today(self.env.user))
+        return wizard
+
+    def test_settlement_is_never_dated_in_the_future(self):
+        today, start, end = self._open_period()
+        ded = self._activate(self._make_deduction(
+            self.type_gov_pen, amount=1000.0, installments=2,
+            start_month=start))
+        line = ded.line_ids.sorted('sequence')[0]
+        slip = self._fake_payslip(start, end)
+        self.assertGreater(slip.date_to, today, 'fixture must be mid-period')
+
+        ded.sudo()._settle_payslip_lines(line, {line.id: 500.0}, slip)
+
+        self.assertEqual(
+            line.x_settlement_date, today,
+            'A settlement confirmed today moved money today — the period '
+            'end has not arrived yet.')
+
+    def test_midperiod_collection_shows_on_todays_statement(self):
+        """The reported bug: charge visible, credit silently dropped."""
+        today, start, end = self._open_period()
+        ded = self._activate(self._make_deduction(
+            self.type_gov_pen, amount=3000.0, installments=2,
+            start_month=start))
+        first, second = ded.line_ids.sorted('sequence')[:2]
+        slip = self._fake_payslip(start, end)
+        # Two installments settled by one slip, as payslip 18822 did.
+        ded.sudo()._settle_payslip_lines(
+            first + second, {first.id: 1500.0, second.id: 1500.0}, slip)
+
+        wizard = self._statement_as_the_user_gets_it()
+        rows = self._movements(wizard)
+        credits = rows.filtered(lambda l: l.row_kind == 'credit')
+        charges = rows.filtered(lambda l: l.row_kind == 'charge')
+
+        self.assertTrue(charges, 'the charge row was never the problem')
+        self.assertEqual(
+            len(credits), 2,
+            'Both collections must be on the statement — a charge shown '
+            'without its collections is the reported defect.')
+        self.assertAlmostEqual(
+            sum(credits.mapped('credit')), 3000.0, places=2)
+        self.assertAlmostEqual(wizard.total_settled, 3000.0, places=2)
+
+    def test_default_statement_balance_matches_outstanding(self):
+        """The invariant, through the default period rather than 2099.
+
+        This is the figure the accountant reads, and it was overstated by
+        the whole collection.
+        """
+        today, start, end = self._open_period()
+        ded = self._activate(self._make_deduction(
+            self.type_gov_pen, amount=3000.0, installments=2,
+            start_month=start))
+        line = ded.line_ids.sorted('sequence')[0]
+        ded.sudo()._settle_payslip_lines(
+            line, {line.id: 1500.0}, self._fake_payslip(start, end))
+
+        wizard = self._statement_as_the_user_gets_it()
+        self.assertAlmostEqual(
+            wizard.closing_balance, self._outstanding(), places=2,
+            msg='A statement dated today must agree with what the '
+                'employee still owes today.')

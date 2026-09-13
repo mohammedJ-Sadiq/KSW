@@ -762,6 +762,32 @@ class KswDeduction(models.Model):
             },
         }
 
+    def action_reschedule_installments(self):
+        """Open the reschedule wizard (re-spread the remaining balance).
+
+        The Installments tab can re-value and postpone the lines that
+        already exist, but it can never lengthen a plan — a row added by
+        hand there is a manual *payment* entry, and an auto line cannot be
+        deleted outside the cancel / reset-to-draft flow. This is the route
+        for "spread what is left over N months instead".
+
+        The privilege check lives in
+        `ksw.deduction.reschedule.wizard.action_confirm`, which mirrors
+        `x_can_edit_installments` per record — the same matrix as the
+        Installments tab and the payment wizard.
+        """
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Reschedule Installments — %s') % self.name,
+            'res_model': 'ksw.deduction.reschedule.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_deduction_id': self.id,
+            },
+        }
+
     def action_view_installments(self):
         """Smart-button target. Re-opens the record on the same form
         (scrolls back to the Installments page via `default_tab`).
@@ -2608,10 +2634,23 @@ class KswDeduction(models.Model):
             the remainder as a new pending line that points back at the
             origin (so a payslip reset can merge it back).
         """
-        # The payslip period end is when the money actually left the
-        # employee's pay, which is the date the Statement of Account
-        # credits — not the installment's scheduled `period_date`.
-        settled_on = payslip.date_to
+        # When the money actually left the employee's pay — the date the
+        # Statement of Account credits, not the installment's scheduled
+        # `period_date`.
+        #
+        # Capped at today, and that cap is the whole point: this runs on
+        # the `state -> done` transition, so a payslip confirmed BEFORE
+        # its period closes (a mid-month run, an off-cycle or arrears
+        # slip) would otherwise stamp a settlement date in the FUTURE.
+        # `_split_movements` drops every movement dated after the day the
+        # statement is stated as of, silently — so a collection made this
+        # morning disappeared from this morning's statement while its
+        # charge row stayed, overstating the balance by the amount just
+        # collected. Confirmed after the period closes, `date_to` still
+        # wins and the period-end convention is unchanged.
+        today = fields.Date.context_today(self)
+        settled_on = (min(payslip.date_to, today) if payslip.date_to
+                      else today)
         for ded in lines.mapped('deduction_id'):
             cur = ded.currency_id
             commands = []
