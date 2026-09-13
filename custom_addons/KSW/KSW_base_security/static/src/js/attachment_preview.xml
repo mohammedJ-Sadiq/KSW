@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-inherit="web.Many2ManyBinaryField.attachment_preview" t-inherit-mode="extension">
+
+        <!-- The whole tile opens the file, not just the three anchors. The
+             delete "×" already stops propagation, so it never lands here. -->
+        <xpath expr="//div[hasclass('o_attachment_wrap')]" position="attributes">
+            <attribute name="t-on-click">(ev) => this.onClickAttachment(file, ev)</attribute>
+        </xpath>
+
+        <!-- "Download x.pdf" is the wrong promise once the tile opens it. -->
+        <xpath expr="//div[hasclass('o_image_box')]" position="attributes">
+            <attribute name="t-att-data-tooltip">(isViewable(file) ? 'Open ' : 'Download ') + file.name</attribute>
+        </xpath>
+        <xpath expr="//div[hasclass('caption')]/a" position="attributes">
+            <attribute name="t-att-data-tooltip">(isViewable(file) ? 'Open ' : 'Download ') + file.name</attribute>
+        </xpath>
+
+    </t>
+
+</templates>

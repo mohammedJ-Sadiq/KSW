@@ -80,10 +80,14 @@ class TestInlinePdfDisposition(HttpCase):
         self.assertTrue(disposition.startswith('attachment'), disposition)
         self.assertEqual(disposition.count('filename'), 1, disposition)
 
-    def test_backend_bundle_loads_the_handler(self):
-        """Smoke test: a bad import in `report_open_inline.js` would break the
-        whole backend bundle, not just printing. Boot the web client and read
-        the handler back out of the registry."""
+    def test_backend_bundle_loads_both_patches(self):
+        """Smoke test for the whole asset contribution.
+
+        Two distinct failure modes are covered by booting the client at all:
+        a bad *import* in either JS file breaks the backend bundle, and a bad
+        *xpath* in `attachment_preview.xml` makes the server fail to build the
+        bundle, so `/web/assets/....js` 500s and nothing renders. Then read
+        both patches back out of the running client."""
         self.browser_js(
             '/odoo',
             """
@@ -92,6 +96,11 @@ class TestInlinePdfDisposition(HttpCase):
                 const handlers = registry.category("ir.actions.report handlers");
                 if (!handlers.contains("ksw_open_pdf_inline")) {
                     throw new Error("ksw_open_pdf_inline handler not registered");
+                }
+                const { Many2ManyBinaryField } = odoo.loader.modules.get(
+                    "@web/views/fields/many2many_binary/many2many_binary_field");
+                if (!Many2ManyBinaryField.prototype.onClickAttachment) {
+                    throw new Error("Many2ManyBinaryField not patched for preview");
                 }
                 console.log("test successful");
             })();
