@@ -150,6 +150,13 @@
               sequence="10"
               groups="KSW_commissions.group_commission_officer"/>
 
+    <menuitem id="menu_ksw_pay_employee_rate"
+              name="Employee Rates"
+              parent="menu_ksw_commissions_config"
+              action="action_ksw_pay_employee_rate"
+              sequence="20"
+              groups="KSW_commissions.group_commission_officer"/>
+
     <menuitem id="menu_ksw_commissions_sites"
               name="Work Sites"
               parent="menu_ksw_commissions_config"

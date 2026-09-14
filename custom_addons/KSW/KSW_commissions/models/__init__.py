@@ -2,6 +2,7 @@ from . import hr_department
 from . import ksw_commission_lock         # period lock predicate + guard (no models)
 from . import ksw_site                    # work sites (used by entries and tiers)
 from . import ksw_pay_component           # the catalog: a pay type is data, not code
+from . import ksw_pay_employee_rate    # per-employee exception to a component's rate
 from . import hr_employee
 from . import ksw_pay_batch               # batches + entries: the supervisor's screen
 from . import ksw_pay_recurring           # SAP infotype 0014 equivalent

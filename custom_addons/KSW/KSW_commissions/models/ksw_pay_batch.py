@@ -747,12 +747,17 @@ class KswPayEntry(models.Model):
     amount = fields.Monetary(compute='_compute_amount', store=True)
     is_overridden = fields.Boolean(compute='_compute_amount', store=True)
 
+    # `date` and `period` are in here because the rate an employee has of
+    # their own (ksw.pay.employee.rate) is dated: moving an occurrence into
+    # another month can move it across a rate change. That model has no
+    # relation to traverse back from, so it marks affected entries for
+    # recompute itself — see its _recompute_affected_entries.
     @api.depends('employee_id', 'quantity', 'threshold_qty', 'amount_override',
                  'component_id', 'component_id.calculation',
                  'component_id.rate', 'component_id.divisor',
                  'component_id.factor', 'component_id.tier_ids.rate',
                  'component_id.tier_ids.width', 'site_id',
-                 'option_id', 'option_id.rate')
+                 'option_id', 'option_id.rate', 'date', 'period')
     def _compute_amount(self):
         for rec in self:
             component = rec.component_id
@@ -763,6 +768,7 @@ class KswPayEntry(models.Model):
                     site=rec.site_id or rec.location_id,
                     threshold=rec.threshold_qty,
                     option=rec.option_id,
+                    date=rec.date or rec.period,
                 )
             else:
                 rate, amount = 0.0, 0.0
@@ -794,7 +800,7 @@ class KswPayEntry(models.Model):
 
     @api.depends('amount', 'quantity', 'quantity_ref', 'threshold_qty',
                  'rate', 'amount_override', 'component_id', 'option_id',
-                 'employee_id')
+                 'employee_id', 'date', 'period')
     def _compute_explanation(self):
         """Render the derivation as a table.
 
@@ -818,6 +824,7 @@ class KswPayEntry(models.Model):
             site=self.site_id or self.location_id,
             threshold=self.threshold_qty,
             option=self.option_id,
+            date=self.date or self.period,
         )
 
         if self.quantity_ref and component.qty_ref_label:

@@ -99,6 +99,11 @@ class KswPayComponent(models.Model):
              'Lunch, Dinner. Leave empty when the component has a single '
              'rate.',
     )
+    employee_rate_ids = fields.One2many(
+        'ksw.pay.employee.rate', 'component_id', string='Employee Rates',
+        help='Employees whose unit of this component is worth something '
+             'other than the rate above.',
+    )
     has_options = fields.Boolean(
         compute='_compute_has_options', store=True,
         help='Set automatically: this component is recorded by choosing one '
@@ -203,22 +208,36 @@ class KswPayComponent(models.Model):
     # ------------------------------------------------------------------
     # The resolver — the whole point of this model
     # ------------------------------------------------------------------
-    def _unit_rate(self, option=None):
+    def _unit_rate(self, option=None, employee=None, date=None):
         """The per-unit rate for one entry.
 
-        The option's own rate when the entry names one — a lunch is 20 and a
-        breakfast 10 within the same Meals component — otherwise the
-        component's single rate. An option belonging to a different
-        component is ignored rather than trusted; the entry constraint
-        rejects it, and a rate is not the place to find out.
+        Three answers, most specific first:
+
+        1. the employee's own rate, when one is on file for this component
+           (and this option) on ``date`` — see :class:`ksw.pay.employee.rate`;
+        2. the option's rate when the entry names one — a lunch is 20 and a
+           breakfast 10 within the same Meals component;
+        3. the component's single rate.
+
+        An option belonging to a different component is ignored rather than
+        trusted; the entry constraint rejects it, and a rate is not the place
+        to find out.
         """
         self.ensure_one()
+        # Most components never have an exception; reading the o2m once per
+        # component (cached for the whole compute) is cheaper than a search
+        # per entry to find nothing.
+        if self.sudo().employee_rate_ids:
+            own = self.env['ksw.pay.employee.rate']._rate_for(
+                employee, self, option=option, date=date)
+            if own:
+                return own.rate or 0.0
         if option and option.component_id == self:
             return option.rate or 0.0
         return self.rate or 0.0
 
     def _resolve(self, employee, quantity=0.0, site=None, threshold=0.0,
-                 option=None):
+                 option=None, date=None):
         """Return ``(rate, amount)`` for one entry.
 
         ``rate`` is informational and may be fractional; ``amount`` is the
@@ -233,7 +252,7 @@ class KswPayComponent(models.Model):
             return 0.0, 0.0
 
         if self.calculation == 'qty_rate':
-            rate = self._unit_rate(option)
+            rate = self._unit_rate(option, employee=employee, date=date)
             return rate, rate * quantity
 
         if self.calculation == 'wage_rate':
@@ -254,7 +273,7 @@ class KswPayComponent(models.Model):
         return 0.0, 0.0
 
     def _resolve_detail(self, employee, quantity=0.0, site=None,
-                        threshold=0.0, option=None):
+                        threshold=0.0, option=None, date=None):
         """Return ``(rows, notes)`` explaining how the amount was reached.
 
         ``rows`` are dicts of ``label`` / ``quantity`` / ``rate`` / ``amount``
@@ -272,18 +291,34 @@ class KswPayComponent(models.Model):
             return rows, notes
 
         if self.calculation == 'qty_rate':
-            rate = self._unit_rate(option)
+            own = self.env['ksw.pay.employee.rate']._rate_for(
+                employee, self, option=option, date=date) \
+                if self.sudo().employee_rate_ids else None
+            rate = self._unit_rate(option, employee=employee, date=date)
             named = option if option and option.component_id == self else None
-            label = _('%(option)s at the configured rate', option=named.name) \
-                if named else \
-                _('%(label)s at the configured rate',
-                  label=self.qty_label or _('Quantity'))
+            what = named.name if named else (self.qty_label or _('Quantity'))
+            label = _("%(what)s at this employee's own rate", what=what) \
+                if own else \
+                _('%(what)s at the configured rate', what=what)
             rows.append({
                 'label': label,
                 'quantity': quantity,
                 'rate': rate,
                 'amount': rate * quantity,
             })
+            if own:
+                # A figure a supervisor cannot justify is a figure he cannot
+                # defend at review: say that this one is an exception, what
+                # everybody else gets, and since when.
+                notes.append(_(
+                    'This employee has a rate of their own: %(rate).2f '
+                    'instead of the standard %(standard).2f, effective '
+                    '%(since)s.',
+                    rate=own.rate or 0.0,
+                    standard=own.standard_rate or 0.0,
+                    since=own.date_from))
+                if own.reason:
+                    notes.append(own.reason)
             return rows, notes
 
         if self.calculation == 'wage_rate':

@@ -137,7 +137,11 @@
             <field name="rate">100.0</field>
             <field name="qty_label">Days</field>
             <field name="scope">department</field>
-            <field name="needs_date" eval="True"/>
+            <!-- A monthly total, not a dated occurrence: the supervisor
+                 records how many Fridays the employee worked, one row per
+                 employee. Overtime is the opposite case — hours worked on a
+                 given day — and keeps needs_date. -->
+            <field name="needs_date" eval="False"/>
             <field name="sequence">50</field>
         </record>
 

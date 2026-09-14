@@ -11,3 +11,4 @@ from . import test_recurring_access
 from . import test_bas_trips_import
 from . import test_bas_sync_override
 from . import test_pay_employee_access
+from . import test_pay_employee_rate

@@ -30,6 +30,8 @@ access_ksw_pay_rate_tier_user,ksw.pay.rate.tier read,model_ksw_pay_rate_tier,bas
 access_ksw_pay_rate_tier_administrator,ksw.pay.rate.tier administrator,model_ksw_pay_rate_tier,group_commission_officer,1,1,1,1
 access_ksw_pay_option_user,ksw.pay.option read,model_ksw_pay_option,base.group_user,1,0,0,0
 access_ksw_pay_option_administrator,ksw.pay.option administrator,model_ksw_pay_option,group_commission_officer,1,1,1,1
+access_ksw_pay_employee_rate_user,ksw.pay.employee.rate read,model_ksw_pay_employee_rate,base.group_user,1,0,0,0
+access_ksw_pay_employee_rate_administrator,ksw.pay.employee.rate administrator,model_ksw_pay_employee_rate,group_commission_officer,1,1,1,1
 access_ksw_pay_recurring_supervisor,ksw.pay.recurring supervisor,model_ksw_pay_recurring,group_commission_supervisor,1,1,1,1
 access_ksw_pay_recurring_officer,ksw.pay.recurring officer,model_ksw_pay_recurring,group_commission_officer,1,1,1,1
 access_ksw_pay_batch_supervisor,ksw.pay.batch supervisor,model_ksw_pay_batch,group_commission_supervisor,1,1,1,1

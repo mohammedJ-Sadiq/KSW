@@ -92,6 +92,41 @@
                             </div>
                         </page>
 
+                        <page string="Employee Rates" name="employee_rates"
+                              invisible="calculation != 'qty_rate'">
+                            <field name="employee_rate_ids"
+                                   context="{'default_component_id': id}">
+                                <list editable="bottom">
+                                    <field name="has_options" column_invisible="1"/>
+                                    <field name="employee_id"
+                                           options="{'no_create': True}"/>
+                                    <field name="option_id"
+                                           options="{'no_create': True}"
+                                           optional="show"/>
+                                    <field name="rate"/>
+                                    <field name="standard_rate" optional="show"/>
+                                    <field name="date_from"
+                                           widget="date"
+                                           options="{'min_precision': 'months'}"/>
+                                    <field name="date_to"
+                                           widget="date"
+                                           options="{'min_precision': 'months'}"/>
+                                    <field name="reason" optional="show"/>
+                                    <field name="active"
+                                           widget="boolean_toggle"
+                                           optional="hide"/>
+                                </list>
+                            </field>
+                            <div class="text-muted mt-2">
+                                The rate above is the policy; these are its
+                                exceptions. An employee listed here is paid
+                                their own rate per unit from the date it takes
+                                effect — earlier months keep computing at
+                                whatever applied then. Leave "Valid To" empty
+                                until the exception ends.
+                            </div>
+                        </page>
+
                         <page string="Rate Tiers" name="tiers"
                               invisible="calculation != 'tiered'">
                             <field name="tier_ids">
@@ -249,6 +284,131 @@
                 A mobile-phone allowance, a project-management allowance. The
                 supervisor pulls these into the month's batch with one button
                 instead of typing them twelve times a year.
+            </p>
+        </field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Employee Rates — the exceptions to a component's rate             -->
+    <!-- ================================================================ -->
+    <record id="view_ksw_pay_employee_rate_list" model="ir.ui.view">
+        <field name="name">ksw.pay.employee.rate.list</field>
+        <field name="model">ksw.pay.employee.rate</field>
+        <field name="arch" type="xml">
+            <list string="Employee Rates" editable="bottom"
+                  decoration-muted="not active">
+                <field name="has_options" column_invisible="1"/>
+                <field name="employee_id" options="{'no_create': True}"/>
+                <field name="component_id" options="{'no_create': True}"/>
+                <field name="option_id" options="{'no_create': True}"
+                       required="has_options" optional="show"/>
+                <field name="department_id" optional="show" readonly="1"/>
+                <field name="rate"/>
+                <field name="standard_rate" optional="show"/>
+                <field name="date_from" widget="date"
+                       options="{'min_precision': 'months'}"/>
+                <field name="date_to" widget="date"
+                       options="{'min_precision': 'months'}"/>
+                <field name="reason" optional="show"/>
+                <field name="active" widget="boolean_toggle" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_employee_rate_form" model="ir.ui.view">
+        <field name="name">ksw.pay.employee.rate.form</field>
+        <field name="model">ksw.pay.employee.rate</field>
+        <field name="arch" type="xml">
+            <form string="Employee Rate">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived"
+                            bg_color="text-bg-danger" invisible="active"/>
+                    <field name="active" invisible="1"/>
+                    <field name="has_options" invisible="1"/>
+                    <group>
+                        <group string="Who and what">
+                            <field name="employee_id"
+                                   options="{'no_create': True}"/>
+                            <field name="component_id"
+                                   options="{'no_create': True}"/>
+                            <field name="option_id"
+                                   options="{'no_create': True}"
+                                   invisible="not has_options"
+                                   required="has_options"/>
+                            <field name="department_id" readonly="1"/>
+                        </group>
+                        <group string="What a unit is worth">
+                            <label for="rate"/>
+                            <div class="o_row">
+                                <field name="rate" class="oe_inline"/>
+                                <span class="text-muted ms-2">
+                                    per <field name="qty_label"
+                                               class="oe_inline" readonly="1"
+                                               nolabel="1"/>
+                                </span>
+                            </div>
+                            <field name="standard_rate"/>
+                            <field name="date_from" widget="date"
+                                   options="{'min_precision': 'months'}"/>
+                            <field name="date_to" widget="date"
+                                   options="{'min_precision': 'months'}"/>
+                            <field name="reason"
+                                   placeholder="Agreed with the GM, Sep 2026…"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="alert">
+                        Entries dated inside this window are worked out at this
+                        rate instead of the component's. Months already
+                        approved are never restated — closing this row off and
+                        starting a new one is what a rate change looks like.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_employee_rate_search" model="ir.ui.view">
+        <field name="name">ksw.pay.employee.rate.search</field>
+        <field name="model">ksw.pay.employee.rate</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="component_id"/>
+                <field name="department_id"/>
+                <filter name="current" string="In Force Today"
+                        domain="['&amp;', ('date_from', '&lt;=', context_today().strftime('%Y-%m-%d')),
+                                 '|', ('date_to', '=', False),
+                                 ('date_to', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter name="inactive" string="Archived"
+                        domain="[('active', '=', False)]"/>
+                <group>
+                    <filter string="Component" name="grp_component" domain="[]"
+                            context="{'group_by': 'component_id'}"/>
+                    <filter string="Employee" name="grp_employee" domain="[]"
+                            context="{'group_by': 'employee_id'}"/>
+                    <filter string="Department" name="grp_department" domain="[]"
+                            context="{'group_by': 'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_pay_employee_rate" model="ir.actions.act_window">
+        <field name="name">Employee Rates</field>
+        <field name="res_model">ksw.pay.employee.rate</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ksw_pay_employee_rate_search"/>
+        <field name="context">{'search_default_grp_component': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Pay one employee a different rate
+            </p>
+            <p>
+                A component's rate is the policy — a Friday is 100. An
+                exception here says this employee's Friday is 150, from a
+                given month onwards. Everything else keeps computing at the
+                standard rate, and approved months are never restated.
             </p>
         </field>
     </record>
