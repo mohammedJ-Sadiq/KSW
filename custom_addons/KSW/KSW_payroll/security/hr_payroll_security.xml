@@ -76,9 +76,19 @@
          implied_ids chain above makes them members of every tier below
          them, so there's no need to list them separately. No "parent"
          attribute here on purpose: this is the top-level app menu. -->
+    <!--
+         The GM and Accounting approvers of a salary revision request hold
+         no payroll tier at all — they act on the request document, not on
+         payslips. A menu's effective groups= is the INTERSECTION of its
+         own and every ancestor's (pitfall #41), so without naming them
+         here the "Salary Revisions" section below would exist and be
+         unreachable for exactly the two roles that must act on it. They
+         see nothing else under this root: every sibling menu carries its
+         own payroll group.
+    -->
     <menuitem id="om_hr_payroll.menu_hr_payroll_root"
               name="Payroll"
-              groups="group_hr_payroll_self"/>
+              groups="group_hr_payroll_self,KSW_annual_leave.group_annual_leave_gm,KSW_annual_leave.group_annual_leave_acc"/>
 
     <!-- Employee Payslips: same single menu/action Officer already uses
          (its own group stays on it), opened up to the tiers above too.
@@ -355,6 +365,90 @@
             <field name="groups" eval="[(4, ref('group_hr_payroll_reviewer'))]"/>
             <field name="perm_read" eval="1"/>
             <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+
+        <!-- ============================================================ -->
+        <!-- ksw.payslip.revision.request                                  -->
+        <!-- ============================================================ -->
+        <!--
+            Four scopes, one per audience. A rule only ever ADDS rows to
+            what a group may reach, so an officer who also manages people
+            keeps the unrestricted officer rule; and the ACL rows are the
+            other half — the GM/Accounting rows grant no create or unlink
+            at all, because those roles approve requests, they do not raise
+            or destroy them.
+        -->
+        <record id="ksw_revision_request_rule_self" model="ir.rule">
+            <field name="name">Revision requests: own and direct subordinates'</field>
+            <field name="model_id" ref="model_ksw_payslip_revision_request"/>
+            <field name="domain_force">['|', ('employee_id.user_id', '=', user.id), ('employee_id.parent_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_hr_payroll_self'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+
+        <record id="ksw_revision_request_rule_officer_all" model="ir.rule">
+            <field name="name">Revision requests: payroll officer/administrator all</field>
+            <field name="model_id" ref="model_ksw_payslip_revision_request"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('om_hr_payroll.group_hr_payroll_user')), (4, ref('om_hr_payroll.group_hr_payroll_manager'))]"/>
+        </record>
+
+        <record id="ksw_revision_request_rule_reviewer_all" model="ir.rule">
+            <field name="name">Revision requests: reviewer all (read only)</field>
+            <field name="model_id" ref="model_ksw_payslip_revision_request"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_hr_payroll_reviewer'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <!-- The GM tier is scoped by department, exactly as the annual
+             leave chain is: authority comes from
+             hr.department.x_effective_gm_id, so the scope has to follow
+             it rather than hand every GM every department's complaints. -->
+        <record id="ksw_revision_request_rule_department_gm" model="ir.rule">
+            <field name="name">Revision requests: department GM (own departments)</field>
+            <field name="model_id" ref="model_ksw_payslip_revision_request"/>
+            <field name="domain_force">[('employee_id.department_id.x_effective_gm_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('KSW_annual_leave.group_annual_leave_gm'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <!-- ~100 active employees have no department; their requests fall
+             back to the company default GM in _department_gm_user, so the
+             same person must be able to open them or the chain stalls on a
+             request nobody can see. -->
+        <record id="ksw_revision_request_rule_default_gm" model="ir.rule">
+            <field name="name">Revision requests: default GM (employees with no department)</field>
+            <field name="model_id" ref="model_ksw_payslip_revision_request"/>
+            <field name="domain_force">[
+                ('employee_id.department_id', '=', False),
+                ('company_id.x_default_gm_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('KSW_annual_leave.group_annual_leave_gm'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <record id="ksw_revision_request_rule_accounting" model="ir.rule">
+            <field name="name">Revision requests: accounting approver (all)</field>
+            <field name="model_id" ref="model_ksw_payslip_revision_request"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('KSW_annual_leave.group_annual_leave_acc'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
             <field name="perm_create" eval="0"/>
             <field name="perm_unlink" eval="0"/>
         </record>

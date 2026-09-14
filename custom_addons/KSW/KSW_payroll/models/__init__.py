@@ -10,3 +10,4 @@ from . import hr_version
 from . import biometric_attendance_sync
 from . import res_config_settings
 from . import res_partner_bank
+from . import ksw_payslip_revision_request

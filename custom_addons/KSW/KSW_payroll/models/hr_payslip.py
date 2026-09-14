@@ -284,6 +284,68 @@ class HrPayslip(models.Model):
              'total — the difference payable plus what was already paid.',
     )
 
+    # ------------------------------------------------------------------
+    # Revision requests raised against this payslip
+    # ------------------------------------------------------------------
+    # No model-level ``groups=``: ``x_revision_request_count`` is read by
+    # an ``invisible=`` on the self-service banner, which is shown to the
+    # employee tier (pitfall #31).
+
+    x_revision_request_ids = fields.One2many(
+        'ksw.payslip.revision.request', 'payslip_id',
+        string='Revision Requests', readonly=True, copy=False,
+    )
+
+    x_revision_request_count = fields.Integer(
+        string='Revision Request Count',
+        compute='_compute_revision_request_count',
+    )
+
+    x_has_open_revision_request = fields.Boolean(
+        compute='_compute_revision_request_count',
+    )
+
+    @api.depends('x_revision_request_ids.state')
+    def _compute_revision_request_count(self):
+        for slip in self:
+            requests = slip.x_revision_request_ids
+            slip.x_revision_request_count = len(requests)
+            slip.x_has_open_revision_request = bool(requests.filtered(
+                lambda r: r.state not in ('refused', 'cancelled')))
+
+    def action_request_revision(self):
+        """Open a new revision request against this payslip.
+
+        The employee's own route in. ``action_issue_revision`` is the
+        payroll team's route and stays where it is: this one raises a
+        *complaint*, which HR then accepts (and only then is a revision
+        payslip built).
+        """
+        self.ensure_one()
+        Request = self.env['ksw.payslip.revision.request']
+        # Fails fast with an explanation rather than letting the form open
+        # and the save blow up on the same guard.
+        Request._check_can_file(self.sudo())
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Request a Salary Revision'),
+            'res_model': 'ksw.payslip.revision.request',
+            'view_mode': 'form',
+            'target': 'current',
+            'context': {'default_payslip_id': self.id},
+        }
+
+    def action_open_revision_requests(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Revision Requests'),
+            'res_model': 'ksw.payslip.revision.request',
+            'view_mode': 'list,form',
+            'domain': [('payslip_id', '=', self.id)],
+            'context': {'default_payslip_id': self.id},
+        }
+
     @api.depends('x_revision_ids')
     def _compute_revision_count(self):
         for slip in self:

@@ -32,3 +32,5 @@ from . import test_unpaid_return_gate
 from . import test_payslip_email_queue
 
 from . import test_payroll_reviewer
+
+from . import test_payslip_revision_request

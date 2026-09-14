@@ -99,6 +99,46 @@
                 </div>
             </xpath>
 
+            <!-- ── Self-service: raise a revision request ──
+                 Deliberately NOT in the <header>: KSW gates the whole
+                 header to the Officer tier, so anything placed there is
+                 invisible to the very employee this button exists for.
+                 A sheet-level banner is the only placement the read-only
+                 tiers can actually see. -->
+            <xpath expr="//notebook" position="before">
+                <field name="x_has_open_revision_request" invisible="1"/>
+                <div class="alert alert-info d-flex align-items-center justify-content-between"
+                     role="alert"
+                     invisible="state != 'done' or x_is_revision or credit_note or x_has_open_revision_request"
+                     groups="KSW_payroll.group_hr_payroll_self">
+                    <span>
+                        Was this payslip wrong? Raise a complaint and HR will
+                        check it.
+                    </span>
+                    <button name="action_request_revision" type="object"
+                            string="Request a Salary Revision"
+                            class="btn-primary"/>
+                </div>
+                <div class="alert alert-warning" role="alert"
+                     invisible="not x_has_open_revision_request"
+                     groups="KSW_payroll.group_hr_payroll_self">
+                    A salary revision request is open for this payslip.
+                    <button name="action_open_revision_requests" type="object"
+                            string="Open it" class="btn-link"/>
+                </div>
+            </xpath>
+
+            <!-- ── Revision requests raised against this payslip ── -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_open_revision_requests" type="object"
+                        class="oe_stat_button" icon="fa-comments-o"
+                        invisible="x_revision_request_count == 0"
+                        groups="KSW_payroll.group_hr_payroll_self">
+                    <field name="x_revision_request_count" widget="statinfo"
+                           string="Requests"/>
+                </button>
+            </xpath>
+
             <!-- ── Revisions of this payslip ── -->
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="action_open_revisions" type="object"
