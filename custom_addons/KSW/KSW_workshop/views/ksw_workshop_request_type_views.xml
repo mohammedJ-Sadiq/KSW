@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ksw_workshop_request_type_list" model="ir.ui.view">
+        <field name="name">ksw.workshop.request.type.list</field>
+        <field name="model">ksw.workshop.request.type</field>
+        <field name="arch" type="xml">
+            <list string="Request Types" editable="bottom">
+                <!-- display="always": a header button defaults to appearing
+                     only once a row is ticked (Odoo 19 Pitfalls #6). -->
+                <header>
+                    <button name="action_rescan_all" type="object" display="always"
+                            string="Re-scan All Requests" class="btn-secondary"
+                            confirm="Re-apply every type's keywords to the requests already in the system? Requests whose type was set by hand are left alone."/>
+                </header>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="keywords"
+                       placeholder="زيت, فلتر, oil change"/>
+                <field name="request_count" string="Requests"/>
+                <field name="color" widget="color_picker" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_workshop_request_type_form" model="ir.ui.view">
+        <field name="name">ksw.workshop.request.type.form</field>
+        <field name="model">ksw.workshop.request.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_rescan_requests" type="object"
+                            string="Apply to Existing Requests" class="btn-secondary"
+                            confirm="Re-apply this type's keywords to the requests already in the system? Requests whose type was set by hand are left alone."/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Brakes"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="keywords"
+                                   placeholder="فرامل, بريك, قماشات, brake"/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                            <field name="color" widget="color_picker"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                    <div class="text-muted">
+                        A request is tagged with this type when any of these words appears
+                        in its description. Matching ignores case and matches inside longer
+                        words. A request can carry several types at once — an oil change
+                        that also replaced brake pads is both.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ksw_workshop_request_type" model="ir.actions.act_window">
+        <field name="name">Request Types</field>
+        <field name="res_model">ksw.workshop.request.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Define a type of work, and the words that identify it
+            </p>
+            <p>
+                Requesters describe the problem in their own words; these keywords are
+                what turn those words into tags. Add the spellings people actually use.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_ksw_workshop_request_types" name="Request Types"
+              parent="menu_ksw_workshop_configuration"
+              action="action_ksw_workshop_request_type" sequence="40"/>
+
+</odoo>

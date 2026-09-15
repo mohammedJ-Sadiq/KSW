@@ -61,7 +61,9 @@
     <record id="rule_ksw_workshop_request_technician" model="ir.rule">
         <field name="name">Workshop Request: technician sees in-progress + own assignments</field>
         <field name="model_id" ref="model_ksw_workshop_request"/>
-        <field name="domain_force">['|', ('state', '=', 'in_progress'), ('technician_id.user_id', '=', user.id)]</field>
+        <field name="domain_force">['|', ('state', '=', 'in_progress'),
+                                    '|', ('technician_id.user_id', '=', user.id),
+                                         ('labor_line_ids.technician_id.employee_id.user_id', '=', user.id)]</field>
         <field name="groups" eval="[(4, ref('group_workshop_technician'))]"/>
     </record>
 
@@ -87,13 +89,42 @@
     <record id="rule_ksw_workshop_part_line_technician" model="ir.rule">
         <field name="name">Workshop Part Line: technician sees in-progress + own assignments</field>
         <field name="model_id" ref="model_ksw_workshop_part_line"/>
-        <field name="domain_force">['|', ('request_id.state', '=', 'in_progress'), ('request_id.technician_id.user_id', '=', user.id)]</field>
+        <field name="domain_force">['|', ('request_id.state', '=', 'in_progress'),
+                                    '|', ('request_id.technician_id.user_id', '=', user.id),
+                                         ('request_id.labor_line_ids.technician_id.employee_id.user_id', '=', user.id)]</field>
         <field name="groups" eval="[(4, ref('group_workshop_technician'))]"/>
     </record>
 
     <record id="rule_ksw_workshop_part_line_manager" model="ir.rule">
         <field name="name">Workshop Part Line: manager sees all</field>
         <field name="model_id" ref="model_ksw_workshop_part_line"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_workshop_manager'))]"/>
+    </record>
+
+    <!--
+        Labor / service lines mirror the part-line rules exactly: a line is
+        part of its request, so whoever can see the request can see what was
+        done on it, and nobody else.
+    -->
+    <record id="rule_ksw_workshop_labor_line_own" model="ir.rule">
+        <field name="name">Workshop Labor Line: own requests only</field>
+        <field name="model_id" ref="model_ksw_workshop_labor_line"/>
+        <field name="domain_force">[('request_id.employee_id.user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="rule_ksw_workshop_labor_line_technician" model="ir.rule">
+        <field name="name">Workshop Labor Line: technician sees in-progress + own assignments</field>
+        <field name="model_id" ref="model_ksw_workshop_labor_line"/>
+        <field name="domain_force">['|', ('request_id.state', '=', 'in_progress'),
+                                    ('technician_id.employee_id.user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_workshop_technician'))]"/>
+    </record>
+
+    <record id="rule_ksw_workshop_labor_line_manager" model="ir.rule">
+        <field name="name">Workshop Labor Line: manager sees all</field>
+        <field name="model_id" ref="model_ksw_workshop_labor_line"/>
         <field name="domain_force">[(1, '=', 1)]</field>
         <field name="groups" eval="[(4, ref('group_workshop_manager'))]"/>
     </record>

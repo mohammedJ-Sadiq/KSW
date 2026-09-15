@@ -1,6 +1,6 @@
 {
     'name': 'KSW Helpdesk',
-    'version': '19.0.1.4.0',
+    'version': '19.0.1.2.0',
     'summary': 'Internal IT support ticketing system and asset register for employees',
     'description': """
 Helpdesk / IT Ticketing for KSW
@@ -17,11 +17,8 @@ assign and resolve it:
   direct reports if you are a manager
 - Kanban board grouped by stage with priority stars, blocked/ready state
   and overdue badges
-- Notifications (Odoo inbox + email, per each recipient's own preference):
-  the whole IT Team is told about every new ticket, an agent is told when a
-  ticket is assigned to them, and the requester is told when their ticket is
-  closed - whether it was closed with the Close button or by dragging the
-  card into the Closed column
+- Automatic notification to the assigned agent
+- Automatic email to the requester when their ticket is closed
 - Reporting (pivot/graph) and a calendar of ticket deadlines
 
 Just two roles: every employee submits tickets (for themselves, or a

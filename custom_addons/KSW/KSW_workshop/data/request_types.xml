@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        The nine request types, seeded with exactly the keywords that classified
+        the 17,079 imported requests (REQUEST_TYPE_KEYWORDS in
+        models/ksw_workshop_request.py).
+
+        noupdate="1" ON PURPOSE: the whole point of moving the rules into the
+        database is that the workshop manager maintains them. Without it, every
+        `-u KSW_workshop` would silently throw away every keyword he has added
+        since. The trade-off is the usual one (Odoo 19 Pitfalls #2): a later
+        <record> here can no longer change these rows, so a rule change that
+        must reach existing databases needs a <function> or a migration.
+    -->
+    <data noupdate="1">
+
+        <record id="request_type_oil_filters" model="ksw.workshop.request.type">
+            <field name="name">Oil &amp; Filters</field>
+            <field name="sequence">10</field>
+            <field name="color">1</field>
+            <field name="keywords">زيت, زبت, فلتر, فلاتر, change oil, chance oil, chang oil, oil change</field>
+        </record>
+
+        <record id="request_type_tyres" model="ksw.workshop.request.type">
+            <field name="name">Tyres</field>
+            <field name="sequence">20</field>
+            <field name="color">2</field>
+            <field name="keywords">اطار, إطار, كفر, بنشر, كاوتش</field>
+        </record>
+
+        <record id="request_type_brakes" model="ksw.workshop.request.type">
+            <field name="name">Brakes</field>
+            <field name="sequence">30</field>
+            <field name="color">3</field>
+            <field name="keywords">فرامل, بريك, قماشات</field>
+        </record>
+
+        <record id="request_type_electrical" model="ksw.workshop.request.type">
+            <field name="name">Electrical</field>
+            <field name="sequence">40</field>
+            <field name="color">4</field>
+            <field name="keywords">كهرب, دينامو, بطاري, سلف, مولد</field>
+        </record>
+
+        <record id="request_type_bodywork" model="ksw.workshop.request.type">
+            <field name="name">Bodywork / Welding</field>
+            <field name="sequence">50</field>
+            <field name="color">5</field>
+            <field name="keywords">لحام, سمكر, دهان, بوية</field>
+        </record>
+
+        <record id="request_type_water_pump" model="ksw.workshop.request.type">
+            <field name="name">Water Pump / Motor</field>
+            <field name="sequence">60</field>
+            <field name="color">6</field>
+            <field name="keywords">موتور, طرمبة, مضخة</field>
+        </record>
+
+        <record id="request_type_hoses" model="ksw.workshop.request.type">
+            <field name="name">Hoses</field>
+            <field name="sequence">70</field>
+            <field name="color">7</field>
+            <field name="keywords">هوز, خرطوم</field>
+        </record>
+
+        <record id="request_type_mechanical" model="ksw.workshop.request.type">
+            <field name="name">Mechanical</field>
+            <field name="sequence">80</field>
+            <field name="color">8</field>
+            <field name="keywords">كلتش, جير, دبرياج, عفشة, رديتر, مكيف, دنجل</field>
+        </record>
+
+        <record id="request_type_inspection" model="ksw.workshop.request.type">
+            <field name="name">Periodic Inspection</field>
+            <field name="sequence">90</field>
+            <field name="color">9</field>
+            <field name="keywords">فحص دوري, الفحص الدوري, استمارة</field>
+        </record>
+
+
+        <!--
+            Added 2026-09-15. The nine types above were the ones the history
+            backfill happened to need; these complete the list against the
+            industry standard for fleet maintenance — ATA/TMC's VMRS System
+            Level codes (the first three digits of a VMRS code), which is what
+            Fleetio, Samsara, Trimble and every professional truck shop code
+            repairs against. The VMRS code is in each comment below.
+
+            They are NOT the VMRS list imported wholesale: each candidate was
+            scored against KSW's own 17,080 descriptions and kept only if the
+            shop actually talks about it. Two VMRS-shaped guesses were wrong
+            and were corrected by that check:
+
+              * هواء on a trailer is the AIR SUSPENSION ("مشكله بالهواء",
+                "بالون الهواء"), not the air intake — 269 requests would have
+                been mistagged. It sits under Suspension & Air System, and
+                Air Intake keeps only تربو / فلتر هواء.
+              * تهريب (leak) crosses every system — تهريب ديزل, تهريب ميه,
+                تهريب هواء. It is a SYMPTOM, not a component, so it is not a
+                keyword on anything. VMRS keeps that axis separate too
+                ("Reason for Repair"), as do SAP PM (damage/cause), Maximo
+                (problem/cause) and D365 (fault symptom).
+
+            Together these take keyword coverage from 73.9% to 84.8% of the
+            corpus. Coupling / Fifth Wheel is seeded with NO keywords on
+            purpose: VMRS 059 is a real system for a trailer fleet, but no
+            wording for it appears in 17,080 requests, so it is there to be
+            picked by hand rather than to guess.
+        -->
+
+        <!-- VMRS 016 -->
+        <record id="request_type_suspension_air" model="ksw.workshop.request.type">
+            <field name="name">Suspension &amp; Air System</field>
+            <field name="sequence">100</field>
+            <field name="color">1</field>
+            <field name="keywords">بالون, هواء, مساعد, عفشة, عفشه, سوست, سوستة</field>
+        </record>
+
+        <!-- VMRS 026 -->
+        <record id="request_type_transmission" model="ksw.workshop.request.type">
+            <field name="name">Transmission / Gearbox</field>
+            <field name="sequence">110</field>
+            <field name="color">2</field>
+            <field name="keywords">قير, جير, ناقل الحركة</field>
+        </record>
+
+        <!-- VMRS 042 -->
+        <record id="request_type_cooling" model="ksw.workshop.request.type">
+            <field name="name">Cooling System</field>
+            <field name="sequence">120</field>
+            <field name="color">3</field>
+            <field name="keywords">رديتر, ردايتر, ترموستات, حرارة, حراره, مياه, مويه</field>
+        </record>
+
+        <!-- VMRS 055 -->
+        <record id="request_type_tank_cargo" model="ksw.workshop.request.type">
+            <field name="name">Tank &amp; Cargo Body</field>
+            <field name="sequence">130</field>
+            <field name="color">4</field>
+            <field name="keywords">بلف, صمام, صهريج, مواسير, غطاس</field>
+        </record>
+
+        <!-- VMRS 044 -->
+        <record id="request_type_fuel_system" model="ksw.workshop.request.type">
+            <field name="name">Fuel System</field>
+            <field name="sequence">140</field>
+            <field name="color">5</field>
+            <field name="keywords">ديزل, بخاخ, رشاش, بنزين, سولار</field>
+        </record>
+
+        <!-- VMRS 045 -->
+        <record id="request_type_engine" model="ksw.workshop.request.type">
+            <field name="name">Engine / Power Plant</field>
+            <field name="sequence">150</field>
+            <field name="color">6</field>
+            <field name="keywords">مكينة, مكينه, ماكينه, محرك, بستم, كرنك</field>
+        </record>
+
+        <!-- VMRS 018 -->
+        <record id="request_type_wheels_hubs" model="ksw.workshop.request.type">
+            <field name="name">Wheels, Hubs &amp; Bearings</field>
+            <field name="sequence">160</field>
+            <field name="color">7</field>
+            <field name="keywords">رمان بلي, رمان, جنط, هوب</field>
+        </record>
+
+        <!-- VMRS 034 -->
+        <record id="request_type_lighting" model="ksw.workshop.request.type">
+            <field name="name">Lighting</field>
+            <field name="sequence">170</field>
+            <field name="color">8</field>
+            <field name="keywords">لمبة, لمبه, اضاءة, اضاءه, اضائه, كشاف, اسطب</field>
+        </record>
+
+        <!-- VMRS 015 -->
+        <record id="request_type_steering" model="ksw.workshop.request.type">
+            <field name="name">Steering</field>
+            <field name="sequence">180</field>
+            <field name="color">9</field>
+            <field name="keywords">دركسيون, مقود, دريكسون, ستيرنج</field>
+        </record>
+
+        <!-- VMRS 023 -->
+        <record id="request_type_clutch" model="ksw.workshop.request.type">
+            <field name="name">Clutch</field>
+            <field name="sequence">190</field>
+            <field name="color">10</field>
+            <field name="keywords">كلتش, دبرياج</field>
+        </record>
+
+        <!-- VMRS 001 -->
+        <record id="request_type_air_conditioning" model="ksw.workshop.request.type">
+            <field name="name">Air Conditioning</field>
+            <field name="sequence">200</field>
+            <field name="color">11</field>
+            <field name="keywords">مكيف, تكييف, فريون</field>
+        </record>
+
+        <!-- VMRS 041 -->
+        <record id="request_type_air_intake" model="ksw.workshop.request.type">
+            <field name="name">Air Intake</field>
+            <field name="sequence">210</field>
+            <field name="color">1</field>
+            <field name="keywords">تربو, فلتر هواء</field>
+        </record>
+
+        <!-- VMRS 022 -->
+        <record id="request_type_axles_shafts" model="ksw.workshop.request.type">
+            <field name="name">Axles &amp; Drive Shafts</field>
+            <field name="sequence">220</field>
+            <field name="color">2</field>
+            <field name="keywords">دنجل, كردان, دفرنس, اكصات</field>
+        </record>
+
+        <!-- VMRS 003 -->
+        <record id="request_type_instruments" model="ksw.workshop.request.type">
+            <field name="name">Instruments &amp; Gauges</field>
+            <field name="sequence">230</field>
+            <field name="color">3</field>
+            <field name="keywords">طبلون, عداد</field>
+        </record>
+
+        <!-- VMRS 043 -->
+        <record id="request_type_exhaust" model="ksw.workshop.request.type">
+            <field name="name">Exhaust</field>
+            <field name="sequence">240</field>
+            <field name="color">4</field>
+            <field name="keywords">شكمان, عادم</field>
+        </record>
+
+        <!-- VMRS 014 -->
+        <record id="request_type_frame" model="ksw.workshop.request.type">
+            <field name="name">Frame / Chassis</field>
+            <field name="sequence">250</field>
+            <field name="color">5</field>
+            <field name="keywords">شاصي, شاصيه, هيكل</field>
+        </record>
+
+        <!-- VMRS 059 -->
+        <record id="request_type_coupling" model="ksw.workshop.request.type">
+            <field name="name">Coupling / Fifth Wheel</field>
+            <field name="sequence">260</field>
+            <field name="color">6</field>
+            <field name="keywords"></field>
+        </record>
+
+    </data>
+</odoo>

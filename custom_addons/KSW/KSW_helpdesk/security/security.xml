@@ -66,6 +66,25 @@
     </record>
 
     <!-- ============================================================ -->
+    <!-- Record Rule — hr.employee                                      -->
+    <!-- The IT Team needs to pick ANY employee when assigning an asset
+         (it.asset.assign.wizard.employee_id has no domain of its own).
+         Without this, they only get whatever the base hr.employee rules
+         allow (KSW_base_security's rule_hr_employee_self limits a plain
+         base.group_user to their own record) - read-only, no other HR
+         access is implied. -->
+    <record id="rule_hr_employee_helpdesk_agent_all" model="ir.rule">
+        <field name="name">Employee: IT Team can see all employees (asset assignment)</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_helpdesk_agent'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- ============================================================ -->
     <!-- Record Rules — it.asset / it.asset.assignment                  -->
     <!-- Assets live entirely under IT Team control. The one exception:
          an employee may read (never write) the asset(s) currently

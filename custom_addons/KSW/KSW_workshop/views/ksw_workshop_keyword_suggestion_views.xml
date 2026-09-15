@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ksw_workshop_keyword_suggestion_list" model="ir.ui.view">
+        <field name="name">ksw.workshop.keyword.suggestion.list</field>
+        <field name="model">ksw.workshop.keyword.suggestion</field>
+        <field name="arch" type="xml">
+            <list string="Suggested Keywords" create="false" editable="bottom">
+                <field name="name" readonly="1"/>
+                <field name="request_count" readonly="1"/>
+                <field name="sample" readonly="1" optional="show"/>
+                <field name="type_id" options="{'no_create': True}"/>
+                <button name="action_add_to_type" type="object" string="Add to Type"
+                        icon="fa-plus-circle" class="btn-link"
+                        invisible="not type_id"/>
+                <button name="action_ignore" type="object" string="Ignore"
+                        icon="fa-ban" class="btn-link"/>
+            </list>
+        </field>
+    </record>
+
+    <!--
+        A server action, not a plain window action: the rows have to be counted
+        out of the corpus before there is anything to show.
+    -->
+    <record id="action_ksw_workshop_keyword_suggestions" model="ir.actions.server">
+        <field name="name">Suggested Keywords</field>
+        <field name="model_id" ref="model_ksw_workshop_keyword_suggestion"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_open_suggestions()</field>
+    </record>
+
+    <record id="view_ksw_workshop_keyword_ignored_list" model="ir.ui.view">
+        <field name="name">ksw.workshop.keyword.ignored.list</field>
+        <field name="model">ksw.workshop.keyword.ignored</field>
+        <field name="arch" type="xml">
+            <list string="Ignored Words" editable="bottom">
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_ksw_workshop_keyword_ignored" model="ir.actions.act_window">
+        <field name="name">Ignored Words</field>
+        <field name="res_model">ksw.workshop.keyword.ignored</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No words ignored yet</p>
+            <p>
+                Words you dismiss from the Suggested Keywords list land here.
+                Delete one to have it suggested again.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_ksw_workshop_keyword_suggestions" name="Suggested Keywords"
+              parent="menu_ksw_workshop_configuration"
+              action="action_ksw_workshop_keyword_suggestions" sequence="50"/>
+    <menuitem id="menu_ksw_workshop_keyword_ignored" name="Ignored Words"
+              parent="menu_ksw_workshop_configuration"
+              action="action_ksw_workshop_keyword_ignored" sequence="60"/>
+
+</odoo>

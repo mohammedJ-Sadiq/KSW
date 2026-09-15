@@ -54,8 +54,12 @@ class TestKswWorkshopRequest(TransactionCase):
         })
 
     def _make_request(self, employee_user=None, **kwargs):
+        vehicle = self.env['ksw.fleet.vehicle'].browse(
+            kwargs['vehicle_id']) if kwargs.get('vehicle_id') else self.vehicle
         vals = {
-            'vehicle_id': self.vehicle.id,
+            'vehicle_id': vehicle.id,
+            'vehicle_type': vehicle.vehicle_type,
+            'driver_id': self.other_employee.id,
             'description': 'Battery problem',
         }
         vals.update(kwargs)
@@ -263,7 +267,9 @@ class TestKswWorkshopRequest(TransactionCase):
     def test_vehicle_domain_resets_on_client_change(self):
         request = self._make_request(employee_user=self.user_employee)
         request.with_user(self.user_manager).write({
-            'client_id': self.other_client.id, 'vehicle_id': self.other_client_vehicle.id,
+            'client_id': self.other_client.id,
+            'vehicle_id': self.other_client_vehicle.id,
+            'vehicle_type': self.other_client_vehicle.vehicle_type,
         })
         self.assertEqual(request.vehicle_id, self.other_client_vehicle)
 
@@ -324,12 +330,40 @@ class TestKswWorkshopRequest(TransactionCase):
         })
         self.assertFalse(request.vehicle_id)
 
-    def test_cash_customer_requires_name_and_vehicle_number(self):
+    def test_cash_customer_details_are_all_optional(self):
+        """A walk-in is taken down with whatever the counter is actually told.
+
+        The description stays required for every request, so a cash-customer
+        row is never completely empty — but nothing under the Cash Customer
+        heading is demanded of the manager.
+        """
+        request = self.env['ksw.workshop.request'].with_user(self.user_manager).create({
+            'description': 'Walk-in repair',
+            'is_cash_customer': True,
+        })
+        self.assertTrue(request.is_cash_customer)
+        self.assertFalse(request.x_cash_customer_name)
+        self.assertFalse(request.x_cash_vehicle_number)
+
+    def test_regular_request_requires_vehicle_type_and_driver(self):
         with self.assertRaises(ValidationError):
             self.env['ksw.workshop.request'].with_user(self.user_manager).create({
-                'description': 'Walk-in repair',
-                'is_cash_customer': True,
+                'description': 'No driver named',
+                'employee_id': self.employee.id,
+                'vehicle_id': self.vehicle.id,
+                'vehicle_type': 'isuzu',
             })
+
+    def test_imported_history_is_exempt_from_the_driver_requirement(self):
+        """The Google Sheet never had a driver column, so requiring one here
+        would make all 17,079 imported rows uneditable."""
+        request = self.env['ksw.workshop.request'].sudo().create({
+            'description': 'Legacy row',
+            'employee_id': self.employee.id,
+            'vehicle_id': self.vehicle.id,
+            'x_imported': True,
+        })
+        self.assertFalse(request.driver_id)
 
     def test_regular_request_requires_client_and_vehicle(self):
         with self.assertRaises(ValidationError):
@@ -344,6 +378,8 @@ class TestKswWorkshopRequest(TransactionCase):
         request = self.env['ksw.workshop.request'].with_user(self.user_employee).create({
             'description': 'Battery problem',
             'vehicle_id': self.vehicle.id,
+            'vehicle_type': 'isuzu',
+            'driver_id': self.other_employee.id,
             'is_cash_customer': True,
             'x_cash_customer_name': 'Should be ignored',
             'x_cash_vehicle_number': '999',

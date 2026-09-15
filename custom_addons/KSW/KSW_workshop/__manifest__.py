@@ -1,6 +1,6 @@
 {
     'name': 'KSW Workshop',
-    'version': '19.0.8.0.0',
+    'version': '19.0.12.1.0',
     'summary': 'Workshop service requests: submission, triage, and repair report',
     'description': """
 Workshop Service Requests
@@ -9,8 +9,11 @@ Replaces the Google Form + Google Sheet workflow employees used to request
 vehicle workshop service. A request goes Client -> Vehicle Type -> Vehicle
 (or "Cash Customer" free text for one-off walk-in work); the workshop
 manager triages it (New -> In Progress -> Completed/Rejected); a workshop
-technician fills in the repair report (entry/exit, odometer, technician,
-spare parts and labor cost) while the request is In Progress.
+technician fills in the repair report (entry/exit, odometer, spare parts
+issued, and the labor / service performed) while the request is In Progress.
+Labor is itemised one line per job, each naming a workshop technician or the
+standing "External Service Location" entry; the fee itself stays a single
+figure on the repair.
 
 Clients offered on a request are the ones the workshop manager registered
 under Configuration -> Clients (a role assignment on res.partner, not a flag).
@@ -41,7 +44,13 @@ is the lighter thing asked for instead, not a resumption of that design.
         'security/security.xml',
         'security/ir.model.access.csv',
         'data/sequence.xml',
+        'data/workshop_technician.xml',
+        'data/request_types.xml',
         'views/ksw_workshop_request_views.xml',
+        'views/ksw_workshop_technician_views.xml',
+        'views/ksw_workshop_request_type_views.xml',
+        'views/ksw_workshop_keyword_suggestion_views.xml',
+        'views/hr_employee_views.xml',
         'views/ksw_workshop_client_views.xml',
         'views/ksw_workshop_part_views.xml',
         'views/ksw_fleet_vehicle_views.xml',

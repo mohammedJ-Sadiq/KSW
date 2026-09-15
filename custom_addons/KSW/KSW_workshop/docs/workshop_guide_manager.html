@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head><meta charset="utf-8"><title>دليل مدير الورشة</title>
+<link rel="stylesheet" href="_guide.css"></head>
+<body>
+
+<div class="head">
+  <div class="ar">دليل مدير الورشة — استلام الطلب وتنفيذه وإنهاؤه</div>
+  <div class="en">Workshop Manager — Receive, Execute and Close a Request</div>
+  <span class="who">لمدير الورشة والفني &nbsp;·&nbsp; For the Manager &amp; Technician</span>
+</div>
+
+<div class="ar" style="margin-bottom:10px">
+  دورة الطلب أربع خطوات: تستلم الطلب، تبدأ العمل أو ترفضه، تُدخل تقرير الإصلاح، ثم تُنهي الطلب.
+  أسماء الحقول والأزرار مكتوبة هنا بالإنجليزية كما تظهر على الشاشة.
+</div>
+<div class="en" style="margin-bottom:12px">
+  Four steps: receive, start or reject, fill the repair report, close. Field and button names are
+  shown in English exactly as they appear on screen.
+</div>
+
+<div class="step"><div class="num">1</div><div class="body">
+  <div class="ar">افتح <span class="ui">Workshop</span> ثم <span class="ui">All Requests</span>.
+    تظهر لك الطلبات الجديدة وقيد التنفيذ. افتح الطلب واقرأ <span class="ui">Description</span>،
+    ويمكنك الاطلاع على تبويب <span class="ui">History (This Year)</span> لترى ما عُمل لهذه المركبة هذا العام.</div>
+  <div class="en">Open <b>Workshop › All Requests</b>, open a request and read its <b>Description</b>.
+    The <b>History (This Year)</b> tab shows what this vehicle already had done this year.</div>
+</div></div>
+
+<div class="step"><div class="num">2</div><div class="body">
+  <div class="ar">إما أن تضغط <span class="ui btn">Start</span> لبدء العمل،
+    أو — إذا كان الطلب غير مقبول — تكتب السبب في <span class="ui">Rejection Reason</span>
+    ثم تضغط <span class="ui btn red">Reject</span>. لن يقبل النظام الرفض بدون سبب مكتوب.</div>
+  <div class="en">Either click <b>Start</b>, or — if the request is not accepted — write the reason in
+    <b>Rejection Reason</b> and click <b>Reject</b>. The system will not reject without a reason.</div>
+</div></div>
+
+<div class="step"><div class="num">3</div><div class="body">
+  <div class="ar">أثناء التنفيذ، افتح تبويب <span class="ui">Repair Report</span> واملأ ما يلي:
+    أولاً <span class="ui">Work Type</span> (نوع العمل المنفَّذ)، ثم بيانات الدخول والخروج
+    <span class="ui">Entry / Exit</span> و<span class="ui">Odometer Reading</span>
+    و<span class="ui">Technician</span> والتكاليف.</div>
+  <div class="en">While the job is open, go to the <b>Repair Report</b> tab: set <b>Work Type</b> first,
+    then entry/exit, odometer, technician and costs.</div>
+</div></div>
+
+<div class="step"><div class="num">4</div><div class="body">
+  <div class="ar">اضغط <span class="ui btn">Complete</span> لإنهاء الطلب. تصل رسالة لمقدّم الطلب
+    تلقائياً، ويمكنك أن تكتب له ملاحظة في <span class="ui">Note to Requester</span> قبل الإنهاء.</div>
+  <div class="en">Click <b>Complete</b>. The requester is notified automatically; you can add a
+    message for them in <b>Note to Requester</b> first.</div>
+</div></div>
+
+<h2>نوع العمل المنفَّذ — <span class="ui">Work Type</span> <small>What was actually done</small></h2>
+<div class="ar" style="margin-bottom:6px">
+  <span class="ui">Request Type</span> هو ما <b>طلبه</b> صاحب المركبة، أما <span class="ui">Work Type</span>
+  فهو ما <b>نفَّذته الورشة فعلاً</b> — وقد يختلفان، وهذا طبيعي.
+</div>
+<table>
+  <tr><th style="width:34%">على الشاشة / On screen</th><th>المقصود / Meaning</th></tr>
+  <tr><td class="l"><b>Spare Parts</b></td>
+      <td class="a">قطع غيار — <b>يجب</b> إدخال القطع في جدول <span class="ui">Spare Parts Used</span></td></tr>
+  <tr><td class="l"><b>Maintenance</b></td><td class="a">صيانة داخل الورشة</td></tr>
+  <tr><td class="l"><b>External Maintenance</b></td><td class="a">صيانة خارجية (خارج الورشة)</td></tr>
+  <tr><td class="l"><b>Oils &amp; Filters</b></td><td class="a">زيوت وفلاتر</td></tr>
+  <tr><td class="l"><b>Other</b></td>
+      <td class="a">أخرى — يظهر حقل <span class="ui">Other Work Type</span> تكتب فيه ما تم عمله</td></tr>
+</table>
+
+<div class="warn">
+  <div class="ar"><b>شرطان لإنهاء الطلب:</b><br/>
+    ١ — لا يمكن الضغط على <span class="ui btn">Complete</span> قبل اختيار <span class="ui">Work Type</span>.<br/>
+    ٢ — إذا اخترت <span class="ui">Spare Parts</span> فلا بد من إدخال القطع في جدول
+    <span class="ui">Spare Parts Used</span> أولاً.</div>
+  <div class="en"><b>Two conditions to close a request:</b> a Work Type must be set, and if it is
+    <b>Spare Parts</b>, the parts must be listed in <b>Spare Parts Used</b> first.</div>
+</div>
+
+<div class="screen">
+  <div class="bar">Request &nbsp;›&nbsp; Repair Report</div>
+  <div class="row"><div class="lbl">Work Type</div><div class="val ar">اختر نوع العمل المنفَّذ</div></div>
+  <div class="row"><div class="lbl">Entry / Exit Date</div><div class="val">— دخول وخروج المركبة —</div></div>
+  <div class="row"><div class="lbl">Odometer Reading</div><div class="val">— قراءة العداد —</div></div>
+  <div class="row"><div class="lbl">Technician</div><div class="val">— الفني —</div></div>
+  <div class="row"><div class="lbl">Spare Parts Used</div><div class="val ar">جدول القطع المستخدمة</div></div>
+  <div class="row"><div class="lbl">Labor Cost / Total Cost</div><div class="val">— تكلفة العمالة / الإجمالي —</div></div>
+</div>
+
+<h2>متى يمكن التعديل؟ <small>When each field can be edited</small></h2>
+<table>
+  <tr><th style="width:30%">الحالة / Status</th><th>ما يمكن عمله / What is possible</th></tr>
+  <tr><td class="l"><span class="badge b-new">New</span></td>
+      <td class="a">البدء أو الرفض فقط. تقرير الإصلاح مُقفل. <span class="en">Start or Reject only; the report is locked.</span></td></tr>
+  <tr><td class="l"><span class="badge b-prog">In Progress</span></td>
+      <td class="a">تقرير الإصلاح مفتوح للتعديل، ومنه <span class="ui">Work Type</span>. <span class="en">The repair report is editable.</span></td></tr>
+  <tr><td class="l"><span class="badge b-done">Completed</span></td>
+      <td class="a">الطلب مُقفل ولا يُعدَّل. <span class="en">Closed; nothing can be edited.</span></td></tr>
+</table>
+
+<div class="tip">
+  <div class="ar">تقرير الإصلاح يظهر لمدير الورشة والفني فقط — لا يراه مقدّم الطلب.
+    وتصل لك رسالة داخل النظام (الجرس 🔔) عند وصول كل طلب جديد.</div>
+  <div class="en">The Repair Report tab is visible to the manager and technician only. You are notified
+    in Odoo (🔔) whenever a new request arrives.</div>
+</div>
+
+<div class="foot"><span>KSW — Workshop · دليل مدير الورشة</span><span>Al-Kawthar Software</span></div>
+</body></html>

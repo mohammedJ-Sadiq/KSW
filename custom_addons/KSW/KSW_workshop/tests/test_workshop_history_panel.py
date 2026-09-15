@@ -40,6 +40,7 @@ class TestWorkshopHistoryPanel(TransactionCase):
             'employee_id': self.employee.id,
             'client_id': self.client.id,
             'vehicle_id': self.vehicle.id,
+            'vehicle_type': 'isuzu',
             'driver_id': self.driver.id,
             'description': 'Service',
         }

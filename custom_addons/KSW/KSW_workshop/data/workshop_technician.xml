@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        The one entry in the technician register that is not a person: work the
+        workshop sent out rather than did itself. It lives here, in the same
+        picker, so the Technician column on a labor line is one question with
+        one answer rather than a person plus an "is it external?" checkbox.
+
+        Deliberately NOT inside noupdate="1": the label is the only thing it
+        carries, and an upgrade should be able to correct or translate it.
+    -->
+    <record id="technician_external_service_location" model="ksw.workshop.technician">
+        <field name="name">External Service Location</field>
+        <field name="is_external" eval="True"/>
+    </record>
+
+</odoo>

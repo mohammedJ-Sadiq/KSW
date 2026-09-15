@@ -9,3 +9,13 @@ access_ksw_workshop_part_manager,ksw.workshop.part.manager,model_ksw_workshop_pa
 access_ksw_workshop_part_line_user,ksw.workshop.part.line.user,model_ksw_workshop_part_line,base.group_user,1,0,0,0
 access_ksw_workshop_part_line_technician,ksw.workshop.part.line.technician,model_ksw_workshop_part_line,group_workshop_technician,1,1,1,1
 access_ksw_workshop_part_line_manager,ksw.workshop.part.line.manager,model_ksw_workshop_part_line,group_workshop_manager,1,1,1,1
+access_ksw_workshop_technician_user,ksw.workshop.technician.user,model_ksw_workshop_technician,base.group_user,1,0,0,0
+access_ksw_workshop_technician_manager,ksw.workshop.technician.manager,model_ksw_workshop_technician,group_workshop_manager,1,1,1,1
+access_ksw_workshop_labor_line_user,ksw.workshop.labor.line.user,model_ksw_workshop_labor_line,base.group_user,1,0,0,0
+access_ksw_workshop_labor_line_technician,ksw.workshop.labor.line.technician,model_ksw_workshop_labor_line,group_workshop_technician,1,1,1,1
+access_ksw_workshop_labor_line_manager,ksw.workshop.labor.line.manager,model_ksw_workshop_labor_line,group_workshop_manager,1,1,1,1
+access_ksw_workshop_request_type_user,ksw.workshop.request.type.user,model_ksw_workshop_request_type,base.group_user,1,0,0,0
+access_ksw_workshop_request_type_manager,ksw.workshop.request.type.manager,model_ksw_workshop_request_type,group_workshop_manager,1,1,1,1
+access_ksw_workshop_keyword_suggestion_manager,ksw.workshop.keyword.suggestion.manager,model_ksw_workshop_keyword_suggestion,group_workshop_manager,1,1,1,1
+access_ksw_workshop_keyword_ignored_user,ksw.workshop.keyword.ignored.user,model_ksw_workshop_keyword_ignored,base.group_user,1,0,0,0
+access_ksw_workshop_keyword_ignored_manager,ksw.workshop.keyword.ignored.manager,model_ksw_workshop_keyword_ignored,group_workshop_manager,1,1,1,1

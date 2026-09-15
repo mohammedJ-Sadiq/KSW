@@ -13,11 +13,17 @@ from odoo.exceptions import UserError, ValidationError
 # employee headcount and turning up in every employee picker.
 LEGACY_PLACEHOLDER_SUFFIX = ' (Legacy Import - No Odoo Account)'
 
-# Keyword -> request_type, used to classify the legacy Google-Sheet history,
-# whose `request_type` was empty on all 17,079 rows (the sheet never had the
-# column). Ordered: the FIRST entry whose pattern matches wins, so the most
-# specific/most common work goes first — ~400 rows mention more than one of
-# these and would otherwise classify arbitrarily.
+# Keyword -> request_type. This is now the SEED for the nine
+# ksw.workshop.request.type rows (data/request_types.xml) and the input to the
+# 19.0.6.0.0 migration — it is no longer the live ruleset. The live keywords
+# live on those records, where the workshop manager maintains them; read them
+# from there, never from here.
+#
+# Ordering mattered when a request could only carry one type: the first match
+# won, so the most specific/most common work went first. 872 of the 17,079
+# descriptions match more than one of these, and every one of those lost the
+# rest of its answer. request_type_ids (Many2many) keeps them all, which is
+# why the ordering below is now only the display order of the tags.
 #
 # Patterns are POSIX regex fragments fed to SQL `~*` by the 19.0.6.0.0
 # migration, so they must stay valid PostgreSQL regexes. Arabic misspellings
@@ -56,14 +62,17 @@ class KswWorkshopRequest(models.Model):
     _REPORT_FIELDS = {
         'entry_datetime', 'exit_datetime', 'odometer_reading', 'tire_pressure',
         'tire_bolts', 'work_statement', 'repairs_parts', 'technician_id',
-        'parts_cost', 'labor_cost', 'part_line_ids',
+        'parts_cost', 'labor_cost', 'part_line_ids', 'labor_line_ids',
     }
     _REQUESTER_FIELDS = {
-        'client_id', 'vehicle_type', 'vehicle_id', 'driver_id', 'description', 'request_type',
+        'client_id', 'vehicle_type', 'vehicle_id', 'driver_id', 'description',
         'x_cash_customer_name', 'x_cash_vehicle_number', 'x_cash_tank_number',
         'x_cash_plate_number', 'x_cash_driver_name', 'x_cash_brand', 'x_cash_model', 'x_cash_year',
     }
     _MANAGER_ONLY_FIELDS = {'is_cash_customer'}
+    # Tags are the workshop's own classification, not the requester's — they
+    # are derived from his words, and corrected by the people who did the work.
+    _CLASSIFICATION_FIELDS = {'request_type_ids'}
 
     name = fields.Char(default='New', copy=False, readonly=True, tracking=True)
 
@@ -71,10 +80,11 @@ class KswWorkshopRequest(models.Model):
         'hr.employee', string='Requested By', required=True,
         default=lambda self: self.env.user.employee_id, readonly=True,
     )
+    # Kept although it is no longer on the form: it is stored, and the
+    # "Department" group-by in the search view measures on it. The other three
+    # employee mirrors (work email, mobile, job title) were form-only and went
+    # with the Requester section.
     department_id = fields.Many2one(related='employee_id.department_id', store=True, readonly=True)
-    work_email = fields.Char(related='employee_id.work_email', readonly=True)
-    mobile_phone = fields.Char(related='employee_id.mobile_phone', readonly=True)
-    job_title = fields.Char(related='employee_id.job_title', readonly=True)
 
     # The four original values keep their keys; the rest were added once the
     # 17k imported descriptions showed what the workshop actually does — tyres
@@ -91,12 +101,25 @@ class KswWorkshopRequest(models.Model):
         ('hoses', 'Hoses'),
         ('mechanical', 'Mechanical'),
         ('inspection', 'Periodic Inspection'),
-    ], string='Request Type', tracking=True)
+    ], string='Request Type (legacy)', tracking=True)
+
+    # What the request is about, as tags. Replaces the Selection above, which
+    # is kept only as the provenance record of what each imported row was
+    # classified as in Aug 2026 — it is on no view and nothing writes it.
+    #
+    # Nobody picks these: the requester types a description and the tags are
+    # derived from it (_derive_request_types below). Asking a driver to place
+    # his own fault in one of nine buckets is asking the wrong person, which
+    # is why the field used to be wrong so often.
+    request_type_ids = fields.Many2many(
+        'ksw.workshop.request.type',
+        'ksw_workshop_request_type_rel', 'request_id', 'type_id',
+        string='Request Type', tracking=True)
     x_request_type_derived = fields.Boolean(
-        string='Type Derived from Description', readonly=True, copy=False,
-        help="Set by the history backfill when the request type was inferred from the "
-             "description text rather than chosen by a person. Lets a report separate "
-             "derived values from entered ones.")
+        string='Type Derived from Description', readonly=True, copy=False, default=True,
+        help="True while the tags are the ones the keywords produced. Editing them by "
+             "hand clears it, and from then on they are left alone — a correction must "
+             "never be undone by the next edit to the description.")
 
     is_cash_customer = fields.Boolean(string='Cash Customer', tracking=True, copy=False)
     x_can_toggle_cash_customer = fields.Boolean(
@@ -205,7 +228,13 @@ class KswWorkshopRequest(models.Model):
         string='Other Parts Cost',
         help="Free-typed figure for uncatalogued or one-off items that were not "
              "listed above. This is where the legacy history's parts costs live.")
-    labor_cost = fields.Float(string='Labor Cost')
+    labor_cost = fields.Float(string='Labor / Service Fee')
+    # --- Labor / service performed ---
+    # What was done and who did it, itemised the way spare parts are. The fee
+    # itself stays the single figure above: the workshop itemises the work,
+    # not a price per task.
+    labor_line_ids = fields.One2many(
+        'ksw.workshop.labor.line', 'request_id', string='Labor / Service Performed')
     total_cost = fields.Float(
         string='Total Cost', compute='_compute_total_cost', store=True,
         help="Listed spare parts, plus other parts, plus labor. Note the legacy "
@@ -369,19 +398,29 @@ class KswWorkshopRequest(models.Model):
                 request.x_cash_year = False
 
     @api.constrains('is_cash_customer', 'client_id', 'vehicle_type', 'vehicle_id',
-                     'x_cash_customer_name', 'x_cash_vehicle_number')
+                     'driver_id')
     def _check_vehicle_and_cash_customer(self):
         for request in self:
             if request.is_cash_customer:
-                if not request.x_cash_customer_name or not request.x_cash_vehicle_number:
-                    raise ValidationError(_(
-                        'Cash Customer requests require at least a customer name and a '
-                        'vehicle/tank number.'
-                    ))
+                # Every Cash Customer detail is optional, by decision
+                # (2026-09-14): a walk-in is written down with whatever the
+                # person at the counter actually has, and the description —
+                # required for every request — is the part that always exists.
                 continue
             if not request.client_id or not request.vehicle_id:
                 raise ValidationError(_(
                     'Client and Vehicle are required unless this is a Cash Customer request.'
+                ))
+            # Vehicle Type and Driver are required of anyone submitting a
+            # normal request, but NOT retro-applied to the 17,079 imported
+            # rows: the Google Sheet never had a driver column (exactly one of
+            # them carries a driver), so enforcing it here would make the whole
+            # legacy history uneditable the moment a manager corrected a
+            # vehicle on it.
+            if not request.x_imported and not (request.vehicle_type and request.driver_id):
+                raise ValidationError(_(
+                    'Vehicle Type and Driver are required unless this is a Cash '
+                    'Customer request.'
                 ))
             if request.vehicle_id.client_id != request.client_id:
                 raise ValidationError(_(
@@ -399,12 +438,22 @@ class KswWorkshopRequest(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         is_manager = self.env.su or self.env.user.has_group('KSW_workshop.group_workshop_manager')
+        RequestType = self.env['ksw.workshop.request.type']
         for vals in vals_list:
             if not is_manager:
                 vals['employee_id'] = self.env.user.employee_id.id
                 vals['is_cash_customer'] = False
             if not vals.get('name') or vals['name'] == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code('ksw.workshop.request') or 'New'
+            # Tags come from the words the requester wrote. An explicit list
+            # (an import, a manager creating on someone's behalf) is left
+            # alone and marked as chosen, so it is never re-derived away.
+            if vals.get('request_type_ids'):
+                vals['x_request_type_derived'] = False
+            else:
+                derived = RequestType._match_description(vals.get('description'))
+                vals['request_type_ids'] = [fields.Command.set(derived.ids)]
+                vals['x_request_type_derived'] = True
         requests = super().create(vals_list)
         for request in requests:
             request._notify_workshop_managers()
@@ -432,7 +481,10 @@ class KswWorkshopRequest(models.Model):
                 raise UserError(_('The repair report can only be edited while the request is In Progress.'))
 
     def write(self, vals):
-        if not self.env.su:
+        # Set only by _apply_derived_types() below, so the tagger's own write
+        # is not mistaken for a person choosing the tags by hand.
+        deriving = self.env.context.get('ksw_deriving_request_types')
+        if not self.env.su and not deriving:
             user = self.env.user
             is_manager = user.has_group('KSW_workshop.group_workshop_manager')
             touched = set(vals.keys())
@@ -458,7 +510,43 @@ class KswWorkshopRequest(models.Model):
                     if request.employee_id.user_id != user or request.state != 'new':
                         raise UserError(_('You can only edit your own request while it is New.'))
 
-        return super().write(vals)
+            if touched & self._CLASSIFICATION_FIELDS and not (
+                is_manager or user.has_group('KSW_workshop.group_workshop_technician')
+            ):
+                raise UserError(_(
+                    'The request type is set from the description. Only the workshop '
+                    'can change it.'
+                ))
+
+        # A person choosing the tags ends the derivation, permanently: a
+        # correction must not be undone by the next edit to the description.
+        if 'request_type_ids' in vals and not deriving:
+            vals = dict(vals, x_request_type_derived=False)
+
+        res = super().write(vals)
+
+        # Still New and still untouched by a person: the tags follow the words.
+        if 'description' in vals and 'request_type_ids' not in vals:
+            stale = self.filtered(
+                lambda request: request.x_request_type_derived and request.state == 'new')
+            stale._apply_derived_types()
+        return res
+
+    def _apply_derived_types(self):
+        """Re-run the keyword rules over each request's own description.
+
+        sudo() because the rules are configuration and the requester editing
+        his own description is not the one being asked to classify it; the
+        context flag is what tells write() above that this is the tagger, not
+        a person.
+        """
+        RequestType = self.env['ksw.workshop.request.type']
+        for request in self:
+            derived = RequestType._match_description(request.description)
+            if derived != request.request_type_ids:
+                request.sudo().with_context(ksw_deriving_request_types=True).write({
+                    'request_type_ids': [fields.Command.set(derived.ids)],
+                })
 
     # ------------------------------------------------------------------
     # Workflow

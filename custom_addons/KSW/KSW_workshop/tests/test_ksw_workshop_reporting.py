@@ -24,6 +24,8 @@ class TestWorkshopReporting(TransactionCase):
     def _make(self, description='Something broke', **kwargs):
         vals = {
             'vehicle_id': self.vehicle.id,
+            'vehicle_type': 'isuzu',
+            'driver_id': self.requester.id,
             'description': description,
             'employee_id': self.requester.id,
         }

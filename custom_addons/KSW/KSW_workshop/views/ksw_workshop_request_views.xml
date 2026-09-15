@@ -35,15 +35,22 @@
                     </div>
                     <field name="x_can_toggle_cash_customer" invisible="1"/>
                     <group>
-                        <group string="Requester">
+                        <group>
+                            <!-- "Requested By" is the whole of what used to be a
+                                 Requester section: the department/job/email/mobile
+                                 mirrors said nothing the employee record does not
+                                 already say, one field is not a section, and this
+                                 is the column a requester fills in. -->
                             <field name="employee_id" readonly="1"/>
-                            <field name="department_id" readonly="1"/>
-                            <field name="job_title" readonly="1"/>
-                            <field name="work_email" readonly="1"/>
-                            <field name="mobile_phone" readonly="1"/>
-                        </group>
-                        <group string="Vehicle">
+                            <!-- Cash Customer is the workshop manager's switch, not
+                                 an option offered to a requester. Driven by
+                                 x_can_toggle_cash_customer rather than groups=,
+                                 because a field groups= removes from the arch is
+                                 also missing from every invisible= expression that
+                                 reads it (Odoo 19 Pitfalls #31) — and half this
+                                 column reads it. -->
                             <field name="is_cash_customer"
+                                   invisible="not x_can_toggle_cash_customer"
                                    readonly="not x_can_toggle_cash_customer or state != 'new'"/>
                             <!-- Static context dict on the view tag, never a
                                  dynamic one on the field definition (see the
@@ -62,6 +69,7 @@
                                    readonly="state != 'new'"/>
                             <field name="vehicle_type"
                                    invisible="is_cash_customer"
+                                   required="not is_cash_customer"
                                    readonly="state != 'new'"/>
                             <field name="vehicle_id"
                                    context="{'default_client_id': client_id, 'default_vehicle_type': vehicle_type}"
@@ -70,38 +78,42 @@
                                    readonly="state != 'new'"/>
                             <field name="driver_id"
                                    invisible="is_cash_customer"
+                                   required="not is_cash_customer"
                                    readonly="state != 'new'"/>
-                            <field name="x_cash_customer_name"
-                                   invisible="not is_cash_customer"
-                                   required="is_cash_customer"
-                                   readonly="state != 'new'"/>
-                            <field name="x_cash_vehicle_number"
-                                   invisible="not is_cash_customer"
-                                   required="is_cash_customer"
-                                   readonly="state != 'new'"/>
-                            <field name="x_cash_tank_number"
-                                   invisible="not is_cash_customer"
-                                   readonly="state != 'new'"/>
-                            <field name="x_cash_plate_number"
-                                   invisible="not is_cash_customer"
-                                   readonly="state != 'new'"/>
-                            <field name="x_cash_driver_name"
-                                   invisible="not is_cash_customer"
-                                   readonly="state != 'new'"/>
-                            <field name="x_cash_brand"
-                                   invisible="not is_cash_customer"
-                                   readonly="state != 'new'"/>
-                            <field name="x_cash_model"
-                                   invisible="not is_cash_customer"
-                                   readonly="state != 'new'"/>
-                            <field name="x_cash_year"
-                                   invisible="not is_cash_customer"
-                                   readonly="state != 'new'"/>
+                        </group>
+                        <!-- Walk-in work: every field optional on purpose. What
+                             the counter gets told varies, and the description
+                             (required for every request) is the part that is
+                             always there. -->
+                        <group string="Cash Customer" invisible="not is_cash_customer">
+                            <field name="x_cash_customer_name" readonly="state != 'new'"/>
+                            <field name="x_cash_vehicle_number" readonly="state != 'new'"/>
+                            <field name="x_cash_tank_number" readonly="state != 'new'"/>
+                            <field name="x_cash_plate_number" readonly="state != 'new'"/>
+                            <field name="x_cash_driver_name" readonly="state != 'new'"/>
+                            <field name="x_cash_brand" readonly="state != 'new'"/>
+                            <field name="x_cash_model" readonly="state != 'new'"/>
+                            <field name="x_cash_year" readonly="state != 'new'"/>
                         </group>
                     </group>
                     <group string="Request">
-                        <field name="request_type" required="1" readonly="state != 'new'"/>
-                        <field name="description" nolabel="1" readonly="state != 'new'"/>
+                        <!-- The requester's only question. The type is not asked
+                             of him at all: it is derived from these words (see
+                             _apply_derived_types) and shown below to the workshop,
+                             who can correct it. Asking a driver to classify his
+                             own fault is asking the wrong person. -->
+                        <field name="description" readonly="state != 'new'"
+                               placeholder="Describe the problem: what is wrong, since when, and any warning light or noise."/>
+                        <field name="request_type_ids" widget="many2many_tags"
+                               options="{'color_field': 'color', 'no_create': True}"
+                               groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_manager"/>
+                        <div class="text-muted" colspan="2"
+                             invisible="not x_request_type_derived"
+                             groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_manager">
+                            Tagged from the description. Edit the tags to correct them —
+                            they will then be left alone.
+                        </div>
+                        <field name="x_request_type_derived" invisible="1"/>
                     </group>
                     <notebook>
                         <page string="Repair Report"
@@ -111,16 +123,18 @@
                                     <field name="entry_datetime" readonly="state != 'in_progress'"/>
                                     <field name="exit_datetime" readonly="state != 'in_progress'"/>
                                     <field name="odometer_reading" readonly="state != 'in_progress'"/>
-                                    <field name="technician_id" readonly="state != 'in_progress'"/>
-                                    <field name="x_legacy_technician_name" readonly="1"
-                                           invisible="not x_legacy_technician_name"/>
                                 </group>
                                 <group>
                                     <field name="tire_pressure" readonly="state != 'in_progress'"/>
                                     <field name="tire_bolts" readonly="state != 'in_progress'"/>
                                     <field name="part_lines_cost" readonly="1"/>
-                                    <field name="parts_cost" readonly="state != 'in_progress'"/>
                                     <field name="labor_cost" readonly="state != 'in_progress'"/>
+                                    <!-- Off the form for new work, but still shown
+                                         (read-only) on the 878 imported rows that
+                                         carry a figure, so no history is hidden by
+                                         the field going away. -->
+                                    <field name="parts_cost" readonly="1"
+                                           invisible="not parts_cost"/>
                                     <field name="total_cost" readonly="1"/>
                                 </group>
                             </group>
@@ -140,9 +154,36 @@
                                     </list>
                                 </field>
                             </group>
-                            <group string="Work">
-                                <field name="work_statement" readonly="state != 'in_progress'"/>
-                                <field name="repairs_parts" readonly="state != 'in_progress'"/>
+                            <!-- The labor half of the same idea: what was done and
+                                 who did it, one line each. No amount per line —
+                                 the fee is the single figure above. The Technician
+                                 picker offers the employees flagged Workshop
+                                 Technician plus External Service Location. -->
+                            <group string="Labor / Service Performed">
+                                <field name="labor_line_ids" nolabel="1" colspan="2"
+                                       readonly="state != 'in_progress'">
+                                    <list editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="line_no" string="#"/>
+                                        <field name="description"/>
+                                        <field name="technician_id" options="{'no_create': True}"/>
+                                    </list>
+                                </field>
+                            </group>
+                            <!-- Legacy only. The Work section (Statement of
+                                 Required Work / Repairs and Spare Parts) and the
+                                 request-level Technician left the form as
+                                 redundant, but 5,639 imported rows carry that
+                                 text and 4,320 carry a technician name, so they
+                                 stay readable where they exist. -->
+                            <group string="Recorded on the Legacy Sheet"
+                                   invisible="not work_statement and not repairs_parts and not x_legacy_technician_name">
+                                <field name="x_legacy_technician_name" readonly="1"
+                                       invisible="not x_legacy_technician_name"/>
+                                <field name="work_statement" readonly="1"
+                                       invisible="not work_statement"/>
+                                <field name="repairs_parts" readonly="1"
+                                       invisible="not repairs_parts"/>
                             </group>
                         </page>
                         <!-- The workshop's equivalent of the Time Off form's
@@ -174,7 +215,8 @@
                                 <list>
                                     <field name="create_date" string="Date"/>
                                     <field name="name"/>
-                                    <field name="request_type"/>
+                                    <field name="request_type_ids" widget="many2many_tags"
+                                           options="{'color_field': 'color'}"/>
                                     <field name="description"/>
                                     <field name="technician_label"/>
                                     <field name="total_cost" sum="Total"/>
@@ -188,7 +230,8 @@
                                     <field name="create_date" string="Date"/>
                                     <field name="name"/>
                                     <field name="vehicle_id"/>
-                                    <field name="request_type"/>
+                                    <field name="request_type_ids" widget="many2many_tags"
+                                           options="{'color_field': 'color'}"/>
                                     <field name="description"/>
                                     <field name="state" widget="badge"/>
                                 </list>
@@ -228,7 +271,8 @@
                 <field name="employee_id"/>
                 <field name="client_id"/>
                 <field name="vehicle_id"/>
-                <field name="request_type"/>
+                <field name="request_type_ids" widget="many2many_tags"
+                       options="{'color_field': 'color'}"/>
                 <field name="description"/>
                 <field name="state" widget="badge"/>
             </list>
@@ -301,11 +345,12 @@
                 <filter string="Last 12 Months" name="filter_last_12_months"
                         domain="[('create_date', '&gt;=', (context_today() - relativedelta(months=12)).strftime('%Y-%m-%d'))]"/>
                 <separator/>
+                <field name="request_type_ids"/>
                 <filter string="Unclassified Type" name="filter_no_request_type"
-                        domain="[('request_type', '=', False)]"/>
+                        domain="[('request_type_ids', '=', False)]"/>
                 <group>
                     <filter string="Vehicle" name="groupby_vehicle" context="{'group_by': 'vehicle_id'}"/>
-                    <filter string="Request Type" name="groupby_request_type" context="{'group_by': 'request_type'}"/>
+                    <filter string="Request Type" name="groupby_request_type" context="{'group_by': 'request_type_ids'}"/>
                     <filter string="Technician" name="groupby_technician" context="{'group_by': 'technician_label'}"/>
                     <filter string="Vehicle Type" name="groupby_vehicle_type" context="{'group_by': 'vehicle_type'}"/>
                     <filter string="Status" name="groupby_state" context="{'group_by': 'state'}"/>
@@ -345,7 +390,7 @@
         <field name="arch" type="xml">
             <graph string="Workshop Analysis" type="bar" stacked="1" sample="1">
                 <field name="create_date" interval="month"/>
-                <field name="request_type"/>
+                <field name="request_type_ids"/>
             </graph>
         </field>
     </record>

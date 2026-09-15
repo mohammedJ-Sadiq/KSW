@@ -4,3 +4,6 @@ from . import test_client_is_partner_role
 from . import test_workshop_client_registry
 from . import test_workshop_parts
 from . import test_workshop_history_panel
+from . import test_workshop_labor_lines
+from . import test_request_type_tags
+from . import test_keyword_maintenance

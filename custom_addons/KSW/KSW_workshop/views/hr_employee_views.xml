@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_employee_form_workshop_technician" model="ir.ui.view">
+        <field name="name">hr.employee.form.workshop.technician</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <!-- The Settings page already carries groups="hr.group_hr_user", so
+                 the checkbox inherits that audience without a second gate. -->
+            <xpath expr="//page[@name='hr_settings']/group[@name='settings_group']" position="inside">
+                <group string="Workshop" name="ksw_workshop">
+                    <field name="x_is_workshop_technician"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

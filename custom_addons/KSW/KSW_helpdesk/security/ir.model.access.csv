@@ -12,3 +12,4 @@ access_it_asset_assignment_agent,it.asset.assignment.agent,model_it_asset_assign
 access_it_asset_maintenance_agent,it.asset.maintenance.agent,model_it_asset_maintenance,group_helpdesk_agent,1,1,1,1
 access_it_asset_assign_wizard,it.asset.assign.wizard,model_it_asset_assign_wizard,group_helpdesk_agent,1,1,1,1
 access_it_asset_return_wizard,it.asset.return.wizard,model_it_asset_return_wizard,group_helpdesk_agent,1,1,1,1
+access_hr_employee_helpdesk_agent,hr.employee.helpdesk.agent,hr.model_hr_employee,group_helpdesk_agent,1,0,0,0

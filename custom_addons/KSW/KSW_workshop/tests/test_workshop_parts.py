@@ -48,7 +48,8 @@ class TestWorkshopParts(TransactionCase):
 
     def _in_progress_request(self):
         request = self.env['ksw.workshop.request'].with_user(self.user_employee).create({
-            'vehicle_id': self.vehicle.id, 'description': 'Oil change',
+            'vehicle_id': self.vehicle.id, 'vehicle_type': 'isuzu',
+            'driver_id': self.employee.id, 'description': 'Oil change',
         })
         request.with_user(self.user_manager).action_start()
         return request
