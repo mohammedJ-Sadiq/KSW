@@ -509,11 +509,19 @@
         <field name="name">Employee: whoever a pay supervisor may record for</field>
         <field name="model_id" ref="hr.model_hr_employee"/>
         <field name="groups" eval="[(4, ref('group_commission_supervisor'))]"/>
-        <field name="domain_force">['|', '|', '|',
+        <!--
+            The fourth clause used to be ('x_site_id', '!=', False): a
+            supervisor could read any employee assigned to a work site,
+            because a site-scoped Driver Trips batch drew its drivers from
+            that field regardless of department. Driver Trips is recorded
+            per department since 19.0.4.3.0 and nothing reads x_site_id, so
+            the clause granted company-wide read on whoever happened to
+            carry a site and justified nothing. Removed with the scope.
+        -->
+        <field name="domain_force">['|', '|',
             ('department_id.manager_id.user_id', '=', user.id),
             ('department_id.manager_id.user_id', 'in', user.x_assisted_manager_ids.ids),
-            ('id', 'child_of', user.employee_ids.ids),
-            ('x_site_id', '!=', False)]</field>
+            ('id', 'child_of', user.employee_ids.ids)]</field>
         <field name="perm_read" eval="True"/>
         <field name="perm_write" eval="False"/>
         <field name="perm_create" eval="False"/>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Optional per-driver narrowing. Maintained by dispatch rather than HR,
+         so the gate is this view's groups= and not a model-level one. -->
+    <record id="view_employee_form_water_clients" model="ir.ui.view">
+        <field name="name">hr.employee.form.water.clients</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="water_delivery" string="Water Delivery"
+                      groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing">
+                    <group>
+                        <field name="x_water_client_ids" widget="many2many_tags"
+                               options="{'no_create': True}"
+                               context="{'res_partner_search_mode': 'customer'}"
+                               placeholder="Leave empty to use the branch's client list"/>
+                    </group>
+                    <div class="text-muted">
+                        Leave this empty and the driver sees every client his
+                        branch serves. Fill it in to narrow him to these clients
+                        only — he can still reach the others by ticking
+                        <b>Client not listed</b>, which marks the note as off
+                        the usual route.
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

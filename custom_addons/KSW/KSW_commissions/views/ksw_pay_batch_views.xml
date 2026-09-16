@@ -17,6 +17,8 @@
                 <field name="needs_date" invisible="1"/>
                 <field name="needs_location" invisible="1"/>
                 <field name="importer" invisible="1"/>
+                <field name="entries_import_only" invisible="1"/>
+                <field name="x_entries_readonly" invisible="1"/>
                 <field name="x_can_reopen" invisible="1"/>
                 <field name="submission_state" invisible="1"/>
 
@@ -24,9 +26,11 @@
                     <button name="action_submit" string="Submit"
                             type="object" class="btn-primary"
                             invisible="state != 'draft'"/>
+                    <!-- Nothing to pull in for a component whose lines
+                         only ever come from its import. -->
                     <button name="action_add_recurring" string="Add Recurring"
                             type="object" class="btn-secondary"
-                            invisible="state != 'draft'"
+                            invisible="state != 'draft' or entries_import_only"
                             title="Pull in this component's recurring entries for the month"/>
                     <button name="action_import" string="Import"
                             type="object" class="btn-secondary"
@@ -92,7 +96,13 @@
 
                     <notebook>
                         <page string="Entries" name="entries">
-                            <field name="entry_ids" readonly="is_locked"
+                            <!-- readonly hides "Add a line" and the row
+                                 delete as well as freezing the cells, which
+                                 is the whole behaviour wanted for an
+                                 import-only component. The server-side twin
+                                 is ksw.pay.entry._check_import_only. -->
+                            <field name="entry_ids"
+                                   readonly="is_locked or x_entries_readonly"
                                    context="{'default_batch_id': id}">
                                 <list editable="bottom"
                                       decoration-warning="is_overridden">
@@ -151,13 +161,23 @@
                                     <button name="action_duplicate_line"
                                             type="object" icon="fa-copy"
                                             title="Duplicate this line"
-                                            invisible="parent.state != 'draft'"/>
+                                            invisible="parent.state != 'draft' or parent.x_entries_readonly"/>
                                     <field name="currency_id"
                                            column_invisible="1"/>
                                 </list>
                             </field>
+                            <div class="alert alert-info mt-2" role="status"
+                                 invisible="not x_entries_readonly">
+                                These lines are imported, not typed. Press
+                                <b>Import</b> to fill or refresh them, then
+                                review. The <b>calculator</b> icon shows how
+                                each amount was worked out. If a figure is
+                                wrong the cause is in the source data, not in
+                                this batch — contact technical support rather
+                                than correcting it here.
+                            </div>
                             <div class="text-muted mt-2"
-                                 invisible="calculation == 'fixed'">
+                                 invisible="calculation == 'fixed' or x_entries_readonly">
                                 Each new line starts as a copy of the one
                                 before it — change what differs. The
                                 <b>calculator</b> icon shows how an amount was

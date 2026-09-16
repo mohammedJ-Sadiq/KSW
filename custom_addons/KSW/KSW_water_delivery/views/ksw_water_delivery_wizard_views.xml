@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_water_delivery_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.water.delivery.wizard.form</field>
+        <field name="model">ksw.water.delivery.wizard</field>
+        <field name="arch" type="xml">
+            <!-- One screen, filled top to bottom on a phone. The driver types
+                 the client and taps; everything else is already right. -->
+            <form string="New Delivery">
+                <!-- Carried so the computes can see them; the client only asks
+                     for fields the view names (KSW gotcha #40). -->
+                <field name="allowed_partner_ids" invisible="1"/>
+                <field name="allowed_product_ids" invisible="1"/>
+                <field name="product_locked" invisible="1"/>
+                <field name="signature_required" invisible="1"/>
+                <field name="location_rule" invisible="1"/>
+                <field name="can_enter_trips" invisible="1"/>
+                <field name="trip_volume_m3" invisible="1"/>
+                <field name="gps_latitude" invisible="1"/>
+                <field name="gps_longitude" invisible="1"/>
+                <field name="gps_accuracy" invisible="1"/>
+                <field name="picking_id" invisible="1"/>
+                <field name="off_route" invisible="1"/>
+
+                <widget name="ksw_geolocation" invisible="location_rule == 'off'"/>
+
+                <group>
+                    <field name="partner_id"
+                           context="{'res_partner_search_mode': 'customer'}"
+                           options="{'no_create': True, 'no_open': True}"
+                           placeholder="Who are you delivering to?"/>
+                    <!-- The way out of a narrowed list. One tick, and the note
+                         records that it was issued off the usual route. -->
+                    <field name="show_all_clients"/>
+                    <div class="text-warning" colspan="2"
+                         invisible="not off_route">
+                        <i class="fa fa-exclamation-triangle me-1"/>
+                        This client is not one your branch normally serves. The
+                        note will be marked as off the usual route.
+                    </div>
+                    <!-- 257 of 312 clients buy one product: when there is only
+                         one it is chosen and shown read-only, because a picker
+                         with a single option is a question with one answer. -->
+                    <!-- force_save: the web client omits read-only fields from
+                         its payload, which is what made this arrive empty and
+                         fail on a NOT NULL. create() fills it too; this just
+                         stops the round trip losing it in the first place. -->
+                    <field name="product_id"
+                           options="{'no_create': True, 'no_open': True}"
+                           readonly="product_locked" force_save="1"
+                           invisible="not partner_id"/>
+                    <label for="entered_qty"/>
+                    <div class="o_row">
+                        <field name="entered_qty" class="oe_inline"/>
+                        <field name="entered_uom" class="oe_inline"
+                               invisible="not can_enter_trips"/>
+                    </div>
+                    <field name="quantity_preview" string="Delivering"
+                           invisible="entered_uom != 'trip' or not quantity_preview"/>
+                    <field name="rate_preview" string="Agreed rate"
+                           invisible="not rate_preview"/>
+                </group>
+
+                <group invisible="not signature_required">
+                    <field name="signed_by" placeholder="Name of the person signing"/>
+                    <field name="signature" widget="signature"
+                           options="{'full_name': 'signed_by', 'size': [0, 180]}"/>
+                    <field name="signature_origin"/>
+                </group>
+
+                <group string="Trip" col="2">
+                    <field name="driver_id" readonly="1" force_save="1"/>
+                    <field name="vehicle_id"/>
+                    <field name="note" placeholder="Anything the client should see on the note"/>
+                </group>
+
+                <footer>
+                    <button name="action_confirm" type="object" string="Issue Delivery Note"
+                            class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_water_delivery_wizard" model="ir.actions.act_window">
+        <field name="name">New Delivery</field>
+        <field name="res_model">ksw.water.delivery.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_water_delivery_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

@@ -44,9 +44,13 @@ CALCULATION = [
     ('tiered', 'Tiered on quantity'),
 ]
 
+# 'site' was retired in 19.0.4.3.0: Driver Trips, the only component that
+# ever used it, is recorded per department now. Historical batches keep
+# their ksw.pay.batch.site_id as a record of where those trips were driven
+# — the value is read nowhere, and the option is gone so nothing can put
+# the site picker back in front of a supervisor.
 SCOPE = [
     ('department', 'Department'),
-    ('site', 'Work Site'),
     ('company', 'Company-wide'),
 ]
 
@@ -156,6 +160,13 @@ class KswPayComponent(models.Model):
         selection='_selection_importer', string='Import Source',
         help='Optional. Adds an Import button on batches of this component.',
     )
+    entries_import_only = fields.Boolean(
+        string='Filled by Import Only', default=False,
+        help='The entries are produced by the import and reviewed, never '
+             'typed: no line can be added, edited or deleted by hand. For a '
+             'component whose figures come from another system, where a '
+             'correction belongs in that system and not in this one.',
+    )
 
     _unique_code = models.Constraint(
         'UNIQUE(code)', 'A pay component code must be unique.')
@@ -192,6 +203,21 @@ class KswPayComponent(models.Model):
                     "'%(name)s' has options, so its amount has to be a "
                     "quantity × rate — each option carries its own rate.",
                     name=rec.name))
+
+    @api.constrains('entries_import_only', 'importer')
+    def _check_import_only_has_an_importer(self):
+        """Import-only without an importer is a batch nobody can fill.
+
+        The flag closes the only other way in, so the button has to exist
+        or the component is a dead end with no error to explain it.
+        """
+        for rec in self:
+            if rec.entries_import_only and not rec.importer:
+                raise ValidationError(_(
+                    "'%(name)s' is set to be filled by import only, so it "
+                    "needs an Import Source — otherwise its batches can "
+                    "never be filled at all.", name=rec.name))
+
 
     @api.constrains('calculation', 'divisor', 'rate', 'tier_ids')
     def _check_calculation(self):
@@ -509,9 +535,15 @@ class KswPayRateTier(models.Model):
     component_id = fields.Many2one(
         'ksw.pay.component', required=True, ondelete='cascade', index=True,
     )
+    # Kept for the shape of the waterfall, not for choosing: with trips
+    # recorded per department there is no site on the entry to match a
+    # site-specific band against, so every live tier is a site-less one.
     site_id = fields.Many2one(
         'ksw.site', string='Work Site',
-        help='Leave empty to apply to every site.',
+        domain="[('site_type', '=', 'calculation')]",
+        help='Leave empty — the ladder applies to every location. Driver '
+             'Trips is recorded per department, so a site-specific band '
+             'has nothing to match on.',
     )
     sequence = fields.Integer(default=10)
     name = fields.Char(help='Optional label, e.g. "Tier 2".')

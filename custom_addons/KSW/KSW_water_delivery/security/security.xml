@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="module_category_water_delivery" model="ir.module.category">
+        <field name="name">KSW Water Delivery</field>
+        <field name="sequence">210</field>
+    </record>
+
+    <!-- Two questions, not three (KSW standing rule: one question per role).
+         Driving and billing are different jobs; dispatcher is the senior half
+         of the driving one, so it sits in the same dropdown. -->
+    <record id="privilege_water_delivery" model="res.groups.privilege">
+        <field name="name">Water Delivery</field>
+        <field name="sequence">10</field>
+        <field name="category_id" ref="module_category_water_delivery"/>
+    </record>
+
+    <record id="privilege_water_billing" model="res.groups.privilege">
+        <field name="name">Water Delivery Billing</field>
+        <field name="sequence">20</field>
+        <field name="category_id" ref="module_category_water_delivery"/>
+    </record>
+
+    <!-- Every group below implies base.group_user on purpose: issuing a note
+         posts the signed PDF to the chatter, and mail.message create is gated
+         on the internal-user group (KSW gotcha #11). -->
+    <record id="group_water_driver" model="res.groups">
+        <field name="name">Driver</field>
+        <field name="sequence">1</field>
+        <field name="privilege_id" ref="privilege_water_delivery"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">Issues delivery notes for his own trips and sees only those.</field>
+    </record>
+
+    <record id="group_water_dispatcher" model="res.groups">
+        <field name="name">Dispatcher</field>
+        <field name="sequence">2</field>
+        <field name="privilege_id" ref="privilege_water_delivery"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user')), (4, ref('group_water_driver'))]"/>
+        <field name="comment">Sees every water delivery note and can issue one on a driver's behalf.</field>
+    </record>
+
+    <record id="group_water_billing" model="res.groups">
+        <field name="name">Billing</field>
+        <field name="sequence">1</field>
+        <field name="privilege_id" ref="privilege_water_billing"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">Reads every water delivery note for month-end invoicing. Does not issue or correct notes.</field>
+    </record>
+
+    <!-- Turn on the core "Signature" feature on delivery orders. This is the
+         Inventory settings checkbox, which grants the group through
+         base.group_user.implied_ids. A record override of another module's
+         group is silently skipped on every upgrade after the first install
+         (KSW gotcha #2); a function calls write() directly and is not. -->
+    <function model="res.groups" name="write">
+        <value eval="[ref('base.group_user')]"/>
+        <value eval="{'implied_ids': [(4, ref('stock.group_stock_sign_delivery'))]}"/>
+    </function>
+
+    <!-- A driver sees his own notes and nothing else. -->
+    <record id="rule_water_picking_driver" model="ir.rule">
+        <field name="name">Water delivery notes: own only</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="groups" eval="[(4, ref('group_water_driver'))]"/>
+        <field name="domain_force">[('x_driver_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- The dispatcher's rule ORs with the driver's (he holds both groups), so
+         he reaches every water note plus his own. -->
+    <record id="rule_water_picking_dispatcher" model="ir.rule">
+        <field name="name">Water delivery notes: all (dispatcher)</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="groups" eval="[(4, ref('group_water_dispatcher'))]"/>
+        <field name="domain_force">[('x_is_water_delivery', '=', True)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_water_picking_billing" model="ir.rule">
+        <field name="name">Water delivery notes: all (billing)</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="groups" eval="[(4, ref('group_water_billing'))]"/>
+        <field name="domain_force">[('x_is_water_delivery', '=', True)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+</odoo>

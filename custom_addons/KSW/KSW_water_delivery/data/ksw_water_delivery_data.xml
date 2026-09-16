@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Seeds only. Everything here is configuration the business edits
+         afterwards (price, branch code, terms), so noupdate="1" keeps an
+         upgrade from overwriting their edits. -->
+    <data noupdate="1">
+
+        <!-- The pilot branch's own operation type. Its own sequence is what
+             gives Odoo-issued notes a number that cannot be confused with the
+             BAS notes already imported into WH/OUT. -->
+        <record id="picking_type_water_out" model="stock.picking.type">
+            <field name="name">Water Delivery Notes</field>
+            <field name="sequence_code">WTR</field>
+            <field name="code">outgoing</field>
+            <field name="warehouse_id" ref="stock.warehouse0"/>
+            <field name="x_is_water_delivery" eval="True"/>
+            <!-- Proof of concept: drivers issue the note at the customer to
+                 prove they can, and the paper note still collects the wet
+                 signature. Ticking this box turns signing on; nothing else
+                 has to change. Existing databases are switched by
+                 migrations/19.0.1.1.0, since this block is noupdate. -->
+            <field name="x_signature_required" eval="False"/>
+            <field name="print_label" eval="False"/>
+        </record>
+
+        <!-- One load ("ردة") of sweet water. Non-storable, like every water
+             product in the BAS import: there is no stock and no valuation
+             behind a tanker load. Delivered-quantity invoicing is the whole
+             point : it is what makes the month-end invoice add up to the
+             notes that were actually signed. -->
+        <record id="product_water_load" model="product.product">
+            <field name="name">Sweet Water — Load</field>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="False"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">0.0</field>
+            <field name="description_sale">مياه عذبة — ردة</field>
+        </record>
+
+        <!-- Core ships 30 and 45 days but no plain 60 or 90, and KSW contracts
+             run to 90 and beyond. -->
+        <record id="account_payment_term_60days" model="account.payment.term">
+            <field name="name">60 Days</field>
+            <field name="note">Payment terms: 60 Days</field>
+            <field name="line_ids" eval="[Command.clear(), Command.create({'value': 'percent', 'value_amount': 100.0, 'nb_days': 60})]"/>
+        </record>
+
+        <record id="account_payment_term_90days" model="account.payment.term">
+            <field name="name">90 Days</field>
+            <field name="note">Payment terms: 90 Days</field>
+            <field name="line_ids" eval="[Command.clear(), Command.create({'value': 'percent', 'value_amount': 100.0, 'nb_days': 90})]"/>
+        </record>
+
+        <record id="account_payment_term_120days" model="account.payment.term">
+            <field name="name">120 Days</field>
+            <field name="note">Payment terms: 120 Days</field>
+            <field name="line_ids" eval="[Command.clear(), Command.create({'value': 'percent', 'value_amount': 100.0, 'nb_days': 120})]"/>
+        </record>
+
+    </data>
+</odoo>

@@ -16,7 +16,6 @@ class PayEntryCommon(TransactionCase):
         cls.period = '2028-07-01'
         cls.dept = env['hr.department'].create({'name': 'Pay Dept'})
         cls.other_dept = env['hr.department'].create({'name': 'Pay Dept 2'})
-        cls.site = env['ksw.site'].create({'name': 'Pay Site', 'code': 'PS'})
 
         cls.emp = cls._employee('Pay Emp', cls.dept, 7200.0)
         cls.emp2 = cls._employee('Pay Emp 2', cls.dept, 4500.0)
@@ -37,7 +36,7 @@ class PayEntryCommon(TransactionCase):
             emp.current_version_id.sudo().write({'wage': wage})
         return emp
 
-    def _batch(self, component=None, dept=None, site=None, period=None):
+    def _batch(self, component=None, dept=None, period=None):
         component = component or self.c_overtime
         vals = {
             'component_id': component.id,
@@ -45,8 +44,6 @@ class PayEntryCommon(TransactionCase):
         }
         if component.scope == 'department':
             vals['department_id'] = (dept or self.dept).id
-        elif component.scope == 'site':
-            vals['site_id'] = (site or self.site).id
         return self.env['ksw.pay.batch'].sudo().create(vals)
 
     def _entry(self, batch, employee=None, **kwargs):
@@ -127,16 +124,26 @@ class TestPayResolver(PayEntryCommon):
         entry.write({'amount_override': 0.0})
         self.assertAlmostEqual(entry.amount, 360.0, places=2)
 
-    def test_10_site_specific_tier_wins(self):
+    def test_10_a_site_specific_tier_no_longer_applies(self):
+        """The waterfall kept its site column; nothing can match on it.
+
+        Driver Trips is recorded per department since 19.0.4.3.0, so no
+        batch names a site and no entry inherits one — a site-specific
+        band has nothing to be specific about, and the default ladder is
+        what runs. Pinned rather than deleted because a row like this is
+        still creatable, and silently paying it would be the bug.
+        """
+        settings = self.env['ksw.site']._trip_settings()
         self.env['ksw.pay.rate.tier'].sudo().create({
             'component_id': self.c_trips.id,
-            'site_id': self.site.id,
+            'site_id': settings.id,
             'name': 'Site flat', 'sequence': 5, 'width': 0.0, 'rate': 2.0,
         })
         batch = self._batch(component=self.c_trips)
+        self.assertFalse(batch.site_id)
         entry = self._entry(batch, quantity=60.0, threshold_qty=50.0)
-        # Only the site row applies: 10 earning x 2.00
-        self.assertAlmostEqual(entry.amount, 20.0, places=2)
+        # The default ladder, not the 2.00 row: 10 earning in Tier 2 @ 10.
+        self.assertAlmostEqual(entry.amount, 100.0, places=2)
 
 
 class TestPayBatch(PayEntryCommon):
@@ -293,14 +300,29 @@ class TestPayComponentAccess(PayEntryCommon):
         self.assertNotIn(theirs, visible,
                          "a supervisor must not see another department's batch")
 
-    def test_05_creator_sees_a_site_scoped_batch(self):
-        """The create_uid clause carries site-scoped batches, which have no
-        department to match the manager rule on."""
+    def test_05_creator_keeps_his_own_batch_after_a_handover(self):
+        """The create_uid clause, now that every batch has a department.
+
+        It used to carry site-scoped batches, which matched no manager
+        rule at all. Those are gone, but the clause still earns its place:
+        the department rule is evaluated live, so the day the department
+        changes hands the outgoing supervisor would lose sight of the
+        batch he typed — mid-month, with the run not yet approved.
+        """
+        author = self.env['hr.employee'].sudo().search(
+            [('user_id', '=', self.user.id)], limit=1)
+        self.dept.sudo().manager_id = author
         batch = self.env['ksw.pay.batch'].with_user(self.user).create({
             'component_id': self.c_trips.id,
-            'site_id': self.site.id,
+            'department_id': self.dept.id,
             'period': self.period,
         })
+
+        successor = self.env['hr.employee'].sudo().create(
+            {'name': 'New Boss', 'department_id': self.dept.id})
+        self.dept.sudo().manager_id = successor
+
+        self.env.invalidate_all()
         visible = self.env['ksw.pay.batch'].with_user(self.user).search([])
         self.assertIn(batch, visible)
 

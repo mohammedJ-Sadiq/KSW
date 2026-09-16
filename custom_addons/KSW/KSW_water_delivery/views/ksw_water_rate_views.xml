@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_water_rate_list" model="ir.ui.view">
+        <field name="name">ksw.water.rate.list</field>
+        <field name="model">ksw.water.rate</field>
+        <field name="arch" type="xml">
+            <list string="Water Rates" editable="bottom" sample="1">
+                <header>
+                    <!-- display="always": a header button defaults to
+                         display="selection" and only appears once a row is
+                         ticked (KSW gotcha #6). -->
+                    <button name="action_import_from_bas" type="object"
+                            string="Import Rates from BAS9" display="always"
+                            class="btn-secondary"
+                            groups="KSW_water_delivery.group_water_billing"/>
+                </header>
+                <field name="partner_id" context="{'res_partner_search_mode': 'customer'}"/>
+                <field name="product_id"/>
+                <field name="price"/>
+                <field name="uom_name" string="Per"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="source" widget="badge"
+                       decoration-info="source == 'bas'"
+                       decoration-success="source == 'manual'"/>
+                <field name="x_bas_price" optional="show" string="BAS Price"/>
+                <field name="x_bas_date" optional="hide"/>
+                <field name="x_bas_branch" optional="hide"/>
+                <field name="company_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_water_rate_search" model="ir.ui.view">
+        <field name="name">ksw.water.rate.search</field>
+        <field name="model">ksw.water.rate</field>
+        <field name="arch" type="xml">
+            <search string="Water Rates">
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <filter name="from_bas" string="Imported from BAS9"
+                        domain="[('source', '=', 'bas')]"/>
+                <filter name="manual" string="Entered in Odoo"
+                        domain="[('source', '=', 'manual')]"/>
+                <separator/>
+                <!-- The register is maintained in Odoo from here on, so the
+                     useful question is which rates have since drifted from
+                     what BAS last charged. -->
+                <filter name="differs_from_bas" string="Differs from BAS9"
+                        domain="[('x_bas_price', '!=', False), ('price', '!=', 'x_bas_price')]"/>
+                <group>
+                    <filter name="group_partner" string="Client" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_product" string="Product" context="{'group_by': 'product_id'}"/>
+                    <filter name="group_branch" string="BAS Branch" context="{'group_by': 'x_bas_branch'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_water_rates" model="ir.actions.act_window">
+        <field name="name">Client Rates</field>
+        <field name="res_model">ksw.water.rate</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_water_rate_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No rates yet</p>
+            <p>
+                A rate is what one client pays for one product. It decides the
+                price on the delivery note, which clients the drivers may
+                deliver to, and which products they may pick.
+            </p>
+            <p>Use <b>Import Rates from BAS9</b> to seed them from what BAS actually charged.</p>
+        </field>
+    </record>
+
+    <!-- Client locations are learned from the notes the drivers issue on site,
+         because no client in the database has coordinates and nobody is going
+         to survey 312 of them. -->
+    <record id="action_partner_locate_from_deliveries" model="ir.actions.server">
+        <field name="name">Set Location from Delivery Notes</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="binding_view_types">list,form</field>
+        <field name="group_ids" eval="[(4, ref('KSW_water_delivery.group_water_billing'))]"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_set_location_from_deliveries()</field>
+    </record>
+
+</odoo>

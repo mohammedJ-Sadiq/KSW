@@ -8,7 +8,8 @@ button, dispatched by name from the component's ``importer`` field.
 The BAS query moved here verbatim when the old driver-commission model was
 retired: item 11032 water loads from ``vou10``/``STR10``, weighted by each
 destination customer's distance factor (``cod10.FACTORE``), matched to
-employees through ``hr.employee.x_bas_driver_cost_center``. Configurable via
+employees through ``hr.employee.x_bas_driver_cost_center`` — the drivers
+being whoever sits under the batch's department. Configurable via
 ``ir.config_parameter`` ``ksw_commissions.orood_item_codes`` (default 11032)
 and ``ksw_commissions.orood_ftypes`` (default 600).
 """
@@ -26,7 +27,21 @@ class KswPayBatchBasImport(models.Model):
     _inherit = 'ksw.pay.batch'
 
     def _import_bas_trips(self):
-        """Fill this batch with each site driver's trips for the month.
+        """Fill this batch with each of the department's drivers' trips.
+
+        Whose trips to fetch used to be a work-site question — the batch
+        named a site and the drivers were whoever carried it on their
+        employee record. Two registers to keep in step (the site list and
+        every driver's assignment) for a question the batch already
+        answers: it is recorded by the supervisor, for his department.
+
+        So the pool is simply :meth:`_allowed_employees` — everyone in the
+        batch's department plus anyone who reports to this supervisor from
+        elsewhere. That is deliberately the *same* pool the employee picker
+        on the form uses, so the importer can never produce a line the
+        picker would have refused. Whoever has no BAS cost centre, or no
+        loads this month, is named in the summary rather than skipped
+        silently.
 
         The quantity is الرد المضاعف (loads weighted by each destination's
         distance factor) and the free allowance is the driver's required
@@ -37,20 +52,19 @@ class KswPayBatchBasImport(models.Model):
         if self.state != 'draft':
             raise UserError(_(
                 "Import is only available while the batch is in Draft."))
-        if not self.site_id:
+        if not self.department_id:
             raise UserError(_(
-                "Select a Work Site on the batch before importing."))
+                "Select a Department on the batch before importing — the "
+                "drivers are taken from it."))
 
         date_from = self.period.replace(day=1)
         date_to = date_from + relativedelta(months=1)
 
-        employees = self.env['hr.employee'].search([
-            ('x_site_id', '=', self.site_id.id),
-        ])
+        employees = self._allowed_employees()
         if not employees:
             raise UserError(_(
-                "No employees are assigned to %(site)s.",
-                site=self.site_id.name))
+                "There are no employees under %(department)s.",
+                department=self.department_id.name))
 
         bas_data = self._bas_fetch_orood(date_from, date_to)
         existing = {e.employee_id.id: e for e in self.entry_ids}
@@ -140,11 +154,16 @@ class KswPayBatchBasImport(models.Model):
     def _bas_required_trips(self, worked_days):
         """The free allowance: required trips pro-rated to days worked.
 
-        Mirrors the old ``round(site.required_trips_full_month * worked / 30)``
-        so historical figures reproduce exactly.
+        Still ``round(base * worked / 30)`` so historical figures
+        reproduce exactly — only ``base`` moved. It used to come from the
+        batch's work site; with the batch scoped to a department there is
+        no site to read, so it comes from the one hidden settings record
+        (Configuration → Driver Trip Settings), which is what "the
+        calculation for all locations" means.
         """
         self.ensure_one()
-        base = self.site_id.required_trips_full_month or 0
+        base = self.env['ksw.site']._trip_settings().required_trips_full_month
+        base = base or 0
         if worked_days is None:
             return float(base)
         return float(round(base * (worked_days or 0) / 30.0))

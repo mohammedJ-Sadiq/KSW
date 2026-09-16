@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- The driver's copy of the note he just issued. Read-only on purpose:
+         a signed document is not something its author edits afterwards. -->
+    <record id="view_water_delivery_note_form" model="ir.ui.view">
+        <field name="name">stock.picking.water.note.form</field>
+        <field name="model">stock.picking</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <form string="Delivery Note" create="false" edit="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Delivery">
+                            <field name="partner_id" readonly="1"/>
+                            <field name="date_done" readonly="1"/>
+                            <field name="x_load_qty" readonly="1"/>
+                            <field name="x_currency_id" invisible="1"/>
+                            <field name="x_amount_untaxed" readonly="1"/>
+                            <field name="x_amount_tax" readonly="1"/>
+                            <field name="x_amount_total" readonly="1"/>
+                        </group>
+                        <group string="Trip">
+                            <field name="x_driver_id" readonly="1"/>
+                            <field name="x_vehicle_id" readonly="1"/>
+                            <field name="x_branch_code" readonly="1"/>
+                            <field name="x_off_route" readonly="1"
+                                   invisible="not x_off_route"/>
+                            <field name="state" readonly="1"/>
+                        </group>
+                    </group>
+                    <!-- Visible so the coordinates can actually be checked
+                         against where the delivery happened. -->
+                    <group string="Where it was issued"
+                           invisible="not x_gps_latitude and not x_gps_longitude">
+                        <field name="x_gps_latitude" readonly="1" digits="[10, 7]"/>
+                        <field name="x_gps_longitude" readonly="1" digits="[10, 7]"/>
+                        <field name="x_gps_accuracy" readonly="1"/>
+                        <field name="x_gps_distance_m" readonly="1"
+                               invisible="not x_gps_distance_m"/>
+                    </group>
+                    <field name="x_signature_required" invisible="1"/>
+                    <group string="Signature" invisible="not x_signed_on and not x_signature_required">
+                        <field name="signature" widget="image" readonly="1" nolabel="1"
+                               options="{'size': [0, 120]}"/>
+                        <field name="x_signed_by" readonly="1"/>
+                        <field name="x_signed_on" readonly="1"/>
+                        <field name="x_signature_origin" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_water_delivery_note_list" model="ir.ui.view">
+        <field name="name">stock.picking.water.note.list</field>
+        <field name="model">stock.picking</field>
+        <field name="arch" type="xml">
+            <list string="Delivery Notes" create="false" edit="false" sample="1">
+                <field name="name"/>
+                <field name="date_done"/>
+                <field name="partner_id"/>
+                <field name="x_branch_code" optional="show"/>
+                <field name="x_driver_id" optional="show"/>
+                <field name="x_vehicle_id" optional="hide"/>
+                <field name="x_load_qty" sum="Loads"/>
+                <field name="x_amount_untaxed" sum="Before Tax" optional="hide"/>
+                <field name="x_amount_tax" sum="VAT" optional="hide"/>
+                <field name="x_amount_total" sum="After Tax"/>
+                <field name="x_off_route" optional="show" widget="boolean_toggle" readonly="1"/>
+                <field name="x_gps_latitude" optional="hide" digits="[10, 7]"/>
+                <field name="x_gps_longitude" optional="hide" digits="[10, 7]"/>
+                <field name="x_gps_distance_m" optional="hide"/>
+                <field name="x_signed_by" optional="hide"/>
+                <field name="x_signature_origin" optional="hide"/>
+                <field name="is_signed" optional="hide" widget="boolean_toggle" readonly="1"/>
+                <field name="x_currency_id" column_invisible="1"/>
+                <field name="state" widget="badge" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_water_delivery_note_kanban" model="ir.ui.view">
+        <field name="name">stock.picking.water.note.kanban</field>
+        <field name="model">stock.picking</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" create="false" sample="1">
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between">
+                            <strong><field name="partner_id"/></strong>
+                            <field name="x_amount_total" widget="monetary"/>
+                        </div>
+                        <div class="text-muted">
+                            <field name="name"/> ·
+                            <field name="x_load_qty"/> load(s) ·
+                            <field name="date_done" widget="date"/>
+                        </div>
+                        <field name="x_currency_id" invisible="1"/>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_water_delivery_note_search" model="ir.ui.view">
+        <field name="name">stock.picking.water.note.search</field>
+        <field name="model">stock.picking</field>
+        <field name="arch" type="xml">
+            <search string="Delivery Notes">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="x_driver_id"/>
+                <field name="x_vehicle_id"/>
+                <field name="x_branch_code"/>
+                <filter name="today" string="Today"
+                        domain="[('date_done', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"/>
+                <filter name="this_month" string="This Month"
+                        domain="[('date_done', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <!-- The gap the paper process cannot see: a note that was
+                     issued and never signed. Notes issued while the branch was
+                     running without signatures are not a gap, so they are
+                     excluded by the stamp rather than by today's setting. -->
+                <filter name="unsigned" string="Not Signed"
+                        domain="[('x_signed_on', '=', False), ('x_signature_required', '=', True)]"/>
+                <filter name="awaiting_signature_rollout" string="Issued Without a Signature"
+                        domain="[('x_signature_required', '=', False)]"/>
+                <filter name="signed_at_depot" string="Signed at the Depot"
+                        domain="[('x_signature_origin', '=', 'depot')]"/>
+                <filter name="off_route" string="Off the Usual Route"
+                        domain="[('x_off_route', '=', True)]"/>
+                <filter name="no_position" string="No Position Recorded"
+                        domain="[('x_gps_latitude', '=', 0.0)]"/>
+                <separator/>
+                <filter name="to_invoice" string="Not Yet Invoiced"
+                        domain="[('sale_id.invoice_status', '=', 'to invoice')]"
+                        groups="KSW_water_delivery.group_water_billing"/>
+                <group>
+                    <filter name="group_partner" string="Customer" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_driver" string="Driver" context="{'group_by': 'x_driver_id'}"/>
+                    <filter name="group_branch" string="Branch" context="{'group_by': 'x_branch_code'}"/>
+                    <filter name="group_date" string="Delivery Date" context="{'group_by': 'date_done'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Driver: his own notes (the record rule does the "his own" part). -->
+    <record id="action_water_delivery_my_notes" model="ir.actions.act_window">
+        <field name="name">My Deliveries</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('x_is_water_delivery', '=', True)]</field>
+        <field name="context">{'search_default_today': 1}</field>
+        <field name="search_view_id" ref="view_water_delivery_note_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No deliveries recorded today</p>
+            <p>Tap <b>New Delivery</b> when you arrive at the customer.</p>
+        </field>
+    </record>
+
+    <record id="action_water_delivery_my_notes_view_kanban" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_water_delivery_note_kanban"/>
+        <field name="act_window_id" ref="action_water_delivery_my_notes"/>
+    </record>
+    <record id="action_water_delivery_my_notes_view_list" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_water_delivery_note_list"/>
+        <field name="act_window_id" ref="action_water_delivery_my_notes"/>
+    </record>
+    <record id="action_water_delivery_my_notes_view_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_water_delivery_note_form"/>
+        <field name="act_window_id" ref="action_water_delivery_my_notes"/>
+    </record>
+
+    <!-- Billing / dispatch: every note, which at month end is the pile that
+         used to arrive on a desk. -->
+    <record id="action_water_delivery_all_notes" model="ir.actions.act_window">
+        <field name="name">Delivery Notes</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="domain">[('x_is_water_delivery', '=', True)]</field>
+        <field name="context">{'search_default_this_month': 1, 'search_default_group_partner': 1}</field>
+        <field name="search_view_id" ref="view_water_delivery_note_search"/>
+    </record>
+
+    <record id="action_water_delivery_all_notes_view_list" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_water_delivery_note_list"/>
+        <field name="act_window_id" ref="action_water_delivery_all_notes"/>
+    </record>
+    <record id="action_water_delivery_all_notes_view_kanban" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_water_delivery_note_kanban"/>
+        <field name="act_window_id" ref="action_water_delivery_all_notes"/>
+    </record>
+    <record id="action_water_delivery_all_notes_view_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_water_delivery_note_form"/>
+        <field name="act_window_id" ref="action_water_delivery_all_notes"/>
+    </record>
+
+    <!-- Branch and note numbering live on the operation type. -->
+    <record id="view_picking_type_form_water" model="ir.ui.view">
+        <field name="name">stock.picking.type.form.water</field>
+        <field name="model">stock.picking.type</field>
+        <field name="inherit_id" ref="stock.view_picking_type_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='sequence_code']" position="after">
+                <field name="x_is_water_delivery" invisible="code != 'outgoing'"/>
+                <field name="x_branch_code" invisible="not x_is_water_delivery"/>
+                <field name="x_signature_required" invisible="not x_is_water_delivery"/>
+                <field name="x_location_rule" invisible="not x_is_water_delivery"/>
+                <field name="x_location_radius_m"
+                       invisible="not x_is_water_delivery or x_location_rule != 'enforce'"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

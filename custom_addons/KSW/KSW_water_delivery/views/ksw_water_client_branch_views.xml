@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_water_client_branch_list" model="ir.ui.view">
+        <field name="name">ksw.water.client.branch.list</field>
+        <field name="model">ksw.water.client.branch</field>
+        <field name="arch" type="xml">
+            <list string="Branch Clients" editable="bottom" sample="1"
+                  default_group_by="branch_code">
+                <field name="branch_code"/>
+                <field name="partner_id" context="{'res_partner_search_mode': 'customer'}"/>
+                <field name="source" widget="badge"
+                       decoration-info="source == 'bas'"
+                       decoration-success="source == 'manual'"/>
+                <field name="x_bas_last_delivery" optional="show"/>
+                <field name="company_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_water_client_branch_search" model="ir.ui.view">
+        <field name="name">ksw.water.client.branch.search</field>
+        <field name="model">ksw.water.client.branch</field>
+        <field name="arch" type="xml">
+            <search string="Branch Clients">
+                <field name="branch_code"/>
+                <field name="partner_id"/>
+                <filter name="from_bas" string="Imported from BAS9"
+                        domain="[('source', '=', 'bas')]"/>
+                <filter name="manual" string="Added in Odoo"
+                        domain="[('source', '=', 'manual')]"/>
+                <group>
+                    <filter name="group_branch" string="Branch" context="{'group_by': 'branch_code'}"/>
+                    <filter name="group_partner" string="Client" context="{'group_by': 'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_water_client_branches" model="ir.actions.act_window">
+        <field name="name">Branch Clients</field>
+        <field name="res_model">ksw.water.client.branch</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_water_client_branch_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No branch client lists yet</p>
+            <p>
+                This is what each branch's drivers see in their client picker.
+                It is filled by <b>Import Rates from BAS9</b> on the Client
+                Rates screen, from the branches that actually delivered.
+            </p>
+            <p>
+                A client can be served by more than one branch — 93 of them are.
+                While a branch has no list at all, its drivers see every client
+                with an agreed rate.
+            </p>
+        </field>
+    </record>
+
+</odoo>

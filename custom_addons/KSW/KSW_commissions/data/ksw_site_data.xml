@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--
+        The driver-trip settings.
+
+        Driver Trips is recorded per department, so no site is chosen when
+        a batch is filled and there is nothing left for a per-site figure
+        to key on. The required-trips base still has to live somewhere, and
+        it lives here — one record, "Default", applying to every location.
+
+        noupdate="1" so an admin's change to the required-trips figure
+        survives an upgrade. It is hidden from the Work Sites list and from
+        every picker (they filter on site_type = 'location'); the way in is
+        Configuration → Driver Trip Settings, which opens this record by id.
+    -->
+    <data noupdate="1">
+        <record id="site_trip_default" model="ksw.site">
+            <field name="name">Default</field>
+            <field name="code">DEFAULT</field>
+            <field name="site_type">calculation</field>
+            <field name="required_trips_full_month">50</field>
+            <field name="note">Driver-trip settings applying to every location. Driver Trips is recorded per department, so this is not a place — it is the calculation.</field>
+        </record>
+    </data>
+</odoo>

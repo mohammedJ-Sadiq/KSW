@@ -425,22 +425,23 @@ class TestEmployeeScope(SubmissionCommon):
             'date': batch.period, 'quantity': 1.0, 'reason': 'company-wide',
         })
 
-    def test_56_a_site_batch_follows_the_site(self):
-        """Driver trips are recorded per work site — and that is exactly the
-        set the BAS import fills in, so the picker has to match it."""
-        site = self.env['ksw.site'].sudo().create(
-            {'name': 'Sub Site', 'code': 'SUBS'})
-        driver = self._employee('Sub Driver', self.dept_b, 3000.0)
-        driver.sudo().write({'x_site_id': site.id})
+    def test_56_a_trips_batch_follows_its_department(self):
+        """Driver trips follow the supervisor's department now.
+
+        They used to follow a work site named on the batch, which drew in
+        whoever carried that site on their employee record regardless of
+        who managed them — and that is exactly the set the BAS import
+        filled in. Both sides moved to the department together; the
+        picker and the import must still agree.
+        """
+        driver = self._employee('Sub Driver', self.dept_a, 3000.0)
         trips = self.env.ref('KSW_commissions.pay_component_driver_trips')
         batch = self.env['ksw.pay.batch'].with_user(self.sup_a).create({
-            'component_id': trips.id, 'site_id': site.id,
+            'component_id': trips.id, 'department_id': self.dept_a.id,
             'period': self.period,
         })
-        # default_get preselects the supervisor's department on every new
-        # batch; a site-scoped one must not keep it, or it draws its
-        # employee list from the wrong place.
-        self.assertFalse(batch.department_id)
+        self.assertFalse(batch.site_id,
+                         'no batch carries a work site any more')
         allowed = batch.with_user(self.sup_a).allowed_employee_ids
         self.assertIn(driver, allowed)
         self.assertNotIn(self.emp_b, allowed)

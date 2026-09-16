@@ -3,9 +3,12 @@
 The importer used to write a zero-quantity entry for any driver it could
 not find in BAS. ``ksw.pay.entry._check_quantity`` rejects that, so the
 ValidationError rolled back the *whole* import: one driver with no BAS
-cost centre cost every other driver at the site his trips, and the error
+cost centre cost every other driver in the batch his trips, and the error
 named nobody. These tests pin the behaviour that replaced it — skip the
 driver, import the rest, name who was skipped.
+
+Since 19.0.4.3.0 the drivers come from the batch's **department** rather
+than from a work site named on the batch, so the fixture puts them in one.
 """
 from unittest.mock import patch
 
@@ -19,10 +22,11 @@ class BasTripsImportCommon(TransactionCase):
         super().setUpClass()
         env = cls.env
         cls.period = '2028-07-01'
-        cls.site = env['ksw.site'].create({
-            'name': 'BAS Site', 'code': 'BS',
-            'required_trips_full_month': 50,
-        })
+        cls.dept = env['hr.department'].create({'name': 'BAS Drivers'})
+        # The required-trips base is no longer a property of a place. It
+        # lives on the one seeded settings record, for every location.
+        cls.trip_settings = env['ksw.site']._trip_settings()
+        cls.trip_settings.sudo().required_trips_full_month = 50
         cls.c_trips = env.ref('KSW_commissions.pay_component_driver_trips')
 
         # Matched: cost centre set, and BAS has loads for it.
@@ -43,7 +47,7 @@ class BasTripsImportCommon(TransactionCase):
     def _driver(cls, name, cost_center):
         return cls.env['hr.employee'].sudo().create({
             'name': name,
-            'x_site_id': cls.site.id,
+            'department_id': cls.dept.id,
             'x_bas_driver_cost_center': cost_center,
         })
 
@@ -51,7 +55,7 @@ class BasTripsImportCommon(TransactionCase):
         return self.env['ksw.pay.batch'].sudo().create({
             'component_id': self.c_trips.id,
             'period': self.period,
-            'site_id': self.site.id,
+            'department_id': self.dept.id,
         })
 
     def _import(self, batch, rows=None):
@@ -157,8 +161,12 @@ class TestBasTripsImport(BasTripsImportCommon):
             result['params'].get('next'),
             {'type': 'ir.actions.client', 'tag': 'soft_reload'})
 
-    def test_08_threshold_is_prorated_to_the_site_allowance(self):
-        """No attendance sheet -> the full-month allowance, not zero."""
+    def test_08_threshold_is_prorated_to_the_default_allowance(self):
+        """No attendance sheet -> the full-month allowance, not zero.
+
+        And it comes from the settings record, which is the point of the
+        record: the batch names no site to read it from.
+        """
         batch = self._batch()
         self._import(batch)
 

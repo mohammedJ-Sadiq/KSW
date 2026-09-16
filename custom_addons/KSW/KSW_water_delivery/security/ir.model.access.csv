@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_water_delivery_wizard_driver,ksw.water.delivery.wizard.driver,model_ksw_water_delivery_wizard,group_water_driver,1,1,1,0
+access_water_delivery_wizard_dispatcher,ksw.water.delivery.wizard.dispatcher,model_ksw_water_delivery_wizard,group_water_dispatcher,1,1,1,1
+access_water_picking_driver,stock.picking.water.driver,stock.model_stock_picking,group_water_driver,1,0,0,0
+access_water_picking_dispatcher,stock.picking.water.dispatcher,stock.model_stock_picking,group_water_dispatcher,1,1,0,0
+access_water_picking_billing,stock.picking.water.billing,stock.model_stock_picking,group_water_billing,1,0,0,0
+access_water_rate_driver,ksw.water.rate.driver,model_ksw_water_rate,group_water_driver,1,0,0,0
+access_water_rate_dispatcher,ksw.water.rate.dispatcher,model_ksw_water_rate,group_water_dispatcher,1,0,0,0
+access_water_rate_billing,ksw.water.rate.billing,model_ksw_water_rate,group_water_billing,1,1,1,1
+access_water_client_branch_driver,ksw.water.client.branch.driver,model_ksw_water_client_branch,group_water_driver,1,0,0,0
+access_water_client_branch_dispatcher,ksw.water.client.branch.dispatcher,model_ksw_water_client_branch,group_water_dispatcher,1,1,1,1
+access_water_client_branch_billing,ksw.water.client.branch.billing,model_ksw_water_client_branch,group_water_billing,1,1,1,1

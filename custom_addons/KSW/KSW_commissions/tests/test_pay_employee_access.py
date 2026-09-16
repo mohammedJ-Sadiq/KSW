@@ -38,9 +38,6 @@ class PayEmployeeAccessCommon(TransactionCase):
         cls.dept = env['hr.department'].sudo().create({'name': 'Acc Dept'})
         cls.other_dept = env['hr.department'].sudo().create(
             {'name': 'Acc Other Dept'})
-        cls.site = env['ksw.site'].sudo().create(
-            {'name': 'Acc Site', 'code': 'ACS'})
-
         cls.supervisor = cls._user(
             'acc_sup', 'KSW_commissions.group_commission_supervisor')
         cls.sup_employee = env['hr.employee'].sudo().create({
@@ -62,7 +59,6 @@ class PayEmployeeAccessCommon(TransactionCase):
         })
         cls.driver = env['hr.employee'].sudo().create({
             'name': 'Acc Driver', 'department_id': cls.other_dept.id,
-            'x_site_id': cls.site.id,
         })
 
         cls.gm = cls._user('acc_gm', 'KSW_commissions.group_commission_gm')
@@ -103,11 +99,11 @@ class TestPickerWidth(PayEmployeeAccessCommon):
     """The picker is the user's authority, not everybody."""
 
     def test_01_scopeless_batch_does_not_offer_the_company(self):
-        """A site-scoped component before its site is chosen.
+        """A batch before its department is chosen.
 
-        This is the state every new Driver Trips batch passes through, and
-        it used to fall into the `_allowed_departments()` branch with su
-        still on — which returns every department, hence every employee.
+        This is the state every new batch passes through, and it used to
+        fall into the `_allowed_departments()` branch with su still on —
+        which returns every department, hence every employee.
         """
         batch = self.env['ksw.pay.batch'].with_user(self.supervisor).new({
             'component_id': self.trips.id, 'period': self.period,
@@ -128,11 +124,19 @@ class TestPickerWidth(PayEmployeeAccessCommon):
             self.assertIn(employee, allowed)
         self.assertNotIn(self.outsider, allowed)
 
-    def test_03_site_batch_offers_that_site(self):
+    def test_03_trips_batch_offers_its_department(self):
+        """Driver Trips is department-scoped like everything else now.
+
+        It used to offer whoever carried the batch's work site, wherever
+        they sat — the one component whose picker ignored the department.
+        """
         batch = self._batch(user=self.supervisor,
-                            component_id=self.trips.id, site_id=self.site.id)
+                            component_id=self.trips.id,
+                            department_id=self.dept.id)
         allowed = batch.allowed_employee_ids
-        self.assertIn(self.driver, allowed)
+        for employee in self.staff:
+            self.assertIn(employee, allowed)
+        self.assertNotIn(self.driver, allowed)
         self.assertNotIn(self.outsider, allowed)
 
     def test_04_a_viewer_gets_no_picker(self):

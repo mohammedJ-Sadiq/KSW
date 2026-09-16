@@ -62,6 +62,8 @@
                                 </group>
                                 <group string="Extras">
                                     <field name="importer"/>
+                                    <field name="entries_import_only"
+                                           invisible="not importer"/>
                                 </group>
                             </group>
                             <field name="description" nolabel="1"
@@ -178,6 +180,7 @@
                 <field name="qty_label" optional="hide"/>
                 <field name="scope" optional="show"/>
                 <field name="importer" optional="hide"/>
+                <field name="entries_import_only" optional="hide"/>
                 <field name="active" widget="boolean_toggle" optional="show"/>
             </list>
         </field>

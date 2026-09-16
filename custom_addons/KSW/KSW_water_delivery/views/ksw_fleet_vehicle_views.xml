@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ksw_fleet_vehicle_form_water" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.form.water</field>
+        <field name="model">ksw.fleet.vehicle</field>
+        <field name="inherit_id" ref="KSW_fleet.view_ksw_fleet_vehicle_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='driver_name']" position="after">
+                <field name="x_picking_type_id"
+                       groups="KSW_water_delivery.group_water_dispatcher"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

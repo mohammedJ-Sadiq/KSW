@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
+    <!--
+        The Work Sites list is overtime locations and nothing else. The one
+        'calculation' record is filtered out by the action's domain and
+        reached through its own menu (Driver Trip Settings) instead — it is
+        not a place, and offering it among places is what the split is for.
+    -->
     <record id="view_ksw_site_list" model="ir.ui.view">
         <field name="name">ksw.site.list</field>
         <field name="model">ksw.site</field>
@@ -8,14 +14,7 @@
             <list>
                 <field name="name"/>
                 <field name="code"/>
-                <field name="required_trips_full_month"/>
-                <field name="tier2_trips"/>
-                <field name="tier2_rate"/>
-                <field name="tier3_trips"/>
-                <field name="tier3_rate"/>
-                <field name="tier4_trips"/>
-                <field name="tier4_rate"/>
-                <field name="tier5_rate"/>
+                <field name="site_type" column_invisible="1"/>
                 <field name="active" widget="boolean_toggle"/>
             </list>
         </field>
@@ -27,17 +26,41 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Site name…"/></h1>
+                    </div>
                     <group>
                         <group string="Identification">
-                            <field name="name"/>
                             <field name="code"/>
-                            <field name="active"/>
-                        </group>
-                        <group string="Trip Base">
-                            <field name="required_trips_full_month"/>
+                            <!-- Readonly: which of the two a record is, is a
+                                 system classification, not a choice. There is
+                                 exactly one calculation record and it is
+                                 seeded. -->
+                            <field name="site_type" readonly="1"/>
+                            <field name="active"
+                                   invisible="site_type == 'calculation'"/>
                         </group>
                     </group>
-                    <group string="Tiered Commission Rules">
+
+                    <div class="alert alert-info" role="status"
+                         invisible="site_type != 'calculation'">
+                        These are the driver-trip settings used for
+                        <b>every</b> location. Driver Trips is recorded per
+                        department, so no site is chosen when a batch is
+                        filled — this record is the calculation, not a place,
+                        and it is deliberately absent from the Work Sites list
+                        and from every picker.
+                    </div>
+
+                    <group string="Trip Base"
+                           invisible="site_type != 'calculation'">
+                        <field name="required_trips_full_month"/>
+                    </group>
+                    <group string="Tiered Commission Rules"
+                           invisible="site_type != 'calculation'">
                         <group string="Tier 2">
                             <field name="tier2_trips" string="Trips in band"/>
                             <field name="tier2_rate" string="Rate (SAR / trip)"/>
@@ -60,11 +83,49 @@
         </field>
     </record>
 
+    <record id="view_ksw_site_search" model="ir.ui.view">
+        <field name="name">ksw.site.search</field>
+        <field name="model">ksw.site</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <filter name="filter_inactive" string="Archived"
+                        domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
     <record id="action_ksw_site" model="ir.actions.act_window">
         <field name="name">Work Sites</field>
         <field name="res_model">ksw.site</field>
         <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ksw_site_search"/>
+        <!-- Locations only. The trip-settings record has its own menu. -->
+        <field name="domain">[('site_type', '=', 'location')]</field>
+        <field name="context">{'default_site_type': 'location'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add an overtime location</p>
+            <p>
+                A work site is a place named on an overtime or
+                location-allowance entry. Driver trips are recorded per
+                department and need no site — their settings live under
+                Driver Trip Settings.
+            </p>
+        </field>
+    </record>
+
+    <!--
+        Opens the single settings record directly, by id. There is nothing
+        to list and nothing to choose, so this is a form action rather than
+        a filtered list.
+    -->
+    <record id="action_ksw_trip_settings" model="ir.actions.act_window">
+        <field name="name">Driver Trip Settings</field>
+        <field name="res_model">ksw.site</field>
+        <field name="view_mode">form</field>
+        <field name="res_id" ref="site_trip_default"/>
+        <field name="target">current</field>
     </record>
 
 </odoo>
-

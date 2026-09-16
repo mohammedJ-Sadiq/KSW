@@ -7,12 +7,17 @@ class HrEmployee(models.Model):
     # ``hr.employee`` custom fields that don't exist on hr.employee.public
     # MUST declare ``groups='hr.group_hr_user'`` (AGENTS.md gotcha) to
     # avoid AccessError on prefetch for non-HR users.
+    # No longer read by anything. The BAS driver import used to pick its
+    # drivers up by this field; since 19.0.4.3.0 it takes them from the
+    # batch's department instead (whoever the supervisor runs). Kept so
+    # the historical assignments are not thrown away, and left off the
+    # narrowed pickers because it no longer picks anything.
     x_site_id = fields.Many2one(
         'ksw.site', string='Work Site',
+        domain="[('site_type', '=', 'location')]",
         groups='hr.group_hr_user,base.group_system',
-        help='Site assignment used by the KSW driver-commission '
-             'sub-form. Site change mid-month: the driver line is '
-             'recorded on the month-end site only.',
+        help='Historical site assignment. Driver trips are imported by '
+             'department now, so nothing reads this.',
     )
     x_commission_import_name = fields.Char(
         string='Commission Import Name',

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="KSW_water_delivery.GeolocationWidget">
+        <div class="o_ksw_geolocation w-100 mb-2">
+            <div class="d-flex align-items-center gap-2 small">
+                <span t-if="state.status === 'locating'" class="text-muted">
+                    <i class="fa fa-spinner fa-spin me-1"/>
+                    <t t-esc="state.message"/>
+                </span>
+                <span t-elif="state.status === 'located'" class="text-success">
+                    <i class="fa fa-map-marker me-1"/>
+                    <t t-esc="state.message"/>
+                </span>
+                <span t-else="" t-att-class="isRequired ? 'text-danger' : 'text-muted'">
+                    <i class="fa fa-exclamation-triangle me-1"/>
+                    <t t-esc="state.message"/>
+                </span>
+            </div>
+            <div t-if="state.hint" class="small text-muted mt-1">
+                <t t-esc="state.hint"/>
+            </div>
+            <!-- Always available, not only after a refusal: a tap carries a
+                 user gesture, and iOS does not reliably raise the prompt for a
+                 request made on page load. -->
+            <button t-if="canRetry" type="button"
+                    class="btn btn-secondary btn-sm mt-1" t-on-click="onRetry">
+                <i class="fa fa-map-marker me-1"/>Record my location
+            </button>
+        </div>
+    </t>
+
+</templates>

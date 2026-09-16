@@ -38,16 +38,24 @@
             <field name="calculation">tiered</field>
             <field name="qty_label">Weighted Trips</field>
             <field name="qty_ref_label">Actual Trips</field>
-            <field name="scope">site</field>
+            <field name="scope">department</field>
             <field name="importer">bas_trips</field>
+            <!--
+                Import-only: the figures come out of BAS whole and a wrong
+                one means wrong data there, not a typo here. No line can be
+                added, edited or deleted by hand.
+            -->
+            <field name="entries_import_only" eval="True"/>
             <field name="sequence">20</field>
-            <field name="description">الرد المضاعف — loads weighted by each destination's distance factor. The free allowance on each entry is the driver's required trips pro-rated to the days he worked; everything above it waterfalls through the site's tiers.</field>
+            <field name="description">الرد المضاعف — loads weighted by each destination's distance factor. The free allowance on each entry is the driver's required trips pro-rated to the days he worked; everything above it waterfalls through the tiers below.</field>
             <!--
                 Default ladder, matching the ksw.site defaults it replaces
                 (40 trips at 10, then 40 at 15, then 40 at 20, remainder at
                 25). Seeded inline because the tiered constraint is checked
-                as soon as the component is created. Leave site_id empty to
-                apply everywhere; add site-specific rows to override.
+                as soon as the component is created. site_id is left empty
+                and stays that way: trips are recorded per department, so
+                there is no site on the entry for a site-specific row to
+                match against.
             -->
             <field name="tier_ids" eval="[
                 (0, 0, {'name': 'Tier 2', 'sequence': 10, 'width': 40.0, 'rate': 10.0}),

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- The water note is the core Delivery Slip with prices on it.
+
+         It extends `stock.report_delivery_document` rather than being a report
+         of its own on purpose: `stock.picking._attach_sign()` hard-codes
+         `stock.action_report_delivery`, and that call is what stores the signed
+         PDF the moment the customer signs. Extending the template keeps that
+         working with no override.
+
+         Every `o.sudo()` below is deliberate: the driver who prints his own
+         note has no access to `sale.order`, and a field read inside a QWeb
+         template raises AccessError just as it does in a compute
+         (KSW gotcha #5). -->
+    <template id="report_water_delivery_note"
+              inherit_id="stock.report_delivery_document"
+              name="Water Delivery Note">
+
+        <!-- Who drove it, in which tanker, for which branch. -->
+        <xpath expr="//div[@id='informations']" position="inside">
+            <div t-if="o.x_is_water_delivery and o.x_branch_code" class="col col-3 mw-100 mb-2" name="div_water_branch">
+                <strong>الفرع / Branch</strong>
+                <div t-field="o.x_branch_code" class="m-0"/>
+            </div>
+            <div t-if="o.x_is_water_delivery and o.x_driver_id" class="col col-3 mw-100 mb-2" name="div_water_driver">
+                <strong>السائق / Driver</strong>
+                <div t-out="o.sudo().x_driver_id.name" class="m-0"/>
+            </div>
+            <div t-if="o.x_is_water_delivery and o.x_vehicle_id" class="col col-3 mw-100 mb-2" name="div_water_vehicle">
+                <strong>الوايت / Tanker</strong>
+                <div class="m-0">
+                    <span t-out="o.sudo().x_vehicle_id.name"/>
+                    <span t-if="o.sudo().x_vehicle_id.plate_number">
+                        (<span t-out="o.sudo().x_vehicle_id.plate_number"/>)
+                    </span>
+                </div>
+            </div>
+        </xpath>
+
+        <!-- The priced body. This is the figure the customer signs against and
+             the one accounting sums at month end : BAS's credit note prints
+             the after-tax total, and the monthly invoice ties to the sum of
+             them to the halala, so the note has to carry it. -->
+        <xpath expr="//div[@id='informations']" position="after">
+            <t t-if="o.x_is_water_delivery">
+                <t t-set="water_order" t-value="o.sudo().sale_id"/>
+                <table class="table table-sm o_main_table" name="water_note_table">
+                    <thead>
+                        <tr>
+                            <th name="th_water_desc"><strong>الصنف / Description</strong></th>
+                            <th name="th_water_qty" class="text-end"><strong>الردات / Loads</strong></th>
+                            <th name="th_water_price" class="text-end"><strong>السعر / Unit Price</strong></th>
+                            <th name="th_water_subtotal" class="text-end"><strong>قبل الضريبة / Before Tax</strong></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="water_order.order_line.filtered(lambda l: not l.display_type)" t-as="water_line">
+                            <td><span t-field="water_line.name"/></td>
+                            <td class="text-end"><span t-field="water_line.qty_delivered"/></td>
+                            <td class="text-end"><span t-field="water_line.price_unit"/></td>
+                            <td class="text-end"><span t-field="water_line.price_subtotal"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="clearfix">
+                    <div id="water_total" class="row justify-content-end">
+                        <div class="col-5">
+                            <table class="table table-sm">
+                                <tr>
+                                    <td><strong>الإجمالي قبل الضريبة / Before Tax</strong></td>
+                                    <td class="text-end">
+                                        <span t-field="o.x_amount_untaxed"
+                                              t-options='{"widget": "monetary", "display_currency": o.x_currency_id}'/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ضريبة القيمة المضافة / VAT</strong></td>
+                                    <td class="text-end">
+                                        <span t-field="o.x_amount_tax"
+                                              t-options='{"widget": "monetary", "display_currency": o.x_currency_id}'/>
+                                    </td>
+                                </tr>
+                                <tr class="border-black o_total">
+                                    <td><strong>الإجمالي بعد الضريبة / After Tax</strong></td>
+                                    <td class="text-end">
+                                        <strong><span t-field="o.x_amount_total"
+                                                      t-options='{"widget": "monetary", "display_currency": o.x_currency_id}'/></strong>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+
+        <!-- Suppress the stock Ordered/Delivered tables on a water note: the
+             priced table above already says what was delivered, and printing it
+             twice invites the customer to sign against the wrong one. These are
+             attribute changes, so the t-if / t-elif pairing stays intact. -->
+        <xpath expr="//table[@name='stock_move_table']" position="attributes">
+            <attribute name="t-if">o.state != 'done' and not o.x_is_water_delivery</attribute>
+        </xpath>
+        <xpath expr="//table[@name='stock_move_line_table']" position="attributes">
+            <attribute name="t-elif">o.move_line_ids and o.state == 'done' and not o.x_is_water_delivery</attribute>
+        </xpath>
+
+        <!-- Core prints the signature over the customer's name. The paper note
+             also records who actually held the pen and when. -->
+        <xpath expr="//div[@name='signature']" position="inside">
+            <div t-if="o.x_is_water_delivery and o.x_signed_by" class="offset-8 text-center">
+                <span t-field="o.x_signed_by"/>
+            </div>
+            <div t-if="o.x_is_water_delivery and o.x_signed_on" class="offset-8 text-center text-muted">
+                <span t-field="o.x_signed_on"/>
+            </div>
+        </xpath>
+
+    </template>
+
+</odoo>

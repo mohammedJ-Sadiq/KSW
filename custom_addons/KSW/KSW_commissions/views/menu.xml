@@ -164,6 +164,13 @@
               sequence="30"
               groups="KSW_commissions.group_commission_officer"/>
 
+    <menuitem id="menu_ksw_trip_settings"
+              name="Driver Trip Settings"
+              parent="menu_ksw_commissions_config"
+              action="action_ksw_trip_settings"
+              sequence="35"
+              groups="KSW_commissions.group_commission_officer"/>
+
     <menuitem id="menu_ksw_salesperson_profile"
               name="Salesperson Profiles"
               parent="menu_ksw_commissions_config"

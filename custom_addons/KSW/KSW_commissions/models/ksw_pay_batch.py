@@ -54,6 +54,11 @@ class KswPayBatch(models.Model):
         'hr.department', ondelete='restrict', tracking=True,
         domain="[('id', 'in', allowed_department_ids)]",
     )
+    # Legacy. No component has scope='site' since 19.0.4.3.0 — Driver
+    # Trips, the only one that did, is recorded per department now — so
+    # this is never set on a new batch and never shown (the field is
+    # invisible unless scope == 'site', which no longer exists). Kept
+    # because the batches already recorded against a site are history.
     site_id = fields.Many2one(
         'ksw.site', string='Work Site', ondelete='restrict', tracking=True,
     )
@@ -129,6 +134,8 @@ class KswPayBatch(models.Model):
         related='component_id.needs_location', readonly=True)
     importer = fields.Selection(
         related='component_id.importer', readonly=True)
+    entries_import_only = fields.Boolean(
+        related='component_id.entries_import_only', readonly=True)
 
     entry_count = fields.Integer(compute='_compute_totals', store=True)
     employee_count = fields.Integer(compute='_compute_totals', store=True)
@@ -138,6 +145,12 @@ class KswPayBatch(models.Model):
 
     is_locked = fields.Boolean(compute='_compute_is_locked')
     x_can_reopen = fields.Boolean(compute='_compute_can_reopen')
+    # Whether the Entries tab is read-only *for this user*. Deliberately no
+    # model-level groups= on it: a readonly= expression in the view is
+    # resolved against fields_get(), and a gated field is simply missing
+    # there — the form would crash for everyone outside the group rather
+    # than render read-only (Odoo 19 Pitfalls #31).
+    x_entries_readonly = fields.Boolean(compute='_compute_entries_readonly')
 
     # Deliberately NOT a SQL UNIQUE. A department-scoped batch leaves
     # site_id NULL (and vice versa), and Postgres indexes are NULLS
@@ -183,6 +196,29 @@ class KswPayBatch(models.Model):
                 rec.x_can_reopen = is_gm
                 continue
             rec.x_can_reopen = is_gm or rec.submission_id.state != 'submitted'
+
+    @api.depends_context('uid')
+    @api.depends('component_id', 'component_id.entries_import_only')
+    def _compute_entries_readonly(self):
+        """An imported batch is reviewed, not typed.
+
+        Driver Trips comes out of BAS whole — a weighted trip count and
+        the allowance it earned. There is nothing in it a supervisor is in
+        a position to correct: a wrong figure means a wrong cost centre or
+        wrong data in BAS, and both are fixed there and re-imported, not
+        typed over here. So the tab is read-only for him and there is no
+        Add a line. Settings Administrator is exempt because somebody has
+        to be able to intervene.
+
+        ``depends_context('uid')`` is not optional — without it the ORM
+        cache hands the first user's answer to everyone after him in the
+        same request (Odoo 19 Pitfalls #14).
+        """
+        privileged = self.env.su or self.env.user.has_group(
+            'base.group_system')
+        for rec in self:
+            rec.x_entries_readonly = (
+                rec.entries_import_only and not privileged)
 
     @api.model
     def _allowed_departments(self, user=None):
@@ -635,7 +671,12 @@ class KswPayBatch(models.Model):
             raise UserError(_(
                 "The import source '%(src)s' is not available.",
                 src=self.component_id.importer))
-        return getattr(self, method)()
+        # Here rather than inside each importer: this is the one door they
+        # all come through, so a future one is import-only-safe without
+        # having to know the flag exists. Not sudo() on purpose — the
+        # entries it writes must still face the period lock, the
+        # draft-state check and the employee scope.
+        return getattr(self.with_context(ksw_pay_importing=True), method)()
 
     def _notify(self, message, title=None):
         """Toast the outcome, then refresh the form.
@@ -728,7 +769,14 @@ class KswPayEntry(models.Model):
         help='Tiered components only: the quantity earned before payment '
              'starts — a driver\'s required trips for the days he worked.',
     )
-    location_id = fields.Many2one('ksw.site', string='Location')
+    # Every work site except the one hidden record that holds the driver
+    # trip settings — that one is a calculation, not a place, and must
+    # never turn up in a picker.
+    location_id = fields.Many2one(
+        'ksw.site', string='Location',
+        domain="[('site_type', '=', 'location')]",
+        help='Where this occurred.',
+    )
     reason = fields.Char()
     details = fields.Text(string='Further Details')
 
@@ -958,6 +1006,35 @@ class KswPayEntry(models.Model):
                     "Batch %(name)s has been submitted. %(what)s is only "
                     "possible while it is in Draft.",
                     name=batch.name, what=what))
+            rec._check_import_only(what)
+
+    def _check_import_only(self, what):
+        """An imported figure is not the supervisor's to type over.
+
+        The read-only Entries tab is cosmetic — anyone with write access
+        can still reach these rows over RPC, which is exactly why this
+        exists (Odoo 19 Pitfalls #15). One predicate, called from the one
+        guard every route already goes through: create, write, unlink and
+        Duplicate Line.
+
+        The import itself comes through here too, so it announces itself
+        with a context key rather than sudo(): the writes still have to
+        pass the period lock, the draft-state check and the employee
+        scope, which sudo() would wave through.
+        """
+        if self.env.context.get('ksw_pay_importing'):
+            return
+        component = self.batch_id.component_id
+        if not component.entries_import_only:
+            return
+        if self.env.user.has_group('base.group_system'):
+            return
+        raise UserError(_(
+            "%(component)s is imported and reviewed, not typed — "
+            "%(what)s is not possible here. Press Import to refresh the "
+            "figures. If one of them is still wrong, the cause is in the "
+            "source data and not in this batch: contact technical support.",
+            component=component.name, what=what))
 
     # ------------------------------------------------------------------
     # Fast entry — each new row starts as a copy of the last
