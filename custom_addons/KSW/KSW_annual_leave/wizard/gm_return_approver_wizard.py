@@ -74,11 +74,11 @@ _TARGET_LABELS = {
     _PLAIN_RETURN_TARGET: 'Back to Approval',
 }
 
-# The two GM steps are absent on purpose: they route to one named person
-# (the department's GM), not to a group — see `_notify_return`.
+# The two GM steps and the accounting step are absent on purpose: each
+# routes to one named person derived from the department, not to a group —
+# see `_notify_return`.
 _TARGET_GROUP = {
     'pending_hr':        'KSW_annual_leave.group_annual_leave_hr',
-    'pending_acc':       'KSW_annual_leave.group_annual_leave_acc',
     'pending_employee_signature': 'KSW_annual_leave.group_annual_leave_hr',
 }
 
@@ -301,6 +301,11 @@ class GmReturnApproverWizard(models.TransientModel):
             partner_ids = (
                 [gm_user.partner_id.id] if gm_user and gm_user.partner_id else []
             )
+        elif target == 'pending_acc':
+            # Likewise derived from the department: its accounting team,
+            # not every member of the group.
+            partner_ids = leave._department_accountant_users(
+                leave).mapped('partner_id').ids
         else:
             group_xmlid = _TARGET_GROUP.get(target)
             group = self.env.ref(group_xmlid, raise_if_not_found=False) if group_xmlid else None

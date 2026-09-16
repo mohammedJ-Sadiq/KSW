@@ -3,16 +3,18 @@ from odoo import api, fields, models
 
 
 class ResCompany(models.Model):
-    """Company-wide fallback General Manager.
+    """Company-wide fallback approvers.
 
     Not a nicety: 103 active employees have no department at all, and their
     requests still have to reach somebody. This is also the seed value every
     department starts from, so the chains keep working the day the feature
-    ships and HR can then set the real per-department GMs at its own pace.
+    ships and HR can then set the real per-department approvers at its own
+    pace.
 
-    `hr.department.x_effective_gm_id` lists `company_id.x_default_gm_id` in
-    its `@api.depends`, so writing here recomputes every department that was
-    falling back to it -- no explicit invalidation needed.
+    `hr.department.x_effective_gm_id` / `x_effective_accountant_ids` list
+    these fields in their `@api.depends`, so writing here recomputes every
+    department that was falling back to them -- no explicit invalidation
+    needed.
     """
     _inherit = 'res.company'
 
@@ -21,6 +23,17 @@ class ResCompany(models.Model):
         string='Default General Manager',
         help="Approves the GM step for employees whose department has no GM "
              "of its own (and for employees with no department at all).",
+    )
+
+    x_default_accountant_ids = fields.Many2many(
+        'hr.employee',
+        relation='ksw_company_default_accountant_rel',
+        column1='company_id', column2='employee_id',
+        string='Accounting Team',
+        help="May approve the accounting step of time off for employees "
+             "whose department has no Accounting Approvers of its own (and "
+             "for employees with no department at all). A team, not one "
+             "manager: any one of them can clear the step.",
     )
 
     def _ksw_sync_default_gm_capability(self):
@@ -36,14 +49,24 @@ class ResCompany(models.Model):
         self.env['hr.department']._ksw_grant_gm_capability(
             self.mapped('x_default_gm_id'))
 
+    def _ksw_sync_default_accountant_capability(self):
+        """Same reasoning, for the company-wide accounting team."""
+        self.env['hr.department']._ksw_grant_accountant_capability(
+            self.mapped('x_default_accountant_ids'))
+
     @api.model_create_multi
     def create(self, vals_list):
         companies = super().create(vals_list)
         companies.filtered('x_default_gm_id')._ksw_sync_default_gm_capability()
+        companies.filtered(
+            'x_default_accountant_ids')._ksw_sync_default_accountant_capability()
         return companies
 
     def write(self, vals):
         res = super().write(vals)
         if 'x_default_gm_id' in vals:
             self.filtered('x_default_gm_id')._ksw_sync_default_gm_capability()
+        if 'x_default_accountant_ids' in vals:
+            self.filtered(
+                'x_default_accountant_ids')._ksw_sync_default_accountant_capability()
         return res

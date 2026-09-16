@@ -25,3 +25,6 @@ access_deduction_line_manager_assistant,hr.leave.deduction.line.manager.assistan
 access_ksw_annual_leave_department_gm,ksw.annual.leave.department.gm,model_ksw_annual_leave,KSW_annual_leave.group_annual_leave_gm,1,0,0,0
 access_commission_line_department_gm,hr.leave.commission.line.department.gm,model_hr_leave_commission_line,KSW_annual_leave.group_annual_leave_gm,1,0,0,0
 access_deduction_line_department_gm,hr.leave.deduction.line.department.gm,model_hr_leave_deduction_line,KSW_annual_leave.group_annual_leave_gm,1,0,0,0
+access_ksw_annual_leave_department_acc,ksw.annual.leave.department.acc,model_ksw_annual_leave,KSW_annual_leave.group_annual_leave_acc,1,0,0,0
+access_commission_line_department_acc,hr.leave.commission.line.department.acc,model_hr_leave_commission_line,KSW_annual_leave.group_annual_leave_acc,1,1,1,1
+access_deduction_line_department_acc,hr.leave.deduction.line.department.acc,model_hr_leave_deduction_line,KSW_annual_leave.group_annual_leave_acc,1,1,1,1

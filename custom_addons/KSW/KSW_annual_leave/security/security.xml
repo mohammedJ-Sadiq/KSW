@@ -128,11 +128,31 @@
         <field name="comment">Can perform the HR step of annual leave approval (penalty / iqama renewal / flight ticket).</field>
     </record>
 
+    <!--
+        The accounting tier stopped being company-wide in September 2026,
+        for the same reason and in the same shape as the GM tier below:
+        an accountant who handles one department was reading, and being
+        notified about, every other department's requests. Authority comes
+        from `hr.department.x_effective_accountant_ids`, so scope follows it
+        and `group_leave_officer` — whose rule is [(1,'=',1)] — is
+        deliberately NOT implied.
+
+        `(6, 0, [...])` rather than `(4, ...)`: an implication already
+        written to the database survives its removal from this file, so the
+        list must be set outright to actively drop `group_leave_officer`
+        (Odoo 19 Pitfalls #3). `hr_holidays.group_hr_holidays_user` is named
+        explicitly because it used to arrive via the Officer tier and
+        carries the Time Off menus and the hr.leave ACL — losing it would
+        leave the accountant with a scoped rule over a model he cannot open.
+    -->
     <record id="group_annual_leave_acc" model="res.groups">
         <field name="name">Accounting Approver</field>
         <field name="privilege_id" ref="privilege_annual_leave_approval"/>
-        <field name="implied_ids" eval="[(4, ref('base.group_user')), (4, ref('group_leave_officer'))]"/>
-        <field name="comment">Can approve annual leave requests at the accounting step (additional commissions, remaining loans).</field>
+        <field name="implied_ids" eval="[(6, 0, [
+            ref('base.group_user'),
+            ref('hr_holidays.group_hr_holidays_user'),
+        ])]"/>
+        <field name="comment">Can approve annual leave requests at the accounting step (additional commissions, remaining loans), for the departments they are set as Accounting Approver of.</field>
     </record>
 
     <!--
@@ -308,6 +328,156 @@
         <field name="perm_write" eval="False"/>
         <field name="perm_create" eval="False"/>
         <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Record Rules — Department Accounting Approver                 -->
+    <!-- ============================================================ -->
+    <!--
+        The mirror of the GM block above, one step later in the chain, with
+        two deliberate differences.
+
+        First, the accountant WRITES at his step: he fills the additional
+        commissions, the other deductions and the remaining loan figures, so
+        the two line models are full CRUD for him where the GM — who only
+        reviews — gets read.
+
+        Second, it is a Many2many. A department has one GM but an accounting
+        TEAM, so the domains traverse `x_effective_accountant_ids` rather
+        than comparing one id. What narrows is which departments a person
+        appears on: somebody named on a single department is in that
+        department's list and no other.
+
+        `x_effective_accountant_ids` is a stored compute on hr.department, so
+        every domain here is a plain join. It already folds in the
+        parent-department climb and the company default, so a department
+        left blank still resolves to somebody and needs no OR branch.
+
+        Employees with NO department cannot be reached through a department
+        join at all — there is no row to join to — so each model gets a
+        second rule keyed on the company default. The GM block only has that
+        second rule on hr.leave itself; for the accountant it has to cover
+        the line models too, or he opens such a request and cannot fill in
+        the figures his step exists for.
+    -->
+    <record id="hr_leave_rule_department_acc" model="ir.rule">
+        <field name="name">KSW Leave: department accountant (own departments)</field>
+        <field name="model_id" ref="hr_holidays.model_hr_leave"/>
+        <field name="groups" eval="[(4, ref('group_annual_leave_acc'))]"/>
+        <field name="domain_force">[('employee_id.department_id.x_effective_accountant_ids.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="hr_leave_rule_department_acc_no_department" model="ir.rule">
+        <field name="name">KSW Leave: default accountant (employees with no department)</field>
+        <field name="model_id" ref="hr_holidays.model_hr_leave"/>
+        <field name="groups" eval="[(4, ref('group_annual_leave_acc'))]"/>
+        <field name="domain_force">[
+            ('employee_id.department_id', '=', False),
+            ('company_id.x_default_accountant_ids.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="hr_leave_allocation_rule_view_department_acc" model="ir.rule">
+        <field name="name">KSW Allocation: department accountant (own departments)</field>
+        <field name="model_id" ref="hr_holidays.model_hr_leave_allocation"/>
+        <field name="groups" eval="[(4, ref('group_annual_leave_acc'))]"/>
+        <field name="domain_force">[('employee_id.department_id.x_effective_accountant_ids.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="hr_leave_allocation_rule_view_default_acc" model="ir.rule">
+        <field name="name">KSW Allocation: default accountant (employees with no department)</field>
+        <field name="model_id" ref="hr_holidays.model_hr_leave_allocation"/>
+        <field name="groups" eval="[(4, ref('group_annual_leave_acc'))]"/>
+        <field name="domain_force">[
+            ('employee_id.department_id', '=', False),
+            ('employee_id.company_id.x_default_accountant_ids.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="ksw_annual_leave_rule_department_acc" model="ir.rule">
+        <field name="name">KSW Annual Leave: department accountant (own departments)</field>
+        <field name="model_id" ref="model_ksw_annual_leave"/>
+        <field name="groups" eval="[(4, ref('group_annual_leave_acc'))]"/>
+        <field name="domain_force">[('employee_id.department_id.x_effective_accountant_ids.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="ksw_annual_leave_rule_default_acc" model="ir.rule">
+        <field name="name">KSW Annual Leave: default accountant (employees with no department)</field>
+        <field name="model_id" ref="model_ksw_annual_leave"/>
+        <field name="groups" eval="[(4, ref('group_annual_leave_acc'))]"/>
+        <field name="domain_force">[
+            ('employee_id.department_id', '=', False),
+            ('employee_id.company_id.x_default_accountant_ids.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="hr_leave_commission_line_rule_department_acc" model="ir.rule">
+        <field name="name">KSW Leave Commission: department accountant (own departments)</field>
+        <field name="model_id" ref="model_hr_leave_commission_line"/>
+        <field name="groups" eval="[(4, ref('group_annual_leave_acc'))]"/>
+        <field name="domain_force">[('leave_id.employee_id.department_id.x_effective_accountant_ids.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="hr_leave_commission_line_rule_default_acc" model="ir.rule">
+        <field name="name">KSW Leave Commission: default accountant (employees with no department)</field>
+        <field name="model_id" ref="model_hr_leave_commission_line"/>
+        <field name="groups" eval="[(4, ref('group_annual_leave_acc'))]"/>
+        <field name="domain_force">[
+            ('leave_id.employee_id.department_id', '=', False),
+            ('leave_id.employee_id.company_id.x_default_accountant_ids.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="hr_leave_deduction_line_rule_department_acc" model="ir.rule">
+        <field name="name">KSW Leave Other Deduction: department accountant (own departments)</field>
+        <field name="model_id" ref="model_hr_leave_deduction_line"/>
+        <field name="groups" eval="[(4, ref('group_annual_leave_acc'))]"/>
+        <field name="domain_force">[('leave_id.employee_id.department_id.x_effective_accountant_ids.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="hr_leave_deduction_line_rule_default_acc" model="ir.rule">
+        <field name="name">KSW Leave Other Deduction: default accountant (employees with no department)</field>
+        <field name="model_id" ref="model_hr_leave_deduction_line"/>
+        <field name="groups" eval="[(4, ref('group_annual_leave_acc'))]"/>
+        <field name="domain_force">[
+            ('leave_id.employee_id.department_id', '=', False),
+            ('leave_id.employee_id.company_id.x_default_accountant_ids.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
     </record>
 
     <!-- ============================================================ -->

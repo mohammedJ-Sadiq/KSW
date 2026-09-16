@@ -16,6 +16,11 @@
                        placeholder="Inherited from the parent department"/>
                 <field name="x_effective_gm_id" readonly="1"
                        invisible="x_gm_id or not x_effective_gm_id"/>
+                <field name="x_accountant_ids" widget="many2many_tags"
+                       placeholder="Inherited from the parent department"/>
+                <field name="x_effective_accountant_ids" widget="many2many_tags"
+                       readonly="1"
+                       invisible="x_accountant_ids or not x_effective_accountant_ids"/>
             </xpath>
         </field>
     </record>
@@ -28,6 +33,8 @@
             <xpath expr="//field[@name='manager_id']" position="after">
                 <field name="x_effective_gm_id" string="General Manager"
                        optional="show"/>
+                <field name="x_effective_accountant_ids" widget="many2many_tags"
+                       string="Accounting Approvers" optional="hide"/>
             </xpath>
         </field>
     </record>
@@ -43,6 +50,11 @@
                              string="Default General Manager"
                              help="Approves the GM step for departments with no GM of their own, and for employees with no department.">
                         <field name="x_default_gm_id"/>
+                    </setting>
+                    <setting id="ksw_default_accountant_setting"
+                             string="Accounting Team"
+                             help="May approve the accounting step of time off for departments with no Accounting Approvers of their own, and for employees with no department. Any one of them can clear the step.">
+                        <field name="x_default_accountant_ids" widget="many2many_tags"/>
                     </setting>
                 </block>
             </xpath>

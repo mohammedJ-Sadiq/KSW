@@ -839,12 +839,12 @@ class HrLeave(models.Model):
     @api.depends_context('uid')
     @api.depends('x_annual_approval_state', 'employee_id',
                  'employee_id.leave_manager_id',
-                 'employee_id.department_id.x_effective_gm_id')
+                 'employee_id.department_id.x_effective_gm_id',
+                 'employee_id.department_id.x_effective_accountant_ids')
     def _compute_is_pending_my_action(self):
         user = self.env.user
         uid = user.id
         is_hr = user.has_group('KSW_annual_leave.group_annual_leave_hr')
-        is_acc = user.has_group('KSW_annual_leave.group_annual_leave_acc')
         for leave in self:
             s = leave.x_annual_approval_state
             if not s or not leave.id:
@@ -861,7 +861,8 @@ class HrLeave(models.Model):
                 leave.x_is_pending_my_action = (
                     self._department_gm_user(leave) == user)
             elif s == 'pending_acc':
-                leave.x_is_pending_my_action = is_acc
+                leave.x_is_pending_my_action = (
+                    user in self._department_accountant_users(leave))
             elif s == 'pending_employee_signature':
                 leave.x_is_pending_my_action = is_hr
             else:
@@ -888,7 +889,6 @@ class HrLeave(models.Model):
         user = self.env.user
         uid = user.id
         is_hr = user.has_group('KSW_annual_leave.group_annual_leave_hr')
-        is_acc = user.has_group('KSW_annual_leave.group_annual_leave_acc')
 
         parts = [
             # DM step: current user is the configured leave manager
@@ -901,6 +901,17 @@ class HrLeave(models.Model):
             [('x_annual_approval_state', 'in',
               ['pending_gm_initial', 'pending_gm_final']),
              ('employee_id.department_id.x_effective_gm_id.user_id', '=', uid)],
+            # Accounting step: same shape, same reasoning.
+            [('x_annual_approval_state', '=', 'pending_acc'),
+             ('employee_id.department_id.x_effective_accountant_ids.user_id',
+              '=', uid)],
+            # An employee with no department resolves to the company
+            # default accountant, and there is no department row to join
+            # through — so it needs its own branch or the fallback is
+            # invisible in "Waiting For Me" while the button is live.
+            [('x_annual_approval_state', '=', 'pending_acc'),
+             ('employee_id.department_id', '=', False),
+             ('company_id.x_default_accountant_ids.user_id', '=', uid)],
         ]
         if is_hr:
             parts.extend([
@@ -910,8 +921,6 @@ class HrLeave(models.Model):
                 [('x_annual_approval_state', '=', 'pending_hr')],
                 [('x_annual_approval_state', '=', 'pending_employee_signature')],
             ])
-        if is_acc:
-            parts.append([('x_annual_approval_state', '=', 'pending_acc')])
 
         positive = odoo_expr.OR(parts)
         if positive_wanted:
@@ -922,11 +931,11 @@ class HrLeave(models.Model):
     @api.depends_context('uid')
     @api.depends('x_annual_approval_state', 'state', 'holiday_status_id',
                  'employee_id',
-                 'employee_id.department_id.x_effective_gm_id')
+                 'employee_id.department_id.x_effective_gm_id',
+                 'employee_id.department_id.x_effective_accountant_ids')
     def _compute_approval_role_gates(self):
         user = self.env.user
         is_hr = user.has_group('KSW_annual_leave.group_annual_leave_hr')
-        is_acc = user.has_group('KSW_annual_leave.group_annual_leave_acc')
         is_admin = self.env.su or user.has_group(SETTINGS_ADMIN_GROUP)
         wizard = self.env['ksw.gm.return.approver.wizard']
         for leave in self:
@@ -942,6 +951,11 @@ class HrLeave(models.Model):
             # the wrong question — the only one that matters is whether he is
             # the GM of THIS employee's department.
             is_gm = has_id and self._department_gm_user(leave) == user
+            # Same question for accounting: not "is he an accountant" but
+            # "is he THIS department's accountant". x_is_acc_approver gates
+            # the readonly= on the accounting fields, so it has to narrow
+            # with the button or a stranger can still type in the figures.
+            is_acc = has_id and user in self._department_accountant_users(leave)
             leave.x_can_hr_approve = is_hr and s == 'pending_hr' and has_id
             leave.x_can_gm_initial_approve = is_gm and s == 'pending_gm_initial' and has_id
             leave.x_can_acc_approve = is_acc and s == 'pending_acc' and has_id
@@ -2376,12 +2390,9 @@ class HrLeave(models.Model):
 
     def action_acc_approve(self):
         """Step 4: Accounting approves and fills flight ticket."""
-        self._check_group(
-            'KSW_annual_leave.group_annual_leave_acc',
-            'Only Accounting Approvers can approve this step.',
-        )
         self._check_annual_approval_can_advance()
         for leave in self:
+            self._check_department_accountant(leave)
             if leave.x_annual_approval_state != 'pending_acc':
                 raise UserError(
                     'This leave is not pending accounting approval.')
@@ -2628,6 +2639,72 @@ class HrLeave(models.Model):
                       or _('this department')),
             ))
 
+    # ------------------------------------------------------------------
+    # Department accountants (accounting step)
+    # ------------------------------------------------------------------
+    #
+    # September 2026. The same argument as the GM above, one step later in
+    # the chain: `group_annual_leave_acc` answers "may you act at the
+    # accounting step at all", never "for whom". An accountant who handles
+    # one department was reading -- and being notified about -- every other
+    # department's requests, because the group check never looked at the
+    # record.
+    #
+    # A SET, not one name, and that is the difference from the GM. The
+    # accounting step is worked by a team; any of them may clear it. What
+    # narrows is which departments a given person appears on, so somebody
+    # named on one department is in that department and nowhere else.
+    #
+    # Deliberately NOT a separate "is he in the group" test on top. Being
+    # named on the department (or being in the company default team) is the
+    # whole qualification, and naming somebody grants the group
+    # automatically via `hr.department._ksw_accountant_capability_groups`.
+    # A second gate here would only ever fire as a setup error nobody can
+    # act on.
+
+    @api.model
+    def _department_accountant_users(self, leave):
+        """The users who may clear the accounting step for this request.
+
+        sudo() throughout for the same reason as `_department_gm_user`:
+        the acting user has no `hr.employee` model access, so reading the
+        requester's department is impossible in their own right. An
+        identity read, not a scope one.
+        """
+        employee = leave.employee_id.sudo()
+        accountants = employee.department_id.x_effective_accountant_ids
+        if not accountants:
+            # No department at all, so the company team is the only answer
+            # left -- the same fallback the GM steps use.
+            accountants = (
+                leave.company_id or self.env.company
+            ).sudo().x_default_accountant_ids
+        return accountants.sudo().user_id
+
+    def _check_department_accountant(self, leave):
+        """Raise unless the caller is one of this request's accountants."""
+        if self.env.su:
+            return
+        acc_users = self._department_accountant_users(leave)
+        dept_name = (leave.employee_id.sudo().department_id.display_name
+                     or _('this employee'))
+        if not acc_users:
+            raise UserError(_(
+                "No Accounting Approver is set for %(dept)s, so this step "
+                "cannot be approved. Ask HR to set the department's "
+                "Accounting Approvers.",
+                dept=dept_name,
+            ))
+        if self.env.user not in acc_users:
+            # Name who can, rather than only who cannot: the reader of this
+            # message is usually the person who has to go and find them.
+            raise UserError(_(
+                "Only the Accounting Approvers of %(dept)s can approve this "
+                "step: %(names)s.",
+                dept=dept_name,
+                names=', '.join(sorted(acc_users.mapped('name'))),
+            ))
+
     def _mark_attendance_sheet_leave_absent(self):
         """Mark remaining attended workday lines absent on draft attendance sheets.
 
@@ -2678,15 +2755,15 @@ class HrLeave(models.Model):
                 subtype_xmlid='mail.mt_note',
             )
 
-    # 'department_gm' marks the steps whose recipient is one named person
-    # derived from the request, not a whole group. Data-driven rather than a
-    # state-name test in the body, so a new GM-style step cannot be added
-    # without deciding how it routes.
+    # 'department_gm' / 'department_accountant' mark the steps whose
+    # recipient is one named person derived from the request, not a whole
+    # group. Data-driven rather than a state-name test in the body, so a new
+    # step of either kind cannot be added without deciding how it routes.
     _ANNUAL_MULTI_STEP_CONFIG = {
         'pending_dm':                 {'label': 'Direct Manager Approval',  'group': None},
         'pending_hr':                 {'label': 'HR Approval',              'group': 'KSW_annual_leave.group_annual_leave_hr'},
         'pending_gm_initial':         {'label': 'GM Initial Approval',      'group': None, 'department_gm': True},
-        'pending_acc':                {'label': 'Accounting Approval',      'group': 'KSW_annual_leave.group_annual_leave_acc'},
+        'pending_acc':                {'label': 'Accounting Approval',      'group': None, 'department_accountant': True},
         'pending_gm_final':           {'label': 'GM Final Approval',        'group': None, 'department_gm': True},
         'pending_employee_signature': {'label': 'HR Confirmation',           'group': 'KSW_annual_leave.group_annual_leave_hr'},
     }
@@ -2706,6 +2783,12 @@ class HrLeave(models.Model):
                 [gm_user.partner_id.id]
                 if gm_user and gm_user.partner_id else []
             )
+        elif config.get('department_accountant'):
+            # The whole team of that department, and only that department:
+            # the notification is the other half of the narrowing, not just
+            # the button.
+            partner_ids = self._department_accountant_users(
+                leave).mapped('partner_id').ids
         else:
             group = self.env.ref(config['group'], raise_if_not_found=False)
             partner_ids = group.user_ids.mapped('partner_id').ids if group else []

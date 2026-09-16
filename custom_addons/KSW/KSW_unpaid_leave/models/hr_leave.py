@@ -353,10 +353,9 @@ class HrLeaveUnpaid(models.Model):
                 )
 
         for leave in unpaid:
-            self._check_group(
-                'KSW_annual_leave.group_annual_leave_acc',
-                'Only Accounting Approvers can approve this step.',
-            )
+            # Per department, not per group -- the unpaid chain forks from
+            # the annual one and inherits its accounting scope with it.
+            self._check_department_accountant(leave)
             if leave.x_annual_approval_state != 'pending_acc':
                 raise UserError(
                     'This leave is not pending accounting approval.')

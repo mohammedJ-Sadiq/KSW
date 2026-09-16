@@ -12,6 +12,7 @@ from . import test_admin_return_any_state
 from . import test_return_wizard_ui
 from . import test_manager_assistant_delegation
 from . import test_department_gm
+from . import test_department_accountant
 from . import test_return_balance_sync
 from . import test_return_punch_notification
 from . import test_on_vacation_at_gm_final

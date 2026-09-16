@@ -3,7 +3,7 @@ from odoo import models
 
 
 class HrDepartment(models.Model):
-    """Naming a GM on the department is the whole setup for time off.
+    """Naming the approvers on the department is the whole setup for time off.
 
     KSW_base_security owns the field and the resolver but must not know the
     leave groups exist. Each chain declares its own capability group here,
@@ -16,4 +16,9 @@ class HrDepartment(models.Model):
     def _ksw_gm_capability_groups(self):
         return super()._ksw_gm_capability_groups() + [
             'KSW_annual_leave.group_annual_leave_gm',
+        ]
+
+    def _ksw_accountant_capability_groups(self):
+        return super()._ksw_accountant_capability_groups() + [
+            'KSW_annual_leave.group_annual_leave_acc',
         ]

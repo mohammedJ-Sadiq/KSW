@@ -163,6 +163,19 @@ class TestVacationMonthlyOverlap(TransactionCase):
         # (GOSI is paid only once per month via PRIOR_GOSI injection).
         cls.GOSI_ADJ = 0.0
 
+        # The accounting step follows the employee's department since Sep 2026,
+        # so holding the group is no longer enough to reach a request. Put the
+        # approver on the company-wide accounting team, which every department
+        # with no accountants of its own inherits. Last in setUpClass on
+        # purpose: it reuses whatever employee the fixture already made for
+        # that user, and only creates one when there is none.
+        _acc_emp = cls.env['hr.employee'].sudo().search(
+            [('user_id', '=', cls.user_acc.id)], limit=1)
+        if not _acc_emp:
+            _acc_emp = cls.env['hr.employee'].sudo().create({
+                'name': cls.user_acc.name, 'user_id': cls.user_acc.id})
+        cls.env.company.sudo().x_default_accountant_ids = [(4, _acc_emp.id)]
+
     # ==================================================================
     # HELPERS
     # ==================================================================
