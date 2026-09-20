@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- =============================================================== -->
+    <!-- LIST                                                              -->
+    <!-- =============================================================== -->
+    <record id="it_consumable_purchase_request_view_list" model="ir.ui.view">
+        <field name="name">it.consumable.purchase.request.list</field>
+        <field name="model">it.consumable.purchase.request</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="date_request"/>
+                <field name="requested_by"/>
+                <field name="approver_id" optional="hide"/>
+                <field name="amount_total" sum="Total"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'purchased'"
+                       decoration-info="state == 'draft'"
+                       decoration-muted="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- =============================================================== -->
+    <!-- FORM                                                              -->
+    <!-- =============================================================== -->
+    <record id="it_consumable_purchase_request_view_form" model="ir.ui.view">
+        <field name="name">it.consumable.purchase.request.form</field>
+        <field name="model">it.consumable.purchase.request</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_mark_purchased" type="object"
+                            string="Mark as Purchased" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_print" type="object"
+                            string="Print PDF" class="oe_highlight"/>
+                    <button name="action_cancel" type="object"
+                            string="Cancel" invisible="state != 'draft'"/>
+                    <button name="action_reset_to_draft" type="object"
+                            string="Reset to Draft" invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,purchased"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date_request"/>
+                            <field name="requested_by" readonly="1"/>
+                            <field name="approver_id"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="amount_total" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Items">
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <list editable="bottom">
+                                    <field name="consumable_id"/>
+                                    <field name="category_id" optional="hide"/>
+                                    <field name="qty_on_hand"/>
+                                    <field name="uom" optional="hide"/>
+                                    <field name="quantity"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="unit_cost"/>
+                                    <field name="subtotal" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes for Supply Chain">
+                            <field name="note" nolabel="1" placeholder="Anything supply chain should know..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- =============================================================== -->
+    <!-- SEARCH                                                            -->
+    <!-- =============================================================== -->
+    <record id="it_consumable_purchase_request_view_search" model="ir.ui.view">
+        <field name="name">it.consumable.purchase.request.search</field>
+        <field name="model">it.consumable.purchase.request</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="requested_by"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Purchased" name="purchased" domain="[('state', '=', 'purchased')]"/>
+                <group>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- =============================================================== -->
+    <!-- ACTION                                                            -->
+    <!-- =============================================================== -->
+    <record id="action_it_consumable_purchase_request" model="ir.actions.act_window">
+        <field name="name">Purchase Requests</field>
+        <field name="res_model">it.consumable.purchase.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_draft': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No purchase requests yet
+            </p>
+            <p>
+                Generate one from the Consumables list once an item is low
+                on stock - select specific items first, or leave nothing
+                selected to pull in everything currently low.
+            </p>
+        </field>
+    </record>
+
+</odoo>

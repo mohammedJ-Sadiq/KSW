@@ -17,6 +17,10 @@
                         ("<t t-out="object.name"/>") has been closed
                         <t t-if="object.closed_by">by <t t-out="object.closed_by.name"/></t>.
                     </p>
+                    <t t-if="object.resolution_notes">
+                        <p><strong>How it was resolved:</strong></p>
+                        <t t-out="object.resolution_notes"/>
+                    </t>
                     <p>If the issue is not fully resolved, you can reopen it or reply on
                         the ticket's message log and the IT Team will follow up.</p>
                     <br/>

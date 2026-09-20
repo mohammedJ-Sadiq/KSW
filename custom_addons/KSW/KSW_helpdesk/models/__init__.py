@@ -5,3 +5,8 @@ from . import it_asset_category
 from . import it_asset
 from . import it_asset_assignment
 from . import it_asset_maintenance
+from . import it_consumable_category
+from . import it_consumable
+from . import it_consumable_move
+from . import it_consumable_purchase_request
+from . import it_consumable_purchase_request_line

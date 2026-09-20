@@ -12,4 +12,11 @@ access_it_asset_assignment_agent,it.asset.assignment.agent,model_it_asset_assign
 access_it_asset_maintenance_agent,it.asset.maintenance.agent,model_it_asset_maintenance,group_helpdesk_agent,1,1,1,1
 access_it_asset_assign_wizard,it.asset.assign.wizard,model_it_asset_assign_wizard,group_helpdesk_agent,1,1,1,1
 access_it_asset_return_wizard,it.asset.return.wizard,model_it_asset_return_wizard,group_helpdesk_agent,1,1,1,1
+access_it_consumable_category_agent,it.consumable.category.agent,model_it_consumable_category,group_helpdesk_agent,1,1,1,1
+access_it_consumable_agent,it.consumable.agent,model_it_consumable,group_helpdesk_agent,1,1,1,1
+access_it_consumable_move_agent,it.consumable.move.agent,model_it_consumable_move,group_helpdesk_agent,1,1,1,1
+access_it_consumable_issue_wizard,it.consumable.issue.wizard,model_it_consumable_issue_wizard,group_helpdesk_agent,1,1,1,1
+access_it_consumable_receive_wizard,it.consumable.receive.wizard,model_it_consumable_receive_wizard,group_helpdesk_agent,1,1,1,1
+access_it_consumable_purchase_request_agent,it.consumable.purchase.request.agent,model_it_consumable_purchase_request,group_helpdesk_agent,1,1,1,1
+access_it_consumable_purchase_request_line_agent,it.consumable.purchase.request.line.agent,model_it_consumable_purchase_request_line,group_helpdesk_agent,1,1,1,1
 access_hr_employee_helpdesk_agent,hr.employee.helpdesk.agent,hr.model_hr_employee,group_helpdesk_agent,1,0,0,0

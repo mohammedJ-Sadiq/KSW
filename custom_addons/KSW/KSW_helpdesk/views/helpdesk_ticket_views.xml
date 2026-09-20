@@ -175,6 +175,17 @@
                         <page string="Detailed Description">
                             <field name="description" placeholder="Describe the issue in as much detail as possible..."/>
                         </page>
+                        <page string="Resolution" invisible="not id">
+                            <div class="text-muted mb-2" invisible="not is_closed">
+                                Kept as a reference for the next time this
+                                kind of issue comes up.
+                            </div>
+                            <field name="resolution_notes"
+                                   groups="KSW_helpdesk.group_helpdesk_agent"
+                                   placeholder="Explain how this was (or is being) resolved..."/>
+                            <field name="resolution_notes" readonly="1"
+                                   groups="!KSW_helpdesk.group_helpdesk_agent"/>
+                        </page>
                         <page string="Attachments">
                             <field name="attachment_ids" widget="many2many_binary"/>
                         </page>

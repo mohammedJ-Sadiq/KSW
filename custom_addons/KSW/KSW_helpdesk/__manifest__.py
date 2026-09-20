@@ -1,6 +1,6 @@
 {
     'name': 'KSW Helpdesk',
-    'version': '19.0.1.2.0',
+    'version': '19.0.1.4.0',
     'summary': 'Internal IT support ticketing system and asset register for employees',
     'description': """
 Helpdesk / IT Ticketing for KSW
@@ -18,7 +18,9 @@ assign and resolve it:
 - Kanban board grouped by stage with priority stars, blocked/ready state
   and overdue badges
 - Automatic notification to the assigned agent
-- Automatic email to the requester when their ticket is closed
+- Automatic email to the requester when their ticket is closed, including
+  the agent's Resolution Notes (how the issue was actually fixed - kept
+  as a reference on every closed ticket)
 - Reporting (pivot/graph) and a calendar of ticket deadlines
 
 Just two roles: every employee submits tickets (for themselves, or a
@@ -33,9 +35,25 @@ IT Asset Register (IT Team only)
 - Optional link from a ticket to the specific IT asset it's about
 - Automatic activity reminder 30 days before an asset's warranty expires
 
-Other employees never see the asset register itself - only the IT Team
-does. The optional "Related Asset" field on a ticket only ever shows
-assets already assigned to that employee (or their direct report).
+IT Consumables (IT Team only)
+------------------------------
+- Separate "Consumables" sub-menu (ink, toner, cables, batteries, spare
+  parts...) - a stock/quantity register, distinct from the serialised
+  Assets list (laptops, printers, etc.)
+- Current quantity on hand per item, derived from a full Receive / Issue /
+  Adjustment stock-move ledger (who took what, when, and for which asset)
+- Minimum stock (par level) and suggested reorder quantity per item, with
+  a daily Low Stock activity reminder to the IT Team
+- "Consumable Moves" list for auditing consumption across the board
+- One-click Purchase Request generation from any low-stock item(s): a
+  PDF with an items table, estimated cost, and signature lines for IT,
+  the approving Manager, and Supply Chain; "Mark as Purchased" receives
+  the requested quantities straight back into stock
+
+Other employees never see the asset register or the consumable stock
+themselves - only the IT Team does. The optional "Related Asset" field on
+a ticket only ever shows assets already assigned to that employee (or
+their direct report).
 """,
     'author': 'KSW',
     'category': 'Services/Helpdesk',
@@ -50,6 +68,7 @@ assets already assigned to that employee (or their direct report).
         'data/helpdesk_ticket_stage_data.xml',
         'data/helpdesk_ticket_category_data.xml',
         'data/it_asset_category_data.xml',
+        'data/it_consumable_category_data.xml',
         'data/mail_template_ticket_closed.xml',
         'data/ir_cron_data.xml',
         'views/helpdesk_ticket_stage_views.xml',
@@ -59,8 +78,15 @@ assets already assigned to that employee (or their direct report).
         'views/it_asset_assignment_views.xml',
         'views/it_asset_maintenance_views.xml',
         'views/it_asset_views.xml',
+        'views/it_consumable_category_views.xml',
+        'views/it_consumable_move_views.xml',
+        'views/it_consumable_views.xml',
+        'views/it_consumable_purchase_request_views.xml',
+        'report/report_it_consumable_purchase_request.xml',
         'wizard/it_asset_assign_wizard_views.xml',
         'wizard/it_asset_return_wizard_views.xml',
+        'wizard/it_consumable_issue_wizard_views.xml',
+        'wizard/it_consumable_receive_wizard_views.xml',
         'views/menu.xml',
     ],
     'installable': True,

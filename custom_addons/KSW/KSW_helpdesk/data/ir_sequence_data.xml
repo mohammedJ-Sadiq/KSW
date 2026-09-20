@@ -25,4 +25,20 @@
         <field name="company_id" eval="False"/>
     </record>
 
+    <record id="seq_it_consumable" model="ir.sequence">
+        <field name="name">IT Consumable Reference</field>
+        <field name="code">it.consumable</field>
+        <field name="prefix">CONS/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_it_consumable_purchase_request" model="ir.sequence">
+        <field name="name">IT Consumable Purchase Request</field>
+        <field name="code">it.consumable.purchase.request</field>
+        <field name="prefix">PR/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
 </odoo>

@@ -111,6 +111,11 @@ class HelpdeskTicket(models.Model):
         string='Resolution Time (h)', compute='_compute_resolution_hours', store=True,
         help="Hours between creation and closing. Used for reporting on solved tickets.",
     )
+    resolution_notes = fields.Html(
+        string='Resolution Notes',
+        help="How the IT agent actually solved this ticket - kept as a "
+             "reference for the next time the same issue comes up.",
+    )
 
     # ------------------------------------------------------------------
     # Compute
@@ -271,6 +276,13 @@ class HelpdeskTicket(models.Model):
 
     def action_close(self):
         self._check_agent()
+        for ticket in self:
+            if not ticket.resolution_notes:
+                raise UserError(_(
+                    'Please fill in the Resolution Notes before closing '
+                    '"%s" - explain how it was solved so it can be used as '
+                    'a reference next time.', ticket.name,
+                ))
         closed_stage = self.env['helpdesk.ticket.stage'].search(
             [('is_closed', '=', True)], order='sequence', limit=1,
         )

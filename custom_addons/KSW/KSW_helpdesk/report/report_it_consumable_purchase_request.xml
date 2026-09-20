@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- ================================================================ -->
+    <!-- Report action — bound to the model so it appears in the          -->
+    <!-- "Print" menu on both the list and the form view.                 -->
+    <!-- ================================================================ -->
+    <record id="action_report_it_consumable_purchase_request" model="ir.actions.report">
+        <field name="name">Purchase Request</field>
+        <field name="model">it.consumable.purchase.request</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">KSW_helpdesk.report_it_consumable_purchase_request</field>
+        <field name="report_file">KSW_helpdesk.report_it_consumable_purchase_request</field>
+        <field name="print_report_name">'Purchase Request - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_it_consumable_purchase_request"/>
+        <field name="binding_type">report</field>
+        <!-- A4 portrait -->
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Main QWeb template                                                -->
+    <!-- ================================================================ -->
+    <template id="report_it_consumable_purchase_request">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+
+                        <h2 class="text-center mb-3">Purchase Request <span class="fs-4" dir="rtl">/ طلب شراء</span></h2>
+                        <h4 class="text-center text-muted mb-4">
+                            IT Consumables Restock
+                        </h4>
+
+                        <!-- ── Header block ── -->
+                        <table class="table table-sm table-bordered mb-3">
+                            <tr>
+                                <td style="width:20%"><strong>Reference</strong></td>
+                                <td style="width:30%" t-out="o.name or ''"/>
+                                <td style="width:20%"><strong>Date</strong></td>
+                                <td style="width:30%" t-out="o.date_request and o.date_request.strftime('%d/%m/%Y') or ''"/>
+                            </tr>
+                            <tr>
+                                <td><strong>Requested By</strong></td>
+                                <td t-out="o.requested_by.name or ''"/>
+                                <td><strong>For Approval By</strong></td>
+                                <td t-out="o.approver_id.name or ''"/>
+                            </tr>
+                        </table>
+
+                        <!-- ── Items ── -->
+                        <table class="table table-sm table-bordered mb-3">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width:4%">#</th>
+                                    <th style="width:28%">Item</th>
+                                    <th style="width:16%">Category</th>
+                                    <th style="width:13%" class="text-end">Current Stock</th>
+                                    <th style="width:13%" class="text-end">Qty to Order</th>
+                                    <th style="width:13%" class="text-end">Unit Cost</th>
+                                    <th style="width:13%" class="text-end">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.line_ids" t-as="line">
+                                    <tr>
+                                        <td t-out="line_index + 1"/>
+                                        <td t-out="line.consumable_id.name or ''"/>
+                                        <td t-out="line.category_id.name or ''"/>
+                                        <td class="text-end" t-out="line.qty_on_hand"/>
+                                        <td class="text-end" t-out="line.quantity"/>
+                                        <td class="text-end">
+                                            <t t-out="'%.2f' % line.unit_cost"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-out="'%.2f' % line.subtotal"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <t t-if="not o.line_ids">
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted">
+                                            No items on this request.
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                            <tfoot class="table-light fw-bold">
+                                <tr>
+                                    <td colspan="6" class="text-end">Total Estimated Cost</td>
+                                    <td class="text-end">
+                                        <t t-out="'%.2f' % o.amount_total"/>
+                                        <t t-out="' ' + (o.currency_id.name or 'SAR')"/>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <div t-if="o.note" class="mb-4">
+                            <strong>Notes for Supply Chain</strong>
+                            <p t-out="o.note"/>
+                        </div>
+
+                        <!-- ── Signature block ── -->
+                        <div class="row mt-5" style="page-break-inside: avoid;">
+                            <div class="col-4 offset-4 text-center">
+                                <p style="border-top: 1px solid #000; padding-top: 4px; min-height: 40px;">
+                                    <strong>Approved by (Manager)</strong>
+                                </p>
+                            </div>
+                        </div>
+
+                        <p class="text-muted mt-3" style="font-size:10px;">
+                            Printed on
+                            <t t-out="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/>
+                        </p>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

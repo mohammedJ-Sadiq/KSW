@@ -11,4 +11,14 @@
         <field name="active">True</field>
     </record>
 
+    <record id="ir_cron_it_consumable_low_stock_reminder" model="ir.cron">
+        <field name="name">IT Consumables: Low Stock Reminder</field>
+        <field name="model_id" ref="model_it_consumable"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_low_stock_reminder()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+
 </odoo>
