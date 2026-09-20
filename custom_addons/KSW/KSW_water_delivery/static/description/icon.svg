@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- App icon for the driver's home screen. Odoo's scoped-app manifest looks
+     for exactly this path (web/controllers/webmanifest.py: _get_scoped_app_icons
+     checks `<module>/static/description/icon.svg`) and falls back to the Odoo
+     icon when it is missing — which would defeat the point of a standalone app.
+     Replace the artwork with the KSW logo when one is available; keep the path
+     and the 512x512 viewBox. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d6efd"/>
+      <stop offset="1" stop-color="#0a4fb5"/>
+    </linearGradient>
+    <linearGradient id="drop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#cfe6ff"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+
+  <!-- water drop -->
+  <path fill="url(#drop)"
+        d="M256 96c0 0 104 118 104 186a104 104 0 0 1-208 0C152 214 256 96 256 96z"/>
+  <!-- highlight -->
+  <path fill="#ffffff" opacity="0.55"
+        d="M214 268c0-34 20-70 34-90-38 40-62 78-62 106a62 62 0 0 0 40 58c-8-20-12-47-12-74z"/>
+
+  <!-- tanker hint: a simple wheeled tank under the drop -->
+  <g fill="#ffffff" opacity="0.92">
+    <rect x="128" y="392" width="256" height="44" rx="22"/>
+    <circle cx="176" cy="452" r="22"/>
+    <circle cx="336" cy="452" r="22"/>
+  </g>
+</svg>

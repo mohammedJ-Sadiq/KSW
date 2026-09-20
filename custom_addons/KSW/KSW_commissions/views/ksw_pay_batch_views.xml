@@ -21,6 +21,7 @@
                 <field name="x_entries_readonly" invisible="1"/>
                 <field name="x_can_reopen" invisible="1"/>
                 <field name="submission_state" invisible="1"/>
+                <field name="entry_count" invisible="1"/>
 
                 <header>
                     <button name="action_submit" string="Submit"
@@ -35,6 +36,14 @@
                     <button name="action_import" string="Import"
                             type="object" class="btn-secondary"
                             invisible="state != 'draft' or not importer"/>
+                    <!-- Available in every state, not just Draft:
+                         the reason to export an approved batch (file it,
+                         check it against BAS) outlives the entry window. -->
+                    <button name="action_export_xlsx" string="Export to Excel"
+                            type="object" class="btn-secondary"
+                            icon="fa-file-excel-o"
+                            invisible="entry_count == 0"
+                            title="Download these entries as a spreadsheet"/>
                     <!-- Correcting your own work before anyone has looked at
                          it should not need a request, so this stays open to
                          the supervisor right up until his department is

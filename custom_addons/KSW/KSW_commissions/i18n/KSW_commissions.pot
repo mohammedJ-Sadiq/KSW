@@ -5262,3 +5262,43 @@ msgstr ""
 #: code:addons/KSW_commissions/wizard/sales_commission_override_wizard.py:0
 msgid "Commission"
 msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_batch_form
+msgid "Export to Excel"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_batch_form
+msgid "Download these entries as a spreadsheet"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch_export.py:0
+msgid "Employee No."
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch_export.py:0
+msgid "BAS Cost Center"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch_export.py:0
+msgid "Computed Amount"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch_export.py:0
+msgid "Exported by"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch_export.py:0
+msgid "Exported on"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch_export.py:0
+msgid "There is nothing to export — this batch has no entries yet."
+msgstr ""

@@ -60,6 +60,12 @@
         <field name="model">stock.picking</field>
         <field name="arch" type="xml">
             <list string="Delivery Notes" create="false" edit="false" sample="1">
+                <header>
+                    <button name="%(KSW_water_delivery.action_water_delivery_wizard)d"
+                            type="action" string="New Delivery"
+                            class="btn-primary" display="always"
+                            groups="KSW_water_delivery.group_water_driver"/>
+                </header>
                 <field name="name"/>
                 <field name="date_done"/>
                 <field name="partner_id"/>
@@ -88,6 +94,12 @@
         <field name="model">stock.picking</field>
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile" create="false" sample="1">
+                <header>
+                    <button name="%(KSW_water_delivery.action_water_delivery_wizard)d"
+                            type="action" string="New Delivery"
+                            class="btn-primary" display="always"
+                            groups="KSW_water_delivery.group_water_driver"/>
+                </header>
                 <templates>
                     <t t-name="card">
                         <div class="d-flex justify-content-between">

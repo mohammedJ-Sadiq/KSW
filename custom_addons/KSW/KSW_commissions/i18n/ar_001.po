@@ -5644,3 +5644,43 @@ msgstr "عمولة المبيعات والتحصيل"
 #: code:addons/KSW_commissions/wizard/sales_commission_override_wizard.py:0
 msgid "Commission"
 msgstr "العمولة"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_batch_form
+msgid "Export to Excel"
+msgstr "تصدير إلى Excel"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_batch_form
+msgid "Download these entries as a spreadsheet"
+msgstr "تنزيل هذه الإدخالات في ملف جدول بيانات"
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch_export.py:0
+msgid "Employee No."
+msgstr "الرقم الوظيفي"
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch_export.py:0
+msgid "BAS Cost Center"
+msgstr "مركز التكلفة في BAS"
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch_export.py:0
+msgid "Computed Amount"
+msgstr "المبلغ المحتسب"
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch_export.py:0
+msgid "Exported by"
+msgstr "صدَّره"
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch_export.py:0
+msgid "Exported on"
+msgstr "تاريخ التصدير"
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_batch_export.py:0
+msgid "There is nothing to export — this batch has no entries yet."
+msgstr "لا يوجد ما يُصدَّر — لا تتضمّن هذه الدفعة أي إدخالات بعد."

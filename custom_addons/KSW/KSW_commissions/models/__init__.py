@@ -9,6 +9,7 @@ from . import ksw_pay_recurring           # SAP infotype 0014 equivalent
 from . import ksw_pay_submission          # one department's handover to the GM
 from . import ksw_pay_run                 # the month, its approval and the register
 from . import ksw_pay_import_bas          # the one importer: driver trips from BAS
+from . import ksw_pay_batch_export        # the batch as a spreadsheet
 from . import ksw_meal_settings           # res.config.settings: overtime params
 from . import ksw_salesperson_profile     # sales: yearly target + client splits
 from . import ksw_sales_commission_rule   # sales: rule + tier catalog

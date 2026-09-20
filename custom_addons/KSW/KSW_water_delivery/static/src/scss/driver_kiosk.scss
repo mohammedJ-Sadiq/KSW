@@ -1,0 +1,24 @@
+// Single-app screen. Applied by driver_kiosk.js, either because the user is a
+// driver and nothing else, or because the page is running inside the installed
+// "Water Delivery" app rather than a browser tab.
+.o_ksw_driver_kiosk {
+
+    // The app switcher: the one discoverable route out of the app.
+    .o_navbar_apps_menu {
+        display: none !important;
+    }
+
+    // The brand is the other way back to the apps home screen. Kept visible so
+    // the bar still reads as an app header, but inert.
+    .o_menu_brand {
+        pointer-events: none;
+        cursor: default;
+    }
+
+    // The breadcrumb "back" arrow walks up to the action's own list, which is
+    // inside the app, so it stays. Only the width it reserves is reclaimed --
+    // a phone has little enough of it.
+    .o_last_breadcrumb_item > .min-w-0 {
+        max-width: 100%;
+    }
+}

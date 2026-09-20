@@ -1,6 +1,6 @@
 {
     'name': 'KSW Water Delivery Notes',
-    'version': '19.0.1.3.0',
+    'version': '19.0.1.4.3',
     'summary': 'Issue and sign the water delivery note on the driver\'s phone',
     'description': """
 Water Delivery Notes
@@ -51,6 +51,8 @@ accounting the finished list.
     'assets': {
         'web.assets_backend': [
             'KSW_water_delivery/static/src/js/geolocation_widget.js',
+            'KSW_water_delivery/static/src/js/driver_kiosk.js',
+            'KSW_water_delivery/static/src/scss/driver_kiosk.scss',
             'KSW_water_delivery/static/src/xml/geolocation_widget.xml',
         ],
     },
