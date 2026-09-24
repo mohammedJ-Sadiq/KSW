@@ -355,8 +355,15 @@ class KswPaySubmission(models.Model):
                      'total': rec.total_amount or 0.0},
                 subtype_xmlid='mail.mt_note',
             )
-        self.mapped('run_id')._sync_state()
-        self.mapped('run_id')._refresh_register()
+        runs = self.mapped('run_id')
+        runs._sync_state()
+        runs._refresh_register()
+        # The month finalises here too, not only down the run's own Approve
+        # button. Approving the last department is the same decision
+        # whichever screen it is made on, and reaching it from this one used
+        # to leave the month with nothing waiting, nothing to close and no
+        # way for the accountant to export it.
+        runs._finalise_if_complete()
         return True
 
     def action_return(self):

@@ -160,6 +160,40 @@ class KswPayComponent(models.Model):
         selection='_selection_importer', string='Import Source',
         help='Optional. Adds an Import button on batches of this component.',
     )
+    # ------------------------------------------------------------------
+    # BAS journal entry
+    # ------------------------------------------------------------------
+    # Which accounts this kind of pay hits when the month is exported as a
+    # journal entry for BAS. They live on the component for the same reason
+    # its rate does: a pay type is configuration, and the account it is
+    # expensed to is part of what the type *is* — SAP hangs a symbolic
+    # account off the wage type the same way. A new component therefore
+    # carries its own accounts in, instead of needing a mapping table
+    # somewhere else to be remembered.
+    x_bas_expense_code = fields.Char(
+        string='BAS Expense Account',
+        help='The account this pay is expensed to in BAS — 3203020007. '
+             'Debited.',
+    )
+    x_bas_expense_name = fields.Char(
+        string='BAS Expense Account Name',
+        help='The account name written into the entry, as the accountant '
+             'reads it in BAS.',
+    )
+    x_bas_accrual_code = fields.Char(
+        string='BAS Accrual Account',
+        help='The account the money becomes owed on until it is paid — '
+             '2107010001. Credited with whatever is left after the '
+             "employee's loan installments.",
+    )
+    x_bas_accrual_name = fields.Char(string='BAS Accrual Account Name')
+    x_bas_use_cost_center = fields.Boolean(
+        string='Stamp the BAS Cost Centre', default=False,
+        help="Write the employee's BAS cost centre (his truck, for a "
+             'driver) on the expense line. Off for pay that is not '
+             'attributable to one vehicle or site.',
+    )
+
     entries_import_only = fields.Boolean(
         string='Filled by Import Only', default=False,
         help='The entries are produced by the import and reviewed, never '

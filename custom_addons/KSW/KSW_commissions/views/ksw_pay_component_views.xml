@@ -94,6 +94,35 @@
                             </div>
                         </page>
 
+                        <page string="BAS Journal" name="bas_journal">
+                            <group>
+                                <group string="Expense (debited)">
+                                    <field name="x_bas_expense_code"
+                                           placeholder="3203020007"/>
+                                    <field name="x_bas_expense_name"
+                                           placeholder="حساب مصروفات - عمولات سائقين التريلات"/>
+                                    <field name="x_bas_use_cost_center"/>
+                                </group>
+                                <group string="Accrual (credited)">
+                                    <field name="x_bas_accrual_code"
+                                           placeholder="2107010001"/>
+                                    <field name="x_bas_accrual_name"
+                                           placeholder="مصروفات مستحقة عمولات سائقين التريلات"/>
+                                </group>
+                            </group>
+                            <div class="text-muted mt-2">
+                                Where this pay lands when the month is
+                                exported as journal entries for BAS: the
+                                expense account is debited with what was
+                                earned, the accrual account credited with
+                                what is left after the employee's loan
+                                installments come out. Without both, a month
+                                containing this component cannot be
+                                exported — the export says so by name
+                                rather than posting a half entry.
+                            </div>
+                        </page>
+
                         <page string="Employee Rates" name="employee_rates"
                               invisible="calculation != 'qty_rate'">
                             <field name="employee_rate_ids"

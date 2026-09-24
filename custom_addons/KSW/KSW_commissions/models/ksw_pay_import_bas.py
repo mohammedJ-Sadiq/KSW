@@ -247,6 +247,14 @@ class KswPayBatchBasImport(models.Model):
                           'whether somebody reviewed it.')))
                 continue
 
+            # The truck, kept for the journal entry's cost-centre
+            # column. BAS gives it per month, on the loads themselves —
+            # there is nowhere else to get it, and the hand-typed voucher
+            # carries it on every commission line.
+            equipment = (data.get('equip') or '').strip()
+            if equipment and employee.sudo().x_bas_equipment_code != equipment:
+                employee.sudo().x_bas_equipment_code = equipment
+
             # A load with no «رد الفاتورة» is not weightless, it is
             # unrecorded. Counting it as zero would quietly shrink the
             # driver's month; BAS stopped filling the column on 6 Sep 2026,

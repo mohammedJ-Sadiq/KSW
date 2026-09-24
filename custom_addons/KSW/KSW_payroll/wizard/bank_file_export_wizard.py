@@ -15,6 +15,7 @@ EXPORT_MODES = [
     ('all_txt', 'All banks – Text files'),
     ('specific_excel', 'Specific bank – Excel'),
     ('specific_txt', 'Specific bank – Text file'),
+    ('journal_entry', 'Journal entries – BAS import file'),
 ]
 
 
@@ -230,8 +231,21 @@ class BankFileExportWizard(models.TransientModel):
             'all_txt': self._export_all_txt,
             'specific_excel': self._export_specific_excel,
             'specific_txt': self._export_specific_txt,
+            'journal_entry': self._export_journal_entry,
         }
         return handler[mode]()
+
+    def _export_journal_entry(self):
+        """The batch as one BAS journal entry, ready to import.
+
+        No bank grouping: the entry is the month's posting, not a payment
+        instruction, so it covers every payslip the batch still pays
+        whichever bank the money leaves from.
+        """
+        batch = self.payslip_run_id
+        data = batch._bas_journal_workbook()
+        return self._bundle_and_download(
+            [('JournalEntry_%s.xlsx' % self._batch_label(), data)])
 
     # -- Mode handlers -----------------------------------------------------
 

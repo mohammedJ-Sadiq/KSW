@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Where a rule's money lands in the BAS journal entry. Its own page:
+         the accountant who fills this in is not the person who wrote the
+         Python condition on the General page, and mixing the two put a
+         chart of accounts next to a code editor. -->
+    <record id="view_hr_salary_rule_form_bas" model="ir.ui.view">
+        <field name="name">hr.salary.rule.form.bas.journal</field>
+        <field name="model">hr.salary.rule</field>
+        <field name="inherit_id" ref="om_hr_payroll.hr_salary_rule_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='rules']" position="before">
+                <page name="bas_journal" string="BAS Journal">
+                    <group>
+                        <group string="Posting">
+                            <field name="x_bas_posting"/>
+                        </group>
+                        <group string="Account"
+                               invisible="x_bas_posting in ('none', 'loan')">
+                            <field name="x_bas_account_code"
+                                   placeholder="3201010006"
+                                   required="x_bas_posting not in ('none', 'loan')"/>
+                            <field name="x_bas_account_name"
+                                   placeholder="مصروفات اضافي العاملين"/>
+                        </group>
+                    </group>
+                    <div class="text-muted"
+                         invisible="x_bas_posting != 'loan'">
+                        This rule is credited to each employee's own
+                        <b>Loan Acc No. in Bas</b>, so it needs no account
+                        of its own.
+                    </div>
+                    <div class="text-muted"
+                         invisible="x_bas_posting != 'none'">
+                        Not posted. A rule carrying an amount that is left
+                        unposted stops the export: the entry would pay the
+                        employee a different net than his payslip says.
+                        Totals (GROSS) are the exception and are meant to
+                        stay here.
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_hr_salary_rule_list_bas" model="ir.ui.view">
+        <field name="name">hr.salary.rule.list.bas.journal</field>
+        <field name="model">hr.salary.rule</field>
+        <field name="inherit_id" ref="om_hr_payroll.hr_salary_rule_list"/>
+        <field name="arch" type="xml">
+            <field name="category_id" position="after">
+                <field name="x_bas_posting" optional="show"/>
+                <field name="x_bas_account_code" optional="show"/>
+                <field name="x_bas_account_name" optional="hide"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

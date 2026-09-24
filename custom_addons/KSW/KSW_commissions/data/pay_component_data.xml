@@ -28,6 +28,10 @@
             <field name="needs_reason" eval="True"/>
             <field name="sequence">10</field>
             <field name="description">Basic salary ÷ 240 × hours × 1.5, per Saudi Labour Law art. 107. Recorded per occurrence with the date, where it was worked and why.</field>
+            <field name="x_bas_expense_code">3201010006</field>
+            <field name="x_bas_expense_name">مصروفات اضافي العاملين</field>
+            <field name="x_bas_accrual_code">2107010001</field>
+            <field name="x_bas_accrual_name">مصروفات مستحقة عمولات سائقين التريلات</field>
         </record>
 
         <!-- ── Driver trips ─────────────────────────────────────────── -->
@@ -63,6 +67,11 @@
                 (0, 0, {'name': 'Tier 4', 'sequence': 30, 'width': 40.0, 'rate': 20.0}),
                 (0, 0, {'name': 'Tier 5', 'sequence': 40, 'width': 0.0,  'rate': 25.0}),
             ]"/>
+            <field name="x_bas_expense_code">3203020007</field>
+            <field name="x_bas_expense_name">حساب مصروفات - عمولات سائقين التريلات</field>
+            <field name="x_bas_accrual_code">2107010001</field>
+            <field name="x_bas_accrual_name">مصروفات مستحقة عمولات سائقين التريلات</field>
+            <field name="x_bas_use_cost_center" eval="True"/>
         </record>
 
         <!-- ── Meals ────────────────────────────────────────────────── -->
@@ -121,6 +130,10 @@
             <field name="scope">department</field>
             <field name="needs_location" eval="True"/>
             <field name="sequence">41</field>
+            <field name="x_bas_expense_code">3201010005</field>
+            <field name="x_bas_expense_name">مصروفات بدل طبيعة عمل</field>
+            <field name="x_bas_accrual_code">2107010001</field>
+            <field name="x_bas_accrual_name">مصروفات مستحقة عمولات سائقين التريلات</field>
         </record>
         <record id="pay_component_data_entry" model="ksw.pay.component">
             <field name="name">Data Entry Allowance</field>
@@ -128,6 +141,10 @@
             <field name="calculation">fixed</field>
             <field name="scope">department</field>
             <field name="sequence">42</field>
+            <field name="x_bas_expense_code">3201010006</field>
+            <field name="x_bas_expense_name">مصروفات اضافي العاملين</field>
+            <field name="x_bas_accrual_code">2107010001</field>
+            <field name="x_bas_accrual_name">مصروفات مستحقة عمولات سائقين التريلات</field>
         </record>
         <record id="pay_component_mobile" model="ksw.pay.component">
             <field name="name">Mobile Phone Allowance</field>
@@ -135,6 +152,10 @@
             <field name="calculation">fixed</field>
             <field name="scope">department</field>
             <field name="sequence">43</field>
+            <field name="x_bas_expense_code">3201010004</field>
+            <field name="x_bas_expense_name">مصروفات بدل اتصال (جوال)</field>
+            <field name="x_bas_accrual_code">2107010001</field>
+            <field name="x_bas_accrual_name">مصروفات مستحقة عمولات سائقين التريلات</field>
         </record>
 
         <!-- ── Friday work ──────────────────────────────────────────── -->
@@ -151,6 +172,10 @@
                  given day — and keeps needs_date. -->
             <field name="needs_date" eval="False"/>
             <field name="sequence">50</field>
+            <field name="x_bas_expense_code">3201010006</field>
+            <field name="x_bas_expense_name">مصروفات اضافي العاملين</field>
+            <field name="x_bas_accrual_code">2107010001</field>
+            <field name="x_bas_accrual_name">مصروفات مستحقة عمولات سائقين التريلات</field>
         </record>
 
         <!-- ── Holiday bonuses: one component per paid holiday ───────── -->

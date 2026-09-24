@@ -18,6 +18,11 @@
                 <field name="x_bas_driver_cost_center"
                        groups="hr.group_hr_user,base.group_system"
                        invisible="not x_is_attendance_sheet"/>
+                <!-- Read-only: the BAS pull owns it. Shown because the
+                     journal entry's cost-centre column comes from here. -->
+                <field name="x_bas_equipment_code"
+                       groups="hr.group_hr_user,base.group_system"
+                       invisible="not x_bas_driver_cost_center"/>
                 <!-- Only shown once the main one is set: it is a fix for a
                      BAS split, not a second field to fill in routinely. -->
                 <field name="x_bas_driver_cost_center_alt"

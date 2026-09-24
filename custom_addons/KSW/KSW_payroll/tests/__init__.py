@@ -34,3 +34,5 @@ from . import test_payslip_email_queue
 from . import test_payroll_reviewer
 
 from . import test_payslip_revision_request
+
+from . import test_bas_journal_entry

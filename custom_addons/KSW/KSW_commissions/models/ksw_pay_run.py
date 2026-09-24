@@ -217,16 +217,24 @@ class KswPayRun(models.Model):
             # of his own waiting has nothing to approve, however senior he is.
             rec.x_can_approve = bool(
                 rec.state not in LOCKING_STATES and rec.x_gm_submission_ids)
-            # Closing is the separate, deliberate act of declaring the month
-            # finished while some department never handed over. It is not
-            # any single GM's call, so it belongs to whoever owns the month.
+            # Finalising is the separate, deliberate act of declaring the
+            # month finished and handing it to the accountant. It is not any
+            # single GM's call, so it belongs to whoever owns the month.
+            #
+            # It used to also require a department still stuck on
+            # 'submitted', on the reasoning that a month with nothing left
+            # waiting finalises itself. It does — but only down the run's own
+            # Approve button. A GM who signed his departments off on their
+            # submission forms instead reached exactly the same place with
+            # nothing to show for it: no department waiting, so no Approve
+            # button; no department unapproved, so no close button either;
+            # and the accountant's export gated on a state the month could no
+            # longer reach. One approved department is enough to offer it.
             rec.x_can_close_month = bool(
                 is_closer
                 and rec.state not in LOCKING_STATES
                 and rec.submission_ids.filtered(
-                    lambda s: s.state == 'approved')
-                and rec.submission_ids.filtered(
-                    lambda s: s.state == 'submitted'))
+                    lambda s: s.state == 'approved'))
             rec.x_can_reopen = is_closer and rec.state in LOCKING_STATES
             rec.x_can_export = is_accountant and rec.state in LOCKING_STATES
 
@@ -465,6 +473,20 @@ class KswPayRun(models.Model):
         """
         if self.env.su:
             return True
+        # The system administrator is not a second General Manager — he is
+        # the way out when the configured one is absent, has left, or was
+        # never set on the company at all. Without him a month whose GM is
+        # gone can never be handed to the accountant by anybody.
+        #
+        # Two keys, deliberately: this grants the *authority*, his
+        # Commission Role grants the *reach*. base.group_system holds no
+        # ACL on ksw.pay.run, so a Settings administrator with no commission
+        # role cannot read the month, let alone finalise it (gotcha #38).
+        # Implying Administrator from it instead would put every Settings
+        # admin into the Commission Role single-select, which is the whole
+        # separation of duties.
+        if self.env.user.has_group('base.group_system'):
+            return True
         default_gm = self.env.company.sudo().x_default_gm_id
         return bool(default_gm and default_gm.sudo().user_id == self.env.user)
 
@@ -496,40 +518,70 @@ class KswPayRun(models.Model):
                     "Managers: %(names)s.",
                     period=rec.display_name,
                     names=', '.join(waiting.mapped('display_name'))))
+            # Approving the submissions is what finalises the month when
+            # they were the last ones waiting — see _finalise_if_complete,
+            # which both this button and the submission form go through.
             mine.action_approve()
+            if rec.state in LOCKING_STATES:
+                continue
 
             still_waiting = rec.submission_ids.filtered(
                 lambda s: s.state == 'submitted')
-            if still_waiting:
-                rec.sudo().message_post(
-                    body=Markup(
-                        '<strong>✅ %(mine)s department(s) approved by '
-                        '%(user)s</strong><br/>'
-                        '<i>%(period)s stays open — still waiting on: '
-                        '%(names)s.</i>'
-                    ) % {'mine': len(mine), 'user': self.env.user.name,
-                         'period': rec.display_name,
-                         'names': ', '.join(
-                             still_waiting.mapped('display_name'))},
-                    subtype_xmlid='mail.mt_note',
-                )
-                rec._refresh_register()
+            rec.sudo().message_post(
+                body=Markup(
+                    '<strong>✅ %(mine)s department(s) approved by '
+                    '%(user)s</strong><br/>'
+                    '<i>%(period)s stays open — still waiting on: '
+                    '%(names)s.</i>'
+                ) % {'mine': len(mine), 'user': self.env.user.name,
+                     'period': rec.display_name,
+                     'names': ', '.join(
+                         still_waiting.mapped('display_name'))},
+                subtype_xmlid='mail.mt_note',
+            )
+            rec._refresh_register()
+        return True
+
+    def _finalise_if_complete(self):
+        """Lock the month the moment no department is left waiting.
+
+        One predicate, called from every approval route. A GM who signs a
+        department off on its own submission form has made exactly the same
+        decision as one who pressed Approve on the month, so the month has
+        to finalise either way — it used to finalise only down the run's
+        button, which is how a fully approved month ended up with no button
+        on it at all and no way to reach the accountant.
+
+        "Waiting" means a department that handed over and whose own GM has
+        not signed yet. A department still in draft is not waiting on
+        anyone; it is left out of the month, exactly as it is when the run's
+        own Approve button finalises (tests/test_submission.py::test_30).
+        """
+        for rec in self:
+            if rec.state in LOCKING_STATES:
+                continue
+            if not rec.submission_ids.filtered(
+                    lambda s: s.state == 'approved'):
+                continue
+            if rec.submission_ids.filtered(lambda s: s.state == 'submitted'):
                 continue
             rec._finalise_month()
         return True
 
     def action_close_month(self):
-        """Lock the month with some departments still not handed over.
+        """Finalise the month by hand and hand it to the accountant.
 
-        The deliberate counterpart to the automatic finalisation above: only
-        what was approved gets paid, and a department that never submitted
-        keeps its work in draft rather than being swept into a month it
-        never declared itself ready for.
+        The deliberate counterpart to the automatic finalisation above, and
+        the button that is always there when it did not happen: only what
+        each department's own General Manager approved gets paid, and
+        anything still waiting or never submitted keeps its work in draft
+        rather than being swept into a month it never declared itself ready
+        for.
         """
         if not self._is_month_closer():
             raise UserError(_(
-                "Only the company's General Manager can close a month "
-                "while departments are still outstanding."))
+                "Only the company's General Manager or a system "
+                "administrator can finalise the month."))
         for rec in self:
             if rec.state in LOCKING_STATES:
                 raise UserError(_(
@@ -582,8 +634,28 @@ class KswPayRun(models.Model):
                 '<br/><b>⚠ Not included</b> (submitted but never approved '
                 'by their General Manager): %(names)s'
             ) % {'names': ', '.join(unapproved.mapped('display_name'))}
-        self.sudo().message_post(body=body, subtype_xmlid='mail.mt_note')
+        # Finalising the month *is* the handover to accounting, so it is
+        # addressed to them rather than filed as an internal note: the bank
+        # export is the next thing that has to happen and nobody was being
+        # told it could.
+        accountants = self._accountant_partners()
+        if accountants:
+            body += Markup(
+                '<br/><i>Ready for the bank export.</i>')
+        self.sudo().message_post(
+            body=body,
+            partner_ids=accountants.ids,
+            subtype_xmlid='mail.mt_comment' if accountants
+            else 'mail.mt_note',
+        )
         return True
+
+    def _accountant_partners(self):
+        group = self.env.ref('KSW_commissions.group_commission_accountant',
+                             raise_if_not_found=False)
+        if not group:
+            return self.env['res.partner']
+        return group.sudo().all_user_ids.partner_id
 
     def action_return_to_supervisors(self):
         """submitted → open, so corrections can be made."""

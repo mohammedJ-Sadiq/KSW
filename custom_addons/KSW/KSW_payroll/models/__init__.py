@@ -5,7 +5,9 @@ from . import hr_leave
 from . import hr_payslip
 from . import hr_payslip_input
 from . import hr_payslip_run
+from . import hr_payslip_run_journal   # the batch as a BAS journal entry
 from . import hr_salary_rule
+from . import ksw_bas_journal          # the nine-column sheet BAS imports
 from . import hr_version
 from . import biometric_attendance_sync
 from . import res_config_settings

@@ -47,6 +47,18 @@ class HrEmployee(models.Model):
              'version of the same name and number, say. Their loads are '
              'added to his. Leave empty unless BAS really did split him.',
     )
+    x_bas_equipment_code = fields.Char(
+        string='BAS Equipment (Cost Centre)',
+        groups='hr.group_hr_user,base.group_system',
+        readonly=True,
+        help='The truck this driver\'s loads were booked on in BAS '
+             '(vou10.COST_CENTER — "T166", "ايسوزو286"). Filled in by the '
+             '"Pull from BAS" button, and written into the cost-centre '
+             'column of the journal entry: that column is the *vehicle*, '
+             'not the driver, so the BAS Driver Cost Center above is the '
+             'wrong value for it. A driver who drove more than one truck '
+             'in the month carries the one BAS returns first.',
+    )
     x_deduct_commission_priority = fields.Boolean(
         string='Settle Deductions from Commission First',
         default=True,

@@ -17,7 +17,8 @@
                     <field name="value_date"
                            invisible="export_mode not in ('all_txt', 'specific_txt')"
                            required="export_mode in ('all_txt', 'specific_txt')"/>
-                    <field name="operation_code"/>
+                    <field name="operation_code"
+                           invisible="export_mode == 'journal_entry'"/>
                 </group>
                 <footer>
                     <button string="Export" name="action_export"

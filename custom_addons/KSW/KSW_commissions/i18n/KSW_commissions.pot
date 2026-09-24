@@ -2274,21 +2274,22 @@ msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
-msgid "Lock the Month Now"
+msgid "Finalise & Send to Accounting"
 msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
 msgid ""
-"Lock the month even though some departments have not been approved by their "
-"General Manager"
+"Build the payment register, lock the period and hand the month to the "
+"accountant for the bank export"
 msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
 msgid ""
-"Lock the month now? Departments still waiting on their General Manager will "
-"NOT be paid this month."
+"Finalise the month and hand it to the accountant? Only departments their own "
+"General Manager approved will be paid — anything still waiting, or never "
+"submitted, stays out and the period locks."
 msgstr ""
 
 #. module: KSW_commissions
@@ -4859,10 +4860,11 @@ msgid ""
 msgstr ""
 
 #. module: KSW_commissions
+#. odoo-python
 #: code:addons/KSW_commissions/models/ksw_pay_run.py:0
 msgid ""
-"Only the company's General Manager can close a month while departments are "
-"still outstanding."
+"Only the company's General Manager or a system administrator can finalise "
+"the month."
 msgstr ""
 
 #. module: KSW_commissions
@@ -5301,4 +5303,72 @@ msgstr ""
 #. module: KSW_commissions
 #: code:addons/KSW_commissions/models/ksw_pay_batch_export.py:0
 msgid "There is nothing to export — this batch has no entries yet."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_run_journal.py:0
+msgid "Deducted from commissions"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_run_journal.py:0
+msgid "Journal"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_component__x_bas_expense_code
+msgid "BAS Expense Account"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_component__x_bas_expense_name
+msgid "BAS Expense Account Name"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_component__x_bas_accrual_code
+msgid "BAS Accrual Account"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_component__x_bas_accrual_name
+msgid "BAS Accrual Account Name"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_component__x_bas_use_cost_center
+msgid "Stamp the BAS Cost Centre"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_commission_bank_export_wizard__export_mode__journal_entry
+msgid "Journal entries – BAS import file"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_component_form
+msgid "BAS Journal"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_run_journal.py:0
+msgid "Monthly commissions"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_hr_employee__x_bas_equipment_code
+msgid "BAS Equipment (Cost Centre)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
+msgid "Anything still waiting on its own General Manager,\n                            or never submitted, stays out of this month."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
+msgid "<strong>Ready to finalise.</strong>\n                        Every department that has been approved is waiting to\n                        be paid. <b>Finalise &amp; Send to Accounting</b>\n                        builds the payment register, settles the loan\n                        installments, locks the month and hands it to the\n                        accountant for the bank export."
 msgstr ""

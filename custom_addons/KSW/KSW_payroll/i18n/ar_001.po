@@ -1557,3 +1557,77 @@ msgstr "إخفاء المرفوضة"
 #: model_terms:ir.ui.view,arch_db:KSW_payroll.view_hr_payslip_filter_inherit_ksw
 msgid "Hide rejected / cancelled payslips"
 msgstr "إخفاء كشوف الراتب المرفوضة أو الملغاة"
+
+#. module: KSW_payroll
+#. odoo-python
+#: code:addons/KSW_payroll/models/hr_payslip_run_journal.py:0
+msgid "Salary"
+msgstr "راتب"
+
+#. module: KSW_payroll
+#. odoo-python
+#: code:addons/KSW_payroll/models/hr_payslip_run_journal.py:0
+msgid "Deducted from salary"
+msgstr "خصم من الراتب"
+
+#. module: KSW_payroll
+#. odoo-python
+#: code:addons/KSW_payroll/models/hr_payslip_run_journal.py:0
+msgid "Journal"
+msgstr "قيد"
+
+#. module: KSW_payroll
+#. odoo-python
+#: code:addons/KSW_payroll/models/ksw_bas_journal.py:0
+msgid "Advance — %(name)s"
+msgstr "سلف %(name)s"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_salary_rule__x_bas_posting
+msgid "BAS Posting"
+msgstr "الترحيل في BAS"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_salary_rule__x_bas_account_code
+msgid "BAS Account Code"
+msgstr "رقم الحساب في BAS"
+
+#. module: KSW_payroll
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_salary_rule__x_bas_account_name
+msgid "BAS Account Name"
+msgstr "اسم الحساب في BAS"
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__hr_salary_rule__x_bas_posting__expense
+msgid "Debit — salary expense"
+msgstr "مدين — مصروف الرواتب"
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__hr_salary_rule__x_bas_posting__liability
+msgid "Credit — liability (GOSI, penalties, recoveries)"
+msgstr "دائن — التزام (التأمينات، الجزاءات، الاستردادات)"
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__hr_salary_rule__x_bas_posting__loan
+msgid "Credit — the employee's own BAS loan account"
+msgstr "دائن — حساب سلف الموظف في BAS"
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__hr_salary_rule__x_bas_posting__payable
+msgid "Credit — net payable to the employee"
+msgstr "دائن — صافي المستحق للموظف"
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__hr_salary_rule__x_bas_posting__none
+msgid "Not posted"
+msgstr "غير مُرحَّل"
+
+#. module: KSW_payroll
+#: model:ir.model.fields.selection,name:KSW_payroll.selection__ksw_bank_file_export_wizard__export_mode__journal_entry
+msgid "Journal entries – BAS import file"
+msgstr "قيود اليومية – ملف استيراد BAS"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.view_hr_salary_rule_form_bas
+msgid "BAS Journal"
+msgstr "قيد اليومية في BAS"

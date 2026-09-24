@@ -23,6 +23,7 @@ EXPORT_MODES = [
     ('all_txt',      'All banks – Text files (Kawthar)'),
     ('specific_excel', 'Specific bank – Excel'),
     ('specific_txt', 'Specific bank – Text file'),
+    ('journal_entry', 'Journal entries – BAS import file'),
 ]
 
 
@@ -288,8 +289,21 @@ class KswCommissionBankExportWizard(models.TransientModel):
             'all_txt':       self._export_all_txt,
             'specific_excel': self._export_specific_excel,
             'specific_txt':  self._export_specific_txt,
+            'journal_entry': self._export_journal_entry,
         }
         return handlers[mode]()
+
+    def _export_journal_entry(self):
+        """The month as one BAS journal entry, ready to import.
+
+        No bank grouping: the entry is the month's posting, not a payment
+        instruction, so it covers the whole register whichever bank each
+        employee is paid from.
+        """
+        run = self.run_id
+        data = run._bas_journal_workbook()
+        return self._bundle_and_download(
+            [('JournalEntry_%s.xlsx' % self._batch_label(), data)])
 
     def _export_all_excel(self):
         groups = self._group_and_validate(require_type=None)

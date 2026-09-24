@@ -44,12 +44,18 @@
                             invisible="not x_can_approve"/>
                     <!-- Distinct from "Close the Month" (action_submit)
                          below, which only marks the handover complete. This
-                         one builds the register and locks the period. -->
-                    <button name="action_close_month" string="Lock the Month Now"
-                            type="object" class="btn-secondary"
-                            confirm="Lock the month now? Departments still waiting on their General Manager will NOT be paid this month."
+                         one builds the register, locks the period and tells
+                         the accountant the bank file can be exported. It is
+                         offered as soon as one department is approved, so a
+                         month whose departments were all signed off on their
+                         own submission forms is never left without a way
+                         out. -->
+                    <button name="action_close_month"
+                            string="Finalise &amp; Send to Accounting"
+                            type="object" class="btn-primary"
+                            confirm="Finalise the month and hand it to the accountant? Only departments their own General Manager approved will be paid — anything still waiting, or never submitted, stays out and the period locks."
                             invisible="not x_can_close_month"
-                            title="Lock the month even though some departments have not been approved by their General Manager"/>
+                            title="Build the payment register, lock the period and hand the month to the accountant for the bank export"/>
                     <button name="action_submit" string="Close the Month"
                             type="object" class="btn-secondary"
                             groups="KSW_commissions.group_commission_officer"
@@ -107,6 +113,29 @@
                         request.</strong>
                         <field name="x_vacation_held_warning" readonly="1"
                                nolabel="1"/>
+                    </div>
+
+                    <!-- The month does not finalise itself here: every
+                         department is signed off, but nothing has built the
+                         register or told the accountant. Say so, next to
+                         the button that does it — the absence of a prompt
+                         is what made this look like a dead end. No groups=:
+                         x_can_close_month already answers "is this mine to
+                         do", and a coarser filter would have to be a
+                         superset of what the compute grants or the field
+                         goes missing from fields_get() (gotcha #31). -->
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not x_can_close_month">
+                        <strong>Ready to finalise.</strong>
+                        Every department that has been approved is waiting to
+                        be paid. <b>Finalise &amp; Send to Accounting</b>
+                        builds the payment register, settles the loan
+                        installments, locks the month and hands it to the
+                        accountant for the bank export.
+                        <div class="text-muted">
+                            Anything still waiting on its own General Manager,
+                            or never submitted, stays out of this month.
+                        </div>
                     </div>
 
                     <div class="alert alert-info" role="alert"
