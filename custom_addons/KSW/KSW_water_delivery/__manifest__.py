@@ -1,7 +1,7 @@
 {
     'name': 'KSW Water Delivery Notes',
-    'version': '19.0.1.4.3',
-    'summary': 'Issue and sign the water delivery note on the driver\'s phone',
+    'version': '19.0.1.5.0',
+    'summary': 'Issue the water delivery note at the client, online or off',
     'description': """
 Water Delivery Notes
 ====================
@@ -39,6 +39,7 @@ accounting the finished list.
         'security/security.xml',
         'security/ir.model.access.csv',
         'data/ksw_water_delivery_data.xml',
+        'data/ksw_water_app_templates.xml',
         'report/report_water_delivery_note.xml',
         'views/ksw_water_rate_views.xml',
         'views/ksw_water_client_branch_views.xml',
@@ -46,6 +47,7 @@ accounting the finished list.
         'views/stock_picking_views.xml',
         'views/ksw_fleet_vehicle_views.xml',
         'views/ksw_water_delivery_wizard_views.xml',
+        'views/ksw_water_capture_views.xml',
         'views/ksw_water_delivery_menus.xml',
     ],
     'assets': {

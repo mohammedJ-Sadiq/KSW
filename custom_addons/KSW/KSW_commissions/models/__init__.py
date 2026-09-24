@@ -1,10 +1,14 @@
 from . import hr_department
 from . import ksw_commission_lock         # period lock predicate + guard (no models)
+from . import ksw_vacation_hold          # vacation hold predicate + guard (no models)
 from . import ksw_site                    # work sites (used by entries and tiers)
 from . import ksw_pay_component           # the catalog: a pay type is data, not code
+from . import ksw_pay_cash_band          # why a cash load is weighted differently
 from . import ksw_pay_employee_rate    # per-employee exception to a component's rate
 from . import hr_employee
+from . import ksw_pay_vacation_release   # the GM's override of the vacation hold
 from . import ksw_pay_batch               # batches + entries: the supervisor's screen
+from . import ksw_pay_batch_skip_line    # what the import left out, and why
 from . import ksw_pay_recurring           # SAP infotype 0014 equivalent
 from . import ksw_pay_submission          # one department's handover to the GM
 from . import ksw_pay_run                 # the month, its approval and the register

@@ -19,6 +19,7 @@
                 <field name="importer" invisible="1"/>
                 <field name="entries_import_only" invisible="1"/>
                 <field name="x_entries_readonly" invisible="1"/>
+                <field name="x_vacation_hold_warning" invisible="1"/>
                 <field name="x_can_reopen" invisible="1"/>
                 <field name="submission_state" invisible="1"/>
                 <field name="entry_count" invisible="1"/>
@@ -64,6 +65,13 @@
                          invisible="not return_reason or state != 'draft'">
                         <strong>Returned by the General Manager:</strong>
                         <field name="return_reason" readonly="1" nolabel="1"/>
+                    </div>
+
+                    <div class="alert alert-danger" role="alert"
+                         invisible="not x_vacation_hold_warning">
+                        <strong>Already paid on a vacation request.</strong>
+                        <field name="x_vacation_hold_warning" readonly="1"
+                               nolabel="1"/>
                     </div>
 
                     <div class="alert alert-info" role="alert"
@@ -114,7 +122,8 @@
                                    readonly="is_locked or x_entries_readonly"
                                    context="{'default_batch_id': id}">
                                 <list editable="bottom"
-                                      decoration-warning="is_overridden">
+                                      decoration-warning="is_overridden"
+                                      decoration-danger="x_vacation_hold">
                                     <!-- Carries the picker's domain: the
                                          batch's own scope plus whoever
                                          reports to this supervisor. -->
@@ -122,6 +131,13 @@
                                            column_invisible="1"/>
                                     <field name="employee_id"
                                            options="{'no_create': True}"/>
+                                    <!-- Why this row is red. Read-only and
+                                         always shown when set: the row may
+                                         predate the guard, and the money it
+                                         carries will simply not be paid. -->
+                                    <field name="x_vacation_hold"
+                                           string="On Vacation" readonly="1"
+                                           optional="show"/>
                                     <!-- Off the parent, not off the line's
                                          own component_id: that one is a
                                          stored related, and a line the user
@@ -199,8 +215,12 @@
                         <page string="By Employee" name="by_employee">
                             <field name="entry_ids" readonly="1" nolabel="1">
                                 <list create="false" delete="false"
-                                      default_group_by="employee_id">
+                                      default_group_by="employee_id"
+                                      decoration-danger="x_vacation_hold">
                                     <field name="employee_id"/>
+                                    <field name="x_vacation_hold"
+                                           string="On Vacation"
+                                           optional="show"/>
                                     <field name="option_id" optional="show"
                                            column_invisible="not parent.has_options"/>
                                     <field name="date" optional="show"/>
@@ -211,6 +231,56 @@
                                            column_invisible="1"/>
                                 </list>
                             </field>
+                        </page>
+
+                        <page string="Not Imported" name="not_imported"
+                              invisible="not skip_line_ids">
+                            <div name="skip_page_title" class="mb-2">
+                                <span class="fw-bold">
+                                    What the last import left out:
+                                </span>
+                                <field name="skipped_count" readonly="1"
+                                       class="oe_inline"/>
+                                <span> not imported, </span>
+                                <field name="review_count" readonly="1"
+                                       class="oe_inline"/>
+                                <span> imported but worth a look.</span>
+                            </div>
+                            <div class="alert alert-warning" role="alert">
+                                <b>Not imported</b> — no line was created at
+                                all. Fix what the reason says and press
+                                Import again to include them.
+                                <b>Imported, needs review</b> — the line IS
+                                there, but something about it is unusual and
+                                the figure should be looked at before this
+                                batch is handed over.
+                                <div class="text-muted">
+                                    Rebuilt from scratch on every import, so
+                                    it always describes the last run.
+                                </div>
+                            </div>
+                            <field name="skip_line_ids" readonly="1"
+                                   nolabel="1">
+                                <list string="Not Imported"
+                                      create="false" delete="false"
+                                      decoration-danger="outcome == 'skipped'"
+                                      decoration-warning="outcome == 'warning'"
+                                      default_order="outcome, employee_id">
+                                    <field name="employee_id"/>
+                                    <field name="line_type" widget="badge"/>
+                                    <field name="reason"/>
+                                    <field name="outcome" column_invisible="1"/>
+                                </list>
+                            </field>
+                            <div>
+                                <button name="action_clear_skip_log"
+                                        type="object"
+                                        string="Clear Import Log"
+                                        icon="fa-trash"
+                                        class="btn-sm btn-secondary"
+                                        invisible="state != 'draft'"
+                                        confirm="Remove the import log from this batch?"/>
+                            </div>
                         </page>
 
                         <page string="Notes" name="notes">
@@ -349,8 +419,11 @@
         <field name="name">ksw.pay.entry.list</field>
         <field name="model">ksw.pay.entry</field>
         <field name="arch" type="xml">
-            <list string="Pay Entries" create="false">
+            <list string="Pay Entries" create="false"
+                  decoration-danger="x_vacation_hold">
                 <field name="employee_id"/>
+                <field name="x_vacation_hold" string="On Vacation"
+                       optional="show"/>
                 <field name="component_id"/>
                 <field name="option_id" optional="show"/>
                 <field name="department_id" optional="show"/>

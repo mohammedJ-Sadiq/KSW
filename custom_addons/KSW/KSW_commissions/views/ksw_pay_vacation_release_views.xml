@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ksw_pay_vacation_release_list" model="ir.ui.view">
+        <field name="name">ksw.pay.vacation.release.list</field>
+        <field name="model">ksw.pay.vacation.release</field>
+        <field name="arch" type="xml">
+            <list string="Vacation Releases">
+                <field name="employee_id"/>
+                <field name="period" options="{'min_precision': 'months'}"/>
+                <field name="held_reason" optional="show"/>
+                <field name="reason"/>
+                <field name="released_by" optional="show"/>
+                <field name="released_date" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_vacation_release_form" model="ir.ui.view">
+        <field name="name">ksw.pay.vacation.release.form</field>
+        <field name="model">ksw.pay.vacation.release</field>
+        <field name="arch" type="xml">
+            <form string="Vacation Release">
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        <strong>What this does.</strong>
+                        When an employee goes on vacation, what he had
+                        earned is settled on the leave request itself —
+                        Accounting lists the commission months owed and they
+                        are paid with the vacation payslip. The monthly
+                        commission run therefore holds that month, so it is
+                        not paid twice.
+                        <div class="text-muted">
+                            Record a release here only when that month was
+                            <b>not</b> listed on the leave, so nobody has
+                            paid it. The decision is posted on the vacation
+                            request.
+                        </div>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id"
+                                   options="{'no_create': True}"/>
+                            <field name="period"
+                                   options="{'min_precision': 'months'}"/>
+                        </group>
+                        <group>
+                            <field name="held_reason" readonly="1"
+                                   invisible="not held_reason"/>
+                            <field name="leave_id" readonly="1"
+                                   invisible="not leave_id"/>
+                            <field name="released_by" readonly="1"
+                                   invisible="not released_by"/>
+                            <field name="released_date" readonly="1"
+                                   invisible="not released_date"/>
+                        </group>
+                    </group>
+                    <group string="Why">
+                        <field name="reason" nolabel="1"
+                               placeholder="e.g. August was never listed on his leave, so it was never paid…"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_vacation_release_search" model="ir.ui.view">
+        <field name="name">ksw.pay.vacation.release.search</field>
+        <field name="model">ksw.pay.vacation.release</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="period" options="{'min_precision': 'months'}"/>
+                <field name="released_by"/>
+                <group>
+                    <filter string="Month" name="grp_period" domain="[]"
+                            context="{'group_by': 'period'}"/>
+                    <filter string="Employee" name="grp_employee" domain="[]"
+                            context="{'group_by': 'employee_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_pay_vacation_release" model="ir.actions.act_window">
+        <field name="name">Vacation Releases</field>
+        <field name="res_model">ksw.pay.vacation.release</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ksw_pay_vacation_release_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Nothing has been released.
+            </p>
+            <p>
+                A month an employee spent on vacation is held: what he had
+                earned was paid on the leave request. Release it here only
+                if that month was never listed there.
+            </p>
+        </field>
+    </record>
+
+</odoo>

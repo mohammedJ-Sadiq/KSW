@@ -20,12 +20,17 @@ Two deliberate choices, both explained at length in the design spec:
   batch, not beside it — Breakfast, Lunch and Dinner are one Meals batch with
   a Type column, not three batches to open, submit and approve separately.
 """
+from collections import defaultdict
+
 from markupsafe import Markup
 
 from odoo import _, SUPERUSER_ID, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 from .ksw_commission_lock import check_period_unlocked, period_is_locked
+from .ksw_vacation_hold import (
+    check_not_held, hold_blocks, hold_reason, vacation_holds,
+)
 
 BATCH_STATES = [
     ('draft', 'Draft'),
@@ -114,6 +119,17 @@ class KswPayBatch(models.Model):
     )
     note = fields.Text()
 
+    # What the last import left out. Kept on the batch rather than
+    # announced once in a toast: a run that silently drops people
+    # needs a log on the document (same reasoning as
+    # ksw.payslip.run.skip.line).
+    skip_line_ids = fields.One2many(
+        'ksw.pay.batch.skip.line', 'batch_id',
+        string='Not Imported', copy=False,
+    )
+    skipped_count = fields.Integer(compute='_compute_skip_counts')
+    review_count = fields.Integer(compute='_compute_skip_counts')
+
     submitted_by = fields.Many2one('res.users', readonly=True, copy=False)
     submitted_date = fields.Datetime(readonly=True, copy=False)
     return_reason = fields.Text(readonly=True, copy=False)
@@ -151,6 +167,16 @@ class KswPayBatch(models.Model):
     # there — the form would crash for everyone outside the group rather
     # than render read-only (Odoo 19 Pitfalls #31).
     x_entries_readonly = fields.Boolean(compute='_compute_entries_readonly')
+    # Entries for somebody whose month was settled on his vacation request.
+    # A banner rather than a silent filter: the rows are already there (the
+    # guard below only stops new ones), and the supervisor is the one who
+    # has to decide between deleting them and asking for a release.
+    # Deliberately no model-level groups= — it is read by an invisible=
+    # expression in the view (Odoo 19 Pitfalls #31).
+    x_vacation_hold_warning = fields.Text(
+        compute='_compute_vacation_hold_warning', compute_sudo=True,
+        string='On Vacation',
+    )
 
     # Deliberately NOT a SQL UNIQUE. A department-scoped batch leaves
     # site_id NULL (and vice versa), and Postgres indexes are NULLS
@@ -340,6 +366,74 @@ class KswPayBatch(models.Model):
                 rec._allowed_employees() if may_record
                 else self.env['hr.employee'])
 
+    @api.depends('period', 'entry_ids.employee_id', 'entry_ids.date')
+    def _compute_vacation_hold_warning(self):
+        for rec in self:
+            rec.x_vacation_hold_warning = False
+            # Not on a month that has already been paid. The money left the
+            # bank; telling the reader it "will not be paid" would be a
+            # lie, and there is nothing left to act on either way.
+            if period_is_locked(self.env, rec.period):
+                continue
+            held = rec.entry_ids.filtered('x_vacation_hold')
+            if not held:
+                continue
+            lines = []
+            for employee in held.employee_id:
+                entry = held.filtered(
+                    lambda e, emp=employee: e.employee_id == emp)[:1]
+                lines.append('\u2022 %s \u2014 %s' % (
+                    employee.sudo().display_name, entry.x_vacation_hold))
+            rec.x_vacation_hold_warning = _(
+                "These people were on vacation in %(period)s. What they had "
+                "earned was settled on the leave request itself, so paying "
+                "it here pays it twice \u2014 remove the entries, or ask the "
+                "General Manager to release the month.\n\n%(list)s",
+                period=rec.period.strftime('%B %Y') if rec.period else '',
+                list='\n'.join(lines),
+            )
+
+    @api.depends('skip_line_ids.outcome')
+    def _compute_skip_counts(self):
+        for rec in self:
+            lines = rec.skip_line_ids
+            rec.skipped_count = len(
+                lines.filtered(lambda l: l.outcome == 'skipped'))
+            rec.review_count = len(
+                lines.filtered(lambda l: l.outcome == 'warning'))
+
+    def action_clear_skip_log(self):
+        """Drop the log once it has been dealt with."""
+        self.ensure_one()
+        self._check_editable_batch(_('Clearing the import log'))
+        self.skip_line_ids.sudo().unlink()
+        return True
+
+    def _check_editable_batch(self, what):
+        """The batch's own draft/lock guard, without an entry in hand."""
+        if self.env.su:
+            return
+        check_period_unlocked(self.env, self.period, what)
+        if self.state != 'draft':
+            raise UserError(_(
+                "%(name)s has been submitted. %(what)s is only possible "
+                "while it is in Draft.", name=self.name, what=what))
+
+    def _held_entries(self):
+        """The entries this batch may not actually pay.
+
+        Narrower than the banner above: an undated row in the month the
+        employee came back is shown as a warning but not refused, because
+        a monthly figure has no day to compare against.
+        """
+        self.ensure_one()
+        entries = self.entry_ids.filtered('employee_id')
+        if not entries or not self.period:
+            return self.env['ksw.pay.entry']
+        holds = vacation_holds(self.env, entries.employee_id, self.period)
+        return entries.filtered(
+            lambda e: hold_blocks(holds.get(e.employee_id.id), e.date))
+
     @api.model
     def default_get(self, fields_list):
         vals = super().default_get(fields_list)
@@ -514,6 +608,28 @@ class KswPayBatch(models.Model):
                     name=rec.name, state=rec.state))
         return super().unlink()
 
+    def _check_no_held_entries(self):
+        """Refuse to hand over a month that pays a settled vacation twice."""
+        if self.env.su:
+            return
+        self.ensure_one()
+        held = self._held_entries()
+        if not held:
+            return
+        raise UserError(_(
+            "%(name)s cannot be submitted: %(count)s entr%(plural)s "
+            "belong%(verb)s to somebody whose %(period)s was already "
+            "settled on his vacation request.\n\n%(who)s\n\n"
+            "Delete those entries, or ask the General Manager to release "
+            "the month (Commissions \u2192 Vacation Releases).",
+            name=self.name,
+            count=len(held),
+            plural=_('y') if len(held) == 1 else _('ies'),
+            verb=_('s') if len(held) == 1 else '',
+            period=self.period.strftime('%B %Y') if self.period else '',
+            who=', '.join(held.employee_id.sudo().mapped('display_name')),
+        ))
+
     def _check_component_rights(self):
         """Server-side check that the user may record this component.
 
@@ -561,6 +677,7 @@ class KswPayBatch(models.Model):
                     name=rec.name))
             rec._check_component_rights()
             check_period_unlocked(self.env, rec.period, _("Submitting"))
+            rec._check_no_held_entries()
             rec._ensure_submission()
             rec.write({
                 'state': 'submitted',
@@ -795,6 +912,15 @@ class KswPayEntry(models.Model):
     amount = fields.Monetary(compute='_compute_amount', store=True)
     is_overridden = fields.Boolean(compute='_compute_amount', store=True)
 
+    # Why this row is a problem, in one line, or False when it is not.
+    # Not stored: it is an answer about a leave that can change after the
+    # entry was typed (a return gets confirmed, a month gets released),
+    # and a stale stored copy is worse than no copy.
+    x_vacation_hold = fields.Char(
+        compute='_compute_vacation_hold', compute_sudo=True,
+        string='On Vacation',
+    )
+
     # `date` and `period` are in here because the rate an employee has of
     # their own (ksw.pay.employee.rate) is dated: moving an occurrence into
     # another month can move it across a rate change. That model has no
@@ -933,6 +1059,54 @@ class KswPayEntry(models.Model):
                 'KSW_commissions.view_ksw_pay_entry_explain_form').id,
             'target': 'new',
         }
+
+    # ------------------------------------------------------------------
+    # Vacation hold
+    # ------------------------------------------------------------------
+    @api.depends('employee_id', 'date', 'period')
+    def _compute_vacation_hold(self):
+        """One hr.leave search per month, not one per row.
+
+        A batch routinely carries forty entries; asking the question per
+        record would be forty searches every time the Entries tab renders.
+        """
+        by_period = defaultdict(lambda: self.env['ksw.pay.entry'])
+        for rec in self:
+            rec.x_vacation_hold = False
+            if rec.employee_id and rec.period:
+                by_period[rec.period] |= rec
+        for period, entries in by_period.items():
+            holds = vacation_holds(self.env, entries.employee_id, period)
+            for rec in entries:
+                hold = holds.get(rec.employee_id.id)
+                # Shown when the row is refused, and also on an undated row
+                # in the month he came back — that one is allowed through
+                # (there is no day to compare) but it is exactly the row
+                # where a full month's meals get billed for half a month.
+                if hold and (hold_blocks(hold, rec.date) or not rec.date):
+                    rec.x_vacation_hold = hold_reason(self.env, hold)
+
+    def _check_vacation_hold(self, what):
+        """Server-side twin of the banner on the batch.
+
+        Grouped by period for the same reason as the compute, and raising
+        on the first offender: one entry is enough to make the answer no.
+        """
+        if self.env.su:
+            return
+        by_period = defaultdict(lambda: self.env['ksw.pay.entry'])
+        for rec in self:
+            if rec.employee_id and rec.period:
+                by_period[rec.period] |= rec
+        for period, entries in by_period.items():
+            holds = vacation_holds(self.env, entries.employee_id, period)
+            if not holds:
+                continue
+            for rec in entries:
+                check_not_held(
+                    self.env, rec.employee_id, period, what,
+                    entry_date=rec.date, hold=holds.get(rec.employee_id.id),
+                )
 
     # ------------------------------------------------------------------
     # Validation
@@ -1103,6 +1277,7 @@ class KswPayEntry(models.Model):
         entries = super().create(vals_list)
         entries._check_editable(_("Adding an entry"))
         entries._check_employee_allowed()
+        entries._check_vacation_hold(_("Adding an entry"))
         return entries
 
     def write(self, vals):
@@ -1110,6 +1285,11 @@ class KswPayEntry(models.Model):
         res = super().write(vals)
         if 'employee_id' in vals:
             self._check_employee_allowed()
+        # `date` too: moving an occurrence back into the vacation is the
+        # same act as typing it there. Nothing else can change the answer —
+        # the period belongs to the batch and a batch cannot move months.
+        if 'employee_id' in vals or 'date' in vals:
+            self._check_vacation_hold(_("Editing an entry"))
         return res
 
     def unlink(self):

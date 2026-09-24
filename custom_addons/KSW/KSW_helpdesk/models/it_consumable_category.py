@@ -10,6 +10,12 @@ class ItConsumableCategory(models.Model):
     sequence = fields.Integer(default=10)
     color = fields.Integer(string='Color')
     icon = fields.Char(help="Font Awesome icon class, e.g. fa-tint")
+    is_ink_toner = fields.Boolean(
+        string='Ink / Toner Category',
+        help="Consumables in this category are printer ink/toner "
+             "cartridges: they are matched onto printer assets by their "
+             "'Compatible With' field.",
+    )
     active = fields.Boolean(default=True)
     consumable_count = fields.Integer(compute='_compute_consumable_count')
     company_id = fields.Many2one('res.company', default=lambda self: self.env.company)

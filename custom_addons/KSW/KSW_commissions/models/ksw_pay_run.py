@@ -26,6 +26,9 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 from .ksw_commission_lock import LOCKING_STATES
+from .ksw_vacation_hold import (
+    hold_blocks, hold_reason, vacation_holds,
+)
 
 RUN_STATES = [
     ('open', 'Open'),
@@ -115,6 +118,14 @@ class KswPayRun(models.Model):
     x_can_close_month = fields.Boolean(compute='_compute_permissions')
     x_can_reopen = fields.Boolean(compute='_compute_permissions')
     x_can_export = fields.Boolean(compute='_compute_permissions')
+
+    # What this month will NOT pay, shown before the GM approves rather
+    # than explained in the chatter afterwards. No model-level groups= —
+    # the form reads it in an invisible= expression (Odoo 19 Pitfalls #31).
+    x_vacation_held_warning = fields.Text(
+        compute='_compute_vacation_held_warning', compute_sudo=True,
+        string='Held for Vacation',
+    )
 
     # The submitted departments this user is the GM of — what his Approve
     # button will actually act on, and the list the form shows him.
@@ -218,6 +229,34 @@ class KswPayRun(models.Model):
                     lambda s: s.state == 'submitted'))
             rec.x_can_reopen = is_closer and rec.state in LOCKING_STATES
             rec.x_can_export = is_accountant and rec.state in LOCKING_STATES
+
+    # Deliberately NOT depending on batch_ids.entry_ids: batch_ids is a
+    # non-searchable compute, so the ORM cannot work back from an entry to
+    # the runs to recompute (it warns about exactly that at load). The
+    # field is non-stored and the form recomputes on open, which is when
+    # the GM reads it.
+    @api.depends('period', 'state', 'submission_ids.state',
+                 'line_ids.employee_id')
+    def _compute_vacation_held_warning(self):
+        for rec in self:
+            rec.x_vacation_held_warning = False
+            # Same reasoning as the batch banner: an approved or paid month
+            # is history, and _build_register never touches it again.
+            if not rec.period or rec.state in LOCKING_STATES:
+                continue
+            held = rec._held_entries()
+            if not held:
+                continue
+            rec.x_vacation_held_warning = _(
+                "%(count)s entr%(plural)s worth %(amount).2f will NOT be "
+                "paid: %(who)s went on vacation, and what they had earned "
+                "was settled on the leave request itself. Release the month "
+                "under Vacation Releases if it was never listed there.",
+                count=len(held),
+                plural=_('y') if len(held) == 1 else _('ies'),
+                amount=sum(held.mapped('amount')),
+                who=', '.join(held.employee_id.sudo().mapped('display_name')),
+            )
 
     @api.depends('period')
     def _compute_display_name(self):
@@ -668,13 +707,24 @@ class KswPayRun(models.Model):
         self.ensure_one()
         Line = self.env['ksw.pay.run.line'].sudo()
 
-        totals = {}
+        entries = self.env['ksw.pay.entry'].sudo().browse()
         for batch in self._payable_batches(settled_only=not preview):
-            for entry in batch.sudo().entry_ids:
-                if not entry.employee_id:
-                    continue
-                totals.setdefault(entry.employee_id.id, 0.0)
-                totals[entry.employee_id.id] += entry.amount or 0.0
+            entries |= batch.sudo().entry_ids
+        entries = entries.filtered('employee_id')
+
+        # The last of the three gates on the vacation hold, and the one
+        # that matters most: the entry guard only ever sees rows typed
+        # after it existed, and a batch submitted before that carries its
+        # own. Whatever reaches the register, the register does not pay it.
+        held = self._held_entries(entries)
+        payable = entries - held
+
+        totals = {}
+        for entry in payable:
+            totals.setdefault(entry.employee_id.id, 0.0)
+            totals[entry.employee_id.id] += entry.amount or 0.0
+        if held and not preview:
+            self._announce_held(held)
 
         lines = self.sudo().line_ids
         existing = {line.employee_id.id: line for line in lines}
@@ -707,6 +757,51 @@ class KswPayRun(models.Model):
                 # From approval on, this is the settlement itself.
                 line.x_preview_generated = False
         return self.line_ids
+
+    def _held_entries(self, entries=None):
+        """The entries this month may not pay — see ``ksw_vacation_hold``."""
+        self.ensure_one()
+        if entries is None:
+            entries = self._all_entries().filtered('employee_id')
+        if not entries:
+            return self.env['ksw.pay.entry']
+        holds = vacation_holds(self.env, entries.employee_id, self.period)
+        return entries.filtered(
+            lambda e: hold_blocks(holds.get(e.employee_id.id), e.date))
+
+    def _announce_held(self, held):
+        """Say, on the month, whose entries were left out and why.
+
+        Silence here would be the worst of both: the supervisor typed the
+        rows, the GM approved the department, and the money simply would
+        not appear in the bank file with nothing anywhere to say so.
+        """
+        self.ensure_one()
+        holds = vacation_holds(self.env, held.employee_id, self.period)
+        body = Markup(
+            '<strong>\u23f8 Held \u2014 settled on a vacation request'
+            '</strong><br/>'
+            'These entries were left out of the register. What the employee '
+            'had earned was paid on the leave itself, so paying it again '
+            'here would pay it twice. If a month was never listed on the '
+            'leave, release it under Commissions \u2192 Vacation Releases '
+            'and reopen this run.<br/>'
+        )
+        for employee in held.employee_id:
+            rows = held.filtered(
+                lambda e, emp=employee: e.employee_id == emp)
+            hold = holds.get(employee.id)
+            body += Markup(
+                '\u2022 <b>%(name)s</b> \u2014 %(count)s entr%(plural)s, '
+                '%(amount).2f: %(why)s<br/>'
+            ) % {
+                'name': employee.sudo().display_name,
+                'count': len(rows),
+                'plural': 'y' if len(rows) == 1 else 'ies',
+                'amount': sum(rows.mapped('amount')),
+                'why': hold_reason(self.env, hold) if hold else '',
+            }
+        self.sudo().message_post(body=body, subtype_xmlid='mail.mt_note')
 
     def _refresh_register(self):
         """Keep the preview in step. Never touches an approved month."""

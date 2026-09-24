@@ -77,8 +77,8 @@
          them, so there's no need to list them separately. No "parent"
          attribute here on purpose: this is the top-level app menu. -->
     <!--
-         The GM and Accounting approvers of a salary revision request hold
-         no payroll tier at all — they act on the request document, not on
+         The HR, GM and Accounting approvers of a salary revision request
+         hold no payroll tier at all — they act on the request document, not on
          payslips. A menu's effective groups= is the INTERSECTION of its
          own and every ancestor's (pitfall #41), so without naming them
          here the "Salary Revisions" section below would exist and be
@@ -88,7 +88,7 @@
     -->
     <menuitem id="om_hr_payroll.menu_hr_payroll_root"
               name="Payroll"
-              groups="group_hr_payroll_self,KSW_annual_leave.group_annual_leave_gm,KSW_annual_leave.group_annual_leave_acc"/>
+              groups="group_hr_payroll_self,KSW_annual_leave.group_annual_leave_hr,KSW_annual_leave.group_annual_leave_gm,KSW_annual_leave.group_annual_leave_acc"/>
 
     <!-- Employee Payslips: same single menu/action Officer already uses
          (its own group stays on it), opened up to the tiers above too.
@@ -407,6 +407,24 @@
             <field name="perm_read" eval="1"/>
             <field name="perm_write" eval="0"/>
             <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <!-- The annual-leave HR Approver reviews salary complaints exactly
+             as the payroll Officer does, so the scope is the same: every
+             request. The tier is deliberately NOT given the payroll
+             Officer group — that would hand it full CRUD on every payslip,
+             batch and salary rule — which is why it needs a rule of its
+             own here rather than riding on the officer rule above.
+             No unlink: a complaint is cancelled, never destroyed. -->
+        <record id="ksw_revision_request_rule_hr_leave_all" model="ir.rule">
+            <field name="name">Revision requests: HR approver all</field>
+            <field name="model_id" ref="model_ksw_payslip_revision_request"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('KSW_annual_leave.group_annual_leave_hr'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
             <field name="perm_unlink" eval="0"/>
         </record>
 

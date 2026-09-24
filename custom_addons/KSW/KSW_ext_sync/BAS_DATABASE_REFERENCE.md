@@ -698,10 +698,41 @@ Source of the KSW driver-commission report (BAS menu: بيانات وحركات 
   **`vou10.COST_CENTER2` = driver cost center** («مركز تكلفة الموظف», e.g.
   `WAHAB JAN1387`).
 - **عدد الردود = COUNT of item-11032 lines** (each load ≈ 1).
-- **الرد المضاعف = Σ `cod10.FACTORE`** of each line's customer — **`cod10.FACTORE`
-  is the per-customer distance multiplier** (e.g. NEOM/International Energy 2.14,
-  Jafurah 2.5, near sites 1.0, some 0.75; NULL ⇒ 0). Join `STR10.FCODE =
-  cod10.DCODE1`.
+- **الرد المضاعف = Σ `cod10.FACTORE`** of each line's customer — the
+  per-customer distance multiplier (NEOM/International Energy 2.14, Jafurah 2.5,
+  near sites 1.0, some 0.75; NULL ⇒ 0). Join `STR10.FCODE = cod10.DCODE1`.
+  **⚠️ Superseded Sep 2026 — do not use for money.** It is a *live* value:
+  changing a customer's ratio silently rewrites every month ever computed from
+  it, including months already paid.
+- **رد الفاتورة = Σ `STR10.TAXES_5`** — the same multiplier **as it stood when
+  the invoice was issued**, stored on the line. A legacy tax column BAS reuses;
+  the name means nothing here. Values are the ordinary ladder (0.75, 1, 1.25,
+  1.5, 2, 2.14, 2.5, 3, 6). Shown in «الحركة التجارية للأصناف». **This is what
+  `KSW_commissions` pays on** (`INVOICE_FACTOR_COLUMN` in
+  `models/ksw_pay_import_bas.py`).
+  - Confirmed on doc **172/9026417** (20 Aug 2026, شركة ناصر سعيد الهاجري):
+    line reads **2.5**, `cod10.FACTORE` had since been moved to **2.0**.
+  - In Aug 2026 the two disagreed on **13%** of item-11032 lines.
+  - **⚠️ BAS stopped writing it on 6 Sep 2026** — 0 of 8,652 lines from
+    6–22 Sep carry a value, after tapering 1–5 Sep. Until that is fixed on the
+    BAS side, September onward has nothing to weight. The importer skips such a
+    driver and names him rather than counting his loads as zero.
+  - Populated Jan–5 Sep 2026: Σ 22,914 (Jan) … 26,843 (Aug), ~98.7% of lines.
+  - **Coverage by month** (item 11032, FTYPE 600): Jan 99.4%, Feb 99.4%,
+    Mar 99.4%, Apr 99.8%, May 99.7%, Jun 99.5%, Jul 99.5%, Aug 98.7%,
+    **Sep 16.1%** (all of it 1–5 Sep; 0% from the 6th).
+  - The switch is **dated, not global**: `INVOICE_FACTOR_FROM_DEFAULT`
+    (`2026-09-06`, overridable via `ir.config_parameter`
+    `ksw_commissions.invoice_factor_from`). Loads invoiced **before** it keep
+    «الرد المضاعف»; from it on they use «رد الفاتورة». Chosen **per line by
+    document date**, so a month straddling the cutover splits at the right
+    day. August therefore imports exactly as it always has — re-basing a
+    month the week it is about to be paid is the same retroactive move the
+    change exists to stop.
+  - Measured on KSWCO 22 Sep 2026: August Σ 13,293.17 with the cutover,
+    identical to the old basis (0 lines on the new side). September would be
+    Σ 1,961.15 against 8,706.67 — 4,032 of its 5,172 driver loads are on the
+    new basis and **every one is unweighted**.
 - The `OROOD_NUMBER/PRICE/TYPE` "الردة" columns on bin/vou/STR are **empty** in
   this instance — do NOT use them. The `Trans_*` transport tables are also empty.
 - Validated: the query reproduces the driver report exactly for 2026-07-22

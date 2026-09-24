@@ -14,6 +14,15 @@ _logger = logging.getLogger(__name__)
 # department GM exactly as the annual-leave chain does; the accounting step
 # is the existing Accounting Approver group.
 HR_GROUP = 'om_hr_payroll.group_hr_payroll_user'
+# The HR Approver of the annual-leave chain is HR for this document too: the
+# people who review a salary complaint are the same people who review a leave,
+# and they are not payroll operators — they hold no hr.payslip access and do
+# not need any, because every payslip read on this document is sudo'd.  Naming
+# the group here rather than making it imply the payroll Officer tier is the
+# whole point: Officer is full CRUD on every payslip, batch and salary rule.
+HR_LEAVE_GROUP = 'KSW_annual_leave.group_annual_leave_hr'
+# Either group is "HR" at the review step.  Never test one of them alone.
+HR_GROUPS = (HR_GROUP, HR_LEAVE_GROUP)
 ACC_GROUP = 'KSW_annual_leave.group_annual_leave_acc'
 GM_GROUP = 'KSW_annual_leave.group_annual_leave_gm'
 
@@ -53,9 +62,9 @@ class KswPayslipRevisionRequest(models.Model):
     # the "Waiting for My Action" filter.  ``department_gm`` routes to one
     # person rather than a whole group.
     _STEP_CONFIG = {
-        'pending_hr': {'group': HR_GROUP, 'label': 'HR Review'},
+        'pending_hr': {'groups': HR_GROUPS, 'label': 'HR Review'},
         'pending_gm': {'department_gm': True, 'label': 'GM Approval'},
-        'pending_acc': {'group': ACC_GROUP, 'label': 'Accounting Payment'},
+        'pending_acc': {'groups': (ACC_GROUP,), 'label': 'Accounting Payment'},
     }
 
     name = fields.Char(
@@ -229,7 +238,7 @@ class KswPayslipRevisionRequest(models.Model):
     @api.depends('state', 'employee_id', 'payslip_id')
     def _compute_permissions(self):
         user = self.env.user
-        is_hr = user.has_group(HR_GROUP)
+        is_hr = self._is_hr_reviewer(user)
         is_acc = user.has_group(ACC_GROUP)
         for req in self:
             # Identity reads go through sudo(): a plain employee holding the
@@ -274,7 +283,7 @@ class KswPayslipRevisionRequest(models.Model):
 
         user = self.env.user
         states = []
-        if user.has_group(HR_GROUP):
+        if self._is_hr_reviewer(user):
             states.append('pending_hr')
         if user.has_group(ACC_GROUP):
             states.append('pending_acc')
@@ -445,7 +454,7 @@ class KswPayslipRevisionRequest(models.Model):
 
         user = self.env.user
         employee = payslip.employee_id.sudo()
-        if user.has_group(HR_GROUP):
+        if self._is_hr_reviewer(user):
             return
         if employee.user_id == user:
             return
@@ -476,7 +485,7 @@ class KswPayslipRevisionRequest(models.Model):
         self.ensure_one()
         employee = self.employee_id.sudo()
         user = self.env.user
-        is_hr = user.has_group(HR_GROUP)
+        is_hr = self._is_hr_reviewer(user)
         is_filer = (
             employee.user_id == user
             or employee.parent_id.user_id == user
@@ -590,7 +599,7 @@ class KswPayslipRevisionRequest(models.Model):
         recompute, so a file exported from a draft can stop matching.
         """
         for req in self:
-            req._check_step('pending_hr', HR_GROUP, _(
+            req._check_step('pending_hr', HR_GROUPS, _(
                 'Only the payroll team may review a revision request.'))
             if not (req.hr_comment or '').strip():
                 raise UserError(_(
@@ -640,7 +649,7 @@ class KswPayslipRevisionRequest(models.Model):
     def action_hr_refuse(self):
         """HR checked the complaint and it does not hold."""
         self.ensure_one()
-        self._check_step('pending_hr', HR_GROUP, _(
+        self._check_step('pending_hr', HR_GROUPS, _(
             'Only the payroll team may review a revision request.'))
         return self._open_reason_wizard('refuse')
 
@@ -729,7 +738,7 @@ class KswPayslipRevisionRequest(models.Model):
         payslip that can no longer move.
         """
         for req in self:
-            req._check_step('pending_acc', ACC_GROUP, _(
+            req._check_step('pending_acc', (ACC_GROUP,), _(
                 'Only the accounting team may pay a revision request.'))
             if not req.payment_method:
                 raise UserError(_(
@@ -770,7 +779,7 @@ class KswPayslipRevisionRequest(models.Model):
 
     def action_acc_refuse(self):
         self.ensure_one()
-        self._check_step('pending_acc', ACC_GROUP, _(
+        self._check_step('pending_acc', (ACC_GROUP,), _(
             'Only the accounting team may act on this step.'))
         return self._open_reason_wizard('refuse')
 
@@ -807,7 +816,7 @@ class KswPayslipRevisionRequest(models.Model):
         self.ensure_one()
         if not self.env.su and not (
                 self.env.user.has_group(ACC_GROUP)
-                or self.env.user.has_group(HR_GROUP)):
+                or self._is_hr_reviewer()):
             raise UserError(_(
                 'Only the accounting or payroll team may generate the bank '
                 'file for a revision.'))
@@ -924,7 +933,7 @@ class KswPayslipRevisionRequest(models.Model):
                     'Only a refused or cancelled request can be reopened.'))
             if not self.env.su:
                 employee = req.employee_id.sudo()
-                if not (self.env.user.has_group(HR_GROUP)
+                if not (self._is_hr_reviewer()
                         or employee.user_id == self.env.user
                         or employee.parent_id.user_id == self.env.user):
                     raise UserError(_(
@@ -984,13 +993,18 @@ class KswPayslipRevisionRequest(models.Model):
     # Guards
     # ==================================================================
 
-    def _check_step(self, expected_state, group, message):
+    def _check_step(self, expected_state, groups, message):
         """State + authority in one place, called by every action method.
 
         View-level ``invisible=`` is cosmetic; any user with write access
-        can call these over RPC (pitfall #15).
+        can call these over RPC (pitfall #15).  ``groups`` is a tuple and
+        holding *any one* of them is enough: a step may be owned by more
+        than one role — the HR step is held by the payroll Officer and by
+        the annual-leave HR Approver alike.
         """
         self.ensure_one()
+        if isinstance(groups, str):
+            groups = (groups,)
         if self.state != expected_state:
             raise UserError(_(
                 'This request is in state "%(state)s" and cannot be acted '
@@ -998,8 +1012,20 @@ class KswPayslipRevisionRequest(models.Model):
                 state=dict(self._STATES).get(self.state, self.state)))
         if self.env.su:
             return
-        if not self.env.user.has_group(group):
+        if not any(self.env.user.has_group(g) for g in groups):
             raise UserError(message)
+
+    @api.model
+    def _is_hr_reviewer(self, user=None):
+        """Is this user HR for the review step?
+
+        One predicate, called from every guard and every gate field, so the
+        two HR roles can never drift apart — a role that may press the
+        button but is missing from the "Waiting for My Action" filter is
+        exactly the shape this gap took.
+        """
+        user = user or self.env.user
+        return any(user.has_group(g) for g in HR_GROUPS)
 
     def _check_refusal_rights(self):
         """Whoever the request is currently waiting on may refuse it.
@@ -1012,13 +1038,13 @@ class KswPayslipRevisionRequest(models.Model):
         if self.env.su:
             return
         if self.state == 'pending_hr':
-            self._check_step('pending_hr', HR_GROUP, _(
+            self._check_step('pending_hr', HR_GROUPS, _(
                 'Only the payroll team may refuse a request at the HR '
                 'step.'))
         elif self.state == 'pending_gm':
             self._check_gm()
         elif self.state == 'pending_acc':
-            self._check_step('pending_acc', ACC_GROUP, _(
+            self._check_step('pending_acc', (ACC_GROUP,), _(
                 'Only the accounting team may refuse a request at the '
                 'payment step.'))
         else:
@@ -1077,10 +1103,12 @@ class KswPayslipRevisionRequest(models.Model):
                 [gm_user.partner_id.id]
                 if gm_user and gm_user.partner_id else [])
         else:
-            group = self.env.ref(config['group'], raise_if_not_found=False)
-            partner_ids = (
-                group.sudo().user_ids.mapped('partner_id').ids
-                if group else [])
+            partners = self.env['res.partner']
+            for xmlid in config.get('groups', ()):
+                group = self.env.ref(xmlid, raise_if_not_found=False)
+                if group:
+                    partners |= group.sudo().user_ids.partner_id
+            partner_ids = partners.ids
         if not partner_ids:
             return
         self.sudo().message_post(

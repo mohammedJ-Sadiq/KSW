@@ -89,6 +89,20 @@
               sequence="25"
               groups="KSW_commissions.group_commission_supervisor,KSW_commissions.group_commission_gm"/>
 
+    <!--
+        Straight under the root, not under Configuration: a menu's effective
+        groups are the INTERSECTION of its own and every ancestor's, and
+        Configuration is gated to the Administrator — which would orphan
+        this item for the General Manager, who is the one who releases a
+        month (gotcha #41).
+    -->
+    <menuitem id="menu_ksw_pay_vacation_release"
+              name="Vacation Releases"
+              parent="menu_ksw_commissions_root"
+              action="action_ksw_pay_vacation_release"
+              sequence="27"
+              groups="KSW_commissions.group_commission_gm,KSW_commissions.group_commission_officer"/>
+
     <!-- ══ 3. Reports ═══════════════════════════════════════════════ -->
     <!--
         Widened together with the Payment Register below it: a menu's
@@ -169,6 +183,13 @@
               parent="menu_ksw_commissions_config"
               action="action_ksw_trip_settings"
               sequence="35"
+              groups="KSW_commissions.group_commission_officer"/>
+
+    <menuitem id="menu_ksw_pay_cash_band"
+              name="Cash Load Bands"
+              parent="menu_ksw_commissions_config"
+              action="action_ksw_pay_cash_band"
+              sequence="36"
               groups="KSW_commissions.group_commission_officer"/>
 
     <menuitem id="menu_ksw_salesperson_profile"

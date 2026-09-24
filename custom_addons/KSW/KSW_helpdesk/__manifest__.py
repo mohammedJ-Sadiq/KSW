@@ -1,6 +1,6 @@
 {
     'name': 'KSW Helpdesk',
-    'version': '19.0.1.4.0',
+    'version': '19.0.1.5.0',
     'summary': 'Internal IT support ticketing system and asset register for employees',
     'description': """
 Helpdesk / IT Ticketing for KSW

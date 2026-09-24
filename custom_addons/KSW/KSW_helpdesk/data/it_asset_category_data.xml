@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<odoo noupdate="1">
+<odoo>
+<data noupdate="1">
 
     <record id="category_laptop" model="it.asset.category">
         <field name="name">Laptop</field>
@@ -30,6 +31,7 @@
         <field name="sequence">50</field>
         <field name="icon">fa-print</field>
         <field name="color">2</field>
+        <field name="is_printer">1</field>
     </record>
     <record id="category_network" model="it.asset.category">
         <field name="name">Networking Equipment</field>
@@ -49,5 +51,17 @@
         <field name="icon">fa-plug</field>
         <field name="color">8</field>
     </record>
+
+</data>
+
+    <!-- is_printer added after category_printer already existed in some
+         databases: a plain <field> edit above is silently skipped by
+         Odoo's noupdate gate on every upgrade after the first install (see
+         CLAUDE.md gotcha #2), so flip it with write() instead, outside the
+         noupdate block. Idempotent - safe to run on every upgrade. -->
+    <function model="it.asset.category" name="write">
+        <value eval="[ref('category_printer')]"/>
+        <value eval="{'is_printer': True}"/>
+    </function>
 
 </odoo>

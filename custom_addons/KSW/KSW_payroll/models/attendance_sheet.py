@@ -120,3 +120,45 @@ class KswAttendanceSheet(models.Model):
             date_from=min(dates) if dates else None,
             date_to=max(dates) if dates else None,
         )
+
+    # ------------------------------------------------------------------
+    # Withdrawing a month payroll has already paid
+    # ------------------------------------------------------------------
+
+    def _paid_payslips(self):
+        """Confirmed payslips covering this sheet's month."""
+        self.ensure_one()
+        date_from, date_to = self._period_bounds()
+        return self.env['hr.payslip'].sudo().search([
+            ('employee_id', '=', self.employee_id.id),
+            ('state', '=', 'done'),
+            ('date_from', '<=', date_to),
+            ('date_to', '>=', date_from),
+        ])
+
+    def _reset_denial_reason(self, user):
+        """Also refuse a supervisor once the month has actually been paid.
+
+        `done` means the transfer already left the bank in this shop (the
+        payslip is marked done *after* the payment), so the figures in the
+        sheet are no longer a proposal — they are the record of what was
+        paid. Withdrawing it would leave payroll reading zero attendance
+        for a month that was paid in full, with nothing saying why.
+
+        Administrators keep the route: correcting a paid month is real
+        work someone has to be able to do, and they already own the
+        Payslip Revision flow that goes with it. This only stops the
+        supervisor's one-click undo from reaching that far.
+        """
+        reason = super()._reset_denial_reason(user)
+        if reason or self.env.su or self._is_sheet_administrator(user):
+            return reason
+        slips = self._paid_payslips()
+        if slips:
+            return _(
+                '%(period)s has already been paid (payslip %(slip)s is '
+                'confirmed), so its attendance can no longer be withdrawn. '
+                'Ask HR — correcting a paid month is a payslip revision.',
+                period=self.display_name, slip=slips[0].number or slips[0].id,
+            )
+        return ''

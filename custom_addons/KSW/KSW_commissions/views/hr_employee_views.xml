@@ -18,6 +18,12 @@
                 <field name="x_bas_driver_cost_center"
                        groups="hr.group_hr_user,base.group_system"
                        invisible="not x_is_attendance_sheet"/>
+                <!-- Only shown once the main one is set: it is a fix for a
+                     BAS split, not a second field to fill in routinely. -->
+                <field name="x_bas_driver_cost_center_alt"
+                       groups="hr.group_hr_user,base.group_system"
+                       placeholder="e.g. عرفان الله قاسم 1483"
+                       invisible="not x_bas_driver_cost_center"/>
             </field>
         </field>
     </record>

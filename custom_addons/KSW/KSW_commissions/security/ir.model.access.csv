@@ -54,3 +54,15 @@ access_ksw_pay_run_line_accountant,ksw.pay.run.line accountant,model_ksw_pay_run
 access_ksw_pay_submission_accountant,ksw.pay.submission accountant,model_ksw_pay_submission,group_commission_accountant,1,0,0,0
 access_ksw_pay_batch_accountant,ksw.pay.batch accountant,model_ksw_pay_batch,group_commission_accountant,1,0,0,0
 access_ksw_pay_entry_accountant,ksw.pay.entry accountant,model_ksw_pay_entry,group_commission_accountant,1,0,0,0
+access_ksw_pay_vacation_release_gm,ksw.pay.vacation.release gm,model_ksw_pay_vacation_release,group_commission_gm,1,1,1,1
+access_ksw_pay_vacation_release_officer,ksw.pay.vacation.release officer,model_ksw_pay_vacation_release,group_commission_officer,1,1,1,1
+access_ksw_pay_vacation_release_supervisor,ksw.pay.vacation.release supervisor,model_ksw_pay_vacation_release,group_commission_supervisor,1,0,0,0
+access_ksw_pay_vacation_release_accountant,ksw.pay.vacation.release accountant,model_ksw_pay_vacation_release,group_commission_accountant,1,0,0,0
+access_ksw_pay_batch_skip_line_supervisor,ksw.pay.batch.skip.line supervisor,model_ksw_pay_batch_skip_line,group_commission_supervisor,1,1,1,1
+access_ksw_pay_batch_skip_line_officer,ksw.pay.batch.skip.line officer,model_ksw_pay_batch_skip_line,group_commission_officer,1,1,1,1
+access_ksw_pay_batch_skip_line_gm,ksw.pay.batch.skip.line gm,model_ksw_pay_batch_skip_line,group_commission_gm,1,0,0,0
+access_ksw_pay_batch_skip_line_accountant,ksw.pay.batch.skip.line accountant,model_ksw_pay_batch_skip_line,group_commission_accountant,1,0,0,0
+access_ksw_pay_cash_band_officer,ksw.pay.cash.band officer,model_ksw_pay_cash_band,group_commission_officer,1,1,1,1
+access_ksw_pay_cash_band_accountant,ksw.pay.cash.band accountant,model_ksw_pay_cash_band,group_commission_accountant,1,0,0,0
+access_ksw_pay_cash_band_gm,ksw.pay.cash.band gm,model_ksw_pay_cash_band,group_commission_gm,1,0,0,0
+access_ksw_pay_cash_band_supervisor,ksw.pay.cash.band supervisor,model_ksw_pay_cash_band,group_commission_supervisor,1,0,0,0

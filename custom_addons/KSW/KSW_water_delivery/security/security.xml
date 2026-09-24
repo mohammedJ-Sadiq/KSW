@@ -83,6 +83,47 @@
         <field name="perm_unlink" eval="False"/>
     </record>
 
+    <!-- A driver sees what HIS phone sent, and nothing else. He needs to,
+         because the app shows him what happened to each capture, but the
+         queue of another driver's exceptions is not his business.
+
+         Note the ACL gives him read only: a capture is created by the
+         controller under sudo() after `_check_driver()`, the same shape as the
+         wizard (which does the privileged work under sudo after checking
+         authority once). Nothing a driver can call writes to this model. -->
+    <record id="rule_water_capture_driver" model="ir.rule">
+        <field name="name">Offline deliveries: own only</field>
+        <field name="model_id" ref="model_ksw_water_capture"/>
+        <field name="groups" eval="[(4, ref('group_water_driver'))]"/>
+        <field name="domain_force">[('driver_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_water_capture_dispatcher" model="ir.rule">
+        <field name="name">Offline deliveries: all (dispatcher)</field>
+        <field name="model_id" ref="model_ksw_water_capture"/>
+        <field name="groups" eval="[(4, ref('group_water_dispatcher'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_water_capture_billing" model="ir.rule">
+        <field name="name">Offline deliveries: all (billing)</field>
+        <field name="model_id" ref="model_ksw_water_capture"/>
+        <field name="groups" eval="[(4, ref('group_water_billing'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
     <record id="rule_water_picking_billing" model="ir.rule">
         <field name="name">Water delivery notes: all (billing)</field>
         <field name="model_id" ref="stock.model_stock_picking"/>

@@ -128,20 +128,11 @@ class KswWaterDeliveryWizard(models.TransientModel):
         Precedence is narrowest-wins, but a MISSING list never narrows: a branch
         nobody has listed yet must not lock its drivers out.
         """
-        Rate = self.env['ksw.water.rate'].sudo()
-        Coverage = self.env['ksw.water.client.branch'].sudo()
-        rated = self.env['res.partner'].browse(Rate._rated_partner_ids())
+        Picking = self.env['stock.picking']
         for wizard in self:
-            partners = rated
-            if not wizard.show_all_clients:
-                driver_clients = wizard.driver_id.sudo().x_water_client_ids
-                if driver_clients:
-                    partners &= driver_clients
-                else:
-                    branch_ids = Coverage._partner_ids_for_branch(
-                        wizard._picking_type().x_branch_code)
-                    if branch_ids is not None:
-                        partners &= self.env['res.partner'].browse(branch_ids)
+            normal, rated = Picking._water_client_scope(
+                wizard.driver_id, wizard._picking_type())
+            partners = rated if wizard.show_all_clients else normal
             if wizard.location_rule == 'enforce' and wizard.gps_latitude:
                 radius = wizard._picking_type().x_location_radius_m or 300
                 near = partners.filtered(lambda p: (
@@ -163,19 +154,15 @@ class KswWaterDeliveryWizard(models.TransientModel):
         """Is the chosen client outside the list he would normally see?
         Worked out from the lists themselves rather than from the tick box, so
         ticking it and then picking a normal client is not an exception."""
-        Coverage = self.env['ksw.water.client.branch'].sudo()
+        Picking = self.env['stock.picking']
         for wizard in self:
             partner = wizard.partner_id._origin
             if not partner:
                 wizard.off_route = False
                 continue
-            driver_clients = wizard.driver_id.sudo().x_water_client_ids
-            if driver_clients:
-                wizard.off_route = partner not in driver_clients
-                continue
-            branch_ids = Coverage._partner_ids_for_branch(
-                wizard._picking_type().x_branch_code)
-            wizard.off_route = branch_ids is not None and partner.id not in branch_ids
+            normal, _rated = Picking._water_client_scope(
+                wizard.driver_id, wizard._picking_type())
+            wizard.off_route = partner not in normal
 
     @api.depends('partner_id')
     def _compute_allowed_product_ids(self):
@@ -258,32 +245,18 @@ class KswWaterDeliveryWizard(models.TransientModel):
         return super().create(vals_list)
 
     # --- helpers ----------------------------------------------------------
+    # All three delegate to `stock.picking`, which is where the rules live now
+    # that the offline queue issues notes through the same path. The wizard
+    # keeps thin wrappers because its computes call them on an unsaved record.
     def _picking_type(self, strict=False):
-        """Branch, numbering and the two branch rules follow the tanker; the
-        pilot branch is the fallback for a tanker not yet assigned one."""
         self.ensure_one()
-        picking_type = self.vehicle_id.sudo().x_picking_type_id
-        if not picking_type:
-            picking_type = self.env.ref(
-                'KSW_water_delivery.picking_type_water_out', raise_if_not_found=False,
-            )
-        if not picking_type:
-            if not strict:
-                return self.env['stock.picking.type']
-            raise UserError(_(
-                'No water delivery operation type is configured. Set one on the '
-                'tanker, or restore the default one.'
-            ))
-        return picking_type.sudo()
+        return self.env['stock.picking']._water_picking_type_for(
+            self.vehicle_id, strict=strict)
 
     def _quantity_in_product_uom(self):
-        """A trip is not a unit of measure: a trailer carries 32 m³ and an Isuzu
-        far less, so the factor belongs to the truck and the conversion happens
-        here rather than in `uom.uom`."""
         self.ensure_one()
-        if self.entered_uom == 'trip':
-            return self.entered_qty * (self.vehicle_id.x_capacity_m3 or 0.0)
-        return self.entered_qty
+        return self.env['stock.picking']._water_quantity_in_product_uom(
+            self.vehicle_id, self.entered_qty, self.entered_uom)
 
     def _distance_to_client_m(self):
         self.ensure_one()
@@ -327,112 +300,26 @@ class KswWaterDeliveryWizard(models.TransientModel):
                 self.picking_id.name,
             ))
 
-        picking_type = self._picking_type(strict=True)
-
-        # Read every rule off the operation type, not off the form: the form's
-        # computed flags decide what the driver SEES, and a view-level
-        # `invisible=` is cosmetic against a direct RPC call.
-        if picking_type.x_signature_required:
-            if not self.signature:
-                raise UserError(_('The customer has to sign before the note can be issued.'))
-            if not self.signed_by:
-                raise UserError(_('Record the name of the person who signed.'))
-
-        distance = self._distance_to_client_m()
-        if picking_type.x_location_rule == 'enforce':
-            if not (self.gps_latitude and self.gps_longitude):
-                raise UserError(_(
-                    'This branch issues delivery notes at the client\'s site, so '
-                    'your location is needed. Allow location access in the '
-                    'browser and try again.'
-                ))
-            radius = picking_type.x_location_radius_m or 300
-            if distance is not None and distance > radius:
-                raise UserError(_(
-                    'You appear to be %(distance)d m from %(client)s, and notes '
-                    'for this branch may only be issued within %(radius)d m of '
-                    'the client. Check you have picked the right client.',
-                    distance=int(distance), client=self.partner_id.display_name,
-                    radius=radius,
-                ))
-
-        rate = self.env['ksw.water.rate'].sudo()._rate_for(self.partner_id, self.product_id)
-        if not rate:
-            raise UserError(_(
-                'There is no agreed rate for %(product)s with %(client)s, so the '
-                'note cannot be priced. Ask accounting to add one.',
-                product=self.product_id.display_name,
-                client=self.partner_id.display_name,
-            ))
-
-        quantity = self._quantity_in_product_uom()
-        if quantity <= 0:
-            raise UserError(_(
-                'The quantity must be greater than zero. If you entered trips, '
-                'check that the tanker has a trip volume set.'
-            ))
-
-        # The full native chain, on purpose: one trip = one sale order, so that
-        # month end is `qty_delivered` on real order lines and the consolidated
-        # invoice needs no code of ours at all. The price is the agreed rate --
-        # the driver never sees or types one.
-        order = self.env['sale.order'].sudo().create({
+        # `location_mode='raise'`: the driver is standing in front of the
+        # client, so a failed location check is something he can act on. The
+        # offline queue calls the same method with 'hold' for the opposite
+        # reason -- see `stock.picking._issue_water_note`.
+        picking = self.env['stock.picking']._issue_water_note({
             'partner_id': self.partner_id.id,
-            'company_id': picking_type.company_id.id or self.env.company.id,
-            'warehouse_id': picking_type.warehouse_id.id,
-            'order_line': [(0, 0, {
-                'product_id': self.product_id.id,
-                'product_uom_qty': quantity,
-                'price_unit': rate.price,
-                'name': self.note or self.product_id.get_product_multiline_description_sale(),
-            })],
-        })
-        order.action_confirm()
-
-        picking = order.picking_ids
-        if len(picking) != 1:
-            raise UserError(_(
-                'Expected exactly one delivery for this order, got %s. Ask a '
-                'dispatcher to check the warehouse configuration.', len(picking),
-            ))
-
-        # Re-home the delivery onto the branch's own operation type. Core's
-        # write() re-draws the note number from that type's sequence and moves
-        # the locations across with it (stock_picking.py: write).
-        picking.write({'picking_type_id': picking_type.id})
-        picking.write({
-            'x_driver_id': self.driver_id.id,
-            'x_vehicle_id': self.vehicle_id.id,
-            'x_entered_qty': self.entered_qty,
-            'x_entered_uom': self.entered_uom,
-            'x_gps_latitude': self.gps_latitude,
-            'x_gps_longitude': self.gps_longitude,
-            'x_gps_accuracy': self.gps_accuracy,
-            'x_gps_distance_m': distance or 0.0,
-            'x_off_route': self.off_route,
-        })
-
-        picking.move_ids.write({'quantity': quantity, 'picked': True})
-        picking.with_context(skip_backorder=True).button_validate()
-
-        # Signature last, so the PDF that core attaches carries the validated
-        # quantities. Writing it triggers stock.picking._attach_sign(), which
-        # renders the delivery slip, attaches it and posts to the chatter --
-        # that attachment is the signed document, and we add nothing to it.
-        #
-        # During the proof of concept there is no signature, so none of this
-        # runs and no PDF is attached. The note still exists, still carries its
-        # figures, and can be signed later through the standard Sign button --
-        # the signing half is off, not absent.
-        if self.signature:
-            picking.write({
-                'signature': self.signature,
-                'x_signed_by': self.signed_by,
-                'x_signed_on': fields.Datetime.now(),
-                'x_signature_origin': self.signature_origin,
-            })
-        elif self.signed_by:
-            picking.write({'x_signed_by': self.signed_by})
+            'product_id': self.product_id.id,
+            'entered_qty': self.entered_qty,
+            'entered_uom': self.entered_uom,
+            'driver_id': self.driver_id.id,
+            'vehicle_id': self.vehicle_id.id,
+            'signature': self.signature,
+            'signed_by': self.signed_by,
+            'signature_origin': self.signature_origin,
+            'gps_latitude': self.gps_latitude,
+            'gps_longitude': self.gps_longitude,
+            'gps_accuracy': self.gps_accuracy,
+            'note': self.note,
+            'off_route': self.off_route,
+        }, location_mode='raise')
 
         self.picking_id = picking.id
         return self._action_open_note(picking)

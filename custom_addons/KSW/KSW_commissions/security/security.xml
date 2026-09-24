@@ -414,6 +414,132 @@
     </record>
 
 
+    <!--
+        The General Manager releases a vacation-held month for his own
+        departments' people, so he has to be able to READ them: a group in
+        a Python guard is worthless if no ir.rule lets it see the records
+        (gotcha #38). Without this the release form's employee picker is
+        wider than his read scope and the form dies on the first render.
+        Read only, and narrowed to his departments — the Administrator's
+        rule above already covers the company-wide case.
+    -->
+    <record id="rule_hr_employee_pay_gm" model="ir.rule">
+        <field name="name">Employee: whoever a GM may release a month for</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="groups" eval="[(4, ref('group_commission_gm'))]"/>
+        <field name="domain_force">[('department_id.x_effective_gm_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Record Rules — ksw.pay.batch.skip.line                        -->
+    <!-- ============================================================ -->
+    <!--
+        The import log is part of the batch, so it is visible exactly where
+        the batch is: same domains as ksw.pay.entry one section up. Written
+        only by the import itself, but the supervisor may clear it, so he
+        keeps unlink.
+    -->
+    <record id="pay_batch_skip_line_rule_supervisor" model="ir.rule">
+        <field name="name">KSW Import Log: departments I manage or assist, or created by me</field>
+        <field name="model_id" ref="model_ksw_pay_batch_skip_line"/>
+        <field name="groups" eval="[(4, ref('group_commission_supervisor'))]"/>
+        <field name="domain_force">['|', '|', ('batch_id.create_uid', '=', user.id), ('batch_id.department_id.manager_id.user_id', '=', user.id), ('batch_id.department_id.manager_id.user_id', 'in', user.x_assisted_manager_ids.ids)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="pay_batch_skip_line_rule_officer" model="ir.rule">
+        <field name="name">KSW Import Log: Officer (all)</field>
+        <field name="model_id" ref="model_ksw_pay_batch_skip_line"/>
+        <field name="groups" eval="[(4, ref('group_commission_officer'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="pay_batch_skip_line_rule_department_gm" model="ir.rule">
+        <field name="name">KSW Import Log: department GM (read-only)</field>
+        <field name="model_id" ref="model_ksw_pay_batch_skip_line"/>
+        <field name="groups" eval="[(4, ref('group_commission_gm'))]"/>
+        <field name="domain_force">['|',
+            ('batch_id.department_id.x_effective_gm_id.user_id', '=', user.id),
+            ('batch_id.submission_id.gm_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="pay_batch_skip_line_rule_accountant" model="ir.rule">
+        <field name="name">KSW Import Log: Accountant (read-only, all)</field>
+        <field name="model_id" ref="model_ksw_pay_batch_skip_line"/>
+        <field name="groups" eval="[(4, ref('group_commission_accountant'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Record Rules — Vacation Hold Releases                         -->
+    <!-- ============================================================ -->
+    <!--
+        Everyone who works the month may SEE why an employee was released
+        (the figure it changes is on their screen); only his own General
+        Manager, or the Administrator, may record one. The Python guard
+        `_check_may_release` says the same thing a second time, because a
+        record rule cannot produce a message that explains itself.
+    -->
+    <record id="pay_vacation_release_rule_gm" model="ir.rule">
+        <field name="name">Vacation Release: my departments</field>
+        <field name="model_id" ref="model_ksw_pay_vacation_release"/>
+        <field name="groups" eval="[(4, ref('group_commission_gm'))]"/>
+        <field name="domain_force">[('employee_id.department_id.x_effective_gm_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!--
+        Read only, and the three write perms explicitly False: an ir.rule's
+        unused perms go live the moment its ACL widens, so a rule that says
+        1,1,1,1 "because the ACL blocks it anyway" is a trap left for the
+        next person. The Administrator gets his own row below.
+    -->
+    <record id="pay_vacation_release_rule_readonly" model="ir.rule">
+        <field name="name">Vacation Release: visible to whoever works the month</field>
+        <field name="model_id" ref="model_ksw_pay_vacation_release"/>
+        <field name="groups" eval="[(4, ref('group_commission_supervisor')),
+                                    (4, ref('group_commission_accountant'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="pay_vacation_release_rule_officer" model="ir.rule">
+        <field name="name">Vacation Release: Administrator (all)</field>
+        <field name="model_id" ref="model_ksw_pay_vacation_release"/>
+        <field name="groups" eval="[(4, ref('group_commission_officer'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+
     <!-- ============================================================ -->
     <!-- Record Rules — Accountant                                     -->
     <!-- ============================================================ -->

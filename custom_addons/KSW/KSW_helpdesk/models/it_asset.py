@@ -80,6 +80,22 @@ class ItAsset(models.Model):
     maintenance_ids = fields.One2many('it.asset.maintenance', 'asset_id', string='Maintenance History')
     maintenance_count = fields.Integer(compute='_compute_maintenance_count')
 
+    # ------------------------------------------------------------------
+    # Printer consumables
+    # ------------------------------------------------------------------
+    is_printer = fields.Boolean(related='category_id.is_printer', store=True, readonly=True)
+    cartridge_ids = fields.Many2many(
+        'it.consumable', string='Ink / Cartridge',
+        compute='_compute_cartridge_ids',
+        help="Consumables from the Consumables register whose 'Compatible "
+             "With' matches this printer's model.",
+    )
+    cartridge_type = fields.Char(
+        string='Ink / Cartridge Type', compute='_compute_cartridge_ids',
+        help="Cartridge category (Ink / Toner) fetched from the matching "
+             "consumable(s), based on this printer's model.",
+    )
+
     _asset_tag_uniq = models.Constraint(
         'unique(asset_tag)',
         'This asset tag already exists.',
@@ -107,6 +123,33 @@ class ItAsset(models.Model):
         count_map = {asset.id: count for asset, count in counts}
         for asset in self:
             asset.maintenance_count = count_map.get(asset.id, 0)
+
+    @api.depends('is_printer', 'model_name')
+    def _compute_cartridge_ids(self):
+        for asset in self:
+            consumables = self.env['it.consumable']
+            if asset.is_printer and asset.model_name:
+                # sudo(): a regular employee viewing their own printer in
+                # "My Assets" has no ACL on it.consumable at all (IT Team
+                # only - see security.xml). This is a harmless lookup, not
+                # a data leak, so read it as sudo (see gotcha #5 pattern).
+                consumables = self.env['it.consumable'].sudo().search([
+                    ('active', '=', True),
+                    ('category_id.is_ink_toner', '=', True),
+                    ('compatible_with', 'ilike', asset.model_name),
+                ])
+            # sudo() again on the assignment itself: setting a many2many
+            # field's cache still makes the ORM validate/relate the target
+            # records through *this* record's own (non-sudo) env, which
+            # would re-raise the same AccessError even though the search
+            # above already ran as sudo.
+            asset.sudo().cartridge_ids = consumables
+            if not asset.is_printer:
+                asset.cartridge_type = False
+            elif consumables:
+                asset.cartridge_type = ', '.join(sorted(set(consumables.mapped('category_id.name'))))
+            else:
+                asset.cartridge_type = _('No matching consumable registered')
 
     @api.depends('warranty_expiry_date')
     def _compute_warranty_status(self):

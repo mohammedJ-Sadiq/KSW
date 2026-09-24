@@ -10,6 +10,12 @@ class ItAssetCategory(models.Model):
     sequence = fields.Integer(default=10)
     color = fields.Integer(string='Color')
     icon = fields.Char(help="Font Awesome icon class, e.g. fa-laptop")
+    is_printer = fields.Boolean(
+        string='Printer Category',
+        help="Assets in this category are printers: their form shows the "
+             "matching ink/toner cartridge type, fetched from the "
+             "Consumables register.",
+    )
     active = fields.Boolean(default=True)
     asset_count = fields.Integer(compute='_compute_asset_count')
     company_id = fields.Many2one('res.company', default=lambda self: self.env.company)

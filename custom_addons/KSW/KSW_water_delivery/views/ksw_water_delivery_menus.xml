@@ -30,6 +30,16 @@
               sequence="30"
               groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing"/>
 
+    <!-- The dispatcher's queue. Sits next to the notes rather than under
+         Configuration, because it is day-to-day work: a held delivery is one
+         a driver has already made. -->
+    <menuitem id="menu_water_delivery_captures"
+              name="Offline Deliveries"
+              parent="menu_water_delivery_root"
+              action="action_water_captures"
+              sequence="40"
+              groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing"/>
+
     <menuitem id="menu_water_delivery_config"
               name="Configuration"
               parent="menu_water_delivery_root"

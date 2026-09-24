@@ -19,6 +19,8 @@ chain — through :meth:`ksw.pay.batch._allowed_departments` and
 from odoo import SUPERUSER_ID, _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
+from .ksw_vacation_hold import hold_blocks, vacation_holds
+
 
 class KswPayRecurring(models.Model):
     _name = 'ksw.pay.recurring'
@@ -240,11 +242,19 @@ class KswPayRecurring(models.Model):
         # Pull in only the people it actually covers, or the entry guard
         # would reject the whole button for one out-of-scope row.
         in_scope = set(batch._allowed_employees().ids)
+        # Whoever was on vacation this month is skipped rather than
+        # refused: the entry guard raises, and a UserError here would cost
+        # the whole department its standing instructions over one driver —
+        # the same lesson the BAS importer records a few files over.
+        entry_date = period if batch.component_id.needs_date else None
+        holds = vacation_holds(self.env, recurring.employee_id, period)
         vals_list = []
         for rec in recurring:
             if (rec.employee_id.id, rec.option_id.id or False) in already:
                 continue
             if rec.employee_id.id not in in_scope:
+                continue
+            if hold_blocks(holds.get(rec.employee_id.id), entry_date):
                 continue
             vals = {
                 'batch_id': batch.id,

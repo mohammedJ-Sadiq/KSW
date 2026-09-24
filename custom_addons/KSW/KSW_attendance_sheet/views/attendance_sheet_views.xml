@@ -16,6 +16,9 @@
                     <button name="action_confirm_my_team" type="object"
                             string="✓ Confirm &amp; Send to Payroll"
                             class="btn-primary" display="always"/>
+                    <button name="action_withdraw_selected" type="object"
+                            string="↩ Withdraw from Payroll"
+                            confirm="This takes the selected months back out of payroll and reopens them for editing. Until they are confirmed again, payroll reads those employees as zero attendance. Continue?"/>
                     <button name="action_apply_approved_leave" type="object"
                             string="⚡ Apply Approved Time Off"
                             confirm="This marks every day covered by an approved time-off request as absent on the selected sheets. Continue?"/>
@@ -69,10 +72,9 @@
                             invisible="not is_editable_period"
                             class="btn-info"/>
                     <button name="action_reset_to_draft" type="object"
-                            string="↩ Reset to Draft"
-                            invisible="state != 'confirmed'"
-                            confirm="This will delete all auto-generated attendance records. Continue?"
-                            groups="KSW_attendance_sheet.group_attendance_sheet_manager"/>
+                            string="↩ Withdraw from Payroll"
+                            invisible="not x_can_reset"
+                            confirm="This takes the month back out of payroll and reopens it for editing. Until you confirm it again, payroll reads this employee as zero attendance. Continue?"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,confirmed"/>
                 </header>
@@ -126,6 +128,7 @@
                             <field name="is_locked" invisible="1"/>
                             <field name="is_editable_period" invisible="1"/>
                             <field name="x_can_confirm" invisible="1"/>
+                            <field name="x_can_reset" invisible="1"/>
                         </group>
                     </group>
                     <group string="Sent to Payroll"

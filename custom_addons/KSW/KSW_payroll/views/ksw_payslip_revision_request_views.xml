@@ -359,7 +359,7 @@
     <!--
         A menu's effective groups= is the INTERSECTION of its own and
         every ancestor's (pitfall #41), and the Payroll root is gated on
-        `group_hr_payroll_self`. The GM and Accounting approvers hold
+        `group_hr_payroll_self`. The HR, GM and Accounting approvers hold
         neither that group nor any payslip access, so the root menuitem is
         re-declared in security/hr_payroll_security.xml to include them —
         otherwise these items exist but nobody outside payroll can reach
@@ -369,7 +369,7 @@
               name="Salary Revisions"
               parent="om_hr_payroll.menu_hr_payroll_root"
               sequence="15"
-              groups="KSW_payroll.group_hr_payroll_self,KSW_annual_leave.group_annual_leave_gm,KSW_annual_leave.group_annual_leave_acc"/>
+              groups="KSW_payroll.group_hr_payroll_self,KSW_annual_leave.group_annual_leave_hr,KSW_annual_leave.group_annual_leave_gm,KSW_annual_leave.group_annual_leave_acc"/>
 
     <menuitem id="menu_ksw_my_revision_requests"
               name="My Revision Requests"
@@ -383,13 +383,13 @@
               parent="menu_ksw_revision_requests_root"
               action="action_ksw_revision_requests_todo"
               sequence="20"
-              groups="om_hr_payroll.group_hr_payroll_user,KSW_annual_leave.group_annual_leave_gm,KSW_annual_leave.group_annual_leave_acc"/>
+              groups="om_hr_payroll.group_hr_payroll_user,KSW_annual_leave.group_annual_leave_hr,KSW_annual_leave.group_annual_leave_gm,KSW_annual_leave.group_annual_leave_acc"/>
 
     <menuitem id="menu_ksw_revision_requests_all"
               name="All Revision Requests"
               parent="menu_ksw_revision_requests_root"
               action="action_ksw_revision_requests_all"
               sequence="30"
-              groups="om_hr_payroll.group_hr_payroll_user,KSW_annual_leave.group_annual_leave_gm,KSW_annual_leave.group_annual_leave_acc,KSW_payroll.group_hr_payroll_reviewer"/>
+              groups="om_hr_payroll.group_hr_payroll_user,KSW_annual_leave.group_annual_leave_hr,KSW_annual_leave.group_annual_leave_gm,KSW_annual_leave.group_annual_leave_acc,KSW_payroll.group_hr_payroll_reviewer"/>
 
 </odoo>

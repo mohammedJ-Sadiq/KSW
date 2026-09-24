@@ -32,6 +32,18 @@
                             <field name="state" readonly="1"/>
                         </group>
                     </group>
+                    <field name="x_location_exception" invisible="1"/>
+                    <!-- A note whose location nobody could confirm is not a
+                         refused note: the water was delivered. It is held
+                         unvalidated, which is what stops it being invoiced
+                         until a dispatcher has looked at it. -->
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not x_location_exception">
+                        <strong>Waiting for a dispatcher.</strong>
+                        <field name="x_location_exception_reason" readonly="1" nolabel="1"/>
+                        <field name="x_capture_id" readonly="1"
+                               string="Review it here" invisible="not x_capture_id"/>
+                    </div>
                     <!-- Visible so the coordinates can actually be checked
                          against where the delivery happened. -->
                     <group string="Where it was issued"
@@ -41,6 +53,14 @@
                         <field name="x_gps_accuracy" readonly="1"/>
                         <field name="x_gps_distance_m" readonly="1"
                                invisible="not x_gps_distance_m"/>
+                        <!-- Kept apart from create_date on purpose. Offline,
+                             the capture time is the PHONE's clock, which the
+                             driver can set; the server's own arrival time is
+                             on the capture record next to it. -->
+                        <field name="x_issued_offline" readonly="1"
+                               invisible="not x_issued_offline"/>
+                        <field name="x_captured_at" readonly="1"
+                               invisible="not x_captured_at"/>
                     </group>
                     <field name="x_signature_required" invisible="1"/>
                     <group string="Signature" invisible="not x_signed_on and not x_signature_required">
@@ -77,6 +97,9 @@
                 <field name="x_amount_tax" sum="VAT" optional="hide"/>
                 <field name="x_amount_total" sum="After Tax"/>
                 <field name="x_off_route" optional="show" widget="boolean_toggle" readonly="1"/>
+                <field name="x_issued_offline" optional="hide" widget="boolean_toggle" readonly="1"/>
+                <field name="x_location_exception" optional="show" widget="boolean_toggle" readonly="1"/>
+                <field name="x_captured_at" optional="hide"/>
                 <field name="x_gps_latitude" optional="hide" digits="[10, 7]"/>
                 <field name="x_gps_longitude" optional="hide" digits="[10, 7]"/>
                 <field name="x_gps_distance_m" optional="hide"/>
@@ -145,6 +168,14 @@
                         domain="[('x_signature_origin', '=', 'depot')]"/>
                 <filter name="off_route" string="Off the Usual Route"
                         domain="[('x_off_route', '=', True)]"/>
+                <filter name="issued_offline" string="Issued Offline"
+                        domain="[('x_issued_offline', '=', True)]"/>
+                <!-- The number that matters at month end: a note the driver
+                     issued somewhere the rule does not recognise. Rare and
+                     countable is what gives the rule teeth without refusing a
+                     delivery that has already happened. -->
+                <filter name="location_held" string="Location Not Confirmed"
+                        domain="[('x_location_exception', '=', True)]"/>
                 <filter name="no_position" string="No Position Recorded"
                         domain="[('x_gps_latitude', '=', 0.0)]"/>
                 <separator/>

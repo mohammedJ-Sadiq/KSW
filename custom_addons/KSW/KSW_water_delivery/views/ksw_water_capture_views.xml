@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_water_capture_list" model="ir.ui.view">
+        <field name="name">ksw.water.capture.list</field>
+        <field name="model">ksw.water.capture</field>
+        <field name="arch" type="xml">
+            <list decoration-warning="state == 'held'"
+                  decoration-danger="state == 'failed'"
+                  decoration-muted="state == 'rejected'">
+                <field name="captured_at"/>
+                <field name="driver_id"/>
+                <field name="partner_id"/>
+                <field name="product_id" optional="hide"/>
+                <field name="entered_qty"/>
+                <field name="distance_m" optional="show"/>
+                <field name="queued_seconds" optional="hide"/>
+                <field name="picking_id"/>
+                <field name="price_changed" optional="hide"/>
+                <field name="hold_reason" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'issued'"
+                       decoration-warning="state == 'held'"
+                       decoration-danger="state == 'failed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_water_capture_form" model="ir.ui.view">
+        <field name="name">ksw.water.capture.form</field>
+        <field name="model">ksw.water.capture</field>
+        <field name="arch" type="xml">
+            <form string="Offline Delivery">
+                <header>
+                    <button name="action_accept" type="object" string="Accept and Issue"
+                            class="btn-primary" invisible="state != 'held'"
+                            groups="KSW_water_delivery.group_water_dispatcher"/>
+                    <button name="action_reject" type="object" string="Reject"
+                            class="btn-secondary" invisible="state != 'held'"
+                            confirm="Reject this delivery? The note will be cancelled."
+                            groups="KSW_water_delivery.group_water_dispatcher"/>
+                    <button name="action_retry" type="object" string="Try Again"
+                            class="btn-primary" invisible="state != 'failed'"
+                            groups="KSW_water_delivery.group_water_dispatcher"/>
+                    <button name="action_open_note" type="object" string="Open the Note"
+                            class="btn-secondary" invisible="not picking_id"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="pending,held,issued"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="partner_id" readonly="1"/></h1>
+                    </div>
+
+                    <div class="alert alert-warning" role="alert" invisible="state != 'held'">
+                        <field name="hold_reason" readonly="1" nolabel="1"/>
+                        <p class="mb-0">
+                            The water was delivered — this note exists and is waiting,
+                            not lost. Accepting it validates the note so it can be
+                            invoiced; rejecting it cancels the note.
+                        </p>
+                    </div>
+                    <div class="alert alert-danger" role="alert" invisible="state != 'failed'">
+                        <field name="failure_reason" readonly="1" nolabel="1"/>
+                    </div>
+                    <div class="alert alert-info" role="alert" invisible="not price_changed">
+                        The rate changed between the moment the driver captured this
+                        and the moment it reached the server. The note carries the
+                        live rate; the phone showed the other one.
+                    </div>
+
+                    <group>
+                        <group string="Delivery">
+                            <field name="driver_id" readonly="1"/>
+                            <field name="vehicle_id" readonly="1"/>
+                            <field name="product_id" readonly="1"/>
+                            <field name="entered_qty" readonly="1"/>
+                            <field name="entered_uom" readonly="1"/>
+                            <field name="off_route" readonly="1"/>
+                            <field name="note" readonly="1"/>
+                        </group>
+                        <group string="Where and When">
+                            <!-- Three timestamps, deliberately not one: offline
+                                 capture moves the first under the driver's control. -->
+                            <field name="captured_at" readonly="1"/>
+                            <field name="received_at" readonly="1"/>
+                            <field name="queued_seconds" readonly="1"/>
+                            <field name="clock_skew_s" readonly="1"/>
+                            <field name="gps_latitude" readonly="1"/>
+                            <field name="gps_longitude" readonly="1"/>
+                            <field name="gps_accuracy" readonly="1"/>
+                            <field name="distance_m" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Price">
+                            <field name="cached_price" readonly="1"/>
+                            <field name="issued_price" readonly="1"/>
+                            <field name="price_changed" readonly="1"/>
+                        </group>
+                        <group string="Outcome">
+                            <field name="picking_id" readonly="1"/>
+                            <field name="picking_state" readonly="1"/>
+                            <field name="reviewed_by" readonly="1"/>
+                            <field name="reviewed_on" readonly="1"/>
+                            <field name="review_note"
+                                   placeholder="Why it was rejected — the driver recorded it as delivered, so the reason is the record"/>
+                            <field name="app_version" readonly="1"/>
+                            <field name="uuid" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Signature" invisible="not signature">
+                        <field name="signed_by" readonly="1"/>
+                        <field name="signature" widget="image" readonly="1" nolabel="1"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_water_capture_search" model="ir.ui.view">
+        <field name="name">ksw.water.capture.search</field>
+        <field name="model">ksw.water.capture</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <field name="driver_id"/>
+                <field name="picking_id"/>
+                <filter name="held" string="Waiting for Review"
+                        domain="[('state', '=', 'held')]"/>
+                <filter name="failed" string="Could Not Be Issued"
+                        domain="[('state', '=', 'failed')]"/>
+                <filter name="needs_me" string="Needs Someone"
+                        domain="[('state', 'in', ['held', 'failed'])]"/>
+                <separator/>
+                <filter name="price_changed" string="Rate Changed Since Capture"
+                        domain="[('price_changed', '=', True)]"/>
+                <filter name="off_route" string="Off the Usual Route"
+                        domain="[('off_route', '=', True)]"/>
+                <separator/>
+                <filter name="today" string="Captured Today"
+                        domain="[('captured_at', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"/>
+                <group>
+                    <filter name="by_driver" string="Driver" context="{'group_by': 'driver_id'}"/>
+                    <filter name="by_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="by_client" string="Client" context="{'group_by': 'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_water_captures" model="ir.actions.act_window">
+        <field name="name">Offline Deliveries</field>
+        <field name="res_model">ksw.water.capture</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_water_capture_search"/>
+        <field name="context">{'search_default_needs_me': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Nothing captured offline yet.</p>
+            <p>
+                Deliveries a driver recorded at a client with no mobile signal
+                arrive here when his phone gets back into coverage. Most are
+                issued straight away; the ones whose location could not be
+                confirmed wait for you.
+            </p>
+        </field>
+    </record>
+
+</odoo>

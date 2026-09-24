@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<odoo noupdate="1">
+<odoo>
+<data noupdate="1">
 
     <record id="consumable_category_ink" model="it.consumable.category">
         <field name="name">Ink Cartridge</field>
         <field name="sequence">10</field>
         <field name="icon">fa-tint</field>
         <field name="color">4</field>
+        <field name="is_ink_toner">1</field>
     </record>
     <record id="consumable_category_toner" model="it.consumable.category">
         <field name="name">Toner Cartridge</field>
         <field name="sequence">20</field>
         <field name="icon">fa-square</field>
         <field name="color">6</field>
+        <field name="is_ink_toner">1</field>
     </record>
     <record id="consumable_category_cable" model="it.consumable.category">
         <field name="name">Cables &amp; Adapters</field>
@@ -43,5 +46,17 @@
         <field name="icon">fa-cube</field>
         <field name="color">8</field>
     </record>
+
+</data>
+
+    <!-- is_ink_toner added after these categories already existed in some
+         databases: a plain <field> edit above is silently skipped by
+         Odoo's noupdate gate on every upgrade after the first install (see
+         CLAUDE.md gotcha #2), so flip it with write() instead, outside the
+         noupdate block. Idempotent - safe to run on every upgrade. -->
+    <function model="it.consumable.category" name="write">
+        <value eval="[ref('consumable_category_ink'), ref('consumable_category_toner')]"/>
+        <value eval="{'is_ink_toner': True}"/>
+    </function>
 
 </odoo>

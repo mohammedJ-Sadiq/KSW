@@ -1,0 +1,113 @@
+/* Phone-first, and only a phone: this page is never opened on a desktop.
+   Safe-area padding is not decoration — installed as a standalone app there is
+   no browser chrome, so the top row sits under the notch without it. */
+:root {
+    --ksw-blue: #0b5ed7;
+    --ksw-warn: #b45309;
+    --ksw-ok: #15803d;
+    --ksw-line: #d7dbe0;
+    color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f5f6f8;
+    color: #111;
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+}
+
+.ksw-boot { padding: 2rem 1rem; text-align: center; color: #555; }
+
+.ksw-top {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: #fff;
+    border-bottom: 1px solid var(--ksw-line);
+    padding: calc(0.6rem + env(safe-area-inset-top, 0px)) 1rem 0.6rem;
+}
+.ksw-top-row { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+.ksw-sub { font-size: 0.82rem; color: #666; margin-top: 0.15rem; }
+
+.ksw-chip { font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 999px; }
+.ksw-on { background: #dcfce7; color: var(--ksw-ok); }
+.ksw-off { background: #fee2e2; color: #b91c1c; }
+.ksw-warnchip { background: #fef3c7; color: var(--ksw-warn); }
+
+.ksw-banner { padding: 0.7rem 1rem; font-size: 0.9rem; }
+.ksw-ok { background: #dcfce7; color: #14532d; }
+.ksw-warn { background: #fef3c7; color: #78350f; }
+
+.ksw-main { padding: 1rem; }
+
+.ksw-label { display: block; font-size: 0.8rem; color: #555; margin: 1rem 0 0.25rem; text-transform: uppercase; letter-spacing: 0.02em; }
+.ksw-h2 { font-size: 0.95rem; color: #555; margin: 1.2rem 0 0.5rem; }
+
+/* 16px minimum, or iOS zooms the whole page in on focus and the driver loses
+   the form behind his own keyboard. */
+.ksw-input {
+    width: 100%;
+    font-size: 16px;
+    padding: 0.7rem 0.75rem;
+    border: 1px solid var(--ksw-line);
+    border-radius: 8px;
+    background: #fff;
+}
+.ksw-row { display: flex; gap: 0.5rem; }
+.ksw-narrow { width: 40%; }
+
+.ksw-list { list-style: none; margin: 0.4rem 0 0; padding: 0; max-height: 45vh; overflow-y: auto; border: 1px solid var(--ksw-line); border-radius: 8px; background: #fff; }
+.ksw-list li + li { border-top: 1px solid #eef0f2; }
+.ksw-list button { width: 100%; text-align: left; padding: 0.8rem 0.75rem; border: 0; background: none; font-size: 1rem; }
+.ksw-off-route { color: var(--ksw-warn); }
+.ksw-empty { padding: 0.8rem 0.75rem; color: #888; }
+
+.ksw-picked { display: flex; justify-content: space-between; align-items: center; background: #fff; border: 1px solid var(--ksw-line); border-radius: 8px; padding: 0.7rem 0.75rem; }
+.ksw-locked { color: #444; background: #f1f2f4; }
+.ksw-check { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.6rem; font-size: 0.88rem; color: #555; }
+
+.ksw-hint { font-size: 0.82rem; color: #555; margin-top: 0.4rem; }
+.ksw-warnbox { margin-top: 0.7rem; padding: 0.7rem; background: #fef3c7; color: #78350f; border-radius: 8px; font-size: 0.88rem; }
+
+.ksw-gps { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; font-size: 0.85rem; padding: 0.6rem 0.75rem; border-radius: 8px; background: #fff; border: 1px solid var(--ksw-line); }
+.ksw-gps-located { border-color: #86efac; color: var(--ksw-ok); }
+.ksw-gps-locating { color: #555; }
+.ksw-gps-denied, .ksw-gps-failed, .ksw-gps-unavailable { border-color: #fcd34d; color: var(--ksw-warn); }
+
+.ksw-primary, .ksw-secondary {
+    display: block; width: 100%; margin-top: 1.2rem;
+    padding: 0.9rem; font-size: 1rem; font-weight: 600;
+    border: 0; border-radius: 10px; background: var(--ksw-blue); color: #fff;
+}
+.ksw-primary[disabled] { background: #9aa4b2; }
+.ksw-secondary { width: auto; margin: 0; padding: 0.45rem 0.7rem; font-size: 0.82rem; background: #e5e7eb; color: #111; }
+.ksw-link { border: 0; background: none; color: var(--ksw-blue); font-size: 0.85rem; padding: 0.2rem 0; }
+
+.ksw-sign { width: 100%; height: 180px; background: #fff; border: 1px dashed #9aa4b2; border-radius: 8px; touch-action: none; }
+
+.ksw-cards { list-style: none; margin: 0; padding: 0; }
+.ksw-card { display: flex; flex-direction: column; gap: 0.1rem; background: #fff; border: 1px solid var(--ksw-line); border-radius: 8px; padding: 0.7rem 0.75rem; margin-bottom: 0.5rem; }
+.ksw-card .ksw-sub { font-size: 0.8rem; color: #666; }
+.ksw-pending { border-left: 4px solid var(--ksw-warn); }
+.ksw-held { border-left: 4px solid var(--ksw-warn); }
+
+.ksw-tabs {
+    position: fixed; bottom: 0; left: 0; right: 0; display: flex;
+    background: #fff; border-top: 1px solid var(--ksw-line);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.ksw-tabs button { flex: 1; padding: 1rem 0.5rem; border: 0; background: none; font-size: 0.9rem; color: #555; }
+.ksw-tabs button.active { color: var(--ksw-blue); font-weight: 600; box-shadow: inset 0 2px 0 var(--ksw-blue); }
+
+/* Offline readiness. Deliberately loud and deliberately always visible: the
+   failure this prevents is a driver who believes the app is ready, drives to a
+   site with no coverage, and finds out there. */
+.ksw-ready { padding: 0.7rem 1rem; font-size: 0.85rem; }
+.ksw-ready-good { background: #dcfce7; color: #14532d; }
+.ksw-ready-warn { background: #fef3c7; color: #78350f; }
+.ksw-ready-bad { background: #fee2e2; color: #7f1d1d; }
+.ksw-ready strong { display: block; margin-bottom: 0.15rem; }
+.ksw-ready .ksw-secondary { margin-top: 0.5rem; }

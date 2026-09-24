@@ -12,8 +12,10 @@ Employee setup matches test_payslip_worked_days:
     wage=6000  travel=500  meal=300  medical=200  hra=1500
     Deductible base = 7000 (HRA excluded)
 """
+from calendar import monthrange
 from datetime import date
 
+from odoo import fields
 from odoo.exceptions import UserError
 from odoo.tests.common import TransactionCase
 
@@ -339,3 +341,95 @@ class TestUnconfirmedSheetZero(TransactionCase):
 
         self.assertIn('return was never confirmed', blockers)
         self.assertIn('no evidence the employee came back', blockers)
+
+
+class TestWithdrawAfterPayment(TestUnconfirmedSheetZero):
+    """A supervisor's one-click undo stops at the bank.
+
+    Withdrawing a month takes it back to zero attendance for payroll. That
+    is the right answer while the month is still a proposal; once the
+    payslip is `done` the money has already left (this shop marks a slip
+    done *after* the transfer), so the sheet is no longer a proposal — it
+    is the record of what was paid.
+    """
+
+    def _current_month_sheet(self):
+        today = fields.Date.context_today(self.env['ksw.attendance.sheet'])
+        self.month_start = today.replace(day=1)
+        self.month_end = date(
+            today.year, today.month,
+            monthrange(today.year, today.month)[1])
+        return self.env['ksw.attendance.sheet'].sudo().create({
+            'employee_id': self.employee.id,
+            'month': str(today.month),
+            'year': today.year,
+        })
+
+    def _done_payslip(self):
+        slip = self.env['hr.payslip'].sudo().create({
+            'employee_id': self.employee.id,
+            'name': 'Paid month for withdrawal test',
+            'date_from': self.month_start,
+            'date_to': self.month_end,
+        })
+        # A raw write, not action_payslip_done(): this test is about the
+        # sheet guard, and the real confirmation path would drag the whole
+        # compute + deduction pipeline in with it.
+        slip.sudo().write({'state': 'done'})
+        return slip
+
+    def test_supervisor_cannot_withdraw_a_month_already_paid(self):
+        sheet = self._current_month_sheet()
+        sheet.with_user(self.supervisor_user).action_supervisor_confirm()
+        self.assertTrue(
+            sheet.with_user(self.supervisor_user).x_can_reset,
+            'Withdrawable while the month is still only a proposal.')
+
+        slip = self._done_payslip()
+
+        # x_can_reset does not depend on hr.payslip, so the True read above
+        # is still cached. The button is display-only by design (the guard
+        # below is the real gate) and a browser reads it on a fresh
+        # request; the test has to say so explicitly.
+        sheet.invalidate_recordset(['x_can_reset'])
+        self.assertFalse(sheet.with_user(self.supervisor_user).x_can_reset)
+        with self.assertRaises(UserError) as err:
+            sheet.with_user(self.supervisor_user).action_reset_to_draft()
+        self.assertIn('already been paid', str(err.exception))
+        self.assertEqual(sheet.state, 'confirmed')
+        self.assertEqual(slip.state, 'done')
+
+    def test_a_draft_payslip_does_not_block_the_withdrawal(self):
+        """Only a *paid* month is closed — payroll re-reads a draft slip."""
+        sheet = self._current_month_sheet()
+        sheet.with_user(self.supervisor_user).action_supervisor_confirm()
+        self.env['hr.payslip'].sudo().create({
+            'employee_id': self.employee.id,
+            'name': 'Draft month for withdrawal test',
+            'date_from': self.month_start,
+            'date_to': self.month_end,
+        })
+
+        sheet.with_user(self.supervisor_user).action_reset_to_draft()
+        self.assertEqual(sheet.state, 'draft')
+
+    def test_administrator_keeps_the_route_to_a_paid_month(self):
+        """Correcting a paid month is real work, and HR owns the revision
+        flow that goes with it."""
+        admin_user = self.env['res.users'].sudo().create({
+            'name': 'Withdraw Sheet Admin',
+            'login': 'withdraw_sheet_admin',
+            'email': 'withdraw_admin@zerosheet.test',
+            'group_ids': [(6, 0, [
+                self.env.ref('base.group_user').id,
+                self.env.ref(
+                    'KSW_attendance_sheet.group_attendance_sheet_manager'
+                ).id,
+            ])],
+        })
+        sheet = self._current_month_sheet()
+        sheet.with_user(self.supervisor_user).action_supervisor_confirm()
+        self._done_payslip()
+
+        sheet.with_user(admin_user).action_reset_to_draft()
+        self.assertEqual(sheet.state, 'draft')

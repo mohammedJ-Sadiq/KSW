@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- The driver's app shell.
+
+         Deliberately holds no user data and loads none of the Odoo web client:
+         it has to boot with no connection at all, from the service worker's
+         cache, on a phone that has been in a truck cab since yesterday. What it
+         knows about this driver comes from IndexedDB, filled by /water/reference
+         whenever there is a signal. -->
+    <!-- The doctype is escaped because this file is parsed as XML first;
+         core does exactly the same in `web.layout`. -->
+    <template id="water_app_shell" name="Water Delivery App">&lt;!DOCTYPE html&gt;
+        <html lang="en">
+            <head>
+                <meta charset="utf-8"/>
+                <meta name="viewport"
+                      content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no"/>
+                <meta name="theme-color" content="#0b5ed7"/>
+                <meta name="apple-mobile-web-app-capable" content="yes"/>
+                <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+                <meta name="apple-mobile-web-app-title" content="Water"/>
+                <title>Water Delivery</title>
+                <link rel="manifest" href="/water/manifest.webmanifest"/>
+                <link rel="apple-touch-icon" href="/KSW_water_delivery/static/description/icon.svg"/>
+                <link rel="stylesheet" t-attf-href="/KSW_water_delivery/static/src/app/app.css?v=#{app_version}"/>
+            </head>
+            <body>
+                <div id="ksw-app"></div>
+                <script type="module"
+                        t-attf-src="/KSW_water_delivery/static/src/app/app.js?v=#{app_version}"></script>
+                <noscript>This app needs JavaScript.</noscript>
+            </body>
+        </html>
+    </template>
+
+</odoo>

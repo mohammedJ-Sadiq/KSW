@@ -6,3 +6,4 @@ from . import test_leave_weekend_grant
 from . import test_night_shift_leave
 from . import test_attendance_excuse_same_day
 from . import test_attendance_issue_relink_after_redownload
+from . import test_public_holiday_exempts_running_leave

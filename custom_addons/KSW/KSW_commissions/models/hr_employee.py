@@ -38,6 +38,15 @@ class HrEmployee(models.Model):
              'differs from the employee\'s Odoo name, so this must be set '
              'explicitly for the pull to find the driver\'s loads.',
     )
+    x_bas_driver_cost_center_alt = fields.Char(
+        string='Other BAS Cost Centres',
+        groups='hr.group_hr_user,base.group_system',
+        help='Comma-separated. Extra «مركز تكلفة الموظف» values that belong '
+             'to this same driver in BAS, for when his loads were booked '
+             'under more than one spelling — an Arabic and an English '
+             'version of the same name and number, say. Their loads are '
+             'added to his. Leave empty unless BAS really did split him.',
+    )
     x_deduct_commission_priority = fields.Boolean(
         string='Settle Deductions from Commission First',
         default=True,

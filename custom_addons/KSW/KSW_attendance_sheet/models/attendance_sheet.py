@@ -89,6 +89,12 @@ class KswAttendanceSheet(models.Model):
              'payroll. Drives the Confirm button; the real gate is the '
              'server-side check in action_supervisor_confirm.',
     )
+    x_can_reset = fields.Boolean(
+        string='Can Withdraw', compute='_compute_x_can_reset',
+        help='True when the current user may take this sheet back out of '
+             'payroll. Drives the Withdraw button; the real gate is the '
+             'server-side check in action_reset_to_draft.',
+    )
 
     # ── Blocked state ────────────────────────────────────────────────
     # Stored so the list can sort blocked sheets to the top and filter on
@@ -262,6 +268,41 @@ class KswAttendanceSheet(models.Model):
         user = self.env.user
         for rec in self:
             rec.x_can_confirm = not rec._confirm_denial_reason(user)
+
+    def _reset_denial_reason(self, user):
+        """Why *user* may not withdraw this sheet from payroll — '' when
+        they may.
+
+        Same shape as `_confirm_denial_reason`: one predicate read by both
+        the button-visibility compute and the server-side guard, so the
+        button can never offer an action the guard refuses.
+
+        The authority rule is deliberately the same one that governs
+        confirming — `_authority_denial_reason`. A supervisor owns their
+        own team's *current* month and nothing else, so the person who
+        confirmed a month by mistake can undo it themselves while it is
+        still theirs, and a closed month stays closed. Administrators
+        (Attendance Sheet Manager) keep the repair route for older months.
+
+        The state check applies to everyone, superuser included: a draft
+        sheet has nothing to withdraw, and silently doing nothing would be
+        worse than saying so.
+        """
+        self.ensure_one()
+        if self.state != 'confirmed':
+            return _(
+                '%(period)s has not been sent to payroll, so there is '
+                'nothing to withdraw.', period=self.display_name)
+        if self.env.su:
+            return ''
+        return self._authority_denial_reason(user)
+
+    @api.depends_context('uid')
+    @api.depends('state', 'manager_id', 'month', 'year')
+    def _compute_x_can_reset(self):
+        user = self.env.user
+        for rec in self:
+            rec.x_can_reset = not rec._reset_denial_reason(user)
 
     # ------------------------------------------------------------------
     # Schedule helpers
@@ -1129,21 +1170,104 @@ class KswAttendanceSheet(models.Model):
             sheet.write({'state': 'confirmed', 'is_locked': True})
 
     def action_reset_to_draft(self):
-        """Reset to draft and remove generated attendance records."""
+        """Withdraw this month from payroll and reopen it for editing.
+
+        Deliberately does NOT touch the hr.attendance records. The payslip
+        reads the sheet's *state* (see
+        hr.payslip._worked_day_lines_attendance_sheet: an unconfirmed month
+        is read as zero attendance), so withdrawing needs no attendance
+        change at all — and deleting those rows is not free. It destroys
+        the m2m link that an approved late/early-leave excuse hangs on
+        (hr_leave_attendance_rel is ON DELETE CASCADE), so a supervisor
+        undoing a misclick would silently un-excuse days HR had already
+        approved. The old delete-then-recreate was a no-op rebuild with
+        that one real side effect; now that supervisors press this button
+        routinely, it has to go.
+        """
+        user = self.env.user
         for sheet in self:
-            if sheet.state != 'confirmed':
-                raise UserError('Only confirmed sheets can be reset.')
+            reason = sheet._reset_denial_reason(user)
+            if reason:
+                raise UserError(reason)
 
-            att_records = sheet.line_ids.mapped('attendance_id').filtered(
-                'x_is_auto_generated',
+        for sheet in self:
+            confirmer = sheet.x_confirmed_by
+            sheet.write({
+                'state': 'draft',
+                'is_locked': False,
+                'x_confirmed_by': False,
+                'x_confirmed_on': False,
+            })
+            sheet._recompute_blocked()
+            # sudo: the chatter write is a mail.message create, which is
+            # gated on access to the document. Authority was checked above.
+            sheet.sudo().message_post(
+                body=Markup(
+                    '<strong>↩ Withdrawn from Payroll</strong><br/>'
+                    '<b>Withdrawn by:</b> %(user)s<br/>'
+                    '<b>Was confirmed by:</b> %(confirmer)s<br/>'
+                    '<i>This month is back in Draft. Until it is confirmed '
+                    'again, payroll reads it as zero attendance.</i>'
+                ) % {
+                    'user': user.name,
+                    'confirmer': confirmer.name or _('(unknown)'),
+                },
+                subtype_xmlid='mail.mt_note',
             )
-            sheet.line_ids.sudo().write({'attendance_id': False})
-            if att_records:
-                att_records.sudo().unlink()
 
-            sheet.write({'state': 'draft', 'is_locked': False})
-            # Re-sync attendance records for currently attended lines
-            sheet._sync_line_attendance(sheet.line_ids)
+    def action_withdraw_selected(self):
+        """Bulk withdraw from the list header.
+
+        The mistake this exists for is a bulk one — somebody presses
+        "Confirm & Send to Payroll" on a whole team by accident — so the
+        undo has to be bulk too. Reports every refusal at once rather than
+        stopping on the first, and keeps the withdrawals that did succeed.
+        """
+        if not self:
+            raise UserError(_(
+                'Select the attendance sheets you want to withdraw from '
+                'payroll first.'))
+
+        user = self.env.user
+        withdrawable = self.browse()
+        problems = []
+        for sheet in self:
+            reason = sheet._reset_denial_reason(user)
+            if reason:
+                problems.append('%s:\n  • %s' % (
+                    sheet.display_name, reason))
+                continue
+            withdrawable |= sheet
+
+        detail = '\n\n'.join(problems)
+        if not withdrawable:
+            raise UserError(_(
+                'None of the selected attendance sheets could be withdrawn '
+                'from payroll:\n\n%(problems)s', problems=detail))
+
+        withdrawable.action_reset_to_draft()
+
+        if problems:
+            # A UserError here would roll back the withdrawals above and
+            # contradict its own message — report instead, and keep them.
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _(
+                        '%(done)s Withdrawn — %(failed)s Refused',
+                        done=len(withdrawable), failed=len(problems),
+                    ),
+                    'message': _(
+                        'These sheets were left as they were:\n\n'
+                        '%(problems)s', problems=detail,
+                    ),
+                    'type': 'warning',
+                    'sticky': True,
+                    'next': {'type': 'ir.actions.act_window_close'},
+                },
+            }
+        return True
 
     def _reopen_for_change(self, reason):
         """Send a confirmed sheet back to draft because its days changed.

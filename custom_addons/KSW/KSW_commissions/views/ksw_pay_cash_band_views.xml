@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ksw_pay_cash_band_list" model="ir.ui.view">
+        <field name="name">ksw.pay.cash.band.list</field>
+        <field name="model">ksw.pay.cash.band</field>
+        <field name="arch" type="xml">
+            <list string="Cash Load Bands" editable="bottom">
+                <field name="amount_from"/>
+                <field name="amount_to"/>
+                <field name="factor"/>
+                <field name="name" string="Reads as" readonly="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_ksw_pay_cash_band" model="ir.actions.act_window">
+        <field name="name">Cash Load Bands</field>
+        <field name="res_model">ksw.pay.cash.band</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No bands are set.
+            </p>
+            <p>
+                A cash sale is booked to the cash box, not to the customer,
+                so the account carries the branch's own rate and the real
+                destination is only written on the document as text. These
+                bands read the weighting off the line's total amount
+                instead, because the amount is what records the distance.
+                An amount below the first band earns nothing.
+            </p>
+        </field>
+    </record>
+
+</odoo>

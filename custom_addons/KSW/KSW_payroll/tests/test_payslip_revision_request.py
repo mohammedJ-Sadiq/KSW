@@ -61,6 +61,7 @@ class TestPayslipRevisionRequest(TransactionCase):
         group_user = cls.env.ref('base.group_user')
         group_officer = cls.env.ref('om_hr_payroll.group_hr_payroll_user')
         group_self = cls.env.ref('KSW_payroll.group_hr_payroll_self')
+        group_hr_leave = cls.env.ref('KSW_annual_leave.group_annual_leave_hr')
         group_gm = cls.env.ref('KSW_annual_leave.group_annual_leave_gm')
         group_acc = cls.env.ref('KSW_annual_leave.group_annual_leave_acc')
         # See test_payslip_revision.py: confirming ANY payslip needs this,
@@ -81,6 +82,12 @@ class TestPayslipRevisionRequest(TransactionCase):
                                  [group_user, group_self])
         cls.user_hr = _user('Revreq HR', 'revreq_hr',
                             [group_user, group_officer, group_hr_manager])
+        # The HR desk the employee actually brings the form to: the HR
+        # Approver of the annual-leave chain, who holds no payroll tier at
+        # all.  Deliberately given nothing else — this user is the proof
+        # that the HR step needs no hr.payslip access of its own.
+        cls.user_hr_leave = _user('Revreq HR Approver', 'revreq_hr_leave',
+                                  [group_user, group_hr_leave])
         cls.user_gm = _user('Revreq GM', 'revreq_gm', [group_user, group_gm])
         cls.user_other_gm = _user('Revreq Other GM', 'revreq_other_gm',
                                   [group_user, group_gm])
@@ -330,6 +337,66 @@ class TestPayslipRevisionRequest(TransactionCase):
         for user in (self.user_employee, self.user_gm, self.user_acc):
             with self.assertRaises(UserError):
                 req.with_user(user).action_hr_accept()
+
+    # ------------------------------------------------------------------
+    # The second HR role: the annual-leave HR Approver
+    # ------------------------------------------------------------------
+
+    def test_annual_leave_hr_approver_is_hr_here_too(self):
+        """The HR desk that reviews leave reviews salary complaints.
+
+        This user holds no payroll tier: no hr.payslip access, no batches,
+        no salary rules.  Everything the step touches on the payslip goes
+        through sudo() after authority has been checked, so the whole HR
+        step must work on that group alone.
+        """
+        self.assertFalse(self.user_hr_leave.has_group(
+            'om_hr_payroll.group_hr_payroll_user'))
+        req = self._submitted()
+        self.assertTrue(req.with_user(self.user_hr_leave).can_hr_act)
+        req.with_user(self.user_hr_leave).write(
+            {'hr_comment': 'Checked: one absence was deducted wrongly.'})
+        req.with_user(self.user_hr_leave).action_hr_accept()
+        self.assertEqual(req.state, 'pending_gm')
+        self.assertEqual(req.hr_user_id, self.user_hr_leave)
+        self.assertTrue(req.revision_payslip_id.sudo().x_is_revision)
+
+    def test_annual_leave_hr_approver_may_refuse(self):
+        req = self._submitted()
+        wizard = self.Wizard.with_user(self.user_hr_leave).create({
+            'request_id': req.id, 'mode': 'refuse',
+            'reason': 'The overtime was already paid in June.',
+        })
+        wizard.action_confirm()
+        self.assertEqual(req.state, 'refused')
+        self.assertEqual(req.refused_by_id, self.user_hr_leave)
+
+    def test_annual_leave_hr_approver_sees_it_waiting(self):
+        """Acting on a step and being told to act on it are one decision.
+
+        The button guard and the "Waiting for My Action" filter read the
+        same predicate, so a role can never hold one without the other.
+        """
+        req = self._submitted()
+        self.assertTrue(
+            req.with_user(self.user_hr_leave).is_pending_my_action)
+        self.assertIn(req, self.Request.with_user(self.user_hr_leave).search(
+            [('is_pending_my_action', '=', True)]))
+
+    def test_annual_leave_hr_approver_is_notified_on_submission(self):
+        req = self._file()
+        existing = req.sudo().message_ids.ids
+        req.with_user(self.user_employee).action_submit()
+        new = req.sudo().message_ids.filtered(lambda m: m.id not in existing)
+        self.assertTrue(new.filtered(
+            lambda m: self.user_hr_leave.partner_id in m.partner_ids),
+            'the HR Approver was not notified of the new request')
+
+    def test_annual_leave_hr_approver_gets_no_payslip_access(self):
+        """Being HR for this document is not being a payroll officer."""
+        slip = self._make_done_payslip()
+        with self.assertRaises(AccessError):
+            slip.with_user(self.user_hr_leave).read(['number'])
 
     # ==================================================================
     # 3. The GM step

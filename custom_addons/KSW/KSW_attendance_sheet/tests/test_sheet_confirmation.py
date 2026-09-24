@@ -602,3 +602,160 @@ class TestSheetScoping(TestSheetConfirmation):
         sheet.with_user(self.supervisor_user).check_access('write')
         sheet.with_user(self.supervisor_user).action_supervisor_confirm()
         self.assertEqual(sheet.state, 'confirmed')
+
+
+class TestSheetWithdrawal(TestSheetConfirmation):
+    """Undoing a confirmation.
+
+    A supervisor confirming their whole team from the list header is one
+    click, and so is doing it a month too early or before a correction
+    lands. Until now the undo was Attendance Sheet Manager only, so every
+    misclick became an HR ticket. The rule is the same one that governs
+    confirming: your own team, your own month — nothing else.
+    """
+
+    def _confirmed_sheet(self, **kw):
+        sheet = self._sheet(**kw)
+        sheet.with_user(self.supervisor_user).action_supervisor_confirm()
+        return sheet
+
+    # ------------------------------------------------------------------
+    # Who may withdraw
+    # ------------------------------------------------------------------
+
+    def test_supervisor_withdraws_own_current_month(self):
+        sheet = self._confirmed_sheet()
+        sheet.with_user(self.supervisor_user).action_reset_to_draft()
+
+        self.assertEqual(sheet.state, 'draft')
+        self.assertFalse(sheet.is_locked)
+        self.assertFalse(sheet.x_confirmed_by)
+        self.assertFalse(sheet.x_confirmed_on)
+
+    def test_withdrawn_sheet_can_be_confirmed_again(self):
+        """The whole point: fix the days, send it to payroll again."""
+        sheet = self._confirmed_sheet()
+        sheet.with_user(self.supervisor_user).action_reset_to_draft()
+        self.assertTrue(sheet.is_editable_period)
+
+        sheet.with_user(self.supervisor_user).action_supervisor_confirm()
+        self.assertEqual(sheet.state, 'confirmed')
+        self.assertEqual(sheet.x_confirmed_by, self.supervisor_user)
+
+    def test_unrelated_user_cannot_withdraw(self):
+        """No .sudo(): the guard exempts env.su, so a sudo'd call would
+        sail through and prove nothing."""
+        sheet = self._confirmed_sheet()
+        with self.assertRaises(UserError):
+            sheet.with_user(self.other_user).action_reset_to_draft()
+        self.assertEqual(sheet.state, 'confirmed')
+
+    def test_supervisor_cannot_withdraw_a_closed_month(self):
+        """The month is the fence — once it is past, HR owns it."""
+        last_month = self.today.replace(day=1) - timedelta(days=1)
+        sheet = self._sheet(
+            month=str(last_month.month), year=last_month.year)
+        sheet.with_user(self.hr_user).action_supervisor_confirm()
+
+        with self.assertRaises(UserError):
+            sheet.with_user(self.supervisor_user).action_reset_to_draft()
+        self.assertEqual(sheet.state, 'confirmed')
+
+        # HR remains the escape hatch for a closed month.
+        sheet.with_user(self.hr_user).action_reset_to_draft()
+        self.assertEqual(sheet.state, 'draft')
+
+    def test_draft_sheet_cannot_be_withdrawn(self):
+        sheet = self._sheet()
+        with self.assertRaises(UserError):
+            sheet.with_user(self.supervisor_user).action_reset_to_draft()
+
+    def test_can_reset_flag_matches_the_guard(self):
+        """The button must never offer what the guard refuses."""
+        sheet = self._confirmed_sheet()
+        self.assertTrue(sheet.with_user(self.supervisor_user).x_can_reset)
+        self.assertFalse(sheet.with_user(self.other_user).x_can_reset)
+
+        sheet.with_user(self.supervisor_user).action_reset_to_draft()
+        self.assertFalse(
+            sheet.with_user(self.supervisor_user).x_can_reset,
+            'A draft sheet has nothing to withdraw.',
+        )
+
+    # ------------------------------------------------------------------
+    # What withdrawing must not destroy
+    # ------------------------------------------------------------------
+
+    def test_withdrawing_keeps_the_attendance_records(self):
+        """Payroll reads the sheet's state, not its attendance rows.
+
+        Deleting them would take the approved late/early-leave excuses
+        linked to those punches with them (the m2m is ON DELETE CASCADE),
+        so an undo would silently un-excuse days HR had approved.
+        """
+        sheet = self._confirmed_sheet()
+        att_ids = sheet.line_ids.mapped('attendance_id').ids
+        self.assertTrue(att_ids, 'Fixture should produce attendance rows.')
+
+        sheet.with_user(self.supervisor_user).action_reset_to_draft()
+
+        self.assertEqual(
+            sorted(sheet.line_ids.mapped('attendance_id').ids),
+            sorted(att_ids),
+            'Withdrawing must not rebuild the attendance records.',
+        )
+        self.assertEqual(
+            len(self.env['hr.attendance'].sudo().browse(att_ids).exists()),
+            len(att_ids),
+        )
+
+    def test_withdrawing_posts_who_did_it(self):
+        sheet = self._confirmed_sheet()
+        before = sheet.message_ids.ids
+        sheet.with_user(self.supervisor_user).action_reset_to_draft()
+
+        new = sheet.message_ids.filtered(lambda m: m.id not in before)
+        self.assertTrue(new)
+        self.assertIn('Withdrawn from Payroll', new[0].body)
+        self.assertIn(self.supervisor_user.name, new[0].body)
+
+    # ------------------------------------------------------------------
+    # Bulk withdrawal from the list
+    # ------------------------------------------------------------------
+
+    def test_bulk_withdraw_takes_the_selection_back(self):
+        second = self.env['hr.employee'].sudo().create({
+            'name': 'Confirm Sheet Employee 2',
+            'resource_calendar_id': self.calendar.id,
+            'parent_id': self.supervisor.id,
+            'x_is_attendance_sheet': True,
+        })
+        sheets = self._confirmed_sheet() | self._confirmed_sheet(
+            employee=second)
+        sheets.with_user(self.supervisor_user).action_withdraw_selected()
+
+        self.assertEqual(set(sheets.mapped('state')), {'draft'})
+
+    def test_bulk_withdraw_keeps_what_it_could_and_names_the_rest(self):
+        """A partial refusal must not roll back the ones that worked."""
+        mine = self._confirmed_sheet()
+        outsider_employee = self.env['hr.employee'].sudo().create({
+            'name': 'Someone Else\'s Report',
+            'resource_calendar_id': self.calendar.id,
+            'x_is_attendance_sheet': True,
+        })
+        theirs = self._sheet(employee=outsider_employee)
+        theirs.sudo().action_supervisor_confirm()
+
+        result = (mine | theirs).with_user(
+            self.supervisor_user).action_withdraw_selected()
+
+        self.assertEqual(mine.state, 'draft')
+        self.assertEqual(theirs.state, 'confirmed')
+        self.assertEqual(result['tag'], 'display_notification')
+        self.assertIn(theirs.display_name, result['params']['message'])
+
+    def test_bulk_withdraw_with_nothing_selected_says_so(self):
+        with self.assertRaises(UserError):
+            self.env['ksw.attendance.sheet'].with_user(
+                self.supervisor_user).action_withdraw_selected()

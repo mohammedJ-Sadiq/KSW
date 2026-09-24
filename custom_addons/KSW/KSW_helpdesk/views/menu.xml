@@ -13,6 +13,15 @@
               action="action_helpdesk_ticket_my_tickets"
               sequence="1"/>
 
+    <!-- Read-only: an employee's own IT equipment, never anyone else's
+         (see it_asset_rule_user_own + the action's own domain), and never
+         editable - only the IT Team can change asset data. -->
+    <menuitem id="menu_helpdesk_my_assets"
+              name="My Assets"
+              parent="menu_helpdesk_root"
+              action="action_it_asset_my_assets"
+              sequence="5"/>
+
     <!-- Operations (agents + managers) -->
     <menuitem id="menu_helpdesk_all_tickets"
               name="All Tickets"

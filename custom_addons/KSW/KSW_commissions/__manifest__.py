@@ -1,6 +1,6 @@
 {
     'name': 'KSW Commissions & Other Allowances',
-    'version': '19.0.4.5.0',
+    'version': '19.0.4.13.0',
     'summary': 'Commissions and allowances on the ERP element model: a '
                'configurable pay-component catalog, one entry screen per '
                'department, and a monthly run the General Manager approves.',
@@ -35,6 +35,11 @@ not part of the commission request.
         'KSW_attendance_sheet',
         'KSW_deduction',
         'KSW_ext_sync',
+        # The vacation hold reads hr.leave.x_return_state / x_return_date.
+        # Already loaded transitively (KSW_deduction -> KSW_payroll ->
+        # KSW_annual_leave), so naming it reorders nothing — it just stops
+        # the hold breaking if that chain is ever shortened.
+        'KSW_annual_leave',
     ],
     'data': [
         'security/security.xml',
@@ -42,12 +47,15 @@ not part of the commission request.
         'data/sequence.xml',
         'data/ksw_site_data.xml',
         'data/pay_component_data.xml',
+        'data/cash_band_data.xml',
         'data/mail_template_data.xml',
         'views/ksw_site_views.xml',
         'views/ksw_pay_component_views.xml',
+        'views/ksw_pay_cash_band_views.xml',
         'views/ksw_pay_batch_views.xml',
         'views/ksw_pay_submission_views.xml',
         'views/ksw_pay_run_views.xml',
+        'views/ksw_pay_vacation_release_views.xml',
         'views/ksw_salesperson_profile_views.xml',
         'views/ksw_sales_commission_rule_views.xml',
         'views/ksw_sales_commission_sheet_views.xml',

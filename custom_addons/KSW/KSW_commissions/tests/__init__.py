@@ -14,3 +14,5 @@ from . import test_pay_employee_access
 from . import test_pay_employee_rate
 from . import test_site_type
 from . import test_pay_batch_export
+from . import test_vacation_hold
+from . import test_cash_bands
