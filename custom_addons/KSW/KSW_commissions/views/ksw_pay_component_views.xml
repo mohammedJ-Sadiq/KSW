@@ -241,12 +241,17 @@
                 <field name="employee_id" options="{'no_create': True}"/>
                 <field name="component_id" options="{'no_create': True}"/>
                 <field name="has_options" column_invisible="1"/>
+                <field name="needs_reason" column_invisible="1"/>
                 <field name="option_id" options="{'no_create': True}"
                        required="has_options" optional="show"/>
                 <field name="department_id" optional="show" readonly="1"/>
                 <field name="quantity"/>
                 <field name="amount"/>
-                <field name="reason" optional="hide"/>
+                <!-- On a catch-all component the reason is what tells two
+                     standing payments for the same employee apart, so it is
+                     shown by default and required where the component asks
+                     for it. -->
+                <field name="reason" required="needs_reason" optional="show"/>
                 <field name="date_from"/>
                 <field name="date_to"/>
                 <field name="active" widget="boolean_toggle" optional="hide"/>

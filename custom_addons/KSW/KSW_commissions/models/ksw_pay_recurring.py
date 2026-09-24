@@ -52,6 +52,8 @@ class KswPayRecurring(models.Model):
     )
     has_options = fields.Boolean(
         related='component_id.has_options', readonly=True)
+    needs_reason = fields.Boolean(
+        related='component_id.needs_reason', readonly=True)
     quantity = fields.Float(default=1.0, digits=(16, 2))
     amount = fields.Monetary(
         help='For fixed-amount components, what to pay each month.',
@@ -60,7 +62,11 @@ class KswPayRecurring(models.Model):
         'res.currency', required=True,
         default=lambda s: s.env.company.currency_id,
     )
-    reason = fields.Char()
+    reason = fields.Char(
+        help="What this standing payment is for. On a catch-all component "
+             "such as Other it is the only thing telling two of them apart, "
+             "so it is required there and forms part of their identity.",
+    )
     date_from = fields.Date(
         required=True, default=lambda s: fields.Date.context_today(s).replace(day=1),
     )
@@ -156,26 +162,64 @@ class KswPayRecurring(models.Model):
             self._check_employee_allowed()
         return res
 
+    @staticmethod
+    def _reason_key(reason):
+        """Normalised reason, so spacing and case do not invent a difference."""
+        return ' '.join((reason or '').split()).lower()
+
     # Python rather than SQL: a component without options leaves option_id
     # NULL, and Postgres indexes NULLS DISTINCT — a UNIQUE over the four
     # columns would wave every duplicate through. Same reasoning as
     # ksw.pay.batch._check_unique_scope.
-    @api.constrains('employee_id', 'component_id', 'option_id', 'date_from')
+    #
+    # The component is not the identity of a standing instruction. A
+    # catch-all like Other exists precisely so that one employee can carry
+    # several unrelated monthly payments under it — a housing top-up and a
+    # fuel card both start on the 1st and are told apart only by their
+    # reason, which is why the component sets needs_reason. Keying on
+    # (employee, component, option, date) alone refused the second one and
+    # left the supervisor no way to record it. So the reason joins the key:
+    # two differently-explained payments coexist, while typing the same one
+    # twice — the accident this guard is for — is still refused.
+    @api.constrains(
+        'employee_id', 'component_id', 'option_id', 'date_from', 'reason')
     def _check_unique_employee_component(self):
         for rec in self:
-            duplicate = self.sudo().search([
+            siblings = self.sudo().search([
                 ('id', '!=', rec.id),
                 ('employee_id', '=', rec.employee_id.id),
                 ('component_id', '=', rec.component_id.id),
                 ('option_id', '=', rec.option_id.id or False),
                 ('date_from', '=', rec.date_from),
-            ], limit=1)
+            ])
+            key = rec._reason_key(rec.reason)
+            duplicate = siblings.filtered(
+                lambda s, k=key: s._reason_key(s.reason) == k)
             if duplicate:
+                what = rec.option_id.name or rec.component_id.name
+                if key:
+                    raise ValidationError(_(
+                        "%(employee)s already has a recurring %(what)s for "
+                        "'%(reason)s' starting on that date. Give this one a "
+                        "different reason if it is a separate payment.",
+                        employee=rec.employee_id.display_name,
+                        what=what, reason=rec.reason))
                 raise ValidationError(_(
                     "%(employee)s already has a recurring %(what)s starting "
                     "on that date.",
-                    employee=rec.employee_id.display_name,
-                    what=rec.option_id.name or rec.component_id.name))
+                    employee=rec.employee_id.display_name, what=what))
+
+    # Mirrors ksw.pay.entry._check_reason_required. Without it a standing
+    # instruction could be saved with no reason and then break Add Recurring
+    # for the whole department when the entry it creates hits that
+    # constraint — refuse it here, where one supervisor can fix it.
+    @api.constrains('reason', 'component_id')
+    def _check_reason_required(self):
+        for rec in self:
+            if rec.component_id.needs_reason and not (rec.reason or '').strip():
+                raise ValidationError(_(
+                    "A recurring %(name)s needs a reason saying what it is "
+                    "for.", name=rec.component_id.name))
 
     @api.constrains('option_id', 'component_id')
     def _check_option(self):
@@ -236,7 +280,12 @@ class KswPayRecurring(models.Model):
         # A component with options repeats per option, so "already there"
         # is the employee *and* the choice: pulling in the recurring meals
         # must not stop at the first one because his breakfast is typed.
-        already = {(e.employee_id.id, e.option_id.id or False)
+        # The reason is in the key for the same reason it is in the
+        # uniqueness key above — an employee may carry two standing Other
+        # payments, and keying on the employee alone would pull the first
+        # and silently drop the second.
+        already = {(e.employee_id.id, e.option_id.id or False,
+                    self._reason_key(e.reason))
                    for e in batch.entry_ids}
         # A recurring entry is company-wide configuration; this batch is not.
         # Pull in only the people it actually covers, or the entry guard
@@ -250,7 +299,8 @@ class KswPayRecurring(models.Model):
         holds = vacation_holds(self.env, recurring.employee_id, period)
         vals_list = []
         for rec in recurring:
-            if (rec.employee_id.id, rec.option_id.id or False) in already:
+            if (rec.employee_id.id, rec.option_id.id or False,
+                    self._reason_key(rec.reason)) in already:
                 continue
             if rec.employee_id.id not in in_scope:
                 continue

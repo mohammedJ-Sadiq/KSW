@@ -624,3 +624,94 @@ class TestComponentOptions(PayEntryCommon):
         # Idempotent: pressing the button twice adds nothing.
         self.assertFalse(
             self.env['ksw.pay.recurring']._apply_to_batch(batch))
+
+
+class TestRecurringCatchAllComponent(PayEntryCommon):
+    """Two standing payments under one catch-all component (19.0.4.14.0).
+
+    'Other' exists so an employee can carry a monthly payment that fits none
+    of the named components — a housing top-up and a fuel card, both starting
+    on the 1st. The uniqueness guard keyed on (employee, component, option,
+    date) called the second one a duplicate and left the supervisor no way to
+    record it. The reason is what tells them apart, which is exactly why the
+    component sets needs_reason.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.c_other = cls.env.ref('KSW_commissions.pay_component_other')
+
+    def _other(self, reason, amount=100.0, **kw):
+        vals = {
+            'employee_id': self.emp.id,
+            'component_id': self.c_other.id,
+            'quantity': 1.0, 'amount': amount,
+            'date_from': '2028-01-01',
+            'reason': reason,
+        }
+        vals.update(kw)
+        return self.env['ksw.pay.recurring'].sudo().create(vals)
+
+    def test_01_two_different_reasons_same_date_are_allowed(self):
+        self._other('Housing top-up', 300.0)
+        second = self._other('Fuel card', 200.0)
+        self.assertTrue(second.id)
+
+    def test_02_the_same_reason_twice_is_still_refused(self):
+        self._other('Housing top-up', 300.0)
+        with self.assertRaises(ValidationError):
+            self._other('  housing   TOP-UP ', 300.0)
+
+    def test_03_a_catch_all_recurring_needs_a_reason(self):
+        """Refused here, where one supervisor can fix it — not later, when
+        the entry it creates would break Add Recurring for the department."""
+        with self.assertRaises(ValidationError):
+            self._other(False)
+
+    def test_04_both_are_pulled_into_the_batch(self):
+        self._other('Housing top-up', 300.0)
+        self._other('Fuel card', 200.0)
+        batch = self._batch(component=self.c_other)
+        batch.action_add_recurring()
+        batch.invalidate_recordset()
+        self.assertEqual(batch.entry_count, 2)
+        self.assertAlmostEqual(batch.total_amount, 500.0, places=2)
+        self.assertEqual(
+            set(batch.entry_ids.mapped('reason')),
+            {'Housing top-up', 'Fuel card'})
+
+    def test_05_the_second_is_not_dropped_by_an_earlier_press(self):
+        """The regression the reason in the `already` key prevents: keyed on
+        the employee alone, a standing payment added after the button was
+        first pressed never arrived."""
+        self._other('Housing top-up', 300.0)
+        batch = self._batch(component=self.c_other)
+        batch.action_add_recurring()
+        self._other('Fuel card', 200.0)
+        batch.action_add_recurring()
+        batch.invalidate_recordset()
+        self.assertEqual(batch.entry_count, 2)
+
+    def test_06_pressing_twice_still_does_not_duplicate(self):
+        self._other('Housing top-up', 300.0)
+        self._other('Fuel card', 200.0)
+        batch = self._batch(component=self.c_other)
+        batch.action_add_recurring()
+        batch.action_add_recurring()
+        batch.invalidate_recordset()
+        self.assertEqual(batch.entry_count, 2)
+
+    def test_07_a_named_component_still_refuses_a_plain_duplicate(self):
+        """Nothing loosened for a component whose identity IS the component:
+        Mobile Phone Allowance carries no reason, so a second one on the same
+        date is the accident the guard is for."""
+        Recurring = self.env['ksw.pay.recurring'].sudo()
+        vals = {
+            'employee_id': self.emp.id,
+            'component_id': self.c_mobile.id,
+            'quantity': 1.0, 'amount': 100.0, 'date_from': '2028-01-01',
+        }
+        Recurring.create(vals)
+        with self.assertRaises(ValidationError):
+            Recurring.create(dict(vals))
