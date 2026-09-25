@@ -46,6 +46,7 @@ class HrPayslipRun(models.Model):
         month = Journal.month_label(self.date_end or self.date_start)
         rows = []
         unmapped = {}
+        self._check_loan_accounts()
 
         for slip in self._bas_journal_slips().sorted(
                 lambda s: (s.employee_id.sudo().name or '', s.id)):
@@ -146,6 +147,17 @@ class HrPayslipRun(models.Model):
                 'The salary rule "%(rule)s" is marked net payable but has '
                 'no BAS Account Code.', rule=rule.name or rule.code))
         return rule.x_bas_account_code, rule.x_bas_account_name
+
+    def _check_loan_accounts(self):
+        """Everyone whose repayment has nowhere to go, before row one."""
+        self.ensure_one()
+        owing = self.env['hr.employee']
+        for slip in self._bas_journal_slips():
+            if any(line.total and line.salary_rule_id.x_bas_posting == 'loan'
+                   for line in slip.line_ids):
+                owing |= slip.employee_id
+        if owing:
+            self.env['ksw.bas.journal'].check_loan_accounts(owing.sudo())
 
     def _bas_loan_account(self, employee):
         """The employee's BAS loan account — defined once, in the writer."""

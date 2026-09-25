@@ -237,8 +237,16 @@ class KswCommissionBankExportWizard(models.TransientModel):
     # --- TXT generation (Kawthar format) -----------------------------------
 
     def _make_kawthar_txt(self, bank, lines):
-        """Generate Kawthar fixed-width 194-char TXT file for commissions."""
-        lines = []
+        """Generate Kawthar fixed-width 194-char TXT file for commissions.
+
+        The accumulator is `rows`, not `lines`: it used to be called `lines`
+        too, which rebound the parameter to an empty list on the first
+        statement and killed the very next line with
+        `'list' object has no attribute 'sorted'`. Nothing caught it because
+        this export had no test and the crash is on the first line of the
+        loop, so the file was never produced even once.
+        """
+        rows = []
         op = (self.operation_code or '2')
         vd = (self.value_date or fields.Date.context_today(self))
         vd_str = vd.strftime('%Y%m%d') if hasattr(vd, 'strftime') else str(vd).replace('-', '')
@@ -273,9 +281,9 @@ class KswCommissionBankExportWizard(models.TransientModel):
                 + basic_str + housing_str + other_str + ded_str
             )
             assert len(row) == 194, f"Row length {len(row)} != 194"
-            lines.append(row)
+            rows.append(row)
 
-        return '\n'.join(lines)
+        return '\n'.join(rows)
 
     # ------------------------------------------------------------------
     # Main action
@@ -301,6 +309,18 @@ class KswCommissionBankExportWizard(models.TransientModel):
         employee is paid from.
         """
         run = self.run_id
+        # The writer (`ksw.bas.journal`) lives in KSW_payroll, which this
+        # module deliberately does not depend on — adding the dependency
+        # reorders module loading. So the model can genuinely be absent, and
+        # it was on KSWCO the day this shipped: the commissions half of the
+        # feature was deployed while the payroll half was not, and the
+        # accountant got a bare KeyError traceback. Say what is wrong instead.
+        if 'ksw.bas.journal' not in self.env:
+            raise UserError(_(
+                'The journal-entry export is not available on this system '
+                'yet: it is written by KSW_payroll, which has not been '
+                'updated. Ask IT to deploy it, or use one of the bank-file '
+                'exports above.'))
         data = run._bas_journal_workbook()
         return self._bundle_and_download(
             [('JournalEntry_%s.xlsx' % self._batch_label(), data)])

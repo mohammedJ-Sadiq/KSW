@@ -92,6 +92,10 @@
             <field name="scope">department</field>
             <field name="sequence">30</field>
             <field name="description">Meals provided on duty. Pick the meal on each row — the rate comes from it.</field>
+            <field name="x_bas_expense_code">3201010006</field>
+            <field name="x_bas_expense_name">مصروفات اضافي العاملين</field>
+            <field name="x_bas_accrual_code">2107010001</field>
+            <field name="x_bas_accrual_name">مصروفات مستحقة عمولات سائقين التريلات</field>
         </record>
         <record id="pay_option_meal_breakfast" model="ksw.pay.option">
             <field name="component_id" ref="pay_component_meals"/>
@@ -122,6 +126,10 @@
             <field name="calculation">fixed</field>
             <field name="scope">department</field>
             <field name="sequence">40</field>
+            <field name="x_bas_expense_code">3201010006</field>
+            <field name="x_bas_expense_name">مصروفات اضافي العاملين</field>
+            <field name="x_bas_accrual_code">2107010001</field>
+            <field name="x_bas_accrual_name">مصروفات مستحقة عمولات سائقين التريلات</field>
         </record>
         <record id="pay_component_location_allowance" model="ksw.pay.component">
             <field name="name">Location Allowance</field>
@@ -185,6 +193,10 @@
             <field name="calculation">fixed</field>
             <field name="scope">department</field>
             <field name="sequence">60</field>
+            <field name="x_bas_expense_code">3201010006</field>
+            <field name="x_bas_expense_name">مصروفات اضافي العاملين</field>
+            <field name="x_bas_accrual_code">2107010001</field>
+            <field name="x_bas_accrual_name">مصروفات مستحقة عمولات سائقين التريلات</field>
         </record>
         <record id="pay_component_bonus_national" model="ksw.pay.component">
             <field name="name">National Day Bonus</field>
@@ -192,6 +204,10 @@
             <field name="calculation">fixed</field>
             <field name="scope">department</field>
             <field name="sequence">61</field>
+            <field name="x_bas_expense_code">3201010006</field>
+            <field name="x_bas_expense_name">مصروفات اضافي العاملين</field>
+            <field name="x_bas_accrual_code">2107010001</field>
+            <field name="x_bas_accrual_name">مصروفات مستحقة عمولات سائقين التريلات</field>
         </record>
         <record id="pay_component_bonus_fitr" model="ksw.pay.component">
             <field name="name">Eid Al-Fitr Bonus</field>
@@ -199,6 +215,10 @@
             <field name="calculation">fixed</field>
             <field name="scope">department</field>
             <field name="sequence">62</field>
+            <field name="x_bas_expense_code">3201010006</field>
+            <field name="x_bas_expense_name">مصروفات اضافي العاملين</field>
+            <field name="x_bas_accrual_code">2107010001</field>
+            <field name="x_bas_accrual_name">مصروفات مستحقة عمولات سائقين التريلات</field>
         </record>
         <record id="pay_component_bonus_adha" model="ksw.pay.component">
             <field name="name">Eid Al-Adha Bonus</field>
@@ -206,6 +226,10 @@
             <field name="calculation">fixed</field>
             <field name="scope">department</field>
             <field name="sequence">63</field>
+            <field name="x_bas_expense_code">3201010006</field>
+            <field name="x_bas_expense_name">مصروفات اضافي العاملين</field>
+            <field name="x_bas_accrual_code">2107010001</field>
+            <field name="x_bas_accrual_name">مصروفات مستحقة عمولات سائقين التريلات</field>
         </record>
 
         <!-- ── Employee bonus / catch-all ───────────────────────────── -->
@@ -216,6 +240,10 @@
             <field name="scope">department</field>
             <field name="needs_reason" eval="True"/>
             <field name="sequence">70</field>
+            <field name="x_bas_expense_code">3201010006</field>
+            <field name="x_bas_expense_name">مصروفات اضافي العاملين</field>
+            <field name="x_bas_accrual_code">2107010001</field>
+            <field name="x_bas_accrual_name">مصروفات مستحقة عمولات سائقين التريلات</field>
         </record>
         <record id="pay_component_other" model="ksw.pay.component">
             <field name="name">Other</field>
@@ -224,6 +252,10 @@
             <field name="scope">department</field>
             <field name="needs_reason" eval="True"/>
             <field name="sequence">200</field>
+            <field name="x_bas_expense_code">3201010006</field>
+            <field name="x_bas_expense_name">مصروفات اضافي العاملين</field>
+            <field name="x_bas_accrual_code">2107010001</field>
+            <field name="x_bas_accrual_name">مصروفات مستحقة عمولات سائقين التريلات</field>
         </record>
 
         <!-- ── Sequence for batches ─────────────────────────────────── -->

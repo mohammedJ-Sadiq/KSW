@@ -5372,3 +5372,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
 msgid "<strong>Ready to finalise.</strong>\n                        Every department that has been approved is waiting to\n                        be paid. <b>Finalise &amp; Send to Accounting</b>\n                        builds the payment register, settles the loan\n                        installments, locks the month and hands it to the\n                        accountant for the bank export."
 msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/bank_file_export_wizard.py:0
+msgid ""
+"The journal-entry export is not available on this system yet: it is "
+"written by KSW_payroll, which has not been updated. Ask IT to deploy "
+"it, or use one of the bank-file exports above."
+msgstr ""

@@ -62,6 +62,17 @@ class KswPayRun(models.Model):
         Journal = self.env['ksw.bas.journal']
         month = Journal.month_label(self.period)
         totals = self._bas_component_totals()
+        # Every component in one pass, before any row is built: hitting
+        # this one component at a time, re-running the export after each,
+        # is the same whack-a-mole the BAS importer was taught not to play.
+        used = self.env['ksw.pay.component']
+        for by_component in totals.values():
+            for component, amount in by_component.items():
+                if amount:
+                    used |= component
+        self._check_component_accounts(used)
+        Journal.check_loan_accounts(self.line_ids.filtered('loan_offset')
+                                    .employee_id.sudo())
         rows = []
         mismatched = []
 
@@ -78,7 +89,6 @@ class KswPayRun(models.Model):
 
             debits = []
             for component, amount in by_component.items():
-                self._check_component_accounts(component)
                 debits.append({
                     'code': component.x_bas_expense_code,
                     'name': component.x_bas_expense_name,
@@ -130,20 +140,30 @@ class KswPayRun(models.Model):
     # ------------------------------------------------------------------
     # Accounts
     # ------------------------------------------------------------------
-    def _check_component_accounts(self, component):
-        """Refuse by name rather than post a half entry."""
-        missing = [label for label, value in (
-            (_('BAS Expense Account'), component.x_bas_expense_code),
-            (_('BAS Accrual Account'), component.x_bas_accrual_code),
-        ) if not value]
-        if missing:
+    def _check_component_accounts(self, components):
+        """Refuse by name rather than post a half entry.
+
+        Takes the whole month's components at once and lists every one
+        that is short an account, so the accountant fills them in in a
+        single visit to the catalog instead of discovering them one
+        export at a time.
+        """
+        unmapped = []
+        for component in components:
+            missing = [label for label, value in (
+                (_('BAS Expense Account'), component.x_bas_expense_code),
+                (_('BAS Accrual Account'), component.x_bas_accrual_code),
+            ) if not value]
+            if missing:
+                unmapped.append('• %s — %s' % (component.name or '',
+                                               ' / '.join(missing)))
+        if unmapped:
             raise UserError(_(
-                'The pay component "%(component)s" has no %(missing)s set, '
-                'so its amounts have no account to be posted to. Set it on '
-                'the component (Commissions ▸ Configuration ▸ Pay '
-                'Components) and export again.',
-                component=component.name or '',
-                missing=' / '.join(missing)))
+                'These pay components have no BAS account set, so their '
+                'amounts have nothing to be posted to:\n\n%(missing)s\n\n'
+                'Set them on each component (Commissions ▸ Configuration ▸ '
+                'Pay Components ▸ BAS Journal) and export again.',
+                missing='\n'.join(unmapped)))
 
     def _bas_loan_account(self, employee):
         """The employee's BAS loan account — defined once, in the writer."""

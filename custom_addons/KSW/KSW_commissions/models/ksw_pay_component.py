@@ -215,6 +215,25 @@ class KswPayComponent(models.Model):
         """
         return [('bas_trips', 'Driver trips from BAS')]
 
+    def action_open_form(self):
+        """Open this component's own form.
+
+        The catalog list is editable in place, which is right for the
+        columns — a rate or a sequence is a one-click change — but it means
+        a row click never opens the form, and options, rate tiers, employee
+        rates and the BAS accounts exist nowhere else.
+        """
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': self._name,
+            'res_id': self.id,
+            'view_mode': 'form',
+            'views': [(self.env.ref(
+                'KSW_commissions.view_ksw_pay_component_form').id, 'form')],
+            'target': 'current',
+        }
+
     @api.depends('name', 'code')
     def _compute_display_name(self):
         for rec in self:

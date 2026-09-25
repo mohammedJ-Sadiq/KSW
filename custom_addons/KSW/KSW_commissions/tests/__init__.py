@@ -18,3 +18,4 @@ from . import test_vacation_hold
 from . import test_cash_bands
 from . import test_bas_journal_entry
 from . import test_run_finalisation
+from . import test_bank_export_txt

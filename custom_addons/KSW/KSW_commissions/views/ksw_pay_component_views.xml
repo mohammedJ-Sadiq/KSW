@@ -211,6 +211,13 @@
                 <field name="importer" optional="hide"/>
                 <field name="entries_import_only" optional="hide"/>
                 <field name="active" widget="boolean_toggle" optional="show"/>
+                <!-- An editable list edits the row in place, so clicking it
+                     never opens the form — and everything that does not fit
+                     a column (options, rate tiers, employee rates, the BAS
+                     accounts) lives only there. This button is the way in. -->
+                <button name="action_open_form" type="object"
+                        icon="fa-expand" title="Open"
+                        class="btn-link" invisible="not id"/>
             </list>
         </field>
     </record>

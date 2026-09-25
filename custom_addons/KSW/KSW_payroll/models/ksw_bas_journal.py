@@ -201,6 +201,25 @@ class KswBasJournal(models.AbstractModel):
     # Accounts
     # ------------------------------------------------------------------
     @api.model
+    def check_loan_accounts(self, employees):
+        """Every employee whose repayment has nowhere to go, in one list.
+
+        Named together rather than one export at a time: the accountant
+        fixes the employee records in a single visit, the way the BAS
+        importer reports its skipped drivers.
+        """
+        missing = [employee for employee in employees
+                   if not (getattr(employee, 'x_loan_acc_no', '') or '').strip()]
+        if missing:
+            raise UserError(_(
+                'These employees have an installment settled in this period '
+                'but no "Loan Acc No. in Bas" on their employee record, so '
+                'the repayment has no account to be credited to:\n\n'
+                '%(who)s\n\nSet it on each of them and export again.',
+                who='\n'.join('• %s' % (e.name or '') for e in missing)))
+        return True
+
+    @api.model
     def loan_account(self, employee):
         """The employee's own loan account in BAS, and its name there.
 
