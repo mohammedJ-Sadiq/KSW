@@ -79,6 +79,7 @@ class TestJournalRows(BasJournalCommon):
         self.assertEqual(credit['code'], '2107010001')
         self.assertAlmostEqual(credit['credit'], 1200.0)
         self.assertIn(self.emp_a.name, debit['ref'])
+        self.assertIn(self.emp_a.name, credit['ref'])
 
     def test_02_loan_comes_out_before_the_accrual(self):
         """The three-line block the hand-typed voucher used."""
@@ -139,22 +140,27 @@ class TestJournalRows(BasJournalCommon):
 
 
 class TestJournalDescriptions(BasJournalCommon):
-    """What the line *says* — the half of the voucher nobody can compute."""
+    """What the line *says*: the pay type, «شهر», the month — nothing else."""
 
-    def test_30_the_supervisors_note_is_the_description(self):
+    def _month(self, run):
+        Journal = self.env['ksw.bas.journal']
+        return Journal.with_context(
+            lang=Journal.voucher_lang()).month_label(run.period)
+
+    def test_30_the_description_is_the_type_and_the_month(self):
         batch = self._batch(self.sup_a, self.dept_a, component=self.meals)
         self._entry(batch, self.emp_a, user=self.sup_a, quantity=1.0,
                     amount_override=300.0, reason='تصليح قفل باب سيارة ١٢٤')
         run = self._approve(batch)
 
-        debit = self._rows(run)[0]
+        ref = self._rows(run)[0]['ref']
 
-        # His words, not the component's name.
-        self.assertIn('تصليح قفل باب سيارة ١٢٤', debit['ref'])
-        self.assertNotIn(self._voucher_name(self.meals), debit['ref'])
+        self.assertNotIn('تصليح', ref, "the supervisor's note stays off")
+        self.assertTrue(ref.startswith(self._voucher_name(self.meals)), ref)
+        self.assertTrue(ref.endswith(self._month(run)), ref)
 
-    def test_31_a_line_per_note_not_per_component(self):
-        """Three notes, three lines — one accrual credit for the lot."""
+    def test_31_one_line_per_type_however_it_was_entered(self):
+        """Three notes, three rows — one debit and one credit."""
         batch = self._batch(self.sup_a, self.dept_a, component=self.meals)
         for note, amount in (('قير 108', 100.0), ('سير 158', 200.0),
                              ('ماطور 131', 300.0)):
@@ -164,48 +170,50 @@ class TestJournalDescriptions(BasJournalCommon):
 
         rows = self._rows(run)
 
-        self.assertEqual(len(rows), 4)
-        self.assertEqual([r['debit'] for r in rows[:3]], [100.0, 200.0, 300.0])
-        for note, row in zip(('قير 108', 'سير 158', 'ماطور 131'), rows[:3]):
-            self.assertIn(note, row['ref'])
-        self.assertAlmostEqual(rows[3]['credit'], 600.0)
+        self.assertEqual(len(rows), 2)
+        self.assertAlmostEqual(rows[0]['debit'], 600.0)
+        self.assertAlmostEqual(rows[1]['credit'], 600.0)
 
-    def test_32_occurrences_described_the_same_way_stay_one_line(self):
+    def test_32_the_components_voucher_wording_wins(self):
+        """Split Fridays come out as one «بدل عمل ايام الجمعة» line."""
+        self.meals.sudo().x_bas_ref = 'بدل عمل ايام الجمعة'
         batch = self._batch(self.sup_a, self.dept_a, component=self.meals)
-        for _i in range(3):
+        for note in ('جمعة 1', 'جمعة 8', 'جمعة 15'):
             self._entry(batch, self.emp_a, user=self.sup_a, quantity=1.0,
-                        amount_override=100.0, reason='قير 108')
+                        amount_override=150.0, reason=note)
         run = self._approve(batch)
 
         rows = self._rows(run)
 
         self.assertEqual(len(rows), 2)
-        self.assertAlmostEqual(rows[0]['debit'], 300.0)
+        self.assertAlmostEqual(rows[0]['debit'], 450.0)
+        self.assertTrue(rows[0]['ref'].startswith('بدل عمل ايام الجمعة'))
+        self.assertTrue(rows[0]['ref'].endswith(self._month(run)))
 
-    def test_33_no_note_falls_back_to_the_component_name(self):
-        batch = self._batch(self.sup_a, self.dept_a, component=self.meals)
-        self._entry(batch, self.emp_a, user=self.sup_a, quantity=1.0,
-                    amount_override=300.0, reason='')
+    def test_33_every_line_names_the_employee_as_bas_knows_him(self):
+        """BAS's spelling, minus the number BAS appends — on all three."""
+        self._make_pending_installment(self.emp_a, 500.0)
+        self.emp_a.sudo().x_bas_driver_cost_center = 'عبدالله محمد700'
+        batch = self._commission_entry(self.emp_a, 1200.0).batch_id
         run = self._approve(batch)
 
-        self.assertIn(self._voucher_name(self.meals),
-                      self._rows(run)[0]['ref'])
+        rows = self._rows(run)
 
-    def test_33b_an_importers_audit_note_is_not_a_description(self):
-        """`details` on an imported component is the machine's, not his."""
-        self.meals.sudo().importer = 'bas_trips'
-        batch = self._batch(self.sup_a, self.dept_a, component=self.meals)
-        self._entry(batch, self.emp_a, user=self.sup_a, quantity=1.0,
-                    amount_override=300.0, reason='',
-                    details='Weighted on «الرد المضاعف». Worked days: 31.')
+        self.assertEqual(len(rows), 3)
+        for row in rows:
+            self.assertIn('عبدالله محمد', row['ref'])
+            self.assertNotIn('700', row['ref'])
+            self.assertNotIn(self.emp_a.name, row['ref'])
+            self.assertTrue(row['ref'].endswith(self._month(run)), row)
+
+    def test_33b_without_a_bas_name_his_odoo_name_is_used(self):
+        self.emp_a.sudo().x_bas_driver_cost_center = False
+        batch = self._commission_entry(self.emp_a, 500.0).batch_id
         run = self._approve(batch)
 
-        ref = self._rows(run)[0]['ref']
+        self.assertIn(self.emp_a.name, self._rows(run)[0]['ref'])
 
-        self.assertNotIn('Worked days', ref)
-        self.assertIn(self._voucher_name(self.meals), ref)
-
-    def test_33c_the_voucher_is_arabic_whoever_exports_it(self):
+    def test_34_the_voucher_is_arabic_whoever_exports_it(self):
         """An English session must still produce an Arabic voucher."""
         arabic = self.env['res.lang'].sudo().search(
             [('code', '=like', 'ar%'), ('active', '=', True)], limit=1)
@@ -221,24 +229,60 @@ class TestJournalDescriptions(BasJournalCommon):
 
         self.assertIn('الوجبات', rows[0]['ref'])
 
-    def test_34_the_name_is_the_one_bas_holds(self):
-        """BAS's own spelling, minus the employee number it appends."""
-        self.emp_a.sudo().x_bas_driver_cost_center = 'عبدالله محمد عبد الحفيظ محمد700'
-        batch = self._commission_entry(self.emp_a, 500.0).batch_id
+
+class TestWholeRiyals(BasJournalCommon):
+    """The transfer and the journal carry no halalas."""
+
+    def test_40_a_types_total_is_rounded_half_up(self):
+        batch = self._batch(self.sup_a, self.dept_a, component=self.meals)
+        for amount in (100.25, 100.25):
+            self._entry(batch, self.emp_a, user=self.sup_a, quantity=1.0,
+                        amount_override=amount)
         run = self._approve(batch)
 
-        ref = self._rows(run)[0]['ref']
+        line = run.line_ids.filtered(lambda l: l.employee_id == self.emp_a)
+        self.assertEqual(line.earnings, 201.0, '200.50 rounds up')
+        self.assertEqual(line.net_payable, 201.0)
+        self.assertEqual(self._rows(run)[0]['debit'], 201.0)
 
-        self.assertIn('عبدالله محمد عبد الحفيظ محمد', ref)
-        self.assertNotIn('700', ref)
-        self.assertNotIn(self.emp_a.name, ref)
-
-    def test_35_without_a_bas_name_his_odoo_name_is_used(self):
-        self.emp_a.sudo().x_bas_driver_cost_center = False
-        batch = self._commission_entry(self.emp_a, 500.0).batch_id
+    def test_41_register_and_journal_agree_after_rounding(self):
+        batch = self._batch(self.sup_a, self.dept_a, component=self.meals)
+        self._entry(batch, self.emp_a, user=self.sup_a, quantity=1.0,
+                    amount_override=333.33)
+        self._entry(batch, self.emp_a2, user=self.sup_a, quantity=1.0,
+                    amount_override=666.67)
         run = self._approve(batch)
 
-        self.assertIn(self.emp_a.name, self._rows(run)[0]['ref'])
+        rows = self._rows(run)  # would refuse on a mismatch
+
+        self.assertEqual(sorted(run.line_ids.mapped('earnings')),
+                         [333.0, 667.0])
+        for row in rows:
+            self.assertEqual(row['debit'] + row['credit'],
+                             int(row['debit'] + row['credit']), row)
+
+    def test_42_a_fractional_installment_is_settled_to_the_riyal(self):
+        self._make_pending_installment(self.emp_a, 87.5)
+        batch = self._commission_entry(self.emp_a, 1200.0).batch_id
+        run = self._approve(batch)
+
+        line = run.line_ids.filtered(lambda l: l.employee_id == self.emp_a)
+        self.assertEqual(line.loan_offset, 87.0)
+        self.assertEqual(line.net_payable, 1113.0)
+
+    def test_43_batch_department_and_register_agree(self):
+        """The three totals a GM sees are one figure, not three."""
+        batch = self._batch(self.sup_a, self.dept_a, component=self.meals)
+        for emp, amount in ((self.emp_a, 100.25), (self.emp_a, 100.25),
+                            (self.emp_a2, 50.4)):
+            self._entry(batch, emp, user=self.sup_a, quantity=1.0,
+                        amount_override=amount)
+        run = self._approve(batch)
+
+        # 200.50 → 201, 50.40 → 50
+        self.assertEqual(batch.total_amount, 251.0)
+        self.assertEqual(batch.submission_id.total_amount, 251.0)
+        self.assertEqual(run.total_earnings, 251.0)
 
 
 class TestJournalRefusals(BasJournalCommon):
@@ -294,7 +338,7 @@ class TestJournalWorkbook(BasJournalCommon):
              'ref', 'remark', 'cost_Center'])
         self.assertTrue(sheet.sheet_view.rightToLeft)
 
-        # The voucher number is BAS's to assign, so the column is blank.
+        # No number given: the column is blank.
         self.assertEqual(sheet.cell(3, 1).value.strip(), '')
         # Period end, not the day it was exported.
         self.assertEqual(sheet.cell(3, 2).value.strip(), '31/03/2029')
@@ -311,7 +355,8 @@ class TestJournalWorkbook(BasJournalCommon):
         run = self._approve(batch)
 
         wizard = self.env['ksw.commission.bank.export.wizard'].sudo().create({
-            'run_id': run.id, 'export_mode': 'journal_entry'})
+            'run_id': run.id, 'export_mode': 'journal_entry',
+            'journal_number': '26007264'})
         action = wizard.action_export()
 
         attachment = self.env['ir.attachment'].browse(
@@ -320,3 +365,48 @@ class TestJournalWorkbook(BasJournalCommon):
         sheet = openpyxl.load_workbook(
             io.BytesIO(base64.b64decode(attachment.datas))).active
         self.assertEqual(sheet.cell(2, 1).value, 'number')
+        # The number he typed, on every line, as a number.
+        self.assertEqual(
+            {sheet.cell(r, 1).value for r in range(3, sheet.max_row + 1)},
+            {26007264})
+
+    def test_22_the_wizard_asks_for_the_journal_number(self):
+        batch = self._commission_entry(self.emp_a, 1200.0).batch_id
+        run = self._approve(batch)
+
+        wizard = self.env['ksw.commission.bank.export.wizard'].sudo().create({
+            'run_id': run.id, 'export_mode': 'journal_entry'})
+        with self.assertRaises(UserError):
+            wizard.action_export()
+
+
+class TestOneOrder(BasJournalCommon):
+    """The bank Excel and the journal are read side by side."""
+
+    def test_50_journal_and_excel_list_people_in_the_same_order(self):
+        # A leading space and lower case: a plain sort puts " zed" first
+        # and "abe" last.
+        self.emp_a.sudo().name = ' zed Driver'
+        self.emp_a2.sudo().name = 'abe Driver'
+        emp_c = self._employee('Bob Driver', self.dept_a, 6000.0)
+        emp_c.sudo().x_loan_acc_no = '1205010388'
+        for emp in (self.emp_a, self.emp_a2, emp_c):
+            emp.sudo().x_bas_driver_cost_center = False
+        batch = self._batch(self.sup_a, self.dept_a, component=self.meals)
+        for emp in (self.emp_a, self.emp_a2, emp_c):
+            self._entry(batch, emp, user=self.sup_a, quantity=1.0,
+                        amount_override=100.0)
+        run = self._approve(batch)
+
+        journal = [r['ref'] for r in self._rows(run) if r['debit']]
+        wizard = self.env['ksw.commission.bank.export.wizard'].sudo().create(
+            {'run_id': run.id, 'export_mode': 'journal_entry'})
+        book = openpyxl.Workbook()
+        wizard._make_comm_summary_excel(book, run.line_ids)
+        excel = [row[0].value for row in
+                 book['Commission Summary'].iter_rows(min_row=2)]
+
+        self.assertEqual([n.strip() for n in excel],
+                         ['abe Driver', 'Bob Driver', 'zed Driver'])
+        for name, ref in zip(excel, journal):
+            self.assertIn(name.strip(), ref)

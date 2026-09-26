@@ -1,6 +1,6 @@
 {
     'name': 'KSW Commissions & Other Allowances',
-    'version': '19.0.4.18.2',
+    'version': '19.0.4.19.3',
     'summary': 'Commissions and allowances on the ERP element model: a '
                'configurable pay-component catalog, one entry screen per '
                'department, and a monthly run the General Manager approves.',

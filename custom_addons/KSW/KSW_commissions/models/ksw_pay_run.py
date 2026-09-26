@@ -18,12 +18,14 @@ than typed, so there is no second document to keep in step and no second
 approval to chase.
 """
 import json
+import math
 
 from dateutil.relativedelta import relativedelta
 from markupsafe import Markup
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
+from odoo.tools import float_round
 
 from .ksw_commission_lock import LOCKING_STATES
 from .ksw_vacation_hold import (
@@ -791,10 +793,11 @@ class KswPayRun(models.Model):
         held = self._held_entries(entries)
         payable = entries - held
 
-        totals = {}
-        for entry in payable:
-            totals.setdefault(entry.employee_id.id, 0.0)
-            totals[entry.employee_id.id] += entry.amount or 0.0
+        totals = {
+            employee_id: sum(by_component.values())
+            for employee_id, by_component
+            in self._rounded_component_totals(payable).items()
+        }
         if held and not preview:
             self._announce_held(held)
 
@@ -824,11 +827,37 @@ class KswPayRun(models.Model):
                     'x_preview_generated': True,
                 })
             if preview:
-                line.loan_offset = min(amount, line._pending_loan_total())
+                line.loan_offset = math.floor(
+                    min(amount, line._pending_loan_total()) + 1e-6)
             else:
                 # From approval on, this is the settlement itself.
                 line.x_preview_generated = False
         return self.line_ids
+
+    @api.model
+    def _rounded_component_totals(self, entries):
+        """``{employee_id: {component: whole riyals}}``, in catalog order.
+
+        The month is paid in whole riyals: each employee's total for each
+        pay type is rounded half-up, and his earnings are the sum of those.
+        Rounded per type rather than once per employee because the BAS
+        journal posts one line per type — rounding the sum instead would
+        leave the lines adding up to a figure the transfer does not pay.
+        This is the one place that rule lives; the register and the journal
+        both read it, which is what keeps them equal.
+        """
+        totals = {}
+        for entry in entries.sorted(
+                lambda e: (e.component_id.sequence, e.component_id.id, e.id)):
+            by_component = totals.setdefault(entry.employee_id.id, {})
+            by_component[entry.component_id] = (
+                by_component.get(entry.component_id, 0.0)
+                + (entry.amount or 0.0))
+        for by_component in totals.values():
+            for component, amount in by_component.items():
+                by_component[component] = float_round(
+                    amount, precision_digits=0, rounding_method='HALF-UP')
+        return totals
 
     def _held_entries(self, entries=None):
         """The entries this month may not pay — see ``ksw_vacation_hold``."""
@@ -988,6 +1017,18 @@ class KswPayRunLine(models.Model):
         for rec in self:
             rec.is_preview = rec.state not in LOCKING_STATES
 
+    def _export_sorted(self):
+        """The one order every file of the month lists people in.
+
+        The bank Excel, the Kawthar TXT and the BAS journal are read side
+        by side, so they must agree row for row. By Odoo name, trimmed and
+        case-blind — names here carry leading spaces and mixed case, and a
+        plain sort files " AHMED" before "AAT" and "abdullah" after "ZAHID"
+        — with the id to settle ties.
+        """
+        return self.sorted(lambda l: (
+            (l.employee_id.sudo().name or '').strip().casefold(), l.id))
+
     @api.depends('earnings', 'loan_offset')
     def _compute_net(self):
         for rec in self:
@@ -1100,7 +1141,10 @@ class KswPayRunLine(models.Model):
             available = rec.earnings or 0.0
             total, lines = Ded._get_pending_commission_lines_for_period(
                 rec.employee_id, rec.period)
-            amount = min(available, total)
+            # Whole riyals, like the earnings: a fractional installment is
+            # settled down to the riyal and the rest stays pending, so the
+            # transfer is never a fraction.
+            amount = math.floor(min(available, total) + 1e-6)
             if amount <= 0.0:
                 rec.loan_offset = 0.0
                 rec.x_unwind_data = False

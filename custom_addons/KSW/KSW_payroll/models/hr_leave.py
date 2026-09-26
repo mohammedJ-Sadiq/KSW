@@ -386,6 +386,14 @@ class HrLeave(models.Model):
         vals_list = []
         version_id = payslip.version_id.id
         Input = self.env['hr.payslip.input']
+        # An unpaid leave's payslip is a departure settlement: no annual
+        # balance is consumed, so none is paid out (item 1), and the
+        # HRA / GOSI advances cover only the payslip's own month (items
+        # 8-9) — both rules are suppressed on a leave-linked payslip, and
+        # the months inside the leave are left to the monthly runs as
+        # before.
+        unpaid_settlement = self._is_unpaid_settlement(leave)
+        own_month = [(payslip.date_from.year, payslip.date_from.month)]
 
         # 1. Vacation Balance Settlement (FIFO historical wage slicing)
         # For EOS and full-clearance leaves, pin the balance to the leave's
@@ -412,7 +420,8 @@ class HrLeave(models.Model):
         exclude = leave.number_of_days if leave.state == 'validate' else 0.0
         vac_result = AnnualLeave._compute_historical_vacation_value(
             employee, vacation_days, exclude_days=exclude)
-        vacation_balance_value = vac_result['total']
+        vacation_balance_value = (
+            0.0 if unpaid_settlement else vac_result['total'])
 
         if vacation_balance_value > 0:
             vals_list.append({
@@ -530,7 +539,7 @@ class HrLeave(models.Model):
         #   - full clearance          → x_clearance_balance
         #   - excess accepted (combo) → x_annual_portion_days
         #   - simple annual           → calendar days of the leave
-        paid_months = self._paid_months(leave)
+        paid_months = own_month if unpaid_settlement else self._paid_months(leave)
         hra_settled = self._months_already_settled(
             leave, employee, payslip, paid_months, 'hra')
         hra_due = [m for m in paid_months if m not in hra_settled]
@@ -560,7 +569,8 @@ class HrLeave(models.Model):
         # Same already-settled filter as the HRA advance above: a month
         # whose ordinary payslip is already out has had its GOSI
         # deducted, and charging it again takes the money twice.
-        gosi_months = self._all_vacation_months(leave)
+        gosi_months = (own_month if unpaid_settlement
+                       else self._all_vacation_months(leave))
         gosi_settled = self._months_already_settled(
             leave, employee, payslip, gosi_months, 'gosi')
         gosi_due = [m for m in gosi_months if m not in gosi_settled]
@@ -593,6 +603,13 @@ class HrLeave(models.Model):
             self._post_settled_months_note(payslip, hra_settled, gosi_settled)
 
         return vals_list
+
+    @staticmethod
+    def _is_unpaid_settlement(leave):
+        """True for an unpaid-leave type (KSW_unpaid_leave), whose payslip
+        settles the departure month only.  A combined annual leave with
+        accepted excess days is an annual type and is not one."""
+        return bool(leave.holiday_status_id.is_unpaid_leave)
 
     @staticmethod
     def _paid_months(leave):
@@ -962,35 +979,38 @@ class HrLeave(models.Model):
         return result
 
     def action_refuse(self):
-        annual_multi = self.filtered(
+        chain = self.filtered(
             lambda l: l.holiday_status_id
-            and l.holiday_status_id.leave_validation_type == 'annual_multi'
+            and l.holiday_status_id.leave_validation_type in (
+                'annual_multi', 'unpaid_multi')
         )
         result = super().action_refuse()
-        if annual_multi:
-            annual_multi._cancel_vacation_payslips()
+        if chain:
+            chain._cancel_vacation_payslips()
         self._refresh_sheet_blocked_flags()
         return result
 
     def _move_validate_leave_to_confirm(self):
         """Cancel vacation payslips when using 'Back to Approval'."""
-        annual_multi = self.filtered(
+        chain = self.filtered(
             lambda l: l.holiday_status_id
-            and l.holiday_status_id.leave_validation_type == 'annual_multi'
+            and l.holiday_status_id.leave_validation_type in (
+                'annual_multi', 'unpaid_multi')
         )
         result = super()._move_validate_leave_to_confirm()
-        if annual_multi:
-            annual_multi._cancel_vacation_payslips()
+        if chain:
+            chain._cancel_vacation_payslips()
         return result
 
     def action_draft(self):
-        annual_multi = self.filtered(
+        chain = self.filtered(
             lambda l: l.holiday_status_id
-            and l.holiday_status_id.leave_validation_type == 'annual_multi'
+            and l.holiday_status_id.leave_validation_type in (
+                'annual_multi', 'unpaid_multi')
         )
         result = super().action_draft()
-        if annual_multi:
-            annual_multi._cancel_vacation_payslips()
+        if chain:
+            chain._cancel_vacation_payslips()
         return result
 
     def unlink(self):

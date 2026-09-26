@@ -1,7 +1,7 @@
 {
     'name': 'KSW - Odoo 19 HR Payroll',
     'category': 'Human Resources/Payroll',
-    'version': '19.0.1.20.4',
+    'version': '19.0.1.20.5',
     'sequence': 1,
     'author': 'Mohammed Albadr',
     'summary': 'HR Payroll Management for Odoo 19 Community Edition',

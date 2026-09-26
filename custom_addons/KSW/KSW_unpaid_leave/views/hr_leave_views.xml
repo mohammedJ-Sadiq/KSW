@@ -102,29 +102,10 @@
                 </attribute>
             </xpath>
 
-            <!-- ===== Hide commission lines section for unpaid ===== -->
-            <xpath expr="//separator[@name='commission_lines_section']" position="attributes">
-                <attribute name="invisible">
-                    x_annual_approval_state in ('pending_dm', 'pending_hr', 'pending_gm_initial') or not x_annual_approval_state or validation_type == 'unpaid_multi'
-                </attribute>
-            </xpath>
-            <xpath expr="//field[@name='x_commission_line_ids']" position="attributes">
-                <attribute name="invisible">
-                    x_annual_approval_state in ('pending_dm', 'pending_hr', 'pending_gm_initial') or not x_annual_approval_state or validation_type == 'unpaid_multi'
-                </attribute>
-            </xpath>
-
-            <!-- ===== Hide other-deduction lines section for unpaid ===== -->
-            <xpath expr="//separator[@name='deduction_lines_section']" position="attributes">
-                <attribute name="invisible">
-                    x_annual_approval_state in ('pending_dm', 'pending_hr', 'pending_gm_initial') or not x_annual_approval_state or validation_type == 'unpaid_multi'
-                </attribute>
-            </xpath>
-            <xpath expr="//field[@name='x_deduction_line_ids']" position="attributes">
-                <attribute name="invisible">
-                    x_annual_approval_state in ('pending_dm', 'pending_hr', 'pending_gm_initial') or not x_annual_approval_state or validation_type == 'unpaid_multi'
-                </attribute>
-            </xpath>
+            <!-- Commission and other-deduction lines are NOT hidden for
+                 unpaid: the accountant lists what the employee is owed and
+                 owes at Step 4, and they ride out on the settlement payslip
+                 created at GM final approval, exactly like annual leave. -->
 
             <!-- ===== Unpaid accounting fields (unpaid_multi OR combined annual+unpaid) ===== -->
             <xpath expr="//group[@name='accounting_allowances']" position="after">

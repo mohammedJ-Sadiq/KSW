@@ -43,7 +43,17 @@ class TestKawtharTxtExport(TransactionCase):
             'department_id': cls.dept.id,
             'barcode': '100000000042',
         })
-        cls.emp.sudo().write({'x_salary_bank_account_id': cls.bank.id})
+        # The employee's own Kawthar card: CIC(5) + card number(14).
+        cls.card = Bank.sudo().create({
+            'acc_number': '1234512345678901234',
+            'partner_id': cls.emp.work_contact_id.id,
+        })
+        cls.emp.sudo().write({
+            'x_salary_bank_account_id': cls.bank.id,
+            'bank_account_ids': [(4, cls.card.id)],
+            'x_employee_no': '4242',
+            'ssnid': '1098765432',
+        })
 
         cls.pay_run = env['ksw.pay.run'].sudo().create({'period': '2029-05-01'})
         cls.line = env['ksw.pay.run.line'].sudo().create({
@@ -86,7 +96,11 @@ class TestKawtharTxtExport(TransactionCase):
             self.skipTest(self.skip_reason)
         text = self._wizard('specific_txt')._make_kawthar_txt(
             self.bank, self.pay_run.line_ids)
-        self.assertIn('100000000042', text, 'the barcode')
+        row = text.split('\n')[0]
+        self.assertEqual(row[:12], '000000000001', 'running 1..N, as payroll')
+        self.assertEqual(row[12:22], '0000012345', 'CIC from the card')
+        self.assertEqual(row[22:36], '12345678901234', 'the card number')
+        self.assertEqual(row[86:96], '1098765432', 'the SSN (ssnid)')
         self.assertIn('TXT Employee', text, 'the employee name')
         # net_payable = earnings - loan_offset = 1250.00 → 125000 halalas
         self.assertIn(str(125000).zfill(15), text, 'the net in halalas')
@@ -99,7 +113,8 @@ class TestKawtharTxtExport(TransactionCase):
             'run_id': self.pay_run.id,
             'employee_id': self.env['hr.employee'].sudo().create({
                 'name': 'TXT Zero', 'department_id': self.dept.id,
-                'barcode': '100000000043'}).id,
+                'barcode': '100000000043',
+                'bank_account_ids': [(4, self.card.id)]}).id,
             'earnings': 0.0,
         })
         text = self._wizard('specific_txt')._make_kawthar_txt(
@@ -118,3 +133,80 @@ class TestKawtharTxtExport(TransactionCase):
             order='id desc', limit=1)
         self.assertTrue(att, 'no file was attached')
         self.assertTrue(att.name.endswith('.txt'), att.name)
+
+    def test_a_line_without_an_employee_account_is_left_out(self):
+        """The company account the transfer leaves from is not a card."""
+        if self.skip_reason:
+            self.skipTest(self.skip_reason)
+        self.emp.sudo().write({'bank_account_ids': [(5,)]})
+        text = self._wizard('specific_txt')._make_kawthar_txt(
+            self.bank, self.pay_run.line_ids)
+        self.assertNotIn('SA0380000000608010167519'[5:19], text)
+        self.assertFalse(text)
+
+
+class TestCommissionBankExcel(TestKawtharTxtExport):
+    """Employee No / SSN on both sheets, and the merged workbook."""
+
+    def _sheets(self, data):
+        import io
+        import openpyxl
+        return openpyxl.load_workbook(io.BytesIO(data))
+
+    def test_excel_carries_employee_number_and_ssn(self):
+        if self.skip_reason:
+            self.skipTest(self.skip_reason)
+        wiz = self._wizard('specific_excel')
+        wb = self._sheets(wiz._make_wps_excel({self.bank: self.pay_run.line_ids}))
+        summary = [c.value for c in wb['Commission Summary'][2]]
+        self.assertIn('4242', summary)
+        self.assertIn('1098765432', summary)
+        wps = [c.value for c in wb['WPS'][7]]
+        self.assertEqual(wps[1], '1234512345678901234', "the employee's card")
+        self.assertEqual(wps[3], '4242')
+        self.assertEqual(wps[4], '1098765432')
+
+    def test_all_excel_merges_banks_into_one_file(self):
+        if self.skip_reason:
+            self.skipTest(self.skip_reason)
+        bank2 = self.env['res.partner.bank'].sudo().create({
+            'acc_number': 'SA0000000000000000000002',
+            'partner_id': self.partner.id,
+            'x_file_type': 'wps',
+        })
+        emp2 = self.env['hr.employee'].sudo().create({
+            'name': 'XLS Other', 'department_id': self.dept.id})
+        self.env['ksw.pay.run.line'].sudo().create({
+            'run_id': self.pay_run.id, 'employee_id': emp2.id,
+            'earnings': 900.0, 'bank_account_id': bank2.id,
+        })
+        self._wizard('all_excel').action_export()
+        att = self.env['ir.attachment'].sudo().search(
+            [('res_model', '=', 'ksw.pay.run'), ('res_id', '=', self.pay_run.id)],
+            order='id desc', limit=1)
+        self.assertTrue(att.name.endswith('.xlsx'), att.name)
+        wb = self._sheets(att.raw)
+        self.assertEqual(len(wb.sheetnames), 3, wb.sheetnames)
+        self.assertEqual(wb['Commission Summary'].max_row, 3)
+
+    def test_all_excel_split_still_zips_one_file_per_bank(self):
+        if self.skip_reason:
+            self.skipTest(self.skip_reason)
+        bank2 = self.env['res.partner.bank'].sudo().create({
+            'acc_number': 'SA0000000000000000000003',
+            'partner_id': self.partner.id,
+            'x_file_type': 'wps',
+        })
+        emp2 = self.env['hr.employee'].sudo().create({
+            'name': 'XLS Split', 'department_id': self.dept.id})
+        self.env['ksw.pay.run.line'].sudo().create({
+            'run_id': self.pay_run.id, 'employee_id': emp2.id,
+            'earnings': 900.0, 'bank_account_id': bank2.id,
+        })
+        wiz = self._wizard('all_excel')
+        wiz.excel_layout = 'split'
+        wiz.action_export()
+        att = self.env['ir.attachment'].sudo().search(
+            [('res_model', '=', 'ksw.pay.run'), ('res_id', '=', self.pay_run.id)],
+            order='id desc', limit=1)
+        self.assertTrue(att.name.endswith('.zip'), att.name)

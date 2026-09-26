@@ -193,7 +193,14 @@ class KswPayBatch(models.Model):
             rec.entry_count = len(rec.entry_ids)
             rec.employee_count = len(rec.entry_ids.mapped('employee_id'))
             rec.total_quantity = sum(rec.entry_ids.mapped('quantity'))
-            rec.total_amount = sum(rec.entry_ids.mapped('amount'))
+            # Whole riyals, by the register's own rule (each employee's
+            # total per pay type, rounded half-up) — so the batches, the
+            # department handovers and the month's earnings add up to the
+            # same figure instead of three that differ by the halalas.
+            rec.total_amount = sum(
+                sum(by_component.values()) for by_component
+                in self.env['ksw.pay.run']._rounded_component_totals(
+                    rec.entry_ids).values())
 
     @api.depends('state')
     def _compute_is_locked(self):

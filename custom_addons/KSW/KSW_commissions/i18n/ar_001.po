@@ -5760,3 +5760,25 @@ msgid ""
 "written by KSW_payroll, which has not been updated. Ask IT to deploy "
 "it, or use one of the bank-file exports above."
 msgstr "تصدير قيد اليومية غير متاح على هذا النظام بعد: يكتبه تطبيق الرواتب KSW_payroll ولم يُحدَّث. اطلب من تقنية المعلومات تحديثه، أو استخدم أحد تصديرات الملف البنكي أعلاه."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_run_journal.py:0
+msgid "month"
+msgstr "شهر"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_component__x_bas_ref
+msgid "BAS Journal Description"
+msgstr "وصف قيد BAS"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_bank_export_wizard__journal_number
+msgid "Journal Number"
+msgstr "رقم القيد"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/bank_file_export_wizard.py:0
+msgid "Enter the journal number before exporting."
+msgstr "أدخل رقم القيد قبل التصدير."

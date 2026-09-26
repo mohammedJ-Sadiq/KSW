@@ -102,6 +102,8 @@
                                     <field name="x_bas_expense_name"
                                            placeholder="حساب مصروفات - عمولات سائقين التريلات"/>
                                     <field name="x_bas_use_cost_center"/>
+                                    <field name="x_bas_ref"
+                                           placeholder="بدل عمل ايام الجمعة"/>
                                 </group>
                                 <group string="Accrual (credited)">
                                     <field name="x_bas_accrual_code"

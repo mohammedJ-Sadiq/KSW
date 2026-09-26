@@ -9,6 +9,12 @@
                 <group>
                     <field name="run_id" readonly="1"/>
                     <field name="export_mode" widget="radio"/>
+                    <field name="journal_number"
+                           placeholder="26007264"
+                           invisible="export_mode != 'journal_entry'"
+                           required="export_mode == 'journal_entry'"/>
+                    <field name="excel_layout" widget="radio"
+                           invisible="export_mode != 'all_excel'"/>
                     <field name="bank_account_id"
                            invisible="export_mode not in ('specific_excel','specific_txt')"
                            required="export_mode in ('specific_excel','specific_txt')"/>

@@ -368,6 +368,24 @@ class HrLeaveUnpaid(models.Model):
                 '<strong>✅ Step 4 — Accounting Approval (Unpaid)</strong>'
                 '<br/><b>Approved by:</b> %(user)s<br/>'
             ) % {'user': self.env.user.name}
+            if leave.x_commission_line_ids:
+                body += Markup('<b>Additional Commissions:</b><br/>')
+                for line in leave.x_commission_line_ids:
+                    body += Markup(
+                        '&nbsp;&nbsp;• %(name)s: %(amt).2f SAR<br/>'
+                    ) % {'name': line.name, 'amt': line.amount}
+                body += Markup(
+                    '<b>Total:</b> %(total).2f SAR<br/>'
+                ) % {'total': leave.x_additional_commissions}
+            if leave.x_deduction_line_ids:
+                body += Markup('<b>Other Deductions:</b><br/>')
+                for line in leave.x_deduction_line_ids:
+                    body += Markup(
+                        '&nbsp;&nbsp;• %(name)s: %(amt).2f SAR<br/>'
+                    ) % {'name': line.name, 'amt': line.amount}
+                body += Markup(
+                    '<b>Total:</b> %(total).2f SAR<br/>'
+                ) % {'total': leave.x_other_deductions}
             if leave.x_financial_consideration_excess:
                 body += Markup(
                     '<b>Financial Consideration for Excess Leave:</b>'
@@ -392,11 +410,18 @@ class HrLeaveUnpaid(models.Model):
             )
 
     # ------------------------------------------------------------------
-    # Override GM Final → no payslip, no return tracking for unpaid
+    # Override GM Final → settle and validate at once (no Step 6)
     # ------------------------------------------------------------------
 
     def action_gm_final_approve(self):
-        """Override: for unpaid leaves, skip payslip and return tracking."""
+        """Override: for unpaid leaves, settle and validate immediately.
+
+        The settlement payslip pays what the employee has earned up to the
+        day he leaves, plus the accountant's commission lines, less the
+        deduction lines (KSW_payroll builds it; the hook is a no-op here).
+        It is created before _action_validate for the same reason as on
+        annual leave: x_return_state is the payslip guard.
+        """
         unpaid = self.filtered(self._is_unpaid_leave)
         remaining = self - unpaid
 
@@ -416,13 +441,14 @@ class HrLeaveUnpaid(models.Model):
                         self.env.user.employee_id.id,
                     'x_gm_final_approved_date': fields.Datetime.now(),
                 })
-                # NO payslip creation for unpaid leave
+                leave._create_vacation_payslip()
                 leave.message_post(
                     body=Markup(
                         '<strong>✅ Step 5 — GM Final Approval '
                         '(Unpaid)</strong>'
                         '<br/><b>Approved by:</b> %(approver)s<br/>'
-                        '<b>Status:</b> Fully approved — no payslip.'
+                        '<b>Status:</b> Fully approved — settlement '
+                        'payslip issued.'
                     ) % {'approver': self.env.user.name},
                     subtype_xmlid='mail.mt_note',
                 )

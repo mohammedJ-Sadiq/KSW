@@ -53,6 +53,18 @@ class KswCommissionBankExportWizard(models.TransientModel):
         [('1', '1 – New'), ('2', '2 – Renewal'), ('3', '3 – Delete')],
         default='2', string='Kawthar Operation',
     )
+    journal_number = fields.Char(
+        string='Journal Number',
+        help='The voucher number in BAS. Written in the "number" column of '
+             'every line of the journal-entry file.',
+    )
+    excel_layout = fields.Selection(
+        [('merged', 'One file: every bank in one workbook'),
+         ('split', 'One file per bank (zip)')],
+        default='merged', required=True, string='Excel Files',
+        help='Merged: one workbook with the summary over every employee and '
+             'one sheet per paying bank.',
+    )
 
     @api.depends('run_id')
     def _compute_company_partner(self):
@@ -125,6 +137,36 @@ class KswCommissionBankExportWizard(models.TransientModel):
             'target': 'new',
         }
 
+    # --- Employee identifiers ----------------------------------------------
+    # The same reads as the payroll bank file (KSW_payroll
+    # `_fill_wps_sheet` / `_build_kawthar_text`). This export used `barcode`
+    # and `identification_id` instead: barcode is the biometric device ID and
+    # identification_id is not where HR records the SSN (ssnid is), so both
+    # columns came out blank.
+    # And it printed `x_salary_bank_account_id` as the employee's account —
+    # that is the COMPANY account the transfer leaves from, not the card or
+    # IBAN it goes to (`primary_bank_account_id`).
+
+    def _emp_number(self, emp):
+        emp = emp.sudo()
+        # x_employee_no is declared by KSW_payroll, which this module does
+        # not depend on.
+        number = emp.x_employee_no if 'x_employee_no' in emp._fields else ''
+        return number or emp.barcode or ''
+
+    def _emp_ssn(self, emp):
+        emp = emp.sudo()
+        return emp.ssnid or emp.identification_id or ''
+
+    def _emp_account(self, emp):
+        return emp.sudo().primary_bank_account_id
+
+    def _sheet_title(self, prefix, bank, many):
+        title = '%s %s' % (prefix, self._bank_label(bank)) if many else prefix
+        for ch in '[]:*?/\\':
+            title = title.replace(ch, '-')
+        return title[:31]
+
     # --- Excel generation --------------------------------------------------
 
     def _make_comm_summary_excel(self, wb, lines):
@@ -138,10 +180,9 @@ class KswCommissionBankExportWizard(models.TransientModel):
         bold = Font(bold=True, size=11)
         hdr_fill = PatternFill('solid', fgColor='D9E1F2')
         headers = [
-            'Employee', 'SSN', 'Department',
-            'Manual Lines', 'Entry Sheets', 'Gross Total',
-            'Loans Deduction', 'Bank Transfer Amount',
-            'Bank Account', 'Bank Name',
+            'Employee', 'Employee No', 'SSN No', 'Department',
+            'Earnings', 'Loans Deduction', 'Bank Transfer Amount',
+            'Bank Account Number', 'Bank Name', 'Paid From',
         ]
         for ci, h in enumerate(headers, 1):
             c = ws.cell(row=1, column=ci, value=h)
@@ -150,30 +191,32 @@ class KswCommissionBankExportWizard(models.TransientModel):
             c.border = thin
             c.alignment = Alignment(horizontal='center', wrap_text=True)
         for ri, line in enumerate(
-                lines.sorted(lambda s: s.employee_id.name or ''), 2):
+                lines._export_sorted(), 2):
             emp = line.employee_id.sudo()
-            bank = getattr(emp, 'x_salary_bank_account_id', False)
+            bank = self._emp_account(emp)
             row = [
                 emp.name or '',
-                emp.identification_id or '',
+                self._emp_number(emp),
+                self._emp_ssn(emp),
                 emp.department_id.name if emp.department_id else '',
                 line.earnings,
                 line.loan_offset,
                 line.net_payable,
                 bank.acc_number if bank else '',
                 bank.bank_id.name if bank and bank.bank_id else '',
+                line.bank_account_id.acc_number or '',
             ]
             for ci, v in enumerate(row, 1):
                 c = ws.cell(row=ri, column=ci, value=v)
                 c.border = thin
+        for ci in range(1, len(headers) + 1):
+            letter = openpyxl.utils.get_column_letter(ci)
+            mx = max(len(str(ws.cell(row=r, column=ci).value or ''))
+                     for r in range(1, ws.max_row + 1))
+            ws.column_dimensions[letter].width = min(mx + 3, 35)
 
-    def _make_wps_excel(self, bank, lines):
-        if not openpyxl:
-            raise UserError(_('openpyxl is required for Excel export.'))
-        wb = openpyxl.Workbook()
-        self._make_comm_summary_excel(wb, lines)
-
-        ws = wb.create_sheet('WPS Bank File')
+    def _fill_wps_sheet(self, wb, bank, lines, title):
+        ws = wb.create_sheet(title)
         thin = Border(left=Side('thin'), right=Side('thin'),
                       top=Side('thin'), bottom=Side('thin'))
         bold = Font(bold=True, size=11)
@@ -205,18 +248,18 @@ class KswCommissionBankExportWizard(models.TransientModel):
             c.alignment = Alignment(horizontal='center')
 
         ri = 7
-        for line in lines.sorted(lambda s: s.employee_id.name or ''):
+        for line in lines._export_sorted():
             amt = line.net_payable
             if not amt:
                 continue
             emp = line.employee_id.sudo()
-            emp_bank = getattr(emp, 'x_salary_bank_account_id', False)
+            emp_bank = self._emp_account(emp)
             row = [
                 emp_bank.bank_id.name if emp_bank and emp_bank.bank_id else '',
                 emp_bank.acc_number if emp_bank else '',
                 emp.name or '',
-                emp.barcode or '',
-                emp.identification_id or '',
+                self._emp_number(emp),
+                self._emp_ssn(emp),
                 amt,
                 line.earnings,
                 0.0,  # HRA not applicable in commissions
@@ -227,7 +270,28 @@ class KswCommissionBankExportWizard(models.TransientModel):
             for ci, v in enumerate(row, 1):
                 ws.cell(ri, ci, v).border = thin
             ri += 1
+        for ci in range(1, len(en_headers) + 1):
+            letter = openpyxl.utils.get_column_letter(ci)
+            mx = max(len(str(ws.cell(row=r, column=ci).value or ''))
+                     for r in range(6, max(ws.max_row + 1, 7)))
+            ws.column_dimensions[letter].width = min(mx + 3, 40)
 
+    def _make_wps_excel(self, groups):
+        """One workbook: a summary over every line, one bank sheet per bank.
+
+        :param groups: dict {paying res.partner.bank: ksw.pay.run.line}
+        """
+        if not openpyxl:
+            raise UserError(_('openpyxl is required for Excel export.'))
+        wb = openpyxl.Workbook()
+        all_lines = self.env['ksw.pay.run.line']
+        for lines in groups.values():
+            all_lines |= lines
+        self._make_comm_summary_excel(wb, all_lines)
+        many = len(groups) > 1
+        for bank, lines in groups.items():
+            self._fill_wps_sheet(
+                wb, bank, lines, self._sheet_title('WPS', bank, many))
         if 'Sheet' in wb.sheetnames and len(wb.sheetnames) > 1:
             del wb['Sheet']
         buf = io.BytesIO()
@@ -236,50 +300,64 @@ class KswCommissionBankExportWizard(models.TransientModel):
 
     # --- TXT generation (Kawthar format) -----------------------------------
 
+    @staticmethod
+    def _pz(number, length):
+        return str(int(number)).zfill(length)[:length]
+
+    @staticmethod
+    def _pr(text, length):
+        return str(text or '')[:length].ljust(length)
+
+    @staticmethod
+    def _halalas(amount):
+        return int(round((amount or 0.0) * 100))
+
     def _make_kawthar_txt(self, bank, lines):
-        """Generate Kawthar fixed-width 194-char TXT file for commissions.
+        """Kawthar fixed-width 194-char TXT — the payroll layout, field for
+        field (`KSW_payroll` `ksw.kawthar.file.wizard._build_kawthar_text`):
 
-        The accumulator is `rows`, not `lines`: it used to be called `lines`
-        too, which rebound the parameter to an empty list on the first
-        statement and killed the very next line with
-        `'list' object has no attribute 'sorted'`. Nothing caught it because
-        this export had no test and the crash is on the first line of the
-        loop, so the file was never produced even once.
+          Employee ID — 1..N over this file (12N) | CIC from card (10N) |
+          Card number (14N) | Employee name (50A) | National ID (10N) |
+          Net in halalas (15N) | Value date YYYYMMDD (8) | Operation (1X) |
+          Zeros (6) | Spaces (20) | Basic (12N) | Housing (12N) |
+          Other (12N) | Deductions (12N)
+
+        The card is the EMPLOYEE's account (`primary_bank_account_id`),
+        stored as CIC(5) + card number(14); `bank` is the company account
+        the file is paid from and only decides which file a line lands in.
         """
+        op = (self.operation_code or '2')[:1]
+        vd = (self.value_date or fields.Date.context_today(self)).strftime('%Y%m%d')
+
+        valid = lines.filtered(
+            lambda l: self._emp_account(l.employee_id)
+            and self._halalas(l.net_payable) > 0
+        )._export_sorted()
+
         rows = []
-        op = (self.operation_code or '2')
-        vd = (self.value_date or fields.Date.context_today(self))
-        vd_str = vd.strftime('%Y%m%d') if hasattr(vd, 'strftime') else str(vd).replace('-', '')
-
-        for line in lines.sorted(lambda s: s.employee_id.name or ''):
-            amt_halala = int(round((line.net_payable or 0.0) * 100))
-            if amt_halala <= 0:
-                continue
+        for seq, line in enumerate(valid, 1):
             emp = line.employee_id.sudo()
-            emp_bank = getattr(emp, 'x_salary_bank_account_id', False)
-            basic_halala = int(round((line.earnings or 0.0) * 100))
+            acc_full = (self._emp_account(emp).acc_number or '').replace(' ', '')
+            cic_from_card = acc_full[:5]
+            card_no = acc_full[5:]
+            nat_id = self._emp_ssn(emp)
 
-            barcode = (emp.barcode or '').ljust(12)[:12]
-            cic = (bank.x_wps_cic_number or '').ljust(10)[:10]
-            card_no = (emp_bank.acc_number if emp_bank else '').ljust(14)[:14]
-            emp_name = (emp.name or '').ljust(50)[:50]
-            nat_id = (emp.identification_id or '').ljust(10)[:10]
-            net_str = str(amt_halala).zfill(15)
-            basic_str = str(basic_halala).zfill(12)
-            housing_str = '0' * 12
-            # Everything earned this month, not just the manual lines plus
-            # the driver commission. The old expression silently omitted
-            # location allowance, sales, collection and combined, so the
-            # breakdown never reconciled with the NET it sits next to.
-            # line.total covers every contribution, present and future.
-            other_str = str(int(round((line.earnings or 0.0) * 100))).zfill(12)
-            ded_str = str(int(round((line.loan_offset or 0.0) * 100))).zfill(12)
-
-            row = (
-                barcode + cic + card_no + emp_name + nat_id
-                + net_str + vd_str + op + '0' * 6 + ' ' * 20
-                + basic_str + housing_str + other_str + ded_str
-            )
+            row = ''.join([
+                self._pz(seq, 12),
+                self._pz(int(cic_from_card) if cic_from_card.isdigit() else 0, 10),
+                self._pr(card_no, 14),
+                self._pr(emp.name, 50),
+                self._pz(int(nat_id) if nat_id.isdigit() else 0, 10),
+                self._pz(self._halalas(line.net_payable), 15),
+                vd,
+                op,
+                '0' * 6,
+                ' ' * 20,
+                self._pz(self._halalas(line.earnings), 12),
+                self._pz(0, 12),  # housing: not part of a commission
+                self._pz(self._halalas(line.earnings), 12),
+                self._pz(self._halalas(line.loan_offset), 12),
+            ])
             assert len(row) == 194, f"Row length {len(row)} != 194"
             rows.append(row)
 
@@ -321,21 +399,28 @@ class KswCommissionBankExportWizard(models.TransientModel):
                 'yet: it is written by KSW_payroll, which has not been '
                 'updated. Ask IT to deploy it, or use one of the bank-file '
                 'exports above.'))
-        data = run._bas_journal_workbook()
+        if not (self.journal_number or '').strip():
+            raise UserError(_('Enter the journal number before exporting.'))
+        data = run._bas_journal_workbook(number=self.journal_number)
         return self._bundle_and_download(
             [('JournalEntry_%s.xlsx' % self._batch_label(), data)])
 
     def _export_all_excel(self):
-        groups = self._group_and_validate(require_type=None)
-        files = []
-        bl = self._batch_label()
-        for bank, lines in groups.items():
-            label = self._bank_label(bank)
-            if bank.x_file_type in ('wps', 'kawthar'):
-                data = self._make_wps_excel(bank, lines)
-                files.append(('Commissions_%s_%s.xlsx' % (bl, label), data))
-        if not files:
+        groups = {
+            b: lines for b, lines in self._group_and_validate().items()
+            if b.x_file_type in ('wps', 'kawthar')
+        }
+        if not groups:
             raise UserError(_('No Excel files could be generated.'))
+        bl = self._batch_label()
+        if self.excel_layout == 'split':
+            files = [
+                ('Commissions_%s_%s.xlsx' % (bl, self._bank_label(bank)),
+                 self._make_wps_excel({bank: lines}))
+                for bank, lines in groups.items()
+            ]
+        else:
+            files = [('Commissions_%s.xlsx' % bl, self._make_wps_excel(groups))]
         return self._bundle_and_download(files)
 
     def _export_all_txt(self):
@@ -362,7 +447,7 @@ class KswCommissionBankExportWizard(models.TransientModel):
             raise UserError(_('No lines are assigned to the selected bank.'))
         bl = self._batch_label()
         label = self._bank_label(bank)
-        data = self._make_wps_excel(bank, lines)
+        data = self._make_wps_excel({bank: lines})
         return self._bundle_and_download(
             [('Commissions_%s_%s.xlsx' % (bl, label), data)])
 

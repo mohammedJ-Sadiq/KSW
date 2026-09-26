@@ -204,8 +204,8 @@
                             </table>
                         </t>
 
-                        <!-- ── Accounting Inputs (annual only) ── -->
-                        <t t-if="not o.holiday_status_id.is_unpaid_leave and (o.x_commission_line_ids or o.x_remaining_loans or o.x_deduction_line_ids)">
+                        <!-- ── Accounting Inputs (annual and unpaid) ── -->
+                        <t t-if="o.x_commission_line_ids or o.x_remaining_loans or o.x_deduction_line_ids">
                             <h4>Accounting Inputs</h4>
                             <t t-if="o.x_commission_line_ids">
                                 <table class="table table-sm table-bordered mb-2">

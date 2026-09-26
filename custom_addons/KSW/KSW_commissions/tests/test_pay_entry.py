@@ -3,6 +3,7 @@
 The resolver is the heart of the redesign: every pay type in KSW now goes
 through it, so an error here is an error in everyone's pay.
 """
+from odoo.tools import float_round
 from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.tests.common import TransactionCase
 
@@ -184,7 +185,16 @@ class TestPayBatch(PayEntryCommon):
         self.assertEqual(batch.entry_count, 2)
         self.assertEqual(batch.employee_count, 2)
         self.assertAlmostEqual(batch.total_quantity, 8.0)
-        self.assertAlmostEqual(batch.total_amount, 292.50, places=2)
+        # 292.50 of entries; each employee's share rounded half-up, as the
+        # register pays it — the total is the sum of those.
+        by_emp = {}
+        for entry in batch.entry_ids:
+            by_emp[entry.employee_id] = by_emp.get(entry.employee_id, 0.0) + entry.amount
+        self.assertAlmostEqual(sum(by_emp.values()), 292.50, places=2)
+        self.assertEqual(batch.total_amount, sum(
+            float_round(a, 0, rounding_method='HALF-UP')
+            for a in by_emp.values()))
+        self.assertEqual(batch.total_amount, int(batch.total_amount))
 
     def test_07_submit_locks_entries(self):
         batch = self._batch()

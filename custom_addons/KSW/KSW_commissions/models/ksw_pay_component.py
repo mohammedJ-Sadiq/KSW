@@ -187,6 +187,12 @@ class KswPayComponent(models.Model):
              "employee's loan installments.",
     )
     x_bas_accrual_name = fields.Char(string='BAS Accrual Account Name')
+    x_bas_ref = fields.Char(
+        string='BAS Journal Description',
+        help='What the journal line says for this pay, followed by the '
+             'month — "بدل عمل ايام الجمعة شهر أغسطس". Empty: the '
+             "component's own name.",
+    )
     x_bas_use_cost_center = fields.Boolean(
         string='Stamp the BAS Cost Centre', default=False,
         help="Write the employee's BAS cost centre (his truck, for a "
