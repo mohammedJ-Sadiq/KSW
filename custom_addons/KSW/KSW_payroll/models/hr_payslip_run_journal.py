@@ -43,6 +43,11 @@ class HrPayslipRun(models.Model):
         """Every journal line for this batch, employee by employee."""
         self.ensure_one()
         Journal = self.env['ksw.bas.journal']
+        # The voucher's language is BAS's, not the exporting user's — see
+        # ksw.bas.journal.voucher_lang.
+        lang = Journal.voucher_lang()
+        if lang and self.env.context.get('lang') != lang:
+            return self.with_context(lang=lang)._bas_journal_rows()
         month = Journal.month_label(self.date_end or self.date_start)
         rows = []
         unmapped = {}
@@ -51,6 +56,7 @@ class HrPayslipRun(models.Model):
         for slip in self._bas_journal_slips().sorted(
                 lambda s: (s.employee_id.sudo().name or '', s.id)):
             employee = slip.employee_id.sudo()
+            who = Journal.employee_label(employee)
             if not slip.line_ids:
                 # A draft slip nobody has computed yet has nothing to post
                 # and no NET rule to read a payable account from. Skipping
@@ -67,8 +73,7 @@ class HrPayslipRun(models.Model):
                     continue
                 rule = line.salary_rule_id
                 posting = rule.x_bas_posting
-                ref = Journal.ref(line.name or rule.name, employee.name,
-                                  month)
+                ref = Journal.ref(line.name or rule.name, who, month)
                 if posting == 'expense':
                     debits.append({
                         'code': rule.x_bas_account_code,
@@ -78,7 +83,7 @@ class HrPayslipRun(models.Model):
                         'credit_code': payable[0],
                         'credit_name': payable[1],
                         'credit_ref': Journal.ref(
-                            _('Salary'), employee.name, month),
+                            _('Salary'), who, month),
                     })
                 elif posting == 'liability':
                     credits.append({

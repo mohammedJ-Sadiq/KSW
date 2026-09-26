@@ -11,11 +11,34 @@ class KswAttendanceSheet(models.Model):
     _inherit = 'ksw.attendance.sheet'
 
     def _unresolved_return_leaves(self):
-        """Overlapping leaves whose return nobody has confirmed."""
+        """Overlapping leaves whose return nobody has confirmed *and is due*.
+
+        The question this blocker asks is "could this month contain days the
+        employee actually worked, which the sheet is calling absent?" Those
+        days exist only *after* the vacation's planned end — which is why the
+        filter is on `request_date_to`, not on the leave overlapping at all.
+
+        A vacation still running past the end of this month asks nothing of
+        anyone: every day of the month is inside it, so the month is fully
+        determined, and there is no return to confirm yet. Blocking it
+        demanded that the Time Off manager press "Confirm Return" on a
+        return that had not happened and would not for months — a deadlock
+        with no legal move (KSWCO leave 5144, ALOMGIR HOSSAIN, 17 Sep →
+        15 Dec 2026: the September sheet could not be released until
+        mid-December).
+
+        The month containing the planned end still blocks, which is the case
+        the rule was written for. And a sheet claiming *attendance* during a
+        covered day is still refused by the clashing-days rule in
+        `_confirmation_blockers`, whatever this returns — so relaxing here
+        cannot let an asserted-attendance contradiction through.
+        """
         self.ensure_one()
         _date_from, date_to = self._period_bounds()
-        return self.env['hr.payslip']._get_unresolved_vacation_leaves(
+        leaves = self.env['hr.payslip']._get_unresolved_vacation_leaves(
             self.employee_id.id, date_to)
+        return leaves.filtered(
+            lambda l: (l.request_date_to or l.request_date_from) < date_to)
 
     def _leave_coverage_end(self, leave, period_end):
         """An unconfirmed return has no end date yet.

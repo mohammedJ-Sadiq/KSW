@@ -21,7 +21,7 @@ Where the two disagree the export stops and says whose figures they are.
 """
 from dateutil.relativedelta import relativedelta
 
-from odoo import _, models
+from odoo import _, fields, models
 from odoo.exceptions import UserError
 
 
@@ -31,11 +31,36 @@ class KswPayRun(models.Model):
     # ------------------------------------------------------------------
     # Source figures
     # ------------------------------------------------------------------
+    @staticmethod
+    def _entry_note(entry):
+        """What the *supervisor* wrote on this entry, as one line.
+
+        The reason and the further details are two fields on the screen
+        and one sentence on a voucher. Either may be empty — and on an
+        imported component ``details`` is not his at all: the BAS importer
+        writes its own audit trail there ("Weighted on «الرد المضاعف»
+        (customer rate). Worked days: 31. Required trips before earning:
+        50."). That is worth keeping on the entry and worthless on a
+        journal line, so those fall back to the component's own name,
+        which is what the hand-typed voucher used.
+        """
+        parts = [(entry.reason or '').strip()]
+        if not entry.component_id.importer:
+            parts.append((entry.details or '').strip())
+        return ' - '.join(part for part in parts if part)
+
     def _bas_component_totals(self):
-        """``{employee_id: {component: amount}}`` for the payable month.
+        """``{employee_id: {(component, note): amount}}`` for the month.
 
         Same entries as ``_build_register``: approved batches only, minus
         anything a vacation hold is keeping back.
+
+        Keyed on the supervisor's note as well as the component, so the
+        voucher carries **his own words** — "تصليح قفل باب سيارة ١٢٤" says
+        what a month of "بدل عمل اضافى" never could, and the accountant
+        reading it in BAS is the person who would otherwise have to come
+        back and ask. Occurrences he described the same way are still one
+        line; the note is what splits them, not the date.
         """
         self.ensure_one()
         entries = self.env['ksw.pay.entry'].sudo().browse()
@@ -46,11 +71,12 @@ class KswPayRun(models.Model):
 
         totals = {}
         for entry in payable.sorted(
-                lambda e: (e.component_id.sequence, e.component_id.id)):
-            by_component = totals.setdefault(entry.employee_id.id, {})
-            component = entry.component_id
-            by_component[component] = round(
-                by_component.get(component, 0.0) + (entry.amount or 0.0), 2)
+                lambda e: (e.component_id.sequence, e.component_id.id,
+                           e.date or fields.Date.today(), e.id)):
+            by_line = totals.setdefault(entry.employee_id.id, {})
+            key = (entry.component_id, self._entry_note(entry))
+            by_line[key] = round(
+                by_line.get(key, 0.0) + (entry.amount or 0.0), 2)
         return totals
 
     # ------------------------------------------------------------------
@@ -60,14 +86,21 @@ class KswPayRun(models.Model):
         """Every journal line for this month, employee by employee."""
         self.ensure_one()
         Journal = self.env['ksw.bas.journal']
+        # Every word below — the component names, the month, the _() terms
+        # — resolves against the context language, so the voucher is built
+        # in the language it is read in rather than the one the exporter
+        # happens to use. One re-entry, then the real work.
+        lang = Journal.voucher_lang()
+        if lang and self.env.context.get('lang') != lang:
+            return self.with_context(lang=lang)._bas_journal_rows()
         month = Journal.month_label(self.period)
         totals = self._bas_component_totals()
         # Every component in one pass, before any row is built: hitting
         # this one component at a time, re-running the export after each,
         # is the same whack-a-mole the BAS importer was taught not to play.
         used = self.env['ksw.pay.component']
-        for by_component in totals.values():
-            for component, amount in by_component.items():
+        for by_line in totals.values():
+            for (component, _note), amount in by_line.items():
                 if amount:
                     used |= component
         self._check_component_accounts(used)
@@ -79,8 +112,9 @@ class KswPayRun(models.Model):
         for line in self.line_ids.sorted(
                 lambda l: (l.employee_id.sudo().name or '', l.id)):
             employee = line.employee_id.sudo()
-            by_component = totals.get(employee.id, {})
-            earnings = round(sum(by_component.values()), 2)
+            by_line = totals.get(employee.id, {})
+            who = Journal.employee_label(employee)
+            earnings = round(sum(by_line.values()), 2)
             if abs(earnings - round(line.earnings or 0.0, 2)) >= 0.005:
                 mismatched.append('• %s — %s %.2f, %s %.2f' % (
                     employee.name or '', _('register'), line.earnings or 0.0,
@@ -88,13 +122,16 @@ class KswPayRun(models.Model):
                 continue
 
             debits = []
-            for component, amount in by_component.items():
+            for (component, note), amount in by_line.items():
                 debits.append({
                     'code': component.x_bas_expense_code,
                     'name': component.x_bas_expense_name,
                     'amount': amount,
-                    'ref': Journal.ref(component.name, employee.name,
-                                       month),
+                    # His note in place of the component's name when he
+                    # wrote one: it is the more specific answer to the same
+                    # question, and it is already in the language the
+                    # voucher is read in.
+                    'ref': Journal.ref(note or component.name, who, month),
                     # The *vehicle*, never x_bas_driver_cost_center: that
                     # one identifies the driver (BAS COST_CENTER2) and
                     # putting it in this column would post every line to a
@@ -110,7 +147,7 @@ class KswPayRun(models.Model):
                     # app's own name ("عمولات KSW"), and a voucher line
                     # must not read like a menu.
                     'credit_ref': Journal.ref(
-                        _('Monthly commissions'), employee.name, month),
+                        _('Monthly commissions'), who, month),
                 })
 
             credits = []

@@ -2294,14 +2294,24 @@ class HrLeave(models.Model):
         # If a single attendance-sheet employee's leave is being approved and
         # there are draft sheet lines covering the leave period, open the wizard
         # so the DM can mark those days absent immediately.
+        #
+        # The window searched here is the whole month(s) the leave touches, not
+        # the leave's own dates: the wizard's default scope marks the whole
+        # month absent (the vacation settles it), and a tail of the month left
+        # Attended is exactly what blocks the sheet later with no way out.
         if 'ksw.attendance.sheet' in self.env and len(self) == 1:
             leave = self
-            if leave.employee_id.sudo().x_is_attendance_sheet:
+            if leave.employee_id.sudo().x_is_attendance_sheet \
+                    and leave.request_date_from:
+                window_from = leave.request_date_from.replace(day=1)
+                window_end = leave.request_date_to or leave.request_date_from
+                window_to = window_end.replace(
+                    day=_cal.monthrange(window_end.year, window_end.month)[1])
                 has_lines = self.env['ksw.attendance.sheet.line'].sudo().search_count([
                     ('sheet_id.employee_id', '=', leave.employee_id.id),
                     ('sheet_id.state', '=', 'draft'),
-                    ('date', '>=', leave.request_date_from),
-                    ('date', '<=', leave.request_date_to),
+                    ('date', '>=', window_from),
+                    ('date', '<=', window_to),
                     ('is_workday', '=', True),
                     ('is_attended', '=', True),
                 ])

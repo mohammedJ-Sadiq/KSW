@@ -342,6 +342,69 @@ class TestUnconfirmedSheetZero(TransactionCase):
         self.assertIn('return was never confirmed', blockers)
         self.assertIn('no evidence the employee came back', blockers)
 
+    # ------------------------------------------------------------------
+    # A vacation still running asks nothing of anyone
+    # ------------------------------------------------------------------
+
+    def test_vacation_running_past_the_month_does_not_block(self):
+        """KSWCO leave 5144: Annual Vacation 17 Sep -> 15 Dec 2026.
+
+        The September sheet demanded that the Time Off manager press
+        "Confirm Return" on a return that had not happened and would not
+        for another three months. There was no legal move: the month could
+        not be released until mid-December.
+
+        Every day of March here is inside the vacation, so the month is
+        fully determined and nothing is waiting on anybody.
+        """
+        sheet = self._sheet()
+        self._open_vacation(date(2026, 1, 20), date(2026, 6, 30))
+
+        self.assertFalse(
+            sheet._unresolved_return_leaves(),
+            'A vacation running past the month end has no return due yet.')
+        blockers = '\n'.join(sheet._confirmation_blockers())
+        self.assertNotIn('ON VACATION', blockers)
+
+    def test_vacation_ending_inside_the_month_still_blocks(self):
+        """The case the rule was written for is untouched: the planned end
+        falls inside the month, so the days after it are unknown."""
+        sheet = self._sheet()
+        self._open_vacation(date(2026, 1, 20), date(2026, 3, 16))
+
+        self.assertTrue(sheet._unresolved_return_leaves())
+        self.assertIn('ON VACATION',
+                      '\n'.join(sheet._confirmation_blockers()))
+
+    def test_vacation_ending_on_the_last_day_does_not_block(self):
+        """The boundary: the return falls due on the 1st of NEXT month, so
+        this month holds no day whose status is unknown."""
+        sheet = self._sheet()
+        self._open_vacation(date(2026, 1, 20), date(2026, 3, 31))
+
+        self.assertFalse(sheet._unresolved_return_leaves())
+
+    def test_running_vacation_still_refuses_an_attended_day(self):
+        """Relaxing the return blocker must not let a sheet claim
+        attendance on a day the vacation covers — that contradiction is
+        caught by the clashing-days rule, which is untouched."""
+        sheet = self._sheet()
+        self._open_vacation(date(2026, 3, 5), date(2026, 6, 30))
+
+        claimed = sheet.line_ids.filtered(
+            lambda l: l.date >= date(2026, 3, 10) and l.is_workday)[:1]
+        self.assertTrue(claimed)
+        # Releasing the leave's own lock is what makes this reachable at
+        # all (KSW_unpaid_leave pins the covered days). The lock is a
+        # separate guard; what is under test here is the blocker behind it.
+        claimed.write({'x_leave_id': False})
+        claimed.with_context(ksw_system_write=True).write(
+            {'is_attended': True})
+
+        blockers = '\n'.join(sheet._confirmation_blockers())
+        self.assertNotIn('ON VACATION', blockers)
+        self.assertIn('marked Attended', blockers)
+
 
 class TestWithdrawAfterPayment(TestUnconfirmedSheetZero):
     """A supervisor's one-click undo stops at the bank.

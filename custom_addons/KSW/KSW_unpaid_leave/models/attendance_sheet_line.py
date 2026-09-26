@@ -25,7 +25,16 @@ class KswAttendanceSheetLineLeave(models.Model):
 
     def write(self, vals):
         if 'is_attended' in vals:
-            locked_by_leave = self.filtered(lambda l: l.x_leave_id)
+            # Only a write that would actually CHANGE a locked day is an
+            # attempt to take it back from the leave. Re-asserting the value
+            # the leave already put there is a no-op and must go through:
+            # 'Mark All Absent' writes False over every workday of the month,
+            # locked days included, and refusing that aborted the whole
+            # action — leaving the supervisor no way to mark the rest of the
+            # month absent when a vacation covers part of it.
+            wanted = bool(vals['is_attended'])
+            locked_by_leave = self.filtered(
+                lambda l: l.x_leave_id and l.is_attended != wanted)
             if locked_by_leave:
                 raise UserError(
                     'Cannot modify attendance for days locked by an '
@@ -37,4 +46,3 @@ class KswAttendanceSheetLineLeave(models.Model):
                     )
                 )
         return super().write(vals)
-

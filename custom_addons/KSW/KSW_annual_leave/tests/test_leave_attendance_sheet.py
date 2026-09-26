@@ -182,8 +182,13 @@ class TestLeaveAttendanceSheet(TransactionCase):
     # Test: Wizard action_mark_absent
     # ------------------------------------------------------------------
 
-    def test_wizard_mark_absent_marks_workdays(self):
-        """Wizard action_mark_absent marks workday lines in the leave period as absent."""
+    def test_wizard_mark_absent_marks_whole_month(self):
+        """Default scope marks EVERY workday of the month(s) the leave touches.
+
+        The vacation settles the month, so the monthly sheet is absent for the
+        whole month — not only for the leave's own dates. Leaving the tail of
+        the month Attended is what blocks the sheet later with no way out.
+        """
         sheet = self._make_sheet(self.sheet_emp, 2027, 7)
         leave = self._make_leave(self.sheet_emp, date(2027, 7, 7), date(2027, 7, 20))
         leave.with_user(self.user_dm).sudo().action_dm_approve()
@@ -191,24 +196,22 @@ class TestLeaveAttendanceSheet(TransactionCase):
         wiz = self.env['ksw.leave.attendance.wizard'].sudo().create({
             'leave_id': leave.id,
         })
+        self.assertEqual(wiz.scope, 'month', "Whole month is the default scope")
+        self.assertEqual(wiz.range_from, date(2027, 7, 1))
+        self.assertEqual(wiz.range_to, date(2027, 7, 31))
         wiz.action_mark_absent()
 
-        # Workday lines in the leave period must be absent
-        period_workday_lines = sheet.sudo().line_ids.filtered(
-            lambda l: date(2027, 7, 7) <= l.date <= date(2027, 7, 20) and l.is_workday
-        )
-        self.assertTrue(period_workday_lines, "There must be workday lines in the leave period")
-        absent = period_workday_lines.filtered(lambda l: not l.is_attended)
-        self.assertEqual(len(absent), len(period_workday_lines),
-                         "All workday lines in the leave period must be marked absent")
+        month_workday_lines = sheet.sudo().line_ids.filtered('is_workday')
+        self.assertTrue(month_workday_lines, "There must be workday lines in the month")
+        self.assertTrue(
+            all(not l.is_attended for l in month_workday_lines),
+            "Every workday of the month must be marked absent")
 
-        # Lines outside the period must still be attended
-        outside_lines = sheet.sudo().line_ids.filtered(
-            lambda l: (l.date < date(2027, 7, 7) or l.date > date(2027, 7, 20)) and l.is_workday
-        )
-        if outside_lines:
-            self.assertTrue(all(l.is_attended for l in outside_lines),
-                            "Lines outside the leave period must remain attended")
+        # The leave request itself keeps its real dates — the sheet is a
+        # different document and marking it does not move the vacation.
+        leave.invalidate_recordset()
+        self.assertEqual(leave.request_date_from, date(2027, 7, 7))
+        self.assertEqual(leave.request_date_to, date(2027, 7, 20))
 
         # A chatter note must be posted on the leave
         msgs = leave.sudo().message_ids.filtered(
@@ -216,6 +219,56 @@ class TestLeaveAttendanceSheet(TransactionCase):
         self.assertTrue(msgs, "A chatter note about the attendance update must be posted")
 
         sheet.sudo().unlink()
+
+    def test_wizard_leave_period_scope_marks_only_leave_dates(self):
+        """Choosing 'Leave dates only' keeps the rest of the month attended."""
+        sheet = self._make_sheet(self.sheet_emp, 2027, 7)
+        leave = self._make_leave(self.sheet_emp, date(2027, 7, 7), date(2027, 7, 20))
+        leave.with_user(self.user_dm).sudo().action_dm_approve()
+
+        wiz = self.env['ksw.leave.attendance.wizard'].sudo().create({
+            'leave_id': leave.id,
+            'scope': 'leave_period',
+        })
+        self.assertEqual(wiz.range_from, date(2027, 7, 7))
+        self.assertEqual(wiz.range_to, date(2027, 7, 20))
+        wiz.action_mark_absent()
+
+        inside = sheet.sudo().line_ids.filtered(
+            lambda l: date(2027, 7, 7) <= l.date <= date(2027, 7, 20) and l.is_workday)
+        outside = sheet.sudo().line_ids.filtered(
+            lambda l: not (date(2027, 7, 7) <= l.date <= date(2027, 7, 20))
+            and l.is_workday)
+        self.assertTrue(inside and outside)
+        self.assertTrue(all(not l.is_attended for l in inside))
+        self.assertTrue(all(l.is_attended for l in outside),
+                        "Lines outside the leave period must remain attended")
+
+        sheet.sudo().unlink()
+
+    def test_wizard_month_scope_spans_both_months(self):
+        """A leave crossing a month boundary settles BOTH months in full."""
+        sheet_dec = self._make_sheet(self.sheet_emp, 2027, 12)
+        sheet_jan = self._make_sheet(self.sheet_emp, 2028, 1)
+        leave = self._make_leave(
+            self.sheet_emp, date(2027, 12, 25), date(2028, 1, 10))
+        leave.with_user(self.user_dm).sudo().action_dm_approve()
+
+        wiz = self.env['ksw.leave.attendance.wizard'].sudo().create({
+            'leave_id': leave.id,
+        })
+        self.assertEqual(wiz.range_from, date(2027, 12, 1))
+        self.assertEqual(wiz.range_to, date(2028, 1, 31))
+        wiz.action_mark_absent()
+
+        for sheet in (sheet_dec, sheet_jan):
+            workdays = sheet.sudo().line_ids.filtered('is_workday')
+            self.assertTrue(workdays)
+            self.assertTrue(all(not l.is_attended for l in workdays),
+                            "Both months must be fully absent")
+
+        sheet_dec.sudo().unlink()
+        sheet_jan.sudo().unlink()
 
     def test_wizard_dismiss_leaves_sheet_unchanged(self):
         """Wizard action_dismiss leaves sheet lines unchanged."""

@@ -7,12 +7,18 @@
         <field name="arch" type="xml">
             <form string="Update Attendance Sheet">
                 <sheet>
+                    <!-- leave_id must be in the arch: every compute below
+                         depends on it, and the client only sends the fields
+                         the view asks for to onchange. Without it the dialog
+                         renders zeros. See Odoo 19 Pitfalls #40. -->
+                    <field name="leave_id" invisible="1"/>
                     <div class="alert alert-warning" role="alert">
                         <strong>Attendance Sheet Employee</strong><br/>
                         This employee is tracked on a monthly attendance sheet.
-                        The leave period below covers workdays that are currently
-                        marked as <em>attended</em>. You can mark them absent now,
-                        or update the attendance sheet manually later.
+                        The vacation settles the whole month, so by default the
+                        entire month(s) the leave touches are marked
+                        <em>absent</em> on the sheet. The leave request itself is
+                        not changed: it keeps its real start and return dates.
                     </div>
                     <group string="Leave Details" col="2">
                         <field name="employee_name" string="Employee" readonly="1"/>
@@ -20,12 +26,15 @@
                         <field name="date_to"       string="Leave To"   readonly="1"/>
                     </group>
                     <group string="Attendance Sheet Impact" col="2">
-                        <field name="affected_count"  string="Attended Workdays in Period" readonly="1"/>
-                        <field name="affected_months" string="Month(s) Affected"           readonly="1"/>
+                        <field name="scope" widget="radio"/>
+                        <field name="range_from" string="Sheet Marked From" readonly="1"/>
+                        <field name="range_to"   string="Sheet Marked To"   readonly="1"/>
+                        <field name="affected_count"  string="Attended Workdays to Mark" readonly="1"/>
+                        <field name="affected_months" string="Month(s) Affected"         readonly="1"/>
                     </group>
                 </sheet>
                 <footer>
-                    <button string="Mark All Absent"
+                    <button string="Mark Absent"
                             name="action_mark_absent"
                             type="object"
                             class="btn-primary"/>

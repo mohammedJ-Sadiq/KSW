@@ -31,6 +31,7 @@ account configured is refused by name, never silently dropped: a journal
 entry that balances because a line went missing is worse than no file.
 """
 import io
+import re
 
 from odoo import _, api, models
 from odoo.exceptions import UserError
@@ -57,6 +58,11 @@ COLUMNS = [
 # a single space at each end. Mirrored so the file we hand back is
 # byte-for-byte the kind of thing its importer already accepts.
 EMPTY = '  '
+
+# BAS writes the employee's number on the end of his name in the cost
+# centre ("عبدالله محمد عبد الحفيظ محمد700"). The voucher carries the name
+# alone, so the trailing number comes off.
+_TRAILING_NUMBER = re.compile(r'[\s\-_]*\d+\s*$')
 
 # Everything is rounded to two places before it is written, and the
 # balancing line is derived from the rounded figures rather than recomputed
@@ -200,6 +206,46 @@ class KswBasJournal(models.AbstractModel):
     # ------------------------------------------------------------------
     # Accounts
     # ------------------------------------------------------------------
+    @api.model
+    def voucher_lang(self):
+        """The language the voucher is written in — Arabic, if installed.
+
+        Not the exporting user's. This file is read in BAS, next to BAS's
+        own Arabic records, by an accountant who does not care which
+        language the person who pressed the button happens to use. An
+        export whose wording depends on that is an export that produces a
+        different voucher for two people on the same month.
+
+        Falls back to whatever is in context when no Arabic language is
+        installed, so nothing breaks on an English-only database.
+        """
+        lang = self.env['res.lang'].sudo().search(
+            [('code', '=like', 'ar%'), ('active', '=', True)],
+            order='code', limit=1)
+        return lang.code or self.env.context.get('lang')
+
+    @api.model
+    def employee_label(self, employee):
+        """The employee as BAS knows him.
+
+        The voucher is read in BAS, next to BAS's own records, so the name
+        on it has to be the one BAS holds — that is
+        ``x_bas_driver_cost_center``, the field kept for exactly this
+        («مركز تكلفة الموظف»), minus the employee number BAS appends to
+        it. Where it is not filled in, his Odoo name is all there is.
+
+        ``getattr`` because the field belongs to KSW_commissions, which
+        depends on this module and therefore loads after it — the same
+        reason ``loan_account`` reads ``x_loan_acc_no`` that way.
+        """
+        bas_name = (getattr(employee, 'x_bas_driver_cost_center', '')
+                    or '').strip()
+        if bas_name:
+            stripped = _TRAILING_NUMBER.sub('', bas_name).strip()
+            if stripped:
+                return stripped
+        return employee.name or ''
+
     @api.model
     def check_loan_accounts(self, employees):
         """Every employee whose repayment has nowhere to go, in one list.

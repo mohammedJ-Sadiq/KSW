@@ -47,6 +47,17 @@ class BasJournalCommon(CommissionPriorityCommon):
     def _rows(self, run):
         return run._bas_journal_rows()
 
+    def _voucher_name(self, component):
+        """The component's name as the voucher writes it.
+
+        The export builds in the voucher's language, not the session's
+        (``ksw.bas.journal.voucher_lang``), so a test that compares against
+        ``component.name`` is comparing against the wrong string the moment
+        an Arabic translation exists.
+        """
+        lang = self.env['ksw.bas.journal'].voucher_lang()
+        return component.with_context(lang=lang).name
+
     @staticmethod
     def _by_code(rows, code):
         return [r for r in rows if r['code'] == code]
@@ -127,6 +138,109 @@ class TestJournalRows(BasJournalCommon):
         self.assertEqual(self._rows(run)[0]['cost_center'], 'T166')
 
 
+class TestJournalDescriptions(BasJournalCommon):
+    """What the line *says* — the half of the voucher nobody can compute."""
+
+    def test_30_the_supervisors_note_is_the_description(self):
+        batch = self._batch(self.sup_a, self.dept_a, component=self.meals)
+        self._entry(batch, self.emp_a, user=self.sup_a, quantity=1.0,
+                    amount_override=300.0, reason='تصليح قفل باب سيارة ١٢٤')
+        run = self._approve(batch)
+
+        debit = self._rows(run)[0]
+
+        # His words, not the component's name.
+        self.assertIn('تصليح قفل باب سيارة ١٢٤', debit['ref'])
+        self.assertNotIn(self._voucher_name(self.meals), debit['ref'])
+
+    def test_31_a_line_per_note_not_per_component(self):
+        """Three notes, three lines — one accrual credit for the lot."""
+        batch = self._batch(self.sup_a, self.dept_a, component=self.meals)
+        for note, amount in (('قير 108', 100.0), ('سير 158', 200.0),
+                             ('ماطور 131', 300.0)):
+            self._entry(batch, self.emp_a, user=self.sup_a, quantity=1.0,
+                        amount_override=amount, reason=note)
+        run = self._approve(batch)
+
+        rows = self._rows(run)
+
+        self.assertEqual(len(rows), 4)
+        self.assertEqual([r['debit'] for r in rows[:3]], [100.0, 200.0, 300.0])
+        for note, row in zip(('قير 108', 'سير 158', 'ماطور 131'), rows[:3]):
+            self.assertIn(note, row['ref'])
+        self.assertAlmostEqual(rows[3]['credit'], 600.0)
+
+    def test_32_occurrences_described_the_same_way_stay_one_line(self):
+        batch = self._batch(self.sup_a, self.dept_a, component=self.meals)
+        for _i in range(3):
+            self._entry(batch, self.emp_a, user=self.sup_a, quantity=1.0,
+                        amount_override=100.0, reason='قير 108')
+        run = self._approve(batch)
+
+        rows = self._rows(run)
+
+        self.assertEqual(len(rows), 2)
+        self.assertAlmostEqual(rows[0]['debit'], 300.0)
+
+    def test_33_no_note_falls_back_to_the_component_name(self):
+        batch = self._batch(self.sup_a, self.dept_a, component=self.meals)
+        self._entry(batch, self.emp_a, user=self.sup_a, quantity=1.0,
+                    amount_override=300.0, reason='')
+        run = self._approve(batch)
+
+        self.assertIn(self._voucher_name(self.meals),
+                      self._rows(run)[0]['ref'])
+
+    def test_33b_an_importers_audit_note_is_not_a_description(self):
+        """`details` on an imported component is the machine's, not his."""
+        self.meals.sudo().importer = 'bas_trips'
+        batch = self._batch(self.sup_a, self.dept_a, component=self.meals)
+        self._entry(batch, self.emp_a, user=self.sup_a, quantity=1.0,
+                    amount_override=300.0, reason='',
+                    details='Weighted on «الرد المضاعف». Worked days: 31.')
+        run = self._approve(batch)
+
+        ref = self._rows(run)[0]['ref']
+
+        self.assertNotIn('Worked days', ref)
+        self.assertIn(self._voucher_name(self.meals), ref)
+
+    def test_33c_the_voucher_is_arabic_whoever_exports_it(self):
+        """An English session must still produce an Arabic voucher."""
+        arabic = self.env['res.lang'].sudo().search(
+            [('code', '=like', 'ar%'), ('active', '=', True)], limit=1)
+        if not arabic:
+            self.skipTest('no Arabic language installed on this database')
+        self.meals.with_context(lang=arabic.code).sudo().name = 'الوجبات'
+        batch = self._batch(self.sup_a, self.dept_a, component=self.meals)
+        self._entry(batch, self.emp_a, user=self.sup_a, quantity=1.0,
+                    amount_override=300.0, reason='')
+        run = self._approve(batch)
+
+        rows = run.with_context(lang='en_US')._bas_journal_rows()
+
+        self.assertIn('الوجبات', rows[0]['ref'])
+
+    def test_34_the_name_is_the_one_bas_holds(self):
+        """BAS's own spelling, minus the employee number it appends."""
+        self.emp_a.sudo().x_bas_driver_cost_center = 'عبدالله محمد عبد الحفيظ محمد700'
+        batch = self._commission_entry(self.emp_a, 500.0).batch_id
+        run = self._approve(batch)
+
+        ref = self._rows(run)[0]['ref']
+
+        self.assertIn('عبدالله محمد عبد الحفيظ محمد', ref)
+        self.assertNotIn('700', ref)
+        self.assertNotIn(self.emp_a.name, ref)
+
+    def test_35_without_a_bas_name_his_odoo_name_is_used(self):
+        self.emp_a.sudo().x_bas_driver_cost_center = False
+        batch = self._commission_entry(self.emp_a, 500.0).batch_id
+        run = self._approve(batch)
+
+        self.assertIn(self.emp_a.name, self._rows(run)[0]['ref'])
+
+
 class TestJournalRefusals(BasJournalCommon):
 
     def test_10_component_without_an_account_is_named(self):
@@ -136,7 +250,8 @@ class TestJournalRefusals(BasJournalCommon):
 
         with self.assertRaises(UserError) as caught:
             self._rows(run)
-        self.assertIn(self.meals.name, str(caught.exception))
+        # Named in the voucher's language, like every other word on it.
+        self.assertIn(self._voucher_name(self.meals), str(caught.exception))
 
     def test_11_employee_without_a_loan_account_is_named(self):
         self.emp_a.sudo().x_loan_acc_no = False
