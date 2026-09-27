@@ -5,6 +5,7 @@ from markupsafe import Markup
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
+from odoo.fields import Domain
 from odoo.tools import float_round
 from odoo.osv import expression as odoo_expr
 
@@ -1280,14 +1281,31 @@ class HrLeave(models.Model):
 
         A return the manager has already confirmed is never re-opened.
         """
+        moved = self.browse()
         for leave in self.filtered(self._is_annual_leave):
             if leave.x_return_state == 'hr_confirmed':
                 continue
+            was_away = leave.x_return_state == 'on_vacation'
             if leave._is_past_gm_final():
                 if leave.x_return_state != 'on_vacation':
                     leave.write({'x_return_state': 'on_vacation'})
             else:
                 leave._reset_return_tracking()
+            if was_away != (leave.x_return_state == 'on_vacation'):
+                moved |= leave
+        # 'On Vacation' is what exempts a still-'confirm' request from a
+        # public holiday, so its start and end re-open that decision too.
+        if moved:
+            moved._recheck_public_holidays()
+
+    @api.model
+    def _public_holiday_exempt_domain(self):
+        # The employee leaves at GM final approval, while the KSW chain is
+        # still state == 'confirm' (gotcha #48).
+        return super()._public_holiday_exempt_domain() | Domain([
+            ('state', '=', 'confirm'),
+            ('x_return_state', '=', 'on_vacation'),
+        ])
 
     def _notify_return_confirmation_due(self):
         """Tell the direct manager, once, that this return is theirs to close.

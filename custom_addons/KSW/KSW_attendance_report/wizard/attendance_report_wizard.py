@@ -91,6 +91,7 @@ class AttendanceReportWizard(models.TransientModel):
             'leave': 0,
             'weekend': 0,
             'weekend_worked': 0,
+            'public_holiday': 0,
             'no_record': 0,
             'worked_hours': 0.0,
             'late_minutes': 0.0,
@@ -132,12 +133,22 @@ class AttendanceReportWizard(models.TransientModel):
                     row['status_class'] = 'no_record'
                     totals['no_record'] += 1
             else:
+                holiday_recs = [a for a in day_atts if a.x_public_holiday_id]
                 absent_recs = [a for a in day_atts if a.x_is_absent]
                 weekend_recs = [a for a in day_atts if a.x_is_weekend]
                 normal_recs = [a for a in day_atts
                                if not a.x_is_absent and not a.x_is_weekend]
 
-                if absent_recs:
+                if holiday_recs:
+                    # Granted, not worked: no punch times, the holiday's name.
+                    att = holiday_recs[0]
+                    row['status'] = 'Public Holiday'
+                    row['status_class'] = 'public_holiday'
+                    row['notes'] = att.x_public_holiday_id.name
+                    row['worked_hours'] = att.x_net_worked_hours or 0.0
+                    totals['public_holiday'] += 1
+                    totals['worked_hours'] += att.x_net_worked_hours or 0.0
+                elif absent_recs:
                     att = absent_recs[0]
                     if att.x_is_covered or not att.x_net_is_absent:
                         row['status'] = 'Absent (Covered)'

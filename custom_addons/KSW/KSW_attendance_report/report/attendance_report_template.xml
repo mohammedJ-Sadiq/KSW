@@ -86,6 +86,7 @@
                                         'background:#fdecea;' if day['status_class'] == 'absent'
                                         else 'background:#e8f5e9;' if day['status_class'] == 'present'
                                         else 'background:#e3f2fd;' if day['status_class'] in ('weekend', 'weekend_worked')
+                                        else 'background:#ede7f6;' if day['status_class'] == 'public_holiday'
                                         else 'background:#fff3e0;' if day['status_class'] == 'leave'
                                         else 'background:#f0f0f0;' if day['status_class'] == 'covered'
                                         else 'background:#fafafa;' if day['status_class'] == 'future'
@@ -108,6 +109,9 @@
                                             </t>
                                             <t t-elif="day['status_class'] == 'weekend_worked'">
                                                 <span style="color:#1565c0;">⬛ Weekend</span>
+                                            </t>
+                                            <t t-elif="day['status_class'] == 'public_holiday'">
+                                                <span style="color:#4527a0;">★ Public Holiday</span>
                                             </t>
                                             <t t-elif="day['status_class'] == 'weekend'">
                                                 <span style="color:#90a4ae;">⬜ Weekend</span>
@@ -193,6 +197,16 @@
                                     <td style="padding:6px 10px; border:1px solid #ddd; text-align:center;">
                                         <t t-out="totals['no_record']"/>
                                     </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:6px 10px; border:1px solid #ddd; background:#ede7f6;">
+                                        <strong>★ Public Holidays</strong>
+                                    </td>
+                                    <td style="padding:6px 10px; border:1px solid #ddd; text-align:center;">
+                                        <t t-out="totals['public_holiday']"/>
+                                    </td>
+                                    <td style="padding:6px 10px; border:1px solid #ddd;"/>
+                                    <td style="padding:6px 10px; border:1px solid #ddd;"/>
                                 </tr>
                             </table>
 

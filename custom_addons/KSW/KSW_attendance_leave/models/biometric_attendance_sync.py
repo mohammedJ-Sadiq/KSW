@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 import json
 import logging
-from datetime import datetime as dt, timedelta
+from datetime import datetime as dt, time, timedelta
 
 import pytz
 
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
+from odoo.fields import Domain
 
 _logger = logging.getLogger(__name__)
 
@@ -94,6 +96,16 @@ class BiometricAttendanceSyncKSW(models.AbstractModel):
             "      JOIN hr_leave hl ON hl.id = rel.leave_id "
             "      WHERE rel.attendance_id = ha.id AND hl.state = 'validate'"
             "  )",
+            (emp_id,
+             day.strftime("%Y-%m-%d"),
+             (day + timedelta(days=1)).strftime("%Y-%m-%d")))
+
+        # A real punch merged into a public-holiday grant makes it real
+        # attendance: deleting or moving the holiday must not take it away.
+        new_cr.execute(
+            "UPDATE hr_attendance SET x_public_holiday_id = NULL "
+            "WHERE employee_id = %s AND x_public_holiday_id IS NOT NULL "
+            "  AND check_in >= %s AND check_in < %s",
             (emp_id,
              day.strftime("%Y-%m-%d"),
              (day + timedelta(days=1)).strftime("%Y-%m-%d")))
@@ -672,5 +684,239 @@ class BiometricAttendanceSyncKSW(models.AbstractModel):
         ], limit=1)
         if att_issue_leave:
             return False
+        # A public holiday is granted exactly where the absence would have
+        # gone — so every path that generates absences (nightly cron,
+        # Generate All Absences, the download wizard) also grants holidays.
+        holiday = self._public_holiday_to_grant(employee, check_date)
+        if holiday and self._try_grant_public_holiday(employee, check_date, holiday):
+            return False
         self._create_absence_record(employee, check_date)
         return True
+
+    # ------------------------------------------------------------------
+    # Public holidays
+    # ------------------------------------------------------------------
+
+    @api.model
+    def _public_holiday_employees(self, holidays):
+        """Employees a public holiday is granted to: biometric only.
+
+        Attendance-sheet employees are excluded — their month is entered by
+        hand on the sheet, which has no hr.attendance rows to grant into.
+        """
+        Employee = self.env['hr.employee'].sudo()
+        domain = Domain('biometric_user_id', '!=', False)
+        if 'x_is_attendance_sheet' in Employee._fields:
+            domain &= Domain('x_is_attendance_sheet', '=', False)
+        companies = holidays.mapped('company_id')
+        if companies and len(companies) == len(holidays):
+            domain &= Domain('company_id', 'in', companies.ids)
+        employees = Employee.search(domain)
+        return employees.filtered(
+            lambda e: any(h._applies_to_employee(e) for h in holidays))
+
+    @api.model
+    def _employee_day_bounds_utc(self, employee, day):
+        tz = self.env['biometric.schedule.helper'].get_employee_tz(employee)
+        start = tz.localize(dt.combine(day, time.min)).astimezone(
+            pytz.utc).replace(tzinfo=None)
+        return start, start + timedelta(days=1)
+
+    @api.model
+    def _public_holidays_on(self, employee, day):
+        """Public holidays covering `day` in the employee's own timezone."""
+        start, end = self._employee_day_bounds_utc(employee, day)
+        holidays = self.env['resource.calendar.leaves'].sudo().search([
+            ('resource_id', '=', False),
+            ('time_type', '=', 'leave'),
+            ('date_from', '<', end),
+            ('date_to', '>', start),
+        ], order='date_from, id')
+        return holidays.filtered(lambda h: h._applies_to_employee(employee))
+
+    @api.model
+    def _is_public_holiday_exempt(self, employee, day):
+        """True when the employee is on time off that day.
+
+        Policy (Sep 2026): an employee already on leave does not receive the
+        holiday; the day stays whatever the leave makes it.  Hour-based and
+        attendance-issue requests (late / early excuses) are not "on leave".
+        """
+        Leave = self.env['hr.leave'].sudo()
+        return bool(Leave.search_count(
+            Leave._public_holiday_exempt_domain() & Domain([
+                ('employee_id', '=', employee.id),
+                ('request_unit_hours', '=', False),
+                ('holiday_status_id.is_attendance_issue', '=', False),
+                ('request_date_from', '<=', day),
+                ('request_date_to', '>=', day),
+            ]), limit=1))
+
+    @api.model
+    def _public_holiday_to_grant(self, employee, day):
+        """The holiday to grant (employee, day), or an empty recordset."""
+        empty = self.env['resource.calendar.leaves']
+        employee = employee.sudo()
+        if not employee.biometric_user_id:
+            return empty
+        if 'x_is_attendance_sheet' in employee._fields \
+                and employee.x_is_attendance_sheet:
+            return empty
+        if day > fields.Date.context_today(self):
+            return empty
+        helper = self.env['biometric.schedule.helper']
+        # A holiday on a weekend day grants nothing: the weekend pass owns it.
+        if not (helper.is_calendar_configured(employee)
+                and helper.is_scheduled_workday(employee, day)):
+            return empty
+        holidays = self._public_holidays_on(employee, day)
+        if not holidays or self._is_public_holiday_exempt(employee, day):
+            return empty
+        return holidays[:1]
+
+    @api.model
+    def _create_public_holiday_record(self, employee, day, holiday):
+        """A full scheduled day, like a weekend grant, tagged with the holiday."""
+        helper = self.env['biometric.schedule.helper']
+        emp_tz = helper.get_employee_tz(employee)
+        schedule = helper.get_employee_day_schedule(employee, day, emp_tz)
+        if not schedule:
+            return self.env['hr.attendance']
+        ci_utc = schedule['start'].astimezone(pytz.utc).replace(tzinfo=None)
+        co_utc = schedule['end'].astimezone(pytz.utc).replace(tzinfo=None)
+        break_hours = helper.calculate_break_deduction(
+            employee, day, schedule['start'], schedule['end'], emp_tz)
+        worked = (co_utc - ci_utc).total_seconds() / 3600.0 - break_hours
+        rec = self.env['hr.attendance'].sudo().create({
+            'employee_id': employee.id,
+            'check_in': ci_utc,
+            'check_out': co_utc,
+            'x_is_absent': False,
+            'x_public_holiday_id': holiday.id,
+        })
+        rec.write({'worked_hours': worked})
+        _logger.info("Public holiday %s granted to %s on %s (%.2fh)",
+                     holiday.name, employee.name, day, worked)
+        return rec
+
+    @api.model
+    def _try_grant_public_holiday(self, employee, day, holiday, replace=None):
+        """Replace `replace` (the day's absence rows) with the grant.
+
+        In a savepoint: hr.attendance refuses overlapping rows, and a night
+        shift's grant runs past the UTC-midnight absence row of the next day.
+        One employee's collision must not abort the holiday for everyone —
+        the day then simply keeps what it had.
+        """
+        try:
+            with self.env.cr.savepoint():
+                if replace:
+                    replace.unlink()
+                return bool(self._create_public_holiday_record(
+                    employee, day, holiday))
+        except ValidationError as exc:
+            _logger.warning("Public holiday %s not granted to %s on %s: %s",
+                            holiday.name, employee.name, day, exc)
+            return False
+
+    @api.model
+    def _day_attendances(self, employee, day):
+        """Rows belonging to `day`: the UTC day (absences sit at UTC midnight,
+        as _has_attendance_on_date assumes) plus the employee's local day
+        (where a holiday grant starts), so neither kind is missed."""
+        start, end = self._employee_day_bounds_utc(employee, day)
+        utc_start = dt.combine(day, time.min)
+        return self.env['hr.attendance'].sudo().search([
+            ('employee_id', '=', employee.id),
+            ('check_in', '>=', min(start, utc_start)),
+            ('check_in', '<', max(end, utc_start + timedelta(days=1))),
+        ])
+
+    @api.model
+    def _sync_public_holiday_day(self, employee, day):
+        """Make one (employee, day) agree with the holiday calendar.
+
+        Idempotent in both directions, like the weekend pass: grants where the
+        holiday is earned, revokes (and restores the absence) where it no
+        longer is — holiday deleted or moved, employee went on leave.
+        Returns 'granted', 'revoked' or None.
+        """
+        rows = self._day_attendances(employee, day)
+        grants = rows.filtered('x_public_holiday_id')
+        holiday = self._public_holiday_to_grant(employee, day)
+
+        if not holiday:
+            if not grants:
+                return None
+            grants.unlink()
+            if day < fields.Date.context_today(self):
+                # Put back the absence the grant replaced (auto-linked to the
+                # covering leave, if that is why the grant went away).  If it
+                # collides, the day is left empty — payroll deducts an
+                # unpresented day exactly like an absence.
+                try:
+                    with self.env.cr.savepoint():
+                        self._check_absence_for_date(employee, day)
+                except ValidationError as exc:
+                    _logger.warning("Absence not restored for %s on %s: %s",
+                                    employee.name, day, exc)
+            return 'revoked'
+
+        if grants:
+            if grants[:1].x_public_holiday_id != holiday:
+                grants.write({'x_public_holiday_id': holiday.id})
+            return None
+        if rows.filtered(lambda a: not a.x_is_absent):
+            # He came in on the holiday: the real punch stands.
+            return None
+        absences = rows.filtered('x_is_absent')
+        if any(a.x_leave_ids.filtered(lambda l: l.state == 'validate')
+               for a in absences):
+            # Already explained by an approved request — leave it alone.
+            return None
+        if self._try_grant_public_holiday(employee, day, holiday,
+                                          replace=absences):
+            return 'granted'
+        return 'failed'
+
+    @api.model
+    def _sync_public_holidays(self, holidays, extra_pairs=()):
+        """Apply `holidays` to every eligible employee, up to today.
+
+        ``extra_pairs`` are (employee, date) pairs to re-check as well — the
+        days a holiday covered before it was moved or deleted.
+        """
+        today = fields.Date.context_today(self)
+        pairs = {(e.id, d) for e, d in extra_pairs}
+        holidays = holidays.sudo().exists()
+        for holiday in holidays:
+            # Anyone already holding this holiday is re-checked too, so an
+            # employee who stopped being eligible loses it.
+            for att in holiday.x_granted_attendance_ids:
+                pairs.add((att.employee_id.id,
+                           self._local_date(att.employee_id, att.check_in)))
+        for employee in self._public_holiday_employees(holidays):
+            for holiday in holidays.filtered(
+                    lambda h: h._applies_to_employee(employee)):
+                for day in holiday._local_days(employee):
+                    if day <= today:
+                        pairs.add((employee.id, day))
+
+        Employee = self.env['hr.employee'].sudo()
+        result = {'granted': 0, 'revoked': 0, 'failed': 0, 'failed_names': []}
+        for emp_id, day in sorted(pairs, key=lambda p: (p[0], p[1])):
+            employee = Employee.browse(emp_id)
+            outcome = self._sync_public_holiday_day(employee, day)
+            if outcome:
+                result[outcome] += 1
+            if outcome == 'failed':
+                result['failed_names'].append(employee.name)
+        _logger.info("Public holiday sync %s: %d granted, %d revoked, %d failed",
+                     holidays.mapped('name'), result['granted'],
+                     result['revoked'], result['failed'])
+        return result
+
+    @api.model
+    def _local_date(self, employee, utc_naive):
+        tz = self.env['biometric.schedule.helper'].get_employee_tz(employee)
+        return pytz.utc.localize(utc_naive).astimezone(tz).date()

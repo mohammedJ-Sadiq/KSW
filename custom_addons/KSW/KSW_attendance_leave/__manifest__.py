@@ -1,7 +1,7 @@
 {
     'name': 'KSW - attendance leave',
     'category': 'Human Resources',
-    'version': '19.0.1.3.5',
+    'version': '19.0.1.3.7',
     'sequence': 1,
     'author': 'Mohammed Albadr',
     'summary': 'HR Attendance Leave for Odoo 19 Community Edition',
@@ -36,6 +36,7 @@ Connecting attendance records with leave management to be a list to choose from
         'views/hr_leave_views.xml',
         'views/hr_attendance_views.xml',
         'views/biometric_device_details_views.xml',
+        'views/resource_calendar_leaves_views.xml',
     ],
     'assets': {
         'web.assets_backend': [

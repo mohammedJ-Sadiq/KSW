@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Public Holidays list: grant the holiday to every biometric employee.
+         Saving a holiday already applies it; the button re-applies it on
+         demand (e.g. after a schedule change or a re-download). -->
+    <record id="resource_calendar_leaves_tree_inherit_ksw_grant" model="ir.ui.view">
+        <field name="name">resource.calendar.leaves.list.inherit.ksw.grant</field>
+        <field name="model">resource.calendar.leaves</field>
+        <field name="inherit_id" ref="hr_holidays.resource_calendar_leaves_tree_inherit"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <header>
+                    <button name="action_grant_public_holiday" type="object"
+                            string="Grant to Employees"/>
+                </header>
+                <field name="x_granted_count" optional="show"/>
+                <button name="action_grant_public_holiday" type="object"
+                        string="Grant to Employees" icon="fa-calendar-check-o"
+                        class="btn-link"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -6,6 +6,7 @@ from markupsafe import Markup
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
+from odoo.fields import Domain
 from odoo.tools.misc import format_date
 
 
@@ -1111,7 +1112,37 @@ class HrLeave(models.Model):
         # weekend pass reads it straight from the DB, so it has to be written
         # out before we hand over.
         self.env.flush_all()
+        # Holidays first: whether a holiday is granted or an absence restored
+        # on a day next to a weekend changes the weekend decision.
+        self._recheck_public_holidays()
         self.env['biometric.attendance.sync']._regenerate_weekends_for_leaves(self)
+
+    @api.model
+    def _public_holiday_exempt_domain(self):
+        """Requests that take a public holiday away from the employee.
+
+        KSW_annual_leave widens this to the vacation already under way (GM
+        final approval) while the request is still ``confirm``.
+        """
+        return Domain('state', '=', 'validate')
+
+    def _recheck_public_holidays(self):
+        """Re-derive the public-holiday grant on the days these leaves cover.
+
+        A leave approved after the holiday takes the grant back (the employee
+        was on leave, not on holiday); refusing it gives the holiday back.
+        """
+        Sync = self.env['biometric.attendance.sync'].sudo()
+        today = fields.Date.context_today(self)
+        for leave in self.sudo().filtered(
+                lambda l: l.employee_id.biometric_user_id
+                and l.request_date_from and l.request_date_to):
+            day = leave.request_date_from
+            last = min(leave.request_date_to, today)
+            while day <= last:
+                if Sync._public_holidays_on(leave.employee_id, day):
+                    Sync._sync_public_holiday_day(leave.employee_id, day)
+                day += timedelta(days=1)
 
     def action_refuse(self):
         """Unmark attendance records when leave is refused, post detailed message."""

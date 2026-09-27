@@ -44,6 +44,9 @@
             <!-- Add absent and coverage columns at the end -->
             <xpath expr="//list" position="inside">
                 <field name="x_net_is_absent" string="Absent" optional="show"/>
+                <field name="x_public_holiday_id" string="Public Holiday"
+                       widget="badge" decoration-primary="x_public_holiday_id"
+                       optional="show"/>
                 <field name="x_is_covered" string="Covered"
                        widget="boolean_toggle" readonly="1"
                        optional="show"/>
@@ -54,6 +57,9 @@
                 <attribute name="decoration-warning">x_net_late_minutes &gt; 0 or x_net_early_leave_minutes &gt; 0 or (x_net_worked_hours == 0 and not x_net_is_absent and not x_is_covered)</attribute>
                 <attribute name="decoration-danger">x_net_is_absent</attribute>
                 <attribute name="decoration-success">x_is_covered and not x_net_is_absent and x_net_late_minutes == 0 and x_net_early_leave_minutes == 0</attribute>
+                <!-- A day granted for a public holiday is not a day worked. -->
+                <attribute name="decoration-primary">x_public_holiday_id</attribute>
+                <attribute name="decoration-bf">x_public_holiday_id</attribute>
             </xpath>
         </field>
     </record>
@@ -65,6 +71,16 @@
         <field name="inherit_id" ref="hr_attendance.hr_attendance_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="inside">
+                <widget name="web_ribbon" title="Public Holiday" bg_color="text-bg-primary"
+                        invisible="not x_public_holiday_id"/>
+                <group string="Public Holiday" invisible="not x_public_holiday_id">
+                    <field name="x_public_holiday_id" readonly="1"
+                           options="{'no_open': True}"/>
+                    <div class="text-muted" colspan="2">
+                        Granted as a full scheduled day because of this public
+                        holiday: no punch was needed and nothing is deducted.
+                    </div>
+                </group>
                 <group string="Attendance Issues">
                     <group>
                         <field name="worked_hours" string="Raw Worked Hours" readonly="1" widget="float_time"/>
@@ -90,6 +106,22 @@
                     <field name="x_is_covered" readonly="1"
                            widget="boolean_toggle"/>
                 </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Find the days granted for a public holiday -->
+    <record id="hr_attendance_view_filter_inherit_public_holiday" model="ir.ui.view">
+        <field name="name">hr.attendance.search.inherit.public.holiday</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='nocheckout']" position="after">
+                <filter string="Public Holiday" name="public_holiday"
+                        domain="[('x_public_holiday_id', '!=', False)]"/>
+            </xpath>
+            <xpath expr="//search" position="inside">
+                <field name="x_public_holiday_id"/>
             </xpath>
         </field>
     </record>

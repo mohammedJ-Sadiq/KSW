@@ -13,6 +13,16 @@ class HrAttendance(models.Model):
         string='Related Leaves',
     )
 
+    x_public_holiday_id = fields.Many2one(
+        'resource.calendar.leaves',
+        string='Public Holiday',
+        ondelete='set null',
+        index='btree_not_null',
+        readonly=True,
+        help='Set on the full scheduled day written to grant this public '
+             'holiday.  Cleared when a real punch lands on that day.',
+    )
+
     x_is_covered = fields.Boolean(
         string='Covered by Time Off',
         compute='_compute_is_covered',
@@ -239,7 +249,9 @@ class HrAttendance(models.Model):
             issues = []
             details = []
 
-            if rec.x_net_is_absent:
+            if rec.x_public_holiday_id:
+                issues.append(f'Public Holiday ({rec.x_public_holiday_id.name})')
+            elif rec.x_net_is_absent:
                 issues.append('Absent')
                 details.append('Full Day')
             elif rec.x_is_absent and not rec.x_net_is_absent:
