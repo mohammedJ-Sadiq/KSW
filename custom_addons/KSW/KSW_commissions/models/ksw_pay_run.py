@@ -1017,17 +1017,48 @@ class KswPayRunLine(models.Model):
         for rec in self:
             rec.is_preview = rec.state not in LOCKING_STATES
 
+    def _export_submissions(self):
+        """``{(run_id, employee_id): ksw.pay.submission}`` — whose handover
+        each person was paid through.
+
+        The department handovers in the order the run's *By Department*
+        page lists them (the submission model's own ``_order``); a person
+        whose entries sit in two of them belongs to the first.
+        """
+        owner = {}
+        for run in self.run_id:
+            for submission in run.sudo().submission_ids:
+                for employee in submission.batch_ids.entry_ids.employee_id:
+                    owner.setdefault((run.id, employee.id), submission)
+        return owner
+
     def _export_sorted(self):
         """The one order every file of the month lists people in.
 
-        The bank Excel, the Kawthar TXT and the BAS journal are read side
-        by side, so they must agree row for row. By Odoo name, trimmed and
-        case-blind — names here carry leading spaces and mixed case, and a
-        plain sort files " AHMED" before "AAT" and "abdullah" after "ZAHID"
-        — with the id to settle ties.
+        The bank Excel, the bank text files and the BAS journal are read
+        side by side, so they must agree row for row: department by
+        department, in the order of the run's *By Department* page, and by
+        name inside each — trimmed and case-blind, because names here carry
+        leading spaces and mixed case and a plain sort files " AHMED" before
+        "AAT" and "abdullah" after "ZAHID" — with the id to settle ties.
+        Anyone not traceable to a handover (a register line carried over
+        by hand) comes last.
         """
-        return self.sorted(lambda l: (
-            (l.employee_id.sudo().name or '').strip().casefold(), l.id))
+        owner = self._export_submissions()
+        position = {}
+        for run in self.run_id:
+            for pos, submission in enumerate(run.sudo().submission_ids):
+                position[submission.id] = pos
+
+        def key(line):
+            submission = owner.get((line.run_id.id, line.employee_id.id))
+            return (
+                position.get(submission.id, len(position))
+                if submission else len(position),
+                (line.employee_id.sudo().name or '').strip().casefold(),
+                line.id,
+            )
+        return self.sorted(key)
 
     @api.depends('earnings', 'loan_offset')
     def _compute_net(self):

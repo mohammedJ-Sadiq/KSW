@@ -21,7 +21,7 @@ Where the two disagree the export stops and says whose figures they are.
 """
 from dateutil.relativedelta import relativedelta
 
-from odoo import _, models
+from odoo import _, api, models
 from odoo.exceptions import UserError
 
 
@@ -51,6 +51,33 @@ class KswPayRun(models.Model):
         entries = entries.filtered('employee_id')
         payable = entries - self._held_entries(entries)
         return self._rounded_component_totals(payable)
+
+    @api.model
+    def _bas_detail_lines(self, by_component):
+        """One employee's month as the voucher itemises it.
+
+        ``by_component`` is his ``{component: amount}``. Components the
+        voucher describes the same way *and* posts to the same accounts
+        are one line — "Other" and every bonus are all «بدل عمل اضافي» on
+        3201010006 / 2107010001, and three lines saying the same thing
+        against the same account is detail the voucher does not want.
+        The Excel summary reads this too, so its columns are the voucher's.
+
+        Returns a list of ``{'label', 'component', 'amount'}`` in catalog
+        order; ``component`` is the first of the group and carries the
+        accounts.
+        """
+        lines = {}
+        for component, amount in by_component.items():
+            label = (component.x_bas_ref or component.name or '').strip()
+            key = (label, component.x_bas_expense_code,
+                   component.x_bas_accrual_code,
+                   component.x_bas_use_cost_center)
+            if key not in lines:
+                lines[key] = {'label': label, 'component': component,
+                              'amount': 0.0}
+            lines[key]['amount'] += amount
+        return list(lines.values())
 
     def _bas_ref(self, label, who, month):
         """``<what> <who> شهر <month>`` — the description on every line.
@@ -103,13 +130,13 @@ class KswPayRun(models.Model):
                 continue
 
             debits = []
-            for component, amount in by_line.items():
+            for detail in self._bas_detail_lines(by_line):
+                component = detail['component']
                 debits.append({
                     'code': component.x_bas_expense_code,
                     'name': component.x_bas_expense_name,
-                    'amount': amount,
-                    'ref': self._bas_ref(
-                        component.x_bas_ref or component.name, who, month),
+                    'amount': detail['amount'],
+                    'ref': self._bas_ref(detail['label'], who, month),
                     # The *vehicle*, never x_bas_driver_cost_center: that
                     # one identifies the driver (BAS COST_CENTER2) and
                     # putting it in this column would post every line to a

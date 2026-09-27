@@ -20,7 +20,7 @@ except ImportError:
 
 EXPORT_MODES = [
     ('all_excel',    'All banks – Excel files'),
-    ('all_txt',      'All banks – Text files (Kawthar)'),
+    ('all_txt',      'All banks – Text files (Kawthar and WPS)'),
     ('specific_excel', 'Specific bank – Excel'),
     ('specific_txt', 'Specific bank – Text file'),
     ('journal_entry', 'Journal entries – BAS import file'),
@@ -49,9 +49,16 @@ class KswCommissionBankExportWizard(models.TransientModel):
         default=fields.Date.context_today,
         help='Payment value date used in TXT files.',
     )
+    # The bank's own codes, from the payroll Kawthar export — not a list of
+    # our own. This used to offer "1 – New / 2 – Renewal / 3 – Delete":
+    # the default was right (2 is Load Funds, what paying onto a card is),
+    # but "Delete" was really Close Card, one click from closing every
+    # card in the file.
     operation_code = fields.Selection(
-        [('1', '1 – New'), ('2', '2 – Renewal'), ('3', '3 – Delete')],
+        selection='_get_operation_codes',
         default='2', string='Kawthar Operation',
+        help='The operation Al Rajhi applies to each card in the Kawthar '
+             'file. Paying commission is 2 – Load Funds (تحميل رصيد).',
     )
     journal_number = fields.Char(
         string='Journal Number',
@@ -65,6 +72,18 @@ class KswCommissionBankExportWizard(models.TransientModel):
         help='Merged: one workbook with the summary over every employee and '
              'one sheet per paying bank.',
     )
+
+    @api.model
+    def _get_operation_codes(self):
+        # KSW_payroll defines the template's codes; this module does not
+        # depend on it, so without it only the one code a payment uses is
+        # offered.
+        try:
+            from odoo.addons.KSW_payroll.wizard.kawthar_file_wizard import (
+                OPERATION_CODES)
+        except ImportError:
+            return [('2', 'Load Funds - تحميل رصيد')]
+        return OPERATION_CODES
 
     @api.depends('run_id')
     def _compute_company_partner(self):
@@ -179,9 +198,19 @@ class KswCommissionBankExportWizard(models.TransientModel):
         )
         bold = Font(bold=True, size=11)
         hdr_fill = PatternFill('solid', fgColor='D9E1F2')
+        details, labels = self._summary_details(lines)
+        # A register line its entries do not explain (carried over by hand)
+        # still shows its whole figure, under a column that says so.
+        unitemised = {
+            line.id: line.earnings - sum(details.get(line.id, {}).values())
+            for line in lines
+        }
+        extra = ['Unitemised'] if any(
+            abs(v) >= 0.005 for v in unitemised.values()) else []
         headers = [
             'Employee', 'Employee No', 'SSN No', 'Department',
-            'Earnings', 'Loans Deduction', 'Bank Transfer Amount',
+        ] + labels + extra + [
+            'Total Earnings', 'Loans Deduction', 'Bank Transfer Amount',
             'Bank Account Number', 'Bank Name', 'Paid From',
         ]
         for ci, h in enumerate(headers, 1):
@@ -190,15 +219,23 @@ class KswCommissionBankExportWizard(models.TransientModel):
             c.fill = hdr_fill
             c.border = thin
             c.alignment = Alignment(horizontal='center', wrap_text=True)
+        owner = lines._export_submissions()
         for ri, line in enumerate(
                 lines._export_sorted(), 2):
             emp = line.employee_id.sudo()
             bank = self._emp_account(emp)
+            mine = details.get(line.id, {})
+            submission = owner.get((line.run_id.id, emp.id))
             row = [
                 emp.name or '',
                 self._emp_number(emp),
                 self._emp_ssn(emp),
-                emp.department_id.name if emp.department_id else '',
+                # The handover he was paid through — the grouping the rows
+                # are in — falling back to his HR department.
+                (submission.department_id.name or submission.display_name
+                 if submission else emp.department_id.name or ''),
+            ] + [mine.get(label, 0) for label in labels] + (
+                [unitemised[line.id]] if extra else []) + [
                 line.earnings,
                 line.loan_offset,
                 line.net_payable,
@@ -214,6 +251,36 @@ class KswCommissionBankExportWizard(models.TransientModel):
             mx = max(len(str(ws.cell(row=r, column=ci).value or ''))
                      for r in range(1, ws.max_row + 1))
             ws.column_dimensions[letter].width = min(mx + 3, 35)
+
+    def _summary_details(self, lines):
+        """Each line's earnings itemised exactly as the BAS journal does.
+
+        Returns ``({line_id: {label: amount}}, [labels in catalog order])``
+        — the voucher's own descriptions («العمل الإضافي», «بدل عمل ايام
+        الجمعة», «بدل عمل اضافي» …), from the same whole-riyal figures, so
+        a column here and a line in the journal are the same number.
+        """
+        run = self.run_id
+        lang = (self.env['ksw.bas.journal'].voucher_lang()
+                if 'ksw.bas.journal' in self.env
+                else self.env.context.get('lang'))
+        run = run.with_context(lang=lang)
+        totals = run._bas_component_totals()
+        details, first_seen = {}, {}
+        for line in lines:
+            mine = {}
+            for detail in run._bas_detail_lines(
+                    totals.get(line.employee_id.id, {})):
+                if not detail['amount']:
+                    continue
+                label = detail['label']
+                mine[label] = mine.get(label, 0) + detail['amount']
+                component = detail['component']
+                first_seen[label] = min(
+                    first_seen.get(label, (component.sequence, component.id)),
+                    (component.sequence, component.id))
+            details[line.id] = mine
+        return details, sorted(first_seen, key=first_seen.get)
 
     def _fill_wps_sheet(self, wb, bank, lines, title):
         ws = wb.create_sheet(title)
@@ -311,6 +378,76 @@ class KswCommissionBankExportWizard(models.TransientModel):
     @staticmethod
     def _halalas(amount):
         return int(round((amount or 0.0) * 100))
+
+    def _make_wps_txt(self, bank, lines):
+        """WPS fixed-width TXT — the payroll bank file, line for line.
+
+        The header, the line length and every padding rule are KSW_payroll's
+        (`ksw.wps.file.wizard._header` / `_pz` / `_pr` / `_swift4`), so the
+        bank's format is defined once. Only the detail is written here,
+        because payroll's reads a payslip and this reads a register line.
+        Its breakdown follows this module's other two bank files (the
+        Kawthar TXT and the WPS sheet): earnings as basic and as other,
+        housing 0, the loan offset as the deduction.
+
+        The account is the EMPLOYEE's IBAN (`primary_bank_account_id`);
+        `bank` is the company account the file is paid from.
+        """
+        if 'ksw.wps.file.wizard' not in self.env:
+            raise UserError(_(
+                'The WPS text file is not available on this system yet: its '
+                'format is defined by KSW_payroll, which has not been '
+                'updated. Ask IT to deploy it, or use the WPS Excel file.'))
+        wps = self.env['ksw.wps.file.wizard'].new({
+            'value_date': self.value_date or fields.Date.context_today(self),
+        })
+        valid = lines.filtered(
+            lambda l: self._emp_account(l.employee_id)
+            and self._halalas(l.net_payable) > 0
+        )._export_sorted()
+        if not valid:
+            raise UserError(_(
+                'No employee paid from %(bank)s has a positive amount and a '
+                'bank account of his own.', bank=self._bank_label(bank)))
+
+        rows = [wps._header(
+            bank, sum(int(round(l.net_payable)) for l in valid), len(valid))]
+        for line in valid:
+            emp = line.employee_id.sudo()
+            account = self._emp_account(emp)
+            number = self._emp_number(emp)
+            ssn = self._emp_ssn(emp)
+            row = ''.join([
+                wps._pz(int(number) if number.isdigit() else 0, 12),
+                wps._swift4(account),
+                ' ' * 8,
+                wps._pr((account.acc_number or '').replace(' ', ''), 24),
+                ' ' * 11,
+                wps._pr((emp.name or '').strip().upper(), 50),
+                wps._pz(self._halalas(line.net_payable), 15),
+                wps._pz(int(ssn) if ssn.isdigit() else 0, 10),
+                ' ' * 5,
+                wps._pz(self._halalas(line.earnings), 13),
+                wps._pz(0, 12),  # housing: not part of a commission
+                wps._pz(self._halalas(line.earnings), 12),
+                wps._pz(self._halalas(line.loan_offset), 12),
+                'SAR',
+                '0' * 5,
+            ])
+            # The same trailer payroll's `_detail` writes.
+            remain = wps._LINE_LEN - len(row)
+            if remain > 51:
+                row += ' ' * 50 + '0' + ' ' * (remain - 51)
+            elif remain > 0:
+                row += ' ' * (remain - 1) + '0'
+            rows.append(row[:wps._LINE_LEN])
+        return '\n'.join(rows) + '\n'
+
+    def _make_bank_txt(self, bank, lines):
+        """``(prefix, text)`` in the format the paying account takes."""
+        if bank.x_file_type == 'wps':
+            return 'WPS', self._make_wps_txt(bank, lines)
+        return 'Kawthar', self._make_kawthar_txt(bank, lines)
 
     def _make_kawthar_txt(self, bank, lines):
         """Kawthar fixed-width 194-char TXT — the payroll layout, field for
@@ -424,15 +561,22 @@ class KswCommissionBankExportWizard(models.TransientModel):
         return self._bundle_and_download(files)
 
     def _export_all_txt(self):
-        groups = self._group_and_validate(require_type='kawthar')
+        # Every paying account, in its own format: a WPS account used to be
+        # filtered out here (require_type='kawthar'), so the month's WPS
+        # people were silently missing from "All banks".
+        groups = {
+            b: lines for b, lines in self._group_and_validate().items()
+            if b.x_file_type in ('wps', 'kawthar')
+        }
         files = []
         bl = self._batch_label()
         vd = (self.value_date or fields.Date.context_today(self)
               ).strftime('%Y%m%d')
         for bank, lines in groups.items():
             label = self._bank_label(bank)
-            data = self._make_kawthar_txt(bank, lines).encode('utf-8')
-            files.append(('Commissions_%s_%s_%s.txt' % (bl, label, vd), data))
+            prefix, text = self._make_bank_txt(bank, lines)
+            files.append(('Commissions_%s_%s_%s_%s.txt' % (
+                prefix, bl, label, vd), text.encode('utf-8')))
         if not files:
             raise UserError(_('No text files could be generated.'))
         return self._bundle_and_download(files)
@@ -464,7 +608,8 @@ class KswCommissionBankExportWizard(models.TransientModel):
         bl = self._batch_label()
         label = self._bank_label(bank)
         vd = self.value_date.strftime('%Y%m%d')
-        data = self._make_kawthar_txt(bank, lines).encode('utf-8')
+        prefix, text = self._make_bank_txt(bank, lines)
         return self._bundle_and_download(
-            [('Commissions_%s_%s_%s.txt' % (bl, label, vd), data)])
+            [('Commissions_%s_%s_%s_%s.txt' % (prefix, bl, label, vd),
+              text.encode('utf-8'))])
 

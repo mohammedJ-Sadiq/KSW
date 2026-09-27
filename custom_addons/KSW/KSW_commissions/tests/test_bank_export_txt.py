@@ -13,6 +13,7 @@ this test asserts the 194-character row contract and the field reads, not just
 
 Hit on KSWCO 2026-09-24 by the accountant, on the August run.
 """
+import io
 from datetime import date
 
 from odoo.tests.common import TransactionCase
@@ -210,3 +211,89 @@ class TestCommissionBankExcel(TestKawtharTxtExport):
             [('res_model', '=', 'ksw.pay.run'), ('res_id', '=', self.pay_run.id)],
             order='id desc', limit=1)
         self.assertTrue(att.name.endswith('.zip'), att.name)
+
+
+class TestWpsTxtExport(TestKawtharTxtExport):
+    """A WPS paying account gets a WPS text file, not nothing."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        if cls.skip_reason:
+            return
+        cls.wps_bank = cls.env['res.partner.bank'].sudo().create({
+            'acc_number': 'SA0000000000000000000009',
+            'partner_id': cls.partner.id,
+            'x_file_type': 'wps',
+            'x_wps_cic_number': '1234567890',
+            'x_wps_debit_account': 'SA0000000000000000000009',
+            'x_wps_mol_id': '7-1234567',
+        })
+        cls.wps_emp = cls.env['hr.employee'].sudo().create({
+            'name': 'WPS Employee', 'department_id': cls.dept.id})
+        cls.iban = cls.env['res.partner.bank'].sudo().create({
+            'acc_number': 'SA4420000001234567891234',
+            'partner_id': cls.wps_emp.work_contact_id.id,
+        })
+        cls.wps_emp.sudo().write({
+            'bank_account_ids': [(4, cls.iban.id)],
+            'x_employee_no': '5151', 'ssnid': '2098765432'})
+        # Its own run, so the inherited Kawthar tests keep their one line.
+        cls.wps_run = cls.env['ksw.pay.run'].sudo().create(
+            {'period': '2029-06-01'})
+        cls.env['ksw.pay.run.line'].sudo().create({
+            'run_id': cls.wps_run.id, 'employee_id': cls.emp.id,
+            'earnings': 1500.0, 'bank_account_id': cls.bank.id,
+        })
+        cls.wps_line = cls.env['ksw.pay.run.line'].sudo().create({
+            'run_id': cls.wps_run.id, 'employee_id': cls.wps_emp.id,
+            'earnings': 900.0, 'bank_account_id': cls.wps_bank.id,
+        })
+
+    def _wps_wizard(self, mode):
+        return self.env['ksw.commission.bank.export.wizard'].sudo().create({
+            'run_id': self.wps_run.id, 'export_mode': mode,
+            'bank_account_id': self.wps_bank.id,
+            'value_date': date(2029, 6, 28),
+        })
+
+    def test_wps_txt_has_the_payroll_layout(self):
+        if self.skip_reason:
+            self.skipTest(self.skip_reason)
+        text = self._wps_wizard('specific_txt')._make_wps_txt(
+            self.wps_bank, self.wps_line)
+        header, row = text.rstrip('\n').split('\n')
+        self.assertEqual(len(header), 301)
+        self.assertEqual(len(row), 300)
+        self.assertIn('SA4420000001234567891234', row, "the employee's IBAN")
+        self.assertIn(str(90000).zfill(15), row, 'the net in halalas')
+        self.assertIn('2098765432', row)
+
+    def test_all_txt_includes_the_wps_bank(self):
+        if self.skip_reason:
+            self.skipTest(self.skip_reason)
+        import zipfile
+        self._wps_wizard('all_txt').action_export()
+        att = self.env['ir.attachment'].sudo().search(
+            [('res_model', '=', 'ksw.pay.run'), ('res_id', '=', self.wps_run.id)],
+            order='id desc', limit=1)
+        self.assertTrue(att.name.endswith('.zip'), att.name)
+        names = zipfile.ZipFile(io.BytesIO(att.raw)).namelist()
+        self.assertTrue(any('_WPS_' in n for n in names), names)
+        self.assertTrue(any('_Kawthar_' in n for n in names), names)
+
+
+class TestKawtharOperationCodes(TestKawtharTxtExport):
+    """The operation is the bank's code, labelled as the bank means it."""
+
+    def test_the_default_is_load_funds(self):
+        if self.skip_reason:
+            self.skipTest(self.skip_reason)
+        wizard = self.env['ksw.commission.bank.export.wizard'].sudo().create(
+            {'run_id': self.pay_run.id, 'export_mode': 'all_txt'})
+        self.assertEqual(wizard.operation_code, '2')
+        labels = dict(wizard._fields['operation_code']._description_selection(
+            self.env))
+        self.assertIn('Load Funds', labels['2'])
+        self.assertIn('Close Card', labels['3'], 'not "Delete"')
+        self.assertNotIn('Renewal', ' '.join(labels.values()))

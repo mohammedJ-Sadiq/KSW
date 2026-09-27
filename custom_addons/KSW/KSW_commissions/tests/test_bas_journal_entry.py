@@ -36,6 +36,9 @@ class BasJournalCommon(CommissionPriorityCommon):
             'x_bas_accrual_code': '2107010001',
             'x_bas_accrual_name': 'مصروفات مستحقة عمولات سائقين التريلات',
         })
+        # The catalog's own voucher wording (set by migration) is not this
+        # fixture's concern; tests that want one set it themselves.
+        (cls.meals | cls.component).sudo().write({'x_bas_ref': False})
         cls.emp_a.sudo().x_loan_acc_no = '1205010385'
         cls.emp_b.sudo().x_loan_acc_no = '1205010386'
         # A second employee in the *same* department: the fixture's
@@ -410,3 +413,108 @@ class TestOneOrder(BasJournalCommon):
                          ['abe Driver', 'Bob Driver', 'zed Driver'])
         for name, ref in zip(excel, journal):
             self.assertIn(name.strip(), ref)
+
+    def test_51_department_by_department_in_the_pages_order(self):
+        """By Department first, name second — as the run's page lists them."""
+        self.emp_a.sudo().name = 'Zed In A'
+        self.emp_b.sudo().name = 'Abe In B'
+        self.emp_b.sudo().x_loan_acc_no = '1205010386'
+        for emp in (self.emp_a, self.emp_b):
+            emp.sudo().x_bas_driver_cost_center = False
+        batch_a = self._batch(self.sup_a, self.dept_a, component=self.meals)
+        self._entry(batch_a, self.emp_a, user=self.sup_a, quantity=1.0,
+                    amount_override=100.0)
+        batch_b = self._batch(self.sup_b, self.dept_b, component=self.meals)
+        self._entry(batch_b, self.emp_b, user=self.sup_b, quantity=1.0,
+                    amount_override=100.0)
+        batch_b.submission_id.sudo().action_submit()
+        run = self._approve(batch_a)
+
+        order = [l.employee_id for l in run.line_ids._export_sorted()]
+        self.assertEqual(order, [self.emp_a, self.emp_b],
+                         'Sub Dept A before Sub Dept B, whatever the names')
+        journal = [r['ref'] for r in self._rows(run) if r['debit']]
+        self.assertIn('Zed In A', journal[0])
+        self.assertIn('Abe In B', journal[1])
+
+
+class TestVoucherDetail(BasJournalCommon):
+    """Same description, same accounts: one line, one column."""
+
+    def _two_types(self):
+        for component in (self.component, self.meals):
+            component.sudo().write({
+                'x_bas_ref': 'بدل عمل اضافي',
+                'x_bas_expense_code': '3201010006',
+                'x_bas_expense_name': 'مصروفات اضافي العاملين',
+                'x_bas_accrual_code': '2107010001',
+                'x_bas_accrual_name': 'مصروفات مستحقة',
+            })
+        overtime = self._batch(self.sup_a, self.dept_a)
+        self._entry(overtime, self.emp_a, user=self.sup_a, quantity=1.0,
+                    amount_override=300.0)
+        meals = self._batch(self.sup_a, self.dept_a, component=self.meals)
+        self._entry(meals, self.emp_a, user=self.sup_a, quantity=1.0,
+                    amount_override=200.0)
+        return self._approve(meals)
+
+    def test_60_one_line_for_types_described_alike(self):
+        run = self._two_types()
+
+        debits = [r for r in self._rows(run) if r['debit']]
+
+        self.assertEqual(len(debits), 1)
+        self.assertEqual(debits[0]['debit'], 500.0)
+        self.assertTrue(debits[0]['ref'].startswith('بدل عمل اضافي'))
+
+    def test_61_the_excel_summary_itemises_like_the_journal(self):
+        self.meals.sudo().x_bas_ref = 'وجبات'
+        batch = self._batch(self.sup_a, self.dept_a, component=self.meals)
+        self._entry(batch, self.emp_a, user=self.sup_a, quantity=1.0,
+                    amount_override=200.5)
+        run = self._approve(batch)
+
+        wizard = self.env['ksw.commission.bank.export.wizard'].sudo().create(
+            {'run_id': run.id, 'export_mode': 'journal_entry'})
+        book = openpyxl.Workbook()
+        wizard._make_comm_summary_excel(book, run.line_ids)
+        sheet = book['Commission Summary']
+        headers = [c.value for c in sheet[1]]
+        row = [c.value for c in sheet[2]]
+
+        self.assertIn('وجبات', headers)
+        self.assertNotIn('Unitemised', headers)
+        self.assertEqual(row[headers.index('وجبات')], 201.0)
+        self.assertEqual(row[headers.index('Total Earnings')], 201.0)
+
+    def test_62_one_column_for_one_description_across_accounts(self):
+        """Meals and location allowance are both «بدل موقع»: one column,
+        but two journal lines, because their accounts differ."""
+        self.meals.sudo().x_bas_ref = 'بدل موقع'
+        self.component.sudo().write({
+            'x_bas_ref': 'بدل موقع',
+            'x_bas_expense_code': '3201010005',
+            'x_bas_expense_name': 'بدل موقع',
+            'x_bas_accrual_code': '2107010001',
+            'x_bas_accrual_name': 'مصروفات مستحقة',
+        })
+        location = self._batch(self.sup_a, self.dept_a)
+        self._entry(location, self.emp_a, user=self.sup_a, quantity=1.0,
+                    amount_override=300.0)
+        meals = self._batch(self.sup_a, self.dept_a, component=self.meals)
+        self._entry(meals, self.emp_a, user=self.sup_a, quantity=1.0,
+                    amount_override=200.0)
+        run = self._approve(meals)
+
+        debits = [r for r in self._rows(run) if r['debit']]
+        self.assertEqual(sorted(r['code'] for r in debits),
+                         ['3201010005', '3201010006'])
+
+        wizard = self.env['ksw.commission.bank.export.wizard'].sudo().create(
+            {'run_id': run.id, 'export_mode': 'journal_entry'})
+        book = openpyxl.Workbook()
+        wizard._make_comm_summary_excel(book, run.line_ids)
+        headers = [c.value for c in book['Commission Summary'][1]]
+        row = [c.value for c in book['Commission Summary'][2]]
+        self.assertEqual(headers.count('بدل موقع'), 1)
+        self.assertEqual(row[headers.index('بدل موقع')], 500.0)
