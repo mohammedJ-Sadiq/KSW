@@ -119,6 +119,27 @@ class TestPayslipRevisionRequest(TransactionCase):
             'user_id': cls.user_outsider.id,
         })
 
+        # Paying by bank transfer produces the Excel + TXT files on the spot,
+        # so the employee needs a paying account the exporter accepts.
+        bank = cls.env['res.bank'].sudo().create({
+            'name': 'Revreq Test Bank', 'bic': 'REVRSARI'})
+        cls.paying_account = cls.env['res.partner.bank'].sudo().create({
+            'acc_number': 'TEST Revreq Paying Account',
+            'partner_id': cls.env.company.partner_id.id,
+            'bank_id': bank.id,
+            'x_wps_cic_number': '7777777',
+            'x_file_type': 'kawthar',
+        })
+        own_account = cls.env['res.partner.bank'].sudo().create({
+            'acc_number': 'SA0000000000000000REVREQ1',
+            'partner_id': cls.employee.work_contact_id.id,
+            'bank_id': bank.id,
+        })
+        cls.employee.write({
+            'bank_account_ids': [(4, own_account.id)],
+            'x_salary_bank_account_id': cls.paying_account.id,
+        })
+
         cls.version = cls.employee.current_version_id
         cls.version.write({
             'name': 'Revreq Version',
@@ -162,10 +183,23 @@ class TestPayslipRevisionRequest(TransactionCase):
             'reason': reason,
         })
 
-    def _submitted(self, slip=None):
+    def _at_dm(self, slip=None):
         req = self._file(slip)
         req.with_user(self.user_employee).action_submit()
         return req
+
+    def _submitted(self, slip=None):
+        """Walk to pending_hr: submitted and approved by the DM."""
+        req = self._at_dm(slip)
+        req.with_user(self.user_manager).action_dm_approve()
+        return req
+
+    def _new_messages(self, req, before):
+        return req.sudo().message_ids.filtered(lambda m: m.id not in before)
+
+    def _notified(self, req, before, user):
+        return bool(self._new_messages(req, before).filtered(
+            lambda m: user.partner_id in m.partner_ids))
 
     def _accepted(self, slip=None):
         """Walk to pending_gm with a revision issued."""
@@ -299,18 +333,129 @@ class TestPayslipRevisionRequest(TransactionCase):
     # 2. Submission and the HR step
     # ==================================================================
 
-    def test_submit_moves_to_hr_and_notifies(self):
+    def test_submit_moves_to_dm_and_notifies_only_the_dm(self):
         req = self._file()
-        hr_partners = self.env.ref(
-            'om_hr_payroll.group_hr_payroll_user'
-        ).sudo().user_ids.mapped('partner_id')
+        existing = req.sudo().message_ids.ids
+        req.with_user(self.user_employee).action_submit()
+        self.assertEqual(req.state, 'pending_dm')
+        self.assertTrue(self._notified(req, existing, self.user_manager),
+                        'the direct manager was not notified')
+        self.assertFalse(self._notified(req, existing, self.user_hr),
+                         'HR was notified before the DM approved')
+
+    def test_dm_approval_moves_to_hr_and_notifies_both_hr_roles(self):
+        req = self._at_dm()
+        existing = req.sudo().message_ids.ids
+        req.with_user(self.user_manager).write({'dm_comment': 'Confirmed.'})
+        req.with_user(self.user_manager).action_dm_approve()
+        self.assertEqual(req.state, 'pending_hr')
+        self.assertEqual(req.dm_user_id, self.user_manager)
+        self.assertTrue(req.dm_date)
+        self.assertTrue(self._notified(req, existing, self.user_hr),
+                        'the payroll officer was not notified')
+        self.assertTrue(self._notified(req, existing, self.user_hr_leave),
+                        'the HR Approver was not notified')
+
+    # ------------------------------------------------------------------
+    # The DM step
+    # ------------------------------------------------------------------
+
+    def test_only_the_direct_manager_may_approve(self):
+        req = self._at_dm()
+        for user in (self.user_employee, self.user_hr, self.user_hr_leave,
+                     self.user_gm, self.user_acc, self.user_outsider):
+            with self.assertRaises(UserError):
+                req.with_user(user).action_dm_approve()
+        self.assertEqual(req.state, 'pending_dm')
+
+    def test_hr_cannot_act_before_the_dm(self):
+        req = self._at_dm()
+        req.sudo().write({'hr_comment': 'x'})
+        with self.assertRaises(UserError):
+            req.with_user(self.user_hr).action_hr_accept()
+
+    def test_dm_refuses_and_the_employee_is_told(self):
+        req = self._at_dm()
+        existing = req.sudo().message_ids.ids
+        self.Wizard.with_user(self.user_manager).create({
+            'request_id': req.id, 'mode': 'refuse',
+            'reason': 'You were absent that day.'}).action_confirm()
+        self.assertEqual(req.state, 'refused')
+        self.assertEqual(req.refused_by_id, self.user_manager)
+        self.assertTrue(self._notified(req, existing, self.user_employee))
+
+    def test_dm_filing_it_themselves_is_the_dm_approval(self):
+        req = self._file(user=self.user_manager)
+        req.with_user(self.user_manager).action_submit()
+        self.assertEqual(req.state, 'pending_hr')
+        self.assertEqual(req.dm_user_id, self.user_manager)
+
+    def test_hr_filing_on_behalf_still_waits_for_the_dm(self):
+        req = self._file(user=self.user_hr)
+        req.with_user(self.user_hr).action_submit()
+        self.assertEqual(req.state, 'pending_dm')
+
+    def test_no_direct_manager_goes_straight_to_hr(self):
+        self.employee.sudo().parent_id = False
+        req = self._file()
         existing = req.sudo().message_ids.ids
         req.with_user(self.user_employee).action_submit()
         self.assertEqual(req.state, 'pending_hr')
-        new = req.sudo().message_ids.filtered(lambda m: m.id not in existing)
-        self.assertTrue(new.filtered(
-            lambda m: self.user_hr.partner_id in m.partner_ids),
-            'HR was not notified of the new request')
+        self.assertFalse(req.dm_user_id)
+        self.assertTrue(self._notified(req, existing, self.user_hr))
+
+    def test_a_manager_with_no_payroll_tier_can_approve(self):
+        """Most real managers hold no Payroll tier at all, so the DM's
+        scope cannot ride on group_hr_payroll_self."""
+        plain = self.env['res.users'].create({
+            'name': 'Revreq Plain Manager', 'login': 'revreq_plain_mgr',
+            'group_ids': [(6, 0, [self.env.ref('base.group_user').id])],
+        })
+        self.assertFalse(plain.has_group('KSW_payroll.group_hr_payroll_self'))
+        boss = self.env['hr.employee'].sudo().create({
+            'name': 'Revreq Plain Boss', 'user_id': plain.id})
+        self.employee.sudo().parent_id = boss
+        req = self._at_dm()
+        mine = self.Request.with_user(plain)
+        self.assertIn(req, mine.search([('is_pending_my_action', '=', True)]))
+        req.with_user(plain).read(['name', 'state', 'employee_id'])
+        req.with_user(plain).write({'dm_comment': 'Fine by me.'})
+        req.with_user(plain).action_dm_approve()
+        self.assertEqual(req.state, 'pending_hr')
+        # Their scope is their own team, and write access is not a licence
+        # to move anything but their own comment.
+        with self.assertRaises(UserError):
+            req.with_user(plain).write({'dm_comment': 'too late'})
+
+    def test_dm_sees_it_waiting_and_nobody_else_does(self):
+        req = self._at_dm()
+        self.assertTrue(req.with_user(self.user_manager).is_pending_my_action)
+        self.assertIn(req, self.Request.with_user(self.user_manager).search(
+            [('is_pending_my_action', '=', True)]))
+        for user in (self.user_hr, self.user_employee, self.user_outsider):
+            self.assertFalse(req.with_user(user).is_pending_my_action)
+
+    def test_dm_comment_is_writable_only_by_the_dm_at_the_dm_step(self):
+        req = self._at_dm()
+        with self.assertRaises(UserError):
+            req.with_user(self.user_employee).write({'dm_comment': 'mine'})
+        req.with_user(self.user_manager).write({'dm_comment': 'OK'})
+        self.assertEqual(req.dm_comment, 'OK')
+
+    def test_employee_may_cancel_while_waiting_for_the_dm(self):
+        req = self._at_dm()
+        req.with_user(self.user_employee).action_cancel()
+        self.assertEqual(req.state, 'cancelled')
+
+    def test_reopening_needs_the_dm_again(self):
+        req = self._submitted()
+        self.Wizard.with_user(self.user_hr).create({
+            'request_id': req.id, 'mode': 'refuse',
+            'reason': 'Paperwork missing.'}).action_confirm()
+        req.with_user(self.user_employee).action_reset_to_draft()
+        self.assertFalse(req.dm_user_id)
+        req.with_user(self.user_employee).action_submit()
+        self.assertEqual(req.state, 'pending_dm')
 
     def test_hr_accept_requires_findings(self):
         req = self._submitted()
@@ -383,10 +528,10 @@ class TestPayslipRevisionRequest(TransactionCase):
         self.assertIn(req, self.Request.with_user(self.user_hr_leave).search(
             [('is_pending_my_action', '=', True)]))
 
-    def test_annual_leave_hr_approver_is_notified_on_submission(self):
-        req = self._file()
+    def test_annual_leave_hr_approver_is_notified_on_dm_approval(self):
+        req = self._at_dm()
         existing = req.sudo().message_ids.ids
-        req.with_user(self.user_employee).action_submit()
+        req.with_user(self.user_manager).action_dm_approve()
         new = req.sudo().message_ids.filtered(lambda m: m.id not in existing)
         self.assertTrue(new.filtered(
             lambda m: self.user_hr_leave.partner_id in m.partner_ids),
@@ -406,6 +551,28 @@ class TestPayslipRevisionRequest(TransactionCase):
         req = self._submitted()
         with self.assertRaises(UserError):
             req.with_user(self.user_gm).action_gm_approve()
+
+    def test_gm_is_notified_when_hr_accepts(self):
+        req = self._submitted()
+        req.with_user(self.user_hr).write({'hr_comment': 'Holds.'})
+        existing = req.sudo().message_ids.ids
+        req.with_user(self.user_hr).action_hr_accept()
+        self.assertTrue(self._notified(req, existing, self.user_gm))
+        self.assertFalse(self._notified(req, existing, self.user_other_gm))
+
+    def test_accounting_is_notified_when_the_gm_approves(self):
+        req = self._make_payable(self._accepted())
+        existing = req.sudo().message_ids.ids
+        req.with_user(self.user_gm).action_gm_approve()
+        self.assertTrue(self._notified(req, existing, self.user_acc))
+
+    def test_hr_is_notified_when_the_gm_returns_it(self):
+        req = self._make_payable(self._accepted())
+        existing = req.sudo().message_ids.ids
+        self.Wizard.with_user(self.user_gm).create({
+            'request_id': req.id, 'mode': 'return',
+            'reason': 'Recheck.'}).action_confirm()
+        self.assertTrue(self._notified(req, existing, self.user_hr))
 
     def test_only_the_department_gm_may_approve(self):
         req = self._make_payable(self._accepted())
@@ -465,14 +632,131 @@ class TestPayslipRevisionRequest(TransactionCase):
             req.with_user(self.user_acc).action_acc_pay()
         self.assertEqual(req.state, 'pending_acc')
 
-    def test_accounting_pays_and_confirms_the_revision(self):
+    def test_bank_transfer_pays_and_produces_both_files(self):
         req = self._at_accounting()
-        req.with_user(self.user_acc).write({'payment_method': 'cash'})
+        req.with_user(self.user_acc).write({'payment_method': 'bank'})
         req.with_user(self.user_acc).action_acc_pay()
         self.assertEqual(req.state, 'paid')
         self.assertEqual(req.revision_payslip_id.sudo().state, 'done')
         self.assertEqual(req.acc_user_id, self.user_acc)
         self.assertTrue(req.payment_date)
+        self.assertTrue(req.payslip_run_id)
+        names = req.sudo().attachment_ids.mapped('name')
+        self.assertTrue([n for n in names if n.endswith('.xlsx')],
+                        'no Excel bank file: %s' % names)
+        self.assertTrue([n for n in names if n.lower().endswith('.txt')],
+                        'no TXT bank file: %s' % names)
+        # Filed on the request, so accounting can download them (the batch
+        # would 403 for this user).
+        for att in req.sudo().attachment_ids:
+            self.assertEqual(att.res_model, req._name)
+            att.with_user(self.user_acc).check_access('read')
+
+    def test_bank_payment_without_a_bank_account_fails_clearly(self):
+        """No file for the bank means no payment: the step rolls back and
+        says so, naming the employee and what to fix."""
+        self.employee.sudo().x_salary_bank_account_id = False
+        self.employee.sudo().bank_account_ids = [(5, 0, 0)]
+        req = self._at_accounting()
+        req.with_user(self.user_acc).write({'payment_method': 'bank'})
+        with self.assertRaises(UserError) as caught:
+            with self.env.cr.savepoint():
+                req.with_user(self.user_acc).action_acc_pay()
+        message = str(caught.exception)
+        self.assertIn('Payment NOT recorded', message)
+        self.assertIn(self.employee.name, message)
+        self.assertIn('Salary Paying Bank Account', message)
+        req.invalidate_recordset()
+        self.assertEqual(req.state, 'pending_acc')
+        self.assertNotEqual(req.revision_payslip_id.sudo().state, 'done')
+
+    # ------------------------------------------------------------------
+    # Cash: Pending Disbursement
+    # ------------------------------------------------------------------
+
+    def _disbursement_user(self):
+        group = self.env.ref('KSW_deduction.group_loan_disbursement',
+                             raise_if_not_found=False)
+        if not group:
+            self.skipTest('KSW_deduction is not installed')
+        return self.env['res.users'].create({
+            'name': 'Revreq Cashier', 'login': 'revreq_cashier',
+            'group_ids': [(6, 0, [self.env.ref('base.group_user').id,
+                                  group.id])],
+        })
+
+    def _at_disbursement(self):
+        req = self._at_accounting()
+        req.with_user(self.user_acc).write({'payment_method': 'cash'})
+        req.with_user(self.user_acc).action_acc_pay()
+        return req
+
+    def test_cash_waits_for_disbursement(self):
+        cashier = self._disbursement_user()
+        req = self._at_accounting()
+        req.with_user(self.user_acc).write({'payment_method': 'cash'})
+        existing = req.sudo().message_ids.ids
+        req.with_user(self.user_acc).action_acc_pay()
+        self.assertEqual(req.state, 'pending_disbursement')
+        self.assertEqual(req.revision_payslip_id.sudo().state, 'done',
+                         'the figure is fixed when accounting commits it')
+        self.assertEqual(req.acc_user_id, self.user_acc)
+        self.assertFalse(req.payment_date)
+        self.assertFalse(req.sudo().attachment_ids,
+                         'no bank file for a cash payment')
+        self.assertTrue(self._notified(req, existing, cashier),
+                        'the disbursement officer was not notified')
+        self.assertTrue(self._notified(req, existing, self.user_employee),
+                        'the employee was not told to collect the cash')
+
+    def test_disbursement_officer_confirms_and_the_employee_is_told(self):
+        cashier = self._disbursement_user()
+        req = self._at_disbursement()
+        self.assertTrue(req.with_user(cashier).can_disburse)
+        self.assertTrue(req.with_user(cashier).is_pending_my_action)
+        # The cashier's ACL and record rule are declared in KSW_deduction,
+        # which loads after this module's at_install tests run, so their
+        # record scope is asserted there (test_revision_request_disbursement).
+        self.assertEqual(req.with_user(cashier)._allowed_write_fields(),
+                         {'payment_reference'})
+        existing = req.sudo().message_ids.ids
+        req.with_user(cashier).action_disbursement_confirm()
+        self.assertEqual(req.state, 'paid')
+        self.assertEqual(req.disbursed_by_id, cashier)
+        self.assertTrue(req.disbursed_date)
+        self.assertTrue(req.payment_date)
+        self.assertTrue(self._notified(req, existing, self.user_employee))
+
+    def test_only_the_disbursement_officer_may_confirm(self):
+        self._disbursement_user()
+        req = self._at_disbursement()
+        for user in (self.user_acc, self.user_hr, self.user_gm,
+                     self.user_employee, self.user_manager):
+            with self.assertRaises(UserError):
+                req.with_user(user).action_disbursement_confirm()
+        self.assertEqual(req.state, 'pending_disbursement')
+
+    def test_disbursement_cannot_be_refused(self):
+        """The revision payslip is already confirmed: the money is owed."""
+        cashier = self._disbursement_user()
+        req = self._at_disbursement()
+        for user in (cashier, self.user_acc):
+            with self.assertRaises(UserError):
+                req.with_user(user)._check_refusal_rights()
+
+    def test_cashier_writes_only_the_reference(self):
+        cashier = self._disbursement_user()
+        req = self._at_disbursement()
+        with self.assertRaises(UserError):
+            req.with_user(cashier).write({'payment_method': 'bank'})
+        with self.assertRaises(UserError):
+            req.with_user(cashier).write({'state': 'paid'})
+
+    def test_no_bank_file_for_cash(self):
+        self._disbursement_user()
+        req = self._at_disbursement()
+        with self.assertRaises(UserError):
+            req.with_user(self.user_acc).action_export_bank_excel()
 
     def test_only_accounting_may_pay(self):
         req = self._at_accounting()

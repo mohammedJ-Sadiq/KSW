@@ -37,7 +37,9 @@ access_ksw_revision_request_reviewer,ksw.payslip.revision.request.reviewer,model
 access_ksw_revision_request_hr_leave,ksw.payslip.revision.request.hr.leave,model_ksw_payslip_revision_request,KSW_annual_leave.group_annual_leave_hr,1,1,1,0
 access_ksw_revision_request_gm,ksw.payslip.revision.request.gm,model_ksw_payslip_revision_request,KSW_annual_leave.group_annual_leave_gm,1,1,0,0
 access_ksw_revision_request_acc,ksw.payslip.revision.request.acc,model_ksw_payslip_revision_request,KSW_annual_leave.group_annual_leave_acc,1,1,0,0
+access_ksw_revision_request_user,ksw.payslip.revision.request.user,model_ksw_payslip_revision_request,base.group_user,1,1,0,0
 access_ksw_revision_reason_wizard_self,ksw.revision.request.reason.wizard.self,model_ksw_revision_request_reason_wizard,om_hr_payroll.group_hr_payroll_user,1,1,1,1
 access_ksw_revision_reason_wizard_hr_leave,ksw.revision.request.reason.wizard.hr.leave,model_ksw_revision_request_reason_wizard,KSW_annual_leave.group_annual_leave_hr,1,1,1,1
 access_ksw_revision_reason_wizard_gm,ksw.revision.request.reason.wizard.gm,model_ksw_revision_request_reason_wizard,KSW_annual_leave.group_annual_leave_gm,1,1,1,1
 access_ksw_revision_reason_wizard_acc,ksw.revision.request.reason.wizard.acc,model_ksw_revision_request_reason_wizard,KSW_annual_leave.group_annual_leave_acc,1,1,1,1
+access_ksw_revision_reason_wizard_user,ksw.revision.request.reason.wizard.user,model_ksw_revision_request_reason_wizard,base.group_user,1,1,1,1

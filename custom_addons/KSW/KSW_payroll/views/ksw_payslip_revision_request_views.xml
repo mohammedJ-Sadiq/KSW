@@ -16,8 +16,14 @@
                          (pitfall #14). The server-side guard in each
                          action method is what actually holds. -->
                     <button name="action_submit" type="object"
-                            string="Submit to HR" class="btn-primary"
+                            string="Submit" class="btn-primary"
                             invisible="not can_submit"/>
+                    <button name="action_dm_approve" type="object"
+                            string="Approve" class="btn-primary"
+                            invisible="not can_dm_act"/>
+                    <button name="action_dm_refuse" type="object"
+                            string="Refuse"
+                            invisible="not can_dm_act"/>
                     <button name="action_hr_accept" type="object"
                             string="Accept &amp; Issue Revision"
                             class="btn-primary"
@@ -38,10 +44,14 @@
                     <button name="action_acc_pay" type="object"
                             string="Confirm &amp; Pay" class="btn-primary"
                             invisible="not can_acc_act"
-                            confirm="This confirms the revision payslip and records the payment. Continue?"/>
+                            confirm="This confirms the revision payslip. A bank transfer is marked paid and its Excel and TXT bank files are generated now; a cash payment goes to the Loan Disbursement Officer to hand over. Continue?"/>
                     <button name="action_acc_refuse" type="object"
                             string="Refuse"
                             invisible="not can_acc_act"/>
+                    <button name="action_disbursement_confirm" type="object"
+                            string="Confirm Disbursement" class="btn-primary"
+                            invisible="not can_disburse"
+                            confirm="Confirm that the cash has been handed over to the employee?"/>
                     <button name="action_export_bank_excel" type="object"
                             string="Bank File (Excel)"
                             invisible="state not in ('pending_acc', 'paid') or revision_state != 'done' or payment_method != 'bank'"
@@ -57,7 +67,7 @@
                             string="Reopen"
                             invisible="state not in ('refused', 'cancelled')"/>
                     <field name="state" widget="statusbar"
-                           statusbar_visible="draft,pending_hr,pending_gm,pending_acc,paid"/>
+                           statusbar_visible="draft,pending_dm,pending_hr,pending_gm,pending_acc,paid"/>
                 </header>
                 <sheet>
                     <widget name="web_ribbon" title="Refused"
@@ -90,9 +100,11 @@
                          can read them. -->
                     <field name="can_edit" invisible="1"/>
                     <field name="can_submit" invisible="1"/>
+                    <field name="can_dm_act" invisible="1"/>
                     <field name="can_hr_act" invisible="1"/>
                     <field name="can_gm_act" invisible="1"/>
                     <field name="can_acc_act" invisible="1"/>
+                    <field name="can_disburse" invisible="1"/>
                     <field name="can_cancel" invisible="1"/>
                     <field name="revision_state" invisible="1"/>
 
@@ -139,8 +151,19 @@
                     </group>
 
                     <notebook>
+                        <page string="DM Approval" name="dm_approval"
+                              invisible="state == 'draft'">
+                            <group>
+                                <field name="dm_user_id" readonly="1"/>
+                                <field name="dm_date" readonly="1"/>
+                            </group>
+                            <group string="DM Comment">
+                                <field name="dm_comment" nolabel="1"
+                                       readonly="not can_dm_act"/>
+                            </group>
+                        </page>
                         <page string="HR Review" name="hr_review"
-                              invisible="state in ('draft',)">
+                              invisible="state in ('draft', 'pending_dm')">
                             <group>
                                 <group>
                                     <field name="hr_user_id" readonly="1"/>
@@ -159,7 +182,7 @@
                             </group>
                         </page>
                         <page string="GM Approval" name="gm_approval"
-                              invisible="state in ('draft', 'pending_hr')">
+                              invisible="state in ('draft', 'pending_dm', 'pending_hr')">
                             <group>
                                 <field name="gm_user_id" readonly="1"/>
                                 <field name="gm_date" readonly="1"/>
@@ -170,30 +193,48 @@
                             </group>
                         </page>
                         <page string="Payment" name="payment"
-                              invisible="state not in ('pending_acc', 'paid')">
+                              invisible="state not in ('pending_acc', 'pending_disbursement', 'paid')">
                             <group>
                                 <group>
                                     <field name="payment_method"
-                                           readonly="state == 'paid'"
+                                           readonly="not can_acc_act"
                                            required="state == 'pending_acc'"/>
                                     <field name="payment_reference"
-                                           readonly="state == 'paid'"/>
+                                           readonly="not (can_acc_act or can_disburse)"/>
                                 </group>
                                 <group>
                                     <field name="acc_user_id" readonly="1"/>
                                     <field name="acc_date" readonly="1"/>
+                                    <field name="disbursed_by_id" readonly="1"
+                                           invisible="payment_method != 'cash'"/>
+                                    <field name="disbursed_date" readonly="1"
+                                           invisible="payment_method != 'cash'"/>
                                     <field name="payment_date" readonly="1"/>
                                     <field name="payslip_run_id" readonly="1"
                                            groups="om_hr_payroll.group_hr_payroll_user"/>
                                 </group>
                             </group>
                             <div class="alert alert-info" role="alert"
-                                 invisible="payment_method != 'bank' or revision_state != 'done'">
-                                Press <strong>Bank File (Excel)</strong> or
-                                <strong>Bank File (TXT)</strong> to produce the
-                                file for this employee alone, ready to hand to
-                                the bank. Each file is kept under Supporting
-                                Documents above.
+                                 invisible="state != 'pending_acc'">
+                                <strong>Bank transfer:</strong> Confirm &amp; Pay
+                                marks the request paid and generates the Excel
+                                and TXT bank files for this employee alone.
+                                <strong>Cash:</strong> Confirm &amp; Pay sends
+                                it to the Loan Disbursement Officer, who
+                                confirms once the cash is handed over.
+                            </div>
+                            <div class="alert alert-warning" role="alert"
+                                 invisible="state != 'pending_disbursement'">
+                                Awaiting the Loan Disbursement Officer to
+                                confirm the cash was handed to the employee.
+                            </div>
+                            <div class="alert alert-info" role="alert"
+                                 invisible="state != 'paid' or payment_method != 'bank'">
+                                The Excel and TXT bank files are kept under
+                                Supporting Documents above. Use
+                                <strong>Bank File (Excel)</strong> /
+                                <strong>Bank File (TXT)</strong> to produce them
+                                again.
                             </div>
                         </page>
                     </notebook>
@@ -213,7 +254,7 @@
             <list string="Revision Requests"
                   decoration-muted="state in ('cancelled', 'refused')"
                   decoration-success="state == 'paid'"
-                  decoration-bf="state in ('pending_hr', 'pending_gm', 'pending_acc')">
+                  decoration-bf="state in ('pending_dm', 'pending_hr', 'pending_gm', 'pending_acc', 'pending_disbursement')">
                 <field name="name"/>
                 <field name="employee_id"/>
                 <field name="department_id" optional="show"/>
@@ -226,7 +267,7 @@
                 <field name="state" widget="badge"
                        decoration-success="state == 'paid'"
                        decoration-danger="state == 'refused'"
-                       decoration-warning="state in ('pending_hr', 'pending_gm', 'pending_acc')"/>
+                       decoration-warning="state in ('pending_dm', 'pending_hr', 'pending_gm', 'pending_acc', 'pending_disbursement')"/>
             </list>
         </field>
     </record>
@@ -247,7 +288,7 @@
                         domain="[('is_pending_my_action', '=', True)]"/>
                 <separator/>
                 <filter name="open" string="Open"
-                        domain="[('state', 'in', ['draft', 'pending_hr', 'pending_gm', 'pending_acc'])]"/>
+                        domain="[('state', 'in', ['draft', 'pending_dm', 'pending_hr', 'pending_gm', 'pending_acc', 'pending_disbursement'])]"/>
                 <filter name="paid" string="Paid"
                         domain="[('state', '=', 'paid')]"/>
                 <filter name="refused" string="Refused / Cancelled"
@@ -291,9 +332,9 @@
             <p>
                 If one of your payslips paid you less than it should have,
                 open that payslip and press
-                <b>Request a Salary Revision</b>. HR will check the
-                complaint, the General Manager approves the correction, and
-                accounting pays you the difference.
+                <b>Request a Salary Revision</b>. Your direct manager approves
+                it, HR checks the complaint, the General Manager approves the
+                correction, and accounting pays you the difference.
             </p>
         </field>
     </record>
@@ -383,7 +424,7 @@
               parent="menu_ksw_revision_requests_root"
               action="action_ksw_revision_requests_todo"
               sequence="20"
-              groups="om_hr_payroll.group_hr_payroll_user,KSW_annual_leave.group_annual_leave_hr,KSW_annual_leave.group_annual_leave_gm,KSW_annual_leave.group_annual_leave_acc"/>
+              groups="KSW_payroll.group_hr_payroll_self,om_hr_payroll.group_hr_payroll_user,KSW_annual_leave.group_annual_leave_hr,KSW_annual_leave.group_annual_leave_gm,KSW_annual_leave.group_annual_leave_acc"/>
 
     <menuitem id="menu_ksw_revision_requests_all"
               name="All Revision Requests"

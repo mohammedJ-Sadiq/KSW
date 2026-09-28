@@ -5,6 +5,7 @@ from markupsafe import Markup
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
+from odoo.fields import Domain
 
 _logger = logging.getLogger(__name__)
 
@@ -25,6 +26,11 @@ HR_LEAVE_GROUP = 'KSW_annual_leave.group_annual_leave_hr'
 HR_GROUPS = (HR_GROUP, HR_LEAVE_GROUP)
 ACC_GROUP = 'KSW_annual_leave.group_annual_leave_acc'
 GM_GROUP = 'KSW_annual_leave.group_annual_leave_gm'
+# A difference paid in cash is handed over by the same cashier who hands out
+# loan cash.  The group is declared in KSW_deduction, which depends on this
+# module, so it is only ever resolved at runtime (``_is_disbursement_officer``)
+# and its ACL, record rule and menus are declared over there.
+DISB_GROUP = 'KSW_deduction.group_loan_disbursement'
 
 
 class KswPayslipRevisionRequest(models.Model):
@@ -36,11 +42,15 @@ class KswPayslipRevisionRequest(models.Model):
     request — the same way an approved time-off request is what finally
     writes the attendance.
 
-        draft → pending_hr → pending_gm → pending_acc → paid
+        draft → pending_dm → pending_hr → pending_gm → pending_acc
+              → paid                                   (bank transfer)
+              → pending_disbursement → paid            (cash)
 
-    Refusal, with a reason, is available at every pending step; the GM may
-    also return the request to HR when the *figure* needs reworking rather
-    than the complaint being wrong.
+    Refusal, with a reason, is available at every approval step up to and
+    including accounting; the GM may also return the request to HR when the
+    *figure* needs reworking rather than the complaint being wrong.  Once
+    accounting has confirmed the revision payslip the money is committed,
+    so the disbursement step can only confirm, never refuse.
     """
 
     _name = 'ksw.payslip.revision.request'
@@ -50,21 +60,27 @@ class KswPayslipRevisionRequest(models.Model):
 
     _STATES = [
         ('draft', 'Draft'),
+        ('pending_dm', 'Pending DM Approval'),
         ('pending_hr', 'Pending HR Review'),
         ('pending_gm', 'Pending GM Approval'),
         ('pending_acc', 'Pending Accounting Payment'),
+        ('pending_disbursement', 'Pending Disbursement'),
         ('paid', 'Paid'),
         ('refused', 'Refused'),
         ('cancelled', 'Cancelled'),
     ]
 
     # Which group is being waited on at each step, for notifications and for
-    # the "Waiting for My Action" filter.  ``department_gm`` routes to one
-    # person rather than a whole group.
+    # the "Waiting for My Action" filter.  ``direct_manager`` and
+    # ``department_gm`` route to one person rather than a whole group.
     _STEP_CONFIG = {
+        'pending_dm': {'direct_manager': True,
+                       'label': 'Direct Manager Approval'},
         'pending_hr': {'groups': HR_GROUPS, 'label': 'HR Review'},
         'pending_gm': {'department_gm': True, 'label': 'GM Approval'},
         'pending_acc': {'groups': (ACC_GROUP,), 'label': 'Accounting Payment'},
+        'pending_disbursement': {'groups': (DISB_GROUP,),
+                                 'label': 'Cash Disbursement'},
     }
 
     name = fields.Char(
@@ -124,6 +140,12 @@ class KswPayslipRevisionRequest(models.Model):
     # ------------------------------------------------------------------
     # Step stamps
     # ------------------------------------------------------------------
+    dm_comment = fields.Text(string='DM Comment', tracking=True)
+    dm_user_id = fields.Many2one('res.users', string='Approved By (DM)',
+                                 readonly=True, copy=False)
+    dm_date = fields.Datetime(string='Approved On (DM)', readonly=True,
+                              copy=False)
+
     hr_comment = fields.Text(
         string='HR Findings', tracking=True,
         help="HR's conclusion after checking the complaint. Required "
@@ -142,6 +164,11 @@ class KswPayslipRevisionRequest(models.Model):
     acc_user_id = fields.Many2one('res.users', string='Paid By',
                                   readonly=True, copy=False)
     acc_date = fields.Datetime(string='Paid On', readonly=True, copy=False)
+
+    disbursed_by_id = fields.Many2one(
+        'res.users', string='Disbursed By', readonly=True, copy=False)
+    disbursed_date = fields.Datetime(
+        string='Disbursed On', readonly=True, copy=False)
 
     refuse_reason = fields.Text(string='Refusal Reason', readonly=True,
                                 copy=False, tracking=True)
@@ -201,12 +228,16 @@ class KswPayslipRevisionRequest(models.Model):
                               compute_sudo=False)
     can_submit = fields.Boolean(compute='_compute_permissions',
                                 compute_sudo=False)
+    can_dm_act = fields.Boolean(compute='_compute_permissions',
+                                compute_sudo=False)
     can_hr_act = fields.Boolean(compute='_compute_permissions',
                                 compute_sudo=False)
     can_gm_act = fields.Boolean(compute='_compute_permissions',
                                 compute_sudo=False)
     can_acc_act = fields.Boolean(compute='_compute_permissions',
                                  compute_sudo=False)
+    can_disburse = fields.Boolean(compute='_compute_permissions',
+                                  compute_sudo=False)
     can_cancel = fields.Boolean(compute='_compute_permissions',
                                 compute_sudo=False)
     is_pending_my_action = fields.Boolean(
@@ -240,6 +271,7 @@ class KswPayslipRevisionRequest(models.Model):
         user = self.env.user
         is_hr = self._is_hr_reviewer(user)
         is_acc = user.has_group(ACC_GROUP)
+        is_disb = self._is_disbursement_officer(user)
         for req in self:
             # Identity reads go through sudo(): a plain employee holding the
             # Employees privilege may read exactly one hr.employee row —
@@ -259,13 +291,19 @@ class KswPayslipRevisionRequest(models.Model):
             req.can_edit = req.state == 'draft' and (
                 not employee or is_owner or is_manager or is_hr)
             req.can_submit = req.can_edit
-            req.can_cancel = req.state in ('draft', 'pending_hr') and (
+            req.can_cancel = req.state in (
+                'draft', 'pending_dm', 'pending_hr') and (
                 is_owner or is_manager or is_hr)
+            req.can_dm_act = (
+                req.state == 'pending_dm'
+                and req._direct_manager_user() == user)
             req.can_hr_act = req.state == 'pending_hr' and is_hr
             req.can_gm_act = req.state == 'pending_gm' and is_gm
             req.can_acc_act = req.state == 'pending_acc' and is_acc
+            req.can_disburse = req.state == 'pending_disbursement' and is_disb
             req.is_pending_my_action = (
-                req.can_hr_act or req.can_gm_act or req.can_acc_act)
+                req.can_dm_act or req.can_hr_act or req.can_gm_act
+                or req.can_acc_act or req.can_disburse)
 
     def _search_is_pending_my_action(self, operator, value):
         """Records waiting on the current user.
@@ -287,32 +325,38 @@ class KswPayslipRevisionRequest(models.Model):
             states.append('pending_hr')
         if user.has_group(ACC_GROUP):
             states.append('pending_acc')
+        if self._is_disbursement_officer(user):
+            states.append('pending_disbursement')
 
-        gm_domain = []
+        parts = []
+        if states:
+            parts.append(Domain('state', 'in', states))
+
+        # The direct manager is resolved through sudo(): a manager holding
+        # no HR rights cannot walk hr.employee.parent_id as themselves, and
+        # this is an identity question, not a scope one.  Same predicate as
+        # _direct_manager_user(): nobody is their own manager.
+        reports = self.env['hr.employee'].sudo().with_context(
+            active_test=False).search([
+                ('parent_id.user_id', '=', user.id),
+                ('user_id', '!=', user.id),
+            ])
+        if reports:
+            parts.append(Domain('state', '=', 'pending_dm')
+                         & Domain('employee_id', 'in', reports.ids))
+
         if user.has_group(GM_GROUP):
-            gm_domain = [
-                '&', ('state', '=', 'pending_gm'),
-                '|',
-                ('employee_id.department_id.x_effective_gm_id.user_id',
-                 '=', user.id),
-                '&', ('employee_id.department_id', '=', False),
-                ('company_id.x_default_gm_id.user_id', '=', user.id),
-            ]
+            parts.append(Domain('state', '=', 'pending_gm') & (
+                Domain('employee_id.department_id.x_effective_gm_id.user_id',
+                       '=', user.id)
+                | (Domain('employee_id.department_id', '=', False)
+                   & Domain('company_id.x_default_gm_id.user_id',
+                            '=', user.id))))
 
-        if states and gm_domain:
-            domain = ['|', ('state', 'in', states)] + gm_domain
-        elif states:
-            domain = [('state', 'in', states)]
-        elif gm_domain:
-            domain = gm_domain
-        else:
-            # Nothing can ever be pending this user's action.  `[]` would
-            # mean "match everything" (pitfall #24), so say so explicitly.
-            domain = [('id', 'in', [])]
-
-        if positive_wanted:
-            return domain
-        return ['!'] + domain
+        # Nothing can ever be pending this user's action.  `[]` would mean
+        # "match everything" (pitfall #24); Domain.OR([]) is FALSE.
+        domain = Domain.OR(parts)
+        return domain if positive_wanted else ~domain
 
     # ==================================================================
     # Approver resolution
@@ -332,6 +376,37 @@ class KswPayslipRevisionRequest(models.Model):
         if not gm:
             gm = (self.company_id or self.env.company).sudo().x_default_gm_id
         return gm.sudo().user_id
+
+    def _direct_manager_user(self):
+        """The user who must clear this request's DM step, or an empty
+        recordset when there is none.
+
+        ``employee_id.parent_id.user_id`` — the same "direct manager" this
+        document already uses to decide who may file on an employee's
+        behalf.  Read through sudo(): a plain employee may not read their
+        manager's hr.employee row (pitfall #69).  An employee set as their
+        own manager (the top of a hierarchy) has no one above them.
+        """
+        self.ensure_one()
+        employee = (self.employee_id or self.payslip_id.employee_id).sudo()
+        manager_user = employee.parent_id.user_id
+        if not manager_user or manager_user == employee.user_id:
+            return self.env['res.users']
+        return manager_user
+
+    @api.model
+    def _is_disbursement_officer(self, user=None):
+        """Does this user hand out cash for a revision paid in cash?
+
+        The group lives in KSW_deduction, which depends on this module, so
+        it may be absent from the registry (KSW_payroll's own tests run
+        before KSW_deduction is loaded) — has_group() on a missing xmlid
+        raises, hence the lookup first.
+        """
+        user = user or self.env.user
+        if not self.env.ref(DISB_GROUP, raise_if_not_found=False):
+            return False
+        return user.has_group(DISB_GROUP)
 
     def _is_department_gm(self, user):
         self.ensure_one()
@@ -471,9 +546,13 @@ class KswPayslipRevisionRequest(models.Model):
     _DRAFT_WRITABLE = {
         'payslip_id', 'reason', 'claimed_amount', 'attachment_ids',
     }
+    _DM_WRITABLE = {'dm_comment'}
     _HR_WRITABLE = {'hr_comment', 'attachment_ids'}
     _GM_WRITABLE = {'gm_comment'}
     _ACC_WRITABLE = {'payment_method', 'payment_reference'}
+    # The cashier records the receipt they handed over, nothing else — the
+    # method is accounting's decision and is already fixed.
+    _DISB_WRITABLE = {'payment_reference'}
 
     def _allowed_write_fields(self):
         """The fields the current user may write on this record right now.
@@ -493,12 +572,17 @@ class KswPayslipRevisionRequest(models.Model):
         )
         if self.state == 'draft' and is_filer:
             return set(self._DRAFT_WRITABLE)
+        if self.state == 'pending_dm' and self._direct_manager_user() == user:
+            return set(self._DM_WRITABLE)
         if self.state == 'pending_hr' and is_hr:
             return set(self._HR_WRITABLE)
         if self.state == 'pending_gm' and self._is_department_gm(user):
             return set(self._GM_WRITABLE)
         if self.state == 'pending_acc' and user.has_group(ACC_GROUP):
             return set(self._ACC_WRITABLE)
+        if (self.state == 'pending_disbursement'
+                and self._is_disbursement_officer(user)):
+            return set(self._DISB_WRITABLE)
         return set()
 
     def write(self, vals):
@@ -580,14 +664,65 @@ class KswPayslipRevisionRequest(models.Model):
                 raise UserError(_(
                     'Describe what is wrong with the payslip before '
                     'submitting.'))
-            req.sudo().write({'state': 'pending_hr'})
-            req._post_step_note(
-                '📨 Submitted', _('Sent to HR for review.'))
+            manager_user = req._direct_manager_user()
+            if manager_user and manager_user != self.env.user:
+                req.sudo().write({'state': 'pending_dm'})
+                req._post_step_note(
+                    '📨 Submitted',
+                    _('Sent to the direct manager, %(dm)s, for approval.',
+                      dm=manager_user.name))
+                req._notify_pending_approvers('pending_dm')
+                continue
+            # No DM step to wait on: the manager filed it themselves (their
+            # submission *is* the approval, stamped as such), or the
+            # employee has no manager with a user — waiting on nobody would
+            # stall the request forever.
+            vals = {'state': 'pending_hr'}
+            if manager_user:
+                vals.update({
+                    'dm_user_id': manager_user.id,
+                    'dm_date': fields.Datetime.now(),
+                })
+                detail = _('Filed by the direct manager, so the DM step is '
+                           'approved with the submission. Sent to HR for '
+                           'review.')
+            else:
+                detail = _('The employee has no direct manager with a user '
+                           'account, so the DM step is skipped. Sent to HR '
+                           'for review.')
+            req.sudo().write(vals)
+            req._post_step_note('📨 Submitted', detail)
             req._notify_pending_approvers('pending_hr')
         return True
 
     # ==================================================================
-    # Step 1 — HR checks the complaint and issues the revision
+    # Step 1 — the direct manager approves the complaint going forward
+    # ==================================================================
+
+    def action_dm_approve(self):
+        for req in self:
+            req._check_dm()
+            req.sudo().write({
+                'state': 'pending_hr',
+                'dm_user_id': self.env.uid,
+                'dm_date': fields.Datetime.now(),
+            })
+            detail = _('Approved by %(user)s. Sent to HR for review.',
+                       user=self.env.user.name)
+            if (req.dm_comment or '').strip():
+                detail = Markup('%(detail)s<br/><b>Comment:</b> %(note)s') % {
+                    'detail': detail, 'note': req.dm_comment}
+            req._post_step_note('✅ Approved by Direct Manager', detail)
+            req._notify_pending_approvers('pending_hr')
+        return True
+
+    def action_dm_refuse(self):
+        self.ensure_one()
+        self._check_dm()
+        return self._open_reason_wizard('refuse')
+
+    # ==================================================================
+    # Step 2 — HR checks the complaint and issues the revision
     # ==================================================================
 
     def action_hr_accept(self):
@@ -654,7 +789,7 @@ class KswPayslipRevisionRequest(models.Model):
         return self._open_reason_wizard('refuse')
 
     # ==================================================================
-    # Step 2 — the GM approves the figure
+    # Step 3 — the GM approves the figure
     # ==================================================================
 
     def action_gm_approve(self):
@@ -726,16 +861,24 @@ class KswPayslipRevisionRequest(models.Model):
         self._notify_pending_approvers('pending_hr')
 
     # ==================================================================
-    # Step 3 — accounting confirms the revision and pays
+    # Step 4 — accounting confirms the revision and pays
     # ==================================================================
 
     def action_acc_pay(self):
-        """Confirm the revision payslip, then record the payment.
+        """Confirm the revision payslip, then pay by the chosen method.
 
         Confirming is deliberately here and not earlier: ``action_payslip_
         done`` recomputes the sheet, so the figure is fixed at the moment
         the money is committed and the bank file is generated from a
         payslip that can no longer move.
+
+        * **Bank transfer** — paid now, and both bank files (Excel + TXT)
+          are produced on the spot and filed on the request.  If either
+          cannot be produced the whole step rolls back: a bank payment with
+          no file to send the bank is not a payment.
+        * **Cash** — the money has not left yet, so the request waits in
+          ``pending_disbursement`` for the Loan Disbursement Officer to
+          confirm they handed it over, exactly as a loan does.
         """
         for req in self:
             req._check_step('pending_acc', (ACC_GROUP,), _(
@@ -760,22 +903,100 @@ class KswPayslipRevisionRequest(models.Model):
                         '%(slip)s and check it — the period may now show '
                         'the employee was over-paid.',
                         slip=payslip_name(revision)))
-            req.sudo().write({
-                'state': 'paid',
+            stamps = {
                 'acc_user_id': self.env.uid,
                 'acc_date': fields.Datetime.now(),
-                'payment_date': fields.Date.context_today(req),
-            })
+            }
+            if req.payment_method == 'cash':
+                req.sudo().write(dict(stamps, state='pending_disbursement'))
+                req._post_step_note(
+                    '💵 Payment confirmed — awaiting cash disbursement',
+                    _('Revision %(slip)s confirmed; %(amount).2f SAR to be '
+                      'handed over in cash.',
+                      slip=payslip_name(revision),
+                      amount=req.difference_amount),
+                )
+                req._notify_pending_approvers('pending_disbursement')
+                req._notify_employee(
+                    _('Your payslip revision request %(ref)s is ready for '
+                      'cash collection.', ref=req.name),
+                    _('%(amount).2f SAR has been approved. Please collect it '
+                      'from the disbursement officer; the request is closed '
+                      'once the handover is confirmed.',
+                      amount=req.difference_amount),
+                )
+                continue
+            req.sudo().write(dict(
+                stamps, state='paid',
+                payment_date=fields.Date.context_today(req)))
             req._post_step_note(
                 '💵 Paid',
                 _('%(amount).2f SAR paid by %(method)s.',
                   amount=req.difference_amount,
-                  method=dict(
-                      req._fields['payment_method'].selection
-                  ).get(req.payment_method, req.payment_method)),
+                  method=req._payment_method_label()),
+            )
+            # Both files, now: the bank transfer is only real once there is
+            # a file to hand the bank.  Each is re-homed onto the request
+            # under Supporting Documents by _file_export_on_request().
+            try:
+                req._generate_bank_file('all_excel')
+                req._generate_bank_file('all_txt')
+            except UserError as exc:
+                # Raising rolls the whole step back — revision confirmation
+                # included — so say plainly that nothing was paid, and
+                # replace the exporter's batch-level wording ("no fallback
+                # on the batch") with what accounting can actually fix.
+                raise UserError(_(
+                    'Payment NOT recorded — the bank file for %(employee)s '
+                    'could not be produced, so nothing was confirmed or '
+                    'paid.\n\nReason: %(reason)s\n\nFix: set the '
+                    "employee's Salary Paying Bank Account (and its Payroll "
+                    'File Type) and press Confirm & Pay again, or choose '
+                    'Cash as the payment method.',
+                    employee=req.employee_id.sudo().name,
+                    reason=exc.args[0] if exc.args else str(exc),
+                )) from exc
+            req._notify_employee_paid()
+        return True
+
+    # ==================================================================
+    # Step 5 (cash only) — the cash is handed over
+    # ==================================================================
+
+    def action_disbursement_confirm(self):
+        """The disbursement officer confirms the cash left the till.
+
+        The loan's Step 5, for the same reason: accounting's approval says
+        the money *may* be paid, only the person who hands it over can say
+        it *was*.  There is no refusal here — the revision payslip is
+        already confirmed, so the money is owed either way.
+        """
+        for req in self:
+            if req.state != 'pending_disbursement':
+                raise UserError(_(
+                    'This request is not waiting for cash disbursement.'))
+            if not self.env.su and not self._is_disbursement_officer():
+                raise UserError(_(
+                    'Only the Loan Disbursement Officer can confirm a cash '
+                    'disbursement.'))
+            req.sudo().write({
+                'state': 'paid',
+                'disbursed_by_id': self.env.uid,
+                'disbursed_date': fields.Datetime.now(),
+                'payment_date': fields.Date.context_today(req),
+            })
+            req._post_step_note(
+                '✅ Cash disbursed',
+                _('%(amount).2f SAR handed over by %(user)s.',
+                  amount=req.difference_amount, user=self.env.user.name),
             )
             req._notify_employee_paid()
         return True
+
+    def _payment_method_label(self):
+        self.ensure_one()
+        return dict(self._fields['payment_method'].selection).get(
+            self.payment_method, self.payment_method or '')
 
     def action_acc_refuse(self):
         self.ensure_one()
@@ -824,6 +1045,10 @@ class KswPayslipRevisionRequest(models.Model):
             raise UserError(_(
                 'The bank file can only be generated once the GM has '
                 'approved this request.'))
+        if self.payment_method != 'bank':
+            raise UserError(_(
+                'A bank file is only produced for a bank transfer. This '
+                'difference is being paid in cash.'))
         revision = self.revision_payslip_id.sudo()
         if not revision:
             raise UserError(_('This request has no revision payslip.'))
@@ -943,10 +1168,14 @@ class KswPayslipRevisionRequest(models.Model):
             # the same payslip.
             if not self.env.su:
                 req._check_can_file(req.payslip_id.sudo(), exclude=req)
+            # The DM approved the complaint as it stood; a reopened request
+            # can be edited, so it needs their approval again.
             req.sudo().write({
                 'state': 'draft',
                 'refuse_reason': False,
                 'refused_by_id': False,
+                'dm_user_id': False,
+                'dm_date': False,
             })
             req._post_step_note(
                 '🔄 Reopened',
@@ -1037,7 +1266,9 @@ class KswPayslipRevisionRequest(models.Model):
         self.ensure_one()
         if self.env.su:
             return
-        if self.state == 'pending_hr':
+        if self.state == 'pending_dm':
+            self._check_dm()
+        elif self.state == 'pending_hr':
             self._check_step('pending_hr', HR_GROUPS, _(
                 'Only the payroll team may refuse a request at the HR '
                 'step.'))
@@ -1051,6 +1282,23 @@ class KswPayslipRevisionRequest(models.Model):
             raise UserError(_(
                 'A request in state "%(state)s" cannot be refused.',
                 state=dict(self._STATES).get(self.state, self.state)))
+
+    def _check_dm(self):
+        """Raise unless the request is at the DM step and the caller is
+        the employee's direct manager."""
+        self.ensure_one()
+        if self.state != 'pending_dm':
+            raise UserError(_(
+                'This request is not waiting for the direct manager.'))
+        if self.env.su:
+            return
+        manager_user = self._direct_manager_user()
+        if self.env.user != manager_user:
+            raise UserError(_(
+                'Only %(dm)s, the direct manager of %(employee)s, may approve '
+                'or refuse this request at this step.',
+                dm=manager_user.name or _('the direct manager'),
+                employee=self.employee_id.sudo().name))
 
     def _check_gm(self):
         """Raise unless the caller is this request's department GM."""
@@ -1097,7 +1345,12 @@ class KswPayslipRevisionRequest(models.Model):
         config = self._STEP_CONFIG.get(pending_state)
         if not config:
             return
-        if config.get('department_gm'):
+        if config.get('direct_manager'):
+            manager_user = self._direct_manager_user()
+            partner_ids = (
+                [manager_user.partner_id.id]
+                if manager_user and manager_user.partner_id else [])
+        elif config.get('department_gm'):
             gm_user = self._department_gm_user()
             partner_ids = (
                 [gm_user.partner_id.id]
@@ -1110,6 +1363,9 @@ class KswPayslipRevisionRequest(models.Model):
                     partners |= group.sudo().user_ids.partner_id
             partner_ids = partners.ids
         if not partner_ids:
+            _logger.warning(
+                'Revision request %s reached %s with nobody to notify.',
+                self.name, pending_state)
             return
         self.sudo().message_post(
             body=Markup(
@@ -1161,9 +1417,7 @@ class KswPayslipRevisionRequest(models.Model):
             _('%(amount).2f SAR was paid by %(method)s for the period '
               '%(date_from)s → %(date_to)s.',
               amount=self.difference_amount,
-              method=dict(
-                  self._fields['payment_method'].selection
-              ).get(self.payment_method, self.payment_method or ''),
+              method=self._payment_method_label(),
               date_from=self.date_from,
               date_to=self.date_to),
         )

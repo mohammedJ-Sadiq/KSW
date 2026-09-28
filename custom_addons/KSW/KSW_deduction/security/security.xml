@@ -522,6 +522,43 @@
         <field name="perm_unlink" eval="False"/>
     </record>
 
+    <!-- ============================================================ -->
+    <!-- Salary revision requests paid in cash (KSW_payroll)           -->
+    <!-- ============================================================ -->
+    <!--
+        A revision difference paid in cash waits in `pending_disbursement`
+        for the same cashier who hands out loan cash. KSW_payroll owns the
+        model but cannot name this group (this module depends on it, not the
+        other way round), so its access is declared here. Scope: cash
+        requests from the disbursement step on. Read + write only; the
+        write() whitelist lets the cashier touch the payment reference and
+        nothing else, and the state moves only through
+        action_disbursement_confirm().
+    -->
+    <record id="ksw_revision_request_rule_disbursement" model="ir.rule">
+        <field name="name">Revision requests: loan disbursement officer (cash)</field>
+        <field name="model_id" ref="KSW_payroll.model_ksw_payslip_revision_request"/>
+        <field name="domain_force">[('payment_method', '=', 'cash'), ('state', 'in', ('pending_disbursement', 'paid'))]</field>
+        <field name="groups" eval="[(4, ref('group_loan_disbursement'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+
+    <!-- A menu's effective groups= is the intersection with every
+         ancestor's (pitfall #41): the Payroll root and the Salary Revisions
+         section must both name the cashier or the entries below are
+         unreachable. <function> rather than a <menuitem> override, which
+         would reset parent_id/name unless repeated (pitfall #1). Link only,
+         so nothing KSW_payroll grants is taken away. -->
+    <function model="ir.ui.menu" name="write">
+        <value eval="[ref('om_hr_payroll.menu_hr_payroll_root'),
+                      ref('KSW_payroll.menu_ksw_revision_requests_root'),
+                      ref('KSW_payroll.menu_ksw_revision_requests_todo'),
+                      ref('KSW_payroll.menu_ksw_revision_requests_all')]"/>
+        <value eval="{'group_ids': [(4, ref('group_loan_disbursement'))]}"/>
+    </function>
 </odoo>
 
 
