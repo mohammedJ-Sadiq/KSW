@@ -4,6 +4,20 @@ from odoo import api, models
 class HrLeave(models.Model):
     _inherit = 'hr.leave'
 
+    @api.model
+    def default_get(self, fields):
+        # Core pre-selects the lowest-sequence type the employee may use, which
+        # made every new request start as a Vacation Extension. Start empty so
+        # the employee picks the type; a caller that names one (the Extend
+        # Vacation button, a dashboard card) still gets it through context.
+        defaults = super().default_get(fields)
+        ctx = self.env.context
+        if 'holiday_status_id' in fields and not ctx.get('default_holiday_status_id'):
+            defaults['holiday_status_id'] = False
+            if 'default_request_unit_hours' not in ctx:
+                defaults['request_unit_hours'] = False
+        return defaults
+
     @api.depends('date_from', 'date_to', 'resource_calendar_id',
                  'holiday_status_id.request_unit', 'holiday_status_id.is_sick_leave')
     def _compute_duration(self):

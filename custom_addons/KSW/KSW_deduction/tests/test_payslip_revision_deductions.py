@@ -97,6 +97,17 @@ class TestPayslipRevisionDeductions(TransactionCase):
                 cls.env.ref('hr.group_hr_manager').id,
             ])],
         })
+        # Confirming a payslip is a Payroll Manager act since Sept 2026.
+        cls.user_manager = cls.env['res.users'].create({
+            'name': 'Revision Deduction Manager',
+            'login': 'revision_ded_manager',
+            'email': 'revision_ded_manager@revision.test',
+            'group_ids': [(6, 0, [
+                cls.env.ref('base.group_user').id,
+                cls.env.ref('om_hr_payroll.group_hr_payroll_manager').id,
+                cls.env.ref('hr.group_hr_manager').id,
+            ])],
+        })
 
     # ------------------------------------------------------------------
     # Helpers
@@ -133,7 +144,9 @@ class TestPayslipRevisionDeductions(TransactionCase):
         })
 
     def _issue_revision(self, slip):
-        action = slip.with_user(self.user_officer).action_issue_revision()
+        # System-only since Sept 2026 (revisions come through a Salary
+        # Revision Request, whose HR step issues them under sudo).
+        action = slip.sudo().action_issue_revision()
         return self.env['hr.payslip'].browse(action['res_id'])
 
     def _make_deduction(self, amount, installments=1):
@@ -168,7 +181,7 @@ class TestPayslipRevisionDeductions(TransactionCase):
         # …and it must NOT be re-injected as a collectable input.
         self.assertFalse(self._input(revision, 'KSW_DED_%d' % line.id))
 
-        revision.with_user(self.user_officer).action_payslip_done()
+        revision.with_user(self.user_manager).action_payslip_done()
 
         line.invalidate_recordset()
         self.assertEqual(line.state, 'paid')
@@ -206,7 +219,7 @@ class TestPayslipRevisionDeductions(TransactionCase):
         line = deduction.line_ids[0]
         self.assertEqual(line.state, 'pending')
 
-        revision.with_user(self.user_officer).action_payslip_done()
+        revision.with_user(self.user_manager).action_payslip_done()
 
         self.assertEqual(self._net(revision), 500.0,
                          '800 owed less the 300 penalty now due')
@@ -233,7 +246,7 @@ class TestPayslipRevisionDeductions(TransactionCase):
         before = Deduction.sudo().search([
             ('employee_id', '=', self.employee.id)])
 
-        result = revision.with_user(self.user_officer).action_payslip_done()
+        result = revision.with_user(self.user_manager).action_payslip_done()
 
         self.assertEqual(revision.state, 'cancel')
         self.assertEqual(result.get('tag'), 'display_notification')
@@ -260,7 +273,7 @@ class TestPayslipRevisionDeductions(TransactionCase):
 
         before = self.env['ksw.deduction'].sudo().search([
             ('employee_id', '=', self.employee.id)])
-        revision.with_user(self.user_officer).action_payslip_done()
+        revision.with_user(self.user_manager).action_payslip_done()
         created = self.env['ksw.deduction'].sudo().search([
             ('employee_id', '=', self.employee.id),
             ('id', 'not in', before.ids),
@@ -279,5 +292,5 @@ class TestPayslipRevisionDeductions(TransactionCase):
         revision.compute_sheet()
 
         with self.assertRaises(UserError):
-            revision.with_user(self.user_officer).write({'state': 'done'})
+            revision.with_user(self.user_manager).write({'state': 'done'})
         self.assertNotEqual(revision.state, 'done')

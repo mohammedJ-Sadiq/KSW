@@ -112,6 +112,16 @@ class TestPayslipRevision(TransactionCase):
             'group_ids': [(6, 0, [group_user.id, group_officer.id,
                                   group_hr_manager.id])],
         })
+        # Confirming a payslip is a Payroll Manager act since Sept 2026
+        # (Officers review only), so the confirmation steps below run as one.
+        cls.user_manager = cls.env['res.users'].create({
+            'name': 'Revision Manager',
+            'login': 'revision_manager',
+            'email': 'revision_manager@revision.test',
+            'group_ids': [(6, 0, [group_user.id, cls.env.ref(
+                'om_hr_payroll.group_hr_payroll_manager').id,
+                group_hr_manager.id])],
+        })
         cls.user_plain = cls.env['res.users'].create({
             'name': 'Revision Plain User',
             'login': 'revision_plain',
@@ -172,7 +182,7 @@ class TestPayslipRevision(TransactionCase):
 
         second = self._make_payslip('Second')
         with self.assertRaises(UserError):
-            second.with_user(self.user_officer).action_payslip_done()
+            second.with_user(self.user_manager).action_payslip_done()
         self.assertNotEqual(second.state, 'done')
 
     def test_second_payslip_cannot_be_confirmed_via_raw_write(self):
@@ -182,7 +192,7 @@ class TestPayslipRevision(TransactionCase):
 
         second = self._make_payslip('Second')
         with self.assertRaises(UserError):
-            second.with_user(self.user_officer).write({'state': 'done'})
+            second.with_user(self.user_manager).write({'state': 'done'})
         self.assertNotEqual(second.state, 'done')
 
     def test_partial_overlap_also_blocks(self):
@@ -193,14 +203,14 @@ class TestPayslipRevision(TransactionCase):
             'Half month', date_from=date(2026, 7, 15),
             date_to=date(2026, 8, 14))
         with self.assertRaises(UserError):
-            overlapping.with_user(self.user_officer).action_payslip_done()
+            overlapping.with_user(self.user_manager).action_payslip_done()
 
     def test_other_period_is_unaffected(self):
         self._confirm(self._make_payslip('July'))
 
         august = self._make_payslip(
             'August', date_from=date(2026, 8, 1), date_to=date(2026, 8, 31))
-        august.with_user(self.user_officer).action_payslip_done()
+        august.with_user(self.user_manager).action_payslip_done()
         self.assertEqual(august.state, 'done')
 
     # ==================================================================
@@ -239,7 +249,7 @@ class TestPayslipRevision(TransactionCase):
         self.assertTrue(vacation_slip._is_settled_vacation_payslip())
 
         monthly = self._make_payslip('Monthly after return')
-        monthly.with_user(self.user_officer).action_payslip_done()
+        monthly.with_user(self.user_manager).action_payslip_done()
         self.assertEqual(monthly.state, 'done')
 
     def test_vacation_payslip_with_open_return_still_blocks(self):
@@ -254,7 +264,7 @@ class TestPayslipRevision(TransactionCase):
 
         monthly = self._make_payslip('Monthly while away')
         with self.assertRaises(UserError):
-            monthly.with_user(self.user_officer).action_payslip_done()
+            monthly.with_user(self.user_manager).action_payslip_done()
 
     # ==================================================================
     # 3 & 4. Issuing a revision
@@ -278,7 +288,7 @@ class TestPayslipRevision(TransactionCase):
         self._add_input(revision, 'ADDITIONAL_COMMISSIONS', 800.0)
 
         # A revision is always allowed to confirm despite the done original.
-        revision.with_user(self.user_officer).action_payslip_done()
+        revision.with_user(self.user_manager).action_payslip_done()
         self.assertEqual(revision.state, 'done')
         self.assertEqual(self._net(revision), 800.0)
         self.assertEqual(revision.x_deserved_net, original_net + 800.0)
@@ -336,7 +346,7 @@ class TestPayslipRevision(TransactionCase):
 
         first = self._issue_revision(original)
         self._add_input(first, 'ADDITIONAL_COMMISSIONS', 800.0)
-        first.with_user(self.user_officer).action_payslip_done()
+        first.with_user(self.user_manager).action_payslip_done()
         self.assertEqual(self._net(first), 800.0)
 
         # A second look finds another 200 owed for the same period.
@@ -348,7 +358,7 @@ class TestPayslipRevision(TransactionCase):
         # The first revision's commission is carried over as part of the
         # period; the new 200 is what is still outstanding.
         self._add_input(second, 'FLIGHT_TICKET', 200.0)
-        second.with_user(self.user_officer).action_payslip_done()
+        second.with_user(self.user_manager).action_payslip_done()
         self.assertEqual(self._net(second), 200.0)
 
     # ==================================================================

@@ -28,6 +28,9 @@ from .hr_payslip import PAYROLL_MANAGER_GROUP
 
 SYSTEM_CTX = 'ksw_payslip_system'
 _FREE_PREFIXES = ('message_', 'activity_', 'website_message_')
+# Delivery bookkeeping, not payroll values: re-sending a payslip email is an
+# Officer task and must work on a paid payslip too.
+_FREE_FIELDS = frozenset({'x_email_state', 'x_email_error'})
 _VALUE_O2M = ('line_ids', 'input_line_ids', 'worked_days_line_ids')
 
 
@@ -37,6 +40,17 @@ def _unrestricted(env):
 
 def _is_manager(env):
     return env.user.has_group(PAYROLL_MANAGER_GROUP)
+
+
+def _is_officer_only(env):
+    """The tier this lock narrows. Anyone below it has no write access to
+    payroll at all and gets Odoo's own AccessError from the ACL."""
+    return (env.user.has_group('om_hr_payroll.group_hr_payroll_user')
+            and not _is_manager(env))
+
+
+def _free(fname):
+    return fname.startswith(_FREE_PREFIXES) or fname in _FREE_FIELDS
 
 
 def _officer_error():
@@ -57,7 +71,7 @@ class HrPayslip(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        if not _unrestricted(self.env) and not _is_manager(self.env):
+        if not _unrestricted(self.env) and _is_officer_only(self.env):
             # An Officer outside the generate wizard: never trust hand-made
             # figures. compute_sheet() rebuilds them from the real sources.
             for vals in vals_list:
@@ -69,16 +83,21 @@ class HrPayslip(models.Model):
 
     def write(self, vals):
         if not _unrestricted(self.env):
-            keys = [k for k in vals if not k.startswith(_FREE_PREFIXES)]
+            keys = [k for k in vals if not _free(k)]
             if keys:
-                if not _is_manager(self.env):
+                # Access rights first: a user with no write access at all
+                # (e.g. the read-only Payroll Reviewer) gets Odoo's own
+                # AccessError, not this lock's explanation.
+                self.check_access('write')
+                if _is_officer_only(self.env):
                     raise _officer_error()
                 if any(s.state == 'done' for s in self.sudo()):
                     raise _sealed_error()
         return super().write(vals)
 
     def unlink(self):
-        if not _unrestricted(self.env) and not _is_manager(self.env):
+        if not _unrestricted(self.env) and _is_officer_only(self.env):
+            self.check_access('unlink')
             raise _officer_error()
         return super().unlink()
 
@@ -87,12 +106,15 @@ class HrPayslip(models.Model):
             raise _sealed_error()
         if not self.env.su and not self.env.user.has_group(
                 'om_hr_payroll.group_hr_payroll_user'):
+            # No payroll tier at all: Odoo's own AccessError, not ours.
+            self.check_access('write')
             raise _officer_error()
         return super(HrPayslip, self.with_context(**{SYSTEM_CTX: True})
                      ).compute_sheet()
 
     def action_payslip_done(self):
-        if not self.env.su and not _is_manager(self.env):
+        if not self.env.su and _is_officer_only(self.env):
+            self.check_access('write')
             raise UserError(_(
                 'Only a Payroll Manager may confirm payslips. Payroll '
                 'Officers prepare and review them.'))
@@ -123,7 +145,8 @@ def _check_child_value_change(records, payslip_field):
     draft payslip) may create, change or delete them."""
     if _unrestricted(records.env):
         return
-    if not _is_manager(records.env):
+    records.check_access('write')
+    if _is_officer_only(records.env):
         raise _officer_error()
     if any(r[payslip_field].state == 'done' for r in records.sudo()):
         raise _sealed_error()
@@ -134,7 +157,8 @@ class HrPayslipLineLock(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        if not _unrestricted(self.env) and not _is_manager(self.env):
+        if not _unrestricted(self.env) and _is_officer_only(self.env):
+            self.browse().check_access('create')
             raise _officer_error()
         records = super().create(vals_list)
         _check_child_value_change(records, 'slip_id')
@@ -154,7 +178,8 @@ class HrPayslipInputLock(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        if not _unrestricted(self.env) and not _is_manager(self.env):
+        if not _unrestricted(self.env) and _is_officer_only(self.env):
+            self.browse().check_access('create')
             raise _officer_error()
         records = super().create(vals_list)
         _check_child_value_change(records, 'payslip_id')
@@ -174,7 +199,8 @@ class HrPayslipWorkedDaysLock(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        if not _unrestricted(self.env) and not _is_manager(self.env):
+        if not _unrestricted(self.env) and _is_officer_only(self.env):
+            self.browse().check_access('create')
             raise _officer_error()
         records = super().create(vals_list)
         _check_child_value_change(records, 'payslip_id')
@@ -195,14 +221,16 @@ class HrPayslipRun(models.Model):
     def write(self, vals):
         # An Officer creates and prepares a batch; once it is closed it is
         # the Manager's.
-        if (not _unrestricted(self.env) and not _is_manager(self.env)
+        if (not _unrestricted(self.env) and _is_officer_only(self.env)
                 and any(r.state != 'draft' for r in self.sudo())
-                and any(not k.startswith(_FREE_PREFIXES) for k in vals)):
+                and any(not _free(k) for k in vals)):
+            self.check_access('write')
             raise _officer_error()
         return super().write(vals)
 
     def done_payslip_run(self):
-        if not self.env.su and not _is_manager(self.env):
+        if not self.env.su and _is_officer_only(self.env):
+            self.check_access('write')
             raise UserError(_(
                 'Only a Payroll Manager may confirm a payslip batch (Mark as '
                 'Done). Payroll Officers prepare and review it.'))

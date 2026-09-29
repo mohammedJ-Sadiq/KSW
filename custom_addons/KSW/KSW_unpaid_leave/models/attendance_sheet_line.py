@@ -12,6 +12,11 @@ class KswAttendanceSheetLineLeave(models.Model):
              'approved at GM final. Released automatically if the vacation '
              'is refused, returned, cancelled or reset.',
     )
+    x_lock_only = fields.Boolean(
+        string='Locked Without Owning', readonly=True, copy=False,
+        help='Locked by a vacation on its own dates although the day was '
+             'already absent: releasing the lock must not flip it to present.',
+    )
     x_leave_id = fields.Many2one(
         'hr.leave', string='Linked Leave',
         ondelete='set null', readonly=True, copy=False,

@@ -59,11 +59,14 @@ class TestCaptureTimingAndScope(OfflineCaptureCommon):
         self.driver.sudo().x_water_client_ids = [(6, 0, [self.customer.id])]
         other = self.multi_customer if hasattr(self, 'multi_customer') \
             else self.other_branch_customer
-        capture = self._receive(ref='scp1', partner_id=other.id)
+        # As the driver: the superuser (and a dispatcher) is exempt.
+        capture = self.Capture.with_user(self.driver_user)._receive(
+            self._payload(ref='scp1', partner_id=other.id), self.driver)
         self.assertEqual(capture.state, 'held')
         self.assertIn('client list', capture.hold_reason)
 
     def test_client_on_the_list_issues(self):
         self.driver.sudo().x_water_client_ids = [(6, 0, [self.customer.id])]
-        capture = self._receive(ref='scp2')
+        capture = self.Capture.with_user(self.driver_user)._receive(
+            self._payload(ref='scp2'), self.driver)
         self.assertEqual(capture.state, 'issued')

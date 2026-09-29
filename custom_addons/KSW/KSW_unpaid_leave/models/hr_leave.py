@@ -640,7 +640,13 @@ class HrLeaveUnpaid(models.Model):
 
     def _unlock_attendance_sheet_lines(self, leave):
         """Restore attendance sheet lines locked by this leave."""
-        lines = self.env['ksw.attendance.sheet.line'].sudo().search([
+        Line = self.env['ksw.attendance.sheet.line'].sudo()
+        # Days a vacation locked although they were already absent are
+        # released as they were — never flipped to present.
+        Line.search([('x_leave_id', '=', leave.id),
+                     ('x_lock_only', '=', True)]).write(
+            {'x_leave_id': False, 'x_lock_only': False})
+        lines = Line.search([
             ('x_leave_id', '=', leave.id),
         ])
         if lines:

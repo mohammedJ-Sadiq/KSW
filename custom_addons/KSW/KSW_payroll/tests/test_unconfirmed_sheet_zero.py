@@ -291,10 +291,11 @@ class TestUnconfirmedSheetZero(TransactionCase):
 
         sheet.action_apply_approved_leave()
 
-        # Mar 1-4 precede the vacation and were genuinely worked; from the
-        # 5th onward nothing is known, so nothing is claimed as attended.
-        self.assertEqual(sheet.total_absent, 27)
-        self.assertEqual(sheet.total_attended, 4)
+        # Whole month absent (user decision 2026-09-29): the vacation
+        # payslip settles the month, including Mar 1-4 worked before it
+        # (KSW_unpaid_leave vacation_sheet_settlement, at GM final).
+        self.assertEqual(sheet.total_absent, 31)
+        self.assertEqual(sheet.total_attended, 0)
 
     def test_vacation_from_an_earlier_month_absents_the_whole_month(self):
         """KSWCO's actual shape — the one that prompted this.
@@ -329,9 +330,11 @@ class TestUnconfirmedSheetZero(TransactionCase):
 
         sheet.action_apply_approved_leave()
 
-        self.assertGreater(
-            sheet.total_attended, 0,
-            'Days after a confirmed return are attended again.')
+        # The coverage end still follows the confirmed return (above), but
+        # the month itself stays settled by the vacation: whole month absent
+        # (user decision 2026-09-29). The confirmer is sent to the sheet to
+        # check it instead (test_vacation_sheet_settlement).
+        self.assertEqual(sheet.total_attended, 0)
 
     def test_open_return_blocker_explains_the_open_end(self):
         sheet = self._sheet()
@@ -339,8 +342,9 @@ class TestUnconfirmedSheetZero(TransactionCase):
 
         blockers = '\n'.join(sheet._confirmation_blockers())
 
-        self.assertIn('return was never confirmed', blockers)
-        self.assertIn('no evidence the employee came back', blockers)
+        # The days are settled absent, so no 'attended while on leave' clash
+        # remains; what blocks the month is the unconfirmed return itself.
+        self.assertIn('has not been marked as returned', blockers)
 
     # ------------------------------------------------------------------
     # A vacation still running asks nothing of anyone
