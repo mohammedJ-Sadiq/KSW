@@ -215,7 +215,10 @@ class BASCustomer(models.Model):
         candidates = Partner.search([])
         by_name = {}
         for p in candidates:
-            for key in (p.name, p.x_commission_import_name):
+            # getattr: `x_commission_import_name` is declared by
+            # KSW_commissions, which depends on this module -- not the
+            # other way round.
+            for key in (p.name, getattr(p, 'x_commission_import_name', False)):
                 norm = ' '.join((key or '').split()).strip().lower()
                 if norm and norm not in by_name:
                     by_name[norm] = p
@@ -225,9 +228,25 @@ class BASCustomer(models.Model):
             norm_en = ' '.join((rec.name_en or '').split()).strip().lower()
             norm_ar = ' '.join((rec.name_ar or '').split()).strip().lower()
             partner = by_name.get(norm_en) or by_name.get(norm_ar)
-            if partner and not partner.x_client_account_number:
+            # Link when the name matches AND the contact is either unclaimed or
+            # already carries THIS account. The second case used to fall
+            # through to create(), so re-running the button on a contact
+            # somebody had linked by hand made a duplicate with the same name.
+            if partner and partner.x_client_account_number in (False, '', rec.bas_code):
                 rec.write({'partner_id': partner.id, 'partner_created': False})
-                partner.write({'x_client_account_number': rec.bas_code})
+                vals = {'x_client_account_number': rec.bas_code}
+                # A BAS customer is a customer. Only created contacts used to
+                # get the rank, so every MATCHED one stayed invisible to every
+                # picker filtered on `customer_rank > 0` -- the water delivery
+                # client list, the workshop client, `res_partner_search_mode`
+                # (KSW gotcha #43). Raised, never lowered: a contact that is
+                # already a customer keeps its rank.
+                # `customer_rank` is declared by `account`, which this module
+                # does not depend on (KSW gotcha #43) -- present on every real
+                # database here, but not guaranteed.
+                if 'customer_rank' in partner._fields and not partner.customer_rank:
+                    vals['customer_rank'] = 1
+                partner.write(vals)
                 matched += 1
             else:
                 new_partner = Partner.create({

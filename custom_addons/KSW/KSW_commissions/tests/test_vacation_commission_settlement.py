@@ -25,7 +25,7 @@ AUG = date(2031, 8, 1)
 SEP = date(2031, 9, 1)
 
 
-class TestVacationCommissionSettlement(TransactionCase):
+class _SettlementCommon(TransactionCase):
 
     @classmethod
     def setUpClass(cls):
@@ -71,6 +71,8 @@ class TestVacationCommissionSettlement(TransactionCase):
         cls.jul = cls._entry(JUL, 700.0)
         cls.aug = cls._entry(AUG, 300.0)
         cls.sep = cls._entry(SEP, 999.0)
+        # Signed off by the GM — the only figures a settlement may pay.
+        (cls.jul | cls.aug | cls.sep).batch_id.write({'state': 'approved'})
 
     # ------------------------------------------------------------------
     @classmethod
@@ -137,6 +139,9 @@ class TestVacationCommissionSettlement(TransactionCase):
             i.code: i.amount for i in payslip.input_line_ids
             if i.code and i.code.startswith('KSW_COM_')}
 
+
+class TestVacationCommissionSettlement(_SettlementCommon):
+
     # ------------------------------------------------------------------
     # Which entries
     # ------------------------------------------------------------------
@@ -145,6 +150,27 @@ class TestVacationCommissionSettlement(TransactionCase):
         self.assertEqual(entries, self.jul | self.aug,
                          'September starts after he left: not the '
                          'settlement\'s business.')
+
+    def test_unapproved_entries_are_listed_but_not_paid(self):
+        """KSWCO dev leave 47147: a submitted, never-approved batch was
+        paid on the vacation payslip."""
+        self.aug.batch_id.write({'state': 'submitted'})
+        leave = self._leave()
+        self.assertEqual(leave._commission_entries_to_settle(), self.jul)
+        self.assertEqual(leave.x_commission_entries_total, 700.0)
+        self.assertEqual(leave.x_commission_pending_count, 1)
+        self.assertEqual(leave.x_commission_pending_total, 300.0)
+        payslip = self._payslip(leave)
+        self.assertEqual(self._com_inputs(payslip),
+                         {'KSW_COM_%d' % self.jul.id: 700.0})
+
+    def test_confirming_refuses_an_entry_approved_nowhere(self):
+        """A payslip built earlier and confirmed by hand after the batch was
+        taken back is refused, not paid."""
+        payslip = self._payslip(self._leave())
+        self.aug.batch_id.write({'state': 'draft'})
+        with self.assertRaises(UserError):
+            payslip.write({'state': 'done'})
 
     def test_month_already_paid_by_its_run_is_left_alone(self):
         self._run(JUL).write({'state': 'approved'})
@@ -226,6 +252,41 @@ class TestVacationCommissionSettlement(TransactionCase):
         self.assertNotIn(self.employee, paid)
         self.assertEqual(paid.get(other.employee_id), 450.0)
 
+    def test_the_excel_summary_lists_it_as_paid_on_the_vacation(self):
+        """Left out of the register and the bank files, but not out of the
+        month's record: the summary lists it, marked, with no transfer."""
+        import openpyxl
+        other = self._entry(AUG, 450.0, employee=self.colleague)
+        payslip = self._payslip(self._leave())
+        payslip.write({'state': 'done'})
+        run = self._run(AUG)
+        run._build_register(preview=True)
+
+        self.assertNotIn(self.employee.id, run._bas_component_totals(),
+                         'The journal must not post what the vacation paid.')
+
+        wizard = self.env['ksw.commission.bank.export.wizard'].sudo().create(
+            {'run_id': run.id, 'export_mode': 'journal_entry'})
+        book = openpyxl.Workbook()
+        wizard._make_comm_summary_excel(
+            book, run.line_ids, run._vacation_settled_totals())
+        sheet = book['Commission Summary']
+        headers = [c.value for c in sheet[1]]
+        rows = {r[0]: r for r in sheet.iter_rows(min_row=2, values_only=True)}
+
+        paid = rows[self.employee.name]
+        self.assertEqual(paid[headers.index('Status')],
+                         'Paid on vacation payslip')
+        self.assertIn(payslip.number or payslip.name,
+                      paid[headers.index('Paid On')])
+        self.assertEqual(paid[headers.index('Total Earnings')], 300.0)
+        self.assertEqual(paid[headers.index('Bank Transfer Amount')], 0)
+
+        transfer = rows[other.employee_id.name]
+        self.assertEqual(transfer[headers.index('Status')], 'Bank transfer')
+        self.assertEqual(transfer[headers.index('Bank Transfer Amount')],
+                         450.0)
+
     # ------------------------------------------------------------------
     # The leave's Accounting page
     # ------------------------------------------------------------------
@@ -245,3 +306,98 @@ class TestVacationCommissionSettlement(TransactionCase):
         leave.invalidate_recordset()
         self.assertTrue(leave.x_commission_entries_settled)
         self.assertEqual(leave.x_commission_entries_total, 1000.0)
+
+    def test_batch_links_only_for_who_can_open_it(self):
+        leave = self._leave()
+        href = '/odoo/ksw.pay.batch/%d' % self.aug.batch_id.id
+        officer = self.env['res.users'].create({
+            'name': 'settlement_officer', 'login': 'settlement_officer',
+            'group_ids': [(6, 0, [
+                self.env.ref('base.group_user').id,
+                self.env.ref('KSW_commissions.group_commission_officer').id,
+            ])],
+        })
+        outsider = self.env['res.users'].create({
+            'name': 'settlement_outsider', 'login': 'settlement_outsider',
+            'group_ids': [(6, 0, [self.env.ref('base.group_user').id])],
+        })
+        self.assertIn(href, leave.with_user(officer).x_commission_entries_html)
+        html = leave.with_user(outsider).x_commission_entries_html
+        self.assertNotIn(href, html,
+                         'No link to a batch the viewer cannot open.')
+        self.assertIn(self.aug.batch_id.name, html)
+
+
+class TestCommissionLatch(_SettlementCommon):
+    """What Accounting reviewed stays on the request.
+
+    Dev leave 47147, Sep 2026: after GM final the GM approved a June batch,
+    and the request — read live — started showing a commission its payslip
+    never paid. The list is latched when the request first reaches Step 4
+    and only the accountant's Refresh, at Step 4, fetches it again.
+    """
+
+    def _to_accounting(self, leave):
+        leave.sudo().write({'x_annual_approval_state': 'pending_acc'})
+        leave.invalidate_recordset()
+        return leave
+
+    def test_latched_when_it_reaches_accounting(self):
+        leave = self._to_accounting(self._leave())
+        self.assertTrue(leave.x_commission_latched_date)
+        self.assertEqual(leave.x_commission_entries_total, 1000.0)
+        self.assertFalse(leave.x_commission_live_changed)
+
+    def test_a_later_approval_does_not_change_the_request(self):
+        leave = self._to_accounting(self._leave())
+        self._entry(AUG, 50.0)          # a new, approved August entry
+        leave.invalidate_recordset()
+        self.assertEqual(leave.x_commission_entries_total, 1000.0,
+                         'The request keeps what was latched.')
+        self.assertTrue(leave.x_commission_live_changed)
+        self.assertEqual(leave.x_commission_live_total, 1050.0)
+        self.assertEqual(
+            sum(self._com_inputs(self._payslip(leave)).values()), 1000.0,
+            'The payslip pays the latch, not the live app.')
+
+    def test_refresh_at_accounting_takes_the_new_figures(self):
+        leave = self._to_accounting(self._leave())
+        self._entry(AUG, 50.0)
+        leave.sudo().action_refresh_commission_entries()
+        leave.invalidate_recordset()
+        self.assertEqual(leave.x_commission_entries_total, 1050.0)
+        self.assertFalse(leave.x_commission_live_changed)
+
+    def test_refresh_is_refused_outside_accounting(self):
+        leave = self._to_accounting(self._leave())
+        leave.sudo().write({'x_annual_approval_state': 'pending_gm_final'})
+        with self.assertRaises(UserError):
+            leave.sudo().action_refresh_commission_entries()
+
+    def test_returning_to_accounting_does_not_refresh_by_itself(self):
+        leave = self._to_accounting(self._leave())
+        leave.sudo().write({'x_annual_approval_state': 'pending_gm_final'})
+        self._entry(AUG, 50.0)
+        self._to_accounting(leave)
+        self.assertEqual(leave.x_commission_entries_total, 1000.0)
+        self.assertTrue(leave.x_commission_live_changed)
+
+    def test_an_entry_changed_after_the_latch_is_left_out(self):
+        leave = self._to_accounting(self._leave())
+        self.aug.write({'amount_override': 350.0})
+        leave.invalidate_recordset()
+        self.assertEqual(leave.x_commission_entries_total, 1000.0,
+                         'The latched figure is kept on the request.')
+        self.assertEqual(self._com_inputs(self._payslip(leave)),
+                         {'KSW_COM_%d' % self.jul.id: 700.0},
+                         'A figure that moved is not paid on the old value, '
+                         'and not silently swapped for the new one.')
+
+    def test_past_accounting_without_a_latch_pays_nothing(self):
+        leave = self._leave()
+        leave.sudo().write({'x_annual_approval_state': 'pending_gm_final'})
+        self.assertFalse(self._com_inputs(self._payslip(leave)))
+        self.assertEqual(leave.x_commission_entries_total, 0.0)
+        self.assertTrue(leave.x_commission_live_changed,
+                        'What the app now shows is flagged, not taken.')
+        self.assertEqual(leave.x_commission_live_total, 1000.0)

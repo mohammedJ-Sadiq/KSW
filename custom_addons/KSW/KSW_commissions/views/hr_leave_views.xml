@@ -29,8 +29,29 @@
                 <separator string="Commissions from the Commissions App"
                            name="ksw_commission_entries_section"
                            invisible="not x_commission_entries_applies"/>
+                <field name="x_commission_live_changed" invisible="1"/>
+                <field name="x_can_refresh_commissions" invisible="1"/>
                 <div name="ksw_commission_entries"
                      invisible="not x_commission_entries_applies">
+                    <!-- The latch: what Accounting reviewed stays on the
+                         request; only Refresh, at Step 4, fetches again. -->
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="text-muted"
+                              invisible="not x_commission_latched_date">
+                            Captured on
+                            <field name="x_commission_latched_date"
+                                   readonly="1" class="oe_inline"/>
+                            by
+                            <field name="x_commission_latched_by"
+                                   readonly="1" class="oe_inline"
+                                   options="{'no_open': True}"/>
+                        </span>
+                        <button name="action_refresh_commission_entries"
+                                type="object" class="btn btn-secondary btn-sm"
+                                icon="fa-refresh" string="Refresh Commissions"
+                                invisible="not x_can_refresh_commissions"
+                                confirm="Fetch the commission entries again from the Commissions app? The list on this request will be replaced by what the app says now."/>
+                    </div>
                     <p class="text-muted"
                        invisible="x_commission_entries_count or x_commission_entries_settled">
                         No commission or allowance entries are outstanding
@@ -38,7 +59,7 @@
                     </p>
                     <p class="text-muted"
                        invisible="not x_commission_entries_count or x_commission_entries_settled">
-                        Recorded in the Commissions app and not yet paid.
+                        Approved by the General Manager and not yet paid.
                         They are paid automatically on the vacation payslip,
                         and the monthly commission run will not pay them
                         again.
@@ -51,6 +72,42 @@
                     <field name="x_commission_entries_html" nolabel="1"
                            readonly="1"
                            invisible="not x_commission_entries_count"/>
+                </div>
+
+                <!-- The app moved after the latch: say so, never follow it. -->
+                <div class="alert alert-info" role="alert"
+                     invisible="not x_commission_entries_applies or not x_commission_live_changed">
+                    <div>
+                        <strong>The Commissions app has changed since this was captured.</strong>
+                        It now shows
+                        <field name="x_commission_live_total" readonly="1"
+                               class="oe_inline"/> SAR payable for this
+                        settlement. The request keeps the figures above.
+                    </div>
+                    <div invisible="not x_can_refresh_commissions">
+                        Press <em>Refresh Commissions</em> to take the new
+                        figures in.
+                    </div>
+                    <div invisible="x_can_refresh_commissions">
+                        To take them in, return the request to Accounting
+                        (Step 4), where the accountant can refresh them.
+                    </div>
+                </div>
+
+                <!-- Recorded but not approved by the GM: shown, never paid
+                     on this payslip. -->
+                <field name="x_commission_pending_count" invisible="1"/>
+                <div class="alert alert-warning" role="alert"
+                     name="ksw_commission_pending"
+                     invisible="not x_commission_entries_applies or not x_commission_pending_count">
+                    <strong>Not included: awaiting General Manager approval.</strong>
+                    These entries are recorded in the Commissions app but
+                    their batch has not been approved yet, so the vacation
+                    payslip does not pay them. Once the General Manager
+                    approves them, the accountant can include them with
+                    <em>Refresh Commissions</em> at Step 4.
+                    <field name="x_commission_pending_html" nolabel="1"
+                           readonly="1"/>
                 </div>
 
                 <div class="alert alert-warning" role="alert"

@@ -66,3 +66,4 @@ access_ksw_pay_cash_band_officer,ksw.pay.cash.band officer,model_ksw_pay_cash_ba
 access_ksw_pay_cash_band_accountant,ksw.pay.cash.band accountant,model_ksw_pay_cash_band,group_commission_accountant,1,0,0,0
 access_ksw_pay_cash_band_gm,ksw.pay.cash.band gm,model_ksw_pay_cash_band,group_commission_gm,1,0,0,0
 access_ksw_pay_cash_band_supervisor,ksw.pay.cash.band supervisor,model_ksw_pay_cash_band,group_commission_supervisor,1,0,0,0
+access_ksw_leave_commission_entry_system,ksw.leave.commission.entry system,model_ksw_leave_commission_entry,base.group_system,1,1,1,1

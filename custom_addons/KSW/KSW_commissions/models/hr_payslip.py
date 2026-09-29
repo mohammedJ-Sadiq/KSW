@@ -144,6 +144,21 @@ class HrPayslip(models.Model):
             and e.x_vacation_payslip_id != self)
         locked = entries.filtered(
             lambda e: period_is_locked(self.env, e.period))
+        # Only what the GM approved may be paid — the builder already
+        # filters on it; this catches a payslip confirmed by hand later.
+        unapproved = entries.filtered(
+            lambda e: e.batch_id.state != 'approved')
+        if unapproved:
+            raise UserError(_(
+                "%(slip)s pays commission entries the General Manager has not "
+                "approved:\n%(rows)s\n\nRecompute the vacation payslip from "
+                "the leave request before confirming it.",
+                slip=self.number or self.name,
+                rows='\n'.join(
+                    '\u2022 %s \u2014 %s (%s)' % (
+                        e.display_name, e.period.strftime('%B %Y'),
+                        e.batch_id.name)
+                    for e in unapproved)))
         if elsewhere or locked:
             raise UserError(_(
                 "%(slip)s pays commission entries that have been paid since "

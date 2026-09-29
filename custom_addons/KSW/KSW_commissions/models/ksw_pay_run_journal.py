@@ -49,8 +49,29 @@ class KswPayRun(models.Model):
         for batch in self._payable_batches(settled_only=True):
             entries |= batch.sudo().entry_ids
         entries = entries.filtered('employee_id')
-        payable = entries - self._held_entries(entries)
+        # Exactly the register's set: an entry paid on a vacation payslip is
+        # not in the register either, and leaving it in here made the
+        # employee's journal figure disagree with his register line.
+        payable = (entries - self._held_entries(entries)
+                   - entries.filtered('x_vacation_payslip_id'))
         return self._rounded_component_totals(payable)
+
+    def _vacation_settled_totals(self):
+        """``{employee: (entries, {component: whole riyals})}`` for the
+        month's entries already paid on a vacation payslip.
+
+        Not payable here — the Excel summary lists them, marked, so the
+        month can be reconciled without asking where they went.
+        """
+        self.ensure_one()
+        settled = self._all_entries().filtered(
+            lambda e: e.employee_id and e.x_vacation_payslip_id)
+        totals = self._rounded_component_totals(settled)
+        return {
+            employee: (settled.filtered(lambda e, emp=employee: e.employee_id == emp),
+                       totals.get(employee.id, {}))
+            for employee in settled.employee_id
+        }
 
     @api.model
     def _bas_detail_lines(self, by_component):

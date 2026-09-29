@@ -188,8 +188,15 @@ class KswCommissionBankExportWizard(models.TransientModel):
 
     # --- Excel generation --------------------------------------------------
 
-    def _make_comm_summary_excel(self, wb, lines):
-        """Fill a summary worksheet (mirrors payroll summary but for commissions)."""
+    def _make_comm_summary_excel(self, wb, lines, settled=None):
+        """Fill a summary worksheet (mirrors payroll summary but for commissions).
+
+        ``settled`` is ``{employee: (entries, {component: amount})}`` — pay
+        of this month already paid on a vacation payslip. It is not in the
+        register and no bank transfers it, but it belongs in the month's
+        record: listed after the register, marked, with a zero transfer, so
+        whoever reconciles the month sees where it went instead of a gap.
+        """
         ws = wb.active
         ws.title = 'Commission Summary'
         thin = Border(
@@ -198,7 +205,10 @@ class KswCommissionBankExportWizard(models.TransientModel):
         )
         bold = Font(bold=True, size=11)
         hdr_fill = PatternFill('solid', fgColor='D9E1F2')
-        details, labels = self._summary_details(lines)
+        settled_fill = PatternFill('solid', fgColor='EDEDED')
+        settled = settled or {}
+        details, labels = self._summary_details(
+            lines, [by for _entries, by in settled.values()])
         # A register line its entries do not explain (carried over by hand)
         # still shows its whole figure, under a column that says so.
         unitemised = {
@@ -212,6 +222,7 @@ class KswCommissionBankExportWizard(models.TransientModel):
         ] + labels + extra + [
             'Total Earnings', 'Loans Deduction', 'Bank Transfer Amount',
             'Bank Account Number', 'Bank Name', 'Paid From',
+            'Status', 'Paid On',
         ]
         for ci, h in enumerate(headers, 1):
             c = ws.cell(row=1, column=ci, value=h)
@@ -220,6 +231,7 @@ class KswCommissionBankExportWizard(models.TransientModel):
             c.border = thin
             c.alignment = Alignment(horizontal='center', wrap_text=True)
         owner = lines._export_submissions()
+        ri = 1
         for ri, line in enumerate(
                 lines._export_sorted(), 2):
             emp = line.employee_id.sudo()
@@ -242,31 +254,83 @@ class KswCommissionBankExportWizard(models.TransientModel):
                 bank.acc_number if bank else '',
                 bank.bank_id.name if bank and bank.bank_id else '',
                 line.bank_account_id.acc_number or '',
+                'Bank transfer',
+                '',
             ]
             for ci, v in enumerate(row, 1):
                 c = ws.cell(row=ri, column=ci, value=v)
                 c.border = thin
+
+        for employee in sorted(settled, key=lambda e: e.sudo().name or ''):
+            entries, by_component = settled[employee]
+            emp = employee.sudo()
+            mine = {}
+            for detail in self._summary_detail_lines(by_component):
+                mine[detail['label']] = (
+                    mine.get(detail['label'], 0) + detail['amount'])
+            slips = entries.x_vacation_payslip_id.sudo()
+            row = [
+                emp.name or '',
+                self._emp_number(emp),
+                self._emp_ssn(emp),
+                ', '.join(entries.batch_id.department_id.mapped('name'))
+                or emp.department_id.name or '',
+            ] + [mine.get(label, 0) for label in labels] + (
+                [0] if extra else []) + [
+                sum(by_component.values()),
+                0,
+                0,            # nothing transferred: paid with the vacation
+                '', '', '',
+                'Paid on vacation payslip',
+                ', '.join(
+                    '%s (%s)' % (
+                        slip.number or slip.name,
+                        slip.x_leave_id.holiday_status_id.display_name or '')
+                    for slip in slips),
+            ]
+            ri += 1
+            for ci, v in enumerate(row, 1):
+                c = ws.cell(row=ri, column=ci, value=v)
+                c.border = thin
+                c.fill = settled_fill
         for ci in range(1, len(headers) + 1):
             letter = openpyxl.utils.get_column_letter(ci)
             mx = max(len(str(ws.cell(row=r, column=ci).value or ''))
                      for r in range(1, ws.max_row + 1))
             ws.column_dimensions[letter].width = min(mx + 3, 35)
 
-    def _summary_details(self, lines):
+    def _summary_voucher_run(self):
+        """The run in the voucher's language, as the journal reads it."""
+        run = self.run_id
+        lang = (self.env['ksw.bas.journal'].voucher_lang()
+                if 'ksw.bas.journal' in self.env
+                else self.env.context.get('lang'))
+        return run.with_context(lang=lang)
+
+    def _summary_detail_lines(self, by_component):
+        return self._summary_voucher_run()._bas_detail_lines(by_component)
+
+    def _summary_details(self, lines, extra_totals=()):
         """Each line's earnings itemised exactly as the BAS journal does.
 
         Returns ``({line_id: {label: amount}}, [labels in catalog order])``
         — the voucher's own descriptions («العمل الإضافي», «بدل عمل ايام
         الجمعة», «بدل عمل اضافي» …), from the same whole-riyal figures, so
         a column here and a line in the journal are the same number.
+        ``extra_totals`` (``{component: amount}`` each) only contribute
+        columns — the vacation-settled rows need theirs too.
         """
-        run = self.run_id
-        lang = (self.env['ksw.bas.journal'].voucher_lang()
-                if 'ksw.bas.journal' in self.env
-                else self.env.context.get('lang'))
-        run = run.with_context(lang=lang)
+        run = self._summary_voucher_run()
         totals = run._bas_component_totals()
         details, first_seen = {}, {}
+
+        def see(detail):
+            component = detail['component']
+            first_seen[detail['label']] = min(
+                first_seen.get(detail['label'],
+                               (component.sequence, component.id)),
+                (component.sequence, component.id))
+
         for line in lines:
             mine = {}
             for detail in run._bas_detail_lines(
@@ -275,11 +339,12 @@ class KswCommissionBankExportWizard(models.TransientModel):
                     continue
                 label = detail['label']
                 mine[label] = mine.get(label, 0) + detail['amount']
-                component = detail['component']
-                first_seen[label] = min(
-                    first_seen.get(label, (component.sequence, component.id)),
-                    (component.sequence, component.id))
+                see(detail)
             details[line.id] = mine
+        for by_component in extra_totals:
+            for detail in run._bas_detail_lines(by_component):
+                if detail['amount']:
+                    see(detail)
         return details, sorted(first_seen, key=first_seen.get)
 
     def _fill_wps_sheet(self, wb, bank, lines, title):
@@ -343,10 +408,13 @@ class KswCommissionBankExportWizard(models.TransientModel):
                      for r in range(6, max(ws.max_row + 1, 7)))
             ws.column_dimensions[letter].width = min(mx + 3, 40)
 
-    def _make_wps_excel(self, groups):
+    def _make_wps_excel(self, groups, all_settled=True):
         """One workbook: a summary over every line, one bank sheet per bank.
 
         :param groups: dict {paying res.partner.bank: ksw.pay.run.line}
+        :param all_settled: list every vacation-settled employee in the
+            summary (the one-workbook export); False keeps only those whose
+            own account is one of ``groups``' banks (a per-bank workbook).
         """
         if not openpyxl:
             raise UserError(_('openpyxl is required for Excel export.'))
@@ -354,7 +422,12 @@ class KswCommissionBankExportWizard(models.TransientModel):
         all_lines = self.env['ksw.pay.run.line']
         for lines in groups.values():
             all_lines |= lines
-        self._make_comm_summary_excel(wb, all_lines)
+        settled = self.run_id._vacation_settled_totals()
+        if not all_settled:
+            settled = {
+                emp: v for emp, v in settled.items()
+                if self._emp_account(emp.sudo()) in groups}
+        self._make_comm_summary_excel(wb, all_lines, settled)
         many = len(groups) > 1
         for bank, lines in groups.items():
             self._fill_wps_sheet(
@@ -553,7 +626,7 @@ class KswCommissionBankExportWizard(models.TransientModel):
         if self.excel_layout == 'split':
             files = [
                 ('Commissions_%s_%s.xlsx' % (bl, self._bank_label(bank)),
-                 self._make_wps_excel({bank: lines}))
+                 self._make_wps_excel({bank: lines}, all_settled=False))
                 for bank, lines in groups.items()
             ]
         else:
@@ -591,7 +664,7 @@ class KswCommissionBankExportWizard(models.TransientModel):
             raise UserError(_('No lines are assigned to the selected bank.'))
         bl = self._batch_label()
         label = self._bank_label(bank)
-        data = self._make_wps_excel({bank: lines})
+        data = self._make_wps_excel({bank: lines}, all_settled=False)
         return self._bundle_and_download(
             [('Commissions_%s_%s.xlsx' % (bl, label), data)])
 

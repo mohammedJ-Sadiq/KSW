@@ -132,6 +132,44 @@ class KswWaterRate(models.Model):
         ], limit=1)
 
     # ------------------------------------------------------------------
+    # BAS code -> Odoo record. Two sources each, because the two databases
+    # got their BAS records two different ways: dev from KSW_bas_gl_import
+    # (`x_bas_code`, a module production does not have and should not get --
+    # it drags in a whole GL import), production from the connector's own
+    # mirror and a hand-kept Internal Reference. Requiring `x_bas_code` is
+    # what made this button impossible to run where it is actually needed.
+    @api.model
+    def _bas_partner_map(self):
+        """FCODE -> res.partner."""
+        result = {
+            rec.bas_code.strip(): rec.partner_id
+            for rec in self.env['ksw.bas.customer'].sudo().search([
+                ('partner_id', '!=', False), ('bas_code', '!=', False)])
+        }
+        if 'x_bas_code' in self.env['res.partner']._fields:
+            # The GL import's mapping is by account code, not by name, so
+            # where both exist it wins over the mirror's name match.
+            for partner in self.env['res.partner'].sudo().search(
+                    [('x_bas_code', '!=', False)]):
+                result[partner.x_bas_code.strip()] = partner
+        return result
+
+    @api.model
+    def _bas_product_map(self):
+        """ICODE -> product.product. Internal Reference is the standard
+        place a product's code in another system goes, and the one a person
+        can fill in without a module."""
+        Product = self.env['product.product'].sudo()
+        result = {
+            p.default_code.strip(): p
+            for p in Product.search([('default_code', '!=', False)])
+            if p.default_code.strip()
+        }
+        if 'x_bas_code' in Product._fields:
+            for product in Product.search([('x_bas_code', '!=', False)]):
+                result[product.x_bas_code.strip()] = product
+        return result
+
     def action_import_from_bas(self):
         """One-off seed of the register from what BAS actually charged.
 
@@ -145,24 +183,20 @@ class KswWaterRate(models.Model):
                 and not self.env.su:
             raise UserError(_('Only Water Delivery Billing may import rates.'))
 
-        # The import matches BAS accounts and item codes to Odoo records through
-        # `x_bas_code`, which is declared by KSW_bas_gl_import -- a module this
-        # one deliberately does NOT depend on, because everything else here
-        # works without it and it drags in a whole GL import. So the dependency
-        # is checked at the one moment it is needed, with a message that says
-        # what to do, rather than surfacing as "Invalid field 'x_bas_code'".
-        missing = [
-            model for model in ('res.partner', 'product.product')
-            if 'x_bas_code' not in self.env[model]._fields
-        ]
-        if missing:
+        # Checked before connecting: with nothing to match against, a round
+        # trip to the BAS server only ends in the same message.
+        partners = self._bas_partner_map()
+        products = self._bas_product_map()
+        if not partners or not products:
             raise UserError(_(
-                'Rates are matched to BAS by the BAS account and item codes '
-                '(`x_bas_code`), which are not present on %(models)s in this '
-                'database. Install KSW_bas_gl_import and import the chart and '
-                'items first, or enter the rates by hand.',
-                models=', '.join(missing),
+                'Nothing to match the BAS rates against yet.\n\n'
+                '%(partners)s BAS customers are linked to contacts: run '
+                '"Match / Create Contacts" on BAS Customers first.\n'
+                '%(products)s products carry a BAS item code: put the BAS item '
+                'code in each water product\'s Internal Reference.',
+                partners=len(partners), products=len(products),
             ))
+
 
         months = int(self.env['ir.config_parameter'].sudo().get_param(
             'ksw_water_delivery.rate_import_months', 12))
@@ -176,17 +210,7 @@ class KswWaterRate(models.Model):
         finally:
             conn.close()
 
-        Partner = self.env['res.partner'].sudo()
         Product = self.env['product.product'].sudo()
-        partners = {
-            p.x_bas_code.strip(): p
-            for p in Partner.search([('x_bas_code', '!=', False)]) if p.x_bas_code
-        }
-        products = {
-            p.x_bas_code.strip(): p
-            for p in Product.search([('x_bas_code', '!=', False)]) if p.x_bas_code
-        }
-
         existing = {
             (r.partner_id.id, r.product_id.id): r
             for r in self.sudo().with_context(active_test=False).search([])
@@ -289,11 +313,15 @@ class KswWaterRate(models.Model):
             '%(products)s products switched to invoicing on delivered quantity, '
             '%(taxed)s given the default sales tax.\n'
             '%(coverage)s new client/branch pairs recorded.\n'
-            'Unmatched client accounts: %(nc)s. Unmatched item codes: %(ni)s.',
+            'Unmatched client accounts: %(nc)s. Unmatched item codes: %(ni)s %(codes)s',
             created=created, updated=updated, skipped=skipped_manual,
             products=len(stale), taxed=len(untaxed) if default_tax else 0,
             coverage=cov_created,
             nc=len(unmatched_clients), ni=len(unmatched_items),
+            # Named, because each one is a product somebody has to create
+            # before its rates can come across -- a bare count says nothing
+            # about what to do next.
+            codes=('(%s)' % ', '.join(sorted(unmatched_items)[:25])) if unmatched_items else '',
         )
         _logger.info('KSW_water_delivery rate import: %s', message.replace('\n', ' '))
         if unmatched_clients:

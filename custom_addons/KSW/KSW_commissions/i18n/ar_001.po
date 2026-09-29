@@ -5961,3 +5961,213 @@ msgstr ""
 "%(rows)s\n"
 "\n"
 "أعد احتساب كشف راتب الإجازة من طلب الإجازة قبل تأكيده."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/hr_leave.py:0
+msgid "Open the batch"
+msgstr "افتح الدفعة"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.hr_leave_view_form_inherit_ksw_commission_entries
+msgid ""
+"<strong>Not included: awaiting General Manager approval.</strong>\n"
+"                    These entries are recorded in the Commissions app but\n"
+"                    their batch has not been approved yet, so the vacation\n"
+"                    payslip does not pay them. Once the General Manager\n"
+"                    approves them, press <em>Recompute Vacation Payslip</em>\n"
+"                    to include them."
+msgstr ""
+"<strong>غير مشمولة: بانتظار اعتماد المدير العام.</strong>\n"
+"                    هذه الإدخالات مسجّلة في تطبيق العمولات لكن دفعتها لم تُعتمد بعد، لذا\n"
+"                    لا يصرفها كشف راتب الإجازة. بعد اعتماد المدير العام لها، اضغط\n"
+"                    <em>إعادة احتساب كشف راتب الإجازة</em> لإدراجها."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.hr_leave_view_form_inherit_ksw_commission_entries
+msgid ""
+"Approved by the General Manager and not yet paid.\n"
+"                        They are paid automatically on the vacation payslip,\n"
+"                        and the monthly commission run will not pay them\n"
+"                        again."
+msgstr ""
+"اعتمدها المدير العام ولم تُصرف بعد. تُصرف تلقائيًا في كشف راتب\n"
+"                        الإجازة، ولن تصرفها دورة المستحقات الشهرية مرة أخرى."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_hr_leave__x_commission_pending_total
+msgid "Awaiting GM Approval"
+msgstr "بانتظار اعتماد المدير العام"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_hr_leave__x_commission_pending_html
+msgid "Commission Entries Awaiting Approval"
+msgstr "إدخالات عمولات بانتظار الاعتماد"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/hr_payslip.py:0
+msgid ""
+"%(slip)s pays commission entries the General Manager has not approved:\n"
+"%(rows)s\n"
+"\n"
+"Recompute the vacation payslip from the leave request once they are approved."
+msgstr ""
+"يصرف %(slip)s إدخالات عمولات لم يعتمدها المدير العام:\n"
+"%(rows)s\n"
+"\n"
+"أعد احتساب كشف راتب الإجازة من طلب الإجازة بعد اعتمادها."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.hr_leave_view_form_inherit_ksw_commission_entries
+msgid ""
+"<strong>Not included: awaiting General Manager approval.</strong>\n"
+"                    These entries are recorded in the Commissions app but\n"
+"                    their batch has not been approved yet, so the vacation\n"
+"                    payslip does not pay them. Once the General Manager\n"
+"                    approves them, the accountant can include them with\n"
+"                    <em>Refresh Commissions</em> at Step 4."
+msgstr ""
+"<strong>غير مشمولة: بانتظار اعتماد المدير العام.</strong>\n"
+"                    هذه الإدخالات مسجّلة في تطبيق العمولات لكن دفعتها لم تُعتمد بعد، لذا\n"
+"                    لا يصرفها كشف راتب الإجازة. بعد اعتماد المدير العام لها، يمكن للمحاسب\n"
+"                    إدراجها بزر <em>تحديث العمولات</em> في الخطوة 4."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.hr_leave_view_form_inherit_ksw_commission_entries
+msgid ""
+"<strong>The Commissions app has changed since this was captured.</strong>\n"
+"                        It now shows"
+msgstr ""
+"<strong>تغيّر تطبيق العمولات منذ التقاط هذه البيانات.</strong>\n"
+"                        يُظهر الآن"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.hr_leave_view_form_inherit_ksw_commission_entries
+msgid ""
+"SAR payable for this\n"
+"                        settlement. The request keeps the figures above."
+msgstr ""
+"ريال مستحقة لهذه التسوية.\n"
+"                        ويحتفظ الطلب بالأرقام أعلاه."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.hr_leave_view_form_inherit_ksw_commission_entries
+msgid ""
+"Press <em>Refresh Commissions</em> to take the new\n"
+"                        figures in."
+msgstr ""
+"اضغط <em>تحديث العمولات</em> لإدراج\n"
+"                        الأرقام الجديدة."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.hr_leave_view_form_inherit_ksw_commission_entries
+msgid ""
+"To take them in, return the request to Accounting\n"
+"                        (Step 4), where the accountant can refresh them."
+msgstr ""
+"لإدراجها، أعد الطلب إلى المحاسبة\n"
+"                        (الخطوة 4) ليتمكن المحاسب من تحديثها."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.hr_leave_view_form_inherit_ksw_commission_entries
+msgid "Captured on"
+msgstr "التُقطت في"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.hr_leave_view_form_inherit_ksw_commission_entries
+msgid "by"
+msgstr "بواسطة"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.hr_leave_view_form_inherit_ksw_commission_entries
+msgid "Refresh Commissions"
+msgstr "تحديث العمولات"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.hr_leave_view_form_inherit_ksw_commission_entries
+msgid ""
+"Fetch the commission entries again from the Commissions app? The list on "
+"this request will be replaced by what the app says now."
+msgstr ""
+"هل تريد جلب إدخالات العمولات مجددًا من تطبيق العمولات؟ ستُستبدل القائمة في "
+"هذا الطلب بما يُظهره التطبيق الآن."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_hr_leave__x_commission_latched_date
+msgid "Commissions Captured On"
+msgstr "تاريخ التقاط العمولات"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_hr_leave__x_commission_latched_by
+msgid "Commissions Captured By"
+msgstr "التقط العمولات"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_hr_leave__x_commission_live_total
+msgid "Commissions App Now"
+msgstr "تطبيق العمولات الآن"
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_leave_commission_entry
+msgid "Commission Entry Latched on a Vacation Request"
+msgstr "إدخال عمولة مُلتقط في طلب إجازة"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_leave_commission_entry__batch_state
+msgid "Batch Status When Latched"
+msgstr "حالة الدفعة عند الالتقاط"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_hr_leave__x_commission_live_changed
+msgid ""
+"The Commissions app no longer matches what was latched on this request."
+msgstr "لم يعد تطبيق العمولات يطابق ما التُقط في هذا الطلب."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/hr_leave.py:0
+msgid ""
+"Commissions can only be refreshed while the request is with Accounting (Step"
+" 4). Return it to Accounting first."
+msgstr ""
+"لا يمكن تحديث العمولات إلا والطلب لدى المحاسبة (الخطوة 4). أعده إلى المحاسبة"
+" أولًا."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/hr_leave.py:0
+msgid "Commissions refreshed from the Commissions app"
+msgstr "حُدّثت العمولات من تطبيق العمولات"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/hr_leave.py:0
+msgid "Before:"
+msgstr "قبل:"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/hr_leave.py:0
+msgid "After:"
+msgstr "بعد:"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/hr_leave.py:0
+msgid "By:"
+msgstr "بواسطة:"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/hr_payslip.py:0
+msgid ""
+"%(slip)s pays commission entries the General Manager has not approved:\n"
+"%(rows)s\n"
+"\n"
+"Recompute the vacation payslip from the leave request before confirming it."
+msgstr ""
+"يصرف %(slip)s إدخالات عمولات لم يعتمدها المدير العام:\n"
+"%(rows)s\n"
+"\n"
+"أعد احتساب كشف راتب الإجازة من طلب الإجازة قبل تأكيده."

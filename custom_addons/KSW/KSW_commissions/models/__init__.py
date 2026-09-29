@@ -27,4 +27,5 @@ from . import ksw_deduction               # adds awaiting-commission helpers
 from . import ksw_deduction_line          # parked installments + pay-run settlement link
 from . import hr_payslip                  # filters parked KSW_DED_* inputs out of payslips
 from . import hr_salary_rule              # attaches KSW_COMMISSIONS to the structures
+from . import ksw_leave_commission_entry  # what a vacation request latched
 from . import hr_leave                    # commission entries paid on the vacation payslip

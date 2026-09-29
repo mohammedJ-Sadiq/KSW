@@ -1,6 +1,6 @@
 {
     'name': 'KSW Water Delivery Notes',
-    'version': '19.0.1.7.0',
+    'version': '19.0.1.7.1',
     'summary': 'Issue the water delivery note at the client, online or off',
     'description': """
 Water Delivery Notes
@@ -44,9 +44,14 @@ accounting the finished list.
         'views/ksw_water_rate_views.xml',
         'views/ksw_water_client_branch_views.xml',
         'views/hr_employee_views.xml',
+        # Before stock_picking_views.xml: the notes list and kanban carry a
+        # header button `%(action_water_delivery_wizard)d`, and on a FRESH
+        # install an xml id must be defined before it is referenced. Upgrades
+        # never showed it -- the id was already in the database -- so the
+        # first clean install anywhere (KSWCO, 2026-09-29) was what failed.
+        'views/ksw_water_delivery_wizard_views.xml',
         'views/stock_picking_views.xml',
         'views/ksw_fleet_vehicle_views.xml',
-        'views/ksw_water_delivery_wizard_views.xml',
         'views/ksw_water_capture_views.xml',
         'views/ksw_water_delivery_menus.xml',
     ],
