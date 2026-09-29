@@ -416,8 +416,11 @@ class TestWaterDeliveryScope(WaterDeliveryCommon):
 
     def test_a_driver_sees_only_his_own_notes(self):
         mine = self._issue_note(user=self.driver_user).picking_id
+        # No tanker: T-100 is Driver One's, and a driver may only issue on
+        # his own (audit 2026-09-28, see test_vehicle_trust.py).
         theirs = self._issue_note(
             user=self.other_driver_user, partner_id=self.multi_customer.id,
+            vehicle_id=False,
         ).picking_id
 
         visible = self.env['stock.picking'].with_user(self.driver_user).search(

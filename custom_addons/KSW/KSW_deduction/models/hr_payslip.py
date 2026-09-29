@@ -24,6 +24,11 @@ class HrPayslip(models.Model):
         # silently vanishing from the payslip. See CLAUDE.md pitfall #49 —
         # this is what broke payslip 18441 in August 2026 when a reopened
         # batch was re-confirmed.
+        # The KSW_DED_* inputs below are the system's figures, written
+        # before KSW_payroll's compute_sheet() sets the same flag; without it
+        # the payslip value lock (KSW_payroll/models/payslip_value_lock.py)
+        # would refuse them to a Payroll Officer pressing Compute.
+        self = self.with_context(ksw_payslip_system=True)  # noqa: PLW0642
         live = self.filtered(lambda s: s.state != 'done')
         for payslip in live:
             self._inject_ksw_deduction_inputs(payslip)

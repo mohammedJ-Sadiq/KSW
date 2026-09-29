@@ -1,7 +1,7 @@
 from markupsafe import Markup
 
 from odoo import _, api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class KswAttendanceSheetLine(models.Model):
@@ -40,6 +40,21 @@ class KswAttendanceSheetLine(models.Model):
         KSW_unpaid_leave's x_leave_id lock).
         """
         return self
+
+    @api.constrains('date', 'sheet_id')
+    def _check_date_within_employment(self):
+        """Hard gate: a day outside the month or before the joining date
+        can never sit on a sheet, whichever route tries to put it there."""
+        for line in self:
+            first, last = line.sheet_id._expected_line_dates()
+            if not first <= line.date <= last:
+                raise ValidationError(_(
+                    '%(date)s is outside the period %(employee)s is '
+                    'employed in on this sheet (%(first)s to %(last)s).',
+                    date=line.date,
+                    employee=line.sheet_id.employee_id.name,
+                    first=first, last=last,
+                ))
 
     @api.depends('date')
     def _compute_day_name(self):

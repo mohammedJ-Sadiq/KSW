@@ -302,6 +302,18 @@ class KswPaySubmission(models.Model):
                     names='\n'.join('  • %s' % b.name for b in empty)))
 
             drafts = rec.batch_ids.filtered(lambda b: b.state == 'draft')
+            # A department coming back after a return (by the GM, or the
+            # supervisor pulling a batch back) must reach the GM as such:
+            # he approved nothing yet, but he may have looked, and the work
+            # has changed since. Captured before the batches' own submit
+            # clears their return reasons.
+            resubmission = None
+            if rec.state == 'returned':
+                resubmission = {
+                    'returned_by': rec.returned_by.name or '',
+                    'reason': rec.return_reason or '',
+                    'batches': [(b.name, b.return_reason or '') for b in drafts],
+                }
             if drafts:
                 drafts.action_submit()
 
@@ -311,7 +323,7 @@ class KswPaySubmission(models.Model):
                 'submitted_date': fields.Datetime.now(),
                 'return_reason': False,
             })
-            rec._notify_gm()
+            rec._notify_gm(resubmission=resubmission)
         self.mapped('run_id')._sync_state()
         self.mapped('run_id')._refresh_register()
         return True
@@ -432,14 +444,39 @@ class KswPaySubmission(models.Model):
             | self.batch_ids.mapped('create_uid')
         return users.partner_id
 
-    def _notify_gm(self):
+    def _notify_gm(self, resubmission=None):
         """Tell the GM this department is in — in his inbox and by email.
 
         Both on purpose: the inbox message is the audit trail on the record,
         the email is what reaches him when he is not in Odoo.
+
+        ``resubmission`` (from action_submit) turns it into a "resubmitted
+        after changes" message naming what was reopened, by whom and why.
         """
         self.ensure_one()
         partners = self._gm_partners()
+        if resubmission:
+            body = Markup(
+                '<strong>🔁 Resubmitted after changes</strong><br/>'
+                '<b>Department:</b> %(scope)s<br/>'
+                '<b>Resubmitted by:</b> %(user)s<br/>'
+                '<b>Returned by:</b> %(returned_by)s<br/>'
+                '<b>Reason:</b> %(reason)s<br/>'
+                '<b>Total now:</b> %(total).2f<br/>'
+                '<b>Batches reopened and edited:</b><ul>'
+            ) % {'scope': self.display_name, 'user': self.env.user.name,
+                 'returned_by': resubmission['returned_by'] or '—',
+                 'reason': resubmission['reason'] or '—',
+                 'total': self.total_amount or 0.0}
+            for name, reason in resubmission['batches']:
+                body += Markup('<li>%(name)s%(reason)s</li>') % {
+                    'name': name,
+                    'reason': Markup(' — <i>%s</i>') % reason if reason else ''}
+            body += Markup('</ul><i>Please review the changes before approving.</i>')
+            self.sudo().message_post(
+                body=body, partner_ids=partners.ids,
+                subtype_xmlid='mail.mt_comment')
+            return
         self.sudo().message_post(
             body=Markup(
                 '<strong>📤 Submitted for approval</strong><br/>'

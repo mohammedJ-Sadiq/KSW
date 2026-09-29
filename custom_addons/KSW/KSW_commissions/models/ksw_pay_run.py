@@ -791,7 +791,10 @@ class KswPayRun(models.Model):
         # after it existed, and a batch submitted before that carries its
         # own. Whatever reaches the register, the register does not pay it.
         held = self._held_entries(entries)
-        payable = entries - held
+        # Paid on a vacation payslip already (KSW_COM_ inputs): the entry
+        # stays on its batch as the record, the register does not pay it.
+        settled = entries.filtered('x_vacation_payslip_id')
+        payable = entries - held - settled
 
         totals = {
             employee_id: sum(by_component.values())
@@ -800,6 +803,8 @@ class KswPayRun(models.Model):
         }
         if held and not preview:
             self._announce_held(held)
+        if settled and not preview:
+            self._announce_settled(settled)
 
         lines = self.sudo().line_ids
         existing = {line.employee_id.id: line for line in lines}
@@ -867,8 +872,35 @@ class KswPayRun(models.Model):
         if not entries:
             return self.env['ksw.pay.entry']
         holds = vacation_holds(self.env, entries.employee_id, self.period)
+        # A row already paid on a vacation payslip is left out of the
+        # register separately — nothing about it is for the GM to release.
         return entries.filtered(
-            lambda e: hold_blocks(holds.get(e.employee_id.id), e.date))
+            lambda e: not e.x_vacation_payslip_id
+            and hold_blocks(holds.get(e.employee_id.id), e.date))
+
+    def _announce_settled(self, settled):
+        """Say whose entries the register skipped because a vacation
+        payslip already paid them."""
+        self.ensure_one()
+        body = Markup(
+            '<strong>\u2714 Paid on a vacation payslip</strong><br/>'
+            'These entries were left out of the register: they were paid '
+            'with the employee\u2019s vacation settlement.<br/>'
+        )
+        for slip in settled.x_vacation_payslip_id:
+            rows = settled.filtered(
+                lambda e, s=slip: e.x_vacation_payslip_id == s)
+            body += Markup(
+                '\u2022 <b>%(name)s</b> \u2014 %(count)s entr%(plural)s, '
+                '%(amount).2f: %(slip)s<br/>'
+            ) % {
+                'name': rows.employee_id[:1].sudo().display_name,
+                'count': len(rows),
+                'plural': 'y' if len(rows) == 1 else 'ies',
+                'amount': sum(rows.mapped('amount')),
+                'slip': slip.sudo().number or slip.sudo().name,
+            }
+        self.sudo().message_post(body=body, subtype_xmlid='mail.mt_note')
 
     def _announce_held(self, held):
         """Say, on the month, whose entries were left out and why.

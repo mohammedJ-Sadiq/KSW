@@ -138,6 +138,12 @@
                                     <field name="x_vacation_hold"
                                            string="On Vacation" readonly="1"
                                            optional="show"/>
+                                    <!-- Paid with a vacation settlement:
+                                         kept as the record, never paid by
+                                         the run, and locked server-side. -->
+                                    <field name="x_vacation_settlement"
+                                           readonly="1" optional="show"
+                                           decoration-info="x_vacation_settlement"/>
                                     <!-- Off the parent, not off the line's
                                          own component_id: that one is a
                                          stored related, and a line the user
@@ -220,6 +226,8 @@
                                     <field name="employee_id"/>
                                     <field name="x_vacation_hold"
                                            string="On Vacation"
+                                           optional="show"/>
+                                    <field name="x_vacation_settlement"
                                            optional="show"/>
                                     <field name="option_id" optional="show"
                                            column_invisible="not parent.has_options"/>
@@ -424,6 +432,7 @@
                 <field name="employee_id"/>
                 <field name="x_vacation_hold" string="On Vacation"
                        optional="show"/>
+                <field name="x_vacation_settlement" optional="show"/>
                 <field name="component_id"/>
                 <field name="option_id" optional="show"/>
                 <field name="department_id" optional="show"/>

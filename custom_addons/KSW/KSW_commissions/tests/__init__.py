@@ -19,3 +19,6 @@ from . import test_cash_bands
 from . import test_bas_journal_entry
 from . import test_run_finalisation
 from . import test_bank_export_txt
+from . import test_vacation_commission_settlement
+from . import test_explanation_escaping
+from . import test_resubmission_notice

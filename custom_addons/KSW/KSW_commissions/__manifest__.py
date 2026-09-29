@@ -1,6 +1,6 @@
 {
     'name': 'KSW Commissions & Other Allowances',
-    'version': '19.0.4.20.2',
+    'version': '19.0.4.21.0',
     'summary': 'Commissions and allowances on the ERP element model: a '
                'configurable pay-component catalog, one entry screen per '
                'department, and a monthly run the General Manager approves.',
@@ -49,6 +49,7 @@ not part of the commission request.
         'data/pay_component_data.xml',
         'data/cash_band_data.xml',
         'data/mail_template_data.xml',
+        'data/salary_rule_commissions.xml',
         'views/ksw_site_views.xml',
         'views/ksw_pay_component_views.xml',
         'views/ksw_pay_cash_band_views.xml',
@@ -65,6 +66,7 @@ not part of the commission request.
         'views/hr_employee_views.xml',
         'views/res_partner_views.xml',
         'views/ksw_deduction_views.xml',
+        'views/hr_leave_views.xml',
         'views/res_config_settings_views.xml',
         'views/menu.xml',
     ],

@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 
 from markupsafe import Markup
 
@@ -194,6 +195,7 @@ class KswWaterCapture(models.Model):
             return existing
 
         captured_at = fields.Datetime.to_datetime(payload.get('captured_at'))
+        phone_time = bool(captured_at)
         now = fields.Datetime.now()
         if not captured_at:
             # A capture with no timestamp is still a real delivery; it just
@@ -208,6 +210,12 @@ class KswWaterCapture(models.Model):
         # the first as the second would flag every genuinely offline delivery.
         sent_at = fields.Datetime.to_datetime(payload.get('sent_at'))
         skew = int((sent_at - now).total_seconds()) if sent_at else 0
+        # The phone's clock is corrected by the skew measured on this very
+        # call (a phone 2 h fast stamps every capture 2 h fast). Small skew
+        # is noise and left alone. The raw phone time stays recoverable:
+        # captured_at + clock_skew_s.
+        if phone_time and abs(skew) > self._CLOCK_TOLERANCE_S:
+            captured_at = captured_at - timedelta(seconds=skew)
 
         values = {
             'uuid': uuid,
@@ -238,9 +246,61 @@ class KswWaterCapture(models.Model):
     # ------------------------------------------------------------------
     # Issuing
     # ------------------------------------------------------------------
+    _CLOCK_TOLERANCE_S = 120
+    _FUTURE_TOLERANCE_S = 600
+
+    def _timing_problems(self):
+        """Reasons this capture's timing needs a dispatcher, if any.
+
+        Never a refusal (the water is delivered): the note is held unvalidated,
+        so nothing is billed until somebody looks.
+        """
+        self.ensure_one()
+        problems = []
+        captured, received = self.captured_at, self.received_at
+        if not captured or not received:
+            return problems
+        if (captured - received).total_seconds() > self._FUTURE_TOLERANCE_S:
+            problems.append(_('Recorded %(when)s, after it reached the server '
+                              '— the phone\'s clock cannot be trusted.',
+                              when=fields.Datetime.to_string(captured)))
+        max_hours = float(self.env['ir.config_parameter'].sudo().get_param(
+            'ksw_water.max_queue_hours', 48) or 48)
+        waited = (received - captured).total_seconds() / 3600.0
+        if waited > max_hours:
+            problems.append(_('Sent %(hours).0f hours after the delivery '
+                              '(limit %(limit).0f).', hours=waited,
+                              limit=max_hours))
+        if self._falls_in_closed_month():
+            problems.append(_('Dated in %(month)s, which is already invoiced '
+                              'or closed in accounting.',
+                              month=captured.strftime('%B %Y')))
+        return problems
+
+    def _falls_in_closed_month(self):
+        self.ensure_one()
+        captured = self.captured_at.date()
+        month_start = captured.replace(day=1)
+        today = fields.Date.context_today(self)
+        if month_start >= today.replace(day=1):
+            return False
+        company = self.env.company.sudo()
+        for fname in ('sale_lock_date', 'fiscalyear_lock_date', 'hard_lock_date'):
+            lock = getattr(company, fname, False) if fname in company._fields else False
+            if lock and captured <= lock:
+                return True
+        next_month = (month_start + timedelta(days=32)).replace(day=1)
+        return bool(self.env['sale.order'].sudo().search_count([
+            ('partner_id', '=', self.partner_id.id),
+            ('date_order', '>=', month_start),
+            ('date_order', '<', next_month),
+            ('invoice_ids.state', '=', 'posted'),
+        ], limit=1))
+
     def _payload(self):
         self.ensure_one()
         return {
+            'hold_reasons': self._timing_problems(),
             'partner_id': self.partner_id.id,
             'product_id': self.product_id.id,
             'entered_qty': self.entered_qty,

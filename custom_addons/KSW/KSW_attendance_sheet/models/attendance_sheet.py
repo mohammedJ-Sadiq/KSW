@@ -134,6 +134,16 @@ class KswAttendanceSheet(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         sheets = super().create(vals_list)
+        for sheet in sheets:
+            first, last = sheet._expected_line_dates()
+            if first > last:
+                raise UserError(_(
+                    '%(employee)s joins on %(joining)s, after %(month)s/'
+                    '%(year)s ends. There is no attendance to record for '
+                    'that month.',
+                    employee=sheet.employee_id.name, joining=first,
+                    month=sheet.month, year=sheet.year,
+                ))
         sheets.action_generate_lines()
         sheets._recompute_blocked()
         return sheets
@@ -664,51 +674,161 @@ class KswAttendanceSheet(models.Model):
             if old_atts.exists():
                 old_atts.sudo().unlink()
 
-            m = int(sheet.month)
-            y = sheet.year
-            num_days = monthrange(y, m)[1]
-            misconfigured = self._is_misconfigured_calendar(sheet.employee_id)
+            # Only the days the employee is employed: a new joiner's sheet
+            # starts on the joining date, never on the 1st.
+            first, last = sheet._expected_line_dates()
+            dates = [first + timedelta(days=n)
+                     for n in range((last - first).days + 1)]
+            sheet._create_lines(dates)
 
-            # Pre-load all group lines for this employee's calendar in one
-            # query, then filter in Python per day — avoids 31 DB searches
-            # per employee (one per day) during bulk sheet generation.
-            calendar = self._get_employee_calendar(sheet.employee_id)
-            preloaded_group_lines = None
-            if calendar and calendar.calendar_group_ids:
-                preloaded_group_lines = self.env[
-                    'resource.calendar.group.line'].sudo().search([
-                        ('calendar_group_id', 'in',
-                         calendar.calendar_group_ids.ids),
-                    ], order='hour_from asc')
+    def _create_lines(self, dates):
+        """Create default lines (and their hr.attendance) for *dates*."""
+        self.ensure_one()
+        if not dates:
+            return self.env['ksw.attendance.sheet.line']
+        misconfigured = self._is_misconfigured_calendar(self.employee_id)
 
-            vals_list = []
-            schedules = {}
-            for day in range(1, num_days + 1):
-                d = fields.Date.to_date(f'{y}-{m:02d}-{day:02d}')
-                schedule = self._get_work_schedule(
-                    sheet.employee_id, d,
-                    preloaded_group_lines=preloaded_group_lines,
-                )
-                is_wd = schedule is not None
-                schedules[d] = schedule
-                vals_list.append({
-                    'sheet_id': sheet.id,
-                    'date': d,
-                    'is_workday': is_wd,
-                    # Workdays default to attended (HR flags exceptions).
-                    # Non-workdays (e.g. Friday) also default to attended —
-                    # they're a paid weekly rest day, not an absence —
-                    # UNLESS the calendar is misconfigured (selected but
-                    # never given hours), in which case every day looks
-                    # like a non-workday and defaulting to attended would
-                    # fabricate a full month of pay with no real schedule
-                    # behind it.
-                    'is_attended': is_wd or not misconfigured,
-                })
+        # Pre-load all group lines for this employee's calendar in one
+        # query, then filter in Python per day — avoids 31 DB searches
+        # per employee (one per day) during bulk sheet generation.
+        calendar = self._get_employee_calendar(self.employee_id)
+        preloaded_group_lines = None
+        if calendar and calendar.calendar_group_ids:
+            preloaded_group_lines = self.env[
+                'resource.calendar.group.line'].sudo().search([
+                    ('calendar_group_id', 'in',
+                     calendar.calendar_group_ids.ids),
+                ], order='hour_from asc')
 
-            new_lines = self.env['ksw.attendance.sheet.line'].create(vals_list)
-            # Immediately create hr.attendance records
-            sheet._sync_line_attendance(new_lines, schedules=schedules)
+        vals_list = []
+        schedules = {}
+        for d in dates:
+            schedule = self._get_work_schedule(
+                self.employee_id, d,
+                preloaded_group_lines=preloaded_group_lines,
+            )
+            is_wd = schedule is not None
+            schedules[d] = schedule
+            vals_list.append({
+                'sheet_id': self.id,
+                'date': d,
+                'is_workday': is_wd,
+                # Workdays default to attended (HR flags exceptions).
+                # Non-workdays (e.g. Friday) also default to attended —
+                # they're a paid weekly rest day, not an absence —
+                # UNLESS the calendar is misconfigured (selected but
+                # never given hours), in which case every day looks
+                # like a non-workday and defaulting to attended would
+                # fabricate a full month of pay with no real schedule
+                # behind it.
+                'is_attended': is_wd or not misconfigured,
+            })
+
+        new_lines = self.env['ksw.attendance.sheet.line'].create(vals_list)
+        # Immediately create hr.attendance records
+        self._sync_line_attendance(new_lines, schedules=schedules)
+        return new_lines
+
+    # ------------------------------------------------------------------
+    # Employment window — a sheet never covers days before joining
+    # ------------------------------------------------------------------
+
+    @api.model
+    def _employment_start(self, employee):
+        """The joining date: earliest contract start across all versions.
+
+        Same definition KSW_annual_leave uses for the accrual. False when
+        no version carries a start date — the sheet then covers the whole
+        month, as it always did. sudo: contract_date_start is gated on
+        hr.group_hr_manager and supervisors generate sheets too.
+        """
+        starts = employee.sudo().version_ids.filtered(
+            'contract_date_start').mapped('contract_date_start')
+        return min(starts) if starts else False
+
+    def _expected_line_dates(self):
+        """(first, last) day this sheet may hold: its month from joining.
+
+        The one predicate behind generation, the line constraint, the
+        confirmation blocker and the realignment — so they cannot drift.
+        first > last means the employee joins after the month ends.
+        """
+        self.ensure_one()
+        first, last = self._period_bounds()
+        joining = self._employment_start(self.employee_id)
+        if joining and joining > first:
+            first = joining
+        return first, last
+
+    def _employment_window_blockers(self):
+        """Reasons the sheet's days disagree with the employment window."""
+        self.ensure_one()
+        first, last = self._expected_line_dates()
+        if first > last:
+            return [_(
+                'The employee joins on %(joining)s, after this month ends. '
+                'This sheet should not exist — delete it.', joining=first)]
+        present = set(self.line_ids.mapped('date'))
+        before = sorted(d for d in present if d < first)
+        expected = {first + timedelta(days=n)
+                    for n in range((last - first).days + 1)}
+        missing = sorted(expected - present)
+        blockers = []
+        if before:
+            blockers.append(_(
+                '%(count)s day(s) fall before the joining date '
+                '%(joining)s: %(days)s',
+                count=len(before), joining=first,
+                days=', '.join(d.strftime('%d %b') for d in before)))
+        if missing:
+            blockers.append(_(
+                '%(count)s day(s) of employment are missing from the '
+                'sheet: %(days)s',
+                count=len(missing),
+                days=', '.join(d.strftime('%d %b') for d in missing)))
+        return blockers
+
+    def _align_to_employment(self):
+        """Bring draft sheets' days back inside the employment window.
+
+        Drops days before the joining date (and their auto-generated
+        attendance) and adds employed days the sheet lacks. Days already
+        inside the window keep whatever the supervisor marked. Confirmed
+        sheets are left alone: their month has been released to payroll,
+        and changing what was paid is a Payslip Revision, not a data fix.
+        """
+        for sheet in self.filtered(lambda s: s.state == 'draft'):
+            first, last = sheet._expected_line_dates()
+            outside = sheet.line_ids.filtered(
+                lambda l: not first <= l.date <= last)
+            removed = sorted(outside.mapped('date'))
+            if outside:
+                atts = outside.mapped('attendance_id').filtered(
+                    'x_is_auto_generated')
+                outside.unlink()
+                atts.sudo().unlink()
+            present = set(sheet.line_ids.mapped('date'))
+            added = [first + timedelta(days=n)
+                     for n in range(max(0, (last - first).days + 1))
+                     if first + timedelta(days=n) not in present]
+            sheet._create_lines(added)
+            if not (removed or added):
+                continue
+            # The edge of the sheet moved, so a rest day bordering it may
+            # now be judged on a different neighbour.
+            sheet._recompute_off_day_pay(sheet.line_ids.filtered('is_workday'))
+            sheet._recompute_blocked()
+            sheet.message_post(body=Markup(
+                '<strong>Days aligned to the employment period</strong><br/>'
+                '<b>Joining date:</b> %(joining)s<br/>'
+                '<b>Removed:</b> %(removed)s<br/>'
+                '<b>Added:</b> %(added)s'
+            ) % {
+                'joining': self._employment_start(sheet.employee_id) or '-',
+                'removed': ', '.join(d.strftime('%d %b') for d in removed)
+                or '-',
+                'added': ', '.join(d.strftime('%d %b') for d in added) or '-',
+            })
 
     def action_mark_all_absent(self):
         """Set every workday to absent (off days are derived, not set)."""
@@ -741,7 +861,7 @@ class KswAttendanceSheet(models.Model):
         rule lands in one place and is enforced by every confirm route.
         """
         self.ensure_one()
-        blockers = []
+        blockers = self._employment_window_blockers()
 
         date_from, date_to = self._period_bounds()
         leaves = self.env['hr.leave'].sudo().search([
@@ -886,9 +1006,10 @@ class KswAttendanceSheet(models.Model):
         if problems:
             raise UserError(_(
                 'This attendance cannot be sent to payroll — it '
-                'contradicts approved time off.\n\n%(problems)s\n\n'
-                'Correct the days above (or the time-off request), then '
-                'confirm again.',
+                'contradicts approved time off or the employment '
+                'period.\n\n%(problems)s\n\n'
+                'Correct the days above (or the time-off request / '
+                'contract start date), then confirm again.',
                 problems='\n\n'.join(problems),
             ))
 
@@ -1404,8 +1525,14 @@ class KswAttendanceSheet(models.Model):
         existing = self.search([('month', '=', month), ('year', '=', year)])
         existing_emp_ids = set(existing.mapped('employee_id').ids)
 
+        month_end = date(year, today.month, monthrange(year, today.month)[1])
         created = emp_skipped = 0
         for emp in employees:
+            # Onboarded ahead of the joining date — next month's run
+            # opens the sheet, starting on the joining day.
+            joining = self._employment_start(emp)
+            if joining and joining > month_end:
+                continue
             if emp.id not in existing_emp_ids:
                 try:
                     with self.env.cr.savepoint():

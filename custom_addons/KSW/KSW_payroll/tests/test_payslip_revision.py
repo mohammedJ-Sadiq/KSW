@@ -156,7 +156,10 @@ class TestPayslipRevision(TransactionCase):
         })
 
     def _issue_revision(self, slip):
-        action = slip.with_user(self.user_officer).action_issue_revision()
+        # The direct door is system-only since Sept 2026 (revisions come
+        # through a Salary Revision Request); the arithmetic under test is
+        # the same _create_revision_payslip() the request's HR step uses.
+        action = slip.sudo().action_issue_revision()
         return self.env['hr.payslip'].browse(action['res_id'])
 
     # ==================================================================
@@ -309,7 +312,7 @@ class TestPayslipRevision(TransactionCase):
     def test_cannot_revise_a_draft_payslip(self):
         draft = self._make_payslip('Still draft')
         with self.assertRaises(UserError):
-            draft.with_user(self.user_officer).action_issue_revision()
+            draft.sudo().action_issue_revision()
 
     def test_one_time_inputs_are_carried_over(self):
         """VACATION_BAL / FLIGHT_TICKET and friends must appear on the
@@ -357,10 +360,14 @@ class TestPayslipRevision(TransactionCase):
         with self.assertRaises(UserError):
             original.with_user(self.user_plain).action_issue_revision()
 
-    def test_officer_can_issue_and_confirm_a_revision(self):
+    def test_officer_cannot_issue_or_confirm_a_revision_directly(self):
+        """Sept 2026: revisions come only through a Salary Revision Request.
+        The Officer approves the request's HR step; he does not issue or
+        confirm a revision payslip by hand."""
         original = self._confirm(self._make_payslip('Original officer'))
+        with self.assertRaises(UserError):
+            original.with_user(self.user_officer).action_issue_revision()
         revision = self._issue_revision(original)
-        self._add_input(revision, 'ADDITIONAL_COMMISSIONS', 250.0)
-        revision.with_user(self.user_officer).action_payslip_done()
-        self.assertEqual(revision.state, 'done')
-        self.assertEqual(self._net(revision), 250.0)
+        with self.assertRaises(UserError):
+            revision.with_user(self.user_officer).action_payslip_done()
+        self.assertNotEqual(revision.state, 'done')

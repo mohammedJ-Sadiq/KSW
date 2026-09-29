@@ -5,3 +5,4 @@ from . import ir_mail_server
 from . import res_company
 from . import res_config_settings
 from . import res_users
+from . import ksw_user_group_log

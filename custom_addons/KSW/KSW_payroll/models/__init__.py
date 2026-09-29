@@ -13,3 +13,4 @@ from . import biometric_attendance_sync
 from . import res_config_settings
 from . import res_partner_bank
 from . import ksw_payslip_revision_request
+from . import payslip_value_lock        # Officers review, Managers change, paid is sealed

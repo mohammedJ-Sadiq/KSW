@@ -1,4 +1,6 @@
-from odoo import api, fields, models
+from markupsafe import Markup
+
+from odoo import _, api, fields, models
 from odoo.fields import Domain
 
 def _ksw_readable_name_search_domain(model, operator, value):
@@ -122,6 +124,65 @@ class HrEmployee(models.Model):
         related='company_id.partner_id',
         store=False,
     )
+
+    def _attendance_sheet_missing_prerequisites(self):
+        """A sheet feeds a payslip, so there must be a structure to feed."""
+        missing = super()._attendance_sheet_missing_prerequisites()
+        if not self.sudo().struct_id:
+            missing.append(_('Salary Structure'))
+        return missing
+
+    x_contract_missing = fields.Boolean(
+        string='Contract Start Date Missing',
+        compute='_compute_x_contract_missing', compute_sudo=True,
+        help='No contract start date on any version: the employee has no '
+             'joining date, so the attendance sheet, leave accrual and '
+             'payroll window cannot tell when employment began.',
+    )
+
+    # No groups= on purpose: the form's warning banner references it in an
+    # invisible= visible to every HR user, while contract_date_start itself
+    # is HR-Manager-only (gotcha #31). compute_sudo reads it for them.
+    @api.depends('contract_date_start', 'version_ids.contract_date_start')
+    def _compute_x_contract_missing(self):
+        for employee in self:
+            employee.x_contract_missing = not (
+                employee.contract_date_start
+                or employee.version_ids.filtered('contract_date_start'))
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        # om_hr_payroll's struct_id is related to current_version_id, which
+        # does not exist yet while the employee is being created: the value
+        # is silently dropped. Re-apply it once the version exists, and only
+        # then run the attendance-sheet gate (which requires it).
+        structs = [vals.get('struct_id') for vals in vals_list]
+        employees = super(
+            HrEmployee, self.with_context(ksw_defer_sheet_finalize=True),
+        ).create(vals_list).with_env(self.env)
+        for employee, struct_id in zip(employees, structs):
+            if struct_id and not employee.sudo().struct_id:
+                employee.sudo().struct_id = struct_id
+        employees._finalize_attendance_sheet_on_create()
+        # A warning, not a refusal: saving without a contract is allowed,
+        # but it is written down so nobody can say they were not told.
+        if not self.env.su:
+            for employee in employees.filtered('x_contract_missing'):
+                employee.sudo().message_post(
+                    body=Markup(
+                        '<strong>⚠️ No contract start date</strong><br/>'
+                        '%(text)s'
+                    ) % {'text': _(
+                        'This employee was saved without a contract start '
+                        'date. Until it is set, the attendance sheet covers '
+                        'the whole month and leave accrual has no joining '
+                        'date.')},
+                    subtype_xmlid='mail.mt_note',
+                )
+        return employees
+
+    _ATTENDANCE_SHEET_PREREQUISITE_FIELDS = (
+        'x_is_attendance_sheet', 'main_calendar_id', 'parent_id', 'struct_id')
 
 
 

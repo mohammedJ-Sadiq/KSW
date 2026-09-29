@@ -20,6 +20,8 @@ from odoo import _, api, fields, models
 SKIP_REASONS = {
     'on_vacation': (
         'Held — settled on a vacation request', 'skipped'),
+    'settled_on_vacation': (
+        'Kept — paid on a vacation payslip', 'skipped'),
     'no_cost_centre': (
         'Not imported — no BAS cost centre', 'skipped'),
     'no_data': (

@@ -2,7 +2,8 @@ import logging
 from datetime import date, datetime
 from time import monotonic
 
-from odoo import models, api
+from odoo import _, api, models, tools
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -17,11 +18,17 @@ except ImportError:
         "Run: pip install pymssql"
     )
 
-_SERVER = '192.168.1.82'
-_PORT = '59090'
-_USER = 'odoo_reader'
-_PASSWORD = 'OdooRead@KSW2024!'
-_DATABASE = 'bas9ss'
+# Where BAS is. Not secret, so it may default here.
+_DEFAULTS = {
+    'server': '192.168.1.82',
+    'port': '59090',
+    'database': 'bas9ss',
+}
+# The login and password are NOT in the code (audit 2026-09-28: they were,
+# and so in git and in every image). They come from the server config file
+# (`ksw_bas_user` / `ksw_bas_password`) or, the usual place, the System
+# Parameters `ksw_bas.user` / `ksw_bas.password` (Settings > Technical),
+# which only administrators can read.
 
 
 class BASConnector(models.AbstractModel):
@@ -31,16 +38,27 @@ class BASConnector(models.AbstractModel):
     def _bas_connect(self):
         if not _PYMSSQL_AVAILABLE:
             raise ImportError("pymssql is not installed. Run: pip install pymssql")
-        p = self.env['ir.config_parameter'].sudo()
         return pymssql.connect(
-            server=p.get_param('ksw_bas.server', _SERVER),
-            port=p.get_param('ksw_bas.port', _PORT),
-            user=p.get_param('ksw_bas.user', _USER),
-            password=p.get_param('ksw_bas.password', _PASSWORD),
-            database=p.get_param('ksw_bas.database', _DATABASE),
+            server=self._bas_setting('server'),
+            port=self._bas_setting('port'),
+            user=self._bas_setting('user'),
+            password=self._bas_setting('password'),
+            database=self._bas_setting('database'),
             login_timeout=15,
             charset='UTF-8',
         )
+
+    def _bas_setting(self, key):
+        value = (tools.config.get('ksw_bas_%s' % key)
+                 or self.env['ir.config_parameter'].sudo().get_param(
+                     'ksw_bas.%s' % key)
+                 or _DEFAULTS.get(key))
+        if not value:
+            raise UserError(_(
+                'The BAS connection is not configured: set the System '
+                'Parameter "ksw_bas.%s" (Settings > Technical > System '
+                'Parameters).', key))
+        return value
 
     # ------------------------------------------------------------------
     # Batched upsert

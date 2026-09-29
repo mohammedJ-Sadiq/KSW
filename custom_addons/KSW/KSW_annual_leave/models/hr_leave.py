@@ -1931,6 +1931,77 @@ class HrLeave(models.Model):
         'x_flight_ticket_amount', 'x_flight_ticket_description',
     })
 
+    # ── The employee's own request, once somebody has signed it ─────────
+    # What the approvers put their names to. After the first approval the
+    # employee may no longer change it (KSW chains stay in state 'confirm'
+    # all the way to HR's Step 6, so the record rule alone let them edit
+    # dates after GM final approval).
+    _OWNER_FROZEN_FIELDS = frozenset({
+        'employee_id', 'holiday_status_id',
+        'request_date_from', 'request_date_to', 'date_from', 'date_to',
+        'request_unit_half', 'request_unit_hours', 'request_date_from_period',
+        'request_hour_from', 'request_hour_to',
+        'x_is_full_clearance', 'x_excess_days_accepted',
+    })
+    # Figures the system derives. Never the employee's to set, at any step.
+    _DERIVED_FIELDS = frozenset({
+        'number_of_days', 'number_of_hours',
+        'x_annual_portion_days', 'x_unpaid_portion_days',
+        'x_actual_vacation_days', 'x_clearance_balance',
+    })
+    # Filled by an approver role. The role guard below stops anyone else
+    # *setting* them; the employee may not clear them either.
+    _OWNER_UNTOUCHABLE_FIELDS = frozenset({
+        'x_financial_consideration_excess',
+        'x_financial_consideration_excess_description',
+        'x_eos_unpaid_days', 'x_eos_termination_reason',
+        'x_eos_previous_payments', 'x_eos_notice_pay',
+    })
+
+    def _owned_by_current_user(self):
+        user = self.env.user
+        return self.sudo().filtered(
+            lambda l: l.employee_id.user_id == user).with_env(self.env)
+
+    def _left_owners_hands(self):
+        """True once any approver has signed this request."""
+        self.ensure_one()
+        leave = self.sudo()
+        if self._uses_multi_step_chain(leave):
+            return leave.x_annual_approval_state not in (
+                False, 'draft', 'pending_dm')
+        return leave.state not in ('draft', 'confirm')
+
+    def _check_owner_edit(self, vals):
+        """Refuse the employee changing what approvers already decided."""
+        if self.env.su:
+            return
+        owned = self._owned_by_current_user()
+        if not owned:
+            return
+        guarded = (self._DERIVED_FIELDS | self._OWNER_UNTOUCHABLE_FIELDS
+                   | self._ACC_ONLY_FIELDS | self._HR_ONLY_FIELDS)
+        for leave in owned.sudo():
+            frozen = guarded | (self._OWNER_FROZEN_FIELDS
+                                if leave._left_owners_hands() else frozenset())
+            changed = []
+            for fname in set(vals) & frozen:
+                if fname not in leave._fields:
+                    continue
+                field = leave._fields[fname]
+                new = field.convert_to_record(
+                    field.convert_to_cache(vals[fname], leave), leave)
+                if new != leave[fname]:
+                    changed.append(field.string or fname)
+            if changed:
+                raise UserError(_(
+                    'You cannot change %(fields)s on your own time off request '
+                    '%(leave)s. Once an approver has signed it, the request can '
+                    'only be changed by returning it; calculated and approver '
+                    'figures are never yours to set.',
+                    fields=', '.join(sorted(changed)),
+                    leave=leave.display_name))
+
     def write(self, vals):
         """Re-trigger allocation validity on save for annual leaves.
 
@@ -1959,6 +2030,8 @@ class HrLeave(models.Model):
         when auto-clearing stale toggles — those internal clears should
         NOT trigger validity checks (the compute is still in progress).
         """
+        self._check_owner_edit(vals)
+
         # Walking a finalised request backwards is Settings-Administrator
         # only. Guarding write() and not just the action_* methods closes the
         # direct-RPC route: core's own _check_approval_update happily lets the
@@ -2208,6 +2281,17 @@ class HrLeave(models.Model):
             if vals.get('employee_id'):
                 self._check_assistant_employee_scope(
                     self.env['hr.employee'].sudo().browse(vals['employee_id']))
+        if not self.env.su:
+            # A stored compute takes a value given at create as-is, so an
+            # employee could file a request with his own number_of_days.
+            # Drop the derived and approver figures; the computes and the
+            # approvers fill them.
+            own_employee_ids = set(self.env.user.employee_ids.ids)
+            strip = self._DERIVED_FIELDS | self._OWNER_UNTOUCHABLE_FIELDS
+            for vals in vals_list:
+                if vals.get('employee_id') in own_employee_ids:
+                    for fname in strip & set(vals):
+                        vals.pop(fname)
         records = super().create(vals_list)
         for leave in records:
             # Deliberately _is_annual_multi, NOT _uses_multi_step_chain:
@@ -2309,39 +2393,12 @@ class HrLeave(models.Model):
             )
             self._notify_pending_approvers(leave, 'pending_hr')
 
-        # If a single attendance-sheet employee's leave is being approved and
-        # there are draft sheet lines covering the leave period, open the wizard
-        # so the DM can mark those days absent immediately.
-        #
-        # The window searched here is the whole month(s) the leave touches, not
-        # the leave's own dates: the wizard's default scope marks the whole
-        # month absent (the vacation settles it), and a tail of the month left
-        # Attended is exactly what blocks the sheet later with no way out.
-        if 'ksw.attendance.sheet' in self.env and len(self) == 1:
-            leave = self
-            if leave.employee_id.sudo().x_is_attendance_sheet \
-                    and leave.request_date_from:
-                window_from = leave.request_date_from.replace(day=1)
-                window_end = leave.request_date_to or leave.request_date_from
-                window_to = window_end.replace(
-                    day=_cal.monthrange(window_end.year, window_end.month)[1])
-                has_lines = self.env['ksw.attendance.sheet.line'].sudo().search_count([
-                    ('sheet_id.employee_id', '=', leave.employee_id.id),
-                    ('sheet_id.state', '=', 'draft'),
-                    ('date', '>=', window_from),
-                    ('date', '<=', window_to),
-                    ('is_workday', '=', True),
-                    ('is_attended', '=', True),
-                ])
-                if has_lines:
-                    return {
-                        'type': 'ir.actions.act_window',
-                        'name': _('Update Attendance Sheet'),
-                        'res_model': 'ksw.leave.attendance.wizard',
-                        'view_mode': 'form',
-                        'target': 'new',
-                        'context': {'default_leave_id': leave.id},
-                    }
+        # The DM no longer gets an 'Update Attendance Sheet' dialog here
+        # (removed Sept 2026): it asked him to mark a vacation that could
+        # still be refused four steps later, nothing undid it, and most
+        # dismissed it. The sheet is now settled automatically when the
+        # vacation actually starts, at GM final approval, and released on
+        # every route back (KSW_unpaid_leave: vacation_sheet_settlement).
 
     def action_hr_approve(self):
         """Step 2: HR approves and fills penalty + iqama renewal."""

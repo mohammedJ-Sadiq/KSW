@@ -15,6 +15,8 @@ What these are actually guarding, in the order it matters:
 import base64
 import json
 
+from datetime import timedelta
+
 from odoo import fields
 from odoo.exceptions import UserError
 from odoo.tests import HttpCase, tagged
@@ -57,7 +59,10 @@ class OfflineCaptureCommon(WaterDeliveryCommon):
             'gps_latitude': HERE[0],
             'gps_longitude': HERE[1],
             'gps_accuracy': 12.0,
-            'captured_at': '2026-09-20 06:30:00',
+            # An hour ago: a capture older than ksw_water.max_queue_hours is
+            # held for a dispatcher (Sept 2026), which is its own test.
+            'captured_at': fields.Datetime.to_string(
+                fields.Datetime.now() - timedelta(hours=1)),
             'sent_at': fields.Datetime.to_string(fields.Datetime.now()),
             'cached_price': 200.0,
             'app_version': '1.0.0',
@@ -95,11 +100,12 @@ class TestOfflineIssue(OfflineCaptureCommon):
     def test_the_note_records_that_it_came_from_the_queue(self):
         """`x_issued_offline` and `x_captured_at` are history: they say how the
         note came to exist, which stays true forever."""
-        picking = self._receive().picking_id.sudo()
+        payload = self._payload()
+        picking = self.Capture._receive(payload, self.driver).picking_id.sudo()
 
         self.assertTrue(picking.x_issued_offline)
         self.assertEqual(
-            fields.Datetime.to_string(picking.x_captured_at), '2026-09-20 06:30:00')
+            fields.Datetime.to_string(picking.x_captured_at), payload['captured_at'])
         self.assertEqual(picking.x_capture_id.uuid, 'cap-0001')
 
     def test_a_live_note_is_not_marked_offline(self):

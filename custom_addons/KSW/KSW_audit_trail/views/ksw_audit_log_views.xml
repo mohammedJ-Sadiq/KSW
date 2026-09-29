@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ksw_audit_log_view_list" model="ir.ui.view">
+        <field name="name">ksw.audit.log.list</field>
+        <field name="model">ksw.audit.log</field>
+        <field name="arch" type="xml">
+            <list create="0" edit="0" delete="0">
+                <field name="date"/>
+                <field name="user_id"/>
+                <field name="operation"/>
+                <field name="model_label"/>
+                <field name="record_name"/>
+                <field name="employee_id" optional="show"/>
+                <field name="field_label"/>
+                <field name="old_value"/>
+                <field name="new_value"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="ksw_audit_log_view_form" model="ir.ui.view">
+        <field name="name">ksw.audit.log.form</field>
+        <field name="model">ksw.audit.log</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0" delete="0">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="user_id"/>
+                            <field name="operation"/>
+                        </group>
+                        <group>
+                            <field name="model_label"/>
+                            <field name="record_name"/>
+                            <field name="res_id"/>
+                            <field name="employee_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="field_label"/>
+                        <field name="old_value"/>
+                        <field name="new_value"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="ksw_audit_log_view_search" model="ir.ui.view">
+        <field name="name">ksw.audit.log.search</field>
+        <field name="model">ksw.audit.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="record_name"/>
+                <field name="employee_id"/>
+                <field name="user_id"/>
+                <field name="field_label"/>
+                <filter name="users" string="Users" domain="[('model', '=', 'res.users')]"/>
+                <filter name="employees" string="Employees" domain="[('model', 'in', ('hr.employee', 'hr.version'))]"/>
+                <filter name="banks" string="Bank Accounts" domain="[('model', '=', 'res.partner.bank')]"/>
+                <filter name="groups" string="Access Rights" domain="[('field_name', '=', 'group_ids')]"/>
+                <separator/>
+                <filter name="today" string="Today" domain="[('date', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <group>
+                    <filter name="by_user" string="Changed By" context="{'group_by': 'user_id'}"/>
+                    <filter name="by_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+                    <filter name="by_type" string="Record Type" context="{'group_by': 'model_label'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="ksw_audit_log_action" model="ir.actions.act_window">
+        <field name="name">Audit Log</field>
+        <field name="res_model">ksw.audit.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p>Every change to users, employees, contracts and salary bank
+            accounts appears here. Entries cannot be edited or deleted.</p>
+        </field>
+    </record>
+
+    <menuitem id="ksw_audit_log_menu_settings"
+              name="Audit Log"
+              parent="base.menu_users"
+              action="ksw_audit_log_action"
+              groups="base.group_system"
+              sequence="90"/>
+
+    <menuitem id="ksw_audit_log_menu_hr"
+              name="Audit Log"
+              parent="hr.hr_menu_hr_reports"
+              action="ksw_audit_log_action"
+              groups="hr.group_hr_manager"
+              sequence="90"/>
+</odoo>

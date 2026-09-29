@@ -161,6 +161,16 @@ class KswPayBatchBasImport(models.Model):
         self.skip_line_ids.sudo().unlink()
         log = []
         for employee in employees:
+            paid = existing.get(employee.id)
+            if paid and paid.x_vacation_payslip_id:
+                # Paid with his vacation settlement: that figure is what
+                # left the bank, and a refresh would rewrite history.
+                log.append(Skip._log(
+                    self, employee, 'settled_on_vacation',
+                    _('His line was paid on the vacation payslip %(slip)s '
+                      'and is kept exactly as paid.',
+                      slip=paid.sudo().x_vacation_payslip_id.display_name)))
+                continue
             hold = holds.get(employee.id)
             # `!= 'partial'`, NOT `== 'full'`: a part month is the only
             # kind with a date to work from. Testing for one specific

@@ -408,6 +408,21 @@ class TestLeaveExtension(TransactionCase):
         self.assertEqual(form.request_date_from,
                          parent.request_date_to + timedelta(days=1))
 
+    def test_switching_away_from_extension_clears_the_link(self):
+        """Picking another type afterwards must not keep the hidden link,
+        or the save fails 'Only a Vacation Extension request can extend
+        another vacation' with nothing on screen to explain it."""
+        self._finalise(self._make_vacation(offset=57))
+        form = self.env['hr.leave'].sudo().new({
+            'employee_id': self.employee.id,
+            'holiday_status_id': self.ext_type.id,
+        })
+        form._onchange_extension_link()
+        self.assertTrue(form.x_extended_leave_id)
+        form.holiday_status_id = self.annual_type
+        form._onchange_extension_link()
+        self.assertFalse(form.x_extended_leave_id)
+
     # ==================================================================
     # The form: one HR tab, and Accounting's own comment box
     # ==================================================================

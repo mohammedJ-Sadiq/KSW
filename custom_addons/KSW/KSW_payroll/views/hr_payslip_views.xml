@@ -45,18 +45,15 @@
                  hr.payslip._check_payroll_officer. -->
             <xpath expr="//header/button[@name='refund_sheet']"
                    position="after">
-                <button string="Issue Revision" name="action_issue_revision"
-                        type="object" class="btn-primary"
-                        invisible="state != 'done' or x_is_revision or credit_note"
-                        groups="om_hr_payroll.group_hr_payroll_user"
-                        help="Recompute this period with current data and pay the employee the difference."/>
+                <!-- "Issue Revision" removed (Sept 2026): revisions come only
+                     through a Salary Revision Request. -->
             </xpath>
 
             <!-- ── Re-send Payslip Email ──
                  Confirming a payslip only queues the email; the cron renders
                  the PDF.  This is the route back after a failure, and the
                  way to re-send one the employee never received. -->
-            <xpath expr="//header/button[@name='action_issue_revision']"
+            <xpath expr="//header/button[@name='refund_sheet']"
                    position="after">
                 <field name="x_email_state" invisible="1"/>
                 <button string="Re-send Payslip Email"

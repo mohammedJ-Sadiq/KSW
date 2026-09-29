@@ -13,7 +13,7 @@
 | Server IP | `192.168.1.82` (Hyper-V vEthernet; DC-1 physical NIC 192.168.1.200 is unreachable) |
 | Port | `59090` (named instance DC-1\NEWSERVER_2022; discovered via SQL Browser UDP 1434) |
 | Database | `bas9ss` (current year — 2026) |
-| Read-only login | `odoo_reader` / `OdooRead@KSW2024!` (db_datareader role) |
+| Read-only login | stored in System Parameters `ksw_bas.user` / `ksw_bas.password` (db_datareader role) — never in files |
 | Driver | `pymssql` 2.3.13 (in both `.venv` and `odoo19env`) |
 
 ### Multi-Year Architecture

@@ -5,6 +5,13 @@ from odoo.exceptions import UserError
 class KswAttendanceSheetLineLeave(models.Model):
     _inherit = 'ksw.attendance.sheet.line'
 
+    x_settled_leave_id = fields.Many2one(
+        'hr.leave', string='Settled by Vacation',
+        ondelete='set null', readonly=True, copy=False, index=True,
+        help='The annual vacation that marked this day absent when it was '
+             'approved at GM final. Released automatically if the vacation '
+             'is refused, returned, cancelled or reset.',
+    )
     x_leave_id = fields.Many2one(
         'hr.leave', string='Linked Leave',
         ondelete='set null', readonly=True, copy=False,

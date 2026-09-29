@@ -508,23 +508,6 @@ class HrLeave(models.Model):
         return result
 
     # ------------------------------------------------------------------
-    # DM step: suppress attendance-sheet wizard for EOS leaves
-    # ------------------------------------------------------------------
-
-    def action_dm_approve(self):
-        result = super().action_dm_approve()
-        # EOS leaves don't need attendance-sheet marking — the employee is
-        # leaving, not going on vacation.
-        if (
-            len(self) == 1
-            and self.x_is_eos_leave
-            and isinstance(result, dict)
-            and result.get('res_model') == 'ksw.leave.attendance.wizard'
-        ):
-            return True
-        return result
-
-    # ------------------------------------------------------------------
     # Approval guards: an EOS request is worthless without its reason
     # ------------------------------------------------------------------
 

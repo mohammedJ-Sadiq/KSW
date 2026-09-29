@@ -9,8 +9,23 @@ twice (once via salary, once via commission).
 The override post-filters the parent's results rather than rerunning
 the search from scratch — minimal behavioural change, no duplicated
 SQL.
+
+It also settles the commission entries a vacation payslip carries
+(``KSW_COM_<entry_id>``, built by ``hr.leave._build_vacation_input_lines``
+in this module): confirming the payslip stamps them paid, cancelling or
+resetting it releases them to their monthly run again — the twin of
+KSW_deduction's ``_sync_deductions_on_done`` / ``_on_reset``.
 """
-from odoo import api, models
+from markupsafe import Markup
+
+from odoo import _, api, models
+from odoo.exceptions import UserError
+
+from .ksw_commission_lock import period_is_locked
+
+#: Input code prefix for a commission entry paid on a vacation payslip —
+#: ``KSW_COM_<ksw.pay.entry id>``. Summed by the KSW_COMMISSIONS rule.
+COMMISSION_INPUT_PREFIX = 'KSW_COM_'
 
 
 class HrPayslip(models.Model):
@@ -70,4 +85,102 @@ class HrPayslip(models.Model):
             lambda i: int(i.code[8:]) in parked_ids)
         if to_drop:
             to_drop.sudo().unlink()
+
+    # ------------------------------------------------------------------
+    # Commission entries settled on a vacation payslip
+    # ------------------------------------------------------------------
+    def write(self, vals):
+        new_state = vals.get('state')
+        prev = {s.id: s.state for s in self} if new_state else {}
+        res = super().write(vals)
+        if new_state:
+            for slip in self:
+                old = prev.get(slip.id)
+                if new_state == 'done' and old != 'done':
+                    slip._ksw_settle_commission_entries()
+                elif new_state in ('draft', 'cancel') and old == 'done':
+                    slip._ksw_release_commission_entries()
+        return res
+
+    def _ksw_commission_entry_ids(self):
+        self.ensure_one()
+        n = len(COMMISSION_INPUT_PREFIX)
+        return [
+            int(i.code[n:]) for i in self.input_line_ids
+            if i.code and i.code.startswith(COMMISSION_INPUT_PREFIX)
+            and i.code[n:].isdigit()
+        ]
+
+    def _ksw_settles_commissions(self):
+        """Is this the payslip that pays the entries it carries?
+
+        A revision carries the KSW_COM_ inputs forward so its deserved NET
+        is right, but the entries were paid by the payslip it revises —
+        stamping them again would move them to the wrong document. A
+        provisional preview settles nothing.
+        """
+        self.ensure_one()
+        return bool(
+            self.x_leave_id and not self.x_is_revision
+            and not self.x_is_vacation_preview)
+
+    def _ksw_settle_commission_entries(self):
+        """Mark the entries this payslip pays, so the run does not pay them.
+
+        Raises rather than paying twice: an entry already paid elsewhere, or
+        a month whose run has since been approved (and so paid through the
+        register), means the payslip is stale — Recompute Vacation Payslip
+        rebuilds it from what is still owed.
+        """
+        self.ensure_one()
+        if not self._ksw_settles_commissions():
+            return
+        entries = self.env['ksw.pay.entry'].sudo().browse(
+            self._ksw_commission_entry_ids()).exists()
+        if not entries:
+            return
+        elsewhere = entries.filtered(
+            lambda e: e.x_vacation_payslip_id
+            and e.x_vacation_payslip_id != self)
+        locked = entries.filtered(
+            lambda e: period_is_locked(self.env, e.period))
+        if elsewhere or locked:
+            raise UserError(_(
+                "%(slip)s pays commission entries that have been paid since "
+                "it was calculated:\n%(rows)s\n\nRecompute the vacation "
+                "payslip from the leave request before confirming it.",
+                slip=self.number or self.name,
+                rows='\n'.join(
+                    '\u2022 %s \u2014 %s' % (
+                        e.display_name, e.period.strftime('%B %Y'))
+                    for e in (elsewhere | locked))))
+        entries.with_context(ksw_vacation_settling=True).write(
+            {'x_vacation_payslip_id': self.id})
+        self._ksw_post_commission_note(
+            entries, _('Commission entries paid on this payslip'))
+
+    def _ksw_release_commission_entries(self):
+        """The payslip no longer pays them: the monthly run may again."""
+        self.ensure_one()
+        entries = self.env['ksw.pay.entry'].sudo().search([
+            ('x_vacation_payslip_id', '=', self.id)])
+        if not entries:
+            return
+        entries.with_context(ksw_vacation_settling=True).write(
+            {'x_vacation_payslip_id': False})
+        self._ksw_post_commission_note(
+            entries, _('Commission entries released — payable in their '
+                       'monthly pay run again'))
+
+    def _ksw_post_commission_note(self, entries, title):
+        body = Markup('<strong>%(title)s</strong><br/>') % {'title': title}
+        for entry in entries:
+            body += Markup('\u2022 %(what)s \u2014 %(month)s: %(amt).2f<br/>') % {
+                'what': entry.option_id.name or entry.component_id.name or '',
+                'month': entry.period.strftime('%B %Y'),
+                'amt': entry.amount,
+            }
+        body += Markup('<b>%(label)s</b> %(total).2f') % {
+            'label': _('Total:'), 'total': sum(entries.mapped('amount'))}
+        self.sudo().message_post(body=body, subtype_xmlid='mail.mt_note')
 

@@ -1,6 +1,6 @@
 {
     'name': 'KSW - Odoo 19 working schedule',
-    'version': '19.0.1.0.1',
+    'version': '19.0.1.1.0',
     'sequence': 1,
     'author': 'Mohammed Albadr',
     'summary': 'Adding work schedule fields to employee model',

@@ -3,3 +3,4 @@ from . import hr_leave
 from . import attendance_sheet_line
 from . import annual_leave
 
+from . import vacation_sheet_settlement

@@ -554,6 +554,12 @@ class HrLeaveExtension(models.Model):
         """
         for leave in self:
             if not leave._is_leave_extension(leave):
+                # The link is filled the moment the Extension type is picked
+                # (or arrives as a default from Extend Vacation); switching to
+                # another type hides the field but would keep the value, and
+                # the save then fails _check_extension_link with nothing on
+                # screen to explain it.
+                leave.x_extended_leave_id = False
                 continue
             if not leave.x_extended_leave_id:
                 leave.x_extended_leave_id = leave._extendable_vacation(

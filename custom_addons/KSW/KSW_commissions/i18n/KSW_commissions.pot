@@ -430,6 +430,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring__amount
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_addition_line__amount
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_deduction_line__amount
+#. odoo-python
+#: code:addons/KSW_commissions/models/hr_leave.py:0
 msgid "Amount"
 msgstr ""
 
@@ -644,6 +646,8 @@ msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__batch_id
+#. odoo-python
+#: code:addons/KSW_commissions/models/hr_leave.py:0
 msgid "Batch"
 msgstr ""
 
@@ -1181,6 +1185,8 @@ msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__date
+#. odoo-python
+#: code:addons/KSW_commissions/models/hr_leave.py:0
 msgid "Date"
 msgstr ""
 
@@ -2397,6 +2403,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_target_line__month
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_search
+#. odoo-python
+#: code:addons/KSW_commissions/models/hr_leave.py:0
 msgid "Month"
 msgstr ""
 
@@ -3938,6 +3946,8 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_line_form_full
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_list
+#. odoo-python
+#: code:addons/KSW_commissions/models/hr_leave.py:0
 msgid "Total"
 msgstr ""
 
@@ -5402,4 +5412,154 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_commissions/wizard/bank_file_export_wizard.py:0
 msgid "Enter the journal number before exporting."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.hr_leave_view_form_inherit_ksw_commission_entries
+msgid "Commissions from the Commissions App"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.hr_leave_view_form_inherit_ksw_commission_entries
+msgid ""
+"No commission or allowance entries are outstanding\n"
+"                        for this employee."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_hr_leave__x_commission_entries_html
+msgid "Commission Entries"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_hr_leave__x_commission_entries_total
+msgid "Commissions from Pay Entries"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.hr_leave_view_form_inherit_ksw_commission_entries
+msgid ""
+"<strong>Possible double payment.</strong>\n"
+"                    The payslip already pays the"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.hr_leave_view_form_inherit_ksw_commission_entries
+msgid ""
+"SAR recorded in the\n"
+"                    Commissions app (above). The lines under\n"
+"                    <em>Additional Commissions Detail</em> are paid\n"
+"                    <strong>on top</strong> of that — keep them only for\n"
+"                    amounts that are not in the Commissions app."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.hr_leave_view_form_inherit_ksw_commission_entries
+msgid ""
+"Recorded in the Commissions app and not yet paid.\n"
+"                        They are paid automatically on the vacation payslip,\n"
+"                        and the monthly commission run will not pay them\n"
+"                        again."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.hr_leave_view_form_inherit_ksw_commission_entries
+msgid ""
+"Paid on the confirmed vacation payslip. The monthly\n"
+"                        commission run leaves these entries out."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__x_vacation_payslip_id
+msgid "Paid on Vacation Payslip"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__x_vacation_settlement
+msgid "Paid on Vacation"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_batch_skip_line__line_type__settled_on_vacation
+msgid "Kept — paid on a vacation payslip"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:hr.salary.rule,name:KSW_commissions.hr_rule_ksw_commissions
+msgid "Commissions (Pay Entries)"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/hr_leave.py:0
+msgid "Pay Type"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/hr_payslip.py:0
+msgid "Total:"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "Paid on %(slip)s (%(leave)s)"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "Editing it"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "Deleting it"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "Deleting its batch"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/hr_payslip.py:0
+msgid "Commission entries paid on this payslip"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/hr_payslip.py:0
+msgid "Commission entries released — payable in their monthly pay run again"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_import_bas.py:0
+msgid ""
+"His line was paid on the vacation payslip %(slip)s and is kept exactly as "
+"paid."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid ""
+"%(entry)s (%(month)s) was paid on the vacation payslip %(slip)s. %(what)s is"
+" not possible. If that payslip was wrong, cancel or recompute it from the "
+"leave request first."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/hr_payslip.py:0
+msgid ""
+"%(slip)s pays commission entries that have been paid since it was calculated:\n"
+"%(rows)s\n"
+"\n"
+"Recompute the vacation payslip from the leave request before confirming it."
 msgstr ""

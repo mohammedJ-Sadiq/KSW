@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Access right history. Read-only for everyone: rows are written only
+        by the res.users / res.groups write hooks, through sudo.
+    -->
+    <record id="view_ksw_user_group_log_list" model="ir.ui.view">
+        <field name="name">ksw.user.group.log.list</field>
+        <field name="model">ksw.user.group.log</field>
+        <field name="arch" type="xml">
+            <list create="0" edit="0" delete="0"
+                  decoration-success="action == 'added'"
+                  decoration-danger="action == 'removed'">
+                <field name="date"/>
+                <field name="user_id"/>
+                <field name="group_id"/>
+                <field name="action"/>
+                <field name="is_implied" optional="show"/>
+                <field name="changed_by_id"/>
+                <field name="source" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_user_group_log_search" model="ir.ui.view">
+        <field name="name">ksw.user.group.log.search</field>
+        <field name="model">ksw.user.group.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="user_id"/>
+                <field name="group_id"/>
+                <field name="changed_by_id"/>
+                <filter name="granted" string="Granted" domain="[('action', '=', 'added')]"/>
+                <filter name="revoked" string="Revoked" domain="[('action', '=', 'removed')]"/>
+                <separator/>
+                <filter name="direct" string="Ticked directly" domain="[('is_implied', '=', False)]"/>
+                <filter name="not_module" string="Manual changes" domain="[('source', '!=', 'module')]"/>
+                <group>
+                    <filter name="group_by_user" string="User" context="{'group_by': 'user_id'}"/>
+                    <filter name="group_by_group" string="Access Right" context="{'group_by': 'group_id'}"/>
+                    <filter name="group_by_changed_by" string="Changed By" context="{'group_by': 'changed_by_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_user_group_log" model="ir.actions.act_window">
+        <field name="name">Access Right History</field>
+        <field name="res_model">ksw.user.group.log</field>
+        <field name="view_mode">list</field>
+        <field name="context">{'search_default_not_module': 1}</field>
+    </record>
+
+    <menuitem id="menu_ksw_user_group_log"
+              name="Access Right History"
+              parent="base.menu_users"
+              action="action_ksw_user_group_log"
+              groups="base.group_erp_manager"
+              sequence="50"/>
+
+    <record id="view_users_form_ksw_group_log" model="ir.ui.view">
+        <field name="name">res.users.form.ksw.group.log</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="ksw_access_history" string="Access Right History"
+                      groups="base.group_erp_manager">
+                    <field name="x_group_log_ids" readonly="1" nolabel="1">
+                        <list decoration-success="action == 'added'"
+                              decoration-danger="action == 'removed'">
+                            <field name="date"/>
+                            <field name="group_id"/>
+                            <field name="action"/>
+                            <field name="is_implied"/>
+                            <field name="changed_by_id"/>
+                            <field name="source"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

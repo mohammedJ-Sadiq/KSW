@@ -38,3 +38,5 @@ from . import test_payslip_revision_request
 from . import test_bas_journal_entry
 
 from . import test_unpaid_settlement_payslip
+from . import test_employee_prerequisites
+from . import test_payslip_value_lock

@@ -27,4 +27,48 @@
             </xpath>
         </field>
     </record>
+
+    <!-- A new employee cannot be saved without the data every KSW flow
+         depends on. required only while the record is new (not id), so the
+         form never locks an existing employee (e.g. the top of the org
+         chart has no manager); users created from Settings still get their
+         employee through res.users.create, which bypasses this form. -->
+    <record id="hr_employee_view_form_required_on_create" model="ir.ui.view">
+        <field name="name">hr.employee.form.required.on.create</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <!-- Above hr_attendance's 110, which adds attendance_manager_id. -->
+        <field name="priority">200</field>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='work_information']//field[@name='department_id']" position="attributes">
+                <attribute name="required">not id</attribute>
+            </xpath>
+            <xpath expr="//page[@name='work_information']//field[@name='parent_id']" position="attributes">
+                <attribute name="required">not id</attribute>
+            </xpath>
+            <xpath expr="//field[@name='leave_manager_id']" position="attributes">
+                <attribute name="required">not id</attribute>
+            </xpath>
+            <xpath expr="//field[@name='attendance_manager_id']" position="attributes">
+                <attribute name="required">not id</attribute>
+            </xpath>
+            <xpath expr="//field[@name='main_calendar_id']" position="attributes">
+                <attribute name="required">not id</attribute>
+            </xpath>
+            <xpath expr="//field[@name='struct_id']" position="attributes">
+                <attribute name="required">not id</attribute>
+            </xpath>
+            <!-- Warn, do not block: saving without a contract is allowed. -->
+            <xpath expr="//sheet" position="before">
+                <field name="x_contract_missing" invisible="1"/>
+                <div class="alert alert-warning mb-0 text-center" role="alert"
+                     invisible="not x_contract_missing">
+                    ⚠️ No <strong>contract start date</strong> is set
+                    (Payroll tab). The employee can be saved, but the
+                    attendance sheet, leave accrual and payroll will not know
+                    when employment began.
+                </div>
+            </xpath>
+        </field>
+    </record>
 </odoo>

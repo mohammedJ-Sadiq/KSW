@@ -4,3 +4,4 @@ access_hr_attendance_self,hr.attendance.self,hr_attendance.model_hr_attendance,g
 access_hr_version_self,hr.version.self,hr.model_hr_version,group_hr_employee_subordinate,1,0,0,0
 access_res_partner_bank_hr_officer,res.partner.bank.hr.officer,base.model_res_partner_bank,hr.group_hr_user,1,1,1,0
 access_res_bank_hr_officer,res.bank.hr.officer,base.model_res_bank,hr.group_hr_user,1,1,1,0
+access_ksw_user_group_log_erp_manager,ksw.user.group.log.erp.manager,model_ksw_user_group_log,base.group_erp_manager,1,0,0,0

@@ -2,7 +2,7 @@ from math import asin, cos, radians, sin, sqrt
 
 from markupsafe import Markup
 
-from odoo import _, api, fields, models
+from odoo import SUPERUSER_ID, _, api, fields, models
 from odoo.exceptions import UserError
 
 _EARTH_RADIUS_M = 6371000.0
@@ -290,6 +290,47 @@ class StockPicking(models.Model):
         return picking_type.sudo()
 
     @api.model
+    def _water_scope_check(self, partner, driver, picking_type):
+        """Why this client needs a dispatcher, or None.
+
+        Held, not refused: the off-route tick exists for genuine one-offs,
+        but somebody other than the driver has to agree it happened.
+        """
+        if self.env.uid == SUPERUSER_ID or self.env.user.has_group(
+                'KSW_water_delivery.group_water_dispatcher'):
+            return None
+        driver = driver or self.env.user.sudo().employee_id
+        normal, _rated = self._water_client_scope(driver, picking_type)
+        if partner and partner not in normal:
+            return _(
+                '%(client)s is not on %(driver)s\'s client list for this '
+                'branch, so a dispatcher has to confirm the delivery.',
+                client=partner.sudo().display_name,
+                driver=driver.sudo().name or _('the driver'))
+        return None
+
+    @api.model
+    def _water_vehicle_check(self, vehicle, driver):
+        """Why this tanker/driver pair may not issue unreviewed, or None."""
+        # uid, not env.su: the capture path always runs under sudo() but
+        # keeps the driver's uid. SUPERUSER_ID is never a real session.
+        if self.env.uid == SUPERUSER_ID or self.env.user.has_group(
+                'KSW_water_delivery.group_water_dispatcher'):
+            return None
+        own = self.env.user.sudo().employee_id
+        if driver and driver != own:
+            return _(
+                'Notes are issued in your own name; %(driver)s must issue '
+                'their own.', driver=driver.sudo().name)
+        if vehicle and vehicle.sudo().driver_id != (driver or own):
+            return _(
+                'Tanker %(tanker)s is not assigned to %(driver)s, so its trip '
+                'volume cannot be used without a dispatcher checking it.',
+                tanker=vehicle.sudo().display_name,
+                driver=(driver or own).sudo().name or _('you'))
+        return None
+
+    @api.model
     def _water_quantity_in_product_uom(self, vehicle, entered_qty, entered_uom):
         """A trip is not a unit of measure: a trailer carries 32 m³ and an Isuzu
         far less, so the factor belongs to the truck and the conversion happens
@@ -358,6 +399,14 @@ class StockPicking(models.Model):
         partner = self.env['res.partner'].browse(payload['partner_id'])
         product = self.env['product.product'].browse(payload['product_id'])
         vehicle = self.env['ksw.fleet.vehicle'].browse(payload.get('vehicle_id') or [])
+        driver = self.env['hr.employee'].browse(payload.get('driver_id') or [])
+        # The tanker decides the trip volume (trips x capacity) AND which
+        # branch's rules apply, so it is never the phone's or the driver's
+        # choice: a driver issues on a tanker assigned to him, in his own
+        # name. A dispatcher may issue on any tanker (a swapped truck).
+        vehicle_problem = self._water_vehicle_check(vehicle, driver)
+        if vehicle_problem and location_mode == 'raise':
+            raise UserError(vehicle_problem)
         picking_type = self._water_picking_type_for(vehicle, strict=True)
 
         # Every rule is read off the operation type, never off what the caller
@@ -388,6 +437,16 @@ class StockPicking(models.Model):
                 distance=int(distance or 0), client=partner.display_name,
                 radius=picking_type.x_location_radius_m or 300,
             ))
+        # Everything that makes the note a dispatcher's call rather than
+        # the driver's: wrong tanker (offline), a client outside the driver's
+        # list or branch, and the capture's timing (offline only).
+        problems = [p for p in (
+            vehicle_problem,
+            self._water_scope_check(partner, driver, picking_type),
+            location_problem,
+            *(payload.get('hold_reasons') or []),
+        ) if p]
+        location_problem = ' '.join(problems) or False
         held = bool(location_problem)
 
         rate = self.env['ksw.water.rate'].sudo()._rate_for(partner, product)

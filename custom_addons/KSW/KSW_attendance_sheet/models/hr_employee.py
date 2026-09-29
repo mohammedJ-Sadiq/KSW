@@ -1,4 +1,7 @@
-from odoo import api, fields, models
+from calendar import monthrange
+
+from odoo import _, api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class HrEmployee(models.Model):
@@ -37,6 +40,65 @@ class HrEmployee(models.Model):
             'context': {'default_employee_id': self.id},
         }
 
+    def _attendance_sheet_missing_prerequisites(self):
+        """Labels of what must be set before this employee may use a sheet.
+
+        A sheet needs a manager (they confirm it) and a main schedule (it
+        decides workdays). KSW_payroll adds the salary structure.
+        """
+        self.ensure_one()
+        emp = self.sudo()
+        missing = []
+        if not emp.main_calendar_id:
+            missing.append(_('Main Work Schedule'))
+        if not emp.parent_id:
+            missing.append(_('Manager'))
+        return missing
+
+    # Fields whose change can make an active sheet employee incomplete.
+    # KSW_payroll adds struct_id.
+    _ATTENDANCE_SHEET_PREREQUISITE_FIELDS = (
+        'x_is_attendance_sheet', 'main_calendar_id', 'parent_id')
+
+    def _check_attendance_sheet_prerequisites(self):
+        """Refuse a sheet employee who lacks a prerequisite.
+
+        Called from create()/write(), NOT @api.constrains: Odoo 19 runs
+        constraints under sudo(), so they cannot tell a person in the UI
+        from a cron. Superuser paths (crons, migrations, imports) are exempt
+        like every other KSW role guard.
+        """
+        if self.env.su:
+            return
+        problems = []
+        for emp in self.sudo().filtered('x_is_attendance_sheet'):
+            missing = emp._attendance_sheet_missing_prerequisites()
+            if missing:
+                problems.append('%s: %s' % (emp.name, ', '.join(missing)))
+        if problems:
+            raise ValidationError(_(
+                'The attendance sheet cannot be activated until these are '
+                'set:\n%(problems)s',
+                problems='\n'.join(problems),
+            ))
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        employees = super().create(vals_list)
+        # A module that still has values to settle on the new employees
+        # (KSW_payroll: the salary structure) defers this and calls it itself.
+        if not self.env.context.get('ksw_defer_sheet_finalize'):
+            employees._finalize_attendance_sheet_on_create()
+        return employees
+
+    def _finalize_attendance_sheet_on_create(self):
+        self._check_attendance_sheet_prerequisites()
+        # Only a person creating the employee gets the sheet opened here;
+        # system paths (imports, migrations) never did, and the monthly cron
+        # or a later toggle of the flag opens it for them as before.
+        if not self.env.su:
+            self.sudo().filtered('x_is_attendance_sheet')._open_current_sheet()
+
     def write(self, vals):
         """Auto-create current-month attendance sheet when the flag is turned ON."""
         # Detect employees that are being switched ON
@@ -46,32 +108,43 @@ class HrEmployee(models.Model):
 
         res = super().write(vals)
 
-        if newly_enabled:
-            # sudo: opening the employee's first sheet is a side effect of
-            # an edit already authorised on hr.employee, not an act on the
-            # sheet itself. Sheet access is scoped to the employee's own
-            # manager, so without this an HR user enabling the flag for
-            # somebody else's report would be refused by the create rule —
-            # and the employee would silently have no sheet at all.
-            Sheet = self.env['ksw.attendance.sheet'].sudo()
-            today = fields.Date.context_today(self)
-            month = str(today.month)
-            year = today.year
-
-            existing = Sheet.search([
-                ('employee_id', 'in', newly_enabled.ids),
-                ('month', '=', month),
-                ('year', '=', year),
-            ])
-            existing_emp_ids = set(existing.mapped('employee_id').ids)
-
-            for emp in newly_enabled:
-                if emp.id not in existing_emp_ids:
-                    Sheet.create({
-                        'employee_id': emp.id,
-                        'month': month,
-                        'year': year,
-                    })
-
+        if set(vals) & set(self._ATTENDANCE_SHEET_PREREQUISITE_FIELDS):
+            self._check_attendance_sheet_prerequisites()
+        newly_enabled._open_current_sheet()
         return res
 
+    def _open_current_sheet(self):
+        """Open this month's sheet for employees who do not have one yet."""
+        if not self:
+            return
+        # sudo: opening the employee's first sheet is a side effect of
+        # an edit already authorised on hr.employee, not an act on the
+        # sheet itself. Sheet access is scoped to the employee's own
+        # manager, so without this an HR user enabling the flag for
+        # somebody else's report would be refused by the create rule —
+        # and the employee would silently have no sheet at all.
+        Sheet = self.env['ksw.attendance.sheet'].sudo()
+        today = fields.Date.context_today(self)
+        month = str(today.month)
+        year = today.year
+
+        existing = Sheet.search([
+            ('employee_id', 'in', self.ids),
+            ('month', '=', month),
+            ('year', '=', year),
+        ])
+        existing_emp_ids = set(existing.mapped('employee_id').ids)
+
+        month_end = today.replace(
+            day=monthrange(today.year, today.month)[1])
+        for emp in self:
+            joining = Sheet._employment_start(emp)
+            if joining and joining > month_end:
+                # Joins in a later month; the monthly cron opens it.
+                continue
+            if emp.id not in existing_emp_ids:
+                Sheet.create({
+                    'employee_id': emp.id,
+                    'month': month,
+                    'year': year,
+                })

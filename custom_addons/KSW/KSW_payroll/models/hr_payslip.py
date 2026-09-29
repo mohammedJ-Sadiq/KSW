@@ -1887,6 +1887,15 @@ class HrPayslip(models.Model):
     def action_issue_revision(self):
         """Create (or reopen) the revision payslip for this period."""
         self.ensure_one()
+        # Sept 2026: a revision is raised only through a Salary Revision
+        # Request (employee/DM -> HR step -> GM -> accounting pays), whose HR
+        # step issues it via _create_revision_payslip() under sudo. This
+        # direct door is closed to people; only system code may use it.
+        if not self.env.su:
+            raise UserError(_(
+                'Payslip revisions are raised through a Salary Revision '
+                'Request. HR approves its HR step, which issues the revision '
+                'payslip; the GM approves it and Accounting pays it.'))
         self._check_payroll_officer(_('issue a payslip revision'))
 
         if self.state != 'done':

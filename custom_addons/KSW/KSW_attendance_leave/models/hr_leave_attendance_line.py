@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models
-from odoo.exceptions import ValidationError
+from odoo.fields import Domain
+from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.tools.translate import _
 
 
@@ -62,6 +63,83 @@ class HrLeaveAttendanceLine(models.Model):
         string='Accepted (min)',
         help='The approved portion of this issue in minutes. Cannot exceed the total duration.',
     )
+
+    # Fields that decide how much of an issue is excused. Once the leave is
+    # decided they are part of a paid (or refused) record and never move.
+    _DECIDED_FIELDS = frozenset({
+        'leave_id', 'issue_type', 'date', 'hour_from', 'hour_to',
+        'accepted_minutes',
+    })
+
+    @api.model
+    def _search(self, domain, *args, **kwargs):
+        """Reads go through _search, not _check_access (Odoo 19 fetch()):
+        only lines of leaves the user can read are ever returned."""
+        if not self.env.su:
+            readable_leaves = self.env['hr.leave'].with_context(
+                active_test=False)._search([])
+            domain = Domain(domain) & Domain('leave_id', 'in', readable_leaves)
+        return super()._search(domain, *args, **kwargs)
+
+    def _check_access(self, operation):
+        """A line is part of its leave, so it follows the leave's access.
+
+        Read needs read on the leave; create/write/unlink need write on it.
+        Without this the model was open to every internal user, who could
+        read anyone's lateness and raise anyone's accepted minutes (the
+        figure that removes the late/early deduction).
+        """
+        result = super()._check_access(operation)
+        if result or not any(self._ids):
+            return result
+        lines = self.sudo()
+        leaves = lines.leave_id.with_env(self.env)
+        allowed = leaves._filtered_access(
+            'read' if operation == 'read' else 'write')
+        forbidden_ids = [l.id for l in lines if l.leave_id not in allowed]
+        if not forbidden_ids:
+            return None
+        forbidden = self.browse(forbidden_ids)
+        return forbidden, lambda: AccessError(_(
+            'You cannot %(op)s the attendance issue lines of a time off '
+            'request you do not have access to.', op=operation))
+
+    def _check_not_decided(self, changed_fields=None):
+        """Refuse to change the excuse once the leave is decided.
+
+        Approvers with broad write rules on hr.leave could otherwise still
+        edit a validated request's minutes. System paths (the re-link after
+        an attendance re-download runs under sudo) are exempt.
+        """
+        if self.env.su:
+            return
+        if changed_fields is not None and not (
+                set(changed_fields) & self._DECIDED_FIELDS):
+            return
+        decided = self.sudo().filtered(
+            lambda l: l.leave_id.state in ('validate', 'validate1',
+                                           'refuse', 'cancel'))
+        if decided:
+            raise UserError(_(
+                'The accepted minutes of a time off request cannot be changed '
+                'once it has been approved, refused or cancelled.'))
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        lines = super().create(vals_list)
+        lines._check_not_decided()
+        return lines
+
+    def write(self, vals):
+        self._check_not_decided(vals.keys())
+        res = super().write(vals)
+        if 'leave_id' in vals:
+            self._check_not_decided()
+        return res
+
+    def unlink(self):
+        self._check_not_decided()
+        return super().unlink()
 
     @api.depends('hour_from', 'hour_to')
     def _compute_duration_minutes(self):

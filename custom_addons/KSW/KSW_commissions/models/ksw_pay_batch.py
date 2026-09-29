@@ -22,7 +22,7 @@ Two deliberate choices, both explained at length in the design spec:
 """
 from collections import defaultdict
 
-from markupsafe import Markup
+from markupsafe import Markup, escape
 
 from odoo import _, SUPERUSER_ID, api, fields, models
 from odoo.exceptions import UserError, ValidationError
@@ -438,8 +438,12 @@ class KswPayBatch(models.Model):
         if not entries or not self.period:
             return self.env['ksw.pay.entry']
         holds = vacation_holds(self.env, entries.employee_id, self.period)
+        # A row the vacation payslip already paid stays on the batch as the
+        # record of that payment (and cannot be deleted); it is left out of
+        # the register, so it is no reason to refuse the handover.
         return entries.filtered(
-            lambda e: hold_blocks(holds.get(e.employee_id.id), e.date))
+            lambda e: not e.x_vacation_payslip_id
+            and hold_blocks(holds.get(e.employee_id.id), e.date))
 
     @api.model
     def default_get(self, fields_list):
@@ -606,6 +610,9 @@ class KswPayBatch(models.Model):
                 rec.sudo().write({'submission_id': submission.id})
 
     def unlink(self):
+        # The entries go by ondelete='cascade', which never calls their own
+        # unlink(), so their paid-on-vacation lock has to be asked here.
+        self.entry_ids._check_not_settled(_("Deleting its batch"))
         for rec in self:
             check_period_unlocked(
                 self.env, rec.period, _("Deleting this batch"))
@@ -927,6 +934,19 @@ class KswPayEntry(models.Model):
         compute='_compute_vacation_hold', compute_sudo=True,
         string='On Vacation',
     )
+    # The vacation payslip that paid this entry. Set when that payslip is
+    # confirmed, cleared if it is cancelled (hr.payslip.write in this
+    # module); the monthly run leaves a stamped entry out of its register.
+    # Never shown directly: a supervisor has no read on hr.payslip, so the
+    # list reads x_vacation_settlement instead.
+    x_vacation_payslip_id = fields.Many2one(
+        'hr.payslip', string='Paid on Vacation Payslip', readonly=True,
+        copy=False, index=True, ondelete='set null',
+    )
+    x_vacation_settlement = fields.Char(
+        compute='_compute_vacation_settlement', compute_sudo=True,
+        string='Paid on Vacation',
+    )
 
     # `date` and `period` are in here because the rate an employee has of
     # their own (ksw.pay.employee.rate) is dated: moving an occurrence into
@@ -1015,31 +1035,35 @@ class KswPayEntry(models.Model):
                     self.quantity_ref, {'precision': 2}),
             ))
 
-        currency = self.currency_id.symbol or ''
-        html = ['<table class="table table-sm o_main_table">',
-                '<thead><tr>',
-                '<th>%s</th>' % _('Step'),
-                '<th class="text-end">%s</th>' % (component.qty_label or _('Quantity')),
-                '<th class="text-end">%s</th>' % _('Rate'),
-                '<th class="text-end">%s</th>' % _('Amount'),
-                '</tr></thead><tbody>']
+        # Every value is escaped: `details` is free text a supervisor types,
+        # and this field is sanitize=False, so an unescaped value here runs
+        # as script in the browser of whoever opens the entry (GM, accounts).
+        currency = escape(self.currency_id.symbol or '')
+        html = [Markup('<table class="table table-sm o_main_table">'
+                       '<thead><tr><th>%s</th>'
+                       '<th class="text-end">%s</th>'
+                       '<th class="text-end">%s</th>'
+                       '<th class="text-end">%s</th>'
+                       '</tr></thead><tbody>') % (
+            _('Step'), component.qty_label or _('Quantity'),
+            _('Rate'), _('Amount'))]
         for row in rows:
-            html.append(
+            html.append(Markup(
                 '<tr><td>%s</td>'
                 '<td class="text-end">%s</td>'
                 '<td class="text-end">%s</td>'
-                '<td class="text-end">%s</td></tr>' % (
+                '<td class="text-end">%s</td></tr>') % (
                     row['label'],
                     ('%.2f' % row['quantity']) if row.get('quantity') is not None else '',
                     ('%.4f' % row['rate']) if row.get('rate') is not None else '',
                     ('%.2f' % row['amount']) if row.get('amount') is not None else '',
                 ))
-        html.append(
+        html.append(Markup(
             '<tr class="fw-bold border-top">'
             '<td>%s</td><td></td><td></td>'
-            '<td class="text-end">%s %s</td></tr>' % (
+            '<td class="text-end">%s %s</td></tr>') % (
                 _('Total'), '%.2f' % (self.amount or 0.0), currency))
-        html.append('</tbody></table>')
+        html.append(Markup('</tbody></table>'))
 
         if self.is_overridden:
             notes.append(_(
@@ -1048,10 +1072,10 @@ class KswPayEntry(models.Model):
         if self.details:
             notes.append(self.details)
         if notes:
-            html.append('<ul class="mb-0">')
-            html.extend('<li>%s</li>' % note for note in notes)
-            html.append('</ul>')
-        return ''.join(html)
+            html.append(Markup('<ul class="mb-0">'))
+            html.extend(Markup('<li>%s</li>') % note for note in notes)
+            html.append(Markup('</ul>'))
+        return Markup('').join(html)
 
     def action_explain(self):
         """Open the derivation for this line."""
@@ -1085,6 +1109,11 @@ class KswPayEntry(models.Model):
         for period, entries in by_period.items():
             holds = vacation_holds(self.env, entries.employee_id, period)
             for rec in entries:
+                if rec.x_vacation_payslip_id:
+                    # Already paid on the vacation: nothing to remove and
+                    # nothing to release, so no warning either —
+                    # x_vacation_settlement says what happened.
+                    continue
                 hold = holds.get(rec.employee_id.id)
                 # Shown when the row is refused, and also on an undated row
                 # in the month he came back — that one is allowed through
@@ -1092,6 +1121,39 @@ class KswPayEntry(models.Model):
                 # where a full month's meals get billed for half a month.
                 if hold and (hold_blocks(hold, rec.date) or not rec.date):
                     rec.x_vacation_hold = hold_reason(self.env, hold)
+
+    @api.depends('x_vacation_payslip_id')
+    def _compute_vacation_settlement(self):
+        for rec in self:
+            slip = rec.x_vacation_payslip_id
+            rec.x_vacation_settlement = _(
+                "Paid on %(slip)s (%(leave)s)",
+                slip=slip.number or slip.name,
+                leave=slip.x_leave_id.holiday_status_id.display_name or '',
+            ) if slip else False
+
+    def _check_not_settled(self, what):
+        """A paid entry is history: its figure is what left the bank.
+
+        Deliberately NOT exempting env.su, unlike the other guards here — a
+        sudo()'d import or cleanup rewriting it would silently change a
+        payment already made. The settlement itself passes the
+        ``ksw_vacation_settling`` context key.
+        """
+        if self.env.context.get('ksw_vacation_settling'):
+            return
+        settled = self.filtered('x_vacation_payslip_id')
+        if not settled:
+            return
+        entry = settled[0]
+        raise UserError(_(
+            "%(entry)s (%(month)s) was paid on the vacation payslip "
+            "%(slip)s. %(what)s is not possible. If that payslip was wrong, "
+            "cancel or recompute it from the leave request first.",
+            entry=entry.display_name,
+            month=entry.period.strftime('%B %Y') if entry.period else '',
+            slip=entry.sudo().x_vacation_payslip_id.display_name,
+            what=what))
 
     def _check_vacation_hold(self, what):
         """Server-side twin of the banner on the batch.
@@ -1288,6 +1350,8 @@ class KswPayEntry(models.Model):
         return entries
 
     def write(self, vals):
+        if set(vals) - {'x_vacation_payslip_id'}:
+            self._check_not_settled(_("Editing it"))
         self._check_editable(_("Editing an entry"))
         res = super().write(vals)
         if 'employee_id' in vals:
@@ -1300,5 +1364,6 @@ class KswPayEntry(models.Model):
         return res
 
     def unlink(self):
+        self._check_not_settled(_("Deleting it"))
         self._check_editable(_("Deleting an entry"))
         return super().unlink()
