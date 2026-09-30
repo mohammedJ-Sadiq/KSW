@@ -1,5 +1,7 @@
 from calendar import monthrange
 
+from markupsafe import Markup
+
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
@@ -102,16 +104,68 @@ class HrEmployee(models.Model):
     def write(self, vals):
         """Auto-create current-month attendance sheet when the flag is turned ON."""
         # Detect employees that are being switched ON
-        newly_enabled = self.env['hr.employee']
-        if 'x_is_attendance_sheet' in vals and vals['x_is_attendance_sheet']:
-            newly_enabled = self.filtered(lambda e: not e.x_is_attendance_sheet)
+        newly_enabled = newly_disabled = self.env['hr.employee']
+        if 'x_is_attendance_sheet' in vals:
+            if vals['x_is_attendance_sheet']:
+                newly_enabled = self.filtered(
+                    lambda e: not e.x_is_attendance_sheet)
+            else:
+                newly_disabled = self.filtered('x_is_attendance_sheet')
+                newly_disabled._check_sheets_removable()
 
         res = super().write(vals)
 
         if set(vals) & set(self._ATTENDANCE_SHEET_PREREQUISITE_FIELDS):
             self._check_attendance_sheet_prerequisites()
         newly_enabled._open_current_sheet()
+        newly_disabled._remove_current_sheets()
         return res
+
+    def _check_sheets_removable(self):
+        """Refuse turning the flag off over a month already sent to payroll.
+
+        The current month's sheet is deleted when the flag goes off, but a
+        confirmed one has been released to payroll: it has to be withdrawn
+        first, through the button that carries the withdraw authority rules.
+        Superuser paths (imports, migrations) keep it and are not refused.
+        """
+        if self.env.su:
+            return
+        confirmed = self.env['ksw.attendance.sheet'].sudo() \
+            ._current_and_later_sheets(self).filtered(
+                lambda s: s.state == 'confirmed')
+        if confirmed:
+            raise ValidationError(_(
+                'These attendance sheets were already sent to payroll. '
+                'Withdraw them from payroll first, then turn off '
+                '"Uses Attendance Sheet":\n%(sheets)s',
+                sheets='\n'.join(confirmed.mapped('display_name')),
+            ))
+
+    def _remove_current_sheets(self):
+        """Delete the current (and any later) month's draft sheet.
+
+        Once the flag is off payroll reads the biometric path, so the sheet
+        and its auto-generated attendance would otherwise count as real
+        attended days. Past months are history and are left alone.
+        """
+        if not self:
+            return
+        # sudo: a side effect of an edit already authorised on hr.employee,
+        # like _open_current_sheet — sheet access is scoped to the manager.
+        sheets = self.env['ksw.attendance.sheet'].sudo() \
+            ._current_and_later_sheets(self).filtered(
+                lambda s: s.state == 'draft')
+        for emp in self:
+            removed = sheets.filtered(lambda s: s.employee_id == emp)
+            if not removed:
+                continue
+            emp.sudo().message_post(body=Markup(
+                '<strong>Attendance sheet removed</strong><br/>'
+                '"Uses Attendance Sheet" was turned off, so %(sheets)s '
+                'was deleted with its auto-generated attendance.'
+            ) % {'sheets': ', '.join(removed.mapped('display_name'))})
+        sheets.unlink()
 
     def _open_current_sheet(self):
         """Open this month's sheet for employees who do not have one yet."""

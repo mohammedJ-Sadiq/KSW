@@ -161,6 +161,30 @@ class KswAttendanceSheet(models.Model):
                 'month instead.')
         return super().write(vals)
 
+    def unlink(self):
+        """Take the sheet's fabricated hr.attendance rows with it.
+
+        Lines hold them with ondelete='set null', so deleting a sheet used
+        to leave a month of auto-generated "present" days behind — which
+        the biometric payroll path then reads as real punches once the
+        employee is no longer a sheet employee.
+        """
+        atts = self.line_ids.mapped('attendance_id').filtered(
+            'x_is_auto_generated')
+        res = super().unlink()
+        atts.exists().sudo().unlink()
+        return res
+
+    @api.model
+    def _current_and_later_sheets(self, employees):
+        """Sheets of *employees* for the current month or any later one."""
+        today = fields.Date.context_today(self)
+        return self.search([
+            ('employee_id', 'in', employees.ids),
+            ('year', '>=', today.year),
+        ]).filtered(
+            lambda s: (s.year, int(s.month)) >= (today.year, today.month))
+
     def _check_editable(self):
         """Raise unless every sheet in self may have its lines edited."""
         is_manager = self.env.user.has_group(
