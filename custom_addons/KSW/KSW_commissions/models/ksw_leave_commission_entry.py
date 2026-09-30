@@ -30,7 +30,7 @@ class KswLeaveCommissionEntry(models.Model):
     batch_id = fields.Many2one('ksw.pay.batch', ondelete='set null')
     batch_name = fields.Char()
     batch_state = fields.Selection(
-        BATCH_STATES, string='Batch Status When Latched')
+        BATCH_STATES, string='Status When Latched')
     amount = fields.Float(digits=(16, 2))
 
     @api.model
@@ -46,8 +46,10 @@ class KswLeaveCommissionEntry(models.Model):
             'date': entry.date,
             'batch': batch,
             'batch_name': batch.name,
-            'state_key': batch.state,
-            'state': self._state_label(batch.state),
+            # The row's own status: with sub-batches, a row can be approved
+            # while its batch is still open.
+            'state_key': entry.state,
+            'state': self._state_label(entry.state),
             'amount': entry.amount,
         }
 

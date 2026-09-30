@@ -45,6 +45,11 @@ class KswAttendanceSheetLineLeave(models.Model):
             # action — leaving the supervisor no way to mark the rest of the
             # month absent when a vacation covers part of it.
             wanted = bool(vals['is_attended'])
+            # A system write taking a locked day to ABSENT agrees with the
+            # lock (applying the leave to a rest day it left paid), so it
+            # goes through; only giving a leave's day back is refused.
+            if not wanted and self.env.context.get('ksw_system_write'):
+                return super().write(vals)
             locked_by_leave = self.filtered(
                 lambda l: l.x_leave_id and l.is_attended != wanted)
             if locked_by_leave:

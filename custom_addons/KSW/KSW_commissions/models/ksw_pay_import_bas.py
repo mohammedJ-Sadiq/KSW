@@ -171,6 +171,17 @@ class KswPayBatchBasImport(models.Model):
                       'and is kept exactly as paid.',
                       slip=paid.sudo().x_vacation_payslip_id.display_name)))
                 continue
+            if paid and paid.state != 'draft':
+                # Sent early in a sub-batch, or approved and the rest of the
+                # batch returned: the GM has this figure, and a refresh
+                # would change it behind his back (and be refused).
+                log.append(Skip._log(
+                    self, employee, 'handed_over',
+                    _('His line is with the General Manager or already '
+                      'approved (%(where)s), so it is kept as it is. Ask '
+                      'the General Manager to return it to import again.',
+                      where=paid.x_sub_batch_id.name or paid.batch_id.name)))
+                continue
             hold = holds.get(employee.id)
             # `!= 'partial'`, NOT `== 'full'`: a part month is the only
             # kind with a date to work from. Testing for one specific

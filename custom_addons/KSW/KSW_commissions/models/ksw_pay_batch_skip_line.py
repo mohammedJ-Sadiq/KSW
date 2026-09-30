@@ -22,6 +22,8 @@ SKIP_REASONS = {
         'Held — settled on a vacation request', 'skipped'),
     'settled_on_vacation': (
         'Kept — paid on a vacation payslip', 'skipped'),
+    'handed_over': (
+        'Kept — with the General Manager or approved', 'skipped'),
     'no_cost_centre': (
         'Not imported — no BAS cost centre', 'skipped'),
     'no_data': (

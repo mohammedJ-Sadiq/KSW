@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- ================================================================ -->
+    <!-- Employee review: one employee's handover, a section per component -->
+    <!-- ================================================================ -->
+    <!-- Each component gets its own table and its own subtotal, because a
+         quantity only adds up inside one component: overtime is in hours,
+         Fridays in days, meals in meals. Only the amount is totalled across
+         sections. -->
+    <template id="employee_review_sections">
+        <div class="o_ksw_employee_review">
+            <p t-if="not sections" class="text-muted">
+                No entries you can see for this employee.
+            </p>
+            <t t-foreach="sections" t-as="section">
+                <h4 class="mt-3 mb-1" t-out="section['component'].name"/>
+                <table class="table table-sm table-hover mb-2">
+                    <thead>
+                        <tr>
+                            <th t-if="section['show_date']">Date</th>
+                            <th t-if="section['show_option']">Type</th>
+                            <th class="text-end" t-out="section['qty_label']"/>
+                            <th t-if="section['show_reason']">Reason</th>
+                            <th>Status</th>
+                            <th class="text-end">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="section['rows']" t-as="entry">
+                            <td t-if="section['show_date']" t-out="format_date(entry.date) if entry.date else ''"/>
+                            <td t-if="section['show_option']" t-out="entry.option_id.name or ''"/>
+                            <td class="text-end" t-out="format_qty(entry.quantity)"/>
+                            <td t-if="section['show_reason']" t-out="entry.reason or ''"/>
+                            <td t-out="state_labels.get(entry.state, entry.state)"/>
+                            <td class="text-end" t-out="format_amount(entry.amount)"/>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr class="fw-bold border-top">
+                            <t t-set="lead" t-value="int(section['show_date']) + int(section['show_option'])"/>
+                            <td t-if="lead" t-att-colspan="lead">Subtotal</td>
+                            <td class="text-end">
+                                <t t-out="format_qty(section['quantity'])"/>
+                                <t t-out="section['qty_label']"/>
+                            </td>
+                            <td t-if="section['show_reason']"/>
+                            <td><t t-if="not lead">Subtotal · </t><t t-out="len(section['rows'])"/> entries</td>
+                            <td class="text-end" t-out="format_amount(section['amount'])"/>
+                        </tr>
+                    </tfoot>
+                </table>
+            </t>
+            <div t-if="len(sections) &gt; 1"
+                 class="d-flex justify-content-end fs-5 fw-bold border-top pt-2 mt-3">
+                <span class="me-3">Total, all components</span>
+                <span t-out="format_amount(total)"/>
+            </div>
+        </div>
+    </template>
+
+    <record id="view_ksw_pay_employee_review_list" model="ir.ui.view">
+        <field name="name">ksw.pay.employee.review.list</field>
+        <field name="model">ksw.pay.employee.review</field>
+        <field name="arch" type="xml">
+            <list string="Employees" create="false" edit="false"
+                  delete="false" decoration-danger="vacation_hold">
+                <field name="employee_id"/>
+                <field name="vacation_hold" optional="show"/>
+                <field name="component_names"/>
+                <field name="entry_count"/>
+                <field name="pending_count" optional="show"/>
+                <field name="amount" sum="Total"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Opened from the list, so the pager in the top-right corner (and
+         Alt+N / Alt+P) steps through the other employees of the handover
+         without going back. -->
+    <record id="view_ksw_pay_employee_review_form" model="ir.ui.view">
+        <field name="name">ksw.pay.employee.review.form</field>
+        <field name="model">ksw.pay.employee.review</field>
+        <field name="arch" type="xml">
+            <form string="Employee Review" create="false" edit="false"
+                  delete="false">
+                <sheet>
+                    <widget name="web_ribbon" title="On Vacation"
+                            bg_color="text-bg-danger"
+                            invisible="not vacation_hold"/>
+                    <div class="oe_title">
+                        <h1><field name="employee_id" readonly="1"
+                                   options="{'no_open': True}"/></h1>
+                        <field name="submission_id" readonly="1"
+                               options="{'no_open': True}"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="entry_count" readonly="1"/>
+                            <field name="pending_count" readonly="1"
+                                   invisible="not pending_count"/>
+                            <field name="vacation_hold" readonly="1"
+                                   invisible="not vacation_hold"/>
+                        </group>
+                        <group>
+                            <field name="amount" readonly="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="sections_html" nolabel="1" readonly="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_employee_review_search" model="ir.ui.view">
+        <field name="name">ksw.pay.employee.review.search</field>
+        <field name="model">ksw.pay.employee.review</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="submission_id"/>
+            </search>
+        </field>
+    </record>
+
+</odoo>

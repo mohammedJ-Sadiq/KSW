@@ -25,7 +25,7 @@ from markupsafe import Markup
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
-from odoo.tools import float_round
+from odoo.tools import float_compare, float_round
 
 from .ksw_commission_lock import LOCKING_STATES
 from .ksw_vacation_hold import (
@@ -164,8 +164,10 @@ class KswPayRun(models.Model):
         for rec in self:
             visible = Submission.search([('run_id', '=', rec.id)])
             rec.x_visible_submission_ids = visible
+            # Anything in front of him — a handed-over department or a
+            # sub-batch sent early — not only departments on 'submitted'.
             rec.x_gm_submission_ids = visible.filtered(
-                lambda s: s.state == 'submitted' and s.gm_id == user)
+                lambda s: s.pending_entry_count and s.gm_id == user)
             # "Mine" is narrower than "visible": an officer sees every
             # department but hands over none of them.
             mine = visible if not is_officer else visible.filtered(
@@ -174,6 +176,7 @@ class KswPayRun(models.Model):
             rec.x_can_submit_mine = bool(
                 rec.state not in LOCKING_STATES
                 and mine.filtered(lambda s: s.x_can_submit))
+
 
     @api.depends('submission_ids.state', 'submission_ids.batch_count')
     def _compute_submission_stats(self):
@@ -235,9 +238,11 @@ class KswPayRun(models.Model):
             rec.x_can_close_month = bool(
                 is_closer
                 and rec.state not in LOCKING_STATES
-                and rec.submission_ids.filtered(
-                    lambda s: s.state == 'approved'))
-            rec.x_can_reopen = is_closer and rec.state in LOCKING_STATES
+                and rec._has_approved_work())
+            # A paid month is history: the money left the bank, and
+            # reopening it would restate what was paid (sub-batch rows
+            # included, which the GM promised the supervisor were final).
+            rec.x_can_reopen = is_closer and rec.state == 'approved'
             rec.x_can_export = is_accountant and rec.state in LOCKING_STATES
 
     # Deliberately NOT depending on batch_ids.entry_ids: batch_ids is a
@@ -339,6 +344,37 @@ class KswPayRun(models.Model):
         return self.env['ksw.pay.entry'].sudo().search([
             ('period', '=', self.period)])
 
+    def _has_approved_work(self):
+        """Is there anything the General Manager has approved this month —
+        a whole department, or employees approved early in a sub-batch?"""
+        self.ensure_one()
+        return bool(self.submission_ids.filtered(
+            lambda s: s.state == 'approved')) or bool(
+            self.env['ksw.pay.entry'].sudo().search_count([
+                ('period', '=', self.period), ('state', '=', 'approved')],
+                limit=1))
+
+    def _waiting_submissions(self):
+        """Departments with rows in front of their GM, whatever their own
+        state says — a sub-batch waits on him as much as a handover does."""
+        return self.submission_ids.filtered('pending_entry_count')
+
+    def _payable_entries(self, settled_only=False):
+        """The entries this month pays — decided per row, not per batch.
+
+        Settled: every row its General Manager approved, whether with its
+        whole department or early, in a sub-batch. Preview: those, plus the
+        rows in front of him now (_handed_over) — a batch merely submitted
+        on its own is a supervisor who has finished typing, not a department
+        declaring itself complete, so it is still left out.
+        """
+        self.ensure_one()
+        entries = self._all_entries()
+        if settled_only:
+            return entries.filtered(lambda e: e.state == 'approved')
+        return entries.filtered(lambda e: e.state == 'approved') \
+            | entries._handed_over()
+
     def _payable_batches(self, settled_only=False):
         """The batches whose entries are actually going to be paid.
 
@@ -399,10 +435,9 @@ class KswPayRun(models.Model):
                 "You have nothing to submit for %(period)s. Record your "
                 "entries first — or they have already been submitted.",
                 period=self.display_name))
-        mine.action_submit()
-        return self._notify_toast(_(
-            "%(count)s department(s) submitted to the General Manager.",
-            count=len(mine)))
+        # He chooses what goes: every component, or only the ones he ticks.
+        mine._check_mine()
+        return self.env['ksw.pay.submit.wizard']._open_for(mine)
 
     def action_submit(self):
         """open → submitted, by hand.
@@ -430,14 +465,6 @@ class KswPayRun(models.Model):
             })
             rec._notify_gm()
         return True
-
-    def _notify_toast(self, message):
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {'title': _('Monthly Pay Run'), 'message': message,
-                       'type': 'success', 'sticky': False},
-        }
 
     def _notify_gm(self):
         self.ensure_one()
@@ -527,13 +554,12 @@ class KswPayRun(models.Model):
             if rec.state in LOCKING_STATES:
                 continue
 
-            still_waiting = rec.submission_ids.filtered(
-                lambda s: s.state == 'submitted')
+            still_waiting = rec._unapproved_departments()
             rec.sudo().message_post(
                 body=Markup(
                     '<strong>✅ %(mine)s department(s) approved by '
                     '%(user)s</strong><br/>'
-                    '<i>%(period)s stays open — still waiting on: '
+                    '<i>%(period)s stays open — not approved yet: '
                     '%(names)s.</i>'
                 ) % {'mine': len(mine), 'user': self.env.user.name,
                      'period': rec.display_name,
@@ -554,21 +580,36 @@ class KswPayRun(models.Model):
         button, which is how a fully approved month ended up with no button
         on it at all and no way to reach the accountant.
 
-        "Waiting" means a department that handed over and whose own GM has
-        not signed yet. A department still in draft is not waiting on
-        anyone; it is left out of the month, exactly as it is when the run's
-        own Approve button finalises (tests/test_submission.py::test_30).
+        Only when **every** department with entries is fully approved — the
+        user's rule (Sep 2026). It used to fire as soon as one department
+        was approved and none was waiting, leaving a department still typing
+        out of the month; with partial approvals that locked a whole month
+        mid-way (dev, September 2026: Maintenance and Train Department shut
+        out). Anything short of "all in" is the company GM's call, through
+        Finalise & Send to Accounting.
         """
         for rec in self:
             if rec.state in LOCKING_STATES:
                 continue
-            if not rec.submission_ids.filtered(
-                    lambda s: s.state == 'approved'):
+            if rec._unapproved_departments() or rec._waiting_submissions():
                 continue
-            if rec.submission_ids.filtered(lambda s: s.state == 'submitted'):
+            if not rec._active_submissions():
                 continue
             rec._finalise_month()
         return True
+
+    def _active_submissions(self):
+        """Departments that recorded anything this month."""
+        self.ensure_one()
+        return self.submission_ids.filtered(
+            lambda s: s.sudo().batch_ids.entry_ids)
+
+    def _unapproved_departments(self):
+        """Departments with entries that are not fully approved yet —
+        still typing, handed over, or partly returned."""
+        self.ensure_one()
+        return self._active_submissions().filtered(
+            lambda s: s.state != 'approved')
 
     def action_close_month(self):
         """Finalise the month by hand and hand it to the accountant.
@@ -589,8 +630,7 @@ class KswPayRun(models.Model):
                 raise UserError(_(
                     "%(name)s has already been approved.",
                     name=rec.display_name))
-            if not rec.submission_ids.filtered(
-                    lambda s: s.state == 'approved'):
+            if not rec._has_approved_work():
                 raise UserError(_(
                     "No department has been approved for %(period)s, so "
                     "there is nothing to pay.", period=rec.display_name))
@@ -603,8 +643,7 @@ class KswPayRun(models.Model):
         approved = self.submission_ids.filtered(
             lambda s: s.state == 'approved')
         never_submitted = self.pending_department_names
-        unapproved = self.submission_ids.filtered(
-            lambda s: s.state == 'submitted')
+        unapproved = self._waiting_submissions()
         self._build_register()
         auto_ids = self.line_ids.sudo()._auto_flag_priority_installments()
         self.write({
@@ -722,6 +761,11 @@ class KswPayRun(models.Model):
                 "Only the company's General Manager can reopen an "
                 "approved month."))
         for rec in self:
+            if rec.state == 'paid':
+                raise UserError(_(
+                    "%(name)s has been paid. A paid month cannot be "
+                    "reopened — not even by the General Manager.",
+                    name=rec.display_name))
             if rec.state not in LOCKING_STATES:
                 raise UserError(_(
                     "%(name)s is not approved, so there is nothing to "
@@ -732,12 +776,24 @@ class KswPayRun(models.Model):
             # departments are still handed over, they are simply no longer
             # approved. Leaving the batches on 'approved' would keep them
             # payable even after their department withdrew.
+            #
+            # Per row: a row approved early in a sub-batch was its own
+            # decision and stays approved; so does anything already paid on
+            # a vacation payslip.
             reopened = rec.submission_ids.filtered(
                 lambda s: s.state == 'approved')
+            rows = reopened.sudo().batch_ids.entry_ids.filtered(
+                lambda e: e.state == 'approved'
+                and not e.x_vacation_payslip_id)
+            (rows - rows._sub_batch_controlled()).write(
+                {'state': 'submitted'})
             reopened.mapped('batch_ids').filtered(
                 lambda b: b.state == 'approved'
-            ).sudo().write({'state': 'submitted'})
+            ).sudo().with_context(ksw_entry_sync=True).write(
+                {'state': 'submitted'})
             reopened.sudo().write({'state': 'submitted'})
+            reopened.mapped('batch_ids')._sync_state_from_entries()
+            reopened._sync_state_from_entries()
             rec.write({'state': 'open'})
             rec.sudo().message_post(
                 body=Markup(
@@ -781,10 +837,8 @@ class KswPayRun(models.Model):
         self.ensure_one()
         Line = self.env['ksw.pay.run.line'].sudo()
 
-        entries = self.env['ksw.pay.entry'].sudo().browse()
-        for batch in self._payable_batches(settled_only=not preview):
-            entries |= batch.sudo().entry_ids
-        entries = entries.filtered('employee_id')
+        entries = self._payable_entries(
+            settled_only=not preview).filtered('employee_id')
 
         # The last of the three gates on the vacation hold, and the one
         # that matters most: the entry guard only ever sees rows typed
@@ -838,6 +892,98 @@ class KswPayRun(models.Model):
                 # From approval on, this is the settlement itself.
                 line.x_preview_generated = False
         return self.line_ids
+
+    @api.model
+    def _months_paid_to(self, employee, periods):
+        """The months in ``periods`` whose run actually paid ``employee``.
+
+        Only **Paid** counts: an approved month is committed to a bank file
+        that has not gone out, and it takes around a month to go out. A
+        vacation settles the employee's whole account on the day he leaves,
+        so it takes those entries too, and ``_resync_vacation_line`` takes
+        them out of the approved register. A paid run with no line for him
+        paid him nothing.
+        """
+        return set(self.env['ksw.pay.run.line'].sudo().search([
+            ('employee_id', '=', employee.id),
+            ('run_id.period', 'in', list(periods)),
+            ('run_id.state', '=', 'paid'),
+        ]).mapped('run_id.period'))
+
+    def _resync_vacation_line(self, employees):
+        """Re-derive an approved month's register line for ``employees``
+        after a vacation payslip took entries out of it (or gave them back).
+
+        An approved register is otherwise frozen (``_refresh_register``
+        skips it), so without this the bank file would pay the entries a
+        second time, and the BAS journal — which reads the entries minus the
+        settled ones — would stop on the mismatch. The line's figure is the
+        journal's own figure, so the two cannot disagree.
+
+        The loan offset is unwound and re-applied against the new earnings.
+        Whatever it no longer covers is unflagged, so payroll collects it
+        instead of it waiting on a commission run that will not come.
+        """
+        Line = self.env['ksw.pay.run.line'].sudo()
+        DedLine = self.env['ksw.deduction.line'].sudo()
+        for run in self.sudo():
+            if run.state != 'approved':
+                continue
+            totals = run._bas_component_totals()
+            for employee in employees:
+                earnings = sum(totals.get(employee.id, {}).values())
+                line = run.line_ids.filtered(
+                    lambda l, emp=employee: l.employee_id == emp)
+                if float_compare(line.earnings if line else 0.0, earnings,
+                                 precision_digits=2) == 0:
+                    continue
+                before = line.earnings if line else 0.0
+                released = DedLine
+                if line:
+                    payload = json.loads(line.x_unwind_data or '{}')
+                    released = DedLine.browse(
+                        payload.get('paid_ids') or []).exists()
+                    released |= DedLine.browse(
+                        [s.get('orig') for s in payload.get('splits') or []]
+                    ).exists()
+                    line._unwind_loan_offset()
+                    if earnings:
+                        line.write({'earnings': earnings})
+                    else:
+                        line.unlink()
+                        line = Line
+                elif earnings:
+                    line = Line.create({
+                        'run_id': run.id, 'employee_id': employee.id,
+                        'earnings': earnings,
+                    })
+                if line:
+                    line._apply_loan_offset()
+                uncovered = released.filtered(
+                    lambda l: l.state == 'pending' and l.x_awaiting_commission)
+                if uncovered:
+                    uncovered.write({'x_awaiting_commission': False})
+                run.message_post(
+                    body=Markup(
+                        '<strong>%(title)s</strong><br/>'
+                        '<b>%(l_emp)s</b> %(emp)s<br/>'
+                        '<b>%(l_before)s</b> %(before).2f<br/>'
+                        '<b>%(l_after)s</b> %(after).2f<br/>'
+                        '%(note)s'
+                    ) % {
+                        'title': _('Register line updated by a vacation '
+                                   'settlement'),
+                        'l_emp': _('Employee:'),
+                        'emp': employee.sudo().display_name,
+                        'l_before': _('Earnings before:'), 'before': before,
+                        'l_after': _('Earnings after:'), 'after': earnings,
+                        'note': _('Loan installments no longer covered by '
+                                  'this line go back to payroll: %(n)s',
+                                  n=len(uncovered)) if uncovered else '',
+                    },
+                    subtype_xmlid='mail.mt_note',
+                )
+        return True
 
     @api.model
     def _rounded_component_totals(self, entries):

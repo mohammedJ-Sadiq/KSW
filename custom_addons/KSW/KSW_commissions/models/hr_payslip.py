@@ -21,7 +21,6 @@ from markupsafe import Markup
 from odoo import _, api, models
 from odoo.exceptions import UserError
 
-from .ksw_commission_lock import period_is_locked
 
 #: Input code prefix for a commission entry paid on a vacation payslip —
 #: ``KSW_COM_<ksw.pay.entry id>``. Summed by the KSW_COMMISSIONS rule.
@@ -128,8 +127,8 @@ class HrPayslip(models.Model):
         """Mark the entries this payslip pays, so the run does not pay them.
 
         Raises rather than paying twice: an entry already paid elsewhere, or
-        a month whose run has since been approved (and so paid through the
-        register), means the payslip is stale — Recompute Vacation Payslip
+        a month whose run has since been marked Paid with a line for him,
+        means the payslip is stale — Recompute Vacation Payslip
         rebuilds it from what is still owed.
         """
         self.ensure_one()
@@ -142,12 +141,15 @@ class HrPayslip(models.Model):
         elsewhere = entries.filtered(
             lambda e: e.x_vacation_payslip_id
             and e.x_vacation_payslip_id != self)
-        locked = entries.filtered(
-            lambda e: period_is_locked(self.env, e.period))
+        # A month counts as paid only once its run is marked Paid and has
+        # a line for him; an approved month is taken out of its register
+        # below (_resync_vacation_line).
+        paid_months = self.env['ksw.pay.run']._months_paid_to(
+            self.employee_id, set(entries.mapped('period')))
+        locked = entries.filtered(lambda e: e.period in paid_months)
         # Only what the GM approved may be paid — the builder already
         # filters on it; this catches a payslip confirmed by hand later.
-        unapproved = entries.filtered(
-            lambda e: e.batch_id.state != 'approved')
+        unapproved = entries.filtered(lambda e: e.state != 'approved')
         if unapproved:
             raise UserError(_(
                 "%(slip)s pays commission entries the General Manager has not "
@@ -171,6 +173,7 @@ class HrPayslip(models.Model):
                     for e in (elsewhere | locked))))
         entries.with_context(ksw_vacation_settling=True).write(
             {'x_vacation_payslip_id': self.id})
+        self._ksw_resync_approved_runs(entries)
         self._ksw_post_commission_note(
             entries, _('Commission entries paid on this payslip'))
 
@@ -183,9 +186,19 @@ class HrPayslip(models.Model):
             return
         entries.with_context(ksw_vacation_settling=True).write(
             {'x_vacation_payslip_id': False})
+        self._ksw_resync_approved_runs(entries)
         self._ksw_post_commission_note(
             entries, _('Commission entries released — payable in their '
                        'monthly pay run again'))
+
+    def _ksw_resync_approved_runs(self, entries):
+        """Keep an approved (not yet paid) month's register in step with
+        what this payslip took from it or gave back."""
+        runs = self.env['ksw.pay.run'].sudo().search([
+            ('period', 'in', list(set(entries.mapped('period')))),
+            ('state', '=', 'approved'),
+        ])
+        runs._resync_vacation_line(entries.employee_id)
 
     def _ksw_post_commission_note(self, entries, title):
         body = Markup('<strong>%(title)s</strong><br/>') % {'title': title}

@@ -12,13 +12,21 @@
                 <field name="x_can_submit" invisible="1"/>
                 <field name="x_can_return" invisible="1"/>
                 <field name="x_can_approve" invisible="1"/>
+                <field name="x_can_reopen_rows" invisible="1"/>
+                <field name="x_can_split" invisible="1"/>
                 <field name="state" invisible="1"/>
 
                 <header>
-                    <button name="action_submit" string="Submit to GM"
+                    <!-- Asks what goes: every component, or only the ones he
+                         ticks (and any open sub-batch). -->
+                    <button name="action_submit_prompt" string="Submit to GM"
                             type="object" class="btn-primary"
-                            invisible="not x_can_submit"
-                            confirm="This hands your department's commissions to the General Manager and freezes your batches. Continue?"/>
+                            invisible="not x_can_submit"/>
+                    <button name="action_new_sub_batch" string="New Sub-Batch"
+                            type="object" class="btn-secondary"
+                            icon="fa-scissors"
+                            invisible="not x_can_split"
+                            title="Send some employees to the General Manager early, without locking the department"/>
                     <button name="action_reset_to_draft"
                             string="Take Back" type="object"
                             class="btn-secondary"
@@ -33,10 +41,22 @@
                     <button name="action_approve" string="Approve"
                             type="object" class="btn-primary"
                             invisible="not x_can_approve"
-                            confirm="Approve this department's commissions? Its batches are locked once you do."/>
-                    <button name="action_return" string="Return for Correction"
+                            confirm="Approve everything this department has waiting on you? Those entries are locked once you do."/>
+                    <!-- Partial decisions: the review screen, component by
+                         component — approve or return the employees he
+                         ticks; the rest stay waiting on him. -->
+                    <button name="action_open_review"
+                            string="Review by Component…"
                             type="object" class="btn-secondary"
-                            invisible="not x_can_return"/>
+                            invisible="not x_can_approve"/>
+                    <button name="action_return" string="Return All"
+                            type="object" class="btn-secondary"
+                            invisible="not x_can_return"
+                            confirm="Send everything waiting back to the supervisor, with the reason typed below?"/>
+                    <button name="action_open_reopen"
+                            string="Reopen Approved…"
+                            type="object" class="btn-secondary"
+                            invisible="not x_can_reopen_rows"/>
                     <statusbar statusfield="state"
                                statusbar_visible="draft,submitted,approved"/>
                 </header>
@@ -50,9 +70,15 @@
                         </button>
                         <button name="action_open_entries" type="object"
                                 class="oe_stat_button" icon="fa-users"
-                                title="Every entry, grouped per employee">
+                                title="Review each employee, one component at a time">
                             <field name="employee_count" widget="statinfo"
                                    string="Employees"/>
+                        </button>
+                        <button name="action_open_sub_batches" type="object"
+                                class="oe_stat_button" icon="fa-scissors"
+                                invisible="not sub_batch_count">
+                            <field name="sub_batch_count" widget="statinfo"
+                                   string="Sub-Batches"/>
                         </button>
                     </div>
 
@@ -86,6 +112,12 @@
                                    invisible="not submitted_date"/>
                             <field name="entry_count" readonly="1"/>
                             <field name="total_amount" readonly="1"/>
+                            <field name="pending_entry_count" readonly="1"
+                                   string="Waiting on the GM"
+                                   invisible="not pending_entry_count"/>
+                            <field name="pending_amount" readonly="1"
+                                   string="Amount Waiting"
+                                   invisible="not pending_entry_count"/>
                         </group>
                     </group>
 
@@ -93,13 +125,36 @@
                          Readonly for everyone else so it reads as a record
                          of what happened rather than an editable note. -->
                     <group string="Return Reason"
-                           invisible="state != 'submitted'"
+                           invisible="not x_can_return"
                            groups="KSW_commissions.group_commission_gm">
                         <field name="return_reason" nolabel="1"
                                placeholder="What has to be corrected before this can be approved?"/>
                     </group>
 
                     <notebook>
+                        <!-- Exactly what the GM is deciding: rows handed
+                             over as a department or in a sub-batch. Rows
+                             the supervisor is still typing are not shown. -->
+                        <page string="Waiting on the GM" name="pending"
+                              invisible="not pending_entry_count">
+                            <field name="pending_entry_ids" nolabel="1"
+                                   readonly="1">
+                                <list default_group_by="employee_id"
+                                      create="false" delete="false">
+                                    <field name="employee_id"/>
+                                    <field name="component_id"/>
+                                    <field name="option_id" optional="show"/>
+                                    <field name="date" optional="show"/>
+                                    <field name="quantity" sum="Total"/>
+                                    <field name="reason" optional="show"/>
+                                    <field name="x_sub_batch_id"
+                                           optional="show"/>
+                                    <field name="amount" sum="Total Amount"/>
+                                    <field name="currency_id"
+                                           column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
                         <page string="Batches" name="batches">
                             <field name="batch_ids" nolabel="1" readonly="1">
                                 <list decoration-info="state == 'submitted'"
@@ -140,6 +195,8 @@
                 <field name="entry_count" string="Records"/>
                 <field name="employee_count"/>
                 <field name="total_amount" sum="Total"/>
+                <field name="pending_entry_count" string="Waiting on GM"
+                       optional="show"/>
                 <field name="state" widget="badge"
                        decoration-success="state in ['submitted', 'approved']"
                        decoration-warning="state == 'returned'"/>

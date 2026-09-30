@@ -37,6 +37,15 @@
                     <button name="action_import" string="Import"
                             type="object" class="btn-secondary"
                             invisible="state != 'draft' or not importer"/>
+                    <!-- Hand some employees over ahead of the rest of the
+                         month (e.g. before a vacation) without locking
+                         this batch — see ksw.pay.sub.batch. -->
+                    <button name="action_new_sub_batch" string="Sub-Batch"
+                            type="object" class="btn-secondary"
+                            icon="fa-scissors"
+                            groups="KSW_commissions.group_commission_supervisor"
+                            invisible="state != 'draft' or not id"
+                            title="Send some employees to the General Manager early, without locking this batch"/>
                     <!-- Available in every state, not just Draft:
                          the reason to export an approved batch (file it,
                          check it against BAS) outlives the entry window. -->
@@ -74,6 +83,13 @@
                                nolabel="1"/>
                     </div>
 
+                    <field name="handed_over_date" invisible="1"/>
+                    <div class="alert alert-info" role="alert"
+                         invisible="not handed_over_date or state != 'submitted' or submission_state == 'submitted'">
+                        <strong>Sent to the General Manager on its own.</strong>
+                        The other components stay open. Reopen this one to
+                        take it back while he has not acted on it.
+                    </div>
                     <div class="alert alert-info" role="alert"
                          invisible="submission_state != 'submitted' or state == 'approved'">
                         <strong>Handed over to the General Manager.</strong>
@@ -123,13 +139,15 @@
                                    context="{'default_batch_id': id}">
                                 <list editable="bottom"
                                       decoration-warning="is_overridden"
-                                      decoration-danger="x_vacation_hold">
+                                      decoration-danger="x_vacation_hold"
+                                      decoration-muted="state == 'approved'">
                                     <!-- Carries the picker's domain: the
                                          batch's own scope plus whoever
                                          reports to this supervisor. -->
                                     <field name="allowed_employee_ids"
                                            column_invisible="1"/>
                                     <field name="employee_id"
+                                           readonly="state != 'draft'"
                                            options="{'no_create': True}"/>
                                     <!-- Why this row is red. Read-only and
                                          always shown when set: the row may
@@ -151,26 +169,34 @@
                                          read it from — the picker would come
                                          up empty exactly when it is needed. -->
                                     <field name="option_id"
+                                           readonly="state != 'draft'"
                                            domain="[('component_id', '=', parent.component_id)]"
                                            column_invisible="not parent.has_options"
                                            required="parent.has_options"
                                            options="{'no_create': True}"/>
                                     <field name="date"
+                                           readonly="state != 'draft'"
                                            column_invisible="not parent.needs_date"/>
                                     <field name="quantity_ref"
+                                           readonly="state != 'draft'"
                                            column_invisible="not parent.qty_ref_label"
                                            optional="show"/>
                                     <field name="quantity"
+                                           readonly="state != 'draft'"
                                            column_invisible="parent.calculation == 'fixed'"
                                            sum="Total"/>
                                     <field name="threshold_qty"
+                                           readonly="state != 'draft'"
                                            column_invisible="parent.calculation != 'tiered'"
                                            optional="show"/>
                                     <field name="location_id"
+                                           readonly="state != 'draft'"
                                            column_invisible="not parent.needs_location"
                                            options="{'no_create': True}"/>
-                                    <field name="reason"/>
-                                    <field name="details" optional="hide"/>
+                                    <field name="reason"
+                                           readonly="state != 'draft'"/>
+                                    <field name="details"
+                                           readonly="state != 'draft'" optional="hide"/>
                                     <field name="rate" readonly="1"
                                            column_invisible="parent.calculation == 'fixed'"
                                            optional="show"/>
@@ -178,12 +204,13 @@
                                            column_invisible="parent.calculation == 'fixed'"
                                            optional="hide"/>
                                     <field name="amount_override"
+                                           readonly="state != 'draft'"
                                            column_invisible="parent.calculation == 'fixed'"
                                            optional="hide"/>
                                     <field name="is_overridden"
                                            column_invisible="1"/>
                                     <field name="amount"
-                                           readonly="parent.calculation != 'fixed'"
+                                           readonly="parent.calculation != 'fixed' or state != 'draft'"
                                            sum="Total Amount"/>
                                     <button name="action_explain" type="object"
                                             icon="fa-calculator"
@@ -193,6 +220,19 @@
                                             type="object" icon="fa-copy"
                                             title="Duplicate this line"
                                             invisible="parent.state != 'draft' or parent.x_entries_readonly"/>
+                                    <!-- The row's own status: with
+                                         sub-batches and partial returns a
+                                         row can be with the GM, or approved,
+                                         while this batch is still open. -->
+                                    <field name="state" widget="badge"
+                                           optional="show"
+                                           decoration-info="state == 'submitted'"
+                                           decoration-success="state == 'approved'"/>
+                                    <field name="x_sub_batch_id"
+                                           optional="show"
+                                           options="{'no_open': True}"/>
+                                    <field name="x_return_reason"
+                                           optional="hide"/>
                                     <field name="currency_id"
                                            column_invisible="1"/>
                                 </list>

@@ -45,10 +45,8 @@ class KswPayRun(models.Model):
         were split.
         """
         self.ensure_one()
-        entries = self.env['ksw.pay.entry'].sudo().browse()
-        for batch in self._payable_batches(settled_only=True):
-            entries |= batch.sudo().entry_ids
-        entries = entries.filtered('employee_id')
+        entries = self._payable_entries(
+            settled_only=True).filtered('employee_id')
         # Exactly the register's set: an entry paid on a vacation payslip is
         # not in the register either, and leaving it in here made the
         # employee's journal figure disagree with his register line.

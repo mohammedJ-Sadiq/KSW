@@ -67,3 +67,14 @@ access_ksw_pay_cash_band_accountant,ksw.pay.cash.band accountant,model_ksw_pay_c
 access_ksw_pay_cash_band_gm,ksw.pay.cash.band gm,model_ksw_pay_cash_band,group_commission_gm,1,0,0,0
 access_ksw_pay_cash_band_supervisor,ksw.pay.cash.band supervisor,model_ksw_pay_cash_band,group_commission_supervisor,1,0,0,0
 access_ksw_leave_commission_entry_system,ksw.leave.commission.entry system,model_ksw_leave_commission_entry,base.group_system,1,1,1,1
+access_ksw_pay_sub_batch_supervisor,ksw.pay.sub.batch supervisor,model_ksw_pay_sub_batch,group_commission_supervisor,1,1,1,1
+access_ksw_pay_sub_batch_officer,ksw.pay.sub.batch officer,model_ksw_pay_sub_batch,group_commission_officer,1,1,1,1
+access_ksw_pay_sub_batch_gm,ksw.pay.sub.batch gm,model_ksw_pay_sub_batch,group_commission_gm,1,1,0,0
+access_ksw_pay_sub_batch_accountant,ksw.pay.sub.batch accountant,model_ksw_pay_sub_batch,group_commission_accountant,1,0,0,0
+access_ksw_pay_submit_wizard_supervisor,ksw.pay.submit.wizard supervisor,model_ksw_pay_submit_wizard,group_commission_supervisor,1,1,1,1
+access_ksw_pay_gm_review_wizard_gm,ksw.pay.gm.review.wizard gm,model_ksw_pay_gm_review_wizard,group_commission_gm,1,1,1,1
+access_ksw_pay_gm_review_line_gm,ksw.pay.gm.review.line gm,model_ksw_pay_gm_review_line,group_commission_gm,1,1,1,1
+access_ksw_pay_gm_review_reason_gm,ksw.pay.gm.review.reason gm,model_ksw_pay_gm_review_reason,group_commission_gm,1,1,1,1
+access_ksw_pay_employee_review_supervisor,ksw.pay.employee.review supervisor,model_ksw_pay_employee_review,group_commission_supervisor,1,0,0,0
+access_ksw_pay_employee_review_gm,ksw.pay.employee.review gm,model_ksw_pay_employee_review,group_commission_gm,1,0,0,0
+access_ksw_pay_employee_review_accountant,ksw.pay.employee.review accountant,model_ksw_pay_employee_review,group_commission_accountant,1,0,0,0

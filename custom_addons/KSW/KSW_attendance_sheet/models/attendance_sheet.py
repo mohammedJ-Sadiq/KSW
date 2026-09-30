@@ -724,6 +724,13 @@ class KswAttendanceSheet(models.Model):
                      calendar.calendar_group_ids.ids),
                 ], order='hour_from asc')
 
+        # Days approved time off already owns are born absent — the same
+        # coverage the confirmation blocker checks, so a freshly generated
+        # sheet can never contradict the leave record. The leave-side lock
+        # only reaches sheets that existed when the leave was approved; a
+        # vacation approved in June never saw September's sheet.
+        covered = self._approved_leave_coverage(dates)
+
         vals_list = []
         schedules = {}
         for d in dates:
@@ -733,7 +740,7 @@ class KswAttendanceSheet(models.Model):
             )
             is_wd = schedule is not None
             schedules[d] = schedule
-            vals_list.append({
+            vals = {
                 'sheet_id': self.id,
                 'date': d,
                 'is_workday': is_wd,
@@ -746,12 +753,84 @@ class KswAttendanceSheet(models.Model):
                 # fabricate a full month of pay with no real schedule
                 # behind it.
                 'is_attended': is_wd or not misconfigured,
-            })
+            }
+            if d in covered:
+                vals['is_attended'] = False
+                vals.update(self._covered_line_vals(covered[d], d))
+            vals_list.append(vals)
 
         new_lines = self.env['ksw.attendance.sheet.line'].create(vals_list)
         # Immediately create hr.attendance records
         self._sync_line_attendance(new_lines, schedules=schedules)
+        if covered:
+            self._post_covered_days_note(covered)
         return new_lines
+
+    # ------------------------------------------------------------------
+    # Approved time off — one predicate for generation and confirmation
+    # ------------------------------------------------------------------
+
+    def _approved_leaves(self):
+        """Validated full-day leaves of this employee touching the month.
+
+        Hourly and half-day requests are left out: an hour's excuse does
+        not make the day absent, and the sheet has no finer unit.
+        """
+        self.ensure_one()
+        date_from, date_to = self._period_bounds()
+        return self.env['hr.leave'].sudo().search([
+            ('employee_id', '=', self.employee_id.id),
+            ('state', '=', 'validate'),
+            ('request_date_from', '<=', date_to),
+            ('request_date_to', '>=', date_from),
+            ('request_unit_hours', '=', False),
+            ('request_unit_half', '=', False),
+        ])
+
+    def _approved_leave_coverage(self, dates):
+        """{date: leave} for the *dates* approved time off takes off."""
+        self.ensure_one()
+        leaves = self._approved_leaves()
+        if not leaves:
+            return {}
+        period_end = self._period_bounds()[1]
+        covered = {}
+        for leave in leaves.sorted('request_date_from'):
+            end = self._leave_coverage_end(leave, period_end)
+            for d in dates:
+                if leave.request_date_from <= d <= end:
+                    covered.setdefault(d, leave)
+        return covered
+
+    def _covered_line_vals(self, leave, day):
+        """Extra values for a line born absent under *leave*.
+
+        Hook: KSW_unpaid_leave adds the lock (x_leave_id), exactly as the
+        leave would have written it had this sheet existed at approval.
+        """
+        return {}
+
+    def _post_covered_days_note(self, covered):
+        self.ensure_one()
+        by_leave = {}
+        for d, leave in covered.items():
+            by_leave.setdefault(leave, []).append(d)
+        for leave, days in by_leave.items():
+            days.sort()
+            self.sudo().message_post(
+                body=Markup(
+                    '<strong>📋 Approved Time Off Applied</strong><br/>'
+                    '<b>%(count)s day(s)</b> generated as absent: '
+                    '%(type)s (%(from_)s → %(to_)s) covers %(days)s.'
+                ) % {
+                    'count': len(days),
+                    'type': leave.holiday_status_id.name,
+                    'from_': leave.request_date_from,
+                    'to_': leave.request_date_to,
+                    'days': ', '.join(d.strftime('%d %b') for d in days),
+                },
+                subtype_xmlid='mail.mt_note',
+            )
 
     # ------------------------------------------------------------------
     # Employment window — a sheet never covers days before joining
@@ -887,13 +966,8 @@ class KswAttendanceSheet(models.Model):
         self.ensure_one()
         blockers = self._employment_window_blockers()
 
-        date_from, date_to = self._period_bounds()
-        leaves = self.env['hr.leave'].sudo().search([
-            ('employee_id', '=', self.employee_id.id),
-            ('state', '=', 'validate'),
-            ('request_date_from', '<=', date_to),
-            ('request_date_to', '>=', date_from),
-        ])
+        date_to = self._period_bounds()[1]
+        leaves = self._approved_leaves()
         if not leaves:
             return blockers
 
@@ -936,21 +1010,6 @@ class KswAttendanceSheet(models.Model):
         """
         self.ensure_one()
         return leave.request_date_to or leave.request_date_from
-
-    def _covered_line_ids(self, leaves, period_end):
-        """Line ids this sheet should record as absent for these leaves."""
-        self.ensure_one()
-        covered = set()
-        for leave in leaves:
-            start = leave.request_date_from
-            end = self._leave_coverage_end(leave, period_end)
-            if not start or not end:
-                continue
-            covered.update(
-                line.id for line in self.line_ids
-                if start <= line.date <= end
-            )
-        return covered
 
     def _confirmation_owner(self):
         """The user who has to act next before this sheet can be released.
@@ -1104,25 +1163,22 @@ class KswAttendanceSheet(models.Model):
                     raise UserError(reason)
 
         for sheet in self:
-            date_from, date_to = sheet._period_bounds()
-            leaves = self.env['hr.leave'].sudo().search([
-                ('employee_id', '=', sheet.employee_id.id),
-                ('state', '=', 'validate'),
-                ('request_date_from', '<=', date_to),
-                ('request_date_to', '>=', date_from),
-            ])
-            if not leaves:
-                continue
-
-            covered = sheet._covered_line_ids(leaves, date_to)
+            # Same coverage and lock that generation applies, so repairing
+            # an older sheet leaves it exactly as a new one would be born.
+            covered = sheet._approved_leave_coverage(
+                sheet.line_ids.mapped('date'))
             to_mark = sheet.line_ids.filtered(
-                lambda l: l.id in covered and l.is_attended)
+                lambda l: l.date in covered and l.is_attended)
             if not to_mark:
                 continue
 
             dates = sorted(to_mark.mapped('date'))
             to_mark.with_context(ksw_system_write=True).write(
                 {'is_attended': False})
+            for line in to_mark:
+                lock = sheet._covered_line_vals(covered[line.date], line.date)
+                if lock:
+                    line.sudo().write(lock)
             sheet.sudo().message_post(
                 body=Markup(
                     '<strong>📋 Approved Time Off Applied</strong><br/>'

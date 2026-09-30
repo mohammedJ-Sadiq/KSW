@@ -34,6 +34,11 @@ class HrLeave(models.Model):
                 and not self._is_unpaid_leave(leave)
                 and not getattr(leave, 'x_is_eos_leave', False))
 
+    def _locks_attendance_sheet(self, leave):
+        """Leaves whose own days are locked on the sheet at validation
+        (see _action_validate → _lock_attendance_sheet_lines)."""
+        return self._is_unpaid_leave(leave) or self._is_annual_leave(leave)
+
     def _sync_gm_final_state(self):
         res = super()._sync_gm_final_state()
         for leave in self.filtered(self._settles_attendance_sheet):
@@ -107,7 +112,11 @@ class HrLeave(models.Model):
         start = self.request_date_from
         end = self.request_date_to or start
         month_start = start.replace(day=1)
-        month_end = end.replace(day=monthrange(end.year, end.month)[1])
+        # The whole-month rule is for the month the vacation starts in (the
+        # vacation payslip settles it). The return month is worked from the
+        # return date on, so there it stops at the vacation's last day.
+        month_end = max(
+            end, start.replace(day=monthrange(start.year, start.month)[1]))
         Line = self.env['ksw.attendance.sheet.line'].sudo()
         candidates = Line.search([
             ('sheet_id.employee_id', '=', emp.id),
@@ -173,6 +182,25 @@ class KswAttendanceSheet(models.Model):
     # mail.activity.mixin: the return-review To-Do lands on the sheet.
     _name = 'ksw.attendance.sheet'
     _inherit = ['ksw.attendance.sheet', 'mail.activity.mixin']
+
+    def _covered_line_vals(self, leave, day):
+        """Lock a day born absent exactly as the leave would have locked it.
+
+        Only the leave's own dates: past the planned end an unconfirmed
+        return keeps the day absent (KSW_payroll's coverage), but whoever
+        confirms the return must be able to mark it present again.
+        """
+        vals = super()._covered_line_vals(leave, day)
+        Leave = self.env['hr.leave']
+        own_end = leave.request_date_to or leave.request_date_from
+        if not (leave.request_date_from <= day <= own_end
+                and Leave._locks_attendance_sheet(leave)):
+            return vals
+        vals['x_leave_id'] = leave.id
+        if Leave._settles_attendance_sheet(leave):
+            # Owned by the settlement, so every route back releases it.
+            vals['x_settled_leave_id'] = leave.id
+        return vals
 
     def _create_lines(self, dates):
         """A sheet opened mid-vacation (next month's, by the monthly job) is

@@ -26,8 +26,7 @@
                             string="Submit My Entries"
                             type="object" class="btn-primary"
                             groups="KSW_commissions.group_commission_supervisor"
-                            invisible="not x_can_submit_mine"
-                            confirm="This hands your department's commissions to the General Manager and freezes your batches. Continue?"/>
+                            invisible="not x_can_submit_mine"/>
                     <button name="action_open_my_submission"
                             string="My Department"
                             type="object" class="btn-secondary"

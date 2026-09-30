@@ -919,6 +919,10 @@ class HrLeaveExtension(models.Model):
     # Validate / reverse — attendance sheet lock and chain reset
     # ==================================================================
 
+    def _locks_attendance_sheet(self, leave):
+        return (super()._locks_attendance_sheet(leave)
+                or self._is_leave_extension(leave))
+
     def _action_validate(self, check_state=True):
         result = super()._action_validate(check_state=check_state)
         extensions = self._extension_leaves()

@@ -168,7 +168,10 @@ class TestDepartmentScope(SubmissionCommon):
         yours = self._filled_batch(self.sup_b, self.dept_b, self.emp_b)
 
         run = mine.submission_id.run_id
-        run.with_user(self.sup_a).action_submit_my_departments()
+        # The button asks what goes; "every component" is the whole handover.
+        action = run.with_user(self.sup_a).action_submit_my_departments()
+        self.env['ksw.pay.submit.wizard'].with_user(self.sup_a).browse(
+            action['res_id']).action_confirm()
 
         self.assertEqual(mine.submission_id.state, 'submitted')
         self.assertEqual(mine.state, 'submitted')
@@ -461,11 +464,24 @@ class TestApproval(SubmissionCommon):
 
         run.with_user(self.gm).action_approve()
 
-        self.assertEqual(run.state, 'approved')
+        # B is still typing, so the month does not lock itself (Sep 2026:
+        # it used to, and shut B out of the month mid-way)...
+        self.assertNotIn(run.state, ('approved', 'paid'))
         self.assertEqual(mine.state, 'approved')
+        # ...until whoever owns the month decides B is out of it.
+        run.sudo().action_close_month()
+        self.assertEqual(run.state, 'approved')
         self.assertEqual(yours.state, 'draft')
         self.assertEqual(run.line_ids.mapped('employee_id'), self.emp_a)
         self.assertFalse(run.line_ids.is_preview)
+
+    def test_30b_the_month_locks_itself_once_all_are_approved(self):
+        mine = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)
+        yours = self._filled_batch(self.sup_b, self.dept_b, self.emp_b)
+        run = self._submit(mine)
+        yours.submission_id.with_user(self.sup_b).action_submit()
+        run.with_user(self.gm).action_approve()
+        self.assertEqual(run.state, 'approved')
 
     def test_31_nothing_handed_over_means_nothing_to_approve(self):
         batch = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)

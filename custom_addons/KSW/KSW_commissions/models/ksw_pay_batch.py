@@ -132,6 +132,14 @@ class KswPayBatch(models.Model):
 
     submitted_by = fields.Many2one('res.users', readonly=True, copy=False)
     submitted_date = fields.Datetime(readonly=True, copy=False)
+    # This component was sent to the General Manager on its own, ahead of
+    # the rest of the department. A plain Submit only says "I have finished
+    # typing it"; this is what puts it in front of the GM
+    # (entry._handed_over). Cleared only when the whole batch comes back
+    # (action_return, action_reset_to_draft) — NOT when the GM returns some
+    # of its rows, or the others would drop off his desk.
+    handed_over_date = fields.Datetime(
+        string='Sent to GM On', readonly=True, copy=False)
     return_reason = fields.Text(readonly=True, copy=False)
 
     # Mirrors of the component, so the view can adapt without a second read.
@@ -222,11 +230,13 @@ class KswPayBatch(models.Model):
         for rec in self:
             if rec.period not in locked:
                 locked[rec.period] = period_is_locked(self.env, rec.period)
-            if rec.state == 'draft' or (locked[rec.period] and not is_gm):
+            if rec.state == 'draft' or locked[rec.period]:
                 rec.x_can_reopen = False
                 continue
             if rec.state == 'approved':
-                rec.x_can_reopen = is_gm
+                # Money that has left is history, for the GM too.
+                rec.x_can_reopen = is_gm and not rec.sudo().entry_ids.filtered(
+                    lambda e: e.state == 'approved')._paid_entries()
                 continue
             rec.x_can_reopen = is_gm or rec.submission_id.state != 'submitted'
 
@@ -434,7 +444,11 @@ class KswPayBatch(models.Model):
         a monthly figure has no day to compare against.
         """
         self.ensure_one()
-        entries = self.entry_ids.filtered('employee_id')
+        # Only what is still the supervisor's to hand over. A row already
+        # approved in a sub-batch is not his to delete; the register holds
+        # it back and the vacation settlement pays it.
+        entries = self.entry_ids.filtered(
+            lambda e: e.employee_id and e.state == 'draft')
         if not entries or not self.period:
             return self.env['ksw.pay.entry']
         holds = vacation_holds(self.env, entries.employee_id, self.period)
@@ -563,7 +577,25 @@ class KswPayBatch(models.Model):
         batches._check_component_rights()
         batches._check_department_rights()
         batches._ensure_submission()
+        batches._check_department_open(_("Creating a batch"))
         return batches
+
+    def _check_department_open(self, what):
+        """A department handed over as a whole takes no new batch.
+
+        Its batches are frozen, and a new one could never be handed over —
+        the department is already in, or approved — so the rows typed into
+        it would sit there unpaid with nothing to say why. Once the GM
+        returns something, the department is open again.
+        """
+        if self.env.su:
+            return
+        for rec in self:
+            if rec.submission_id.state in ('submitted', 'approved'):
+                raise UserError(_(
+                    "%(scope)s has been handed to the General Manager as a "
+                    "whole. %(what)s is not possible until he returns it.",
+                    scope=rec.submission_id.display_name, what=what))
 
     def write(self, vals):
         if vals.get('period'):
@@ -573,6 +605,7 @@ class KswPayBatch(models.Model):
         if not self.env.su:
             protected = set(vals) - {
                 'state', 'note', 'submitted_by', 'submitted_date',
+                'handed_over_date',
                 'return_reason', 'message_follower_ids', 'message_ids',
                 'activity_ids', 'message_main_attachment_id',
             }
@@ -584,13 +617,32 @@ class KswPayBatch(models.Model):
                         "Batch %(name)s has been submitted. Ask the General "
                         "Manager to return it before changing it.",
                         name=rec.name))
+                # An open batch can still hold rows the GM has; those rows
+                # are tied to this component, month and department.
+                if protected & {'component_id', 'period', 'department_id',
+                                'site_id', 'currency_id'} \
+                        and rec.entry_ids.filtered(
+                            lambda e: e.state != 'draft'):
+                    raise UserError(_(
+                        "%(name)s holds entries that have been handed to "
+                        "the General Manager, so its component, month and "
+                        "department can no longer change.", name=rec.name))
         res = super().write(vals)
+        if 'state' in vals and not self.env.context.get('ksw_entry_sync'):
+            # A blunt write of the batch's state (a data fix, an old
+            # script) means the whole batch — the rows follow it, except a
+            # row already paid, which nothing moves.
+            self.entry_ids.filtered(
+                lambda e: not e.x_vacation_payslip_id
+                and e.state != vals['state']
+            ).sudo().write({'state': vals['state']})
         if 'component_id' in vals:
             self._check_component_rights()
         if 'department_id' in vals:
             self._check_department_rights()
         if {'period', 'department_id', 'site_id'} & set(vals):
             self._ensure_submission()
+            self._check_department_open(_("Moving a batch into it"))
         return res
 
     def _ensure_submission(self):
@@ -609,10 +661,45 @@ class KswPayBatch(models.Model):
             if rec.submission_id != submission:
                 rec.sudo().write({'submission_id': submission.id})
 
+    def _sync_state_from_entries(self):
+        """Make the batch read what its rows say.
+
+        An open batch (draft) stays open whatever a sub-batch did to some of
+        its rows — that is the point of splitting: the supervisor keeps
+        typing while those rows wait on the GM. Once the batch has been
+        submitted as a whole, it follows its rows: back to draft when the GM
+        returns any of them, approved once all of them are.
+        """
+        for rec in self.sudo():
+            if rec.state == 'draft':
+                continue
+            states = set(rec.entry_ids.mapped('state'))
+            if not states or 'draft' in states:
+                target = 'draft'
+            elif 'submitted' in states:
+                target = 'submitted'
+            else:
+                target = 'approved'
+            if target != rec.state:
+                vals = {'state': target}
+                if target == 'draft':
+                    vals.update(submitted_by=False, submitted_date=False)
+                rec.with_context(ksw_entry_sync=True).write(vals)
+        return True
+
     def unlink(self):
         # The entries go by ondelete='cascade', which never calls their own
         # unlink(), so their paid-on-vacation lock has to be asked here.
         self.entry_ids._check_not_settled(_("Deleting its batch"))
+        # Not exempting env.su, on purpose: a batch holding rows the GM has
+        # or has approved is part of an approval, not a draft, and nothing
+        # — no cleanup, no administrator — should make it disappear.
+        handed = self.entry_ids.filtered(lambda e: e.state != 'draft')
+        if handed:
+            raise UserError(_(
+                "%(name)s cannot be deleted: %(count)s of its entries have "
+                "been handed to or approved by the General Manager.",
+                name=handed[0].batch_id.name, count=len(handed)))
         for rec in self:
             check_period_unlocked(
                 self.env, rec.period, _("Deleting this batch"))
@@ -693,12 +780,19 @@ class KswPayBatch(models.Model):
             check_period_unlocked(self.env, rec.period, _("Submitting"))
             rec._check_no_held_entries()
             rec._ensure_submission()
-            rec.write({
+            # Rows a sub-batch already handed over stay where they are;
+            # everything still in draft goes with the batch.
+            rec.entry_ids._wf_submit()
+            rec.with_context(ksw_entry_sync=True).write({
                 'state': 'submitted',
                 'submitted_by': self.env.uid,
                 'submitted_date': fields.Datetime.now(),
                 'return_reason': False,
             })
+            # Nothing left pending (every row came in a sub-batch the GM
+            # already approved) reads as approved, not as waiting.
+            rec._sync_state_from_entries()
+            rec.entry_ids.x_sub_batch_id._sync_state_from_entries()
             rec.sudo().message_post(
                 body=Markup(
                     '<strong>Submitted</strong><br/>'
@@ -717,13 +811,16 @@ class KswPayBatch(models.Model):
             if rec.state != 'submitted':
                 raise UserError(_(
                     "Only a submitted batch can be returned."))
-            rec.write({
+            partners = rec.submitted_by.partner_id
+            rec.entry_ids._wf_return(reason)
+            rec.with_context(ksw_entry_sync=True).write({
                 'state': 'draft',
                 'return_reason': reason or False,
                 'submitted_by': False,
                 'submitted_date': False,
+                'handed_over_date': False,
             })
-            partners = rec.submitted_by.partner_id
+            rec.entry_ids.x_sub_batch_id._sync_state_from_entries()
             rec.sudo().message_post(
                 body=Markup(
                     '<strong>Returned for correction</strong><br/>'
@@ -757,9 +854,29 @@ class KswPayBatch(models.Model):
         for rec in self:
             check_period_unlocked(
                 self.env, rec.period, _("Reopening this batch"))
+            # Not GM-exempt, unlike the period lock above: a finalised month
+            # has its register built from these rows, so reopening one batch
+            # inside it would leave the bank file paying rows that read as
+            # draft. The month is reopened first (ksw.pay.run.action_reopen).
+            if not self.env.su and period_is_locked(self.env, rec.period):
+                raise UserError(_(
+                    "%(month)s has been finalised. Reopen the month first — "
+                    "a batch cannot be reopened inside a finalised month.",
+                    month=rec.period.strftime('%B %Y')))
+            # Rows a sub-batch handed over are the sub-batch's to reopen;
+            # a row that has been paid is nobody's.
+            rows = (rec.entry_ids - rec.entry_ids._sub_batch_controlled())
             if self.env.su or is_gm:
-                rec.write({'state': 'draft', 'submitted_by': False,
-                           'submitted_date': False})
+                approved = rows.filtered(lambda e: e.state == 'approved')
+                if not self.env.su:
+                    approved._check_reopenable()
+                rows.filtered(
+                    lambda e: e.state != 'draft' and not e.x_vacation_payslip_id
+                ).sudo().write({'state': 'draft'})
+                rec.with_context(ksw_entry_sync=True).write({
+                    'state': 'draft', 'submitted_by': False,
+                    'submitted_date': False, 'handed_over_date': False})
+                rec.submission_id._sync_state_from_entries()
                 continue
             if rec.state == 'approved':
                 raise UserError(_(
@@ -772,8 +889,12 @@ class KswPayBatch(models.Model):
                     "it — or, if he has not looked yet, take the submission "
                     "back from the Monthly Pay Run.",
                     scope=rec.submission_id.display_name))
-            rec.write({'state': 'draft', 'submitted_by': False,
-                       'submitted_date': False})
+            # Taking back a component sent on its own is the batch-sized
+            # twin of the department's Take Back: allowed until the GM acts.
+            rows._wf_return()
+            rec.with_context(ksw_entry_sync=True).write({
+                'state': 'draft', 'submitted_by': False,
+                'submitted_date': False, 'handed_over_date': False})
         self.mapped('submission_id.run_id')._refresh_register()
         return True
 
@@ -789,6 +910,58 @@ class KswPayBatch(models.Model):
             "%(count)s recurring entr%(plural)s added.",
             count=len(created), plural=_('y') if len(created) == 1 else _('ies'),
         ))
+
+    def action_hand_over(self):
+        """Send these components to the General Manager on their own.
+
+        The supervisor's choice of *which* pay components go now; the rest
+        of his department stays open for him. It never hands the department
+        over by itself — not even the last component: saying "my month is
+        finished" is the explicit "Every component" choice, because the
+        department's approval is what can finalise and lock the month.
+        """
+        self.mapped('submission_id')._check_mine()
+        batches = self.filtered(
+            lambda b: b.state in ('draft', 'submitted')
+            and b.entry_ids.filtered(lambda e: e.state == 'draft'))
+        if not batches:
+            raise UserError(_("Pick at least one component to send."))
+        batches.filtered(lambda b: b.state == 'draft').action_submit()
+        now = fields.Datetime.now()
+        for rec in batches:
+            if rec.state == 'submitted':
+                rec.with_context(ksw_entry_sync=True).write(
+                    {'handed_over_date': now})
+        for submission in batches.submission_id:
+            sent = batches.filtered(lambda b, s=submission: b.submission_id == s)
+            body = Markup(
+                '<strong>%(title)s</strong><br/>'
+                '<b>%(l_by)s</b> %(user)s<ul>'
+            ) % {'title': _('📤 Components sent for approval'),
+                 'l_by': _('By:'), 'user': self.env.user.name}
+            for b in sent:
+                body += Markup('<li>%(name)s — %(total).2f</li>') % {
+                    'name': b.component_id.name,
+                    'total': b.total_amount or 0.0}
+            body += Markup('</ul>')
+            submission.sudo().message_post(
+                body=body, partner_ids=submission._gm_partners().ids,
+                subtype_xmlid='mail.mt_comment')
+        runs = batches.mapped('submission_id.run_id')
+        runs._sync_state()
+        runs._refresh_register()
+        return True
+
+    def action_new_sub_batch(self):
+        """Start a sub-batch for this batch's department month.
+
+        A sub-batch names employees, not rows, and takes their entries from
+        every batch of the month — so it belongs to the department, and this
+        is only a shortcut to it.
+        """
+        self.ensure_one()
+        self._ensure_submission()
+        return self.submission_id.action_new_sub_batch()
 
     def action_import(self):
         """Run the importer the component declares."""
@@ -855,8 +1028,24 @@ class KswPayEntry(models.Model):
     site_id = fields.Many2one(
         related='batch_id.site_id', store=True, readonly=True,
     )
-    state = fields.Selection(related='batch_id.state', store=True,
-                             readonly=True, index=True)
+    # The entry's own approval state — not the batch's. It used to be a
+    # stored related of batch_id.state, which made the batch the smallest
+    # thing a GM could approve or return. A supervisor handing over one
+    # employee before his vacation, or a GM refusing one employee's
+    # overtime and approving the rest, both need the decision to sit on the
+    # row. The batch and the department submission are summaries of it
+    # (_sync_state_from_entries), so a batch stays open while some of its
+    # rows are locked.
+    state = fields.Selection(
+        BATCH_STATES, default='draft', required=True, readonly=True,
+        copy=False, index=True, string='Status')
+    # The sub-batch this row was handed over in, if it went early. Kept on
+    # the row after approval as the record of how it was approved.
+    x_sub_batch_id = fields.Many2one(
+        'ksw.pay.sub.batch', string='Sub-Batch', readonly=True, copy=False,
+        index=True, ondelete='set null')
+    x_return_reason = fields.Text(
+        string='Returned Because', readonly=True, copy=False)
     currency_id = fields.Many2one(
         related='batch_id.currency_id', readonly=True,
     )
@@ -1249,6 +1438,17 @@ class KswPayEntry(models.Model):
                     "Batch %(name)s has been submitted. %(what)s is only "
                     "possible while it is in Draft.",
                     name=batch.name, what=what))
+            # The batch can be open while this row is not: it went to the
+            # General Manager in a sub-batch, or he approved it and returned
+            # only the others.
+            if rec.state != 'draft':
+                raise UserError(_(
+                    "%(entry)s is %(state)s — it is with the General Manager "
+                    "or already approved. %(what)s is not possible; ask him "
+                    "to return it.",
+                    entry=rec.sudo().display_name,
+                    state=dict(self._fields['state']._description_selection(
+                        self.env)).get(rec.state), what=what))
             rec._check_import_only(what)
 
     def _check_import_only(self, what):
@@ -1343,10 +1543,22 @@ class KswPayEntry(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        # A row can only reach a submitted or approved batch through
+        # sudo() (a data fix, a script) — _check_editable refuses everyone
+        # else. It joins the batch as the batch stands, which is what the
+        # old related `state` did, rather than as a stray draft inside it.
+        batch_states = dict(self.env['ksw.pay.batch'].sudo().browse(
+            {v['batch_id'] for v in vals_list if v.get('batch_id')}
+        ).mapped(lambda b: (b.id, b.state)))
+        for vals in vals_list:
+            if 'state' not in vals and batch_states.get(
+                    vals.get('batch_id'), 'draft') != 'draft':
+                vals['state'] = batch_states[vals['batch_id']]
         entries = super().create(vals_list)
         entries._check_editable(_("Adding an entry"))
         entries._check_employee_allowed()
         entries._check_vacation_hold(_("Adding an entry"))
+        entries._join_open_sub_batch()
         return entries
 
     def write(self, vals):
@@ -1356,6 +1568,7 @@ class KswPayEntry(models.Model):
         res = super().write(vals)
         if 'employee_id' in vals:
             self._check_employee_allowed()
+            self._join_open_sub_batch()
         # `date` too: moving an occurrence back into the vacation is the
         # same act as typing it there. Nothing else can change the answer —
         # the period belongs to the batch and a batch cannot move months.
@@ -1365,5 +1578,145 @@ class KswPayEntry(models.Model):
 
     def unlink(self):
         self._check_not_settled(_("Deleting it"))
+        # Not exempting env.su: an approved row is a decision the General
+        # Manager made, and no cleanup should make it disappear. Returning
+        # it to draft first is the way out, and that has its own guards.
+        approved = self.filtered(lambda e: e.state == 'approved')
+        if approved:
+            raise UserError(_(
+                "%(entry)s has been approved by the General Manager and "
+                "cannot be deleted.", entry=approved[0].sudo().display_name))
         self._check_editable(_("Deleting an entry"))
         return super().unlink()
+
+    # ------------------------------------------------------------------
+    # Workflow primitives — the entry is the unit of approval
+    # ------------------------------------------------------------------
+    # Every approval route (a batch, a department handover, a sub-batch,
+    # the GM's review wizard) moves rows through these four and then calls
+    # _sync_containers. One place decides what may move; the containers
+    # only summarise.
+    def _join_open_sub_batch(self):
+        """A row typed for somebody in an open sub-batch belongs to it, so
+        submitting the sub-batch takes everything he is owed so far."""
+        SubBatch = self.env['ksw.pay.sub.batch'].sudo()
+        for rec in self.sudo():
+            if rec.state != 'draft':
+                continue
+            submission = rec.batch_id.submission_id
+            target = SubBatch
+            if submission and rec.employee_id:
+                target = SubBatch.search([
+                    ('submission_id', '=', submission.id),
+                    ('state', 'in', ('draft', 'returned')),
+                    ('employee_ids', 'in', rec.employee_id.id),
+                ], limit=1)
+            if rec.x_sub_batch_id != target and (
+                    target or rec.x_sub_batch_id.state in ('draft', 'returned')):
+                rec.x_sub_batch_id = target
+
+    def _handed_over(self):
+        """The submitted rows the General Manager actually has in front of
+        him: sent in a sub-batch, or part of a department handed over.
+
+        A batch submitted on its own is only a supervisor saying he has
+        finished typing it — nobody is waiting on the GM for that.
+        """
+        return self.filtered(lambda e: e.state == 'submitted' and (
+            e.x_sub_batch_id.submitted_date
+            or e.batch_id.handed_over_date
+            or e.batch_id.submission_id.state not in (False, 'draft')))
+
+    def _sub_batch_controlled(self):
+        """Rows a sub-batch handed over. A batch-level Reopen or Submit
+        leaves them alone — the sub-batch and the GM decide them."""
+        return self.filtered(
+            lambda e: e.state != 'draft' and e.x_sub_batch_id.submitted_date)
+
+    def _paid_entries(self):
+        """Rows whose money has left: paid on a vacation payslip, or in a
+        month the accountant marked Paid. Nobody reopens these."""
+        periods = list(set(self.mapped('period')))
+        paid_periods = set(self.env['ksw.pay.run'].sudo().search([
+            ('period', 'in', periods), ('state', '=', 'paid'),
+        ]).mapped('period')) if periods else set()
+        return self.filtered(
+            lambda e: e.x_vacation_payslip_id or e.period in paid_periods)
+
+    def _check_reopenable(self):
+        """Refuse to send an approved row back when it has been paid, or a
+        vacation settlement has already counted on it."""
+        paid = self._paid_entries()
+        if paid:
+            raise UserError(_(
+                "%(entry)s (%(month)s) has been paid, so it cannot be "
+                "reopened — not even by the General Manager.",
+                entry=paid[0].sudo().display_name,
+                month=paid[0].period.strftime('%B %Y')))
+        latched = self.env['ksw.leave.commission.entry'].sudo().search([
+            ('entry_id', 'in', self.ids), ('included', '=', True),
+            ('leave_id.state', 'not in', ('refuse', 'cancel')),
+        ], limit=1)
+        if latched:
+            raise UserError(_(
+                "%(entry)s is already included in the vacation settlement "
+                "of %(leave)s. Return that request to Accounting and refresh "
+                "its commissions without it before reopening this row.",
+                entry=latched.entry_id.sudo().display_name,
+                leave=latched.leave_id.sudo().display_name))
+
+    def _check_not_held_for_submit(self, what):
+        """Refuse to hand over rows that pay a settled vacation twice."""
+        if self.env.su:
+            return
+        entries = self.filtered('employee_id')
+        by_period = defaultdict(lambda: self.env['ksw.pay.entry'])
+        for rec in entries:
+            by_period[rec.period] |= rec
+        held = self.env['ksw.pay.entry']
+        for period, rows in by_period.items():
+            holds = vacation_holds(self.env, rows.employee_id, period)
+            held |= rows.filtered(
+                lambda e: not e.x_vacation_payslip_id
+                and hold_blocks(holds.get(e.employee_id.id), e.date))
+        if held:
+            raise UserError(_(
+                "%(what)s is not possible: %(who)s went on vacation and "
+                "what they had earned was settled on the leave request. "
+                "Delete those entries, or ask the General Manager to release "
+                "the month (Commissions → Vacation Releases).",
+                what=what,
+                who=', '.join(held.employee_id.sudo().mapped('display_name'))))
+
+    def _wf_submit(self):
+        todo = self.filtered(lambda e: e.state == 'draft')
+        todo.sudo().write({'state': 'submitted', 'x_return_reason': False})
+        return todo
+
+    def _wf_approve(self):
+        todo = self.filtered(lambda e: e.state == 'submitted')
+        todo.sudo().write({'state': 'approved', 'x_return_reason': False})
+        return todo
+
+    def _wf_return(self, reason=None):
+        """submitted → draft. With a reason when the GM refused it; without
+        one when the supervisor took it back before anyone looked."""
+        todo = self.filtered(lambda e: e.state == 'submitted')
+        todo.sudo().write({'state': 'draft',
+                           'x_return_reason': reason or False})
+        return todo
+
+    def _wf_reopen(self, reason):
+        """approved → draft, by the General Manager, while nothing is paid."""
+        todo = self.filtered(lambda e: e.state == 'approved')
+        todo._check_reopenable()
+        todo.sudo().write({'state': 'draft', 'x_return_reason': reason})
+        return todo
+
+    def _sync_containers(self):
+        """Re-derive the batch, sub-batch and department summaries."""
+        entries = self.sudo()
+        entries.batch_id._sync_state_from_entries()
+        entries.x_sub_batch_id._sync_state_from_entries()
+        entries.batch_id.submission_id._sync_state_from_entries()
+        return True

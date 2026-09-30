@@ -11,6 +11,8 @@ from . import ksw_pay_batch               # batches + entries: the supervisor's 
 from . import ksw_pay_batch_skip_line    # what the import left out, and why
 from . import ksw_pay_recurring           # SAP infotype 0014 equivalent
 from . import ksw_pay_submission          # one department's handover to the GM
+from . import ksw_pay_sub_batch           # some employees handed over early
+from . import ksw_pay_employee_review     # one employee's handover, section per component
 from . import ksw_pay_run                 # the month, its approval and the register
 from . import ksw_pay_run_journal        # the month as a BAS journal entry
 from . import ksw_pay_import_bas          # the one importer: driver trips from BAS

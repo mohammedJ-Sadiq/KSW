@@ -376,6 +376,56 @@
         <field name="perm_unlink" eval="False"/>
     </record>
 
+    <!--
+        Sub-batches follow their department month exactly: the supervisor
+        who runs (or assists on) the department, whoever created one, the
+        department's own GM (read and write, never create or delete), the
+        Administrator for all, the accountant to read.
+    -->
+    <record id="pay_sub_batch_rule_supervisor" model="ir.rule">
+        <field name="name">KSW Pay Sub-Batch: departments I manage or assist, or created by me</field>
+        <field name="model_id" ref="model_ksw_pay_sub_batch"/>
+        <field name="groups" eval="[(4, ref('group_commission_supervisor'))]"/>
+        <field name="domain_force">['|', '|', ('department_id.manager_id.user_id', '=', user.id), ('department_id.manager_id.user_id', 'in', user.x_assisted_manager_ids.ids), ('create_uid', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="pay_sub_batch_rule_officer" model="ir.rule">
+        <field name="name">KSW Pay Sub-Batch: Administrator (all)</field>
+        <field name="model_id" ref="model_ksw_pay_sub_batch"/>
+        <field name="groups" eval="[(4, ref('group_commission_officer'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="pay_sub_batch_rule_department_gm" model="ir.rule">
+        <field name="name">KSW Pay Sub-Batch: department GM</field>
+        <field name="model_id" ref="model_ksw_pay_sub_batch"/>
+        <field name="groups" eval="[(4, ref('group_commission_gm'))]"/>
+        <field name="domain_force">[('gm_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="pay_sub_batch_rule_accountant" model="ir.rule">
+        <field name="name">KSW Pay Sub-Batch: Accountant (read-only, all)</field>
+        <field name="model_id" ref="model_ksw_pay_sub_batch"/>
+        <field name="groups" eval="[(4, ref('group_commission_accountant'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
     <record id="pay_batch_rule_department_gm" model="ir.rule">
         <field name="name">KSW Pay Batch: department GM</field>
         <field name="model_id" ref="model_ksw_pay_batch"/>
@@ -697,5 +747,36 @@
         <value eval="[ref('group_commission_accountant'), ref('group_commission_supervisor'), ref('group_entry_sales')]"/>
         <value eval="{'user_ids': [(3, ref('base.user_root')), (3, ref('base.user_admin'))]}"/>
     </function>
+
+    <!-- ============================================================ -->
+    <!-- Record Rules: ksw.pay.employee.review                          -->
+    <!-- ============================================================ -->
+    <!--
+        A row per employee per department handover. Its figures are read
+        from ksw.pay.entry as the viewing user, so the entry rules already
+        decide what is shown; these rules decide which rows exist for him,
+        and are the submission rules above one level down. Read-only: the
+        ACL grants nothing else.
+    -->
+    <record id="pay_employee_review_rule_supervisor" model="ir.rule">
+        <field name="name">KSW Employee Review: my departments</field>
+        <field name="model_id" ref="model_ksw_pay_employee_review"/>
+        <field name="groups" eval="[(4, ref('group_commission_supervisor'))]"/>
+        <field name="domain_force">['|', '|', ('submission_id.department_id.manager_id.user_id', '=', user.id), ('submission_id.department_id.manager_id.user_id', 'in', user.x_assisted_manager_ids.ids), ('submission_id.batch_ids.create_uid', '=', user.id)]</field>
+    </record>
+
+    <record id="pay_employee_review_rule_department_gm" model="ir.rule">
+        <field name="name">KSW Employee Review: department GM</field>
+        <field name="model_id" ref="model_ksw_pay_employee_review"/>
+        <field name="groups" eval="[(4, ref('group_commission_gm'))]"/>
+        <field name="domain_force">[('submission_id.gm_id', '=', user.id)]</field>
+    </record>
+
+    <record id="pay_employee_review_rule_all" model="ir.rule">
+        <field name="name">KSW Employee Review: Officer and Accountant (all)</field>
+        <field name="model_id" ref="model_ksw_pay_employee_review"/>
+        <field name="groups" eval="[(4, ref('group_commission_officer')), (4, ref('group_commission_accountant'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
 
 </odoo>

@@ -5,6 +5,7 @@ approval, and releases it on every route back. Replaces the DM dialog.
 from datetime import date
 
 from odoo.exceptions import UserError
+from odoo.tests import tagged
 
 from odoo.addons.KSW_annual_leave.tests.test_leave_attendance_sheet import (
     LeaveAttendanceSheetCommon,
@@ -63,10 +64,12 @@ class TestVacationSheetSettlement(LeaveAttendanceSheetCommon):
         leave = self._make_leave(self.sheet_emp, date(2027, 6, 20), date(2027, 7, 12))
         self._advance_to(leave, 'pending_employee_signature')
         july = self._make_sheet(self.sheet_emp, 2027, 7)
-        workdays = self._workdays(july)
-        self.assertTrue(workdays and all(not l.is_attended for l in workdays))
-        self.assertTrue(all(l.x_leave_id == leave for l in
-                            self._workdays(july, date(2027, 7, 1), date(2027, 7, 12))))
+        away = self._workdays(july, end=date(2027, 7, 12))
+        self.assertTrue(away and all(not l.is_attended for l in away))
+        self.assertTrue(all(l.x_leave_id == leave for l in away))
+        # July is the return month: worked from the return date on.
+        back = self._workdays(july, start=date(2027, 7, 13))
+        self.assertTrue(back and all(l.is_attended for l in back))
 
     def test_confirmed_month_outside_vacation_dates_not_reopened(self):
         sheet = self._make_sheet(self.sheet_emp, 2027, 8)
@@ -109,3 +112,96 @@ class TestVacationSheetSettlement(LeaveAttendanceSheetCommon):
         leave.sudo().action_refuse()
         self.assertFalse(day.x_leave_id)
         self.assertFalse(day.is_attended, 'released, and it stays absent as it was')
+
+    # ------------------------------------------------------------------
+    # Generation applies approved time off (KSWCO sheet 4705)
+    # ------------------------------------------------------------------
+
+    def _validate(self, leave):
+        self._advance_to(leave, 'pending_employee_signature')
+        self._add_stub_attachment(leave)
+        leave.with_user(self.user_hr).sudo().action_employee_confirm_signature()
+        self.assertEqual(leave.state, 'validate')
+
+    def test_sheet_generated_after_return_is_absent_until_return(self):
+        """Vacation approved months before the sheet exists, return
+        confirmed: the return-month sheet is born with the days before the
+        return absent and locked, the rest attended, nothing to fix."""
+        leave = self._make_leave(self.sheet_emp, date(2028, 1, 20), date(2028, 2, 6))
+        self._validate(leave)
+        leave.sudo().write({'x_return_state': 'hr_confirmed',
+                            'x_return_date': date(2028, 2, 7)})
+        feb = self._make_sheet(self.sheet_emp, 2028, 2)
+        away = feb.sudo().line_ids.filtered(lambda l: l.date <= date(2028, 2, 6))
+        self.assertEqual(len(away), 6)
+        self.assertFalse(away.filtered('is_attended'),
+                         'no day before the return is born attended')
+        self.assertTrue(all(l.x_leave_id == leave for l in away))
+        self.assertTrue(all(l.x_settled_leave_id == leave for l in away))
+        back = self._workdays(feb, start=date(2028, 2, 7))
+        self.assertTrue(back and all(l.is_attended for l in back))
+        self.assertFalse(feb.x_is_blocked, feb.x_blocked_reason)
+        with self.assertRaises(UserError):
+            away.filtered('is_workday')[:1].write({'is_attended': True})
+        # Any route back releases the born-locked days too.
+        leave.sudo().action_refuse()
+        self.assertFalse(feb.sudo().line_ids.filtered('x_leave_id'))
+        self.assertTrue(all(l.is_attended for l in self._workdays(feb)))
+
+    def test_apply_approved_leave_locks_like_generation(self):
+        """The repair of an older sheet ends where generation starts."""
+        leave = self._make_leave(self.sheet_emp, date(2028, 5, 20), date(2028, 6, 4))
+        self._validate(leave)
+        leave.sudo().write({'x_return_state': 'hr_confirmed'})
+        jun = self._make_sheet(self.sheet_emp, 2028, 6)
+        # Reproduce a sheet generated before generation knew about leave.
+        lines = jun.sudo().line_ids
+        lines.write({'x_leave_id': False, 'x_settled_leave_id': False})
+        lines.with_context(ksw_system_write=True).write({'is_attended': True})
+        self.assertTrue(jun.x_is_blocked)
+        jun.sudo().action_apply_approved_leave()
+        away = lines.filtered(lambda l: l.date <= date(2028, 6, 4))
+        self.assertFalse(away.filtered('is_attended'))
+        self.assertTrue(all(l.x_leave_id == leave for l in away))
+        self.assertFalse(jun.x_is_blocked, jun.x_blocked_reason)
+
+    def test_apply_reaches_a_locked_day_left_attended(self):
+        """KSWCO 4559: the vacation's first day, a rest day, was locked
+        by the vacation yet still paid. Applying the leave must take it,
+        not abort on the lock."""
+        leave = self._make_leave(self.sheet_emp, date(2028, 7, 10), date(2028, 7, 20))
+        self._validate(leave)
+        leave.sudo().write({'x_return_state': 'hr_confirmed'})
+        jul = self._make_sheet(self.sheet_emp, 2028, 7)
+        day = jul.sudo().line_ids.filtered(lambda l: l.date == date(2028, 7, 14))
+        self.assertEqual(day.x_leave_id, leave)
+        self.env.cr.execute(
+            'UPDATE ksw_attendance_sheet_line SET is_attended = TRUE '
+            'WHERE id = %s', (day.id,))
+        day.invalidate_recordset()
+        jul.sudo().action_apply_approved_leave()
+        self.assertFalse(day.is_attended)
+        self.assertEqual(day.x_leave_id, leave)
+        with self.assertRaises(UserError):
+            day.write({'is_attended': True})
+
+
+@tagged('post_install', '-at_install')
+class TestVacationSheetOpenReturn(LeaveAttendanceSheetCommon):
+    """Post-install: an unconfirmed return covering the rest of the month
+    comes from KSW_payroll's _leave_coverage_end, loaded after this module."""
+
+    _validate = TestVacationSheetSettlement._validate
+
+    def test_unconfirmed_return_keeps_month_absent_but_unlocked(self):
+        leave = self._make_leave(self.sheet_emp, date(2028, 3, 20), date(2028, 4, 6))
+        self._validate(leave)
+        leave.sudo().write({'x_return_state': 'on_vacation'})
+        apr = self._make_sheet(self.sheet_emp, 2028, 4)
+        self.assertFalse(apr.sudo().line_ids.filtered('is_attended'),
+                         'nobody knows he came back: the month stays absent')
+        after = apr.sudo().line_ids.filtered(lambda l: l.date > date(2028, 4, 6))
+        self.assertFalse(after.filtered('x_leave_id'),
+                         'past the planned end the confirmer can still mark him present')
+        # Blocked only by the open return itself, never by a clashing day.
+        self.assertNotIn('marked Attended', apr.x_blocked_reason or '')

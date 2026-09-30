@@ -22,3 +22,5 @@ from . import test_bank_export_txt
 from . import test_vacation_commission_settlement
 from . import test_explanation_escaping
 from . import test_resubmission_notice
+from . import test_sub_batch
+from . import test_employee_review

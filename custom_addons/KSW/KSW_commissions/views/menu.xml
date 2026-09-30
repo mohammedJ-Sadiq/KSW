@@ -89,6 +89,16 @@
               sequence="25"
               groups="KSW_commissions.group_commission_supervisor,KSW_commissions.group_commission_gm"/>
 
+    <!-- Some employees' month handed over ahead of the rest. Beside the
+         department handovers, and gated the same way, so a GM reaches the
+         ones waiting on him without going through the month. -->
+    <menuitem id="menu_ksw_pay_sub_batch"
+              name="Sub-Batches"
+              parent="menu_ksw_commissions_root"
+              action="action_ksw_pay_sub_batch"
+              sequence="26"
+              groups="KSW_commissions.group_commission_supervisor,KSW_commissions.group_commission_gm"/>
+
     <!--
         Straight under the root, not under Configuration: a menu's effective
         groups are the INTERSECTION of its own and every ancestor's, and

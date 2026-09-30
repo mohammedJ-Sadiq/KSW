@@ -4,9 +4,9 @@ The deductions twin: a vacation settles the employee's whole position at the
 request, and what he is still owed in commissions is already recorded as
 ``ksw.pay.entry`` rows. The settlement reads them:
 
-  * every month up to and including the departure month, unless that
-    month's own pay run was already approved (it went out through the
-    register);
+  * every approved entry up to and including the departure month, unless
+    that month's own run was marked Paid with a line for him; an approved
+    but unpaid month is paid here and taken out of its register;
   * one ``KSW_COM_<entry_id>`` input each, summed by ``KSW_COMMISSIONS``;
   * confirming the payslip stamps them paid, and the monthly run leaves a
     stamped entry out of its register; cancelling it releases them.
@@ -172,10 +172,53 @@ class TestVacationCommissionSettlement(_SettlementCommon):
         with self.assertRaises(UserError):
             payslip.write({'state': 'done'})
 
+    def _run_line(self, period, employee, earnings, state):
+        run = self._run(period)
+        self.env['ksw.pay.run.line'].sudo().create({
+            'run_id': run.id, 'employee_id': employee.id,
+            'earnings': earnings})
+        run.write({'state': state})
+        return run
+
     def test_month_already_paid_by_its_run_is_left_alone(self):
-        self._run(JUL).write({'state': 'approved'})
+        self._run_line(JUL, self.employee, 700.0, 'paid')
         entries = self._leave()._commission_entries_to_settle()
         self.assertEqual(entries, self.aug)
+
+    def test_approved_but_unpaid_month_is_settled(self):
+        """KSWCO leave 5185: August was approved (register built, 800 on
+        his line) but the bank transfer goes out about a month later. The
+        vacation settles his account on the day he leaves, so it pays
+        August now."""
+        self._run_line(JUL, self.employee, 700.0, 'approved')
+        entries = self._leave()._commission_entries_to_settle()
+        self.assertEqual(entries, self.jul | self.aug)
+
+    def test_paid_run_that_did_not_pay_him_is_still_settled(self):
+        """A run marked Paid with no line for him paid him nothing."""
+        self._run_line(JUL, self.colleague, 50.0, 'paid')
+        entries = self._leave()._commission_entries_to_settle()
+        self.assertEqual(entries, self.jul | self.aug)
+
+    def test_confirming_takes_him_out_of_the_approved_register(self):
+        """Paid on the vacation payslip: the approved month's bank file
+        must not pay him again. Cancelling gives the line back."""
+        self.jul.batch_id.submission_id.sudo().write({'state': 'approved'})
+        run = self._run_line(JUL, self.employee, 700.0, 'approved')
+        self.env['ksw.pay.run.line'].sudo().create({
+            'run_id': run.id, 'employee_id': self.colleague.id,
+            'earnings': 50.0})
+        payslip = self._payslip(self._leave())
+        payslip.write({'state': 'done'})
+        self.assertEqual(self.jul.x_vacation_payslip_id, payslip)
+        paid = {l.employee_id: l.earnings for l in run.line_ids}
+        self.assertNotIn(self.employee, paid)
+        self.assertEqual(paid.get(self.colleague), 50.0,
+                         'Nobody else on the register is touched.')
+
+        payslip.write({'state': 'cancel'})
+        paid = {l.employee_id: l.earnings for l in run.line_ids}
+        self.assertEqual(paid.get(self.employee), 700.0)
 
     def test_other_leave_types_pull_nothing(self):
         leave = self._leave(self.plain_type)

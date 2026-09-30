@@ -1,6 +1,6 @@
 {
     'name': 'KSW Attendance Sheet',
-    'version': '19.0.1.9.0',
+    'version': '19.0.1.10.0',
     'category': 'Human Resources',
     'sequence': 1,
     'author': 'Mohammed Albadr',

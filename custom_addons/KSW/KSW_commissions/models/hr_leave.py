@@ -14,8 +14,10 @@ accountant to re-type them as ``x_commission_line_ids``:
     cancelling it releases them again (``hr.payslip.write`` in this module).
 
 Which entries: the ones ``ksw_vacation_hold`` already says the settlement
-paid — every month up to and including the departure month whose own pay
-run has not been approved or paid yet. The months inside the vacation and
+paid — every approved entry up to and including the departure month that
+its own pay run has not actually paid him (run marked Paid with a line for
+him). An approved-but-unpaid month is taken, and confirming the payslip
+takes it back out of that month's register. The months inside the vacation and
 the part of the return month after he came back are not the settlement's
 business, exactly as before.
 
@@ -32,7 +34,6 @@ from odoo.exceptions import UserError
 from odoo.tools import float_compare
 from odoo.tools.misc import format_date
 
-from .ksw_commission_lock import LOCKING_STATES
 from .ksw_vacation_hold import hold_blocks, vacation_holds
 
 
@@ -106,13 +107,15 @@ class HrLeave(models.Model):
     def _commission_entries_to_settle(self):
         """The entries the settlement of this request would pay today.
 
-        Only what the General Manager has approved: a batch reaches
-        'approved' when its department's submission is approved. A row still
-        being typed, or submitted but not yet signed off, is not a figure
-        anyone has agreed to pay — see _commission_entries_awaiting_approval.
+        Only what the General Manager has approved — per row: with its
+        whole department, or early in a sub-batch, which is how a supervisor
+        gets an employee's month so far approved before he leaves. A row
+        still being typed, or submitted but not yet signed off, is not a
+        figure anyone has agreed to pay — see
+        _commission_entries_awaiting_approval.
         """
         return self._commission_entries_outstanding().filtered(
-            lambda e: e.batch_id.state == 'approved')
+            lambda e: e.state == 'approved')
 
     def _commission_entries_awaiting_approval(self):
         """Outstanding entries the settlement does NOT pay: not approved yet.
@@ -122,7 +125,7 @@ class HrLeave(models.Model):
         after the leave is closed, a Vacation Release lets the run pay them).
         """
         return self._commission_entries_outstanding().filtered(
-            lambda e: e.batch_id.state != 'approved')
+            lambda e: e.state != 'approved')
 
     def _commission_entries_outstanding(self):
         """Every entry still owed for the months this settlement covers."""
@@ -140,15 +143,13 @@ class HrLeave(models.Model):
         ], order='period, component_id, date, id')
         if not entries:
             return entries
-        # A month whose own run was approved or paid went out through the
-        # register; whatever of it is still unpaid is a Vacation Release
-        # question, not this settlement's.
-        periods = set(entries.mapped('period'))
-        locked = set(self.env['ksw.pay.run'].sudo().search([
-            ('period', 'in', list(periods)),
-            ('state', 'in', LOCKING_STATES),
-        ]).mapped('period'))
-        entries = entries.filtered(lambda e: e.period not in locked)
+        # Only a month its run actually paid him is done with. An approved
+        # month is still waiting for its bank transfer (around a month
+        # later); the settlement pays it now and takes it out of that
+        # register when the payslip is confirmed (_resync_vacation_line).
+        paid_by_run = self.env['ksw.pay.run']._months_paid_to(
+            leave.employee_id, set(entries.mapped('period')))
+        entries = entries.filtered(lambda e: e.period not in paid_by_run)
         # Another vacation may already speak for one of these months (back
         # to back requests): what that one holds was not earned, and is
         # not this settlement's to pay.

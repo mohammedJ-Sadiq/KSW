@@ -70,6 +70,9 @@ class KswPaySubmission(models.Model):
     batch_ids = fields.One2many(
         'ksw.pay.batch', 'submission_id', string='Batches',
     )
+    sub_batch_ids = fields.One2many(
+        'ksw.pay.sub.batch', 'submission_id', string='Sub-Batches',
+    )
 
     # Who is answerable for this scope, whether or not they have submitted
     # yet — the department's manager. Shown to the GM next to the department
@@ -102,9 +105,24 @@ class KswPaySubmission(models.Model):
     employee_count = fields.Integer(compute='_compute_totals', store=True)
     total_amount = fields.Monetary(compute='_compute_totals', store=True)
 
+    # What is actually in front of the GM: rows of a department handed over
+    # as a whole, plus rows sent early in a sub-batch. Not the department's
+    # state — a department still being prepared can have a sub-batch
+    # waiting, and a returned one can still have rows to approve.
+    pending_entry_ids = fields.Many2many(
+        'ksw.pay.entry', compute='_compute_pending',
+        string='Waiting on the GM')
+    pending_entry_count = fields.Integer(compute='_compute_pending')
+    pending_employee_count = fields.Integer(compute='_compute_pending')
+    pending_amount = fields.Monetary(compute='_compute_pending')
+    approved_entry_count = fields.Integer(compute='_compute_pending')
+    sub_batch_count = fields.Integer(compute='_compute_pending')
+
     x_can_submit = fields.Boolean(compute='_compute_permissions')
     x_can_return = fields.Boolean(compute='_compute_permissions')
     x_can_approve = fields.Boolean(compute='_compute_permissions')
+    x_can_reopen_rows = fields.Boolean(compute='_compute_permissions')
+    x_can_split = fields.Boolean(compute='_compute_permissions')
 
     # ------------------------------------------------------------------
     # Computes
@@ -166,10 +184,28 @@ class KswPaySubmission(models.Model):
                 batches.mapped('entry_ids.employee_id'))
             rec.total_amount = sum(batches.mapped('total_amount'))
 
+    @api.depends('state', 'batch_ids.entry_ids.state',
+                 'batch_ids.entry_ids.amount',
+                 'batch_ids.entry_ids.x_sub_batch_id', 'sub_batch_ids.state')
+    def _compute_pending(self):
+        for rec in self:
+            entries = rec.sudo().batch_ids.entry_ids
+            pending = entries._handed_over()
+            rec.pending_entry_ids = pending
+            rec.pending_entry_count = len(pending)
+            rec.pending_employee_count = len(pending.employee_id)
+            rec.pending_amount = sum(pending.mapped('amount'))
+            rec.approved_entry_count = len(
+                entries.filtered(lambda e: e.state == 'approved'))
+            rec.sub_batch_count = len(rec.sudo().sub_batch_ids)
+
     @api.depends_context('uid')
-    @api.depends('state', 'run_id.state', 'gm_id')
+    @api.depends('state', 'run_id.state', 'gm_id', 'pending_entry_count',
+                 'approved_entry_count')
     def _compute_permissions(self):
         user = self.env.user
+        is_supervisor = user.has_group(
+            'KSW_commissions.group_commission_supervisor')
         for rec in self:
             locked = rec.run_id.state in LOCKING_STATES
             # Per record, not per user: being a GM somewhere says nothing
@@ -180,10 +216,13 @@ class KswPaySubmission(models.Model):
                 and rec.state in ('draft', 'returned')
                 and bool(rec.batch_ids)
             )
-            rec.x_can_return = is_my_gm and not locked \
-                and rec.state == 'submitted'
-            rec.x_can_approve = is_my_gm and not locked \
-                and rec.state == 'submitted'
+            waiting = bool(rec.pending_entry_count)
+            rec.x_can_return = is_my_gm and not locked and waiting
+            rec.x_can_approve = is_my_gm and not locked and waiting
+            rec.x_can_reopen_rows = is_my_gm and not locked \
+                and bool(rec.approved_entry_count)
+            rec.x_can_split = is_supervisor and not locked \
+                and rec.state in ('draft', 'returned') and bool(rec.batch_ids)
 
     @api.depends('department_id', 'site_id', 'period')
     def _compute_display_name(self):
@@ -236,6 +275,13 @@ class KswPaySubmission(models.Model):
         return super().write(vals)
 
     def unlink(self):
+        handed = self.sudo().batch_ids.entry_ids.filtered(
+            lambda e: e.state != 'draft')
+        if handed:
+            raise UserError(_(
+                "%(name)s holds entries the General Manager has or has "
+                "approved, and cannot be deleted.",
+                name=handed[0].batch_id.submission_id.display_name))
         if not self.env.su:
             blocked = self.filtered(lambda s: s.state != 'draft')
             if blocked:
@@ -294,12 +340,14 @@ class KswPaySubmission(models.Model):
                 raise UserError(_(
                     "There is nothing to submit — no entries have been "
                     "recorded for %(name)s.", name=rec.display_name))
-            empty = rec.batch_ids.filtered(lambda b: not b.entry_ids)
-            if empty:
+            # An empty batch records nothing, so it is no reason to refuse
+            # the handover — and it cannot stay open inside a department
+            # that has been handed over. It goes, and the chatter says so.
+            rec._drop_empty_batches()
+            if not rec.batch_ids:
                 raise UserError(_(
-                    "These batches have no entries. Delete them or fill them "
-                    "in before submitting:\n%(names)s",
-                    names='\n'.join('  • %s' % b.name for b in empty)))
+                    "There is nothing to submit — no entries have been "
+                    "recorded for %(name)s.", name=rec.display_name))
 
             drafts = rec.batch_ids.filtered(lambda b: b.state == 'draft')
             # A department coming back after a return (by the GM, or the
@@ -323,6 +371,10 @@ class KswPaySubmission(models.Model):
                 'submitted_date': fields.Datetime.now(),
                 'return_reason': False,
             })
+            # A department whose every row was already approved in
+            # sub-batches has nothing left waiting — it reads approved.
+            rec._sync_state_from_entries()
+            rec.sudo().sub_batch_ids._sync_state_from_entries()
             rec._notify_gm(resubmission=resubmission)
         self.mapped('run_id')._sync_state()
         self.mapped('run_id')._refresh_register()
@@ -345,14 +397,15 @@ class KswPaySubmission(models.Model):
                 raise UserError(_(
                     "%(name)s has already been approved.",
                     name=rec.display_name))
-            if rec.state != 'submitted':
+            # Everything in front of him: the department's handover, and
+            # any sub-batch sent early. Rows he returned are not in it.
+            pending = rec._pending_entries()
+            if not pending:
                 raise UserError(_(
                     "%(name)s has not been submitted yet, so there is "
                     "nothing to approve.", name=rec.display_name))
-            rec.batch_ids.filtered(
-                lambda b: b.state == 'submitted').sudo().write(
-                    {'state': 'approved'})
-            rec.sudo().write({'state': 'approved'})
+            pending._wf_approve()
+            pending._sync_containers()
             # sudo(): mail.message create is gated on access to the document,
             # and a GM's scope here is one department. Authorisation was
             # settled by _check_is_my_department above.
@@ -363,8 +416,8 @@ class KswPaySubmission(models.Model):
                     '<b>By:</b> %(user)s<br/>'
                     '<b>Employees:</b> %(emp)s · <b>Total:</b> %(total).2f'
                 ) % {'scope': rec.display_name, 'user': self.env.user.name,
-                     'emp': rec.employee_count,
-                     'total': rec.total_amount or 0.0},
+                     'emp': len(pending.employee_id),
+                     'total': sum(pending.mapped('amount'))},
                 subtype_xmlid='mail.mt_note',
             )
         runs = self.mapped('run_id')
@@ -382,7 +435,8 @@ class KswPaySubmission(models.Model):
         """GM sends the department back, with the reason on every batch."""
         self._check_is_my_department()
         for rec in self:
-            if rec.state != 'submitted':
+            pending = rec._pending_entries()
+            if not pending:
                 raise UserError(_(
                     "Only a submitted department can be returned."))
             reason = (rec.return_reason or '').strip()
@@ -392,6 +446,12 @@ class KswPaySubmission(models.Model):
                     "know what to fix. Type it in 'Return Reason' first."))
             rec.batch_ids.filtered(
                 lambda b: b.state == 'submitted').action_return(reason)
+            # Sub-batch rows sit in open batches, which action_return does
+            # not reach — they go back the same way.
+            rest = rec._pending_entries()
+            rest._wf_return(reason)
+            rest.x_sub_batch_id.sudo().write({'return_reason': reason})
+            (pending | rest)._sync_containers()
             rec.write({
                 'state': 'returned',
                 'returned_by': self.env.uid,
@@ -426,6 +486,120 @@ class KswPaySubmission(models.Model):
         self.mapped('run_id')._sync_state()
         self.mapped('run_id')._refresh_register()
         return True
+
+    # ------------------------------------------------------------------
+    # Partial approval
+    # ------------------------------------------------------------------
+    def _pending_entries(self):
+        """The rows in front of the General Manager for this department."""
+        return self.sudo().batch_ids.entry_ids._handed_over()
+
+    def _review_entries(self, mode):
+        """What the GM's review wizard lists: waiting rows to return, or
+        approved rows to reopen."""
+        if mode == 'review':
+            return self._pending_entries()
+        return self.sudo().batch_ids.entry_ids.filtered(
+            lambda e: e.state == 'approved')
+
+    def _open_batches(self):
+        """The components still his to send: open batches with at least
+        one draft row. A batch whose rows all went in a sub-batch has
+        nothing to send — offering it only closed it for nothing."""
+        return self.sudo().batch_ids.filtered(
+            lambda b: b.state == 'draft'
+            and b.entry_ids.filtered(lambda e: e.state == 'draft'))
+
+    def _open_sub_batches(self):
+        """Sub-batches the supervisor has prepared and not yet sent."""
+        return self.sudo().sub_batch_ids.filtered(
+            lambda s: s.state in ('draft', 'returned')
+            and s.entry_ids.filtered(lambda e: e.state == 'draft'))
+
+    def _sync_state_from_entries(self):
+        """Once handed over, the department reads what its rows say.
+
+        Before the handover it is simply being prepared, whatever its
+        sub-batches are doing — which is what stops approving one early
+        employee from finalising the month.
+        """
+        for rec in self.sudo():
+            if rec.state == 'draft':
+                continue
+            states = set(rec.batch_ids.entry_ids.mapped('state'))
+            if not states:
+                continue
+            if 'draft' in states:
+                target = 'returned'
+            elif 'submitted' in states:
+                target = 'submitted'
+            else:
+                target = 'approved'
+            if target != rec.state:
+                rec.write({'state': target})
+        return True
+
+    def action_submit_prompt(self):
+        """Submit — asking "every component, or only the ones I tick?"."""
+        self._check_mine()
+        return self.env['ksw.pay.submit.wizard']._open_for(self)
+
+    def _drop_empty_batches(self):
+        """Delete the draft batches with no entries, saying so on the
+        department. Nothing is lost: an empty batch records nothing, and
+        opening the component again next month recreates it."""
+        for rec in self:
+            empty = rec.sudo().batch_ids.filtered(
+                lambda b: b.state == 'draft' and not b.entry_ids)
+            if not empty:
+                continue
+            names = ', '.join('%s (%s)' % (b.name, b.component_id.name)
+                              for b in empty)
+            empty.unlink()
+            rec.sudo().message_post(
+                body=_("Empty batches removed on submission: %(names)s",
+                       names=names),
+                subtype_xmlid='mail.mt_note')
+        return True
+
+    def action_open_review(self):
+        """GM: the review screen — component by component, approve or return
+        the employees he ticks; the rest stay waiting on him."""
+        self.ensure_one()
+        self._check_is_my_department()
+        return self.env['ksw.pay.gm.review.wizard']._open_for(
+            self, mode='review')
+
+    def action_open_reopen(self):
+        """GM: reopen approved rows for correction, while they are unpaid."""
+        self.ensure_one()
+        self._check_is_my_department()
+        return self.env['ksw.pay.gm.review.wizard']._open_for(
+            self, mode='reopen')
+
+    def action_new_sub_batch(self):
+        """Start a sub-batch for this department's month."""
+        self.ensure_one()
+        self._check_mine()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('New Sub-Batch'),
+            'res_model': 'ksw.pay.sub.batch',
+            'view_mode': 'form',
+            'target': 'current',
+            'context': {'default_submission_id': self.id},
+        }
+
+    def action_open_sub_batches(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Sub-Batches — %(name)s', name=self.display_name),
+            'res_model': 'ksw.pay.sub.batch',
+            'view_mode': 'list,form',
+            'domain': [('submission_id', '=', self.id)],
+            'context': {'default_submission_id': self.id},
+        }
 
     # ------------------------------------------------------------------
     # Notification
@@ -517,17 +691,18 @@ class KswPaySubmission(models.Model):
         }
 
     def action_open_entries(self):
-        """Every entry in this department, grouped per employee.
+        """Every employee in this department, one review page each.
 
         This is the detail behind the department's total: who is being paid,
-        for what, and how much each of them adds up to.
+        for what, and how much each of them adds up to. The page splits an
+        employee's entries by component, each with its own subtotal, and its
+        pager walks the reviewer to the next employee.
         """
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Entries — %(name)s', name=self.display_name),
-            'res_model': 'ksw.pay.entry',
+            'name': _('Employees — %(name)s', name=self.display_name),
+            'res_model': 'ksw.pay.employee.review',
             'view_mode': 'list,form',
-            'domain': [('batch_id.submission_id', '=', self.id)],
-            'context': {'search_default_grp_employee': 1},
+            'domain': [('submission_id', '=', self.id)],
         }

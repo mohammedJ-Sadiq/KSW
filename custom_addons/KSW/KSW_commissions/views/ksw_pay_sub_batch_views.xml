@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- ================================================================ -->
+    <!-- Sub-batch — some employees' month, handed over ahead of the rest  -->
+    <!-- ================================================================ -->
+    <record id="view_ksw_pay_sub_batch_form" model="ir.ui.view">
+        <field name="name">ksw.pay.sub.batch.form</field>
+        <field name="model">ksw.pay.sub.batch</field>
+        <field name="arch" type="xml">
+            <form string="Sub-Batch">
+                <field name="x_can_edit" invisible="1"/>
+                <field name="x_can_submit" invisible="1"/>
+                <field name="x_can_review" invisible="1"/>
+                <field name="x_can_reopen" invisible="1"/>
+                <field name="pending_count" invisible="1"/>
+                <header>
+                    <button name="action_submit" string="Submit to GM"
+                            type="object" class="btn-primary"
+                            invisible="not x_can_submit or not id"
+                            confirm="Hand these employees' entries so far to the General Manager? Only their rows are locked — your batches stay open."/>
+                    <!-- No groups= on the GM buttons: x_can_review /
+                         x_can_reopen already answer "is this department
+                         mine" (see the department submission form). -->
+                    <button name="action_approve" string="Approve"
+                            type="object" class="btn-primary"
+                            invisible="not x_can_review"
+                            confirm="Approve every entry this sub-batch has waiting? They are locked once you do."/>
+                    <button name="action_open_review"
+                            string="Review by Component…" type="object"
+                            class="btn-secondary"
+                            invisible="not x_can_review"/>
+                    <button name="action_open_reopen"
+                            string="Reopen Approved…" type="object"
+                            class="btn-secondary"
+                            invisible="not x_can_reopen"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_entries" type="object"
+                                class="oe_stat_button" icon="fa-list"
+                                invisible="not id">
+                            <field name="entry_count" widget="statinfo"
+                                   string="Entries"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <div class="alert alert-warning" role="alert"
+                         invisible="state != 'returned'">
+                        <strong>Returned by the General Manager:</strong>
+                        <field name="return_reason" readonly="1" nolabel="1"/>
+                    </div>
+                    <div class="alert alert-info" role="status"
+                         invisible="state != 'draft'">
+                        Pick the employees who cannot wait for the rest of the
+                        month. Every draft entry they have in this department's
+                        batches for the month comes with them — and anything
+                        you type for them before you submit. Submitting locks
+                        <b>only their entries</b>; your batches stay open.
+                    </div>
+
+                    <group>
+                        <group string="Month">
+                            <!-- Only a month still being prepared: a
+                                 department already handed over whole has
+                                 nothing left to send early. -->
+                            <field name="submission_id"
+                                   readonly="id"
+                                   domain="[('state', 'in', ('draft', 'returned'))]"
+                                   options="{'no_create': True, 'no_open': True}"/>
+                            <field name="department_id"/>
+                            <field name="gm_id"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Handover">
+                            <field name="submitted_by"
+                                   invisible="not submitted_by"/>
+                            <field name="submitted_date"
+                                   invisible="not submitted_date"/>
+                            <field name="approved_by"
+                                   invisible="not approved_by"/>
+                            <field name="approved_date"
+                                   invisible="not approved_date"/>
+                            <field name="total_amount"/>
+                        </group>
+                    </group>
+                    <group>
+                        <!-- The picker is for the supervisor; the GM and the
+                             accountant read the names, which need no read
+                             on hr.employee outside their own rules. -->
+                        <field name="allowed_employee_ids" invisible="1"
+                               groups="KSW_commissions.group_commission_supervisor"/>
+                        <field name="employee_ids" widget="many2many_tags"
+                               readonly="not x_can_edit and id"
+                               options="{'no_create': True}"
+                               groups="KSW_commissions.group_commission_supervisor"/>
+                        <field name="employee_names" string="Employees"
+                               groups="!KSW_commissions.group_commission_supervisor"/>
+                        <field name="note"
+                               readonly="not x_can_edit and id"
+                               placeholder="e.g. Annual leave from 12 October"/>
+                    </group>
+
+                    <notebook>
+                        <page string="Entries" name="entries">
+                            <field name="entry_ids" nolabel="1">
+                                <list create="false" delete="false"
+                                      default_group_by="employee_id"
+                                      decoration-muted="state == 'approved'"
+                                      decoration-info="state == 'submitted'"
+                                      decoration-warning="x_return_reason and state == 'draft'">
+                                    <field name="employee_id"/>
+                                    <field name="component_id"/>
+                                    <field name="option_id" optional="show"/>
+                                    <field name="date" optional="show"/>
+                                    <field name="quantity" sum="Total"/>
+                                    <field name="reason" optional="show"/>
+                                    <field name="amount" sum="Total Amount"/>
+                                    <field name="state" widget="badge"
+                                           decoration-info="state == 'submitted'"
+                                           decoration-success="state == 'approved'"/>
+                                    <field name="x_return_reason"
+                                           optional="show"/>
+                                    <field name="currency_id"
+                                           column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_sub_batch_list" model="ir.ui.view">
+        <field name="name">ksw.pay.sub.batch.list</field>
+        <field name="model">ksw.pay.sub.batch</field>
+        <field name="arch" type="xml">
+            <list decoration-info="state == 'submitted'"
+                  decoration-warning="state == 'returned'"
+                  decoration-muted="state == 'approved'">
+                <field name="name"/>
+                <field name="submission_id" string="Department Month"/>
+                <field name="employee_names" string="Employees"/>
+                <field name="note" optional="show"/>
+                <field name="submitted_date" optional="show"/>
+                <field name="entry_count" string="Entries"/>
+                <field name="total_amount" sum="Total"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'submitted'"
+                       decoration-warning="state == 'returned'"
+                       decoration-success="state == 'approved'"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_sub_batch_search" model="ir.ui.view">
+        <field name="name">ksw.pay.sub.batch.search</field>
+        <field name="model">ksw.pay.sub.batch</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="department_id"/>
+                <field name="employee_ids"/>
+                <field name="period" options="{'min_precision': 'months'}"/>
+                <filter name="awaiting_me" string="Waiting on Me"
+                        domain="[('state', '=', 'submitted'), ('gm_id', '=', uid)]"/>
+                <filter name="open" string="Not Submitted Yet"
+                        domain="[('state', 'in', ['draft', 'returned'])]"/>
+                <group>
+                    <filter string="Month" name="grp_period" domain="[]"
+                            context="{'group_by': 'period'}"/>
+                    <filter string="Department" name="grp_department"
+                            domain="[]"
+                            context="{'group_by': 'department_id'}"/>
+                    <filter string="Status" name="grp_state" domain="[]"
+                            context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_pay_sub_batch" model="ir.actions.act_window">
+        <field name="name">Sub-Batches</field>
+        <field name="res_model">ksw.pay.sub.batch</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ksw_pay_sub_batch_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No sub-batch yet
+            </p>
+            <p>
+                A sub-batch hands some employees' month so far to the General
+                Manager ahead of the rest of the department — for someone
+                going on vacation, say — without locking your batches.
+                Start one from your department's month (Department
+                Submissions) or from any batch.
+            </p>
+        </field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Wizards                                                          -->
+    <!-- ================================================================ -->
+    <record id="view_ksw_pay_submit_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.pay.submit.wizard.form</field>
+        <field name="model">ksw.pay.submit.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Submit to the General Manager">
+                <field name="submission_ids" invisible="1"/>
+                <field name="allowed_component_ids" invisible="1"/>
+                <field name="has_open_sub_batch" invisible="1"/>
+                <p>What are you sending to the General Manager?</p>
+                <group>
+                    <field name="mode" widget="radio" nolabel="1" colspan="2"/>
+                </group>
+                <group invisible="mode != 'some'">
+                    <field name="component_ids"
+                           widget="many2many_checkboxes"/>
+                    <field name="sub_batch_ids" widget="many2many_checkboxes"
+                           invisible="not has_open_sub_batch"/>
+                </group>
+                <div class="text-muted" invisible="mode != 'all'">
+                    Every component of the month is handed over and frozen,
+                    the sub-batches included. Empty batches are removed.
+                </div>
+                <div class="text-muted" invisible="mode != 'some'">
+                    Only what you tick goes to the General Manager and is
+                    locked. The other components stay open for you to keep
+                    recording and send later.
+                </div>
+                <div class="text-muted" invisible="mode != 'some'">
+                    Your department stays open for the month until you
+                    choose Every component.
+                </div>
+                <footer>
+                    <button name="action_confirm" string="Submit"
+                            type="object" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"
+                            class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+<!-- The GM's review screen: components in the side panel, one row per
+         employee. Tick, then Approve or Return… in the header; what he does
+         not touch stays waiting on him. -->
+    <record id="view_ksw_pay_gm_review_line_list" model="ir.ui.view">
+        <field name="name">ksw.pay.gm.review.line.list</field>
+        <field name="model">ksw.pay.gm.review.line</field>
+        <field name="arch" type="xml">
+            <list create="false" delete="false" edit="false"
+                  string="Review">
+                <header>
+                    <button name="action_approve" type="object"
+                            string="Approve" class="btn-primary"/>
+                    <button name="action_return" type="object"
+                            string="Return…" class="btn-secondary"/>
+                </header>
+                <field name="component_id"/>
+                <field name="employee_name"/>
+                <field name="entry_count"/>
+                <field name="amount" sum="Total"/>
+                <field name="sub_batch_name" optional="show"/>
+                <field name="batch_name" optional="hide"/>
+                <button name="action_open_entries" type="object"
+                        icon="fa-list" title="See the entries"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_gm_review_line_list_reopen" model="ir.ui.view">
+        <field name="name">ksw.pay.gm.review.line.list.reopen</field>
+        <field name="model">ksw.pay.gm.review.line</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <list create="false" delete="false" edit="false"
+                  string="Reopen">
+                <header>
+                    <button name="action_reopen" type="object"
+                            string="Reopen…" class="btn-primary"/>
+                </header>
+                <field name="component_id"/>
+                <field name="employee_name"/>
+                <field name="entry_count"/>
+                <field name="amount" sum="Total"/>
+                <field name="sub_batch_name" optional="show"/>
+                <field name="batch_name" optional="hide"/>
+                <button name="action_open_entries" type="object"
+                        icon="fa-list" title="See the entries"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_gm_review_line_search" model="ir.ui.view">
+        <field name="name">ksw.pay.gm.review.line.search</field>
+        <field name="model">ksw.pay.gm.review.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_name"/>
+                <field name="component_id"/>
+                <searchpanel>
+                    <field name="component_id" icon="fa-tags"
+                           enable_counters="1"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_gm_review_reason_form" model="ir.ui.view">
+        <field name="name">ksw.pay.gm.review.reason.form</field>
+        <field name="model">ksw.pay.gm.review.reason</field>
+        <field name="arch" type="xml">
+            <form string="Why">
+                <field name="action" invisible="1"/>
+                <field name="line_ids" nolabel="1" readonly="1">
+                    <list>
+                        <field name="component_id"/>
+                        <field name="employee_name"/>
+                        <field name="entry_count"/>
+                        <field name="amount" sum="Total"/>
+                    </list>
+                </field>
+                <group>
+                    <field name="reason" required="1"
+                           placeholder="What has to be corrected?"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" type="object"
+                            class="btn-primary" string="Send Back"/>
+                    <button string="Cancel" special="cancel"
+                            class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
