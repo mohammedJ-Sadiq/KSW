@@ -15,6 +15,7 @@ from . import ksw_pay_sub_batch           # some employees handed over early
 from . import ksw_pay_employee_review     # one employee's handover, section per component
 from . import ksw_pay_run                 # the month, its approval and the register
 from . import ksw_pay_run_journal        # the month as a BAS journal entry
+from . import ksw_pay_run_line_review    # Who Gets Paid, one employee at a time
 from . import ksw_pay_import_bas          # the one importer: driver trips from BAS
 from . import ksw_pay_batch_export        # the batch as a spreadsheet
 from . import ksw_meal_settings           # res.config.settings: overtime params

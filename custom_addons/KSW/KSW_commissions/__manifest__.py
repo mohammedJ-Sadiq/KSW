@@ -58,6 +58,7 @@ not part of the commission request.
         'views/ksw_pay_sub_batch_views.xml',
         'views/ksw_pay_employee_review_views.xml',
         'views/ksw_pay_run_views.xml',
+        'views/ksw_pay_run_line_review_views.xml',
         'views/ksw_pay_vacation_release_views.xml',
         'views/ksw_salesperson_profile_views.xml',
         'views/ksw_sales_commission_rule_views.xml',

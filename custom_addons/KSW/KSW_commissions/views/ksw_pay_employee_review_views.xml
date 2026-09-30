@@ -10,17 +10,20 @@
          sections. -->
     <template id="employee_review_sections">
         <div class="o_ksw_employee_review">
+            <div t-if="mismatch" class="alert alert-warning" role="alert"
+                 t-out="mismatch"/>
             <p t-if="not sections" class="text-muted">
                 No entries you can see for this employee.
             </p>
             <t t-foreach="sections" t-as="section">
+                <t t-set="lead" t-value="int(section['show_date']) + int(section['show_option'])"/>
                 <h4 class="mt-3 mb-1" t-out="section['component'].name"/>
                 <table class="table table-sm table-hover mb-2">
                     <thead>
                         <tr>
                             <th t-if="section['show_date']">Date</th>
                             <th t-if="section['show_option']">Type</th>
-                            <th class="text-end" t-out="section['qty_label']"/>
+                            <th t-if="section['show_qty']" class="text-end" t-out="section['qty_label']"/>
                             <th t-if="section['show_reason']">Reason</th>
                             <th>Status</th>
                             <th class="text-end">Amount</th>
@@ -30,7 +33,7 @@
                         <tr t-foreach="section['rows']" t-as="entry">
                             <td t-if="section['show_date']" t-out="format_date(entry.date) if entry.date else ''"/>
                             <td t-if="section['show_option']" t-out="entry.option_id.name or ''"/>
-                            <td class="text-end" t-out="format_qty(entry.quantity)"/>
+                            <td t-if="section['show_qty']" class="text-end" t-out="format_qty(entry.quantity)"/>
                             <td t-if="section['show_reason']" t-out="entry.reason or ''"/>
                             <td t-out="state_labels.get(entry.state, entry.state)"/>
                             <td class="text-end" t-out="format_amount(entry.amount)"/>
@@ -38,15 +41,20 @@
                     </tbody>
                     <tfoot>
                         <tr class="fw-bold border-top">
-                            <t t-set="lead" t-value="int(section['show_date']) + int(section['show_option'])"/>
                             <td t-if="lead" t-att-colspan="lead">Subtotal</td>
-                            <td class="text-end">
+                            <td t-if="section['show_qty']" class="text-end">
                                 <t t-out="format_qty(section['quantity'])"/>
                                 <t t-out="section['qty_label']"/>
                             </td>
                             <td t-if="section['show_reason']"/>
                             <td><t t-if="not lead">Subtotal · </t><t t-out="len(section['rows'])"/> entries</td>
-                            <td class="text-end" t-out="format_amount(section['amount'])"/>
+                            <td class="text-end">
+                                <t t-out="format_amount(section['paid'])"/>
+                                <div t-if="round(section['paid'] - section['amount'], 2)"
+                                     class="small fw-normal text-muted">
+                                    rounded from <t t-out="format_amount(section['amount'])"/>
+                                </div>
+                            </td>
                         </tr>
                     </tfoot>
                 </table>
@@ -56,6 +64,29 @@
                 <span class="me-3">Total, all components</span>
                 <span t-out="format_amount(total)"/>
             </div>
+            <t t-if="excluded">
+                <h5 class="mt-4 mb-1 text-muted">Not in this payment</h5>
+                <table class="table table-sm mb-2 text-muted">
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Why</th>
+                            <th class="text-end">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="excluded" t-as="item">
+                            <td t-out="item[0].component_id.name"/>
+                            <td t-out="format_date(item[0].date) if item[0].date else ''"/>
+                            <td t-out="state_labels.get(item[0].state, item[0].state)"/>
+                            <td t-out="item[1]"/>
+                            <td class="text-end" t-out="format_amount(item[0].amount)"/>
+                        </tr>
+                    </tbody>
+                </table>
+            </t>
         </div>
     </template>
 

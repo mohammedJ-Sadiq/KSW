@@ -853,6 +853,7 @@ msgid "Clients"
 msgstr "العملاء"
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_line_review_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_entry_explain_form
 msgid "Close"
 msgstr "إغلاق"
@@ -1110,6 +1111,7 @@ msgid "Company-wide"
 msgstr "على مستوى الشركة"
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.employee_review_sections
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_batch__component_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__component_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_option__component_id
@@ -4562,6 +4564,7 @@ msgid ""
 msgstr "أي خيارات هذا المكوّن يمثّله هذا السطر — ومنه يُؤخذ السعر."
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_line_review_form
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run__x_visible_line_ids
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
 msgid "Who Gets Paid"
@@ -6346,6 +6349,7 @@ msgid "Returned Because"
 msgstr "سبب الإعادة"
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form_review
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_gm_review_wizard_form
 msgid "Review"
 msgstr "مراجعة"
@@ -6847,6 +6851,7 @@ msgid "See the entries"
 msgstr "عرض القيود"
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.employee_review_sections
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_gm_review_reason_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_vacation_release_form
 msgid "Why"
@@ -6970,3 +6975,77 @@ msgstr "مراجعة مستحقات الموظف"
 #: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
 msgid "Employees — %(name)s"
 msgstr "الموظفون — %(name)s"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.employee_review_sections
+msgid "rounded from"
+msgstr "مُقرَّب من"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.employee_review_sections
+msgid "Not in this payment"
+msgstr "غير مشمول في هذا الصرف"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_line_review_form
+msgid "Previous"
+msgstr "السابق"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_line_review_form
+msgid "Next"
+msgstr "التالي"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form_review
+msgid "Review Employees One by One"
+msgstr "مراجعة الموظفين واحدًا تلو الآخر"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form_review
+msgid "This employee's breakdown, then the next"
+msgstr "تفاصيل هذا الموظف، ثم الذي يليه"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__x_review_sections_html
+msgid "Breakdown"
+msgstr "التفاصيل"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__x_review_position
+msgid "Position"
+msgstr "الترتيب"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__x_review_has_prev
+msgid "Has Previous"
+msgstr "يوجد سابق"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__x_review_has_next
+msgid "Has Next"
+msgstr "يوجد تالٍ"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_run_line_review.py:0
+msgid "On vacation, held"
+msgstr "في إجازة، محجوز"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_run_line_review.py:0
+msgid "Paid on a vacation payslip"
+msgstr "صُرف في مسير الإجازة"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_run_line_review.py:0
+msgid "Not handed over to the GM yet"
+msgstr "لم يُسلَّم للمدير العام بعد"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_employee_review.py:0
+msgid "These entries add up to %(total)s, not the %(expected)s on this line: the entries changed after the register was built."
+msgstr "مجموع هذه القيود %(total)s، وليس %(expected)s الظاهر في هذا السطر: تغيّرت القيود بعد إعداد كشف الصرف."

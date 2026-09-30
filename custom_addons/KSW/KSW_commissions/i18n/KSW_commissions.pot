@@ -757,6 +757,7 @@ msgid "Clients"
 msgstr ""
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_line_review_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_entry_explain_form
 msgid "Close"
 msgstr ""
@@ -1008,6 +1009,7 @@ msgid "Company-wide"
 msgstr ""
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.employee_review_sections
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_batch__component_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__component_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_option__component_id
@@ -4254,6 +4256,7 @@ msgid ""
 msgstr ""
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_line_review_form
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run__x_visible_line_ids
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
 msgid "Who Gets Paid"
@@ -5918,6 +5921,7 @@ msgid "Returned Because"
 msgstr ""
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form_review
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_gm_review_wizard_form
 msgid "Review"
 msgstr ""
@@ -6419,6 +6423,7 @@ msgid "See the entries"
 msgstr ""
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.employee_review_sections
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_gm_review_reason_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_vacation_release_form
 msgid "Why"
@@ -6541,4 +6546,78 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
 msgid "Employees — %(name)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.employee_review_sections
+msgid "rounded from"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.employee_review_sections
+msgid "Not in this payment"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_line_review_form
+msgid "Previous"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_line_review_form
+msgid "Next"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form_review
+msgid "Review Employees One by One"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form_review
+msgid "This employee's breakdown, then the next"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__x_review_sections_html
+msgid "Breakdown"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__x_review_position
+msgid "Position"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__x_review_has_prev
+msgid "Has Previous"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__x_review_has_next
+msgid "Has Next"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_run_line_review.py:0
+msgid "On vacation, held"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_run_line_review.py:0
+msgid "Paid on a vacation payslip"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_run_line_review.py:0
+msgid "Not handed over to the GM yet"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_employee_review.py:0
+msgid "These entries add up to %(total)s, not the %(expected)s on this line: the entries changed after the register was built."
 msgstr ""

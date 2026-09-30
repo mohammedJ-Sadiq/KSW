@@ -507,8 +507,7 @@ class KswPaySubmission(models.Model):
         one draft row. A batch whose rows all went in a sub-batch has
         nothing to send — offering it only closed it for nothing."""
         return self.sudo().batch_ids.filtered(
-            lambda b: b.state == 'draft'
-            and b.entry_ids.filtered(lambda e: e.state == 'draft'))
+            lambda b: b._has_something_to_send())
 
     def _open_sub_batches(self):
         """Sub-batches the supervisor has prepared and not yet sent."""

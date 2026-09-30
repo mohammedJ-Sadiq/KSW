@@ -921,9 +921,7 @@ class KswPayBatch(models.Model):
         department's approval is what can finalise and lock the month.
         """
         self.mapped('submission_id')._check_mine()
-        batches = self.filtered(
-            lambda b: b.state in ('draft', 'submitted')
-            and b.entry_ids.filtered(lambda e: e.state == 'draft'))
+        batches = self.filtered(lambda b: b._has_something_to_send())
         if not batches:
             raise UserError(_("Pick at least one component to send."))
         batches.filtered(lambda b: b.state == 'draft').action_submit()
@@ -951,6 +949,22 @@ class KswPayBatch(models.Model):
         runs._sync_state()
         runs._refresh_register()
         return True
+
+    def _has_something_to_send(self):
+        """Does this component carry anything the GM does not have yet?
+
+        Draft rows, or rows the supervisor already submitted batch by batch
+        ("finished typing") that are not in front of the GM. A batch whose
+        rows all went in a sub-batch has nothing — sending it would only
+        close it (PB016633, Sep 2026).
+        """
+        self.ensure_one()
+        if self.state not in ('draft', 'submitted'):
+            return False
+        rows = self.sudo().entry_ids
+        return bool(rows.filtered(lambda e: e.state == 'draft')
+                    or (rows.filtered(lambda e: e.state == 'submitted')
+                        - rows._handed_over()))
 
     def action_new_sub_batch(self):
         """Start a sub-batch for this batch's department month.

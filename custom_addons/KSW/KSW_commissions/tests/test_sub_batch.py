@@ -295,6 +295,25 @@ class TestPickComponents(SubBatchCommon):
         self.assertEqual(self.submission.state, 'submitted')
         self.assertFalse(empty.exists())
 
+    def test_58_a_batch_submitted_on_its_own_can_still_be_sent(self):
+        """KSWCO shape (Sep 2026, 6 batches): the supervisor pressed the
+        batch's own Submit ("finished typing") and did not hand over the
+        department. That component must still be offered, and sending it
+        puts it in front of the GM."""
+        self.ot.with_user(self.sup_a).action_submit()
+        self.submission.invalidate_recordset()
+        self.assertFalse(self.submission.pending_entry_ids)
+        self.assertIn(self.component,
+                      self._wizard(self.run).allowed_component_ids)
+        self._send(self.component)
+        self.assertTrue(self.ot.handed_over_date)
+        self.submission.invalidate_recordset()
+        self.assertEqual(self.submission.pending_entry_ids,
+                         self.ot_a | self.ot_a2)
+        # And once it is with the GM, it is not offered again.
+        self.assertNotIn(self.component,
+                         self._wizard(self.run).allowed_component_ids)
+
     def test_57_a_component_already_in_a_sub_batch_is_not_offered(self):
         """KSWCO-shaped (PB016633): every row went early and was approved.
         There is nothing to send, and sending it only closed the batch."""

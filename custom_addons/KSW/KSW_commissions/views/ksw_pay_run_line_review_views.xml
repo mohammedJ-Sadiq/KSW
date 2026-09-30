@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- ================================================================ -->
+    <!-- Who Gets Paid: one employee at a time                             -->
+    <!-- ================================================================ -->
+    <!-- Opened as a dialog by action_open_review. Previous / Next open the
+         neighbouring line the same way, which replaces this dialog, so the
+         GM walks the whole tab without closing anything. They show only
+         when opened that way (ksw_review_nav); clicking a row of the tab
+         opens the same page without them. -->
+    <record id="view_ksw_pay_run_line_review_form" model="ir.ui.view">
+        <field name="name">ksw.pay.run.line.review.form</field>
+        <field name="model">ksw.pay.run.line</field>
+        <field name="arch" type="xml">
+            <form string="Who Gets Paid" create="false" edit="false"
+                  delete="false">
+                <sheet>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="oe_title">
+                            <h2><field name="employee_id" readonly="1"
+                                       options="{'no_open': True}"/></h2>
+                            <field name="department_id" readonly="1"
+                                   options="{'no_open': True}"/>
+                        </div>
+                        <span class="badge text-bg-secondary fs-6"
+                              invisible="not context.get('ksw_review_nav')">
+                            <field name="x_review_position" readonly="1"/>
+                        </span>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="earnings" readonly="1"/>
+                            <field name="loan_offset" readonly="1"/>
+                            <field name="net_payable" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="run_id" readonly="1"
+                                   options="{'no_open': True}"/>
+                            <field name="bank_account_id" readonly="1"
+                                   options="{'no_open': True}"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="x_review_sections_html" nolabel="1"
+                           readonly="1"/>
+                </sheet>
+                <footer>
+                    <field name="x_review_has_prev" invisible="1"/>
+                    <field name="x_review_has_next" invisible="1"/>
+                    <button name="action_review_prev" type="object"
+                            string="Previous" icon="fa-chevron-left"
+                            class="btn-secondary"
+                            invisible="not context.get('ksw_review_nav') or not x_review_has_prev"/>
+                    <button name="action_review_next" type="object"
+                            string="Next" icon="fa-chevron-right"
+                            class="btn-primary"
+                            invisible="not context.get('ksw_review_nav') or not x_review_has_next"/>
+                    <button string="Close" special="cancel"
+                            class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_run_form_review" model="ir.ui.view">
+        <field name="name">ksw.pay.run.form.review</field>
+        <field name="model">ksw.pay.run</field>
+        <field name="inherit_id" ref="KSW_commissions.view_ksw_pay_run_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='register']/field[@name='x_visible_line_ids']"
+                   position="before">
+                <button name="action_review_employees" type="object"
+                        string="Review Employees One by One"
+                        icon="fa-user-circle-o" class="btn-primary mb-2"
+                        invisible="not x_visible_line_ids"/>
+            </xpath>
+            <xpath expr="//field[@name='x_visible_line_ids']/list/button[@name='action_open_entries']"
+                   position="before">
+                <button name="action_open_review" type="object"
+                        string="Review" icon="fa-user-circle-o"
+                        title="This employee's breakdown, then the next"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

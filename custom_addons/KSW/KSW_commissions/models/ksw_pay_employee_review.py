@@ -89,32 +89,57 @@ class KswPayEmployeeReview(models.Model):
             rec.sections_html = rec._render_sections(entries, components)
 
     def _render_sections(self, entries, components):
+        return self._render_entry_sections(
+            entries, self.currency_id or self.env.company.currency_id)
+
+    @api.model
+    def _render_entry_sections(self, entries, currency, paid=None,
+                               excluded=None, expected=None):
+        """One table per component, each closed by its own subtotal.
+
+        Shared by this page and the pay run's *Who Gets Paid* review.
+        ``paid`` is ``{component: amount}`` when the figure actually paid
+        differs from the plain sum (the run rounds each component to whole
+        riyals); the grand total is then the sum of those. ``excluded`` is
+        ``[(entry, why)]``: rows that exist but are not in this payment.
+        ``expected`` is the figure the breakdown must reach; when it does
+        not, the page says so rather than quietly disagreeing with it.
+        """
         state_labels = dict(
             entries._fields['state']._description_selection(self.env))
         sections = []
-        for component in components:
+        for component in entries.component_id.sorted():
             rows = entries.filtered(lambda e: e.component_id == component)
+            amount = sum(rows.mapped('amount'))
             sections.append({
                 'component': component,
                 'qty_label': component.qty_label or _('Quantity'),
+                'show_qty': any(rows.mapped('quantity')),
                 'show_option': any(rows.mapped('option_id')),
                 'show_date': any(rows.mapped('date')),
                 'show_reason': any(rows.mapped('reason')),
                 'rows': rows.sorted(
                     lambda e: (e.date or datetime.date.min, e.id)),
                 'quantity': sum(rows.mapped('quantity')),
-                'amount': sum(rows.mapped('amount')),
+                'amount': amount,
+                'paid': paid.get(component, amount) if paid else amount,
             })
+        total = sum(sec['paid'] for sec in sections)
+        fmt = lambda value: tools.format_amount(self.env, value, currency)
+        mismatch = expected is not None and round(expected - total, 2) and _(
+            "These entries add up to %(total)s, not the %(expected)s on this "
+            "line: the entries changed after the register was built.",
+            total=fmt(total), expected=fmt(expected))
         return self.env['ir.qweb']._render(
             'KSW_commissions.employee_review_sections', {
                 'sections': sections,
+                'mismatch': mismatch,
+                'excluded': excluded or [],
                 'state_labels': state_labels,
-                'total': sum(entries.mapped('amount')),
+                'total': total,
                 'format_qty': lambda value: (
                     '%.2f' % value).rstrip('0').rstrip('.'),
                 'format_date': lambda value: tools.format_date(
                     self.env, value),
-                'format_amount': lambda value: tools.format_amount(
-                    self.env, value,
-                    self.currency_id or self.env.company.currency_id),
+                'format_amount': fmt,
             })
