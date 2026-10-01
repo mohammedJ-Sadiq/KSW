@@ -20,6 +20,7 @@ Two deliberate choices, both explained at length in the design spec:
   batch, not beside it — Breakfast, Lunch and Dinner are one Meals batch with
   a Type column, not three batches to open, submit and approve separately.
 """
+import calendar
 from collections import defaultdict
 
 from markupsafe import Markup, escape
@@ -129,6 +130,10 @@ class KswPayBatch(models.Model):
     )
     skipped_count = fields.Integer(compute='_compute_skip_counts')
     review_count = fields.Integer(compute='_compute_skip_counts')
+    # Rows paying an employee for something he already has in a sub-batch
+    # (or the other way round). A warning on the form, never a block.
+    x_overlap_count = fields.Integer(
+        compute='_compute_overlap_count', string='Overlapping Rows')
 
     submitted_by = fields.Many2one('res.users', readonly=True, copy=False)
     submitted_date = fields.Datetime(readonly=True, copy=False)
@@ -418,6 +423,12 @@ class KswPayBatch(models.Model):
                 lines.filtered(lambda l: l.outcome == 'skipped'))
             rec.review_count = len(
                 lines.filtered(lambda l: l.outcome == 'warning'))
+
+    @api.depends('entry_ids.x_overlap_note')
+    def _compute_overlap_count(self):
+        for rec in self:
+            rec.x_overlap_count = len(
+                rec.entry_ids.filtered(lambda e: e.x_overlap_note))
 
     def action_clear_skip_log(self):
         """Drop the log once it has been dealt with."""
@@ -966,16 +977,30 @@ class KswPayBatch(models.Model):
                     or (rows.filtered(lambda e: e.state == 'submitted')
                         - rows._handed_over()))
 
-    def action_new_sub_batch(self):
-        """Start a sub-batch for this batch's department month.
-
-        A sub-batch names employees, not rows, and takes their entries from
-        every batch of the month — so it belongs to the department, and this
-        is only a shortcut to it.
-        """
+    def action_send_early(self):
+        """Send Early…: some employees of this component, for some days,
+        to the General Manager now — one dialog, nothing else to press."""
         self.ensure_one()
+        self._check_editable_batch(_("Sending employees early"))
         self._ensure_submission()
-        return self.submission_id.action_new_sub_batch()
+        self.submission_id._check_mine()
+        wizard = self.env['ksw.pay.send.early.wizard'].create({
+            'batch_id': self.id,
+        })
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Send Early — %(name)s', name=self.component_id.name),
+            'res_model': wizard._name,
+            'res_id': wizard.id,
+            'view_mode': 'form',
+            'target': 'new',
+        }
+
+    def action_new_sub_batch(self):
+        """The old "Sub-Batch" button's name. A browser tab left open across
+        the upgrade keeps the cached form and still calls it — open the new
+        dialog rather than an error."""
+        return self.action_send_early()
 
     def action_import(self):
         """Run the importer the component declares."""
@@ -1151,6 +1176,31 @@ class KswPayEntry(models.Model):
         string='Paid on Vacation',
     )
 
+    # The days an imported figure covers. A month's driver trips can be
+    # paid in pieces — a sub-batch for 16–30 Sep, the batch's own import
+    # for the days no sub-batch took — and each piece has to say which
+    # days it is, or the next import cannot tell what is still unpaid.
+    # Blank on typed rows and on rows imported before windows existed;
+    # those cover the whole month (`_span`).
+    x_window_from = fields.Date(
+        string='Days From', readonly=True, copy=False,
+        help='First day the imported figure covers.')
+    x_window_to = fields.Date(
+        string='Days To', readonly=True, copy=False,
+        help='Last day the imported figure covers.')
+    # The same employee paid for the same thing twice: once in a sub-batch
+    # and again in the batch, or in another sub-batch. A warning, never a
+    # block — the supervisor may mean it (two separate overtime sessions on
+    # one day), and he is the one who knows. Not stored: it is an answer
+    # about the other rows, which change without touching this one.
+    x_overlap_note = fields.Char(
+        compute='_compute_overlap_note', compute_sudo=True,
+        string='Also In',
+        help='This employee has another row for the same thing — the same '
+             'day, overlapping days, or (for a monthly allowance) the same '
+             'month — in a different sub-batch or in the batch itself. '
+             'Check that it is not being paid twice.')
+
     # `date` and `period` are in here because the rate an employee has of
     # their own (ksw.pay.employee.rate) is dated: moving an occurrence into
     # another month can move it across a rate change. That model has no
@@ -1161,7 +1211,8 @@ class KswPayEntry(models.Model):
                  'component_id.rate', 'component_id.divisor',
                  'component_id.factor', 'component_id.tier_ids.rate',
                  'component_id.tier_ids.width', 'site_id',
-                 'option_id', 'option_id.rate', 'date', 'period')
+                 'option_id', 'option_id.rate', 'date', 'period',
+                 'x_window_from', 'x_window_to')
     def _compute_amount(self):
         for rec in self:
             component = rec.component_id
@@ -1173,6 +1224,7 @@ class KswPayEntry(models.Model):
                     threshold=rec.threshold_qty,
                     option=rec.option_id,
                     date=rec.date or rec.period,
+                    band_scale=rec._band_scale(),
                 )
             else:
                 rate, amount = 0.0, 0.0
@@ -1204,7 +1256,8 @@ class KswPayEntry(models.Model):
 
     @api.depends('amount', 'quantity', 'quantity_ref', 'threshold_qty',
                  'rate', 'amount_override', 'component_id', 'option_id',
-                 'employee_id', 'date', 'period')
+                 'employee_id', 'date', 'period',
+                 'x_window_from', 'x_window_to')
     def _compute_explanation(self):
         """Render the derivation as a table.
 
@@ -1229,8 +1282,20 @@ class KswPayEntry(models.Model):
             threshold=self.threshold_qty,
             option=self.option_id,
             date=self.date or self.period,
+            band_scale=self._band_scale(),
         )
 
+        if self.x_window_from and self.x_window_to \
+                and self._band_scale() != 1.0:
+            notes.insert(0, _(
+                'Covers %(start)s to %(end)s only (%(days)d of %(month)d '
+                'days), so the tier bands are cut to %(pct).0f%% of a '
+                'full month.',
+                start=self.x_window_from, end=self.x_window_to,
+                days=(self.x_window_to - self.x_window_from).days + 1,
+                month=calendar.monthrange(
+                    self.period.year, self.period.month)[1],
+                pct=self._band_scale() * 100))
         if self.quantity_ref and component.qty_ref_label:
             notes.insert(0, '%s: %s' % (
                 component.qty_ref_label,
@@ -1422,6 +1487,114 @@ class KswPayEntry(models.Model):
                     "%(date)s is outside the batch period %(period)s.",
                     date=rec.date, period=rec.period.strftime('%B %Y')))
 
+    @api.constrains('x_window_from', 'x_window_to', 'batch_id')
+    def _check_window_in_period(self):
+        for rec in self:
+            if not (rec.x_window_from or rec.x_window_to):
+                continue
+            start, end = rec._month_bounds()
+            if not (rec.x_window_from and rec.x_window_to
+                    and start <= rec.x_window_from <= rec.x_window_to <= end):
+                raise ValidationError(_(
+                    "The days an entry covers must be a range inside "
+                    "%(period)s.", period=rec.period.strftime('%B %Y')))
+
+    # ------------------------------------------------------------------
+    # Which days a row is about
+    # ------------------------------------------------------------------
+    def _month_bounds(self):
+        self.ensure_one()
+        start = self.period.replace(day=1)
+        last = calendar.monthrange(start.year, start.month)[1]
+        return start, start.replace(day=last)
+
+    def _span(self):
+        """The days this row is about, as ``(first, last)``, or ``None``.
+
+        An occurrence is its own day; an imported figure is its window;
+        an imported figure from before windows existed is the whole month.
+        A typed monthly figure (a location allowance) has no days — it is
+        about the month as a whole, and ``None`` says so.
+        """
+        self.ensure_one()
+        if self.date:
+            return self.date, self.date
+        if self.x_window_from and self.x_window_to:
+            return self.x_window_from, self.x_window_to
+        if self.component_id.importer and self.period:
+            return self._month_bounds()
+        return None
+
+    def _within(self, date_from, date_to):
+        """Whether this row belongs to a sub-batch covering these days.
+
+        A row with no days of its own (a monthly allowance) goes wherever
+        its employee goes — the sub-batch takes all his components."""
+        self.ensure_one()
+        span = self._span()
+        if span is None or not (date_from and date_to):
+            return True
+        return date_from <= span[0] and span[1] <= date_to
+
+    def _band_scale(self):
+        """How much of a month this row's tier bands are worth.
+
+        A 15-day window earns through bands half as wide, the same way its
+        free allowance is already pro-rated — otherwise a driver whose month
+        is paid in two pieces climbs the ladder from the bottom twice and
+        earns less than had it been paid once."""
+        self.ensure_one()
+        if not (self.x_window_from and self.x_window_to and self.period):
+            return 1.0
+        start, end = self._month_bounds()
+        days = (self.x_window_to - self.x_window_from).days + 1
+        return min(days / float((end - start).days + 1), 1.0)
+
+    @api.depends('employee_id', 'option_id', 'date', 'x_window_from',
+                 'x_window_to', 'x_sub_batch_id', 'batch_id.entry_ids')
+    def _compute_overlap_note(self):
+        """Name the other places this employee is paid for the same thing.
+
+        One batch per component, department and month, so "the same thing"
+        is always a sibling row in the same batch. Only rows that sit in a
+        *different* sub-batch (or one in a sub-batch, one not) are compared
+        — two rows typed side by side in the batch is ordinary data entry,
+        not the double payment this exists to catch."""
+        notes = {}
+        for batch in self.batch_id:
+            groups = defaultdict(list)
+            for row in batch.entry_ids:
+                if row.employee_id:
+                    groups[(row.employee_id.id, row.option_id.id)].append(row)
+            for rows in groups.values():
+                if len(rows) < 2:
+                    continue
+                for row in rows:
+                    where = []
+                    for other in rows:
+                        if other == row or \
+                                other.x_sub_batch_id == row.x_sub_batch_id:
+                            continue
+                        if not row._overlaps(other):
+                            continue
+                        label = other.x_sub_batch_id.name or _(
+                            'the batch itself')
+                        if label not in where:
+                            where.append(label)
+                    if where:
+                        notes[row.id] = _(
+                            'Also in %(where)s', where=', '.join(where))
+        for rec in self:
+            rec.x_overlap_note = notes.get(rec.id, False)
+
+    def _overlaps(self, other):
+        mine, theirs = self._span(), other._span()
+        if mine is None or theirs is None:
+            # A monthly figure against anything for the same thing: the
+            # month is paid twice.
+            return True
+        return mine[0] <= theirs[1] and theirs[0] <= mine[1]
+
     @api.constrains('date', 'component_id')
     def _check_date_required(self):
         for rec in self:
@@ -1582,6 +1755,8 @@ class KswPayEntry(models.Model):
         res = super().write(vals)
         if 'employee_id' in vals:
             self._check_employee_allowed()
+        # Moving a row's day can move it into or out of a sub-batch's range.
+        if {'employee_id', 'date', 'x_window_from', 'x_window_to'} & set(vals):
             self._join_open_sub_batch()
         # `date` too: moving an occurrence back into the vacation is the
         # same act as typing it there. Nothing else can change the answer —
@@ -1622,9 +1797,15 @@ class KswPayEntry(models.Model):
             if submission and rec.employee_id:
                 target = SubBatch.search([
                     ('submission_id', '=', submission.id),
+                    ('batch_id', 'in', [rec.batch_id.id, False]),
                     ('state', 'in', ('draft', 'returned')),
-                    ('employee_ids', 'in', rec.employee_id.id),
+                    ('employee_ids', 'in', [rec.employee_id.id]),
                 ], limit=1)
+                # Only a row about the sub-batch's own days: overtime on
+                # the 20th is not part of a handover for the 1st–12th.
+                if target and not rec._within(target.date_from,
+                                              target.date_to):
+                    target = SubBatch
             if rec.x_sub_batch_id != target and (
                     target or rec.x_sub_batch_id.state in ('draft', 'returned')):
                 rec.x_sub_batch_id = target

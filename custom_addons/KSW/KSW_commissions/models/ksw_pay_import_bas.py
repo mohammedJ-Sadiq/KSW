@@ -82,7 +82,7 @@ INVOICE_FACTOR_FROM_DEFAULT = '2026-09-06'
 class KswPayBatchBasImport(models.Model):
     _inherit = 'ksw.pay.batch'
 
-    def _import_bas_trips(self):
+    def _import_bas_trips(self, employees=None, window=None, sub_batch=None):
         """Fill this batch with each of the department's drivers' trips.
 
         Whose trips to fetch used to be a work-site question — the batch
@@ -104,6 +104,15 @@ class KswPayBatchBasImport(models.Model):
         by the customer's current one — and the free allowance is the
         driver's required trips pro-rated to the days he actually worked.
         The tiered resolver turns both into money.
+
+        **A month can be paid in pieces.** Run from a sub-batch
+        (``sub_batch``), it imports only the drivers picked there
+        (``employees``) and only the sub-batch's days (``window``, both
+        ends included). Run from the batch itself, it imports for each
+        driver only the days **no sub-batch row already covers** — one row
+        per uncovered stretch — so a day is never paid twice. Every row
+        records its days (``x_window_from`` / ``x_window_to``); the free
+        allowance and the tier bands are cut to them.
         """
         self.ensure_one()
         if self.state != 'draft':
@@ -114,17 +123,45 @@ class KswPayBatchBasImport(models.Model):
                 "Select a Department on the batch before importing — the "
                 "drivers are taken from it."))
 
-        date_from = self.period.replace(day=1)
-        date_to = date_from + relativedelta(months=1)
+        month_start = self.period.replace(day=1)
+        month_end = month_start + relativedelta(months=1, days=-1)
+        if window:
+            window = (fields.Date.to_date(window[0]),
+                      fields.Date.to_date(window[1]))
+            if not (month_start <= window[0] <= window[1] <= month_end):
+                raise UserError(_(
+                    "The days to import must lie inside %(period)s.",
+                    period=self.period.strftime('%B %Y')))
 
-        employees = self._allowed_employees()
-        if not employees:
+        pool = self._allowed_employees()
+        if not pool:
             raise UserError(_(
                 "There are no employees under %(department)s.",
                 department=self.department_id.name))
+        if employees is None:
+            employees = pool
+        else:
+            outside = employees - pool
+            if outside:
+                raise UserError(_(
+                    "%(names)s cannot be imported into %(batch)s — they are "
+                    "not under %(department)s and do not report to you.",
+                    names=self._name_list(outside), batch=self.name,
+                    department=self.department_id.name))
+        if not employees:
+            raise UserError(_("Pick at least one driver to import."))
 
-        bas_data = self._bas_fetch_orood(date_from, date_to)
-        existing = {e.employee_id.id: e for e in self.entry_ids}
+        # One BAS query per distinct stretch of days, not per driver: most
+        # drivers share the same stretch (the whole month, or the
+        # sub-batch's days).
+        fetched = {}
+
+        def fetch(day_from, day_to):
+            key = (day_from, day_to)
+            if key not in fetched:
+                fetched[key] = self._bas_fetch_orood(
+                    day_from, day_to + relativedelta(days=1))
+            return fetched[key]
 
         # A driver who was on vacation this month was paid for it on the
         # leave. Importing his loads anyway would pay them a second time,
@@ -132,15 +169,6 @@ class KswPayBatchBasImport(models.Model):
         # cost centre whoever actually drove the truck while he was away.
         cutover = self._invoice_factor_cutover()
         holds = vacation_holds(self.env, employees, self.period)
-        # He came back mid-month: only the days from his return date on are
-        # his. One extra BAS query per distinct return date, not per driver.
-        windows = {}
-        for employee_id, hold in holds.items():
-            if hold.kind == 'partial':
-                windows.setdefault(hold.payable_from, {})
-        for payable_from in list(windows):
-            windows[payable_from] = self._bas_fetch_orood(
-                payable_from, date_to)
 
         matched = 0
         unmapped = self.env['hr.employee']
@@ -153,25 +181,44 @@ class KswPayBatchBasImport(models.Model):
         part_factor = self.env['hr.employee']
         cash_rerated = self.env['hr.employee']
         out_of_scope = self.env['hr.employee']
+        covered_all = self.env['hr.employee']
         commands = []
         # Rebuilt from scratch every import: the log describes THIS run,
         # and a stale row from a run whose cause has since been fixed is
-        # worse than no row at all.
+        # worse than no row at all. A sub-batch import only touches the
+        # drivers it was run for — the rest of the log is still true.
         Skip = self.env['ksw.pay.batch.skip.line'].sudo()
-        self.skip_line_ids.sudo().unlink()
+        if sub_batch:
+            self.skip_line_ids.filtered(
+                lambda s: s.employee_id in employees).sudo().unlink()
+        else:
+            self.skip_line_ids.sudo().unlink()
         log = []
         for employee in employees:
-            paid = existing.get(employee.id)
-            if paid and paid.x_vacation_payslip_id:
+            rows = self.entry_ids.filtered(
+                lambda e, emp=employee: e.employee_id == emp)
+            if sub_batch:
+                # This sub-batch's own rows; anything else he has here is
+                # somebody else's handover, compared by x_overlap_note.
+                mine = rows.filtered(lambda e: e.x_sub_batch_id == sub_batch)
+                segments = [window or (month_start, month_end)]
+            else:
+                mine = rows.filtered(lambda e: not e.x_sub_batch_id)
+                taken = [r._span() for r in rows - mine]
+                segments = self._uncovered_days(
+                    month_start, month_end, taken)
+            settled = mine.filtered('x_vacation_payslip_id')[:1]
+            if settled:
                 # Paid with his vacation settlement: that figure is what
                 # left the bank, and a refresh would rewrite history.
                 log.append(Skip._log(
                     self, employee, 'settled_on_vacation',
                     _('His line was paid on the vacation payslip %(slip)s '
                       'and is kept exactly as paid.',
-                      slip=paid.sudo().x_vacation_payslip_id.display_name)))
+                      slip=settled.sudo().x_vacation_payslip_id.display_name)))
                 continue
-            if paid and paid.state != 'draft':
+            locked = mine.filtered(lambda e: e.state != 'draft')[:1]
+            if locked:
                 # Sent early in a sub-batch, or approved and the rest of the
                 # batch returned: the GM has this figure, and a refresh
                 # would change it behind his back (and be refused).
@@ -180,7 +227,7 @@ class KswPayBatchBasImport(models.Model):
                     _('His line is with the General Manager or already '
                       'approved (%(where)s), so it is kept as it is. Ask '
                       'the General Manager to return it to import again.',
-                      where=paid.x_sub_batch_id.name or paid.batch_id.name)))
+                      where=locked.x_sub_batch_id.name or locked.batch_id.name)))
                 continue
             hold = holds.get(employee.id)
             # `!= 'partial'`, NOT `== 'full'`: a part month is the only
@@ -203,7 +250,7 @@ class KswPayBatchBasImport(models.Model):
                          if hold.kind == 'settled_later'
                          else _('The month was settled on that request.')),
                 )
-                if employee.id in existing:
+                if mine:
                     note += _(
                         ' A line from an earlier import is still on this '
                         'batch and will not be paid — delete it.')
@@ -214,16 +261,12 @@ class KswPayBatchBasImport(models.Model):
                 ([employee.x_bas_driver_cost_center or '']
                  + (employee.x_bas_driver_cost_center_alt or '').split(','))
                 if v.strip())
-            source = bas_data
             if hold:
-                # Built up front for the whole batch; fetched here if some
-                # future path produces a hold the prepass never saw, so a
-                # missing key can never again cost the supervisor his
-                # import.
-                source = windows.get(hold.payable_from)
-                if source is None:
-                    source = windows[hold.payable_from] = \
-                        self._bas_fetch_orood(hold.payable_from, date_to)
+                # He came back mid-month: only the days from his return
+                # date on are his.
+                segments = [
+                    (max(start, hold.payable_from), end)
+                    for start, end in segments if end >= hold.payable_from]
                 part_month |= employee
                 log.append(Skip._log(
                     self, employee, 'part_month',
@@ -232,34 +275,73 @@ class KswPayBatchBasImport(models.Model):
                       'of the month was settled on the leave.',
                       type=hold.leave.holiday_status_id.sudo().display_name,
                       date=fields.Date.to_string(hold.payable_from))))
-            data = self._bas_merge(source, self._bas_cost_centres(employee))
 
-            entry = existing.get(employee.id)
-            if not data:
+            # A batch row whose days a sub-batch has since taken would pay
+            # those days twice. It is this importer's own row, so it is
+            # replaced by the uncovered remainder rather than left to rot.
+            if not sub_batch:
+                stale = mine.filtered(
+                    lambda e: e._span() and not any(
+                        e._span()[0] <= end and start <= e._span()[1]
+                        for start, end in segments))
+                stale = stale.filtered(lambda e: any(
+                    e._overlaps(r) for r in rows - mine))
+                if stale:
+                    commands += [(2, r.id) for r in stale]
+                    mine -= stale
+
+            if not segments and hold:
+                # Back only after these days: nothing here is his, and the
+                # part-month note above already says why.
+                continue
+            if not segments:
+                covered_all |= employee
+                log.append(Skip._log(
+                    self, employee, 'covered_by_sub_batch',
+                    _('Every day of %(period)s already has his trips in a '
+                      'sub-batch (%(subs)s), so there is nothing left to '
+                      'import here.',
+                      period=self.period.strftime('%B %Y'),
+                      subs=', '.join(sorted(set(
+                          (rows - mine).x_sub_batch_id.mapped('name'))))
+                      or '—')))
+                continue
+
+            keys = self._bas_cost_centres(employee)
+            if not keys:
+                unmapped |= employee
+                log.append(Skip._log(
+                    self, employee, 'no_cost_centre',
+                    _('No BAS Driver Cost Center on the employee '
+                      'record, so his loads cannot be matched. Set it '
+                      'on the employee and import again.')))
+                if mine:
+                    kept |= employee
+                continue
+
+            pieces = []
+            for start, end in segments:
+                data = self._bas_merge(fetch(start, end), keys)
+                if data:
+                    pieces.append((start, end, data))
+            if not pieces:
                 # Nothing to import for this driver. Writing a zero-quantity
                 # entry is not an option — ksw.pay.entry._check_quantity
                 # rejects it and the ValidationError would roll back the whole
-                # import, so a single unmapped driver would cost every other
-                # driver his trips and report nobody by name. Skip him and say
-                # so in the summary instead.
-                if not self._bas_cost_centres(employee):
-                    unmapped |= employee
-                    log.append(Skip._log(
-                        self, employee, 'no_cost_centre',
-                        _('No BAS Driver Cost Center on the employee '
-                          'record, so his loads cannot be matched. Set it '
-                          'on the employee and import again.')))
-                else:
-                    no_data |= employee
-                    log.append(Skip._log(
-                        self, employee, 'no_data',
-                        _('BAS has no water loads booked to "%(cc)s" for '
-                          '%(period)s.', cc=cost_center,
-                          period=self.period.strftime('%B %Y'))))
+                # import, so a single driver with no loads would cost every
+                # other driver his trips and report nobody by name. Skip him
+                # and say so in the summary instead.
+                no_data |= employee
+                log.append(Skip._log(
+                    self, employee, 'no_data',
+                    _('BAS has no water loads booked to "%(cc)s" for '
+                      '%(period)s.', cc=cost_center,
+                      period=self._days_label(segments))))
                 # A line already in the batch is left alone: it may hold a
-                # figure someone entered or reviewed, and this importer cannot
-                # tell. It is named in the summary so it gets a second look.
-                if entry:
+                # figure someone entered or reviewed, and this importer
+                # cannot tell. It is named in the summary so it gets a
+                # second look.
+                if mine:
                     kept |= employee
                     log.append(Skip._log(
                         self, employee, 'kept',
@@ -268,129 +350,166 @@ class KswPayBatchBasImport(models.Model):
                           'whether somebody reviewed it.')))
                 continue
 
-            # The truck, kept for the journal entry's cost-centre
-            # column. BAS gives it per month, on the loads themselves —
-            # there is nowhere else to get it, and the hand-typed voucher
-            # carries it on every commission line.
-            equipment = (data.get('equip') or '').strip()
-            if equipment and employee.sudo().x_bas_equipment_code != equipment:
-                employee.sudo().x_bas_equipment_code = equipment
+            free = list(mine.sorted(
+                lambda e: e._span() or (month_start, month_end)))
+            for start, end, data in pieces:
+                # The truck, kept for the journal entry's cost-centre
+                # column. BAS gives it per month, on the loads themselves —
+                # there is nowhere else to get it, and the hand-typed
+                # voucher carries it on every commission line.
+                equipment = (data.get('equip') or '').strip()
+                if equipment and \
+                        employee.sudo().x_bas_equipment_code != equipment:
+                    employee.sudo().x_bas_equipment_code = equipment
 
-            # A load with no «رد الفاتورة» is not weightless, it is
-            # unrecorded. Counting it as zero would quietly shrink the
-            # driver's month; BAS stopped filling the column on 6 Sep 2026,
-            # so this is the difference between "he did less" and "nobody
-            # wrote it down".
-            if not data['mult']:
-                no_factor |= employee
-                log.append(Skip._log(
-                    self, employee, 'no_invoice_factor',
-                    _('BAS recorded %(loads)d load(s) for him in '
-                      '%(period)s but there is no weighting on any of them '
-                      '(%(new)d invoiced on or after %(cut)s carry no '
-                      '«رد الفاتورة»), so there is nothing to pay against. '
-                      'This is a BAS data problem, not an absence — his '
-                      'loads are there.',
-                      loads=data['loads'],
-                      new=data.get('new_basis') or 0,
-                      cut=fields.Date.to_string(cutover),
-                      period=self.period.strftime('%B %Y'))))
-                if entry:
-                    kept |= employee
-                continue
-            if data.get('missing'):
-                part_factor |= employee
-                log.append(Skip._log(
-                    self, employee, 'part_invoice_factor',
-                    _('%(missing)d of the %(new)d load(s) invoiced on or '
-                      'after %(cut)s carry no «رد الفاتورة», so they are '
-                      'not counted in the weighted quantity below. Check '
-                      'the figure before approving.',
-                      missing=data['missing'],
-                      new=data.get('new_basis') or 0,
-                      cut=fields.Date.to_string(cutover))))
-
-            # Re-rated, never silently. The till's own rate is what the
-            # line carries in BAS; the band is what the business says the
-            # run was worth. Saying so on the record is the whole point —
-            # the figure differs from BAS and the reason has to travel
-            # with it.
-            if data.get('cash_loads'):
-                cash_delta = round(data['cash_at_band']
-                                   - data['cash_at_till'], 2)
-                if abs(cash_delta) > 0.005:
-                    cash_rerated |= employee
+                # A load with no «رد الفاتورة» is not weightless, it is
+                # unrecorded. Counting it as zero would quietly shrink the
+                # driver's month; BAS stopped filling the column on 6 Sep
+                # 2026, so this is the difference between "he did less" and
+                # "nobody wrote it down".
+                if not data['mult']:
+                    no_factor |= employee
                     log.append(Skip._log(
-                        self, employee, 'cash_band',
-                        _('%(n)d load(s) went to cash customers. BAS books '
-                          'those to the till, whose own rate would weight '
-                          'them %(till).2f; the amount bands weight them '
-                          '%(band).2f — a difference of %(d)+.2f on this '
-                          'driver.',
-                          n=data['cash_loads'], till=data['cash_at_till'],
-                          band=data['cash_at_band'], d=cash_delta)))
+                        self, employee, 'no_invoice_factor',
+                        _('BAS recorded %(loads)d load(s) for him in '
+                          '%(period)s but there is no weighting on any of '
+                          'them (%(new)d invoiced on or after %(cut)s carry '
+                          'no «رد الفاتورة»), so there is nothing to pay '
+                          'against. This is a BAS data problem, not an '
+                          'absence — his loads are there.',
+                          loads=data['loads'],
+                          new=data.get('new_basis') or 0,
+                          cut=fields.Date.to_string(cutover),
+                          period=self._days_label([(start, end)]))))
+                    if mine:
+                        kept |= employee
+                    continue
+                if data.get('missing'):
+                    part_factor |= employee
+                    log.append(Skip._log(
+                        self, employee, 'part_invoice_factor',
+                        _('%(missing)d of the %(new)d load(s) invoiced on or '
+                          'after %(cut)s carry no «رد الفاتورة», so they are '
+                          'not counted in the weighted quantity below. Check '
+                          'the figure before approving.',
+                          missing=data['missing'],
+                          new=data.get('new_basis') or 0,
+                          cut=fields.Date.to_string(cutover))))
 
-            worked = self._get_worked_days_from_sheet(employee, self.period)
-            required = self._bas_required_trips(worked, self.period)
-            if worked is None:
-                # Charged the FULL month's requirement, because nothing
-                # says otherwise. Never silently: that is the one outcome
-                # the driver cannot argue with and cannot see.
-                no_attendance |= employee
-                log.append(Skip._log(
-                    self, employee, 'no_attendance',
-                    _('No attendance sheet and no punches for %(period)s, '
-                      'so the full %(req).0f required trips were applied '
-                      'instead of a pro-rated figure. Check his sheet '
-                      'before approving.',
-                      period=self.period.strftime('%B %Y'),
-                      req=required)))
-            vals = {
-                # Σ «رد الفاتورة» — what the tiers are calculated on.
-                'quantity': data['mult'],
-                # عدد الردود — the raw count, kept so the amount can be
-                # justified at review rather than appearing from nowhere.
-                'quantity_ref': float(data['loads']),
-                'threshold_qty': required,
-                'details': _(
-                    'Weighted on %(basis)s. Worked days: %(days)s. '
-                    'Required trips before earning: %(required).0f.',
-                    basis=(
-                        _('«رد الفاتورة» as invoiced')
-                        if (data.get('new_basis') or 0) >= data['loads']
-                        else (_('«الرد المضاعف» (customer rate)')
-                              if not data.get('new_basis')
-                              else _('both bases, split at %(cut)s',
-                                     cut=fields.Date.to_string(cutover)))),
-                    days=worked if worked is not None else _('not recorded'),
-                    required=required),
-            }
-            if data.get('missing'):
-                # The figure is short and the entry itself must say so —
-                # the import log is on another tab, and this line is what
-                # the approver reads next to the money.
-                vals['details'] += _(
-                    ' Only %(counted)d of %(new)d load(s) invoiced from '
-                    '%(cut)s are weighted; the other %(missing)d carry no '
-                    '«رد الفاتورة» in BAS.',
-                    counted=(data.get('new_basis') or 0) - data['missing'],
-                    new=data.get('new_basis') or 0,
-                    missing=data['missing'],
-                    cut=fields.Date.to_string(cutover))
-            if hold:
-                vals['details'] += _(
-                    ' Back from vacation on %(date)s — only loads from that '
-                    'date onwards are counted; the earlier part of the '
-                    'month was settled on the leave.',
-                    date=fields.Date.to_string(hold.payable_from))
-            matched += 1
-            if entry:
-                commands.append((1, entry.id, vals))
-            else:
-                commands.append((0, 0, dict(vals, employee_id=employee.id)))
+                # Re-rated, never silently. The till's own rate is what the
+                # line carries in BAS; the band is what the business says
+                # the run was worth. Saying so on the record is the whole
+                # point — the figure differs from BAS and the reason has to
+                # travel with it.
+                if data.get('cash_loads'):
+                    cash_delta = round(data['cash_at_band']
+                                       - data['cash_at_till'], 2)
+                    if abs(cash_delta) > 0.005:
+                        cash_rerated |= employee
+                        log.append(Skip._log(
+                            self, employee, 'cash_band',
+                            _('%(n)d load(s) went to cash customers. BAS '
+                              'books those to the till, whose own rate '
+                              'would weight them %(till).2f; the amount '
+                              'bands weight them %(band).2f — a difference '
+                              'of %(d)+.2f on this driver.',
+                              n=data['cash_loads'],
+                              till=data['cash_at_till'],
+                              band=data['cash_at_band'], d=cash_delta)))
+
+                whole = (start, end) == (month_start, month_end)
+                worked = self._get_worked_days_from_sheet(
+                    employee, self.period,
+                    date_from=None if whole else start,
+                    date_to=None if whole else end)
+                required = self._bas_required_trips(
+                    worked, self.period, days=(end - start).days + 1)
+                if worked is None:
+                    # Charged the FULL requirement for these days, because
+                    # nothing says otherwise. Never silently: that is the
+                    # one outcome the driver cannot argue with and cannot
+                    # see.
+                    no_attendance |= employee
+                    log.append(Skip._log(
+                        self, employee, 'no_attendance',
+                        _('No attendance sheet and no punches for '
+                          '%(period)s, so the full %(req).0f required trips '
+                          'were applied instead of a pro-rated figure. '
+                          'Check his sheet before approving.',
+                          period=self._days_label([(start, end)]),
+                          req=required)))
+                vals = {
+                    # Σ «رد الفاتورة» — what the tiers are calculated on.
+                    'quantity': data['mult'],
+                    # عدد الردود — the raw count, kept so the amount can be
+                    # justified at review rather than appearing from
+                    # nowhere.
+                    'quantity_ref': float(data['loads']),
+                    'threshold_qty': required,
+                    'x_window_from': start,
+                    'x_window_to': end,
+                    'details': _(
+                        'Weighted on %(basis)s. Worked days: %(days)s. '
+                        'Required trips before earning: %(required).0f.',
+                        basis=(
+                            _('«رد الفاتورة» as invoiced')
+                            if (data.get('new_basis') or 0) >= data['loads']
+                            else (_('«الرد المضاعف» (customer rate)')
+                                  if not data.get('new_basis')
+                                  else _('both bases, split at %(cut)s',
+                                         cut=fields.Date.to_string(cutover)))),
+                        days=worked if worked is not None
+                        else _('not recorded'),
+                        required=required),
+                }
+                if not whole:
+                    vals['details'] += _(
+                        ' Covers %(start)s to %(end)s only.',
+                        start=fields.Date.to_string(start),
+                        end=fields.Date.to_string(end))
+                if data.get('missing'):
+                    # The figure is short and the entry itself must say so —
+                    # the import log is on another tab, and this line is
+                    # what the approver reads next to the money.
+                    vals['details'] += _(
+                        ' Only %(counted)d of %(new)d load(s) invoiced from '
+                        '%(cut)s are weighted; the other %(missing)d carry '
+                        'no «رد الفاتورة» in BAS.',
+                        counted=(data.get('new_basis') or 0)
+                        - data['missing'],
+                        new=data.get('new_basis') or 0,
+                        missing=data['missing'],
+                        cut=fields.Date.to_string(cutover))
+                if hold:
+                    vals['details'] += _(
+                        ' Back from vacation on %(date)s — only loads from '
+                        'that date onwards are counted; the earlier part of '
+                        'the month was settled on the leave.',
+                        date=fields.Date.to_string(hold.payable_from))
+                matched += 1
+                # Refresh the row already holding these days (or the
+                # nearest one) in place, so a re-import is an update and
+                # not a second line.
+                entry = next(
+                    (r for r in free if (r._span() or ()) == (start, end)),
+                    None) or next(
+                    (r for r in free if r._span() and r._span()[0] <= end
+                     and start <= r._span()[1]), None) or (
+                    free[0] if free and len(pieces) == 1 else None)
+                if entry:
+                    free.remove(entry)
+                    commands.append((1, entry.id, vals))
+                else:
+                    commands.append(
+                        (0, 0, dict(vals, employee_id=employee.id)))
 
         if commands:
             self.write({'entry_ids': commands})
+            # The new rows have their days now; one about a sub-batch's
+            # days goes into it if its driver is there.
+            self.entry_ids.filtered(
+                lambda e: e.employee_id in employees
+                and e.state == 'draft')._join_open_sub_batch()
 
         # Entries for people the importer never looks at. `employees` is the
         # batch's scope, so an entry outside it is walked past in silence and
@@ -400,7 +519,8 @@ class KswPayBatchBasImport(models.Model):
         # entry that is already here (KSWCO, Aug 2026: four drivers, one of
         # them earning 0.00 on a stale figure that sat below the threshold
         # while his real one was above it).
-        stranded = self.entry_ids.employee_id - employees
+        stranded = self.env['hr.employee'] if sub_batch \
+            else self.entry_ids.employee_id - employees
         for employee in stranded:
             out_of_scope |= employee
             log.append(Skip._log(
@@ -418,6 +538,16 @@ class KswPayBatchBasImport(models.Model):
 
         message = _(
             "%(matched)s driver(s) filled from BAS.", matched=matched)
+        if sub_batch:
+            message = _(
+                "%(sub)s, %(days)s: ", sub=sub_batch.name,
+                days=self._days_label([window])) + message
+        if covered_all:
+            message += _(
+                "\n%(count)s already have every day of the month in a "
+                "sub-batch, so nothing was left to import: %(names)s",
+                count=len(covered_all),
+                names=self._name_list(covered_all))
         if unmapped:
             message += _(
                 "\n%(count)s have no BAS cost centre set: %(names)s",
@@ -485,6 +615,33 @@ class KswPayBatchBasImport(models.Model):
         return self._notify(message, title=_('Imported from BAS'))
 
     @staticmethod
+    def _uncovered_days(month_start, month_end, taken):
+        """The stretches of the month no span in ``taken`` covers, as a
+        list of ``(first, last)`` — the days still to be paid."""
+        free, day = [], month_start
+        for start, end in sorted(s for s in taken if s):
+            if start > day:
+                free.append((day, min(start - relativedelta(days=1),
+                                      month_end)))
+            day = max(day, end + relativedelta(days=1))
+            if day > month_end:
+                break
+        if day <= month_end:
+            free.append((day, month_end))
+        return free
+
+    def _days_label(self, segments):
+        """'September 2026' for the whole month, '16–30 Sep 2026' for less."""
+        self.ensure_one()
+        month_start = self.period.replace(day=1)
+        month_end = month_start + relativedelta(months=1, days=-1)
+        if [tuple(s) for s in segments] == [(month_start, month_end)]:
+            return self.period.strftime('%B %Y')
+        return ', '.join(
+            '%s–%s' % (start.strftime('%d'), end.strftime('%d %b %Y'))
+            for start, end in segments)
+
+    @staticmethod
     def _name_list(employees, limit=5):
         """First few employee names, with a count of the rest."""
         names = ', '.join(employees[:limit].mapped('name'))
@@ -492,7 +649,7 @@ class KswPayBatchBasImport(models.Model):
             names += _(' and %(more)s more', more=len(employees) - limit)
         return names
 
-    def _bas_required_trips(self, worked_days, period=None):
+    def _bas_required_trips(self, worked_days, period=None, days=None):
         """The free allowance: required trips pro-rated to days worked.
 
         ``base`` is the figure for a **full month**, from the one hidden
@@ -513,16 +670,24 @@ class KswPayBatchBasImport(models.Model):
         ``worked_days is None`` means nothing recorded the month at all:
         the full requirement stands, and the importer names him in the
         summary rather than letting it pass unseen.
+
+        ``days`` is how many days the figure covers when it is less than
+        the month (a sub-batch's 16–30): the cap — and the "nothing
+        recorded" requirement — shrink to that share of the month, as the
+        tier bands do.
         """
         self.ensure_one()
         base = self.env['ksw.site']._trip_settings().required_trips_full_month
         base = base or 0
-        if worked_days is None:
-            return float(base)
         period = period or self.period
         days_in_month = calendar.monthrange(period.year, period.month)[1]
+        cap = base
+        if days and days < days_in_month:
+            cap = round(base * days / float(days_in_month))
+        if worked_days is None:
+            return float(cap)
         return float(min(
-            base, round(base * (worked_days or 0) / float(days_in_month))))
+            cap, round(base * (worked_days or 0) / float(days_in_month))))
 
     def _invoice_factor_cutover(self):
         """The date from which «رد الفاتورة» replaces «الرد المضاعف».
@@ -727,7 +892,8 @@ class KswPayBatchBasImport(models.Model):
             conn.close()
         return result
 
-    def _get_worked_days_from_sheet(self, employee, period):
+    def _get_worked_days_from_sheet(self, employee, period, date_from=None,
+                                    date_to=None):
         """Attended days from the employee's monthly attendance sheet.
 
         **This is the figure the free allowance is pro-rated against**: if
@@ -743,6 +909,10 @@ class KswPayBatchBasImport(models.Model):
 
         ``None`` when the month was not recorded anywhere, so the caller
         can tell "he worked no days" from "nobody said".
+
+        With ``date_from``/``date_to`` only the attended days in that
+        stretch count — a sub-batch for 16–30 is asked to earn against the
+        days he worked in it, not in the whole month.
         """
         Sheet = self.env['ksw.attendance.sheet'].sudo()
         domain = [
@@ -753,10 +923,16 @@ class KswPayBatchBasImport(models.Model):
         sheet = Sheet.search(domain + [('state', '=', 'confirmed')], limit=1) \
             or Sheet.search(domain, limit=1)
         if sheet:
+            if date_from and date_to:
+                return len(sheet.line_ids.filtered(
+                    lambda l: l.is_attended
+                    and date_from <= l.date <= date_to))
             return sheet.total_attended
-        return self._get_worked_days_from_attendance(employee, period)
+        return self._get_worked_days_from_attendance(
+            employee, period, date_from=date_from, date_to=date_to)
 
-    def _get_worked_days_from_attendance(self, employee, period):
+    def _get_worked_days_from_attendance(self, employee, period,
+                                         date_from=None, date_to=None):
         """Days worked for a driver who punches instead of being marked.
 
         About one driver in ten carries a BAS cost centre but no monthly
@@ -773,8 +949,9 @@ class KswPayBatchBasImport(models.Model):
         Attendance = self.env['hr.attendance'].sudo()
         if 'x_is_absent' not in Attendance._fields:
             return None
-        start = period.replace(day=1)
-        end = start + relativedelta(months=1)
+        start = date_from or period.replace(day=1)
+        end = (date_to + relativedelta(days=1)) if date_to \
+            else period.replace(day=1) + relativedelta(months=1)
         records = Attendance.search([
             ('employee_id', '=', employee.id),
             ('check_in', '>=', fields.Datetime.to_datetime(start)),

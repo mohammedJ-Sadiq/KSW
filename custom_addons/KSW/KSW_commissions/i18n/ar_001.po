@@ -7160,3 +7160,364 @@ msgstr "صافي المستحق، الأعلى أولًا"
 #: code:addons/KSW_commissions/models/ksw_pay_run_line_review.py:0
 msgid "Who Gets Paid — %(run)s"
 msgstr "من سيُصرَف له — %(run)s"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__x_overlap_note
+msgid "Also In"
+msgstr "موجود أيضاً في"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "Also in %(where)s"
+msgstr "موجود أيضاً في %(where)s"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "the batch itself"
+msgstr "الدفعة نفسها"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_batch__x_overlap_count
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_sub_batch__x_overlap_count
+msgid "Overlapping Rows"
+msgstr "سطور متداخلة"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__x_window_from
+msgid "Days From"
+msgstr "من يوم"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__x_window_to
+msgid "Days To"
+msgstr "إلى يوم"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_entry__x_window_from
+msgid "First day the imported figure covers."
+msgstr "أول يوم يغطيه الرقم المستورد."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_entry__x_window_to
+msgid "Last day the imported figure covers."
+msgstr "آخر يوم يغطيه الرقم المستورد."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_cash_band__amount_from
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_sub_batch__date_from
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_sub_batch_trip_wizard__date_from
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_list
+msgid "From"
+msgstr "من"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_cash_band__amount_to
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_sub_batch__date_to
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_sub_batch_trip_wizard__date_to
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_list
+msgid "To"
+msgstr "إلى"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_sub_batch__date_from
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_sub_batch_trip_wizard__date_from
+msgid "First day this sub-batch covers. Defaults to the 1st of the month."
+msgstr "أول يوم تغطيه هذه الدفعة الفرعية. الافتراضي هو أول الشهر."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_sub_batch__date_to
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_sub_batch_trip_wizard__date_to
+msgid ""
+"Last day this sub-batch covers. Defaults to today, or the end of the month "
+"for a month already over."
+msgstr ""
+"آخر يوم تغطيه هذه الدفعة الفرعية. الافتراضي هو اليوم، أو آخر الشهر إذا كان "
+"الشهر قد انتهى."
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_batch_skip_line__line_type__covered_by_sub_batch
+msgid "Not imported — every day already in a sub-batch"
+msgstr "لم يُستورد — كل الأيام مدرجة في دفعة فرعية"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_batch_form
+msgid "<strong>Possible double payment.</strong>"
+msgstr "<strong>احتمال صرف مزدوج.</strong>"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_entry__x_overlap_note
+msgid ""
+"This employee has another row for the same thing — the same day, overlapping"
+" days, or (for a monthly allowance) the same month — in a different sub-"
+"batch or in the batch itself. Check that it is not being paid twice."
+msgstr ""
+"لهذا الموظف سطر آخر للبند نفسه — في اليوم نفسه، أو في أيام متداخلة، أو "
+"(للبدل الشهري) في الشهر نفسه — ضمن دفعة فرعية أخرى أو في الدفعة نفسها. تأكّد"
+" من عدم صرفه مرتين."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
+msgid ""
+"entr(ies) here are for an employee who already has\n"
+"                        the same thing in another sub-batch or in the batch\n"
+"                        itself (see <b>Also In</b>). Check that nobody is\n"
+"                        paid twice before you submit."
+msgstr ""
+"قيد/قيود هنا لموظف لديه البند نفسه في دفعة فرعية أخرى أو في الدفعة نفسها "
+"(انظر <b>موجود أيضاً في</b>). تأكّد من عدم الصرف مرتين قبل التقديم."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_batch_form
+msgid ""
+"row(s) pay an employee for something he also has in\n"
+"                        a sub-batch, or in another one: the same day, the\n"
+"                        same days, or the same monthly allowance. See\n"
+"                        <b>Also In</b> on the rows, and remove whichever\n"
+"                        should not be paid."
+msgstr ""
+"سطر/سطور تصرف لموظف بنداً لديه أيضاً في دفعة فرعية، أو في دفعة فرعية أخرى: "
+"اليوم نفسه، أو الأيام نفسها، أو البدل الشهري نفسه. انظر <b>موجود أيضاً "
+"في</b> على السطور، واحذف ما لا يجب صرفه."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid ""
+"Covers %(start)s to %(end)s only (%(days)d of %(month)d days), so the tier "
+"bands are cut to %(pct).0f%% of a full month."
+msgstr ""
+"يغطي من %(start)s إلى %(end)s فقط (%(days)d من %(month)d يوماً)، لذلك قُلّصت"
+" شرائح الاحتساب إلى %(pct).0f%% من الشهر الكامل."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "The days an entry covers must be a range inside %(period)s."
+msgstr "يجب أن تكون الأيام التي يغطيها القيد فترة داخل %(period)s."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
+msgid "Changing its dates"
+msgstr "تغيير أيامها"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
+msgid "%(name)s needs the days it covers (From and To)."
+msgstr "يلزم تحديد الأيام التي تغطيها %(name)s (من وإلى)."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
+msgid "The days of %(name)s must run forward and stay inside %(month)s."
+msgstr "يجب أن تكون أيام %(name)s متسلسلة وضمن %(month)s."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_import_bas.py:0
+#: code:addons/KSW_commissions/wizard/ksw_pay_sub_batch_trip_wizard.py:0
+msgid "Pick at least one driver to import."
+msgstr "اختر سائقاً واحداً على الأقل للاستيراد."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_import_bas.py:0
+msgid "%(sub)s, %(days)s: "
+msgstr "%(sub)s، %(days)s: "
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_import_bas.py:0
+msgid "The days to import must lie inside %(period)s."
+msgstr "يجب أن تكون أيام الاستيراد داخل %(period)s."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_import_bas.py:0
+msgid ""
+"%(names)s cannot be imported into %(batch)s — they are not under "
+"%(department)s and do not report to you."
+msgstr ""
+"لا يمكن استيراد %(names)s إلى %(batch)s — فهم ليسوا ضمن %(department)s ولا "
+"يتبعونك."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_import_bas.py:0
+msgid ""
+"\n"
+"%(count)s already have every day of the month in a sub-batch, so nothing was left to import: %(names)s"
+msgstr ""
+"\n"
+"%(count)s لديهم كل أيام الشهر في دفعة فرعية، فلم يبقَ شيء للاستيراد: %(names)s"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_import_bas.py:0
+msgid ""
+"Every day of %(period)s already has his trips in a sub-batch (%(subs)s), so "
+"there is nothing left to import here."
+msgstr ""
+"كل أيام %(period)s مستوردة له بالفعل في دفعة فرعية (%(subs)s)، فلم يبقَ شيء "
+"للاستيراد هنا."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_import_bas.py:0
+msgid " Covers %(start)s to %(end)s only."
+msgstr " يغطي من %(start)s إلى %(end)s فقط."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_sub_batch__batch_id
+msgid "Component Batch"
+msgstr "دفعة المكوّن"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
+msgid "Import Again"
+msgstr "استيراد مجدداً"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_send_early_wizard__is_import
+msgid "Is Import"
+msgstr "مستورد"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_sub_batch__x_can_reimport
+msgid "X Can Reimport"
+msgstr "يمكنه إعادة الاستيراد"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_send_early_wizard_form
+msgid "Send Early"
+msgstr "إرسال مبكر"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_batch_form
+msgid "Send Early…"
+msgstr "إرسال مبكر…"
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_pay_send_early_wizard
+msgid "Send some employees of a component to the GM early"
+msgstr "إرسال بعض موظفي مكوّن إلى المدير العام مبكراً"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_batch_form
+msgid ""
+"Send some employees of this component to the General Manager now, without "
+"locking this batch"
+msgstr ""
+"إرسال بعض موظفي هذا المكوّن إلى المدير العام الآن، دون إقفال هذه الدفعة"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_send_early_wizard_form
+msgid "Send to GM"
+msgstr "إرسال إلى المدير العام"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_send_early_wizard.py:0
+msgid "Sent Early"
+msgstr "أُرسلت مبكراً"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
+msgid ""
+"Correct the returned rows in the component's batch\n"
+"                        (or press <b>Import Again</b> for Driver Trips), then\n"
+"                        <b>Submit to GM</b>."
+msgstr ""
+"صحّح السطور المُعادة في دفعة المكوّن (أو اضغط <b>استيراد مجدداً</b> لردود "
+"السائقين)، ثم <b>تقديم إلى المدير العام</b>."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_send_early_wizard_form
+msgid ""
+"Press <b>Add a line</b>, tick the drivers and press\n"
+"                    <b>Select</b>. Their trips for these days are imported\n"
+"                    from BAS and sent to the General Manager. The rest of\n"
+"                    the month stays in the batch."
+msgstr ""
+"اضغط <b>إضافة سطر</b>، وحدّد السائقين ثم اضغط <b>اختيار</b>. تُستورد ردودهم "
+"لهذه الأيام من BAS وتُرسل إلى المدير العام. ويبقى باقي الشهر في الدفعة."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_send_early_wizard_form
+msgid ""
+"Press <b>Add a line</b>, tick the employees and press\n"
+"                    <b>Select</b>. Their rows in this batch for these days\n"
+"                    are sent to the General Manager and locked. Everything\n"
+"                    else stays open."
+msgstr ""
+"اضغط <b>إضافة سطر</b>، وحدّد الموظفين ثم اضغط <b>اختيار</b>. تُرسل سطورهم في"
+" هذه الدفعة لهذه الأيام إلى المدير العام وتُقفل. ويبقى كل ما عداها مفتوحاً."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
+msgid "Importing again"
+msgstr "إعادة الاستيراد"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
+msgid "%(name)s is typed, not imported — correct its rows in %(batch)s."
+msgstr "%(name)s تُدخل يدوياً ولا تُستورد — صحّح سطورها في %(batch)s."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
+msgid ""
+"A sub-batch is made from a component's batch: open the batch and press Send "
+"Early…."
+msgstr "تُنشأ الدفعة الفرعية من دفعة المكوّن: افتح الدفعة واضغط إرسال مبكر…."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+#: code:addons/KSW_commissions/wizard/ksw_pay_send_early_wizard.py:0
+msgid "Sending employees early"
+msgstr "إرسال الموظفين مبكراً"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "Send Early — %(name)s"
+msgstr "إرسال مبكر — %(name)s"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_send_early_wizard.py:0
+msgid ""
+"%(name)s sent to the General Manager: %(count)s employee(s), %(start)s – "
+"%(end)s."
+msgstr ""
+"أُرسلت %(name)s إلى المدير العام: %(count)s موظف، من %(start)s إلى %(end)s."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_send_early_wizard.py:0
+msgid "The days must run forward and stay inside %(month)s."
+msgstr "يجب أن تكون الأيام متسلسلة وضمن %(month)s."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_send_early_wizard.py:0
+msgid "Pick at least one employee to send."
+msgstr "اختر موظفاً واحداً على الأقل للإرسال."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_send_early_wizard.py:0
+msgid ""
+"Nothing was sent — none of the picked drivers could be imported for those days:\n"
+"\n"
+"%(why)s"
+msgstr ""
+"لم يُرسل شيء — تعذّر استيراد أي من السائقين المختارين لتلك الأيام:\n"
+"\n"
+"%(why)s"

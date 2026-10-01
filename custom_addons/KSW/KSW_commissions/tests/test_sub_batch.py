@@ -39,10 +39,11 @@ class SubBatchCommon(SubmissionCommon):
         self.submission = self.ot.submission_id
         self.run = self.submission.run_id
 
-    def _sub_batch(self, employees, user=None):
+    def _sub_batch(self, employees, user=None, batch=None):
+        """A sub-batch of one component batch (Overtime by default)."""
         return self.env['ksw.pay.sub.batch'].with_user(
             user or self.sup_a).create({
-                'submission_id': self.submission.id,
+                'batch_id': (batch or self.ot).id,
                 'employee_ids': [(6, 0, employees.ids)],
                 'note': 'Annual leave from the 12th',
             })
@@ -89,9 +90,11 @@ class SubBatchCommon(SubmissionCommon):
 
 class TestSubBatchScope(SubBatchCommon):
 
-    def test_01_takes_the_employees_rows_across_every_batch(self):
+    def test_01_takes_only_its_own_components_rows(self):
+        """One component: an Overtime sub-batch leaves his meals alone."""
         sub = self._sub_batch(self.emp_a)
-        self.assertEqual(sub.entry_ids, self.ot_a | self.meal_a)
+        self.assertEqual(sub.entry_ids, self.ot_a)
+        self.assertFalse(self.meal_a.x_sub_batch_id)
 
     def test_02_a_row_typed_while_it_is_open_joins_it(self):
         sub = self._sub_batch(self.emp_a)
@@ -114,8 +117,9 @@ class TestSubBatchLock(SubBatchCommon):
         sub = self._sub_batch(self.emp_a)
         sub.with_user(self.sup_a).action_submit()
         self.assertEqual(sub.state, 'submitted')
-        self.assertEqual((self.ot_a | self.meal_a).mapped('state'),
-                         ['submitted', 'submitted'])
+        self.assertEqual(self.ot_a.state, 'submitted')
+        # One component: his meal row is not part of an Overtime sub-batch.
+        self.assertEqual(self.meal_a.state, 'draft')
         # The batches stay open…
         self.assertEqual(self.ot.state, 'draft')
         self.assertEqual(self.meals_batch.state, 'draft')
@@ -132,8 +136,7 @@ class TestSubBatchLock(SubBatchCommon):
         sub = self._sub_batch(self.emp_a)
         sub.with_user(self.sup_a).action_submit()
         self.submission.invalidate_recordset()
-        self.assertEqual(self.submission.pending_entry_ids,
-                         self.ot_a | self.meal_a)
+        self.assertEqual(self.submission.pending_entry_ids, self.ot_a)
         self.run.invalidate_recordset()
         self.assertIn(self.submission,
                       self.run.with_user(self.gm).x_gm_submission_ids)
@@ -143,8 +146,8 @@ class TestSubBatchLock(SubBatchCommon):
         sub.with_user(self.sup_a).action_submit()
         sub.with_user(self.gm).action_approve()
         self.assertEqual(sub.state, 'approved')
-        self.assertEqual((self.ot_a | self.meal_a).mapped('state'),
-                         ['approved', 'approved'])
+        self.assertEqual(self.ot_a.state, 'approved')
+        self.assertEqual(self.meal_a.state, 'draft')
         self.assertEqual(self.submission.state, 'draft')
         self.assertNotIn(self.run.state, ('approved', 'paid'))
         # A new row for the same man is new work, typed as usual.
@@ -371,8 +374,7 @@ class TestGmPartialReturn(SubBatchCommon):
         sub.with_user(self.sup_a).action_submit()
         self._review(sub, 'return', self.emp_a2, approve_rest=True)
         self.assertEqual(self.ot_a2.state, 'draft')
-        self.assertEqual((self.ot_a | self.meal_a).mapped('state'),
-                         ['approved', 'approved'])
+        self.assertEqual(self.ot_a.state, 'approved')
         self.assertEqual(sub.state, 'returned')
 
 
@@ -433,12 +435,12 @@ class TestGmReviewByComponent(SubBatchCommon):
         self.assertEqual(self.submission.state, 'approved')
 
     def test_63_works_on_a_sub_batch(self):
-        sub = self._sub_batch(self.emp_a)
+        sub = self._sub_batch(self.emp_a | self.emp_a2)
         sub.with_user(self.sup_a).action_submit()
         lines = self._lines(sub)
-        self._pick(lines, self.meals, self.emp_a).action_approve()
-        self.assertEqual(self.meal_a.state, 'approved')
-        self.assertEqual(self.ot_a.state, 'submitted')
+        self._pick(lines, self.component, self.emp_a).action_approve()
+        self.assertEqual(self.ot_a.state, 'approved')
+        self.assertEqual(self.ot_a2.state, 'submitted')
         self.assertEqual(sub.state, 'submitted')
 
     def test_64_a_return_needs_a_reason(self):

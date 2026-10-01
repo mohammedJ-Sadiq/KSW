@@ -322,7 +322,7 @@ class KswPayComponent(models.Model):
         return self.rate or 0.0
 
     def _resolve(self, employee, quantity=0.0, site=None, threshold=0.0,
-                 option=None, date=None):
+                 option=None, date=None, band_scale=1.0):
         """Return ``(rate, amount)`` for one entry.
 
         ``rate`` is informational and may be fractional; ``amount`` is the
@@ -353,12 +353,14 @@ class KswPayComponent(models.Model):
 
         if self.calculation == 'tiered':
             return self._resolve_tiered(quantity, site=site,
-                                        threshold=threshold)
+                                        threshold=threshold,
+                                        band_scale=band_scale)
 
         return 0.0, 0.0
 
     def _resolve_detail(self, employee, quantity=0.0, site=None,
-                        threshold=0.0, option=None, date=None):
+                        threshold=0.0, option=None, date=None,
+                        band_scale=1.0):
         """Return ``(rows, notes)`` explaining how the amount was reached.
 
         ``rows`` are dicts of ``label`` / ``quantity`` / ``rate`` / ``amount``
@@ -441,11 +443,13 @@ class KswPayComponent(models.Model):
 
         if self.calculation == 'tiered':
             return self._detail_tiered(quantity, site=site,
-                                       threshold=threshold)
+                                       threshold=threshold,
+                                       band_scale=band_scale)
 
         return rows, notes
 
-    def _detail_tiered(self, quantity, site=None, threshold=0.0):
+    def _detail_tiered(self, quantity, site=None, threshold=0.0,
+                       band_scale=1.0):
         """The tier waterfall, band by band — the driver's justification."""
         self.ensure_one()
         tiers = self._applicable_tiers(site)
@@ -476,7 +480,7 @@ class KswPayComponent(models.Model):
                 break
             is_last = index == len(tiers) - 1
             take = remaining if (is_last or not tier.width) \
-                else min(remaining, tier.width)
+                else min(remaining, tier.width * band_scale)
             rows.append({
                 'label': tier.name or _('Tier %(n)s', n=index + 1),
                 'quantity': take,
@@ -502,12 +506,18 @@ class KswPayComponent(models.Model):
             return site_tiers.sorted('sequence')
         return self.tier_ids.filtered(lambda t: not t.site_id).sorted('sequence')
 
-    def _resolve_tiered(self, quantity, site=None, threshold=0.0):
+    def _resolve_tiered(self, quantity, site=None, threshold=0.0,
+                        band_scale=1.0):
         """Waterfall ``quantity`` through the tiers above ``threshold``.
 
         ``threshold`` is the free allowance earned nothing is paid for — the
         driver's required trips for the days he actually worked. Tiers are
         consumed in order; whatever is left over falls into the last one.
+
+        ``band_scale`` narrows every band for a figure covering part of a
+        month (a sub-batch's 16–30 Sep): the widths are monthly, and a
+        driver paid in two pieces must not climb the ladder from the
+        bottom twice.
         """
         self.ensure_one()
         tiers = self._applicable_tiers(site)
@@ -521,7 +531,7 @@ class KswPayComponent(models.Model):
             if not remaining:
                 break
             take = remaining if (is_last or not tier.width) \
-                else min(remaining, tier.width)
+                else min(remaining, tier.width * band_scale)
             amount += take * (tier.rate or 0.0)
             remaining -= take
         earned_qty = max((quantity or 0.0) - (threshold or 0.0), 0.0)

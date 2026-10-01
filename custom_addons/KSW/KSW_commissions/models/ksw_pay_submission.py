@@ -576,19 +576,6 @@ class KswPaySubmission(models.Model):
         return self.env['ksw.pay.gm.review.wizard']._open_for(
             self, mode='reopen')
 
-    def action_new_sub_batch(self):
-        """Start a sub-batch for this department's month."""
-        self.ensure_one()
-        self._check_mine()
-        return {
-            'type': 'ir.actions.act_window',
-            'name': _('New Sub-Batch'),
-            'res_model': 'ksw.pay.sub.batch',
-            'view_mode': 'form',
-            'target': 'current',
-            'context': {'default_submission_id': self.id},
-        }
-
     def action_open_sub_batches(self):
         self.ensure_one()
         return {
@@ -597,7 +584,6 @@ class KswPaySubmission(models.Model):
             'res_model': 'ksw.pay.sub.batch',
             'view_mode': 'list,form',
             'domain': [('submission_id', '=', self.id)],
-            'context': {'default_submission_id': self.id},
         }
 
     # ------------------------------------------------------------------

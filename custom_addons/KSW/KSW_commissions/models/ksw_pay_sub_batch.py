@@ -25,6 +25,8 @@ the month's register (or by the vacation payslip, which the register then
 skips), and when the supervisor finally submits the department, he is asked
 whether he means the whole of it or only his open sub-batches.
 """
+import calendar
+
 from markupsafe import Markup
 
 from odoo import _, api, fields, models
@@ -68,6 +70,18 @@ class KswPaySubBatch(models.Model):
     currency_id = fields.Many2one(
         related='submission_id.currency_id', readonly=True)
 
+    # The one component batch this sends early — Driver Trips, Location
+    # Allowance, Overtime. One component, because that is how a supervisor
+    # thinks of it ("a sub-batch for the trips"): taking an employee's rows
+    # from every batch at once meant a Location Allowance sub-batch offered
+    # the 63 drivers the trips import had just filled. Empty only on
+    # sub-batches made before 19.0.4.26.0 that had no rows to tell from.
+    batch_id = fields.Many2one(
+        'ksw.pay.batch', string='Component Batch', readonly=True,
+        index=True, ondelete='restrict')
+    component_id = fields.Many2one(
+        related='batch_id.component_id', store=True, readonly=True,
+        string='Component')
     employee_ids = fields.Many2many(
         'hr.employee', 'ksw_pay_sub_batch_employee_rel', 'sub_batch_id',
         'employee_id', string='Employees',
@@ -87,6 +101,25 @@ class KswPaySubBatch(models.Model):
         string='Employees ')
     entry_ids = fields.One2many(
         'ksw.pay.entry', 'x_sub_batch_id', string='Entries', readonly=True)
+    # The days this handover is about. A row with a day of its own — an
+    # overtime date, the days an imported trip figure covers — comes into
+    # the sub-batch only when it falls inside; the Driver Trips import run
+    # from here fetches exactly these days. A monthly allowance has no day
+    # and comes with its employee regardless.
+    date_from = fields.Date(
+        string='From', copy=False, tracking=True,
+        help='First day this sub-batch covers. Defaults to the 1st of the '
+             'month.')
+    date_to = fields.Date(
+        string='To', copy=False, tracking=True,
+        help='Last day this sub-batch covers. Defaults to today, or the '
+             'end of the month for a month already over.')
+    # A returned Driver Trips sub-batch cannot be corrected by hand (the
+    # component is import-only): re-importing its drivers for its days is
+    # the correction.
+    x_can_reimport = fields.Boolean(compute='_compute_permissions')
+    x_overlap_count = fields.Integer(
+        compute='_compute_totals', string='Overlapping Rows')
     note = fields.Text(
         string='Why Early',
         help='Why these employees cannot wait for the rest of the month — '
@@ -114,14 +147,21 @@ class KswPaySubBatch(models.Model):
     # ------------------------------------------------------------------
     # Computes
     # ------------------------------------------------------------------
-    @api.depends('submission_id')
+    @api.depends('submission_id', 'batch_id')
     def _compute_allowed_employees(self):
         Entry = self.env['ksw.pay.entry']
         for rec in self:
-            rec.allowed_employee_ids = Entry.search([
-                ('batch_id.submission_id', '=', rec.submission_id.id),
-                ('state', '=', 'draft'),
-            ]).employee_id if rec.submission_id else False
+            rec.allowed_employee_ids = Entry.search(
+                rec._row_domain() + [('state', '=', 'draft')]
+            ).employee_id if rec.submission_id else False
+
+    def _row_domain(self):
+        """The rows this sub-batch draws from: its component batch, or —
+        for a sub-batch from before it had one — the whole month."""
+        self.ensure_one()
+        if self.batch_id:
+            return [('batch_id', '=', self.batch_id.id)]
+        return [('batch_id.submission_id', '=', self.submission_id.id)]
 
     @api.depends('employee_ids')
     def _compute_employee_names(self):
@@ -138,6 +178,8 @@ class KswPaySubBatch(models.Model):
             rec.approved_count = len(
                 entries.filtered(lambda e: e.state == 'approved'))
             rec.total_amount = sum(entries.mapped('amount'))
+            rec.x_overlap_count = len(
+                entries.filtered(lambda e: e.x_overlap_note))
 
     @api.depends_context('uid')
     @api.depends('state', 'gm_id', 'run_id.state', 'entry_ids.state')
@@ -155,6 +197,8 @@ class KswPaySubBatch(models.Model):
                 rec.pending_count)
             rec.x_can_reopen = is_my_gm and month_open and bool(
                 rec.approved_count)
+            rec.x_can_reimport = rec.x_can_edit and rec.state == 'returned' \
+                and bool(rec.batch_id.component_id.importer)
 
     # ------------------------------------------------------------------
     # CRUD
@@ -167,6 +211,15 @@ class KswPaySubBatch(models.Model):
             if not vals.get('name') or vals['name'] == 'New':
                 vals['name'] = Seq.next_by_code('ksw.pay.sub.batch') or 'New'
             employees.append(vals.pop('employee_ids', None))
+            if not vals.get('batch_id'):
+                raise UserError(_(
+                    "A sub-batch is made from a component's batch: open "
+                    "the batch and press Send Early…."))
+            batch = self.env['ksw.pay.batch'].sudo().browse(vals['batch_id'])
+            if not batch.submission_id:
+                batch._ensure_submission()
+            vals.setdefault('submission_id', batch.submission_id.id)
+            self._default_range(vals)
         records = super().create(vals_list)
         for rec, commands in zip(records, employees):
             rec._check_can_prepare(_("Creating a sub-batch"))
@@ -179,14 +232,63 @@ class KswPaySubBatch(models.Model):
         if self.env.context.get('ksw_sub_batch_employees'):
             return super().write(vals)
         commands = vals.pop('employee_ids', None)
+        range_changed = bool({'date_from', 'date_to'} & set(vals))
+        if range_changed and not self.env.su:
+            for rec in self:
+                rec._check_can_prepare(_("Changing its dates"))
         res = super().write(vals) if vals else True
         if commands is not None:
             for rec in self:
                 if not self.env.su:
                     rec._check_can_prepare(_("Changing its employees"))
                 rec._write_employees(commands)
+        if commands is not None or range_changed:
             self._collect_entries()
         return res
+
+    @api.model
+    def _default_range(self, vals):
+        """1st of the month to today — or to the month's end when today
+        is not in it. Filled server-side so a sub-batch made over RPC or by
+        a script is never without days."""
+        if vals.get('date_from') and vals.get('date_to'):
+            return
+        submission = self.env['ksw.pay.submission'].sudo().browse(
+            vals.get('submission_id'))
+        if not submission.period:
+            return
+        start = submission.period.replace(day=1)
+        end = start.replace(
+            day=calendar.monthrange(start.year, start.month)[1])
+        today = fields.Date.context_today(self)
+        vals.setdefault('date_from', start)
+        vals.setdefault('date_to', today if start <= today <= end else end)
+
+    @api.onchange('submission_id')
+    def _onchange_submission_range(self):
+        if self.submission_id and not (self.date_from and self.date_to):
+            vals = {'submission_id': self.submission_id.id}
+            self._default_range(vals)
+            self.date_from = vals.get('date_from')
+            self.date_to = vals.get('date_to')
+
+    @api.constrains('date_from', 'date_to', 'period')
+    def _check_range(self):
+        for rec in self:
+            if not rec.period:
+                continue
+            if not (rec.date_from and rec.date_to):
+                raise ValidationError(_(
+                    "%(name)s needs the days it covers (From and To).",
+                    name=rec.name))
+            start = rec.period.replace(day=1)
+            end = start.replace(
+                day=calendar.monthrange(start.year, start.month)[1])
+            if not (start <= rec.date_from <= rec.date_to <= end):
+                raise ValidationError(_(
+                    "The days of %(name)s must run forward and stay inside "
+                    "%(month)s.", name=rec.name,
+                    month=start.strftime('%B %Y')))
 
     def _write_employees(self, commands):
         """Set the employees through sudo(), after the caller's authority
@@ -201,16 +303,16 @@ class KswPaySubBatch(models.Model):
         self.ensure_one()
         self.sudo().with_context(ksw_sub_batch_employees=True).write(
             {'employee_ids': commands})
-        known = self.env['ksw.pay.entry'].sudo().search([
-            ('batch_id.submission_id', '=', self.submission_id.id),
-        ]).employee_id
+        known = self.env['ksw.pay.entry'].sudo().search(
+            self._row_domain()).employee_id
         stray = self.sudo().employee_ids - known
         if stray:
             raise UserError(_(
                 "%(who)s has no entry in %(scope)s, so there is nothing to "
                 "hand over for them.",
                 who=', '.join(stray.mapped('name')),
-                scope=self.submission_id.display_name))
+                scope=self.batch_id.display_name
+                or self.submission_id.display_name))
 
     def unlink(self):
         for rec in self:
@@ -227,9 +329,12 @@ class KswPaySubBatch(models.Model):
         for rec in self:
             if rec.state not in OPEN_STATES:
                 continue
+            # Per component: a driver can have his trips and his location
+            # allowance sent early in two separate sub-batches at once.
             clash = self.sudo().search([
                 ('id', '!=', rec.id),
                 ('submission_id', '=', rec.submission_id.id),
+                ('batch_id', 'in', [rec.batch_id.id, False]),
                 ('state', 'in', OPEN_STATES),
                 ('employee_ids', 'in', rec.employee_ids.ids),
             ], limit=1)
@@ -290,17 +395,15 @@ class KswPaySubBatch(models.Model):
         for rec in self.sudo():
             if rec.state not in ('draft', 'returned'):
                 continue
-            rows = Entry.search([
-                ('batch_id.submission_id', '=', rec.submission_id.id),
+            rows = Entry.search(rec._row_domain() + [
                 ('employee_id', 'in', rec.employee_ids.ids),
                 ('state', '=', 'draft'),
                 '|', ('x_sub_batch_id', '=', False),
                 ('x_sub_batch_id', '=', rec.id),
-            ])
+            ]).filtered(lambda e: e._within(rec.date_from, rec.date_to))
             (rows - rec.entry_ids).write({'x_sub_batch_id': rec.id})
             rec.entry_ids.filtered(
-                lambda e: e.state == 'draft'
-                and e.employee_id not in rec.employee_ids
+                lambda e: e.state == 'draft' and e not in rows
             ).write({'x_sub_batch_id': False})
         return True
 
@@ -449,6 +552,27 @@ class KswPaySubBatch(models.Model):
         self.ensure_one()
         wanted = 'approved' if mode == 'reopen' else 'submitted'
         return self.sudo().entry_ids.filtered(lambda e: e.state == wanted)
+
+    # ------------------------------------------------------------------
+    # An imported component, returned by the GM
+    # ------------------------------------------------------------------
+    def action_reimport(self):
+        """Fetch this sub-batch's drivers again for its days.
+
+        Driver Trips cannot be corrected by hand, so when the GM returns
+        one the correction is in BAS (or a driver's cost centre) and then
+        a fresh import — for these drivers and these days only.
+        """
+        self.ensure_one()
+        self._check_can_prepare(_("Importing again"))
+        batch = self.batch_id
+        if not batch.component_id.importer:
+            raise UserError(_(
+                "%(name)s is typed, not imported — correct its rows in "
+                "%(batch)s.", name=self.name, batch=batch.name))
+        return batch.with_context(ksw_pay_importing=True)._import_bas_trips(
+            employees=self.sudo().employee_ids,
+            window=(self.date_from, self.date_to), sub_batch=self)
 
     def action_open_entries(self):
         self.ensure_one()

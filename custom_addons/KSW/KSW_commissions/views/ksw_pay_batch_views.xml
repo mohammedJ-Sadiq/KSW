@@ -37,15 +37,15 @@
                     <button name="action_import" string="Import"
                             type="object" class="btn-secondary"
                             invisible="state != 'draft' or not importer"/>
-                    <!-- Hand some employees over ahead of the rest of the
-                         month (e.g. before a vacation) without locking
-                         this batch — see ksw.pay.sub.batch. -->
-                    <button name="action_new_sub_batch" string="Sub-Batch"
+                    <!-- Some employees of this component, for some days,
+                         to the GM now (e.g. before a vacation), without
+                         locking this batch. One dialog: pick, send. -->
+                    <button name="action_send_early" string="Send Early…"
                             type="object" class="btn-secondary"
-                            icon="fa-scissors"
+                            icon="fa-paper-plane"
                             groups="KSW_commissions.group_commission_supervisor"
                             invisible="state != 'draft' or not id"
-                            title="Send some employees to the General Manager early, without locking this batch"/>
+                            title="Send some employees of this component to the General Manager now, without locking this batch"/>
                     <!-- Available in every state, not just Draft:
                          the reason to export an approved batch (file it,
                          check it against BAS) outlives the entry window. -->
@@ -81,6 +81,19 @@
                         <strong>Already paid on a vacation request.</strong>
                         <field name="x_vacation_hold_warning" readonly="1"
                                nolabel="1"/>
+                    </div>
+
+                    <field name="x_overlap_count" invisible="1"/>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not x_overlap_count">
+                        <strong>Possible double payment.</strong>
+                        <field name="x_overlap_count" readonly="1"
+                               class="oe_inline"/>
+                        row(s) pay an employee for something he also has in
+                        a sub-batch, or in another one: the same day, the
+                        same days, or the same monthly allowance. See
+                        <b>Also In</b> on the rows, and remove whichever
+                        should not be paid.
                     </div>
 
                     <field name="handed_over_date" invisible="1"/>
@@ -138,7 +151,7 @@
                                    readonly="is_locked or x_entries_readonly"
                                    context="{'default_batch_id': id}">
                                 <list editable="bottom"
-                                      decoration-warning="is_overridden"
+                                      decoration-warning="is_overridden or x_overlap_note"
                                       decoration-danger="x_vacation_hold"
                                       decoration-muted="state == 'approved'">
                                     <!-- Carries the picker's domain: the
@@ -177,6 +190,15 @@
                                     <field name="date"
                                            readonly="state != 'draft'"
                                            column_invisible="not parent.needs_date"/>
+                                    <!-- The days an imported figure covers:
+                                         a month paid in pieces (sub-batch,
+                                         then the rest) shows each piece. -->
+                                    <field name="x_window_from" readonly="1"
+                                           column_invisible="not parent.importer"
+                                           optional="show"/>
+                                    <field name="x_window_to" readonly="1"
+                                           column_invisible="not parent.importer"
+                                           optional="show"/>
                                     <field name="quantity_ref"
                                            readonly="state != 'draft'"
                                            column_invisible="not parent.qty_ref_label"
@@ -231,6 +253,9 @@
                                     <field name="x_sub_batch_id"
                                            optional="show"
                                            options="{'no_open': True}"/>
+                                    <field name="x_overlap_note"
+                                           readonly="1" optional="show"
+                                           decoration-warning="x_overlap_note"/>
                                     <field name="x_return_reason"
                                            optional="hide"/>
                                     <field name="currency_id"

@@ -42,6 +42,8 @@ SKIP_REASONS = {
         'Cash loads re-rated from the amount band', 'warning'),
     'out_of_scope': (
         'NOT refreshed — outside this batch’s scope', 'warning'),
+    'covered_by_sub_batch': (
+        'Not imported — every day already in a sub-batch', 'skipped'),
 }
 
 

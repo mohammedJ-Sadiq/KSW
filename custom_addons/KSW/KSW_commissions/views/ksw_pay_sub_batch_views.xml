@@ -8,12 +8,13 @@
         <field name="name">ksw.pay.sub.batch.form</field>
         <field name="model">ksw.pay.sub.batch</field>
         <field name="arch" type="xml">
-            <form string="Sub-Batch">
+            <form string="Sub-Batch" create="false">
                 <field name="x_can_edit" invisible="1"/>
                 <field name="x_can_submit" invisible="1"/>
                 <field name="x_can_review" invisible="1"/>
                 <field name="x_can_reopen" invisible="1"/>
                 <field name="pending_count" invisible="1"/>
+                <field name="x_can_reimport" invisible="1"/>
                 <header>
                     <button name="action_submit" string="Submit to GM"
                             type="object" class="btn-primary"
@@ -22,6 +23,13 @@
                     <!-- No groups= on the GM buttons: x_can_review /
                          x_can_reopen already answer "is this department
                          mine" (see the department submission form). -->
+                    <!-- Returned trips cannot be typed over: the fix is
+                         in BAS, then a fresh import of these drivers for
+                         these days. -->
+                    <button name="action_reimport"
+                            string="Import Again" type="object"
+                            class="btn-secondary" icon="fa-refresh"
+                            invisible="not x_can_reimport"/>
                     <button name="action_approve" string="Approve"
                             type="object" class="btn-primary"
                             invisible="not x_can_review"
@@ -56,12 +64,20 @@
                         <field name="return_reason" readonly="1" nolabel="1"/>
                     </div>
                     <div class="alert alert-info" role="status"
-                         invisible="state != 'draft'">
-                        Pick the employees who cannot wait for the rest of the
-                        month. Every draft entry they have in this department's
-                        batches for the month comes with them — and anything
-                        you type for them before you submit. Submitting locks
-                        <b>only their entries</b>; your batches stay open.
+                         invisible="state != 'returned'">
+                        Correct the returned rows in the component's batch
+                        (or press <b>Import Again</b> for Driver Trips), then
+                        <b>Submit to GM</b>.
+                    </div>
+                    <field name="x_overlap_count" invisible="1"/>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not x_overlap_count">
+                        <field name="x_overlap_count" readonly="1"
+                               class="oe_inline"/>
+                        entr(ies) here are for an employee who already has
+                        the same thing in another sub-batch or in the batch
+                        itself (see <b>Also In</b>). Check that nobody is
+                        paid twice before you submit.
                     </div>
 
                     <group>
@@ -69,11 +85,18 @@
                             <!-- Only a month still being prepared: a
                                  department already handed over whole has
                                  nothing left to send early. -->
-                            <field name="submission_id"
-                                   readonly="id"
-                                   domain="[('state', 'in', ('draft', 'returned'))]"
-                                   options="{'no_create': True, 'no_open': True}"/>
+                            <field name="component_id"/>
+                            <field name="batch_id"
+                                   options="{'no_create': True}"/>
+                            <field name="submission_id" readonly="1"
+                                   options="{'no_open': True}"/>
                             <field name="department_id"/>
+                            <label for="date_from" string="Days"/>
+                            <div class="o_row">
+                                <field name="date_from" readonly="1"/>
+                                <span>→</span>
+                                <field name="date_to" readonly="1"/>
+                            </div>
                             <field name="gm_id"/>
                             <field name="currency_id" invisible="1"/>
                         </group>
@@ -96,14 +119,12 @@
                         <field name="allowed_employee_ids" invisible="1"
                                groups="KSW_commissions.group_commission_supervisor"/>
                         <field name="employee_ids" widget="many2many_tags"
-                               readonly="not x_can_edit and id"
+                               readonly="1"
                                options="{'no_create': True}"
                                groups="KSW_commissions.group_commission_supervisor"/>
                         <field name="employee_names" string="Employees"
                                groups="!KSW_commissions.group_commission_supervisor"/>
-                        <field name="note"
-                               readonly="not x_can_edit and id"
-                               placeholder="e.g. Annual leave from 12 October"/>
+                        <field name="note" readonly="1"/>
                     </group>
 
                     <notebook>
@@ -113,11 +134,13 @@
                                       default_group_by="employee_id"
                                       decoration-muted="state == 'approved'"
                                       decoration-info="state == 'submitted'"
-                                      decoration-warning="x_return_reason and state == 'draft'">
+                                      decoration-warning="(x_return_reason and state == 'draft') or x_overlap_note">
                                     <field name="employee_id"/>
                                     <field name="component_id"/>
                                     <field name="option_id" optional="show"/>
                                     <field name="date" optional="show"/>
+                                    <field name="x_window_from" optional="show"/>
+                                    <field name="x_window_to" optional="show"/>
                                     <field name="quantity" sum="Total"/>
                                     <field name="reason" optional="show"/>
                                     <field name="amount" sum="Total Amount"/>
@@ -125,6 +148,9 @@
                                            decoration-info="state == 'submitted'"
                                            decoration-success="state == 'approved'"/>
                                     <field name="x_return_reason"
+                                           optional="show"/>
+                                    <field name="x_overlap_note"
+                                           decoration-warning="x_overlap_note"
                                            optional="show"/>
                                     <field name="currency_id"
                                            column_invisible="1"/>
@@ -142,12 +168,16 @@
         <field name="name">ksw.pay.sub.batch.list</field>
         <field name="model">ksw.pay.sub.batch</field>
         <field name="arch" type="xml">
-            <list decoration-info="state == 'submitted'"
+            <list create="false"
+                  decoration-info="state == 'submitted'"
                   decoration-warning="state == 'returned'"
                   decoration-muted="state == 'approved'">
                 <field name="name"/>
                 <field name="submission_id" string="Department Month"/>
+                <field name="component_id"/>
                 <field name="employee_names" string="Employees"/>
+                <field name="date_from" string="From"/>
+                <field name="date_to" string="To"/>
                 <field name="note" optional="show"/>
                 <field name="submitted_date" optional="show"/>
                 <field name="entry_count" string="Entries"/>
@@ -242,6 +272,58 @@
                 </div>
                 <footer>
                     <button name="action_confirm" string="Submit"
+                            type="object" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"
+                            class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Send Early…: one component, some employees, some days, one
+         button. Opened from the component's batch. -->
+    <record id="view_ksw_pay_send_early_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.pay.send.early.wizard.form</field>
+        <field name="model">ksw.pay.send.early.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Send Early">
+                <!-- In the arch on purpose: the employee picker's domain is
+                     computed from them (Odoo 19 Pitfalls #40). -->
+                <field name="batch_id" invisible="1"/>
+                <field name="is_import" invisible="1"/>
+                <field name="allowed_employee_ids" invisible="1"/>
+                <group>
+                    <field name="component_id" readonly="1"/>
+                    <label for="date_from" string="Days"/>
+                    <div class="o_row">
+                        <field name="date_from"/>
+                        <span>→</span>
+                        <field name="date_to"/>
+                    </div>
+                    <field name="note"
+                           placeholder="e.g. Annual leave from 12 October"/>
+                </group>
+                <field name="employee_ids" nolabel="1"
+                       options="{'no_create': True}">
+                    <list>
+                        <field name="name"/>
+                        <field name="job_title" optional="show"/>
+                    </list>
+                </field>
+                <div class="text-muted" invisible="not is_import">
+                    Press <b>Add a line</b>, tick the drivers and press
+                    <b>Select</b>. Their trips for these days are imported
+                    from BAS and sent to the General Manager. The rest of
+                    the month stays in the batch.
+                </div>
+                <div class="text-muted" invisible="is_import">
+                    Press <b>Add a line</b>, tick the employees and press
+                    <b>Select</b>. Their rows in this batch for these days
+                    are sent to the General Manager and locked. Everything
+                    else stays open.
+                </div>
+                <footer>
+                    <button name="action_send" string="Send to GM"
                             type="object" class="btn-primary"/>
                     <button string="Cancel" special="cancel"
                             class="btn-secondary"/>

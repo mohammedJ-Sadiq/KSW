@@ -22,11 +22,6 @@
                     <button name="action_submit_prompt" string="Submit to GM"
                             type="object" class="btn-primary"
                             invisible="not x_can_submit"/>
-                    <button name="action_new_sub_batch" string="New Sub-Batch"
-                            type="object" class="btn-secondary"
-                            icon="fa-scissors"
-                            invisible="not x_can_split"
-                            title="Send some employees to the General Manager early, without locking the department"/>
                     <button name="action_reset_to_draft"
                             string="Take Back" type="object"
                             class="btn-secondary"

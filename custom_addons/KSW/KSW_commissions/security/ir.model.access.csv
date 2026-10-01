@@ -81,3 +81,4 @@ access_ksw_pay_employee_review_accountant,ksw.pay.employee.review accountant,mod
 access_ksw_pay_run_review_supervisor,ksw.pay.run.review supervisor,model_ksw_pay_run_review,group_commission_supervisor,1,1,1,1
 access_ksw_pay_run_review_gm,ksw.pay.run.review gm,model_ksw_pay_run_review,group_commission_gm,1,1,1,1
 access_ksw_pay_run_review_accountant,ksw.pay.run.review accountant,model_ksw_pay_run_review,group_commission_accountant,1,1,1,1
+access_ksw_pay_send_early_wizard_supervisor,ksw.pay.send.early.wizard supervisor,model_ksw_pay_send_early_wizard,group_commission_supervisor,1,1,1,1
