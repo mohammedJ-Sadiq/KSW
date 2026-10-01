@@ -24,3 +24,4 @@ from . import test_explanation_escaping
 from . import test_resubmission_notice
 from . import test_sub_batch
 from . import test_employee_review
+from . import test_run_review_ui

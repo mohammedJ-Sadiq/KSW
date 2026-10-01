@@ -90,29 +90,87 @@ class TestWhoGetsPaidReview(SubmissionCommon):
         self.assertIn(format_amount(self.env, line.earnings, line.currency_id),
                       html)
 
+    def _session(self, run, user):
+        action = run.with_user(user).action_review_employees()
+        self.assertEqual(action['target'], 'new')
+        self.assertEqual(action['res_model'], 'ksw.pay.run.review')
+        return self.env['ksw.pay.run.review'].with_user(user).browse(
+            action['res_id'])
+
     def test_02_next_and_previous_walk_the_gms_list(self):
         run = self._handed_over_run()
-        first = run.with_user(self.gm).action_review_employees()
-        self.assertEqual(first['target'], 'new')
-        lines = self.env['ksw.pay.run.line'].with_user(self.gm).search(
-            [('run_id', '=', run.id)])
-        self.assertEqual(len(lines), 2)
-        start = lines.browse(first['res_id'])
-        self.assertEqual(start, lines[0])
-        self.assertEqual(start.x_review_position, '1 / 2')
-        self.assertFalse(start.x_review_has_prev)
-        self.assertTrue(start.x_review_has_next)
-        nxt = start.action_review_next()
-        self.assertEqual(nxt['res_id'], lines[1].id)
-        self.assertFalse(lines[1].x_review_has_next)
-        self.assertEqual(lines[1].action_review_prev()['res_id'], lines[0].id)
+        review = self._session(run, self.gm)
+        review.sort_by = 'name'
+        review.line_id = review._ordered_lines()[:1]
+        self.assertEqual(review.position, '1 / 2')
+        self.assertFalse(review.has_prev)
+        self.assertTrue(review.has_next)
+        first = review.line_id
+        action = review.action_next()
+        self.assertEqual(action['res_id'], review.id, 'same dialog')
+        self.assertNotEqual(review.line_id, first)
+        self.assertEqual(review.position, '2 / 2')
+        self.assertFalse(review.has_next)
+        review.action_prev()
+        self.assertEqual(review.line_id, first)
+
+    def test_02b_sort_and_filter_change_what_next_walks(self):
+        run = self._handed_over_run()
+        review = self._session(run, self.gm)
+        # Highest earnings first, then narrowed to department B only.
+        review.sort_by = 'earnings_desc'
+        ordered = review._ordered_lines()
+        self.assertGreaterEqual(ordered[0].earnings, ordered[1].earnings)
+        review.department_ids = self.dept_b
+        self.assertEqual(review._ordered_lines().employee_id, self.emp_b)
+        review.department_ids = False
+        review.search_text = 'emp a'
+        self.assertEqual(review._ordered_lines().employee_id, self.emp_a)
+        review.search_text = 'nobody'
+        review._onchange_order()
+        self.assertFalse(review.line_id)
+        self.assertEqual(review.position, '0 / 0')
+
+    def test_02e_the_dialog_filter_and_sort_as_the_client_runs_them(self):
+        """Through Form, so the bar runs as an onchange on NewId records:
+        a department filter that emptied the list, and a sort that kept the
+        same employee on screen, both passed the plain-ORM tests above."""
+        from odoo.tests import Form
+        run = self._handed_over_run()
+        review = self._session(run, self.gm)
+        with Form(review) as f:
+            f.department_ids.add(self.dept_b)
+            self.assertEqual(f.line_id.employee_id, self.emp_b)
+            self.assertEqual(f.position, '1 / 1')
+            f.department_ids.clear()
+            f.sort_by = 'name'
+            first_by_name = f.line_id
+            f.sort_by = 'earnings_desc'
+            top = review._ordered_lines()[:1]
+            self.assertEqual(f.line_id, top, 'a new sort starts at its top')
+            self.assertEqual(f.position, '1 / 2')
+        self.assertTrue(first_by_name)
+
+    def test_02c_the_last_sort_is_remembered(self):
+        run = self._handed_over_run()
+        self._session(run, self.gm).write({'sort_by': 'name'})
+        self.assertEqual(self._session(run, self.gm).sort_by, 'name')
+        # Another reviewer keeps the default.
+        self.assertEqual(self._session(run, self.sup_a).sort_by, 'department')
+
+    def test_02d_review_from_a_row_starts_on_that_employee(self):
+        run = self._handed_over_run()
+        line = run.line_ids.filtered(lambda l: l.employee_id == self.emp_b)
+        action = line.with_user(self.gm).action_open_review()
+        review = self.env['ksw.pay.run.review'].browse(action['res_id'])
+        self.assertEqual(review.line_id, line)
 
     def test_03_a_supervisor_walks_only_his_people(self):
         run = self._handed_over_run()
-        mine = self.env['ksw.pay.run.line'].with_user(self.sup_a).search(
-            [('run_id', '=', run.id)])
-        self.assertEqual(mine.employee_id, self.emp_a)
-        self.assertEqual(mine.x_review_position, '1 / 1')
+        review = self._session(run, self.sup_a)
+        self.assertEqual(review.line_id.employee_id, self.emp_a)
+        self.assertEqual(review.position, '1 / 1')
+        self.assertFalse(review.allowed_department_ids - self.dept_a)
 
     def test_04_a_draft_entry_is_listed_apart(self):
         run = self._handed_over_run()

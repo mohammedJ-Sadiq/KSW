@@ -724,6 +724,7 @@ msgid "Band Size"
 msgstr "حجم الشريحة"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_review__bank_account_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_bank_export_wizard__bank_account_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__bank_account_id
 msgid "Bank Account"
@@ -853,6 +854,7 @@ msgid "Clients"
 msgstr "العملاء"
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_review_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_line_review_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_entry_explain_form
 msgid "Close"
@@ -1261,6 +1263,7 @@ msgid "Created on"
 msgstr "أنشئ في"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_review__currency_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_employee_review__currency_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_batch__currency_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__currency_id
@@ -1373,6 +1376,7 @@ msgid "Define a kind of extra pay"
 msgstr "عرّف نوعًا من المستحقات الإضافية"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_review__department_id
 #: model:ir.model,name:KSW_commissions.model_hr_department
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_batch__department_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__department_id
@@ -1410,6 +1414,7 @@ msgid "Department Submissions"
 msgstr "تسليمات الأقسام"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_review__department_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run__x_visible_submission_ids
 msgid "Departments"
 msgstr "الأقسام"
@@ -1581,6 +1586,7 @@ msgid "Earning"
 msgstr "استحقاق"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_review__earnings
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__earnings
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_component_search
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
@@ -1626,6 +1632,7 @@ msgid "Eid Al-Fitr Bonus"
 msgstr "مكافأة عيد الفطر"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_review__employee_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_employee_review__employee_id
 #: model:ir.model,name:KSW_commissions.model_hr_employee
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__employee_id
@@ -2428,6 +2435,7 @@ msgstr ""
 " المالية الحالية — فالديون المرحّلة من قبل ١ يناير غير ظاهرة هنا."
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_review__loan_offset
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__loan_offset
 msgid "Loan Offset"
 msgstr "استرداد القروض"
@@ -2694,6 +2702,7 @@ msgid "National Day Bonus"
 msgstr "مكافأة اليوم الوطني"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_review__net_payable
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__net_payable
 msgid "Net Payable"
 msgstr "صافي المستحق"
@@ -3062,6 +3071,7 @@ msgid "Paid via Sheet"
 msgstr "مدفوع عبر الكشف"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_run_review__loan_offset
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_run_line__loan_offset
 msgid ""
 "Parked loan installments taken out of this payment. Before the month is "
@@ -3548,6 +3558,7 @@ msgstr ""
 "النظام تلقائيًا أدقّ قاعدة نشطة تطابق هذا الموظف (مطابقة النطاق)."
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_review__run_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_bank_export_wizard__run_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__run_id
 msgid "Run"
@@ -3970,6 +3981,7 @@ msgid "Submitted to GM"
 msgstr "مُقدَّم إلى المدير العام"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_run_review__earnings
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_run_line__earnings
 msgid "Sum of every approved entry for this employee."
 msgstr "مجموع كل إدخال معتمَد لهذا الموظف."
@@ -4564,6 +4576,7 @@ msgid ""
 msgstr "أي خيارات هذا المكوّن يمثّله هذا السطر — ومنه يُؤخذ السعر."
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_review_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_line_review_form
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run__x_visible_line_ids
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
@@ -6987,11 +7000,13 @@ msgid "Not in this payment"
 msgstr "غير مشمول في هذا الصرف"
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_review_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_line_review_form
 msgid "Previous"
 msgstr "السابق"
 
 #. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_review_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_line_review_form
 msgid "Next"
 msgstr "التالي"
@@ -7007,11 +7022,13 @@ msgid "This employee's breakdown, then the next"
 msgstr "تفاصيل هذا الموظف، ثم الذي يليه"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_review__sections_html
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__x_review_sections_html
 msgid "Breakdown"
 msgstr "التفاصيل"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_review__position
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__x_review_position
 msgid "Position"
 msgstr "الترتيب"
@@ -7022,6 +7039,7 @@ msgid "Has Previous"
 msgstr "يوجد سابق"
 
 #. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_review__has_next
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__x_review_has_next
 msgid "Has Next"
 msgstr "يوجد تالٍ"
@@ -7049,3 +7067,96 @@ msgstr "لم يُسلَّم للمدير العام بعد"
 #: code:addons/KSW_commissions/models/ksw_pay_employee_review.py:0
 msgid "These entries add up to %(total)s, not the %(expected)s on this line: the entries changed after the register was built."
 msgstr "مجموع هذه القيود %(total)s، وليس %(expected)s الظاهر في هذا السطر: تغيّرت القيود بعد إعداد كشف الصرف."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_review_form
+msgid "<span class=\"fa fa-sort-amount-asc text-muted\" title=\"Sort by\"/>"
+msgstr "<span class=\"fa fa-sort-amount-asc text-muted\" title=\"ترتيب حسب\"/>"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_review_form
+msgid "<span class=\"fa fa-filter text-muted\" title=\"Departments\"/>"
+msgstr "<span class=\"fa fa-filter text-muted\" title=\"الأقسام\"/>"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_review_form
+msgid "<span class=\"fa fa-search text-muted\" title=\"Find\"/>"
+msgstr "<span class=\"fa fa-search text-muted\" title=\"بحث\"/>"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_review_form
+msgid "All departments"
+msgstr "جميع الأقسام"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_review_form
+msgid "Employee name…"
+msgstr "اسم الموظف…"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_review_form
+msgid ""
+"No employee matches. Clear the filter or the search to see\n"
+"                    everyone again."
+msgstr "لا يوجد موظف مطابق. امسح التصفية أو البحث لعرض الجميع مرة أخرى."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_review__line_id
+msgid "Employee Line"
+msgstr "سطر الموظف"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_review__sort_by
+msgid "Sort by"
+msgstr "ترتيب حسب"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_run_review__department_ids
+msgid "Only these departments. Leave empty for everyone."
+msgstr "هذه الأقسام فقط. اتركه فارغًا لعرض الجميع."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_review__allowed_department_ids
+msgid "Allowed Department"
+msgstr "الأقسام المتاحة"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_review__search_text
+msgid "Find"
+msgstr "بحث"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_review__has_prev
+msgid "Has Prev"
+msgstr "يوجد سابق"
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_pay_run_review
+msgid "KSW Pay Run Review"
+msgstr "مراجعة كشف الصرف"
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_run_review__sort_by__department
+msgid "Department, then name"
+msgstr "القسم، ثم الاسم"
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_run_review__sort_by__name
+msgid "Employee name"
+msgstr "اسم الموظف"
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_run_review__sort_by__earnings_desc
+msgid "Earnings, highest first"
+msgstr "المستحقات، الأعلى أولًا"
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_run_review__sort_by__net_desc
+msgid "Net payable, highest first"
+msgstr "صافي المستحق، الأعلى أولًا"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_run_line_review.py:0
+msgid "Who Gets Paid — %(run)s"
+msgstr "من سيُصرَف له — %(run)s"

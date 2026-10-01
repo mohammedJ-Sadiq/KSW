@@ -4,11 +4,86 @@
     <!-- ================================================================ -->
     <!-- Who Gets Paid: one employee at a time                             -->
     <!-- ================================================================ -->
-    <!-- Opened as a dialog by action_open_review. Previous / Next open the
-         neighbouring line the same way, which replaces this dialog, so the
-         GM walks the whole tab without closing anything. They show only
-         when opened that way (ksw_review_nav); clicking a row of the tab
-         opens the same page without them. -->
+    <!-- The review session. The bar at the top sorts and narrows the list
+         Previous / Next walk; it never filters the tab itself. Each step
+         re-opens this same record as a target-new action, which replaces
+         the dialog in place. -->
+    <record id="view_ksw_pay_run_review_form" model="ir.ui.view">
+        <field name="name">ksw.pay.run.review.form</field>
+        <field name="model">ksw.pay.run.review</field>
+        <field name="arch" type="xml">
+            <form string="Who Gets Paid">
+                <field name="run_id" invisible="1"/>
+                <field name="allowed_department_ids" invisible="1"/>
+                <field name="has_prev" invisible="1"/>
+                <field name="has_next" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+                <div class="d-flex flex-wrap align-items-center gap-3 border-bottom pb-2 mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fa fa-sort-amount-asc text-muted" title="Sort by"/>
+                        <field name="sort_by" nolabel="1" class="o_ksw_review_sort"/>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 flex-grow-1" style="min-width: 220px;">
+                        <span class="fa fa-filter text-muted" title="Departments"/>
+                        <field name="department_ids" nolabel="1"
+                               widget="many2many_tags"
+                               placeholder="All departments"
+                               domain="[('id', 'in', allowed_department_ids)]"
+                               options="{'no_create': True, 'no_open': True}"/>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fa fa-search text-muted" title="Find"/>
+                        <field name="search_text" nolabel="1"
+                               placeholder="Employee name…"/>
+                    </div>
+                    <span class="badge text-bg-secondary fs-6">
+                        <field name="position" readonly="1"/>
+                    </span>
+                </div>
+
+                <div invisible="line_id" class="alert alert-info" role="status">
+                    No employee matches. Clear the filter or the search to see
+                    everyone again.
+                </div>
+                <field name="line_id" invisible="1"/>
+                <div invisible="not line_id">
+                    <div class="oe_title">
+                        <h2><field name="employee_id" readonly="1"
+                                   options="{'no_open': True}"/></h2>
+                        <field name="department_id" readonly="1"
+                               options="{'no_open': True}"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="earnings" readonly="1"/>
+                            <field name="loan_offset" readonly="1"/>
+                            <field name="net_payable" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="bank_account_id" readonly="1"
+                                   options="{'no_open': True}"/>
+                        </group>
+                    </group>
+                    <field name="sections_html" nolabel="1" readonly="1"/>
+                </div>
+                <footer>
+                    <button name="action_prev" type="object"
+                            string="Previous" icon="fa-chevron-left"
+                            class="btn-secondary"
+                            invisible="not has_prev"/>
+                    <button name="action_next" type="object"
+                            string="Next" icon="fa-chevron-right"
+                            class="btn-primary"
+                            invisible="not has_next"/>
+                    <button string="Close" special="cancel"
+                            class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- What a click on a row of the tab opens: the same breakdown for that
+         one line, without the walking. -->
     <record id="view_ksw_pay_run_line_review_form" model="ir.ui.view">
         <field name="name">ksw.pay.run.line.review.form</field>
         <field name="model">ksw.pay.run.line</field>
@@ -16,17 +91,11 @@
             <form string="Who Gets Paid" create="false" edit="false"
                   delete="false">
                 <sheet>
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div class="oe_title">
-                            <h2><field name="employee_id" readonly="1"
-                                       options="{'no_open': True}"/></h2>
-                            <field name="department_id" readonly="1"
-                                   options="{'no_open': True}"/>
-                        </div>
-                        <span class="badge text-bg-secondary fs-6"
-                              invisible="not context.get('ksw_review_nav')">
-                            <field name="x_review_position" readonly="1"/>
-                        </span>
+                    <div class="oe_title">
+                        <h2><field name="employee_id" readonly="1"
+                                   options="{'no_open': True}"/></h2>
+                        <field name="department_id" readonly="1"
+                               options="{'no_open': True}"/>
                     </div>
                     <group>
                         <group>
@@ -45,20 +114,6 @@
                     <field name="x_review_sections_html" nolabel="1"
                            readonly="1"/>
                 </sheet>
-                <footer>
-                    <field name="x_review_has_prev" invisible="1"/>
-                    <field name="x_review_has_next" invisible="1"/>
-                    <button name="action_review_prev" type="object"
-                            string="Previous" icon="fa-chevron-left"
-                            class="btn-secondary"
-                            invisible="not context.get('ksw_review_nav') or not x_review_has_prev"/>
-                    <button name="action_review_next" type="object"
-                            string="Next" icon="fa-chevron-right"
-                            class="btn-primary"
-                            invisible="not context.get('ksw_review_nav') or not x_review_has_next"/>
-                    <button string="Close" special="cancel"
-                            class="btn-secondary"/>
-                </footer>
             </form>
         </field>
     </record>

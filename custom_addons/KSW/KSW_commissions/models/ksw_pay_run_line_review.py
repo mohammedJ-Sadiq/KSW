@@ -5,28 +5,43 @@ line per employee, a figure, and a magnifier that opened every entry behind
 it in one list — hours, days and meals under one quantity column, and back to
 the tab before the next person.
 
-This adds a review dialog on the register line: the entries split into a
-section per component, each closed by its own subtotal, adding up to exactly
-the *Earnings* on the line (each component rounded to whole riyals, the way
+The review is a small session (``ksw.pay.run.review``) shown as a dialog:
+the current employee's entries split into a section per component, each
+closed by its own subtotal, adding up to exactly the *Earnings* on the line
+(each component rounded to whole riyals, the way
 ``ksw.pay.run._rounded_component_totals`` pays it). Rows that exist but are
-not in this payment are listed apart with the reason. Previous / Next step
-through the tab's own list without closing the dialog: each opens the next
-line as a new ``target: 'new'`` action, which replaces the dialog in place.
+not in this payment are listed apart with the reason.
+
+At the top of the dialog the reviewer sorts (by department, by name, by
+amount) and narrows (departments, a name search) the list Previous / Next
+walk through, without filtering the tab itself. The sort he last used is
+remembered for him (``ir.default``), since most reviews go department by
+department.
 """
 from odoo import _, api, fields, models
+
+
+def _name_key(line):
+    # Names here carry leading spaces and mixed case (see _export_sorted).
+    return (line.employee_id.sudo().name or '').strip().casefold()
+
+
+SORT_KEYS = {
+    'department': lambda l: (
+        (l.department_id.sudo().name or '').strip().casefold(), _name_key(l)),
+    'name': lambda l: (_name_key(l),),
+    'earnings_desc': lambda l: (-(l.earnings or 0.0), _name_key(l)),
+    'net_desc': lambda l: (-(l.net_payable or 0.0), _name_key(l)),
+}
 
 
 class KswPayRun(models.Model):
     _inherit = 'ksw.pay.run'
 
     def action_review_employees(self):
-        """Open the first employee of *Who Gets Paid*."""
+        """Open the review on the first employee of the user's order."""
         self.ensure_one()
-        first = self.env['ksw.pay.run.line'].search(
-            [('run_id', '=', self.id)], limit=1)
-        if not first:
-            return False
-        return first.action_open_review()
+        return self.env['ksw.pay.run.review']._open_for(self)
 
 
 class KswPayRunLine(models.Model):
@@ -35,28 +50,6 @@ class KswPayRunLine(models.Model):
     x_review_sections_html = fields.Html(
         compute='_compute_review_sections', sanitize=False,
         string='Breakdown')
-    x_review_position = fields.Char(
-        compute='_compute_review_position', string='Position')
-    x_review_has_prev = fields.Boolean(
-        compute='_compute_review_position', string='Has Previous')
-    x_review_has_next = fields.Boolean(
-        compute='_compute_review_position', string='Has Next')
-
-    def _review_siblings(self):
-        """The tab's own list: the lines this user may see, in its order."""
-        self.ensure_one()
-        return self.search([('run_id', '=', self.run_id.id)])
-
-    @api.depends_context('uid')
-    @api.depends('run_id', 'employee_id')
-    def _compute_review_position(self):
-        for rec in self:
-            ids = rec._review_siblings().ids if rec.id else []
-            pos = ids.index(rec.id) if rec.id in ids else -1
-            rec.x_review_position = (
-                '%s / %s' % (pos + 1, len(ids)) if pos >= 0 else False)
-            rec.x_review_has_prev = pos > 0
-            rec.x_review_has_next = 0 <= pos < len(ids) - 1
 
     @api.depends('run_id.state', 'employee_id', 'earnings')
     def _compute_review_sections(self):
@@ -89,31 +82,136 @@ class KswPayRunLine(models.Model):
                 paid=totals, excluded=excluded, expected=rec.earnings)
 
     def action_open_review(self):
+        """Open the review on this employee, in the user's usual order."""
+        self.ensure_one()
+        return self.env['ksw.pay.run.review']._open_for(self.run_id, self)
+
+
+class KswPayRunReview(models.TransientModel):
+    """One reviewer walking one month's register."""
+    _name = 'ksw.pay.run.review'
+    _description = 'KSW Pay Run Review'
+
+    run_id = fields.Many2one('ksw.pay.run', required=True, readonly=True)
+    line_id = fields.Many2one('ksw.pay.run.line', string='Employee Line')
+    sort_by = fields.Selection([
+        ('department', 'Department, then name'),
+        ('name', 'Employee name'),
+        ('earnings_desc', 'Earnings, highest first'),
+        ('net_desc', 'Net payable, highest first'),
+    ], string='Sort by', required=True, default='department')
+    department_ids = fields.Many2many(
+        'hr.department', string='Departments',
+        help='Only these departments. Leave empty for everyone.')
+    allowed_department_ids = fields.Many2many(
+        'hr.department', compute='_compute_allowed_departments')
+    search_text = fields.Char(string='Find')
+
+    position = fields.Char(compute='_compute_position')
+    has_prev = fields.Boolean(compute='_compute_position')
+    has_next = fields.Boolean(compute='_compute_position')
+
+    employee_id = fields.Many2one(related='line_id.employee_id')
+    department_id = fields.Many2one(related='line_id.department_id')
+    earnings = fields.Monetary(related='line_id.earnings')
+    loan_offset = fields.Monetary(related='line_id.loan_offset')
+    net_payable = fields.Monetary(related='line_id.net_payable')
+    bank_account_id = fields.Many2one(related='line_id.bank_account_id')
+    currency_id = fields.Many2one(related='run_id.currency_id')
+    sections_html = fields.Html(
+        related='line_id.x_review_sections_html', sanitize=False)
+
+    # ------------------------------------------------------------------
+    @api.model
+    def _open_for(self, run, line=None):
+        review = self.create({'run_id': run.id})
+        ordered = review._ordered_lines()
+        review.line_id = line if line and line in ordered else ordered[:1]
+        return review._action()
+
+    def _action(self):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': '%s — %s' % (self.employee_id.name,
-                                 self.run_id.display_name),
+            'name': _('Who Gets Paid — %(run)s',
+                      run=self.run_id.display_name),
             'res_model': self._name,
             'res_id': self.id,
             'view_mode': 'form',
-            'views': [(self.env.ref(
-                'KSW_commissions.view_ksw_pay_run_line_review_form').id,
-                'form')],
             'target': 'new',
-            'context': {'ksw_review_nav': True,
-                        'dialog_size': 'extra-large'},
+            'context': {'dialog_size': 'extra-large'},
         }
 
-    def _review_step(self, step):
+    def _all_lines(self):
+        """The tab's own list: the lines this user may see."""
         self.ensure_one()
-        ids = self._review_siblings().ids
-        pos = ids.index(self.id) + step if self.id in ids else 0
-        pos = max(0, min(pos, len(ids) - 1))
-        return self.browse(ids[pos]).action_open_review()
+        return self.env['ksw.pay.run.line'].search(
+            [('run_id', '=', self.run_id.id)])
 
-    def action_review_next(self):
-        return self._review_step(1)
+    def _ordered_lines(self):
+        self.ensure_one()
+        lines = self._all_lines()
+        # _origin: inside an onchange the tags are new records (NewId), and
+        # a real department is never "in" them, which emptied the list.
+        departments = self.department_ids._origin
+        if departments:
+            lines = lines.filtered(lambda l: l.department_id in departments)
+        if self.search_text and self.search_text.strip():
+            needle = self.search_text.strip().casefold()
+            lines = lines.filtered(lambda l: needle in _name_key(l))
+        return lines.sorted(SORT_KEYS[self.sort_by or 'department'])
 
-    def action_review_prev(self):
-        return self._review_step(-1)
+    @api.depends('run_id')
+    def _compute_allowed_departments(self):
+        for rec in self:
+            rec.allowed_department_ids = (
+                rec._all_lines().department_id if rec.run_id else False)
+
+    @api.depends('line_id', 'sort_by', 'department_ids', 'search_text')
+    def _compute_position(self):
+        for rec in self:
+            ids = rec._ordered_lines().ids if rec.run_id else []
+            line_id = rec.line_id._origin.id or rec.line_id.id
+            pos = ids.index(line_id) if line_id in ids else -1
+            rec.position = '%s / %s' % (pos + 1 if pos >= 0 else 0, len(ids))
+            rec.has_prev = pos > 0
+            rec.has_next = 0 <= pos < len(ids) - 1
+
+    @api.onchange('sort_by', 'department_ids', 'search_text')
+    def _onchange_order(self):
+        """Start the new list from its first employee. Keeping the one on
+        screen when he was still in the list made a new sort look like it
+        had done nothing: only the counter moved."""
+        self.line_id = self._ordered_lines()[:1]
+
+    def _remember_sort(self):
+        for rec in self:
+            self.env['ir.default'].sudo().set(
+                self._name, 'sort_by', rec.sort_by, user_id=self.env.uid)
+
+    def write(self, vals):
+        res = super().write(vals)
+        if vals.get('sort_by'):
+            self._remember_sort()
+        return res
+
+    def _step(self, step):
+        self.ensure_one()
+        ids = self._ordered_lines().ids
+        if not ids:
+            self.line_id = False
+        elif self.line_id.id in ids:
+            pos = ids.index(self.line_id.id) + step
+            self.line_id = ids[max(0, min(pos, len(ids) - 1))]
+        else:
+            self.line_id = ids[0]
+        # Re-open this same session: a falsy return would close the dialog
+        # (doActionButton turns it into act_window_close), while a new
+        # target-new action replaces it in place.
+        return self._action()
+
+    def action_next(self):
+        return self._step(1)
+
+    def action_prev(self):
+        return self._step(-1)
