@@ -2635,22 +2635,17 @@ class KswDeduction(models.Model):
             origin (so a payslip reset can merge it back).
         """
         # When the money actually left the employee's pay — the date the
-        # Statement of Account credits, not the installment's scheduled
-        # `period_date`.
+        # Statement of Account credits: the day the payslip is confirmed,
+        # which this shop does only after the transfer has gone out.
         #
-        # Capped at today, and that cap is the whole point: this runs on
-        # the `state -> done` transition, so a payslip confirmed BEFORE
-        # its period closes (a mid-month run, an off-cycle or arrears
-        # slip) would otherwise stamp a settlement date in the FUTURE.
-        # `_split_movements` drops every movement dated after the day the
-        # statement is stated as of, silently — so a collection made this
-        # morning disappeared from this morning's statement while its
-        # charge row stayed, overstating the balance by the amount just
-        # collected. Confirmed after the period closes, `date_to` still
-        # wins and the period-end convention is unchanged.
-        today = fields.Date.context_today(self)
-        settled_on = (min(payslip.date_to, today) if payslip.date_to
-                      else today)
+        # Not the period end (`payslip.date_to`), which is what this used
+        # to stamp. A deduction activated after its first installment's
+        # month closed — a loan disbursed on 10 Sep whose August
+        # installment is collected afterwards — then showed the collection
+        # on 31 Aug, BEFORE its own charge on 10 Sep. And a slip confirmed
+        # before its period closes would be dated in the future, which
+        # `_split_movements` silently drops from today's statement.
+        settled_on = fields.Date.context_today(self)
         for ded in lines.mapped('deduction_id'):
             cur = ded.currency_id
             commands = []

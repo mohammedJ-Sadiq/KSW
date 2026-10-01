@@ -201,12 +201,15 @@ msgstr ""
 #. module: KSW_eos_leave
 #: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_unpaid_days
 msgid ""
-"Number of unpaid leave days taken during the service period. These days are "
-"excluded from the service period before recomputing the Article 84/85 EOS "
-"entitlement."
+"Unpaid days the system does not record (e.g. before go-live, or agreed with "
+"the employee). Added to the System Unpaid Days; both are excluded from the "
+"service period before recomputing the Article 84/85 EOS entitlement. Do not "
+"repeat days the system already counts."
 msgstr ""
-"عدد أيام الإجازة بدون أجر المأخوذة خلال فترة الخدمة. تستبعد هذه الأيام من "
-"فترة الخدمة قبل إعادة حساب استحقاق نهاية الخدمة وفق المادتين 84/85."
+"أيام بدون أجر غير مسجلة في النظام (مثل ما قبل تشغيل النظام، أو ما اتفق عليه "
+"مع الموظف). تضاف إلى أيام بدون أجر حسب النظام، ويستبعد المجموع من فترة "
+"الخدمة قبل إعادة حساب استحقاق نهاية الخدمة وفق المادتين 84/85. لا تكرر "
+"الأيام التي يحتسبها النظام."
 
 #. module: KSW_eos_leave
 #: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_previous_payments
@@ -269,10 +272,69 @@ msgstr "صحيح عندما يكون نوع الإجازة محددا كطلب �
 
 #. module: KSW_eos_leave
 #: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_unpaid_days
-msgid "Unpaid Vacations to be Deducted (Days)"
-msgstr "أيام الإجازات بدون أجر المستقطعة"
+msgid "Extra Unpaid Days"
+msgstr "أيام بدون أجر إضافية"
 
 #. module: KSW_eos_leave
 #: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
 msgid "🏢 EOS Review"
 msgstr "🏢 مراجعة نهاية الخدمة"
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_system_unpaid_days
+msgid "System Unpaid Days"
+msgstr "أيام بدون أجر حسب النظام"
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_system_unpaid_days
+msgid ""
+"Unpaid days recorded in the system between the joining date and the "
+"termination date: validated unpaid leaves, plus the excess accepted as "
+"unpaid on annual leaves. Same rule as the annual leave balance. Counted live "
+"up to the HR Approval step and frozen once HR approves."
+msgstr ""
+"أيام بدون أجر المسجلة في النظام بين تاريخ المباشرة وتاريخ انتهاء الخدمة: "
+"الإجازات بدون أجر المعتمدة، إضافة إلى الأيام الزائدة المقبولة بدون أجر في "
+"الإجازات السنوية. بنفس قاعدة رصيد الإجازة السنوية. تحتسب تلقائيا حتى مرحلة "
+"اعتماد الموارد البشرية، وتثبت عند اعتمادها."
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_unpaid_days_counted
+msgid "Unpaid Days Counted"
+msgstr "الأيام المحتسبة بدون أجر"
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_unpaid_days_counted
+msgid "Days of this leave that do not count as service."
+msgstr "أيام هذه الإجازة التي لا تحتسب ضمن مدة الخدمة."
+
+#. module: KSW_eos_leave
+#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
+msgid "View Leaves"
+msgstr "عرض الإجازات"
+
+#. module: KSW_eos_leave
+#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_list_eos_unpaid
+msgid "Duration (Days)"
+msgstr "المدة (أيام)"
+
+#. module: KSW_eos_leave
+#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_list_eos_unpaid
+msgid "Total"
+msgstr "الإجمالي"
+
+#. module: KSW_eos_leave
+#. odoo-python
+#: code:addons/KSW_eos_leave/models/hr_leave.py:0
+msgid "Unpaid Days — %s"
+msgstr "أيام بدون أجر — %s"
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_system_unpaid_locked
+msgid "System Unpaid Days Frozen"
+msgstr "تثبيت أيام بدون أجر حسب النظام"
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_system_unpaid_snapshot
+msgid "System Unpaid Days (Frozen)"
+msgstr "أيام بدون أجر حسب النظام (مثبتة)"

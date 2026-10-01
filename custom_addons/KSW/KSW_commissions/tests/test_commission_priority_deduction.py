@@ -11,6 +11,8 @@ carry-over (unchanged by this feature, and already covered by
 KSW_deduction's own test suite) picks it up exactly as it would have
 without this feature.
 """
+from odoo import fields
+
 from .test_submission import SubmissionCommon
 
 
@@ -99,6 +101,25 @@ class TestPartialCommissionOffset(CommissionPriorityCommon):
             "the uncovered remainder must fall straight into this month's "
             "payslip, not wait for a future commission run",
         )
+
+
+class TestCommissionSettlementDate(CommissionPriorityCommon):
+    """The Statement of Account dates a commission collection on the day
+    the run was approved, not at the end of its period: a loan disbursed
+    after the period closed would otherwise show its collection before its
+    charge."""
+
+    def test_settlement_dated_on_approval_day(self):
+        ded = self._make_pending_installment(self.emp_a, 500.0)
+        entry = self._commission_entry(self.emp_a, 700.0)
+        run = self._approve(entry.batch_id)
+
+        paid = ded.line_ids.filtered(lambda l: l.state == 'paid')
+        self.assertTrue(paid.x_paid_via_pay_run_line_id)
+        self.assertEqual(
+            paid.x_settlement_date,
+            fields.Date.context_today(run, timestamp=run.approved_date))
+        self.assertGreaterEqual(paid.x_settlement_date, ded.x_charge_date)
 
 
 class TestShortfallBothSides(CommissionPriorityCommon):

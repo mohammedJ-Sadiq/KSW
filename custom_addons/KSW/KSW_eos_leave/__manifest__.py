@@ -1,6 +1,6 @@
 {
     'name': 'KSW End of Service Leave',
-    'version': '19.0.1.3.0',
+    'version': '19.0.1.4.1',
     'author': 'Mohammed Albadr',
     'category': 'Human Resources',
     'summary': 'End-of-Service request leave type with 6-step approval and EOS payslip',
@@ -10,7 +10,8 @@
         allocation balance.
 
         At the HR Approval step the HR team fills:
-        - Unpaid vacation days (reduces the service period before computing Art. 84/85)
+        - Extra unpaid days, added to the unpaid days the system counts itself
+          (both reduce the service period before computing Art. 84/85)
         - Termination Reason (Article 84 — Termination, or Article 85 — Resignation)
         - Previous Payments (deducted from the EOS payslip)
         - Notice Pay — Deduction (deducted from the EOS payslip)
@@ -20,6 +21,7 @@
     """,
     'depends': [
         'KSW_annual_leave',
+        'KSW_unpaid_leave',
         'KSW_payroll',
     ],
     'data': [

@@ -19,6 +19,33 @@ class KswAnnualLeaveUnpaid(models.Model):
             since_date: optional date — only count leaves starting on or
                 after this date (used to exclude pre-reset unpaid leaves).
         """
+        return sum(
+            self._unpaid_days_of(leave)
+            for leave in self._get_unpaid_leaves(employee_id, since_date)
+        )
+
+    @api.model
+    def _unpaid_days_of(self, leave):
+        """Days of one leave that do not count as service.
+
+        An unpaid-type leave counts in full; an annual leave counts only the
+        excess the employee accepted as unpaid.
+        """
+        days = 0.0
+        if leave.holiday_status_id.is_unpaid_leave:
+            days += leave.number_of_days
+        if (leave.holiday_status_id.is_annual_leave
+                and leave.x_excess_days_accepted
+                and leave.x_unpaid_portion_days > 0):
+            days += leave.x_unpaid_portion_days
+        return days
+
+    def _get_unpaid_leaves(self, employee_id, since_date=None):
+        """Validated leaves whose days reduce service (sudo recordset).
+
+        Shared by the annual accrual and the EOS service period, so both
+        exclude exactly the same days. Measure each with _unpaid_days_of().
+        """
         domain = [
             ('employee_id', '=', employee_id),
             ('state', '=', 'validate'),
@@ -28,7 +55,6 @@ class KswAnnualLeaveUnpaid(models.Model):
             domain.append(('date_from', '>=', fields.Datetime.to_datetime(since_date)))
 
         unpaid_leaves = self.env['hr.leave'].sudo().search(domain)
-        total = sum(unpaid_leaves.mapped('number_of_days'))
 
         domain2 = [
             ('employee_id', '=', employee_id),
@@ -41,9 +67,7 @@ class KswAnnualLeaveUnpaid(models.Model):
             domain2.append(('date_from', '>=', fields.Datetime.to_datetime(since_date)))
 
         combined_leaves = self.env['hr.leave'].sudo().search(domain2)
-        total += sum(combined_leaves.mapped('x_unpaid_portion_days'))
-
-        return total
+        return unpaid_leaves | combined_leaves
 
     @api.depends(
         'employee_id',

@@ -24,6 +24,11 @@ _EOS_HR_FIELDS = frozenset({
 # (see _VALID_RETURN_TARGETS in KSW_annual_leave/wizard/).
 _EOS_INPUT_STATE = 'pending_hr'
 
+# Up to and including HR's step the System Unpaid Days figure is counted live.
+# Leaving it freezes the figure HR approved; returning to one of these
+# (GM return wizard, chain reset) thaws it again.
+_EOS_UNPAID_LIVE_STATES = (False, 'pending_dm', 'pending_hr')
+
 
 class HrLeave(models.Model):
     _inherit = 'hr.leave'
@@ -76,12 +81,39 @@ class HrLeave(models.Model):
     # ------------------------------------------------------------------
 
     x_eos_unpaid_days = fields.Float(
-        string='Unpaid Vacations to be Deducted (Days)',
+        string='Extra Unpaid Days',
         digits=(10, 2),
         copy=False,
-        help='Number of unpaid leave days taken during the service period. '
-             'These days are excluded from the service period before recomputing '
-             'the Article 84/85 EOS entitlement.',
+        help='Unpaid days the system does not record (e.g. before go-live, '
+             'or agreed with the employee). Added to the System Unpaid Days; '
+             'both are excluded from the service period before recomputing '
+             'the Article 84/85 EOS entitlement. Do not repeat days the '
+             'system already counts.',
+    )
+    x_eos_system_unpaid_days = fields.Float(
+        string='System Unpaid Days',
+        compute='_compute_eos_system_unpaid_days',
+        digits=(10, 2),
+        help='Unpaid days recorded in the system between the joining date '
+             'and the termination date: validated unpaid leaves, plus the '
+             'excess accepted as unpaid on annual leaves. Same rule as the '
+             'annual leave balance. Counted live up to the HR Approval step '
+             'and frozen once HR approves.',
+    )
+    # Plain stored fields, never computes: a snapshot that recomputes is not
+    # a snapshot. Set by write() on the approval-state transition.
+    x_eos_system_unpaid_locked = fields.Boolean(
+        string='System Unpaid Days Frozen', copy=False, readonly=True,
+    )
+    x_eos_system_unpaid_snapshot = fields.Float(
+        string='System Unpaid Days (Frozen)', digits=(10, 2),
+        copy=False, readonly=True,
+    )
+    x_eos_unpaid_days_counted = fields.Float(
+        string='Unpaid Days Counted',
+        compute='_compute_eos_unpaid_days_counted',
+        digits=(10, 2),
+        help='Days of this leave that do not count as service.',
     )
     x_eos_termination_reason = fields.Selection(
         selection=[
@@ -240,9 +272,65 @@ class HrLeave(models.Model):
             leave.x_eos_termination_amount = term
             leave.x_eos_resignation_amount = resig
 
+    def _eos_system_unpaid_leaves(self, leave):
+        """Validated leaves of the EOS employee that reduce service, from
+        joining up to the termination date (sudo recordset)."""
+        if not leave.x_is_eos_leave or not leave.employee_id:
+            return self.env['hr.leave']
+        emp = leave.employee_id.sudo()
+        starts = emp.version_ids.filtered('contract_date_start').mapped(
+            'contract_date_start')
+        if not starts:
+            return self.env['hr.leave']
+        as_of = leave.request_date_from or fields.Date.context_today(self)
+        leaves = self.env['ksw.annual.leave'].sudo()._get_unpaid_leaves(
+            emp.id, since_date=min(starts))
+        return leaves.filtered(
+            lambda l: l.request_date_from and l.request_date_from < as_of)
+
+    @api.depends('x_is_eos_leave', 'employee_id', 'request_date_from',
+                 'x_eos_system_unpaid_locked', 'x_eos_system_unpaid_snapshot')
+    def _compute_eos_system_unpaid_days(self):
+        Annual = self.env['ksw.annual.leave'].sudo()
+        for leave in self:
+            if leave.x_eos_system_unpaid_locked:
+                leave.x_eos_system_unpaid_days = (
+                    leave.x_eos_system_unpaid_snapshot)
+                continue
+            leave.x_eos_system_unpaid_days = sum(
+                Annual._unpaid_days_of(l)
+                for l in self._eos_system_unpaid_leaves(leave))
+
+    @api.depends('holiday_status_id', 'number_of_days',
+                 'x_excess_days_accepted', 'x_unpaid_portion_days')
+    def _compute_eos_unpaid_days_counted(self):
+        Annual = self.env['ksw.annual.leave'].sudo()
+        for leave in self:
+            leave.x_eos_unpaid_days_counted = Annual._unpaid_days_of(
+                leave.sudo())
+
+    def action_view_eos_unpaid_leaves(self):
+        self.ensure_one()
+        leaves = self._eos_system_unpaid_leaves(self)
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Unpaid Days — %s', self.employee_id.name),
+            'res_model': 'hr.leave',
+            'view_mode': 'list,form',
+            'views': [
+                (self.env.ref('KSW_eos_leave.hr_leave_view_list_eos_unpaid').id,
+                 'list'),
+                (False, 'form'),
+            ],
+            'domain': [('id', 'in', leaves.ids)],
+            'context': {'create': False},
+            'target': 'current',
+        }
+
     @api.depends(
         'x_is_eos_leave',
         'x_eos_unpaid_days',
+        'x_eos_system_unpaid_days',
         'request_date_from',
         'employee_id',
         'employee_id.version_ids.contract_date_start',
@@ -270,7 +358,9 @@ class HrLeave(models.Model):
 
             joining = min(versions.mapped('contract_date_start'))
             total_days = max((as_of - joining).days, 0)
-            adjusted_days = max(total_days - (leave.x_eos_unpaid_days or 0.0), 0.0)
+            unpaid_days = (
+                leave.x_eos_system_unpaid_days + (leave.x_eos_unpaid_days or 0.0))
+            adjusted_days = max(total_days - unpaid_days, 0.0)
             years, term, resig = self._eos_calc(adjusted_days, wage)
 
             leave.x_eos_adjusted_service_years = years
@@ -368,11 +458,39 @@ class HrLeave(models.Model):
                 and self._will_all_be_eos(vals)):
             vals = dict(vals, request_date_to=vals['request_date_from'])
 
+        # System Unpaid Days: read the live figure *before* the request
+        # leaves HR's hands, freeze it after.
+        to_freeze = {}
+        if ('x_annual_approval_state' in vals
+                and vals['x_annual_approval_state']
+                not in _EOS_UNPAID_LIVE_STATES):
+            to_freeze = {
+                leave: leave.x_eos_system_unpaid_days
+                for leave in self.filtered(
+                    lambda l: l.x_is_eos_leave
+                    and not l.x_eos_system_unpaid_locked)
+            }
+
         result = super().write(vals)
 
         if {'holiday_status_id', 'request_date_from',
                 'request_date_to'} & vals.keys():
             self._sync_eos_dates()
+
+        for leave, days in to_freeze.items():
+            leave.sudo().write({
+                'x_eos_system_unpaid_locked': True,
+                'x_eos_system_unpaid_snapshot': days,
+            })
+        if ('x_annual_approval_state' in vals
+                and vals['x_annual_approval_state']
+                in _EOS_UNPAID_LIVE_STATES):
+            thawed = self.filtered('x_eos_system_unpaid_locked')
+            if thawed:
+                thawed.sudo().write({
+                    'x_eos_system_unpaid_locked': False,
+                    'x_eos_system_unpaid_snapshot': 0.0,
+                })
 
         return result
 

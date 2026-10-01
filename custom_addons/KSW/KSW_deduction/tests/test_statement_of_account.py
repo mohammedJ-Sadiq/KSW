@@ -269,12 +269,36 @@ class TestStatementSettlementDates(StatementCommon):
         credits = self._movements(self._statement()).filtered(
             lambda l: l.row_kind == 'credit')
         self.assertEqual(len(credits), 1)
-        # Dated by the payslip that collected it...
-        self.assertEqual(credits.date, date(2026, 4, 30))
+        # Dated the day the payslip that collected it was confirmed...
+        self.assertEqual(credits.date, date.today())
         # ...while the installment itself still says January, which is
         # exactly the divergence that makes `period_date` the wrong axis.
         self.assertEqual(january_line.period_date, start)
         self.assertNotEqual(credits.date, january_line.period_date)
+
+    def test_collection_never_predates_its_charge(self):
+        """A loan activated after its first month closed (LO00078).
+
+        The collection used to be dated at the payslip's period end, so a
+        loan charged today and collected on last month's payslip showed
+        the collection a month BEFORE the charge.
+        """
+        last_month = date.today().replace(day=1) - relativedelta(months=1)
+        ded = self._activate(self._make_deduction(
+            self.type_gov_pen, amount=1000.0, installments=2,
+            start_month=last_month))
+        line = ded.line_ids.sorted('sequence')[0]
+        slip = self._fake_payslip(
+            last_month, last_month + relativedelta(months=1, days=-1))
+        ded.sudo()._settle_payslip_lines(line, {line.id: 500.0}, slip)
+
+        self.assertEqual(line.x_settlement_date, date.today())
+        rows = self._movements(self._statement())
+        charge = rows.filtered(lambda l: l.row_kind == 'charge')
+        credit = rows.filtered(lambda l: l.row_kind == 'credit')
+        self.assertGreaterEqual(credit.date, charge.date)
+        self.assertEqual(rows[0].row_kind, 'charge',
+                         'the charge must come first on the statement')
 
     def test_partial_collection_credits_only_the_collected_part(self):
         """The split branch: paid part is a credit, remainder is not."""

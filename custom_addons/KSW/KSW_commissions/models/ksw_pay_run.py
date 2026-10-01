@@ -20,7 +20,6 @@ approval to chase.
 import json
 import math
 
-from dateutil.relativedelta import relativedelta
 from markupsafe import Markup
 
 from odoo import _, api, fields, models
@@ -1363,18 +1362,21 @@ class KswPayRunLine(models.Model):
             remaining = amount
             touched = self.env['ksw.deduction']
             # Settling out of commission is a third collection route
-            # alongside payroll and manual payment, so it dates its
-            # credits on the Statement of Account the same way a payslip
-            # does: the end of the period being paid — capped at today,
-            # for the same reason `_settle_payslip_lines` caps it. A run
-            # paid mid-period would otherwise stamp a settlement date in
-            # the future, and the statement silently drops every movement
-            # dated after the day it is stated as of.
-            today = fields.Date.context_today(rec)
+            # alongside payroll and manual payment, and like them it dates
+            # its credit on the Statement of Account on the day it happened:
+            # the day the month was approved, which is when the installment
+            # is taken out of the commission. Read from `approved_date`
+            # rather than today so a later re-application of the offset
+            # (`_resync_vacation_line`) keeps the original date.
+            #
+            # Not the end of the commission period, which is what this used
+            # to stamp: a loan disbursed in September whose August
+            # installment the August run settled showed the collection on
+            # 31 Aug, before its own charge.
+            approved = rec.run_id.approved_date
             settled_on = (
-                min(rec.period.replace(day=1)
-                    + relativedelta(months=1, days=-1), today)
-                if rec.period else today
+                fields.Date.context_today(rec, timestamp=approved)
+                if approved else fields.Date.context_today(rec)
             )
 
             for line in lines:

@@ -797,3 +797,77 @@ class TestEosLeave(TransactionCase):
 
         self.assertFalse(leave.x_eos_employee_archived)
         self.assertFalse(emp.with_context(active_test=False).active)
+
+    # ==================================================================
+    # System Unpaid Days: live until HR approves, then frozen
+    # ==================================================================
+
+    def _validated_unpaid(self, date_from, date_to):
+        unpaid_type = self.env['hr.leave.type'].create({
+            'name': 'Unpaid (EOS freeze test)',
+            'requires_allocation': False,
+            'leave_validation_type': 'manager',
+            'request_unit': 'day',
+            'is_unpaid_leave': True,
+        })
+        leave = self.env['hr.leave'].with_context(
+            tracking_disable=True, mail_create_nosubscribe=True,
+        ).create({
+            'employee_id': self.employee.id,
+            'holiday_status_id': unpaid_type.id,
+            'request_date_from': date_from,
+            'request_date_to': date_to,
+        })
+        leave.with_context(leave_skip_state_check=True).write(
+            {'state': 'validate'})
+        return leave
+
+    def test_system_unpaid_days_frozen_at_hr_approval(self):
+        self._validated_unpaid(date(2024, 3, 1), date(2024, 3, 10))
+        leave = self._make_leave(offset=40)
+        self._advance_to(leave, 'pending_hr')
+        self.assertFalse(leave.x_eos_system_unpaid_locked)
+        self.assertAlmostEqual(leave.x_eos_system_unpaid_days, 10.0, places=2)
+
+        leave.sudo().write({'x_eos_termination_reason': '84'})
+        self._advance_to(leave, 'pending_gm_initial')
+        self.assertTrue(leave.x_eos_system_unpaid_locked)
+        self.assertAlmostEqual(
+            leave.x_eos_system_unpaid_snapshot, 10.0, places=2)
+        payout = leave.x_eos_payout_amount
+
+        # A leave recorded after HR approved must not move the figure.
+        self._validated_unpaid(date(2025, 3, 1), date(2025, 3, 5))
+        leave.invalidate_recordset()
+        self.assertAlmostEqual(leave.x_eos_system_unpaid_days, 10.0, places=2)
+        self.assertAlmostEqual(leave.x_eos_payout_amount, payout, places=2)
+
+    def test_system_unpaid_days_recounted_when_returned_to_hr(self):
+        self._validated_unpaid(date(2024, 3, 1), date(2024, 3, 10))
+        leave = self._make_leave(offset=41)
+        leave.sudo().write({'x_eos_termination_reason': '84'})
+        self._advance_to(leave, 'pending_gm_initial')
+        self._validated_unpaid(date(2025, 3, 1), date(2025, 3, 5))
+
+        wiz = self.env['ksw.gm.return.approver.wizard'].sudo().create({
+                'leave_id': leave.id,
+                'target_step_id': self.env.ref(
+                    'KSW_annual_leave.return_step_pending_hr').id,
+                'reason': 'Re-check the unpaid days.',
+            })
+        wiz.action_confirm()
+        self.assertEqual(leave.x_annual_approval_state, 'pending_hr')
+        self.assertFalse(leave.x_eos_system_unpaid_locked)
+        self.assertAlmostEqual(leave.x_eos_system_unpaid_days, 15.0, places=2)
+
+    def test_frozen_legacy_request_keeps_zero(self):
+        """What the migration leaves on a request already past HR."""
+        self._validated_unpaid(date(2024, 3, 1), date(2024, 3, 10))
+        leave = self._make_leave(offset=42)
+        leave.sudo().write({'x_eos_termination_reason': '84'})
+        self._advance_to(leave, 'pending_gm_initial')
+        leave.sudo().write({'x_eos_system_unpaid_snapshot': 0.0})
+        before = leave.x_eos_payout_amount
+        self._advance_to(leave, 'pending_gm_final')
+        self.assertEqual(leave.x_eos_system_unpaid_days, 0.0)
+        self.assertAlmostEqual(leave.x_eos_payout_amount, before, places=2)
