@@ -121,6 +121,24 @@ class KswCommissionBankExportWizard(models.TransientModel):
         return (bank.acc_number or bank.bank_id.name or str(bank.id)
                 ).replace(' ', '_').replace('/', '-')
 
+    def _commit_lines(self, groups):
+        """A bank file is a payment instruction: once it carries a line,
+        that month is committed to the employee (``_months_paid_to``) and
+        no vacation may settle it. Called BEFORE the file is built, so the
+        register is first brought in step with every confirmed vacation
+        payslip and the file can never carry a settled entry."""
+        run = self.run_id
+        lines = self.env['ksw.pay.run.line'].sudo()
+        for bank_lines in groups.values():
+            lines |= bank_lines
+        run._commit_to_employees(lines)
+        lines = lines.exists()
+        lines.filtered(lambda l: not l.x_bank_exported_date).write({
+            'x_bank_exported_date': fields.Datetime.now(),
+            'x_bank_exported_by': self.env.uid,
+        })
+        return {b: l.exists() for b, l in groups.items() if l.exists()}
+
     def _bundle_and_download(self, files):
         if not files:
             raise UserError(_('No files were generated.'))
@@ -622,6 +640,7 @@ class KswCommissionBankExportWizard(models.TransientModel):
         }
         if not groups:
             raise UserError(_('No Excel files could be generated.'))
+        groups = self._commit_lines(groups)
         bl = self._batch_label()
         if self.excel_layout == 'split':
             files = [
@@ -641,6 +660,7 @@ class KswCommissionBankExportWizard(models.TransientModel):
             b: lines for b, lines in self._group_and_validate().items()
             if b.x_file_type in ('wps', 'kawthar')
         }
+        groups = self._commit_lines(groups)
         files = []
         bl = self._batch_label()
         vd = (self.value_date or fields.Date.context_today(self)
@@ -662,6 +682,9 @@ class KswCommissionBankExportWizard(models.TransientModel):
         lines = groups.get(bank)
         if not lines:
             raise UserError(_('No lines are assigned to the selected bank.'))
+        lines = self._commit_lines({bank: lines}).get(bank)
+        if not lines:
+            raise UserError(_('No lines are assigned to the selected bank.'))
         bl = self._batch_label()
         label = self._bank_label(bank)
         data = self._make_wps_excel({bank: lines}, all_settled=False)
@@ -676,6 +699,9 @@ class KswCommissionBankExportWizard(models.TransientModel):
         bank = self.bank_account_id
         groups = self._group_and_validate()
         lines = groups.get(bank)
+        if not lines:
+            raise UserError(_('No lines are assigned to the selected bank.'))
+        lines = self._commit_lines({bank: lines}).get(bank)
         if not lines:
             raise UserError(_('No lines are assigned to the selected bank.'))
         bl = self._batch_label()

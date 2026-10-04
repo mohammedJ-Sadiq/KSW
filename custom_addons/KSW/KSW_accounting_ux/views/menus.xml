@@ -56,6 +56,10 @@
         <value eval="{'active': False}"/>
     </function>
 
+    <!-- Income Statement: ask for the period first (ksw.pl.wizard) -->
+    <menuitem id="menu_ksw_pl" name="Profit and Loss" sequence="1"
+              parent="account.account_reports_legal_statements_menu" action="action_ksw_pl_wizard"/>
+
     <!-- A migration tool does not belong beside daily transactions -->
     <function model="ir.ui.menu" name="write">
         <value eval="[ref('KSW_bas_gl_import.menu_ksw_bas_gl_import')]"/>

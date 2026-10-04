@@ -1423,6 +1423,35 @@ class KswPayEntry(models.Model):
             slip=entry.sudo().x_vacation_payslip_id.display_name,
             what=what))
 
+    def _check_not_paid_twice(self, payslip_id):
+        """The last line against paying one commission twice: an entry may
+        be stamped as paid on a vacation payslip only if nothing else has
+        paid it — no other payslip, and no monthly run that has paid him
+        that month or exported its bank file (``_months_paid_to``).
+
+        Deliberately NOT exempting env.su or ``ksw_vacation_settling``: the
+        settlement is the very caller this exists to stop when it is stale.
+        """
+        elsewhere = self.filtered(
+            lambda e: e.x_vacation_payslip_id
+            and e.x_vacation_payslip_id.id != payslip_id)
+        Run = self.env['ksw.pay.run']
+        committed = self.browse()
+        for employee in self.employee_id:
+            mine = self.filtered(lambda e, emp=employee: e.employee_id == emp)
+            months = Run._months_paid_to(employee, set(mine.mapped('period')))
+            committed |= mine.filtered(lambda e, m=months: e.period in m)
+        bad = elsewhere | committed
+        if bad:
+            raise UserError(_(
+                "These commission entries have already been paid, so they "
+                "cannot be paid again on a vacation payslip:\n%(rows)s\n\n"
+                "Recompute the vacation payslip from the leave request.",
+                rows='\n'.join(
+                    '\u2022 %s \u2014 %s' % (
+                        e.display_name, e.period.strftime('%B %Y'))
+                    for e in bad)))
+
     def _check_vacation_hold(self, what):
         """Server-side twin of the banner on the batch.
 
@@ -1751,6 +1780,8 @@ class KswPayEntry(models.Model):
     def write(self, vals):
         if set(vals) - {'x_vacation_payslip_id'}:
             self._check_not_settled(_("Editing it"))
+        if vals.get('x_vacation_payslip_id'):
+            self._check_not_paid_twice(vals['x_vacation_payslip_id'])
         self._check_editable(_("Editing an entry"))
         res = super().write(vals)
         if 'employee_id' in vals:

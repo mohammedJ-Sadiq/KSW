@@ -2035,7 +2035,18 @@ class BasGlImport(models.Model):
 
     @api.model
     def action_post_depreciation(self, date_to, company=None, limit=None):
-        """Post every computed, unposted depreciation line up to ``date_to``."""
+        """Post every computed, unposted depreciation line up to ``date_to``.
+
+        Retired 2026-10-03: depreciation now follows BAS -- nothing in the
+        journal during the year, charged daily in the income statement from
+        ``ksw.bas.depreciation.day``.  Posting here as well would count it
+        twice.  Pass ``force=True`` in the context only for a deliberate
+        year-end posting.
+        """
+        if not self.env.context.get('force'):
+            raise UserError(_(
+                'Depreciation is charged daily in the income statement '
+                '(BAS method) and is not posted to the journal.'))
         company = company or self.env.company
         Line = self.env['account.asset.line']
         domain = [

@@ -1,6 +1,6 @@
 {
     'name': 'KSW Accounting UX',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.3.0',
     'author': 'Mohammed Albadr',
     'category': 'Accounting',
     'summary': 'Organise the Accounting menus into the shape Odoo Enterprise uses',
@@ -21,8 +21,14 @@ wrappers, so Reporting reads the way it does in Enterprise.
     'depends': [
         'account', 'account_financial_report', 'account_tax_balance',
         'mis_builder', 'mis_builder_budget', 'account_asset_management',
+        'KSW_bas_gl_import',
     ],
-    'data': ['views/menus.xml'],
+    'data': [
+        'security/ir.model.access.csv',
+        'data/mis_income_statement.xml',
+        'wizard/pl_wizard_views.xml',
+        'views/menus.xml',
+    ],
     'installable': True,
     'auto_install': False,
     'license': 'LGPL-3',

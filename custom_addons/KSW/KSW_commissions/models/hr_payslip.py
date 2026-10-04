@@ -192,13 +192,51 @@ class HrPayslip(models.Model):
                        'monthly pay run again'))
 
     def _ksw_resync_approved_runs(self, entries):
-        """Keep an approved (not yet paid) month's register in step with
-        what this payslip took from it or gave back."""
+        """Keep the month's register in step, at once, with what this
+        payslip took from it or gave back: an approved (not yet paid) run
+        is resynced line by line, an open one has its preview rebuilt."""
         runs = self.env['ksw.pay.run'].sudo().search([
             ('period', 'in', list(set(entries.mapped('period')))),
-            ('state', '=', 'approved'),
+            ('state', '!=', 'paid'),
         ])
-        runs._resync_vacation_line(entries.employee_id)
+        runs.filtered(lambda r: r.state == 'approved')._resync_vacation_line(
+            entries.employee_id)
+        runs.filtered(lambda r: r.state != 'approved')._refresh_register()
+
+    @api.model
+    def _ksw_drop_committed_commissions(self, run, employees):
+        """``run`` has just committed its month to ``employees`` (bank file
+        exported, or marked Paid). Any vacation / EOS payslip not yet
+        confirmed that still carries one of those entries loses it now, so
+        it cannot be confirmed into a second payment of the same month.
+        Previews included: a provisional figure should not show money the
+        run is paying."""
+        Entry = self.env['ksw.pay.entry'].sudo()
+        entries = Entry.search([
+            ('period', '=', run.period),
+            ('employee_id', 'in', employees.ids),
+            ('x_vacation_payslip_id', '=', False),
+        ])
+        if not entries:
+            return
+        codes = {'%s%d' % (COMMISSION_INPUT_PREFIX, e.id): e for e in entries}
+        inputs = self.env['hr.payslip.input'].sudo().search([
+            ('code', 'in', list(codes)),
+            ('payslip_id.state', 'not in', ('done', 'cancel')),
+            ('payslip_id.x_leave_id', '!=', False),
+        ])
+        for slip in inputs.payslip_id:
+            mine = inputs.filtered(lambda i, s=slip: i.payslip_id == s)
+            dropped = Entry.browse([codes[i.code].id for i in mine])
+            mine.unlink()
+            slip.compute_sheet()
+            title = _('Commission entries removed: %(run)s pays them',
+                      run=run.display_name)
+            slip._ksw_post_commission_note(dropped, title)
+            slip.x_leave_id.sudo().message_post(
+                body=Markup('<strong>%(title)s</strong><br/>%(slip)s') % {
+                    'title': title, 'slip': slip.number or slip.name},
+                subtype_xmlid='mail.mt_note')
 
     def _ksw_post_commission_note(self, entries, title):
         body = Markup('<strong>%(title)s</strong><br/>') % {'title': title}

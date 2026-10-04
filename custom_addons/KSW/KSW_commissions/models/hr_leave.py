@@ -21,9 +21,10 @@ takes it back out of that month's register. The months inside the vacation and
 the part of the return month after he came back are not the settlement's
 business, exactly as before.
 
-Annual and unpaid leave only. An EOS payslip goes through the same input
-builder, but the vacation hold does not hold an EOS month, so pulling the
-entries there would pay them twice (once here, once in the run).
+Annual, unpaid and EOS requests (not extensions: no payslip). The EOS
+payslip goes through the same input builder. The vacation hold does not
+hold an EOS month; the per-entry stamp on confirmation is what keeps the
+run from paying it again.
 """
 from collections import defaultdict
 
@@ -68,6 +69,11 @@ class HrLeave(models.Model):
     x_commission_pending_html = fields.Html(
         string='Commission Entries Awaiting Approval', sanitize=False,
         compute='_compute_commission_entries', compute_sudo=True)
+    x_commission_bank_count = fields.Integer(
+        compute='_compute_commission_entries', compute_sudo=True)
+    x_commission_bank_html = fields.Html(
+        string='Commission Entries Paid by the Monthly Run', sanitize=False,
+        compute='_compute_commission_entries', compute_sudo=True)
     x_commission_live_changed = fields.Boolean(
         compute='_compute_commission_entries', compute_sudo=True,
         help='The Commissions app no longer matches what was latched on this '
@@ -97,12 +103,16 @@ class HrLeave(models.Model):
     def _settles_commission_entries(leave):
         """Does this request's payslip pay the recorded commission entries?"""
         leave_type = leave.holiday_status_id
-        # EOS: the hold does not hold its months, so the run would pay them
-        # too. Extension (KSW_leave_extension): it has no payslip at all.
-        if (not leave_type or getattr(leave, 'x_is_eos_leave', False)
-                or getattr(leave, 'x_is_leave_extension', False)):
+        # Extension (KSW_leave_extension): it has no payslip at all.
+        if not leave_type or getattr(leave, 'x_is_leave_extension', False):
             return False
-        return bool(leave_type.is_annual_leave or leave_type.is_unpaid_leave)
+        # EOS: the terminal payslip is his last chance to be paid. The hold
+        # does not hold an EOS month, but it does not need to: confirming
+        # the payslip stamps each entry, which takes it out of the run (and
+        # out of an approved register), and a month the run has since paid
+        # refuses the confirmation — none of that reads the leave type.
+        return bool(leave_type.is_annual_leave or leave_type.is_unpaid_leave
+                    or getattr(leave_type, 'is_eos_leave', False))
 
     def _commission_entries_to_settle(self):
         """The entries the settlement of this request would pay today.
@@ -164,6 +174,49 @@ class HrLeave(models.Model):
                 continue
             blocked |= rows.filtered(lambda e, h=hold: hold_blocks(h, e.date))
         return entries - blocked
+
+    def _commission_entries_paid_elsewhere(self, entries):
+        """The part of ``entries`` paid by something other than this
+        request: another vacation payslip, or a monthly run that has paid
+        him that month or exported its bank file (``_months_paid_to``)."""
+        self.ensure_one()
+        leave = self._origin or self
+        entries = entries.sudo().exists()
+        if not entries:
+            return entries
+        elsewhere = entries.filtered(
+            lambda e: e.x_vacation_payslip_id
+            and e.x_vacation_payslip_id.x_leave_id != leave)
+        months = self.env['ksw.pay.run']._months_paid_to(
+            leave.employee_id, set(entries.mapped('period')))
+        return elsewhere | entries.filtered(
+            lambda e: e.period in months and not e.x_vacation_payslip_id)
+
+    def _commission_entries_in_bank_file(self):
+        """Approved entries up to the departure month that a monthly run
+        is paying him: its bank file exported, not yet marked Paid. The
+        in-flight months — the ones an approver expects on the vacation.
+        A month marked Paid is history and not listed."""
+        self.ensure_one()
+        Entry = self.env['ksw.pay.entry'].sudo()
+        leave = self._origin or self
+        if not leave.employee_id or not leave.request_date_from:
+            return Entry
+        lines = self.env['ksw.pay.run.line'].sudo().search([
+            ('employee_id', '=', leave.employee_id.id),
+            ('run_id.state', '=', 'approved'),
+            ('x_bank_exported_date', '!=', False),
+            ('run_id.period', '<=', leave.request_date_from.replace(day=1)),
+        ])
+        if not lines:
+            return Entry
+        return Entry.search([
+            ('employee_id', '=', leave.employee_id.id),
+            ('period', 'in', lines.mapped('run_id.period')),
+            ('x_vacation_payslip_id', '=', False),
+            ('state', '=', 'approved'),
+            ('amount', '!=', 0.0),
+        ], order='period, component_id, date, id')
 
     def _commission_entries_settled(self):
         """The entries a confirmed payslip of this request already paid."""
@@ -254,8 +307,16 @@ class HrLeave(models.Model):
         leave = self._origin or self
         if leave.x_commission_latched_date:
             lines = leave.sudo().x_commission_snapshot_ids
+            # What was agreed stays on the request — except a row something
+            # else has paid since (its run paid or exported the month, or
+            # another payslip paid it): that one drops off at once, instead
+            # of reading as part of this settlement. A row whose figure
+            # merely changed stays; the Refresh banner deals with it.
+            paid_elsewhere = leave._commission_entries_paid_elsewhere(
+                lines.filtered('included').entry_id)
             return (
-                [l._as_row() for l in lines if l.included],
+                [l._as_row() for l in lines
+                 if l.included and l.entry_id not in paid_elsewhere],
                 [l._as_row() for l in lines if not l.included])
         Snapshot = self.env['ksw.leave.commission.entry']
         settled = leave._commission_entries_settled()
@@ -299,6 +360,13 @@ class HrLeave(models.Model):
                 r['amount'] for r in pending)
             leave.x_commission_pending_html = (
                 self._render_commission_rows(pending) if pending else False)
+            Snapshot = self.env['ksw.leave.commission.entry']
+            in_bank = [Snapshot._row_from_entry(e)
+                       for e in leave._commission_entries_in_bank_file()
+                       ] if applies else []
+            leave.x_commission_bank_count = len(in_bank)
+            leave.x_commission_bank_html = (
+                self._render_commission_rows(in_bank) if in_bank else False)
 
             # Has the Commissions app moved since the latch? Compared on what
             # is still to be paid: the live set excludes what this request's

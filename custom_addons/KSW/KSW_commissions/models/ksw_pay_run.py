@@ -817,6 +817,7 @@ class KswPayRun(models.Model):
             if rec.state != 'approved':
                 raise UserError(_(
                     "Only an approved pay run can be marked paid."))
+            rec._commit_to_employees()
             rec.write({'state': 'paid'})
         return True
 
@@ -894,20 +895,46 @@ class KswPayRun(models.Model):
 
     @api.model
     def _months_paid_to(self, employee, periods):
-        """The months in ``periods`` whose run actually paid ``employee``.
+        """The months in ``periods`` whose run has paid ``employee`` — or
+        has committed to: THE predicate against paying a commission twice.
 
-        Only **Paid** counts: an approved month is committed to a bank file
-        that has not gone out, and it takes around a month to go out. A
-        vacation settles the employee's whole account on the day he leaves,
-        so it takes those entries too, and ``_resync_vacation_line`` takes
-        them out of the approved register. A paid run with no line for him
-        paid him nothing.
+        A month counts once its run is **Paid** with a line for him, or once
+        a **bank file carrying his line has been exported** — from that
+        moment the money is with the bank whether or not anybody presses
+        Mark Paid. An approved month not yet exported is still open: a
+        vacation settles his whole account on the day he leaves, takes
+        those entries, and ``_resync_vacation_line`` takes them out of the
+        register. A run with no line for him paid him nothing.
+
+        Read by every route: which entries a vacation lists and pays
+        (``hr.leave._commission_entries_outstanding``), the payslip confirm
+        guard, and the entry-level stamp guard (``ksw.pay.entry.write``).
         """
         return set(self.env['ksw.pay.run.line'].sudo().search([
             ('employee_id', '=', employee.id),
             ('run_id.period', 'in', list(periods)),
-            ('run_id.state', '=', 'paid'),
+            '|', ('run_id.state', '=', 'paid'),
+            ('x_bank_exported_date', '!=', False),
         ]).mapped('run_id.period'))
+
+    def _commit_to_employees(self, lines=None):
+        """The run's money is now committed to ``lines`` (bank file
+        exported, or the run marked Paid): make sure no vacation pays it.
+
+        First the register is brought in step with every vacation payslip
+        already confirmed — a settled entry must never reach the bank file.
+        Then whatever an unconfirmed vacation / EOS payslip still carries
+        for these months is taken off it at once.
+        """
+        self.ensure_one()
+        run = self.sudo()
+        settled = run._all_entries().filtered('x_vacation_payslip_id')
+        if settled and run.state == 'approved':
+            run._resync_vacation_line(settled.employee_id)
+        lines = (lines or run.line_ids).exists()
+        if lines:
+            self.env['hr.payslip']._ksw_drop_committed_commissions(
+                run, lines.employee_id)
 
     def _resync_vacation_line(self, employees):
         """Re-derive an approved month's register line for ``employees``
@@ -936,6 +963,40 @@ class KswPayRun(models.Model):
                 if float_compare(line.earnings if line else 0.0, earnings,
                                  precision_digits=2) == 0:
                     continue
+                if line and line.x_bank_exported_date and \
+                        earnings > line.earnings:
+                    # Entries given back (a vacation payslip cancelled)
+                    # after the file went out: the file does not carry
+                    # them, so the line keeps what the bank pays and the
+                    # difference is said out loud rather than invented.
+                    run.message_post(
+                        body=Markup(
+                            '<strong>%(title)s</strong><br/>'
+                            '<b>%(l_emp)s</b> %(emp)s<br/>'
+                            '<b>%(l_amt)s</b> %(amount).2f'
+                        ) % {
+                            'title': _('Commission entries released after '
+                                       'the bank file was exported — not '
+                                       'in the file, still owed'),
+                            'l_emp': _('Employee:'),
+                            'emp': employee.sudo().display_name,
+                            'l_amt': _('Amount:'),
+                            'amount': earnings - line.earnings,
+                        },
+                        subtype_xmlid='mail.mt_note',
+                    )
+                    continue
+                if line and line.x_bank_exported_date:
+                    # The bank already has this figure, and part of it was
+                    # paid on a vacation since: lowering the line here would
+                    # not change what the bank pays — refuse.
+                    raise UserError(_(
+                        "The commission bank file for %(run)s already pays "
+                        "%(emp)s %(amount).2f. That month can no longer be "
+                        "settled on a vacation payslip.",
+                        run=run.display_name,
+                        emp=employee.sudo().display_name,
+                        amount=line.earnings))
                 before = line.earnings if line else 0.0
                 released = DedLine
                 if line:
@@ -1180,6 +1241,14 @@ class KswPayRunLine(models.Model):
         readonly=False,
     )
     x_unwind_data = fields.Text(readonly=True, copy=False)
+    # Set when a bank file carrying this line is produced. From then on the
+    # money is committed to the bank whatever the run's state says, so no
+    # vacation settlement may take the month (``_months_paid_to``).
+    x_bank_exported_date = fields.Datetime(
+        string='Bank File Exported On', readonly=True, copy=False)
+    x_bank_exported_by = fields.Many2one(
+        'res.users', string='Bank File Exported By', readonly=True,
+        copy=False)
 
     entry_ids = fields.Many2many(
         'ksw.pay.entry', compute='_compute_entry_ids', string='Entries',

@@ -1,0 +1,581 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      Income Statement (قائمة الدخل) built on MIS Builder, laid out on BAS's own
+      chart: revenue under 4, expenses under 3, one line per BAS level-3 group.
+
+      Signs: revenue is credit, so revenue lines are negated (-balp) and every
+      line reads as a positive figure.
+
+      "Profit before depreciation" exists so the statement can be compared
+      with BAS9 during the year: BAS charges depreciation only at year-end
+      closing, Odoo posts it monthly (BASDP journal).
+    -->
+
+    <!-- Styles -->
+    <record id="mis_pl_style_base" model="mis.report.style">
+        <field name="name">KSW P&amp;L: base</field>
+        <field name="dp_inherit" eval="False"/>
+        <field name="dp">2</field>
+    </record>
+    <record id="mis_pl_style_line" model="mis.report.style">
+        <field name="name">KSW P&amp;L: group line</field>
+        <field name="indent_level_inherit" eval="False"/>
+        <field name="indent_level">1</field>
+    </record>
+    <record id="mis_pl_style_account" model="mis.report.style">
+        <field name="name">KSW P&amp;L: account detail</field>
+        <field name="indent_level_inherit" eval="False"/>
+        <field name="indent_level">2</field>
+        <field name="font_style_inherit" eval="False"/>
+        <field name="font_style">italic</field>
+        <field name="hide_empty_inherit" eval="False"/>
+        <field name="hide_empty" eval="True"/>
+    </record>
+    <record id="mis_pl_style_subtotal" model="mis.report.style">
+        <field name="name">KSW P&amp;L: subtotal</field>
+        <field name="font_weight_inherit" eval="False"/>
+        <field name="font_weight">bold</field>
+    </record>
+    <record id="mis_pl_style_result" model="mis.report.style">
+        <field name="name">KSW P&amp;L: result</field>
+        <field name="font_weight_inherit" eval="False"/>
+        <field name="font_weight">bold</field>
+        <field name="background_color_inherit" eval="False"/>
+        <field name="background_color">#E8EEF4</field>
+    </record>
+    <record id="mis_pl_style_net" model="mis.report.style">
+        <field name="name">KSW P&amp;L: net result</field>
+        <field name="font_weight_inherit" eval="False"/>
+        <field name="font_weight">bold</field>
+        <field name="background_color_inherit" eval="False"/>
+        <field name="background_color">#1F4E79</field>
+        <field name="color_inherit" eval="False"/>
+        <field name="color">#FFFFFF</field>
+    </record>
+
+    <!-- Report template -->
+    <record id="mis_pl_report" model="mis.report">
+        <field name="name">Income Statement (KSW)</field>
+        <field name="description">قائمة الدخل</field>
+        <field name="style_id" ref="mis_pl_style_base"/>
+    </record>
+
+    <!-- Revenue -->
+    <record id="mis_pl_kpi_rev_4101" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">10</field>
+        <field name="name">rev_4101</field>
+        <field name="description">مبيعات وايرادات الفروع</field>
+        <field name="expression">-balp[4101%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+    <record id="mis_pl_kpi_rev_4102" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">11</field>
+        <field name="name">rev_4102</field>
+        <field name="description">مبيعات وايرادات فرع الاحساء</field>
+        <field name="expression">-balp[4102%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+    <record id="mis_pl_kpi_rev_4103" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">12</field>
+        <field name="name">rev_4103</field>
+        <field name="description">مبيعات وايرادات الاستثمارات</field>
+        <field name="expression">-balp[4103%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+    <record id="mis_pl_kpi_rev_4104" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">13</field>
+        <field name="name">rev_4104</field>
+        <field name="description">ايرادات نقليات الكوثر</field>
+        <field name="expression">-balp[4104%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+    <record id="mis_pl_kpi_sales" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">19</field>
+        <field name="name">sales</field>
+        <field name="description">صافي المبيعات والإيرادات</field>
+        <field name="expression">-balp[41%]</field>
+        <field name="style_id" ref="mis_pl_style_subtotal"/>
+    </record>
+
+    <!-- Cost of operations -->
+    <record id="mis_pl_kpi_cost_3101" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">20</field>
+        <field name="name">cost_3101</field>
+        <field name="description">المشتريات العامة</field>
+        <field name="expression">balp[3101%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+    <record id="mis_pl_kpi_cost_3102" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">21</field>
+        <field name="name">cost_3102</field>
+        <field name="description">تكلفة الانتاج بالمصانع</field>
+        <field name="expression">balp[3102%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+    <record id="mis_pl_kpi_cost" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">29</field>
+        <field name="name">cost</field>
+        <field name="description">إجمالي المشتريات وتكلفة التشغيل</field>
+        <field name="expression">balp[31%]</field>
+        <field name="style_id" ref="mis_pl_style_subtotal"/>
+    </record>
+    <record id="mis_pl_kpi_gross" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">30</field>
+        <field name="name">gross</field>
+        <field name="description">مجمل الربح</field>
+        <field name="expression">sales - cost</field>
+        <field name="style_id" ref="mis_pl_style_result"/>
+    </record>
+
+    <!-- Operating expenses -->
+    <record id="mis_pl_kpi_exp_3201" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">40</field>
+        <field name="name">exp_3201</field>
+        <field name="description">مصروفات التشغيل</field>
+        <field name="expression">balp[3201%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+    <record id="mis_pl_kpi_exp_3202" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">41</field>
+        <field name="name">exp_3202</field>
+        <field name="description">مصروفات ادارية وعمومية</field>
+        <field name="expression">balp[3202%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+    <record id="mis_pl_kpi_exp_3203" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">42</field>
+        <field name="name">exp_3203</field>
+        <field name="description">مصروفات البيع والتسويق والتمويل</field>
+        <field name="expression">balp[3203%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+    <record id="mis_pl_kpi_exp_3204" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">43</field>
+        <field name="name">exp_3204</field>
+        <field name="description">مصروفات الاستثمارات</field>
+        <field name="expression">balp[3204%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+    <record id="mis_pl_kpi_exp_3205" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">44</field>
+        <field name="name">exp_3205</field>
+        <field name="description">مصروفات فرع الحياة والثلج البلوري</field>
+        <field name="expression">balp[3205%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+    <record id="mis_pl_kpi_exp_3206" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">45</field>
+        <field name="name">exp_3206</field>
+        <field name="description">مصروفات تشغيلية وادارية فرع النقليات</field>
+        <field name="expression">balp[3206%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+    <record id="mis_pl_kpi_opex" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">49</field>
+        <field name="name">opex</field>
+        <field name="description">إجمالي المصروفات</field>
+        <field name="expression">balp[32%]</field>
+        <field name="style_id" ref="mis_pl_style_subtotal"/>
+    </record>
+    <record id="mis_pl_kpi_ebitda" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">50</field>
+        <field name="name">before_dep</field>
+        <field name="description">الربح قبل الاهلاك</field>
+        <field name="expression">gross - opex</field>
+        <field name="style_id" ref="mis_pl_style_result"/>
+    </record>
+
+    <!--
+      Depreciation is BAS's charge for each column's own range, not the
+      journal: BAS posts none during the year. These queries only select the
+      assets of one expense group (ksw.bas.fixed.asset); the amount is
+      computed per column by models/mis_report.py, because BAS's figure
+      depends on where the range starts. balp[33xx] is kept so a manual
+      depreciation entry still shows.
+    -->
+    <record id="mis_pl_query_dep_3301" model="mis.report.query">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="name">depd_3301</field>
+        <field name="model_id" ref="KSW_bas_gl_import.model_ksw_bas_fixed_asset"/>
+        <field name="field_ids" eval="[(6, 0, [ref('KSW_bas_gl_import.field_ksw_bas_fixed_asset__amount')])]"/>
+        <field name="aggregate">sum</field>
+        <field name="date_field" ref="KSW_bas_gl_import.field_ksw_bas_fixed_asset__date"/>
+        <field name="company_field_id" ref="KSW_bas_gl_import.field_ksw_bas_fixed_asset__company_id"/>
+        <field name="domain">[('expense_group', '=', '3301')]</field>
+    </record>
+    <record id="mis_pl_query_dep_3302" model="mis.report.query">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="name">depd_3302</field>
+        <field name="model_id" ref="KSW_bas_gl_import.model_ksw_bas_fixed_asset"/>
+        <field name="field_ids" eval="[(6, 0, [ref('KSW_bas_gl_import.field_ksw_bas_fixed_asset__amount')])]"/>
+        <field name="aggregate">sum</field>
+        <field name="date_field" ref="KSW_bas_gl_import.field_ksw_bas_fixed_asset__date"/>
+        <field name="company_field_id" ref="KSW_bas_gl_import.field_ksw_bas_fixed_asset__company_id"/>
+        <field name="domain">[('expense_group', '=', '3302')]</field>
+    </record>
+    <record id="mis_pl_query_dep_3303" model="mis.report.query">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="name">depd_3303</field>
+        <field name="model_id" ref="KSW_bas_gl_import.model_ksw_bas_fixed_asset"/>
+        <field name="field_ids" eval="[(6, 0, [ref('KSW_bas_gl_import.field_ksw_bas_fixed_asset__amount')])]"/>
+        <field name="aggregate">sum</field>
+        <field name="date_field" ref="KSW_bas_gl_import.field_ksw_bas_fixed_asset__date"/>
+        <field name="company_field_id" ref="KSW_bas_gl_import.field_ksw_bas_fixed_asset__company_id"/>
+        <field name="domain">[('expense_group', '=', '3303')]</field>
+    </record>
+    <record id="mis_pl_query_dep_3304" model="mis.report.query">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="name">depd_3304</field>
+        <field name="model_id" ref="KSW_bas_gl_import.model_ksw_bas_fixed_asset"/>
+        <field name="field_ids" eval="[(6, 0, [ref('KSW_bas_gl_import.field_ksw_bas_fixed_asset__amount')])]"/>
+        <field name="aggregate">sum</field>
+        <field name="date_field" ref="KSW_bas_gl_import.field_ksw_bas_fixed_asset__date"/>
+        <field name="company_field_id" ref="KSW_bas_gl_import.field_ksw_bas_fixed_asset__company_id"/>
+        <field name="domain">[('expense_group', '=', '3304')]</field>
+    </record>
+    <record id="mis_pl_query_dep_3305" model="mis.report.query">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="name">depd_3305</field>
+        <field name="model_id" ref="KSW_bas_gl_import.model_ksw_bas_fixed_asset"/>
+        <field name="field_ids" eval="[(6, 0, [ref('KSW_bas_gl_import.field_ksw_bas_fixed_asset__amount')])]"/>
+        <field name="aggregate">sum</field>
+        <field name="date_field" ref="KSW_bas_gl_import.field_ksw_bas_fixed_asset__date"/>
+        <field name="company_field_id" ref="KSW_bas_gl_import.field_ksw_bas_fixed_asset__company_id"/>
+        <field name="domain">[('expense_group', '=', '3305')]</field>
+    </record>
+    <record id="mis_pl_query_dep_3306" model="mis.report.query">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="name">depd_3306</field>
+        <field name="model_id" ref="KSW_bas_gl_import.model_ksw_bas_fixed_asset"/>
+        <field name="field_ids" eval="[(6, 0, [ref('KSW_bas_gl_import.field_ksw_bas_fixed_asset__amount')])]"/>
+        <field name="aggregate">sum</field>
+        <field name="date_field" ref="KSW_bas_gl_import.field_ksw_bas_fixed_asset__date"/>
+        <field name="company_field_id" ref="KSW_bas_gl_import.field_ksw_bas_fixed_asset__company_id"/>
+        <field name="domain">[('expense_group', '=', '3306')]</field>
+    </record>
+
+    <!-- Depreciation -->
+    <record id="mis_pl_kpi_dep_3301" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">60</field>
+        <field name="name">dep_3301</field>
+        <field name="description">اهلاك الاراضي</field>
+        <field name="expression">(depd_3301.amount or 0) + balp[3301%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+    <record id="mis_pl_kpi_dep_3302" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">61</field>
+        <field name="name">dep_3302</field>
+        <field name="description">اهلاك مباني وبرتبلات</field>
+        <field name="expression">(depd_3302.amount or 0) + balp[3302%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+    <record id="mis_pl_kpi_dep_3303" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">62</field>
+        <field name="name">dep_3303</field>
+        <field name="description">اهلاك مكائن التحلية</field>
+        <field name="expression">(depd_3303.amount or 0) + balp[3303%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+    <record id="mis_pl_kpi_dep_3304" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">63</field>
+        <field name="name">dep_3304</field>
+        <field name="description">اهلاك اثاث وتجهيزات</field>
+        <field name="expression">(depd_3304.amount or 0) + balp[3304%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+    <record id="mis_pl_kpi_dep_3305" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">64</field>
+        <field name="name">dep_3305</field>
+        <field name="description">اهلاك عدد وادوات</field>
+        <field name="expression">(depd_3305.amount or 0) + balp[3305%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+    <record id="mis_pl_kpi_dep_3306" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">65</field>
+        <field name="name">dep_3306</field>
+        <field name="description">اهلاك السيارات</field>
+        <field name="expression">(depd_3306.amount or 0) + balp[3306%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+    <record id="mis_pl_kpi_dep" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">69</field>
+        <field name="name">dep</field>
+        <field name="description">إجمالي اهلاك الاصول الثابتة</field>
+        <field name="expression">dep_3301 + dep_3302 + dep_3303 + dep_3304 + dep_3305 + dep_3306</field>
+        <field name="style_id" ref="mis_pl_style_subtotal"/>
+    </record>
+    <record id="mis_pl_kpi_operating" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">70</field>
+        <field name="name">operating</field>
+        <field name="description">الربح التشغيلي</field>
+        <field name="expression">before_dep - dep</field>
+        <field name="style_id" ref="mis_pl_style_result"/>
+    </record>
+
+    <!-- Other income and the bottom line -->
+    <record id="mis_pl_kpi_other" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">80</field>
+        <field name="name">other_income</field>
+        <field name="description">ايرادات اخرى متنوعة</field>
+        <field name="expression">-balp[42%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+    <record id="mis_pl_kpi_net" model="mis.report.kpi">
+        <field name="report_id" ref="mis_pl_report"/>
+        <field name="sequence">90</field>
+        <field name="name">net</field>
+        <field name="description">صافي الربح (الخسارة)</field>
+        <field name="expression">operating + other_income</field>
+        <field name="style_id" ref="mis_pl_style_net"/>
+    </record>
+
+    <!--
+      Report instances (what the menus open). noupdate: an accountant who
+      changes the columns or the pivot date keeps those changes on upgrade.
+    -->
+    <data noupdate="1">
+        <!-- 1. Summary: this month, last month, year to date -->
+        <record id="mis_pl_instance" model="mis.report.instance">
+            <field name="name">Profit and Loss</field>
+            <field name="report_id" ref="mis_pl_report"/>
+            <field name="comparison_mode" eval="True"/>
+            <field name="no_auto_expand_accounts" eval="True"/>
+            <field name="target_move">posted</field>
+            <field name="display_columns_description" eval="True"/>
+        </record>
+        <record id="mis_pl_instance_p_month" model="mis.report.instance.period">
+            <field name="report_instance_id" ref="mis_pl_instance"/>
+            <field name="sequence">10</field>
+            <field name="name">الشهر الحالي</field>
+            <field name="mode">relative</field>
+            <field name="type">m</field>
+            <field name="offset">0</field>
+        </record>
+        <record id="mis_pl_instance_p_prev" model="mis.report.instance.period">
+            <field name="report_instance_id" ref="mis_pl_instance"/>
+            <field name="sequence">20</field>
+            <field name="name">الشهر السابق</field>
+            <field name="mode">relative</field>
+            <field name="type">m</field>
+            <field name="offset">-1</field>
+        </record>
+        <record id="mis_pl_instance_p_ytd" model="mis.report.instance.period">
+            <field name="report_instance_id" ref="mis_pl_instance"/>
+            <field name="sequence">30</field>
+            <field name="name">من بداية السنة</field>
+            <field name="mode">relative</field>
+            <field name="type">m</field>
+            <field name="offset">0</field>
+            <field name="is_ytd" eval="True"/>
+        </record>
+
+        <!-- 2. Same columns, every account listed under its group -->
+        <record id="mis_pl_instance_detail" model="mis.report.instance">
+            <field name="name">Profit and Loss (by Account)</field>
+            <field name="report_id" ref="mis_pl_report"/>
+            <field name="comparison_mode" eval="True"/>
+            <field name="no_auto_expand_accounts" eval="False"/>
+            <field name="target_move">posted</field>
+            <field name="display_columns_description" eval="True"/>
+        </record>
+        <record id="mis_pl_instance_detail_p_month" model="mis.report.instance.period">
+            <field name="report_instance_id" ref="mis_pl_instance_detail"/>
+            <field name="sequence">10</field>
+            <field name="name">الشهر الحالي</field>
+            <field name="mode">relative</field>
+            <field name="type">m</field>
+            <field name="offset">0</field>
+        </record>
+        <record id="mis_pl_instance_detail_p_ytd" model="mis.report.instance.period">
+            <field name="report_instance_id" ref="mis_pl_instance_detail"/>
+            <field name="sequence">20</field>
+            <field name="name">من بداية السنة</field>
+            <field name="mode">relative</field>
+            <field name="type">m</field>
+            <field name="offset">0</field>
+            <field name="is_ytd" eval="True"/>
+        </record>
+
+        <!-- 3. Monthly: the twelve months up to the pivot date, plus YTD -->
+        <record id="mis_pl_instance_monthly" model="mis.report.instance">
+            <field name="name">Profit and Loss (Monthly)</field>
+            <field name="report_id" ref="mis_pl_report"/>
+            <field name="comparison_mode" eval="True"/>
+            <field name="no_auto_expand_accounts" eval="True"/>
+            <field name="target_move">posted</field>
+            <field name="display_columns_description" eval="True"/>
+            <field name="landscape_pdf" eval="True"/>
+        </record>
+        <!-- Twelve monthly columns up to the pivot month (M), then YTD -->
+        <record id="mis_pl_instance_monthly_p01" model="mis.report.instance.period">
+            <field name="report_instance_id" ref="mis_pl_instance_monthly"/>
+            <field name="sequence">10</field>
+            <field name="name">M-11</field>
+            <field name="mode">relative</field>
+            <field name="type">m</field>
+            <field name="offset">-11</field>
+        </record>
+        <record id="mis_pl_instance_monthly_p02" model="mis.report.instance.period">
+            <field name="report_instance_id" ref="mis_pl_instance_monthly"/>
+            <field name="sequence">20</field>
+            <field name="name">M-10</field>
+            <field name="mode">relative</field>
+            <field name="type">m</field>
+            <field name="offset">-10</field>
+        </record>
+        <record id="mis_pl_instance_monthly_p03" model="mis.report.instance.period">
+            <field name="report_instance_id" ref="mis_pl_instance_monthly"/>
+            <field name="sequence">30</field>
+            <field name="name">M-9</field>
+            <field name="mode">relative</field>
+            <field name="type">m</field>
+            <field name="offset">-9</field>
+        </record>
+        <record id="mis_pl_instance_monthly_p04" model="mis.report.instance.period">
+            <field name="report_instance_id" ref="mis_pl_instance_monthly"/>
+            <field name="sequence">40</field>
+            <field name="name">M-8</field>
+            <field name="mode">relative</field>
+            <field name="type">m</field>
+            <field name="offset">-8</field>
+        </record>
+        <record id="mis_pl_instance_monthly_p05" model="mis.report.instance.period">
+            <field name="report_instance_id" ref="mis_pl_instance_monthly"/>
+            <field name="sequence">50</field>
+            <field name="name">M-7</field>
+            <field name="mode">relative</field>
+            <field name="type">m</field>
+            <field name="offset">-7</field>
+        </record>
+        <record id="mis_pl_instance_monthly_p06" model="mis.report.instance.period">
+            <field name="report_instance_id" ref="mis_pl_instance_monthly"/>
+            <field name="sequence">60</field>
+            <field name="name">M-6</field>
+            <field name="mode">relative</field>
+            <field name="type">m</field>
+            <field name="offset">-6</field>
+        </record>
+        <record id="mis_pl_instance_monthly_p07" model="mis.report.instance.period">
+            <field name="report_instance_id" ref="mis_pl_instance_monthly"/>
+            <field name="sequence">70</field>
+            <field name="name">M-5</field>
+            <field name="mode">relative</field>
+            <field name="type">m</field>
+            <field name="offset">-5</field>
+        </record>
+        <record id="mis_pl_instance_monthly_p08" model="mis.report.instance.period">
+            <field name="report_instance_id" ref="mis_pl_instance_monthly"/>
+            <field name="sequence">80</field>
+            <field name="name">M-4</field>
+            <field name="mode">relative</field>
+            <field name="type">m</field>
+            <field name="offset">-4</field>
+        </record>
+        <record id="mis_pl_instance_monthly_p09" model="mis.report.instance.period">
+            <field name="report_instance_id" ref="mis_pl_instance_monthly"/>
+            <field name="sequence">90</field>
+            <field name="name">M-3</field>
+            <field name="mode">relative</field>
+            <field name="type">m</field>
+            <field name="offset">-3</field>
+        </record>
+        <record id="mis_pl_instance_monthly_p10" model="mis.report.instance.period">
+            <field name="report_instance_id" ref="mis_pl_instance_monthly"/>
+            <field name="sequence">100</field>
+            <field name="name">M-2</field>
+            <field name="mode">relative</field>
+            <field name="type">m</field>
+            <field name="offset">-2</field>
+        </record>
+        <record id="mis_pl_instance_monthly_p11" model="mis.report.instance.period">
+            <field name="report_instance_id" ref="mis_pl_instance_monthly"/>
+            <field name="sequence">110</field>
+            <field name="name">M-1</field>
+            <field name="mode">relative</field>
+            <field name="type">m</field>
+            <field name="offset">-1</field>
+        </record>
+        <record id="mis_pl_instance_monthly_p12" model="mis.report.instance.period">
+            <field name="report_instance_id" ref="mis_pl_instance_monthly"/>
+            <field name="sequence">120</field>
+            <field name="name">M</field>
+            <field name="mode">relative</field>
+            <field name="type">m</field>
+            <field name="offset">0</field>
+        </record>
+        <record id="mis_pl_instance_monthly_ytd" model="mis.report.instance.period">
+            <field name="report_instance_id" ref="mis_pl_instance_monthly"/>
+            <field name="sequence">200</field>
+            <field name="name">من بداية السنة</field>
+            <field name="mode">relative</field>
+            <field name="type">m</field>
+            <field name="offset">0</field>
+            <field name="is_ytd" eval="True"/>
+        </record>
+    </data>
+</odoo>

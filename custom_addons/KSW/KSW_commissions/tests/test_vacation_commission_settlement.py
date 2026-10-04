@@ -118,6 +118,14 @@ class _SettlementCommon(TransactionCase):
             [('period', '=', period)], limit=1) or \
             self.env['ksw.pay.run'].sudo().create({'period': period})
 
+    def _run_line(self, period, employee, earnings, state):
+        run = self._run(period)
+        self.env['ksw.pay.run.line'].sudo().create({
+            'run_id': run.id, 'employee_id': employee.id,
+            'earnings': earnings})
+        run.write({'state': state})
+        return run
+
     def _payslip(self, leave, **extra):
         payslip = self.env['hr.payslip'].create(dict({
             'employee_id': self.employee.id,
@@ -172,14 +180,6 @@ class TestVacationCommissionSettlement(_SettlementCommon):
         with self.assertRaises(UserError):
             payslip.write({'state': 'done'})
 
-    def _run_line(self, period, employee, earnings, state):
-        run = self._run(period)
-        self.env['ksw.pay.run.line'].sudo().create({
-            'run_id': run.id, 'employee_id': employee.id,
-            'earnings': earnings})
-        run.write({'state': state})
-        return run
-
     def test_month_already_paid_by_its_run_is_left_alone(self):
         self._run_line(JUL, self.employee, 700.0, 'paid')
         entries = self._leave()._commission_entries_to_settle()
@@ -219,6 +219,26 @@ class TestVacationCommissionSettlement(_SettlementCommon):
         payslip.write({'state': 'cancel'})
         paid = {l.employee_id: l.earnings for l in run.line_ids}
         self.assertEqual(paid.get(self.employee), 700.0)
+
+    def test_eos_request_settles_and_stamps(self):
+        # KSWCO leave 5218: the EOS request listed no commissions at all.
+        if 'is_eos_leave' not in self.env['hr.leave.type']._fields:
+            self.skipTest('KSW_eos_leave not installed')
+        eos_type = self.env['hr.leave.type'].create({
+            'name': 'Settlement EOS',
+            'requires_allocation': False,
+            'leave_validation_type': 'no_validation',
+            'request_unit': 'day',
+            'is_eos_leave': True,
+        })
+        leave = self._leave(eos_type, date_to=date(2031, 8, 17))
+        self.assertTrue(leave.x_commission_entries_applies)
+        self.assertEqual(leave._commission_entries_to_settle(),
+                         self.jul | self.aug)
+        payslip = self._payslip(leave)
+        payslip.write({'state': 'done'})
+        self.assertEqual((self.jul | self.aug).x_vacation_payslip_id, payslip,
+                         'Stamped, so the monthly run leaves them out.')
 
     def test_other_leave_types_pull_nothing(self):
         leave = self._leave(self.plain_type)
@@ -444,3 +464,109 @@ class TestCommissionLatch(_SettlementCommon):
         self.assertTrue(leave.x_commission_live_changed,
                         'What the app now shows is flagged, not taken.')
         self.assertEqual(leave.x_commission_live_total, 1000.0)
+
+
+class TestCommissionNeverPaidTwice(_SettlementCommon):
+    """One commission, one payment — whichever of the run and the vacation
+    (annual, unpaid or EOS) gets there first, the other sees it at once.
+
+    The bank file is the commitment: once it carries his line the month is
+    the run's, even before anybody presses Mark Paid.
+    """
+
+    def _approved_run(self, period, earnings):
+        return self._run_line(period, self.employee, earnings, 'approved')
+
+    def _export(self, run):
+        line = run.line_ids.filtered(lambda l: l.employee_id == self.employee)
+        run._commit_to_employees(line)
+        line.exists().write({'x_bank_exported_date': '2031-08-20 08:00:00'})
+        return line
+
+    def test_an_exported_month_is_not_settled(self):
+        run = self._approved_run(JUL, 700.0)
+        leave = self._leave()
+        self.assertEqual(leave._commission_entries_to_settle(),
+                         self.jul | self.aug, 'Approved, not exported: ours.')
+        self._export(run)
+        self.assertEqual(leave._commission_entries_to_settle(),
+                         self.aug, 'Exported: the bank pays July.')
+
+    def test_export_strips_the_unconfirmed_vacation_payslip(self):
+        payslip = self._payslip(self._leave())
+        run = self._approved_run(JUL, 700.0)
+        self._export(run)
+        self.assertEqual(self._com_inputs(payslip),
+                         {'KSW_COM_%d' % self.aug.id: 300.0})
+        payslip.write({'state': 'done'})
+        self.assertFalse(self.jul.x_vacation_payslip_id)
+        self.assertEqual(self.aug.x_vacation_payslip_id, payslip)
+
+    def test_mark_paid_strips_the_unconfirmed_vacation_payslip(self):
+        payslip = self._payslip(self._leave())
+        run = self._approved_run(JUL, 700.0)
+        run.action_mark_paid()
+        self.assertEqual(self._com_inputs(payslip),
+                         {'KSW_COM_%d' % self.aug.id: 300.0})
+
+    def test_stamping_a_committed_month_is_refused_even_under_sudo(self):
+        payslip = self._payslip(self._leave())
+        run = self._approved_run(JUL, 700.0)
+        run.line_ids.write({'x_bank_exported_date': '2031-08-20 08:00:00'})
+        with self.assertRaises(UserError):
+            payslip.write({'state': 'done'})
+        with self.assertRaises(UserError):
+            self.jul.sudo().with_context(ksw_vacation_settling=True).write(
+                {'x_vacation_payslip_id': payslip.id})
+
+    def test_an_entry_paid_on_one_payslip_cannot_be_stamped_on_another(self):
+        first = self._payslip(self._leave())
+        first.write({'state': 'done'})
+        second = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'date_from': SEP, 'date_to': date(2031, 9, 30),
+            'version_id': self.version.id,
+            'struct_id': self.version.struct_id.id,
+        })
+        with self.assertRaises(UserError):
+            self.aug.sudo().with_context(ksw_vacation_settling=True).write(
+                {'x_vacation_payslip_id': second.id})
+
+    def test_vacation_first_then_export_never_carries_it(self):
+        run = self._approved_run(JUL, 700.0)
+        self._payslip(self._leave()).write({'state': 'done'})
+        self.assertNotIn(self.employee, run.line_ids.employee_id,
+                         'Taken out of the approved register at once.')
+
+    def test_confirming_refreshes_an_open_preview_at_once(self):
+        other = self._entry(AUG, 450.0, employee=self.colleague)
+        run = self._run(AUG)
+        run._build_register(preview=True)
+        before = {l.employee_id: l.earnings for l in run.line_ids}
+        self.assertEqual(before.get(other.employee_id), 450.0)
+        payslip = self._payslip(self._leave())
+        payslip.write({'state': 'done'})
+        after = {l.employee_id: l.earnings for l in run.line_ids}
+        self.assertNotIn(self.employee, after)
+        payslip.write({'state': 'cancel'})
+        self.assertFalse(self.aug.x_vacation_payslip_id)
+
+    def test_the_leave_lists_only_what_it_pays(self):
+        leave = self._leave()
+        leave._latch_commission_entries()
+        self.assertEqual(leave.x_commission_entries_total, 1000.0)
+        run = self._approved_run(JUL, 700.0)
+        self._export(run)
+        leave.invalidate_recordset()
+        self.assertEqual(leave.x_commission_entries_total, 300.0)
+        self.assertTrue(leave.x_commission_live_changed)
+
+    def test_a_month_in_the_bank_file_is_listed_not_paid(self):
+        # KSWCO leave 5218: his August is in the exported August file.
+        run = self._approved_run(JUL, 700.0)
+        leave = self._leave()
+        self._export(run)
+        leave.invalidate_recordset()
+        self.assertEqual(leave._commission_entries_in_bank_file(), self.jul)
+        self.assertEqual(leave.x_commission_bank_count, 1)
+        self.assertEqual(leave._commission_entries_to_settle(), self.aug)
