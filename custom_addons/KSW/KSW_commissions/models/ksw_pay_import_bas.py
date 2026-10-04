@@ -18,7 +18,7 @@ destination's *current* distance multiplier. That is a live value: changing
 a customer's ratio silently rewrote every month ever imported from it,
 including months already paid, because the old figure was nowhere on the
 document. From ``INVOICE_FACTOR_FROM_DEFAULT`` it reads «رد الفاتورة»
-(``STR10.TAXES_5``), the multiplier as it stood **when the invoice was
+(``vou10.PHRDIS``), the multiplier as it stood **when the invoice was
 issued**, so a ratio change takes effect from the day it is set.
 
 **Before that date the old basis stands.** A changeover is a date, not a
@@ -28,8 +28,9 @@ already reviewed — the exact retroactive move this change exists to stop.
 The choice is made **per invoice line, by document date**, so a month
 straddling the cutover splits at the right day.
 
-``TAXES_5`` is a legacy tax column BAS reuses for this; the name means
-nothing here. Confirmed against «الحركة التجارية للأصناف» on document
+It was first read from ``STR10.TAXES_5``, a legacy tax column BAS wrote
+the same value into until 6 Sep 2026; ``PHRDIS`` carries it on the header
+before and after that date. Confirmed against «الحركة التجارية للأصناف» on document
 172/9026417 (20 Aug 2026), where the line reads 2.5 while the customer master
 had since been moved to 2.0 — exactly the drift this change removes.
 
@@ -39,10 +40,9 @@ named, and a driver with some missing lines is imported with a warning
 saying how many. Only lines on the **new** side of the cutover can be
 "missing" — a pre-cutover line has nothing to miss.
 
-⚠️ **BAS stopped writing the column on 6 Sep 2026** — ~99% of lines carry it
-from January to August, then 0% from 6 September. Until that is fixed on the
-BAS side, any period on the new basis imports next to nothing, and every
-driver lands in the batch's Not Imported log saying so.
+⚠️ **BAS stopped writing ``TAXES_5`` on 6 Sep 2026**, which made every
+September load look unweighted (Sep 2026 Tabuk: 0 of 114 loads weighted
+against BAS's 211.25). ``PHRDIS`` was never interrupted.
 """
 import calendar
 import logging
@@ -57,11 +57,17 @@ from .ksw_vacation_hold import vacation_holds
 _logger = logging.getLogger(__name__)
 
 #: «رد الفاتورة» — the destination's distance multiplier as it stood
-#: when the invoice was issued. A legacy tax column BAS reuses for it,
-#: so the name means nothing; the values are the ordinary ladder
-#: (0.75, 1, 1.25, 1.5, 2, 2.14, 2.5, 3, 6). A constant, never user
-#: input — it is interpolated into SQL.
-INVOICE_FACTOR_COLUMN = 'TAXES_5'
+#: when the invoice was issued, on the invoice **header** (`vou10`,
+#: aliased ``h``). The values are the ordinary ladder (0.75, 1, 1.25,
+#: 1.5, 2, 2.14, 2.5, 3, 6). A constant, never user input — it is
+#: interpolated into SQL.
+#:
+#: It used to be read from the line column `STR10.TAXES_5`, which BAS
+#: stopped writing on 6 Sep 2026. `vou10.PHRDIS` is what the report
+#: «الحركة التجارية للأصناف» actually shows: identical to `TAXES_5` on
+#: every line where both are set (Jan–Aug 2026), set on every line
+#: `TAXES_5` is, and still written after 6 Sep.
+INVOICE_FACTOR_COLUMN = 'h.PHRDIS'
 
 #: The day the new basis takes effect. Loads invoiced **before** it keep
 #: «الرد المضاعف» (`cod10.FACTORE`, the customer's current multiplier);
@@ -803,7 +809,7 @@ class KswPayBatchBasImport(models.Model):
                 band_case = '0'
             factor_expr = (
                 "CASE WHEN " + is_cash + " THEN " + band_case + " "
-                "     WHEN h.FDATE >= %s THEN ISNULL(s." + col + ", 0) "
+                "     WHEN h.FDATE >= %s THEN ISNULL(" + col + ", 0) "
                 "     ELSE ISNULL(c.FACTORE, 0) END")
 
             # Both bases, chosen per line by the invoice's own date:
@@ -820,7 +826,7 @@ class KswPayBatchBasImport(models.Model):
                 # never be missing — its factor came from the band.
                 "       SUM(CASE WHEN NOT (" + is_cash + ") "
                 "                 AND h.FDATE >= %s "
-                "                 AND ISNULL(s." + col + ", 0) = 0 "
+                "                 AND ISNULL(" + col + ", 0) = 0 "
                 "                THEN 1 ELSE 0 END) AS missing, "
                 "       SUM(CASE WHEN h.FDATE >= %s THEN 1 ELSE 0 END) "
                 "           AS new_basis, "

@@ -704,8 +704,10 @@ Source of the KSW driver-commission report (BAS menu: بيانات وحركات 
   **⚠️ Superseded Sep 2026 — do not use for money.** It is a *live* value:
   changing a customer's ratio silently rewrites every month ever computed from
   it, including months already paid.
-- **رد الفاتورة = Σ `STR10.TAXES_5`** — the same multiplier **as it stood when
-  the invoice was issued**, stored on the line. A legacy tax column BAS reuses;
+- **رد الفاتورة = Σ `vou10.PHRDIS`** (header) — the same multiplier **as it stood when
+  the invoice was issued**. Until 6 Sep 2026 BAS also wrote it on the line as
+  `STR10.TAXES_5` (identical wherever both set, Jan–Aug 2026); from 6 Sep only
+  `PHRDIS` is written. Read `PHRDIS` (fixed 2026-10-04). A legacy tax column BAS reuses;
   the name means nothing here. Values are the ordinary ladder (0.75, 1, 1.25,
   1.5, 2, 2.14, 2.5, 3, 6). Shown in «الحركة التجارية للأصناف». **This is what
   `KSW_commissions` pays on** (`INVOICE_FACTOR_COLUMN` in
@@ -713,7 +715,7 @@ Source of the KSW driver-commission report (BAS menu: بيانات وحركات 
   - Confirmed on doc **172/9026417** (20 Aug 2026, شركة ناصر سعيد الهاجري):
     line reads **2.5**, `cod10.FACTORE` had since been moved to **2.0**.
   - In Aug 2026 the two disagreed on **13%** of item-11032 lines.
-  - **⚠️ BAS stopped writing it on 6 Sep 2026** — 0 of 8,652 lines from
+  - **⚠️ BAS stopped writing `TAXES_5` on 6 Sep 2026 (`PHRDIS` continues)** — 0 of 8,652 lines from
     6–22 Sep carry a value, after tapering 1–5 Sep. Until that is fixed on the
     BAS side, September onward has nothing to weight. The importer skips such a
     driver and names him rather than counting his loads as zero.

@@ -37,7 +37,7 @@ class BasTripsImportCommon(TransactionCase):
         # Never mapped at all.
         cls.driver_unmapped = cls._driver('Driver Unmapped', False)
 
-        # `mult` is now Σ «رد الفاتورة» (STR10.TAXES_5) — the weighting as
+        # `mult` is now Σ «رد الفاتورة» (vou10.PHRDIS) — the weighting as
         # invoiced — and `missing` counts loads BAS left unweighted.
         cls.bas_rows = {
             'wahab jan1387': {
@@ -489,7 +489,7 @@ class TestInvoiceFactorSource(BasTripsImportCommon):
     «الرد المضاعف» read `cod10.FACTORE`, the destination's *current*
     multiplier, so changing a customer's ratio silently rewrote every
     month ever imported from it — including months already paid. It now
-    reads «رد الفاتورة» (`STR10.TAXES_5`), frozen when the invoice was
+    reads «رد الفاتورة» (`vou10.PHRDIS`), frozen when the invoice was
     issued, so a ratio change applies from the day it is set.
 
     The queries themselves are stubbed here; what these pin down is the
@@ -567,8 +567,9 @@ class TestInvoiceFactorSource(BasTripsImportCommon):
         self.assertIn('h.FDATE >= %s', src,
                       'The split must be per line, on the invoice date.')
         self.assertEqual(
-            ksw_pay_import_bas.INVOICE_FACTOR_COLUMN, 'TAXES_5',
-            'Confirmed against «الحركة التجارية للأصناف», doc 172/9026417.')
+            ksw_pay_import_bas.INVOICE_FACTOR_COLUMN, 'h.PHRDIS',
+            'STR10.TAXES_5 went empty on 6 Sep 2026; PHRDIS is what '
+            '«الحركة التجارية للأصناف» shows (doc 172/9026417 reads 2.5).')
 
     def test_the_cutover_defaults_to_the_changeover_date(self):
         from datetime import date as _date
