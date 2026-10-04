@@ -18,8 +18,8 @@ class KswBasFixedAsset(models.Model):
     shows none); its income statement / "depreciation of assets" report
     computes it for the range asked.  Reverse-engineered against BAS's own
     figures (2026: groups 1902-1906 for Jan-Jun, 1903-1905 for Jul-Aug,
-    190201 for Jan-Sep, and twelve 1904 assets line by line, every one to the
-    halala), the rule for a range [a, b] is:
+    190201 for Jan-Sep, total group 33 for Apr-Jun, and twelve 1904 assets
+    line by line, every one to the halala), the rule for a range [a, b] is:
 
     * accumulated at ``a`` = opening accumulated + the charge for
       [1 Jan, a - 1] computed by this same rule
@@ -29,8 +29,8 @@ class KswBasFixedAsset(models.Model):
       i.e. stops at a book value of 1 SAR
     * + each addition dated inside the range, on its own:
       min(amount x rate / 365 x days from its date, amount - 1)
-    * a disposal before ``a``: 0; inside the range: exactly what BAS's
-      disposal entry records, DEP_AMOUNT - accumulated at ``a``
+    * a disposal before ``a``: 0; inside the range: |DEP_AMOUNT -
+      accumulated at a|, DEP_AMOUNT being what BAS's disposal entry records
 
     Because the result depends on where the range STARTS, it cannot be a
     sum of stored daily amounts: the income statement calls
@@ -73,7 +73,10 @@ class KswBasFixedAsset(models.Model):
         if disposal and disposal.date < a:
             return 0.0
         if disposal and disposal.date <= b:
-            return max(0.0, disposal.dep_amount - acc_a)
+            # BAS shows the SIZE of the gap between what its disposal entry
+            # records and the accumulated at ``a``: 1906010073, Q2 2026 =
+            # |43,834.91 - 47,872.93| = 4,038.02 on BAS's own statement.
+            return abs(disposal.dep_amount - acc_a)
         charge = max(0.0, min(cost * rate * ((b - a).days + 1), cost - 1.0 - acc_a))
         for e in adds_in:
             charge += max(0.0, min(e.amount * rate * ((b - e.date).days + 1), e.amount - 1.0))

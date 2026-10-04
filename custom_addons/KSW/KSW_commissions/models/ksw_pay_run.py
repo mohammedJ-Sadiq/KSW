@@ -25,6 +25,7 @@ from markupsafe import Markup
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 from odoo.tools import float_compare, float_round
+from odoo.tools.misc import format_datetime
 
 from .ksw_commission_lock import LOCKING_STATES
 from .ksw_vacation_hold import (
@@ -895,16 +896,15 @@ class KswPayRun(models.Model):
 
     @api.model
     def _months_paid_to(self, employee, periods):
-        """The months in ``periods`` whose run has paid ``employee`` — or
-        has committed to: THE predicate against paying a commission twice.
+        """The months in ``periods`` whose run has paid ``employee``: THE
+        predicate against paying a commission twice.
 
-        A month counts once its run is **Paid** with a line for him, or once
-        a **bank file carrying his line has been exported** — from that
-        moment the money is with the bank whether or not anybody presses
-        Mark Paid. An approved month not yet exported is still open: a
-        vacation settles his whole account on the day he leaves, takes
-        those entries, and ``_resync_vacation_line`` takes them out of the
-        register. A run with no line for him paid him nothing.
+        Only **Paid** counts — that is the accountant's statement that the
+        transfer went out. An approved month, exported or not, is still
+        open: a vacation settles his whole account on the day he leaves,
+        takes those entries, and ``_resync_vacation_line`` takes them out of
+        the register (the bank file must then be exported again). A run
+        with no line for him paid him nothing.
 
         Read by every route: which entries a vacation lists and pays
         (``hr.leave._commission_entries_outstanding``), the payslip confirm
@@ -913,28 +913,25 @@ class KswPayRun(models.Model):
         return set(self.env['ksw.pay.run.line'].sudo().search([
             ('employee_id', '=', employee.id),
             ('run_id.period', 'in', list(periods)),
-            '|', ('run_id.state', '=', 'paid'),
-            ('x_bank_exported_date', '!=', False),
+            ('run_id.state', '=', 'paid'),
         ]).mapped('run_id.period'))
 
-    def _commit_to_employees(self, lines=None):
-        """The run's money is now committed to ``lines`` (bank file
-        exported, or the run marked Paid): make sure no vacation pays it.
+    def _commit_to_employees(self):
+        """The run is being marked Paid: make sure no vacation pays it.
 
         First the register is brought in step with every vacation payslip
-        already confirmed — a settled entry must never reach the bank file.
+        already confirmed — a settled entry must never be paid here too.
         Then whatever an unconfirmed vacation / EOS payslip still carries
-        for these months is taken off it at once.
+        for this month is taken off it at once.
         """
         self.ensure_one()
         run = self.sudo()
         settled = run._all_entries().filtered('x_vacation_payslip_id')
         if settled and run.state == 'approved':
             run._resync_vacation_line(settled.employee_id)
-        lines = (lines or run.line_ids).exists()
-        if lines:
+        if run.line_ids:
             self.env['hr.payslip']._ksw_drop_committed_commissions(
-                run, lines.employee_id)
+                run, run.line_ids.employee_id)
 
     def _resync_vacation_line(self, employees):
         """Re-derive an approved month's register line for ``employees``
@@ -963,41 +960,8 @@ class KswPayRun(models.Model):
                 if float_compare(line.earnings if line else 0.0, earnings,
                                  precision_digits=2) == 0:
                     continue
-                if line and line.x_bank_exported_date and \
-                        earnings > line.earnings:
-                    # Entries given back (a vacation payslip cancelled)
-                    # after the file went out: the file does not carry
-                    # them, so the line keeps what the bank pays and the
-                    # difference is said out loud rather than invented.
-                    run.message_post(
-                        body=Markup(
-                            '<strong>%(title)s</strong><br/>'
-                            '<b>%(l_emp)s</b> %(emp)s<br/>'
-                            '<b>%(l_amt)s</b> %(amount).2f'
-                        ) % {
-                            'title': _('Commission entries released after '
-                                       'the bank file was exported — not '
-                                       'in the file, still owed'),
-                            'l_emp': _('Employee:'),
-                            'emp': employee.sudo().display_name,
-                            'l_amt': _('Amount:'),
-                            'amount': earnings - line.earnings,
-                        },
-                        subtype_xmlid='mail.mt_note',
-                    )
-                    continue
-                if line and line.x_bank_exported_date:
-                    # The bank already has this figure, and part of it was
-                    # paid on a vacation since: lowering the line here would
-                    # not change what the bank pays — refuse.
-                    raise UserError(_(
-                        "The commission bank file for %(run)s already pays "
-                        "%(emp)s %(amount).2f. That month can no longer be "
-                        "settled on a vacation payslip.",
-                        run=run.display_name,
-                        emp=employee.sudo().display_name,
-                        amount=line.earnings))
                 before = line.earnings if line else 0.0
+                exported = line.x_bank_exported_date if line else False
                 released = DedLine
                 if line:
                     payload = json.loads(line.x_unwind_data or '{}')
@@ -1043,6 +1007,19 @@ class KswPayRun(models.Model):
                     },
                     subtype_xmlid='mail.mt_note',
                 )
+                if exported:
+                    # The file already made is now wrong for him: say so,
+                    # so it is not the one that goes to the bank.
+                    run.message_post(
+                        body=Markup('<strong>⚠ %(msg)s</strong>') % {
+                            'msg': _('%(emp)s changed after the bank file '
+                                     'was exported on %(when)s. Export the '
+                                     'bank file again before sending it.',
+                                     emp=employee.sudo().display_name,
+                                     when=format_datetime(self.env, exported)),
+                        },
+                        subtype_xmlid='mail.mt_note',
+                    )
         return True
 
     @api.model
@@ -1241,9 +1218,8 @@ class KswPayRunLine(models.Model):
         readonly=False,
     )
     x_unwind_data = fields.Text(readonly=True, copy=False)
-    # Set when a bank file carrying this line is produced. From then on the
-    # money is committed to the bank whatever the run's state says, so no
-    # vacation settlement may take the month (``_months_paid_to``).
+    # Audit only: when a bank file carrying this line was last produced.
+    # NOT a payment — only the run's Paid state is (``_months_paid_to``).
     x_bank_exported_date = fields.Datetime(
         string='Bank File Exported On', readonly=True, copy=False)
     x_bank_exported_by = fields.Many2one(

@@ -110,21 +110,6 @@
                            readonly="1"/>
                 </div>
 
-                <!-- In a monthly bank file already: listed so nobody
-                     wonders where it went, never paid here. -->
-                <field name="x_commission_bank_count" invisible="1"/>
-                <div class="alert alert-info" role="alert"
-                     name="ksw_commission_in_bank_file"
-                     invisible="not x_commission_entries_applies or not x_commission_bank_count">
-                    <strong>Not included: paid by the monthly commission run.</strong>
-                    These entries are in a monthly bank file that has already
-                    been exported (or the month is marked Paid), so the bank
-                    pays them there. Paying them on this payslip as well would
-                    pay them twice.
-                    <field name="x_commission_bank_html" nolabel="1"
-                           readonly="1"/>
-                </div>
-
                 <div class="alert alert-warning" role="alert"
                      invisible="not x_commission_manual_duplicate">
                     <strong>Possible double payment.</strong>

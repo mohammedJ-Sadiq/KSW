@@ -122,18 +122,18 @@ class KswCommissionBankExportWizard(models.TransientModel):
                 ).replace(' ', '_').replace('/', '-')
 
     def _commit_lines(self, groups):
-        """A bank file is a payment instruction: once it carries a line,
-        that month is committed to the employee (``_months_paid_to``) and
-        no vacation may settle it. Called BEFORE the file is built, so the
-        register is first brought in step with every confirmed vacation
-        payslip and the file can never carry a settled entry."""
-        run = self.run_id
+        """Bring the register in step with every confirmed vacation
+        payslip before the file is built, so a file never carries an entry
+        a vacation already paid, and note when the line was exported. An
+        export is not a payment: only Mark Paid commits the month."""
+        run = self.run_id.sudo()
+        settled = run._all_entries().filtered('x_vacation_payslip_id')
+        if settled and run.state == 'approved':
+            run._resync_vacation_line(settled.employee_id)
         lines = self.env['ksw.pay.run.line'].sudo()
         for bank_lines in groups.values():
             lines |= bank_lines
-        run._commit_to_employees(lines)
-        lines = lines.exists()
-        lines.filtered(lambda l: not l.x_bank_exported_date).write({
+        lines.exists().write({
             'x_bank_exported_date': fields.Datetime.now(),
             'x_bank_exported_by': self.env.uid,
         })

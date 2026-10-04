@@ -69,11 +69,6 @@ class HrLeave(models.Model):
     x_commission_pending_html = fields.Html(
         string='Commission Entries Awaiting Approval', sanitize=False,
         compute='_compute_commission_entries', compute_sudo=True)
-    x_commission_bank_count = fields.Integer(
-        compute='_compute_commission_entries', compute_sudo=True)
-    x_commission_bank_html = fields.Html(
-        string='Commission Entries Paid by the Monthly Run', sanitize=False,
-        compute='_compute_commission_entries', compute_sudo=True)
     x_commission_live_changed = fields.Boolean(
         compute='_compute_commission_entries', compute_sudo=True,
         help='The Commissions app no longer matches what was latched on this '
@@ -177,8 +172,8 @@ class HrLeave(models.Model):
 
     def _commission_entries_paid_elsewhere(self, entries):
         """The part of ``entries`` paid by something other than this
-        request: another vacation payslip, or a monthly run that has paid
-        him that month or exported its bank file (``_months_paid_to``)."""
+        request: another vacation payslip, or a monthly run marked Paid
+        with a line for him (``_months_paid_to``)."""
         self.ensure_one()
         leave = self._origin or self
         entries = entries.sudo().exists()
@@ -191,32 +186,6 @@ class HrLeave(models.Model):
             leave.employee_id, set(entries.mapped('period')))
         return elsewhere | entries.filtered(
             lambda e: e.period in months and not e.x_vacation_payslip_id)
-
-    def _commission_entries_in_bank_file(self):
-        """Approved entries up to the departure month that a monthly run
-        is paying him: its bank file exported, not yet marked Paid. The
-        in-flight months — the ones an approver expects on the vacation.
-        A month marked Paid is history and not listed."""
-        self.ensure_one()
-        Entry = self.env['ksw.pay.entry'].sudo()
-        leave = self._origin or self
-        if not leave.employee_id or not leave.request_date_from:
-            return Entry
-        lines = self.env['ksw.pay.run.line'].sudo().search([
-            ('employee_id', '=', leave.employee_id.id),
-            ('run_id.state', '=', 'approved'),
-            ('x_bank_exported_date', '!=', False),
-            ('run_id.period', '<=', leave.request_date_from.replace(day=1)),
-        ])
-        if not lines:
-            return Entry
-        return Entry.search([
-            ('employee_id', '=', leave.employee_id.id),
-            ('period', 'in', lines.mapped('run_id.period')),
-            ('x_vacation_payslip_id', '=', False),
-            ('state', '=', 'approved'),
-            ('amount', '!=', 0.0),
-        ], order='period, component_id, date, id')
 
     def _commission_entries_settled(self):
         """The entries a confirmed payslip of this request already paid."""
@@ -308,8 +277,8 @@ class HrLeave(models.Model):
         if leave.x_commission_latched_date:
             lines = leave.sudo().x_commission_snapshot_ids
             # What was agreed stays on the request — except a row something
-            # else has paid since (its run paid or exported the month, or
-            # another payslip paid it): that one drops off at once, instead
+            # else has paid since (its run was marked Paid, or another
+            # payslip paid it): that one drops off at once, instead
             # of reading as part of this settlement. A row whose figure
             # merely changed stays; the Refresh banner deals with it.
             paid_elsewhere = leave._commission_entries_paid_elsewhere(
@@ -360,13 +329,6 @@ class HrLeave(models.Model):
                 r['amount'] for r in pending)
             leave.x_commission_pending_html = (
                 self._render_commission_rows(pending) if pending else False)
-            Snapshot = self.env['ksw.leave.commission.entry']
-            in_bank = [Snapshot._row_from_entry(e)
-                       for e in leave._commission_entries_in_bank_file()
-                       ] if applies else []
-            leave.x_commission_bank_count = len(in_bank)
-            leave.x_commission_bank_html = (
-                self._render_commission_rows(in_bank) if in_bank else False)
 
             # Has the Commissions app moved since the latch? Compared on what
             # is still to be paid: the live set excludes what this request's

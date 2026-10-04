@@ -205,8 +205,8 @@ class HrPayslip(models.Model):
 
     @api.model
     def _ksw_drop_committed_commissions(self, run, employees):
-        """``run`` has just committed its month to ``employees`` (bank file
-        exported, or marked Paid). Any vacation / EOS payslip not yet
+        """``run`` is being marked Paid for ``employees``. Any vacation /
+        EOS payslip not yet
         confirmed that still carries one of those entries loses it now, so
         it cannot be confirmed into a second payment of the same month.
         Previews included: a provisional figure should not show money the

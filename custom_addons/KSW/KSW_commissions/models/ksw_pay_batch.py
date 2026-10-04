@@ -1426,8 +1426,8 @@ class KswPayEntry(models.Model):
     def _check_not_paid_twice(self, payslip_id):
         """The last line against paying one commission twice: an entry may
         be stamped as paid on a vacation payslip only if nothing else has
-        paid it — no other payslip, and no monthly run that has paid him
-        that month or exported its bank file (``_months_paid_to``).
+        paid it — no other payslip, and no monthly run marked Paid with a
+        line for him that month (``_months_paid_to``).
 
         Deliberately NOT exempting env.su or ``ksw_vacation_settling``: the
         settlement is the very caller this exists to stop when it is stale.

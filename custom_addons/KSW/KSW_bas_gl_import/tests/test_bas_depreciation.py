@@ -40,3 +40,10 @@ class TestBasDepreciation(TransactionCase):
         asset = self._asset(109176.0, 43834.91, [
             {'date': date(2026, 4, 30), 'kind': 'dispose', 'amount': 109176.0, 'dep_amount': 43834.91}])
         self.assertEqual(asset._bas_charge(date(2026, 1, 1), date(2026, 6, 30)), 0.0)
+
+    def test_disposal_mid_year_range_is_absolute(self):
+        """1906010073 for Q2 2026: BAS's statement charges 4,038.02 =
+        |43,834.91 recorded at disposal - 47,872.93 accumulated at 1 Apr|."""
+        asset = self._asset(109176.0, 43834.91, [
+            {'date': date(2026, 4, 30), 'kind': 'dispose', 'amount': 109176.0, 'dep_amount': 43834.91}])
+        self.assertAlmostEqual(asset._bas_charge(date(2026, 4, 1), date(2026, 6, 30)), 4038.02, delta=0.01)
