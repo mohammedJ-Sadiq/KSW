@@ -122,6 +122,8 @@ This is BAS's unified chart of accounts. It serves triple duty:
 | `DSTOP` | bit | Account is blocked/stopped |
 | `DACC_TYPE2` | nvarchar(2) | Secondary account type |
 | `DCREDIT_LIMT` | float | Credit limit |
+| `INVDAYS` | float | **Payment term in days** — copied onto every customer document as `VOU10.DUTY_DAY` (verified 2026-10-04: 99.3% of 86,905 credit docs since Jan 2026). Mostly 30/60/90; **1500/2000/2500** on ~300 accounts (H1, Jubail camp, Isuzu ledgers) and BAS really applies them. Synced as `ksw.bas.customer.invoice_term_days` → contact's Customer Payment Terms |
+| `LIMT_DAYS` | float | Day limit, **not** the invoice term (equals DUTY_DAY on only 4.6%); probably the credit-stop age. Synced as `credit_term_days`, used by KSW_commissions' collection target |
 | `BADGE_NO` | nvarchar(20) | **Employee badge number — EMPTY in this BAS instance** |
 | `TCODE` | nvarchar(35) | Linked account code |
 | `EMAIL` | nvarchar(100) | Email address |
@@ -745,10 +747,30 @@ Source of the KSW driver-commission report (BAS menu: بيانات وحركات 
   are configurable via `ir.config_parameter` `ksw_commissions.orood_item_codes`
   (default `11032`) and `ksw_commissions.orood_ftypes` (default `600`).
 
-Cost-center master: **`cost_c`** (`code` category, `mcost`, `name`) — 617 rows
-(trailers/tankers «تيدر/تريلا», customer cars). Equipment cost centers are the
-`T###` codes carried on the movement rows, not a separate table.
+Cost-center master: **`WREF10`** (verified 2026-10-04), NOT `cost_c`.
+`WREF10` = `CODE` (unique), `MCOST` (parent CODE; blank on the two roots
+`1` الكوثر / `2` الحياة), `NAME`, `DLEVEL` 1-4, plus running balances — 1,120
+rows, 52 group nodes. The `COST_CENTER*` columns on `vou10` hold the cost
+centre's **NAME** as free text, not its code; `WREF10` covers 100% of
+`COST_CENTER` lines and 99.9% of `COST_CENTER2`. `COST_CENTER3` is 82% —
+the rest are warehouse/site names («مستودع القدية الرياض», «kawthar jubail
+factory») that are not in any cost-centre list.
+`cost_c` (`code` = level, `mcost`, `name`, 617 rows) is a stale partial copy:
+only 83 of the ~900 names vou10 carries are in it.
+Other branches keep their own trees (`WREF20/25/35/50`, codes like `0001`
+that collide with each other). Imported into Odoo as analytic accounts by
+`KSW_bas_gl_import.action_import_cost_centres` (branch 10 only).
 
 ---
 
 *This reference was built by querying `bas9ss` directly via pymssql. Last updated: 2026-07-23.*
+
+### Revenue account of a credit delivery note (verified 2026-10-04)
+
+The customer line of a `VOU10` FTYPE 600 document has an **empty** `TCODE`; the
+revenue sits on the same document's credit line (`TCODE LIKE '4%'`). It is
+decided by **branch (`CODE2`) × item (`STR10.ICODE`)**, not by item alone:
+item 11032 posts to 11 accounts, one per branch ("مبيعات فرع X (تريلات)"), while
+`(CODE2, ICODE)` lands on one account for 99.85% of lines (64 pairs, 10 with a
+stray minority). Ex-factory items (11001) go to the branch's "ارض المصنع" account,
+trailer items to its "(تريلات)" one.

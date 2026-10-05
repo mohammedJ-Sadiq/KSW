@@ -1,6 +1,6 @@
 {
     'name': 'KSW Water Delivery Notes',
-    'version': '19.0.1.7.1',
+    'version': '19.0.1.9.0',
     'summary': 'Issue the water delivery note at the client, online or off',
     'description': """
 Water Delivery Notes
@@ -42,6 +42,7 @@ accounting the finished list.
         'data/ksw_water_app_templates.xml',
         'report/report_water_delivery_note.xml',
         'views/ksw_water_rate_views.xml',
+        'views/ksw_water_revenue_account_views.xml',
         'views/ksw_water_client_branch_views.xml',
         'views/hr_employee_views.xml',
         # Before stock_picking_views.xml: the notes list and kanban carry a
@@ -50,6 +51,9 @@ accounting the finished list.
         # never showed it -- the id was already in the database -- so the
         # first clean install anywhere (KSWCO, 2026-09-29) was what failed.
         'views/ksw_water_delivery_wizard_views.xml',
+        # Before stock_picking_views.xml for the same reason: the notes list
+        # carries "Invoice Selected Notes" -> action_water_invoice_wizard.
+        'views/ksw_water_invoice_wizard_views.xml',
         'views/stock_picking_views.xml',
         'views/ksw_fleet_vehicle_views.xml',
         'views/ksw_water_capture_views.xml',

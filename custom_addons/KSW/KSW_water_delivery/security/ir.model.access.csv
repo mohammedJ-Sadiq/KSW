@@ -13,3 +13,6 @@ access_water_client_branch_billing,ksw.water.client.branch.billing,model_ksw_wat
 access_water_capture_driver,ksw.water.capture.driver,model_ksw_water_capture,group_water_driver,1,0,0,0
 access_water_capture_dispatcher,ksw.water.capture.dispatcher,model_ksw_water_capture,group_water_dispatcher,1,1,0,0
 access_water_capture_billing,ksw.water.capture.billing,model_ksw_water_capture,group_water_billing,1,0,0,0
+access_water_invoice_wizard_billing,ksw.water.invoice.wizard.billing,model_ksw_water_invoice_wizard,group_water_billing,1,1,1,1
+access_water_invoice_wizard_line_billing,ksw.water.invoice.wizard.line.billing,model_ksw_water_invoice_wizard_line,group_water_billing,1,1,1,1
+access_water_revenue_account_billing,ksw.water.revenue.account.billing,model_ksw_water_revenue_account,group_water_billing,1,1,1,1

@@ -1,4 +1,5 @@
 import logging
+from collections import defaultdict
 from odoo import models, fields, api
 
 _logger = logging.getLogger(__name__)
@@ -51,6 +52,17 @@ class BASCustomer(models.Model):
              'overdue for the BAS-derived collection target. Falls back '
              'to 30 days when unset/zero.',
     )
+    # Not `credit_term_days` above, which reads LIMT_DAYS. Verified live
+    # 2026-10-04: on 86,905 credit documents debiting a 1203* customer since
+    # Jan 2026 (VOU10 FTYPE 600/002), the document's own DUTY_DAY equals this
+    # column on 99.3% of them and equals LIMT_DAYS on 4.6%. This is the term
+    # BAS actually puts on the customer's paper.
+    invoice_term_days = fields.Integer(
+        'Payment Term (Days)', readonly=True,
+        help='COD10.INVDAYS: the days BAS gives this customer to pay an '
+             'invoice (it is copied onto every document as DUTY_DAY). '
+             'Applied to the linked contact\'s Customer Payment Terms.',
+    )
     last_synced = fields.Datetime('Last Synced', readonly=True)
     partner_id = fields.Many2one(
         'res.partner', string='Odoo Contact', ondelete='set null',
@@ -69,6 +81,7 @@ class BASCustomer(models.Model):
     _COMPARE_FIELDS = (
         'name_ar', 'name_en', 'is_stopped', 'seller_code', 'seller_name',
         'collector_code', 'collector_name', 'credit_term_days',
+        'invoice_term_days',
     )
 
     @api.model
@@ -83,7 +96,8 @@ class BASCustomer(models.Model):
         try:
             cursor.execute("""
                 SELECT DCODE1, DNAME, DNAME2, ISNULL(DSTOP, 0) AS DSTOP,
-                       SELLER, SELLER2, ISNULL(LIMT_DAYS, 0) AS LIMT_DAYS
+                       SELLER, SELLER2, ISNULL(LIMT_DAYS, 0) AS LIMT_DAYS,
+                       ISNULL(INVDAYS, 0) AS INVDAYS
                 FROM COD10
                 WHERE DACC_TYPE = '01' AND DLEVEL = 5
                   AND DCODE1 LIKE '1203%'
@@ -144,6 +158,7 @@ class BASCustomer(models.Model):
                 'collector_code': collector_code,
                 'collector_name': seller_names.get(collector_code, ''),
                 'credit_term_days': int(row['LIMT_DAYS'] or 0),
+                'invoice_term_days': int(row['INVDAYS'] or 0),
                 'last_synced': now,
             })
 
@@ -174,6 +189,8 @@ class BASCustomer(models.Model):
             stale = self.search([('bas_code', 'not in', synced_codes)])
             if stale:
                 stale.unlink()
+
+        self._apply_payment_terms()
 
         _logger.info(
             'KSW BAS: customers %s — %d read, %d created, %d updated',
@@ -260,6 +277,8 @@ class BASCustomer(models.Model):
                 })
                 created += 1
 
+        self._apply_payment_terms()
+
         _logger.info(
             'KSW BAS: customer match/create — %d matched, %d created',
             matched, created)
@@ -273,3 +292,74 @@ class BASCustomer(models.Model):
                 'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'},
             },
         }
+
+    # ------------------------------------------------------------------
+    # Payment terms: BAS's term onto the Odoo contact
+    # ------------------------------------------------------------------
+    # BAS owns the term while it is the system that invoices, so a change
+    # there follows here on the next sync. A term somebody sets by hand in
+    # Odoo is theirs and is never overwritten: `x_payment_term_from_bas`
+    # records whether the term on the contact is the one we put there.
+    #
+    # `account` is not a dependency of this module (KSW gotcha #43), so the
+    # whole pass is guarded on the field being present.
+    @api.model
+    def _apply_payment_terms(self):
+        Partner = self.env['res.partner']
+        if 'property_payment_term_id' not in Partner._fields:
+            return 0
+        # Every contact carrying the account gets the term, not just the
+        # linked one: one BAS account can have more than one Odoo contact
+        # (a name match linked one, an import created another), and the
+        # invoice is raised on whichever the delivery notes were issued to.
+        by_code = defaultdict(lambda: Partner)
+        for code_field in ('x_client_account_number', 'x_bas_code'):
+            # x_bas_code is KSW_bas_gl_import's (dev-only) link, which is how
+            # the contacts that import created know their BAS account.
+            if code_field not in Partner._fields:
+                continue
+            for partner in Partner.search([(code_field, '!=', False)]):
+                by_code[(partner[code_field] or '').strip()] |= partner
+
+        terms = {}
+        changed = 0
+        for rec in self.search([]):
+            for partner in rec.partner_id | by_code.get(rec.bas_code, Partner):
+                current = partner.property_payment_term_id
+                if current and not partner.x_payment_term_from_bas:
+                    continue
+                days = rec.invoice_term_days
+                if days not in terms:
+                    terms[days] = self._payment_term_for_days(days)
+                if current != terms[days] or not partner.x_payment_term_from_bas:
+                    partner.with_context(ksw_bas_payment_term=True).write({
+                        'property_payment_term_id': terms[days].id,
+                        'x_payment_term_from_bas': True,
+                    })
+                    changed += 1
+        if changed:
+            _logger.info('KSW BAS: payment terms set on %d contact(s)', changed)
+        return changed
+
+    @api.model
+    def _payment_term_for_days(self, days):
+        """A plain "N days after the invoice date, 100%" term: an existing one
+        when there is one (Odoo ships 15/30/45, the localisation 60/90/120),
+        so contacts share the term accounting already knows by name."""
+        Term = self.env['account.payment.term']
+        company = self.env.company
+        for term in Term.search([('early_discount', '=', False),
+                                 ('company_id', 'in', [False, company.id])],
+                                order='sequence, id'):
+            lines = term.line_ids
+            if (len(lines) == 1 and lines.value == 'percent'
+                    and lines.value_amount == 100 and lines.delay_type == 'days_after'
+                    and lines.nb_days == days):
+                return term
+        return Term.create({
+            'name': f'{days} Days' if days else 'Immediate Payment',
+            'line_ids': [(0, 0, {
+                'value': 'percent', 'value_amount': 100,
+                'delay_type': 'days_after', 'nb_days': days,
+            })],
+        })

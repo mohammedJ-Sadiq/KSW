@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_water_invoice_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.water.invoice.wizard.form</field>
+        <field name="model">ksw.water.invoice.wizard</field>
+        <field name="arch" type="xml">
+            <!-- Month end on one screen: pick the client and the period, check
+                 the totals by product, create the invoice. -->
+            <form string="Invoice Delivery Notes">
+                <!-- Carried so the computes can see them (KSW gotcha #40). -->
+                <field name="allowed_partner_ids" invisible="1"/>
+                <field name="company_currency_id" invisible="1"/>
+                <group>
+                    <group>
+                        <field name="partner_id"
+                               options="{'no_create': True, 'no_open': True}"/>
+                        <label for="date_from" string="Delivered"/>
+                        <div class="o_row">
+                            <field name="date_from"/>
+                            <span>to</span>
+                            <field name="date_to"/>
+                        </div>
+                    </group>
+                    <group>
+                        <field name="invoice_date"/>
+                        <field name="summary_only"/>
+                    </group>
+                </group>
+
+                <div class="alert alert-warning" role="alert" invisible="not excluded_summary">
+                    <strong>Not on this invoice</strong>
+                    <field name="excluded_summary" nolabel="1" readonly="1"/>
+                </div>
+
+                <notebook>
+                    <page string="By Product" name="by_product">
+                        <field name="line_ids" readonly="1" nolabel="1">
+                            <list>
+                                <field name="product_id"/>
+                                <field name="note_count" sum="Notes"/>
+                                <field name="quantity"/>
+                                <field name="uom_id"/>
+                                <field name="price_unit"/>
+                                <field name="currency_id" column_invisible="1"/>
+                                <field name="amount_untaxed" sum="Before Tax"/>
+                                <field name="amount_total" sum="After Tax"/>
+                            </list>
+                        </field>
+                        <group class="oe_subtotal_footer">
+                            <field name="note_count" string="Delivery Notes"/>
+                            <field name="amount_untaxed" string="Before Tax"/>
+                            <field name="amount_total" string="After Tax"/>
+                        </group>
+                    </page>
+                    <page string="Delivery Notes" name="notes">
+                        <!-- Remove a disputed note here; it stays waiting and
+                             can go on a later invoice. -->
+                        <field name="picking_ids" nolabel="1"
+                               options="{'no_create': True}">
+                            <list create="0">
+                                <field name="name"/>
+                                <field name="x_delivery_date"/>
+                                <field name="x_driver_id"/>
+                                <field name="x_vehicle_id" optional="hide"/>
+                                <field name="x_load_qty" sum="Quantity"/>
+                                <field name="x_currency_id" column_invisible="1"/>
+                                <field name="x_amount_total" sum="After Tax"/>
+                            </list>
+                        </field>
+                    </page>
+                </notebook>
+                <footer>
+                    <button name="action_create_invoice" type="object"
+                            string="Create Invoice" class="btn-primary"
+                            invisible="not note_count"/>
+                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_water_invoice_wizard" model="ir.actions.act_window">
+        <field name="name">Invoice Delivery Notes</field>
+        <field name="res_model">ksw.water.invoice.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

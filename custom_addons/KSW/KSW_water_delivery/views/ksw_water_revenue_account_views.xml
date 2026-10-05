@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_water_revenue_account_list" model="ir.ui.view">
+        <field name="name">ksw.water.revenue.account.list</field>
+        <field name="model">ksw.water.revenue.account</field>
+        <field name="arch" type="xml">
+            <list string="Revenue Accounts" editable="bottom">
+                <header>
+                    <button name="action_import_from_bas" type="object"
+                            string="Import from BAS9" display="always"
+                            class="btn-secondary"
+                            groups="KSW_water_delivery.group_water_billing"/>
+                </header>
+                <field name="branch_code"/>
+                <field name="product_id"/>
+                <field name="account_id"/>
+                <field name="source" widget="badge"
+                       decoration-info="source == 'bas'"
+                       decoration-success="source == 'manual'"/>
+                <field name="x_bas_account_code" optional="show"/>
+                <field name="x_bas_share" optional="show"/>
+                <field name="company_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_water_revenue_account_search" model="ir.ui.view">
+        <field name="name">ksw.water.revenue.account.search</field>
+        <field name="model">ksw.water.revenue.account</field>
+        <field name="arch" type="xml">
+            <search string="Revenue Accounts">
+                <field name="branch_code"/>
+                <field name="product_id"/>
+                <field name="account_id"/>
+                <filter name="no_account" string="BAS Account Missing Here"
+                        domain="[('account_id', '=', False)]"/>
+                <group>
+                    <filter name="group_branch" string="Branch" context="{'group_by': 'branch_code'}"/>
+                    <filter name="group_account" string="Account" context="{'group_by': 'account_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_water_revenue_accounts" model="ir.actions.act_window">
+        <field name="name">Revenue Accounts</field>
+        <field name="res_model">ksw.water.revenue.account</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_water_revenue_account_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No revenue accounts yet</p>
+            <p>Which account a delivery note's sale posts to, per branch and
+               product, the way BAS posts it. Use <b>Import from BAS9</b>.</p>
+        </field>
+    </record>
+
+</odoo>

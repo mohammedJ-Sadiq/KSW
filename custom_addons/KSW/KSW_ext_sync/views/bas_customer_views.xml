@@ -17,6 +17,7 @@
                 <field name="name_ar"/>
                 <field name="seller_name" string="Sales Rep (BAS)"/>
                 <field name="collector_name" string="Collection Rep (BAS)"/>
+                <field name="invoice_term_days"/>
                 <field name="partner_id"/>
                 <field name="partner_created" string="New Contact"/>
                 <field name="is_stopped"/>

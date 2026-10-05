@@ -5,3 +5,5 @@ from . import ksw_water_capture
 from . import ksw_fleet_vehicle
 from . import hr_employee
 from . import res_partner
+from . import stock_picking_invoice
+from . import ksw_water_revenue_account

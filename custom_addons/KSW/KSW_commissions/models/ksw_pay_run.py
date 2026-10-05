@@ -760,6 +760,8 @@ class KswPayRun(models.Model):
             raise UserError(_(
                 "Only the company's General Manager can reopen an "
                 "approved month."))
+        keep_states = (not self.env.su
+                       and self.env.user.has_group('base.group_system'))
         for rec in self:
             if rec.state == 'paid':
                 raise UserError(_(
@@ -771,7 +773,27 @@ class KswPayRun(models.Model):
                     "%(name)s is not approved, so there is nothing to "
                     "reopen.", name=rec.display_name))
             # Give the installments back before the lock lifts.
-            rec.line_ids.sudo()._unwind_loan_offset()
+            rec.sudo().line_ids._unwind_loan_offset()
+            # The Settings administrator only unlocks the month (user's rule,
+            # Oct 2026): every department and batch keeps the state it had,
+            # so a single one can be corrected without re-approving the rest.
+            # The month re-locks through _finalise_if_complete once the
+            # corrected department is approved again.
+            if keep_states:
+                rec.write({'state': 'open'})
+                rec.sudo().message_post(
+                    body=Markup(
+                        '<strong>🔓 Reopened</strong><br/><b>By:</b> %s<br/>'
+                        '<i>The month is unlocked only: every department '
+                        'and batch keeps its approval. The settled loan '
+                        'installments were returned to pending and the '
+                        'register is a preview again.</i>'
+                    ) % self.env.user.name,
+                    subtype_xmlid='mail.mt_note',
+                )
+                rec._sync_state()
+                rec._refresh_register()
+                continue
             # Everything the approval moved forward moves back one step: the
             # departments are still handed over, they are simply no longer
             # approved. Leaving the batches on 'approved' would keep them

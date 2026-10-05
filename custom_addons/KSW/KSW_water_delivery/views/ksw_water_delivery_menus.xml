@@ -40,6 +40,14 @@
               sequence="40"
               groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing"/>
 
+    <!-- Month end. -->
+    <menuitem id="menu_water_delivery_invoice"
+              name="Invoice Delivery Notes"
+              parent="menu_water_delivery_root"
+              action="action_water_invoice_wizard"
+              sequence="50"
+              groups="KSW_water_delivery.group_water_billing"/>
+
     <menuitem id="menu_water_delivery_config"
               name="Configuration"
               parent="menu_water_delivery_root"
@@ -51,6 +59,13 @@
               parent="menu_water_delivery_config"
               action="action_water_rates"
               sequence="10"
+              groups="KSW_water_delivery.group_water_billing"/>
+
+    <menuitem id="menu_water_delivery_revenue_accounts"
+              name="Revenue Accounts"
+              parent="menu_water_delivery_config"
+              action="action_water_revenue_accounts"
+              sequence="15"
               groups="KSW_water_delivery.group_water_billing"/>
 
     <menuitem id="menu_water_delivery_branch_clients"

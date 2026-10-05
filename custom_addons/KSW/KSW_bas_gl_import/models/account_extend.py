@@ -19,6 +19,33 @@ class AccountAccount(models.Model):
     x_bas_name_en = fields.Char(string='BAS Name (English)')
 
 
+class AccountAnalyticPlan(models.Model):
+    _inherit = 'account.analytic.plan'
+
+    # Set on the root "Cost Centres" plan ('WREF10') and on each sub-plan made
+    # from a BAS group node (WREF10.CODE).  Empty on plans made in Odoo.
+    x_bas_code = fields.Char(string='BAS Code', index=True, copy=False)
+
+    _x_bas_code_uniq = models.Constraint(
+        'UNIQUE (x_bas_code)', 'A plan for this BAS cost centre already exists.')
+
+
+class AccountAnalyticAccount(models.Model):
+    _inherit = 'account.analytic.account'
+
+    # Provenance only.  BAS seeds the cost centres once; after that they are
+    # maintained in Odoo, so an account created here simply has none.
+    x_bas_code = fields.Char(
+        string='BAS Cost Centre', index=True, copy=False, readonly=True,
+        help="WREF10.CODE of the BAS cost centre this account was imported from.")
+
+    # Per root plan: a driver is an account in "Cost Centres" AND in
+    # "Employee Cost Centre", both carrying the same BAS code.
+    _x_bas_code_uniq = models.Constraint(
+        'UNIQUE (x_bas_code, root_plan_id)',
+        'An analytic account for this BAS cost centre already exists in this plan.')
+
+
 class AccountMove(models.Model):
     _inherit = 'account.move'
 

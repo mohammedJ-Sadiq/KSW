@@ -4,3 +4,4 @@ from . import test_driver_kiosk_ui
 from . import test_vehicle_trust
 from . import test_capture_timing_scope
 from . import test_rate_import_matching
+from . import test_month_end_invoice

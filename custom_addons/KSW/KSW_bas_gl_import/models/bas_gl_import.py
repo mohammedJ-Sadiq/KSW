@@ -188,6 +188,326 @@ class BasGlImport(models.Model):
         return {'groups': made_g, 'accounts': made_a}
 
     # ------------------------------------------------------------------
+    # Cost centres
+    # ------------------------------------------------------------------
+    # The master is WREF10 (CODE, parent MCOST, NAME, DLEVEL), NOT ``cost_c``:
+    # cost_c is a stale 617-row list holding 83 of the ~900 names vou10
+    # actually carries, while WREF10 covers all but 8 of them.  Other branches
+    # (WREF20/25/35/50) have their own trees whose codes collide with this
+    # one, so they are left out on purpose.
+    #
+    # One root plan = one analytic column, so a line carries one cost centre,
+    # as in BAS.  Each BAS group node is a sub-plan; every node, group or not,
+    # is also an account (BAS posts to six group nodes directly).
+    _COST_CENTRE_ROOT = 'WREF10'
+
+    def _cost_centre_root_plan(self):
+        Plan = self.env['account.analytic.plan'].with_context(active_test=False)
+        root = Plan.search([('x_bas_code', '=', self._COST_CENTRE_ROOT)], limit=1)
+        if not root:
+            root = Plan.create({
+                'name': 'Cost Centres', 'x_bas_code': self._COST_CENTRE_ROOT,
+                'default_applicability': 'optional',
+            })
+            if self.env['res.lang']._lang_get('ar_001'):
+                root.update_field_translations('name', {'ar_001': 'مراكز التكلفة'})
+        return root
+
+    @api.model
+    def action_import_cost_centres(self, company=None):
+        """WREF10 -> sub-plan per group node + analytic account per cost centre.
+
+        Create-only, like the chart: a BAS code Odoo already has (archived
+        included) is skipped, never renamed, moved or archived.  After the
+        first run Odoo is where cost centres are maintained; a re-run only
+        brings in codes added in BAS since.
+        """
+        company = company or self.env.company
+        conn = self._bas_connect()
+        cur = conn.cursor(as_dict=True)
+        cur.execute("""
+            SELECT RTRIM(CODE) code, RTRIM(ISNULL(MCOST, '')) parent, NAME
+            FROM WREF10 WHERE CODE IS NOT NULL AND RTRIM(CODE) <> ''
+        """)
+        rows = cur.fetchall()
+        conn.close()
+
+        nodes = {}
+        for r in rows:
+            code = (r['code'] or '').strip()
+            nodes[code] = {
+                'parent': (r['parent'] or '').strip(),
+                'name': (r['NAME'] or '').strip() or code,
+            }
+        groups = {n['parent'] for n in nodes.values() if n['parent'] in nodes}
+
+        def depth(code, seen=()):
+            parent = nodes[code]['parent']
+            if parent not in nodes or parent in seen:
+                return 0
+            return 1 + depth(parent, seen + (code,))
+
+        root = self._cost_centre_root_plan()
+        Plan = self.env['account.analytic.plan'].with_context(active_test=False)
+        Account = self.env['account.analytic.account'].with_context(active_test=False)
+        plans = {p.x_bas_code: p for p in Plan.search([('x_bas_code', 'in', list(groups))])}
+        existing = set(Account.search([
+            ('x_bas_code', '!=', False), ('root_plan_id', '=', root.id),
+        ]).mapped('x_bas_code'))
+
+        made_p = 0
+        # Parents before children, one create per level so the plan-column
+        # sync on account.analytic.line runs once per level, not per plan.
+        for level in sorted({depth(c) for c in groups}):
+            todo = sorted(c for c in groups if depth(c) == level and c not in plans)
+            if not todo:
+                continue
+            parent_of = {c: plans.get(nodes[c]['parent'], root) for c in todo}
+            created = Plan.create([{
+                'name': nodes[c]['name'], 'x_bas_code': c,
+                'parent_id': parent_of[c].id,
+            } for c in todo])
+            plans.update(zip(todo, created))
+            made_p += len(created)
+
+        vals = []
+        for code in sorted(nodes):
+            if code in existing:
+                continue
+            node = nodes[code]
+            plan = plans[code] if code in groups else plans.get(node['parent'], root)
+            vals.append({
+                'name': node['name'], 'code': code, 'x_bas_code': code,
+                'plan_id': plan.id, 'company_id': company.id,
+            })
+        Account.create(vals)
+        _logger.info('BAS cost centre import: %s plans, %s accounts created '
+                     '(%s already in Odoo)', made_p, len(vals), len(existing))
+        return {'plans': made_p, 'accounts': len(vals), 'skipped': len(existing)}
+
+    def action_import_cost_centres_button(self):
+        res = self.action_import_cost_centres(company=self.company_id)
+        return {
+            'type': 'ir.actions.client', 'tag': 'display_notification',
+            'params': {
+                'title': _('BAS Cost Centres'),
+                'message': _('%(accounts)s analytic accounts and %(plans)s plans '
+                             'created; %(skipped)s already in Odoo.', **res),
+                'type': 'success',
+            },
+        }
+
+    # ------------------------------------------------------------------
+    # Cost centres on the imported ledger
+    # ------------------------------------------------------------------
+    # vou10 tags each LINE (not the voucher) by NAME, in up to three columns:
+    #   COST_CENTER   the vehicle (السيارات) or a department
+    #   COST_CENTER3  = COST_CENTER, or its parent / branch -- a fallback
+    #   COST_CENTER2  the driver ("مركز تكلفة الموظف"), a different node of
+    #                 the same tree on 243k lines
+    # One root plan holds one value per line, so the driver gets a second
+    # root plan.  Odoo 19 joins both on ONE analytic line ("id1,id2" key).
+    _EMPLOYEE_ROOT = 'WREF10-EMP'
+    _CC_FIELDS = 'RTRIM(ISNULL(COST_CENTER,\'\')) cc1, RTRIM(ISNULL(COST_CENTER2,\'\')) cc2, ' \
+                 'RTRIM(ISNULL(COST_CENTER3,\'\')) cc3'
+
+    @staticmethod
+    def _cc_norm(name):
+        return re.sub(r'\s+', ' ', name or '').strip().lower()
+
+    def _employee_root_plan(self):
+        Plan = self.env['account.analytic.plan'].with_context(active_test=False)
+        root = Plan.search([('x_bas_code', '=', self._EMPLOYEE_ROOT)], limit=1)
+        if not root:
+            root = Plan.create({
+                'name': 'Employee Cost Centre', 'x_bas_code': self._EMPLOYEE_ROOT,
+                'default_applicability': 'optional',
+            })
+            if self.env['res.lang']._lang_get('ar_001'):
+                root.update_field_translations('name', {'ar_001': 'مركز تكلفة الموظف'})
+        return root
+
+    @api.model
+    def action_apply_cost_centres(self, date_from=None, date_to=None,
+                                  company=None, overwrite=False, commit=True):
+        """Stamp BAS's per-line cost centres onto the imported ledger.
+
+        Each Odoo line is matched to the vou10 row it came from inside the same
+        voucher: same account, same side, same amount.  Lines Odoo built
+        differently (STR10 product lines on a converted invoice, the rounding
+        residue, the VAT line) take the remaining rows of that account+side in
+        proportion to their amounts -- exact in total per cost centre.
+
+        A line that already has a distribution is left alone unless
+        ``overwrite``: after the import, Odoo is where cost centres live.
+        Cash-sale payments carry no BAS key and are not touched.
+        """
+        company = company or self.env.company
+        cc_root = self._cost_centre_root_plan()
+        emp_root = self._employee_root_plan()
+        Account = self.env['account.analytic.account'].with_context(active_test=False)
+        cc_acc = {a.x_bas_code: a.id for a in Account.search(
+            [('x_bas_code', '!=', False), ('root_plan_id', '=', cc_root.id)])}
+        if not cc_acc:
+            raise UserError(_('Import the cost centres first.'))
+        emp_acc = {a.x_bas_code: a.id for a in Account.search(
+            [('x_bas_code', '!=', False), ('root_plan_id', '=', emp_root.id)])}
+
+        conn = self._bas_connect()
+        cur = conn.cursor(as_dict=True)
+        cur.execute("SELECT RTRIM(CODE) code, NAME FROM WREF10 ORDER BY CODE")
+        wref = cur.fetchall()
+        by_name, code_name = {}, {}
+        for r in wref:
+            code_name[r['code']] = (r['NAME'] or '').strip() or r['code']
+            by_name.setdefault(self._cc_norm(r['NAME']), r['code'])   # lowest code wins
+
+        unknown = defaultdict(int)
+
+
+        def emp_account(code):
+            if code not in emp_acc:
+                emp_acc[code] = Account.create({
+                    'name': code_name[code], 'code': code, 'x_bas_code': code,
+                    'plan_id': emp_root.id, 'company_id': company.id,
+                }).id
+            return emp_acc[code]
+
+        def row_key(r):
+            main = next((by_name[self._cc_norm(r[c])] for c in ('cc1', 'cc3', 'cc2')
+                         if self._cc_norm(r[c]) in by_name), None)
+            if main is None and (r['cc1'] or r['cc3'] or r['cc2']):
+                unknown[(r['cc1'] or r['cc3'] or r['cc2']).strip()] += 1
+            ids = [str(cc_acc[main])] if main in cc_acc else []
+            if r['cc2'] and self._cc_norm(r['cc2']) != self._cc_norm(r['cc1']):
+                emp = by_name.get(self._cc_norm(r['cc2']))
+                if emp:
+                    ids.append(str(emp_account(emp)))
+            return ','.join(ids) or None
+
+        domain = [('state', '=', 'posted'), ('company_id', '=', company.id),
+                  ('x_bas_key', '=like', '%/%/%/%')]
+        if date_from:
+            domain.append(('date', '>=', date_from))
+        if date_to:
+            domain.append(('date', '<=', date_to))
+        Move = self.env['account.move']
+        dates = Move.search(domain, order='date').mapped('date')
+        if not dates:
+            conn.close()
+            return {'moves': 0, 'lines': 0, 'unknown_names': {}}
+
+        stamped_moves = stamped_lines = 0
+        month = dates[0].replace(day=1)
+        while month <= dates[-1]:
+            nxt = month + relativedelta(months=1)
+            moves = Move.search(domain + [('date', '>=', month), ('date', '<', nxt)])
+            month_start, month = month, nxt
+            if not moves:
+                continue
+            by_key = {m.x_bas_key: m for m in moves}
+            ftypes = sorted({k.split('/')[0] for k in by_key})
+            # A voucher's lines share one FDATE, which is the move date --
+            # but pad a day either side for vouchers time-stamped near midnight.
+            cur.execute(f"""
+                SELECT FTYPE, FTYPE2, RTRIM(CODE2) CODE2, NUMBER1,
+                       RTRIM(ISNULL(FCODE,'')) FCODE, RTRIM(ISNULL(TCODE,'')) TCODE,
+                       AMOUNT, BAMOUNT, {self._CC_FIELDS}
+                FROM vou10
+                WHERE FDATE >= DATEADD(day, -1, %s) AND FDATE < DATEADD(day, 1, %s)
+                  AND FTYPE IN %s
+            """, (month_start, nxt, tuple(ftypes)))
+            pools = defaultdict(lambda: defaultdict(list))
+            for r in cur.fetchall():
+                bas_key = f"{r['FTYPE']}/{r['FTYPE2']}/{r['CODE2']}/{r['NUMBER1']:.0f}"
+                if bas_key not in by_key:
+                    continue
+                code, side = (r['FCODE'], 'D') if r['FCODE'] else (r['TCODE'], 'C')
+                amount = abs(float(
+                    (r['BAMOUNT'] if r['FTYPE'] in _BAMOUNT_FTYPES else r['AMOUNT']) or 0.0))
+                if code and amount:
+                    pools[bas_key][(code, side)].append([round(amount, 2), row_key(r)])
+
+            assign = defaultdict(list)          # json-able dist -> line ids
+            for bas_key, move in by_key.items():
+                pool = pools.get(bas_key)
+                if not pool:
+                    continue
+                groups = defaultdict(list)
+                for line in move.line_ids:
+                    if line.analytic_distribution and not overwrite:
+                        continue
+                    code = line.account_id.x_bas_code
+                    if not code or line.display_type in ('line_section', 'line_note'):
+                        continue
+                    side = 'D' if line.debit else 'C'
+                    groups[(code, side)].append(line)
+                for gkey, lines in groups.items():
+                    rows = pool.get(gkey)
+                    if not rows:
+                        continue
+                    left = list(rows)
+                    rest = []
+                    for line in lines:
+                        amt = round(line.debit or line.credit, 2)
+                        hit = next((r for r in left if r[0] == amt), None)
+                        if hit:
+                            left.remove(hit)
+                            if hit[1]:
+                                assign[((hit[1], 100.0),)].append(line.id)
+                        else:
+                            rest.append(line)
+                    if not rest:
+                        continue
+                    share = left or rows
+                    total = sum(r[0] for r in share)
+                    pct = defaultdict(float)
+                    for amt, key in share:
+                        if key:
+                            pct[key] += 100.0 * amt / total
+                    dist = tuple(sorted((k, round(v, 4)) for k, v in pct.items() if v))
+                    if dist:
+                        for line in rest:
+                            assign[dist].append(line.id)
+
+            MoveLine = self.env['account.move.line']
+            for dist, ids in assign.items():
+                MoveLine.browse(ids).write({'analytic_distribution': dict(dist)})
+                stamped_lines += len(ids)
+            stamped_moves += len({k for k in by_key if k in pools})
+            if commit:
+                self.env.cr.commit()
+            _logger.info('BAS cost centres %s: %s lines stamped so far',
+                         month_start, stamped_lines)
+        conn.close()
+        top_unknown = dict(sorted(unknown.items(), key=lambda x: -x[1])[:30])
+        _logger.info('BAS cost centres: %s lines on %s moves; unknown names %s',
+                     stamped_lines, stamped_moves, top_unknown)
+        return {'moves': stamped_moves, 'lines': stamped_lines,
+                'unknown_names': top_unknown}
+
+    def _apply_cost_centres_if_ready(self, date_from, date_to, company):
+        """Called after every pass that (re)creates entries, so a new or
+        rebuilt voucher arrives with its cost centres.  A no-op until the cost
+        centres have been imported."""
+        root = self.env['account.analytic.plan'].search(
+            [('x_bas_code', '=', self._COST_CENTRE_ROOT)], limit=1)
+        if root and root.account_ids:
+            self.action_apply_cost_centres(date_from, date_to, company=company)
+
+    def action_apply_cost_centres_button(self):
+        res = self.action_apply_cost_centres(company=self.company_id)
+        return {
+            'type': 'ir.actions.client', 'tag': 'display_notification',
+            'params': {
+                'title': _('BAS Cost Centres'),
+                'message': _('%(lines)s journal lines given their BAS cost centre.',
+                             lines=res['lines']),
+                'type': 'success',
+            },
+        }
+
+    # ------------------------------------------------------------------
     # Journals
     # ------------------------------------------------------------------
     def _journal(self, ftype, company):
@@ -284,6 +604,7 @@ class BasGlImport(models.Model):
                 self.env.cr.commit()
         if batch:
             made += self._flush_moves(Move, batch)
+        self._apply_cost_centres_if_ready(self.date_from, self.date_to, company)
 
         self.write({
             'state': 'done',
@@ -790,6 +1111,7 @@ class BasGlImport(models.Model):
             if len(batch_vals) >= 200:
                 flush()
         flush()
+        self._apply_cost_centres_if_ready(date_from, date_to, company)
 
         _logger.info('BAS invoice conversion %s..%s: %s converted, %s skipped',
                      date_from, date_to, converted, skipped)

@@ -506,3 +506,22 @@ class TestApproval(SubmissionCommon):
         self.assertEqual(batch.submission_id.state, 'submitted')
         self.assertTrue(run.line_ids, "the register stays as a preview")
         self.assertAlmostEqual(run.line_ids.earnings, 180.0, places=2)
+
+    def test_33b_admin_reopen_only_unlocks_the_month(self):
+        """A Settings administrator's reopen leaves every approval standing
+        (KSWCO run 3, Aug 2026: four departments knocked back to Submitted
+        when only one empty batch needed deleting)."""
+        batch = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)
+        run = self._submit(batch)
+        run.with_user(self.gm).action_approve()
+        self.assertEqual(run.state, 'approved')
+        admin = self._user('sub_sysadmin', 'KSW_commissions.group_commission_gm')
+        admin.sudo().write({
+            'group_ids': [(4, self.env.ref('base.group_system').id)]})
+
+        run.with_user(admin).action_reopen()
+
+        self.assertNotIn(run.state, ('approved', 'paid'))
+        self.assertEqual(batch.submission_id.state, 'approved')
+        self.assertEqual(batch.state, 'approved')
+        self.assertEqual(set(batch.entry_ids.mapped('state')), {'approved'})

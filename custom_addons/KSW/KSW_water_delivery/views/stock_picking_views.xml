@@ -22,6 +22,13 @@
                             <field name="x_amount_untaxed" readonly="1"/>
                             <field name="x_amount_tax" readonly="1"/>
                             <field name="x_amount_total" readonly="1"/>
+                            <field name="x_delivery_date" readonly="1"/>
+                            <field name="x_invoice_status" readonly="1"
+                                   groups="KSW_water_delivery.group_water_billing"/>
+                            <!-- Accounting groups only: rendering the link reads
+                                 account.move, which billing alone cannot. -->
+                            <field name="x_invoice_id" readonly="1"
+                                   groups="account.group_account_invoice,account.group_account_readonly"/>
                         </group>
                         <group string="Trip">
                             <field name="x_driver_id" readonly="1"/>
@@ -85,9 +92,14 @@
                             type="action" string="New Delivery"
                             class="btn-primary" display="always"
                             groups="KSW_water_delivery.group_water_driver"/>
+                    <!-- Selection-only on purpose: it invoices the ticked notes. -->
+                    <button name="%(KSW_water_delivery.action_water_invoice_wizard)d"
+                            type="action" string="Invoice Selected Notes"
+                            groups="KSW_water_delivery.group_water_billing"/>
                 </header>
                 <field name="name"/>
-                <field name="date_done"/>
+                <field name="date_done" optional="hide"/>
+                <field name="x_delivery_date"/>
                 <field name="partner_id"/>
                 <field name="x_branch_code" optional="show"/>
                 <field name="x_driver_id" optional="show"/>
@@ -108,6 +120,10 @@
                 <field name="is_signed" optional="hide" widget="boolean_toggle" readonly="1"/>
                 <field name="x_currency_id" column_invisible="1"/>
                 <field name="state" widget="badge" optional="hide"/>
+                <field name="x_invoice_status" optional="show"
+                       groups="KSW_water_delivery.group_water_billing"/>
+                <field name="x_invoice_id" optional="hide"
+                       groups="account.group_account_invoice,account.group_account_readonly"/>
             </list>
         </field>
     </record>
@@ -179,14 +195,20 @@
                 <filter name="no_position" string="No Position Recorded"
                         domain="[('x_gps_latitude', '=', 0.0)]"/>
                 <separator/>
+                <!-- On the stored mirror, not sale_id.invoice_status: searching
+                     through sale_id is a read of sale.order, which the billing
+                     role does not hold. -->
                 <filter name="to_invoice" string="Not Yet Invoiced"
-                        domain="[('sale_id.invoice_status', '=', 'to invoice')]"
+                        domain="[('x_invoice_status', '=', 'to invoice')]"
+                        groups="KSW_water_delivery.group_water_billing"/>
+                <filter name="invoiced" string="Invoiced"
+                        domain="[('x_invoice_status', '=', 'invoiced')]"
                         groups="KSW_water_delivery.group_water_billing"/>
                 <group>
                     <filter name="group_partner" string="Customer" context="{'group_by': 'partner_id'}"/>
                     <filter name="group_driver" string="Driver" context="{'group_by': 'x_driver_id'}"/>
                     <filter name="group_branch" string="Branch" context="{'group_by': 'x_branch_code'}"/>
-                    <filter name="group_date" string="Delivery Date" context="{'group_by': 'date_done'}"/>
+                    <filter name="group_date" string="Delivery Date" context="{'group_by': 'x_delivery_date'}"/>
                 </group>
             </search>
         </field>

@@ -1,6 +1,6 @@
 {
     'name': 'KSW BAS GL Import',
-    'version': '19.0.1.2.0',
+    'version': '19.0.1.3.0',
     'author': 'Mohammed Albadr',
     'category': 'Accounting',
     'summary': 'Import the BAS (bas9ss) chart of accounts and general ledger into Odoo',
