@@ -83,7 +83,7 @@ class StockPicking(models.Model):
         return (line.product_id, line.price_unit, line.discount,
                 line.tax_ids, line.product_uom_id)
 
-    def _water_create_invoice(self, invoice_date=None, summary_only=False):
+    def _water_create_invoice(self, invoice_date=None, show_notes=False, display_uoms=None):
         """One draft customer invoice for these notes, a section per product.
 
         Every note keeps its own invoice line, linked to its own sale order
@@ -95,9 +95,12 @@ class StockPicking(models.Model):
         reads as invoiced, cancelling the draft frees it, a credit note for one
         disputed note reopens that note and nothing else.
 
-        The grouping by product is the section: core prints its subtotal, and
-        `summary_only` sets core's own "Hide Composition" so the printed
-        invoice shows one row per product while the lines stay underneath.
+        The grouping by product is the section. By default the invoice PRINTS
+        one row per product (`x_water_summary`); `show_notes` prints every note
+        under its section instead. `display_uoms` ({product id: uom.uom}) is
+        the unit each product is printed in -- m³ shown as trips -- and is only
+        ever a printing choice: the note lines stay in the product's unit, so
+        no amount goes through a conversion.
 
         Authority is the caller's job; this runs as whoever calls it.
         """
@@ -152,21 +155,30 @@ class StockPicking(models.Model):
         for line in lines:
             groups[self._water_group_key(line)] |= line
 
+        display_uoms = display_uoms or {}
         invoice_lines = []
         sequence = 0
         for key in sorted(groups, key=lambda k: (k[0].display_name, k[1])):
             product, price, _discount, _taxes, uom = key
             group = groups[key].sorted(
                 lambda l: (note_of[l].x_delivery_date or fields.Date.today(), note_of[l].name))
-            quantity = sum(group.mapped('qty_to_invoice'))
+            unit = display_uoms.get(product.id) or uom
+            if not uom._ksw_converts_to(unit):
+                raise UserError(_(
+                    '%(product)s is sold in %(uom)s and cannot be shown in %(unit)s.',
+                    product=product.display_name, uom=uom.name, unit=unit.name))
+            quantity = uom._ksw_qty(sum(group.mapped('qty_to_invoice')), unit)
             sequence += 1
             invoice_lines.append(Command.create({
                 'display_type': 'line_section',
                 'sequence': sequence,
                 'name': _('%(product)s: %(qty)s %(uom)s at %(price)s (%(count)s notes)',
-                          product=product.display_name, qty=f'{quantity:g}',
-                          uom=uom.name, price=f'{price:g}', count=len(group)),
-                'collapse_composition': summary_only,
+                          product=product.display_name,
+                          qty=('%.4f' % quantity).rstrip('0').rstrip('.'),
+                          uom=unit.name, price=f'{uom._ksw_price(price, unit):g}',
+                          count=len(group)),
+                'x_water_section': True,
+                'x_display_uom_id': unit.id,
             }))
             for line in group:
                 note = note_of[line]
@@ -187,6 +199,7 @@ class StockPicking(models.Model):
                                 count=len(notes), start=min(dates), end=max(dates)),
             'ref': False,
             'delivery_date': max(dates),
+            'x_water_summary': not show_notes,
         })
         if invoice_date:
             vals['invoice_date'] = invoice_date

@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_ksw_pl_wizard,ksw.pl.wizard,model_ksw_pl_wizard,account.group_account_readonly,1,1,1,0
+access_ksw_pl_depreciation_line,ksw.pl.depreciation.line,model_ksw_pl_depreciation_line,account.group_account_readonly,1,1,1,0

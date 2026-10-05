@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Opened by mis.report.instance.drilldown on a P&L depreciation cell -->
+    <record id="ksw_pl_depreciation_line_view_list" model="ir.ui.view">
+        <field name="name">ksw.pl.depreciation.line.list</field>
+        <field name="model">ksw.pl.depreciation.line</field>
+        <field name="arch" type="xml">
+            <list create="0" edit="0" delete="0">
+                <field name="x_group_l4_id" optional="hide"/>
+                <field name="account_id"/>
+                <field name="asset_account_id" optional="show"/>
+                <field name="rate" optional="show"/>
+                <field name="source" optional="hide"/>
+                <field name="amount" sum="Total"/>
+            </list>
+        </field>
+    </record>
+    <record id="ksw_pl_depreciation_line_view_pivot" model="ir.ui.view">
+        <field name="name">ksw.pl.depreciation.line.pivot</field>
+        <field name="model">ksw.pl.depreciation.line</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="x_group_l4_id" type="row"/>
+                <field name="amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="ksw_pl_depreciation_line_view_search" model="ir.ui.view">
+        <field name="name">ksw.pl.depreciation.line.search</field>
+        <field name="model">ksw.pl.depreciation.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="account_id"/>
+                <field name="asset_account_id"/>
+                <group>
+                    <filter name="ksw_group_l3" string="Level 3" context="{'group_by': 'x_group_l3_id'}"/>
+                    <filter name="ksw_group_l4" string="Level 4" context="{'group_by': 'x_group_l4_id'}"/>
+                    <filter name="group_source" string="Source" context="{'group_by': 'source'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

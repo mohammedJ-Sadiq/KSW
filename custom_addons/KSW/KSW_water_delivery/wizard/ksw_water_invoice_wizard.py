@@ -36,12 +36,14 @@ class KswWaterInvoiceWizard(models.TransientModel):
                           default=_default_date_to)
     invoice_date = fields.Date(string='Invoice Date',
                                default=fields.Date.context_today)
-    summary_only = fields.Boolean(
-        string='Print One Line per Product',
-        help='The printed invoice shows one line per product with its total. '
-             'Every delivery note is still on the invoice underneath; this is '
-             'core\'s "Hide Composition" on each product section, and can be '
-             'switched on the invoice afterwards.',
+    # Summary is the default: the printed invoice shows one line per product.
+    # Ticking this prints every delivery note under its product instead. The
+    # notes are on the invoice either way; this only decides what is printed,
+    # and it can be changed on the invoice afterwards.
+    show_notes = fields.Boolean(
+        string='Show Each Delivery Note',
+        help='Print every delivery note on the invoice, under its product. '
+             'Unticked, the invoice prints one line per product.',
     )
 
     # Relational + domain, not a dynamic selection: the options vary per
@@ -59,15 +61,21 @@ class KswWaterInvoiceWizard(models.TransientModel):
     )
     line_ids = fields.One2many(
         'ksw.water.invoice.wizard.line', 'wizard_id', string='By Product',
-        compute='_compute_line_ids', store=True,
+        compute='_compute_line_ids', store=True, readonly=False,
     )
     company_currency_id = fields.Many2one(
         'res.currency', default=lambda self: self.env.company.currency_id)
+    # Their own compute, from the notes: when the rows arrive with the save
+    # (they are editable), Odoo does not run the rows' compute, and anything
+    # it also computed would silently stay at zero.
+    # compute_sudo: the billing role reads notes, not sale orders, and these
+    # are display figures (who may invoice is checked on the button). Stored
+    # computes get this by default; non-stored ones do not.
     amount_untaxed = fields.Monetary(
-        compute='_compute_line_ids', store=True, currency_field='company_currency_id')
+        compute='_compute_totals', compute_sudo=True, currency_field='company_currency_id')
     amount_total = fields.Monetary(
-        compute='_compute_line_ids', store=True, currency_field='company_currency_id')
-    note_count = fields.Integer(compute='_compute_line_ids', store=True)
+        compute='_compute_totals', compute_sudo=True, currency_field='company_currency_id')
+    note_count = fields.Integer(compute='_compute_totals', compute_sudo=True)
 
     # Notes in the period that are NOT going on this invoice, and why. Billing
     # needs to see these: a note silently missing from an invoice is the
@@ -141,6 +149,10 @@ class KswWaterInvoiceWizard(models.TransientModel):
     def _compute_line_ids(self):
         Picking = self.env['stock.picking']
         for wizard in self:
+            # Keep the unit a product was set to print in when the notes
+            # change underneath it.
+            chosen = {l.product_id.id: l.display_uom_id.id
+                      for l in wizard.line_ids if l.display_uom_id}
             notes = wizard.picking_ids._origin
             groups = {}
             for note in notes:
@@ -150,6 +162,8 @@ class KswWaterInvoiceWizard(models.TransientModel):
                     group = groups.setdefault(key, {
                         'product_id': line.product_id.id,
                         'uom_id': line.product_uom_id.id,
+                        'display_uom_id': chosen.get(line.product_id.id)
+                        or line.product_uom_id.id,
                         'price_unit': line.price_unit,
                         'note_count': 0, 'quantity': 0.0,
                         'amount_untaxed': 0.0, 'amount_total': 0.0,
@@ -161,9 +175,20 @@ class KswWaterInvoiceWizard(models.TransientModel):
                     group['amount_total'] += line.price_total * share
             rows = sorted(groups.values(), key=lambda g: (g['product_id'], g['price_unit']))
             wizard.line_ids = [(5, 0, 0)] + [(0, 0, row) for row in rows]
-            wizard.amount_untaxed = sum(r['amount_untaxed'] for r in rows)
-            wizard.amount_total = sum(r['amount_total'] for r in rows)
-            wizard.note_count = len(notes)
+
+    @api.depends('picking_ids')
+    def _compute_totals(self):
+        for wizard in self:
+            lines = wizard.picking_ids._origin.sale_id.order_line.filtered(
+                lambda l: not l.display_type and l.qty_to_invoice > 0)
+            untaxed = total = 0.0
+            for line in lines:
+                share = line.qty_to_invoice / (line.product_uom_qty or 1.0)
+                untaxed += line.price_subtotal * share
+                total += line.price_total * share
+            wizard.amount_untaxed = untaxed
+            wizard.amount_total = total
+            wizard.note_count = len(wizard.picking_ids)
 
     @api.depends('partner_id', 'date_from', 'date_to', 'picking_ids')
     def _compute_excluded_summary(self):
@@ -224,7 +249,9 @@ class KswWaterInvoiceWizard(models.TransientModel):
                 '%(start)s and %(end)s.', client=self.partner_id.display_name,
                 start=self.date_from, end=self.date_to))
         invoice = notes._water_create_invoice(
-            invoice_date=self.invoice_date, summary_only=self.summary_only)
+            invoice_date=self.invoice_date, show_notes=self.show_notes,
+            display_uoms={l.product_id.id: l.display_uom_id
+                          for l in self.line_ids if l.display_uom_id})
         return {
             'type': 'ir.actions.act_window',
             'name': _('Invoice'),
@@ -242,10 +269,38 @@ class KswWaterInvoiceWizardLine(models.TransientModel):
 
     wizard_id = fields.Many2one('ksw.water.invoice.wizard', required=True, ondelete='cascade')
     product_id = fields.Many2one('product.product', string='Product', readonly=True)
-    uom_id = fields.Many2one('uom.uom', string='Unit', readonly=True)
+    uom_id = fields.Many2one('uom.uom', string='Sold In', readonly=True)
+    # The unit this product is PRINTED in, e.g. m³ shown as 32 m³ trips. Only
+    # units that convert to the product's own are offered.
+    display_uom_id = fields.Many2one(
+        'uom.uom', string='Print In',
+        domain="[('id', 'in', allowed_uom_ids)]",
+    )
+    allowed_uom_ids = fields.Many2many('uom.uom', compute='_compute_display')
+    display_quantity = fields.Char(string='Printed Quantity', compute='_compute_display')
+    display_price = fields.Float(string='Printed Rate', min_display_digits='Product Price',
+                                 compute='_compute_display')
     note_count = fields.Integer(string='Notes', readonly=True)
     quantity = fields.Float(string='Quantity', digits='Product Unit', readonly=True)
-    price_unit = fields.Float(string='Rate', digits='Product Price', readonly=True)
+    # Unrounded: BAS rates run to four decimals (16.5625/m³), and a rate cut
+    # to 16.56 shows a 32 m³ trip as 529.92 instead of 530.
+    price_unit = fields.Float(string='Rate', min_display_digits='Product Price', readonly=True)
     currency_id = fields.Many2one(related='wizard_id.company_currency_id')
     amount_untaxed = fields.Monetary(string='Before Tax', readonly=True)
     amount_total = fields.Monetary(string='After Tax', readonly=True)
+
+    @api.depends('uom_id', 'display_uom_id', 'quantity', 'price_unit')
+    def _compute_display(self):
+        Uom = self.env['uom.uom']
+        for line in self:
+            uom = line.uom_id
+            if not uom:
+                line.allowed_uom_ids = Uom
+                line.display_quantity = False
+                line.display_price = 0.0
+                continue
+            line.allowed_uom_ids = Uom.search([]).filtered(uom._ksw_converts_to)
+            unit = line.display_uom_id or uom
+            qty = uom._ksw_qty(line.quantity, unit)
+            line.display_quantity = '%s %s' % (('%.4f' % qty).rstrip('0').rstrip('.'), unit.name)
+            line.display_price = uom._ksw_price(line.price_unit, unit)

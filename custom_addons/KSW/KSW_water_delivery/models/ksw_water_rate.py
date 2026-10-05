@@ -55,8 +55,11 @@ class KswWaterRate(models.Model):
         'product.product', string='Product', required=True, index=True,
         domain="[('sale_ok', '=', True)]", ondelete='restrict',
     )
+    # min_display_digits, as core's sale price_unit: stored unrounded, shown
+    # with at least two decimals. `digits=` rounds on save, and 71 of 394 BAS
+    # rates have more (16.5625/m³ is 530.00 a 32 m³ trip; 16.56 is 529.92).
     price = fields.Float(
-        string='Rate', required=True, digits='Product Price',
+        string='Rate', required=True, min_display_digits='Product Price',
         help='Price per unit of the product, before VAT.',
     )
     uom_name = fields.Char(related='product_id.uom_id.name', string='Per')
@@ -77,7 +80,8 @@ class KswWaterRate(models.Model):
         [('bas', 'Imported from BAS9'), ('manual', 'Entered in Odoo')],
         default='manual', required=True, readonly=True,
     )
-    x_bas_price = fields.Float(string='BAS Price at Import', readonly=True, digits='Product Price')
+    x_bas_price = fields.Float(string='BAS Price at Import', readonly=True,
+                               min_display_digits='Product Price')
     x_bas_date = fields.Datetime(string='Last BAS Delivery', readonly=True)
     x_bas_branch = fields.Char(string='BAS Branch (CODE2)', readonly=True)
 

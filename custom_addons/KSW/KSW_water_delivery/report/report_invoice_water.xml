@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- A delivery-note invoice prints one row per product by default. The
+         note lines are dropped from the loop in
+         account.move._get_move_lines_to_report and these rows stand in for
+         them, in the same columns. The cell names are our own on purpose:
+         l10n_gcc_invoice xpaths core's td names, and must keep finding core's. -->
+    <template id="report_invoice_document_water_summary" inherit_id="account.report_invoice_document">
+        <xpath expr="//tbody[hasclass('invoice_tbody')]/t[@t-foreach='lines_to_report']" position="before">
+            <t t-if="o.x_water_summary">
+                <tr t-foreach="o._water_summary_rows()" t-as="row">
+                    <td name="water_summary_name"><span t-out="row['name']"/></td>
+                    <td name="water_summary_quantity" class="o_td_quantity text-end">
+                        <span class="text-nowrap" t-out="row['quantity']"/>
+                        <span t-out="row['uom']"/>
+                    </td>
+                    <td name="water_summary_price_unit" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                        <span class="text-nowrap" t-out="row['price_unit']" t-options="{'widget': 'float', 'decimal_precision': 'Product Price'}"/>
+                    </td>
+                    <td name="water_summary_discount" t-if="display_discount" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}"/>
+                    <td name="water_summary_taxes" t-if="display_taxes" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                        <span t-out="row['taxes']"/>
+                    </td>
+                    <!-- l10n_sa hides core's Amount column and appends VAT,
+                         excl. and incl. columns to every row; this module does
+                         not depend on it, so it asks rather than assumes. -->
+                    <t t-set="sa_columns" t-value="o._water_report_sa_columns()"/>
+                    <td name="water_summary_subtotal" t-attf-class="text-end o_price_total {{ 'd-none' if sa_columns else '' }}">
+                        <span t-if="o.company_price_include == 'tax_excluded'" class="text-nowrap" t-out="row['price_subtotal']" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                        <span t-if="o.company_price_include == 'tax_included'" class="text-nowrap" t-out="row['price_total']" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                    </td>
+                    <t t-if="sa_columns">
+                        <td name="water_summary_vat_amount" class="text-end">
+                            <span class="text-nowrap" t-out="row['price_total'] - row['price_subtotal']" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                        </td>
+                        <td name="water_summary_vat_excl" class="text-end o_price_total">
+                            <span class="text-nowrap" t-out="row['price_subtotal']" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                        </td>
+                        <td name="water_summary_vat_incl" class="text-end o_price_total">
+                            <span class="text-nowrap" t-out="row['price_total']" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                        </td>
+                    </t>
+                </tr>
+            </t>
+        </xpath>
+    </template>
+
+</odoo>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Trip (32 m³) and Trip (6 m³) as units of m³, so an invoice can be
+         printed in trips. A function, not records: the m³ the BAS products
+         use has no external id to point at. Idempotent; runs every upgrade. -->
+    <function model="uom.uom" name="_ksw_ensure_trip_units"/>
+</odoo>

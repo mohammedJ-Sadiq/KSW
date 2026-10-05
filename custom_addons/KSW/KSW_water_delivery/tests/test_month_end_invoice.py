@@ -109,14 +109,103 @@ class TestMonthEndInvoice(WaterDeliveryCommon):
         self.assertEqual(len(sections), 2)
         self.assertAlmostEqual(invoice.amount_untaxed, 420.0)
 
-    def test_summary_only_uses_core_hide_composition(self):
+    # --- summary by default, detail on request --------------------------------
+    def test_summary_is_the_default(self):
+        self._note(entered_qty=2.0)
+        self._note(entered_qty=3.0)
+        invoice = self._invoice(self.customer)
+        self.assertTrue(invoice.x_water_summary)
+        # Printed: one row for the product, nothing per note.
+        self.assertFalse(invoice._get_move_lines_to_report().filtered(
+            lambda l: l.x_water_section or l.parent_id.x_water_section))
+        [row] = invoice._water_summary_rows()
+        self.assertEqual(row['quantity'], '5')
+        self.assertEqual(row['price_unit'], 200.0)
+        self.assertAlmostEqual(row['price_subtotal'], invoice.amount_untaxed)
+        # The notes are still on the invoice, one line each.
+        self.assertEqual(len(invoice.invoice_line_ids.filtered(
+            lambda l: l.display_type == 'product')), 2)
+
+    def test_ticking_show_notes_prints_every_note(self):
+        a, b = self._note(), self._note()
+        form = self._wizard(self.customer)
+        form.show_notes = True
+        invoice = self.env['account.move'].browse(form.save().action_create_invoice()['res_id'])
+        self.assertFalse(invoice.x_water_summary)
+        printed = invoice._get_move_lines_to_report().mapped('name')
+        self.assertTrue(any(a.name in n for n in printed))
+        self.assertTrue(any(b.name in n for n in printed))
+
+    def test_the_printed_invoice_follows_the_choice(self):
+        note = self._note()
+        invoice = self._invoice(self.customer)
+        render = lambda: self.env['ir.actions.report']._render_qweb_html(
+            'account.account_invoices', invoice.ids)[0].decode()
+        html = render()
+        self.assertIn('water_summary_name', html)
+        self.assertNotIn(note.name, html)
+        invoice.x_water_summary = False
+        html = render()
+        self.assertNotIn('water_summary_name', html)
+        self.assertIn(note.name, html)
+
+    # --- printed in another unit ----------------------------------------------
+    def _trip(self, size):
+        return self.env['uom.uom'].search([
+            ('name', '=', 'Trip (%d m³)' % size), ('relative_uom_id', '=', self.uom_m3.id)])
+
+    def test_m3_can_be_printed_in_trips(self):
+        trip = self._trip(32)
+        self.assertTrue(trip, 'the module creates Trip (32 m³) on install')
+        self._note(entered_qty=32.0)
+        self._note(entered_qty=32.0)
+        form = self._wizard(self.customer)
+        with form.line_ids.edit(0) as row:
+            row.display_uom_id = trip
+            self.assertEqual(row.display_quantity, '2 %s' % trip.name)
+            self.assertEqual(row.display_price, 6400.0)
+        invoice = self.env['account.move'].browse(form.save().action_create_invoice()['res_id'])
+        [row] = invoice._water_summary_rows()
+        self.assertEqual((row['quantity'], row['uom'], row['price_unit']), ('2', trip.display_name, 6400.0))
+        self.assertAlmostEqual(row['price_subtotal'], 12800.0)
+        # The money did not go through the conversion: the lines are still m³.
+        lines = invoice.invoice_line_ids.filtered(lambda l: l.display_type == 'product')
+        self.assertEqual(set(lines.mapped('product_uom_id')), {self.uom_m3})
+        self.assertEqual(set(lines.mapped('quantity')), {32.0})
+
+    def test_a_part_load_is_an_exact_fraction_of_a_trip(self):
+        trip = self._trip(32)
+        part = self._note(entered_qty=30.0)
+        full = self._note(entered_qty=32.0)
+        invoice = (part | full)._water_create_invoice(display_uoms={self.water.id: trip})
+        [row] = invoice._water_summary_rows()
+        self.assertEqual(row['quantity'], '1.9375')
+        self.assertAlmostEqual(1.9375 * row['price_unit'], row['price_subtotal'])
+        self.assertAlmostEqual(row['price_subtotal'], 62 * 200.0)
+
+    def test_only_units_of_the_same_kind_are_offered(self):
         self._note()
         form = self._wizard(self.customer)
-        form.summary_only = True
-        invoice = form.save().action_create_invoice()
-        invoice = self.env['account.move'].browse(invoice['res_id'])
-        section = invoice.invoice_line_ids.filtered(lambda l: l.display_type == 'line_section')
-        self.assertTrue(section.collapse_composition)
+        with form.line_ids.edit(0) as row:
+            allowed = row.allowed_uom_ids
+        self.assertIn(self._trip(32), allowed)
+        self.assertNotIn(self.env.ref('uom.product_uom_unit'), allowed)
+        note = self._wizard(self.customer).picking_ids[0]
+        with self.assertRaises(UserError):
+            self.env['stock.picking'].browse(note.id)._water_create_invoice(
+                display_uoms={self.water.id: self.env.ref('uom.product_uom_unit')})
+
+    def test_the_chosen_unit_survives_removing_a_note(self):
+        trip = self._trip(32)
+        self._note(entered_qty=32.0)
+        removed = self._note(entered_qty=32.0)
+        form = self._wizard(self.customer)
+        with form.line_ids.edit(0) as row:
+            row.display_uom_id = trip
+        form.picking_ids.remove(id=removed.id)
+        wizard = form.save()
+        self.assertEqual(wizard.line_ids.display_uom_id, trip)
+        self.assertEqual(wizard.line_ids.note_count, 1)
 
     # --- billed once, and only once ------------------------------------------
     def test_invoiced_notes_are_not_offered_again(self):
@@ -272,3 +361,12 @@ class TestMonthEndInvoice(WaterDeliveryCommon):
             'branch_code': '172', 'product_id': self.water.id, 'source': 'bas'})
         row.account_id = account
         self.assertEqual(row.source, 'manual')
+
+    def test_a_four_decimal_rate_shows_the_exact_trip_price(self):
+        self.rate.price = 16.5625
+        self.assertEqual(self.rate.price, 16.5625, 'the register keeps BAS\'s four decimals')
+        self._note(entered_qty=32.0)
+        form = self._wizard(self.customer)
+        with form.line_ids.edit(0) as row:
+            row.display_uom_id = self._trip(32)
+            self.assertEqual(row.display_price, 530.0)

@@ -1,6 +1,6 @@
 {
     'name': 'KSW Water Delivery Notes',
-    'version': '19.0.1.9.0',
+    'version': '19.0.1.10.1',
     'summary': 'Issue the water delivery note at the client, online or off',
     'description': """
 Water Delivery Notes
@@ -40,7 +40,9 @@ accounting the finished list.
         'security/ir.model.access.csv',
         'data/ksw_water_delivery_data.xml',
         'data/ksw_water_app_templates.xml',
+        'data/ksw_water_uom.xml',
         'report/report_water_delivery_note.xml',
+        'report/report_invoice_water.xml',
         'views/ksw_water_rate_views.xml',
         'views/ksw_water_revenue_account_views.xml',
         'views/ksw_water_client_branch_views.xml',
@@ -55,6 +57,7 @@ accounting the finished list.
         # carries "Invoice Selected Notes" -> action_water_invoice_wizard.
         'views/ksw_water_invoice_wizard_views.xml',
         'views/stock_picking_views.xml',
+        'views/account_move_views.xml',
         'views/ksw_fleet_vehicle_views.xml',
         'views/ksw_water_capture_views.xml',
         'views/ksw_water_delivery_menus.xml',

@@ -7,3 +7,4 @@ from . import hr_employee
 from . import res_partner
 from . import stock_picking_invoice
 from . import ksw_water_revenue_account
+from . import account_move_water
