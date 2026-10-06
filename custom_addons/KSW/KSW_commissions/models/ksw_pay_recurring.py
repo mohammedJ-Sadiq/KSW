@@ -252,12 +252,38 @@ class KswPayRecurring(models.Model):
 
     # ------------------------------------------------------------------
     @api.model
-    def _apply_to_batch(self, batch):
+    def _apply_to_batch(self, batch, skip_employee_ids=()):
         """Create the missing entries for ``batch``'s component and month.
 
         Idempotent: an employee who already has an entry in this batch is
         skipped, so the button can be pressed twice without duplicating.
+        ``skip_employee_ids``: whoever the supervisor chose to leave out in
+        the pending-vacation prompt.
         """
+        skip = set(skip_employee_ids)
+        due = self._due_for_batch(batch).filtered(
+            lambda r: r.employee_id.id not in skip)
+        vals_list = []
+        for rec in due:
+            vals = {
+                'batch_id': batch.id,
+                'employee_id': rec.employee_id.id,
+                'option_id': rec.option_id.id or False,
+                'quantity': rec.quantity,
+                'reason': rec.reason or False,
+            }
+            if batch.component_id.calculation == 'fixed':
+                vals['amount'] = rec.amount
+            if batch.component_id.needs_date:
+                vals['date'] = batch.period
+            vals_list.append(vals)
+        if not vals_list:
+            return self.env['ksw.pay.entry']
+        return self.env['ksw.pay.entry'].create(vals_list)
+
+    @api.model
+    def _due_for_batch(self, batch):
+        """The recurring entries ``_apply_to_batch`` would create, sudo()'d."""
         period = batch.period
         domain = [
             ('component_id', '=', batch.component_id.id),
@@ -275,7 +301,7 @@ class KswPayRecurring(models.Model):
         # authoritative filter either way.
         recurring = self.sudo().search(domain)
         if not recurring:
-            return self.env['ksw.pay.entry']
+            return recurring
 
         # A component with options repeats per option, so "already there"
         # is the employee *and* the choice: pulling in the recurring meals
@@ -297,7 +323,7 @@ class KswPayRecurring(models.Model):
         # the same lesson the BAS importer records a few files over.
         entry_date = period if batch.component_id.needs_date else None
         holds = vacation_holds(self.env, recurring.employee_id, period)
-        vals_list = []
+        due = recurring.browse()
         for rec in recurring:
             if (rec.employee_id.id, rec.option_id.id or False,
                     self._reason_key(rec.reason)) in already:
@@ -306,18 +332,5 @@ class KswPayRecurring(models.Model):
                 continue
             if hold_blocks(holds.get(rec.employee_id.id), entry_date):
                 continue
-            vals = {
-                'batch_id': batch.id,
-                'employee_id': rec.employee_id.id,
-                'option_id': rec.option_id.id or False,
-                'quantity': rec.quantity,
-                'reason': rec.reason or False,
-            }
-            if batch.component_id.calculation == 'fixed':
-                vals['amount'] = rec.amount
-            if batch.component_id.needs_date:
-                vals['date'] = period
-            vals_list.append(vals)
-        if not vals_list:
-            return self.env['ksw.pay.entry']
-        return self.env['ksw.pay.entry'].create(vals_list)
+            due |= rec
+        return due

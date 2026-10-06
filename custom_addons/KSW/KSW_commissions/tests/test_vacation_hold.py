@@ -178,6 +178,21 @@ class TestVacationHoldPredicate(VacationHoldCommon):
         leave.sudo().write({'state': 'refuse'})
         self.assertFalse(vacation_hold(self.env, self.emp, AUG))
 
+    def test_a_request_awaiting_hr_confirmation_already_holds(self):
+        """He leaves at GM final approval; the chain stays 'confirm' until
+        HR files the signed form (gotcha #48). 'On Vacation' is the tell."""
+        leave = self._leave(date(2026, 8, 11), date(2026, 8, 20))
+        leave.sudo().write({'state': 'confirm'})
+        hold = vacation_hold(self.env, self.emp, AUG)
+        self.assertTrue(hold)
+        self.assertEqual(hold.kind, 'full')
+
+    def test_a_request_still_in_approval_holds_nothing(self):
+        leave = self._leave(date(2026, 8, 11), date(2026, 8, 20))
+        leave.sudo().write({
+            'state': 'confirm', 'x_return_state': 'not_applicable'})
+        self.assertFalse(vacation_hold(self.env, self.emp, AUG))
+
     def test_a_type_outside_the_return_system_holds_nothing(self):
         """Sick leave settles nothing at the request, so it holds nothing."""
         sick = self.env['hr.leave.type'].sudo().create({
@@ -459,3 +474,138 @@ class TestVacationRelease(VacationHoldCommon):
                     return_date=date(2026, 9, 17))
         with self.assertRaises(Exception):
             self._release(user=other_gm_user)
+
+
+class TestVacationHoldRecurringPull(VacationHoldCommon):
+    """"Add Recurring" must leave out whoever is away, or no longer here.
+
+    2030, not 2026: the shared dev DB has an approved August 2026 run, which
+    locks any batch for that month before the pull is even reached.
+    """
+
+    def _recurring(self, employee):
+        return self.env['ksw.pay.recurring'].sudo().create({
+            'employee_id': employee.id,
+            'component_id': self.component.id,
+            'quantity': 2.0,
+            'reason': 'standing',
+            'date_from': date(2030, 7, 1),
+        })
+
+    def _pulled(self, period):
+        batch = self._batch(period)
+        batch.with_user(self.officer).action_add_recurring()
+        batch.invalidate_recordset()
+        return batch.entry_ids.employee_id
+
+    def test_an_employee_awaiting_hr_confirmation_is_not_pulled(self):
+        """The supervisor's report: GM signed, HR has not filed the form yet,
+        and the pull still offered the driver who had already left."""
+        colleague = self.env['hr.employee'].sudo().create({
+            'name': 'Hold Colleague', 'department_id': self.dept.id})
+        self._recurring(self.emp)
+        self._recurring(colleague)
+        leave = self._leave(date(2030, 8, 11), date(2030, 8, 20))
+        leave.sudo().write({'state': 'confirm'})
+        pulled = self._pulled(date(2030, 8, 1))
+        self.assertNotIn(self.emp, pulled)
+        self.assertIn(colleague, pulled)
+
+    def test_an_archived_employee_is_not_pulled(self):
+        gone = self.env['hr.employee'].sudo().create({
+            'name': 'Hold Archived', 'department_id': self.dept.id})
+        self._recurring(gone)
+        gone.sudo().action_archive()
+        self.assertNotIn(gone, self._pulled(date(2030, 8, 1)))
+
+
+class TestRecurringPendingVacationPrompt(VacationHoldCommon):
+    """Before GM final the request may still be refused: ask, do not decide."""
+
+    P = date(2030, 8, 1)
+
+    def setUp(self):
+        super().setUp()
+        self.colleague = self.env['hr.employee'].sudo().create({
+            'name': 'Prompt Colleague', 'department_id': self.dept.id})
+        for employee in (self.emp, self.colleague):
+            self.env['ksw.pay.recurring'].sudo().create({
+                'employee_id': employee.id,
+                'component_id': self.component.id,
+                'quantity': 2.0,
+                'reason': 'standing',
+                'date_from': date(2030, 7, 1),
+            })
+        self.batch = self._batch(self.P)
+
+    def _pending(self, settles=True):
+        leave = self._leave(date(2030, 8, 11), date(2030, 8, 20))
+        leave.sudo().write({
+            'state': 'confirm',
+            'x_return_state': 'not_applicable',
+            'x_annual_approval_state': 'pending_acc',
+        })
+        # After the leave exists, so creating it does not run the annual
+        # chain; the prompt only asks whether this type settles commissions.
+        self.leave_type.sudo().is_annual_leave = settles
+        return leave
+
+    def _press(self):
+        return self.batch.with_user(self.officer).action_add_recurring()
+
+    def _wizard(self, action):
+        self.assertEqual(action.get('res_model'),
+                         'ksw.pay.recurring.vacation.wizard')
+        return self.env[action['res_model']].with_user(
+            self.officer).browse(action['res_id'])
+
+    def test_a_pending_vacation_prompts_and_adds_nothing_yet(self):
+        self._pending()
+        wizard = self._wizard(self._press())
+        self.assertEqual(wizard.line_ids.employee_id, self.emp)
+        self.assertEqual(wizard.line_ids.step, 'Pending Accounting')
+        self.assertFalse(self.batch.entry_ids)
+        # What the dialog actually asks for, as a user with no hr.employee
+        # or hr.leave access (Odoo 19 Pitfalls #34): it must render.
+        self.assertFalse(self.officer.has_group('hr.group_hr_user'))
+        wizard.invalidate_recordset()
+        rows = wizard.web_read({'line_ids': {'fields': {
+            'add': {}, 'employee_id': {'fields': {'display_name': {}}},
+            'leave_type': {}, 'date_from': {}, 'date_to': {}, 'step': {},
+        }}})
+        self.assertEqual(rows[0]['line_ids'][0]['employee_id']['display_name'],
+                         'Hold Driver')
+
+    def test_unticked_is_left_out_and_everyone_else_is_added(self):
+        self._pending()
+        wizard = self._wizard(self._press())
+        wizard.line_ids.add = False
+        wizard.action_confirm()
+        self.batch.invalidate_recordset()
+        self.assertEqual(self.batch.entry_ids.employee_id, self.colleague)
+
+    def test_ticked_is_added(self):
+        self._pending()
+        wizard = self._wizard(self._press())
+        wizard.action_confirm()
+        self.batch.invalidate_recordset()
+        self.assertEqual(self.batch.entry_ids.employee_id,
+                         self.emp | self.colleague)
+
+    def test_a_leave_that_settles_nothing_does_not_prompt(self):
+        self._pending(settles=False)
+        action = self._press()
+        self.assertEqual(action.get('tag'), 'display_notification')
+        self.batch.invalidate_recordset()
+        self.assertEqual(self.batch.entry_ids.employee_id,
+                         self.emp | self.colleague)
+
+    def test_past_gm_final_is_held_not_prompted(self):
+        leave = self._pending()
+        leave.sudo().write({'x_return_state': 'on_vacation',
+                            'x_annual_approval_state':
+                                'pending_employee_signature'})
+        action = self._press()
+        self.assertEqual(action.get('tag'), 'display_notification')
+        self.batch.invalidate_recordset()
+        self.assertEqual(self.batch.entry_ids.employee_id, self.colleague)

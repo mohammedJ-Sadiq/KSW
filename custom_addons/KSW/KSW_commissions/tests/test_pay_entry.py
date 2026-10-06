@@ -725,3 +725,85 @@ class TestRecurringCatchAllComponent(PayEntryCommon):
         Recurring.create(vals)
         with self.assertRaises(ValidationError):
             Recurring.create(dict(vals))
+
+
+class TestRepricingLeavesSignedOffMonthsAlone(PayEntryCommon):
+    """Changing how a component is priced re-prices only what is still being
+    typed, and a used component keeps its calculation method. KSWCO,
+    6 Oct 2026: switching National Day Bonus from Fixed to Quantity × rate
+    re-ran an approved September batch as 0 × 100."""
+
+    def setUp(self):
+        super().setUp()
+        self.bonus = self.env['ksw.pay.component'].sudo().create({
+            'name': 'Holiday Bonus Test', 'code': 'BONUS_REPRICE',
+            'calculation': 'qty_rate', 'rate': 100.0, 'scope': 'department',
+        })
+
+    def _approved(self, entry):
+        entry.sudo().write({'state': 'approved'})
+        entry.batch_id.sudo().write({'state': 'approved'})
+        return entry
+
+    def _signed_off(self, *entries):
+        # In real life the amount was stored weeks before anyone touched
+        # the component; a pending compute would run under the new pricing.
+        self.env.flush_all()
+        return entries
+
+    def _amount(self, entry):
+        self.env.flush_all()
+        entry.invalidate_recordset()
+        return entry.amount
+
+    def test_01_a_rate_change_keeps_an_approved_amount(self):
+        approved = self._approved(
+            self._entry(self._batch(component=self.bonus), quantity=1.0))
+        self._signed_off(approved)
+        self.bonus.write({'rate': 150.0})
+        self.assertEqual(self._amount(approved), 100.0)
+
+    def test_02_a_draft_entry_takes_the_new_rate(self):
+        draft = self._entry(self._batch(component=self.bonus), quantity=2.0)
+        self._signed_off(draft)
+        self.bonus.write({'rate': 150.0})
+        self.assertEqual(self._amount(draft), 300.0)
+
+    def test_03_an_option_rate_change_spares_the_approved_month(self):
+        old = self.o_lunch.rate
+        draft = self._entry(self._batch(component=self.c_meals),
+                            quantity=2.0, option_id=self.o_lunch.id)
+        approved = self._approved(self._entry(
+            self._batch(component=self.c_meals, dept=self.other_dept),
+            employee=self._employee('Pay Emp 3', self.other_dept, 3000.0),
+            quantity=2.0, option_id=self.o_lunch.id))
+        self._signed_off(draft, approved)
+        self.o_lunch.sudo().write({'rate': old + 5.0})
+        self.assertEqual(self._amount(draft), 2 * (old + 5.0))
+        self.assertEqual(self._amount(approved), 2 * old)
+
+    def test_04_a_used_component_keeps_its_method(self):
+        """Even a draft entry is enough: it was typed in the old meaning."""
+        entry = self._entry(self._batch(component=self.bonus), quantity=1.0)
+        self._signed_off(entry)
+        with self.assertRaises(UserError):
+            self.bonus.write({'calculation': 'fixed'})
+        self.assertEqual(self.bonus.calculation, 'qty_rate')
+        self.assertEqual(self._amount(entry), 100.0)
+
+    def test_05_a_recurring_entry_also_counts_as_use(self):
+        self.env['ksw.pay.recurring'].sudo().create({
+            'employee_id': self.emp.id, 'component_id': self.bonus.id,
+            'quantity': 1.0, 'date_from': self.period,
+        })
+        with self.assertRaises(UserError):
+            self.bonus.write({'calculation': 'fixed'})
+
+    def test_06_an_unused_component_can_change_method(self):
+        self.bonus.write({'calculation': 'fixed'})
+        self.assertEqual(self.bonus.calculation, 'fixed')
+
+    def test_07_rewriting_the_same_method_is_not_a_change(self):
+        self._entry(self._batch(component=self.bonus), quantity=1.0)
+        self.bonus.write({'calculation': 'qty_rate', 'rate': 120.0})
+        self.assertEqual(self.bonus.rate, 120.0)

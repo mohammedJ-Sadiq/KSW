@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Applies to all three OCA statements: they are primary children of this view -->
+    <record id="statement_common_view_ksw_partners" model="ir.ui.view">
+        <field name="name">statement.common.wizard.form.ksw.partners</field>
+        <field name="model">statement.common.wizard</field>
+        <field name="inherit_id" ref="partner_statement.statement_common_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//hr" position="after">
+                <group name="ksw_partners">
+                    <field name="partner_ids" widget="many2many_tags" required="1"
+                           options="{'no_create': True}"
+                           domain="[('customer_rank', '&gt;', 0)] if account_type == 'asset_receivable' else [('supplier_rank', '&gt;', 0)]"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Opened from Reporting > Partner Reports -->
+    <record id="action_ksw_activity_statement" model="ir.actions.act_window">
+        <field name="name">Statement of Account</field>
+        <field name="res_model">activity.statement.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+    <record id="action_ksw_outstanding_statement" model="ir.actions.act_window">
+        <field name="name">Outstanding Statement</field>
+        <field name="res_model">outstanding.statement.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

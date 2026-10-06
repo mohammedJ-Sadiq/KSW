@@ -1,54 +1,171 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!--
-      Re-parenting is done with <function name="write"> rather than a <record>
-      override: a record override aimed at another module's data is silently
-      skipped on every upgrade after the first install (Odoo 19 Pitfalls #2),
-      whereas write() is called directly and always applies.
+      The Accounting app, laid out the way Odoo Enterprise and the big ERPs
+      (SAP FI, Oracle Financials) divide the work:
+
+        Dashboard
+        Customers      receivables: documents, receipts, master data
+        Vendors        payables: documents, payments, what falls due
+        Bank and Cash  treasury: reconcile, statements, import
+        Accounting     general ledger: Transactions / Actions / Management / Closing
+        Review         audit: Control / Logs
+        Reporting      Statement / Audit / Partner / Taxes / Management reports
+        Configuration  one header per area, each with only its own settings
+
+      Rules kept throughout:
+      * a dropdown is either all plain items or all section headers, never a
+        mix (a plain item under a header reads as belonging to it);
+      * every report lives under Reporting only, every setting under
+        Configuration only: nothing appears twice;
+      * debug-only for tools a day-to-day accountant never needs.
+
+      Folders emptied by this file (OCA "Assets", "Bank and Cash", "Date
+      Ranges", "MIS Reporting", ...) disappear on their own: a menu with no
+      action is only shown while it has a visible child.
     -->
 
-    <!-- Statement Reports: the core financial statements -->
-    <function model="ir.ui.menu" name="write">
+    <!-- ============ New section headers ============ -->
+    <menuitem id="menu_ksw_bank_cash" name="Bank and Cash" sequence="4"
+              parent="account.menu_finance" groups="account.group_account_readonly"/>
+    <menuitem id="menu_ksw_entries_actions" name="Actions" sequence="10"
+              parent="account.menu_finance_entries"/>
+    <menuitem id="menu_ksw_entries_management" name="Management" sequence="15"
+              parent="account.menu_finance_entries"/>
+    <menuitem id="menu_ksw_reports_audit" name="Audit Reports" sequence="2"
+              parent="account.menu_finance_reports" groups="account.group_account_readonly"/>
+    <menuitem id="menu_ksw_config_periods" name="Periods" sequence="12"
+              parent="account.menu_finance_configuration"/>
+    <menuitem id="menu_ksw_config_banks" name="Banks" sequence="22"
+              parent="account.menu_finance_configuration"/>
+    <menuitem id="menu_ksw_config_budgets" name="Budgets" sequence="27"
+              parent="account.menu_finance_configuration"/>
+    <menuitem id="menu_ksw_config_reporting" name="Reporting" sequence="50"
+              parent="account.menu_finance_configuration"/>
+    <menuitem id="menu_ksw_config_migration" name="Data Migration" sequence="90"
+              parent="account.menu_finance_configuration"/>
+
+    <!-- ============ New entries (KSW actions, or existing ones never given a menu) ============ -->
+    <!-- Customers / Vendors -->
+    <menuitem id="menu_ksw_debit_notes" name="Debit Notes" sequence="3"
+              parent="account.menu_finance_receivables" action="action_ksw_debit_notes"/>
+    <menuitem id="menu_ksw_payments_due" name="Payments Due" sequence="25"
+              parent="account.menu_finance_payables" action="action_ksw_payments_due"/>
+
+    <!-- Bank and Cash -->
+    <menuitem id="menu_ksw_bank_reconcile" name="Bank Reconciliation" sequence="10"
+              parent="menu_ksw_bank_cash" action="action_ksw_bank_reconcile"/>
+    <menuitem id="menu_ksw_all_payments" name="All Payments" sequence="50"
+              parent="menu_ksw_bank_cash" action="account.action_account_all_payments"/>
+
+    <!-- Accounting -->
+    <menuitem id="menu_ksw_account_reconcile" name="Account Reconciliation" sequence="20"
+              parent="menu_ksw_entries_actions" action="account_reconcile_oca.account_account_reconcile_act_window"/>
+    <menuitem id="menu_ksw_asset_compute" name="Compute Depreciation" sequence="20"
+              parent="menu_ksw_entries_management" action="account_asset_management.account_asset_compute_action"/>
+    <menuitem id="menu_ksw_budgets_by_account" name="Budgets by Account" sequence="40"
+              parent="menu_ksw_entries_management" action="mis_builder_budget.mis_budget_by_account_act_window"/>
+    <menuitem id="menu_ksw_fy_closing" name="Year-End Closing" sequence="20"
+              parent="account.account_closing_menu" action="account_fiscal_year_closing.action_account_fiscalyear_closing"/>
+
+    <!-- Review -->
+    <menuitem id="menu_ksw_entries_to_review" name="Entries to Review" sequence="1"
+              parent="account.account_audit_control_menu" action="action_ksw_entries_to_review"/>
+
+    <!-- Reporting -->
+    <menuitem id="menu_ksw_bs" name="Balance Sheet" sequence="1"
+              parent="account.account_reports_legal_statements_menu" action="action_ksw_bs_wizard"/>
+    <menuitem id="menu_ksw_pl" name="Profit and Loss" sequence="2"
+              parent="account.account_reports_legal_statements_menu" action="action_ksw_pl_wizard"/>
+    <menuitem id="menu_ksw_cf" name="Cash Flow Statement" sequence="3"
+              parent="account.account_reports_legal_statements_menu" action="action_ksw_cf_wizard"/>
+    <menuitem id="menu_ksw_partner_ledger" name="Partner Ledger" sequence="10"
+              parent="account.account_reports_partners_reports_menu" action="account.action_account_moves_ledger_partner"/>
+    <menuitem id="menu_ksw_activity_statement" name="Statement of Account" sequence="40"
+              parent="account.account_reports_partners_reports_menu" action="action_ksw_activity_statement"/>
+    <menuitem id="menu_ksw_outstanding_statement" name="Outstanding Statement" sequence="50"
+              parent="account.account_reports_partners_reports_menu" action="action_ksw_outstanding_statement"/>
+    <menuitem id="menu_ksw_bills_analysis" name="Bills Analysis" sequence="2"
+              parent="account.account_reports_management_menu" action="account.action_account_invoice_report_all_supp"/>
+    <menuitem id="menu_ksw_budget_analysis" name="Budget Analysis" sequence="15"
+              parent="account.account_reports_management_menu" action="account_budget_oca.act_crossovered_budget_lines_view"/>
+    <menuitem id="menu_ksw_asset_report" name="Assets Report" sequence="18"
+              parent="account.account_reports_management_menu" action="account_asset_management.wiz_account_asset_report_action"/>
+
+    <!-- Configuration -->
+    <menuitem id="menu_ksw_update_chart" name="Update Chart of Accounts" sequence="30"
+              parent="account.account_account_menu" action="account_chart_update.action_wizard_update_chart"
+              groups="base.group_no_one"/>
+    <menuitem id="menu_ksw_fy_closing_templates" name="Year-End Closing Templates" sequence="50"
+              parent="menu_ksw_config_periods" action="account_fiscal_year_closing.action_account_fiscalyear_closing_template"/>
+    <menuitem id="menu_ksw_bank_accounts" name="Bank Accounts" sequence="10"
+              parent="menu_ksw_config_banks" action="account.action_account_supplier_accounts"/>
+    <menuitem id="menu_ksw_aged_config" name="Aged Report Intervals" sequence="30"
+              parent="menu_ksw_config_reporting" action="account_financial_report.action_aged_partner_report_configuration"/>
+
+    <!-- ============ Existing menus, re-homed: (menu, new parent, sequence[, groups]) ============ -->
+    <function model="ir.ui.menu" name="_ksw_place_menus">
         <value eval="[
-            ref('account_financial_report.menu_trial_balance_wizard'),
-            ref('account_financial_report.menu_general_ledger_wizard'),
-            ref('account_financial_report.menu_journal_ledger_wizard'),
+            ('account.menu_finance_entries', 'account.menu_finance', 5),
+
+            ('account_usability.menu_accounting_statement_bank', 'KSW_accounting_ux.menu_ksw_bank_cash', 20),
+            ('account_usability.menu_accounting_statement_cash', 'KSW_accounting_ux.menu_ksw_bank_cash', 30),
+            ('account_statement_import_file.account_statement_import_menu', 'KSW_accounting_ux.menu_ksw_bank_cash', 40),
+
+            ('account_move_template.account_move_template_run_menu', 'KSW_accounting_ux.menu_ksw_entries_actions', 10),
+            ('account_asset_management.account_asset_menu', 'KSW_accounting_ux.menu_ksw_entries_management', 10),
+            ('account_budget_oca.menu_act_crossovered_budget_view', 'KSW_accounting_ux.menu_ksw_entries_management', 30),
+            ('mis_builder_budget.mis_budget_menu', 'KSW_accounting_ux.menu_ksw_entries_management', 50, ['base.group_no_one']),
+            ('account_lock_date_update.account_update_lock_date_menu', 'account.account_closing_menu', 10),
+
+            ('account_financial_report.menu_general_ledger_wizard', 'KSW_accounting_ux.menu_ksw_reports_audit', 10),
+            ('account_financial_report.menu_trial_balance_wizard', 'KSW_accounting_ux.menu_ksw_reports_audit', 20),
+            ('account_financial_report.menu_journal_ledger_wizard', 'KSW_accounting_ux.menu_ksw_reports_audit', 30),
+            ('account_financial_report.menu_aged_partner_balance_wizard', 'account.account_reports_partners_reports_menu', 20),
+            ('account_financial_report.menu_open_items_wizard', 'account.account_reports_partners_reports_menu', 30),
+            ('account_financial_report.menu_vat_report_wizard', 'account.account_reports_taxes_and_fiscal_menu', 10),
+            ('account_tax_balance.menu_action_open_tax_balances', 'account.account_reports_taxes_and_fiscal_menu', 20),
+            ('mis_builder.mis_report_instance_view_menu', 'account.account_reports_management_menu', 20),
+            ('mis_builder.last_wizard_mis_report_instance_view_menu', 'account.account_reports_management_menu', 30, ['base.group_no_one']),
+
+            ('account_usability.account_group_menu', 'account.account_account_menu', 2),
+            ('account_usability.account_tag_menu', 'account.account_account_menu', 3),
+            ('account.menu_action_tax_form', 'account.account_account_menu', 4),
+            ('account.menu_action_tax_group', 'account.account_account_menu', 5),
+            ('account.menu_action_account_journal_form', 'account.account_account_menu', 6),
+            ('account.menu_action_currency_form', 'account.account_account_menu', 7),
+            ('account.menu_action_account_fiscal_position_form', 'account.account_account_menu', 8),
+            ('account.menu_action_account_journal_group_list', 'account.account_account_menu', 9),
+            ('account.menu_action_rounding_form_view', 'account.account_account_menu', 10),
+            ('account_move_template.account_move_template_menu', 'account.account_account_menu', 20),
+
+            ('account_fiscal_year.menu_actions_account_fiscal_year', 'KSW_accounting_ux.menu_ksw_config_periods', 10),
+            ('date_range_account.menu_date_range', 'KSW_accounting_ux.menu_ksw_config_periods', 20),
+            ('date_range_account.menu_date_range_type', 'KSW_accounting_ux.menu_ksw_config_periods', 30),
+            ('date_range_account.menu_date_range_generator', 'KSW_accounting_ux.menu_ksw_config_periods', 40),
+
+            ('account_reconcile_oca.menu_account_reconcile_model', 'KSW_accounting_ux.menu_ksw_config_banks', 20),
+            ('account_statement_import_sheet_file.menu_statement_import_sheet_mapping', 'KSW_accounting_ux.menu_ksw_config_banks', 30),
+
+            ('account_budget_oca.menu_budget_post_form', 'KSW_accounting_ux.menu_ksw_config_budgets', 10),
+
+            ('mis_builder.mis_report_view_menu', 'KSW_accounting_ux.menu_ksw_config_reporting', 10),
+            ('mis_builder.mis_report_style_view_menu', 'KSW_accounting_ux.menu_ksw_config_reporting', 20),
+
+            ('KSW_bas_gl_import.menu_ksw_bas_gl_import', 'KSW_accounting_ux.menu_ksw_config_migration', 10),
         ]"/>
-        <value eval="{'parent_id': ref('account.account_reports_legal_statements_menu')}"/>
     </function>
 
-    <!-- Partner Reports: what customers and suppliers owe -->
+    <!-- ============ Retired: replaced by a KSW entry above, or a wrapper left empty ============ -->
     <function model="ir.ui.menu" name="write">
         <value eval="[
-            ref('account_financial_report.menu_aged_partner_balance_wizard'),
-            ref('account_financial_report.menu_open_items_wizard'),
-        ]"/>
-        <value eval="{'parent_id': ref('account.account_reports_partners_reports_menu')}"/>
-    </function>
-
-    <!-- Taxes &amp; Fiscal: everything ZATCA and VAT -->
-    <function model="ir.ui.menu" name="write">
-        <value eval="[
-            ref('account_financial_report.menu_vat_report_wizard'),
-            ref('account_tax_balance.menu_action_open_tax_balances'),
-        ]"/>
-        <value eval="{'parent_id': ref('account.account_reports_taxes_and_fiscal_menu')}"/>
-    </function>
-
-    <!-- Management: analysis and the MIS statements a controller builds -->
-    <function model="ir.ui.menu" name="write">
-        <value eval="[
-            ref('mis_builder.mis_report_instance_view_menu'),
-            ref('mis_builder.last_wizard_mis_report_instance_view_menu'),
+            ref('account_reconcile_oca.account_account_reconcile_menu'),
+            ref('account_asset_management.account_asset_compute_menu'),
+            ref('account_fiscal_year_closing.menu_account_fiscalyear_closing'),
+            ref('account_fiscal_year_closing.menu_account_fiscalyear_closing_template'),
+            ref('account_budget_oca.menu_act_crossovered_budget_lines_view'),
+            ref('account_asset_management.wiz_account_asset_report_menu'),
             ref('mis_builder_budget.mis_budget_by_account_menu'),
-            ref('mis_builder_budget.mis_budget_menu'),
-        ]"/>
-        <value eval="{'parent_id': ref('account.account_reports_management_menu')}"/>
-    </function>
-
-    <!-- The now-empty vendor wrappers disappear -->
-    <function model="ir.ui.menu" name="write">
-        <value eval="[
             ref('account_financial_report.menu_oca_reports'),
             ref('account_tax_balance.menu_tax_balances'),
             ref('mis_builder.mis_report_finance_menu'),
@@ -56,13 +173,39 @@
         <value eval="{'active': False}"/>
     </function>
 
-    <!-- Income Statement: ask for the period first (ksw.pl.wizard) -->
-    <menuitem id="menu_ksw_pl" name="Profit and Loss" sequence="1"
-              parent="account.account_reports_legal_statements_menu" action="action_ksw_pl_wizard"/>
-
-    <!-- A migration tool does not belong beside daily transactions -->
-    <function model="ir.ui.menu" name="write">
-        <value eval="[ref('KSW_bas_gl_import.menu_ksw_bas_gl_import')]"/>
-        <value eval="{'parent_id': ref('account.menu_finance_configuration')}"/>
+    <!-- ============ Arabic labels for menus other modules own (KSW ones come from i18n) ============ -->
+    <function model="ir.ui.menu" name="_ksw_set_arabic_names">
+        <value eval="{
+            'account.menu_finance': 'المحاسبة',
+            'account.menu_action_move_in_invoice_type': 'فواتير الموردين',
+            'account_statement_import_file.account_statement_import_menu': 'استيراد كشف البنك',
+            'account_move_template.account_move_template_run_menu': 'إنشاء قيد من قالب',
+            'account_asset_management.account_asset_menu': 'الأصول',
+            'mis_builder_budget.mis_budget_menu': 'موازنات MIS (حسب المؤشرات)',
+            'account.account_closing_menu': 'الإقفال',
+            'account_lock_date_update.account_update_lock_date_menu': 'تواريخ الإقفال',
+            'account.account_audit_menu': 'المراجعة',
+            'account.account_audit_control_menu': 'الرقابة',
+            'account.account_reports_legal_statements_menu': 'القوائم المالية',
+            'account_financial_report.menu_journal_ledger_wizard': 'تقرير دفاتر اليومية',
+            'account_financial_report.menu_aged_partner_balance_wizard': 'أعمار ديون الشركاء',
+            'account_financial_report.menu_open_items_wizard': 'البنود المفتوحة',
+            'account_tax_balance.menu_action_open_tax_balances': 'أرصدة الضرائب',
+            'account.menu_action_account_invoice_report_all': 'تحليل فواتير العملاء',
+            'mis_builder.mis_report_instance_view_menu': 'تقارير MIS',
+            'mis_builder.last_wizard_mis_report_instance_view_menu': 'آخر التقارير المُنشأة',
+            'account_move_template.account_move_template_menu': 'قوالب القيود',
+            'account_fiscal_year.menu_actions_account_fiscal_year': 'السنوات المالية',
+            'date_range_account.menu_date_range': 'نطاقات التواريخ',
+            'date_range_account.menu_date_range_type': 'أنواع نطاقات التواريخ',
+            'date_range_account.menu_date_range_generator': 'إنشاء نطاقات التواريخ',
+            'account_reconcile_oca.menu_account_reconcile_model': 'نماذج التسوية',
+            'account_statement_import_sheet_file.menu_statement_import_sheet_mapping': 'تنسيقات ملفات كشوف البنك',
+            'account_asset_management.account_asset_group_menu': 'مجموعات الأصول',
+            'account_asset_management.menu_finance_config_assets': 'الأصول',
+            'mis_builder.mis_report_view_menu': 'قوالب تقارير MIS',
+            'mis_builder.mis_report_style_view_menu': 'أنماط تقارير MIS',
+            'KSW_bas_gl_import.menu_ksw_bas_gl_import': 'استيراد دفتر الأستاذ من BAS',
+        }"/>
     </function>
 </odoo>

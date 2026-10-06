@@ -446,6 +446,7 @@ msgstr "الرحلات الفعلية"
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_batch_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_recurring_vacation_wizard_form
 msgid "Add Recurring"
 msgstr "إضافة المتكرّرة"
 
@@ -814,6 +815,7 @@ msgstr "طريقة الاحتساب"
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_bank_export_wizard_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_import_wizard_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_override_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_recurring_vacation_wizard_form
 msgid "Cancel"
 msgstr "إلغاء"
 
@@ -7209,6 +7211,7 @@ msgstr "آخر يوم يغطيه الرقم المستورد."
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_sub_batch__date_from
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_sub_batch_trip_wizard__date_from
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_list
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring_vacation_wizard_line__date_from
 msgid "From"
 msgstr "من"
 
@@ -7217,6 +7220,7 @@ msgstr "من"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_sub_batch__date_to
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_sub_batch_trip_wizard__date_to
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_list
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring_vacation_wizard_line__date_to
 msgid "To"
 msgstr "إلى"
 
@@ -7521,3 +7525,57 @@ msgstr ""
 "لم يُرسل شيء — تعذّر استيراد أي من السائقين المختارين لتلك الأيام:\n"
 "\n"
 "%(why)s"
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/wizard/ksw_pay_recurring_vacation_wizard.py:0
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_recurring_vacation_wizard_form
+#. odoo-python
+msgid "Pending Vacations"
+msgstr "إجازات قيد الاعتماد"
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/wizard/ksw_pay_recurring_vacation_wizard.py:0
+#. odoo-python
+msgid "Awaiting approval"
+msgstr "بانتظار الاعتماد"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_recurring_vacation_wizard_form
+msgid "These employees have a vacation request that is still being approved. If it is approved, this month is paid with the vacation and the entry will have to be removed; if it is refused, it is paid here as usual."
+msgstr "لدى هؤلاء الموظفين طلب إجازة لا يزال قيد الاعتماد. إذا اعتُمد، يُصرف هذا الشهر مع مستحقات الإجازة ويجب حذف القيد؛ وإذا رُفض، يُصرف هنا كالمعتاد."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_recurring_vacation_wizard_form
+msgid "Untick anyone you do not want to add now. Everyone else is added as usual."
+msgstr "ألغِ تحديد من لا تريد إضافته الآن. يُضاف الباقون كالمعتاد."
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_pay_recurring_vacation_wizard
+msgid "Add Recurring: employees with a vacation pending approval"
+msgstr "إضافة المتكرّرة: موظفون لديهم إجازة قيد الاعتماد"
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_pay_recurring_vacation_wizard_line
+msgid "Add Recurring: one employee with a pending vacation"
+msgstr "إضافة المتكرّرة: موظف لديه إجازة قيد الاعتماد"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring_vacation_wizard_line__leave_type
+msgid "Leave"
+msgstr "الإجازة"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring_vacation_wizard_line__step
+msgid "Waiting For"
+msgstr "بانتظار"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring_vacation_wizard_line__add
+msgid "Add"
+msgstr "إضافة"
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+#. odoo-python
+msgid "%(component)s already has %(entries)s pay entries and %(recurring)s recurring entries recorded under its current calculation method, so the method cannot be changed: those records would be re-read in the new meaning and their amounts would change.\n\nCreate a new component with the calculation you want and archive this one. Its rate can still be changed — that only affects entries still in draft."
+msgstr "لدى %(component)s %(entries)s إدخال مستحقات و%(recurring)s إدخال متكرّر مسجّلة بطريقة الاحتساب الحالية، لذا لا يمكن تغيير طريقة الاحتساب: ستُقرأ هذه السجلات بالمعنى الجديد وستتغيّر مبالغها.\n\nأنشئ مكوّناً جديداً بطريقة الاحتساب المطلوبة وأرشف هذا المكوّن. لا يزال بالإمكان تغيير السعر — ويؤثر ذلك فقط على الإدخالات التي ما زالت مسودة."

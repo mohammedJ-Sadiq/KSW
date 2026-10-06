@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ksw_pay_recurring_vacation_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.pay.recurring.vacation.wizard.form</field>
+        <field name="model">ksw.pay.recurring.vacation.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Pending Vacations">
+                <field name="batch_id" invisible="1"/>
+                <!-- One sentence per line: the translation term keeps the
+                     line breaks of the source. -->
+                <div class="alert alert-warning" role="alert">
+                    <p>These employees have a vacation request that is still being approved. If it is approved, this month is paid with the vacation and the entry will have to be removed; if it is refused, it is paid here as usual.</p>
+                    <p class="mb-0">Untick anyone you do not want to add now. Everyone else is added as usual.</p>
+                </div>
+                <field name="line_ids" nolabel="1">
+                    <list create="0" delete="0" editable="bottom">
+                        <field name="add" widget="boolean_toggle"/>
+                        <field name="employee_id"/>
+                        <field name="leave_type"/>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="step"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_confirm" string="Add Recurring"
+                            type="object" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"
+                            class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

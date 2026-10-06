@@ -554,6 +554,51 @@ class KswPayComponent(models.Model):
         return self.search([]).filtered(lambda c: c._check_may_enter())
 
 
+    def _check_calculation_unused(self, calculation):
+        """A component that has been used keeps its calculation method.
+
+        The method is what an entry's figures *mean*: a Fixed entry holds a
+        typed amount and no quantity, a Quantity × rate one holds days and
+        derives the amount. Switching under existing records re-reads them in
+        the new meaning — National Day Bonus on KSWCO (6 Oct 2026) went from
+        Fixed to Quantity × rate and 18 approved entries became 0 × 100.
+        A rate change is still allowed: it only re-prices draft entries.
+        Not exempting env.su on purpose: no data file or migration in this
+        module changes a used component's method, and none should.
+        """
+        Entry = self.env['ksw.pay.entry'].sudo()
+        Recurring = self.env['ksw.pay.recurring'].sudo()
+        for rec in self:
+            if rec.calculation == calculation:
+                continue
+            entries = Entry.search_count([('component_id', '=', rec.id)])
+            recurring = Recurring.search_count([('component_id', '=', rec.id)])
+            if entries or recurring:
+                raise UserError(_(
+                    "%(component)s already has %(entries)s pay entries and "
+                    "%(recurring)s recurring entries recorded under its "
+                    "current calculation method, so the method cannot be "
+                    "changed: those records would be re-read in the new "
+                    "meaning and their amounts would change.\n\n"
+                    "Create a new component with the calculation you want "
+                    "and archive this one. Its rate can still be changed — "
+                    "that only affects entries still in draft.",
+                    component=rec.display_name, entries=entries,
+                    recurring=recurring))
+
+    # What decides an entry's amount. Changing any of it re-prices only the
+    # entries still being typed — see ksw.pay.entry._mark_open_for_repricing.
+    _PRICING_FIELDS = frozenset({'calculation', 'rate', 'divisor', 'factor'})
+
+    def write(self, vals):
+        if 'calculation' in vals:
+            self._check_calculation_unused(vals['calculation'])
+        res = super().write(vals)
+        if self._PRICING_FIELDS & set(vals) or 'tier_ids' in vals:
+            self.env['ksw.pay.entry']._mark_open_for_repricing(components=self)
+        return res
+
+
 class KswPayComponentOption(models.Model):
     """One choice inside a component — Breakfast, Lunch, Dinner.
 
@@ -593,6 +638,12 @@ class KswPayComponentOption(models.Model):
         for rec in self:
             if rec.rate < 0:
                 raise ValidationError(_("An option's rate cannot be negative."))
+
+    def write(self, vals):
+        res = super().write(vals)
+        if 'rate' in vals:
+            self.env['ksw.pay.entry']._mark_open_for_repricing(options=self)
+        return res
 
 
 class KswPayRateTier(models.Model):
@@ -638,3 +689,26 @@ class KswPayRateTier(models.Model):
                 raise ValidationError(_("A band size cannot be negative."))
             if rec.rate < 0:
                 raise ValidationError(_("A tier rate cannot be negative."))
+
+    def _reprice(self, components):
+        self.env['ksw.pay.entry']._mark_open_for_repricing(
+            components=components)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super().create(vals_list)
+        self._reprice(records.component_id)
+        return records
+
+    def write(self, vals):
+        before = self.component_id
+        res = super().write(vals)
+        self._reprice(before | self.component_id)
+        return res
+
+    def unlink(self):
+        # Marked once the band is gone: unlink() flushes before deleting.
+        components = self.component_id
+        res = super().unlink()
+        self._reprice(components.exists())
+        return res

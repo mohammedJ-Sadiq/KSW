@@ -30,7 +30,8 @@ from odoo.exceptions import UserError, ValidationError
 
 from .ksw_commission_lock import check_period_unlocked, period_is_locked
 from .ksw_vacation_hold import (
-    check_not_held, hold_blocks, hold_reason, vacation_holds,
+    check_not_held, hold_blocks, hold_reason, pending_vacations,
+    vacation_holds,
 )
 
 BATCH_STATES = [
@@ -913,10 +914,20 @@ class KswPayBatch(models.Model):
     # Entry helpers
     # ------------------------------------------------------------------
     def action_add_recurring(self):
-        """Materialise this component's recurring entries into the batch."""
+        """Materialise this component's recurring entries into the batch.
+
+        Anyone among them with a vacation still being approved is the
+        supervisor's call, not ours: the prompt lists them all at once.
+        """
         self.ensure_one()
         Recurring = self.env['ksw.pay.recurring']
-        created = Recurring._apply_to_batch(self)
+        due = Recurring._due_for_batch(self)
+        if pending_vacations(self.env, due.employee_id, self.period):
+            return self.env['ksw.pay.recurring.vacation.wizard'] \
+                ._open_for_batch(self)
+        return self._recurring_added(Recurring._apply_to_batch(self))
+
+    def _recurring_added(self, created):
         return self._notify(_(
             "%(count)s recurring entr%(plural)s added.",
             count=len(created), plural=_('y') if len(created) == 1 else _('ies'),
@@ -1206,12 +1217,15 @@ class KswPayEntry(models.Model):
     # another month can move it across a rate change. That model has no
     # relation to traverse back from, so it marks affected entries for
     # recompute itself — see its _recompute_affected_entries.
+    #
+    # The component's own pricing (calculation, rate, divisor, factor, tiers,
+    # option rates) is deliberately NOT a dependency. As one, it restated
+    # every entry ever recorded: switching National Day Bonus from Fixed to
+    # Quantity × rate on KSWCO (6 Oct 2026) re-ran 18 entries of an
+    # *approved* September batch as 0 × 100 and wiped 1,500.00 SAR. Those
+    # models mark the open entries themselves — see _mark_open_for_repricing.
     @api.depends('employee_id', 'quantity', 'threshold_qty', 'amount_override',
-                 'component_id', 'component_id.calculation',
-                 'component_id.rate', 'component_id.divisor',
-                 'component_id.factor', 'component_id.tier_ids.rate',
-                 'component_id.tier_ids.width', 'site_id',
-                 'option_id', 'option_id.rate', 'date', 'period',
+                 'component_id', 'site_id', 'option_id', 'date', 'period',
                  'x_window_from', 'x_window_to')
     def _compute_amount(self):
         for rec in self:
@@ -1238,6 +1252,31 @@ class KswPayEntry(models.Model):
                 rec.amount = rec.amount or 0.0
             else:
                 rec.amount = amount
+
+    _PRICE_FIELDS = ('rate', 'amount_computed', 'amount', 'is_overridden')
+
+    @api.model
+    def _mark_open_for_repricing(self, components=None, options=None):
+        """Re-price the entries a pricing change may still reach.
+
+        Only **draft** entries in an **unlocked** month — the rule
+        ksw.pay.employee.rate already follows: what was submitted, approved
+        or paid keeps the figure it was signed off at. Called *after* the
+        write, or the flush inside it recomputes from the old values and
+        consumes the mark.
+        """
+        domain = [('state', '=', 'draft')]
+        if options:
+            domain.append(('option_id', 'in', options.ids))
+        elif components:
+            domain.append(('component_id', 'in', components.ids))
+        else:
+            return self.browse()
+        entries = self.sudo().search(domain).filtered(
+            lambda e: not period_is_locked(self.env, e.period))
+        for name in self._PRICE_FIELDS:
+            self.env.add_to_compute(self._fields[name], entries)
+        return entries
 
     @api.depends('employee_id', 'component_id', 'option_id', 'date')
     def _compute_display_name(self):

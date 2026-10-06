@@ -67,9 +67,18 @@ VacationHold = namedtuple('VacationHold', 'kind payable_from leave')
 #: was merely settled later, and either outranks a part month.
 _HOLD_RANK = {'partial': 1, 'settled_later': 2, 'full': 3}
 
-#: Leave states that put a request on the hold's radar at all.  A refused,
-#: cancelled or still-unapproved request has settled nothing.
-_HELD_LEAVE_STATE = 'validate'
+#: Which requests are on the hold's radar at all: a validated one, or one
+#: still 'confirm' but already 'On Vacation'.  The employee leaves at GM
+#: final approval, while the KSW chain sits in 'confirm' until HR files the
+#: signed form, which can take days (CLAUDE.md gotcha #48) — asking for
+#: 'validate' alone offered his recurring entries to the supervisor for that
+#: whole gap.  A refused, cancelled or still-unapproved request has settled
+#: nothing; _sync_gm_final_state clears 'On Vacation' on every route back.
+_HELD_LEAVE_DOMAIN = [
+    '|',
+    ('state', '=', 'validate'),
+    '&', ('state', '=', 'confirm'), ('x_return_state', '=', 'on_vacation'),
+]
 
 
 def month_bounds(period):
@@ -116,7 +125,7 @@ def vacation_holds(env, employees, period):
 
     leaves = env['hr.leave'].sudo().search([
         ('employee_id', 'in', employee_ids),
-        ('state', '=', _HELD_LEAVE_STATE),
+        *_HELD_LEAVE_DOMAIN,
         # No leave-type clause, for the same reason
         # hr.payslip._get_unresolved_vacation_leaves has none: x_return_state
         # only ever leaves 'not_applicable' on a type that settles at the
@@ -189,6 +198,39 @@ def _hold_for(leave, month_start, month_end, already_paid):
         return VacationHold('full', None, leave)
     # He was away from before the month and came back inside it.
     return VacationHold('partial', away_until + timedelta(days=1), leave)
+
+
+def pending_vacations(env, employees, period):
+    """``{employee_id: hr.leave}`` — vacations still being approved.
+
+    The other side of the hold: a request that has not reached GM final
+    approval yet is not 'On Vacation', so it holds nothing — the GM may
+    still refuse it. But if it goes through, the settlement pays this month
+    and the run must not. Nobody can know which today, so the supervisor
+    is asked rather than the system guessing (the Add Recurring prompt).
+
+    Same month test as :func:`vacation_holds` — it ends on or after the
+    month began, because one starting later settles this month too — and
+    the same "does this type settle commissions" question the settlement
+    itself asks. sudo(): an identity read, as above.
+    """
+    month_start, _month_end = month_bounds(period)
+    employee_ids = list(getattr(employees, 'ids', employees) or [])
+    if not month_start or not employee_ids:
+        return {}
+    leaves = env['hr.leave'].sudo().search([
+        ('employee_id', 'in', employee_ids),
+        ('state', '=', 'confirm'),
+        # Past GM final it reads 'on_vacation' and the hold owns it.
+        ('x_return_state', '=', 'not_applicable'),
+        ('request_date_to', '>=', month_start),
+    ], order='request_date_from')
+    settles = env['hr.leave']._settles_commission_entries
+    pending = {}
+    for leave in leaves:
+        if settles(leave):
+            pending.setdefault(leave.employee_id.id, leave)
+    return pending
 
 
 def vacation_hold(env, employee, period):

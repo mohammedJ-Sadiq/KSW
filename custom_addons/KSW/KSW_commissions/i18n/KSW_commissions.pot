@@ -368,6 +368,7 @@ msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_batch_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_recurring_vacation_wizard_form
 msgid "Add Recurring"
 msgstr ""
 
@@ -718,6 +719,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_bank_export_wizard_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_import_wizard_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_override_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_recurring_vacation_wizard_form
 msgid "Cancel"
 msgstr ""
 
@@ -6781,6 +6783,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_sub_batch__date_from
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_sub_batch_trip_wizard__date_from
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_list
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring_vacation_wizard_line__date_from
 msgid "From"
 msgstr ""
 
@@ -6789,6 +6792,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_sub_batch__date_to
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_sub_batch_trip_wizard__date_to
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_list
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring_vacation_wizard_line__date_to
 msgid "To"
 msgstr ""
 
@@ -7063,4 +7067,58 @@ msgid ""
 "Nothing was sent — none of the picked drivers could be imported for those days:\n"
 "\n"
 "%(why)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/wizard/ksw_pay_recurring_vacation_wizard.py:0
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_recurring_vacation_wizard_form
+#. odoo-python
+msgid "Pending Vacations"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/wizard/ksw_pay_recurring_vacation_wizard.py:0
+#. odoo-python
+msgid "Awaiting approval"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_recurring_vacation_wizard_form
+msgid "These employees have a vacation request that is still being approved. If it is approved, this month is paid with the vacation and the entry will have to be removed; if it is refused, it is paid here as usual."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_recurring_vacation_wizard_form
+msgid "Untick anyone you do not want to add now. Everyone else is added as usual."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_pay_recurring_vacation_wizard
+msgid "Add Recurring: employees with a vacation pending approval"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_pay_recurring_vacation_wizard_line
+msgid "Add Recurring: one employee with a pending vacation"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring_vacation_wizard_line__leave_type
+msgid "Leave"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring_vacation_wizard_line__step
+msgid "Waiting For"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring_vacation_wizard_line__add
+msgid "Add"
+msgstr ""
+
+#. module: KSW_commissions
+#: code:addons/KSW_commissions/models/ksw_pay_component.py:0
+#. odoo-python
+msgid "%(component)s already has %(entries)s pay entries and %(recurring)s recurring entries recorded under its current calculation method, so the method cannot be changed: those records would be re-read in the new meaning and their amounts would change.\n\nCreate a new component with the calculation you want and archive this one. Its rate can still be changed — that only affects entries still in draft."
 msgstr ""

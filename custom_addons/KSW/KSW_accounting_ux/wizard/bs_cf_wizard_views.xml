@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ksw_bs_wizard_view_form" model="ir.ui.view">
+        <field name="name">ksw.bs.wizard.form</field>
+        <field name="model">ksw.bs.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Balance Sheet">
+                <group>
+                    <group>
+                        <field name="date_to"/>
+                        <field name="comparison"/>
+                    </group>
+                    <group>
+                        <field name="layout" widget="radio"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_open" type="object" string="Show" class="btn-primary"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ksw_bs_wizard" model="ir.actions.act_window">
+        <field name="name">Balance Sheet</field>
+        <field name="res_model">ksw.bs.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="ksw_cf_wizard_view_form" model="ir.ui.view">
+        <field name="name">ksw.cf.wizard.form</field>
+        <field name="model">ksw.cf.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Cash Flow Statement">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group>
+                        <field name="layout" widget="radio"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_open" type="object" string="Show" class="btn-primary"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ksw_cf_wizard" model="ir.actions.act_window">
+        <field name="name">Cash Flow Statement</field>
+        <field name="res_model">ksw.cf.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

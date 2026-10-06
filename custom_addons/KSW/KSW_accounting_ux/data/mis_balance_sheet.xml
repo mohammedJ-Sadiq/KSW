@@ -1,0 +1,526 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      Balance Sheet (قائمة المركز المالي) on BAS's own chart: assets under 1,
+      liabilities 21, equity 23, accumulated depreciation 24 (shown against the
+      fixed assets it belongs to, not as a liability as BAS files it).
+
+      Signs: credit balances are negated so every line reads positive.
+
+      It agrees with the Income Statement by construction: "net result for the
+      year" is the P&L's own net, including BAS's computed depreciation, and
+      that same depreciation is added to the accumulated balance. The last
+      line proves the statement balances.
+      Generated from one spec per line; keep the records uniform when editing.
+      Styles are shared with the Income Statement (mis_income_statement.xml).
+    -->
+
+    <record id="mis_bs_report" model="mis.report">
+        <field name="name">Balance Sheet (KSW)</field>
+        <field name="description">قائمة المركز المالي</field>
+        <field name="style_id" ref="mis_pl_style_base"/>
+    </record>
+
+    <!-- BAS depreciation charged so far in the column (see mis_report._fetch_queries) -->
+    <record id="mis_bs_query_depc" model="mis.report.query">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="name">depc</field>
+        <field name="model_id" ref="KSW_bas_gl_import.model_ksw_bas_fixed_asset"/>
+        <field name="field_ids" eval="[(6, 0, [ref('KSW_bas_gl_import.field_ksw_bas_fixed_asset__amount')])]"/>
+        <field name="aggregate">sum</field>
+        <field name="date_field" ref="KSW_bas_gl_import.field_ksw_bas_fixed_asset__date"/>
+        <field name="company_field_id" ref="KSW_bas_gl_import.field_ksw_bas_fixed_asset__company_id"/>
+    </record>
+
+    <record id="mis_bs_kpi_ca_1201" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">10</field>
+        <field name="name">ca_1201</field>
+        <field name="description">النقدية</field>
+        <field name="expression">bale[1201%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_ca_1202" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">11</field>
+        <field name="name">ca_1202</field>
+        <field name="description">البنوك</field>
+        <field name="expression">bale[1202%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_ca_1203" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">12</field>
+        <field name="name">ca_1203</field>
+        <field name="description">العملاء</field>
+        <field name="expression">bale[1203%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_ca_1204" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">13</field>
+        <field name="name">ca_1204</field>
+        <field name="description">عهد طرف العاملين</field>
+        <field name="expression">bale[1204%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_ca_1205" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">14</field>
+        <field name="name">ca_1205</field>
+        <field name="description">سلف العاملين</field>
+        <field name="expression">bale[1205%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_ca_inv" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">15</field>
+        <field name="name">ca_inv</field>
+        <field name="description">المخزون</field>
+        <field name="expression">bale[1206%,1216%,1217%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_ca_1207" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">16</field>
+        <field name="name">ca_1207</field>
+        <field name="description">مديونية السائقين والتأمين</field>
+        <field name="expression">bale[1207%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_ca_1208" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">17</field>
+        <field name="name">ca_1208</field>
+        <field name="description">أرصدة مدينة أخرى</field>
+        <field name="expression">bale[1208%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_ca_1209" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">18</field>
+        <field name="name">ca_1209</field>
+        <field name="description">ضريبة القيمة المضافة المدينة</field>
+        <field name="expression">bale[1209%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_ca_1210" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">19</field>
+        <field name="name">ca_1210</field>
+        <field name="description">دفعات مقدمة للموردين</field>
+        <field name="expression">bale[1210%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_ca_1211" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">20</field>
+        <field name="name">ca_1211</field>
+        <field name="description">خطابات ضمان واعتمادات وتأمين مقدم</field>
+        <field name="expression">bale[1211%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_ca_1212" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">21</field>
+        <field name="name">ca_1212</field>
+        <field name="description">مدفوعات مقدمة</field>
+        <field name="expression">bale[1212%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_ca_1219" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">22</field>
+        <field name="name">ca_1219</field>
+        <field name="description">مشروعات تحت التنفيذ</field>
+        <field name="expression">bale[1219%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_ca" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">29</field>
+        <field name="name">ca</field>
+        <field name="description">إجمالي الأصول المتداولة</field>
+        <field name="expression">bale[12%]</field>
+        <field name="style_id" ref="mis_pl_style_subtotal"/>
+    </record>
+
+    <record id="mis_bs_kpi_nca_1301" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">30</field>
+        <field name="name">nca_1301</field>
+        <field name="description">أصول الاستثمار العقاري</field>
+        <field name="expression">bale[13%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_fa_1901" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">31</field>
+        <field name="name">fa_1901</field>
+        <field name="description">الأراضي</field>
+        <field name="expression">bale[1901%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_bs_kpi_fa_1902" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">32</field>
+        <field name="name">fa_1902</field>
+        <field name="description">مباني وبرتبلات</field>
+        <field name="expression">bale[1902%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_bs_kpi_fa_1903" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">33</field>
+        <field name="name">fa_1903</field>
+        <field name="description">مكائن التحلية</field>
+        <field name="expression">bale[1903%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_bs_kpi_fa_1904" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">34</field>
+        <field name="name">fa_1904</field>
+        <field name="description">أثاث وتجهيزات</field>
+        <field name="expression">bale[1904%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_bs_kpi_fa_1905" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">35</field>
+        <field name="name">fa_1905</field>
+        <field name="description">عدد وأدوات</field>
+        <field name="expression">bale[1905%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_bs_kpi_fa_1906" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">36</field>
+        <field name="name">fa_1906</field>
+        <field name="description">السيارات</field>
+        <field name="expression">bale[1906%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_bs_kpi_fa_cost" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">37</field>
+        <field name="name">fa_cost</field>
+        <field name="description">إجمالي الأصول الثابتة بالتكلفة</field>
+        <field name="expression">bale[19%]</field>
+        <field name="style_id" ref="mis_pl_style_subtotal"/>
+    </record>
+
+    <record id="mis_bs_kpi_fa_dep" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">38</field>
+        <field name="name">fa_dep</field>
+        <field name="description">مجمع الإهلاك</field>
+        <field name="expression">bale[24%] - (depc.amount or 0)</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_bs_kpi_fa_net" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">39</field>
+        <field name="name">fa_net</field>
+        <field name="description">صافي الأصول الثابتة</field>
+        <field name="expression">fa_cost + fa_dep</field>
+        <field name="style_id" ref="mis_pl_style_subtotal"/>
+    </record>
+
+    <record id="mis_bs_kpi_nca" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">40</field>
+        <field name="name">nca</field>
+        <field name="description">إجمالي الأصول غير المتداولة</field>
+        <field name="expression">nca_1301 + fa_net</field>
+        <field name="style_id" ref="mis_pl_style_subtotal"/>
+    </record>
+
+    <record id="mis_bs_kpi_assets" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">49</field>
+        <field name="name">assets</field>
+        <field name="description">إجمالي الأصول</field>
+        <field name="expression">ca + nca</field>
+        <field name="style_id" ref="mis_pl_style_result"/>
+    </record>
+
+    <record id="mis_bs_kpi_cl_2101" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">50</field>
+        <field name="name">cl_2101</field>
+        <field name="description">الموردين</field>
+        <field name="expression">-bale[2101%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_cl_2102" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">51</field>
+        <field name="name">cl_2102</field>
+        <field name="description">قروض قصيرة الأجل</field>
+        <field name="expression">-bale[2102%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_cl_2103" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">52</field>
+        <field name="name">cl_2103</field>
+        <field name="description">حسابات جارية دائنة - البنوك</field>
+        <field name="expression">-bale[2103%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_cl_2104" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">53</field>
+        <field name="name">cl_2104</field>
+        <field name="description">دائنون - شركات متنوعة</field>
+        <field name="expression">-bale[2104%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_cl_2105" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">54</field>
+        <field name="name">cl_2105</field>
+        <field name="description">تمويل من جهات ذات علاقة</field>
+        <field name="expression">-bale[2105%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_cl_2106" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">55</field>
+        <field name="name">cl_2106</field>
+        <field name="description">إيرادات مقدمة</field>
+        <field name="expression">-bale[2106%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_cl_2107" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">56</field>
+        <field name="name">cl_2107</field>
+        <field name="description">مصروفات مستحقة</field>
+        <field name="expression">-bale[2107%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_cl_2108" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">57</field>
+        <field name="name">cl_2108</field>
+        <field name="description">مخصص مكافأة نهاية الخدمة</field>
+        <field name="expression">-bale[2108%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_cl_2109" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">58</field>
+        <field name="name">cl_2109</field>
+        <field name="description">مخصص الزكاة والضريبة</field>
+        <field name="expression">-bale[2109%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_cl_2110" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">59</field>
+        <field name="name">cl_2110</field>
+        <field name="description">أمانات السائقين</field>
+        <field name="expression">-bale[2110%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_cl_2111" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">60</field>
+        <field name="name">cl_2111</field>
+        <field name="description">جاري مجلس الإدارة</field>
+        <field name="expression">-bale[2111%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_cl_2112" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">61</field>
+        <field name="name">cl_2112</field>
+        <field name="description">مخصص ديون العملاء</field>
+        <field name="expression">-bale[2112%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_cl_2119" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">62</field>
+        <field name="name">cl_2119</field>
+        <field name="description">ضريبة القيمة المضافة - المبيعات</field>
+        <field name="expression">-bale[2119%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_cl" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">69</field>
+        <field name="name">cl</field>
+        <field name="description">إجمالي الخصوم المتداولة</field>
+        <field name="expression">-bale[21%]</field>
+        <field name="style_id" ref="mis_pl_style_subtotal"/>
+    </record>
+
+    <record id="mis_bs_kpi_eq_2301" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">70</field>
+        <field name="name">eq_2301</field>
+        <field name="description">رأس المال</field>
+        <field name="expression">-bale[2301%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_eq_2302" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">71</field>
+        <field name="name">eq_2302</field>
+        <field name="description">الأرباح التشغيلية والمبقاة</field>
+        <field name="expression">-bale[2302%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_eq_2303" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">72</field>
+        <field name="name">eq_2303</field>
+        <field name="description">توزيعات الأرباح</field>
+        <field name="expression">-bale[2303%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+        <field name="auto_expand_accounts" eval="True"/>
+        <field name="auto_expand_accounts_style_id" ref="mis_pl_style_account"/>
+    </record>
+
+    <record id="mis_bs_kpi_eq_prior" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">73</field>
+        <field name="name">eq_prior</field>
+        <field name="description">أرباح (خسائر) سنوات سابقة غير مرحّلة</field>
+        <field name="expression">-balu[]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_bs_kpi_eq_result" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">74</field>
+        <field name="name">eq_result</field>
+        <field name="description">صافي ربح (خسارة) العام</field>
+        <field name="expression">-bale[3%,4%] - (depc.amount or 0)</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_bs_kpi_eq" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">79</field>
+        <field name="name">eq</field>
+        <field name="description">إجمالي حقوق الملكية</field>
+        <field name="expression">eq_2301 + eq_2302 + eq_2303 + eq_prior + eq_result</field>
+        <field name="style_id" ref="mis_pl_style_subtotal"/>
+    </record>
+
+    <record id="mis_bs_kpi_le" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">89</field>
+        <field name="name">le</field>
+        <field name="description">إجمالي الخصوم وحقوق الملكية</field>
+        <field name="expression">cl + eq</field>
+        <field name="style_id" ref="mis_pl_style_result"/>
+    </record>
+
+    <record id="mis_bs_kpi_check" model="mis.report.kpi">
+        <field name="report_id" ref="mis_bs_report"/>
+        <field name="sequence">99</field>
+        <field name="name">check</field>
+        <field name="description">فرق التوازن (يجب أن يساوي صفراً)</field>
+        <field name="expression">assets - le</field>
+        <field name="style_id" ref="mis_pl_style_net"/>
+    </record>
+</odoo>

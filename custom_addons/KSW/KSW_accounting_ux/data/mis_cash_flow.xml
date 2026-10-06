@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      Cash Flow Statement (قائمة التدفقات النقدية), indirect method, on BAS's
+      chart. Cash and cash equivalents = 1201 cash + 1202 banks; 2103 (bank
+      credit current accounts) is treated as financing, not as cash.
+
+      Each line is the movement of a group of balance-sheet accounts in the
+      period. Which group is operating / investing / financing is a
+      presentation choice for the accountants to confirm; the "unclassified"
+      line is what guarantees the statement ties to the cash change either way.
+      Generated from one spec per line; keep the records uniform when editing.
+      Styles are shared with the Income Statement (mis_income_statement.xml).
+    -->
+
+    <record id="mis_cf_report" model="mis.report">
+        <field name="name">Cash Flow Statement (KSW)</field>
+        <field name="description">قائمة التدفقات النقدية</field>
+        <field name="style_id" ref="mis_pl_style_base"/>
+    </record>
+
+    <!-- BAS depreciation charged so far in the column (see mis_report._fetch_queries) -->
+    <record id="mis_cf_query_depc" model="mis.report.query">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="name">depc</field>
+        <field name="model_id" ref="KSW_bas_gl_import.model_ksw_bas_fixed_asset"/>
+        <field name="field_ids" eval="[(6, 0, [ref('KSW_bas_gl_import.field_ksw_bas_fixed_asset__amount')])]"/>
+        <field name="aggregate">sum</field>
+        <field name="date_field" ref="KSW_bas_gl_import.field_ksw_bas_fixed_asset__date"/>
+        <field name="company_field_id" ref="KSW_bas_gl_import.field_ksw_bas_fixed_asset__company_id"/>
+    </record>
+
+    <record id="mis_cf_kpi_net" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">10</field>
+        <field name="name">net</field>
+        <field name="description">صافي الربح (الخسارة)</field>
+        <field name="expression">-balp[3%,4%] - (depc.amount or 0)</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_cf_kpi_dep_add" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">11</field>
+        <field name="name">dep_add</field>
+        <field name="description">يضاف: الإهلاك</field>
+        <field name="expression">(depc.amount or 0) - balp[24%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_cf_kpi_wc_1203" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">12</field>
+        <field name="name">wc_1203</field>
+        <field name="description">التغير في العملاء</field>
+        <field name="expression">-balp[1203%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_cf_kpi_wc_staff" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">13</field>
+        <field name="name">wc_staff</field>
+        <field name="description">التغير في عهد وسلف العاملين</field>
+        <field name="expression">-balp[1204%,1205%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_cf_kpi_wc_inv" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">14</field>
+        <field name="name">wc_inv</field>
+        <field name="description">التغير في المخزون</field>
+        <field name="expression">-balp[1206%,1216%,1217%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_cf_kpi_wc_other" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">15</field>
+        <field name="name">wc_other</field>
+        <field name="description">التغير في مديونية السائقين والأرصدة المدينة الأخرى</field>
+        <field name="expression">-balp[1207%,1208%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_cf_kpi_wc_prepaid" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">16</field>
+        <field name="name">wc_prepaid</field>
+        <field name="description">التغير في الدفعات والمدفوعات المقدمة وخطابات الضمان</field>
+        <field name="expression">-balp[1210%,1211%,1212%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_cf_kpi_wc_vat" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">17</field>
+        <field name="name">wc_vat</field>
+        <field name="description">التغير في صافي ضريبة القيمة المضافة</field>
+        <field name="expression">-balp[1209%,2119%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_cf_kpi_wc_2101" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">18</field>
+        <field name="name">wc_2101</field>
+        <field name="description">التغير في الموردين</field>
+        <field name="expression">-balp[2101%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_cf_kpi_wc_payables" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">19</field>
+        <field name="name">wc_payables</field>
+        <field name="description">التغير في الدائنين والمستحقات والإيرادات المقدمة والأمانات</field>
+        <field name="expression">-balp[2104%,2106%,2107%,2110%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_cf_kpi_wc_prov" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">20</field>
+        <field name="name">wc_prov</field>
+        <field name="description">التغير في المخصصات</field>
+        <field name="expression">-balp[2108%,2109%,2112%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_cf_kpi_op" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">29</field>
+        <field name="name">op</field>
+        <field name="description">صافي النقد من الأنشطة التشغيلية</field>
+        <field name="expression">net + dep_add + wc_1203 + wc_staff + wc_inv + wc_other + wc_prepaid + wc_vat + wc_2101 + wc_payables + wc_prov</field>
+        <field name="style_id" ref="mis_pl_style_subtotal"/>
+    </record>
+
+    <record id="mis_cf_kpi_inv_fa" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">30</field>
+        <field name="name">inv_fa</field>
+        <field name="description">شراء واستبعاد الأصول الثابتة</field>
+        <field name="expression">-balp[19%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_cf_kpi_inv_1301" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">31</field>
+        <field name="name">inv_1301</field>
+        <field name="description">أصول الاستثمار العقاري</field>
+        <field name="expression">-balp[13%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_cf_kpi_inv_1219" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">32</field>
+        <field name="name">inv_1219</field>
+        <field name="description">مشروعات تحت التنفيذ</field>
+        <field name="expression">-balp[1219%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_cf_kpi_inv" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">39</field>
+        <field name="name">inv</field>
+        <field name="description">صافي النقد من الأنشطة الاستثمارية</field>
+        <field name="expression">inv_fa + inv_1301 + inv_1219</field>
+        <field name="style_id" ref="mis_pl_style_subtotal"/>
+    </record>
+
+    <record id="mis_cf_kpi_fin_2102" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">40</field>
+        <field name="name">fin_2102</field>
+        <field name="description">قروض قصيرة الأجل</field>
+        <field name="expression">-balp[2102%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_cf_kpi_fin_2103" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">41</field>
+        <field name="name">fin_2103</field>
+        <field name="description">حسابات جارية دائنة - البنوك</field>
+        <field name="expression">-balp[2103%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_cf_kpi_fin_2105" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">42</field>
+        <field name="name">fin_2105</field>
+        <field name="description">تمويل من جهات ذات علاقة</field>
+        <field name="expression">-balp[2105%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_cf_kpi_fin_2111" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">43</field>
+        <field name="name">fin_2111</field>
+        <field name="description">جاري مجلس الإدارة</field>
+        <field name="expression">-balp[2111%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_cf_kpi_fin_equity" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">44</field>
+        <field name="name">fin_equity</field>
+        <field name="description">رأس المال والأرباح المبقاة والتوزيعات</field>
+        <field name="expression">-balp[23%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_cf_kpi_fin" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">49</field>
+        <field name="name">fin</field>
+        <field name="description">صافي النقد من الأنشطة التمويلية</field>
+        <field name="expression">fin_2102 + fin_2103 + fin_2105 + fin_2111 + fin_equity</field>
+        <field name="style_id" ref="mis_pl_style_subtotal"/>
+    </record>
+
+    <record id="mis_cf_kpi_other" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">50</field>
+        <field name="name">other</field>
+        <field name="description">حركات غير مصنفة (للمراجعة)</field>
+        <field name="expression">balp[1201%,1202%] - (op + inv + fin)</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_cf_kpi_change" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">59</field>
+        <field name="name">change</field>
+        <field name="description">صافي التغير في النقد</field>
+        <field name="expression">op + inv + fin + other</field>
+        <field name="style_id" ref="mis_pl_style_result"/>
+    </record>
+
+    <record id="mis_cf_kpi_cash_open" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">60</field>
+        <field name="name">cash_open</field>
+        <field name="description">النقد وما في حكمه أول الفترة</field>
+        <field name="expression">bali[1201%,1202%]</field>
+        <field name="style_id" ref="mis_pl_style_line"/>
+    </record>
+
+    <record id="mis_cf_kpi_cash_close" model="mis.report.kpi">
+        <field name="report_id" ref="mis_cf_report"/>
+        <field name="sequence">69</field>
+        <field name="name">cash_close</field>
+        <field name="description">النقد وما في حكمه آخر الفترة</field>
+        <field name="expression">bale[1201%,1202%]</field>
+        <field name="style_id" ref="mis_pl_style_net"/>
+    </record>
+</odoo>
