@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- One bank journal per BAS bank account (1202 leaves); re-run on every upgrade -->
+    <function model="account.journal" name="_ksw_ensure_bas_bank_journals"/>
+</odoo>

@@ -1002,7 +1002,7 @@ class BasGlImport(models.Model):
 
     @api.model
     def action_convert_invoices(self, date_from, date_to, company=None,
-                                branch=None, limit_docs=None):
+                                branch=None, limit_docs=None, bas_keys=None):
         """Turn the BAS sales *entries* into native Odoo invoices.
 
         Conversion, never addition: the `entry` created from vou10 is deleted
@@ -1064,6 +1064,9 @@ class BasGlImport(models.Model):
 
         # One search for the whole range, not one per document.
         keys = list(vou)[:limit_docs] if limit_docs else list(vou)
+        if bas_keys:
+            # Convert only these documents, e.g. one client's invoices.
+            keys = [k for k in keys if f'{k[0]}/{k[1]}/{k[2]}/{k[3]:.0f}' in bas_keys]
         bas_keys = [f'{k[0]}/{k[1]}/{k[2]}/{k[3]:.0f}' for k in keys]
         old_by_key = {}
         for chunk in (bas_keys[i:i + 2000] for i in range(0, len(bas_keys), 2000)):
@@ -1389,6 +1392,78 @@ class BasGlImport(models.Model):
     _RECONCILE_TOLERANCE = 0.011
 
     @api.model
+    def action_link_client_ledger(self, account_codes=None, company=None):
+        """Make each client's receivable read like a statement, as in BAS.
+
+        The GL import posts BAS receipts (018), the opening balance and
+        not-yet-converted invoices as plain entries with no partner, and
+        matches nothing, so every invoice stays "Not Paid" and the partner
+        ledger misses half the account.  Per client account (one BAS leaf =
+        one partner, joined on x_bas_code):
+
+        1. tag the partner on its partner-less lines -- classification only,
+           no amount moves.  Opening balances sit on the fiscal lock date, so
+           a one-hour logged lock exception covers them and is revoked after;
+        2. match each credit to the oldest open debit of EXACTLY the same
+           amount dated on or before it.  BAS receipts settle whole invoices,
+           so this covers the normal case; anything else is left open for a
+           person rather than split by guesswork.
+        """
+        company = company or self.env.company
+        Account = self.env['account.account'].with_company(company)
+        domain = [*Account._check_company_domain(company),
+                  ('account_type', '=', 'asset_receivable'),
+                  ('x_bas_code', '!=', False)]
+        if account_codes:
+            domain.append(('code', 'in', list(account_codes)))
+        accounts = Account.search(domain)
+        partners = {p.x_bas_code: p for p in self.env['res.partner'].search(
+            [('x_bas_code', 'in', accounts.mapped('x_bas_code'))])}
+
+        exception = self.env['account.lock_exception'].create({
+            'company_id': company.id,
+            'user_id': self.env.user.id,
+            'lock_date_field': 'fiscalyear_lock_date',
+            'lock_date': False,
+            'end_datetime': fields.Datetime.now() + timedelta(hours=1),
+            'reason': _('BAS client ledger: tag the client on its receivable lines'),
+        }) if company.fiscalyear_lock_date else None
+
+        AML = self.env['account.move.line']
+        stats = defaultdict(int)
+        try:
+            for acc in accounts:
+                partner = partners.get(acc.x_bas_code)
+                if not partner:
+                    stats['no_partner'] += 1
+                    continue
+                lines = AML.search([('account_id', '=', acc.id),
+                                    ('parent_state', '=', 'posted')])
+                untagged = lines.filtered(lambda l: not l.partner_id)
+                if untagged:
+                    untagged.write({'partner_id': partner.id})
+                    stats['tagged'] += len(untagged)
+                open_lines = lines.filtered(lambda l: not l.reconciled)
+                debits = open_lines.filtered(lambda l: l.balance > 0).sorted(lambda l: (l.date, l.id))
+                credits = open_lines.filtered(lambda l: l.balance < 0).sorted(lambda l: (l.date, l.id))
+                cur = company.currency_id
+                for credit in credits:
+                    for debit in debits:
+                        if (not debit.reconciled and debit.date <= credit.date
+                                and cur.compare_amounts(debit.amount_residual,
+                                                        -credit.amount_residual) == 0):
+                            (debit | credit).reconcile()
+                            stats['matched'] += 1
+                            break
+                stats['accounts'] += 1
+                if len(accounts) > 50:
+                    self.env.cr.commit()   # checkpoint on the all-clients run
+        finally:
+            if exception:
+                exception.action_revoke()
+        _logger.info('BAS client ledger: %s', dict(stats))
+        return dict(stats)
+
     def action_reconcile_vouchers(self, date_from, date_to, company=None,
                                   branch_code=None, fix=False):
         """Diff Odoo's journal entries against vou10 for a period.
