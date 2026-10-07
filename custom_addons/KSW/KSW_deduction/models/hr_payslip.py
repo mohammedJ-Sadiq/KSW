@@ -286,16 +286,52 @@ class HrPayslip(models.Model):
                 lambda i: i.code and i.code.startswith('KSW_DED_')
                 and i.code[8:].isdigit())
             presented = sum(inputs.mapped('amount'))
-            carried = sum(i.x_ksw_uncollected or 0.0 for i in inputs)
+            if slip._ksw_shows_full_deductions():
+                carried = sum(i.x_ksw_uncollected or 0.0 for i in inputs)
+                collected = presented - carried
+            else:
+                # An ordinary payslip CAPS the input down to what the pay
+                # absorbs, so x_ksw_uncollected stays 0 and the shortfall is
+                # gone from the inputs. Recover it from the installment: the
+                # part of the line the input did not take (before Done), or
+                # the remainder forwarded by this payslip (after Done, when
+                # `_settle_payslip_lines` has split the line).
+                collected = presented
+                carried = slip._ksw_capped_shortfall(inputs)
+                presented = collected + carried
             slip.x_ksw_ded_presented = presented
             slip.x_ksw_ded_carried = carried
-            slip.x_ksw_ded_collected = presented - carried
+            slip.x_ksw_ded_collected = collected
             # sudo(): x_deduction_outstanding_total is gated behind
             # hr.group_hr_user, and the loan/accounting approvers who read
             # this summary are not necessarily HR users.
             slip.x_ksw_ded_outstanding = (
                 slip.employee_id.sudo().x_deduction_outstanding_total
                 if slip.employee_id else 0.0)
+
+    def _ksw_capped_shortfall(self, inputs):
+        """What an ordinary payslip's capping left uncollected.
+
+        Per KSW_DED_<line id> input: the installment's amount beyond what
+        the input took, plus any remainder this payslip forwarded when it
+        split that installment on Done.
+        """
+        self.ensure_one()
+        cur = self.company_id.currency_id or self.env.company.currency_id
+        Line = self.env['ksw.deduction.line'].sudo()
+        lines = Line.browse([int(i.code[8:]) for i in inputs]).exists()
+        if not lines:
+            return 0.0
+        taken = {}
+        for inp in inputs:
+            taken[int(inp.code[8:])] = taken.get(int(inp.code[8:]), 0.0) + inp.amount
+        shortfall = sum(max(line.amount - taken[line.id], 0.0) for line in lines)
+        if self.id:
+            shortfall += sum(Line.search([
+                ('split_origin_id', 'in', lines.ids),
+                ('forwarded_from_payslip_id', '=', self.id),
+            ]).mapped('amount'))
+        return cur.round(shortfall)
 
     def write(self, vals):
         new_state = vals.get('state')

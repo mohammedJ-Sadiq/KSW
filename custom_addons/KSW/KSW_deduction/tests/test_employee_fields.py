@@ -47,6 +47,43 @@ class TestEmployeeFields(DeductionCommon):
         self.employee.invalidate_recordset(['x_deduction_monthly_total'])
         self.assertEqual(self.employee.x_deduction_monthly_total, 100.0)
 
+    def _done_payslip(self, month_start):
+        slip = self.env['hr.payslip'].sudo().create({
+            'name': 'Done %s' % month_start,
+            'employee_id': self.employee.id,
+            'date_from': month_start,
+            'date_to': month_start + relativedelta(months=1, days=-1),
+            'version_id': self.employee.current_version_id.id,
+        })
+        # Raw write: the payroll engine is not what these tests are about.
+        slip.write({'state': 'done'})
+        return slip
+
+    def test_monthly_total_is_last_month_until_its_payroll_is_done(self):
+        """Early October, September not yet paid: the next payslip ends
+        30 Sep, so October's installment must not be counted (the 2975 vs
+        2225 SAR report: Sep's 3rd + Oct's 4th installment were summed)."""
+        prev_month = self.this_month - relativedelta(months=1)
+        self._done_payslip(prev_month - relativedelta(months=1))
+        d = self._make_deduction(amount=200.0, installments=2,
+                                 start_month=prev_month)
+        d.action_submit()
+        self.employee.invalidate_recordset(['x_deduction_monthly_total'])
+        self.assertEqual(self.employee.x_deduction_monthly_total, 100.0)
+        # The drill-down lists exactly the same lines.
+        action = d.action_view_employee_month_installments()
+        lines = self.env['ksw.deduction.line'].search(action['domain'])
+        self.assertEqual(sum(lines.mapped('amount')), 100.0)
+        # Once September is paid (its line settled), October applies.
+        self._done_payslip(prev_month)
+        d.line_ids.filtered(
+            lambda l: l.period_date == prev_month).write({'state': 'paid'})
+        self.employee.invalidate_recordset(['x_deduction_monthly_total'])
+        self.assertEqual(self.employee.x_deduction_monthly_total, 100.0)
+        self.assertEqual(
+            self.employee._ksw_deduction_period_end()[self.employee.id],
+            self.this_month + relativedelta(months=1, days=-1))
+
     def test_monthly_total_excludes_paid_and_skipped(self):
         d = self._make_deduction(amount=300.0, installments=3,
                                  start_month=self.this_month)

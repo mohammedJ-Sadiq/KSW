@@ -99,9 +99,10 @@ class HrEmployee(models.Model):
         compute='_compute_deduction_count',
         groups='hr.group_hr_user',
         currency_field='x_deduction_currency_id',
-        help='Pending installments this month\'s payroll will collect: '
-             'those scheduled for the current month plus any still pending '
-             'from earlier months.',
+        help='Pending installments the next payroll will collect: those '
+             'scheduled up to the payroll month in progress (last month '
+             'until its payslip is confirmed) plus any still pending from '
+             'earlier months.',
     )
     x_deduction_outstanding_total = fields.Monetary(
         string='Outstanding Deduction Total',
@@ -122,12 +123,44 @@ class HrEmployee(models.Model):
         help='Employee loan account number in BAS (bank loan/financing system).',
     )
 
+    def _ksw_deduction_period_end(self):
+        """End of the payroll month each employee's NEXT payslip covers.
+
+        Payroll for a month runs early the following month, so until last
+        month's payslip is confirmed the payroll "in progress" is last month,
+        not the calendar month: on 7 Oct, with September not yet paid, the
+        next payslip ends 30 Sep and collects nothing dated October. Using
+        the calendar month added the October installment on top.
+
+        Once last month's payslip is done the calendar month applies; it
+        also applies to an employee with no confirmed payslip at all (new
+        hire: there is no earlier month to pay). Returns
+        ``{employee_id: date}``.
+        """
+        today = fields.Date.context_today(self)
+        current_start = today.replace(day=1)
+        current_end = current_start + relativedelta(months=1, days=-1)
+        previous_end = current_start - relativedelta(days=1)
+        # sudo(): payslips are payroll-gated; only the date is read.
+        last_done = {
+            employee.id: date_to
+            for employee, date_to in self.env['hr.payslip'].sudo()._read_group(
+                [('employee_id', 'in', self.ids), ('state', '=', 'done')],
+                ['employee_id'], ['date_to:max'])
+        }
+        result = {}
+        for emp in self:
+            last = last_done.get(emp.id)
+            result[emp.id] = (
+                current_end if not last or last >= previous_end
+                else previous_end)
+        return result
+
     def _compute_deduction_count(self):
         company_currency = self.env.company.currency_id
-        today = fields.Date.context_today(self)
-        period_start = today.replace(day=1)
-        period_end = period_start + relativedelta(months=1, days=-1)
+        period_ends = self._ksw_deduction_period_end()
         for emp in self:
+            period_end = period_ends.get(emp.id)
             active = self.env['ksw.deduction'].sudo().search([
                 ('employee_id', '=', emp.id),
                 ('state', '=', 'active'),

@@ -292,6 +292,9 @@ class TestPayslipRevision(TransactionCase):
         vacation_slip.sudo().write({'state': 'done'})
 
         self.assertEqual(monthly.state, 'cancel')
+        # Out of the batch, so no Excel block or total lists it; it shows up
+        # only in the skipped section, built from the skip log.
+        self.assertNotIn(monthly, run.slip_ids)
         self.assertEqual(
             run.x_skip_line_ids.filtered(
                 lambda l: l.line_type == 'skipped').employee_id,
@@ -324,6 +327,16 @@ class TestPayslipRevision(TransactionCase):
 
         run.sudo().done_payslip_run()
         self.assertEqual(monthly.state, 'cancel')
+        self.assertNotIn(monthly, run.slip_ids)
+
+    def test_done_never_revives_a_cancelled_slip_still_in_the_batch(self):
+        """A slip cancelled after export stays in the batch (its own
+        "cancelled after export" section); Mark as Done must leave it."""
+        run, monthly = self._make_batch_slip('Pulled back')
+        monthly.sudo().write({'state': 'cancel'})
+        run.sudo().done_payslip_run()
+        self.assertEqual(monthly.state, 'cancel')
+        self.assertIn(monthly, run.slip_ids)
 
     # ==================================================================
     # 3 & 4. Issuing a revision

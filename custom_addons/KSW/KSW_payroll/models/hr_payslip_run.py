@@ -367,9 +367,15 @@ class HrPayslipRun(models.Model):
 
         Called where a batch's figures leave the system — every bank export
         and "Mark as Done" — and from ``hr.payslip.write`` the moment a
-        vacation / EOS payslip is confirmed. Cancelled, not deleted, so the
-        row stays visible; the export already leaves cancelled slips out of
-        the text file.
+        vacation / EOS payslip is confirmed.
+
+        The slip is cancelled **and detached** from the batch. Left attached,
+        every Excel sheet listed it in the "cancelled after export" block,
+        which is for money that went to the bank and was pulled back. These
+        slips were never meant to be paid, so they show up only in the skipped
+        section ("Employees with no payslip in this batch"), which is built
+        from the skip log. Not deleted: the cancelled slip stays on the employee
+        and its reference is in the skip reason.
         """
         dropped = self.env['hr.payslip']
         for run in self:
@@ -379,14 +385,16 @@ class HrPayslipRun(models.Model):
             if not reasons:
                 continue
             gone = self.env['hr.payslip'].concat(*reasons)
-            gone.sudo().with_context(_ksw_skip_bank_refresh=True).write(
-                {'state': 'cancel'})
             self.env['ksw.payslip.run.skip.line'].sudo().create([{
                 'run_id': run.id,
                 'employee_id': slip.employee_id.id,
-                'reason': reason,
+                'reason': _('%(reason)s Payslip %(slip)s cancelled.',
+                            reason=reason,
+                            slip=slip.number or slip.name or slip.id),
                 'line_type': 'skipped',
             } for slip, reason in reasons.items()])
+            gone.sudo().with_context(_ksw_skip_bank_refresh=True).write(
+                {'state': 'cancel', 'payslip_run_id': False})
             rows = Markup('').join(
                 Markup('<li>%(emp)s (NET %(net).2f): %(reason)s</li>') % {
                     'emp': s.employee_id.name,
@@ -394,8 +402,8 @@ class HrPayslipRun(models.Model):
                     'reason': r}
                 for s, r in reasons.items())
             run.sudo().message_post(body=Markup(
-                '<strong>%(n)d payslip(s) cancelled and removed from the '
-                'bank file</strong><ul>%(rows)s</ul>'
+                '<strong>%(n)d payslip(s) cancelled and removed from this '
+                'batch</strong><ul>%(rows)s</ul>'
             ) % {'n': len(reasons), 'rows': rows},
                 subtype_xmlid='mail.mt_note')
             run._refresh_bank_totals()

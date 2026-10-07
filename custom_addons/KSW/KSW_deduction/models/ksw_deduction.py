@@ -524,9 +524,10 @@ class KswDeduction(models.Model):
         string="Employee's Total This Month",
         compute='_compute_employee_deduction_totals',
         currency_field='currency_id',
-        help='What this month\'s payroll will collect from this employee '
+        help='What the next payroll will collect from this employee '
              'across every active deduction (this one included): '
-             'installments scheduled for the current month plus any left '
+             'installments scheduled up to the payroll month in progress '
+             '(last month until its payslip is confirmed) plus any left '
              'pending from earlier months.',
     )
     x_emp_outstanding_total = fields.Monetary(
@@ -842,8 +843,10 @@ class KswDeduction(models.Model):
         `hr.payslip._ksw_pending_lines_domain`), so it belongs in this list.
         """
         self.ensure_one()
-        period_start = fields.Date.context_today(self).replace(day=1)
-        period_end = period_start + relativedelta(months=1, days=-1)
+        # Same period as the figure: the payroll month in progress, not the
+        # calendar month (see hr.employee._ksw_deduction_period_end).
+        employee = self.employee_id.sudo()
+        period_end = employee._ksw_deduction_period_end()[employee.id]
         return self._action_employee_installments(
             _('Deductions This Month — %s') % (self.employee_id.name or ''),
             [('period_date', '<=', period_end)],

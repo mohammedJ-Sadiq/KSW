@@ -267,3 +267,57 @@ class TestPayrollPriority(DeductionCommon):
         self.assertEqual(input_line.amount, line.amount)
         self.assertEqual(line.state, 'paid')
         self.assertEqual(line.payslip_id, slip)
+
+    # An ordinary payslip caps the input down, so the coverage report has to
+    # read the shortfall off the installment: before Done (line > input) and
+    # after Done (the remainder the split forwarded).
+
+    def test_capped_shortfall_shown_before_and_after_done(self):
+        cur = self.env.company.currency_id
+        pen = self._make_deduction(self.type_gov_pen, amount=2225.0,
+                                   installments=1,
+                                   start_month=date(2026, 4, 1))
+        pen.action_submit()
+        line = pen.line_ids
+        slip = self._make_payslip()
+        # What `_ksw_apply_deduction_priority` leaves on an ordinary slip
+        # when the pay covers only 1750 of the 2225 due.
+        self.env['hr.payslip.input'].create({
+            'payslip_id': slip.id,
+            'version_id': self.version.id,
+            'name': 'capped',
+            'code': 'KSW_DED_%d' % line.id,
+            'amount': 1750.0,
+        })
+        self.assertFalse(slip._ksw_shows_full_deductions())
+        self.assertEqual(cur.round(slip.x_ksw_ded_collected), 1750.0)
+        self.assertEqual(cur.round(slip.x_ksw_ded_carried), 475.0)
+        self.assertEqual(cur.round(slip.x_ksw_ded_presented), 2225.0)
+
+        # Raw state write: settles without recomputing (see gotcha #49).
+        slip.write({'state': 'done'})
+        slip.invalidate_recordset()
+        self.assertEqual(cur.round(line.amount), 1750.0)
+        self.assertEqual(line.state, 'paid')
+        self.assertEqual(cur.round(slip.x_ksw_ded_collected), 1750.0)
+        self.assertEqual(cur.round(slip.x_ksw_ded_carried), 475.0)
+        self.assertEqual(cur.round(slip.x_ksw_ded_presented), 2225.0)
+
+    def test_uncapped_slip_shows_nothing_carried(self):
+        cur = self.env.company.currency_id
+        pen = self._make_deduction(self.type_gov_pen, amount=900.0,
+                                   installments=1,
+                                   start_month=date(2026, 4, 1))
+        pen.action_submit()
+        slip = self._make_payslip()
+        self.env['hr.payslip.input'].create({
+            'payslip_id': slip.id,
+            'version_id': self.version.id,
+            'name': 'full',
+            'code': 'KSW_DED_%d' % pen.line_ids.id,
+            'amount': 900.0,
+        })
+        slip.write({'state': 'done'})
+        slip.invalidate_recordset()
+        self.assertEqual(cur.round(slip.x_ksw_ded_carried), 0.0)
+        self.assertEqual(cur.round(slip.x_ksw_ded_collected), 900.0)

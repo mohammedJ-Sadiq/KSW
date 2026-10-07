@@ -210,3 +210,67 @@ class TestManualParkCoexistsWithAutoFlag(CommissionPriorityCommon):
             "commission run, not be swept back to payroll by the new "
             "automatic policy",
         )
+
+
+class TestOpenRunLoanEstimate(CommissionPriorityCommon):
+    """An open month shows the loans approval would settle, and keeps it in
+    step as installments are parked or moved — including a reopened month,
+    whose approval-built lines the preview used to skip (KSWCO, Oct 2026:
+    two penalties moved into a reopened August stayed at Loans 0)."""
+
+    def _run_line(self, run, employee):
+        return run.line_ids.filtered(lambda l: l.employee_id == employee)
+
+    def test_open_run_estimates_priority_installment(self):
+        entry = self._commission_entry(self.emp_a, 700.0)
+        entry.batch_id.submission_id.sudo().action_submit()
+        run = entry.batch_id.submission_id.run_id
+        self.assertNotIn(run.state, ('approved', 'paid'))
+        self._make_pending_installment(self.emp_a, 1500.0)
+
+        run_line = self._run_line(run, self.emp_a)
+        self.assertAlmostEqual(run_line.loan_offset, 700.0, places=2,
+                               msg="capped at what the commission affords")
+        self.assertAlmostEqual(run_line.net_payable, 0.0, places=2)
+
+    def test_reopened_run_follows_moved_installment(self):
+        entry = self._commission_entry(self.emp_a, 700.0)
+        run = self._approve(entry.batch_id)
+        # The Settings administrator, as on KSWCO: unlocks the month and
+        # leaves every department approved.
+        run.with_user(self.env.ref('base.user_admin')).action_reopen()
+        self.assertNotIn(run.state, ('approved', 'paid'))
+        run_line = self._run_line(run, self.emp_a)
+        self.assertFalse(run_line.x_preview_generated,
+                         "the case the preview used to skip")
+        self.assertAlmostEqual(run_line.loan_offset, 0.0, places=2)
+
+        # A penalty scheduled for next month, moved back into this one.
+        period = fields.Date.to_date(self.period)
+        next_month = fields.Date.add(period, months=1)
+        ded = self.env['ksw.deduction'].create({
+            'employee_id': self.emp_a.id, 'type_id': self.type_advance.id,
+            'amount': 400.0, 'installments': 1, 'start_month': next_month,
+            'reason': 'Moved into a reopened month',
+        })
+        ded.action_submit()
+        self.assertAlmostEqual(run_line.loan_offset, 0.0, places=2)
+        ded.line_ids.sudo().write({
+            'year': period.year, 'month': period.month,
+            'x_awaiting_commission': True,
+        })
+        self.assertAlmostEqual(run_line.loan_offset, 400.0, places=2)
+        self.assertAlmostEqual(run_line.net_payable, 300.0, places=2)
+
+        # And moved away again: the estimate goes with it.
+        ded.line_ids.sudo().write({
+            'year': next_month.year, 'month': next_month.month})
+        self.assertAlmostEqual(run_line.loan_offset, 0.0, places=2)
+
+    def test_approved_run_is_never_estimated(self):
+        entry = self._commission_entry(self.emp_a, 700.0)
+        run = self._approve(entry.batch_id)
+        run_line = self._run_line(run, self.emp_a)
+        self._make_pending_installment(self.emp_a, 300.0)
+        self.assertAlmostEqual(run_line.loan_offset, 0.0, places=2,
+                               msg="a locked month's figure is a settlement")
