@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ksw_bas_inventory_setup_form" model="ir.ui.view">
+        <field name="name">ksw.bas.inventory.setup.form</field>
+        <field name="model">ksw.bas.inventory.setup</field>
+        <field name="arch" type="xml">
+            <form string="BAS Inventory Setup">
+                <div class="mb-2">
+                    <p><b>Run setup</b> reads BAS and creates only what is missing: the item classes with their
+                        BAS stock and issue accounts, missing items, the BAS warehouses and showrooms, and a
+                        Stock Issue operation per warehouse. Safe to run again.</p>
+                    <p><b>Load opening stock</b> sets each item's quantity per warehouse to BAS's register at BAS
+                        unit cost. It posts no journal entry: the ledger already holds the 1206 balances.</p>
+                </div>
+                <field name="company_id" invisible="1"/>
+                <field name="log" nolabel="1" invisible="not log" class="o_ksw_log"/>
+                <footer>
+                    <button name="action_run_setup" type="object" string="Run setup" class="btn-primary"/>
+                    <button name="action_load_opening_stock" type="object" string="Load opening stock"
+                            confirm="Replace the quantities of all stock items with BAS's register?"/>
+                    <button special="cancel" string="Close"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ksw_bas_inventory_setup" model="ir.actions.act_window">
+        <field name="name">BAS Inventory Setup</field>
+        <field name="res_model">ksw.bas.inventory.setup</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

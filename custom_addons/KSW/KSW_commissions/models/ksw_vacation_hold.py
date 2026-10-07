@@ -279,6 +279,34 @@ def hold_blocks(hold, entry_date=None):
     return True
 
 
+def fridays_from(day):
+    """How many Fridays fall from ``day`` to the end of its month."""
+    last = calendar.monthrange(day.year, day.month)[1]
+    first_friday = day + timedelta(days=(4 - day.weekday()) % 7)
+    if first_friday.day > last:
+        return 0
+    return (last - first_friday.day) // 7 + 1
+
+
+def entry_blocked(hold, entry):
+    """:func:`hold_blocks` for an entry in hand.
+
+    A dated entry is judged on its day, as always. The one an entry adds is
+    an undated **Friday count** in the month he came back: it carries no
+    day, but it does say how many Fridays it claims, and the calendar says
+    how many were left after his return. Within that, it is payable;
+    beyond it, it pays Fridays he was still away for.
+
+    Holiday bonuses need nothing here: their date is filled from the Public
+    Holidays calendar (``ksw.pay.entry._apply_paid_day``), so they arrive
+    dated.
+    """
+    if (hold and hold.kind == 'partial' and not entry.date
+            and entry.component_id.x_paid_day == 'friday'):
+        return entry.quantity > fridays_from(hold.payable_from)
+    return hold_blocks(hold, entry.date)
+
+
 def hold_reason(env, hold):
     """One line naming the vacation, for a warning banner or a summary."""
     leave = hold.leave
@@ -356,7 +384,7 @@ def hold_message(env, employee, period, hold, what, entry_date=None):
 
 
 def check_not_held(env, employee, period, what,
-                   entry_date=None, hold=None, allow_su=True):
+                   entry_date=None, hold=None, allow_su=True, entry=None):
     """Raise :class:`UserError` when ``period`` is held for ``employee``.
 
     :param what: what the caller was trying to do, e.g. ``"Adding an
@@ -366,12 +394,29 @@ def check_not_held(env, employee, period, what,
     :param allow_su: exempt ``env.su``, as every other guard in this module
         does.  Pass ``False`` from a call site that writes through
         ``sudo()`` after checking authorisation itself.
+    :param entry: the ``ksw.pay.entry`` being checked, when there is one,
+        so an undated Friday count is judged by :func:`entry_blocked`.
     """
     if allow_su and env.su:
         return
     if hold is None:
         hold = vacation_hold(env, employee, period)
-    if not hold_blocks(hold, entry_date):
+    if entry is not None:
+        if not entry_blocked(hold, entry):
+            return
+        if not entry.date and entry.component_id.x_paid_day == 'friday':
+            raise UserError(_(
+                "%(employee)s came back on %(return_date)s. Only "
+                "%(count)s Friday(s) of %(month)s fall on or after that "
+                "day, and this entry claims %(qty)s.\n\n"
+                "The Fridays before his return were settled on his "
+                "vacation request. %(what)s is therefore not possible.",
+                employee=employee.sudo().display_name,
+                return_date=format_date(env, hold.payable_from),
+                count=fridays_from(hold.payable_from),
+                month=normalise_period(period).strftime('%B %Y'),
+                qty='%g' % entry.quantity, what=what))
+    elif not hold_blocks(hold, entry_date):
         return
     raise UserError(hold_message(env, employee, period, hold, what,
                                  entry_date=entry_date))

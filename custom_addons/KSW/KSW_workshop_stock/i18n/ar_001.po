@@ -1,0 +1,169 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_workshop_stock
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-06 13:29+0000\n"
+"PO-Revision-Date: 2026-10-06 13:29+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar_001\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_workshop_stock
+#: model:ir.model.fields,help:KSW_workshop_stock.field_ksw_fleet_vehicle__x_analytic_account_id
+#: model:ir.model.fields,help:KSW_workshop_stock.field_ksw_workshop_request__x_cost_centre_id
+msgid ""
+"BAS cost centre of this vehicle. Spare parts issued to it in the workshop "
+"are charged here."
+msgstr ""
+"مركز تكلفة المركبة في BAS. تُحمَّل عليه قطع الغيار المصروفة لها في الورشة."
+
+#. module: KSW_workshop_stock
+#: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_fleet_vehicle__x_analytic_account_id
+msgid "Cost Centre"
+msgstr "مركز التكلفة"
+
+#. module: KSW_workshop_stock
+#: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_fleet_vehicle__display_name
+#: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_part_line__display_name
+#: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_request__display_name
+msgid "Display Name"
+msgstr "اسم العرض"
+
+#. module: KSW_workshop_stock
+#: model:ir.model.fields,help:KSW_workshop_stock.field_ksw_workshop_part_line__x_available_qty
+msgid "Free quantity in the repair's parts warehouse right now."
+msgstr "الكمية المتاحة حالياً في مستودع قطع الغيار لهذا الإصلاح."
+
+#. module: KSW_workshop_stock
+#: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_fleet_vehicle__id
+#: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_part_line__id
+#: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_request__id
+msgid "ID"
+msgstr "المعرف"
+
+#. module: KSW_workshop_stock
+#: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_part_line__part_id
+#: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_part_line__product_id
+msgid "Item"
+msgstr "الصنف"
+
+#. module: KSW_workshop_stock
+#: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_part_line__x_available_qty
+msgid "On Hand"
+msgstr "المتوفر"
+
+#. module: KSW_workshop_stock
+#: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_request__x_warehouse_id
+msgid "Parts Warehouse"
+msgstr "مستودع قطع الغيار"
+
+#. module: KSW_workshop_stock
+#: model_terms:ir.ui.view,arch_db:KSW_workshop_stock.view_ksw_workshop_request_form_stock
+msgid "Set on the vehicle"
+msgstr "يُحدَّد في بطاقة المركبة"
+
+#. module: KSW_workshop_stock
+#: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_request__x_issue_picking_id
+#: model_terms:ir.ui.view,arch_db:KSW_workshop_stock.view_ksw_workshop_request_form_stock
+msgid "Stock Issue"
+msgstr "إذن صرف المخزون"
+
+#. module: KSW_workshop_stock
+#: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_part_line__x_move_id
+msgid "Stock Move"
+msgstr "حركة المخزون"
+
+#. module: KSW_workshop_stock
+#: model:ir.model,name:KSW_workshop_stock.model_ksw_fleet_vehicle
+msgid "Vehicle"
+msgstr "المركبة"
+
+#. module: KSW_workshop_stock
+#: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_request__x_cost_centre_id
+msgid "Vehicle Cost Centre"
+msgstr "مركز تكلفة المركبة"
+
+#. module: KSW_workshop_stock
+#: model:ir.model.fields,help:KSW_workshop_stock.field_ksw_workshop_request__x_warehouse_id
+msgid "Warehouse the spare parts are issued from."
+msgstr "المستودع الذي تُصرف منه قطع الغيار."
+
+#. module: KSW_workshop_stock
+#: model:ir.model,name:KSW_workshop_stock.model_ksw_workshop_request
+msgid "Workshop Service Request"
+msgstr "طلب خدمة الورشة"
+
+#. module: KSW_workshop_stock
+#: model:ir.model,name:KSW_workshop_stock.model_ksw_workshop_part_line
+msgid "Workshop Spare Part Issued"
+msgstr "قطعة غيار مصروفة للورشة"
+
+#. module: KSW_workshop_stock
+#. odoo-python
+#: code:addons/KSW_workshop_stock/models/workshop_request.py:0
+msgid "Only an in-progress repair can issue parts."
+msgstr "لا يمكن صرف القطع إلا لإصلاح قيد التنفيذ."
+
+#. module: KSW_workshop_stock
+#. odoo-python
+#: code:addons/KSW_workshop_stock/models/workshop_request.py:0
+msgid "Choose the warehouse the spare parts come from."
+msgstr "اختر المستودع الذي تُصرف منه قطع الغيار."
+
+#. module: KSW_workshop_stock
+#. odoo-python
+#: code:addons/KSW_workshop_stock/models/workshop_request.py:0
+msgid ""
+"Vehicle %(vehicle)s has no cost centre, so its spare parts can't be charged."
+" Set one on the vehicle first."
+msgstr ""
+"المركبة %(vehicle)s ليس لها مركز تكلفة، فلا يمكن تحميل قطع الغيار عليها. "
+"حدّد مركز التكلفة في بطاقة المركبة أولاً."
+
+#. module: KSW_workshop_stock
+#. odoo-python
+#: code:addons/KSW_workshop_stock/models/workshop_request.py:0
+msgid "Warehouse %s has no Stock Issue operation."
+msgstr "المستودع %s ليس له عملية صرف مخزون."
+
+#. module: KSW_workshop_stock
+#. odoo-python
+#: code:addons/KSW_workshop_stock/models/workshop_request.py:0
+msgid ""
+"Not enough stock to complete %(name)s:\n"
+"%(lines)s"
+msgstr ""
+"لا يوجد مخزون كافٍ لإنهاء %(name)s:\n"
+"%(lines)s"
+
+#. module: KSW_workshop_stock
+#. odoo-python
+#: code:addons/KSW_workshop_stock/models/workshop_request.py:0
+msgid "The stock issue for %s could not be completed."
+msgstr "تعذّر إتمام صرف المخزون للطلب %s."
+
+#. module: KSW_workshop_stock
+#. odoo-python
+#: code:addons/KSW_workshop_stock/models/workshop_request.py:0
+msgid "Parts already issued from stock cannot be changed."
+msgstr "لا يمكن تعديل قطع صُرفت من المخزون."
+
+#. module: KSW_workshop_stock
+#. odoo-python
+#: code:addons/KSW_workshop_stock/models/workshop_request.py:0
+msgid "Parts already issued from stock cannot be removed."
+msgstr "لا يمكن حذف قطع صُرفت من المخزون."
+
+#. module: KSW_workshop_stock
+#. odoo-python
+#: code:addons/KSW_workshop_stock/models/workshop_request.py:0
+msgid "Choose the spare part item."
+msgstr "اختر صنف قطعة الغيار."

@@ -2352,11 +2352,34 @@ class HrPayslip(models.Model):
         # history is frozen — and after the guards above, which can refuse.
         if entering_done:
             entering_done._stamp_paid_bank_account()
+            entering_done.filtered(
+                lambda s: s.x_leave_id and not s.x_is_vacation_preview
+            )._ksw_drop_superseded_batch_slips()
         if 'payslip_run_id' in vals:
             runs = self.mapped('payslip_run_id').filtered(bool)
             if runs:
                 runs._refresh_bank_totals()
         return res
+
+    def _ksw_drop_superseded_batch_slips(self):
+        """``self``: vacation / EOS payslips that were just confirmed.
+
+        They settle their month, so the monthly slip already generated for
+        that month in a draft batch would pay it a second time. Hand those
+        slips to the batch, which re-applies its own eligibility rules
+        (``hr.payslip.run._ksw_drop_superseded_slips``).
+        """
+        if not self:
+            return
+        drafts = self.sudo().search([
+            ('employee_id', 'in', self.employee_id.ids),
+            ('state', '=', 'draft'),
+            ('payslip_run_id', '!=', False),
+            ('date_from', '<=', max(self.mapped('date_to'))),
+            ('date_to', '>=', min(self.mapped('date_from'))),
+        ])
+        if drafts:
+            drafts.payslip_run_id._ksw_drop_superseded_slips(drafts)
 
     def _check_revision_payable(self):
         """Backstop for the raw ``write({'state': 'done'})`` RPC route.

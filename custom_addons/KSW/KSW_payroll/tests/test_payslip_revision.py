@@ -267,6 +267,65 @@ class TestPayslipRevision(TransactionCase):
             monthly.with_user(self.user_manager).action_payslip_done()
 
     # ==================================================================
+    # 2b. A vacation / EOS approved after the batch was generated
+    # ==================================================================
+
+    def _make_batch_slip(self, name):
+        run = self.env['hr.payslip.run'].sudo().create({
+            'name': 'Batch %s' % name,
+            'date_start': self.month_start,
+            'date_end': self.month_end,
+        })
+        slip = self._make_payslip(name)
+        slip.sudo().write({'payslip_run_id': run.id})
+        return run, slip
+
+    def test_confirmed_vacation_payslip_drops_the_batch_slip(self):
+        """KSWCO batch 253: the leave's own payslip paid the month, the
+        monthly slip generated earlier stayed in the batch and went into the
+        bank file. Confirming the vacation payslip must take it out."""
+        run, monthly = self._make_batch_slip('Monthly generated first')
+        leave = self._make_vacation_leave('Approved later', 'on_vacation')
+
+        vacation_slip = self._make_payslip('Vacation Payslip')
+        vacation_slip.sudo().write({'x_leave_id': leave.id})
+        vacation_slip.sudo().write({'state': 'done'})
+
+        self.assertEqual(monthly.state, 'cancel')
+        self.assertEqual(
+            run.x_skip_line_ids.filtered(
+                lambda l: l.line_type == 'skipped').employee_id,
+            self.employee)
+
+    def test_settled_return_keeps_the_batch_slip(self):
+        """The exemption `_check_duplicate_done_period` makes holds here
+        too: once the return is confirmed, the monthly slip stays."""
+        _run, monthly = self._make_batch_slip('Monthly after return')
+        leave = self._make_vacation_leave('Returned', 'hr_confirmed')
+
+        vacation_slip = self._make_payslip('Vacation Payslip settled')
+        vacation_slip.sudo().write({'x_leave_id': leave.id})
+        vacation_slip.sudo().write({'state': 'done'})
+
+        self.assertEqual(monthly.state, 'draft')
+
+    def test_mark_as_done_drops_and_never_revives_cancelled_slips(self):
+        """A batch already holding a stale slip (the confirmation happened
+        before the fix) is cleaned at "Mark as Done" — which runs as sudo
+        and so is not stopped by the duplicate-period guard — and a
+        cancelled slip is not confirmed back to life."""
+        leave = self._make_vacation_leave('Old data', 'on_vacation')
+        vacation_slip = self._make_payslip('Vacation Payslip old')
+        vacation_slip.sudo().write({'x_leave_id': leave.id})
+        vacation_slip.sudo().write({'state': 'done'})
+
+        run, monthly = self._make_batch_slip('Stale monthly')
+        self.assertEqual(monthly.state, 'draft')
+
+        run.sudo().done_payslip_run()
+        self.assertEqual(monthly.state, 'cancel')
+
+    # ==================================================================
     # 3 & 4. Issuing a revision
     # ==================================================================
 

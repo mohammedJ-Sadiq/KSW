@@ -170,6 +170,7 @@
         <record id="pay_component_friday" model="ksw.pay.component">
             <field name="name">Friday Work Allowance</field>
             <field name="code">FRIDAY</field>
+            <field name="x_paid_day">friday</field>
             <field name="calculation">qty_rate</field>
             <field name="rate">100.0</field>
             <field name="qty_label">Days</field>
@@ -190,6 +191,7 @@
         <record id="pay_component_bonus_foundation" model="ksw.pay.component">
             <field name="name">Foundation Day Bonus</field>
             <field name="code">BONUS_FOUNDATION</field>
+            <field name="x_paid_day">foundation_day</field>
             <field name="calculation">fixed</field>
             <field name="scope">department</field>
             <field name="sequence">60</field>
@@ -201,6 +203,7 @@
         <record id="pay_component_bonus_national" model="ksw.pay.component">
             <field name="name">National Day Bonus</field>
             <field name="code">BONUS_NATIONAL</field>
+            <field name="x_paid_day">national_day</field>
             <field name="calculation">fixed</field>
             <field name="scope">department</field>
             <field name="sequence">61</field>
@@ -212,6 +215,7 @@
         <record id="pay_component_bonus_fitr" model="ksw.pay.component">
             <field name="name">Eid Al-Fitr Bonus</field>
             <field name="code">BONUS_FITR</field>
+            <field name="x_paid_day">eid_fitr</field>
             <field name="calculation">fixed</field>
             <field name="scope">department</field>
             <field name="sequence">62</field>
@@ -223,6 +227,7 @@
         <record id="pay_component_bonus_adha" model="ksw.pay.component">
             <field name="name">Eid Al-Adha Bonus</field>
             <field name="code">BONUS_ADHA</field>
+            <field name="x_paid_day">eid_adha</field>
             <field name="calculation">fixed</field>
             <field name="scope">department</field>
             <field name="sequence">63</field>

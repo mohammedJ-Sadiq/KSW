@@ -1,0 +1,251 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_inventory
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-06 12:59+0000\n"
+"PO-Revision-Date: 2026-10-06 12:59+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.ksw_bas_inventory_setup_form
+msgid ""
+"<b>Load opening stock</b> sets each item's quantity per warehouse to BAS's register at BAS\n"
+"                        unit cost. It posts no journal entry: the ledger already holds the 1206 balances."
+msgstr ""
+
+#. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.ksw_bas_inventory_setup_form
+msgid ""
+"<b>Run setup</b> reads BAS and creates only what is missing: the item classes with their\n"
+"                        BAS stock and issue accounts, missing items, the BAS warehouses and showrooms, and a\n"
+"                        Stock Issue operation per warehouse. Safe to run again."
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.model.fields,help:KSW_inventory.field_stock_picking__x_issue_account_id
+msgid ""
+"Account debited for what is issued. Leave empty to use each item class's "
+"expense account (tyres 3102020002, desalination parts 3102010001). Set it to"
+" charge an employee, a project or a branch instead, as BAS does with 1207 / "
+"1212 / 2104 accounts."
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_stock_warehouse__x_bas_code
+msgid "BAS Code"
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.actions.act_window,name:KSW_inventory.action_ksw_bas_inventory_setup
+#: model:ir.model,name:KSW_inventory.model_ksw_bas_inventory_setup
+#: model:ir.ui.menu,name:KSW_inventory.menu_ksw_bas_inventory_setup
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.ksw_bas_inventory_setup_form
+msgid "BAS Inventory Setup"
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_stock_warehouse__x_bas_kind
+msgid "BAS Type"
+msgstr ""
+
+#. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.ksw_bas_inventory_setup_form
+msgid "Close"
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_inventory_setup__company_id
+msgid "Company"
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_stock_location__x_ksw_consumption
+msgid "Consumption Location"
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_inventory_setup__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_inventory_setup__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_inventory_setup__display_name
+#: model:ir.model.fields,field_description:KSW_inventory.field_stock_location__display_name
+#: model:ir.model.fields,field_description:KSW_inventory.field_stock_move__display_name
+#: model:ir.model.fields,field_description:KSW_inventory.field_stock_picking__display_name
+#: model:ir.model.fields,field_description:KSW_inventory.field_stock_picking_type__display_name
+#: model:ir.model.fields,field_description:KSW_inventory.field_stock_warehouse__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_inventory_setup__id
+#: model:ir.model.fields,field_description:KSW_inventory.field_stock_location__id
+#: model:ir.model.fields,field_description:KSW_inventory.field_stock_move__id
+#: model:ir.model.fields,field_description:KSW_inventory.field_stock_picking__id
+#: model:ir.model.fields,field_description:KSW_inventory.field_stock_picking_type__id
+#: model:ir.model.fields,field_description:KSW_inventory.field_stock_warehouse__id
+msgid "ID"
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.model,name:KSW_inventory.model_stock_location
+msgid "Inventory Locations"
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_stock_picking__x_issue_account_id
+msgid "Issue Account"
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.model.fields,help:KSW_inventory.field_stock_picking__x_ksw_issue
+#: model:ir.model.fields,help:KSW_inventory.field_stock_picking_type__x_ksw_issue
+msgid ""
+"Issue of stock for use: posts Dr issue account / Cr stock account when "
+"validated, and requires a cost centre."
+msgstr ""
+
+#. module: KSW_inventory
+#: model_terms:ir.actions.act_window,help:KSW_inventory.action_ksw_stock_issues
+msgid "Issue stock for use"
+msgstr ""
+
+#. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_picking_form_ksw_issue
+msgid "Item class account (e.g. 3102020002 tyres)"
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_inventory_setup__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_inventory_setup__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.ksw_bas_inventory_setup_form
+msgid "Load opening stock"
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_inventory_setup__log
+msgid "Log"
+msgstr ""
+
+#. module: KSW_inventory
+#: model_terms:ir.actions.act_window,help:KSW_inventory.action_ksw_stock_issues
+msgid ""
+"Pick the warehouse's Stock Issue operation, the items and a cost centre for each line.\n"
+"               Validating posts Dr the issue account, Cr the stock account."
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.model,name:KSW_inventory.model_stock_picking_type
+msgid "Picking Type"
+msgstr ""
+
+#. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.ksw_bas_inventory_setup_form
+msgid "Replace the quantities of all stock items with BAS's register?"
+msgstr ""
+
+#. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.ksw_bas_inventory_setup_form
+msgid "Run setup"
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.model.fields.selection,name:KSW_inventory.selection__stock_warehouse__x_bas_kind__showroom
+msgid "Showroom"
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_stock_picking__x_ksw_issue
+#: model:ir.model.fields,field_description:KSW_inventory.field_stock_picking_type__x_ksw_issue
+msgid "Stock Issue"
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.actions.act_window,name:KSW_inventory.action_ksw_stock_issues
+#: model:ir.ui.menu,name:KSW_inventory.menu_ksw_stock_issues
+msgid "Stock Issues"
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.model,name:KSW_inventory.model_stock_move
+msgid "Stock Move"
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.model.fields,help:KSW_inventory.field_stock_location__x_ksw_consumption
+msgid ""
+"Stock sent here is used up (BAS 101 «فاتورة صرف»). The entry debits the "
+"issue's account instead of this location's."
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.model,name:KSW_inventory.model_stock_picking
+msgid "Transfer"
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.model,name:KSW_inventory.model_stock_warehouse
+#: model:ir.model.fields.selection,name:KSW_inventory.selection__stock_warehouse__x_bas_kind__warehouse
+msgid "Warehouse"
+msgstr ""
+
+#. module: KSW_inventory
+#: model:ir.model.fields,help:KSW_inventory.field_stock_warehouse__x_bas_code
+msgid ""
+"Warehouse code in BAS (WSHOW.CODE), e.g. 15. Documents of this warehouse "
+"carry the branch code 1 + it (115), showrooms 2 + it."
+msgstr ""
+
+#. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW_inventory/wizard/bas_inventory_setup.py:0
+msgid "Account %s is missing from the chart; run the BAS GL import first."
+msgstr ""
+
+#. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW_inventory/wizard/bas_inventory_setup.py:0
+msgid "The company has no Stock Journal (Inventory Valuation)."
+msgstr ""
+
+#. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW_inventory/wizard/bas_inventory_setup.py:0
+msgid "Run the setup first: no BAS warehouses yet."
+msgstr ""
+
+#. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW_inventory/models/stock.py:0
+msgid "Stock issue %(name)s must go to a consumption location, not %(loc)s."
+msgstr ""
+
+#. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW_inventory/models/stock.py:0
+msgid ""
+"Set a cost centre on every line of %(name)s before validating: %(items)s."
+msgstr ""

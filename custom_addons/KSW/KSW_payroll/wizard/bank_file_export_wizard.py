@@ -225,6 +225,9 @@ class BankFileExportWizard(models.TransientModel):
     def action_export(self):
         """Generate and download bank files based on the selected mode."""
         self.ensure_one()
+        # A vacation / EOS approved after generation leaves a slip the batch
+        # would no longer generate; it must not reach the file.
+        self.payslip_run_id._ksw_drop_superseded_slips()
         mode = self.export_mode
         handler = {
             'all_excel': self._export_all_excel,

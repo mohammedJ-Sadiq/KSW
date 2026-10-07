@@ -35,7 +35,7 @@ from odoo.exceptions import UserError
 from odoo.tools import float_compare
 from odoo.tools.misc import format_date
 
-from .ksw_vacation_hold import hold_blocks, vacation_holds
+from .ksw_vacation_hold import entry_blocked, vacation_holds
 
 
 class HrLeave(models.Model):
@@ -167,7 +167,7 @@ class HrLeave(models.Model):
                 self.env, leave.employee_id, period).get(leave.employee_id.id)
             if not hold or hold.leave == leave:
                 continue
-            blocked |= rows.filtered(lambda e, h=hold: hold_blocks(h, e.date))
+            blocked |= rows.filtered(lambda e, h=hold: entry_blocked(h, e))
         return entries - blocked
 
     def _commission_entries_paid_elsewhere(self, entries):

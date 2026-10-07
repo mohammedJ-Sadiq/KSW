@@ -29,7 +29,7 @@ from odoo.tools.misc import format_datetime
 
 from .ksw_commission_lock import LOCKING_STATES
 from .ksw_vacation_hold import (
-    hold_blocks, hold_reason, vacation_holds,
+    entry_blocked, hold_reason, vacation_holds,
 )
 
 RUN_STATES = [
@@ -1081,7 +1081,7 @@ class KswPayRun(models.Model):
         # register separately — nothing about it is for the GM to release.
         return entries.filtered(
             lambda e: not e.x_vacation_payslip_id
-            and hold_blocks(holds.get(e.employee_id.id), e.date))
+            and entry_blocked(holds.get(e.employee_id.id), e))
 
     def _announce_settled(self, settled):
         """Say whose entries the register skipped because a vacation

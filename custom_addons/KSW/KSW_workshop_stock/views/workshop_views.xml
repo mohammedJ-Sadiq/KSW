@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Repair report: parts come from stock -->
+    <record id="view_ksw_workshop_request_form_stock" model="ir.ui.view">
+        <field name="name">ksw.workshop.request.form.stock</field>
+        <field name="model">ksw.workshop.request</field>
+        <field name="inherit_id" ref="KSW_workshop.view_ksw_workshop_request_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/*[1]" position="before">
+                <div class="oe_button_box" name="button_box_stock">
+                    <button name="action_view_issue_picking" type="object" class="oe_stat_button"
+                            icon="fa-truck" invisible="not x_issue_picking_id">
+                        <field name="x_issue_picking_id" widget="statinfo" string="Stock Issue"/>
+                    </button>
+                </div>
+            </xpath>
+            <field name="part_line_ids" position="before">
+                <field name="x_warehouse_id" readonly="state != 'in_progress' or x_issue_picking_id"
+                       options="{'no_create': True, 'no_open': True}"/>
+                <field name="x_cost_centre_id" readonly="1"
+                       decoration-danger="not x_cost_centre_id"
+                       placeholder="Set on the vehicle"/>
+            </field>
+            <xpath expr="//field[@name='part_line_ids']/list/field[@name='part_id']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='part_line_ids']/list/field[@name='part_id']" position="after">
+                <field name="product_id" required="1" options="{'no_create': True}"
+                       readonly="x_move_id"/>
+                <field name="x_move_id" column_invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='part_line_ids']/list/field[@name='quantity']" position="after">
+                <field name="x_available_qty" decoration-danger="x_available_qty &lt; quantity and not x_move_id"
+                       column_invisible="parent.x_issue_picking_id"/>
+            </xpath>
+            <xpath expr="//field[@name='part_line_ids']/list/field[@name='unit_cost']" position="attributes">
+                <attribute name="readonly">1</attribute>
+                <attribute name="force_save">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Issued Parts report: show the stock item -->
+    <record id="view_ksw_workshop_part_line_list_stock" model="ir.ui.view">
+        <field name="name">ksw.workshop.part.line.list.stock</field>
+        <field name="model">ksw.workshop.part.line</field>
+        <field name="inherit_id" ref="KSW_workshop.view_ksw_workshop_part_line_list"/>
+        <field name="arch" type="xml">
+            <field name="part_id" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </field>
+            <field name="part_id" position="after">
+                <field name="product_id"/>
+            </field>
+        </field>
+    </record>
+    <record id="view_ksw_workshop_part_line_pivot_stock" model="ir.ui.view">
+        <field name="name">ksw.workshop.part.line.pivot.stock</field>
+        <field name="model">ksw.workshop.part.line</field>
+        <field name="inherit_id" ref="KSW_workshop.view_ksw_workshop_part_line_pivot"/>
+        <field name="arch" type="xml">
+            <field name="part_id" position="replace">
+                <field name="product_id" type="row"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Vehicle: its BAS cost centre -->
+    <record id="view_ksw_fleet_vehicle_form_cost_centre" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.form.cost.centre</field>
+        <field name="model">ksw.fleet.vehicle</field>
+        <field name="inherit_id" ref="KSW_fleet.view_ksw_fleet_vehicle_form"/>
+        <field name="arch" type="xml">
+            <field name="driver_id" position="after">
+                <field name="x_analytic_account_id" options="{'no_create': True}"
+                       groups="KSW_workshop.group_workshop_manager,analytic.group_analytic_accounting"/>
+            </field>
+        </field>
+    </record>
+    <record id="view_ksw_fleet_vehicle_list_cost_centre" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.list.cost.centre</field>
+        <field name="model">ksw.fleet.vehicle</field>
+        <field name="inherit_id" ref="KSW_fleet.view_ksw_fleet_vehicle_list"/>
+        <field name="arch" type="xml">
+            <field name="plate_number" position="after">
+                <field name="x_analytic_account_id" optional="show"
+                       groups="KSW_workshop.group_workshop_manager,analytic.group_analytic_accounting"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- The pass-through item list is replaced by stock items -->
+    <function model="ir.ui.menu" name="write">
+        <value eval="[ref('KSW_workshop.menu_ksw_workshop_parts')]"/>
+        <value eval="{'active': False}"/>
+    </function>
+</odoo>

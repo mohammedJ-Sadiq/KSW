@@ -15,6 +15,7 @@
                 <field name="calculation" invisible="1"/>
                 <field name="has_options" invisible="1"/>
                 <field name="needs_date" invisible="1"/>
+                <field name="x_dated_by_calendar" invisible="1"/>
                 <field name="needs_location" invisible="1"/>
                 <field name="importer" invisible="1"/>
                 <field name="entries_import_only" invisible="1"/>
@@ -187,9 +188,12 @@
                                            column_invisible="not parent.has_options"
                                            required="parent.has_options"
                                            options="{'no_create': True}"/>
+                                    <!-- A holiday bonus shows its day,
+                                         filled from Public Holidays and
+                                         never typed. -->
                                     <field name="date"
-                                           readonly="state != 'draft'"
-                                           column_invisible="not parent.needs_date"/>
+                                           readonly="state != 'draft' or parent.x_dated_by_calendar"
+                                           column_invisible="not parent.needs_date and not parent.x_dated_by_calendar"/>
                                     <!-- The days an imported figure covers:
                                          a month paid in pieces (sub-batch,
                                          then the rest) shows each piece. -->

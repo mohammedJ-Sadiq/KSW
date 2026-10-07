@@ -54,6 +54,20 @@ SCOPE = [
     ('company', 'Company-wide'),
 ]
 
+# The day a component pays for, when that day is already known. A holiday
+# bonus is earned on one day of the month, and the vacation hold can only
+# be fair to somebody who came back mid-month if it knows which day that
+# is. The holidays are dated by HR in Time Off -> Public Holidays, tagged
+# with the same key (resource.calendar.leaves.x_pay_occasion); a Friday
+# needs no calendar.
+HOLIDAY_OCCASIONS = [
+    ('national_day', 'National Day'),
+    ('foundation_day', 'Foundation Day'),
+    ('eid_fitr', 'Eid al-Fitr'),
+    ('eid_adha', 'Eid al-Adha'),
+]
+PAID_DAY = HOLIDAY_OCCASIONS + [('friday', 'Fridays')]
+
 
 class KswPayComponent(models.Model):
     _name = 'ksw.pay.component'
@@ -132,6 +146,16 @@ class KswPayComponent(models.Model):
         string='Per Occurrence', default=False,
         help='Tick when each entry is a dated occurrence (overtime worked on '
              'a given day). Leave off for a monthly total.',
+    )
+    x_paid_day = fields.Selection(
+        PAID_DAY, string='Paid For',
+        help='The day this pay is earned on, when it is a known one. A '
+             'holiday bonus takes its date from Time Off > Public Holidays '
+             '(the holiday tagged with the same occasion), so somebody back '
+             'from vacation before the holiday is paid and somebody still '
+             'away is not. A Friday allowance in the month somebody came '
+             'back may claim only the Fridays after his return. Leave empty '
+             'for pay that has no particular day.',
     )
     needs_location = fields.Boolean(
         string='Ask for Location', default=False,
@@ -596,6 +620,13 @@ class KswPayComponent(models.Model):
         res = super().write(vals)
         if self._PRICING_FIELDS & set(vals) or 'tier_ids' in vals:
             self.env['ksw.pay.entry']._mark_open_for_repricing(components=self)
+        if vals.get('x_paid_day'):
+            # Date what is still being typed; a month the calendar has no
+            # holiday for yet is left alone rather than refused here.
+            self.env['ksw.pay.entry'].sudo().search([
+                ('component_id', 'in', self.ids), ('state', '=', 'draft'),
+                ('x_vacation_payslip_id', '=', False),
+            ])._apply_paid_day(strict=False)
         return res
 
 

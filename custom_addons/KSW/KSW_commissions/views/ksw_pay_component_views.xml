@@ -57,6 +57,7 @@
                             <group>
                                 <group string="What to ask for">
                                     <field name="needs_date"/>
+                                    <field name="x_paid_day"/>
                                     <field name="needs_location"/>
                                     <field name="needs_reason"/>
                                 </group>

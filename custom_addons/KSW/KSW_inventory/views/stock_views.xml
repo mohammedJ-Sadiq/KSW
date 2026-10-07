@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_picking_form_ksw_issue" model="ir.ui.view">
+        <field name="name">stock.picking.form.ksw.issue</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <field name="origin" position="before">
+                <field name="x_ksw_issue" invisible="1"/>
+                <field name="x_issue_account_id" invisible="not x_ksw_issue"
+                       readonly="state in ('cancel', 'done')" options="{'no_create': True}"
+                       placeholder="Item class account (e.g. 3102020002 tyres)"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_warehouse_ksw_bas" model="ir.ui.view">
+        <field name="name">stock.warehouse.form.ksw.bas</field>
+        <field name="model">stock.warehouse</field>
+        <field name="inherit_id" ref="stock.view_warehouse"/>
+        <field name="arch" type="xml">
+            <field name="code" position="after">
+                <field name="x_bas_code" readonly="1" invisible="not x_bas_code"/>
+                <field name="x_bas_kind" readonly="1" invisible="not x_bas_code"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_picking_type_form_ksw_issue" model="ir.ui.view">
+        <field name="name">stock.picking.type.form.ksw.issue</field>
+        <field name="model">stock.picking.type</field>
+        <field name="inherit_id" ref="stock.view_picking_type_form"/>
+        <field name="arch" type="xml">
+            <field name="sequence_code" position="after">
+                <field name="x_ksw_issue" invisible="code != 'outgoing'"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_location_form_ksw_consumption" model="ir.ui.view">
+        <field name="name">stock.location.form.ksw.consumption</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_form"/>
+        <field name="arch" type="xml">
+            <field name="usage" position="after">
+                <field name="x_ksw_consumption" invisible="usage not in ('inventory', 'production')"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Inventory > Operations > Transfers > Stock Issues -->
+    <record id="action_ksw_stock_issues" model="ir.actions.act_window">
+        <field name="name">Stock Issues</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">list,kanban,form,calendar,activity</field>
+        <field name="domain">[('picking_type_id.x_ksw_issue', '=', True)]</field>
+        <field name="context">{'contact_display': 'partner_address', 'default_company_id': allowed_company_ids[0], 'restricted_picking_type_code': 'outgoing'}</field>
+        <field name="search_view_id" ref="stock.view_picking_internal_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Issue stock for use</p>
+            <p>Pick the warehouse's Stock Issue operation, the items and a cost centre for each line.
+               Validating posts Dr the issue account, Cr the stock account.</p>
+        </field>
+    </record>
+</odoo>

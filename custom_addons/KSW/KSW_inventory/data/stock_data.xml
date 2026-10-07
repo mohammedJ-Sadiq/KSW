@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Where issued stock goes (BAS 101). Its account is a placeholder that
+         only switches on Odoo's posting; the entry uses the issue account.
+         Set by the BAS Inventory Setup, since the account is a BAS code. -->
+    <record id="location_consumption" model="stock.location">
+        <field name="name">Consumption</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="usage">inventory</field>
+        <field name="x_ksw_consumption" eval="True"/>
+    </record>
+
+    <!-- Item classes = BAS stock accounts. Valuation, cost method and accounts
+         are company-dependent: the setup writes them for the company. -->
+    <record id="categ_stock" model="product.category">
+        <field name="name">Stock Items - أصناف المخزون</field>
+    </record>
+    <record id="categ_tyres" model="product.category">
+        <field name="name">Tyres - الكفرات</field>
+        <field name="parent_id" ref="categ_stock"/>
+    </record>
+    <record id="categ_desal_parts" model="product.category">
+        <field name="name">Desalination Spare Parts - قطع غيار التحلية</field>
+        <field name="parent_id" ref="categ_stock"/>
+    </record>
+    <record id="categ_membranes" model="product.category">
+        <field name="name">Membranes and Raw Materials - الممبرينات والمواد الخام</field>
+        <field name="parent_id" ref="categ_stock"/>
+    </record>
+    <record id="categ_water" model="product.category">
+        <field name="name">Water and Ice - المياه والثلج</field>
+    </record>
+    <record id="categ_services" model="product.category">
+        <field name="name">Services and Rentals - الخدمات والإيجارات</field>
+    </record>
+</odoo>

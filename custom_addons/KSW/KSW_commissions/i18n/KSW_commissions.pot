@@ -4588,7 +4588,9 @@ msgstr ""
 
 #. module: KSW_commissions
 #: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
-msgid "%(label)s must be greater than zero."
+msgid ""
+"%(label)s must be greater than zero. To remove a line, press Discard, then "
+"delete it with the bin icon at the end of its row."
 msgstr ""
 
 #. module: KSW_commissions

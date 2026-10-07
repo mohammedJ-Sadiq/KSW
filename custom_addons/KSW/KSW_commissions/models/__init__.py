@@ -1,4 +1,5 @@
 from . import hr_department
+from . import resource_calendar_leaves    # public holidays tagged with their pay occasion
 from . import ksw_commission_lock         # period lock predicate + guard (no models)
 from . import ksw_vacation_hold          # vacation hold predicate + guard (no models)
 from . import ksw_site                    # work sites (used by entries and tiers)

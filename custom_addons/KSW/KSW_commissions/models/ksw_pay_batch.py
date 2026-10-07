@@ -22,6 +22,9 @@ Two deliberate choices, both explained at length in the design spec:
 """
 import calendar
 from collections import defaultdict
+from datetime import datetime, time, timedelta
+
+import pytz
 
 from markupsafe import Markup, escape
 
@@ -29,9 +32,10 @@ from odoo import _, SUPERUSER_ID, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 from .ksw_commission_lock import check_period_unlocked, period_is_locked
+from .ksw_pay_component import HOLIDAY_OCCASIONS
 from .ksw_vacation_hold import (
-    check_not_held, hold_blocks, hold_reason, pending_vacations,
-    vacation_holds,
+    check_not_held, entry_blocked, hold_reason, month_bounds,
+    pending_vacations, vacation_holds,
 )
 
 BATCH_STATES = [
@@ -160,6 +164,10 @@ class KswPayBatch(models.Model):
         related='component_id.has_options', readonly=True)
     needs_date = fields.Boolean(
         related='component_id.needs_date', readonly=True)
+    # True for a holiday bonus: its rows are dated from the Public Holidays
+    # calendar, so the Date column shows the day and nobody types it.
+    x_dated_by_calendar = fields.Boolean(
+        compute='_compute_dated_by_calendar')
     needs_location = fields.Boolean(
         related='component_id.needs_location', readonly=True)
     importer = fields.Selection(
@@ -215,6 +223,12 @@ class KswPayBatch(models.Model):
                 sum(by_component.values()) for by_component
                 in self.env['ksw.pay.run']._rounded_component_totals(
                     rec.entry_ids).values())
+
+    @api.depends('component_id.x_paid_day')
+    def _compute_dated_by_calendar(self):
+        occasions = dict(HOLIDAY_OCCASIONS)
+        for rec in self:
+            rec.x_dated_by_calendar = rec.component_id.x_paid_day in occasions
 
     @api.depends('state')
     def _compute_is_locked(self):
@@ -469,7 +483,7 @@ class KswPayBatch(models.Model):
         # the register, so it is no reason to refuse the handover.
         return entries.filtered(
             lambda e: not e.x_vacation_payslip_id
-            and hold_blocks(holds.get(e.employee_id.id), e.date))
+            and entry_blocked(holds.get(e.employee_id.id), e))
 
     @api.model
     def default_get(self, fields_list):
@@ -652,6 +666,12 @@ class KswPayBatch(models.Model):
             self._check_component_rights()
         if 'department_id' in vals:
             self._check_department_rights()
+        if {'period', 'component_id'} & set(vals):
+            # A holiday bonus moved to another month takes that month's
+            # holiday, or is refused if the month has none.
+            self.entry_ids.filtered(
+                lambda e: e.state == 'draft' and not e.x_vacation_payslip_id
+            )._apply_paid_day()
         if {'period', 'department_id', 'site_id'} & set(vals):
             self._ensure_submission()
             self._check_department_open(_("Moving a batch into it"))
@@ -1399,6 +1419,91 @@ class KswPayEntry(models.Model):
         }
 
     # ------------------------------------------------------------------
+    # The day a holiday bonus is paid for
+    # ------------------------------------------------------------------
+    @api.model
+    def _paid_day_date(self, occasion, period):
+        """The day ``occasion`` falls on in ``period``'s month, or False.
+
+        Read from Time Off > Public Holidays: the company-wide holiday HR
+        tagged with this occasion. An Eid spans several days; the LAST one
+        inside the month is returned, so somebody back from vacation for
+        any part of it is paid — the hold refuses only a day before his
+        return, and the last day is the most generous honest answer.
+        """
+        month_start, month_end = month_bounds(period)
+        if not month_start:
+            return False
+        tz = pytz.timezone(
+            self.env.company.resource_calendar_id.tz or 'Asia/Riyadh')
+        holidays = self.env['resource.calendar.leaves'].sudo().search([
+            ('resource_id', '=', False),
+            ('x_pay_occasion', '=', occasion),
+            ('company_id', 'in', [False, self.env.company.id]),
+            # One day of slack each way for the timezone; the exact
+            # local dates are compared below.
+            ('date_from', '<', datetime.combine(
+                month_end + timedelta(days=2), time.min)),
+            ('date_to', '>', datetime.combine(
+                month_start - timedelta(days=1), time.min)),
+        ])
+        days = []
+        for holiday in holidays:
+            first = pytz.utc.localize(holiday.date_from).astimezone(tz).date()
+            last = pytz.utc.localize(holiday.date_to).astimezone(tz).date()
+            last = min(last, month_end)
+            if max(first, month_start) <= last:
+                days.append(last)
+        return max(days) if days else False
+
+    def _apply_paid_day(self, strict=True):
+        """Date every row of a holiday bonus with its holiday.
+
+        The supervisor never types it: the day is already known, and a
+        typed one could only be wrong. With the row dated, the vacation
+        hold judges it like any other dated row — payable when he was back
+        by then, refused when he was still away — instead of flagging every
+        returnee for the whole month.
+
+        :param strict: raise when the calendar has no such holiday in the
+            month (entry and batch routes: a National Day Bonus recorded in
+            October is a mistake worth stopping); ``False`` skips the row
+            (back-filling, where refusing would block an unrelated save).
+        """
+        occasions = dict(HOLIDAY_OCCASIONS)
+        days = {}
+        by_day = defaultdict(lambda: self.browse())
+        for rec in self:
+            batch = rec.batch_id
+            occasion = batch.component_id.x_paid_day
+            if occasion not in occasions or not batch.period:
+                continue
+            key = (occasion, batch.period)
+            if key not in days:
+                days[key] = self._paid_day_date(occasion, batch.period)
+            day = days[key]
+            if not day:
+                if strict:
+                    raise UserError(_(
+                        "%(component)s is paid for %(occasion)s, but Time "
+                        "Off \u2192 Configuration \u2192 Public Holidays has "
+                        "no %(occasion)s in %(month)s.\n\n"
+                        "Check that the batch is for the right month. If it "
+                        "is, ask HR to add the holiday there and set its "
+                        "Pay Occasion to %(occasion)s.",
+                        component=batch.component_id.name,
+                        occasion=occasions[occasion],
+                        month=batch.period.strftime('%B %Y')))
+                continue
+            if rec.date != day:
+                by_day[day] |= rec
+        for day, rows in by_day.items():
+            # The system's own value, not an edit: past the draft and
+            # import-only guards, but still through the constraints.
+            super(KswPayEntry, rows).write({'date': day})
+        return True
+
+    # ------------------------------------------------------------------
     # Vacation hold
     # ------------------------------------------------------------------
     @api.depends('employee_id', 'date', 'period')
@@ -1426,7 +1531,12 @@ class KswPayEntry(models.Model):
                 # in the month he came back — that one is allowed through
                 # (there is no day to compare) but it is exactly the row
                 # where a full month's meals get billed for half a month.
-                if hold and (hold_blocks(hold, rec.date) or not rec.date):
+                # A Friday count is the exception: entry_blocked already
+                # measured it against the Fridays after his return, so
+                # within that it has nothing left to warn about.
+                undated_unknown = not rec.date and (
+                    rec.component_id.x_paid_day != 'friday')
+                if hold and (entry_blocked(hold, rec) or undated_unknown):
                     rec.x_vacation_hold = hold_reason(self.env, hold)
 
     @api.depends('x_vacation_payslip_id')
@@ -1511,6 +1621,7 @@ class KswPayEntry(models.Model):
                 check_not_held(
                     self.env, rec.employee_id, period, what,
                     entry_date=rec.date, hold=holds.get(rec.employee_id.id),
+                    entry=rec,
                 )
 
     # ------------------------------------------------------------------
@@ -1522,8 +1633,13 @@ class KswPayEntry(models.Model):
             if rec.component_id.calculation == 'fixed':
                 continue
             if rec.quantity <= 0:
+                # Zero is how people try to cancel a line, so the refusal
+                # has to name the way that works, or the rejected value
+                # stays in the form and every later save fails on it too.
                 raise ValidationError(_(
-                    "%(label)s must be greater than zero.",
+                    "%(label)s must be greater than zero. To remove a line, "
+                    "press Discard, then delete it with the bin icon at the "
+                    "end of its row.",
                     label=rec.component_id.qty_label or _('Quantity')))
 
     @api.constrains('option_id', 'component_id')
@@ -1811,6 +1927,7 @@ class KswPayEntry(models.Model):
                 vals['state'] = batch_states[vals['batch_id']]
         entries = super().create(vals_list)
         entries._check_editable(_("Adding an entry"))
+        entries._apply_paid_day()
         entries._check_employee_allowed()
         entries._check_vacation_hold(_("Adding an entry"))
         entries._join_open_sub_batch()
@@ -1823,15 +1940,18 @@ class KswPayEntry(models.Model):
             self._check_not_paid_twice(vals['x_vacation_payslip_id'])
         self._check_editable(_("Editing an entry"))
         res = super().write(vals)
+        if 'date' in vals:
+            # A holiday bonus keeps its holiday, whatever was sent.
+            self._apply_paid_day()
         if 'employee_id' in vals:
             self._check_employee_allowed()
         # Moving a row's day can move it into or out of a sub-batch's range.
         if {'employee_id', 'date', 'x_window_from', 'x_window_to'} & set(vals):
             self._join_open_sub_batch()
         # `date` too: moving an occurrence back into the vacation is the
-        # same act as typing it there. Nothing else can change the answer —
-        # the period belongs to the batch and a batch cannot move months.
-        if 'employee_id' in vals or 'date' in vals:
+        # same act as typing it there. `quantity` for an undated Friday
+        # count, which is measured against the Fridays after a return.
+        if {'employee_id', 'date', 'quantity'} & set(vals):
             self._check_vacation_hold(_("Editing an entry"))
         return res
 
@@ -1943,7 +2063,7 @@ class KswPayEntry(models.Model):
             holds = vacation_holds(self.env, rows.employee_id, period)
             held |= rows.filtered(
                 lambda e: not e.x_vacation_payslip_id
-                and hold_blocks(holds.get(e.employee_id.id), e.date))
+                and entry_blocked(holds.get(e.employee_id.id), e))
         if held:
             raise UserError(_(
                 "%(what)s is not possible: %(who)s went on vacation and "

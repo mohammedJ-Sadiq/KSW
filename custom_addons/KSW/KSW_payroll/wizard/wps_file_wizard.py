@@ -20,6 +20,7 @@ class WpsFileWizard(models.TransientModel):
     def action_generate(self):
         self.ensure_one()
         batch = self.payslip_run_id
+        batch._ksw_drop_superseded_slips()
         if not batch.slip_ids:
             raise UserError(_('No payslips in this batch to export.'))
         groups = batch._group_slips_by_bank_account()

@@ -138,6 +138,7 @@ class KawtharFileWizard(models.TransientModel):
             raise UserError(_('The openpyxl library is required.'))
 
         batch = self.payslip_run_id
+        batch._ksw_drop_superseded_slips()
         if not batch.slip_ids:
             raise UserError(_('No payslips in this batch to export.'))
 

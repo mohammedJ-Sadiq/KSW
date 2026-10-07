@@ -4915,8 +4915,10 @@ msgstr ""
 
 #. module: KSW_commissions
 #: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
-msgid "%(label)s must be greater than zero."
-msgstr "يجب أن يكون %(label)s أكبر من صفر."
+msgid ""
+"%(label)s must be greater than zero. To remove a line, press Discard, then "
+"delete it with the bin icon at the end of its row."
+msgstr "يجب أن يكون %(label)s أكبر من صفر. لحذف سطر، اضغط «تجاهل» ثم احذفه بأيقونة سلة المهملات في نهاية السطر."
 
 #. module: KSW_commissions
 #: code:addons/KSW_commissions/models/ksw_pay_batch.py:0

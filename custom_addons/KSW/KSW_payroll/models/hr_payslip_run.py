@@ -267,7 +267,11 @@ class HrPayslipRun(models.Model):
         payslip's loan/deduction line disappears, but the deduction record
         still shows it settled under that payslip").
         """
-        pending = self.slip_ids.filtered(lambda s: s.state != 'done')
+        self._ksw_drop_superseded_slips()
+        # A cancelled slip is out of the batch for good — confirming it here
+        # would put a payslip the batch already dropped back on the books.
+        pending = self.slip_ids.filtered(
+            lambda s: s.state not in ('done', 'cancel'))
         # Confirming recomputes every slip, so the figures can still move
         # here — after a bank file may already have been exported and paid.
         # Snapshot them and report anything that shifted (see
@@ -281,6 +285,122 @@ class HrPayslipRun(models.Model):
             run._ksw_report_confirm_net_changes(
                 pending.filtered(lambda s: s.payslip_run_id == run), net_before)
         return True
+
+    def _ksw_superseded_slip_reasons(self, slips):
+        """Return ``{slip: reason}`` for the draft slips in ``slips`` that the
+        batch would refuse to generate today.
+
+        The batch wizard decides eligibility once, at generation
+        (``hr.payslip.employees._check_employee_for_batch``). A vacation or
+        End of Service approved *after* that leaves a stale slip behind: the
+        leave's own payslip settles the month and is confirmed on the spot,
+        while the monthly slip for the same month still sits in the batch
+        and goes into the bank file. KSWCO batch 253 (September 2026) paid
+        two employees a second time that way.
+
+        Same two rules as the wizard, batched (one search each) because this
+        runs on every export:
+
+        * a leave whose return nobody has confirmed (``on_vacation``);
+        * a confirmed payslip already covering the period, unless it is a
+          settled vacation payslip (``_is_settled_vacation_payslip``) —
+          the exemption ``_check_duplicate_done_period`` also makes.
+
+        The contract check is left out: it is the expensive one, and an
+        employee whose contract ended through EOS is caught by his EOS
+        payslip under the second rule.
+        """
+        slips = slips.filtered(
+            lambda s: s.state == 'draft' and s.employee_id
+            and not s.x_is_revision and not s.x_leave_id)
+        if not slips:
+            return {}
+        employees = slips.employee_id
+        Payslip = self.env['hr.payslip'].sudo()
+        leaves = self.env['hr.leave'].sudo().search([
+            ('employee_id', 'in', employees.ids),
+            ('state', '=', 'validate'),
+            ('x_return_state', '=', 'on_vacation'),
+            ('request_date_from', '<=', max(slips.mapped('date_to'))),
+        ])
+        done = Payslip.search([
+            ('employee_id', 'in', employees.ids),
+            ('state', '=', 'done'),
+            ('date_from', '<=', max(slips.mapped('date_to'))),
+            ('date_to', '>=', min(slips.mapped('date_from'))),
+        ]).filtered(lambda s: not s._is_settled_vacation_payslip())
+
+        reasons = {}
+        for slip in slips:
+            blocking = done.filtered(
+                lambda d: d.employee_id == slip.employee_id
+                and d.date_from <= slip.date_to
+                and d.date_to >= slip.date_from)
+            if blocking:
+                reasons[slip] = _(
+                    'Removed from the batch: this period was already paid '
+                    'by %(slips)s.',
+                    slips=', '.join(
+                        '%s (%s)' % (
+                            d.number or d.name or d.id,
+                            d.x_leave_id.holiday_status_id.name
+                            if d.x_leave_id else _('payslip'))
+                        for d in blocking))
+                continue
+            unresolved = leaves.filtered(
+                lambda l: l.employee_id == slip.employee_id
+                and l.request_date_from <= slip.date_to)
+            if unresolved:
+                reasons[slip] = _(
+                    'Removed from the batch: return not confirmed on '
+                    '%(details)s.',
+                    details=', '.join(
+                        '%s (%s → %s)' % (
+                            l.holiday_status_id.name,
+                            l.request_date_from, l.request_date_to)
+                        for l in unresolved))
+        return reasons
+
+    def _ksw_drop_superseded_slips(self, slips=None):
+        """Cancel the draft slips the batch would no longer generate, log
+        them as skipped and say so in the chatter.
+
+        Called where a batch's figures leave the system — every bank export
+        and "Mark as Done" — and from ``hr.payslip.write`` the moment a
+        vacation / EOS payslip is confirmed. Cancelled, not deleted, so the
+        row stays visible; the export already leaves cancelled slips out of
+        the text file.
+        """
+        dropped = self.env['hr.payslip']
+        for run in self:
+            todo = run.slip_ids if slips is None else slips.filtered(
+                lambda s: s.payslip_run_id == run)
+            reasons = run._ksw_superseded_slip_reasons(todo)
+            if not reasons:
+                continue
+            gone = self.env['hr.payslip'].concat(*reasons)
+            gone.sudo().with_context(_ksw_skip_bank_refresh=True).write(
+                {'state': 'cancel'})
+            self.env['ksw.payslip.run.skip.line'].sudo().create([{
+                'run_id': run.id,
+                'employee_id': slip.employee_id.id,
+                'reason': reason,
+                'line_type': 'skipped',
+            } for slip, reason in reasons.items()])
+            rows = Markup('').join(
+                Markup('<li>%(emp)s (NET %(net).2f): %(reason)s</li>') % {
+                    'emp': s.employee_id.name,
+                    'net': s._ksw_net_amount(),
+                    'reason': r}
+                for s, r in reasons.items())
+            run.sudo().message_post(body=Markup(
+                '<strong>%(n)d payslip(s) cancelled and removed from the '
+                'bank file</strong><ul>%(rows)s</ul>'
+            ) % {'n': len(reasons), 'rows': rows},
+                subtype_xmlid='mail.mt_note')
+            run._refresh_bank_totals()
+            dropped |= gone
+        return dropped
 
     def _ksw_report_confirm_net_changes(self, slips, net_before):
         """Record any NET that moved while the batch was being confirmed.
