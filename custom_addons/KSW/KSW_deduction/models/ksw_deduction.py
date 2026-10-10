@@ -119,6 +119,9 @@ class KswDeduction(models.Model):
     is_loan = fields.Boolean(
         related='type_id.is_loan', store=True, readonly=True,
     )
+    x_single_installment = fields.Boolean(
+        related='type_id.x_single_installment', readonly=True,
+    )
     managed_by = fields.Selection(
         related='type_id.managed_by', store=True, readonly=True,
         string='Managed By',
@@ -736,8 +739,20 @@ class KswDeduction(models.Model):
 
     @api.onchange('type_id')
     def _onchange_type_id(self):
-        if self.type_id and self.type_id.default_installments:
+        if self.type_id and self.type_id.x_single_installment:
+            self.installments = 1
+        elif self.type_id and self.type_id.default_installments:
             self.installments = self.type_id.default_installments
+
+    def _check_single_installment(self):
+        """A type locked to one installment stays one installment, from
+        every route that sets the count (form, RPC, reschedule)."""
+        for rec in self:
+            if rec.type_id.x_single_installment and rec.installments != 1:
+                raise UserError(_(
+                    '%(type)s deductions are a single installment. A system '
+                    'administrator can unlock this on the deduction type.',
+                    type=rec.type_id.display_name))
 
     # ==================================================================
     # UI helpers (smart buttons)
@@ -890,6 +905,11 @@ class KswDeduction(models.Model):
         for vals in vals_list:
             if vals.get('employee_id'):
                 self._check_assistant_employee_scope(vals['employee_id'])
+        for vals in vals_list:
+            type_id = vals.get('type_id')
+            if type_id and DeductionType.browse(type_id).sudo(
+            ).x_single_installment:
+                vals['installments'] = 1
         records = super().create(vals_list)
         return records
 
@@ -1919,6 +1939,8 @@ class KswDeduction(models.Model):
             # Run on the originals (without the skip-flag) so any
             # validation errors are raised in the caller's context.
             self._validate_installments_total()
+        if {'installments', 'type_id'} & set(vals):
+            self._check_single_installment()
         return res
 
     # ------------------------------------------------------------------

@@ -365,6 +365,29 @@ class TestPayslipRevision(TransactionCase):
         self.assertEqual(self._net(revision), 800.0)
         self.assertEqual(revision.x_deserved_net, original_net + 800.0)
 
+    def test_revision_uses_the_version_in_effect(self):
+        """KSWCO 19457: the slip was paid on the old version; a new version
+        dated inside the month raised an allowance. The revision must read
+        the new version or the difference comes out at zero.
+
+        NET is not asserted: worked days are still built from the payslip's
+        single version (clipped to its contract dates), so this attendance-
+        less fixture deducts a different number of unpresented days. That is
+        a separate, known limitation (see KSW-Brain Pitfalls #196)."""
+        original = self._confirm(self._make_payslip('Paid on old version'))
+        self.version.contract_date_end = date(2026, 7, 9)
+        new_version = self.version.copy({
+            'date_version': date(2026, 7, 10),
+            'contract_date_start': date(2026, 7, 10),
+            'contract_date_end': False,
+            'hra': 1500.0,
+        })
+
+        revision = self._issue_revision(original)
+        self.assertEqual(revision.version_id, new_version)
+        hra = revision.line_ids.filtered(lambda l: l.code == 'HRA')
+        self.assertEqual(hra.total, 1500.0)
+
     def test_revision_with_no_change_pays_nothing(self):
         """Re-issuing an unchanged period must come out at exactly zero —
         the sanity check that PRIOR_NET nets the period out completely."""

@@ -203,7 +203,7 @@ class TestPayrollReviewer(TransactionCase):
 
         rev_buttons = buttons(self.user_reviewer)
         off_buttons = buttons(self.user_officer)
-        for name in ('done_payslip_run', 'close_payslip_run',
+        for name in ('action_open_done_wizard', 'close_payslip_run',
                      'action_open_export_wizard', 'action_refresh_bank_totals',
                      'action_clear_skip_log'):
             self.assertNotIn(name, rev_buttons)

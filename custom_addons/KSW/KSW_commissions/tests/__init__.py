@@ -27,3 +27,5 @@ from . import test_sub_batch_dates
 from . import test_employee_review
 from . import test_run_review_ui
 from . import test_paid_day
+from . import test_commission_auto_recovery
+from . import test_mark_paid_by_bank

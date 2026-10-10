@@ -1,6 +1,6 @@
 from markupsafe import Markup
 
-from odoo import fields, models, _
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from odoo.tools import float_compare
 
@@ -99,6 +99,26 @@ class KswPayslipRunBankTotal(models.Model):
              'i.e. the figure on the file that was actually sent to the bank. '
              'Equals Total NET + Cancelled NET.',
     )
+    confirm_state = fields.Selection(
+        [('done', 'Done'), ('pending', 'Pending')],
+        string='Status', compute='_compute_confirm_state',
+        help='Done once every payslip paid from this account is confirmed '
+             '(Mark As Done can confirm one account at a time).',
+    )
+
+    # Not stored: a row is rebuilt only on refresh, while a slip can be
+    # confirmed, reset or added at any time. Resolved with the same helper
+    # Mark As Done uses, so the two can never disagree.
+    @api.depends('run_id.state', 'run_id.slip_ids.state')
+    def _compute_confirm_state(self):
+        for run in self.run_id:
+            pending = {b.id or False for b in run._ksw_pending_bank_groups()}
+            for line in self.filtered(lambda l: l.run_id == run):
+                line.confirm_state = (
+                    'pending' if (line.bank_account_id.id or False) in pending
+                    else 'done')
+        (self - self.filtered('run_id')).confirm_state = 'pending'
+
 
     def action_open_cancelled_payslips(self):
         """Drill down from the summary line to the cancelled payslips.
@@ -267,11 +287,25 @@ class HrPayslipRun(models.Model):
         payslip's loan/deduction line disappears, but the deduction record
         still shows it settled under that payslip").
         """
-        self._ksw_drop_superseded_slips()
+        return self._ksw_confirm_slips()
+
+    def _ksw_pending_slips(self):
         # A cancelled slip is out of the batch for good — confirming it here
         # would put a payslip the batch already dropped back on the books.
-        pending = self.slip_ids.filtered(
+        return self.slip_ids.filtered(
             lambda s: s.state not in ('done', 'cancel'))
+
+    def _ksw_confirm_slips(self, slips=None):
+        """Confirm ``slips`` (default: every pending slip of the batches).
+
+        A batch only moves to Done once nothing in it is left pending, so
+        confirming one paying account at a time (the Mark As Done wizard)
+        leaves it in Draft with the rest still to do.
+        """
+        self._ksw_drop_superseded_slips()
+        pending = self._ksw_pending_slips()
+        if slips is not None:
+            pending &= slips
         # Confirming recomputes every slip, so the figures can still move
         # here — after a bank file may already have been exported and paid.
         # Snapshot them and report anything that shifted (see
@@ -279,12 +313,48 @@ class HrPayslipRun(models.Model):
         net_before = {s.id: s._ksw_net_amount() for s in pending}
         for line in pending:
             line.with_context(_ksw_skip_bank_refresh=True).action_payslip_done()
-        self.write({'state': 'done'})
+        self.filtered(lambda r: not r._ksw_pending_slips()).write(
+            {'state': 'done'})
         self._refresh_bank_totals()
         for run in self:
             run._ksw_report_confirm_net_changes(
                 pending.filtered(lambda s: s.payslip_run_id == run), net_before)
         return True
+
+    def _ksw_pending_bank_groups(self):
+        """``{bank: pending slips}`` — what Mark As Done can still confirm,
+        resolved exactly as the bank files resolve it."""
+        self.ensure_one()
+        groups = {}
+        for slip in self._ksw_pending_slips():
+            bank = self._resolve_slip_bank_account(slip)
+            groups.setdefault(bank, self.env['hr.payslip'])
+            groups[bank] |= slip
+        return groups
+
+    def action_open_done_wizard(self):
+        """Mark As Done: pick which paying accounts to confirm when the
+        batch pays from more than one; otherwise confirm as before."""
+        self.ensure_one()
+        groups = self._ksw_pending_bank_groups()
+        if len(groups) <= 1:
+            return self.done_payslip_run()
+        wizard = self.env['ksw.payslip.run.done.wizard'].create({
+            'run_id': self.id,
+            'line_ids': [(0, 0, {
+                'bank_account_id': bank.id or False,
+                'slip_count': len(slips),
+                'total_net': sum(self._get_line_total(s, 'NET') for s in slips),
+            }) for bank, slips in groups.items()],
+        })
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Mark As Done'),
+            'res_model': 'ksw.payslip.run.done.wizard',
+            'res_id': wizard.id,
+            'view_mode': 'form',
+            'target': 'new',
+        }
 
     def _ksw_superseded_slip_reasons(self, slips):
         """Return ``{slip: reason}`` for the draft slips in ``slips`` that the
@@ -462,6 +532,36 @@ class HrPayslipRun(models.Model):
         self.ensure_one()
         self.x_skip_line_ids.unlink()
         return True
+
+    def action_unlink_with_payslips(self):
+        """Delete the batches together with every payslip inside them.
+
+        A plain ``unlink()`` deletes only the batch: ``payslip_run_id`` has
+        no ``ondelete``, so the slips survive with an empty batch. That stays
+        available as the second choice of the delete dialog
+        (``static/src/js/payslip_run_delete.js``); this is the first one.
+
+        Nothing is bypassed. The batch must be draft (base ``unlink``) and
+        every slip must pass ``hr.payslip.unlink`` (draft/cancelled only,
+        Officers refused) — any refusal rolls the whole call back, so a
+        batch is never deleted with half its slips gone. Both state checks
+        are repeated up front so the slips are not touched before a refusal,
+        and so the message can name the employees.
+        """
+        if any(run.state != 'draft' for run in self):
+            raise UserError(_('You cannot delete a payslip batch which is not draft!'))
+        blocked = self.slip_ids.filtered(
+            lambda s: s.state not in ('draft', 'cancel'))
+        if blocked:
+            raise UserError(_(
+                'These payslips are not draft or cancelled, so the batch '
+                'cannot be deleted with them:\n%(names)s\n\nCancel them '
+                'first, or delete only the batch and keep its payslips.',
+                names='\n'.join(
+                    '• %s' % s.employee_id.name for s in blocked[:20]),
+            ))
+        self.slip_ids.unlink()
+        return self.unlink()
 
 
     # ------------------------------------------------------------------

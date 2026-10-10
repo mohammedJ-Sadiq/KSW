@@ -40,3 +40,7 @@ from . import test_bas_journal_entry
 from . import test_unpaid_settlement_payslip
 from . import test_employee_prerequisites
 from . import test_payslip_value_lock
+from . import test_payslip_effective_version
+from . import test_payslip_run_delete
+from . import test_payslip_run_done_by_bank
+from . import test_confirm_keeps_figures

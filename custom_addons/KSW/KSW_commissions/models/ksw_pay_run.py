@@ -242,7 +242,8 @@ class KswPayRun(models.Model):
             # A paid month is history: the money left the bank, and
             # reopening it would restate what was paid (sub-batch rows
             # included, which the GM promised the supervisor were final).
-            rec.x_can_reopen = is_closer and rec.state == 'approved'
+            rec.x_can_reopen = (is_closer and rec.state == 'approved'
+                                and not rec.line_ids.filtered('x_paid'))
             rec.x_can_export = is_accountant and rec.state in LOCKING_STATES
 
     # Deliberately NOT depending on batch_ids.entry_ids: batch_ids is a
@@ -653,6 +654,10 @@ class KswPayRun(models.Model):
         })
         self.line_ids.sudo()._apply_loan_offset()
         self.line_ids.sudo()._unflag_uncovered_auto_installments(auto_ids)
+        self._release_uncovered_recoveries()
+        # Added step for non-loan deductions: whatever they still owe comes
+        # out of this month if it is free (the 'next commission' route).
+        self.env['ksw.deduction']._recover_for_approved_run(self)
         body = Markup(
             '<strong>✅ Approved</strong><br/>'
             '<b>Departments:</b> %(depts)s<br/>'
@@ -690,6 +695,23 @@ class KswPayRun(models.Model):
             else 'mail.mt_note',
         )
         return True
+
+    def _release_uncovered_recoveries(self, employees=None):
+        """Reservations on this month the commission could not cover go
+        back to payroll — they must not wait on a month already settled.
+
+        Returns the released installment lines.
+        """
+        DedLine = self.env['ksw.deduction.line'].sudo()
+        domain = [('x_recover_from_run_id', 'in', self.ids),
+                  ('state', '=', 'pending')]
+        if employees:
+            domain.append(('employee_id', 'in', employees.ids))
+        lines = DedLine.search(domain)
+        lines._release_recovery(_(
+            'The commission month no longer covers it, so the next payslip '
+            'collects it.'))
+        return lines
 
     def _accountant_partners(self):
         group = self.env.ref('KSW_commissions.group_commission_accountant',
@@ -763,7 +785,7 @@ class KswPayRun(models.Model):
         keep_states = (not self.env.su
                        and self.env.user.has_group('base.group_system'))
         for rec in self:
-            if rec.state == 'paid':
+            if rec.state == 'paid' or rec.line_ids.filtered('x_paid'):
                 raise UserError(_(
                     "%(name)s has been paid. A paid month cannot be "
                     "reopened — not even by the General Manager.",
@@ -833,16 +855,72 @@ class KswPayRun(models.Model):
         return True
 
     def action_mark_paid(self):
+        for rec in self:
+            rec._mark_lines_paid(rec.line_ids)
+        return True
+
+    def _mark_lines_paid(self, lines):
+        """Mark ``lines`` paid; the run turns Paid with its last line.
+
+        Each paying bank account is its own transfer and they do not all
+        leave on the same day, so the accountant may commit one account at
+        a time (Mark Paid wizard). A paid line is as final as a paid run:
+        ``_months_paid_to`` reads either, so no vacation pays it again and
+        the month can no longer be reopened.
+        """
+        self.ensure_one()
         self._check_group(
             'KSW_commissions.group_commission_accountant',
             _("Only the Commission Accountant can mark the month paid."))
-        for rec in self:
-            if rec.state != 'approved':
-                raise UserError(_(
-                    "Only an approved pay run can be marked paid."))
-            rec._commit_to_employees()
-            rec.write({'state': 'paid'})
+        if self.state != 'approved':
+            raise UserError(_(
+                "Only an approved pay run can be marked paid."))
+        lines = (lines & self.line_ids).filtered(lambda l: not l.x_paid)
+        self._commit_to_employees(lines.employee_id)
+        lines.sudo().write({
+            'x_paid': True,
+            'x_paid_date': fields.Datetime.now(),
+            'x_paid_by': self.env.uid,
+        })
+        if not self.line_ids.filtered(lambda l: not l.x_paid):
+            self.write({'state': 'paid'})
         return True
+
+    def _unpaid_bank_groups(self):
+        """``{bank: unpaid register lines}``, grouped as the bank file is."""
+        self.ensure_one()
+        return {
+            bank: lines.filtered(lambda l: not l.x_paid)
+            for bank, lines in self._group_lines_by_bank_account().items()
+            if lines.filtered(lambda l: not l.x_paid)
+        }
+
+    def action_open_mark_paid_wizard(self):
+        """Mark Paid: pick which paying accounts went out when the month
+        pays from more than one; otherwise mark it paid as before."""
+        self.ensure_one()
+        self._check_group(
+            'KSW_commissions.group_commission_accountant',
+            _("Only the Commission Accountant can mark the month paid."))
+        groups = self._unpaid_bank_groups()
+        if len(groups) <= 1:
+            return self.action_mark_paid()
+        wizard = self.env['ksw.pay.run.paid.wizard'].create({
+            'run_id': self.id,
+            'line_ids': [(0, 0, {
+                'bank_account_id': bank.id or False,
+                'line_count': len(lines),
+                'total_payable': sum(lines.mapped('net_payable')),
+            }) for bank, lines in groups.items()],
+        })
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Mark Paid'),
+            'res_model': 'ksw.pay.run.paid.wizard',
+            'res_id': wizard.id,
+            'view_mode': 'form',
+            'target': 'new',
+        }
 
     # ------------------------------------------------------------------
     # The payment register
@@ -908,12 +986,14 @@ class KswPayRun(models.Model):
                     'earnings': amount,
                     'x_preview_generated': True,
                 })
-            if preview:
-                line.loan_offset = math.floor(
-                    min(amount, line._pending_loan_total()) + 1e-6)
-            else:
+            if not preview:
                 # From approval on, this is the settlement itself.
                 line.x_preview_generated = False
+        if preview:
+            # Every line, not only the ones this preview owns: a reopened
+            # month keeps its approval-built lines, and skipping them left
+            # their Loans column frozen at whatever it read on reopening.
+            self.sudo().line_ids._refresh_loan_estimate()
         return self.line_ids
 
     @api.model
@@ -922,7 +1002,8 @@ class KswPayRun(models.Model):
         predicate against paying a commission twice.
 
         Only **Paid** counts — that is the accountant's statement that the
-        transfer went out. An approved month, exported or not, is still
+        transfer went out: the whole run, or his own line when the run is
+        marked paid one bank account at a time. An approved month, exported or not, is still
         open: a vacation settles his whole account on the day he leaves,
         takes those entries, and ``_resync_vacation_line`` takes them out of
         the register (the bank file must then be exported again). A run
@@ -935,10 +1016,10 @@ class KswPayRun(models.Model):
         return set(self.env['ksw.pay.run.line'].sudo().search([
             ('employee_id', '=', employee.id),
             ('run_id.period', 'in', list(periods)),
-            ('run_id.state', '=', 'paid'),
+            '|', ('run_id.state', '=', 'paid'), ('x_paid', '=', True),
         ]).mapped('run_id.period'))
 
-    def _commit_to_employees(self):
+    def _commit_to_employees(self, employees=None):
         """The run is being marked Paid: make sure no vacation pays it.
 
         First the register is brought in step with every vacation payslip
@@ -951,9 +1032,11 @@ class KswPayRun(models.Model):
         settled = run._all_entries().filtered('x_vacation_payslip_id')
         if settled and run.state == 'approved':
             run._resync_vacation_line(settled.employee_id)
-        if run.line_ids:
+        if employees is None:
+            employees = run.line_ids.employee_id
+        if employees:
             self.env['hr.payslip']._ksw_drop_committed_commissions(
-                run, run.line_ids.employee_id)
+                run, employees)
 
     def _resync_vacation_line(self, employees):
         """Re-derive an approved month's register line for ``employees``
@@ -975,7 +1058,8 @@ class KswPayRun(models.Model):
             if run.state != 'approved':
                 continue
             totals = run._bas_component_totals()
-            for employee in employees:
+            paid = run.line_ids.filtered('x_paid').employee_id
+            for employee in employees - paid:
                 earnings = sum(totals.get(employee.id, {}).values())
                 line = run.line_ids.filtered(
                     lambda l, emp=employee: l.employee_id == emp)
@@ -1006,9 +1090,11 @@ class KswPayRun(models.Model):
                 if line:
                     line._apply_loan_offset()
                 uncovered = released.filtered(
-                    lambda l: l.state == 'pending' and l.x_awaiting_commission)
+                    lambda l: l.state == 'pending' and l.x_awaiting_commission
+                    and not l.x_recover_from_run_id)
                 if uncovered:
                     uncovered.write({'x_awaiting_commission': False})
+                uncovered |= run._release_uncovered_recoveries(employee)
                 run.message_post(
                     body=Markup(
                         '<strong>%(title)s</strong><br/>'
@@ -1244,6 +1330,12 @@ class KswPayRunLine(models.Model):
     # NOT a payment — only the run's Paid state is (``_months_paid_to``).
     x_bank_exported_date = fields.Datetime(
         string='Bank File Exported On', readonly=True, copy=False)
+    # Set when the accountant marks this line's bank account paid (Mark
+    # Paid wizard) or the whole run paid. Read by `_months_paid_to`.
+    x_paid = fields.Boolean(string='Paid', readonly=True, copy=False)
+    x_paid_date = fields.Datetime(string='Paid On', readonly=True, copy=False)
+    x_paid_by = fields.Many2one('res.users', string='Paid By', readonly=True,
+                                copy=False)
     x_bank_exported_by = fields.Many2one(
         'res.users', string='Bank File Exported By', readonly=True,
         copy=False)
@@ -1356,6 +1448,135 @@ class KswPayRunLine(models.Model):
             self.employee_id, self.period)
         return total
 
+    def _estimated_loan_total(self):
+        """What approval would park for this line: the installments already
+        parked, plus — for an employee on 'Settle Deductions from Commission
+        First' — the month's other pending installments, which
+        ``_auto_flag_priority_installments`` parks at approval."""
+        self.ensure_one()
+        total = self._pending_loan_total()
+        if self.employee_id.x_deduct_commission_priority:
+            year, month = self.env['ksw.deduction']._period_to_year_month(
+                self.period)
+            total += sum(self.env['ksw.deduction.line'].sudo().search([
+                ('employee_id', '=', self.employee_id.id),
+                ('state', '=', 'pending'),
+                ('year', '=', year), ('month', '=', month),
+                ('x_awaiting_commission', '=', False),
+                ('deduction_id.state', '=', 'active'),
+            ]).mapped('amount'))
+        return total
+
+    def _refresh_loan_estimate(self):
+        """Show, on an open month, the loans approval would settle.
+
+        Only an estimate: ``_apply_loan_offset`` recomputes it at approval.
+        A locked month, or a line still holding a settlement to unwind, is
+        a real figure and is left alone.
+        """
+        for rec in self:
+            if rec.run_id.state in LOCKING_STATES or rec.x_unwind_data:
+                continue
+            estimate = math.floor(
+                min(rec.earnings or 0.0, rec._estimated_loan_total()) + 1e-6)
+            if float_compare(estimate, rec.loan_offset or 0.0,
+                             precision_digits=2):
+                rec.loan_offset = estimate
+
+    @api.model
+    def _refresh_loan_estimates_for(self, keys):
+        """Refresh the open-month lines for ``keys``, a set of
+        ``(employee_id, year, month)`` whose installments just changed."""
+        keys = {k for k in keys if all(k)}
+        if not keys:
+            return
+        lines = self.sudo().search([
+            ('employee_id', 'in', list({k[0] for k in keys})),
+            ('period', 'in', list({
+                fields.Date.to_date('%04d-%02d-01' % (k[1], k[2]))
+                for k in keys})),
+            ('state', 'not in', LOCKING_STATES),
+        ])
+        lines.filtered(lambda l: (
+            l.employee_id.id, l.period.year, l.period.month) in keys
+        )._refresh_loan_estimate()
+
+    # ------------------------------------------------------------------
+    # Recovery from a chosen month (ksw.commission.recovery.wizard)
+    # ------------------------------------------------------------------
+    def _recovery_committed(self):
+        """What this payment already gives up to installments: the real
+        offset once the month is approved, the estimate before."""
+        self.ensure_one()
+        if self.run_id.state in LOCKING_STATES:
+            return self.loan_offset or 0.0
+        return min(self.earnings or 0.0, self._estimated_loan_total())
+
+    def _recovery_available(self):
+        """Whole riyals of this payment nothing has claimed yet."""
+        self.ensure_one()
+        if self.run_id.state == 'paid' or self.x_paid:
+            return 0.0
+        return max(0.0, math.floor(
+            (self.earnings or 0.0) - self._recovery_committed() + 1e-6))
+
+    def _recovered_lines(self):
+        """Installments this payment settled by a recovery reservation."""
+        return self.env['ksw.deduction.line'].sudo().search([
+            ('x_paid_via_pay_run_line_id', 'in', self.ids),
+            ('x_recover_from_run_id', '!=', False),
+            ('state', '=', 'paid'),
+        ])
+
+    def _apply_recovery_now(self, deduction_line):
+        """An approved, unpaid month gives up part of its payment to a
+        non-loan deduction, at once.
+
+        Same shape as ``_resync_vacation_line``: unwind and re-apply, so
+        the FIFO walk and its unwind snapshot stay the single record of
+        what this payment settled. The month's own installments sort first
+        (see ``_get_pending_commission_lines_for_period``), so nothing
+        already settled is pushed out by the newcomer.
+        """
+        self.ensure_one()
+        run = self.run_id.sudo()
+        before = self.net_payable
+        self._unwind_loan_offset()
+        self._apply_loan_offset()
+        run._release_uncovered_recoveries(self.employee_id)
+        run.message_post(
+            body=Markup(
+                '<strong>%(title)s</strong><br/>'
+                '<b>%(l_emp)s</b> %(emp)s<br/>'
+                '<b>%(l_ded)s</b> %(ded)s — %(amt).2f<br/>'
+                '<b>%(l_before)s</b> %(before).2f<br/>'
+                '<b>%(l_after)s</b> %(after).2f'
+            ) % {
+                'title': _('Deduction recovered from this commission'),
+                'l_emp': _('Employee:'),
+                'emp': self.employee_id.sudo().display_name,
+                'l_ded': _('Deduction:'),
+                'ded': deduction_line.deduction_id.display_name or '',
+                'amt': deduction_line.amount,
+                'l_before': _('Net payable before:'), 'before': before,
+                'l_after': _('Net payable after:'), 'after': self.net_payable,
+            },
+            subtype_xmlid='mail.mt_note',
+        )
+        if self.x_bank_exported_date and run.state == 'approved':
+            run.message_post(
+                body=Markup('<strong>⚠ %(msg)s</strong>') % {
+                    'msg': _('%(emp)s changed after the bank file was '
+                             'exported on %(when)s. Export the bank file '
+                             'again before sending it.',
+                             emp=self.employee_id.sudo().display_name,
+                             when=format_datetime(
+                                 self.env, self.x_bank_exported_date)),
+                },
+                partner_ids=run._accountant_partners().ids,
+                subtype_xmlid='mail.mt_comment',
+            )
+
     def _auto_flag_priority_installments(self):
         """Park this period's pending installments for every employee who
         has 'Settle Deductions from Commission First' enabled, so
@@ -1450,6 +1671,12 @@ class KswPayRunLine(models.Model):
                 if remaining <= 1e-6:
                     break
                 line_amt = line.amount or 0.0
+                # A reservation is settled on its own posting date — the
+                # day it was decided, or the commission month's end if
+                # later — not on the day the month was approved.
+                line_settled_on = (line._recovery_posting_date()
+                                   if line.x_recover_from_run_id
+                                   else settled_on)
                 if line_amt <= remaining + 1e-6:
                     line.with_context(
                         _skip_installment_total_check=True,
@@ -1457,7 +1684,7 @@ class KswPayRunLine(models.Model):
                         'state': 'paid',
                         'x_paid_via_pay_run_line_id': rec.id,
                         'x_awaiting_commission': False,
-                        'x_settlement_date': settled_on,
+                        'x_settlement_date': line_settled_on,
                     })
                     paid_ids.append(line.id)
                     touched |= line.deduction_id
@@ -1478,7 +1705,10 @@ class KswPayRunLine(models.Model):
                         'x_awaiting_commission': False,
                         'x_paid_via_pay_run_line_id': rec.id,
                         'x_original_amount': take,
-                        'x_settlement_date': settled_on,
+                        'x_settlement_date': line_settled_on,
+                        'x_recover_from_run_id': line.x_recover_from_run_id.id,
+                        'x_recovery_date': line.x_recovery_date,
+                        'x_recovery_by': line.x_recovery_by.id,
                     })
                     line.with_context(
                         _skip_installment_total_check=True,

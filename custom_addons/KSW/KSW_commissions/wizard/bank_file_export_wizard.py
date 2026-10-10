@@ -24,6 +24,7 @@ EXPORT_MODES = [
     ('specific_excel', 'Specific bank – Excel'),
     ('specific_txt', 'Specific bank – Text file'),
     ('journal_entry', 'Journal entries – BAS import file'),
+    ('recovery_entry', 'Commission deductions after month end – BAS import file'),
 ]
 
 
@@ -604,6 +605,7 @@ class KswCommissionBankExportWizard(models.TransientModel):
             'specific_excel': self._export_specific_excel,
             'specific_txt':  self._export_specific_txt,
             'journal_entry': self._export_journal_entry,
+            'recovery_entry': self._export_recovery_entry,
         }
         return handlers[mode]()
 
@@ -632,6 +634,21 @@ class KswCommissionBankExportWizard(models.TransientModel):
         data = run._bas_journal_workbook(number=self.journal_number)
         return self._bundle_and_download(
             [('JournalEntry_%s.xlsx' % self._batch_label(), data)])
+
+    def _export_recovery_entry(self):
+        """Deductions recovered from this month's commission after the
+        fact — Dr accrued commission / Cr the employee's advance, one
+        voucher per posting date. Kept out of the month's own journal,
+        which is dated the month end."""
+        if 'ksw.bas.journal' not in self.env:
+            raise UserError(_(
+                'The journal-entry export is not available on this system '
+                'yet: it is written by KSW_payroll, which has not been '
+                'updated. Ask IT to deploy it.'))
+        if not (self.journal_number or '').strip():
+            raise UserError(_('Enter the journal number before exporting.'))
+        return self._bundle_and_download(
+            self.run_id._bas_recovery_workbooks(number=self.journal_number))
 
     def _export_all_excel(self):
         groups = {

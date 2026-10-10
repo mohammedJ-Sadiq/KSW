@@ -43,3 +43,5 @@ access_ksw_revision_reason_wizard_hr_leave,ksw.revision.request.reason.wizard.hr
 access_ksw_revision_reason_wizard_gm,ksw.revision.request.reason.wizard.gm,model_ksw_revision_request_reason_wizard,KSW_annual_leave.group_annual_leave_gm,1,1,1,1
 access_ksw_revision_reason_wizard_acc,ksw.revision.request.reason.wizard.acc,model_ksw_revision_request_reason_wizard,KSW_annual_leave.group_annual_leave_acc,1,1,1,1
 access_ksw_revision_reason_wizard_user,ksw.revision.request.reason.wizard.user,model_ksw_revision_request_reason_wizard,base.group_user,1,1,1,1
+access_ksw_payslip_run_done_wizard,ksw.payslip.run.done.wizard,model_ksw_payslip_run_done_wizard,om_hr_payroll.group_hr_payroll_user,1,1,1,1
+access_ksw_payslip_run_done_wizard_line,ksw.payslip.run.done.wizard.line,model_ksw_payslip_run_done_wizard_line,om_hr_payroll.group_hr_payroll_user,1,1,1,1

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ksw_pay_run_paid_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.pay.run.paid.wizard.form</field>
+        <field name="model">ksw.pay.run.paid.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Mark Paid">
+                <field name="run_id" invisible="1"/>
+                <p class="text-muted">
+                    Tick the bank accounts whose transfer has gone out. The rest stay
+                    unpaid, and the month is marked paid once every account is.
+                </p>
+                <field name="line_ids" nolabel="1">
+                    <list editable="bottom" create="0" delete="0">
+                        <field name="selected" widget="boolean_toggle"/>
+                        <field name="label"/>
+                        <field name="line_count" sum="Total"/>
+                        <field name="total_payable" sum="Total"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_confirm" type="object" string="Mark Paid"
+                            class="btn-primary"/>
+                    <button special="cancel" string="Discard" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

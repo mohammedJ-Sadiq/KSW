@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="KSW_payroll.PayslipRunDeleteDialog">
+        <Dialog size="'md'" title.translate="Delete Payslip Batch">
+            <p t-esc="body"/>
+            <p class="text-muted mb-0">
+                Choose "Delete Batch Only" to keep the payslips; they will no longer belong to any batch.
+            </p>
+            <t t-set-slot="footer">
+                <button class="btn btn-danger" t-on-click="() => this.run(props.deleteAll)">
+                    Confirm
+                </button>
+                <button class="btn btn-secondary" t-on-click="() => this.run(props.deleteBatchOnly)">
+                    Delete Batch Only
+                </button>
+                <button class="btn btn-secondary" t-on-click="props.close">
+                    Discard
+                </button>
+            </t>
+        </Dialog>
+    </t>
+
+</templates>

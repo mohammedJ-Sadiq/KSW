@@ -110,7 +110,7 @@ This is BAS's unified chart of accounts. It serves triple duty:
 | `DNAME` | nvarchar(200) | Arabic name |
 | `DNAME2` | nvarchar(200) | English/secondary name |
 | `DACC_TYPE` | nvarchar(2) | Account type code (see below) |
-| `DOLDACC` | float | Opening balance (debit=positive) |
+| `DOLDACC` | float | Opening balance, **CREDIT-positive** (assets negative — see `KSW_bas_gl_import` opening-balance import). Verified 2026-10-07: `2107010005` has `DOLDACC=+1,315,157` = `DOLDACC2` (credit opening). Debit-positive balance = `DDACC - DCACC - DOLDACC` |
 | `DOLDACC1` | float | Opening debit |
 | `DOLDACC2` | float | Opening credit |
 | `DCACC` | float | Cumulative credit (total credit transactions) |
@@ -189,7 +189,7 @@ Individual employee advances follow the pattern `1205010NNN` where NNN is a sequ
 - `1205010001` = سلف كاظم علي كاظم الاحمر (DCACC=23,683 SAR, DDACC=28,129 SAR)
 - `1205010002` = سلف / مجدي سماحه
 
-**Balance formula**: `outstanding_advance = DDACC - DCACC` (positive = employee owes company)
+**Balance formula**: `outstanding_advance = DDACC - DCACC - DOLDACC` (positive = employee owes company; the opening terms are 0 for most advance accounts, which is why `DDACC - DCACC` usually works)
 
 ---
 
@@ -606,7 +606,7 @@ ORDER BY FDATE DESC
 
 ```sql
 -- Current balance of an account (debit positive)
-SELECT DCODE1, DNAME, DDACC - DCACC AS balance
+SELECT DCODE1, DNAME, DDACC - DCACC - DOLDACC AS balance
 FROM cod10
 WHERE DCODE1 LIKE '120501%'
   AND DLEVEL >= 4  -- leaf accounts only
@@ -774,3 +774,23 @@ item 11032 posts to 11 accounts, one per branch ("مبيعات فرع X (تري�
 `(CODE2, ICODE)` lands on one account for 99.85% of lines (64 pairs, 10 with a
 stray minority). Ex-factory items (11001) go to the branch's "ارض المصنع" account,
 trailer items to its "(تريلات)" one.
+
+### Accrued commissions and how deductions are offset (verified 2026-10-07)
+
+- Accrued commissions are **pooled per category, not per employee**:
+  `2107010001` مصروفات مستحقة عمولات سائقين التريلات (trailer drivers) and
+  `2107010005` عمولات مستحقة - مناديب البيع والتحصيل (sales/collection reps).
+  `2104010006` / `2104010029` exist but are unused (zero). The pooled lines carry
+  no REMARK, COST_CENTER or employee reference, so an employee's share is only
+  recoverable by pairing serials inside the month-end voucher.
+- The month-end accrual voucher (FTYPE 018, e.g. `26008282` on 2026-08-31) books,
+  per employee: Dr `3203020007` commission + Dr `3201010005` allowance →
+  Cr `1205010NNN` advance (whatever he owes *on that date*) + Cr `2107010001` (rest).
+  So deduct-from-commission is already practised, but only for debts that exist
+  at the accrual date.
+- The only per-employee account is the advance `1205010NNN`, and it collects
+  everything the employee owes: loans, government fees charged back (paid from
+  `1202010004` Rajhi gov-fees bank), internal penalties (Cr `2104010004` صندوق الجزاءات),
+  spare parts.
+- Commission payouts land as one bulk Dr `2107010001` line in a bank voucher
+  (e.g. `26009099` 2026-09-27, 176,613), roughly two months after the accrual.

@@ -2025,8 +2025,16 @@ class KswPayEntry(models.Model):
         paid_periods = set(self.env['ksw.pay.run'].sudo().search([
             ('period', 'in', periods), ('state', '=', 'paid'),
         ]).mapped('period')) if periods else set()
+        # A run marked paid one bank account at a time: his own line.
+        paid_lines = set(
+            (l.period, l.employee_id.id)
+            for l in self.env['ksw.pay.run.line'].sudo().search([
+                ('period', 'in', periods), ('x_paid', '=', True),
+                ('employee_id', 'in', self.employee_id.ids),
+            ])) if periods else set()
         return self.filtered(
-            lambda e: e.x_vacation_payslip_id or e.period in paid_periods)
+            lambda e: e.x_vacation_payslip_id or e.period in paid_periods
+            or (e.period, e.employee_id.id) in paid_lines)
 
     def _check_reopenable(self):
         """Refuse to send an approved row back when it has been paid, or a

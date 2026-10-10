@@ -84,8 +84,9 @@ class TestJournalRows(BasJournalCommon):
         self.assertIn(self.emp_a.name, debit['ref'])
         self.assertIn(self.emp_a.name, credit['ref'])
 
-    def test_02_loan_comes_out_before_the_accrual(self):
-        """The three-line block the hand-typed voucher used."""
+    def test_02_the_full_commission_first_then_the_deduction(self):
+        """Gross (Oct 2026): the accrual is credited with everything he
+        earned, and the installment is its own record against it."""
         self._make_pending_installment(self.emp_a, 500.0)
         batch = self._commission_entry(self.emp_a, 1200.0).batch_id
         run = self._approve(batch)
@@ -93,13 +94,14 @@ class TestJournalRows(BasJournalCommon):
         rows = self._rows(run)
 
         self.assertEqual([r['code'] for r in rows],
-                         ['3201010006', '1205010385', '2107010001'])
+                         ['3201010006', '2107010001',
+                          '2107010001', '1205010385'])
         self.assertAlmostEqual(rows[0]['debit'], 1200.0)
-        self.assertAlmostEqual(rows[1]['credit'], 500.0)
-        # Only what is left is owed to him.
-        self.assertAlmostEqual(rows[2]['credit'], 700.0)
+        self.assertAlmostEqual(rows[1]['credit'], 1200.0)
+        self.assertAlmostEqual(rows[2]['debit'], 500.0)
+        self.assertAlmostEqual(rows[3]['credit'], 500.0)
 
-    def test_03_a_loan_that_eats_the_whole_month_leaves_no_accrual(self):
+    def test_03_a_loan_that_eats_the_whole_month_still_shows_the_right(self):
         self._make_pending_installment(self.emp_a, 1200.0)
         batch = self._commission_entry(self.emp_a, 1200.0).batch_id
         run = self._approve(batch)
@@ -107,8 +109,10 @@ class TestJournalRows(BasJournalCommon):
         rows = self._rows(run)
 
         self.assertEqual([r['code'] for r in rows],
-                         ['3201010006', '1205010385'])
+                         ['3201010006', '2107010001',
+                          '2107010001', '1205010385'])
         self.assertAlmostEqual(rows[1]['credit'], 1200.0)
+        self.assertAlmostEqual(rows[3]['credit'], 1200.0)
 
     def test_04_the_entry_balances(self):
         self._make_pending_installment(self.emp_a, 500.0)

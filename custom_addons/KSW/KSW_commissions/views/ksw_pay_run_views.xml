@@ -65,7 +65,7 @@
                             type="object" class="btn-primary"
                             groups="KSW_commissions.group_commission_accountant"
                             invisible="not x_can_export"/>
-                    <button name="action_mark_paid" string="Mark Paid"
+                    <button name="action_open_mark_paid_wizard" string="Mark Paid"
                             type="object" class="btn-secondary"
                             groups="KSW_commissions.group_commission_accountant"
                             invisible="state != 'approved'"/>
@@ -257,6 +257,7 @@
                                     <field name="net_payable" sum="Payable"/>
                                     <field name="bank_account_id"
                                            optional="hide"/>
+                                    <field name="x_paid" optional="show"/>
                                     <button name="action_open_entries"
                                             type="object" icon="fa-search-plus"
                                             title="Show the entries behind this figure"/>

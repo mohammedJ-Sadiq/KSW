@@ -11,8 +11,8 @@
                     <field name="export_mode" widget="radio"/>
                     <field name="journal_number"
                            placeholder="26007264"
-                           invisible="export_mode != 'journal_entry'"
-                           required="export_mode == 'journal_entry'"/>
+                           invisible="export_mode not in ('journal_entry', 'recovery_entry')"
+                           required="export_mode in ('journal_entry', 'recovery_entry')"/>
                     <field name="excel_layout" widget="radio"
                            invisible="export_mode != 'all_excel'"/>
                     <field name="bank_account_id"

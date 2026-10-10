@@ -329,7 +329,8 @@
                             <field name="amount"
                                    readonly="(state != 'draft' or approval_state == 'pending_disbursement') and not (is_loan and approval_state == 'pending_gm' and x_allow_edit_amount)"/>
                             <field name="installments"
-                                   readonly="(state != 'draft' or approval_state == 'pending_disbursement') and not (is_loan and approval_state in ('pending_acc', 'pending_gm') and x_allow_edit_installments)"/>
+                                   readonly="x_single_installment or ((state != 'draft' or approval_state == 'pending_disbursement') and not (is_loan and approval_state in ('pending_acc', 'pending_gm') and x_allow_edit_installments))"/>
+                            <field name="x_single_installment" invisible="1"/>
                             <field name="installment_amount"/>
                             <field name="currency_id" invisible="1"/>
                             <field name="x_can_submit" invisible="1"/>

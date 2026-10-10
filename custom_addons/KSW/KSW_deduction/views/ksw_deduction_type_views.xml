@@ -13,6 +13,7 @@
                 <field name="is_loan"/>
                 <field name="managed_by"/>
                 <field name="default_installments"/>
+                <field name="x_single_installment"/>
                 <field name="payroll_priority"/>
                 <field name="active" optional="hide"/>
             </list>
@@ -36,7 +37,15 @@
                         <group>
                             <field name="is_loan"/>
                             <field name="managed_by"/>
-                            <field name="default_installments"/>
+                            <field name="default_installments"
+                                   invisible="x_single_installment"/>
+                            <!-- Only the system administrator changes it;
+                                 everyone else sees it read-only. The write()
+                                 guard enforces the same rule over RPC. -->
+                            <field name="x_single_installment"
+                                   groups="base.group_system"/>
+                            <field name="x_single_installment" readonly="1"
+                                   groups="!base.group_system"/>
                             <field name="payroll_priority"/>
                             <field name="sequence"/>
                             <field name="active"/>

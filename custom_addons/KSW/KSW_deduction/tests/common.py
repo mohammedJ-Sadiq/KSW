@@ -28,6 +28,12 @@ class DeductionCommon(TransactionCase):
         cls.type_advance = cls.env.ref('KSW_deduction.type_advance')
         cls.type_gov_pen = cls.env.ref('KSW_deduction.type_gov_penalty')
         cls.type_internal_pen = cls.env.ref('KSW_deduction.type_internal_penalty')
+        # The schedule mechanics below are tested on multi-installment
+        # non-loan deductions. Since Oct 2026 those types start locked to one
+        # installment (an administrator setting); unlock them here, as an
+        # administrator would. The lock has its own tests.
+        cls.env['ksw.deduction.type'].sudo().search([]).write(
+            {'x_single_installment': False})
         cls.this_month = date.today().replace(day=1)
         cls.next_month = cls.this_month + relativedelta(months=1)
     def _make_deduction(self, ded_type=None, employee=None,

@@ -7,6 +7,7 @@ from markupsafe import Markup
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools import float_compare
 
 _logger = logging.getLogger(__name__)
 
@@ -1149,6 +1150,25 @@ class HrPayslip(models.Model):
     # ------------------------------------------------------------------
 
     @api.model
+    @api.model
+    def get_versions(self, employee, date_from, date_to):
+        """Same versions as om_hr_payroll, but the one in effect at the end
+        of the period first.
+
+        Every caller takes ``ids[0]`` as the payslip's version, and
+        ``hr.version`` sorts oldest first, so a change saved as a new
+        version mid-month (e.g. Other Allowance from 10 Sep) was ignored
+        in favour of the original 2022 terms. A version dated after the
+        period is not in effect yet and goes last.
+        """
+        ids = super().get_versions(employee, date_from, date_to)
+        d_to = fields.Date.to_date(date_to)
+        versions = self.env['hr.version'].sudo().browse(ids)
+        return versions.sorted(
+            lambda v: (bool(v.date_version and v.date_version > d_to),
+                       -(v.date_version or date.min).toordinal())
+        ).ids
+
     def get_worked_day_lines(self, versions, date_from, date_to):
         """Build worked-day lines from actual hr.attendance records.
 
@@ -1936,8 +1956,14 @@ class HrPayslip(models.Model):
         slip_refs = ', '.join(
             s.number or s.name or str(s.id) for s in prior_slips)
 
+        # The version in effect for the period, not the one the paid slip
+        # was computed on: a change saved as a new version after the slip
+        # was generated is exactly what a revision exists to pay.
+        effective = Payslip.get_versions(
+            self.employee_id, self.date_from, self.date_to)[:1]
         version = (
-            self.version_id
+            Payslip.env['hr.version'].browse(effective)
+            or self.version_id
             or self.employee_id.sudo().current_version_id
         )
         revision = Payslip.create({
@@ -2315,6 +2341,18 @@ class HrPayslip(models.Model):
         # already reconciled (pitfall #49). A caller that mixes draft and
         # already-done slips (e.g. a batch reopened to add one late
         # payslip) must only confirm the ones still pending.
+        #
+        # Confirming never recomputes a payslip that already has figures.
+        # This shop exports the bank file and pays BEFORE pressing Confirm,
+        # so the figures on the payslip are what the employee was paid;
+        # base `action_payslip_done` recomputing them is how batch 250
+        # (August 2026) and the September batch moved NETs after the money
+        # had left. Anything that changed since (a loan disbursed, a new
+        # contract version, attendance) belongs to a Payslip Revision or
+        # the next month, never to the confirmation. A payslip with no
+        # figures at all has paid nothing yet, so it is still computed.
+        # Revisions are the exception, unchanged: the officer adds what was
+        # missed to the draft revision and its confirmation computes it.
         revisions = self.filtered(
             lambda s: s.x_is_revision and s.state != 'done')
         overpaid = self.env['hr.payslip']
@@ -2328,7 +2366,26 @@ class HrPayslip(models.Model):
         payable = (self - overpaid).filtered(lambda s: s.state != 'done')
         if not payable:
             return notification
-        res = super(HrPayslip, payable).action_payslip_done()
+        computed = payable.filtered(
+            lambda s: s.line_ids and not s.x_is_revision)
+        net_before = {s.id: s._ksw_net_amount() for s in computed}
+        res = True
+        if payable - computed:
+            res = super(HrPayslip, payable - computed).action_payslip_done()
+        if computed:
+            res = computed.write({'state': 'done'})
+            # Backstop: nothing on the way into `done` may move the money.
+            moved = computed.filtered(lambda s: float_compare(
+                s._ksw_net_amount(), net_before[s.id], precision_digits=2))
+            if moved:
+                raise UserError(_(
+                    'Confirming would change what these employees were '
+                    'paid, so nothing was confirmed:\n%(rows)s',
+                    rows='\n'.join(
+                        '• %s: %.2f → %.2f' % (
+                            s.employee_id.name, net_before[s.id],
+                            s._ksw_net_amount())
+                        for s in moved[:20])))
         payable._queue_auto_payslip_email()
         if not self.env.context.get('_ksw_skip_bank_refresh'):
             runs = payable.mapped('payslip_run_id').filtered(bool)

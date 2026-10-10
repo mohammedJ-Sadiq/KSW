@@ -1,7 +1,7 @@
 {
     'name': 'KSW - Odoo 19 HR Payroll',
     'category': 'Human Resources/Payroll',
-    'version': '19.0.1.23.0',
+    'version': '19.0.1.26.0',
     'sequence': 1,
     'author': 'Mohammed Albadr',
     'summary': 'HR Payroll Management for Odoo 19 Community Edition',
@@ -45,6 +45,7 @@ Extends om_hr_payroll with:
 
         # Wizard
         'wizard/bank_file_export_wizard_views.xml',
+        'wizard/payslip_run_done_wizard_views.xml',
 
         # Views
         'views/hr_employee_view.xml',
@@ -61,7 +62,12 @@ Extends om_hr_payroll with:
         'report/report_payslip_deduction_templates.xml',
         'report/report_annual_vacation_templates.xml',
     ],
-    'assets': {},
+    'assets': {
+        'web.assets_backend': [
+            'KSW_payroll/static/src/js/payslip_run_delete.js',
+            'KSW_payroll/static/src/js/payslip_run_delete.xml',
+        ],
+    },
     'installable': True,
     'auto_install': False,
     'application': True,

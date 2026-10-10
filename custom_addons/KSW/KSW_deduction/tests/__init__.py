@@ -26,3 +26,4 @@ from . import test_concurrent_loan_override
 from . import test_draft_payslip_refresh
 from . import test_reschedule_wizard
 from . import test_revision_request_disbursement
+from . import test_single_installment

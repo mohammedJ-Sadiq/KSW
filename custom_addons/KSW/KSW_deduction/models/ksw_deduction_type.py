@@ -1,4 +1,5 @@
-from odoo import fields, models
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 
 
 class KswDeductionType(models.Model):
@@ -50,6 +51,17 @@ class KswDeductionType(models.Model):
              'Lower is collected first (e.g. penalties before loans). '
              'The unaffordable remainder is forwarded to the next month.',
     )
+    # Oct 2026: a non-loan deduction is one installment — it is taken out of
+    # unpaid commission first (KSW_commissions) and the rest by the next
+    # payslip. Only the system administrator may change that per type.
+    x_single_installment = fields.Boolean(
+        string='Single Installment Only',
+        default=False,
+        help='Deductions of this type are always one installment: the '
+             'number of installments cannot be changed on the deduction or '
+             'by Reschedule Installments. Only a system administrator can '
+             'change this setting.',
+    )
     description = fields.Text()
     sequence = fields.Integer(default=10)
     active = fields.Boolean(default=True)
@@ -63,3 +75,23 @@ class KswDeductionType(models.Model):
         'Default installments must be at least 1.',
     )
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        self._check_single_installment_create(vals_list)
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if ('x_single_installment' in vals and not self.env.su
+                and not self.env.user.has_group('base.group_system')):
+            raise UserError(_(
+                'Only a system administrator can lock or unlock the number '
+                'of installments of a deduction type.'))
+        return super().write(vals)
+
+    def _check_single_installment_create(self, vals_list):
+        if self.env.su or self.env.user.has_group('base.group_system'):
+            return
+        if any(v.get('x_single_installment') for v in vals_list):
+            raise UserError(_(
+                'Only a system administrator can lock the number of '
+                'installments of a deduction type.'))

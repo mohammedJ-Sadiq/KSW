@@ -324,6 +324,16 @@ class KswDeductionRescheduleWizard(models.TransientModel):
         self.ensure_one()
         targets = self._target_deductions()
 
+        # A type locked to one installment cannot be spread over months,
+        # whoever asks — only a system administrator can unlock the type.
+        locked = targets.filtered('type_id.x_single_installment')
+        if locked and (self.effective_installments or 0) > 1:
+            raise UserError(_(
+                "These deductions are a single installment and cannot be "
+                "spread over several months: %(names)s. A system "
+                "administrator can unlock this on the deduction type.",
+                names=', '.join(locked.mapped('display_name'))))
+
         # ── Authority ────────────────────────────────────────────────
         # Same per-record matrix as the Installments tab and the payment
         # wizard: "Loan Modification: Full" reschedules any type, the

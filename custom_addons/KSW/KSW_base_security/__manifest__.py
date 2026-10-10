@@ -1,6 +1,6 @@
 {
     'name': 'KSW - Base Security Extensions',
-    'version': '19.0.1.6.0',
+    'version': '19.0.1.7.0',
     'category': 'Human Resources',
     'summary': 'Extended security groups and rules for Employees and Attendances',
     'author': 'KSW',
@@ -22,6 +22,7 @@
             'KSW_base_security/static/src/js/report_open_inline.js',
             'KSW_base_security/static/src/js/attachment_preview.js',
             'KSW_base_security/static/src/js/attachment_preview.xml',
+            'KSW_base_security/static/src/js/form_no_autosave.js',
         ],
     },
     'installable': True,

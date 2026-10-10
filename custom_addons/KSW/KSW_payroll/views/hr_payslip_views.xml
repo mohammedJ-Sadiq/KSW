@@ -365,9 +365,12 @@
                    position="attributes">
                 <attribute name="groups">om_hr_payroll.group_hr_payroll_user</attribute>
             </xpath>
+            <!-- Mark As Done asks which paying accounts to confirm when the
+                 batch pays from more than one (action_open_done_wizard). -->
             <xpath expr="//header/button[@name='done_payslip_run']"
                    position="attributes">
                 <attribute name="groups">om_hr_payroll.group_hr_payroll_user</attribute>
+                <attribute name="name">action_open_done_wizard</attribute>
             </xpath>
             <xpath expr="//header/button[@name='close_payslip_run']"
                    position="attributes">
@@ -404,13 +407,18 @@
                            invisible="not x_bank_total_ids"/>
                 <field name="x_bank_total_ids" nolabel="1" readonly="1"
                        invisible="not x_bank_total_ids">
-                    <list string="Bank Account Totals">
+                    <list string="Bank Account Totals"
+                          decoration-success="confirm_state == 'done'"
+                          decoration-bf="confirm_state == 'pending'">
                         <field name="bank_account_id" string="Account" width="260px"/>
-                        <field name="slip_count" string="Employees" width="90px"/>
+                        <field name="confirm_state" width="100px" widget="badge"
+                               decoration-success="confirm_state == 'done'"
+                               decoration-warning="confirm_state == 'pending'"/>
+                        <field name="slip_count" string="Employees" width="90px" sum="Total"/>
                         <field name="payable_count" string="In Bank File"
-                               width="90px"/>
+                               width="90px" sum="Total"/>
                         <field name="total_net" string="Total NET (Payable Now)"
-                               digits="[16,2]" width="150px"
+                               digits="[16,2]" width="150px" sum="Total"
                                decoration-bf="True"/>
                         <!-- Before / after a cancellation. `total_net` is the
                              current figure; these two say what the file that
@@ -432,10 +440,10 @@
                                digits="[16,2]" width="150px"
                                invisible="cancelled_count == 0"/>
                         <field name="excluded_count" string="Excluded"
-                               width="90px"
+                               width="90px" sum="Total"
                                decoration-danger="excluded_count &gt; 0"/>
                         <field name="excluded_net" string="Excluded NET"
-                               digits="[16,2]" width="130px"
+                               digits="[16,2]" width="130px" sum="Total"
                                decoration-danger="excluded_net &lt; 0"/>
                     </list>
                 </field>
