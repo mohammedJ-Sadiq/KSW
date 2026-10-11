@@ -50,7 +50,7 @@ const driverKioskService = {
             user.hasGroup("KSW_water_delivery.group_water_dispatcher"),
             user.hasGroup("KSW_water_delivery.group_water_billing"),
         ]);
-        if (!isDriver) {
+        if (!isDriver && !isDispatcher && !isBilling) {
             // Nothing to lock down for someone with no part in this app.
             return;
         }

@@ -46,7 +46,7 @@
                          until a dispatcher has looked at it. -->
                     <div class="alert alert-warning" role="alert"
                          invisible="not x_location_exception">
-                        <strong>Waiting for a dispatcher.</strong>
+                        <strong>Waiting for a supervisor.</strong>
                         <field name="x_location_exception_reason" readonly="1" nolabel="1"/>
                         <field name="x_capture_id" readonly="1"
                                string="Review it here" invisible="not x_capture_id"/>

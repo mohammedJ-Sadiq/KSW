@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- A payslip sent to the bank is frozen; changes wait as pending
+         (models/payslip_bank_freeze.py). -->
+    <record id="view_hr_payslip_form_bank_freeze" model="ir.ui.view">
+        <field name="name">hr.payslip.form.bank.freeze</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="om_hr_payroll.view_hr_payslip_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <field name="x_bank_frozen" invisible="1"/>
+                <field name="x_has_pending_change" invisible="1"/>
+                <div class="alert alert-info mb-0" role="alert"
+                     invisible="not x_bank_frozen">
+                    <i class="fa fa-lock" title="Frozen"/>
+                    <strong> Frozen: sent to the bank on
+                        <field name="x_bank_exported_date" readonly="1" class="oe_inline"/>.</strong>
+                    These figures are what the employee was paid. Changes are not applied here;
+                    they wait under Pending Changes on the batch for a Payroll Manager.
+                </div>
+                <div class="alert alert-warning mb-0" role="alert"
+                     invisible="not x_has_pending_change">
+                    <i class="fa fa-hourglass-half" title="Pending"/>
+                    <strong> A change is waiting:</strong> NET would become
+                    <field name="x_pending_net" readonly="1" class="oe_inline"/>
+                    if a Payroll Manager applies it.
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_hr_payslip_list_bank_freeze" model="ir.ui.view">
+        <field name="name">hr.payslip.list.bank.freeze</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="om_hr_payroll.view_hr_payslip_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list/field[@name='state']" position="after">
+                <field name="x_bank_exported_date" string="Sent to Bank"
+                       optional="show"/>
+                <field name="x_has_pending_change" string="Change Waiting"
+                       widget="boolean" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="ksw_payslip_pending_change_list" model="ir.ui.view">
+        <field name="name">ksw.payslip.pending.change.list</field>
+        <field name="model">ksw.payslip.pending.change</field>
+        <field name="arch" type="xml">
+            <list create="0" delete="0"
+                  decoration-warning="state == 'pending'"
+                  decoration-muted="state != 'pending'">
+                <field name="employee_id"/>
+                <field name="net_current" sum="Total"/>
+                <field name="net_after" sum="Total"/>
+                <field name="net_difference" sum="Total"/>
+                <field name="diff_text"/>
+                <field name="last_detected"/>
+                <field name="trigger_log" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-warning="state == 'pending'"
+                       decoration-success="state == 'applied'"/>
+                <field name="closed_by" optional="hide"/>
+                <button name="action_apply" type="object" string="Apply"
+                        icon="fa-check" invisible="state != 'pending'"
+                        groups="om_hr_payroll.group_hr_payroll_manager"
+                        confirm="Unfreeze this payslip and apply the change? The bank file already sent will no longer match it."/>
+                <button name="action_dismiss" type="object" string="Dismiss"
+                        icon="fa-times" invisible="state != 'pending'"
+                        groups="om_hr_payroll.group_hr_payroll_manager"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_payslip_run_form_bank_freeze" model="ir.ui.view">
+        <field name="name">hr.payslip.run.form.bank.freeze</field>
+        <field name="model">hr.payslip.run</field>
+        <field name="inherit_id" ref="om_hr_payroll.hr_payslip_run_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/field[@name='state']" position="before">
+                <button name="action_apply_pending_changes" type="object"
+                        string="Apply Pending Changes" icon="fa-unlock"
+                        class="btn-warning"
+                        groups="om_hr_payroll.group_hr_payroll_manager"
+                        invisible="not x_pending_change_count"
+                        confirm="Unfreeze the payslips with pending changes and apply them? The bank file already sent will no longer match them; export it again."/>
+            </xpath>
+            <xpath expr="//sheet" position="before">
+                <field name="x_frozen_slip_count" invisible="1"/>
+                <field name="x_pending_change_count" invisible="1"/>
+                <div class="alert alert-info mb-0" role="alert"
+                     invisible="not x_frozen_slip_count">
+                    <i class="fa fa-lock" title="Frozen"/>
+                    <strong> Frozen:
+                        <field name="x_frozen_slip_count" readonly="1" class="oe_inline"/>
+                        payslip(s) were sent to the bank.</strong>
+                    Their figures will not change, and Mark As Done confirms them exactly as sent.
+                </div>
+                <div class="alert alert-warning mb-0" role="alert"
+                     invisible="not x_pending_change_count">
+                    <i class="fa fa-hourglass-half" title="Pending"/>
+                    <strong>
+                        <field name="x_pending_change_count" readonly="1" class="oe_inline"/>
+                        change(s) are waiting</strong> because the payslips are frozen.
+                    See Pending Changes below to apply or dismiss them.
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='slip_ids']" position="after">
+                <div invisible="not x_pending_change_ids">
+                    <h4 class="mt-4">
+                        <i class="fa fa-hourglass-half" title="Pending"/> Pending Changes
+                    </h4>
+                    <div class="text-muted">
+                        Changes that arrived after the payslips were sent to the bank. They are
+                        not applied until a Payroll Manager applies them.
+                    </div>
+                    <field name="x_pending_change_ids" readonly="1" nolabel="1"
+                           context="{'list_view_ref': 'KSW_payroll.ksw_payslip_pending_change_list'}"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

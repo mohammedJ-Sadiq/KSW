@@ -40,6 +40,14 @@ RUN_STATES = [
 ]
 
 
+
+TOTALS_GROUPS = ','.join([
+    'KSW_commissions.group_commission_gm',
+    'KSW_commissions.group_commission_accountant',
+    'KSW_commissions.group_commission_officer',
+    'base.group_system',
+])
+
 class KswPayRun(models.Model):
     _name = 'ksw.pay.run'
     _description = 'KSW Monthly Pay Run'
@@ -109,9 +117,18 @@ class KswPayRun(models.Model):
     batch_count = fields.Integer(compute='_compute_batch_ids')
     draft_batch_count = fields.Integer(compute='_compute_batch_ids')
     employee_count = fields.Integer(compute='_compute_totals', store=True)
-    total_earnings = fields.Monetary(compute='_compute_totals', store=True)
-    total_loan_offset = fields.Monetary(compute='_compute_totals', store=True)
-    total_payable = fields.Monetary(compute='_compute_totals', store=True)
+    # Company-wide money is for the roles that own the company-wide view
+    # (user's rule, Oct 2026): the GM, the accountant, the commission
+    # Administrator and the Settings administrator. A supervisor sees his
+    # own team's subtotal from the register list, which is rule-scoped.
+    # Model-level, so it is refused over RPC too, not just hidden. Safe
+    # against gotcha #31 because no invisible= expression reads them.
+    total_earnings = fields.Monetary(
+        compute='_compute_totals', store=True, groups=TOTALS_GROUPS)
+    total_loan_offset = fields.Monetary(
+        compute='_compute_totals', store=True, groups=TOTALS_GROUPS)
+    total_payable = fields.Monetary(
+        compute='_compute_totals', store=True, groups=TOTALS_GROUPS)
 
     # Button gates — per user, so the same shared run offers each role only
     # what it may actually do.
@@ -228,8 +245,9 @@ class KswPayRun(models.Model):
             #
             # It used to also require a department still stuck on
             # 'submitted', on the reasoning that a month with nothing left
-            # waiting finalises itself. It does — but only down the run's own
-            # Approve button. A GM who signed his departments off on their
+            # waiting finalised itself (it no longer does at all, Oct 2026),
+            # and back then only down the run's own Approve button. A GM
+            # who signed his departments off on their
             # submission forms instead reached exactly the same place with
             # nothing to show for it: no department waiting, so no Approve
             # button; no department unapproved, so no close button either;
@@ -525,8 +543,8 @@ class KswPayRun(models.Model):
 
         Approval used to be one atomic act over every submitted department,
         which only made sense while one GM answered for all of them. Each GM
-        now signs off what is his; the month finalises by itself as soon as
-        nothing is left waiting, and otherwise waits for a deliberate close.
+        now signs off what is his; the month stays open until the company GM
+        finalises it deliberately (action_close_month).
         """
         for rec in self:
             if rec.state in LOCKING_STATES:
@@ -548,14 +566,15 @@ class KswPayRun(models.Model):
                     "Managers: %(names)s.",
                     period=rec.display_name,
                     names=', '.join(waiting.mapped('display_name'))))
-            # Approving the submissions is what finalises the month when
-            # they were the last ones waiting — see _finalise_if_complete,
-            # which both this button and the submission form go through.
+            # The submission's own approval tells the company GM when this
+            # was the last one waiting (_notify_ready_to_close); it never
+            # locks the month.
             mine.action_approve()
-            if rec.state in LOCKING_STATES:
-                continue
 
             still_waiting = rec._unapproved_departments()
+            if not still_waiting:
+                rec._refresh_register()
+                continue
             rec.sudo().message_post(
                 body=Markup(
                     '<strong>✅ %(mine)s department(s) approved by '
@@ -571,24 +590,19 @@ class KswPayRun(models.Model):
             rec._refresh_register()
         return True
 
-    def _finalise_if_complete(self):
-        """Lock the month the moment no department is left waiting.
+    def _notify_ready_to_close(self):
+        """Tell the company GM when nothing recorded is left unapproved.
 
-        One predicate, called from every approval route. A GM who signs a
-        department off on its own submission form has made exactly the same
-        decision as one who pressed Approve on the month, so the month has
-        to finalise either way — it used to finalise only down the run's
-        button, which is how a fully approved month ended up with no button
-        on it at all and no way to reach the accountant.
-
-        Only when **every** department with entries is fully approved — the
-        user's rule (Sep 2026). It used to fire as soon as one department
-        was approved and none was waiting, leaving a department still typing
-        out of the month; with partial approvals that locked a whole month
-        mid-way (dev, September 2026: Maintenance and Train Department shut
-        out). Anything short of "all in" is the company GM's call, through
-        Finalise & Send to Accounting.
+        The month used to lock itself at this point. It no longer does
+        (user's rule, Oct 2026): "every department with entries" cannot see
+        a department that is still preparing and has recorded nothing yet,
+        so KSWCO September 2026 locked under two departments mid-way and
+        they could no longer submit. Finalising is now only ever the
+        company GM's deliberate act (Finalise & Send to Accounting); this
+        just tells him the approved part is complete. One predicate, called
+        from every approval route, as the auto-lock was.
         """
+        default_gm_user = self.env.company.sudo().x_default_gm_id.user_id
         for rec in self:
             if rec.state in LOCKING_STATES:
                 continue
@@ -596,7 +610,22 @@ class KswPayRun(models.Model):
                 continue
             if not rec._active_submissions():
                 continue
-            rec._finalise_month()
+            body = Markup(
+                '<strong>🟢 Every submitted department is approved</strong>'
+                '<br/><i>%(period)s is still open. Finalise it with '
+                '"Finalise &amp; Send to Accounting" once no other '
+                'department has anything left to submit.</i>'
+            ) % {'period': rec.display_name}
+            if rec.pending_department_names:
+                body += Markup(
+                    '<br/><b>Not submitted yet:</b> %(names)s'
+                ) % {'names': rec.pending_department_names}
+            rec.sudo().message_post(
+                body=body,
+                partner_ids=default_gm_user.partner_id.ids,
+                subtype_xmlid='mail.mt_comment' if default_gm_user
+                else 'mail.mt_note',
+            )
         return True
 
     def _active_submissions(self):
@@ -662,15 +691,13 @@ class KswPayRun(models.Model):
             '<strong>✅ Approved</strong><br/>'
             '<b>Departments:</b> %(depts)s<br/>'
             '<b>Employees:</b> %(count)s<br/>'
-            '<b>Earnings:</b> %(earn).2f<br/>'
-            '<b>Loans settled:</b> %(loans).2f<br/>'
-            '<b>Payable:</b> %(pay).2f<br/>'
             '<i>%(period)s is now locked.</i>'
         ) % {'depts': len(approved), 'count': self.employee_count,
-             'earn': self.total_earnings or 0.0,
-             'loans': self.total_loan_offset or 0.0,
-             'pay': self.total_payable or 0.0,
              'period': self.display_name}
+        # No company-wide amounts here: the chatter is readable by every
+        # supervisor who can open the month, and the totals are not theirs
+        # to see (TOTALS_GROUPS). Those who may see them have them on the
+        # form.
         if never_submitted:
             body += Markup(
                 '<br/><b>⚠ Not included</b> (never submitted): %(names)s'
@@ -799,8 +826,7 @@ class KswPayRun(models.Model):
             # The Settings administrator only unlocks the month (user's rule,
             # Oct 2026): every department and batch keeps the state it had,
             # so a single one can be corrected without re-approving the rest.
-            # The month re-locks through _finalise_if_complete once the
-            # corrected department is approved again.
+            # The month stays open until the company GM finalises it again.
             if keep_states:
                 rec.write({'state': 'open'})
                 rec.sudo().message_post(

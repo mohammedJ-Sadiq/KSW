@@ -7,6 +7,23 @@
         <field name="model">ksw.bank.file.export.wizard</field>
         <field name="arch" type="xml">
             <form string="Export Bank File">
+                <field name="pending_change_count" invisible="1"/>
+                <div class="alert alert-warning" role="alert"
+                     invisible="not pending_change_count">
+                    <strong>
+                        <field name="pending_change_count" readonly="1" class="oe_inline"/>
+                        change(s) are waiting behind the bank freeze and will NOT be in this file.
+                    </strong>
+                    <field name="pending_change_summary" readonly="1" nolabel="1"/>
+                    <div>Apply them first under Pending Changes on the batch, or tick
+                        the box below to export the payslips as they are.</div>
+                    <field name="confirm_pending" class="oe_inline"/>
+                    <label for="confirm_pending"/>
+                </div>
+                <div class="text-muted" invisible="export_mode not in ('all_txt', 'specific_txt')">
+                    A text file is what goes to the bank: its payslips are frozen once it is
+                    exported, and later changes wait under Pending Changes.
+                </div>
                 <group>
                     <field name="payslip_run_id"/>
                     <field name="export_mode" widget="radio"/>

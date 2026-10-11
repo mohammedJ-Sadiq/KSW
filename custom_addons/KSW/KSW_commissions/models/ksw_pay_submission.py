@@ -423,12 +423,10 @@ class KswPaySubmission(models.Model):
         runs = self.mapped('run_id')
         runs._sync_state()
         runs._refresh_register()
-        # The month finalises here too, not only down the run's own Approve
-        # button. Approving the last department is the same decision
-        # whichever screen it is made on, and reaching it from this one used
-        # to leave the month with nothing waiting, nothing to close and no
-        # way for the accountant to export it.
-        runs._finalise_if_complete()
+        # Approving the last department is the same decision whichever
+        # screen it is made on, so the company GM is told here too. The
+        # month itself is only ever finalised by him (action_close_month).
+        runs._notify_ready_to_close()
         return True
 
     def action_return(self):

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_water_location_request_list" model="ir.ui.view">
+        <field name="name">ksw.water.location.request.list</field>
+        <field name="model">ksw.water.location.request</field>
+        <field name="arch" type="xml">
+            <list decoration-warning="state == 'pending'" decoration-muted="state == 'rejected'">
+                <field name="received_at"/>
+                <field name="partner_id"/>
+                <field name="employee_id"/>
+                <field name="accuracy_m"/>
+                <field name="map_url" widget="url" text="Open map"/>
+                <field name="reviewed_by" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'approved'"
+                       decoration-warning="state == 'pending'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_water_location_request_form" model="ir.ui.view">
+        <field name="name">ksw.water.location.request.form</field>
+        <field name="model">ksw.water.location.request</field>
+        <field name="arch" type="xml">
+            <form string="Client Location">
+                <header>
+                    <button name="action_approve" type="object" string="Approve Location"
+                            class="btn-primary" invisible="state != 'pending'"
+                            groups="KSW_water_delivery.group_water_dispatcher"/>
+                    <button name="action_reject" type="object" string="Reject"
+                            invisible="state != 'pending'"
+                            groups="KSW_water_delivery.group_water_dispatcher"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="partner_id"/></h1>
+                    </div>
+                    <div class="alert alert-info" role="alert" invisible="state != 'pending'">
+                        Until this is approved, no delivery note can be issued for this
+                        client. Open the map and check the pin is at the client's site.
+                        You may correct the position before approving it.
+                    </div>
+                    <group>
+                        <group string="Location to approve">
+                            <field name="latitude" readonly="state != 'pending'"/>
+                            <field name="longitude" readonly="state != 'pending'"/>
+                            <field name="map_url" widget="url" text="Open in Google Maps"/>
+                            <field name="accuracy_m"/>
+                        </group>
+                        <group string="Sent from the site">
+                            <field name="employee_id"/>
+                            <field name="captured_at"/>
+                            <field name="received_at"/>
+                            <field name="phone_latitude"/>
+                            <field name="phone_longitude"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Review">
+                            <field name="reject_reason" readonly="state != 'pending'"
+                                   placeholder="Required to reject"/>
+                            <field name="reviewed_by" invisible="not reviewed_by"/>
+                            <field name="reviewed_on" invisible="not reviewed_on"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_water_location_request_search" model="ir.ui.view">
+        <field name="name">ksw.water.location.request.search</field>
+        <field name="model">ksw.water.location.request</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <field name="employee_id"/>
+                <filter name="pending" string="Waiting for Approval" domain="[('state', '=', 'pending')]"/>
+                <filter name="approved" string="Approved" domain="[('state', '=', 'approved')]"/>
+                <filter name="rejected" string="Rejected" domain="[('state', '=', 'rejected')]"/>
+                <separator/>
+                <filter name="group_partner" string="Client" context="{'group_by': 'partner_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_water_location_requests" model="ir.actions.act_window">
+        <field name="name">Client Locations</field>
+        <field name="res_model">ksw.water.location.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_pending': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No client locations waiting.</p>
+            <p>Drivers send a client's location from the site with the
+               📍 button in the Water app. A client needs an approved location
+               before any delivery note can be issued for it.</p>
+        </field>
+    </record>
+
+</odoo>

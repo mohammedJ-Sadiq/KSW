@@ -220,7 +220,7 @@ class KswPayGmReviewWizard(models.TransientModel):
         # Approving the last thing a department had waiting is the same
         # decision as pressing Approve on it (submission.action_approve).
         if action == 'approve' and container._name == 'ksw.pay.submission':
-            runs._finalise_if_complete()
+            runs._notify_ready_to_close()
         return True
 
     def _announce(self, container, lines, action, reason):

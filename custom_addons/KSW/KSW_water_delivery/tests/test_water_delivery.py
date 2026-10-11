@@ -241,7 +241,6 @@ class TestWaterDeliveryPickers(WaterDeliveryCommon):
         and a plain `new()` record never fires one. Testing it the other way is
         what let the field arrive empty at the database."""
         form = Form(self.env['ksw.water.delivery.wizard'].with_user(self.driver_user))
-        form.vehicle_id = self.vehicle
         form.partner_id = self.customer
 
         self.assertTrue(form.product_locked)
@@ -259,7 +258,6 @@ class TestWaterDeliveryPickers(WaterDeliveryCommon):
         NewId-wrapped, a search on it matches nothing and raises nothing, and
         the preview just came back blank."""
         form = Form(self.env['ksw.water.delivery.wizard'].with_user(self.driver_user))
-        form.vehicle_id = self.vehicle
         form.partner_id = self.customer
 
         self.assertTrue(form.rate_preview, 'the rate must survive the onchange')
@@ -286,15 +284,16 @@ class TestWaterDeliveryTrips(WaterDeliveryCommon):
         self.assertEqual(picking.x_load_qty, 64.0)
 
     def test_a_smaller_tanker_gives_a_smaller_trip(self):
-        isuzu = self.env['ksw.fleet.vehicle'].create({
+        # Dispatch moves him onto the Isuzu: the tanker follows the fleet
+        # assignment, never a choice made on the note.
+        self.vehicle.driver_id = False
+        self.env['ksw.fleet.vehicle'].create({
             'name': 'IS-900', 'client_id': self.company.partner_id.id,
             'vehicle_type': 'isuzu', 'driver_id': self.driver.id,
             'state': 'confirmed', 'x_capacity_m3': 6.0,
             'x_picking_type_id': self.picking_type.id,
         })
-        picking = self._issue_note(
-            entered_qty=1.0, entered_uom='trip', vehicle_id=isuzu.id,
-        ).picking_id.sudo()
+        picking = self._issue_note(entered_qty=1.0, entered_uom='trip').picking_id.sudo()
         self.assertEqual(picking.x_load_qty, 6.0)
 
     def test_trips_on_a_tanker_with_no_capacity_are_refused(self):
@@ -336,14 +335,14 @@ class TestWaterDeliveryLocation(WaterDeliveryCommon):
         picking = self._issue_note().picking_id.sudo()
         self.assertEqual(picking.state, 'done')
 
-    def test_enforcing_still_allows_a_client_nobody_has_located(self):
-        """Otherwise turning the rule on locks out every site at once -- and
-        the sites are located BY issuing notes at them."""
+    def test_enforcing_refuses_a_client_nobody_has_located(self):
+        """Oct 2026: the approved location is the gate. Until a dispatcher has
+        approved one, no note can be issued for the client at all."""
         self.picking_type.x_location_rule = 'enforce'
         self.assertFalse(self.customer.partner_latitude)
 
-        picking = self._issue_note().picking_id.sudo()
-        self.assertEqual(picking.state, 'done')
+        with self.assertRaisesRegex(UserError, 'no approved location'):
+            self._issue_note()
 
     def test_enforcing_needs_a_position_at_all(self):
         self.picking_type.x_location_rule = 'enforce'
@@ -394,16 +393,26 @@ class TestWaterDeliveryGuards(WaterDeliveryCommon):
         with self.assertRaises(UserError):
             self._issue_note(user=outsider)
 
-    def test_a_dispatcher_may_issue_on_a_drivers_behalf(self):
-        dispatcher = self.env['res.users'].create({
-            'name': 'Dispatcher', 'login': 'dispatcher@ksw.test',
+    def test_a_supervisor_cannot_issue_a_note(self):
+        """A supervisor reviews; he does not issue -- not even on a driver's
+        behalf. The role no longer carries Driver, so no menu offers it, and
+        the server refuses it on every route."""
+        supervisor = self.env['res.users'].create({
+            'name': 'Supervisor', 'login': 'supervisor@ksw.test',
             'group_ids': [(6, 0, [
                 self.env.ref('KSW_water_delivery.group_water_dispatcher').id,
             ])],
         })
-        self.env['hr.employee'].create({'name': 'Dispatcher', 'user_id': dispatcher.id})
-        wizard = self._issue_note(user=dispatcher, driver_id=self.driver.id)
-        self.assertEqual(wizard.picking_id.sudo().x_driver_id, self.driver)
+        self.env['hr.employee'].create({'name': 'Supervisor', 'user_id': supervisor.id})
+        self.assertFalse(supervisor.has_group('KSW_water_delivery.group_water_driver'))
+        with self.assertRaises(Exception):
+            self._issue_note(user=supervisor, driver_id=self.driver.id)
+        # Even with the form handed to him, confirming is refused.
+        wizard = self.env['ksw.water.delivery.wizard'].create(
+            self._wizard_vals(self.driver_user, driver_id=self.driver.id))
+        with self.assertRaisesRegex(UserError, 'Only drivers'):
+            wizard.with_user(supervisor).action_confirm()
+        self.assertFalse(wizard.picking_id)
 
     def test_a_driver_cannot_change_a_rate(self):
         with self.assertRaises(Exception):
@@ -416,11 +425,16 @@ class TestWaterDeliveryScope(WaterDeliveryCommon):
 
     def test_a_driver_sees_only_his_own_notes(self):
         mine = self._issue_note(user=self.driver_user).picking_id
-        # No tanker: T-100 is Driver One's, and a driver may only issue on
-        # his own (audit 2026-09-28, see test_vehicle_trust.py).
+        # Driver Two needs a tanker of his own: it is fetched from the fleet
+        # assignment, and a driver with none cannot issue at all.
+        self.env['ksw.fleet.vehicle'].create({
+            'name': 'T-222', 'client_id': self.company.partner_id.id,
+            'vehicle_type': 'trailer', 'driver_id': self.other_driver.id,
+            'state': 'confirmed', 'x_capacity_m3': 32.0,
+            'x_picking_type_id': self.picking_type.id,
+        })
         theirs = self._issue_note(
             user=self.other_driver_user, partner_id=self.multi_customer.id,
-            vehicle_id=False,
         ).picking_id
 
         visible = self.env['stock.picking'].with_user(self.driver_user).search(
@@ -687,7 +701,6 @@ class TestWaterDeliveryProductFallback(WaterDeliveryCommon):
         """End to end through `Form`, which respects the same read-only rules
         the browser does."""
         form = Form(self.env['ksw.water.delivery.wizard'].with_user(self.driver_user))
-        form.vehicle_id = self.vehicle
         form.partner_id = self.customer
         form.entered_qty = 2.0
         form.signed_by = 'Site Foreman'

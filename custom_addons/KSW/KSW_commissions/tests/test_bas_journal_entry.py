@@ -289,7 +289,8 @@ class TestWholeRiyals(BasJournalCommon):
         # 200.50 → 201, 50.40 → 50
         self.assertEqual(batch.total_amount, 251.0)
         self.assertEqual(batch.submission_id.total_amount, 251.0)
-        self.assertEqual(run.total_earnings, 251.0)
+        # Read as the GM: company-wide totals are not the supervisor's.
+        self.assertEqual(run.with_user(self.gm).total_earnings, 251.0)
 
 
 class TestJournalRefusals(BasJournalCommon):

@@ -210,7 +210,7 @@ class KswWaterInvoiceWizard(models.TransientModel):
             reasons = []
             held = period.filtered(lambda p: p.state != 'done')
             if held:
-                reasons.append(_('%(n)s not validated yet (held for a dispatcher): %(names)s',
+                reasons.append(_('%(n)s not validated yet (held for a supervisor): %(names)s',
                                  n=len(held), names=', '.join(held.mapped('name'))))
             unsigned = period.filtered(
                 lambda p: p.state == 'done' and p.x_signature_required and not p.x_signed_on)

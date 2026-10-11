@@ -398,7 +398,7 @@ class KswWaterCapture(models.Model):
         if self.env.su:
             return
         if not self.env.user.has_group('KSW_water_delivery.group_water_dispatcher'):
-            raise UserError(_('Only a dispatcher may review offline deliveries.'))
+            raise UserError(_('Only a supervisor may review offline deliveries.'))
 
     def action_accept(self):
         """Accept a held note: validate it, and only then write the signature.
@@ -415,6 +415,16 @@ class KswWaterCapture(models.Model):
             picking = capture.picking_id.sudo()
             if not picking:
                 raise UserError(_('This capture has no delivery note to accept.'))
+            # Accepting overrides the distance, never the missing location:
+            # under enforce no note exists for a client the office has not
+            # located, and this button must not be the way round that.
+            partner = capture.partner_id.sudo()
+            if (picking.picking_type_id.x_location_rule == 'enforce'
+                    and not (partner.partner_latitude or partner.partner_longitude)):
+                raise UserError(_(
+                    '%s has no approved location. Approve its location first '
+                    '(Water Delivery ▸ Client Locations), then accept this delivery.',
+                    partner.display_name))
             quantity = self.env['stock.picking']._water_quantity_in_product_uom(
                 capture.vehicle_id, capture.entered_qty, capture.entered_uom)
             picking.move_ids.write({'quantity': quantity, 'picked': True})

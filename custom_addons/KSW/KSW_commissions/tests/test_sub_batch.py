@@ -488,6 +488,7 @@ class TestNothingAfterApproval(SubBatchCommon):
         other = self._approved_normally()
         other.submission_id.with_user(self.sup_b).action_submit()
         other.submission_id.with_user(self.gm).action_approve()
+        self.run.sudo().action_close_month()
         self.assertEqual(self.run.state, 'approved')
         admin = self._user('p_admin72',
                            'KSW_commissions.group_commission_officer')
@@ -547,6 +548,7 @@ class TestPaidIsFinal(SubBatchCommon):
         self._approved_early()
         self.submission.with_user(self.sup_a).action_submit()
         self.submission.with_user(self.gm).action_approve()
+        self.run.sudo().action_close_month()
         self.assertEqual(self.run.state, 'approved')
         self.run.sudo().action_reopen()
         # The department's own approval steps back; the early one stands.

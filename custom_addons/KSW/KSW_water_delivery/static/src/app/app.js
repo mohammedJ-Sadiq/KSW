@@ -33,13 +33,18 @@
 
 const APP_VERSION = new URL(import.meta.url).searchParams.get("v") || "dev";
 const DB_NAME = "ksw-water";
-const DB_VERSION = 1;
+// 2: the "pins" store, for client locations sent without a delivery note.
+const DB_VERSION = 2;
 const STORE_REF = "reference";
 const STORE_QUEUE = "queue";
+const STORE_PINS = "pins";
 
 // Offline, a first fix comes from the satellites alone. Give it room.
 const GPS_WINDOW_MS = 90000;
 const GPS_GOOD_ENOUGH_M = 25;
+// The server's own limit arrives with the reference; this is only for a phone
+// still holding a snapshot from before pins existed.
+const PIN_MAX_ACCURACY_DEFAULT_M = 50;
 
 // ---------------------------------------------------------------------------
 // IndexedDB — small enough to not want a library
@@ -57,6 +62,9 @@ function openDb() {
                 }
                 if (!db.objectStoreNames.contains(STORE_QUEUE)) {
                     db.createObjectStore(STORE_QUEUE, { keyPath: "uuid" });
+                }
+                if (!db.objectStoreNames.contains(STORE_PINS)) {
+                    db.createObjectStore(STORE_PINS, { keyPath: "uuid" });
                 }
             };
             request.onsuccess = () => resolve(request.result);
@@ -88,6 +96,10 @@ const state = {
     reference: null,
     refreshedAt: null,
     queue: [],
+    // Client locations saved on the phone and not yet acknowledged.
+    pins: [],
+    // The client a pin is waiting on a fresh, accurate enough fix for.
+    pinWaiting: null,
     recent: [],
     online: navigator.onLine,
     position: null,
@@ -206,13 +218,24 @@ async function flushQueue({ quiet = false } = {}) {
         return;
     }
     const pending = await dbAll(STORE_QUEUE);
-    if (!pending.length) {
+    const pins = await dbAll(STORE_PINS);
+    if (!pending.length && !pins.length) {
         state.queue = [];
+        state.pins = [];
         return;
     }
     state.syncing = true;
     render();
     try {
+        // Pins first: a note issued on the same visit is then checked against
+        // the location the driver has just given.
+        const pinMessage = pins.length ? await flushPins(pins) : null;
+        if (!pending.length) {
+            if (!quiet && pinMessage) {
+                banner(pinMessage.kind, pinMessage.text);
+            }
+            return;
+        }
         // `sent_at` is the phone's clock right now, so the server can tell a
         // capture that sat in the queue for six hours (normal, and the point)
         // from a phone whose clock is simply wrong (not normal, and worth
@@ -235,12 +258,15 @@ async function flushQueue({ quiet = false } = {}) {
             const sent = results.filter((r) => r.settled).length;
             let message = `${sent} delivery${sent === 1 ? "" : "s"} sent.`;
             if (held) {
-                message += ` ${held} waiting for a dispatcher to check the location.`;
+                message += ` ${held} waiting for a supervisor to check the location.`;
             }
             if (failed) {
                 message += ` ${failed} could not be issued — the office has been given them.`;
             }
-            banner(held || failed ? "warn" : "ok", message);
+            if (pinMessage) {
+                message += ` ${pinMessage.text}`;
+            }
+            banner(held || failed || (pinMessage && pinMessage.kind === "warn") ? "warn" : "ok", message);
         }
         await loadRecent();
     } catch (error) {
@@ -253,6 +279,45 @@ async function flushQueue({ quiet = false } = {}) {
         state.syncing = false;
         render();
     }
+}
+
+/**
+ * Send the client locations saved on the phone. Returns a line for the banner.
+ *
+ * A pin is dropped from the phone once the server has answered for it, even
+ * when the answer is no: a rough fix or a client somebody else located first
+ * will not change by sending it again.
+ */
+async function flushPins(pins) {
+    const { results } = await callJson("/water/pin", {
+        pins: pins.map((p) => p.payload),
+    });
+    const sent = [];
+    const notes = [];
+    for (const result of results) {
+        const pin = pins.find((p) => p.uuid === result.uuid);
+        if (result.status === "pending" && pin) {
+            // Marked here before the pin leaves the phone, so the button does
+            // not flash back while the reference is being refreshed.
+            await markPending(pin.payload.partner_id);
+            sent.push(result.name);
+        } else if (result.message) {
+            notes.push(result.message);
+        }
+        if (result.settled) {
+            await dbDel(STORE_PINS, result.uuid);
+        }
+    }
+    state.pins = await dbAll(STORE_PINS);
+    await refreshReference().catch(() => {});
+    const parts = [];
+    if (sent.length) {
+        parts.push(`Location sent for ${sent.join(", ")} — waiting for the office to approve it.`);
+    }
+    parts.push(...notes);
+    return parts.length
+        ? { kind: notes.length ? "warn" : "ok", text: parts.join(" ") }
+        : null;
 }
 
 // ---------------------------------------------------------------------------
@@ -291,6 +356,11 @@ function startWatching() {
             };
             state.positionStatus = "located";
             state.positionMessage = `Location recorded (±${Math.round(accuracy)} m)`;
+            if (state.pinWaiting && accuracy && accuracy <= pinMaxAccuracy()) {
+                const client = state.pinWaiting;
+                state.pinWaiting = null;
+                savePin(client);
+            }
             // Stop once it is good enough, or once the window is up with
             // whatever we have. A coarse fix is still worth far more than none.
             if (accuracy && accuracy <= GPS_GOOD_ENOUGH_M) {
@@ -299,10 +369,15 @@ function startWatching() {
             } else if (Date.now() - started > GPS_WINDOW_MS) {
                 navigator.geolocation.clearWatch(state.watchId);
                 state.watchId = null;
+                if (state.pinWaiting) {
+                    state.pinWaiting = null;
+                    banner("warn", `The fix is still too rough (±${Math.round(accuracy)} m). Step out of the cab, away from the tank, and try again.`);
+                }
             }
             render();
         },
         (error) => {
+            state.pinWaiting = null;
             if (error.code === 1) {
                 state.positionStatus = "denied";
                 state.positionMessage =
@@ -343,19 +418,129 @@ function locationProblem(form) {
     if (!rules || rules.location_rule !== "enforce" || !form.partner) {
         return null;
     }
+    if (!isLocated(form.partner)) {
+        return `${form.partner.name} has no approved location yet.`;
+    }
     if (!state.position) {
         return "No position yet. This branch issues notes at the client's site.";
-    }
-    if (!form.partner.lat || !form.partner.lon) {
-        return null; // nobody has located this client yet — it stays reachable
     }
     const metres = distanceM(
         state.position.lat, state.position.lon, form.partner.lat, form.partner.lon
     );
     if (metres > (rules.radius_m || 300)) {
-        return `You are about ${Math.round(metres)} m from ${form.partner.name}; this branch allows ${rules.radius_m} m.`;
+        return `You are about ${Math.round(metres)} m from ${form.partner.name}; notes can only be issued within ${rules.radius_m} m.`;
     }
     return null;
+}
+
+// ---------------------------------------------------------------------------
+// Sending a client's location without a delivery note
+// ---------------------------------------------------------------------------
+function pinMaxAccuracy() {
+    const rules = state.reference && state.reference.rules;
+    return (rules && rules.pin_max_accuracy_m) || PIN_MAX_ACCURACY_DEFAULT_M;
+}
+
+/** Under enforce, the client's approved location is the gate: no note at
+ * all without one, and then only within the radius. The server applies the
+ * same rule; this one runs at the gate, where the driver can still act. */
+function strictLocation() {
+    const rules = state.reference && state.reference.rules;
+    return Boolean(rules && rules.location_rule === "enforce");
+}
+
+const isLocated = (client) => Boolean(client && (client.lat || client.lon));
+
+function awaitingApproval(client) {
+    return Boolean(client) && !isLocated(client) && (
+        client.location_pending
+        || state.pins.some((p) => p.payload.partner_id === client.id)
+    );
+}
+
+/** The button is for a client nobody has located and nobody has sent yet. It
+ * goes the moment a pin is saved -- on the phone, before the server has even
+ * heard of it -- and stays gone while the office reviews it. */
+function needsPin(client) {
+    return Boolean(client) && !isLocated(client) && !awaitingApproval(client);
+}
+
+function canDeliver(client) {
+    return Boolean(client) && (!strictLocation() || isLocated(client));
+}
+
+async function markPending(partnerId) {
+    const client = state.reference && state.reference.clients.find((c) => c.id === partnerId);
+    if (!client) {
+        return;
+    }
+    client.location_pending = true;
+    await dbPut(STORE_REF, { id: "current", reference: state.reference, at: state.refreshedAt });
+}
+
+async function checkApproval() {
+    if (!navigator.onLine) {
+        return banner("warn", "You need a connection to check.");
+    }
+    try {
+        await refreshReference();
+    } catch (error) {
+        return banner("warn", `Could not check: ${error.message}`);
+    }
+    const id = state.form.partner && state.form.partner.id;
+    const fresh = state.reference.clients.find((c) => c.id === id);
+    if (fresh) {
+        state.form.partner = fresh;
+    }
+    banner(isLocated(fresh) ? "ok" : "warn", isLocated(fresh)
+        ? "Location approved. You can issue the note."
+        : "Not approved yet.");
+}
+
+/**
+ * Always from a FRESH fix, never the one already on screen: that may have been
+ * taken at the depot when the app opened, and pinning a client to the depot
+ * would hold every later note at the real site for a dispatcher.
+ */
+function requestPin() {
+    const client = state.form.partner;
+    if (!needsPin(client)) {
+        return;
+    }
+    if (!window.confirm(
+        `Send your current position as the location of ${client.name}?\n\n` +
+        "Only do this standing at the client's site, outside the cab. " +
+        "The office approves it before you can issue notes for this client."
+    )) {
+        return;
+    }
+    state.pinWaiting = client;
+    startWatching();
+    render();
+}
+
+async function savePin(client) {
+    const position = state.position;
+    const pin = {
+        uuid: uuid(),
+        clientName: client.name,
+        payload: {
+            uuid: null,
+            partner_id: client.id,
+            latitude: position.lat,
+            longitude: position.lon,
+            accuracy: position.accuracy,
+            captured_at: new Date().toISOString().slice(0, 19).replace("T", " "),
+            app_version: APP_VERSION,
+        },
+    };
+    pin.payload.uuid = pin.uuid;
+    await dbPut(STORE_PINS, pin);
+    state.pins = await dbAll(STORE_PINS);
+    banner("ok", navigator.onLine
+        ? `Location of ${client.name} saved. Sending to the office for approval…`
+        : `Location of ${client.name} saved on the phone. It will go to the office when you have signal.`);
+    flushQueue({ quiet: false });
 }
 
 // ---------------------------------------------------------------------------
@@ -364,8 +549,14 @@ function locationProblem(form) {
 async function saveCapture() {
     const form = state.form;
     const reference = state.reference;
+    if (!reference.vehicle) {
+        return banner("warn", reference.vehicle_problem || "No tanker is assigned to you. Ask your supervisor.");
+    }
     if (!form.partner) {
         return banner("warn", "Pick the client first.");
+    }
+    if (!canDeliver(form.partner)) {
+        return banner("warn", `${form.partner.name} has no approved location yet.`);
     }
     if (!form.product) {
         return banner("warn", "Pick what you delivered.");
@@ -380,9 +571,11 @@ async function saveCapture() {
         return banner("warn", "Record the name of the person who signed.");
     }
 
+    // Refused here, not saved-and-held: the driver is at the gate and the
+    // water is still in the tank, so this is the moment the rule can be kept.
     const problem = locationProblem(form);
-    if (problem && !window.confirm(`${problem}\n\nSave anyway? A dispatcher will have to check it before it can be invoiced.`)) {
-        return;
+    if (problem) {
+        return banner("warn", problem);
     }
 
     const usual = form.partner.usual;
@@ -649,8 +842,9 @@ function renderTop() {
                 </span>
             </div>
             <div class="ksw-top-row ksw-sub">
-                <span>${esc(reference.vehicle ? reference.vehicle.name : "No tanker assigned")}</span>
+                <span>${esc(reference.vehicle ? reference.vehicle.name : "No tanker")}</span>
                 ${queued ? `<span class="ksw-chip ksw-warnchip">${queued} waiting to send</span>` : ""}
+                ${state.pins.length ? `<span class="ksw-chip ksw-warnchip">${state.pins.length} location${state.pins.length === 1 ? "" : "s"} to send</span>` : ""}
             </div>
         </header>`;
 }
@@ -672,7 +866,11 @@ function renderForm() {
     const problem = locationProblem(form);
     const clients = visibleClients();
 
+    const tankerProblem = state.reference.vehicle
+        ? ""
+        : state.reference.vehicle_problem || "No tanker is assigned to you. Ask your supervisor.";
     return `
+        ${tankerProblem ? `<div class="ksw-warnbox">${esc(tankerProblem)} You cannot issue notes until then.</div>` : ""}
         <section class="ksw-gps ksw-gps-${esc(state.positionStatus)}">
             <div>${esc(state.positionMessage || "")}</div>
             ${state.positionStatus !== "located"
@@ -691,7 +889,7 @@ function renderForm() {
                <ul class="ksw-list">
                    ${clients.map((c) => `
                        <li><button data-client="${c.id}" class="${c.usual ? "" : "ksw-off-route"}">
-                           ${esc(c.name)}${c.usual ? "" : " · off your usual route"}
+                           ${esc(c.name)}${c.usual ? "" : " · off your usual route"}${strictLocation() && !isLocated(c) ? " · needs location" : ""}
                        </button></li>`).join("")}
                    ${clients.length ? "" : `<li class="ksw-empty">No match.</li>`}
                </ul>
@@ -700,11 +898,13 @@ function renderForm() {
                    Client not listed — show every priced client
                </label>`}
 
-        ${problem ? `<div class="ksw-warnbox">${esc(problem)} It will be issued and held for a dispatcher.</div>` : ""}
+        ${renderPinBox()}
 
-        ${form.partner ? renderProduct() : ""}
+        ${problem && canDeliver(form.partner) ? `<div class="ksw-warnbox">${esc(problem)}</div>` : ""}
 
-        ${form.partner && rules.signature_required ? `
+        ${canDeliver(form.partner) ? renderProduct() : ""}
+
+        ${canDeliver(form.partner) && rules.signature_required ? `
             <label class="ksw-label">Signed by</label>
             <input id="ksw-signed-by" class="ksw-input" value="${esc(form.signedBy)}"
                    placeholder="Name of the person signing"/>
@@ -712,11 +912,37 @@ function renderForm() {
             <canvas id="ksw-sign" class="ksw-sign"></canvas>
             <button id="ksw-clear-sign" class="ksw-link">clear signature</button>` : ""}
 
-        ${form.partner ? `
+        ${canDeliver(form.partner) ? `
             <label class="ksw-label">Remark</label>
             <input id="ksw-note" class="ksw-input" value="${esc(form.note)}"
                    placeholder="Anything the client should see"/>
-            <button id="ksw-save" class="ksw-primary">Save Delivery</button>` : ""}`;
+            <button id="ksw-save" class="ksw-primary" ${problem || tankerProblem ? "disabled" : ""}>Save Delivery</button>` : ""}`;
+}
+
+function renderPinBox() {
+    const client = state.form.partner;
+    if (awaitingApproval(client)) {
+        return `
+        <section class="ksw-pinbox">
+            <div>Location sent — waiting for the office to approve it.${strictLocation()
+                ? " You can issue a note for this client once it is approved." : ""}</div>
+            <button id="ksw-pin-check" class="ksw-secondary" ${state.online ? "" : "disabled"}>Check again</button>
+        </section>`;
+    }
+    if (!needsPin(client)) {
+        return "";
+    }
+    const waiting = state.pinWaiting && state.pinWaiting.id === client.id;
+    return `
+        <section class="ksw-pinbox">
+            <div>This client has no location on file yet.${strictLocation()
+                ? " No note can be issued until the office approves one." : ""}</div>
+            ${waiting
+                ? `<div class="ksw-hint">Getting an accurate fix (needs ±${esc(pinMaxAccuracy())} m)…
+                       ${state.position ? ` now ±${esc(Math.round(state.position.accuracy))} m` : ""}</div>
+                   <button id="ksw-pin-cancel" class="ksw-link">cancel</button>`
+                : `<button id="ksw-pin" class="ksw-secondary">&#128205; Send my location for this client</button>`}
+        </section>`;
 }
 
 function renderProduct() {
@@ -762,7 +988,21 @@ function renderProduct() {
 function renderQueue() {
     const queue = state.queue;
     const recent = state.recent;
+    const pins = state.pins;
     return `
+        ${pins.length ? `
+            <h2 class="ksw-h2">Client locations to send</h2>
+            <ul class="ksw-cards">
+                ${pins.map((p) => `
+                    <li class="ksw-card ksw-pending">
+                        <strong>${esc(p.clientName)}</strong>
+                        <span class="ksw-sub">±${esc(Math.round(p.payload.accuracy))} m · ${esc(p.payload.captured_at)}</span>
+                    </li>`).join("")}
+            </ul>
+            ${queue.length ? "" : `
+                <button id="ksw-sync" class="ksw-primary" ${state.online ? "" : "disabled"}>
+                    ${state.syncing ? "Sending…" : state.online ? "Send now" : "No signal yet"}
+                </button>`}` : ""}
         ${queue.length ? `
             <h2 class="ksw-h2">Waiting to send</h2>
             <ul class="ksw-cards">
@@ -775,7 +1015,7 @@ function renderQueue() {
             </ul>
             <button id="ksw-sync" class="ksw-primary" ${state.online ? "" : "disabled"}>
                 ${state.syncing ? "Sending…" : state.online ? "Send now" : "No signal yet"}
-            </button>` : `<p class="ksw-empty">Nothing waiting to send.</p>`}
+            </button>` : pins.length ? "" : `<p class="ksw-empty">Nothing waiting to send.</p>`}
 
         <h2 class="ksw-h2">Recently issued</h2>
         <ul class="ksw-cards">
@@ -786,7 +1026,7 @@ function renderQueue() {
                     <span class="ksw-sub">
                         ${esc(n.qty)} · ${esc(n.total)}
                         ${n.offline ? " · offline" : ""}
-                        ${n.held ? " · waiting for a dispatcher" : ""}
+                        ${n.held ? " · waiting for a supervisor" : ""}
                     </span>
                 </li>`).join("") : `<li class="ksw-empty">Nothing yet.</li>`}
         </ul>`;
@@ -837,6 +1077,7 @@ function wire() {
         render();
     });
     on("ksw-clear-client", "click", () => {
+        state.pinWaiting = null;
         state.form = newForm();
         render();
     });
@@ -861,6 +1102,12 @@ function wire() {
     on("ksw-save", "click", saveCapture);
     on("ksw-sync", "click", () => flushQueue());
     on("ksw-locate", "click", startWatching);
+    on("ksw-pin", "click", requestPin);
+    on("ksw-pin-check", "click", checkApproval);
+    on("ksw-pin-cancel", "click", () => {
+        state.pinWaiting = null;
+        render();
+    });
     on("ksw-prepare", "click", prepareForOffline);
     on("ksw-clear-sign", "click", () => {
         state.form.signature = "";
@@ -928,6 +1175,7 @@ async function boot() {
         state.refreshedAt = stored.at;
     }
     state.queue = await dbAll(STORE_QUEUE);
+    state.pins = await dbAll(STORE_PINS);
     render();
 
     // Not awaited: the driver gets a usable screen immediately and the

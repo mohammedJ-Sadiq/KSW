@@ -45,3 +45,6 @@ access_ksw_revision_reason_wizard_acc,ksw.revision.request.reason.wizard.acc,mod
 access_ksw_revision_reason_wizard_user,ksw.revision.request.reason.wizard.user,model_ksw_revision_request_reason_wizard,base.group_user,1,1,1,1
 access_ksw_payslip_run_done_wizard,ksw.payslip.run.done.wizard,model_ksw_payslip_run_done_wizard,om_hr_payroll.group_hr_payroll_user,1,1,1,1
 access_ksw_payslip_run_done_wizard_line,ksw.payslip.run.done.wizard.line,model_ksw_payslip_run_done_wizard_line,om_hr_payroll.group_hr_payroll_user,1,1,1,1
+access_ksw_payslip_pending_change_user,ksw.payslip.pending.change.user,model_ksw_payslip_pending_change,om_hr_payroll.group_hr_payroll_user,1,0,0,0
+access_ksw_payslip_pending_change_manager,ksw.payslip.pending.change.manager,model_ksw_payslip_pending_change,om_hr_payroll.group_hr_payroll_manager,1,1,0,0
+access_ksw_payslip_pending_change_reviewer,ksw.payslip.pending.change.reviewer,model_ksw_payslip_pending_change,group_hr_payroll_reviewer,1,0,0,0

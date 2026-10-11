@@ -13,8 +13,14 @@ status, so:
   reach.
 
 Every batch approved, nothing left to press, and no way to hand the month to
-accounting. The two repairs are one predicate called from both approval
-routes, and a finalise button that only needs *something* approved.
+accounting. The repair was a finalise button that only needs *something*
+approved.
+
+The month used to finalise itself once every department with entries was
+approved. It no longer does (Oct 2026): KSWCO September 2026 locked while two
+departments were still preparing and had recorded nothing yet, and they could
+not submit. Finalising is now only ever the company GM's own act; the last
+approval just tells him the submitted part is complete.
 """
 from odoo.exceptions import UserError
 
@@ -66,21 +72,46 @@ class TestRunFinalisation(SubmissionCommon):
     # ------------------------------------------------------------------
     # The repair itself
     # ------------------------------------------------------------------
-    def test_approving_the_last_department_on_its_own_form_finalises(self):
+    def _close(self, run):
+        run.with_user(self.user_company_gm).sudo().action_close_month()
+
+    def test_approving_the_last_department_leaves_the_month_to_the_gm(self):
         sub_a, sub_b, run = self._stuck_run()
-        self.assertNotEqual(run.state, 'approved',
-                            'B is still waiting on its own GM')
+        existing = run.sudo().message_ids.ids
 
         sub_b.with_user(self.user_gm_b).sudo().action_approve()
 
+        self.assertNotIn(run.state, ('approved', 'paid'))
+        new = run.sudo().message_ids.filtered(lambda m: m.id not in existing)
+        self.assertTrue(
+            new.filtered(lambda m: self.user_company_gm.partner_id
+                         in m.partner_ids),
+            'the company GM is told the month is ready to finalise')
+        self.assertTrue(
+            run.with_user(self.user_company_gm).sudo().x_can_close_month)
+
+        self._close(run)
         self.assertEqual(run.state, 'approved')
         self.assertEqual(
             run.sudo().line_ids.mapped('employee_id'),
             self.emp_a | self.emp_b)
 
+    def test_a_department_not_started_yet_can_still_submit(self):
+        """The KSWCO incident: A recorded and was approved while B had not
+        recorded anything yet. B must still be able to hand over."""
+        sub_a = self._submit(self.sup_a, self.dept_a, self.emp_a)
+        sub_a.with_user(self.gm_a).sudo().action_approve()
+        run = sub_a.run_id
+        self.assertNotIn(run.state, ('approved', 'paid'))
+
+        sub_b = self._submit(self.sup_b, self.dept_b, self.emp_b)
+        self.assertEqual(sub_b.run_id, run)
+        self.assertEqual(sub_b.state, 'submitted')
+
     def test_the_register_is_settled_not_a_preview(self):
         sub_a, sub_b, run = self._stuck_run()
         sub_b.with_user(self.user_gm_b).sudo().action_approve()
+        self._close(run)
         self.assertFalse(run.sudo().line_ids.filtered('x_preview_generated'),
                          'finalisation turns the preview into the settlement')
 
@@ -93,6 +124,7 @@ class TestRunFinalisation(SubmissionCommon):
     def test_finalising_twice_is_refused_not_repeated(self):
         sub_a, sub_b, run = self._stuck_run()
         sub_b.with_user(self.user_gm_b).sudo().action_approve()
+        self._close(run)
         with self.assertRaises(UserError):
             run.with_user(self.user_company_gm).sudo().action_close_month()
 
@@ -187,8 +219,9 @@ class TestRunFinalisation(SubmissionCommon):
             ])],
         })
         sub_a, sub_b, run = self._stuck_run()
-        existing = run.sudo().message_ids.ids
         sub_b.with_user(self.user_gm_b).sudo().action_approve()
+        existing = run.sudo().message_ids.ids
+        self._close(run)
 
         new = run.sudo().message_ids.filtered(lambda m: m.id not in existing)
         self.assertTrue(
@@ -198,6 +231,7 @@ class TestRunFinalisation(SubmissionCommon):
     def test_the_accountant_can_export_once_it_is_finalised(self):
         sub_a, sub_b, run = self._stuck_run()
         sub_b.with_user(self.user_gm_b).sudo().action_approve()
+        self._close(run)
         accountant = self.env['res.users'].sudo().create({
             'name': 'run_acc2', 'login': 'run_acc2',
             'group_ids': [(6, 0, [

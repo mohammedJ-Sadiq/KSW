@@ -46,13 +46,16 @@ class StockPickingType(models.Model):
     x_location_rule = fields.Selection(
         [('off', 'Do not record'),
          ('capture', 'Record where the driver was'),
-         ('enforce', 'Require the driver to be at the client')],
-        string='Driver Location', default='capture', required=True,
+         ('enforce', 'Require an approved client location, and the driver at it')],
+        string='Driver Location', default='enforce', required=True,
+        help='Enforce: no note can be issued for a client until a supervisor '
+             'has approved its location (drivers send it from the site), and '
+             'then only within the allowed distance of it.',
     )
     x_location_radius_m = fields.Integer(
         string='Allowed Distance (m)', default=300,
         help='How far from the client\'s recorded location a delivery note may '
-             'be issued. Only applied to clients whose location is known.',
+             'be issued.',
     )
 
 
@@ -159,7 +162,7 @@ class StockPicking(models.Model):
         string='Location Not Confirmed', index=True, copy=False,
         help='The note was issued outside the allowed distance from the '
              'client, or with no position at all, and is waiting for a '
-             'dispatcher to accept it.',
+             'supervisor to accept it.',
     )
     x_location_exception_reason = fields.Char(
         string='Why It Is Held', copy=False,
@@ -304,12 +307,42 @@ class StockPicking(models.Model):
         if partner and partner not in normal:
             return _(
                 '%(client)s is not on %(driver)s\'s client list for this '
-                'branch, so a dispatcher has to confirm the delivery.',
+                'branch, so a supervisor has to confirm the delivery.',
                 client=partner.sudo().display_name,
                 driver=driver.sudo().name or _('the driver'))
         return None
 
     @api.model
+    def _water_assigned_vehicle(self, driver):
+        """The tanker a driver delivers with: fetched, never chosen (Oct 2026).
+
+        The tanker decides the trip volume and which branch's rules and
+        numbering apply, so letting the driver pick it lets him pick those
+        too. It is whatever the fleet record assigns to him -- and when that
+        is not exactly one tanker, the answer is dispatch's to give, not a
+        guess: `search(limit=1)` used to pick one of two silently.
+
+        Returns (vehicle, problem). `problem` is None when there is one.
+        """
+        Vehicle = self.env['ksw.fleet.vehicle'].sudo()
+        if not driver:
+            return Vehicle, _('Your user is not linked to an employee record.')
+        vehicles = Vehicle.search(
+            [('driver_id', '=', driver.id), ('state', '=', 'confirmed')])
+        if not vehicles:
+            return Vehicle, _(
+                'No tanker is assigned to %s. Ask your supervisor to assign one '
+                '(Water Delivery ▸ Tankers).',
+                driver.sudo().name)
+        if len(vehicles) > 1:
+            return Vehicle, _(
+                '%(driver)s is assigned to %(count)d tankers (%(tankers)s). Ask '
+                'your supervisor to leave only the one being driven today '
+                '(Water Delivery ▸ Tankers).',
+                driver=driver.sudo().name, count=len(vehicles),
+                tankers=', '.join(vehicles.mapped('display_name')))
+        return vehicles, None
+
     def _water_vehicle_check(self, vehicle, driver):
         """Why this tanker/driver pair may not issue unreviewed, or None."""
         # uid, not env.su: the capture path always runs under sudo() but
@@ -322,10 +355,13 @@ class StockPicking(models.Model):
             return _(
                 'Notes are issued in your own name; %(driver)s must issue '
                 'their own.', driver=driver.sudo().name)
-        if vehicle and vehicle.sudo().driver_id != (driver or own):
+        if not vehicle:
+            return self._water_assigned_vehicle(driver or own)[1] or _(
+                'No tanker was recorded for this delivery.')
+        if vehicle.sudo().driver_id != (driver or own):
             return _(
                 'Tanker %(tanker)s is not assigned to %(driver)s, so its trip '
-                'volume cannot be used without a dispatcher checking it.',
+                'volume cannot be used without a supervisor checking it.',
                 tanker=vehicle.sudo().display_name,
                 driver=(driver or own).sudo().name or _('you'))
         return None
@@ -362,9 +398,17 @@ class StockPicking(models.Model):
                 'issues delivery notes at the client\'s site.'
             )
         radius = picking_type.x_location_radius_m or 300
-        # A client nobody has located yet stays reachable -- otherwise
-        # enforcement would lock out every site until somebody surveys it, and
-        # the surveying is done BY issuing notes there.
+        # Enforce means the location is the gate (Oct 2026): a client nobody
+        # has located is not reachable at all. The driver sends a pin from the
+        # site and a dispatcher approves it -- see ksw.water.location.request.
+        # (Until then the surveying was done by issuing notes there; that is
+        # exactly what this rule now forbids.)
+        if not (partner.partner_latitude or partner.partner_longitude):
+            return distance, _(
+                '%(client)s has no approved location yet. Send the location '
+                'from the client\'s site and wait for the office to approve it.',
+                client=partner.display_name,
+            )
         if distance is not None and distance > radius:
             return distance, _(
                 'Issued %(distance)d m from %(client)s; this branch allows '
@@ -424,6 +468,8 @@ class StockPicking(models.Model):
             picking_type, partner, latitude, longitude)
 
         if location_problem and location_mode == 'raise':
+            if not (partner.sudo().partner_latitude or partner.sudo().partner_longitude):
+                raise UserError(location_problem)
             if not (latitude and longitude):
                 raise UserError(_(
                     'This branch issues delivery notes at the client\'s site, so '
@@ -490,7 +536,7 @@ class StockPicking(models.Model):
         if len(picking) != 1:
             raise UserError(_(
                 'Expected exactly one delivery for this order, got %s. Ask a '
-                'dispatcher to check the warehouse configuration.', len(picking),
+                'supervisor to check the warehouse configuration.', len(picking),
             ))
 
         # Re-home the delivery onto the branch's own operation type. Core's

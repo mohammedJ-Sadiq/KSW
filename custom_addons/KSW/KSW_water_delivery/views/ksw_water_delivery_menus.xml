@@ -4,10 +4,31 @@
     <!-- A top-level app of its own: a driver's phone should open on this and
          nothing else. Note every menuitem below repeats parent= and name=
          (KSW gotcha #1). -->
+    <!-- What the app opens on. Without it Odoo opens the first child, New
+         Delivery: a dialog (target new) over an empty page, full screen on a
+         phone, so a supervisor never saw the menu bar behind it. A driver
+         still lands straight in the form; anyone who oversees lands in the
+         notes list with the whole menu. -->
+    <record id="action_water_delivery_home" model="ir.actions.server">
+        <field name="name">Water Delivery</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="state">code</field>
+        <field name="group_ids" eval="[(6, 0, [ref('KSW_water_delivery.group_water_driver'), ref('KSW_water_delivery.group_water_dispatcher'), ref('KSW_water_delivery.group_water_billing')])]"/>
+        <field name="code">
+oversees = (env.user.has_group('KSW_water_delivery.group_water_dispatcher')
+            or env.user.has_group('KSW_water_delivery.group_water_billing'))
+action = env['ir.actions.act_window']._for_xml_id(
+    'KSW_water_delivery.action_water_delivery_all_notes' if oversees
+    else 'KSW_water_delivery.action_water_delivery_wizard')
+        </field>
+    </record>
+
     <menuitem id="menu_water_delivery_root"
               name="Water Delivery"
+              action="action_water_delivery_home"
+              web_icon="KSW_water_delivery,static/description/icon.png"
               sequence="47"
-              groups="KSW_water_delivery.group_water_driver,KSW_water_delivery.group_water_billing"/>
+              groups="KSW_water_delivery.group_water_driver,KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing"/>
 
     <menuitem id="menu_water_delivery_new"
               name="New Delivery"
@@ -39,6 +60,25 @@
               action="action_water_captures"
               sequence="40"
               groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing"/>
+
+    <!-- Also day-to-day work: under the enforce rule a client with no
+         approved location cannot receive a note, so a pending one is a
+         driver waiting to deliver. -->
+    <menuitem id="menu_water_delivery_locations"
+              name="Client Locations"
+              parent="menu_water_delivery_root"
+              action="action_water_location_requests"
+              sequence="45"
+              groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing"/>
+
+    <!-- Who drives which tanker. The app fetches the tanker from here and
+         never lets the driver choose, so this is dispatch's daily lever. -->
+    <menuitem id="menu_water_delivery_tankers"
+              name="Tankers"
+              parent="menu_water_delivery_root"
+              action="action_water_tankers"
+              sequence="47"
+              groups="KSW_water_delivery.group_water_dispatcher"/>
 
     <!-- Month end. -->
     <menuitem id="menu_water_delivery_invoice"

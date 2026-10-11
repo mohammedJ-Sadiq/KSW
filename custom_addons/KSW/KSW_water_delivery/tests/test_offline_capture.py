@@ -37,9 +37,11 @@ class OfflineCaptureCommon(WaterDeliveryCommon):
                 cls.env.ref('KSW_water_delivery.group_water_dispatcher').id,
             ])],
         })
-        cls.env['hr.employee'].create({
+        supervisor = cls.env['hr.employee'].create({
             'name': 'Dispatch Desk', 'user_id': cls.dispatcher_user.id,
         })
+        # A supervisor sees his team only (hr.employee.parent_id).
+        (cls.driver | cls.other_driver).write({'parent_id': supervisor.id})
         cls.Capture = cls.env['ksw.water.capture'].sudo()
 
     def _payload(self, **extra):
@@ -217,13 +219,17 @@ class TestLocationHold(OfflineCaptureCommon):
         self.assertEqual(capture.state, 'held')
         self.assertIn('No position', capture.hold_reason)
 
-    def test_an_unlocated_client_stays_reachable(self):
-        """Enforcement must not lock out every site until somebody surveys it
-        -- the surveying is done BY issuing notes there."""
+    def test_an_unlocated_client_is_held_and_cannot_be_accepted(self):
+        """The phone refuses at the gate; this is the stale-phone case, where
+        a capture arrives anyway. It is held (never lost), and accepting it is
+        not a way round the missing location."""
         self.picking_type.x_location_rule = 'enforce'
         self.assertFalse(self.customer.partner_latitude)
         capture = self._receive(gps_latitude=FAR[0], gps_longitude=FAR[1])
-        self.assertEqual(capture.state, 'issued')
+        self.assertEqual(capture.state, 'held')
+        self.assertIn('no approved location', capture.hold_reason)
+        with self.assertRaisesRegex(UserError, 'Approve its location first'):
+            capture.with_user(self.dispatcher_user).action_accept()
 
     def test_the_pilot_branch_issues_everything(self):
         """While the branch is only recording positions rather than enforcing

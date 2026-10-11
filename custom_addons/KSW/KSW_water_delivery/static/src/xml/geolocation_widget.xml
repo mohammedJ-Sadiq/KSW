@@ -30,4 +30,30 @@
         </div>
     </t>
 
+    <t t-name="KSW_water_delivery.ClientLocationPin">
+        <div t-if="applies and (needsPin or isPending)" class="o_ksw_client_pin alert mb-2"
+             t-att-class="isPending ? 'alert-info' : 'alert-warning'" role="alert">
+            <t t-if="isPending">
+                <i class="fa fa-clock-o me-1"/>
+                Location sent: waiting for the office to approve it. You can issue a
+                note for this client once it is approved.
+            </t>
+            <t t-else="">
+                <div class="mb-2">
+                    <i class="fa fa-exclamation-triangle me-1"/>
+                    This client has no approved location yet, so no note can be issued.
+                </div>
+                <button type="button" class="btn btn-primary"
+                        t-att-disabled="state.busy" t-on-click="onSend">
+                    <t t-if="state.busy">
+                        <i class="fa fa-spinner fa-spin me-1"/>Getting an accurate fix<t t-if="state.accuracy"> (±<t t-esc="state.accuracy"/> m)</t>…
+                    </t>
+                    <t t-else="">
+                        <i class="fa fa-map-marker me-1"/>Send my location for this client
+                    </t>
+                </button>
+            </t>
+        </div>
+    </t>
+
 </templates>

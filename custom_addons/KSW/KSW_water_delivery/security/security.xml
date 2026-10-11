@@ -33,11 +33,15 @@
     </record>
 
     <record id="group_water_dispatcher" model="res.groups">
-        <field name="name">Dispatcher</field>
+        <field name="name">Supervisor</field>
         <field name="sequence">2</field>
         <field name="privilege_id" ref="privilege_water_delivery"/>
-        <field name="implied_ids" eval="[(4, ref('base.group_user')), (4, ref('group_water_driver'))]"/>
-        <field name="comment">Sees every water delivery note and can issue one on a driver's behalf.</field>
+        <!-- (6, 0, ...) and not (4, ...): it used to imply Driver as well, and an
+             implication a file stops declaring lives on in the database (KSW
+             gotcha #3). A supervisor reviews; he does not issue notes, so he
+             must not inherit New Delivery / My Deliveries. -->
+        <field name="implied_ids" eval="[(6, 0, [ref('base.group_user')])]"/>
+        <field name="comment">Supervises the drivers: sees every delivery note, accepts offline deliveries, approves client locations, and assigns tankers and each driver's clients. Does not issue notes.</field>
     </record>
 
     <record id="group_water_billing" model="res.groups">
@@ -70,13 +74,20 @@
         <field name="perm_unlink" eval="False"/>
     </record>
 
-    <!-- The dispatcher's rule ORs with the driver's (he holds both groups), so
-         he reaches every water note plus his own. -->
+    <!-- A supervisor sees his TEAM: drivers who report to him, directly or up
+         to three levels down (hr.employee.parent_id). System administrators
+         see every driver.
+
+         Explicit levels rather than child_of on purpose: ir.rule domains are
+         ormcached per user, and child_of on hr.employee (no parent_store) is
+         resolved to a list of ids at that point, so a driver newly put under
+         a supervisor would stay invisible until the cache happened to clear.
+         A dotted path stays a live subquery. -->
     <record id="rule_water_picking_dispatcher" model="ir.rule">
-        <field name="name">Water delivery notes: all (dispatcher)</field>
+        <field name="name">Water delivery notes: his team (supervisor)</field>
         <field name="model_id" ref="stock.model_stock_picking"/>
         <field name="groups" eval="[(4, ref('group_water_dispatcher'))]"/>
-        <field name="domain_force">[('x_is_water_delivery', '=', True)]</field>
+        <field name="domain_force">[('x_is_water_delivery', '=', True)] + ([(1, '=', 1)] if user.has_group('base.group_system') else ['|', '|', ('x_driver_id.parent_id.user_id', '=', user.id), ('x_driver_id.parent_id.parent_id.user_id', '=', user.id), ('x_driver_id.parent_id.parent_id.parent_id.user_id', '=', user.id)])</field>
         <field name="perm_read" eval="True"/>
         <field name="perm_write" eval="True"/>
         <field name="perm_create" eval="False"/>
@@ -103,10 +114,23 @@
     </record>
 
     <record id="rule_water_capture_dispatcher" model="ir.rule">
-        <field name="name">Offline deliveries: all (dispatcher)</field>
+        <field name="name">Offline deliveries: his team (supervisor)</field>
         <field name="model_id" ref="model_ksw_water_capture"/>
         <field name="groups" eval="[(4, ref('group_water_dispatcher'))]"/>
-        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="domain_force">[(1, '=', 1)] if user.has_group('base.group_system') else ['|', '|', ('driver_id.parent_id.user_id', '=', user.id), ('driver_id.parent_id.parent_id.user_id', '=', user.id), ('driver_id.parent_id.parent_id.parent_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Client locations his team's drivers sent. Billing has no rule on
+         this model, so it keeps reading all of them. -->
+    <record id="rule_water_location_request_dispatcher" model="ir.rule">
+        <field name="name">Client locations: his team (supervisor)</field>
+        <field name="model_id" ref="model_ksw_water_location_request"/>
+        <field name="groups" eval="[(4, ref('group_water_dispatcher'))]"/>
+        <field name="domain_force">[(1, '=', 1)] if user.has_group('base.group_system') else ['|', '|', ('employee_id.parent_id.user_id', '=', user.id), ('employee_id.parent_id.parent_id.user_id', '=', user.id), ('employee_id.parent_id.parent_id.parent_id.user_id', '=', user.id)]</field>
         <field name="perm_read" eval="True"/>
         <field name="perm_write" eval="True"/>
         <field name="perm_create" eval="False"/>

@@ -74,6 +74,8 @@ class TestPeriodLock(TransactionCase):
         # Approve as the department's GM: approval is per department now, so
         # the acting user has to be one.
         run.with_user(self.gm).sudo().action_approve()
+        # Approval no longer locks the month (Oct 2026); finalising does.
+        run.sudo().action_close_month()
         return run, batch
 
     # ------------------------------------------------------------------

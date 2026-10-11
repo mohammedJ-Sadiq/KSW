@@ -43,6 +43,26 @@ class BankFileExportWizard(models.TransientModel):
         'res.partner',
         compute='_compute_company_partner_id',
     )
+    # Changes held back by the bank freeze (models/payslip_bank_freeze.py):
+    # shown before exporting again, and acknowledged, because this file
+    # will NOT carry them.
+    pending_change_count = fields.Integer(
+        compute='_compute_pending_changes')
+    pending_change_summary = fields.Text(
+        compute='_compute_pending_changes')
+    confirm_pending = fields.Boolean(
+        string='Export without the pending changes')
+
+    @api.depends('payslip_run_id')
+    def _compute_pending_changes(self):
+        for wiz in self:
+            pending = wiz.payslip_run_id._ksw_pending_changes()
+            wiz.pending_change_count = len(pending)
+            wiz.pending_change_summary = '\n'.join(
+                '%s: %s → %s' % (p.employee_id.name,
+                                 '{:,.2f}'.format(p.net_current),
+                                 '{:,.2f}'.format(p.net_after))
+                for p in pending)
 
     @api.depends('payslip_run_id')
     def _compute_company_partner_id(self):
@@ -225,6 +245,14 @@ class BankFileExportWizard(models.TransientModel):
     def action_export(self):
         """Generate and download bank files based on the selected mode."""
         self.ensure_one()
+        if self.payslip_run_id._ksw_pending_changes() \
+                and not self.confirm_pending:
+            raise UserError(_(
+                'This batch has changes waiting behind the bank freeze, and '
+                'this file will not include them:\n%(rows)s\n\nApply them '
+                'first (Pending Changes on the batch), or tick "Export '
+                'without the pending changes".',
+                rows=self.pending_change_summary))
         # A vacation / EOS approved after generation leaves a slip the batch
         # would no longer generate; it must not reach the file.
         self.payslip_run_id._ksw_drop_superseded_slips()
@@ -236,7 +264,26 @@ class BankFileExportWizard(models.TransientModel):
             'specific_txt': self._export_specific_txt,
             'journal_entry': self._export_journal_entry,
         }
-        return handler[mode]()
+        result = handler[mode]()
+        # Only once the file exists: from here its figures are a payment.
+        self.payslip_run_id._ksw_stamp_bank_export(self._exported_slips())
+        return result
+
+    def _exported_slips(self):
+        """The payslips the file just generated carries (by paying account).
+
+        Only the text files freeze: they are what is uploaded to the bank.
+        An Excel export is a review copy, and the journal entry is a
+        posting, so neither freezes anything.
+        """
+        Payslip = self.env['hr.payslip']
+        if self.export_mode not in ('all_txt', 'specific_txt'):
+            return Payslip
+        groups = self.payslip_run_id._group_slips_by_bank_account()
+        groups.pop(self.env['res.partner.bank'], None)
+        if self.export_mode == 'specific_txt':
+            return groups.get(self.bank_account_id, Payslip)
+        return Payslip.concat(*groups.values()) if groups else Payslip
 
     def _export_journal_entry(self):
         """The batch as one BAS journal entry, ready to import.

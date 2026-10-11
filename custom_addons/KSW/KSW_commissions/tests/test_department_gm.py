@@ -3,9 +3,9 @@
 `ksw.pay.run.action_approve` used to be one atomic act over every submitted
 department: approve them all, build the register, lock the month. That only
 made sense while one GM answered for the whole company. It now approves the
-caller's own departments; the month finalises by itself once nothing is
-left waiting, and a deliberate `action_close_month` handles the case where
-a department's GM never signs.
+caller's own departments. The month never finalises by itself (Oct 2026):
+the company GM finalises it with `action_close_month`, which also handles
+the case where a department's GM never signs.
 
 The last two tests are the ones that matter most: a department whose GM
 never approved must NOT be paid when the month is closed, and the register
@@ -120,14 +120,14 @@ class TestCommissionDepartmentGm(SubmissionCommon):
             run.state, 'approved',
             'the month must wait for the other department\'s GM')
 
-    def test_the_month_finalises_once_no_department_is_left_waiting(self):
+    def test_the_month_stays_open_once_no_department_is_left_waiting(self):
         sub_a = self._submit(self.sup_a, self.dept_a, self.emp_a)
         sub_b = self._submit(self.sup_b, self.dept_b, self.emp_b)
         run = sub_a.run_id
         run.with_user(self.gm_a).sudo().action_approve()
         run.with_user(self.user_gm_b).sudo().action_approve()
         self.assertEqual(sub_b.state, 'approved')
-        self.assertEqual(run.state, 'approved')
+        self.assertNotIn(run.state, ('approved', 'paid'))
 
     def test_a_gm_with_nothing_waiting_is_told_who_is_holding_it_up(self):
         self._submit(self.sup_a, self.dept_a, self.emp_a)

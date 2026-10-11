@@ -9,7 +9,99 @@
             <xpath expr="//field[@name='driver_name']" position="after">
                 <field name="x_picking_type_id"
                        groups="KSW_water_delivery.group_water_dispatcher"/>
+                <field name="x_driver_client_ids" widget="many2many_tags"
+                       options="{'no_create': True}"
+                       context="{'res_partner_search_mode': 'customer'}"
+                       readonly="not driver_id"
+                       placeholder="Leave empty to use the branch's client list"
+                       groups="KSW_water_delivery.group_water_dispatcher"/>
             </xpath>
+        </field>
+    </record>
+
+    <!-- Water Delivery > Tankers: where dispatch assigns drivers.
+
+         Editable in the list on purpose: setting up 370 vehicles one form at
+         a time is the job nobody would finish. Only the columns that are
+         dispatch's are editable, and `ksw.fleet.vehicle.write` enforces the
+         same ones for a user without HR rights, since a list's `readonly` is
+         cosmetic against an RPC. The Clients column is the DRIVER's list:
+         saved onto him, and it follows him to another tanker. -->
+    <record id="view_water_tanker_list" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.list.water.tankers</field>
+        <field name="model">ksw.fleet.vehicle</field>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" create="0" delete="0"
+                  decoration-muted="not driver_id">
+                <field name="name" readonly="1"/>
+                <field name="vehicle_type" readonly="1"/>
+                <field name="plate_number" readonly="1"/>
+                <!-- Two Driver columns, one per audience: a supervisor picks only
+                     from his team (the same reach as the record rules and
+                     `_water_check_team`); an administrator from everyone. -->
+                <field name="driver_id" string="Driver"
+                       groups="!base.group_system"
+                       domain="['|', '|', ('parent_id.user_id', '=', uid), ('parent_id.parent_id.user_id', '=', uid), ('parent_id.parent_id.parent_id.user_id', '=', uid)]"
+                       options="{'no_create': True, 'no_open': True}"/>
+                <field name="driver_id" string="Driver"
+                       groups="base.group_system"
+                       options="{'no_create': True, 'no_open': True}"/>
+                <field name="x_picking_type_id" string="Branch"
+                       options="{'no_create': True, 'no_open': True}"/>
+                <field name="x_driver_client_ids" string="Clients"
+                       widget="many2many_tags"
+                       options="{'no_create': True}"
+                       context="{'res_partner_search_mode': 'customer'}"
+                       readonly="not driver_id"/>
+                <field name="x_capacity_m3"/>
+                <field name="state" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_water_tanker_search" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.search.water.tankers</field>
+        <field name="model">ksw.fleet.vehicle</field>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Fleet No."/>
+                <field name="plate_number"/>
+                <field name="driver_id" string="Driver"/>
+                <filter name="no_driver" string="No Driver" domain="[('driver_id', '=', False)]"/>
+                <filter name="has_driver" string="Assigned" domain="[('driver_id', '!=', False)]"/>
+                <separator/>
+                <filter name="no_branch" string="No Branch" domain="[('x_picking_type_id', '=', False)]"/>
+                <filter name="no_capacity" string="No Trip Volume" domain="[('x_capacity_m3', '=', 0)]"/>
+                <separator/>
+                <filter name="trailer" string="Trailers" domain="[('vehicle_type', '=', 'trailer')]"/>
+                <filter name="isuzu" string="Isuzu" domain="[('vehicle_type', '=', 'isuzu')]"/>
+                <separator/>
+                <filter name="group_branch" string="Branch" context="{'group_by': 'x_picking_type_id'}"/>
+                <filter name="group_type" string="Type" context="{'group_by': 'vehicle_type'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_water_tankers" model="ir.actions.act_window">
+        <field name="name">Tankers</field>
+        <field name="res_model">ksw.fleet.vehicle</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_water_tanker_list"/>
+        <field name="search_view_id" ref="view_water_tanker_search"/>
+        <!-- The company's own vehicles: KSW_fleet also holds workshop
+             clients' vehicles, which no driver of ours delivers in. -->
+        <field name="domain">[('x_is_own_vehicle', '=', True), ('state', '=', 'confirmed')]</field>
+        <!-- Assigning a driver here MOVES him off his previous tanker. -->
+        <field name="context">{'ksw_water_tanker_assign': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">No tankers.</p>
+            <p>Pick a driver in the Driver column to assign him. Each driver
+               drives one tanker: assigning him here moves him off the one he
+               had. The Water app uses this tanker automatically.</p>
+            <p>The Clients column is the driver's usual client list. Leave it
+               empty and he sees every client his branch serves.</p>
         </field>
     </record>
 

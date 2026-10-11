@@ -475,12 +475,17 @@ class TestApproval(SubmissionCommon):
         self.assertEqual(run.line_ids.mapped('employee_id'), self.emp_a)
         self.assertFalse(run.line_ids.is_preview)
 
-    def test_30b_the_month_locks_itself_once_all_are_approved(self):
+    def test_30b_the_month_never_locks_itself(self):
+        """KSWCO September 2026: every department with entries approved,
+        two more still preparing — the month locked under them. Approval
+        never finalises now; only the company GM's close does."""
         mine = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)
         yours = self._filled_batch(self.sup_b, self.dept_b, self.emp_b)
         run = self._submit(mine)
         yours.submission_id.with_user(self.sup_b).action_submit()
         run.with_user(self.gm).action_approve()
+        self.assertNotIn(run.state, ('approved', 'paid'))
+        run.sudo().action_close_month()
         self.assertEqual(run.state, 'approved')
 
     def test_31_nothing_handed_over_means_nothing_to_approve(self):
@@ -499,6 +504,7 @@ class TestApproval(SubmissionCommon):
         batch = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)
         run = self._submit(batch)
         run.with_user(self.gm).action_approve()
+        run.sudo().action_close_month()
 
         run.sudo().action_reopen()
 
@@ -514,6 +520,7 @@ class TestApproval(SubmissionCommon):
         batch = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)
         run = self._submit(batch)
         run.with_user(self.gm).action_approve()
+        run.sudo().action_close_month()
         self.assertEqual(run.state, 'approved')
         admin = self._user('sub_sysadmin', 'KSW_commissions.group_commission_gm')
         admin.sudo().write({

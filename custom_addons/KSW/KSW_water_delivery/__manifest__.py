@@ -1,6 +1,6 @@
 {
     'name': 'KSW Water Delivery Notes',
-    'version': '19.0.1.10.1',
+    'version': '19.0.1.14.0',
     'summary': 'Issue the water delivery note at the client, online or off',
     'description': """
 Water Delivery Notes
@@ -60,11 +60,13 @@ accounting the finished list.
         'views/account_move_views.xml',
         'views/ksw_fleet_vehicle_views.xml',
         'views/ksw_water_capture_views.xml',
+        'views/ksw_water_location_request_views.xml',
         'views/ksw_water_delivery_menus.xml',
     ],
     'assets': {
         'web.assets_backend': [
             'KSW_water_delivery/static/src/js/geolocation_widget.js',
+            'KSW_water_delivery/static/src/js/client_location_pin.js',
             'KSW_water_delivery/static/src/js/driver_kiosk.js',
             'KSW_water_delivery/static/src/scss/driver_kiosk.scss',
             'KSW_water_delivery/static/src/xml/geolocation_widget.xml',

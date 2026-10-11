@@ -591,11 +591,11 @@ msgstr "اعتماد أقسامي"
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
 msgid ""
-"Approve the departments you are General Manager of? The month locks itself "
-"once no department is left waiting."
+"Approve the departments you are General Manager of? The month stays open "
+"until the company General Manager finalises it."
 msgstr ""
-"هل تعتمد الأقسام التي أنت مديرها العام؟ يُقفَل الشهر تلقائيًا حالما لا يبقى "
-"قسم منتظِر."
+"هل تعتمد الأقسام التي أنت مديرها العام؟ يبقى الشهر مفتوحًا حتى يعتمده "
+"المدير العام للشركة نهائيًا."
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_form

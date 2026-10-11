@@ -6,16 +6,17 @@ from odoo.exceptions import AccessError, UserError
 from odoo.http import request
 from odoo.tools.misc import file_path
 
+from ..models.res_partner import PIN_MAX_ACCURACY_M
+
 _logger = logging.getLogger(__name__)
 
 DRIVER_GROUP = 'KSW_water_delivery.group_water_driver'
-DISPATCHER_GROUP = 'KSW_water_delivery.group_water_dispatcher'
 
 # Bumped whenever the shell or the cached asset list changes. The service
 # worker keys its cache on it, so a bump is how a driver's phone picks up a new
 # version of the app -- there is no other route in, because the whole point is
 # that it does not go to the network to find out.
-APP_VERSION = '1.0.2'
+APP_VERSION = '1.0.5'
 
 
 class KswWaterApp(http.Controller):
@@ -103,8 +104,8 @@ class KswWaterApp(http.Controller):
     # ------------------------------------------------------------------
     def _check_driver(self):
         user = request.env.user
-        if not (user.has_group(DRIVER_GROUP) or user.has_group(DISPATCHER_GROUP)):
-            raise AccessError(_('You are not allowed to issue water delivery notes.'))
+        if not user.has_group(DRIVER_GROUP):
+            raise AccessError(_('Only drivers can issue water delivery notes.'))
         employee = user.sudo().employee_id
         if not employee:
             raise UserError(_(
@@ -127,8 +128,8 @@ class KswWaterApp(http.Controller):
         Picking = env['stock.picking'].sudo()
         Rate = env['ksw.water.rate'].sudo()
 
-        vehicle = env['ksw.fleet.vehicle'].sudo().search(
-            [('driver_id', '=', employee.id), ('state', '=', 'confirmed')], limit=1)
+        # Fetched from the fleet assignment, never offered as a choice.
+        vehicle, vehicle_problem = Picking._water_assigned_vehicle(employee)
         picking_type = Picking._water_picking_type_for(vehicle)
         normal, rated = Picking._water_client_scope(employee, picking_type)
 
@@ -146,12 +147,17 @@ class KswWaterApp(http.Controller):
             })
 
         normal_ids = set(normal.ids)
+        # So the phone can say "sent, waiting for the office" instead of
+        # offering the button again to the next driver at the same gate.
+        pending_ids = env['ksw.water.location.request'].sudo()._pending_partner_ids(
+            rated.ids)
         clients = [{
             'id': partner.id,
             'name': partner.display_name,
             'lat': partner.partner_latitude or 0.0,
             'lon': partner.partner_longitude or 0.0,
             'usual': partner.id in normal_ids,
+            'location_pending': partner.id in pending_ids,
             'products': by_partner.get(partner.id, []),
         } for partner in rated.sudo() if by_partner.get(partner.id)]
         clients.sort(key=lambda c: (not c['usual'], c['name']))
@@ -165,11 +171,15 @@ class KswWaterApp(http.Controller):
                 'name': vehicle.display_name,
                 'capacity_m3': vehicle.x_capacity_m3 or 0.0,
             } if vehicle else None,
+            # Shown instead of the form: with no (or an ambiguous) tanker the
+            # phone has nothing to issue on, and only dispatch can fix it.
+            'vehicle_problem': vehicle_problem or '',
             'rules': {
                 'branch': picking_type.x_branch_code or '',
                 'signature_required': bool(picking_type.x_signature_required),
                 'location_rule': picking_type.x_location_rule or 'capture',
                 'radius_m': picking_type.x_location_radius_m or 300,
+                'pin_max_accuracy_m': PIN_MAX_ACCURACY_M,
             },
             'clients': clients,
             'server_time': request.env['ksw.water.capture'].sudo()._now_iso(),
@@ -226,6 +236,14 @@ class KswWaterApp(http.Controller):
                     'settled': False,
                 })
         return {'results': results}
+
+    @http.route('/water/pin', type='jsonrpc', auth='user')
+    def water_pin(self, pins=None, **kwargs):
+        """Client locations the driver sent from the site. Each one becomes a
+        request a dispatcher approves; none writes the client's location."""
+        employee = self._check_driver()
+        return {'results': request.env['res.partner'].sudo()._water_receive_pins(
+            pins or [], employee)}
 
     @http.route('/water/recent', type='jsonrpc', auth='user')
     def water_recent(self, limit=20, **kwargs):

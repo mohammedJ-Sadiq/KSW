@@ -1,10 +1,11 @@
+import uuid
+
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 from ..models.stock_picking import haversine_m
 
 DRIVER_GROUP = 'KSW_water_delivery.group_water_driver'
-DISPATCHER_GROUP = 'KSW_water_delivery.group_water_dispatcher'
 
 
 class KswWaterDeliveryWizard(models.TransientModel):
@@ -45,7 +46,11 @@ class KswWaterDeliveryWizard(models.TransientModel):
     )
     note = fields.Char(string='Remark')
 
-    # --- filled in for him, but visible so he can correct a swapped truck --
+    # --- filled in for him, never chosen by him ---------------------------
+    # The tanker comes from the fleet assignment (see
+    # `stock.picking._water_assigned_vehicle`): it decides the trip volume and
+    # the branch, so a driver choosing it would be choosing those. A swapped
+    # truck is fixed by dispatch on the fleet record, not on the note.
     driver_id = fields.Many2one(
         'hr.employee', string='Driver', required=True,
         default=lambda self: self._default_driver_id(),
@@ -97,6 +102,15 @@ class KswWaterDeliveryWizard(models.TransientModel):
 
     picking_id = fields.Many2one('stock.picking', string='Delivery Note', readonly=True)
 
+    # Whether the chosen client can receive a note under the enforce rule, and
+    # if not, whether the driver can do anything about it right now. Sudo: a
+    # driver has no access to location requests, only to this answer.
+    partner_location_state = fields.Selection(
+        [('located', 'Located'), ('pending', 'Waiting for approval'),
+         ('missing', 'No location')],
+        compute='_compute_partner_location_state', compute_sudo=True,
+    )
+
     # --- defaults ---------------------------------------------------------
     @api.model
     def _default_driver_id(self):
@@ -107,11 +121,7 @@ class KswWaterDeliveryWizard(models.TransientModel):
     @api.model
     def _default_vehicle_id(self):
         employee = self.env.user.sudo().employee_id
-        if not employee:
-            return False
-        return self.env['ksw.fleet.vehicle'].sudo().search(
-            [('driver_id', '=', employee.id), ('state', '=', 'confirmed')], limit=1,
-        )
+        return self.env['stock.picking']._water_assigned_vehicle(employee)[0]
 
     # --- what he may pick -------------------------------------------------
     @api.depends('gps_latitude', 'gps_longitude', 'show_all_clients',
@@ -171,6 +181,42 @@ class KswWaterDeliveryWizard(models.TransientModel):
             products = Rate._products_for_partner(wizard.partner_id)
             wizard.allowed_product_ids = products
             wizard.product_locked = len(products) == 1
+
+    @api.depends('partner_id')
+    def _compute_partner_location_state(self):
+        Request = self.env['ksw.water.location.request']
+        pending = Request._pending_partner_ids(self.partner_id._origin.ids)
+        for wizard in self:
+            partner = wizard.partner_id._origin
+            if not partner:
+                wizard.partner_location_state = False
+            elif partner.partner_latitude or partner.partner_longitude:
+                wizard.partner_location_state = 'located'
+            elif partner.id in pending:
+                wizard.partner_location_state = 'pending'
+            else:
+                wizard.partner_location_state = 'missing'
+
+    @api.model
+    def action_send_client_location(self, partner_id, latitude, longitude, accuracy):
+        """The 📍 button on this form: the same request the offline app sends
+        (`res.partner._water_receive_pins`), so the rules -- scope, accuracy,
+        one pending request per gate -- live in one place."""
+        user = self.env.user
+        if not user.has_group(DRIVER_GROUP):
+            raise UserError(_('You are not allowed to send client locations.'))
+        employee = user.sudo().employee_id
+        if not employee:
+            raise UserError(_(
+                'Your user account is not linked to an employee record. Ask HR '
+                'to link them.'))
+        [result] = self.env['res.partner'].sudo()._water_receive_pins([{
+            'uuid': 'form-%s' % uuid.uuid4(),
+            'partner_id': partner_id,
+            'latitude': latitude, 'longitude': longitude, 'accuracy': accuracy,
+            'captured_at': fields.Datetime.to_string(fields.Datetime.now()),
+        }], employee)
+        return result
 
     @api.depends('vehicle_id')
     def _compute_branch_rules(self):
@@ -275,19 +321,20 @@ class KswWaterDeliveryWizard(models.TransientModel):
         if self.env.su:
             return
         user = self.env.user
-        is_dispatcher = user.has_group(DISPATCHER_GROUP)
-        if not (is_dispatcher or user.has_group(DRIVER_GROUP)):
-            raise UserError(_('You are not allowed to issue water delivery notes.'))
-        if not is_dispatcher:
-            employee = user.sudo().employee_id
-            if not employee:
-                raise UserError(_(
-                    'Your user account is not linked to an employee record, so '
-                    'the delivery note cannot record who delivered it. Ask HR '
-                    'to link them.'
-                ))
-            if self.driver_id != employee:
-                raise UserError(_('A driver can only record his own deliveries.'))
+        # Drivers only: a supervisor reviews notes, he does not issue them --
+        # not even on a driver's behalf. Held offline deliveries are accepted
+        # through `ksw.water.capture`, which does not come through here.
+        if not user.has_group(DRIVER_GROUP):
+            raise UserError(_('Only drivers can issue water delivery notes.'))
+        employee = user.sudo().employee_id
+        if not employee:
+            raise UserError(_(
+                'Your user account is not linked to an employee record, so '
+                'the delivery note cannot record who delivered it. Ask HR '
+                'to link them.'
+            ))
+        if self.driver_id != employee:
+            raise UserError(_('A driver can only record his own deliveries.'))
 
     # --- the one button ---------------------------------------------------
     def action_confirm(self):
@@ -299,6 +346,12 @@ class KswWaterDeliveryWizard(models.TransientModel):
                 'This delivery note has already been issued as %s.',
                 self.picking_id.name,
             ))
+
+        # Fetched again here rather than read off the form: a read-only field
+        # is cosmetic against an RPC that sends its own value (gotcha #15).
+        vehicle = self.env['stock.picking']._water_assigned_vehicle(self.driver_id)[0]
+        if vehicle != self.vehicle_id:
+            self.vehicle_id = vehicle
 
         # `location_mode='raise'`: the driver is standing in front of the
         # client, so a failed location check is something he can act on. The

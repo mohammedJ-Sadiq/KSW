@@ -505,8 +505,8 @@ msgstr ""
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
 msgid ""
-"Approve the departments you are General Manager of? The month locks itself "
-"once no department is left waiting."
+"Approve the departments you are General Manager of? The month stays open "
+"until the company General Manager finalises it."
 msgstr ""
 
 #. module: KSW_commissions

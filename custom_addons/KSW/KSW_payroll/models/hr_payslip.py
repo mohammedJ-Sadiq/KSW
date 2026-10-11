@@ -2358,7 +2358,10 @@ class HrPayslip(models.Model):
         overpaid = self.env['hr.payslip']
         notification = None
         if revisions:
-            revisions.compute_sheet()
+            # Unless it was already exported in a bank batch: then it is
+            # frozen like any other payslip (payslip_bank_freeze).
+            revisions.filtered(
+                lambda s: not s.x_bank_exported_date).compute_sheet()
             overpaid = revisions._overpaid_revisions()
             if overpaid:
                 notification = overpaid._handle_overpaid_revisions()
@@ -2367,7 +2370,8 @@ class HrPayslip(models.Model):
         if not payable:
             return notification
         computed = payable.filtered(
-            lambda s: s.line_ids and not s.x_is_revision)
+            lambda s: s.line_ids and (
+                not s.x_is_revision or s.x_bank_exported_date))
         net_before = {s.id: s._ksw_net_amount() for s in computed}
         res = True
         if payable - computed:

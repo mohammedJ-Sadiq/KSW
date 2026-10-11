@@ -22,6 +22,7 @@
                 <field name="gps_accuracy" invisible="1"/>
                 <field name="picking_id" invisible="1"/>
                 <field name="off_route" invisible="1"/>
+                <field name="partner_location_state" invisible="1"/>
 
                 <widget name="ksw_geolocation" invisible="location_rule == 'off'"/>
 
@@ -33,6 +34,9 @@
                     <!-- The way out of a narrowed list. One tick, and the note
                          records that it was issued off the usual route. -->
                     <field name="show_all_clients"/>
+                    <!-- Enforce: no approved location, no note. The driver's
+                         only move at such a gate is to send one for approval. -->
+                    <widget name="ksw_client_location_pin" colspan="2"/>
                     <div class="text-warning" colspan="2"
                          invisible="not off_route">
                         <i class="fa fa-exclamation-triangle me-1"/>
@@ -71,13 +75,15 @@
 
                 <group string="Trip" col="2">
                     <field name="driver_id" readonly="1" force_save="1"/>
-                    <field name="vehicle_id"/>
+                    <field name="vehicle_id" readonly="1" force_save="1"
+                           placeholder="No tanker assigned: ask your supervisor"/>
                     <field name="note" placeholder="Anything the client should see on the note"/>
                 </group>
 
                 <footer>
                     <button name="action_confirm" type="object" string="Issue Delivery Note"
-                            class="btn-primary" data-hotkey="q"/>
+                            class="btn-primary" data-hotkey="q"
+                            invisible="location_rule == 'enforce' and partner_id and partner_location_state != 'located'"/>
                     <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
                 </footer>
             </form>

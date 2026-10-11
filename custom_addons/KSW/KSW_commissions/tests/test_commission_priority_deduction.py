@@ -47,9 +47,17 @@ class CommissionPriorityCommon(SubmissionCommon):
                            quantity=1.0, amount_override=amount)
 
     def _approve(self, batch):
+        """Approve the department and finalise the month.
+
+        Approving the last department no longer locks the month (Oct 2026);
+        the company GM finalises it as a separate act, so these tests take
+        that step too. sudo() stands in for him: _is_month_closer exempts
+        env.su.
+        """
         batch.submission_id.sudo().action_submit()
         run = batch.submission_id.run_id
         run.with_user(self.gm).action_approve()
+        run.sudo().action_close_month()
         return run
 
 

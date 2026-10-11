@@ -1,6 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_water_delivery_wizard_driver,ksw.water.delivery.wizard.driver,model_ksw_water_delivery_wizard,group_water_driver,1,1,1,0
-access_water_delivery_wizard_dispatcher,ksw.water.delivery.wizard.dispatcher,model_ksw_water_delivery_wizard,group_water_dispatcher,1,1,1,1
+access_water_delivery_wizard_dispatcher,ksw.water.delivery.wizard.dispatcher,model_ksw_water_delivery_wizard,group_water_dispatcher,1,0,0,0
 access_water_picking_driver,stock.picking.water.driver,stock.model_stock_picking,group_water_driver,1,0,0,0
 access_water_picking_dispatcher,stock.picking.water.dispatcher,stock.model_stock_picking,group_water_dispatcher,1,1,0,0
 access_water_picking_billing,stock.picking.water.billing,stock.model_stock_picking,group_water_billing,1,0,0,0
@@ -16,3 +16,6 @@ access_water_capture_billing,ksw.water.capture.billing,model_ksw_water_capture,g
 access_water_invoice_wizard_billing,ksw.water.invoice.wizard.billing,model_ksw_water_invoice_wizard,group_water_billing,1,1,1,1
 access_water_invoice_wizard_line_billing,ksw.water.invoice.wizard.line.billing,model_ksw_water_invoice_wizard_line,group_water_billing,1,1,1,1
 access_water_revenue_account_billing,ksw.water.revenue.account.billing,model_ksw_water_revenue_account,group_water_billing,1,1,1,1
+access_water_location_request_dispatcher,ksw.water.location.request.dispatcher,model_ksw_water_location_request,group_water_dispatcher,1,1,0,0
+access_water_location_request_billing,ksw.water.location.request.billing,model_ksw_water_location_request,group_water_billing,1,0,0,0
+access_water_tanker_dispatcher,ksw.fleet.vehicle.water.dispatcher,KSW_fleet.model_ksw_fleet_vehicle,group_water_dispatcher,1,1,0,0
