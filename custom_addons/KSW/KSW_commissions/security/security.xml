@@ -85,6 +85,29 @@
     </record>
 
     <!--
+        The one exception to "one role each": a supervisor who is ALSO the
+        General Manager of a department (Equipment Rental: Taha manages it
+        and is named its GM). The roles are a single-select, and every save
+        of the user's Access Rights tab rewrites group_ids with one group
+        per privilege, so holding Supervisor and General Manager side by side
+        never survived: one of the two was silently dropped, and his
+        department's handovers reached him with no button to approve them.
+        Sequence 25 puts it after General Manager, so the dropdown shows it
+        (it picks the last held group in sequence order).
+        res.users._ksw_commission_sync_gm_role() assigns it automatically.
+    -->
+    <record id="group_commission_supervisor_gm" model="res.groups">
+        <field name="name">Supervisor &amp; General Manager</field>
+        <field name="sequence">25</field>
+        <field name="privilege_id" ref="privilege_commission_management"/>
+        <field name="implied_ids" eval="[(6, 0, [
+            ref('group_commission_supervisor'),
+            ref('group_commission_gm'),
+        ])]"/>
+        <field name="comment">For a department manager who is also named its General Manager: records his department's entries and approves its handover himself.</field>
+    </record>
+
+    <!--
         The Accountant no longer implies the Administrator tier. He used
         to, purely to borrow its [(1,'=',1)] rules, which also handed him
         the configuration catalog and the right to reopen an approved

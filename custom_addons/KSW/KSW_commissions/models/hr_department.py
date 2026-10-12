@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import models
+from odoo import api, models
 
 
 class HrDepartment(models.Model):
@@ -14,3 +14,10 @@ class HrDepartment(models.Model):
         return super()._ksw_gm_capability_groups() + [
             'KSW_commissions.group_commission_gm',
         ]
+
+    @api.model
+    def _ksw_grant_gm_capability(self, employees):
+        # A department manager named GM already holds Supervisor; GM next
+        # to it would not survive the next save of his user form.
+        super()._ksw_grant_gm_capability(employees)
+        employees.sudo().user_id._ksw_commission_sync_gm_role()

@@ -7124,3 +7124,15 @@ msgstr ""
 #. odoo-python
 msgid "%(component)s already has %(entries)s pay entries and %(recurring)s recurring entries recorded under its current calculation method, so the method cannot be changed: those records would be re-read in the new meaning and their amounts would change.\n\nCreate a new component with the calculation you want and archive this one. Its rate can still be changed — that only affects entries still in draft."
 msgstr ""
+
+#. module: KSW_commissions
+#: model:res.groups,name:KSW_commissions.group_commission_supervisor_gm
+msgid "Supervisor & General Manager"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:res.groups,comment:KSW_commissions.group_commission_supervisor_gm
+msgid ""
+"For a department manager who is also named its General Manager: records his "
+"department's entries and approves its handover himself."
+msgstr ""

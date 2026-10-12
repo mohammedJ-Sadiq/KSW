@@ -7581,3 +7581,17 @@ msgstr "إضافة"
 #. odoo-python
 msgid "%(component)s already has %(entries)s pay entries and %(recurring)s recurring entries recorded under its current calculation method, so the method cannot be changed: those records would be re-read in the new meaning and their amounts would change.\n\nCreate a new component with the calculation you want and archive this one. Its rate can still be changed — that only affects entries still in draft."
 msgstr "لدى %(component)s %(entries)s إدخال مستحقات و%(recurring)s إدخال متكرّر مسجّلة بطريقة الاحتساب الحالية، لذا لا يمكن تغيير طريقة الاحتساب: ستُقرأ هذه السجلات بالمعنى الجديد وستتغيّر مبالغها.\n\nأنشئ مكوّناً جديداً بطريقة الاحتساب المطلوبة وأرشف هذا المكوّن. لا يزال بالإمكان تغيير السعر — ويؤثر ذلك فقط على الإدخالات التي ما زالت مسودة."
+
+#. module: KSW_commissions
+#: model:res.groups,name:KSW_commissions.group_commission_supervisor_gm
+msgid "Supervisor & General Manager"
+msgstr "المشرف والمدير العام"
+
+#. module: KSW_commissions
+#: model:res.groups,comment:KSW_commissions.group_commission_supervisor_gm
+msgid ""
+"For a department manager who is also named its General Manager: records his "
+"department's entries and approves its handover himself."
+msgstr ""
+"لمدير القسم المعيَّن أيضاً مديراً عاماً له: يُدخل حركات قسمه ويعتمد تسليمه "
+"بنفسه."
