@@ -10,12 +10,17 @@
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">
                 <page name="water_delivery" string="Water Delivery"
-                      groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing">
+                      groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing,hr.group_hr_manager">
                     <group>
                         <field name="x_water_client_ids" widget="many2many_tags"
                                options="{'no_create': True}"
                                context="{'res_partner_search_mode': 'customer'}"
                                placeholder="Leave empty to use the branch's client list"/>
+                    </group>
+                    <group string="Supervisor" groups="hr.group_hr_manager">
+                        <field name="x_water_tanker_group_ids" widget="many2many_tags"
+                               options="{'no_create': True}"
+                               placeholder="Tanker groups this supervisor looks after"/>
                     </group>
                     <div class="text-muted">
                         Leave this empty and the driver sees every client his

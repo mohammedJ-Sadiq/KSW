@@ -22,3 +22,17 @@ class HrEmployee(models.Model):
         help='Leave empty to let this driver deliver to every client his '
              'branch serves. Fill it in to narrow him to these clients only.',
     )
+
+    # The tanker groups this supervisor looks after: Water Delivery > Tankers
+    # shows him those tankers and nothing else. `groups=` on purpose, unlike
+    # the client list above: only the Employees Administrator decides who
+    # supervises which vehicles, and field-level groups block the write as
+    # well as the read. Not stored on hr.employee (a relation table), so not
+    # in the hr.employee.public fetch set (gotcha #32).
+    x_water_tanker_group_ids = fields.Many2many(
+        'ksw.water.tanker.group', 'ksw_water_tanker_group_employee_rel',
+        'employee_id', 'group_id', string='Tanker Groups',
+        groups='hr.group_hr_manager',
+        help='Water Delivery > Tankers shows this supervisor only the tankers '
+             'in these groups.',
+    )

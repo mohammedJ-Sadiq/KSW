@@ -55,6 +55,8 @@
                        context="{'res_partner_search_mode': 'customer'}"
                        readonly="not driver_id"/>
                 <field name="x_capacity_m3"/>
+                <field name="x_tanker_group_ids" string="Groups" widget="many2many_tags"
+                       readonly="1" optional="show"/>
                 <field name="state" column_invisible="1"/>
             </list>
         </field>
@@ -80,6 +82,7 @@
                 <separator/>
                 <filter name="group_branch" string="Branch" context="{'group_by': 'x_picking_type_id'}"/>
                 <filter name="group_type" string="Type" context="{'group_by': 'vehicle_type'}"/>
+                <filter name="group_tanker_group" string="Tanker Group" context="{'group_by': 'x_tanker_group_ids'}"/>
             </search>
         </field>
     </record>
@@ -92,7 +95,9 @@
         <field name="search_view_id" ref="view_water_tanker_search"/>
         <!-- The company's own vehicles: KSW_fleet also holds workshop
              clients' vehicles, which no driver of ours delivers in. -->
-        <field name="domain">[('x_is_own_vehicle', '=', True), ('state', '=', 'confirmed')]</field>
+        <!-- ...and of those, the ones in this supervisor's tanker groups
+             (Employees > Configuration > Tanker Groups). Administrators see all. -->
+        <field name="domain">[('x_is_own_vehicle', '=', True), ('state', '=', 'confirmed'), ('x_in_my_tanker_groups', '=', True)]</field>
         <!-- Assigning a driver here MOVES him off his previous tanker. -->
         <field name="context">{'ksw_water_tanker_assign': True}</field>
         <field name="help" type="html">
@@ -100,6 +105,8 @@
             <p>Pick a driver in the Driver column to assign him. Each driver
                drives one tanker: assigning him here moves him off the one he
                had. The Water app uses this tanker automatically.</p>
+            <p>You see the tankers in your tanker groups. If one is missing,
+               ask the Employees administrator to add it to one of your groups.</p>
             <p>The Clients column is the driver's usual client list. Leave it
                empty and he sees every client his branch serves.</p>
         </field>

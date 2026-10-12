@@ -42,6 +42,11 @@ class OfflineCaptureCommon(WaterDeliveryCommon):
         })
         # A supervisor sees his team only (hr.employee.parent_id).
         (cls.driver | cls.other_driver).write({'parent_id': supervisor.id})
+        # ...and on Tankers, only the tankers in his tanker groups.
+        cls.tanker_group = cls.env['ksw.water.tanker.group'].create({
+            'name': 'Test Trailers', 'vehicle_ids': [(6, 0, cls.vehicle.ids)],
+            'supervisor_ids': [(6, 0, supervisor.ids)],
+        })
         cls.Capture = cls.env['ksw.water.capture'].sudo()
 
     def _payload(self, **extra):

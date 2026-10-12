@@ -26,6 +26,7 @@ class TestTankerAssignment(OfflineCaptureCommon):
         cls.clients_truck = Vehicle.create({
             'name': 'WS-1', 'client_id': cls.customer.id, 'state': 'confirmed',
         })
+        cls.tanker_group.vehicle_ids = [(4, cls.spare.id)]
         cls.no_login = cls.env['hr.employee'].create({
             'name': 'Yard Hand', 'parent_id': cls.driver.parent_id.id})
 

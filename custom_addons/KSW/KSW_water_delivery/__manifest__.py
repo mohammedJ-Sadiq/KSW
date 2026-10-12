@@ -1,6 +1,6 @@
 {
     'name': 'KSW Water Delivery Notes',
-    'version': '19.0.1.14.0',
+    'version': '19.0.1.15.0',
     'summary': 'Issue the water delivery note at the client, online or off',
     'description': """
 Water Delivery Notes
@@ -46,6 +46,7 @@ accounting the finished list.
         'views/ksw_water_rate_views.xml',
         'views/ksw_water_revenue_account_views.xml',
         'views/ksw_water_client_branch_views.xml',
+        'views/ksw_water_tanker_group_views.xml',
         'views/hr_employee_views.xml',
         # Before stock_picking_views.xml: the notes list and kanban carry a
         # header button `%(action_water_delivery_wizard)d`, and on a FRESH

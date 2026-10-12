@@ -3,7 +3,7 @@
 Driven as a dispatcher with NO HR rights -- the employee form, where the list
 used to be the only way in, is exactly what that user cannot open.
 """
-from odoo.exceptions import UserError
+from odoo.exceptions import AccessError, UserError
 from odoo.tests import tagged
 
 from .test_offline_capture import OfflineCaptureCommon
@@ -22,6 +22,7 @@ class TestTankerDriverClients(OfflineCaptureCommon):
             'name': 'T-600', 'client_id': cls.company.partner_id.id,
             'vehicle_type': 'trailer', 'state': 'confirmed',
         })
+        cls.tanker_group.vehicle_ids = [(4, cls.spare.id)]
 
     def _screen(self):
         action = self.env.ref('KSW_water_delivery.action_water_tankers')
@@ -127,6 +128,7 @@ class TestSupervisorTeamScope(OfflineCaptureCommon):
             'driver_id': cls.other_driver.id, 'x_capacity_m3': 32.0,
             'x_picking_type_id': cls.picking_type.id,
         })
+        cls.tanker_group.vehicle_ids = [(4, cls.their_tanker.id)]
         cls.my_note = cls._issue_note_as(cls.driver_user, cls.vehicle)
         cls.their_note = cls._issue_note_as(cls.other_driver_user, cls.their_tanker)
 
@@ -189,3 +191,90 @@ class TestSupervisorTeamScope(OfflineCaptureCommon):
         views = self.env['ksw.fleet.vehicle'].with_user(self.dispatcher_user).get_views(
             [(action.view_id.id, 'list')])
         self.assertIn('parent_id.user_id', views['views']['list']['arch'])
+
+
+@tagged('post_install', '-at_install')
+class TestTankerGroups(OfflineCaptureCommon):
+    """Tankers shows a supervisor his tanker groups only; the Employees
+    Administrator is the one who decides those groups."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.isuzu = cls.env['ksw.fleet.vehicle'].create({
+            'name': 'IS-900', 'client_id': cls.company.partner_id.id,
+            'vehicle_type': 'isuzu', 'state': 'confirmed',
+        })
+        cls.hr_officer = cls.env['res.users'].create({
+            'name': 'HR Officer', 'login': 'hr-officer@ksw.test',
+            'group_ids': [(6, 0, [cls.env.ref('hr.group_hr_user').id])],
+        })
+        cls.hr_admin = cls.env['res.users'].create({
+            'name': 'HR Admin', 'login': 'hr-admin@ksw.test',
+            'group_ids': [(6, 0, [cls.env.ref('hr.group_hr_manager').id])],
+        })
+
+    def _screen_ids(self, user):
+        action = self.env.ref('KSW_water_delivery.action_water_tankers')
+        Vehicle = self.env['ksw.fleet.vehicle'].with_user(user).with_context(
+            **dict(eval(action.context)))
+        return Vehicle, Vehicle.search(eval(action.domain)).ids
+
+    def test_a_supervisor_sees_only_his_groups(self):
+        _Vehicle, ids = self._screen_ids(self.dispatcher_user)
+        self.assertIn(self.vehicle.id, ids)
+        self.assertNotIn(self.isuzu.id, ids)
+
+    def test_a_supervisor_without_groups_sees_no_tanker(self):
+        self.tanker_group.supervisor_ids = [(5, 0, 0)]
+        _Vehicle, ids = self._screen_ids(self.dispatcher_user)
+        self.assertFalse(ids)
+
+    def test_an_administrator_sees_every_tanker(self):
+        admin = self.env['res.users'].create({
+            'name': 'Admin', 'login': 'tank-admin@ksw.test',
+            'group_ids': [(6, 0, [
+                self.env.ref('KSW_water_delivery.group_water_dispatcher').id,
+                self.env.ref('base.group_system').id])],
+        })
+        _Vehicle, ids = self._screen_ids(admin)
+        self.assertIn(self.isuzu.id, ids)
+
+    def test_a_tanker_outside_his_groups_cannot_be_changed(self):
+        Vehicle, _ids = self._screen_ids(self.dispatcher_user)
+        with self.assertRaisesRegex(UserError, 'not in your tanker groups'):
+            Vehicle.browse(self.isuzu.id).write({'x_capacity_m3': 10.0})
+        with self.assertRaisesRegex(UserError, 'not in your tanker groups'):
+            Vehicle.browse(self.isuzu.id).write({'driver_id': self.driver.id})
+
+    def test_adding_a_tanker_to_his_group_shows_it_at_once(self):
+        self.tanker_group.with_user(self.hr_admin).vehicle_ids = [(4, self.isuzu.id)]
+        _Vehicle, ids = self._screen_ids(self.dispatcher_user)
+        self.assertIn(self.isuzu.id, ids)
+
+    def test_the_employees_administrator_attaches_groups_on_the_employee(self):
+        supervisor = self.dispatcher_user.employee_id
+        group = self.env['ksw.water.tanker.group'].with_user(self.hr_admin).create(
+            {'name': 'Isuzu', 'vehicle_ids': [(6, 0, self.isuzu.ids)]})
+        supervisor.with_user(self.hr_admin).write(
+            {'x_water_tanker_group_ids': [(4, group.id)]})
+        _Vehicle, ids = self._screen_ids(self.dispatcher_user)
+        self.assertIn(self.isuzu.id, ids)
+
+    def test_an_hr_officer_cannot_change_tanker_groups(self):
+        supervisor = self.dispatcher_user.employee_id
+        with self.assertRaises(AccessError):
+            supervisor.with_user(self.hr_officer).write(
+                {'x_water_tanker_group_ids': [(5, 0, 0)]})
+        with self.assertRaises(AccessError):
+            self.env['ksw.water.tanker.group'].with_user(self.hr_officer).create({'name': 'X'})
+
+    def test_a_supervisor_cannot_change_tanker_groups(self):
+        with self.assertRaises(AccessError):
+            self.tanker_group.with_user(self.dispatcher_user).write(
+                {'vehicle_ids': [(4, self.isuzu.id)]})
+
+    def test_the_hr_admin_employee_form_loads(self):
+        views = self.env['hr.employee'].with_user(self.hr_admin).get_views([(False, 'form')])
+        self.assertIn('x_water_tanker_group_ids', views['views']['form']['arch'])
+

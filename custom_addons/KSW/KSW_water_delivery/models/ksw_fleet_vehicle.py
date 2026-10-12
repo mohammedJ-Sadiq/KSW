@@ -69,6 +69,43 @@ class KswFleetVehicle(models.Model):
             # limited a non-HR user to the dispatch fields.
             vehicle.driver_id.sudo().x_water_client_ids = vehicle.x_driver_client_ids
 
+    x_tanker_group_ids = fields.Many2many(
+        'ksw.water.tanker.group', 'ksw_water_tanker_group_vehicle_rel',
+        'vehicle_id', 'group_id', string='Tanker Groups')
+    # "Is this tanker in one of MY groups": what Water Delivery > Tankers
+    # filters on. A search method rather than an ir.rule, because a rule on
+    # ksw.fleet.vehicle would also hide vehicles from a supervisor's Workshop
+    # work; this screen is the only place the narrowing belongs.
+    x_in_my_tanker_groups = fields.Boolean(
+        compute='_compute_in_my_tanker_groups', search='_search_in_my_tanker_groups')
+
+    def _my_tanker_group_vehicle_ids(self):
+        """None = no narrowing (administrators); otherwise the tanker ids."""
+        user = self.env.user
+        if self.env.su or user.has_group('base.group_system'):
+            return None
+        employee = user.sudo().employee_id
+        return employee.x_water_tanker_group_ids.filtered('active').vehicle_ids.ids
+
+    @api.depends_context('uid')
+    def _compute_in_my_tanker_groups(self):
+        allowed = self._my_tanker_group_vehicle_ids()
+        for vehicle in self:
+            vehicle.x_in_my_tanker_groups = allowed is None or vehicle.id in allowed
+
+    def _search_in_my_tanker_groups(self, operator, value):
+        # Odoo 19 hands a boolean condition over as in/not in (gotcha #24).
+        if operator in ('in', 'not in'):
+            wanted = (operator == 'in') == any(value)
+        elif operator in ('=', '!='):
+            wanted = (operator == '=') == bool(value)
+        else:
+            return NotImplemented
+        allowed = self._my_tanker_group_vehicle_ids()
+        if allowed is None:
+            return [] if wanted else [('id', '=', False)]
+        return [('id', 'in' if wanted else 'not in', allowed)]
+
     # KSW_fleet also holds workshop clients' vehicles; no driver of ours
     # delivers water in those. Searchable, not stored: "is the client one of
     # our companies" has nothing to depend on when a company is added.
@@ -122,12 +159,21 @@ class KswFleetVehicle(models.Model):
                 ('parent_id.parent_id.parent_id.user_id', '=', user.id)]
 
     def _water_check_team(self, vals):
-        """From Water Delivery > Tankers a supervisor moves only his own
-        team: the tanker must be free or driven by one of his drivers, and the
-        driver he puts on it must be one of his. Administrators are exempt."""
+        """From Water Delivery > Tankers a supervisor edits only the tankers
+        in his tanker groups, and moves only his own team: the tanker must be
+        free or driven by one of his drivers, and the driver he puts on it must
+        be one of his. Administrators are exempt."""
         user = self.env.user
         if self.env.su or user.has_group('base.group_system'):
             return
+        allowed = self._my_tanker_group_vehicle_ids()
+        if allowed is not None:
+            foreign = self.filtered(lambda v: v.id not in allowed)
+            if foreign:
+                raise UserError(_(
+                    '%s is not in your tanker groups. Ask the Employees '
+                    'administrator to add it to one of your groups.',
+                    ', '.join(foreign.mapped('name'))))
         if not ({'driver_id', 'x_driver_client_ids'} & set(vals)):
             return
         Employee = self.env['hr.employee'].sudo()
