@@ -22,6 +22,8 @@ from datetime import date
 from odoo.exceptions import UserError
 from odoo.tests.common import TransactionCase
 
+from odoo.addons.KSW_commissions.models.ksw_commission_lock import (
+    gm_for_department)
 from odoo.addons.KSW_commissions.models.ksw_vacation_hold import (
     vacation_hold,
 )
@@ -81,6 +83,10 @@ class VacationHoldCommon(TransactionCase):
         cls.component = env.ref('KSW_commissions.pay_component_overtime')
 
     # ------------------------------------------------------------------
+    def _own_run(self, period):
+        gm = gm_for_department(self.env, self.emp.department_id)
+        return self.env['ksw.pay.run']._for_gm(period, gm)
+
     @classmethod
     def _leave(cls, date_from, date_to, return_date=None):
         leave = cls.env['hr.leave'].sudo().with_context(
@@ -151,6 +157,10 @@ class TestVacationHoldPredicate(VacationHoldCommon):
         self.assertEqual(hold.kind, 'full')
 
     def test_the_month_before_is_untouched(self):
+        # July already went out through his own run. Before Oct 2026 this
+        # test borrowed whichever July run the database happened to hold
+        # (any GM's); the lock is per GM now, so the premise is explicit.
+        self._own_run(JUL).write({'state': 'approved'})
         self._leave(date(2026, 8, 11), date(2026, 9, 16),
                     return_date=date(2026, 9, 17))
         self.assertFalse(vacation_hold(self.env, self.emp, JUL))
@@ -248,11 +258,9 @@ class TestSettledOnALaterVacation(VacationHoldCommon):
         self._leave(date(2026, 9, 3), date(2026, 12, 1))
         self.assertTrue(vacation_hold(self.env, self.emp, AUG))
 
-        run = self.env['ksw.pay.run'].sudo().search(
-            [('period', '=', AUG)], limit=1)
-        if not run:
-            run = self.env['ksw.pay.run'].sudo().create({'period': AUG})
-        run.sudo().write({'state': 'approved'})
+        # His own GM's run: each GM has his own per month (Oct 2026), and
+        # another GM's run going out says nothing about his.
+        self._own_run(AUG).write({'state': 'approved'})
 
         self.assertFalse(
             vacation_hold(self.env, self.emp, AUG),

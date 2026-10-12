@@ -144,9 +144,7 @@ class HrPayslip(models.Model):
         # A month counts as paid only once its run is marked Paid and has
         # a line for him; an approved month is taken out of its register
         # below (_resync_vacation_line).
-        paid_months = self.env['ksw.pay.run']._months_paid_to(
-            self.employee_id, set(entries.mapped('period')))
-        locked = entries.filtered(lambda e: e.period in paid_months)
+        locked = entries._paid_by_run()
         # Only what the GM approved may be paid — the builder already
         # filters on it; this catches a payslip confirmed by hand later.
         unapproved = entries.filtered(lambda e: e.state != 'approved')

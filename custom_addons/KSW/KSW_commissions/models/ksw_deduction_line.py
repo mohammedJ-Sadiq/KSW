@@ -24,6 +24,8 @@ from markupsafe import Markup
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
+from .ksw_commission_lock import gm_for_department
+
 
 class KswDeductionLine(models.Model):
     _inherit = 'ksw.deduction.line'
@@ -172,12 +174,22 @@ class KswDeductionLine(models.Model):
             by_key[period] |= line
         if not by_key:
             return
-        # One search per distinct period — the run is per month, not per
-        # employee, so this is a handful of queries at most.
+        # One search per distinct period. Each GM has his own run per month
+        # (Oct 2026): the one that will settle an installment is the run
+        # already carrying the employee, else his department GM's.
         for period, lines in by_key.items():
-            run = Run.search([('period', '=', period)], limit=1)
+            runs = Run.search([('period', '=', period)])
+            carrying = {
+                l.employee_id.id: l.run_id
+                for l in runs.line_ids
+            } if len(runs) > 1 else {}
             for line in lines:
-                line.x_pending_pay_run_id = run.id or False
+                run = carrying.get(line.employee_id.id)
+                if not run and len(runs) > 1:
+                    gm = gm_for_department(
+                        self.env, line.employee_id.sudo().department_id)
+                    run = runs.filtered(lambda r, g=gm: r.gm_id == g)[:1]
+                line.x_pending_pay_run_id = (run or runs[:1]).id or False
 
     # ------------------------------------------------------------------
     # Settlement label override — show parked / commission-paid states.

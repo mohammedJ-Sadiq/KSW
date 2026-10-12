@@ -152,9 +152,7 @@ class HrLeave(models.Model):
         # month is still waiting for its bank transfer (around a month
         # later); the settlement pays it now and takes it out of that
         # register when the payslip is confirmed (_resync_vacation_line).
-        paid_by_run = self.env['ksw.pay.run']._months_paid_to(
-            leave.employee_id, set(entries.mapped('period')))
-        entries = entries.filtered(lambda e: e.period not in paid_by_run)
+        entries = entries - entries._paid_by_run()
         # Another vacation may already speak for one of these months (back
         # to back requests): what that one holds was not earned, and is
         # not this settlement's to pay.
@@ -173,7 +171,7 @@ class HrLeave(models.Model):
     def _commission_entries_paid_elsewhere(self, entries):
         """The part of ``entries`` paid by something other than this
         request: another vacation payslip, or a monthly run marked Paid
-        with a line for him (``_months_paid_to``)."""
+        with a line for him (``ksw.pay.entry._paid_by_run``)."""
         self.ensure_one()
         leave = self._origin or self
         entries = entries.sudo().exists()
@@ -182,10 +180,8 @@ class HrLeave(models.Model):
         elsewhere = entries.filtered(
             lambda e: e.x_vacation_payslip_id
             and e.x_vacation_payslip_id.x_leave_id != leave)
-        months = self.env['ksw.pay.run']._months_paid_to(
-            leave.employee_id, set(entries.mapped('period')))
         return elsewhere | entries.filtered(
-            lambda e: e.period in months and not e.x_vacation_payslip_id)
+            lambda e: not e.x_vacation_payslip_id)._paid_by_run()
 
     def _commission_entries_settled(self):
         """The entries a confirmed payslip of this request already paid."""

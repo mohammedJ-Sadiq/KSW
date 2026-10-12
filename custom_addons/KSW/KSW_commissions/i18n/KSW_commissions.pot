@@ -506,7 +506,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
 msgid ""
 "Approve the departments you are General Manager of? The month stays open "
-"until the company General Manager finalises it."
+"until you finalise it."
 msgstr ""
 
 #. module: KSW_commissions
@@ -4904,14 +4904,14 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_commissions/models/ksw_pay_run.py:0
 msgid ""
-"Only the company's General Manager or a system administrator can finalise "
+"Only this month's General Manager or a system administrator can finalise "
 "the month."
 msgstr ""
 
 #. module: KSW_commissions
 #: code:addons/KSW_commissions/models/ksw_pay_run.py:0
 msgid ""
-"Only the company's General Manager can return the whole month. To send back "
+"Only this month's General Manager can return the whole month. To send back "
 "one department, use Return on its own submission."
 msgstr ""
 
@@ -4924,7 +4924,7 @@ msgstr ""
 
 #. module: KSW_commissions
 #: code:addons/KSW_commissions/models/ksw_pay_run.py:0
-msgid "Only the company's General Manager can reopen an approved month."
+msgid "Only this month's General Manager can reopen an approved month."
 msgstr ""
 
 #. module: KSW_commissions
@@ -7135,4 +7135,9 @@ msgstr ""
 msgid ""
 "For a department manager who is also named its General Manager: records his "
 "department's entries and approves its handover himself."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.constraint,message:KSW_commissions.constraint_ksw_pay_run_unique_period_gm
+msgid "This General Manager already has a pay run for that month."
 msgstr ""

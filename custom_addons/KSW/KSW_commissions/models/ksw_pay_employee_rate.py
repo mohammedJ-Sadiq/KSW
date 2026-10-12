@@ -247,7 +247,8 @@ class KswPayEmployeeRate(models.Model):
                 domain.append(('option_id', '=', rec.option_id.id))
             entries |= Entry.search(domain)
         return entries.filtered(
-            lambda e: not period_is_locked(self.env, e.period))
+            lambda e: not period_is_locked(
+                self.env, e.period, gm=e.batch_id._lock_gm()))
 
     def _mark_for_recompute(self, entries):
         """Queue ``entries`` to have their amount worked out again.

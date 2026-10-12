@@ -39,7 +39,7 @@
                          fields_get() and the client crashes (gotcha #31). -->
                     <button name="action_approve" string="Approve My Departments"
                             type="object" class="btn-primary"
-                            confirm="Approve the departments you are General Manager of? The month stays open until the company General Manager finalises it."
+                            confirm="Approve the departments you are General Manager of? The month stays open until you finalise it."
                             invisible="not x_can_approve"/>
                     <!-- Distinct from "Close the Month" (action_submit)
                          below, which only marks the handover complete. This
@@ -157,6 +157,8 @@
                         <group string="Month">
                             <field name="period" options="{'min_precision': 'months'}"
                                    readonly="state != 'open'"/>
+                            <field name="gm_id" readonly="1"
+                                   options="{'no_open': True}"/>
                             <field name="currency_id" invisible="1"/>
                         </group>
                         <group string="Approval">
@@ -315,6 +317,7 @@
                   decoration-muted="state in ['open', 'paid']">
                 <field name="name"/>
                 <field name="period" options="{'min_precision': 'months'}"/>
+                <field name="gm_id" optional="show"/>
                 <field name="submitted_department_count"
                        string="Departments In"/>
                 <field name="pending_department_count" string="Waiting On"/>
@@ -340,6 +343,7 @@
             <search>
                 <field name="name"/>
                 <field name="period" options="{'min_precision': 'months'}"/>
+                <field name="gm_id"/>
                 <filter name="open" string="Open"
                         domain="[('state','=','open')]"/>
                 <filter name="submitted" string="Awaiting GM"
@@ -351,6 +355,8 @@
                             context="{'group_by': 'period'}"/>
                     <filter string="Status" name="grp_state" domain="[]"
                             context="{'group_by': 'state'}"/>
+                    <filter string="General Manager" name="grp_gm" domain="[]"
+                            context="{'group_by': 'gm_id'}"/>
                 </group>
             </search>
         </field>

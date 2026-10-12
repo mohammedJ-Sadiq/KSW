@@ -4,7 +4,8 @@
 department: approve them all, build the register, lock the month. That only
 made sense while one GM answered for the whole company. It now approves the
 caller's own departments. The month never finalises by itself (Oct 2026):
-the company GM finalises it with `action_close_month`, which also handles
+each GM finalises his own run with `action_close_month` (one run per GM
+per month since Oct 2026), which also handles
 the case where a department's GM never signs.
 
 The last two tests are the ones that matter most: a department whose GM
@@ -102,13 +103,15 @@ class TestCommissionDepartmentGm(SubmissionCommon):
     # The month
     # ------------------------------------------------------------------
     def test_the_run_offers_a_gm_only_his_own_departments(self):
+        # Each GM has his own run per month (Oct 2026).
         sub_a = self._submit(self.sup_a, self.dept_a, self.emp_a)
         sub_b = self._submit(self.sup_b, self.dept_b, self.emp_b)
-        run = sub_a.run_id
+        self.assertNotEqual(sub_a.run_id, sub_b.run_id)
         self.assertEqual(
-            run.with_user(self.gm_a).sudo().x_gm_submission_ids, sub_a)
+            sub_a.run_id.with_user(self.gm_a).x_gm_submission_ids, sub_a)
         self.assertEqual(
-            run.with_user(self.user_gm_b).sudo().x_gm_submission_ids, sub_b)
+            sub_b.run_id.with_user(self.user_gm_b).x_gm_submission_ids,
+            sub_b)
 
     def test_approving_one_department_leaves_the_month_open(self):
         sub_a = self._submit(self.sup_a, self.dept_a, self.emp_a)
@@ -123,40 +126,39 @@ class TestCommissionDepartmentGm(SubmissionCommon):
     def test_the_month_stays_open_once_no_department_is_left_waiting(self):
         sub_a = self._submit(self.sup_a, self.dept_a, self.emp_a)
         sub_b = self._submit(self.sup_b, self.dept_b, self.emp_b)
-        run = sub_a.run_id
-        run.with_user(self.gm_a).sudo().action_approve()
-        run.with_user(self.user_gm_b).sudo().action_approve()
+        sub_a.run_id.with_user(self.gm_a).action_approve()
+        sub_b.run_id.with_user(self.user_gm_b).action_approve()
         self.assertEqual(sub_b.state, 'approved')
-        self.assertNotIn(run.state, ('approved', 'paid'))
+        self.assertNotIn(sub_a.run_id.state, ('approved', 'paid'))
+        self.assertNotIn(sub_b.run_id.state, ('approved', 'paid'))
 
-    def test_a_gm_with_nothing_waiting_is_told_who_is_holding_it_up(self):
-        self._submit(self.sup_a, self.dept_a, self.emp_a)
-        sub_b = self._submit(self.sup_b, self.dept_b, self.emp_b)
-        run = sub_b.run_id
-        run.with_user(self.gm_a).sudo().action_approve()
-        with self.assertRaises(UserError) as caught:
-            run.with_user(self.gm_a).sudo().action_approve()
-        self.assertIn(sub_b.display_name, str(caught.exception))
+    def test_a_gm_with_nothing_waiting_is_told_so(self):
+        # His own run only holds his departments (Oct 2026), so once they
+        # are approved there is nothing else on it to name.
+        sub_a = self._submit(self.sup_a, self.dept_a, self.emp_a)
+        run = sub_a.run_id
+        run.with_user(self.gm_a).action_approve()
+        with self.assertRaises(UserError):
+            run.with_user(self.gm_a).action_approve()
 
     # ------------------------------------------------------------------
     # Closing
     # ------------------------------------------------------------------
-    def test_a_department_gm_cannot_close_the_month(self):
-        sub_a = self._submit(self.sup_a, self.dept_a, self.emp_a)
-        self._submit(self.sup_b, self.dept_b, self.emp_b)
-        run = sub_a.run_id
-        run.with_user(self.gm_a).sudo().action_approve()
+    def test_a_gm_cannot_close_another_gms_month(self):
+        self._submit(self.sup_a, self.dept_a, self.emp_a)
+        sub_b = self._submit(self.sup_b, self.dept_b, self.emp_b)
+        sub_b.run_id.with_user(self.user_gm_b).action_approve()
         # No sudo() on the call under test: _is_month_closer() exempts
         # env.su, so a sudo'd call would pass whatever the guard said.
         with self.assertRaises(UserError):
-            run.with_user(self.gm_a).action_close_month()
+            sub_b.run_id.with_user(self.gm_a).action_close_month()
 
-    def test_the_company_gm_can_close_the_month(self):
+    def test_a_gm_closes_his_own_month(self):
         sub_a = self._submit(self.sup_a, self.dept_a, self.emp_a)
         self._submit(self.sup_b, self.dept_b, self.emp_b)
         run = sub_a.run_id
-        run.with_user(self.gm_a).sudo().action_approve()
-        run.with_user(self.user_company_gm).sudo().action_close_month()
+        run.with_user(self.gm_a).action_approve()
+        run.with_user(self.gm_a).action_close_month()
         self.assertEqual(run.state, 'approved')
 
     def test_closing_does_not_pay_a_department_its_gm_never_approved(self):

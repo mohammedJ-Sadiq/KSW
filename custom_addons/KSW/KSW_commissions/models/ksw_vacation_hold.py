@@ -51,7 +51,8 @@ from odoo import _
 from odoo.exceptions import UserError
 from odoo.tools.misc import format_date
 
-from .ksw_commission_lock import normalise_period, period_is_locked
+from .ksw_commission_lock import (
+    gm_for_department, normalise_period, period_is_locked)
 
 #: ``kind`` is one of:
 #:   'full'          — nothing in the month is payable
@@ -147,15 +148,25 @@ def vacation_holds(env, employees, period):
         return {}
 
     # Has this month already gone out through its own register? If so,
-    # no later settlement paid it and nothing here holds it.
-    already_paid = period_is_locked(env, month_start)
+    # no later settlement paid it and nothing here holds it. Each GM has his
+    # own run per month, so "its own register" is the run of the GM the
+    # employee's department resolves to.
+    paid_by_gm = {}
+
+    def already_paid_for(employee):
+        gm = gm_for_department(env, employee.sudo().department_id)
+        if gm.id not in paid_by_gm:
+            paid_by_gm[gm.id] = period_is_locked(env, month_start, gm=gm)
+        return paid_by_gm[gm.id]
+
     released = released_employee_ids(env, employee_ids, month_start)
     holds = {}
     for leave in leaves:
         employee_id = leave.employee_id.id
         if employee_id in released:
             continue
-        candidate = _hold_for(leave, month_start, month_end, already_paid)
+        candidate = _hold_for(leave, month_start, month_end,
+                              already_paid_for(leave.employee_id))
         if candidate is None:
             continue
         current = holds.get(employee_id)

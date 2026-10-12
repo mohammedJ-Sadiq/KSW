@@ -355,7 +355,8 @@ class KswPaySubBatch(models.Model):
         self.ensure_one()
         self.submission_id._check_mine()
         self._check_month_open(what)
-        check_period_unlocked(self.env, self.period, what)
+        check_period_unlocked(self.env, self.period, what,
+                              gm=self.submission_id.sudo().run_id.gm_id)
         if self.submission_id.state in ('submitted', 'approved'):
             raise UserError(_(
                 "%(scope)s has already been handed to the General Manager as "

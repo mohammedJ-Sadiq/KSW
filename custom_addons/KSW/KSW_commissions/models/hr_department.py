@@ -21,3 +21,11 @@ class HrDepartment(models.Model):
         # to it would not survive the next save of his user form.
         super()._ksw_grant_gm_capability(employees)
         employees.sudo().user_id._ksw_commission_sync_gm_role()
+
+    def write(self, vals):
+        res = super().write(vals)
+        # Each GM has his own monthly run: a department that changes GM
+        # takes its work in progress to the new GM's run.
+        if {'x_gm_id', 'parent_id'} & set(vals):
+            self.env['ksw.pay.submission']._rehome_all_open()
+        return res

@@ -592,10 +592,10 @@ msgstr "اعتماد أقسامي"
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
 msgid ""
 "Approve the departments you are General Manager of? The month stays open "
-"until the company General Manager finalises it."
+"until you finalise it."
 msgstr ""
-"هل تعتمد الأقسام التي أنت مديرها العام؟ يبقى الشهر مفتوحًا حتى يعتمده "
-"المدير العام للشركة نهائيًا."
+"هل تعتمد الأقسام التي أنت مديرها العام؟ يبقى الشهر مفتوحًا حتى تعتمده "
+"نهائيًا."
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_form
@@ -5251,17 +5251,17 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_commissions/models/ksw_pay_run.py:0
 msgid ""
-"Only the company's General Manager or a system administrator can finalise "
+"Only this month's General Manager or a system administrator can finalise "
 "the month."
-msgstr "لا يمكن إقفال الشهر إلا للمدير العام للشركة أو لمسؤول النظام."
+msgstr "لا يمكن إقفال الشهر إلا لمديره العام أو لمسؤول النظام."
 
 #. module: KSW_commissions
 #: code:addons/KSW_commissions/models/ksw_pay_run.py:0
 msgid ""
-"Only the company's General Manager can return the whole month. To send back "
+"Only this month's General Manager can return the whole month. To send back "
 "one department, use Return on its own submission."
 msgstr ""
-"لا يمكن إعادة الشهر كاملًا إلا للمدير العام للشركة. ولإعادة قسم واحد استخدم "
+"لا يمكن إعادة الشهر كاملًا إلا لمديره العام. ولإعادة قسم واحد استخدم "
 "زر «إعادة» في تسليم ذلك القسم."
 
 #. module: KSW_commissions
@@ -5275,8 +5275,8 @@ msgstr ""
 
 #. module: KSW_commissions
 #: code:addons/KSW_commissions/models/ksw_pay_run.py:0
-msgid "Only the company's General Manager can reopen an approved month."
-msgstr "لا يمكن إعادة فتح شهر معتمد إلا للمدير العام للشركة."
+msgid "Only this month's General Manager can reopen an approved month."
+msgstr "لا يمكن إعادة فتح شهر معتمد إلا لمديره العام."
 
 #. module: KSW_commissions
 #: code:addons/KSW_commissions/models/ksw_pay_run.py:0
@@ -7595,3 +7595,8 @@ msgid ""
 msgstr ""
 "لمدير القسم المعيَّن أيضاً مديراً عاماً له: يُدخل حركات قسمه ويعتمد تسليمه "
 "بنفسه."
+
+#. module: KSW_commissions
+#: model:ir.model.constraint,message:KSW_commissions.constraint_ksw_pay_run_unique_period_gm
+msgid "This General Manager already has a pay run for that month."
+msgstr "توجد بالفعل دورة مستحقات لهذا المدير العام في ذلك الشهر."

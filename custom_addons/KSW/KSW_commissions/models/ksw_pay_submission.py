@@ -31,7 +31,8 @@ from markupsafe import Markup
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
-from .ksw_commission_lock import LOCKING_STATES, check_period_unlocked
+from .ksw_commission_lock import (
+    LOCKING_STATES, check_period_unlocked, gm_for_department)
 
 SUBMISSION_STATES = [
     ('draft', 'Being Prepared'),
@@ -237,18 +238,23 @@ class KswPaySubmission(models.Model):
     @api.model
     def _for_scope(self, period, department=None, site=None):
         """The submission a batch of this scope belongs to, creating the
-        month and the submission if this is the first batch to need them."""
-        Run = self.env['ksw.pay.run'].sudo()
+        month and the submission if this is the first batch to need them.
+
+        The month is the run of the department's General Manager: each GM
+        has his own run per month (Oct 2026), so no GM ever opens a run
+        holding another GM's departments.
+        """
         period = fields.Date.to_date(period).replace(day=1)
-        run = Run.search([('period', '=', period)], limit=1)
-        if not run:
-            run = Run.create({'period': period})
+        gm = gm_for_department(self.env, department)
+        run = self.env['ksw.pay.run']._for_gm(period, gm)
         domain = [
-            ('run_id', '=', run.id),
+            ('period', '=', period),
             ('department_id', '=', department.id if department else False),
             ('site_id', '=', site.id if site else False),
         ]
         submission = self.sudo().search(domain, limit=1)
+        if submission and submission.run_id != run:
+            submission._rehome_to_gm_run()
         if not submission:
             submission = self.sudo().create({
                 'run_id': run.id,
@@ -256,6 +262,41 @@ class KswPaySubmission(models.Model):
                 'site_id': site.id if site else False,
             })
         return submission
+
+    def _rehome_to_gm_run(self):
+        """Move each submission onto the run of its department's current GM.
+
+        HR can change a department's GM (or the company default) mid-month.
+        A submission still in progress follows the department to its new
+        GM's run; one already approved stays where it was signed, and a
+        finalised run is never touched — that money is settled.
+        Returns the runs that changed, so their registers can be rebuilt.
+        """
+        Run = self.env['ksw.pay.run']
+        touched = Run.browse()
+        for rec in self.sudo():
+            if rec.state == 'approved' or rec.run_id.state in LOCKING_STATES:
+                continue
+            gm = gm_for_department(self.env, rec.department_id)
+            if rec.run_id.gm_id == gm:
+                continue
+            target = Run._for_gm(rec.period, gm)
+            if target.state in LOCKING_STATES:
+                continue
+            touched |= rec.run_id | target
+            rec.write({'run_id': target.id})
+        touched._sync_state()
+        touched._refresh_register()
+        return touched
+
+    @api.model
+    def _rehome_all_open(self):
+        """Re-home every submission whose run no longer matches its GM."""
+        subs = self.sudo().search([
+            ('state', '!=', 'approved'),
+            ('run_id.state', 'not in', LOCKING_STATES),
+        ])
+        return subs._rehome_to_gm_run()
 
     # ------------------------------------------------------------------
     # CRUD
@@ -327,7 +368,8 @@ class KswPaySubmission(models.Model):
         self._check_mine()
         for rec in self:
             check_period_unlocked(
-                self.env, rec.period, _("Submitting this department"))
+                self.env, rec.period, _("Submitting this department"),
+                gm=rec.sudo().run_id.gm_id)
             if rec.state == 'approved':
                 raise UserError(_(
                     "%(name)s has already been approved.",
@@ -392,7 +434,8 @@ class KswPaySubmission(models.Model):
         self._check_is_my_department()
         for rec in self:
             check_period_unlocked(
-                self.env, rec.period, _("Approving this department"))
+                self.env, rec.period, _("Approving this department"),
+                gm=rec.sudo().run_id.gm_id)
             if rec.state == 'approved':
                 raise UserError(_(
                     "%(name)s has already been approved.",
@@ -474,7 +517,8 @@ class KswPaySubmission(models.Model):
         self._check_mine()
         for rec in self:
             check_period_unlocked(
-                self.env, rec.period, _("Reopening this department"))
+                self.env, rec.period, _("Reopening this department"),
+                gm=rec.sudo().run_id.gm_id)
             if rec.state == 'approved':
                 raise UserError(_(
                     "%(name)s has been approved. Only the General Manager "

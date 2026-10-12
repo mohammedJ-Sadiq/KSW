@@ -62,6 +62,15 @@ class KswPayRun(models.Model):
     state = fields.Selection(
         RUN_STATES, default='open', required=True, copy=False, tracking=True,
     )
+    # Whose month this is. Each General Manager has his own run per month
+    # (Oct 2026): his departments are handed over, approved, finalised and
+    # paid on it, and no other GM can open it. A department lands on the
+    # run of its effective GM (ksw_commission_lock.gm_for_department).
+    gm_id = fields.Many2one(
+        'res.users', string='General Manager', index=True, tracking=True,
+        readonly=True,
+        default=lambda s: s.env.company.sudo().x_default_gm_id.user_id,
+    )
     currency_id = fields.Many2one(
         'res.currency', required=True,
         default=lambda s: s.env.company.currency_id,
@@ -153,8 +162,9 @@ class KswPayRun(models.Model):
         string='Awaiting My Approval',
     )
 
-    _unique_period = models.Constraint(
-        'UNIQUE(period)', 'There is already a pay run for that month.')
+    _unique_period_gm = models.Constraint(
+        'UNIQUE(period, gm_id)',
+        'This General Manager already has a pay run for that month.')
 
     # ------------------------------------------------------------------
     # Computes
@@ -164,7 +174,7 @@ class KswPayRun(models.Model):
     def _compute_batch_ids(self):
         Batch = self.env['ksw.pay.batch']
         for rec in self:
-            batches = Batch.search([('period', '=', rec.period)])
+            batches = Batch.search([('run_id', '=', rec.id)])
             rec.batch_ids = batches
             rec.batch_count = len(batches)
             rec.draft_batch_count = len(
@@ -232,8 +242,8 @@ class KswPayRun(models.Model):
             'KSW_commissions.group_commission_supervisor')
         is_accountant = user.has_group(
             'KSW_commissions.group_commission_accountant')
-        is_closer = self._is_month_closer()
         for rec in self:
+            is_closer = rec._is_month_closer()
             rec.x_can_submit = is_supervisor and rec.state == 'open'
             # Approve now means "approve MY departments". A GM with nothing
             # of his own waiting has nothing to approve, however senior he is.
@@ -261,7 +271,7 @@ class KswPayRun(models.Model):
             # reopening it would restate what was paid (sub-batch rows
             # included, which the GM promised the supervisor were final).
             rec.x_can_reopen = (is_closer and rec.state == 'approved'
-                                and not rec.line_ids.filtered('x_paid'))
+                                and not rec.sudo().line_ids.filtered('x_paid'))
             rec.x_can_export = is_accountant and rec.state in LOCKING_STATES
 
     # Deliberately NOT depending on batch_ids.entry_ids: batch_ids is a
@@ -292,11 +302,24 @@ class KswPayRun(models.Model):
                 who=', '.join(held.employee_id.sudo().mapped('display_name')),
             )
 
-    @api.depends('period')
+    @api.depends('period', 'gm_id')
     def _compute_display_name(self):
         for rec in self:
-            rec.display_name = rec.period.strftime('%B %Y') \
+            name = rec.period.strftime('%B %Y') \
                 if rec.period else (rec.name or '')
+            gm = rec.sudo().gm_id
+            rec.display_name = '%s · %s' % (name, gm.name) if gm else name
+
+    @api.model
+    def _for_gm(self, period, gm):
+        """This GM's run for ``period``, created on first use."""
+        period = fields.Date.to_date(period).replace(day=1)
+        Run = self.sudo()
+        run = Run.search([('period', '=', period),
+                          ('gm_id', '=', gm.id or False)], limit=1)
+        if not run:
+            run = Run.create({'period': period, 'gm_id': gm.id or False})
+        return run
 
     # ------------------------------------------------------------------
     # CRUD
@@ -356,12 +379,12 @@ class KswPayRun(models.Model):
         """
         self.ensure_one()
         return self.env['ksw.pay.batch'].sudo().search([
-            ('period', '=', self.period)])
+            ('run_id', '=', self.id)])
 
     def _all_entries(self):
         self.ensure_one()
         return self.env['ksw.pay.entry'].sudo().search([
-            ('period', '=', self.period)])
+            ('batch_id.run_id', '=', self.id)])
 
     def _has_approved_work(self):
         """Is there anything the General Manager has approved this month —
@@ -370,7 +393,7 @@ class KswPayRun(models.Model):
         return bool(self.submission_ids.filtered(
             lambda s: s.state == 'approved')) or bool(
             self.env['ksw.pay.entry'].sudo().search_count([
-                ('period', '=', self.period), ('state', '=', 'approved')],
+                ('batch_id.run_id', '=', self.id), ('state', '=', 'approved')],
                 limit=1))
 
     def _waiting_submissions(self):
@@ -487,9 +510,8 @@ class KswPayRun(models.Model):
 
     def _notify_gm(self):
         self.ensure_one()
-        group = self.env.ref('KSW_commissions.group_commission_gm',
-                             raise_if_not_found=False)
-        partners = group.sudo().all_user_ids.partner_id if group else None
+        # This run's own GM, not the whole GM group: the month is his.
+        partners = self.sudo().gm_id.partner_id
         self.sudo().message_post(
             body=Markup(
                 '<strong>📤 Submitted for approval</strong><br/>'
@@ -503,47 +525,39 @@ class KswPayRun(models.Model):
             subtype_xmlid='mail.mt_comment',
         )
 
-    @api.model
     def _is_month_closer(self):
-        """Who may declare the month finished and lock it.
+        """Who may declare this run finished, lock it, return or reopen it.
 
-        Approving is now per department, so no single GM owns the month any
-        more — but somebody still has to decide that a department which never
-        handed over will not be paid, and to lock the period. That is a
-        company-level call, and it stays with the company's General Manager
-        (`res.company.x_default_gm_id`) — the person who was doing all of
-        this before the split.
+        The run's own General Manager (``gm_id``). Each GM has his own run
+        per month (Oct 2026, user's decision), so each finalises his own
+        and never opens another's. Before that there was one run per month
+        and only the company GM (``res.company.x_default_gm_id``) could
+        close it.
 
         Deliberately NOT the Commission Officer: reopening a month unwinds
-        the loan offsets of every department at once, and that has never
-        been the Officer's to do (tests/test_period_lock.py
-        ::test_10_only_the_gm_reopens).
+        its loan offsets, and that has never been the Officer's to do
+        (tests/test_period_lock.py::test_10_only_the_gm_reopens).
         """
         if self.env.su:
             return True
         # The system administrator is not a second General Manager — he is
-        # the way out when the configured one is absent, has left, or was
-        # never set on the company at all. Without him a month whose GM is
-        # gone can never be handed to the accountant by anybody.
-        #
-        # Two keys, deliberately: this grants the *authority*, his
+        # the way out when the run's GM is absent, has left, or was never
+        # set. Two keys, deliberately: this grants the *authority*, his
         # Commission Role grants the *reach*. base.group_system holds no
         # ACL on ksw.pay.run, so a Settings administrator with no commission
         # role cannot read the month, let alone finalise it (gotcha #38).
-        # Implying Administrator from it instead would put every Settings
-        # admin into the Commission Role single-select, which is the whole
-        # separation of duties.
         if self.env.user.has_group('base.group_system'):
             return True
-        default_gm = self.env.company.sudo().x_default_gm_id
-        return bool(default_gm and default_gm.sudo().user_id == self.env.user)
+        user = self.env.user
+        return bool(self) and all(
+            rec.sudo().gm_id == user for rec in self)
 
     def action_approve(self):
         """The GM approves **his own** departments' handovers.
 
         Approval used to be one atomic act over every submitted department,
         which only made sense while one GM answered for all of them. Each GM
-        now signs off what is his; the month stays open until the company GM
+        now signs off what is his; the month stays open until the run's GM
         finalises it deliberately (action_close_month).
         """
         for rec in self:
@@ -566,7 +580,7 @@ class KswPayRun(models.Model):
                     "Managers: %(names)s.",
                     period=rec.display_name,
                     names=', '.join(waiting.mapped('display_name'))))
-            # The submission's own approval tells the company GM when this
+            # The submission's own approval tells the run's GM when this
             # was the last one waiting (_notify_ready_to_close); it never
             # locks the month.
             mine.action_approve()
@@ -591,7 +605,7 @@ class KswPayRun(models.Model):
         return True
 
     def _notify_ready_to_close(self):
-        """Tell the company GM when nothing recorded is left unapproved.
+        """Tell the run's GM when nothing recorded is left unapproved.
 
         The month used to lock itself at this point. It no longer does
         (user's rule, Oct 2026): "every department with entries" cannot see
@@ -602,8 +616,8 @@ class KswPayRun(models.Model):
         just tells him the approved part is complete. One predicate, called
         from every approval route, as the auto-lock was.
         """
-        default_gm_user = self.env.company.sudo().x_default_gm_id.user_id
         for rec in self:
+            default_gm_user = rec.sudo().gm_id
             if rec.state in LOCKING_STATES:
                 continue
             if rec._unapproved_departments() or rec._waiting_submissions():
@@ -653,7 +667,7 @@ class KswPayRun(models.Model):
         """
         if not self._is_month_closer():
             raise UserError(_(
-                "Only the company's General Manager or a system "
+                "Only this month's General Manager or a system "
                 "administrator can finalise the month."))
         for rec in self:
             if rec.state in LOCKING_STATES:
@@ -751,7 +765,7 @@ class KswPayRun(models.Model):
         """submitted → open, so corrections can be made."""
         if not self._is_month_closer():
             raise UserError(_(
-                "Only the company's General Manager can return the whole "
+                "Only this month's General Manager can return the whole "
                 "month. To send back one department, use Return on its own "
                 "submission."))
         for rec in self:
@@ -807,12 +821,17 @@ class KswPayRun(models.Model):
         """
         if not self._is_month_closer():
             raise UserError(_(
-                "Only the company's General Manager can reopen an "
+                "Only this month's General Manager can reopen an "
                 "approved month."))
         keep_states = (not self.env.su
                        and self.env.user.has_group('base.group_system'))
         for rec in self:
-            if rec.state == 'paid' or rec.line_ids.filtered('x_paid'):
+            # sudo(): a reader whose rules hide some lines caches the
+            # filtered list, and every later sudo() read in the request then
+            # sees it too — this check would miss a paid line, and the
+            # register rebuild below would recreate one (Odoo 19 shares the
+            # x2many cache across su; found Oct 2026).
+            if rec.state == 'paid' or rec.sudo().line_ids.filtered('x_paid'):
                 raise UserError(_(
                     "%(name)s has been paid. A paid month cannot be "
                     "reopened — not even by the General Manager.",
@@ -826,7 +845,7 @@ class KswPayRun(models.Model):
             # The Settings administrator only unlocks the month (user's rule,
             # Oct 2026): every department and batch keeps the state it had,
             # so a single one can be corrected without re-approving the rest.
-            # The month stays open until the company GM finalises it again.
+            # The month stays open until the run's GM finalises it again.
             if keep_states:
                 rec.write({'state': 'open'})
                 rec.sudo().message_post(

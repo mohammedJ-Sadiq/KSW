@@ -31,3 +31,4 @@ from . import test_commission_auto_recovery
 from . import test_mark_paid_by_bank
 from . import test_run_totals_visibility
 from . import test_supervisor_gm_role
+from . import test_gm_runs

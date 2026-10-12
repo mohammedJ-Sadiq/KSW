@@ -41,8 +41,25 @@ def normalise_period(period):
     return fields.Date.to_date(period).replace(day=1)
 
 
-def period_is_locked(env, period):
+def gm_for_department(env, department):
+    """The General Manager (res.users) whose monthly run a scope belongs to.
+
+    The department's effective GM, else the company default GM — the same
+    resolution ``ksw.pay.submission._compute_gm`` stores. Each GM has his
+    own run per month (Oct 2026), so this is also *which* run.
+    """
+    gm = department.sudo().x_effective_gm_id if department else False
+    gm = gm or env.company.sudo().x_default_gm_id
+    return gm.sudo().user_id if gm else env['res.users']
+
+
+def period_is_locked(env, period, gm=None):
     """True when an approved or paid pay run covers ``period``.
+
+    Each General Manager has his own run per month, so ``gm`` says whose:
+    one GM finalising his month must not freeze another's departments.
+    ``gm=None`` keeps the old, conservative reading — any run of that
+    month — for callers that cannot name a scope.
 
     Never raises — safe to call from crons, computes and auto-create
     paths that need to *skip* rather than fail.
@@ -50,17 +67,19 @@ def period_is_locked(env, period):
     period = normalise_period(period)
     if not period:
         return False
-    return bool(env['ksw.pay.run'].sudo().search_count([
-        ('period', '=', period),
-        ('state', 'in', LOCKING_STATES),
-    ]))
+    domain = [('period', '=', period), ('state', 'in', LOCKING_STATES)]
+    if gm is not None:
+        domain.append(('gm_id', '=', gm.id or False))
+    return bool(env['ksw.pay.run'].sudo().search_count(domain))
 
 
-def check_period_unlocked(env, period, what, allow_su=True):
+def check_period_unlocked(env, period, what, allow_su=True, gm=None):
     """Raise :class:`UserError` when ``period`` belongs to a locked run.
 
     :param what: what the caller was trying to do, e.g.
         ``"Editing this sheet"``.  Used verbatim in the message.
+    :param gm: the General Manager whose run the caller belongs to (see
+        :func:`period_is_locked`).
     :param allow_su: exempt ``env.su``.  Pass ``False`` from call sites
         that write through ``sudo()`` after their own authorisation
         check — otherwise the guard would never see them.
@@ -70,7 +89,7 @@ def check_period_unlocked(env, period, what, allow_su=True):
     """
     if allow_su and env.su:
         return
-    if not period_is_locked(env, period):
+    if not period_is_locked(env, period, gm=gm):
         return
     if env.user.has_group('KSW_commissions.group_commission_gm'):
         return

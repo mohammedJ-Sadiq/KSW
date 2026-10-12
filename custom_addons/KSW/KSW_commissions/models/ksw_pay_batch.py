@@ -31,7 +31,8 @@ from markupsafe import Markup, escape
 from odoo import _, SUPERUSER_ID, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
-from .ksw_commission_lock import check_period_unlocked, period_is_locked
+from .ksw_commission_lock import (
+    check_period_unlocked, gm_for_department, period_is_locked)
 from .ksw_pay_component import HOLIDAY_OCCASIONS
 from .ksw_vacation_hold import (
     check_not_held, entry_blocked, hold_reason, month_bounds,
@@ -248,9 +249,11 @@ class KswPayBatch(models.Model):
         is_gm = self.env.user.has_group('KSW_commissions.group_commission_gm')
         locked = {}
         for rec in self:
-            if rec.period not in locked:
-                locked[rec.period] = period_is_locked(self.env, rec.period)
-            if rec.state == 'draft' or locked[rec.period]:
+            key = (rec.period, rec._lock_gm().id)
+            if key not in locked:
+                locked[key] = period_is_locked(
+                    self.env, rec.period, gm=rec._lock_gm())
+            if rec.state == 'draft' or locked[key]:
                 rec.x_can_reopen = False
                 continue
             if rec.state == 'approved':
@@ -410,7 +413,7 @@ class KswPayBatch(models.Model):
             # Not on a month that has already been paid. The money left the
             # bank; telling the reader it "will not be paid" would be a
             # lie, and there is nothing left to act on either way.
-            if period_is_locked(self.env, rec.period):
+            if period_is_locked(self.env, rec.period, gm=rec._lock_gm()):
                 continue
             held = rec.entry_ids.filtered('x_vacation_hold')
             if not held:
@@ -452,11 +455,21 @@ class KswPayBatch(models.Model):
         self.skip_line_ids.sudo().unlink()
         return True
 
+    def _lock_gm(self):
+        """Whose run locks this batch: its run's GM, or — before it has a
+        run — the GM its department resolves to."""
+        self.ensure_one()
+        run = self.sudo().run_id
+        if run:
+            return run.gm_id
+        return gm_for_department(self.env, self.sudo().department_id)
+
     def _check_editable_batch(self, what):
         """The batch's own draft/lock guard, without an entry in hand."""
         if self.env.su:
             return
-        check_period_unlocked(self.env, self.period, what)
+        check_period_unlocked(self.env, self.period, what,
+                              gm=self._lock_gm())
         if self.state != 'draft':
             raise UserError(_(
                 "%(name)s has been submitted. %(what)s is only possible "
@@ -598,7 +611,9 @@ class KswPayBatch(models.Model):
                     vals['period']).replace(day=1)
             self._clear_unused_scope(vals)
             check_period_unlocked(
-                self.env, vals.get('period'), _("Creating a batch"))
+                self.env, vals.get('period'), _("Creating a batch"),
+                gm=gm_for_department(self.env, self.env['hr.department'].browse(
+                    vals.get('department_id') or [])))
         batches = super().create(vals_list)
         batches._check_component_rights()
         batches._check_department_rights()
@@ -637,7 +652,8 @@ class KswPayBatch(models.Model):
             }
             for rec in self:
                 check_period_unlocked(
-                    self.env, rec.period, _("Changing this batch"))
+                    self.env, rec.period, _("Changing this batch"),
+                    gm=rec._lock_gm())
                 if rec.state != 'draft' and protected:
                     raise UserError(_(
                         "Batch %(name)s has been submitted. Ask the General "
@@ -734,7 +750,8 @@ class KswPayBatch(models.Model):
                 name=handed[0].batch_id.name, count=len(handed)))
         for rec in self:
             check_period_unlocked(
-                self.env, rec.period, _("Deleting this batch"))
+                self.env, rec.period, _("Deleting this batch"),
+                gm=rec._lock_gm())
             if rec.state != 'draft' and not self.env.su:
                 raise UserError(_(
                     "Only a draft batch can be deleted. %(name)s is %(state)s.",
@@ -809,7 +826,8 @@ class KswPayBatch(models.Model):
                     "There is nothing to submit — %(name)s has no entries.",
                     name=rec.name))
             rec._check_component_rights()
-            check_period_unlocked(self.env, rec.period, _("Submitting"))
+            check_period_unlocked(self.env, rec.period, _("Submitting"),
+                                  gm=rec._lock_gm())
             rec._check_no_held_entries()
             rec._ensure_submission()
             # Rows a sub-batch already handed over stay where they are;
@@ -885,12 +903,14 @@ class KswPayBatch(models.Model):
         is_gm = self.env.user.has_group('KSW_commissions.group_commission_gm')
         for rec in self:
             check_period_unlocked(
-                self.env, rec.period, _("Reopening this batch"))
+                self.env, rec.period, _("Reopening this batch"),
+                gm=rec._lock_gm())
             # Not GM-exempt, unlike the period lock above: a finalised month
             # has its register built from these rows, so reopening one batch
             # inside it would leave the bank file paying rows that read as
             # draft. The month is reopened first (ksw.pay.run.action_reopen).
-            if not self.env.su and period_is_locked(self.env, rec.period):
+            if not self.env.su and period_is_locked(
+                    self.env, rec.period, gm=rec._lock_gm()):
                 raise UserError(_(
                     "%(month)s has been finalised. Reopen the month first — "
                     "a batch cannot be reopened inside a finalised month.",
@@ -1293,7 +1313,8 @@ class KswPayEntry(models.Model):
         else:
             return self.browse()
         entries = self.sudo().search(domain).filtered(
-            lambda e: not period_is_locked(self.env, e.period))
+            lambda e: not period_is_locked(
+                self.env, e.period, gm=e.batch_id._lock_gm()))
         for name in self._PRICE_FIELDS:
             self.env.add_to_compute(self._fields[name], entries)
         return entries
@@ -1575,8 +1596,8 @@ class KswPayEntry(models.Model):
     def _check_not_paid_twice(self, payslip_id):
         """The last line against paying one commission twice: an entry may
         be stamped as paid on a vacation payslip only if nothing else has
-        paid it — no other payslip, and no monthly run marked Paid with a
-        line for him that month (``_months_paid_to``).
+        paid it — no other payslip, and not its own monthly run
+        (``_paid_by_run``).
 
         Deliberately NOT exempting env.su or ``ksw_vacation_settling``: the
         settlement is the very caller this exists to stop when it is stale.
@@ -1584,12 +1605,7 @@ class KswPayEntry(models.Model):
         elsewhere = self.filtered(
             lambda e: e.x_vacation_payslip_id
             and e.x_vacation_payslip_id.id != payslip_id)
-        Run = self.env['ksw.pay.run']
-        committed = self.browse()
-        for employee in self.employee_id:
-            mine = self.filtered(lambda e, emp=employee: e.employee_id == emp)
-            months = Run._months_paid_to(employee, set(mine.mapped('period')))
-            committed |= mine.filtered(lambda e, m=months: e.period in m)
+        committed = self._paid_by_run()
         bad = elsewhere | committed
         if bad:
             raise UserError(_(
@@ -1803,7 +1819,8 @@ class KswPayEntry(models.Model):
             return
         for rec in self:
             batch = rec.batch_id
-            check_period_unlocked(self.env, batch.period, what)
+            check_period_unlocked(self.env, batch.period, what,
+                                  gm=batch._lock_gm())
             if batch.state != 'draft':
                 raise UserError(_(
                     "Batch %(name)s has been submitted. %(what)s is only "
@@ -2018,23 +2035,40 @@ class KswPayEntry(models.Model):
         return self.filtered(
             lambda e: e.state != 'draft' and e.x_sub_batch_id.submitted_date)
 
-    def _paid_entries(self):
-        """Rows whose money has left: paid on a vacation payslip, or in a
-        month the accountant marked Paid. Nobody reopens these."""
-        periods = list(set(self.mapped('period')))
-        paid_periods = set(self.env['ksw.pay.run'].sudo().search([
-            ('period', 'in', periods), ('state', '=', 'paid'),
-        ]).mapped('period')) if periods else set()
-        # A run marked paid one bank account at a time: his own line.
+    def _paid_by_run(self):
+        """Rows their own monthly run has paid: the run carries a line for
+        him, and either the run is marked Paid or that line was marked paid
+        one bank account at a time. A Paid run with no line for him paid him
+        nothing (same rule as ``ksw.pay.run._months_paid_to``).
+
+        Per row, against the row's own run — never "the month". Each General
+        Manager has his own run per month (Oct 2026), so an employee with
+        entries under two GMs is paid by two runs, and one of them going out
+        says nothing about the other's rows.
+        """
+        rows = self.sudo()  # a fact, read whoever asks (run rules, Oct 2026)
+        runs = rows.batch_id.run_id
+        if not runs:
+            return self.browse()
         paid_lines = set(
-            (l.period, l.employee_id.id)
+            (l.run_id.id, l.employee_id.id)
             for l in self.env['ksw.pay.run.line'].sudo().search([
-                ('period', 'in', periods), ('x_paid', '=', True),
-                ('employee_id', 'in', self.employee_id.ids),
-            ])) if periods else set()
-        return self.filtered(
-            lambda e: e.x_vacation_payslip_id or e.period in paid_periods
-            or (e.period, e.employee_id.id) in paid_lines)
+                ('run_id', 'in', runs.ids),
+                ('employee_id', 'in', rows.employee_id.ids),
+                '|', ('run_id.state', '=', 'paid'), ('x_paid', '=', True),
+            ]))
+        return self.browse(rows.filtered(
+            lambda e: (e.batch_id.run_id.id, e.employee_id.id)
+            in paid_lines).ids)
+
+    def _paid_entries(self):
+        """Rows nobody reopens: paid on a vacation payslip, paid by their
+        own run, or sitting in a run already marked Paid at all — the
+        cautious reading for the reopen guard, as before the split."""
+        in_paid_run = self.browse(self.sudo().filtered(
+            lambda e: e.batch_id.run_id.state == 'paid').ids)
+        return (self.filtered('x_vacation_payslip_id') | in_paid_run
+                | self._paid_by_run())
 
     def _check_reopenable(self):
         """Refuse to send an approved row back when it has been paid, or a

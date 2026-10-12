@@ -19,8 +19,9 @@ approved.
 The month used to finalise itself once every department with entries was
 approved. It no longer does (Oct 2026): KSWCO September 2026 locked while two
 departments were still preparing and had recorded nothing yet, and they could
-not submit. Finalising is now only ever the company GM's own act; the last
-approval just tells him the submitted part is complete.
+not submit. Finalising is now only ever the run's own GM's act (one run per GM per
+month since Oct 2026); the last approval just tells him the submitted part
+is complete.
 """
 from odoo.exceptions import UserError
 
@@ -73,28 +74,30 @@ class TestRunFinalisation(SubmissionCommon):
     # The repair itself
     # ------------------------------------------------------------------
     def _close(self, run):
-        run.with_user(self.user_company_gm).sudo().action_close_month()
+        # Each GM finalises his own run (Oct 2026). No sudo():
+        # _is_month_closer() exempts env.su.
+        run.with_user(run.sudo().gm_id).action_close_month()
 
     def test_approving_the_last_department_leaves_the_month_to_the_gm(self):
-        sub_a, sub_b, run = self._stuck_run()
+        sub_a, sub_b, run_a = self._stuck_run()
+        run = sub_b.run_id   # B's GM has his own run (Oct 2026)
         existing = run.sudo().message_ids.ids
 
-        sub_b.with_user(self.user_gm_b).sudo().action_approve()
+        sub_b.with_user(self.user_gm_b).action_approve()
 
         self.assertNotIn(run.state, ('approved', 'paid'))
         new = run.sudo().message_ids.filtered(lambda m: m.id not in existing)
         self.assertTrue(
-            new.filtered(lambda m: self.user_company_gm.partner_id
+            new.filtered(lambda m: self.user_gm_b.partner_id
                          in m.partner_ids),
-            'the company GM is told the month is ready to finalise')
-        self.assertTrue(
-            run.with_user(self.user_company_gm).sudo().x_can_close_month)
+            'the run\'s own GM is told his month is ready to finalise')
+        self.assertTrue(run.with_user(self.user_gm_b).x_can_close_month)
 
         self._close(run)
         self.assertEqual(run.state, 'approved')
-        self.assertEqual(
-            run.sudo().line_ids.mapped('employee_id'),
-            self.emp_a | self.emp_b)
+        self.assertEqual(run.sudo().line_ids.mapped('employee_id'), self.emp_b)
+        self.assertNotIn(run_a.state, ('approved', 'paid'),
+                         'finalising B\'s run leaves A\'s run open')
 
     def test_a_department_not_started_yet_can_still_submit(self):
         """The KSWCO incident: A recorded and was approved while B had not
@@ -105,7 +108,7 @@ class TestRunFinalisation(SubmissionCommon):
         self.assertNotIn(run.state, ('approved', 'paid'))
 
         sub_b = self._submit(self.sup_b, self.dept_b, self.emp_b)
-        self.assertEqual(sub_b.run_id, run)
+        self.assertEqual(sub_b.run_id.period, run.period)
         self.assertEqual(sub_b.state, 'submitted')
 
     def test_the_register_is_settled_not_a_preview(self):
@@ -126,7 +129,7 @@ class TestRunFinalisation(SubmissionCommon):
         sub_b.with_user(self.user_gm_b).sudo().action_approve()
         self._close(run)
         with self.assertRaises(UserError):
-            run.with_user(self.user_company_gm).sudo().action_close_month()
+            run.with_user(self.gm_a).action_close_month()
 
     # ------------------------------------------------------------------
     # The button that was missing
@@ -146,8 +149,8 @@ class TestRunFinalisation(SubmissionCommon):
         run.invalidate_recordset()
 
         self.assertTrue(
-            run.with_user(self.user_company_gm).sudo().x_can_close_month)
-        run.with_user(self.user_company_gm).sudo().action_close_month()
+            run.with_user(self.gm_a).x_can_close_month)
+        run.with_user(self.gm_a).action_close_month()
         self.assertEqual(run.state, 'approved')
 
     def _system_admin(self, login):
@@ -189,17 +192,23 @@ class TestRunFinalisation(SubmissionCommon):
         with self.assertRaises(UserError):
             run.with_user(officer).action_close_month()
 
-    def test_a_department_gm_still_cannot_finalise_the_month(self):
+    def test_another_gm_cannot_finalise_the_month(self):
         sub_a, sub_b, run = self._stuck_run()
-        self.assertFalse(run.with_user(self.gm_a).x_can_close_month)
+        self.assertFalse(self._closer_as(run, self.user_gm_b))
         with self.assertRaises(UserError):
-            run.with_user(self.gm_a).action_close_month()
+            run.with_user(self.user_gm_b).action_close_month()
+
+    def _closer_as(self, run, user):
+        """_is_month_closer as ``user`` without his record rules, which
+        hide another GM's run from him entirely."""
+        return run.with_env(run.env(user=user.id, su=False)).sudo(
+            False)._is_month_closer()
 
     def test_finalising_does_not_pay_a_department_never_approved(self):
         """Unchanged by the widened button: B handed over, its GM never
         signed, so B is left out even though the month is finalised."""
         sub_a, sub_b, run = self._stuck_run()
-        run.with_user(self.user_company_gm).sudo().action_close_month()
+        run.with_user(self.gm_a).action_close_month()
 
         self.assertEqual(sub_b.state, 'submitted')
         paid = run.sudo().line_ids.mapped('employee_id')

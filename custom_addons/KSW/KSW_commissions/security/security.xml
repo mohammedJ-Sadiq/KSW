@@ -400,6 +400,60 @@
     </record>
 
     <!--
+        The monthly run itself (Oct 2026). Each General Manager has his own
+        run per month, and no GM opens another's: the run carries company
+        level figures (totals, employee count, chatter, the list of
+        departments) that the per-department rules above never covered,
+        because there were no rules on ksw.pay.run at all.
+
+        One rule per role, not a GM rule alone: once any of a user's groups
+        has a rule on a model, only his groups' rules apply, so a GM-only
+        rule would narrow a "Supervisor & General Manager" to his GM runs
+        and lose him the runs his own departments hand over on.
+    -->
+    <record id="pay_run_rule_supervisor" model="ir.rule">
+        <field name="name">KSW Pay Run: months my departments are on</field>
+        <field name="model_id" ref="model_ksw_pay_run"/>
+        <field name="groups" eval="[(4, ref('group_commission_supervisor'))]"/>
+        <field name="domain_force">['|', '|', ('submission_ids.department_id.manager_id.user_id', '=', user.id), ('submission_ids.department_id.manager_id.user_id', 'in', user.x_assisted_manager_ids.ids), ('submission_ids.batch_ids.create_uid', '=', user.id)]</field>
+    </record>
+
+    <record id="pay_run_rule_department_gm" model="ir.rule">
+        <field name="name">KSW Pay Run: my own runs (GM)</field>
+        <field name="model_id" ref="model_ksw_pay_run"/>
+        <field name="groups" eval="[(4, ref('group_commission_gm'))]"/>
+        <field name="domain_force">[('gm_id', '=', user.id)]</field>
+    </record>
+
+    <record id="pay_run_rule_officer" model="ir.rule">
+        <field name="name">KSW Pay Run: Administrator (all)</field>
+        <field name="model_id" ref="model_ksw_pay_run"/>
+        <field name="groups" eval="[(4, ref('group_commission_officer'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <!--
+        The Settings administrator is the way out when a run's GM is absent
+        (ksw.pay.run._is_month_closer), so he must reach every run. Grants
+        nothing on its own: base.group_system has no ACL on ksw.pay.run, so
+        this only widens a Settings admin who also holds a commission role.
+        Never give a department GM base.group_system, or he sees every run.
+    -->
+    <record id="pay_run_rule_system" model="ir.rule">
+        <field name="name">KSW Pay Run: Settings administrator (all)</field>
+        <field name="model_id" ref="model_ksw_pay_run"/>
+        <field name="groups" eval="[(4, ref('base.group_system'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <record id="pay_run_rule_accountant" model="ir.rule">
+        <field name="name">KSW Pay Run: accountant (all)</field>
+        <field name="model_id" ref="model_ksw_pay_run"/>
+        <field name="groups" eval="[(4, ref('group_commission_accountant'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <!--
         Sub-batches follow their department month exactly: the supervisor
         who runs (or assists on) the department, whoever created one, the
         department's own GM (read and write, never create or delete), the
