@@ -30,7 +30,7 @@
         <field name="name">ksw.water.capture.form</field>
         <field name="model">ksw.water.capture</field>
         <field name="arch" type="xml">
-            <form string="Offline Delivery">
+            <form string="App Delivery">
                 <header>
                     <button name="action_accept" type="object" string="Accept and Issue"
                             class="btn-primary" invisible="state != 'held'"
@@ -83,6 +83,7 @@
                             <!-- Three timestamps, deliberately not one: offline
                                  capture moves the first under the driver's control. -->
                             <field name="captured_at" readonly="1"/>
+                            <field name="sent_live" readonly="1"/>
                             <field name="received_at" readonly="1"/>
                             <field name="queued_seconds" readonly="1"/>
                             <field name="clock_skew_s" readonly="1"/>
@@ -151,18 +152,18 @@
     </record>
 
     <record id="action_water_captures" model="ir.actions.act_window">
-        <field name="name">Offline Deliveries</field>
+        <field name="name">App Deliveries</field>
         <field name="res_model">ksw.water.capture</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_water_capture_search"/>
         <field name="context">{'search_default_needs_me': 1}</field>
         <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">Nothing captured offline yet.</p>
+            <p class="o_view_nocontent_smiling_face">No deliveries from the driver app yet.</p>
             <p>
-                Deliveries a driver recorded at a client with no mobile signal
-                arrive here when his phone gets back into coverage. Most are
-                issued straight away; the ones whose location could not be
-                confirmed wait for you.
+                Every delivery a driver saves in the app lands here: at once
+                with signal, or when his phone gets back into coverage. Most
+                are issued straight away; the ones outside the client's range
+                (or with no location fix) wait for you to accept or reject.
             </p>
         </field>
     </record>

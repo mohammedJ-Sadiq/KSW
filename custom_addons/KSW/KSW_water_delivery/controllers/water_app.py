@@ -16,7 +16,7 @@ DRIVER_GROUP = 'KSW_water_delivery.group_water_driver'
 # worker keys its cache on it, so a bump is how a driver's phone picks up a new
 # version of the app -- there is no other route in, because the whole point is
 # that it does not go to the network to find out.
-APP_VERSION = '1.0.5'
+APP_VERSION = '1.0.6'
 
 
 class KswWaterApp(http.Controller):
@@ -37,6 +37,12 @@ class KswWaterApp(http.Controller):
     of IndexedDB, and posts the queue back through `/water/sync` when there is
     a connection. The Odoo app stays exactly as it is for dispatchers, billing
     and anyone looking at a finished note.
+
+    Since Oct 2026 it is also the driver's ONLY app: the web-client New
+    Delivery screen opens this instead. With signal a capture is sent the
+    moment it is saved (`sent_live`), so "online" is simply a queue that
+    empties at once -- one path, one set of rules, and an out-of-range note is
+    held for the supervisor whether or not there was signal.
     """
 
     # ------------------------------------------------------------------

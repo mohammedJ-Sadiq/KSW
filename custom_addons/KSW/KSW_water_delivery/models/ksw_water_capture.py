@@ -35,7 +35,7 @@ class KswWaterCapture(models.Model):
       When the note and the capture disagree, the disagreement is the finding.
     """
     _name = 'ksw.water.capture'
-    _description = 'Water Delivery Captured Offline'
+    _description = 'Water Delivery from the Driver App'
     _inherit = ['mail.thread']
     _order = 'captured_at desc, id desc'
 
@@ -122,6 +122,15 @@ class KswWaterCapture(models.Model):
     )
 
     app_version = fields.Char(string='App Version', readonly=True)
+    # The driver app is the only way a driver issues a note (Oct 2026), so a
+    # capture is no longer evidence of a dead spot by itself. The phone says
+    # whether this was the send it made the moment the driver saved -- with
+    # signal -- or a later flush of its queue. Only the second is offline.
+    sent_live = fields.Boolean(
+        string='Sent Immediately', readonly=True,
+        help='Sent the moment the driver saved it, with a connection. Off '
+             'means it waited on the phone for signal.',
+    )
 
     # --- the outcome ------------------------------------------------------
     picking_id = fields.Many2one('stock.picking', string='Delivery Note',
@@ -238,6 +247,7 @@ class KswWaterCapture(models.Model):
             'received_at': now,
             'clock_skew_s': skew,
             'app_version': payload.get('app_version') or False,
+            'sent_live': bool(payload.get('sent_live')),
         }
         capture = self.sudo().create(values)
         capture._try_issue()
@@ -315,7 +325,7 @@ class KswWaterCapture(models.Model):
             'gps_accuracy': self.gps_accuracy,
             'note': self.note,
             'off_route': self.off_route,
-            'issued_offline': True,
+            'issued_offline': not self.sent_live,
             'captured_at': self.captured_at,
         }
 

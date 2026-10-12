@@ -93,7 +93,7 @@ class TestTankerDriverClients(OfflineCaptureCommon):
 
 @tagged('post_install', '-at_install')
 class TestWaterAppHome(OfflineCaptureCommon):
-    """Opening the app: a driver lands in the form, a supervisor in the list."""
+    """Opening the app: a driver lands in the driver app, a supervisor in the list."""
 
     def _home(self, user):
         return self.env.ref('KSW_water_delivery.action_water_delivery_home').with_user(user).run()
@@ -102,9 +102,14 @@ class TestWaterAppHome(OfflineCaptureCommon):
         root = self.env.ref('KSW_water_delivery.menu_water_delivery_root')
         self.assertEqual(root.action, self.env.ref('KSW_water_delivery.action_water_delivery_home'))
 
-    def test_a_driver_opens_on_new_delivery(self):
+    def test_a_driver_opens_the_driver_app(self):
+        """One app (Oct 2026): /water/ sends at once with signal and queues
+        without, so no driver entry leads to the old web-client form."""
         action = self._home(self.driver_user)
-        self.assertEqual(action['res_model'], 'ksw.water.delivery.wizard')
+        self.assertEqual(action['type'], 'ir.actions.act_url')
+        self.assertEqual(action['url'], '/water/')
+        menu = self.env.ref('KSW_water_delivery.menu_water_delivery_new')
+        self.assertEqual(menu.action.url, '/water/')
 
     def test_a_supervisor_opens_on_the_notes_list(self):
         action = self._home(self.dispatcher_user)

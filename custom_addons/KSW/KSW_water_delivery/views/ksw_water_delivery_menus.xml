@@ -7,8 +7,8 @@
     <!-- What the app opens on. Without it Odoo opens the first child, New
          Delivery: a dialog (target new) over an empty page, full screen on a
          phone, so a supervisor never saw the menu bar behind it. A driver
-         still lands straight in the form; anyone who oversees lands in the
-         notes list with the whole menu. -->
+         goes to the driver app (/water/, online and offline in one); anyone
+         who oversees lands in the notes list with the whole menu. -->
     <record id="action_water_delivery_home" model="ir.actions.server">
         <field name="name">Water Delivery</field>
         <field name="model_id" ref="stock.model_stock_picking"/>
@@ -17,9 +17,12 @@
         <field name="code">
 oversees = (env.user.has_group('KSW_water_delivery.group_water_dispatcher')
             or env.user.has_group('KSW_water_delivery.group_water_billing'))
-action = env['ir.actions.act_window']._for_xml_id(
-    'KSW_water_delivery.action_water_delivery_all_notes' if oversees
-    else 'KSW_water_delivery.action_water_delivery_wizard')
+if oversees:
+    action = env['ir.actions.act_window']._for_xml_id(
+        'KSW_water_delivery.action_water_delivery_all_notes')
+else:
+    action = env['ir.actions.act_url']._for_xml_id(
+        'KSW_water_delivery.action_water_driver_app')
         </field>
     </record>
 
@@ -33,7 +36,7 @@ action = env['ir.actions.act_window']._for_xml_id(
     <menuitem id="menu_water_delivery_new"
               name="New Delivery"
               parent="menu_water_delivery_root"
-              action="action_water_delivery_wizard"
+              action="action_water_driver_app"
               sequence="10"
               groups="KSW_water_delivery.group_water_driver"/>
 
@@ -55,7 +58,7 @@ action = env['ir.actions.act_window']._for_xml_id(
          Configuration, because it is day-to-day work: a held delivery is one
          a driver has already made. -->
     <menuitem id="menu_water_delivery_captures"
-              name="Offline Deliveries"
+              name="App Deliveries"
               parent="menu_water_delivery_root"
               action="action_water_captures"
               sequence="40"

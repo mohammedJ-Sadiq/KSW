@@ -88,7 +88,7 @@
         <field name="arch" type="xml">
             <list string="Delivery Notes" create="false" edit="false" sample="1">
                 <header>
-                    <button name="%(KSW_water_delivery.action_water_delivery_wizard)d"
+                    <button name="%(KSW_water_delivery.action_water_driver_app)d"
                             type="action" string="New Delivery"
                             class="btn-primary" display="always"
                             groups="KSW_water_delivery.group_water_driver"/>
@@ -134,7 +134,7 @@
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile" create="false" sample="1">
                 <header>
-                    <button name="%(KSW_water_delivery.action_water_delivery_wizard)d"
+                    <button name="%(KSW_water_delivery.action_water_driver_app)d"
                             type="action" string="New Delivery"
                             class="btn-primary" display="always"
                             groups="KSW_water_delivery.group_water_driver"/>

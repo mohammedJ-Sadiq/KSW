@@ -301,6 +301,39 @@ class TestDispatcherReview(OfflineCaptureCommon):
 
 
 @tagged('post_install', '-at_install')
+class TestOneApp(OfflineCaptureCommon):
+    """The driver app is the only driver screen (Oct 2026): with signal a
+    capture is sent the moment it is saved, without it the queue waits. One
+    path, so an out-of-range note is held for the supervisor either way."""
+
+    def test_a_queued_capture_is_still_marked_offline(self):
+        """The negative half first: a flush of the queue must keep saying so."""
+        picking = self._receive().picking_id.sudo()
+        self.assertTrue(picking.x_issued_offline)
+
+    def test_a_capture_sent_on_save_is_not_offline(self):
+        capture = self._receive(sent_live=True)
+        self.assertTrue(capture.sent_live)
+        self.assertEqual(capture.state, 'issued')
+        self.assertFalse(capture.picking_id.sudo().x_issued_offline)
+
+    def test_out_of_range_with_signal_is_held_for_the_supervisor(self):
+        """Online is no longer a refusal: the driver confirms on the phone and
+        the note waits, unvalidated, for the supervisor -- same as offline."""
+        self._enforce_here()
+        capture = self._receive(
+            sent_live=True, gps_latitude=FAR[0], gps_longitude=FAR[1])
+
+        self.assertEqual(capture.state, 'held')
+        picking = capture.picking_id.sudo()
+        self.assertNotEqual(picking.state, 'done')
+        self.assertFalse(picking.x_issued_offline)
+
+        capture.with_user(self.dispatcher_user).action_accept()
+        self.assertEqual(picking.state, 'done')
+
+
+@tagged('post_install', '-at_install')
 class TestNothingIsLost(OfflineCaptureCommon):
 
     def test_a_missing_rate_fails_without_losing_the_delivery(self):

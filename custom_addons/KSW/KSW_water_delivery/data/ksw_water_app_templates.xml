@@ -10,6 +10,16 @@
          whenever there is a signal. -->
     <!-- The doctype is escaped because this file is parsed as XML first;
          core does exactly the same in `web.layout`. -->
+    <!-- The driver app is the only place a driver issues a note: every
+         Odoo-side entry (root menu for drivers, New Delivery, the header
+         buttons, the home action) opens it. Defined here, ahead of the views
+         that reference it, for a fresh install (Pitfalls #158). -->
+    <record id="action_water_driver_app" model="ir.actions.act_url">
+        <field name="name">Water Delivery App</field>
+        <field name="url">/water/</field>
+        <field name="target">self</field>
+    </record>
+
     <template id="water_app_shell" name="Water Delivery App">&lt;!DOCTYPE html&gt;
         <html lang="en">
             <head>

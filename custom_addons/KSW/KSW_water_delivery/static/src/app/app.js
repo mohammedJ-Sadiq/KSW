@@ -5,6 +5,11 @@
  * a customer site with no signal, and every kilobyte of framework is a kilobyte
  * that has to be cached correctly for that to work.
  *
+ * It is the driver's ONE app (Oct 2026): there is no separate online screen.
+ * Every delivery goes through the same queue — with signal it leaves the
+ * phone the moment it is saved and the driver sees the note number; without
+ * signal it waits on the phone and sends itself later. Same rules either way.
+ *
  * The shape of the thing:
  *
  *   reference  — clients, their products and the agreed rates, pulled whenever
@@ -155,12 +160,26 @@ function uuid() {
 // ---------------------------------------------------------------------------
 // Server
 // ---------------------------------------------------------------------------
+// One bar of signal reports "online" and then never answers. Give up after
+// this long: whatever was being sent stays queued and goes later.
+const CALL_TIMEOUT_MS = 30000;
+
 async function callJson(route, params) {
-    const response = await fetch(route, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jsonrpc: "2.0", method: "call", params: params || {} }),
-    });
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), CALL_TIMEOUT_MS);
+    let response;
+    try {
+        response = await fetch(route, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ jsonrpc: "2.0", method: "call", params: params || {} }),
+            signal: controller.signal,
+        });
+    } catch (error) {
+        throw error.name === "AbortError" ? new Error("the connection is too weak") : error;
+    } finally {
+        clearTimeout(timer);
+    }
     if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
     }
@@ -213,7 +232,7 @@ async function enqueue(capture) {
  * there that a dispatcher can see and retry — keeping a copy here that nothing
  * will ever retry is how duplicates get made.
  */
-async function flushQueue({ quiet = false } = {}) {
+async function flushQueue({ quiet = false, live = null } = {}) {
     if (state.syncing || !navigator.onLine) {
         return;
     }
@@ -242,7 +261,11 @@ async function flushQueue({ quiet = false } = {}) {
         // knowing before anyone reads `captured_at` as evidence).
         const sentAt = new Date().toISOString().slice(0, 19).replace("T", " ");
         const { results } = await callJson("/water/sync", {
-            captures: pending.map((c) => ({ ...c.payload, sent_at: sentAt })),
+            // `sent_live` only for the capture just saved, on the send made
+            // at that moment: it was issued with signal, not from the queue.
+            captures: pending.map((c) => ({
+                ...c.payload, sent_at: sentAt, sent_live: c.uuid === live,
+            })),
         });
         let held = 0;
         let failed = 0;
@@ -254,7 +277,17 @@ async function flushQueue({ quiet = false } = {}) {
             if (result.status === "failed" || result.status === "error") failed += 1;
         }
         state.queue = await dbAll(STORE_QUEUE);
-        if (!quiet) {
+        const own = live && results.length === 1 && results[0].uuid === live ? results[0] : null;
+        if (own && !pinMessage) {
+            // The driver is standing at the client: tell him about THIS note.
+            if (own.status === "issued") {
+                banner("ok", `Note ${own.note} issued.`);
+            } else if (own.status === "held") {
+                banner("warn", `Note ${own.note} saved — waiting for your supervisor to approve it. ${own.message}`);
+            } else {
+                banner("warn", `Saved, but the note could not be issued — the office has it. ${own.message || ""}`);
+            }
+        } else if (!quiet) {
             const sent = results.filter((r) => r.settled).length;
             let message = `${sent} delivery${sent === 1 ? "" : "s"} sent.`;
             if (held) {
@@ -571,11 +604,17 @@ async function saveCapture() {
         return banner("warn", "Record the name of the person who signed.");
     }
 
-    // Refused here, not saved-and-held: the driver is at the gate and the
-    // water is still in the tank, so this is the moment the rule can be kept.
+    // Out of range (or no fix) is not a refusal: the note is saved and held
+    // for the supervisor, online or not. Asked here first because the driver
+    // is at the gate -- if he picked the wrong client, now is when it is free
+    // to fix. A client with NO approved location never gets this far
+    // (canDeliver above): that still needs a pin first.
     const problem = locationProblem(form);
-    if (problem) {
-        return banner("warn", problem);
+    if (problem && !window.confirm(
+        `${problem}\n\nSave it anyway? The note will not count until your ` +
+        "supervisor approves it."
+    )) {
+        return;
     }
 
     const usual = form.partner.usual;
@@ -613,7 +652,7 @@ async function saveCapture() {
     state.view = "queue";
     banner("ok", navigator.onLine ? "Saved. Sending…" : "Saved on the phone. It will send itself when you have signal.");
     render();
-    flushQueue({ quiet: true });
+    flushQueue({ quiet: true, live: capture.uuid });
 }
 
 // ---------------------------------------------------------------------------
@@ -900,7 +939,8 @@ function renderForm() {
 
         ${renderPinBox()}
 
-        ${problem && canDeliver(form.partner) ? `<div class="ksw-warnbox">${esc(problem)}</div>` : ""}
+        ${problem && canDeliver(form.partner) ? `<div class="ksw-warnbox">${esc(problem)}
+            If you save, your supervisor has to approve the note.</div>` : ""}
 
         ${canDeliver(form.partner) ? renderProduct() : ""}
 
@@ -916,7 +956,8 @@ function renderForm() {
             <label class="ksw-label">Remark</label>
             <input id="ksw-note" class="ksw-input" value="${esc(form.note)}"
                    placeholder="Anything the client should see"/>
-            <button id="ksw-save" class="ksw-primary" ${problem || tankerProblem ? "disabled" : ""}>Save Delivery</button>` : ""}`;
+            <button id="ksw-save" class="ksw-primary" ${tankerProblem ? "disabled" : ""}>
+                ${problem ? "Save for Supervisor Approval" : "Save Delivery"}</button>` : ""}`;
 }
 
 function renderPinBox() {
