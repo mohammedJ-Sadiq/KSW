@@ -48,3 +48,5 @@ access_ksw_payslip_run_done_wizard_line,ksw.payslip.run.done.wizard.line,model_k
 access_ksw_payslip_pending_change_user,ksw.payslip.pending.change.user,model_ksw_payslip_pending_change,om_hr_payroll.group_hr_payroll_user,1,0,0,0
 access_ksw_payslip_pending_change_manager,ksw.payslip.pending.change.manager,model_ksw_payslip_pending_change,om_hr_payroll.group_hr_payroll_manager,1,1,0,0
 access_ksw_payslip_pending_change_reviewer,ksw.payslip.pending.change.reviewer,model_ksw_payslip_pending_change,group_hr_payroll_reviewer,1,0,0,0
+access_ksw_revision_bank_file_acc,ksw.revision.bank.file.acc,model_ksw_revision_bank_file,KSW_annual_leave.group_annual_leave_acc,1,1,1,1
+access_ksw_revision_bank_file_officer,ksw.revision.bank.file.officer,model_ksw_revision_bank_file,om_hr_payroll.group_hr_payroll_user,1,0,0,0

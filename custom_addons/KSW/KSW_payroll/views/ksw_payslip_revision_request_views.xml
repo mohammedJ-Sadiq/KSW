@@ -44,7 +44,7 @@
                     <button name="action_acc_pay" type="object"
                             string="Confirm &amp; Pay" class="btn-primary"
                             invisible="not can_acc_act"
-                            confirm="This confirms the revision payslip. A bank transfer is marked paid and its Excel and TXT bank files are generated now; a cash payment goes to the Loan Disbursement Officer to hand over. Continue?"/>
+                            confirm="This confirms the revision payslip. A bank transfer waits for the next revision bank file (Salary Revisions &gt; Bank Files); a cash payment goes to the Loan Disbursement Officer to hand over. Continue?"/>
                     <button name="action_acc_refuse" type="object"
                             string="Refuse"
                             invisible="not can_acc_act"/>
@@ -54,11 +54,11 @@
                             confirm="Confirm that the cash has been handed over to the employee?"/>
                     <button name="action_export_bank_excel" type="object"
                             string="Bank File (Excel)"
-                            invisible="state not in ('pending_acc', 'paid') or revision_state != 'done' or payment_method != 'bank'"
+                            invisible="state not in ('pending_acc', 'paid') or revision_state != 'done' or payment_method != 'bank' or bank_file_id"
                             groups="om_hr_payroll.group_hr_payroll_user,KSW_annual_leave.group_annual_leave_acc"/>
                     <button name="action_export_bank_txt" type="object"
                             string="Bank File (TXT)"
-                            invisible="state not in ('pending_acc', 'paid') or revision_state != 'done' or payment_method != 'bank'"
+                            invisible="state not in ('pending_acc', 'paid') or revision_state != 'done' or payment_method != 'bank' or bank_file_id"
                             groups="om_hr_payroll.group_hr_payroll_user,KSW_annual_leave.group_annual_leave_acc"/>
                     <button name="action_cancel" type="object"
                             string="Cancel Request"
@@ -193,7 +193,7 @@
                             </group>
                         </page>
                         <page string="Payment" name="payment"
-                              invisible="state not in ('pending_acc', 'pending_disbursement', 'paid')">
+                              invisible="state not in ('pending_acc', 'pending_disbursement', 'pending_bank_file', 'paid')">
                             <group>
                                 <group>
                                     <field name="payment_method"
@@ -212,13 +212,20 @@
                                     <field name="payment_date" readonly="1"/>
                                     <field name="payslip_run_id" readonly="1"
                                            groups="om_hr_payroll.group_hr_payroll_user"/>
+                                    <!-- groups= on purpose: the file holds
+                                         other employees' accounts, and the
+                                         employee has no access to it. -->
+                                    <field name="bank_file_id" readonly="1"
+                                           invisible="not bank_file_id"
+                                           groups="KSW_annual_leave.group_annual_leave_acc,om_hr_payroll.group_hr_payroll_user"/>
                                 </group>
                             </group>
                             <div class="alert alert-info" role="alert"
                                  invisible="state != 'pending_acc'">
                                 <strong>Bank transfer:</strong> Confirm &amp; Pay
-                                marks the request paid and generates the Excel
-                                and TXT bank files for this employee alone.
+                                confirms the revision and queues it for the
+                                next revision bank file, which can pay many
+                                employees in one upload.
                                 <strong>Cash:</strong> Confirm &amp; Pay sends
                                 it to the Loan Disbursement Officer, who
                                 confirms once the cash is handed over.
@@ -228,8 +235,15 @@
                                 Awaiting the Loan Disbursement Officer to
                                 confirm the cash was handed to the employee.
                             </div>
+                            <div class="alert alert-warning" role="alert"
+                                 invisible="state != 'pending_bank_file'">
+                                Confirmed for bank transfer. Waiting to be
+                                included in a revision bank file
+                                (Salary Revisions &gt; Bank Files).
+                            </div>
                             <div class="alert alert-info" role="alert"
-                                 invisible="state != 'paid' or payment_method != 'bank'">
+                                 invisible="state != 'paid' or payment_method != 'bank' or bank_file_id"
+                                 groups="KSW_annual_leave.group_annual_leave_acc,om_hr_payroll.group_hr_payroll_user">
                                 The Excel and TXT bank files are kept under
                                 Supporting Documents above. Use
                                 <strong>Bank File (Excel)</strong> /
@@ -254,7 +268,7 @@
             <list string="Revision Requests"
                   decoration-muted="state in ('cancelled', 'refused')"
                   decoration-success="state == 'paid'"
-                  decoration-bf="state in ('pending_dm', 'pending_hr', 'pending_gm', 'pending_acc', 'pending_disbursement')">
+                  decoration-bf="state in ('pending_dm', 'pending_hr', 'pending_gm', 'pending_acc', 'pending_disbursement', 'pending_bank_file')">
                 <field name="name"/>
                 <field name="employee_id"/>
                 <field name="department_id" optional="show"/>
@@ -264,10 +278,11 @@
                 <field name="claimed_amount" sum="Claimed" optional="hide"/>
                 <field name="difference_amount" sum="Difference Payable"/>
                 <field name="payment_method" optional="hide"/>
+                <field name="paying_bank_label" optional="hide"/>
                 <field name="state" widget="badge"
                        decoration-success="state == 'paid'"
                        decoration-danger="state == 'refused'"
-                       decoration-warning="state in ('pending_dm', 'pending_hr', 'pending_gm', 'pending_acc', 'pending_disbursement')"/>
+                       decoration-warning="state in ('pending_dm', 'pending_hr', 'pending_gm', 'pending_acc', 'pending_disbursement', 'pending_bank_file')"/>
             </list>
         </field>
     </record>
@@ -288,7 +303,9 @@
                         domain="[('is_pending_my_action', '=', True)]"/>
                 <separator/>
                 <filter name="open" string="Open"
-                        domain="[('state', 'in', ['draft', 'pending_dm', 'pending_hr', 'pending_gm', 'pending_acc', 'pending_disbursement'])]"/>
+                        domain="[('state', 'in', ['draft', 'pending_dm', 'pending_hr', 'pending_gm', 'pending_acc', 'pending_disbursement', 'pending_bank_file'])]"/>
+                <filter name="pending_bank_file" string="Pending Bank File"
+                        domain="[('state', '=', 'pending_bank_file')]"/>
                 <filter name="paid" string="Paid"
                         domain="[('state', '=', 'paid')]"/>
                 <filter name="refused" string="Refused / Cancelled"

@@ -18,7 +18,10 @@ Covered here:
   6. Refusal at each step, with a reason.
   7. The field whitelist: write access on the document is not permission
      to walk the chain over RPC.
-  8. The bank file, generated for this one employee.
+  8. The bank file, generated for this one employee (requests paid before
+     the combined bank file).
+  9. The combined revision bank file: accounting picks which pending bank
+     transfers go into one Excel + TXT; the rest wait for the next file.
 
 Same structure fixture as `test_payslip_revision.py`, and for the same
 reason: ATTDED is deliberately left out, because the test employee has no
@@ -27,6 +30,8 @@ unpresented, squeezing the net to zero and making every figure here
 unpredictable.
 """
 from datetime import date
+
+from dateutil.relativedelta import relativedelta
 
 from odoo.exceptions import UserError, AccessError
 from odoo.tests.common import TransactionCase
@@ -163,12 +168,16 @@ class TestPayslipRevisionRequest(TransactionCase):
     # Helpers
     # ------------------------------------------------------------------
 
-    def _make_done_payslip(self, name='Original'):
+    def _make_done_payslip(self, name='Original', month=None):
+        date_from, date_to = self.month_start, self.month_end
+        if month:
+            date_from = date(2026, month, 1)
+            date_to = date_from + relativedelta(months=1, days=-1)
         slip = self.env['hr.payslip'].sudo().create({
             'employee_id': self.employee.id,
             'name': name,
-            'date_from': self.month_start,
-            'date_to': self.month_end,
+            'date_from': date_from,
+            'date_to': date_to,
             'struct_id': self.structure.id,
             'version_id': self.version.id,
         })
@@ -632,25 +641,22 @@ class TestPayslipRevisionRequest(TransactionCase):
             req.with_user(self.user_acc).action_acc_pay()
         self.assertEqual(req.state, 'pending_acc')
 
-    def test_bank_transfer_pays_and_produces_both_files(self):
+    def test_bank_transfer_waits_for_a_bank_file(self):
+        """Confirm & Pay fixes the figure; the money goes out with the next
+        combined bank file, not one file per employee."""
         req = self._at_accounting()
         req.with_user(self.user_acc).write({'payment_method': 'bank'})
+        existing = req.sudo().message_ids.ids
         req.with_user(self.user_acc).action_acc_pay()
-        self.assertEqual(req.state, 'paid')
+        self.assertEqual(req.state, 'pending_bank_file')
         self.assertEqual(req.revision_payslip_id.sudo().state, 'done')
         self.assertEqual(req.acc_user_id, self.user_acc)
-        self.assertTrue(req.payment_date)
-        self.assertTrue(req.payslip_run_id)
-        names = req.sudo().attachment_ids.mapped('name')
-        self.assertTrue([n for n in names if n.endswith('.xlsx')],
-                        'no Excel bank file: %s' % names)
-        self.assertTrue([n for n in names if n.lower().endswith('.txt')],
-                        'no TXT bank file: %s' % names)
-        # Filed on the request, so accounting can download them (the batch
-        # would 403 for this user).
-        for att in req.sudo().attachment_ids:
-            self.assertEqual(att.res_model, req._name)
-            att.with_user(self.user_acc).check_access('read')
+        self.assertFalse(req.payment_date)
+        self.assertFalse(req.bank_file_id)
+        self.assertFalse(req.sudo().attachment_ids,
+                         'no file is generated per request any more')
+        self.assertFalse(self._notified(req, existing, self.user_employee),
+                         'the employee is told only once it is paid')
 
     def test_bank_payment_without_a_bank_account_fails_clearly(self):
         """No file for the bank means no payment: the step rolls back and
@@ -766,10 +772,9 @@ class TestPayslipRevisionRequest(TransactionCase):
                 req.with_user(user).action_acc_pay()
 
     def test_employee_is_notified_when_paid(self):
-        req = self._at_accounting()
-        req.sudo().write({'payment_method': 'bank'})
+        req = self._at_bank_file()
         existing = req.sudo().message_ids.ids
-        req.with_user(self.user_acc).action_acc_pay()
+        self._generate(req)
         new = req.sudo().message_ids.filtered(lambda m: m.id not in existing)
         self.assertTrue(new.filtered(
             lambda m: self.user_employee.partner_id in m.partner_ids))
@@ -911,9 +916,7 @@ class TestPayslipRevisionRequest(TransactionCase):
     # ==================================================================
 
     def test_bank_file_covers_this_employee_only(self):
-        req = self._at_accounting()
-        req.with_user(self.user_acc).write({'payment_method': 'bank'})
-        req.with_user(self.user_acc).action_acc_pay()
+        req = self._at_bank_file()
 
         # A second, unrelated employee is confirmed for the same month, to
         # prove the file is scoped to the request and not to the period.
@@ -932,7 +935,7 @@ class TestPayslipRevisionRequest(TransactionCase):
             'version_id': other_version.id,
         }).action_payslip_done()
 
-        run = req.sudo()._ensure_payment_batch()
+        run = self._generate(req).payslip_run_id
         self.assertEqual(len(run.slip_ids), 1)
         self.assertEqual(run.slip_ids.employee_id, self.employee)
         self.assertEqual(run.slip_ids, req.revision_payslip_id.sudo())
@@ -949,3 +952,156 @@ class TestPayslipRevisionRequest(TransactionCase):
         req = self._accepted()
         with self.assertRaises(UserError):
             req.with_user(self.user_acc).action_export_bank_excel()
+
+    # ==================================================================
+    # 9. The combined revision bank file
+    # ==================================================================
+
+    def _at_bank_file(self, month=None):
+        """Walk a bank-transfer request to pending_bank_file."""
+        slip = self._make_done_payslip(month=month) if month else None
+        req = self._at_accounting(slip)
+        req.with_user(self.user_acc).write({'payment_method': 'bank'})
+        req.with_user(self.user_acc).action_acc_pay()
+        return req
+
+    def _generate(self, requests, user=None):
+        user = user or self.user_acc
+        bank_file = self.BankFile.with_user(user).create({
+            'request_ids': [(6, 0, requests.ids)],
+            'value_date': date(2026, 10, 12),
+        })
+        bank_file.action_generate()
+        return bank_file
+
+    @property
+    def BankFile(self):
+        return self.env['ksw.revision.bank.file']
+
+    def test_one_file_pays_the_picked_requests_and_leaves_the_rest(self):
+        july = self._at_bank_file(7)
+        august = self._at_bank_file(8)
+        september = self._at_bank_file(9)
+
+        bank_file = self._generate(july | august)
+
+        self.assertEqual(bank_file.state, 'done')
+        self.assertEqual(bank_file.request_count, 2)
+        for req in (july, august):
+            self.assertEqual(req.state, 'paid')
+            self.assertEqual(req.bank_file_id, bank_file)
+            self.assertEqual(req.payment_date, date(2026, 10, 12))
+        self.assertEqual(september.state, 'pending_bank_file',
+                         'a request not picked waits for the next file')
+        self.assertFalse(september.bank_file_id)
+
+        run = bank_file.sudo().payslip_run_id
+        self.assertEqual(run.slip_ids, (july | august).mapped(
+            'revision_payslip_id').sudo())
+        self.assertAlmostEqual(
+            bank_file.total_amount,
+            july.difference_amount + august.difference_amount)
+
+        # One Excel and one TXT, filed on the bank file for accounting.
+        names = bank_file.attachment_ids.mapped('name')
+        self.assertEqual(len(names), 2, names)
+        self.assertTrue([n for n in names if n.endswith('.xlsx')], names)
+        self.assertTrue([n for n in names if n.lower().endswith('.txt')],
+                        names)
+        for att in bank_file.sudo().attachment_ids:
+            self.assertEqual(att.res_model, bank_file._name)
+            att.with_user(self.user_acc).check_access('read')
+
+        # The leftover goes into the next file on its own.
+        self._generate(september)
+        self.assertEqual(september.state, 'paid')
+
+    def test_the_file_is_never_filed_on_the_request(self):
+        """It carries every included employee's account and amount, and
+        the request's documents are visible to the employee."""
+        req = self._at_bank_file()
+        bank_file = self._generate(req)
+        self.assertFalse(req.sudo().attachment_ids & bank_file.sudo().attachment_ids)
+        with self.assertRaises(AccessError):
+            bank_file.with_user(self.user_employee).check_access('read')
+        for att in bank_file.sudo().attachment_ids:
+            with self.assertRaises(AccessError):
+                att.with_user(self.user_employee).check_access('read')
+
+    def test_new_file_starts_from_every_pending_request(self):
+        july = self._at_bank_file(7)
+        august = self._at_bank_file(8)
+        defaults = self.BankFile.with_user(self.user_acc).default_get(
+            ['request_ids'])
+        picked = self.Request.browse(defaults['request_ids'][0][2])
+        self.assertIn(july, picked)
+        self.assertIn(august, picked)
+
+    def test_new_file_from_selected_rows_keeps_only_pending(self):
+        july = self._at_bank_file(7)
+        august = self._at_bank_file(8)
+        draft = self._submitted(self._make_done_payslip(month=9))
+        defaults = self.BankFile.with_user(self.user_acc).with_context(
+            active_model=self.Request._name,
+            active_ids=(july | draft).ids,
+        ).default_get(['request_ids'])
+        picked = self.Request.browse(defaults['request_ids'][0][2])
+        self.assertEqual(picked, july)
+        self.assertNotIn(august, picked)
+
+    def test_a_request_cannot_go_out_in_two_files(self):
+        req = self._at_bank_file()
+        late = self.BankFile.with_user(self.user_acc).create({
+            'request_ids': [(6, 0, req.ids)]})
+        self._generate(req)
+        with self.assertRaises(UserError):
+            late.action_generate()
+        self.assertEqual(late.state, 'draft')
+
+    def test_only_accounting_may_prepare_a_bank_file(self):
+        req = self._at_bank_file()
+        for user in (self.user_hr, self.user_gm, self.user_employee):
+            # The create() guard fires before the ACL (pitfall #12).
+            with self.assertRaises(UserError):
+                self.BankFile.with_user(user).create({
+                    'request_ids': [(6, 0, req.ids)]})
+        self.assertEqual(req.state, 'pending_bank_file')
+
+    def test_generated_file_is_locked(self):
+        req = self._at_bank_file(7)
+        other = self._at_bank_file(8)
+        bank_file = self._generate(req)
+        with self.assertRaises(UserError):
+            bank_file.write({'request_ids': [(4, other.id)]})
+        with self.assertRaises(UserError):
+            bank_file.unlink()
+
+    def test_failed_export_marks_nothing_paid(self):
+        req = self._at_bank_file()
+        # The account loses its file type after Confirm & Pay.
+        self.paying_account.sudo().x_file_type = False
+        bank_file = self.BankFile.with_user(self.user_acc).create({
+            'request_ids': [(6, 0, req.ids)]})
+        with self.assertRaises(UserError) as caught:
+            with self.env.cr.savepoint():
+                bank_file.action_generate()
+        self.assertIn('NOT generated', str(caught.exception))
+        req.invalidate_recordset()
+        self.assertEqual(req.state, 'pending_bank_file')
+        self.assertEqual(bank_file.state, 'draft')
+
+    def test_pending_bank_file_is_in_the_accounting_queue(self):
+        req = self._at_bank_file()
+        self.assertTrue(req.with_user(self.user_acc).is_pending_my_action)
+        self.assertIn(req, self.Request.with_user(self.user_acc).search(
+            [('is_pending_my_action', '=', True)]))
+        self.assertFalse(req.with_user(self.user_hr).is_pending_my_action)
+        self.assertTrue(req.paying_bank_label)
+
+    def test_single_request_export_is_refused_once_combined(self):
+        req = self._at_bank_file()
+        with self.assertRaises(UserError):
+            req.with_user(self.user_acc).action_export_bank_excel()
+        self._generate(req)
+        with self.assertRaises(UserError):
+            req.with_user(self.user_acc).action_export_bank_txt()

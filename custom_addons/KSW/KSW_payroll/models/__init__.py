@@ -13,5 +13,6 @@ from . import biometric_attendance_sync
 from . import res_config_settings
 from . import res_partner_bank
 from . import ksw_payslip_revision_request
+from . import ksw_revision_bank_file       # one bank file for many revisions
 from . import payslip_value_lock        # Officers review, Managers change, paid is sealed
 from . import payslip_bank_freeze       # an exported payslip is frozen: what the bank was sent

@@ -8,5 +8,12 @@
             <field name="padding">4</field>
             <field name="company_id" eval="False"/>
         </record>
+        <record id="seq_ksw_revision_bank_file" model="ir.sequence">
+            <field name="name">Salary Revision Bank File</field>
+            <field name="code">ksw.revision.bank.file</field>
+            <field name="prefix">RBF/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
     </data>
 </odoo>

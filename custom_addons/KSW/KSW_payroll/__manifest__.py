@@ -1,7 +1,7 @@
 {
     'name': 'KSW - Odoo 19 HR Payroll',
     'category': 'Human Resources/Payroll',
-    'version': '19.0.1.27.0',
+    'version': '19.0.1.28.0',
     'sequence': 1,
     'author': 'Mohammed Albadr',
     'summary': 'HR Payroll Management for Odoo 19 Community Edition',
@@ -56,6 +56,7 @@ Extends om_hr_payroll with:
         'views/payslip_bank_freeze_views.xml',
         'views/hr_payslip_views.xml',
         'views/ksw_payslip_revision_request_views.xml',
+        'views/ksw_revision_bank_file_views.xml',
         'views/hr_version_views.xml',
         'views/hr_salary_rule_views.xml',
         'views/res_config_settings_views.xml',

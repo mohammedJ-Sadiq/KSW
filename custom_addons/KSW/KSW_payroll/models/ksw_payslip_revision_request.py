@@ -43,8 +43,12 @@ class KswPayslipRevisionRequest(models.Model):
     writes the attendance.
 
         draft → pending_dm → pending_hr → pending_gm → pending_acc
-              → paid                                   (bank transfer)
+              → pending_bank_file → paid               (bank transfer)
               → pending_disbursement → paid            (cash)
+
+    A bank transfer is paid when it goes into a ``ksw.revision.bank.file``:
+    one file for as many pending requests as accounting picks, instead of
+    one file per employee.
 
     Refusal, with a reason, is available at every approval step up to and
     including accounting; the GM may also return the request to HR when the
@@ -65,6 +69,7 @@ class KswPayslipRevisionRequest(models.Model):
         ('pending_gm', 'Pending GM Approval'),
         ('pending_acc', 'Pending Accounting Payment'),
         ('pending_disbursement', 'Pending Disbursement'),
+        ('pending_bank_file', 'Pending Bank File'),
         ('paid', 'Paid'),
         ('refused', 'Refused'),
         ('cancelled', 'Cancelled'),
@@ -81,6 +86,7 @@ class KswPayslipRevisionRequest(models.Model):
         'pending_acc': {'groups': (ACC_GROUP,), 'label': 'Accounting Payment'},
         'pending_disbursement': {'groups': (DISB_GROUP,),
                                  'label': 'Cash Disbursement'},
+        'pending_bank_file': {'groups': (ACC_GROUP,), 'label': 'Bank File'},
     }
 
     name = fields.Char(
@@ -218,6 +224,21 @@ class KswPayslipRevisionRequest(models.Model):
     payment_reference = fields.Char(string='Payment Reference', copy=False)
     payment_date = fields.Date(string='Payment Date', readonly=True,
                                copy=False)
+    # The combined file this transfer went out in.  Never shown to the
+    # employee: the file carries every other employee's account and amount,
+    # which is why it lives on the bank file and not under Supporting
+    # Documents.  Only referenced inside groups-gated view elements.
+    # Shown in the bank-file picker so accounting can group a file by bank.
+    # A Char on purpose: an accounting approver may hold no res.partner.bank
+    # read, and a Many2one would need it for its display name.
+    paying_bank_label = fields.Char(
+        string='Paying Bank', compute='_compute_paying_bank_label',
+        compute_sudo=True,
+    )
+    bank_file_id = fields.Many2one(
+        'ksw.revision.bank.file', string='Bank File', readonly=True,
+        copy=False, index=True, ondelete='restrict',
+    )
 
     # ------------------------------------------------------------------
     # Per-user gate fields — every one needs depends_context('uid')
@@ -265,6 +286,15 @@ class KswPayslipRevisionRequest(models.Model):
                 req.difference_amount = 0.0
                 req.deserved_net = 0.0
 
+    @api.depends('revision_payslip_id', 'employee_id')
+    def _compute_paying_bank_label(self):
+        Run = self.env['hr.payslip.run']
+        for req in self:
+            slip = req.revision_payslip_id or req.payslip_id
+            bank = Run._resolve_slip_bank_account(slip) if slip else False
+            req.paying_bank_label = bank and ' - '.join(filter(None, [
+                bank.bank_id.name, bank.acc_number])) or False
+
     @api.depends_context('uid')
     @api.depends('state', 'employee_id', 'payslip_id')
     def _compute_permissions(self):
@@ -303,7 +333,8 @@ class KswPayslipRevisionRequest(models.Model):
             req.can_disburse = req.state == 'pending_disbursement' and is_disb
             req.is_pending_my_action = (
                 req.can_dm_act or req.can_hr_act or req.can_gm_act
-                or req.can_acc_act or req.can_disburse)
+                or req.can_acc_act or req.can_disburse
+                or (req.state == 'pending_bank_file' and is_acc))
 
     def _search_is_pending_my_action(self, operator, value):
         """Records waiting on the current user.
@@ -324,7 +355,7 @@ class KswPayslipRevisionRequest(models.Model):
         if self._is_hr_reviewer(user):
             states.append('pending_hr')
         if user.has_group(ACC_GROUP):
-            states.append('pending_acc')
+            states += ['pending_acc', 'pending_bank_file']
         if self._is_disbursement_officer(user):
             states.append('pending_disbursement')
 
@@ -553,6 +584,9 @@ class KswPayslipRevisionRequest(models.Model):
     # The cashier records the receipt they handed over, nothing else — the
     # method is accounting's decision and is already fixed.
     _DISB_WRITABLE = {'payment_reference'}
+    # Waiting for the bank file: the method is fixed (the revision is
+    # confirmed), only the reference may still be noted.
+    _BANK_FILE_WRITABLE = {'payment_reference'}
 
     def _allowed_write_fields(self):
         """The fields the current user may write on this record right now.
@@ -583,6 +617,9 @@ class KswPayslipRevisionRequest(models.Model):
         if (self.state == 'pending_disbursement'
                 and self._is_disbursement_officer(user)):
             return set(self._DISB_WRITABLE)
+        if (self.state == 'pending_bank_file'
+                and user.has_group(ACC_GROUP)):
+            return set(self._BANK_FILE_WRITABLE)
         return set()
 
     def write(self, vals):
@@ -872,10 +909,12 @@ class KswPayslipRevisionRequest(models.Model):
         the money is committed and the bank file is generated from a
         payslip that can no longer move.
 
-        * **Bank transfer** — paid now, and both bank files (Excel + TXT)
-          are produced on the spot and filed on the request.  If either
-          cannot be produced the whole step rolls back: a bank payment with
-          no file to send the bank is not a payment.
+        * **Bank transfer** — waits in ``pending_bank_file`` until
+          accounting puts it into a combined bank file
+          (``ksw.revision.bank.file``) with whichever other pending
+          requests they pick; it is paid when that file is generated.  The
+          paying account is checked now, so a request that could never
+          reach a file fails here, with nothing confirmed.
         * **Cash** — the money has not left yet, so the request waits in
           ``pending_disbursement`` for the Loan Disbursement Officer to
           confirm they handed it over, exactly as a loan does.
@@ -926,26 +965,12 @@ class KswPayslipRevisionRequest(models.Model):
                       amount=req.difference_amount),
                 )
                 continue
-            req.sudo().write(dict(
-                stamps, state='paid',
-                payment_date=fields.Date.context_today(req)))
-            req._post_step_note(
-                '💵 Paid',
-                _('%(amount).2f SAR paid by %(method)s.',
-                  amount=req.difference_amount,
-                  method=req._payment_method_label()),
-            )
-            # Both files, now: the bank transfer is only real once there is
-            # a file to hand the bank.  Each is re-homed onto the request
-            # under Supporting Documents by _file_export_on_request().
-            try:
-                req._generate_bank_file('all_excel')
-                req._generate_bank_file('all_txt')
-            except UserError as exc:
-                # Raising rolls the whole step back — revision confirmation
-                # included — so say plainly that nothing was paid, and
-                # replace the exporter's batch-level wording ("no fallback
-                # on the batch") with what accounting can actually fix.
+            # The file itself comes later, but an account the exporter would
+            # refuse must stop the payment now, while it can still roll
+            # back — not surface weeks later in the bank-file step.
+            bank = self.env['hr.payslip.run']._resolve_slip_bank_account(
+                revision)
+            if not bank or not bank.x_file_type:
                 raise UserError(_(
                     'Payment NOT recorded — the bank file for %(employee)s '
                     'could not be produced, so nothing was confirmed or '
@@ -954,9 +979,19 @@ class KswPayslipRevisionRequest(models.Model):
                     'File Type) and press Confirm & Pay again, or choose '
                     'Cash as the payment method.',
                     employee=req.employee_id.sudo().name,
-                    reason=exc.args[0] if exc.args else str(exc),
-                )) from exc
-            req._notify_employee_paid()
+                    reason=(_('no Salary Paying Bank Account is set.')
+                            if not bank else
+                            _('bank account %(acc)s has no Payroll File '
+                              'Type.', acc=bank.acc_number)),
+                ))
+            req.sudo().write(dict(stamps, state='pending_bank_file'))
+            req._post_step_note(
+                '🏦 Payment confirmed — awaiting the bank file',
+                _('Revision %(slip)s confirmed; %(amount).2f SAR to be paid '
+                  'by bank transfer in the next revision bank file.',
+                  slip=payslip_name(revision),
+                  amount=req.difference_amount),
+            )
         return True
 
     # ==================================================================
@@ -1005,7 +1040,35 @@ class KswPayslipRevisionRequest(models.Model):
         return self._open_reason_wizard('refuse')
 
     # ------------------------------------------------------------------
-    # Bank file for this employee alone
+    # Paid by a combined bank file
+    # ------------------------------------------------------------------
+
+    def _mark_paid_by_bank_file(self, bank_file):
+        """Called by ``ksw.revision.bank.file`` once its files exist.
+
+        Authority was checked by the bank file before calling; the state
+        moves through sudo() like every other step.
+        """
+        today = fields.Date.context_today(self)
+        for req in self:
+            req.sudo().write({
+                'state': 'paid',
+                'bank_file_id': bank_file.id,
+                'payslip_run_id': bank_file.payslip_run_id.id,
+                'payment_date': bank_file.value_date or today,
+            })
+            req._post_step_note(
+                '💵 Paid',
+                _('%(amount).2f SAR paid by bank transfer in bank file '
+                  '%(file)s, generated by %(user)s.',
+                  amount=req.difference_amount, file=bank_file.name,
+                  user=self.env.user.name),
+            )
+            req._notify_employee_paid()
+
+    # ------------------------------------------------------------------
+    # Bank file for this employee alone (requests paid before the
+    # combined bank file existed)
     # ------------------------------------------------------------------
 
     def action_export_bank_excel(self):
@@ -1041,6 +1104,11 @@ class KswPayslipRevisionRequest(models.Model):
             raise UserError(_(
                 'Only the accounting or payroll team may generate the bank '
                 'file for a revision.'))
+        if self.bank_file_id or self.state == 'pending_bank_file':
+            raise UserError(_(
+                'This transfer is paid through a combined revision bank '
+                'file (Payroll > Salary Revisions > Bank Files). Generate '
+                'or download it there.'))
         if self.state not in ('pending_acc', 'paid'):
             raise UserError(_(
                 'The bank file can only be generated once the GM has '

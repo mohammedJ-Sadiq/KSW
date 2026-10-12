@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- Revision bank file: one bank upload for many revisions        -->
+    <!-- ============================================================ -->
+    <record id="view_ksw_revision_bank_file_form" model="ir.ui.view">
+        <field name="name">ksw.revision.bank.file.form</field>
+        <field name="model">ksw.revision.bank.file</field>
+        <field name="arch" type="xml">
+            <form string="Revision Bank File">
+                <header>
+                    <button name="action_generate" type="object"
+                            string="Generate Bank File" class="btn-primary"
+                            invisible="state != 'draft'"
+                            groups="KSW_annual_leave.group_annual_leave_acc"
+                            confirm="Generate one Excel and one TXT bank file for the requests listed, and mark every one of them as paid?"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="value_date"
+                                   readonly="state != 'draft'"/>
+                            <field name="request_count" string="Requests"/>
+                            <field name="total_amount" decoration-bf="1"/>
+                        </group>
+                        <group invisible="state == 'draft'">
+                            <field name="generated_by_id"/>
+                            <field name="generated_date"/>
+                            <field name="payslip_run_id"
+                                   groups="om_hr_payroll.group_hr_payroll_user"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="alert"
+                         invisible="state != 'draft'">
+                        These are the revisions waiting for a bank file. Remove
+                        any that should wait; they stay pending for the next
+                        file. <strong>Generate Bank File</strong> produces one
+                        Excel and one TXT for the requests listed (a zip, one
+                        file per paying bank, when more than one bank is
+                        involved) and marks them paid.
+                    </div>
+                    <group string="Bank Files" invisible="state == 'draft'">
+                        <field name="attachment_ids" widget="many2many_binary"
+                               nolabel="1" colspan="2"/>
+                    </group>
+                    <field name="request_ids" readonly="state != 'draft'"
+                           options="{'no_create': True}">
+                        <list>
+                            <field name="name"/>
+                            <field name="employee_id"/>
+                            <field name="department_id" optional="show"/>
+                            <field name="date_to" string="Period"/>
+                            <field name="paying_bank_label"/>
+                            <field name="acc_date" string="Confirmed On"
+                                   optional="hide"/>
+                            <field name="difference_amount"
+                                   sum="Total"/>
+                            <field name="state" widget="badge"
+                                   optional="hide"/>
+                        </list>
+                    </field>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_revision_bank_file_list" model="ir.ui.view">
+        <field name="name">ksw.revision.bank.file.list</field>
+        <field name="model">ksw.revision.bank.file</field>
+        <field name="arch" type="xml">
+            <list string="Revision Bank Files"
+                  decoration-info="state == 'draft'">
+                <field name="name"/>
+                <field name="value_date"/>
+                <field name="request_count" string="Requests"/>
+                <field name="total_amount"/>
+                <field name="generated_by_id" optional="show"/>
+                <field name="generated_date" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'done'"
+                       decoration-info="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_ksw_revision_bank_files" model="ir.actions.act_window">
+        <field name="name">Revision Bank Files</field>
+        <field name="res_model">ksw.revision.bank.file</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No revision bank files yet
+            </p>
+            <p>
+                A salary revision paid by bank transfer waits in
+                <b>Pending Bank File</b> after Confirm &amp; Pay. Create a
+                bank file here to pay any number of them in one upload.
+            </p>
+        </field>
+    </record>
+
+    <!-- The queue itself: requests confirmed for a bank transfer and not
+         yet in a file. Select rows here and use Action > Create Bank File. -->
+    <record id="action_ksw_revision_requests_pending_bank_file"
+            model="ir.actions.act_window">
+        <field name="name">Pending Bank File</field>
+        <field name="res_model">ksw.payslip.revision.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'pending_bank_file')]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No revision is waiting for a bank file
+            </p>
+        </field>
+    </record>
+
+    <!-- Action menu on the request list: start a bank file from the
+         selected rows (default_get keeps only the pending ones). -->
+    <record id="action_ksw_revision_bank_file_from_requests"
+            model="ir.actions.act_window">
+        <field name="name">Create Bank File</field>
+        <field name="res_model">ksw.revision.bank.file</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="binding_model_id"
+               ref="KSW_payroll.model_ksw_payslip_revision_request"/>
+        <field name="binding_view_types">list</field>
+        <field name="group_ids"
+               eval="[(4, ref('KSW_annual_leave.group_annual_leave_acc'))]"/>
+    </record>
+
+    <menuitem id="menu_ksw_revision_requests_pending_bank_file"
+              name="Pending Bank File"
+              parent="menu_ksw_revision_requests_root"
+              action="action_ksw_revision_requests_pending_bank_file"
+              sequence="40"
+              groups="KSW_annual_leave.group_annual_leave_acc,om_hr_payroll.group_hr_payroll_user"/>
+
+    <menuitem id="menu_ksw_revision_bank_files"
+              name="Bank Files"
+              parent="menu_ksw_revision_requests_root"
+              action="action_ksw_revision_bank_files"
+              sequence="50"
+              groups="KSW_annual_leave.group_annual_leave_acc,om_hr_payroll.group_hr_payroll_user"/>
+
+</odoo>
