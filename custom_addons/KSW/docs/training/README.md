@@ -102,6 +102,7 @@ own without the whole role handbook:
 | `pdf/KSW-Return-Confirmation-Guide-{EN,AR}.pdf` | Confirming an employee's return from annual leave |
 | `pdf/KSW-Raise-Support-Ticket-Guide-{EN,AR}.pdf` | Raising an IT support ticket (any employee) |
 | `pdf/KSW-Ticket-For-Team-Member-Guide-{EN,AR}.pdf` | Raising an IT ticket for a direct report (managers) |
+| `pdf/KSW-Workshop-Request-Guide-{EN,AR}.pdf` | Issuing a workshop service request for one of your vehicles (Workshop Requesters: Isuzu/trailer supervisors, maintenance manager). |
 
 ```bash
 node build_pdf.mjs single <relPath> <slug> "<Title EN>" "<Title AR>"

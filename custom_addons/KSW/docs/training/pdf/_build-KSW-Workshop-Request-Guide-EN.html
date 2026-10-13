@@ -1,0 +1,218 @@
+<!doctype html><html lang="en" dir="ltr"><head>
+<meta charset="utf-8"><title>Issuing a Workshop Service Request</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "DejaVu Sans",Arial,sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: left; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-left: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">Issuing a Workshop Service Request</div>
+  <div class="meta">User Training Guide<br/>KSW HR &amp; Payroll · 2026-10-13</div>
+</div>
+<section id="g-supervisor-10-workshop-request"><h1>Issuing a Workshop Service Request</h1>
+<p><strong>Who is this for:</strong> Workshop Requesters: the Isuzu and trailer supervisors, and the maintenance department manager
+<strong>How long it takes:</strong> 2 minutes</p>
+<h2>What this does</h2>
+<p>Asks the workshop to inspect or repair one of your vehicles, as a tracked
+request instead of a phone call or the old Google Form. The workshop manager
+is notified the moment you submit. You can follow the request from the same
+screen until the vehicle is done.</p>
+<p>Each request gets a number (<code>WS00001</code>, <code>WS00002</code>, …) and moves through four
+states:</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>New</strong></td>
+<td>You have submitted it; the workshop has not started yet. You can still correct it.</td>
+</tr>
+<tr>
+<td><strong>In Progress</strong></td>
+<td>The workshop accepted it and is working on the vehicle.</td>
+</tr>
+<tr>
+<td><strong>Completed</strong></td>
+<td>The work is done. You get a message, often with collection details.</td>
+</tr>
+<tr>
+<td><strong>Rejected</strong></td>
+<td>The workshop will not do this request. You get a message explaining why.</td>
+</tr>
+</tbody></table>
+<h2>Before you start</h2>
+<ul>
+<li><p><strong>You need the Workshop Requester role.</strong> Only the people who answer for
+vehicles raise requests. If you open <strong>Workshop → My Requests</strong> and there
+is no <strong>New</strong> button, you don&#39;t have the role. Ask your system
+administrator. (Drivers and other staff report a fault to their
+supervisor, who raises the request.)</p>
+</li>
+<li><p><strong>You can only pick your own vehicles.</strong> The vehicle list offers:</p>
+<ul>
+<li>the trucks in <strong>your tanker groups</strong>, and</li>
+<li>the trucks <strong>driven by your team</strong>: anyone in your reporting line, and you.</li>
+</ul>
+<p>The tanker groups are the same ones you use in <strong>Water Delivery →
+Tankers</strong>. If a truck you are responsible for is missing, it has to be added
+to your tanker group first.</p>
+</li>
+<li><p>Know the vehicle&#39;s <strong>fleet number</strong> (e.g. <code>IS042</code>, <code>T171</code>) and be ready to
+describe the problem: what is wrong, since when, and any warning light or
+noise.</p>
+</li>
+</ul>
+<h2>Steps</h2>
+<ol>
+<li><p><strong>Open the Workshop app</strong>, then <strong>My Requests</strong>. This list shows every
+request you have raised and its current state.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/workshop-01.png" alt="My Requests"></p>
+</li>
+<li><p><strong>Click New.</strong> A blank request opens. <strong>Requested By</strong> is you and cannot be
+changed. <strong>Client</strong> is already set to the company, which is right for any
+company vehicle.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/workshop-02.png" alt="New request form"></p>
+</li>
+<li><p><strong>Choose the Vehicle Type</strong>: <strong>Trailer</strong>, <strong>Isuzu</strong>, <strong>Tank</strong> or <strong>Other</strong>.
+Choose it first, because the <strong>Vehicle</strong> list only shows vehicles of that
+type.</p>
+</li>
+<li><p><strong>Pick the Vehicle.</strong> Click the field or start typing the fleet number.
+Only your own trucks of that type are listed: the ones in your tanker
+groups and the ones your team drives.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/workshop-03.png" alt="Only your vehicles are offered"></p>
+</li>
+<li><p><strong>Check the Driver.</strong> When you pick the truck, <strong>Driver</strong> fills itself in
+with the driver attached to it. That is normally the person BAS shows
+driving it most over the last two weeks, or its default driver. If
+someone else is bringing the truck in, change it. This is allowed, but the
+request will then say so (see <em>What happens next</em>). Driver is required.</p>
+</li>
+<li><p><strong>Write the Description.</strong> This is the most important field. The workshop
+reads it to plan the job, and the system uses it to sort the request by
+repair type (tyres, brakes, electrical…), so you do not choose a type
+yourself. Write plainly. For example, write <em>&quot;Engine overheats on long
+trips; the temperature needle goes into the red after about an hour&quot;</em>,
+not just <em>&quot;engine problem&quot;</em>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/workshop-04.png" alt="Filled-in request"></p>
+</li>
+<li><p><strong>Click Submit Request</strong> (top left). The request is saved, gets its <code>WS…</code>
+number and is sent to the workshop. A green <em>Request submitted</em> message
+confirms it. (Saving with the cloud icon does exactly the same thing.)
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/workshop-05.png" alt="Submitted request"></p>
+</li>
+</ol>
+<h2>What happens next</h2>
+<ul>
+<li><strong>The workshop manager reviews it.</strong> When they accept it, the state moves
+to <strong>In Progress</strong> and a technician starts on the vehicle. You can watch
+the state bar at the top of the request.</li>
+<li><strong>When the work is finished</strong>, the request moves to <strong>Completed</strong>. You
+receive a message in your Inbox (the chat icon at the top right), on the
+request itself. It often includes a note from the workshop, such as where
+to collect the vehicle.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/workshop-06.png" alt="Completed request"></li>
+<li><strong>If the workshop will not do it</strong>, the request moves to <strong>Rejected</strong>. The
+message tells you why. A common reason is that the same vehicle already
+has an open request.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/workshop-07.png" alt="Rejected request"></li>
+<li><strong>If you changed the driver</strong>, a yellow <strong>Driver changed</strong> box shows at the
+top of the request for everyone who opens it. It names the driver you
+entered and the driver attached to the truck, so the workshop knows who
+really brought it in. This is normal when the regular driver is on leave.
+Say why in the description.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/workshop-08.png" alt="Driver changed"></li>
+<li><strong>To talk to the workshop about a request</strong>, use the message box on the
+right of the request (the chatter). Click <strong>External</strong>, type and send.
+Attach a photo of the damage or warning light the same way. Everything
+stays on the request instead of in calls.</li>
+</ul>
+<blockquote>
+<p><strong>What you can and cannot change.</strong> While the request is <strong>New</strong> you can
+correct anything except <strong>Requested By</strong>: open it, edit, save. Once the
+workshop has started, the request is locked for you. To add information,
+write in the chatter. The repair report (entry and exit times, odometer,
+parts, labour) is filled in by the workshop.</p>
+</blockquote>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>There is no <strong>New</strong> button on My Requests</td>
+<td>You don&#39;t have the Workshop Requester role</td>
+<td>Ask your system administrator. Until then, ask a supervisor who has it</td>
+</tr>
+<tr>
+<td>The <strong>Vehicle</strong> list is empty</td>
+<td><strong>Vehicle Type</strong> is not set, or none of your trucks is of that type</td>
+<td>Choose the right type first; the list follows it</td>
+</tr>
+<tr>
+<td>A truck I am responsible for is not in the list</td>
+<td>It is not in your tanker groups, and nobody on your team is its driver</td>
+<td>Ask for it to be added to your tanker group (Water Delivery → Tankers)</td>
+</tr>
+<tr>
+<td>&quot;… is not one of your vehicles: it is not in your tanker groups and none of your team drives it&quot;</td>
+<td>The truck was picked some other way but is not yours</td>
+<td>Pick one of your own trucks, or have it added to your tanker group</td>
+</tr>
+<tr>
+<td><strong>Driver</strong> filled in with the wrong person</td>
+<td>BAS shows that person driving the truck most recently</td>
+<td>Change it to whoever is bringing the truck. The request will show <em>Driver changed</em>, which is expected</td>
+</tr>
+<tr>
+<td>&quot;Vehicle Type and Driver are required…&quot; when saving</td>
+<td><strong>Driver</strong> is empty (the truck has no driver attached)</td>
+<td>Pick the driver yourself</td>
+</tr>
+<tr>
+<td>I can&#39;t edit my request any more</td>
+<td>It is no longer <strong>New</strong>: the workshop has started, finished or rejected it</td>
+<td>Write in the request&#39;s chatter instead</td>
+</tr>
+<tr>
+<td>There is no Delete option</td>
+<td>Requests are never deleted, so the history stays complete</td>
+<td>If you raised it by mistake, ask the workshop in the chatter to reject it</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><span class="xref">Getting Started</span>: login, navigation, notifications</li>
+</ul>
+</section>
+</body></html>

@@ -1,0 +1,210 @@
+<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"><title>تقديم طلب خدمة الورشة</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "Noto Naskh Arabic","Noto Sans Arabic UI","DejaVu Sans",sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: right; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-right: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">تقديم طلب خدمة الورشة</div>
+  <div class="meta">دليل تدريب المستخدم<br/>KSW HR &amp; Payroll · 2026-10-13</div>
+</div>
+<section id="g-supervisor-10-workshop-request"><h1>تقديم طلب خدمة الورشة</h1>
+<p><strong>الفئة المستهدفة:</strong> مقدمو طلبات الورشة: مشرفو الإيسوزو والتريلات، ومدير قسم الصيانة
+<strong>الوقت المقدّر:</strong> دقيقتان</p>
+<hr>
+<h2>ما الذي تفعله هذه الشاشة</h2>
+<p>تطلب من الورشة فحص إحدى مركباتك أو إصلاحها، بطلب مسجّل يمكن متابعته بدلًا
+من الاتصال الهاتفي أو نموذج Google القديم. يُشعَر مدير الورشة لحظة إرسالك
+الطلب، وتتابع الطلب من الشاشة نفسها حتى تنتهي المركبة.</p>
+<p>يحصل كل طلب على رقم (<code>WS00001</code>، <code>WS00002</code>، …) ويمرّ بأربع حالات:</p>
+<table>
+<thead>
+<tr>
+<th>الحالة</th>
+<th>معناها</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>جديد</strong></td>
+<td>أرسلت الطلب ولم تبدأ الورشة العمل بعد. ما زال بإمكانك تصحيحه.</td>
+</tr>
+<tr>
+<td><strong>قيد التنفيذ</strong></td>
+<td>قبلت الورشة الطلب وتعمل على المركبة.</td>
+</tr>
+<tr>
+<td><strong>مكتمل</strong></td>
+<td>انتهى العمل. تصلك رسالة، وغالبًا فيها تفاصيل استلام المركبة.</td>
+</tr>
+<tr>
+<td><strong>مرفوض</strong></td>
+<td>لن تنفّذ الورشة هذا الطلب. تصلك رسالة توضّح السبب.</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>قبل أن تبدأ</h2>
+<ul>
+<li><p><strong>تحتاج إلى صلاحية «مقدم طلب» في الورشة.</strong> لا يقدّم الطلبات إلا
+المسؤولون عن المركبات. إذا فتحت <strong>الورشة ← طلباتي</strong> ولم تجد زر
+<strong>جديد</strong>، فليست لديك هذه الصلاحية؛ اطلبها من مدير النظام. (يُبلغ السائقون
+وبقية الموظفين مشرفهم بالعطل، والمشرف هو من يقدّم الطلب.)</p>
+</li>
+<li><p><strong>لا يمكنك اختيار إلا مركباتك.</strong> تعرض قائمة المركبات:</p>
+<ul>
+<li>الشاحنات الموجودة في <strong>مجموعات الصهاريج التابعة لك</strong>، و</li>
+<li>الشاحنات التي <strong>يقودها أحد من فريقك</strong>: أي شخص في تسلسلك الإداري، وأنت
+منهم.</li>
+</ul>
+<p>مجموعات الصهاريج هي نفسها التي تستخدمها في <strong>Water Delivery ← Tankers</strong>
+(توصيل المياه ← الصهاريج). إذا لم تظهر شاحنة أنت مسؤول عنها، فيجب أولًا
+إضافتها إلى مجموعة الصهاريج الخاصة بك.</p>
+</li>
+<li><p>اعرف <strong>رقم الأسطول</strong> للمركبة (مثل <code>IS042</code> أو <code>T171</code>)، وجهّز وصفًا للمشكلة:
+ما العطل، ومنذ متى، وأي ضوء تحذير أو صوت.</p>
+</li>
+</ul>
+<hr>
+<h2>الخطوات</h2>
+<p>١. <strong>افتح تطبيق الورشة ← طلباتي.</strong> تعرض هذه القائمة كل طلب قدّمته وحالته
+   الحالية.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/workshop-01.png" alt="طلباتي"></p>
+<p>٢. <strong>اضغط جديد.</strong> يُفتح طلب فارغ. حقل <strong>مقدم الطلب</strong> هو أنت ولا يمكن
+   تغييره، وحقل <strong>العميل</strong> معبّأ مسبقًا باسم الشركة، وهو الصحيح لأي مركبة
+   من مركبات الشركة.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/workshop-02.png" alt="نموذج طلب جديد"></p>
+<p>٣. <strong>اختر نوع المركبة:</strong> <strong>تريلا</strong> أو <strong>إيسوزو</strong> أو <strong>صهريج</strong> أو <strong>أخرى</strong>.
+   اختره أولًا، لأن قائمة <strong>المركبة</strong> لا تعرض إلا مركبات النوع الذي تختاره.</p>
+<p>٤. <strong>اختر المركبة.</strong> اضغط على الحقل أو ابدأ بكتابة رقم الأسطول. لا تظهر إلا
+   شاحناتك من هذا النوع: الموجودة في مجموعات الصهاريج التابعة لك، والتي
+   يقودها فريقك.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/workshop-03.png" alt="لا تظهر إلا مركباتك"></p>
+<p>٥. <strong>تحقّق من السائق.</strong> عند اختيار الشاحنة يُعبّأ حقل <strong>السائق</strong> تلقائيًا
+   بالسائق المرتبط بها، وهو عادةً من يظهر في BAS أكثر من قادها خلال آخر
+   أسبوعين، أو سائقها الافتراضي. إذا كان شخص آخر هو من يُحضر الشاحنة،
+   فغيّره. هذا مسموح، لكن الطلب سيُظهر ذلك (انظر <em>ما الذي يحدث بعد ذلك</em>).
+   حقل السائق إلزامي.</p>
+<p>٦. <strong>اكتب الوصف.</strong> هذا أهم حقل في الطلب. تقرؤه الورشة لتخطيط العمل،
+   ويستخدمه النظام لتصنيف الطلب حسب نوع الإصلاح (إطارات، فرامل، كهرباء…)،
+   فلا تحتاج إلى اختيار النوع بنفسك. اكتب بوضوح، مثلًا: <em>«المحرك يسخن في
+   المشاوير الطويلة، ومؤشر الحرارة يصل إلى الأحمر بعد ساعة تقريبًا»</em>، لا
+   <em>«مشكلة في المحرك»</em> فقط.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/workshop-04.png" alt="طلب معبّأ"></p>
+<p>٧. <strong>اضغط إرسال الطلب</strong> (أعلى النموذج). يُحفظ الطلب ويحصل على رقمه <code>WS…</code>
+   ويُرسل إلى الورشة، وتؤكّد ذلك رسالة خضراء <em>«تم إرسال الطلب»</em>. (الحفظ
+   بأيقونة السحابة يؤدي الغرض نفسه تمامًا.)</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/workshop-05.png" alt="الطلب بعد الإرسال"></p>
+<hr>
+<h2>ما الذي يحدث بعد ذلك</h2>
+<ul>
+<li><p><strong>يراجع مدير الورشة الطلب.</strong> عند قبوله تنتقل الحالة إلى <strong>قيد التنفيذ</strong>
+ويبدأ أحد الفنيين العمل على المركبة. تابع شريط الحالة أعلى الطلب.</p>
+</li>
+<li><p><strong>عند انتهاء العمل</strong> ينتقل الطلب إلى <strong>مكتمل</strong>، وتصلك رسالة في صندوق
+الوارد (أيقونة المحادثة أعلى يسار الشاشة) وعلى الطلب نفسه. وغالبًا تتضمّن
+ملاحظة من الورشة، مثل مكان استلام المركبة.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/workshop-06.png" alt="طلب مكتمل"></p>
+</li>
+<li><p><strong>إذا لم تنفّذ الورشة الطلب</strong> ينتقل إلى <strong>مرفوض</strong>، وتوضّح لك الرسالة
+السبب. من الأسباب الشائعة أن للمركبة نفسها طلبًا مفتوحًا بالفعل.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/workshop-07.png" alt="طلب مرفوض"></p>
+</li>
+<li><p><strong>إذا غيّرت السائق</strong> يظهر مربع أصفر بعنوان <strong>تم تغيير السائق</strong> أعلى الطلب
+لكل من يفتحه، يذكر السائق الذي أدخلته والسائق المرتبط بالشاحنة، لتعرف
+الورشة من أحضرها فعلًا. هذا طبيعي إذا كان السائق المعتاد في إجازة؛ اذكر
+السبب في الوصف.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/workshop-08.png" alt="تم تغيير السائق"></p>
+</li>
+<li><p><strong>للتواصل مع الورشة بشأن طلب</strong> استخدم صندوق الرسائل على يسار الطلب: اضغط
+<strong>خارجي</strong> ثم اكتب رسالتك وأرسلها. أرفق صورة العطل أو ضوء التحذير بالطريقة
+نفسها. هكذا يبقى كل شيء على الطلب بدلًا من المكالمات.</p>
+</li>
+</ul>
+<blockquote>
+<p><strong>ما يمكنك تغييره وما لا يمكنك.</strong> ما دام الطلب <strong>جديدًا</strong> يمكنك تصحيح أي
+شيء عدا <strong>مقدم الطلب</strong>: افتحه وعدّله واحفظه. بعد أن تبدأ الورشة العمل
+يُقفل الطلب أمامك؛ ولإضافة أي معلومة اكتبها في صندوق الرسائل. أما تقرير
+الإصلاح (وقت الدخول والخروج، قراءة العداد، القطع، أجور العمل) فتعبّئه
+الورشة.</p>
+</blockquote>
+<hr>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>المشكلة</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>لا يوجد زر <strong>جديد</strong> في طلباتي</td>
+<td>ليست لديك صلاحية «مقدم طلب» في الورشة</td>
+<td>اطلبها من مدير النظام، وإلى ذلك الحين اطلب من مشرف لديه الصلاحية</td>
+</tr>
+<tr>
+<td>قائمة <strong>المركبة</strong> فارغة</td>
+<td>لم تختر <strong>نوع المركبة</strong>، أو ليست لديك شاحنات من هذا النوع</td>
+<td>اختر النوع الصحيح أولًا، فالقائمة تتبعه</td>
+</tr>
+<tr>
+<td>شاحنة أنا مسؤول عنها لا تظهر في القائمة</td>
+<td>ليست في مجموعات الصهاريج التابعة لك، ولا يقودها أحد من فريقك</td>
+<td>اطلب إضافتها إلى مجموعة الصهاريج الخاصة بك من شاشة Water Delivery ← Tankers</td>
+</tr>
+<tr>
+<td>«المركبة … ليست من مركباتك: فهي ليست ضمن مجموعات الصهاريج التابعة لك ولا يقودها أحد من فريقك»</td>
+<td>الشاحنة المختارة ليست من مركباتك</td>
+<td>اختر إحدى شاحناتك، أو اطلب إضافتها إلى مجموعة الصهاريج الخاصة بك</td>
+</tr>
+<tr>
+<td>حقل <strong>السائق</strong> عُبّئ بشخص غير صحيح</td>
+<td>يظهر في BAS أن هذا الشخص هو من قاد الشاحنة مؤخرًا</td>
+<td>غيّره إلى من يُحضر الشاحنة. سيُظهر الطلب «تم تغيير السائق»، وهذا متوقّع</td>
+</tr>
+<tr>
+<td>«نوع المركبة والسائق مطلوبان…» عند الحفظ</td>
+<td>حقل <strong>السائق</strong> فارغ (لا يوجد سائق مرتبط بالشاحنة)</td>
+<td>اختر السائق بنفسك</td>
+</tr>
+<tr>
+<td>لا أستطيع تعديل طلبي</td>
+<td>لم يعد الطلب <strong>جديدًا</strong>: بدأته الورشة أو أنهته أو رفضته</td>
+<td>اكتب في صندوق رسائل الطلب بدلًا من ذلك</td>
+</tr>
+<tr>
+<td>لا يوجد خيار حذف</td>
+<td>لا تُحذف الطلبات أبدًا ليبقى السجل كاملًا</td>
+<td>إذا قدّمته بالخطأ، فاطلب من الورشة في صندوق الرسائل رفضه</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li><span class="xref">البدء في استخدام النظام</span> — تسجيل الدخول، التنقّل، الإشعارات</li>
+</ul>
+</section>
+</body></html>

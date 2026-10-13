@@ -1,0 +1,191 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_fleet
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-13 13:16+0000\n"
+"PO-Revision-Date: 2026-10-13 13:16+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar_001\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_fleet
+#: model:ir.model.constraint,message:KSW_fleet.constraint_ksw_fleet_vehicle_name_uniq
+msgid "A vehicle with this fleet number already exists for this client."
+msgstr "توجد مركبة بهذا الرقم في الأسطول لهذا العميل مسبقاً."
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__active
+msgid "Active"
+msgstr "نشط"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__brand
+msgid "Brand"
+msgstr "الماركة"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__client_id
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_vehicle_search
+msgid "Client"
+msgstr "العميل"
+
+#. module: KSW_fleet
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_vehicle_form
+msgid "Confirm"
+msgstr "اعتماد"
+
+#. module: KSW_fleet
+#: model:ir.model.fields.selection,name:KSW_fleet.selection__ksw_fleet_vehicle__state__confirmed
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_vehicle_search
+msgid "Confirmed"
+msgstr "معتمدة"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__create_uid
+msgid "Created by"
+msgstr "أنشئ بواسطة"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__create_date
+msgid "Created on"
+msgstr "أنشئ في"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__driver_id
+msgid "Default Driver"
+msgstr "السائق الافتراضي"
+
+#. module: KSW_fleet
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_vehicle_form
+msgid "Details"
+msgstr "التفاصيل"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__display_name
+msgid "Display Name"
+msgstr "اسم العرض"
+
+#. module: KSW_fleet
+#: model:ir.model.fields.selection,name:KSW_fleet.selection__ksw_fleet_vehicle__state__draft
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_vehicle_search
+msgid "Draft"
+msgstr "مسودة"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__driver_name
+msgid "Driver Name"
+msgstr "اسم السائق"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__name
+msgid "Fleet No."
+msgstr "رقم الأسطول"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__id
+msgid "ID"
+msgstr "المُعرف"
+
+#. module: KSW_fleet
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_vehicle_form
+msgid "Identification"
+msgstr "بيانات التعريف"
+
+#. module: KSW_fleet
+#: model:ir.model.fields.selection,name:KSW_fleet.selection__ksw_fleet_vehicle__vehicle_type__isuzu
+msgid "Isuzu"
+msgstr "إيسوزو"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__write_uid
+msgid "Last Updated by"
+msgstr "آخر تحديث بواسطة"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__write_date
+msgid "Last Updated on"
+msgstr "آخر تحديث في"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__model
+msgid "Model"
+msgstr "الموديل"
+
+#. module: KSW_fleet
+#: model:ir.model.fields.selection,name:KSW_fleet.selection__ksw_fleet_vehicle__vehicle_type__other
+msgid "Other"
+msgstr "أخرى"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__plate_number
+msgid "Plate Number"
+msgstr "رقم اللوحة"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__state
+msgid "State"
+msgstr "الحالة"
+
+#. module: KSW_fleet
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_vehicle_search
+msgid "Status"
+msgstr "الحالة"
+
+#. module: KSW_fleet
+#: model:ir.model.fields.selection,name:KSW_fleet.selection__ksw_fleet_vehicle__vehicle_type__tank
+msgid "Tank"
+msgstr "صهريج"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__tank_number
+msgid "Tank Number"
+msgstr "رقم الصهريج"
+
+#. module: KSW_fleet
+#: model:ir.model.fields.selection,name:KSW_fleet.selection__ksw_fleet_vehicle__vehicle_type__trailer
+msgid "Trailer"
+msgstr "تريلا"
+
+#. module: KSW_fleet
+#: model:ir.model,name:KSW_fleet.model_ksw_fleet_vehicle
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_vehicle_form
+msgid "Vehicle"
+msgstr "المركبة"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__vehicle_type
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_vehicle_search
+msgid "Vehicle Type"
+msgstr "نوع المركبة"
+
+#. module: KSW_fleet
+#: model:ir.actions.act_window,name:KSW_fleet.action_ksw_fleet_vehicle
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_vehicle_list
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_vehicle_search
+msgid "Vehicles"
+msgstr "المركبات"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__year
+msgid "Year"
+msgstr "السنة"
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_vehicle.py:0
+msgid "Only a fleet/workshop manager can confirm a draft vehicle."
+msgstr "لا يمكن اعتماد مركبة في حالة المسودة إلا لمدير الأسطول / الورشة."
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_vehicle.py:0
+msgid "Only draft vehicles can be confirmed."
+msgstr "لا يمكن اعتماد إلا المركبات في حالة المسودة."

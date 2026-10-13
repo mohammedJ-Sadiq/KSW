@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ksw_fleet_vehicle_list_bas_driver" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.list.bas.driver</field>
+        <field name="model">ksw.fleet.vehicle</field>
+        <field name="inherit_id" ref="KSW_fleet.view_ksw_fleet_vehicle_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <!-- display="always": a list header button otherwise shows
+                     only once a row is ticked (gotcha #6). -->
+                <header>
+                    <button name="action_update_drivers_from_bas" type="object"
+                            string="Update Drivers from BAS" display="always"
+                            groups="base.group_system"/>
+                </header>
+            </xpath>
+            <xpath expr="//field[@name='driver_name']" position="after">
+                <field name="x_bas_driver_id" optional="show"/>
+                <field name="x_bas_driver_date" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_ksw_fleet_vehicle_form_bas_driver" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.form.bas.driver</field>
+        <field name="model">ksw.fleet.vehicle</field>
+        <field name="inherit_id" ref="KSW_fleet.view_ksw_fleet_vehicle_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='driver_name']" position="after">
+                <field name="x_bas_driver_id" invisible="not x_bas_driver_label"/>
+                <field name="x_bas_driver_label" invisible="not x_bas_driver_label"/>
+                <field name="x_bas_cost_centre" invisible="not x_bas_cost_centre"/>
+                <field name="x_bas_driver_date" invisible="not x_bas_driver_date"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_ksw_fleet_vehicle_search_bas_driver" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.search.bas.driver</field>
+        <field name="model">ksw.fleet.vehicle</field>
+        <field name="inherit_id" ref="KSW_fleet.view_ksw_fleet_vehicle_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="x_bas_driver_id"/>
+                <filter string="BAS Driver Not Linked" name="filter_bas_driver_unlinked"
+                        domain="[('x_bas_driver_label', '!=', False), ('x_bas_driver_id', '=', False)]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

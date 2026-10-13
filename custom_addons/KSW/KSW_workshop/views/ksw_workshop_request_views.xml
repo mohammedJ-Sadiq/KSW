@@ -106,10 +106,10 @@
                                placeholder="Describe the problem: what is wrong, since when, and any warning light or noise."/>
                         <field name="request_type_ids" widget="many2many_tags"
                                options="{'color_field': 'color', 'no_create': True}"
-                               groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_manager"/>
+                               groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
                         <div class="text-muted" colspan="2"
                              invisible="not x_request_type_derived"
-                             groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_manager">
+                             groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager">
                             Tagged from the description. Edit the tags to correct them —
                             they will then be left alone.
                         </div>
@@ -117,7 +117,7 @@
                     </group>
                     <notebook>
                         <page string="Repair Report"
-                              groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_manager">
+                              groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager">
                             <group>
                                 <group>
                                     <field name="entry_datetime" readonly="state != 'in_progress'"/>
@@ -196,7 +196,7 @@
                              a model-level groups= (that would strip them from
                              fields_get and break the invisible= below). -->
                         <page string="History (This Year)"
-                              groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_manager">
+                              groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager">
                             <group>
                                 <group string="This Vehicle">
                                     <field name="x_vehicle_history_count" readonly="1"/>
@@ -238,7 +238,7 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Internal" groups="KSW_workshop.group_workshop_manager">
+                        <page string="Internal" groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager">
                             <group>
                                 <field name="note"/>
                                 <field name="note_to_requester"/>
@@ -465,27 +465,28 @@
               parent="menu_ksw_workshop_root" action="action_ksw_workshop_request_my" sequence="10"/>
     <menuitem id="menu_ksw_workshop_all" name="All Requests"
               parent="menu_ksw_workshop_root" action="action_ksw_workshop_request_all" sequence="20"
-              groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_manager"/>
-    <!-- Manager-only, on purpose. The technician record rule is
+              groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
+    <!-- Manager and Reviewer only, on purpose (both read every request).
+         The technician record rule is
          ['|', ('state','=','in_progress'), ('technician_id.user_id','=',user.id)]
          so a technician cannot see completed requests unless they were the
          assigned technician — their pivot would be a silently partial
          aggregate that looks complete. Managers have [(1,'=',1)]. -->
     <menuitem id="menu_ksw_workshop_reporting" name="Reporting"
               parent="menu_ksw_workshop_root" sequence="30"
-              groups="KSW_workshop.group_workshop_manager"/>
+              groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
     <menuitem id="menu_ksw_workshop_report_analysis" name="Workshop Analysis"
               parent="menu_ksw_workshop_reporting" action="action_ksw_workshop_report" sequence="10"
-              groups="KSW_workshop.group_workshop_manager"/>
+              groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
     <menuitem id="menu_ksw_workshop_report_by_vehicle" name="By Vehicle"
               parent="menu_ksw_workshop_reporting" action="action_ksw_workshop_report_by_vehicle" sequence="20"
-              groups="KSW_workshop.group_workshop_manager"/>
+              groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
     <menuitem id="menu_ksw_workshop_report_by_type" name="By Repair Type"
               parent="menu_ksw_workshop_reporting" action="action_ksw_workshop_report_by_type" sequence="30"
-              groups="KSW_workshop.group_workshop_manager"/>
+              groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
     <menuitem id="menu_ksw_workshop_report_by_technician" name="By Technician"
               parent="menu_ksw_workshop_reporting" action="action_ksw_workshop_report_by_technician" sequence="40"
-              groups="KSW_workshop.group_workshop_manager"/>
+              groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
 
     <menuitem id="menu_ksw_workshop_configuration" name="Configuration"
               parent="menu_ksw_workshop_root" sequence="90"

@@ -16,7 +16,7 @@ class TestWorkshopIssue(TransactionCase):
                 'name': name, 'login': login, 'email': f'{login}@wsstock.test',
                 'group_ids': [(6, 0, [cls.env.ref(x).id for x in groups])],
             })
-        cls.user_employee = _mkuser('WSS Employee', 'wss_employee', ('base.group_user',))
+        cls.user_employee = _mkuser('WSS Employee', 'wss_employee', ('base.group_user', 'KSW_workshop.group_workshop_requester'))
         cls.employee = cls.env['hr.employee'].create({'name': 'WSS Employee', 'user_id': cls.user_employee.id})
         cls.user_manager = _mkuser('WSS Manager', 'wss_manager', ('base.group_user', 'KSW_workshop.group_workshop_manager'))
         cls.env['hr.employee'].create({'name': 'WSS Manager', 'user_id': cls.user_manager.id})

@@ -122,8 +122,10 @@ class KswWorkshopRequest(models.Model):
              "never be undone by the next edit to the description.")
 
     is_cash_customer = fields.Boolean(string='Cash Customer', tracking=True, copy=False)
+    # Not compute_sudo: inside a sudo compute env.su is true for everybody, so
+    # the env.su exemption below handed the checkbox to every requester.
     x_can_toggle_cash_customer = fields.Boolean(
-        compute='_compute_x_can_toggle_cash_customer', compute_sudo=True,
+        compute='_compute_x_can_toggle_cash_customer',
     )
 
     # A client is a res.partner carrying the customer role — Odoo's native
@@ -433,6 +435,40 @@ class KswWorkshopRequest(models.Model):
                 ))
 
     # ------------------------------------------------------------------
+    # Reviewer: read-only views
+    # ------------------------------------------------------------------
+    @api.model
+    def _is_workshop_reviewer_only(self):
+        """A Reviewer who holds no role that writes requests.
+
+        A reviewer who is also a requester keeps his normal views: he still
+        raises and edits his own requests, and anyone else's is refused by
+        write() and the record rules anyway.
+        """
+        user = self.env.user
+        return user.has_group('KSW_workshop.group_workshop_reviewer') and not any(
+            user.has_group(xmlid) for xmlid in (
+                'KSW_workshop.group_workshop_manager',
+                'KSW_workshop.group_workshop_technician',
+                'KSW_workshop.group_workshop_requester',
+            ))
+
+    @api.model
+    def _get_view_cache_key(self, view_id=None, view_type='form', **options):
+        key = super()._get_view_cache_key(view_id, view_type, **options)
+        return key + (self._is_workshop_reviewer_only(),)
+
+    @api.model
+    def _get_view(self, view_id=None, view_type='form', **options):
+        arch, view = super()._get_view(view_id, view_type, **options)
+        # Without this the repair report reads as editable on an In Progress
+        # request and the reviewer only learns otherwise when Save fails.
+        if view_type in ('form', 'list', 'kanban') and self._is_workshop_reviewer_only():
+            for attr in ('create', 'edit', 'delete'):
+                arch.set(attr, '0')
+        return arch, view
+
+    # ------------------------------------------------------------------
     # CRUD
     # ------------------------------------------------------------------
     @api.model_create_multi
@@ -587,7 +623,14 @@ class KswWorkshopRequest(models.Model):
     # ------------------------------------------------------------------
     def _notify_workshop_managers(self):
         group = self.env.ref('KSW_workshop.group_workshop_manager', raise_if_not_found=False)
-        partner_ids = group.user_ids.mapped('partner_id').ids if group else []
+        # admin and OdooBot hold the group for system access, not as workshop
+        # people: admin's address is the shared info@ mailbox, so every new
+        # request used to land there.
+        technical = self.env['res.users']
+        for xmlid in ('base.user_admin', 'base.user_root'):
+            technical |= self.env.ref(xmlid, raise_if_not_found=False) or self.env['res.users']
+        users = (group.user_ids - technical) if group else self.env['res.users']
+        partner_ids = users.mapped('partner_id').ids
         if not partner_ids:
             return
         client_text = self.x_cash_customer_name if self.is_cash_customer else self.client_id.display_name

@@ -1,5 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_ksw_workshop_request_user,ksw.workshop.request.user,model_ksw_workshop_request,base.group_user,1,1,1,0
+access_ksw_workshop_request_user,ksw.workshop.request.user,model_ksw_workshop_request,base.group_user,1,1,0,0
+access_ksw_workshop_request_requester,ksw.workshop.request.requester,model_ksw_workshop_request,group_workshop_requester,1,1,1,0
 access_ksw_workshop_request_manager,ksw.workshop.request.manager,model_ksw_workshop_request,group_workshop_manager,1,1,1,1
 access_ksw_workshop_client_user,ksw.workshop.client.user,model_ksw_workshop_client,base.group_user,1,0,0,0
 access_ksw_workshop_client_manager,ksw.workshop.client.manager,model_ksw_workshop_client,group_workshop_manager,1,1,1,1

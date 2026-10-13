@@ -17,7 +17,7 @@ class TestRequestTypeTags(TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        def _mkuser(name, login, group_xmlids=('base.group_user',)):
+        def _mkuser(name, login, group_xmlids=('base.group_user', 'KSW_workshop.group_workshop_requester')):
             return cls.env['res.users'].create({
                 'name': name, 'login': login, 'email': f'{login}@wstags.test',
                 'group_ids': [(6, 0, [cls.env.ref(x).id for x in group_xmlids])],

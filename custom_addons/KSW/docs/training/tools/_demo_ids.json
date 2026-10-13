@@ -43,5 +43,21 @@
   "comm_recurring": 137,
   "comm_submission": 2045,
   "comm_run": 2,
-  "comm_batch_meals": 2482
+  "comm_batch_meals": 2482,
+  "workshop_vehicles": [
+    914,
+    20,
+    680,
+    21,
+    692
+  ],
+  "workshop_tanker_group": 74,
+  "workshop_team_vehicle": 21,
+  "workshop_out_of_scope_vehicle": 692,
+  "workshop_lang": "ar",
+  "workshop_new": 41019,
+  "workshop_in_progress": 41020,
+  "workshop_completed": 41021,
+  "workshop_rejected": 41022,
+  "workshop_mismatch": 41023
 }

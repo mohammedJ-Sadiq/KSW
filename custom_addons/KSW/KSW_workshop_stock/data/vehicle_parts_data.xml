@@ -4549,60 +4549,12 @@
             <field name="is_storable" eval="True"/>
             <field name="purchase_method">receive</field>
         </record>
-        <!-- Car and light-truck tyre sizes BAS bought on custody (3102020002,
-             3205010024, drivers' 1207) with no BAS item; 215/75, 750/16 and
-             315/80 already exist as BAS items (33xxx). -->
+        <!-- One generic tyre item for tyres bought on custody (user, 2026-10-13:
+             "remove all tyres, replaced by one option كفرات"). The BAS tyre items
+             (33xxx) stay: they are real warehouse stock. -->
         <record id="vehicle_part_0568" model="product.template">
-            <field name="name">كفر 650/16</field>
+            <field name="name">كفرات</field>
             <field name="default_code">WSP-0568</field>
-            <field name="categ_id" ref="KSW_inventory.categ_tyres"/>
-            <field name="type">consu</field>
-            <field name="is_storable" eval="True"/>
-            <field name="purchase_method">receive</field>
-        </record>
-        <record id="vehicle_part_0569" model="product.template">
-            <field name="name">كفر 225/70 R15</field>
-            <field name="default_code">WSP-0569</field>
-            <field name="categ_id" ref="KSW_inventory.categ_tyres"/>
-            <field name="type">consu</field>
-            <field name="is_storable" eval="True"/>
-            <field name="purchase_method">receive</field>
-        </record>
-        <record id="vehicle_part_0570" model="product.template">
-            <field name="name">كفر 195 R15</field>
-            <field name="default_code">WSP-0570</field>
-            <field name="categ_id" ref="KSW_inventory.categ_tyres"/>
-            <field name="type">consu</field>
-            <field name="is_storable" eval="True"/>
-            <field name="purchase_method">receive</field>
-        </record>
-        <record id="vehicle_part_0571" model="product.template">
-            <field name="name">كفر 185/70 R14</field>
-            <field name="default_code">WSP-0571</field>
-            <field name="categ_id" ref="KSW_inventory.categ_tyres"/>
-            <field name="type">consu</field>
-            <field name="is_storable" eval="True"/>
-            <field name="purchase_method">receive</field>
-        </record>
-        <record id="vehicle_part_0572" model="product.template">
-            <field name="name">كفر 225/65 R17</field>
-            <field name="default_code">WSP-0572</field>
-            <field name="categ_id" ref="KSW_inventory.categ_tyres"/>
-            <field name="type">consu</field>
-            <field name="is_storable" eval="True"/>
-            <field name="purchase_method">receive</field>
-        </record>
-        <record id="vehicle_part_0573" model="product.template">
-            <field name="name">كفر 265/60</field>
-            <field name="default_code">WSP-0573</field>
-            <field name="categ_id" ref="KSW_inventory.categ_tyres"/>
-            <field name="type">consu</field>
-            <field name="is_storable" eval="True"/>
-            <field name="purchase_method">receive</field>
-        </record>
-        <record id="vehicle_part_0574" model="product.template">
-            <field name="name">كفر 205/65</field>
-            <field name="default_code">WSP-0574</field>
             <field name="categ_id" ref="KSW_inventory.categ_tyres"/>
             <field name="type">consu</field>
             <field name="is_storable" eval="True"/>

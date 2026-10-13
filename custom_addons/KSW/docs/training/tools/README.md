@@ -12,6 +12,7 @@ system (`localhost:8070` / `odoo_dev`) — never production.
 | `stage_leaves.py` | Stages annual leaves in each approval state (+ a validated allocation); merges ids into `_demo_ids.json`. |
 | `stage_more.py` | Flags the demo employee as attendance-sheet based + creates an HR salary advance with installments. |
 | `stage_helpdesk.py` | Creates the `train.it` login (IT Team), a small IT asset fleet (assigned / available / in maintenance / warranty expiring / expired) and tickets in every stage — including an overdue, a blocked and four closed ones so Reporting and History are not empty. Merges ids into `_demo_ids.json`. |
+| `stage_workshop.py` | Gives `train.supervisor` the Workshop Requester role, a "Training Isuzu Group" tanker group (3 trucks) and makes Train Employee the driver of a 4th, then raises five requests as him (New / In Progress / Completed / Rejected / Driver changed); manager steps run as `admin`. Merges `workshop_*` ids into `_demo_ids.json`. Shots: `supervisor/workshop-0{1..8}` in `capture_deep.mjs`. |
 | `demo_lang_switch.py` | Rewrites the staged helpdesk ticket subjects/bodies (plain data, not translatable fields) between English and Arabic so each language's screenshots show that language. `KSW_DEMO_LANG=ar\|en`. |
 | `capture_screenshots.mjs` | Landing-screen shots (lists/dashboards) per persona — navigates by action XML id. |
 | `capture_deep.mjs` | Interaction shots (wizards, dialogs, forms in a specific approval state) — reads record ids from `_demo_ids.json`. |

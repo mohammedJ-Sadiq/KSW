@@ -21,6 +21,7 @@ attendance and commission sheets.
 | Submit the month and understand how it gets paid | [The monthly cycle](06-commission-monthly-cycle.md) |
 | See my team's payslips | [View team payslips](07-view-team-payslips.md) |
 | Raise an IT support ticket for a team member | [IT ticket for a team member](09-ticket-for-team-member.md) |
+| Send one of my vehicles to the workshop (Workshop Requesters) | [Issue a workshop request](10-workshop-request.md) |
 
 ## The golden rules
 

@@ -12,7 +12,7 @@
                 <div class="oe_button_box" name="button_box">
                     <button name="action_view_workshop_requests" type="object"
                             class="oe_stat_button" icon="fa-wrench"
-                            groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_manager">
+                            groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager">
                         <field name="workshop_request_count" widget="statinfo" string="Workshop Visits"/>
                     </button>
                 </div>

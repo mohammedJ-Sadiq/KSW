@@ -23,6 +23,13 @@ const IDS = existsSync(join(__dirname, '_demo_ids.json'))
   ? JSON.parse(readFileSync(join(__dirname, '_demo_ids.json'), 'utf8')) : {};
 const LOANS = 'KSW_deduction.action_ksw_deduction_loans';
 const LEAVES = 'hr_holidays.hr_leave_action_action_approve_department';
+const WORKSHOP_MY = 'KSW_workshop.action_ksw_workshop_request_my';
+// Selection renders as a select-menu (input + dropdown), not a <select>
+async function pickVehicleType(page) {
+  await page.locator('.o_field_widget[name="vehicle_type"] input').click();
+  await page.locator('.o_select_menu_item', { hasText: /^\s*(Isuzu|إيسوزو)\s*$/ }).first().click();
+  await page.waitForTimeout(500);
+}
 async function openRecord(page, action, id) {
   await page.goto(`${BASE}/odoo/action-${action}/${id}`, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('.o_form_view', { timeout: 15000 });
@@ -366,6 +373,55 @@ const SHOTS = [
   }},
   { tag: 'accounting/comm-03', persona: 'accounting', run: async (page) => {
       await openRecord(page, 'KSW_commissions.action_ksw_commission_batch', IDS.comm_batch);
+  }},
+  // ---- Workshop (KSW_workshop + KSW_workshop_tanker) — KSW_DEMO_LANG=ar stage_workshop.py
+  // Requester = train.supervisor (Workshop Requester role, Training Isuzu
+  // Group, and Train Employee drives IS168).
+  { tag: 'supervisor/workshop-01', persona: 'supervisor', run: async (page) => {
+      await gotoAction(page, WORKSHOP_MY);
+      await page.waitForSelector('.o_list_view .o_data_row', { timeout: 15000 });
+      await page.mouse.move(700, 850);   // no hover tooltip on a row
+      await page.waitForTimeout(600);
+  }},
+  { tag: 'supervisor/workshop-02', persona: 'supervisor', post: discardForm, run: async (page) => {
+      await page.goto(`${BASE}/odoo/action-${WORKSHOP_MY}/new`, { waitUntil: 'domcontentloaded' });
+      await page.waitForSelector('.o_form_view', { timeout: 12000 });
+      await page.locator('.o_form_sheet h1').click();
+      await page.waitForTimeout(800);
+  }},
+  { tag: 'supervisor/workshop-03', persona: 'supervisor', post: discardForm, run: async (page) => {
+      await page.goto(`${BASE}/odoo/action-${WORKSHOP_MY}/new`, { waitUntil: 'domcontentloaded' });
+      await page.waitForSelector('.o_form_view', { timeout: 12000 });
+      await pickVehicleType(page);
+      // open the Vehicle dropdown: only the trucks this supervisor answers for
+      await page.locator('.o_field_widget[name="vehicle_id"] input').click();
+      await page.locator('.o-autocomplete--dropdown-item').first().waitFor({ timeout: 8000 });
+      await page.waitForTimeout(600);
+  }},
+  { tag: 'supervisor/workshop-04', persona: 'supervisor', post: discardForm, run: async (page) => {
+      await page.goto(`${BASE}/odoo/action-${WORKSHOP_MY}/new`, { waitUntil: 'domcontentloaded' });
+      await page.waitForSelector('.o_form_view', { timeout: 12000 });
+      await pickVehicleType(page);
+      await page.locator('.o_field_widget[name="vehicle_id"] input').fill('IS168');
+      await page.locator('.o-autocomplete--dropdown-item').first().waitFor({ timeout: 8000 });
+      await page.locator('.o-autocomplete--dropdown-item').first().click();
+      await page.waitForTimeout(800);   // driver fills itself from the truck
+      await page.locator('.o_field_widget[name="description"] textarea').fill(
+        'المحرك يسخن في المشاوير الطويلة، ومؤشر الحرارة يصل إلى الأحمر بعد ساعة تقريبًا.');
+      await page.locator('.o_form_sheet h1').click();  // blur, so no field shows as focused
+      await page.waitForTimeout(500);
+  }},
+  { tag: 'supervisor/workshop-05', persona: 'supervisor', run: async (page) => {
+      await openRecord(page, WORKSHOP_MY, IDS.workshop_new);
+  }},
+  { tag: 'supervisor/workshop-06', persona: 'supervisor', run: async (page) => {
+      await openRecord(page, WORKSHOP_MY, IDS.workshop_completed);
+  }},
+  { tag: 'supervisor/workshop-07', persona: 'supervisor', run: async (page) => {
+      await openRecord(page, WORKSHOP_MY, IDS.workshop_rejected);
+  }},
+  { tag: 'supervisor/workshop-08', persona: 'supervisor', run: async (page) => {
+      await openRecord(page, WORKSHOP_MY, IDS.workshop_mismatch);
   }},
   // ---- Helpdesk (KSW_helpdesk) -------------------------------------
   { tag: 'employee/ticket-02', persona: 'employee', post: discardForm, run: async (page) => {

@@ -8,7 +8,7 @@ class TestKswWorkshopRequest(TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        def _mkuser(name, login, group_xmlids=('base.group_user',)):
+        def _mkuser(name, login, group_xmlids=('base.group_user', 'KSW_workshop.group_workshop_requester')):
             return cls.env['res.users'].create({
                 'name': name,
                 'login': login,
@@ -305,6 +305,11 @@ class TestKswWorkshopRequest(TransactionCase):
         request = self._make_request(employee_user=self.user_employee)
         with self.assertRaises(UserError):
             request.with_user(self.user_employee).write({'is_cash_customer': True})
+
+    def test_cash_customer_checkbox_is_manager_only(self):
+        request = self._make_request(employee_user=self.user_employee)
+        self.assertFalse(request.with_user(self.user_employee).x_can_toggle_cash_customer)
+        self.assertTrue(request.with_user(self.user_manager).x_can_toggle_cash_customer)
 
     def test_manager_can_toggle_cash_customer(self):
         request = self._make_request(employee_user=self.user_employee)

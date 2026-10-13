@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ksw_workshop_request_form_tanker" model="ir.ui.view">
+        <field name="name">ksw.workshop.request.form.tanker</field>
+        <field name="model">ksw.workshop.request</field>
+        <field name="inherit_id" ref="KSW_workshop.view_ksw_workshop_request_form"/>
+        <field name="arch" type="xml">
+            <!-- Shown to everyone who opens the request, not only while the
+                 driver is being picked: the workshop needs to know who really
+                 brought the truck in. -->
+            <!-- Only on a request not yet saved: saving it is what submits it,
+                 and the client saves before running the button. -->
+            <xpath expr="//header/field[@name='state']" position="before">
+                <button name="action_submit" type="object" string="Submit Request"
+                        class="oe_highlight" invisible="id"
+                        groups="KSW_workshop.group_workshop_requester,KSW_workshop.group_workshop_manager"/>
+            </xpath>
+            <xpath expr="//sheet/div[hasclass('oe_title')]" position="before">
+                <field name="x_driver_mismatch" invisible="1"/>
+                <div class="alert alert-warning" role="alert" invisible="not x_driver_mismatch">
+                    <strong>Driver changed:</strong>
+                    <field name="driver_id" readonly="1" class="d-inline fw-bold"/>
+                    is not the driver attached to this vehicle. The attached driver is
+                    <field name="x_attached_driver_id" readonly="1" class="d-inline fw-bold"/>.
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_ksw_workshop_request_list_tanker" model="ir.ui.view">
+        <field name="name">ksw.workshop.request.list.tanker</field>
+        <field name="model">ksw.workshop.request</field>
+        <field name="inherit_id" ref="KSW_workshop.view_ksw_workshop_request_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='vehicle_id']" position="after">
+                <field name="x_driver_mismatch" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_ksw_workshop_request_search_tanker" model="ir.ui.view">
+        <field name="name">ksw.workshop.request.search.tanker</field>
+        <field name="model">ksw.workshop.request</field>
+        <field name="inherit_id" ref="KSW_workshop.view_ksw_workshop_request_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='filter_cash_customer']" position="after">
+                <filter string="Driver Differs" name="filter_driver_mismatch"
+                        domain="[('x_driver_mismatch', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

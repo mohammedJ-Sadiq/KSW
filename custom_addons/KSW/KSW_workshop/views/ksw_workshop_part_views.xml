@@ -202,17 +202,17 @@
          child renders with no visible parent to sit under. -->
     <menuitem id="menu_ksw_workshop_inventory" name="Inventory"
               parent="menu_ksw_workshop_root" sequence="40"
-              groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_manager"/>
+              groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
     <menuitem id="menu_ksw_workshop_parts" name="Items"
               parent="menu_ksw_workshop_inventory" action="action_ksw_workshop_part"
               sequence="10"
-              groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_manager"/>
-    <!-- Manager-only for the same reason the Reporting menu is: the
+              groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
+    <!-- Manager and Reviewer only, for the same reason the Reporting menu is: the
          technician record rule would make this pivot a silently partial
          aggregate that looks complete. -->
     <menuitem id="menu_ksw_workshop_parts_issued" name="Issued Parts"
               parent="menu_ksw_workshop_inventory" action="action_ksw_workshop_part_line"
               sequence="20"
-              groups="KSW_workshop.group_workshop_manager"/>
+              groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
 
 </odoo>

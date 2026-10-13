@@ -1,0 +1,1832 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_workshop
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-13 13:15+0000\n"
+"PO-Revision-Date: 2026-10-13 13:15+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar_001\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_type_form
+msgid ""
+"A request is tagged with this type when any of these words appears\n"
+"                        in its description. Matching ignores case and matches inside longer\n"
+"                        words. A request can carry several types at once — an oil change\n"
+"                        that also replaced brake pads is both."
+msgstr ""
+"يُوسَم الطلب بهذا النوع عند ظهور أي من هذه الكلمات في وصفه. المطابقة لا "
+"تفرّق بين الأحرف الكبيرة والصغيرة وتشمل الكلمات الأطول التي تحتويها. يمكن أن"
+" يحمل الطلب عدة أنواع معاً — فتغيير الزيت مع تبديل قماشات الفرامل يُصنَّف "
+"تحت النوعين."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_labor_line__technician_id
+msgid ""
+"A workshop technician, or External Service Location when the job was sent "
+"outside."
+msgstr "فني ورشة، أو «جهة خدمة خارجية» عند إرسال العمل خارج الورشة."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__message_needaction
+msgid "Action Needed"
+msgstr "إجراء مطلوب"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_client__active
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__active
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request_type__active
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_technician__active
+msgid "Active"
+msgstr "نشط"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__activity_ids
+msgid "Activities"
+msgstr "الأنشطة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "زخرفة استثناء النشاط"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__activity_state
+msgid "Activity State"
+msgstr "حالة النشاط"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "أيقونة نوع النشاط"
+
+#. module: KSW_workshop
+#: model_terms:ir.actions.act_window,help:KSW_workshop.action_ksw_workshop_part
+msgid "Add a spare part item"
+msgstr "إضافة صنف قطع غيار"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_keyword_suggestion_list
+msgid "Add to Type"
+msgstr "إضافة إلى النوع"
+
+#. module: KSW_workshop
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_air_conditioning
+msgid "Air Conditioning"
+msgstr "التكييف"
+
+#. module: KSW_workshop
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_air_intake
+msgid "Air Intake"
+msgstr "نظام سحب الهواء"
+
+#. module: KSW_workshop
+#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_request_all
+#: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_all
+msgid "All Requests"
+msgstr "جميع الطلبات"
+
+#. module: KSW_workshop
+#: model_terms:ir.actions.act_window,help:KSW_workshop.action_ksw_workshop_part
+msgid ""
+"An item is identified by its number on the purchase invoice.\n"
+"                Nothing here holds a stock balance: parts are issued as they\n"
+"                are listed on a repair, and this screen shows what went out."
+msgstr ""
+"يُعرَّف الصنف برقمه في فاتورة الشراء. لا يُحتفظ هنا برصيد مخزون: تُصرف القطع"
+" عند إدراجها في الإصلاح، وتعرض هذه الشاشة ما تم صرفه."
+
+#. module: KSW_workshop
+#: model:ir.model.constraint,message:KSW_workshop.constraint_ksw_workshop_part_name_uniq
+msgid "An item with this number already exists."
+msgstr "يوجد صنف بهذا الرقم مسبقاً."
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_type_form
+msgid "Apply to Existing Requests"
+msgstr "تطبيق على الطلبات الحالية"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_client_form
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_client_search
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_form
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_search
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_type_form
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_technician_form
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_technician_search
+msgid "Archived"
+msgstr "مؤرشف"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__message_attachment_count
+msgid "Attachment Count"
+msgstr "عدد المرفقات"
+
+#. module: KSW_workshop
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_axles_shafts
+msgid "Axles & Drive Shafts"
+msgstr "المحاور وأعمدة الإدارة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__x_bas_avg_price
+msgid "BAS Average Price"
+msgstr "متوسط السعر في BAS"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__x_bas_last_price
+msgid "BAS Last Price"
+msgstr "آخر سعر في BAS"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__x_bas_last_date
+msgid "BAS Last Price Date"
+msgstr "تاريخ آخر سعر في BAS"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__x_bas_qty
+msgid "BAS Quantity Bought"
+msgstr "الكمية المشتراة في BAS"
+
+#. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__request_type__bodywork
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_bodywork
+msgid "Bodywork / Welding"
+msgstr "السمكرة / اللحام"
+
+#. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__request_type__brakes
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_brakes
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_type_form
+msgid "Brakes"
+msgstr "الفرامل"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_cash_brand
+msgid "Brand (Cash)"
+msgstr "الماركة (نقدي)"
+
+#. module: KSW_workshop
+#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_report_by_type
+#: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_report_by_type
+msgid "By Repair Type"
+msgstr "حسب نوع الإصلاح"
+
+#. module: KSW_workshop
+#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_report_by_technician
+#: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_report_by_technician
+msgid "By Technician"
+msgstr "حسب الفني"
+
+#. module: KSW_workshop
+#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_report_by_vehicle
+#: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_report_by_vehicle
+msgid "By Vehicle"
+msgstr "حسب المركبة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__is_cash_customer
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "Cash Customer"
+msgstr "عميل نقدي"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_fleet_vehicle__client_id
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_client__partner_id
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__client_id
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__client_id
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_search
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "Client"
+msgstr "العميل"
+
+#. module: KSW_workshop
+#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_client
+#: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_clients
+msgid "Clients"
+msgstr "العملاء"
+
+#. module: KSW_workshop
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_clutch
+msgid "Clutch"
+msgstr "الكلتش"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request_type__color
+msgid "Color"
+msgstr "اللون"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid "Complete"
+msgstr "إكمال"
+
+#. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__state__completed
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "Completed"
+msgstr "مكتمل"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__completion_date
+msgid "Completion Date"
+msgstr "تاريخ الإكمال"
+
+#. module: KSW_workshop
+#: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_configuration
+msgid "Configuration"
+msgstr "الإعدادات"
+
+#. module: KSW_workshop
+#: model:ir.model,name:KSW_workshop.model_res_partner
+msgid "Contact"
+msgstr "جهة الاتصال"
+
+#. module: KSW_workshop
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_cooling
+msgid "Cooling System"
+msgstr "نظام التبريد"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_part_line__unit_cost
+msgid ""
+"Copied from the item when the line was added. It stays put if the item's "
+"cost changes later, so a past repair never restates itself."
+msgstr ""
+"منسوخ من الصنف عند إضافة البند. يبقى كما هو إذا تغيّرت تكلفة الصنف لاحقاً، "
+"فلا تتغيّر تكلفة إصلاح سابق."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_part_line__description
+msgid ""
+"Copied from the item when the line was added; edit it to note a variant."
+msgstr "منسوخ من الصنف عند إضافة البند؛ عدّله لتوضيح نوع مختلف."
+
+#. module: KSW_workshop
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_coupling
+msgid "Coupling / Fifth Wheel"
+msgstr "وصلة الربط / الصحن"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_client__create_uid
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_keyword_ignored__create_uid
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_keyword_suggestion__create_uid
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_labor_line__create_uid
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__create_uid
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__create_uid
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__create_uid
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request_type__create_uid
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_technician__create_uid
+msgid "Created by"
+msgstr "أنشئ بواسطة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_client__create_date
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_keyword_ignored__create_date
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_keyword_suggestion__create_date
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_labor_line__create_date
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__create_date
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__create_date
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__create_date
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request_type__create_date
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_technician__create_date
+msgid "Created on"
+msgstr "أنشئ في"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_cash_customer_name
+msgid "Customer Name (Cash)"
+msgstr "اسم العميل (نقدي)"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_list
+msgid "Date"
+msgstr "التاريخ"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_part__standard_cost
+msgid ""
+"Default unit cost proposed on a new issue line. Each line keeps its own "
+"snapshot, so changing this never rewrites what a past repair cost."
+msgstr ""
+"تكلفة الوحدة الافتراضية المقترحة في بند صرف جديد. يحتفظ كل بند بنسخته "
+"الخاصة، فتغيير هذه القيمة لا يغيّر تكلفة أي إصلاح سابق."
+
+#. module: KSW_workshop
+#: model_terms:ir.actions.act_window,help:KSW_workshop.action_ksw_workshop_request_type
+msgid "Define a type of work, and the words that identify it"
+msgstr "عرّف نوعاً من الأعمال والكلمات التي تدل عليه"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__department_id
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "Department"
+msgstr "القسم"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid ""
+"Describe the problem: what is wrong, since when, and any warning light or "
+"noise."
+msgstr "صف المشكلة: ما العطل، ومنذ متى، وأي ضوء تحذير أو صوت."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_labor_line__description
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__description
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__description
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__description
+msgid "Description"
+msgstr "الوصف"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_fleet_vehicle__display_name
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_client__display_name
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_keyword_ignored__display_name
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_keyword_suggestion__display_name
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_labor_line__display_name
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__display_name
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__display_name
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__display_name
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request_type__display_name
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_technician__display_name
+#: model:ir.model.fields,field_description:KSW_workshop.field_res_partner__display_name
+msgid "Display Name"
+msgstr "اسم العرض"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__driver_id
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "Driver"
+msgstr "السائق"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_driver_history_count
+msgid "Driver Jobs This Year"
+msgstr "أعمال السائق هذا العام"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_cash_driver_name
+msgid "Driver Name (Cash)"
+msgstr "اسم السائق (نقدي)"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__duration_days
+msgid "Duration Days"
+msgstr "المدة بالأيام"
+
+#. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__request_type__electrical
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_electrical
+msgid "Electrical"
+msgstr "الكهرباء"
+
+#. module: KSW_workshop
+#: model:ir.model,name:KSW_workshop.model_hr_employee
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_technician__employee_id
+msgid "Employee"
+msgstr "الموظف"
+
+#. module: KSW_workshop
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_engine
+msgid "Engine / Power Plant"
+msgstr "المحرك"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__entry_datetime
+msgid "Entry Date/Time"
+msgstr "تاريخ/وقت الدخول"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_keyword_suggestion__sample
+msgid "Example"
+msgstr "مثال"
+
+#. module: KSW_workshop
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_exhaust
+msgid "Exhaust"
+msgstr "نظام العادم"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__exit_datetime
+msgid "Exit Date/Time"
+msgstr "تاريخ/وقت الخروج"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_technician_list
+msgid "External"
+msgstr "خارجي"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_keyword_suggestion__type_id
+msgid "File Under"
+msgstr "تصنيف تحت"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_fleet_vehicle_pivot
+msgid "Fleet Analysis"
+msgstr "تحليل الأسطول"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__message_follower_ids
+msgid "Followers"
+msgstr "المتابعين"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "المتابعين (الشركاء)"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr "أيقونة من Font awesome مثال: fa-tasks"
+
+#. module: KSW_workshop
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_frame
+msgid "Frame / Chassis"
+msgstr "الهيكل / الشاصي"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request__parts_cost
+msgid ""
+"Free-typed figure for uncatalogued or one-off items that were not listed "
+"above. This is where the legacy history's parts costs live."
+msgstr ""
+"مبلغ يُكتب يدوياً للأصناف غير المسجّلة أو لمرة واحدة والتي لم تُدرج أعلاه. "
+"وفيه تكاليف القطع في السجل القديم."
+
+#. module: KSW_workshop
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_fuel_system
+msgid "Fuel System"
+msgstr "نظام الوقود"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__has_message
+msgid "Has Message"
+msgstr "يحتوي على رسالة"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid "History (This Year)"
+msgstr "السجل (هذا العام)"
+
+#. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__request_type__hoses
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_hoses
+msgid "Hoses"
+msgstr "الليّات"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_hr_employee__id
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_fleet_vehicle__id
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_client__id
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_keyword_ignored__id
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_keyword_suggestion__id
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_labor_line__id
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__id
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__id
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__id
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request_type__id
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_technician__id
+#: model:ir.model.fields,field_description:KSW_workshop.field_res_partner__id
+msgid "ID"
+msgstr "المُعرف"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__activity_exception_icon
+msgid "Icon"
+msgstr "الأيقونة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "الأيقونة للإشارة إلى النشاط المستثنى."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "إذا كان محددًا، فهناك رسائل جديدة عليك رؤيتها."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request__message_has_error
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "إذا كان محددًا، فقد حدث خطأ في تسليم بعض الرسائل."
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_keyword_suggestion_list
+msgid "Ignore"
+msgstr "تجاهل"
+
+#. module: KSW_workshop
+#: model:ir.model,name:KSW_workshop.model_ksw_workshop_keyword_ignored
+msgid "Ignored Keyword Suggestion"
+msgstr "كلمة مقترحة متجاهلة"
+
+#. module: KSW_workshop
+#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_keyword_ignored
+#: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_keyword_ignored
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_keyword_ignored_list
+msgid "Ignored Words"
+msgstr "الكلمات المتجاهلة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__state__in_progress
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "In Progress"
+msgstr "قيد التنفيذ"
+
+#. module: KSW_workshop
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_instruments
+msgid "Instruments & Gauges"
+msgstr "العدادات والمؤشرات"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid "Internal"
+msgstr "داخلي"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__note
+msgid "Internal Note"
+msgstr "ملاحظة داخلية"
+
+#. module: KSW_workshop
+#: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_inventory
+msgid "Inventory"
+msgstr "المخزون"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_technician__is_external
+msgid "Is External"
+msgstr "خارجي"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__message_is_follower
+msgid "Is Follower"
+msgstr "متابع"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__issue_date
+msgid "Issue Date"
+msgstr "تاريخ الصرف"
+
+#. module: KSW_workshop
+#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_part_line
+#: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_parts_issued
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_graph
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_list
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_pivot
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_search
+msgid "Issued Parts"
+msgstr "القطع المصروفة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__issued_qty
+msgid "Issued Qty"
+msgstr "الكمية المصروفة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__issued_value
+msgid "Issued Value"
+msgstr "قيمة المصروف"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_form
+msgid "Issued to date"
+msgstr "المصروف حتى تاريخه"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__line_ids
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_form
+msgid "Issues"
+msgstr "مرات الصرف"
+
+#. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__vehicle_type__isuzu
+msgid "Isuzu"
+msgstr "إيسوزو"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__part_id
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_search
+msgid "Item"
+msgstr "الصنف"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__name
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_form
+msgid "Item No."
+msgstr "رقم الصنف"
+
+#. module: KSW_workshop
+#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_part
+#: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_parts
+msgid "Items"
+msgstr "الأصناف"
+
+#. module: KSW_workshop
+#: model:ir.module.category,name:KSW_workshop.module_category_ksw_workshop
+msgid "KSW Workshop"
+msgstr "ورشة KSW"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request_type__keywords
+msgid "Keywords"
+msgstr "الكلمات الدالة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__labor_cost
+msgid "Labor / Service Fee"
+msgstr "أجور العمل / الخدمة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__labor_line_ids
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid "Labor / Service Performed"
+msgstr "الأعمال / الخدمات المنفذة"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "Last 12 Months"
+msgstr "آخر 12 شهراً"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_client__write_uid
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_keyword_ignored__write_uid
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_keyword_suggestion__write_uid
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_labor_line__write_uid
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__write_uid
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__write_uid
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__write_uid
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request_type__write_uid
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_technician__write_uid
+msgid "Last Updated by"
+msgstr "آخر تحديث بواسطة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_client__write_date
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_keyword_ignored__write_date
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_keyword_suggestion__write_date
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_labor_line__write_date
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__write_date
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__write_date
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__write_date
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request_type__write_date
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_technician__write_date
+msgid "Last Updated on"
+msgstr "آخر تحديث في"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid "Legacy Import"
+msgstr "استيراد السجل القديم"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_legacy_uid
+msgid "Legacy UID"
+msgstr "المعرف القديم"
+
+#. module: KSW_workshop
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_lighting
+msgid "Lighting"
+msgstr "الإنارة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request__total_cost
+msgid ""
+"Listed spare parts, plus other parts, plus labor. Note the legacy history "
+"barely carries costs (878 rows have a parts cost, 4 have a labor cost), so "
+"this is only meaningful for requests recorded in Odoo."
+msgstr ""
+"قطع الغيار المدرجة، والقطع الأخرى، وأجور العمل. ملاحظة: السجل القديم لا يكاد"
+" يحمل تكاليف (878 سجلاً فيها تكلفة قطع، و4 فيها أجور عمل)، لذا فهذا الرقم ذو"
+" معنى للطلبات المسجّلة في Odoo فقط."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_hr_employee__x_is_workshop_technician
+msgid ""
+"Lists this employee in the Technician column of a workshop repair's Labor / "
+"Service table."
+msgstr ""
+"يُدرج هذا الموظف في عمود الفني بجدول الأعمال / الخدمات في إصلاحات الورشة."
+
+#. module: KSW_workshop
+#: model:res.groups,name:KSW_workshop.group_workshop_manager
+msgid "Manager"
+msgstr "مدير"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_technician__is_external
+msgid ""
+"Marks the single built-in 'External Service Location' entry, which stands "
+"for any job sent outside the workshop."
+msgstr ""
+"يميّز البند الوحيد المدمج «جهة خدمة خارجية»، والذي يمثّل أي عمل يُرسل خارج "
+"الورشة."
+
+#. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__request_type__mechanical
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_mechanical
+msgid "Mechanical"
+msgstr "الميكانيكا"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__message_has_error
+msgid "Message Delivery error"
+msgstr "خطأ في تسليم الرسائل"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__message_ids
+msgid "Messages"
+msgstr "الرسائل"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_cash_model
+msgid "Model (Cash)"
+msgstr "الموديل (نقدي)"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_search
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "Month"
+msgstr "الشهر"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "الموعد النهائي لنشاطاتي"
+
+#. module: KSW_workshop
+#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_request_my
+#: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_my
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "My Requests"
+msgstr "طلباتي"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_keyword_ignored__name
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__name
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request_type__name
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_technician__name
+msgid "Name"
+msgstr "الاسم"
+
+#. module: KSW_workshop
+#. odoo-python
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__state__new
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+#: code:addons/KSW_workshop/models/ksw_workshop_client.py:0
+msgid "New"
+msgstr "جديد"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__activity_calendar_event_id
+msgid "Next Activity Calendar Event"
+msgstr "الفعالية التالية في تقويم الأنشطة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "الموعد النهائي للنشاط التالي"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__activity_summary
+msgid "Next Activity Summary"
+msgstr "ملخص النشاط التالي"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__activity_type_id
+msgid "Next Activity Type"
+msgstr "نوع النشاط التالي"
+
+#. module: KSW_workshop
+#: model_terms:ir.actions.act_window,help:KSW_workshop.action_ksw_workshop_keyword_ignored
+msgid "No words ignored yet"
+msgstr "لا توجد كلمات متجاهلة بعد"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_client__note
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_technician__note
+msgid "Note"
+msgstr "الملاحظات"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__note_to_requester
+msgid "Note to Requester"
+msgstr "ملاحظة لمقدم الطلب"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__message_needaction_counter
+msgid "Number of Actions"
+msgstr "عدد الإجراءات"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__message_has_error_counter
+msgid "Number of errors"
+msgstr "عدد الأخطاء"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "عدد الرسائل التي تتطلب اتخاذ إجراء"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "عدد الرسائل الحادث بها خطأ في التسليم"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__odometer_reading
+msgid "Odometer Reading"
+msgstr "قراءة العداد"
+
+#. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__request_type__oil_filters
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_oil_filters
+msgid "Oil & Filters"
+msgstr "الزيت والفلاتر"
+
+#. module: KSW_workshop
+#: model_terms:ir.actions.act_window,help:KSW_workshop.action_ksw_workshop_client
+msgid ""
+"Only the clients listed here are offered on a workshop request\n"
+"                and on a fleet vehicle. Archive a row to retire a client\n"
+"                without touching its past requests."
+msgstr ""
+"لا يُعرض في طلب الورشة وفي مركبة الأسطول إلا العملاء المدرجون هنا. أرشف "
+"السطر لإيقاف عميل دون المساس بطلباته السابقة."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_technician__employee_id
+msgid ""
+"Optional. Leave empty for someone who works in the shop but has no employee "
+"record in Odoo."
+msgstr "اختياري. اتركه فارغاً لمن يعمل في الورشة وليس له سجل موظف في Odoo."
+
+#. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__vehicle_type__other
+msgid "Other"
+msgstr "أخرى"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__parts_cost
+msgid "Other Parts Cost"
+msgstr "تكلفة القطع الأخرى"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid "Past jobs for this driver, under this client"
+msgstr "الأعمال السابقة لهذا السائق لدى هذا العميل"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid "Past jobs on this vehicle"
+msgstr "الأعمال السابقة على هذه المركبة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__request_type__inspection
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_inspection
+msgid "Periodic Inspection"
+msgstr "الفحص الدوري"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid "Pick a vehicle to see what it already had done this year."
+msgstr "اختر مركبة لعرض ما أُجري لها هذا العام."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_keyword_suggestion__type_id
+msgid "Pick the type this word belongs to, then use Add to Type."
+msgstr "اختر النوع الذي تنتمي إليه هذه الكلمة، ثم استخدم «إضافة إلى النوع»."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_cash_plate_number
+msgid "Plate Number (Cash)"
+msgstr "رقم اللوحة (نقدي)"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_labor_line__line_no
+msgid "Position of this line on the repair. Follows the order of the table."
+msgstr "ترتيب هذا البند في الإصلاح. يتبع ترتيب الجدول."
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_form
+msgid "Price"
+msgstr "السعر"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__price_note
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__price_note
+msgid "Price History"
+msgstr "سجل الأسعار"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__invoice_ref
+msgid "Purchase Invoice"
+msgstr "فاتورة الشراء"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_list
+msgid "Qty"
+msgstr "الكمية"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__quantity
+msgid "Quantity"
+msgstr "الكمية"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "Quarter"
+msgstr "ربع السنة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__rating_ids
+msgid "Ratings"
+msgstr "التقييمات"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_type_list
+msgid ""
+"Re-apply every type's keywords to the requests already in the system? "
+"Requests whose type was set by hand are left alone."
+msgstr ""
+"إعادة تطبيق الكلمات الدالة لجميع الأنواع على الطلبات الموجودة في النظام؟ "
+"الطلبات التي حُدد نوعها يدوياً لن تتغيّر."
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_type_form
+msgid ""
+"Re-apply this type's keywords to the requests already in the system? "
+"Requests whose type was set by hand are left alone."
+msgstr ""
+"إعادة تطبيق الكلمات الدالة لهذا النوع على الطلبات الموجودة في النظام؟ "
+"الطلبات التي حُدد نوعها يدوياً لن تتغيّر."
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_type_list
+msgid "Re-scan All Requests"
+msgstr "إعادة فحص جميع الطلبات"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid "Recorded on the Legacy Sheet"
+msgstr "المسجّل في الجدول القديم"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_part__invoice_ref
+msgid "Reference of the invoice this item number was taken from."
+msgstr "مرجع الفاتورة التي أُخذ منها رقم الصنف هذا."
+
+#. module: KSW_workshop
+#: model_terms:ir.actions.act_window,help:KSW_workshop.action_ksw_workshop_client
+msgid "Register a workshop client"
+msgstr "تسجيل عميل للورشة"
+
+#. module: KSW_workshop
+#: model_terms:ir.actions.act_window,help:KSW_workshop.action_ksw_workshop_technician
+msgid "Register a workshop technician"
+msgstr "تسجيل فني للورشة"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid "Reject"
+msgstr "رفض"
+
+#. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__state__rejected
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "Rejected"
+msgstr "مرفوض"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__rejection_reason
+msgid "Rejection Reason"
+msgstr "سبب الرفض"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid "Repair Report"
+msgstr "تقرير الإصلاح"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__repairs_parts
+msgid "Repairs & Spare Parts"
+msgstr "الإصلاحات وقطع الغيار"
+
+#. module: KSW_workshop
+#: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_reporting
+msgid "Reporting"
+msgstr "التقارير"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_labor_line__request_id
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__request_id
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid "Request"
+msgstr "الطلب"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__request_type_ids
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "Request Type"
+msgstr "نوع الطلب"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__request_type
+msgid "Request Type (legacy)"
+msgstr "نوع الطلب (قديم)"
+
+#. module: KSW_workshop
+#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_request_type
+#: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_request_types
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_type_list
+msgid "Request Types"
+msgstr "أنواع الطلبات"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__employee_id
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "Requested By"
+msgstr "مقدم الطلب"
+
+#. module: KSW_workshop
+#: model:res.groups,name:KSW_workshop.group_workshop_requester
+msgid "Requester"
+msgstr "مقدم طلب"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_legacy_requester_email
+msgid "Requester Email (as submitted)"
+msgstr "بريد مقدم الطلب (كما ورد)"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_legacy_requester_name
+msgid "Requester Name (as submitted)"
+msgstr "اسم مقدم الطلب (كما ورد)"
+
+#. module: KSW_workshop
+#: model_terms:ir.actions.act_window,help:KSW_workshop.action_ksw_workshop_request_type
+msgid ""
+"Requesters describe the problem in their own words; these keywords are\n"
+"                what turn those words into tags. Add the spellings people actually use."
+msgstr ""
+"يصف مقدمو الطلبات المشكلة بكلماتهم؛ وهذه الكلمات الدالة هي التي تحوّل تلك "
+"الكلمات إلى وسوم. أضف الصيغ التي يكتبها الناس فعلاً."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request_type__request_count
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request_type__request_ids
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_type_list
+msgid "Requests"
+msgstr "الطلبات"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__activity_user_id
+msgid "Responsible User"
+msgstr "المستخدم المسؤول"
+
+#. module: KSW_workshop
+#: model:res.groups,name:KSW_workshop.group_workshop_reviewer
+msgid "Reviewer"
+msgstr "مراجع"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "خطأ في تسليم الرسائل النصية القصيرة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_driver_history_ids
+msgid "Same Driver (This Year)"
+msgstr "السائق نفسه (هذا العام)"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_vehicle_history_ids
+msgid "Same Vehicle (This Year)"
+msgstr "المركبة نفسها (هذا العام)"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_labor_line__sequence
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request_type__sequence
+msgid "Sequence"
+msgstr "تسلسل"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request__technician_label
+msgid ""
+"Single grouping axis for technician reporting: the linked employee for new "
+"requests, the legacy name for imported history."
+msgstr ""
+"محور التجميع الوحيد لتقارير الفنيين: الموظف المرتبط في الطلبات الجديدة، "
+"والاسم القديم في السجل المستورد."
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_list
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_search
+msgid "Spare Part Items"
+msgstr "أصناف قطع الغيار"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__part_lines_cost
+msgid "Spare Parts (Listed)"
+msgstr "قطع الغيار (المدرجة)"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__part_line_ids
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid "Spare Parts Used"
+msgstr "قطع الغيار المستخدمة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_vehicle_history_cost
+msgid "Spent on This Vehicle"
+msgstr "المصروف على هذه المركبة"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid "Start"
+msgstr "بدء العمل"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__state
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__state
+msgid "State"
+msgstr "الحالة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__work_statement
+msgid "Statement of Required Work"
+msgstr "بيان الأعمال المطلوبة"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "Status"
+msgstr "الحالة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+"الأنشطة المعتمدة على الحالة\n"
+"المتأخرة: تاريخ الاستحقاق مر\n"
+"اليوم: تاريخ النشاط هو اليوم\n"
+"المخطط: الأنشطة المستقبلية."
+
+#. module: KSW_workshop
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_steering
+msgid "Steering"
+msgstr "التوجيه"
+
+#. module: KSW_workshop
+#: model_terms:ir.actions.act_window,help:KSW_workshop.action_ksw_workshop_request_my
+msgid "Submit a new workshop service request"
+msgstr "قدّم طلب خدمة ورشة جديداً"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__subtotal
+msgid "Subtotal"
+msgstr "المجموع الفرعي"
+
+#. module: KSW_workshop
+#: model:ir.model,name:KSW_workshop.model_ksw_workshop_keyword_suggestion
+msgid "Suggested Keyword"
+msgstr "كلمة مقترحة"
+
+#. module: KSW_workshop
+#. odoo-python
+#: model:ir.actions.server,name:KSW_workshop.action_ksw_workshop_keyword_suggestions
+#: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_keyword_suggestions
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_keyword_suggestion_list
+#: code:addons/KSW_workshop/models/ksw_workshop_keyword_suggestion.py:0
+msgid "Suggested Keywords"
+msgstr "الكلمات المقترحة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request__part_lines_cost
+msgid "Sum of the spare parts listed on this repair."
+msgstr "مجموع قطع الغيار المدرجة في هذا الإصلاح."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__supplier_id
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_search
+msgid "Supplier"
+msgstr "المورد"
+
+#. module: KSW_workshop
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_suspension_air
+msgid "Suspension & Air System"
+msgstr "نظام التعليق والهواء"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid ""
+"Tagged from the description. Edit the tags to correct them —\n"
+"                            they will then be left alone."
+msgstr ""
+"مصنّف تلقائياً من الوصف. عدّل الوسوم لتصحيحها — وبعدها لن تتغيّر تلقائياً."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_technician__name
+msgid ""
+"Taken from the linked employee and kept in step if they are renamed. Free "
+"text for a technician who has no employee record."
+msgstr ""
+"مأخوذ من الموظف المرتبط ويتحدّث إذا تغيّر اسمه. نص حر للفني الذي ليس له سجل "
+"موظف."
+
+#. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__vehicle_type__tank
+msgid "Tank"
+msgstr "صهريج"
+
+#. module: KSW_workshop
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_tank_cargo
+msgid "Tank & Cargo Body"
+msgstr "الصهريج وصندوق الحمولة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_cash_tank_number
+msgid "Tank Number (Cash)"
+msgstr "رقم الصهريج (نقدي)"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_labor_line__technician_id
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__technician_id
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__technician_id
+#: model:res.groups,name:KSW_workshop.group_workshop_technician
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_search
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "Technician"
+msgstr "الفني"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__technician_label
+msgid "Technician (report)"
+msgstr "الفني (التقرير)"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_legacy_technician_name
+msgid "Technician Name (as recorded)"
+msgstr "اسم الفني (كما سُجّل)"
+
+#. module: KSW_workshop
+#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_technician
+#: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_technicians
+msgid "Technicians"
+msgstr "الفنيون"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_client__partner_id
+msgid ""
+"The contact carrying the customer role. Registering it here is what makes it"
+" selectable on a workshop request and on a fleet vehicle."
+msgstr ""
+"جهة الاتصال التي تحمل صفة العميل. تسجيلها هنا هو ما يجعلها قابلة للاختيار في"
+" طلب الورشة وفي مركبة الأسطول."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request__x_legacy_requester_email
+msgid ""
+"The email address the legacy form was submitted from, kept for reference "
+"regardless of whether it matched an Odoo user."
+msgstr ""
+"البريد الإلكتروني الذي أُرسل منه النموذج القديم، محفوظ للرجوع إليه سواء طابق"
+" مستخدماً في Odoo أم لا."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_part__name
+msgid "The item number as it appears on the purchase invoice for this part."
+msgstr "رقم الصنف كما يظهر في فاتورة الشراء لهذه القطعة."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request__x_legacy_requester_name
+msgid ""
+"The name typed into the legacy form, kept for reference even when "
+"employee_id had to fall back to a placeholder (no matching Odoo account)."
+msgstr ""
+"الاسم المكتوب في النموذج القديم، محفوظ للرجوع إليه حتى عندما رُبط الطلب "
+"بموظف بديل (لعدم وجود حساب مطابق في Odoo)."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request__x_legacy_technician_name
+msgid ""
+"The technician name written on the legacy sheet. Those names are bare first "
+"names that match no single hr.employee, so they could not become "
+"technician_id — this keeps them rather than losing them."
+msgstr ""
+"اسم الفني المكتوب في الجدول القديم. هذه أسماء أولى فقط لا تطابق موظفاً "
+"واحداً، فلم يمكن ربطها بالفني — وهذا الحقل يحفظها بدلاً من فقدانها."
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid "This Driver"
+msgstr "هذا السائق"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_search
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "This Month"
+msgstr "هذا الشهر"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "This Quarter"
+msgstr "هذا الربع"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid "This Vehicle"
+msgstr "هذه المركبة"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_search
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "This Year"
+msgstr "هذا العام"
+
+#. module: KSW_workshop
+#: model:ir.model.constraint,message:KSW_workshop.constraint_ksw_workshop_client_partner_uniq
+msgid "This client is already registered with the workshop."
+msgstr "هذا العميل مسجّل لدى الورشة مسبقاً."
+
+#. module: KSW_workshop
+#: model:ir.model.constraint,message:KSW_workshop.constraint_ksw_workshop_technician_employee_uniq
+msgid "This employee is already registered as a workshop technician."
+msgstr "هذا الموظف مسجّل كفني ورشة مسبقاً."
+
+#. module: KSW_workshop
+#: model:ir.model.constraint,message:KSW_workshop.constraint_ksw_workshop_keyword_ignored_name_uniq
+msgid "This word is already ignored."
+msgstr "هذه الكلمة متجاهلة مسبقاً."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__tire_bolts
+msgid "Tire Bolts"
+msgstr "مسامير الإطارات"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__tire_pressure
+msgid "Tire Pressure"
+msgstr "ضغط الإطارات"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_form
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_list
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid "Total"
+msgstr "الإجمالي"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__total_cost
+msgid "Total Cost"
+msgstr "التكلفة الإجمالية"
+
+#. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__vehicle_type__trailer
+msgid "Trailer"
+msgstr "تريلا"
+
+#. module: KSW_workshop
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_transmission
+msgid "Transmission / Gearbox"
+msgstr "ناقل الحركة / القير"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request__x_request_type_derived
+msgid ""
+"True while the tags are the ones the keywords produced. Editing them by hand"
+" clears it, and from then on they are left alone — a correction must never "
+"be undone by the next edit to the description."
+msgstr ""
+"صحيح ما دامت الوسوم هي التي أنتجتها الكلمات الدالة. تعديلها يدوياً يلغيه، "
+"ومن بعدها لا تتغيّر تلقائياً — فالتصحيح يجب ألا يُلغى بتعديل لاحق على الوصف."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_request_type_derived
+msgid "Type Derived from Description"
+msgstr "النوع مستنتج من الوصف"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "نوع النشاط المستثنى في السجل."
+
+#. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__request_type__tyres
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_tyres
+msgid "Tyres"
+msgstr "الإطارات"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_keyword_suggestion__request_count
+msgid "Unclassified Requests"
+msgstr "طلبات غير مصنّفة"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "Unclassified Type"
+msgstr "نوع غير مصنّف"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__standard_cost
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__unit_cost
+msgid "Unit Cost"
+msgstr "تكلفة الوحدة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_part__x_bas_qty
+msgid "Units behind the BAS average, so Odoo issues weigh in correctly."
+msgstr ""
+"الوحدات التي بُني عليها متوسط BAS، لتُحتسب مصروفات Odoo بالوزن الصحيح."
+
+#. module: KSW_workshop
+#: model:ir.model,name:KSW_workshop.model_ksw_fleet_vehicle
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__vehicle_id
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__vehicle_id
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_search
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "Vehicle"
+msgstr "المركبة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_cash_vehicle_number
+msgid "Vehicle Number (Cash)"
+msgstr "رقم المركبة (نقدي)"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__vehicle_type
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "Vehicle Type"
+msgstr "نوع المركبة"
+
+#. module: KSW_workshop
+#: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_vehicles
+msgid "Vehicles"
+msgstr "المركبات"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_vehicle_history_count
+msgid "Visits This Year"
+msgstr "الزيارات هذا العام"
+
+#. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__request_type__water_pump
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_water_pump
+msgid "Water Pump / Motor"
+msgstr "مضخة / موتور المياه"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__website_message_ids
+msgid "Website Messages"
+msgstr "رسائل الموقع الإلكتروني"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request__website_message_ids
+msgid "Website communication history"
+msgstr "سجل تواصل الموقع الإلكتروني"
+
+#. module: KSW_workshop
+#: model:ksw.workshop.request.type,name:KSW_workshop.request_type_wheels_hubs
+msgid "Wheels, Hubs & Bearings"
+msgstr "العجلات والصرر والرولمانات"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_form
+msgid "Where it came from"
+msgstr "المصدر"
+
+#. module: KSW_workshop
+#: model_terms:ir.actions.act_window,help:KSW_workshop.action_ksw_workshop_technician
+msgid ""
+"Whoever is listed here can be named on a repair's Labor / Service lines.\n"
+"                Ticking \"Workshop Technician\" on an employee form adds them here, and the\n"
+"                built-in \"External Service Location\" entry covers work sent outside."
+msgstr ""
+"يمكن تسمية أي شخص مدرج هنا في بنود الأعمال / الخدمات في الإصلاح. تحديد «فني "
+"ورشة» في نموذج الموظف يضيفه هنا، والبند المدمج «جهة خدمة خارجية» يغطي "
+"الأعمال المرسلة خارج الورشة."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_keyword_suggestion__name
+msgid "Word"
+msgstr "الكلمة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request_type__keywords
+msgid ""
+"Words that earn this tag when they appear in a request's description, "
+"separated by commas. Matching ignores case and matches inside longer words, "
+"so 'فلتر' also catches 'الفلتر'. Add the misspellings people actually type —"
+" 'زبت' and 'chance oil' are hundreds of real requests."
+msgstr ""
+"كلمات تمنح هذا الوسم عند ظهورها في وصف الطلب، مفصولة بفواصل. المطابقة لا "
+"تفرّق بين الأحرف الكبيرة والصغيرة وتشمل الكلمات الأطول التي تحتويها، فكلمة "
+"'فلتر' تلتقط 'الفلتر' أيضاً. أضف الأخطاء الإملائية التي يكتبها الناس فعلاً —"
+" 'زبت' و'chance oil' تمثّل مئات الطلبات الحقيقية."
+
+#. module: KSW_workshop
+#: model_terms:ir.actions.act_window,help:KSW_workshop.action_ksw_workshop_keyword_ignored
+msgid ""
+"Words you dismiss from the Suggested Keywords list land here.\n"
+"                Delete one to have it suggested again."
+msgstr ""
+"الكلمات التي تستبعدها من قائمة الكلمات المقترحة تنتقل إلى هنا. احذف إحداها "
+"لتُقترح من جديد."
+
+#. module: KSW_workshop
+#: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_root
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_employee_form_workshop_technician
+msgid "Workshop"
+msgstr "الورشة"
+
+#. module: KSW_workshop
+#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_report
+#: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_report_analysis
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_graph
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_pivot
+msgid "Workshop Analysis"
+msgstr "تحليل الورشة"
+
+#. module: KSW_workshop
+#: model:ir.model,name:KSW_workshop.model_ksw_workshop_client
+#: model:ir.model.fields,field_description:KSW_workshop.field_res_partner__x_workshop_client_ids
+#: model:ir.model.fields,field_description:KSW_workshop.field_res_users__x_workshop_client_ids
+msgid "Workshop Client Registration"
+msgstr "تسجيل عميل الورشة"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_client_list
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_client_search
+msgid "Workshop Clients"
+msgstr "عملاء الورشة"
+
+#. module: KSW_workshop
+#: model:ir.model,name:KSW_workshop.model_ksw_workshop_labor_line
+msgid "Workshop Labor / Service Line"
+msgstr "بند أعمال / خدمات الورشة"
+
+#. module: KSW_workshop
+#: model:res.groups.privilege,name:KSW_workshop.privilege_workshop_management
+msgid "Workshop Management"
+msgstr "إدارة الورشة"
+
+#. module: KSW_workshop
+#: model:ir.model,name:KSW_workshop.model_ksw_workshop_request_type
+msgid "Workshop Request Type"
+msgstr "نوع طلب الورشة"
+
+#. module: KSW_workshop
+#: model:res.groups.privilege,name:KSW_workshop.privilege_workshop_requests
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_list
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "Workshop Requests"
+msgstr "طلبات الورشة"
+
+#. module: KSW_workshop
+#: model:ir.model,name:KSW_workshop.model_ksw_workshop_request
+msgid "Workshop Service Request"
+msgstr "طلب خدمة الورشة"
+
+#. module: KSW_workshop
+#: model:ir.model,name:KSW_workshop.model_ksw_workshop_part_line
+msgid "Workshop Spare Part Issued"
+msgstr "قطعة غيار مصروفة من الورشة"
+
+#. module: KSW_workshop
+#: model:ir.model,name:KSW_workshop.model_ksw_workshop_part
+msgid "Workshop Spare Part Item"
+msgstr "صنف قطع غيار الورشة"
+
+#. module: KSW_workshop
+#: model:ir.model,name:KSW_workshop.model_ksw_workshop_technician
+#: model:ir.model.fields,field_description:KSW_workshop.field_hr_employee__x_is_workshop_technician
+msgid "Workshop Technician"
+msgstr "فني ورشة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_hr_employee__x_workshop_technician_ids
+msgid "Workshop Technician Registration"
+msgstr "تسجيل فني الورشة"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_technician_list
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_technician_search
+msgid "Workshop Technicians"
+msgstr "فنيو الورشة"
+
+#. module: KSW_workshop
+#. odoo-python
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_fleet_vehicle__workshop_request_count
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_fleet_vehicle_form_workshop
+#: code:addons/KSW_workshop/models/ksw_fleet_vehicle.py:0
+msgid "Workshop Visits"
+msgstr "زيارات الورشة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_can_toggle_cash_customer
+msgid "X Can Toggle Cash Customer"
+msgstr "يمكنه تبديل العميل النقدي"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_imported
+msgid "X Imported"
+msgstr "مستورد"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_search
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "Year"
+msgstr "السنة"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_cash_year
+msgid "Year (Cash)"
+msgstr "السنة (نقدي)"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_form
+msgid "e.g. 90915-YZZD4"
+msgstr "مثال: 90915-YZZD4"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_type_list
+msgid "زيت, فلتر, oil change"
+msgstr "زيت, فلتر, oil change"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_type_form
+msgid "فرامل, بريك, قماشات, brake"
+msgstr "فرامل, بريك, قماشات, brake"
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_technician.py:0
+msgid "A workshop technician needs a name. Link an employee, or type one."
+msgstr "يجب أن يكون لفني الورشة اسم. اربطه بموظف أو اكتب اسمه."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_part_line.py:0
+msgid "The quantity issued must be greater than zero."
+msgstr "يجب أن تكون الكمية المصروفة أكبر من صفر."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Only the workshop manager or a technician can edit the repair report."
+msgstr "لا يمكن تعديل تقرير الإصلاح إلا لمدير الورشة أو الفني."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Only the workshop manager can do this."
+msgstr "هذا الإجراء متاح لمدير الورشة فقط."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Your workshop request was rejected."
+msgstr "تم رفض طلب الورشة الخاص بك."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Your workshop request has been completed."
+msgstr "تم إكمال طلب الورشة الخاص بك."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid ""
+"Client and Vehicle are required unless this is a Cash Customer request."
+msgstr "العميل والمركبة مطلوبان ما لم يكن الطلب لعميل نقدي."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid ""
+"Vehicle Type and Driver are required unless this is a Cash Customer request."
+msgstr "نوع المركبة والسائق مطلوبان ما لم يكن الطلب لعميل نقدي."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "The selected vehicle does not belong to %s."
+msgstr "المركبة المختارة لا تتبع %s."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "The selected vehicle is not a %s."
+msgstr "المركبة المختارة ليست من نوع %s."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "The repair report can only be edited while the request is In Progress."
+msgstr "لا يمكن تعديل تقرير الإصلاح إلا والطلب قيد التنفيذ."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "The requester of a workshop request cannot be changed."
+msgstr "لا يمكن تغيير مقدم طلب الورشة."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid ""
+"The request type is set from the description. Only the workshop can change "
+"it."
+msgstr "يُحدد نوع الطلب من الوصف. ولا يمكن تغييره إلا من قِبل الورشة."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Only new requests can be started."
+msgstr "لا يمكن بدء العمل إلا على الطلبات الجديدة."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Only new requests can be rejected."
+msgstr "لا يمكن رفض إلا الطلبات الجديدة."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Please provide a rejection reason before rejecting the request."
+msgstr "يرجى إدخال سبب الرفض قبل رفض الطلب."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Only in-progress requests can be completed."
+msgstr "لا يمكن إكمال إلا الطلبات قيد التنفيذ."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Only the workshop manager can toggle Cash Customer."
+msgstr "لا يمكن تغيير خيار العميل النقدي إلا لمدير الورشة."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Cash Customer can only be changed while the request is New."
+msgstr "لا يمكن تغيير خيار العميل النقدي إلا والطلب جديد."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "You can only edit your own request while it is New."
+msgstr "لا يمكنك تعديل طلبك إلا وهو في حالة جديد."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request_type.py:0
+msgid "Re-scan complete"
+msgstr "اكتملت إعادة الفحص"
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request_type.py:0
+msgid ""
+"%(added)s tags added, %(removed)s removed. Requests whose type was set by "
+"hand were left alone."
+msgstr ""
+"أُضيف %(added)s وسماً وأُزيل %(removed)s. الطلبات التي حُدد نوعها يدوياً لم "
+"تتغيّر."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_keyword_suggestion.py:0
+msgid ""
+"<p class=\"o_view_nocontent_smiling_face\">Nothing to suggest</p><p>Every "
+"request in the system already matched at least one type.</p>"
+msgstr ""
+"<p class=\"o_view_nocontent_smiling_face\">لا توجد اقتراحات</p><p>كل طلب في "
+"النظام يطابق نوعاً واحداً على الأقل.</p>"
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_keyword_suggestion.py:0
+msgid "Pick a type in \"File Under\" first — that is where %s will be added."
+msgstr "اختر نوعاً في «تصنيف تحت» أولاً — فهناك ستُضاف %s."
