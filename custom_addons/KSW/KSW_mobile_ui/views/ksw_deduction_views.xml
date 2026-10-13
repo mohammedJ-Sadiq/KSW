@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Employee's own card: what it is, how much, how much is left.
+         Deliberately none of the HR-only fields (gross salary, monthly
+         total) that the management kanban carries. -->
+    <record id="ksw_deduction_view_kanban_my_mobile" model="ir.ui.view">
+        <field name="name">ksw.deduction.kanban.my.mobile</field>
+        <field name="model">ksw.deduction</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <kanban class="ksw_m_cards" sample="1">
+                <field name="currency_id"/>
+                <field name="state"/>
+                <field name="approval_state"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between align-items-start gap-2">
+                            <field name="type_id" class="fw-bold"/>
+                            <field name="state" widget="label_selection"
+                                   options="{'classes': {'draft': 'default', 'active': 'info', 'completed': 'success', 'cancelled': 'danger'}}"/>
+                        </div>
+                        <field name="name" class="text-muted small"/>
+                        <div class="row g-0 mt-2">
+                            <div class="col-6 text-muted small">Amount</div>
+                            <div class="col-6 text-end"><field name="amount" widget="monetary"/></div>
+                            <div class="col-6 text-muted small">Monthly Installment</div>
+                            <div class="col-6 text-end"><field name="installment_amount" widget="monetary"/></div>
+                            <div class="col-6 text-muted small">Paid</div>
+                            <div class="col-6 text-end text-success"><field name="total_paid" widget="monetary"/></div>
+                            <div class="col-6 text-muted small">Remaining Balance</div>
+                            <div class="col-6 text-end fw-bold"><field name="total_pending" widget="monetary"/></div>
+                        </div>
+                        <field name="progress_percent" widget="progressbar" class="mt-1"/>
+                        <field name="approval_state" widget="badge" class="mt-1"
+                               invisible="not approval_state or approval_state == 'approved'"/>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_ksw_my_deductions_view_list_mobile" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="act_window_id" ref="KSW_deduction.action_ksw_my_deductions"/>
+    </record>
+    <record id="action_ksw_my_deductions_view_kanban_mobile" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="ksw_deduction_view_kanban_my_mobile"/>
+        <field name="act_window_id" ref="KSW_deduction.action_ksw_my_deductions"/>
+    </record>
+
+    <record id="action_ksw_my_loans_view_list_mobile" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="KSW_deduction.ksw_deduction_view_list_my_loans"/>
+        <field name="act_window_id" ref="KSW_deduction.action_ksw_my_loans"/>
+    </record>
+    <record id="action_ksw_my_loans_view_kanban_mobile" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="ksw_deduction_view_kanban_my_mobile"/>
+        <field name="act_window_id" ref="KSW_deduction.action_ksw_my_loans"/>
+    </record>
+
+</odoo>

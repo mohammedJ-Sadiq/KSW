@@ -5,6 +5,8 @@ against, so what these guard is the *guard*: the parts table is part of the
 repair report and must obey the repair report's rule from every entry route,
 plus the arithmetic of the cost split.
 """
+from datetime import date
+
 from odoo.exceptions import UserError, ValidationError
 from odoo.tests import TransactionCase, tagged
 
@@ -196,3 +198,31 @@ class TestWorkshopParts(TransactionCase):
         self.assertEqual(line.client_id, request.client_id)
         self.assertEqual(line.state, 'in_progress')
         self.assertTrue(line.issue_date)
+
+    # ------------------------------------------------------------------
+    # Price note: BAS history, then Odoo issues on top
+    # ------------------------------------------------------------------
+    def test_price_note_is_empty_without_history(self):
+        self.assertFalse(self.part.price_note)
+
+    def test_price_note_reads_the_bas_history(self):
+        self.part.write({'x_bas_last_price': 30.0, 'x_bas_last_date': date(2026, 8, 31),
+                         'x_bas_avg_price': 20.0, 'x_bas_qty': 8.0})
+        self.assertIn('Last 30.00', self.part.price_note)
+        self.assertIn('Avg 20.00 (8 pcs)', self.part.price_note)
+
+    def test_a_newer_odoo_issue_becomes_last_and_weighs_in(self):
+        self.part.write({'x_bas_last_price': 30.0, 'x_bas_last_date': date(2026, 8, 31),
+                         'x_bas_avg_price': 20.0, 'x_bas_qty': 8.0})
+        request = self._in_progress_request()
+        # 2 pcs at 50: avg = (8*20 + 2*50) / 10 = 26
+        line = self._add_line(request, self.user_technician, unit_cost=50.0)
+        self.part.invalidate_recordset(['price_note'])
+        self.assertIn('Last 50.00', self.part.price_note)
+        self.assertIn('Avg 26.00 (10 pcs)', self.part.price_note)
+        # The technician sees the same note on the line, without seeing other requests.
+        self.assertEqual(line.with_user(self.user_technician).price_note, self.part.price_note)
+
+    def test_picker_finds_an_item_by_its_description(self):
+        found = self.env['ksw.workshop.part'].with_user(self.user_technician).name_search('Oil fil')
+        self.assertIn(self.part.id, [r[0] for r in found])

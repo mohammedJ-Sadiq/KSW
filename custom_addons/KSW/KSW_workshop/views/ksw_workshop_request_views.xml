@@ -146,6 +146,7 @@
                                        readonly="state != 'in_progress'">
                                     <list editable="bottom">
                                         <field name="part_id"/>
+                                        <field name="price_note" class="text-muted"/>
                                         <field name="description"/>
                                         <field name="quantity"/>
                                         <field name="unit_cost"/>

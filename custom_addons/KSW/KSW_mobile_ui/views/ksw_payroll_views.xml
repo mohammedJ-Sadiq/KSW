@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Salary revision request. Approve on the card only for the two
+         plain approvals (DM, GM); HR's "Accept &amp; Issue Revision" and
+         Accounting's "Confirm &amp; Pay" build or pay a payslip behind a
+         confirmation, so they stay on the form. -->
+    <record id="ksw_payslip_revision_request_view_kanban_mobile" model="ir.ui.view">
+        <field name="name">ksw.payslip.revision.request.kanban.mobile</field>
+        <field name="model">ksw.payslip.revision.request</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <kanban class="ksw_m_cards" sample="1">
+                <field name="can_dm_act"/>
+                <field name="can_gm_act"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between align-items-start gap-2">
+                            <field name="employee_id" class="fw-bold"/>
+                            <field name="state" widget="badge"
+                                   decoration-success="state == 'paid'"
+                                   decoration-danger="state == 'refused'"
+                                   decoration-warning="state in ('pending_dm', 'pending_hr', 'pending_gm', 'pending_acc', 'pending_disbursement', 'pending_bank_file')"/>
+                        </div>
+                        <div class="text-muted small"><field name="name"/> · <field name="department_id"/></div>
+                        <div class="d-flex justify-content-between align-items-center mt-1">
+                            <field name="date_to" options="{'min_precision': 'months'}"/>
+                            <span class="fw-bold"><span>Difference</span> <field name="difference_amount"/></span>
+                        </div>
+                        <div class="d-flex mt-2 ksw_m_actions">
+                            <button name="action_dm_approve" type="object"
+                                    class="btn btn-sm btn-primary py-0"
+                                    invisible="not can_dm_act">Approve</button>
+                            <button name="action_gm_approve" type="object"
+                                    class="btn btn-sm btn-primary py-0"
+                                    invisible="not can_gm_act">Approve</button>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_ksw_my_revision_requests_view_list_mobile" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="act_window_id" ref="KSW_payroll.action_ksw_my_revision_requests"/>
+    </record>
+    <record id="action_ksw_my_revision_requests_view_kanban_mobile" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="ksw_payslip_revision_request_view_kanban_mobile"/>
+        <field name="act_window_id" ref="KSW_payroll.action_ksw_my_revision_requests"/>
+    </record>
+
+    <record id="action_ksw_revision_requests_todo_view_list_mobile" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="act_window_id" ref="KSW_payroll.action_ksw_revision_requests_todo"/>
+    </record>
+    <record id="action_ksw_revision_requests_todo_view_kanban_mobile" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="ksw_payslip_revision_request_view_kanban_mobile"/>
+        <field name="act_window_id" ref="KSW_payroll.action_ksw_revision_requests_todo"/>
+    </record>
+
+    <record id="action_ksw_revision_requests_all_view_list_mobile" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="act_window_id" ref="KSW_payroll.action_ksw_revision_requests_all"/>
+    </record>
+    <record id="action_ksw_revision_requests_all_view_kanban_mobile" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="ksw_payslip_revision_request_view_kanban_mobile"/>
+        <field name="act_window_id" ref="KSW_payroll.action_ksw_revision_requests_all"/>
+    </record>
+
+</odoo>

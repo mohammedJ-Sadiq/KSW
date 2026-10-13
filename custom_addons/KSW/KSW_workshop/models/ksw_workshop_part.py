@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from odoo import api, fields, models
 
 
@@ -20,6 +22,8 @@ class KswWorkshopPart(models.Model):
     _name = 'ksw.workshop.part'
     _description = 'Workshop Spare Part Item'
     _order = 'name'
+    # Workshop staff know a part by its name (فلتر زيت), not its item number.
+    _rec_names_search = ['name', 'description']
 
     name = fields.Char(
         string='Item No.', required=True,
@@ -35,6 +39,16 @@ class KswWorkshopPart(models.Model):
         help="Default unit cost proposed on a new issue line. Each line keeps its own "
              "snapshot, so changing this never rewrites what a past repair cost.")
     active = fields.Boolean(default=True)
+
+    # What BAS paid before the workshop moved here: read once from the BAS
+    # vouchers (net of VAT) and loaded as data, never recomputed. The price
+    # note adds the issues recorded in Odoo on top, so it keeps moving.
+    x_bas_last_price = fields.Float(string='BAS Last Price', readonly=True)
+    x_bas_last_date = fields.Date(string='BAS Last Price Date', readonly=True)
+    x_bas_avg_price = fields.Float(string='BAS Average Price', readonly=True)
+    x_bas_qty = fields.Float(string='BAS Quantity Bought', readonly=True,
+                             help="Units behind the BAS average, so Odoo issues weigh in correctly.")
+    price_note = fields.Char(string='Price History', compute='_compute_price_note')
 
     line_ids = fields.One2many('ksw.workshop.part.line', 'part_id', string='Issues')
     # Unstored on purpose: these are display figures on the item list. Anything
@@ -52,6 +66,38 @@ class KswWorkshopPart(models.Model):
     def _compute_display_name(self):
         for part in self:
             part.display_name = f'{part.name} — {part.description}' if part.description else part.name
+
+    @api.depends('x_bas_last_price', 'x_bas_last_date', 'x_bas_avg_price', 'x_bas_qty',
+                 'line_ids.quantity', 'line_ids.unit_cost', 'line_ids.issue_date')
+    def _compute_price_note(self):
+        """«Last 100.00 (31/08/2026) · Avg 94.64 (447 pcs)», BAS history plus Odoo issues.
+
+        sudo(): a technician sees only some requests, but the price of a part
+        is the same whoever fitted it.
+        """
+        Line = self.env['ksw.workshop.part.line'].sudo()
+        lines_by_part = defaultdict(list)
+        for line in Line.search([('part_id', 'in', self.ids), ('unit_cost', '>', 0)],
+                                order='issue_date desc, id desc'):
+            lines_by_part[line.part_id.id].append(line)
+        lang = self.env['res.lang']._get_data(code=self.env.lang or 'en_US')
+        for part in self:
+            lines = lines_by_part.get(part.id, [])
+            last_price, last_date = part.x_bas_last_price, part.x_bas_last_date
+            if lines and (not last_date or lines[0].issue_date >= last_date):
+                last_price, last_date = lines[0].unit_cost, lines[0].issue_date
+            qty = part.x_bas_qty + sum(l.quantity for l in lines)
+            value = part.x_bas_avg_price * part.x_bas_qty + sum(l.quantity * l.unit_cost for l in lines)
+            if not last_price and not qty:
+                part.price_note = False
+                continue
+            note = self.env._('Last %(price)s', price=f'{last_price:,.2f}')
+            if last_date:
+                note += f' ({last_date.strftime(lang.date_format)})'
+            if qty:
+                note += ' · ' + self.env._('Avg %(price)s (%(qty)s pcs)',
+                                           price=f'{value / qty:,.2f}', qty=f'{qty:g}')
+            part.price_note = note
 
     @api.depends('line_ids.quantity', 'line_ids.subtotal')
     def _compute_issued(self):

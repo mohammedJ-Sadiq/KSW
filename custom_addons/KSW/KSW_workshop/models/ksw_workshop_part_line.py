@@ -36,6 +36,9 @@ class KswWorkshopPartLine(models.Model):
         help="Copied from the item when the line was added. It stays put if the item's "
              "cost changes later, so a past repair never restates itself.")
     subtotal = fields.Float(compute='_compute_subtotal', store=True)
+    # Shown when the item is picked, to judge the cost against: not a snapshot,
+    # it is today's view of the item's price history.
+    price_note = fields.Char(related='part_id.price_note', string='Price History')
 
     # A plain field stamped at creation, never a compute reaching through
     # request_id: a field whose job is to survive the related record being

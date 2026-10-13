@@ -15,6 +15,7 @@
                        context="{'res_partner_search_mode': 'supplier'}"/>
                 <field name="invoice_ref" optional="show"/>
                 <field name="standard_cost"/>
+                <field name="price_note" optional="show"/>
                 <field name="issued_qty" readonly="1" optional="show"/>
                 <field name="issued_value" readonly="1" optional="show"/>
                 <field name="active" column_invisible="1"/>
@@ -45,6 +46,13 @@
                                    context="{'res_partner_search_mode': 'supplier'}"/>
                             <field name="invoice_ref"/>
                         </group>
+                    </group>
+                    <group string="Price">
+                        <field name="price_note"/>
+                        <field name="x_bas_last_price"/>
+                        <field name="x_bas_last_date"/>
+                        <field name="x_bas_avg_price"/>
+                        <field name="x_bas_qty"/>
                     </group>
                     <group string="Issued to date">
                         <field name="issued_qty" readonly="1"/>

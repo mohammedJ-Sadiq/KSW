@@ -1,0 +1,107 @@
+// Phone only: nothing in this file reaches a desktop-width screen.
+@include media-breakpoint-down(md) {
+
+    // Record header: a long title wrapped to five lines under the ribbon.
+    // (.o_hr_leave_title is core Time Off's own title block)
+    .o_form_view .o_form_sheet .oe_title h1,
+    .o_form_view .o_form_sheet .o_hr_leave_title {
+        font-size: 1.35rem;
+        line-height: 1.3;
+        padding-right: 2.5rem;
+    }
+    .o_form_view .o_form_sheet .ribbon {
+        transform: scale(0.7);
+        transform-origin: top right;
+    }
+
+    // Grouped lists freeze column widths measured while every group is still
+    // closed, which came out ~1000px wide. On a phone the browser fits the
+    // (already priority-trimmed) columns to the screen instead.
+    .o_list_renderer .o_list_table.o_list_table_grouped {
+        width: 100% !important;
+        table-layout: auto !important;
+        > thead > tr > th {
+            width: auto !important;
+        }
+        // A date-time like "Aug 31, 8:00:00 AM" wraps to two lines rather
+        // than pushing the hours column off-screen.
+        // (the value sits in a Bootstrap .text-truncate span, which is nowrap)
+        // A group heading ("ASYAH ALI A ALSHKHS (27)") spans the first
+        // columns and stretched them just as much, so it wraps too.
+        .o_data_row > td.o_data_cell,
+        .o_data_row > td.o_data_cell .text-truncate,
+        .o_group_header > th,
+        .o_group_header > td,
+        .o_group_header .text-truncate {
+            white-space: normal !important;
+        }
+    }
+
+    // People's names wrap instead of being cut to "ABBAS SH…".
+    // (beats core's `.o_data_row:not(.o_selected_row) .o_list_many2one`)
+    .o_list_renderer .o_list_table .o_data_row td.o_data_cell[name="employee_id"] {
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    // A status badge beside a long name keeps its own width.
+    .ksw_m_cards .o_kanban_record .badge {
+        flex-shrink: 0;
+    }
+
+    // Time Off approval card (core's phone block): every action button the
+    // same size, in a fixed slot. Approve-type on the start side, Refuse
+    // always on the end side, so one-button and two-button cards line up.
+    .o_hr_holidays_kanban_mobile :has(> button.btn:not(.btn-link)) {
+        justify-content: flex-start !important;
+        flex-wrap: nowrap;
+        width: 100%;
+    }
+    .o_hr_holidays_kanban_mobile button.btn:not(.btn-link) {
+        flex: 0 0 calc(50% - 0.25rem);
+        padding: 0.4rem 0.75rem !important;
+        font-size: 0.95rem;
+        line-height: 1.4;
+    }
+    // The attachment paperclip leaves the button row: pinned under the
+    // status badge, it never takes a button's space or shifts it.
+    .o_hr_holidays_kanban_mobile {
+        position: relative;
+    }
+    .o_hr_holidays_kanban_mobile button.btn-link[name="action_documents"] {
+        position: absolute;
+        top: 2.4rem;
+        inset-inline-end: 0;
+        padding: 0.25rem 0.5rem !important;
+    }
+    .o_hr_holidays_kanban_mobile button.btn[name="action_refuse"] {
+        margin-inline-start: auto;
+    }
+
+    // Arabic UI: core Time Off writes the duration as "(<span>9 days</span>)"
+    // and the RTL line flips it to "(days 9)". Only that inner value gets its
+    // direction from its own text. Never apply this to whole lines or
+    // fields: a block takes its alignment from it, so English lines would
+    // jump to the left while Arabic ones stay right.
+    .o_rtl .o_hr_holidays_kanban_mobile span.text-muted > span {
+        unicode-bidi: plaintext;
+    }
+
+    // KSW cards with an action row: same fixed slots as the Time Off card.
+    .ksw_m_cards .ksw_m_actions {
+        gap: 0.5rem;
+    }
+    .ksw_m_cards .ksw_m_actions .btn {
+        flex: 0 0 calc(50% - 0.25rem);
+        padding: 0.4rem 0.75rem !important;
+        font-size: 0.95rem;
+    }
+
+    // Cards: comfortable tap targets.
+    .ksw_m_cards .o_kanban_record {
+        padding: 0.75rem 0.9rem;
+    }
+    .ksw_m_cards .o_kanban_record .btn {
+        min-height: 2.25rem;
+    }
+}

@@ -1,0 +1,116 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-13 08:24+0000\n"
+"PO-Revision-Date: 2026-10-13 08:24+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar_001\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.ksw_attendance_sheet_view_kanban_mobile
+msgid "<span class=\"badge text-bg-danger\">⚠ <span>Needs Attention</span></span>"
+msgstr ""
+"<span class=\"badge text-bg-danger\">⚠ <span>تحتاج إلى مراجعة</span></span>"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.ksw_attendance_sheet_view_kanban_mobile
+msgid "<span>Absent</span>"
+msgstr "<span>غياب</span>"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.ksw_attendance_sheet_view_kanban_mobile
+msgid "<span>Attended</span>"
+msgstr "<span>حضور</span>"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.hr_attendance_view_kanban_mobile
+msgid "<span>Deduction</span>"
+msgstr "<span>الخصم</span>"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.ksw_payslip_revision_request_view_kanban_mobile
+msgid "<span>Difference</span>"
+msgstr "<span>الفرق</span>"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.hr_attendance_view_kanban_mobile
+msgid "<span>Early Leave</span>"
+msgstr "<span>انصراف مبكر</span>"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.hr_attendance_view_kanban_mobile
+msgid "<span>Late</span>"
+msgstr "<span>تأخير</span>"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.ksw_attendance_sheet_view_kanban_mobile
+msgid "<span>Waiting On</span>"
+msgstr "<span>بانتظار</span>"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.hr_attendance_view_kanban_mobile
+msgid "Absent"
+msgstr "غائب"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.ksw_deduction_view_kanban_my_mobile
+msgid "Amount"
+msgstr "المبلغ"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.hr_leave_view_kanban_mobile_steps
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.ksw_payslip_revision_request_view_kanban_mobile
+msgid "Approve"
+msgstr "موافقة"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.hr_leave_view_kanban_return_mobile
+msgid "Confirm Return"
+msgstr "تأكيد المباشرة"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.hr_attendance_view_kanban_mobile
+msgid "Covered by Time Off"
+msgstr "مشمول بإجازة"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.ksw_deduction_view_kanban_my_mobile
+msgid "Monthly Installment"
+msgstr "القسط الشهري"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.ksw_attendance_sheet_view_kanban_mobile
+msgid "Not Sent"
+msgstr "لم يرسل"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.ksw_deduction_view_kanban_my_mobile
+msgid "Paid"
+msgstr "المسدد"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.hr_attendance_view_kanban_mobile
+msgid "Public Holiday"
+msgstr "عطلة رسمية"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.ksw_deduction_view_kanban_my_mobile
+msgid "Remaining Balance"
+msgstr "الرصيد المتبقي"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.ksw_attendance_sheet_view_kanban_mobile
+msgid "Sent to Payroll"
+msgstr "أرسل للرواتب"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.hr_attendance_view_kanban_mobile
+msgid "Weekend"
+msgstr "عطلة أسبوعية"

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- One punch day per card: when, how long, and what payroll will make
+         of it (absent / covered / weekend / holiday / late / early). -->
+    <record id="hr_attendance_view_kanban_mobile" model="ir.ui.view">
+        <field name="name">hr.attendance.kanban.mobile</field>
+        <field name="model">hr.attendance</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <kanban class="ksw_m_cards" create="0" sample="1">
+                <field name="check_in"/>
+                <field name="check_out"/>
+                <field name="x_net_is_absent"/>
+                <field name="x_is_covered"/>
+                <field name="x_is_weekend"/>
+                <field name="x_public_holiday_id"/>
+                <field name="x_net_late_minutes"/>
+                <field name="x_net_early_leave_minutes"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between align-items-start gap-2">
+                            <field name="employee_id" class="fw-bold"/>
+                            <field name="x_day_of_week" class="text-muted small"/>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-1">
+                            <span>
+                                <field name="check_in" options="{'show_time': false}"/>
+                                <!-- raw_value of a datetime is an ISO string in the
+                                     user's zone, not a luxon object -->
+                                <span class="ms-2" t-if="!record.x_net_is_absent.raw_value and record.check_in.raw_value">
+                                    <t t-esc="luxon.DateTime.fromISO(record.check_in.raw_value).toFormat('HH:mm')"/>
+                                    <t t-if="record.check_out.raw_value"> → <t t-esc="luxon.DateTime.fromISO(record.check_out.raw_value).toFormat('HH:mm')"/></t>
+                                </span>
+                            </span>
+                            <field name="x_net_worked_hours" widget="float_time" class="fw-bold"
+                                   invisible="x_net_is_absent"/>
+                        </div>
+                        <div class="d-flex flex-wrap gap-1 mt-2">
+                            <span t-if="record.x_net_is_absent.raw_value" class="badge text-bg-danger">Absent</span>
+                            <span t-if="record.x_is_covered.raw_value" class="badge text-bg-info">Covered by Time Off</span>
+                            <span t-if="record.x_is_weekend.raw_value" class="badge text-bg-secondary">Weekend</span>
+                            <span t-if="record.x_public_holiday_id.raw_value" class="badge text-bg-secondary">Public Holiday</span>
+                            <span t-if="record.x_net_late_minutes.raw_value" class="badge text-bg-warning">
+                                <span>Late</span> <t t-esc="Math.round(record.x_net_late_minutes.raw_value)"/>′
+                            </span>
+                            <span t-if="record.x_net_early_leave_minutes.raw_value" class="badge text-bg-warning">
+                                <span>Early Leave</span> <t t-esc="Math.round(record.x_net_early_leave_minutes.raw_value)"/>′
+                            </span>
+                        </div>
+                        <div groups="hr.group_hr_user" class="small text-danger mt-1"
+                             invisible="not x_deduction_amount">
+                            <span>Deduction</span> <field name="x_deduction_amount" widget="monetary"
+                                   options="{'currency_field': 'x_currency_id'}"/>
+                            <field name="x_currency_id" invisible="1"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="hr_attendance_management_action_view_list_mobile" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="hr_attendance.view_attendance_tree_management"/>
+        <field name="act_window_id" ref="hr_attendance.hr_attendance_management_action"/>
+    </record>
+    <record id="hr_attendance_management_action_view_kanban_mobile" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="hr_attendance_view_kanban_mobile"/>
+        <field name="act_window_id" ref="hr_attendance.hr_attendance_management_action"/>
+    </record>
+
+    <!-- The Attendances dashboard opens grouped by employee (hundreds of
+         groups), which as cards would be hundreds of side-by-side columns.
+         It stays a grouped list; on a phone each row keeps the day's times,
+         hours and the absent flag (the employee is the group heading). -->
+    <record id="hr_attendance_view_list_mobile" model="ir.ui.view">
+        <field name="name">hr.attendance.list.mobile</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.view_attendance_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list/field[@name='employee_id']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='x_day_of_week']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='overtime_status']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='in_mode']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='out_mode']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='in_latitude']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='in_longitude']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='in_location']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='out_latitude']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='out_longitude']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='out_location']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='create_uid']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='write_uid']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='write_date']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='x_net_late_minutes']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='x_net_early_leave_minutes']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='x_public_holiday_id']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='x_is_covered']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='x_deduction_amount']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

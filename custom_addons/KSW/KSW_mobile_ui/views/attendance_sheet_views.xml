@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Phone card for the monthly sheet: who, which month, payroll status,
+         and a short warning badge instead of the full blocked-reason text
+         (that text stays on the form). -->
+    <record id="ksw_attendance_sheet_view_kanban_mobile" model="ir.ui.view">
+        <field name="name">ksw.attendance.sheet.kanban.mobile</field>
+        <field name="model">ksw.attendance.sheet</field>
+        <field name="arch" type="xml">
+            <kanban class="ksw_m_cards" sample="1">
+                <field name="state"/>
+                <field name="year"/>
+                <field name="x_is_blocked"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between align-items-start gap-2">
+                            <field name="employee_id" class="fw-bold"/>
+                            <span t-if="record.state.raw_value == 'confirmed'"
+                                  class="badge text-bg-success">Sent to Payroll</span>
+                            <span t-else="" class="badge text-bg-warning">Not Sent</span>
+                        </div>
+                        <div class="text-muted small">
+                            <field name="month"/> <t t-esc="record.year.raw_value"/>
+                            · <field name="department_id"/>
+                        </div>
+                        <div class="d-flex gap-3 mt-1">
+                            <span class="text-success">✓ <field name="total_attended"/> <span>Attended</span></span>
+                            <span class="text-danger">✗ <field name="total_absent"/> <span>Absent</span></span>
+                        </div>
+                        <div t-if="record.x_is_blocked.raw_value" class="mt-2">
+                            <span class="badge text-bg-danger">⚠ <span>Needs Attention</span></span>
+                            <span class="small text-muted ms-1">
+                                <span>Waiting On</span> <field name="x_action_owner_id"/>
+                            </span>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Same list first on desktop; mobile_view_mode (kanban) picks the card. -->
+    <record id="action_ksw_attendance_sheet_view_list_mobile" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="KSW_attendance_sheet.ksw_attendance_sheet_view_list"/>
+        <field name="act_window_id" ref="KSW_attendance_sheet.action_ksw_attendance_sheet"/>
+    </record>
+    <record id="action_ksw_attendance_sheet_view_kanban_mobile" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="ksw_attendance_sheet_view_kanban_mobile"/>
+        <field name="act_window_id" ref="KSW_attendance_sheet.action_ksw_attendance_sheet"/>
+    </record>
+
+    <!-- If a phone user switches to the list, the long reason text is the
+         column that turned into a one-word-wide tower: drop it there. -->
+    <record id="ksw_attendance_sheet_view_list_mobile" model="ir.ui.view">
+        <field name="name">ksw.attendance.sheet.list.mobile</field>
+        <field name="model">ksw.attendance.sheet</field>
+        <field name="inherit_id" ref="KSW_attendance_sheet.ksw_attendance_sheet_view_list"/>
+        <field name="arch" type="xml">
+            <field name="x_blocked_reason" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </field>
+            <field name="manager_id" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

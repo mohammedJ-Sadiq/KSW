@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Both lists open grouped by month: they stay grouped lists (tap a
+         month to open it) with only what identifies the row and its money. -->
+    <record id="view_ksw_pay_batch_list_mobile" model="ir.ui.view">
+        <field name="name">ksw.pay.batch.list.mobile</field>
+        <field name="model">ksw.pay.batch</field>
+        <field name="inherit_id" ref="KSW_commissions.view_ksw_pay_batch_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list/field[@name='name']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='department_id']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='site_id']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='period']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='entry_count']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='employee_count']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='submission_state']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_submission_list_mobile" model="ir.ui.view">
+        <field name="name">ksw.pay.submission.list.mobile</field>
+        <field name="model">ksw.pay.submission</field>
+        <field name="inherit_id" ref="KSW_commissions.view_ksw_pay_submission_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list/field[@name='responsible_id']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='gm_id']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='submitted_by']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='submitted_date']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='batch_count']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='entry_count']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='employee_count']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='pending_entry_count']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

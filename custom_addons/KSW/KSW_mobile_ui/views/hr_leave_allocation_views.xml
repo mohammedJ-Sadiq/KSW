@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Opens grouped by employee: stays a grouped list; per row the leave
+         type, what was allocated and what is left. -->
+    <record id="hr_leave_allocation_view_list_balance_mobile" model="ir.ui.view">
+        <field name="name">hr.leave.allocation.list.mobile</field>
+        <field name="model">hr.leave.allocation</field>
+        <field name="inherit_id" ref="KSW_leave_types.hr_leave_allocation_view_list_balance"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list/field[@name='employee_id']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='department_id']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='date_from']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='date_to']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='leaves_taken']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

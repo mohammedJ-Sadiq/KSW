@@ -794,3 +794,15 @@ trailer items to its "(تريلات)" one.
   spare parts.
 - Commission payouts land as one bulk Dr `2107010001` line in a bank voucher
   (e.g. `26009099` 2026-09-27, 176,613), roughly two months after the accrual.
+
+### Vehicle spare parts live in «المرجع» = `VOU10.REF` (verified 2026-10-13)
+
+Vehicle parts are not ITM10 items (only tyres 33xxx and desalination parts 15xxx are). The
+workshop custodies expense them directly in FTYPE 018 vouchers, debiting `3102020001` قطع غيار
+السيارات (also `3102020005` صيانة, `3205010023` H1, `3102020008`, `3206010005`, `3102020006`),
+and the part is free text in `REF`, which the BAS screen shows as «المرجع»:
+`<parts joined by +> <vehicle: ت 135 / تيدر 128 / تريلا 186 / س 9986> ف <invoice no.>`, with an
+optional `عدد2` quantity. `REMARK` and `ICODE` are empty on these lines; `VOUREF` names the custody
+(«عهدة عصام جابر»), and `COST_CENTER` holds the vehicle's cost-centre **name** (`T135`, `تيدررقم 128`).
+The 2025 year is in `bas9ss_2025`. 2024 (`bas9ss_2024`) used a different chart.
+Parsed into the Odoo catalogue by `KSW_workshop_stock` (see KSW-Brain «Vehicle Spare Parts Catalogue from BAS»).

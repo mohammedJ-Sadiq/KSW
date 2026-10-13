@@ -1,6 +1,6 @@
 {
     'name': 'KSW Workshop Stock',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'author': 'Mohammed Albadr',
     'category': 'Inventory/Inventory',
     'summary': 'Workshop spare parts are issued from real stock, charged to the vehicle cost centre',
@@ -19,6 +19,7 @@ production (0 items, 0 lines on KSWCO, 2026-10-06).
 """,
     'depends': ['KSW_workshop', 'KSW_inventory'],
     'data': [
+        'data/vehicle_parts_data.xml',
         'views/workshop_views.xml',
     ],
     'post_init_hook': 'post_init_hook',

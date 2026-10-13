@@ -44,12 +44,16 @@ class HrPayslip(models.Model):
     x_bank_exported_by = fields.Many2one(
         'res.users', string='Sent to Bank By', readonly=True, copy=False)
     x_bank_frozen = fields.Boolean(
-        string='Frozen', compute='_compute_bank_frozen')
+        string='Frozen', compute='_compute_bank_frozen', compute_sudo=True)
     x_pending_change_ids = fields.One2many(
         'ksw.payslip.pending.change', 'slip_id', string='Pending Changes')
+    # compute_sudo: the payslip list/form show these to the Self and
+    # Supervisor tiers, which have no ACL on ksw.payslip.pending.change.
     x_pending_net = fields.Float(
-        string='NET After Pending Changes', compute='_compute_bank_frozen')
-    x_has_pending_change = fields.Boolean(compute='_compute_bank_frozen')
+        string='NET After Pending Changes', compute='_compute_bank_frozen',
+        compute_sudo=True)
+    x_has_pending_change = fields.Boolean(
+        compute='_compute_bank_frozen', compute_sudo=True)
 
     @api.depends('state', 'x_bank_exported_date',
                  'x_pending_change_ids.state', 'x_pending_change_ids.net_after')
