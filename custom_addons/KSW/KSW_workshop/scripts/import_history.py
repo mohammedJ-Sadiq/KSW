@@ -60,6 +60,8 @@ import csv
 import re
 from datetime import datetime
 
+import pytz
+
 from odoo.addons.KSW_workshop.models.ksw_workshop_request import (
     LEGACY_PLACEHOLDER_SUFFIX,
 )
@@ -121,10 +123,22 @@ def _parse_date(value):
     # requests were dated the moment of import instead of when they happened.
     for fmt in ('%m/%d/%Y %I:%M:%S %p', '%m/%d/%Y %H:%M:%S', '%m/%d/%Y'):
         try:
-            return datetime.strptime(value, fmt)
+            return _sheet_time_to_utc(datetime.strptime(value, fmt))
         except ValueError:
             continue
     return None
+
+
+SHEET_TZ = pytz.timezone('Asia/Riyadh')
+
+
+def _sheet_time_to_utc(value):
+    """The Google Sheet writes wall-clock Riyadh time; Odoo stores UTC.
+
+    Stored as-is, every imported time read 3 hours late in the UI (fixed in
+    the data on 2026-10-14). Returns a naive UTC datetime, as the ORM wants.
+    """
+    return SHEET_TZ.localize(value).astimezone(pytz.utc).replace(tzinfo=None)
 
 
 def _float(value):

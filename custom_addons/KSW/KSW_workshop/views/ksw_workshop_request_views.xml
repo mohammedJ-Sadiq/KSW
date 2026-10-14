@@ -42,6 +42,12 @@
                                  already say, one field is not a section, and this
                                  is the column a requester fills in. -->
                             <field name="employee_id" readonly="1"/>
+                            <!-- Imported requests have no chatter, so the form is
+                                 the only place their dates can be read. -->
+                            <field name="create_date" string="Requested On"
+                                   readonly="1" invisible="not id"/>
+                            <field name="completion_date" string="Completed On"
+                                   readonly="1" invisible="not completion_date"/>
                             <!-- Cash Customer is the workshop manager's switch, not
                                  an option offered to a requester. Driven by
                                  x_can_toggle_cash_customer rather than groups=,
@@ -243,7 +249,6 @@
                                 <field name="note"/>
                                 <field name="note_to_requester"/>
                                 <field name="rejection_reason" invisible="state not in ('new', 'rejected')"/>
-                                <field name="completion_date" readonly="1"/>
                                 <field name="duration_days" readonly="1"/>
                             </group>
                             <group string="Legacy Import" invisible="not x_imported">
