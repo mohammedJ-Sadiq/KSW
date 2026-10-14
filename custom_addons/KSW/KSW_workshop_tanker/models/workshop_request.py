@@ -36,6 +36,8 @@ class KswWorkshopRequest(models.Model):
     @api.onchange('vehicle_id')
     def _onchange_vehicle_id(self):
         super()._onchange_vehicle_id()
+        if not self._driver_follows_vehicle():
+            return
         for request in self:
             attached = request.vehicle_id.sudo().x_attached_driver_id
             request.x_attached_driver_id = attached
@@ -93,6 +95,10 @@ class KswWorkshopRequest(models.Model):
             if vals.get('vehicle_id'):
                 if not vals.get('x_imported'):
                     self._check_vehicle_in_scope(vals['vehicle_id'])
+                # Switched off with the fill-in: no snapshot means no
+                # "driver changed" warning against a driver nobody suggested.
+                if not self._driver_follows_vehicle():
+                    continue
                 attached = Vehicle.browse(vals['vehicle_id']).x_attached_driver_id
                 vals['x_attached_driver_id'] = attached.id
                 if attached and not vals.get('driver_id'):
@@ -106,5 +112,6 @@ class KswWorkshopRequest(models.Model):
             if not self.env.su:
                 self._check_vehicle_in_scope(vals['vehicle_id'])
             vehicle = self.env['ksw.fleet.vehicle'].sudo().browse(vals['vehicle_id'])
-            vals['x_attached_driver_id'] = vehicle.x_attached_driver_id.id
+            vals['x_attached_driver_id'] = vehicle.x_attached_driver_id.id \
+                if self._driver_follows_vehicle() else False
         return super().write(vals)

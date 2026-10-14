@@ -48,6 +48,9 @@ class TestWorkshopTanker(TransactionCase):
         cls.env['ksw.water.tanker.group'].create({
             'name': 'WST Group', 'vehicle_ids': [(6, 0, cls.in_group.ids)],
             'supervisor_ids': [(6, 0, cls.supervisor.ids)]})
+        # The fill-in is switched off in production (Oct 2026); these tests
+        # keep its behaviour covered for when it is switched back on.
+        cls.env['ir.config_parameter'].sudo().set_param('KSW_workshop.driver_follows_vehicle', '1')
 
     def _pickable(self, user):
         return self.env['ksw.fleet.vehicle'].with_user(user).search(
@@ -92,6 +95,22 @@ class TestWorkshopTanker(TransactionCase):
                                 'driver_id': self.supervisor.id, 'description': 'Brakes'})
         self.assertTrue(other.x_driver_mismatch)
         self.assertEqual(other.x_attached_driver_id, self.driver_a)
+
+    def test_switched_off_the_vehicle_fills_in_no_driver(self):
+        self.env['ir.config_parameter'].sudo().set_param('KSW_workshop.driver_follows_vehicle', '0')
+        request = self.env['ksw.workshop.request'].with_user(self.sup_user).create({
+            'vehicle_type': 'isuzu', 'vehicle_id': self.team_truck.id,
+            'driver_id': self.supervisor.id, 'description': 'Oil change'})
+        self.assertEqual(request.driver_id, self.supervisor)
+        self.assertFalse(request.x_attached_driver_id)
+        self.assertFalse(request.x_driver_mismatch)
+        form_request = self.env['ksw.workshop.request'].with_user(self.sup_user).new(
+            {'vehicle_type': 'isuzu', 'vehicle_id': self.team_truck.id})
+        form_request._onchange_vehicle_id()
+        self.assertFalse(form_request.driver_id)
+        # The scope still follows who drives what: only the fill-in stops.
+        self.assertIn(self.team_truck, self.env['ksw.fleet.vehicle'].with_user(self.sup_user).search(
+            [('x_workshop_in_scope', '=', True)]))
 
     def test_attached_driver_is_a_snapshot(self):
         request = self.env['ksw.workshop.request'].with_user(self.sup_user).create({

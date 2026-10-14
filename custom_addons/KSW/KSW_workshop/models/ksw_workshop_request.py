@@ -389,9 +389,21 @@ class KswWorkshopRequest(models.Model):
 
     @api.onchange('vehicle_id')
     def _onchange_vehicle_id(self):
+        if not self._driver_follows_vehicle():
+            return
         for request in self:
             if request.vehicle_id.driver_id:
                 request.driver_id = request.vehicle_id.driver_id
+
+    @api.model
+    def _driver_follows_vehicle(self):
+        """Does picking a vehicle fill in its driver? Switched off (Oct 2026):
+        the vehicle's recorded driver is not reliably who brings it in, so
+        the requester names the driver himself. The fill-in code is kept for
+        when the fleet's drivers are trusted; turn it back on with the system
+        parameter KSW_workshop.driver_follows_vehicle = 1."""
+        return self.env['ir.config_parameter'].sudo().get_param(
+            'KSW_workshop.driver_follows_vehicle', '0') == '1'
 
     @api.onchange('is_cash_customer')
     def _onchange_is_cash_customer(self):
