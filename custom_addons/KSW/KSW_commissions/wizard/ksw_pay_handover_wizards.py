@@ -1,7 +1,7 @@
 """The two questions partial approval adds to the monthly handover.
 
-``ksw.pay.submit.wizard`` — the supervisor's: every component, or only the
-components (and sub-batches) he ticks? The rest stays open for him.
+``ksw.pay.submit.wizard`` — the supervisor's: send some employees early in
+one sub-batch (the month stays open), or submit the whole month and close it?
 
 ``ksw.pay.gm.review.wizard`` — the General Manager's review screen: one line
 per component per employee, components in a side panel. He goes component by
@@ -10,6 +10,7 @@ whatever he leaves stays waiting on him. In ``reopen`` mode the same screen
 sends back rows he already approved — until they are paid. Works on a
 department handover and on a sub-batch alike.
 """
+import calendar
 from collections import OrderedDict
 
 from markupsafe import Markup
@@ -18,43 +19,97 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 from ..models.ksw_commission_lock import LOCKING_STATES
+from ..models.ksw_pay_sub_batch import OPEN_STATES
 
 
 class KswPaySubmitWizard(models.TransientModel):
+    """Submit to GM — some employees now, or the whole month.
+
+    The supervisor's one habit is this button, so it is also where the
+    mid-month case lives. It defaults to sending a few employees early (a
+    vacation, a resignation) in a **sub-batch**: one per department, days
+    and reason, across every component — Hafiz's Friday Work, Location
+    Allowance and Other are one handover, not three. While that sub-batch
+    is being prepared the dialog offers to add to it; once it is submitted
+    it is closed, and the next early handover is a new sub-batch with its
+    own days and reason.
+
+    Closing the month is the second, explicit choice — the old default,
+    which shut Maintenance and Supply Chain for October seconds after their
+    sub-batches had gone (KSWCO, Oct 2026).
+    """
     _name = 'ksw.pay.submit.wizard'
-    _description = 'Submit the whole department, or only its sub-batches?'
+    _description = 'Submit to GM: some employees early, or the whole month'
 
     submission_ids = fields.Many2many(
         'ksw.pay.submission', string='Departments', readonly=True)
     mode = fields.Selection([
-        ('all', 'Every component — everything, sub-batches included'),
-        ('some', 'Only the components I tick — the rest stays open'),
-    ], default='all', required=True)
-    # Components, not batches: that is what the supervisor thinks in —
-    # Overtime, Meals, Fridays. A tick sends that component's open batch in
-    # each of his departments.
-    allowed_component_ids = fields.Many2many(
-        'ksw.pay.component', 'ksw_pay_submit_wizard_allowed_comp_rel',
-        'wizard_id', 'component_id', readonly=True)
-    component_ids = fields.Many2many(
-        'ksw.pay.component', 'ksw_pay_submit_wizard_comp_rel',
-        'wizard_id', 'component_id', string='Components',
-        domain="[('id', 'in', allowed_component_ids)]")
-    sub_batch_ids = fields.Many2many(
-        'ksw.pay.sub.batch', string='Sub-Batches',
-        domain="[('submission_id', 'in', submission_ids), "
-               "('state', 'in', ('draft', 'returned'))]")
-    has_open_sub_batch = fields.Boolean(readonly=True)
+        ('early', 'Send some employees now — the month stays open'),
+        ('month', 'Submit the whole month and close it'),
+    ], default='early', required=True)
+    # A sub-batch still being prepared, offered first: one handover per
+    # days and reason, not one per pick.
+    open_sub_batch_ids = fields.Many2many(
+        'ksw.pay.sub.batch', 'ksw_pay_submit_wizard_open_sub_rel',
+        'wizard_id', 'sub_batch_id', readonly=True)
+    target = fields.Selection([
+        ('append', 'Add them to the open sub-batch'),
+        ('new', 'Start a new sub-batch (other days or another reason)'),
+    ], default='new', required=True)
+    sub_batch_id = fields.Many2one(
+        'ksw.pay.sub.batch', string='Sub-Batch',
+        domain="[('id', 'in', open_sub_batch_ids)]")
+    sub_date_from = fields.Date(
+        related='sub_batch_id.date_from', string='Sub-Batch From')
+    sub_date_to = fields.Date(
+        related='sub_batch_id.date_to', string='Sub-Batch To')
+    sub_note = fields.Text(
+        related='sub_batch_id.note', string='Sub-Batch Reason')
+    sub_employee_names = fields.Char(related='sub_batch_id.employee_names')
+    date_from = fields.Date(string='From')
+    date_to = fields.Date(string='To')
+    note = fields.Char(
+        string='Why Early',
+        help='Why these employees cannot wait for the rest of the month — '
+             'a vacation from the 12th, a resignation, ...')
+    # compute_sudo: the cost centre is an HR field and the pool reads
+    # hr.employee (Odoo 19 Pitfalls #34); the scope is still asked as the
+    # user (#42).
+    allowed_employee_ids = fields.Many2many(
+        'hr.employee', 'ksw_pay_submit_wizard_allowed_emp_rel', 'wizard_id',
+        'employee_id', compute='_compute_allowed_employees',
+        compute_sudo=True)
+    employee_ids = fields.Many2many(
+        'hr.employee', 'ksw_pay_submit_wizard_employee_rel', 'wizard_id',
+        'employee_id', string='Employees',
+        domain="[('id', 'in', allowed_employee_ids)]")
+    has_returned_sub_batch = fields.Boolean(readonly=True)
 
     @api.model
-    def _open_for(self, submissions):
-        open_subs = submissions._open_sub_batches()
-        wizard = self.create({
+    def _open_for(self, submissions, sub_batch=None):
+        subs = submissions.sudo().sub_batch_ids
+        preparing = subs.filtered(lambda s: s.state == 'draft')
+        if len(submissions) != 1:
+            # Appending is to one department's sub-batch.
+            preparing = preparing.browse()
+        sub_batch = sub_batch or preparing[:1]
+        period = submissions[:1].period
+        vals = {
             'submission_ids': [(6, 0, submissions.ids)],
-            'allowed_component_ids': [(6, 0, submissions._open_batches(
-            ).component_id.ids)],
-            'has_open_sub_batch': bool(open_subs),
-        })
+            'open_sub_batch_ids': [(6, 0, preparing.ids)],
+            'target': 'append' if sub_batch else 'new',
+            'sub_batch_id': sub_batch.id if sub_batch else False,
+            'has_returned_sub_batch': bool(
+                subs.filtered(lambda s: s.state == 'returned')),
+        }
+        if period:
+            start = period.replace(day=1)
+            end = start.replace(
+                day=calendar.monthrange(start.year, start.month)[1])
+            today = fields.Date.context_today(self)
+            vals.update(date_from=start,
+                        date_to=today if start <= today <= end else end)
+        wizard = self.create(vals)
         return {
             'type': 'ir.actions.act_window',
             'name': _('Submit to the General Manager'),
@@ -64,24 +119,155 @@ class KswPaySubmitWizard(models.TransientModel):
             'target': 'new',
         }
 
-    def action_confirm(self):
+    # ------------------------------------------------------------------
+    # Who can be sent
+    # ------------------------------------------------------------------
+    def _days(self):
         self.ensure_one()
-        if self.mode == 'all':
+        if self.target == 'append' and self.sub_batch_id:
+            return self.sub_batch_id.date_from, self.sub_batch_id.date_to
+        return self.date_from, self.date_to
+
+    @api.model
+    def _open_batches_of(self, submissions):
+        return submissions.sudo().batch_ids.filtered(
+            lambda b: b.state == 'draft')
+
+    @api.model
+    def _drivers(self, batch):
+        """Who an importer batch could fill: everyone its import reaches —
+        asked as the user, so it widens by *his* reporting chain only — who
+        has a BAS cost centre. A mechanic or a clerk has no trips."""
+        pool = batch.with_env(self.env(su=False))._allowed_employees()
+        return pool.sudo().filtered(
+            lambda e: e.x_bas_driver_cost_center
+            or e.x_bas_driver_cost_center_alt)
+
+    @api.model
+    def _pool(self, submissions, date_from, date_to, sub_batch=None):
+        """Whoever has something to send in those days — a draft row, or
+        trips still to import — and is not already in an open sub-batch
+        (one handover at a time per employee)."""
+        Employee = self.env['hr.employee'].sudo()
+        if not (date_from and date_to):
+            return Employee
+        pool = Employee
+        for batch in self._open_batches_of(submissions):
+            if batch.component_id.importer:
+                pool |= self._drivers(batch)
+            else:
+                pool |= batch.entry_ids.filtered(
+                    lambda e: e.state == 'draft' and e.employee_id
+                    and e._within(date_from, date_to)).employee_id
+        busy = submissions.sudo().sub_batch_ids.filtered(
+            lambda s: s.state in OPEN_STATES).employee_ids
+        return pool - busy
+
+    @api.depends('submission_ids', 'target', 'sub_batch_id',
+                 'date_from', 'date_to')
+    def _compute_allowed_employees(self):
+        Wizard = self.with_env(self.env(su=False))
+        for wiz in self:
+            date_from, date_to = wiz._days()
+            submissions = wiz.sub_batch_id.submission_id \
+                if wiz.target == 'append' and wiz.sub_batch_id \
+                else wiz.submission_ids
+            wiz.allowed_employee_ids = Wizard._pool(
+                submissions, date_from, date_to)
+
+    # ------------------------------------------------------------------
+    # Buttons
+    # ------------------------------------------------------------------
+    def action_confirm(self):
+        """Submit & Close the Month, or Add & Send to GM."""
+        self.ensure_one()
+        if self.mode == 'month':
             self.submission_ids.action_submit()
             return {'type': 'ir.actions.act_window_close'}
-        if not (self.component_ids or self.sub_batch_ids):
+        return self._send_early(send=True)
+
+    def action_add(self):
+        """Add to the sub-batch and keep it open for more."""
+        self.ensure_one()
+        return self._send_early(send=False)
+
+    def _send_early(self, send):
+        if not self.employee_ids:
+            raise UserError(_("Pick at least one employee to send."))
+        if self.target == 'append':
+            if not self.sub_batch_id:
+                raise UserError(_("Choose the sub-batch to add them to."))
+            if self.sub_batch_id.state != 'draft':
+                raise UserError(_(
+                    "%(name)s has already been submitted, so nobody can be "
+                    "added to it. Start a new sub-batch with its own days "
+                    "and reason.", name=self.sub_batch_id.name))
+            subs = self.sub_batch_id
+        else:
+            if not (self.note or '').strip():
+                raise UserError(_(
+                    "Say why these employees are sent early — the General "
+                    "Manager sees it on the sub-batch."))
+            if not (self.date_from and self.date_to):
+                raise UserError(_("Give the days this sub-batch covers."))
+            # One per department, with the employees who belong to it.
+            subs = self.env['ksw.pay.sub.batch']
+            for submission in self.submission_ids:
+                picked = self.employee_ids.sudo() & self._pool(
+                    submission, self.date_from, self.date_to)
+                if not picked:
+                    continue
+                subs |= self.env['ksw.pay.sub.batch'].create({
+                    'submission_id': submission.id,
+                    'date_from': self.date_from,
+                    'date_to': self.date_to,
+                    'note': self.note,
+                })
+        skipped = []
+        for sub in subs:
+            skipped += sub._add_employees(self.employee_ids)
+        subs = subs.filtered('employee_ids')
+        if not subs:
+            date_from, date_to = self._days()
             raise UserError(_(
-                "Tick at least one component or sub-batch to submit."))
-        # Sub-batches first: sending the last components can hand the whole
-        # department over, after which there is nothing to send early.
-        self.sub_batch_ids.action_submit()
-        batches = self.submission_ids._open_batches().filtered(
-            lambda b: b.component_id in self.component_ids)
-        if batches:
-            # As the supervisor, not the sudo() the lookup used: the hand-over
-            # checks that these departments are his.
-            batches.with_env(self.env).action_hand_over()
-        return {'type': 'ir.actions.act_window_close'}
+                "Nothing was sent — none of the picked employees has an "
+                "open entry in %(start)s – %(end)s.%(why)s",
+                start=fields.Date.to_string(date_from),
+                end=fields.Date.to_string(date_to),
+                why=('\n\n' + '\n'.join(skipped)) if skipped else ''))
+        if send:
+            subs.action_submit()
+        missed = self.employee_ids.sudo() - subs.employee_ids
+        names = ', '.join(subs.mapped('name'))
+        message = (_(
+            "%(subs)s sent to the General Manager. Everything else in the "
+            "month stays open.", subs=names) if send else _(
+            "Added to %(subs)s. Add more people or press Submit to GM on it "
+            "when it is complete.", subs=names))
+        if missed:
+            message += '\n\n' + _(
+                "Nothing to send for: %(names)s",
+                names=', '.join(missed.mapped('name')))
+        if skipped:
+            message += '\n\n' + '\n'.join(skipped)
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Sent Early') if send else _('Added'),
+                'message': message,
+                'type': 'warning' if (missed or skipped) else 'success',
+                'sticky': bool(missed or skipped),
+                'next': {
+                    'type': 'ir.actions.act_window',
+                    'res_model': 'ksw.pay.sub.batch',
+                    'res_id': subs[:1].id,
+                    'view_mode': 'form',
+                    'views': [(False, 'form')],
+                    'target': 'current',
+                },
+            },
+        }
 
 
 class KswPayGmReviewWizard(models.TransientModel):

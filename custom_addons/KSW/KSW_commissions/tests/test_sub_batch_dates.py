@@ -1,13 +1,10 @@
-"""Send Early… — one component, some employees, some days, one button.
+"""Send Early… — some employees, some days, one sub-batch, one button.
 
-Opened from inside a component's batch. The supervisor picks the days and
-the employees and presses Send to GM: the sub-batch is made, Driver Trips
-is imported for the picked drivers and those days only, and it goes to the
-General Manager. Nothing else to press, nothing to do in order.
-
-A sub-batch belongs to one component. The earlier cross-component version
-offered a Location Allowance sub-batch the drivers the trips import had
-just filled, which is what these tests now pin down.
+Send Early… on a batch opens the department's Submit to GM dialog on its
+default. The supervisor picks the days, the reason and the employees and
+presses Send to GM: one sub-batch takes their rows in every component,
+Driver Trips is imported for the picked drivers and those days only, and
+it goes to the General Manager.
 
 The batch's own import afterwards fills only the days no sub-batch covered,
 one row per uncovered stretch; the free allowance and the tier bands are
@@ -63,11 +60,14 @@ class SendEarlyCommon(SubBatchCommon):
             autospec=True, side_effect=fake)
 
     def _dialog(self, batch, date_from=None, date_to=None):
-        """Press Send Early… the way the button does."""
+        """Press Send Early… the way the button does: it opens the
+        department's Submit to GM dialog on its default."""
         action = batch.with_user(self.sup_a).action_send_early()
-        self.assertEqual(action['res_model'], 'ksw.pay.send.early.wizard')
-        wizard = self.env['ksw.pay.send.early.wizard'].with_user(
+        self.assertEqual(action['res_model'], 'ksw.pay.submit.wizard')
+        wizard = self.env['ksw.pay.submit.wizard'].with_user(
             self.sup_a).browse(action['res_id'])
+        wizard.note = 'Annual leave'
+        self.assertEqual(wizard.mode, 'early')
         if date_from:
             wizard.date_from = date_from
         if date_to:
@@ -78,7 +78,7 @@ class SendEarlyCommon(SubBatchCommon):
         wizard = self._dialog(batch, date_from, date_to)
         wizard.employee_ids = [(6, 0, employees.ids)]
         with self._patched():
-            action = wizard.action_send()
+            action = wizard.action_confirm()
         sub = self.env['ksw.pay.sub.batch'].browse(
             action['params']['next']['res_id'])
         return sub
@@ -105,28 +105,29 @@ class TestSendEarly(SendEarlyCommon):
                            date='2029-03-20')
         sub = self._send(self.ot, self.emp_a, '2029-03-01', '2029-03-12')
         self.assertEqual(sub.state, 'submitted')
-        self.assertEqual(sub.entry_ids, self.ot_a)
-        self.assertEqual(self.ot_a.state, 'submitted')
+        # Every component's rows in the days; a monthly allowance has no
+        # day and always comes with its employee.
+        self.assertEqual(sub.entry_ids, self.ot_a | self.meal_a)
         self.assertFalse(late.x_sub_batch_id)
-        # Another component is not touched.
-        self.assertFalse(self.meal_a.x_sub_batch_id)
         self.assertEqual(self.ot.state, 'draft')
 
-    def test_03_the_picker_offers_only_this_components_people(self):
+    def test_03_the_picker_offers_the_departments_people(self):
         wizard = self._dialog(self.meals_batch)
-        self.assertEqual(wizard.allowed_employee_ids, self.emp_a)
-        self.assertNotIn(self.driver_1, wizard.allowed_employee_ids)
-        # Days with nothing typed in them offer nobody.
+        self.assertIn(self.emp_a, wizard.allowed_employee_ids)
+        self.assertIn(self.emp_a2, wizard.allowed_employee_ids)
+        # Drivers too: there is a Driver Trips batch to import into.
+        self.assertIn(self.driver_1, wizard.allowed_employee_ids)
+        # Days with nothing typed in them leave only what can be imported.
+        self._entry(self.ot, self.emp_a2, user=self.sup_a, date='2029-03-20')
         wizard.write({'date_from': '2029-03-02', 'date_to': '2029-03-05'})
-        ot = self._dialog(self.ot, '2029-03-02', '2029-03-05')
-        self.assertFalse(ot.allowed_employee_ids)
+        self.assertNotIn(self.emp_a2, wizard.allowed_employee_ids)
 
-    def test_04_one_employee_early_in_two_components_at_once(self):
-        first = self._send(self.ot, self.emp_a)
-        second = self._send(self.meals_batch, self.emp_a)
-        self.assertEqual(first.component_id, self.component)
-        self.assertEqual(second.component_id, self.meals)
-        self.assertEqual(second.entry_ids, self.meal_a)
+    def test_04_one_employee_in_two_components_is_one_sub_batch(self):
+        """KSWCO, Hafiz: three components made three sub-batches."""
+        sub = self._send(self.ot, self.emp_a)
+        self.assertFalse(sub.batch_id)
+        self.assertEqual(sub.entry_ids, self.ot_a | self.meal_a)
+        self.assertEqual(self.submission.sub_batch_ids, sub)
 
     def test_05_days_outside_the_month_leave_nothing_behind(self):
         before = self.env['ksw.pay.sub.batch'].sudo().search_count([])
@@ -143,10 +144,9 @@ class TestSendEarly(SendEarlyCommon):
         self.assertEqual(second.state, 'submitted')
         self.assertEqual(first.state, 'approved')
 
-    def test_07_no_sub_batch_without_a_component_batch(self):
+    def test_07_no_sub_batch_without_a_department_month(self):
         with self.assertRaises(UserError):
             self.env['ksw.pay.sub.batch'].with_user(self.sup_a).create({
-                'submission_id': self.submission.id,
                 'employee_ids': [(6, 0, self.emp_a.ids)],
             })
 
@@ -256,12 +256,12 @@ class TestSendEarlyTrips(SendEarlyCommon):
         self.assertNotIn(outsider, wizard.allowed_employee_ids)
         wizard.sudo().employee_ids = [(6, 0, outsider.ids)]
         with self.assertRaises(UserError), self._patched():
-            wizard.action_send()
+            wizard.action_confirm()
 
-    def test_26_the_picker_offers_drivers_only(self):
+    def test_26_a_driver_with_nothing_typed_is_offered(self):
         wizard = self._dialog(self.trips_batch)
         self.assertIn(self.driver_1, wizard.allowed_employee_ids)
-        self.assertNotIn(self.emp_a2, wizard.allowed_employee_ids)
+        self.assertFalse(self.driver_1 in self.ot.sudo().entry_ids.employee_id)
 
     def test_27_nothing_in_bas_sends_nothing_and_leaves_nothing(self):
         self.bas_empty = True
@@ -283,3 +283,38 @@ class TestSendEarlyTrips(SendEarlyCommon):
         self.assertEqual(len(self._rows(self.driver_1)), 1)
         sub.with_user(self.sup_a).action_submit()
         self.assertEqual(sub.state, 'submitted')
+
+
+class TestSubmitToGmTrips(SendEarlyCommon):
+    """The department's Submit to GM sends a driver early across every
+    component: his trips imported for the days, his typed rows with them."""
+
+    def _early(self, employees, date_from='2029-03-01', date_to='2029-03-15'):
+        wizard = self._wizard()
+        wizard.write({'employee_ids': [(6, 0, employees.ids)],
+                      'note': 'Annual leave', 'date_from': date_from,
+                      'date_to': date_to})
+        with self._patched():
+            wizard.action_confirm()
+        return self.submission.sub_batch_ids
+
+    def test_40_trips_and_typed_rows_go_together(self):
+        ot_row = self._entry(self.ot, self.driver_1, user=self.sup_a)
+        subs = self._early(self.driver_1)
+        self.assertEqual(len(subs), 1)
+        self.assertEqual(subs.entry_ids.batch_id, self.ot | self.trips_batch)
+        trips = self._rows(self.driver_1)
+        self.assertEqual((trips.x_window_from, trips.x_window_to),
+                         (date(2029, 3, 1), date(2029, 3, 15)))
+        self.assertEqual(trips.state, 'submitted')
+        self.assertEqual(ot_row.state, 'submitted')
+        self.assertEqual(self.trips_batch.state, 'draft')
+        self.assertEqual(self.submission.state, 'draft')
+
+    def test_41_nothing_in_bas_still_sends_his_typed_rows(self):
+        self.bas_empty = True
+        ot_row = self._entry(self.ot, self.driver_1, user=self.sup_a)
+        subs = self._early(self.driver_1)
+        self.assertEqual(subs.entry_ids, ot_row)
+        self.assertEqual(ot_row.state, 'submitted')
+        self.assertFalse(self.trips_batch.sudo().entry_ids)

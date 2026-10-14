@@ -1253,8 +1253,8 @@ msgstr ""
 
 #. module: KSW_workshop
 #: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__vehicle_type__tank
-msgid "Tank"
-msgstr "صهريج"
+msgid "Tedder (تيدر)"
+msgstr "تيدر"
 
 #. module: KSW_workshop
 #: model:ksw.workshop.request.type,name:KSW_workshop.request_type_tank_cargo
@@ -1400,7 +1400,7 @@ msgstr "التكلفة الإجمالية"
 
 #. module: KSW_workshop
 #: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__vehicle_type__trailer
-msgid "Trailer"
+msgid "Trailer (تريلا)"
 msgstr "تريلا"
 
 #. module: KSW_workshop
@@ -1830,3 +1830,97 @@ msgstr ""
 #: code:addons/KSW_workshop/models/ksw_workshop_keyword_suggestion.py:0
 msgid "Pick a type in \"File Under\" first — that is where %s will be added."
 msgstr "اختر نوعاً في «تصنيف تحت» أولاً — فهناك ستُضاف %s."
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_users_form_ksw_workshop_assistant
+msgid ""
+",\n"
+"                        on their vehicles only."
+msgstr ""
+"،\n"
+"                        على مركباتهم فقط."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_res_users__x_workshop_assisted_manager_ids
+msgid "Also Raises Workshop Requests For"
+msgstr "يرفع طلبات الورشة أيضاً نيابةً عن"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid "Completed On"
+msgstr "تاريخ الإنجاز"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_on_behalf_of_id
+msgid "On Behalf Of"
+msgstr "نيابةً عن"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_users_form_ksw_workshop_assistant
+msgid "Only for requesters this user does not report to..."
+msgstr "فقط لمقدمي الطلبات الذين لا يتبع لهم هذا المستخدم..."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_res_users__x_workshop_assists_display
+msgid "Raises Workshop Requests For"
+msgstr "يرفع طلبات الورشة نيابةً عن"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_users_form_ksw_workshop_assistant
+msgid "Raises workshop requests for"
+msgstr "يرفع طلبات الورشة نيابةً عن"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid "Requested On"
+msgstr "تاريخ الطلب"
+
+#. module: KSW_workshop
+#: model:res.groups,name:KSW_workshop.group_workshop_requester_assistant
+msgid "Requester Assistant"
+msgstr "مساعد مقدم الطلب"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request__x_on_behalf_of_id
+msgid "The workshop requester this request was raised for by his assistant."
+msgstr "مقدم طلبات الورشة الذي رفع مساعده هذا الطلب نيابةً عنه."
+
+#. module: KSW_workshop
+#: model:ir.model,name:KSW_workshop.model_res_users
+msgid "User"
+msgstr "المستخدم"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_users_form_ksw_workshop_assistant
+msgid ""
+"With the <b>Requester Assistant</b> role (Access Rights, KSW Workshop),\n"
+"                        this user raises requests for his own manager, if that manager is a\n"
+"                        workshop requester, and for anyone listed above. He picks only from\n"
+"                        their vehicles and sees only the requests he raised himself."
+msgstr ""
+"بدور <b>مساعد مقدم الطلب</b> (صلاحيات الوصول، ورشة KSW) يرفع هذا المستخدم "
+"الطلبات نيابةً عن مديره المباشر إذا كان مقدم طلبات للورشة، ونيابةً عن أي شخص"
+" مذكور أعلاه. ولا يختار إلا من مركباتهم، ولا يرى إلا الطلبات التي رفعها "
+"بنفسه."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_res_users__x_workshop_assisted_manager_ids
+msgid ""
+"Workshop requesters this user raises requests for although he does not "
+"report to them. His own manager is included automatically. Has no effect "
+"without the Requester Assistant role."
+msgstr ""
+"مقدمو طلبات الورشة الذين يرفع هذا المستخدم الطلبات نيابةً عنهم مع أنه لا "
+"يتبع لهم. مديره المباشر مشمول تلقائياً. لا أثر لهذا الحقل دون دور مساعد مقدم"
+" الطلب."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid ""
+"You raise workshop requests for your manager, but your manager is not a "
+"workshop requester and nobody else is named on your user. Ask an "
+"administrator to set this up."
+msgstr ""
+"أنت ترفع طلبات الورشة نيابةً عن مديرك، لكن مديرك ليس مقدم طلبات للورشة ولم "
+"يُحدَّد أحد غيره في حسابك. اطلب من مسؤول النظام إعداد ذلك."

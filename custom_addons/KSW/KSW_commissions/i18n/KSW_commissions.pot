@@ -244,6 +244,7 @@ msgstr ""
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_batch_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
 msgid "<strong>Returned by the General Manager:</strong>"
 msgstr ""
 
@@ -494,6 +495,7 @@ msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
 msgid "Approve"
 msgstr ""
 
@@ -720,6 +722,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_import_wizard_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_override_wizard_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_recurring_vacation_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submit_wizard_form
 msgid "Cancel"
 msgstr ""
 
@@ -1119,6 +1122,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_client_split__create_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_target_line__create_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__create_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submit_wizard__create_uid
 msgid "Created by"
 msgstr ""
 
@@ -1145,6 +1149,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_client_split__create_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_target_line__create_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__create_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submit_wizard__create_date
 msgid "Created on"
 msgstr ""
 
@@ -1212,6 +1217,8 @@ msgstr ""
 
 #. module: KSW_commissions
 #: model:ksw.pay.component,qty_label:KSW_commissions.pay_component_friday
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submit_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
 msgid "Days"
 msgstr ""
 
@@ -1295,6 +1302,7 @@ msgstr ""
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_review__department_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run__x_visible_submission_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submit_wizard__submission_ids
 msgid "Departments"
 msgstr ""
 
@@ -1362,6 +1370,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_res_partner__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submit_wizard__display_name
 msgid "Display Name"
 msgstr ""
 
@@ -1576,6 +1585,8 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_batch_list
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_form
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submit_wizard__employee_ids
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
 msgid "Employees"
 msgstr ""
 
@@ -1591,6 +1602,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_batch__entry_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__entry_ids
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_batch_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
 msgid "Entries"
 msgstr ""
 
@@ -1827,6 +1839,7 @@ msgstr ""
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_batch__submission_state
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
 msgid "Handover"
 msgstr ""
 
@@ -1913,6 +1926,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_res_config_settings__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_res_partner__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submit_wizard__id
 msgid "ID"
 msgstr ""
 
@@ -2190,6 +2204,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_client_split__write_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_target_line__write_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__write_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submit_wizard__write_uid
 msgid "Last Updated by"
 msgstr ""
 
@@ -2216,6 +2231,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_client_split__write_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_target_line__write_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__write_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submit_wizard__write_date
 msgid "Last Updated on"
 msgstr ""
 
@@ -2416,13 +2432,14 @@ msgid "Mobile Phone Allowance"
 msgstr ""
 
 #. module: KSW_commissions
+#. odoo-python
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_batch__run_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__run_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_target_line__month
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_search
-#. odoo-python
 #: code:addons/KSW_commissions/models/hr_leave.py:0
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
 msgid "Month"
 msgstr ""
 
@@ -3703,6 +3720,7 @@ msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
 msgid "Submit to GM"
 msgstr ""
 
@@ -3961,6 +3979,7 @@ msgid "To %"
 msgstr ""
 
 #. module: KSW_commissions
+#. odoo-python
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_employee_review_list
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_employee_review__amount
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_batch_form
@@ -3972,8 +3991,8 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_line_form_full
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_list
-#. odoo-python
 #: code:addons/KSW_commissions/models/hr_leave.py:0
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
 msgid "Total"
 msgstr ""
 
@@ -3982,6 +4001,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__total_amount
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_batch_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_entry_list
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
 msgid "Total Amount"
 msgstr ""
 
@@ -5806,11 +5826,6 @@ msgid "Loan installments no longer covered by this line go back to payroll: %(n)
 msgstr ""
 
 #. module: KSW_commissions
-#: model_terms:ir.actions.act_window,help:KSW_commissions.action_ksw_pay_sub_batch
-msgid "A sub-batch hands some employees' month so far to the General\n                Manager ahead of the rest of the department — for someone\n                going on vacation, say — without locking your batches.\n                Start one from your department's month (Department\n                Submissions) or from any batch."
-msgstr ""
-
-#. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_form
 msgid "Amount Waiting"
 msgstr ""
@@ -5848,6 +5863,7 @@ msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_sub_batch__employee_names
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submit_wizard__sub_employee_names
 msgid "Employees "
 msgstr ""
 
@@ -5856,11 +5872,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_gm_review_line__entry_ids
 #: model:res.groups,name:KSW_commissions.group_entry_sales
 msgid "Entry"
-msgstr ""
-
-#. module: KSW_commissions
-#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
-msgid "Hand these employees' entries so far to the General Manager? Only their rows are locked — your batches stay open."
 msgstr ""
 
 #. module: KSW_commissions
@@ -5909,11 +5920,6 @@ msgstr ""
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__pending_entry_count
 msgid "Pending Entry Count"
-msgstr ""
-
-#. module: KSW_commissions
-#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
-msgid "Pick the employees who cannot wait for the rest of the\n                        month. Every draft entry they have in this department's\n                        batches for the month comes with them — and anything\n                        you type for them before you submit. Submitting locks\n                        <b>only their entries</b>; your batches stay open."
 msgstr ""
 
 #. module: KSW_commissions
@@ -5983,13 +5989,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__x_sub_batch_id
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_batch_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submit_wizard__sub_batch_id
 msgid "Sub-Batch"
 msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.actions.act_window,name:KSW_commissions.action_ksw_pay_sub_batch
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__sub_batch_ids
-#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submit_wizard__sub_batch_ids
 #: model:ir.ui.menu,name:KSW_commissions.menu_ksw_pay_sub_batch
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_form
 msgid "Sub-Batches"
@@ -5999,11 +6005,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_employee_review__submission_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_gm_review_wizard__submission_id
 msgid "Submission"
-msgstr ""
-
-#. module: KSW_commissions
-#: model:ir.model,name:KSW_commissions.model_ksw_pay_submit_wizard
-msgid "Submit the whole department, or only its sub-batches?"
 msgstr ""
 
 #. module: KSW_commissions
@@ -6042,11 +6043,16 @@ msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_sub_batch__note
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submit_wizard__note
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submit_wizard__sub_note
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submit_wizard_form
 msgid "Why Early"
 msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_sub_batch__note
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_submit_wizard__note
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_submit_wizard__sub_note
 msgid "Why these employees cannot wait for the rest of the month — a vacation from the 12th, a resignation, ..."
 msgstr ""
 
@@ -6056,7 +6062,7 @@ msgid "Wizard"
 msgstr ""
 
 #. module: KSW_commissions
-#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submit_wizard_form
 msgid "e.g. Annual leave from 12 October"
 msgstr ""
 
@@ -6318,39 +6324,8 @@ msgid "<strong>Sent to the General Manager on its own.</strong>\n               
 msgstr ""
 
 #. module: KSW_commissions
-#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submit_wizard__allowed_component_ids
-msgid "Allowed Component"
-msgstr ""
-
-#. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_employee_review__component_names
-#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submit_wizard__component_ids
 msgid "Components"
-msgstr ""
-
-#. module: KSW_commissions
-#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submit_wizard_form
-msgid "Every component of the month is handed over and frozen,\n                    the sub-batches included. Empty batches are removed."
-msgstr ""
-
-#. module: KSW_commissions
-#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_submit_wizard__mode__all
-msgid "Every component — everything, sub-batches included"
-msgstr ""
-
-#. module: KSW_commissions
-#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submit_wizard__has_open_sub_batch
-msgid "Has Open Sub Batch"
-msgstr ""
-
-#. module: KSW_commissions
-#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_submit_wizard__mode__some
-msgid "Only the components I tick — the rest stays open"
-msgstr ""
-
-#. module: KSW_commissions
-#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submit_wizard_form
-msgid "Only what you tick goes to the General Manager and is\n                    locked. The other components stay open for you to keep\n                    recording and send later."
 msgstr ""
 
 #. module: KSW_commissions
@@ -6377,12 +6352,6 @@ msgstr ""
 
 #. module: KSW_commissions
 #. odoo-python
-#: code:addons/KSW_commissions/wizard/ksw_pay_handover_wizards.py:0
-msgid "Tick at least one component or sub-batch to submit."
-msgstr ""
-
-#. module: KSW_commissions
-#. odoo-python
 #: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
 msgid "Empty batches removed on submission: %(names)s"
 msgstr ""
@@ -6394,6 +6363,7 @@ msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_sub_batch__allowed_employee_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submit_wizard__allowed_employee_ids
 msgid "Allowed Employee"
 msgstr ""
 
@@ -6473,11 +6443,6 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_commissions/wizard/ksw_pay_handover_wizards.py:0
 msgid "Tick the employees first."
-msgstr ""
-
-#. module: KSW_commissions
-#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submit_wizard_form
-msgid "Your department stays open for the month until you\n                    choose Every component."
 msgstr ""
 
 #. module: KSW_commissions
@@ -6786,6 +6751,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_sub_batch_trip_wizard__date_from
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_list
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring_vacation_wizard_line__date_from
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submit_wizard__date_from
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submit_wizard__sub_date_from
 msgid "From"
 msgstr ""
 
@@ -6795,18 +6762,22 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_sub_batch_trip_wizard__date_to
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_list
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring_vacation_wizard_line__date_to
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submit_wizard__date_to
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submit_wizard__sub_date_to
 msgid "To"
 msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_sub_batch__date_from
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_sub_batch_trip_wizard__date_from
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_submit_wizard__sub_date_from
 msgid "First day this sub-batch covers. Defaults to the 1st of the month."
 msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_sub_batch__date_to
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_sub_batch_trip_wizard__date_to
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_submit_wizard__sub_date_to
 msgid ""
 "Last day this sub-batch covers. Defaults to today, or the end of the month "
 "for a month already over."
@@ -6941,28 +6912,13 @@ msgid "Import Again"
 msgstr ""
 
 #. module: KSW_commissions
-#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_send_early_wizard__is_import
-msgid "Is Import"
-msgstr ""
-
-#. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_sub_batch__x_can_reimport
 msgid "X Can Reimport"
 msgstr ""
 
 #. module: KSW_commissions
-#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_send_early_wizard_form
-msgid "Send Early"
-msgstr ""
-
-#. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_batch_form
 msgid "Send Early…"
-msgstr ""
-
-#. module: KSW_commissions
-#: model:ir.model,name:KSW_commissions.model_ksw_pay_send_early_wizard
-msgid "Send some employees of a component to the GM early"
 msgstr ""
 
 #. module: KSW_commissions
@@ -6973,14 +6929,8 @@ msgid ""
 msgstr ""
 
 #. module: KSW_commissions
-#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_send_early_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submit_wizard_form
 msgid "Send to GM"
-msgstr ""
-
-#. module: KSW_commissions
-#. odoo-python
-#: code:addons/KSW_commissions/wizard/ksw_pay_send_early_wizard.py:0
-msgid "Sent Early"
 msgstr ""
 
 #. module: KSW_commissions
@@ -6992,24 +6942,6 @@ msgid ""
 msgstr ""
 
 #. module: KSW_commissions
-#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_send_early_wizard_form
-msgid ""
-"Press <b>Add a line</b>, tick the drivers and press\n"
-"                    <b>Select</b>. Their trips for these days are imported\n"
-"                    from BAS and sent to the General Manager. The rest of\n"
-"                    the month stays in the batch."
-msgstr ""
-
-#. module: KSW_commissions
-#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_send_early_wizard_form
-msgid ""
-"Press <b>Add a line</b>, tick the employees and press\n"
-"                    <b>Select</b>. Their rows in this batch for these days\n"
-"                    are sent to the General Manager and locked. Everything\n"
-"                    else stays open."
-msgstr ""
-
-#. module: KSW_commissions
 #. odoo-python
 #: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
 msgid "Importing again"
@@ -7017,58 +6949,8 @@ msgstr ""
 
 #. module: KSW_commissions
 #. odoo-python
-#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
-msgid "%(name)s is typed, not imported — correct its rows in %(batch)s."
-msgstr ""
-
-#. module: KSW_commissions
-#. odoo-python
-#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
-msgid ""
-"A sub-batch is made from a component's batch: open the batch and press Send "
-"Early…."
-msgstr ""
-
-#. module: KSW_commissions
-#. odoo-python
 #: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
-#: code:addons/KSW_commissions/wizard/ksw_pay_send_early_wizard.py:0
 msgid "Sending employees early"
-msgstr ""
-
-#. module: KSW_commissions
-#. odoo-python
-#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
-msgid "Send Early — %(name)s"
-msgstr ""
-
-#. module: KSW_commissions
-#. odoo-python
-#: code:addons/KSW_commissions/wizard/ksw_pay_send_early_wizard.py:0
-msgid ""
-"%(name)s sent to the General Manager: %(count)s employee(s), %(start)s – "
-"%(end)s."
-msgstr ""
-
-#. module: KSW_commissions
-#. odoo-python
-#: code:addons/KSW_commissions/wizard/ksw_pay_send_early_wizard.py:0
-msgid "The days must run forward and stay inside %(month)s."
-msgstr ""
-
-#. module: KSW_commissions
-#. odoo-python
-#: code:addons/KSW_commissions/wizard/ksw_pay_send_early_wizard.py:0
-msgid "Pick at least one employee to send."
-msgstr ""
-
-#. module: KSW_commissions
-#. odoo-python
-#: code:addons/KSW_commissions/wizard/ksw_pay_send_early_wizard.py:0
-msgid ""
-"Nothing was sent — none of the picked drivers could be imported for those days:\n"
-"\n"
-"%(why)s"
 msgstr ""
 
 #. module: KSW_commissions
@@ -7140,4 +7022,194 @@ msgstr ""
 #. module: KSW_commissions
 #: model:ir.model.constraint,message:KSW_commissions.constraint_ksw_pay_run_unique_period_gm
 msgid "This General Manager already has a pay run for that month."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submit_wizard_form
+msgid ""
+"<b>This closes the month for the whole department.</b>\n"
+"                    Every component of every employee is handed over and\n"
+"                    frozen, and once the General Manager approves, nothing\n"
+"                    more can be added for anyone this month. Only do this\n"
+"                    when the month is complete."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.actions.act_window,help:KSW_commissions.action_ksw_pay_sub_batch
+msgid ""
+"A sub-batch hands some employees' month so far to the General\n"
+"                Manager ahead of the rest of the department — for someone\n"
+"                going on vacation, say — without locking your batches.\n"
+"                Press Submit to GM on your department's month and pick the\n"
+"                employees, or Send Early… on a single batch."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_submit_wizard__mode__early
+msgid "Send some employees now — the month stays open"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submit_wizard_form
+msgid ""
+"Some employees were returned to you by the General\n"
+"                        Manager: correct them and resubmit from\n"
+"                        <b>Sub-Batches</b>."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submit_wizard_form
+msgid "Submit & Close the Month"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_submit_wizard__mode__month
+msgid "Submit the whole month and close it"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_pay_submit_wizard
+msgid "Submit to GM: some employees early, or the whole month"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_handover_wizards.py:0
+msgid "Say why these employees are sent early — the General Manager sees it on the sub-batch."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_handover_wizards.py:0
+msgid "Nothing was sent — none of the picked employees has an open entry in %(start)s – %(end)s.%(why)s"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_handover_wizards.py:0
+msgid "Nothing to send for: %(names)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submit_wizard_form
+msgid ""
+"A sub-batch is still being prepared for this month.\n"
+"                        Do you want to add these employees to it?"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
+msgid "Add Employees…"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_submit_wizard__target__append
+msgid "Add them to the open sub-batch"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submit_wizard_form
+msgid "Add, Keep Open"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submit_wizard_form
+msgid "Already in it"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
+msgid ""
+"Being prepared: press <b>Add Employees…</b> to add\n"
+"                        more people for these days, or <b>Submit to GM</b>\n"
+"                        when it is complete. Once submitted, nobody more can\n"
+"                        be added: the next early handover is a new sub-batch."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
+msgid "Hand these employees' entries to the General Manager? Only their rows are locked and your batches stay open, but nobody more can be added to this sub-batch."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submit_wizard_form
+msgid ""
+"Press <b>Add a line</b>, tick the employees and press\n"
+"                        <b>Select</b>. All their entries for these days, in\n"
+"                        every component, go into one sub-batch.\n"
+"                        <b>Send to GM</b> hands it over now and closes it;\n"
+"                        <b>Add, Keep Open</b> lets you add more people first.\n"
+"                        Your batches stay open either way."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_submit_wizard__target__new
+msgid "Start a new sub-batch (other days or another reason)"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_handover_wizards.py:0
+msgid "%(subs)s sent to the General Manager. Everything else in the month stays open."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_handover_wizards.py:0
+msgid "Added to %(subs)s. Add more people or press Submit to GM on it when it is complete."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_handover_wizards.py:0
+msgid "Choose the sub-batch to add them to."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_handover_wizards.py:0
+#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
+msgid "%(name)s has already been submitted, so nobody can be added to it. Start a new sub-batch with its own days and reason."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_handover_wizards.py:0
+msgid "Give the days this sub-batch covers."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_handover_wizards.py:0
+msgid "Added"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
+msgid "Adding employees"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
+msgid "%(name)s has no imported component — correct its rows in their batches."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
+msgid "Imported Again"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
+msgid "A sub-batch belongs to a department's month: press Submit to GM on it, or Send Early… on one of its batches."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
+msgid "%(name)s: trips imported again for its days."
 msgstr ""

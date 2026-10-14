@@ -116,6 +116,21 @@ class TestKswWorkshopRequest(TransactionCase):
         request.with_user(self.user_manager).action_reject()
         self.assertEqual(request.state, 'rejected')
 
+    def test_reject_button_prompts_for_reason(self):
+        request = self._make_request(employee_user=self.user_employee)
+        action = request.with_user(self.user_manager).action_open_reject_wizard()
+        self.assertEqual(action['res_model'], 'ksw.workshop.reject.wizard')
+        Wizard = self.env['ksw.workshop.reject.wizard'].with_user(self.user_manager)
+        wizard = Wizard.with_context(action['context']).create({'rejection_reason': 'Duplicate'})
+        wizard.action_confirm()
+        self.assertEqual(request.state, 'rejected')
+        self.assertEqual(request.rejection_reason, 'Duplicate')
+
+    def test_employee_cannot_open_reject_prompt(self):
+        request = self._make_request(employee_user=self.user_employee)
+        with self.assertRaises(UserError):
+            request.with_user(self.user_employee).action_open_reject_wizard()
+
     def test_employee_cannot_set_state_directly(self):
         request = self._make_request(employee_user=self.user_employee)
         with self.assertRaises(UserError):
@@ -281,10 +296,13 @@ class TestKswWorkshopRequest(TransactionCase):
             })
 
     def test_new_draft_vehicle_visible_only_on_own_request(self):
-        draft_vehicle = self.env['ksw.fleet.vehicle'].with_user(self.user_employee).create({
+        # Only the system administrator adds vehicles now (Oct 2026); a draft
+        # left over from the old requester flow still behaves like this.
+        draft_vehicle = self.env['ksw.fleet.vehicle'].create({
             'name': 'WS-DRAFT-1',
             'client_id': self.env.company.partner_id.id,
             'vehicle_type': 'other',
+            'state': 'draft',
         })
         self.assertEqual(draft_vehicle.state, 'draft')
         own_request = self._make_request(employee_user=self.user_employee, vehicle_id=draft_vehicle.id)

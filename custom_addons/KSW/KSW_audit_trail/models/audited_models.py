@@ -128,7 +128,7 @@ class KswAuditMixin(models.AbstractModel):
         targets = rec.sudo()._ksw_audit_employees()
         if not targets:
             targets = rec.sudo()._ksw_audit_chatter_target()
-        for target in targets:
+        for target in targets.filtered('id'):
             target.sudo().message_post(
                 body=body, subtype_xmlid='mail.mt_note',
                 author_id=self.env.user.partner_id.id)
@@ -145,7 +145,9 @@ class KswAuditMixin(models.AbstractModel):
     def write(self, vals):
         if not self._ksw_audit_enabled():
             return super().write(vals)
-        audited = self._ksw_audit_records()
+        # Unsaved records (onchange / web form "New") are not in the database:
+        # nothing to log, and message_post refuses a NewId.
+        audited = self.filtered('id')._ksw_audit_records()
         fnames = [f for f in vals if _auditable(self, f)]
         before = audited._ksw_audit_snapshot(fnames) if (audited and fnames) else {}
         res = super().write(vals)
@@ -203,12 +205,13 @@ class ResUsers(models.Model):
 
     def write(self, vals):
         res = super().write(vals)
-        if ({'password', 'new_password'} & set(vals)) and self._ksw_audit_enabled():
+        saved = self.filtered('id')
+        if ({'password', 'new_password'} & set(vals)) and saved._ksw_audit_enabled():
             field = self._fields['password']
             self.env['ksw.audit.log']._log([
                 self._ksw_audit_entry(rec, 'write', 'password', '', _('(changed)'))
-                for rec in self])
-            for rec in self:
+                for rec in saved])
+            for rec in saved:
                 self._ksw_audit_post(rec, [(field, '', _('(changed)'))], _(
                     'Password changed by %s', self.env.user.name))
         return res

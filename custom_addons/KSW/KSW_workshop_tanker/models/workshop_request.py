@@ -42,6 +42,19 @@ class KswWorkshopRequest(models.Model):
             if attached:
                 request.driver_id = attached
 
+    @api.model
+    def _pick_on_behalf(self, managers, vehicle_id):
+        """The first assisted requester (own manager first) whose trucks
+        include this one. A client's vehicle is in everyone's scope, so it
+        falls to the own manager like any truck they share."""
+        if vehicle_id:
+            Vehicle = self.env['ksw.fleet.vehicle']
+            for manager in managers:
+                if Vehicle.with_user(manager).search_count(
+                        [('id', '=', vehicle_id), ('x_workshop_in_scope', '=', True)]):
+                    return manager
+        return super()._pick_on_behalf(managers, vehicle_id)
+
     def action_submit(self):
         """The phone's Submit button. Saving IS submitting: create() already
         notified the workshop, and the client saves a new record before it

@@ -1,4 +1,5 @@
 from . import models
+from . import wizard
 
 from .models.ksw_workshop_client import _register_existing_clients
 

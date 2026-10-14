@@ -18,9 +18,14 @@ class KswFleetVehicle(models.Model):
         default=lambda self: self.env.company.partner_id,
     )
     vehicle_type = fields.Selection([
-        ('trailer', 'Trailer'),
+        # The truck head, T###. Called "Trailer" (تريلا) because that is what
+        # the workshop and the supervisors call it (a "Tractor Unit" label was
+        # tried on 2026-10-14 and got mixed up with the tedder within hours).
+        ('trailer', 'Trailer (تريلا)'),
         ('isuzu', 'Isuzu'),
-        ('tank', 'Tank'),
+        # The tanker semi-trailer the head pulls, carrying the 32 m³ tank:
+        # «تيدر 68», the name BAS and the workshop both use.
+        ('tank', 'Tedder (تيدر)'),
         ('other', 'Other'),
     ], string='Vehicle Type')
 
@@ -63,11 +68,16 @@ class KswFleetVehicle(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        is_manager = self.env.su or self.env.user.has_group('hr.group_hr_user')
+        # The fleet is a fixed list (Oct 2026): a requester typing "141" into
+        # the vehicle picker created a second T141 that nobody could tell
+        # apart. Only the system administrator adds vehicles; everyone else
+        # picks. The ACL says the same; this gives the reason in words.
+        if not self.env.su and not self.env.user.has_group('base.group_system'):
+            raise UserError(_(
+                'Only the system administrator can add a vehicle. Pick it from the '
+                'list, or ask the administrator to add it.'))
         for vals in vals_list:
-            if not is_manager:
-                vals['state'] = 'draft'
-            elif not vals.get('state'):
+            if not vals.get('state'):
                 vals['state'] = 'confirmed'
         return super().create(vals_list)
 

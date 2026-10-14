@@ -15,11 +15,12 @@ _PLAN_KIND = {
     'سيارات خصوصي': 'private',
 }
 # Which BAS groups a fleet vehicle type may match. Fleet trailers are named
-# like BAS's trailer group (T120 = «T120»); tankers «تيدر رقم 120» are other
-# vehicles, which the fleet keeps as type 'other' under a bare number.
+# like BAS's trailer group (T120 = «T120»); tedders «تيدر رقم 120» are type
+# 'tank' («تيدر 120»), and older ones may still sit under 'other' as a bare number.
 _KINDS_BY_TYPE = {
     'isuzu': ('isuzu',),
     'trailer': ('trailer',),
+    'tank': ('tedder',),
     'other': ('tedder', 'private'),
 }
 

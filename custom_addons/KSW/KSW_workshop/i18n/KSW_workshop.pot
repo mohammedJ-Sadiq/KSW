@@ -6,14 +6,21 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-13 13:15+0000\n"
-"PO-Revision-Date: 2026-10-13 13:15+0000\n"
+"POT-Creation-Date: 2026-10-14 07:16+0000\n"
+"PO-Revision-Date: 2026-10-14 07:16+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_users_form_ksw_workshop_assistant
+msgid ""
+",\n"
+"                        on their vehicles only."
+msgstr ""
 
 #. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_type_form
@@ -88,6 +95,11 @@ msgstr ""
 #: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_request_all
 #: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_all
 msgid "All Requests"
+msgstr ""
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_res_users__x_workshop_assisted_manager_ids
+msgid "Also Raises Workshop Requests For"
 msgstr ""
 
 #. module: KSW_workshop
@@ -230,6 +242,11 @@ msgid "Completed"
 msgstr ""
 
 #. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid "Completed On"
+msgstr ""
+
+#. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__completion_date
 msgid "Completion Date"
 msgstr ""
@@ -350,6 +367,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request_type__display_name
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_technician__display_name
 #: model:ir.model.fields,field_description:KSW_workshop.field_res_partner__display_name
+#: model:ir.model.fields,field_description:KSW_workshop.field_res_users__display_name
 msgid "Display Name"
 msgstr ""
 
@@ -487,6 +505,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request_type__id
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_technician__id
 #: model:ir.model.fields,field_description:KSW_workshop.field_res_partner__id
+#: model:ir.model.fields,field_description:KSW_workshop.field_res_users__id
 msgid "ID"
 msgstr ""
 
@@ -765,10 +784,8 @@ msgid "Name"
 msgstr ""
 
 #. module: KSW_workshop
-#. odoo-python
 #: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__state__new
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
-#: code:addons/KSW_workshop/models/ksw_workshop_client.py:0
 msgid "New"
 msgstr ""
 
@@ -837,6 +854,16 @@ msgstr ""
 #: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__request_type__oil_filters
 #: model:ksw.workshop.request.type,name:KSW_workshop.request_type_oil_filters
 msgid "Oil & Filters"
+msgstr ""
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_on_behalf_of_id
+msgid "On Behalf Of"
+msgstr ""
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_users_form_ksw_workshop_assistant
+msgid "Only for requesters this user does not report to..."
 msgstr ""
 
 #. module: KSW_workshop
@@ -929,6 +956,16 @@ msgstr ""
 #. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
 msgid "Quarter"
+msgstr ""
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_res_users__x_workshop_assists_display
+msgid "Raises Workshop Requests For"
+msgstr ""
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_users_form_ksw_workshop_assistant
+msgid "Raises workshop requests for"
 msgstr ""
 
 #. module: KSW_workshop
@@ -1038,8 +1075,18 @@ msgid "Requested By"
 msgstr ""
 
 #. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid "Requested On"
+msgstr ""
+
+#. module: KSW_workshop
 #: model:res.groups,name:KSW_workshop.group_workshop_requester
 msgid "Requester"
+msgstr ""
+
+#. module: KSW_workshop
+#: model:res.groups,name:KSW_workshop.group_workshop_requester_assistant
+msgid "Requester Assistant"
 msgstr ""
 
 #. module: KSW_workshop
@@ -1177,11 +1224,9 @@ msgid "Suggested Keyword"
 msgstr ""
 
 #. module: KSW_workshop
-#. odoo-python
 #: model:ir.actions.server,name:KSW_workshop.action_ksw_workshop_keyword_suggestions
 #: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_keyword_suggestions
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_keyword_suggestion_list
-#: code:addons/KSW_workshop/models/ksw_workshop_keyword_suggestion.py:0
 msgid "Suggested Keywords"
 msgstr ""
 
@@ -1217,7 +1262,7 @@ msgstr ""
 
 #. module: KSW_workshop
 #: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__vehicle_type__tank
-msgid "Tank"
+msgid "Tedder (تيدر)"
 msgstr ""
 
 #. module: KSW_workshop
@@ -1291,6 +1336,11 @@ msgid ""
 msgstr ""
 
 #. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request__x_on_behalf_of_id
+msgid "The workshop requester this request was raised for by his assistant."
+msgstr ""
+
+#. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
 msgid "This Driver"
 msgstr ""
@@ -1356,7 +1406,7 @@ msgstr ""
 
 #. module: KSW_workshop
 #: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__vehicle_type__trailer
-msgid "Trailer"
+msgid "Trailer (تريلا)"
 msgstr ""
 
 #. module: KSW_workshop
@@ -1407,6 +1457,11 @@ msgstr ""
 #. module: KSW_workshop
 #: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_part__x_bas_qty
 msgid "Units behind the BAS average, so Odoo issues weigh in correctly."
+msgstr ""
+
+#. module: KSW_workshop
+#: model:ir.model,name:KSW_workshop.model_res_users
+msgid "User"
 msgstr ""
 
 #. module: KSW_workshop
@@ -1474,6 +1529,15 @@ msgid ""
 msgstr ""
 
 #. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_users_form_ksw_workshop_assistant
+msgid ""
+"With the <b>Requester Assistant</b> role (Access Rights, KSW Workshop),\n"
+"                        this user raises requests for his own manager, if that manager is a\n"
+"                        workshop requester, and for anyone listed above. He picks only from\n"
+"                        their vehicles and sees only the requests he raised himself."
+msgstr ""
+
+#. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_keyword_suggestion__name
 msgid "Word"
 msgstr ""
@@ -1497,6 +1561,7 @@ msgstr ""
 #. module: KSW_workshop
 #: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_root
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_employee_form_workshop_technician
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_users_form_ksw_workshop_assistant
 msgid "Workshop"
 msgstr ""
 
@@ -1576,11 +1641,17 @@ msgid "Workshop Technicians"
 msgstr ""
 
 #. module: KSW_workshop
-#. odoo-python
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_fleet_vehicle__workshop_request_count
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_fleet_vehicle_form_workshop
-#: code:addons/KSW_workshop/models/ksw_fleet_vehicle.py:0
 msgid "Workshop Visits"
+msgstr ""
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_res_users__x_workshop_assisted_manager_ids
+msgid ""
+"Workshop requesters this user raises requests for although he does not "
+"report to them. His own manager is included automatically. Has no effect "
+"without the Requester Assistant role."
 msgstr ""
 
 #. module: KSW_workshop
@@ -1769,4 +1840,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_workshop/models/ksw_workshop_keyword_suggestion.py:0
 msgid "Pick a type in \"File Under\" first — that is where %s will be added."
+msgstr ""
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid ""
+"You raise workshop requests for your manager, but your manager is not a "
+"workshop requester and nobody else is named on your user. Ask an "
+"administrator to set this up."
 msgstr ""

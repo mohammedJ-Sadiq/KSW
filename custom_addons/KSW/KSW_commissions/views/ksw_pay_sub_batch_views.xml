@@ -16,10 +16,14 @@
                 <field name="pending_count" invisible="1"/>
                 <field name="x_can_reimport" invisible="1"/>
                 <header>
+                    <button name="action_add_employees"
+                            string="Add Employees…" type="object"
+                            class="btn-secondary" icon="fa-user-plus"
+                            invisible="state != 'draft' or not x_can_edit"/>
                     <button name="action_submit" string="Submit to GM"
                             type="object" class="btn-primary"
                             invisible="not x_can_submit or not id"
-                            confirm="Hand these employees' entries so far to the General Manager? Only their rows are locked — your batches stay open."/>
+                            confirm="Hand these employees' entries to the General Manager? Only their rows are locked and your batches stay open, but nobody more can be added to this sub-batch."/>
                     <!-- No groups= on the GM buttons: x_can_review /
                          x_can_reopen already answer "is this department
                          mine" (see the department submission form). -->
@@ -69,6 +73,13 @@
                         (or press <b>Import Again</b> for Driver Trips), then
                         <b>Submit to GM</b>.
                     </div>
+                    <div class="alert alert-info" role="status"
+                         invisible="state != 'draft'">
+                        Being prepared: press <b>Add Employees…</b> to add
+                        more people for these days, or <b>Submit to GM</b>
+                        when it is complete. Once submitted, nobody more can
+                        be added: the next early handover is a new sub-batch.
+                    </div>
                     <field name="x_overlap_count" invisible="1"/>
                     <div class="alert alert-warning" role="alert"
                          invisible="not x_overlap_count">
@@ -85,8 +96,11 @@
                             <!-- Only a month still being prepared: a
                                  department already handed over whole has
                                  nothing left to send early. -->
-                            <field name="component_id"/>
-                            <field name="batch_id"
+                            <!-- Only on the per-component sub-batches of
+                                 Oct 2026; a sub-batch now spans them all. -->
+                            <field name="component_id"
+                                   invisible="not batch_id"/>
+                            <field name="batch_id" invisible="not batch_id"
                                    options="{'no_create': True}"/>
                             <field name="submission_id" readonly="1"
                                    options="{'no_open': True}"/>
@@ -230,8 +244,8 @@
                 A sub-batch hands some employees' month so far to the General
                 Manager ahead of the rest of the department — for someone
                 going on vacation, say — without locking your batches.
-                Start one from your department's month (Department
-                Submissions) or from any batch.
+                Press Submit to GM on your department's month and pick the
+                employees, or Send Early… on a single batch.
             </p>
         </field>
     </record>
@@ -245,86 +259,93 @@
         <field name="arch" type="xml">
             <form string="Submit to the General Manager">
                 <field name="submission_ids" invisible="1"/>
-                <field name="allowed_component_ids" invisible="1"/>
-                <field name="has_open_sub_batch" invisible="1"/>
+                <field name="open_sub_batch_ids" invisible="1"/>
+                <!-- In the arch on purpose: the employee picker's domain is
+                     computed from it (Odoo 19 Pitfalls #40). -->
+                <field name="allowed_employee_ids" invisible="1"/>
+                <field name="has_returned_sub_batch" invisible="1"/>
                 <p>What are you sending to the General Manager?</p>
                 <group>
                     <field name="mode" widget="radio" nolabel="1" colspan="2"/>
                 </group>
-                <group invisible="mode != 'some'">
-                    <field name="component_ids"
-                           widget="many2many_checkboxes"/>
-                    <field name="sub_batch_ids" widget="many2many_checkboxes"
-                           invisible="not has_open_sub_batch"/>
-                </group>
-                <div class="text-muted" invisible="mode != 'all'">
-                    Every component of the month is handed over and frozen,
-                    the sub-batches included. Empty batches are removed.
-                </div>
-                <div class="text-muted" invisible="mode != 'some'">
-                    Only what you tick goes to the General Manager and is
-                    locked. The other components stay open for you to keep
-                    recording and send later.
-                </div>
-                <div class="text-muted" invisible="mode != 'some'">
-                    Your department stays open for the month until you
-                    choose Every component.
-                </div>
-                <footer>
-                    <button name="action_confirm" string="Submit"
-                            type="object" class="btn-primary"/>
-                    <button string="Cancel" special="cancel"
-                            class="btn-secondary"/>
-                </footer>
-            </form>
-        </field>
-    </record>
-
-    <!-- Send Early…: one component, some employees, some days, one
-         button. Opened from the component's batch. -->
-    <record id="view_ksw_pay_send_early_wizard_form" model="ir.ui.view">
-        <field name="name">ksw.pay.send.early.wizard.form</field>
-        <field name="model">ksw.pay.send.early.wizard</field>
-        <field name="arch" type="xml">
-            <form string="Send Early">
-                <!-- In the arch on purpose: the employee picker's domain is
-                     computed from them (Odoo 19 Pitfalls #40). -->
-                <field name="batch_id" invisible="1"/>
-                <field name="is_import" invisible="1"/>
-                <field name="allowed_employee_ids" invisible="1"/>
-                <group>
-                    <field name="component_id" readonly="1"/>
-                    <label for="date_from" string="Days"/>
-                    <div class="o_row">
-                        <field name="date_from"/>
-                        <span>→</span>
-                        <field name="date_to"/>
+                <div invisible="mode != 'early'">
+                    <div class="alert alert-info" role="status"
+                         invisible="not open_sub_batch_ids">
+                        A sub-batch is still being prepared for this month.
+                        Do you want to add these employees to it?
                     </div>
-                    <field name="note"
-                           placeholder="e.g. Annual leave from 12 October"/>
-                </group>
-                <field name="employee_ids" nolabel="1"
-                       options="{'no_create': True}">
-                    <list>
-                        <field name="name"/>
-                        <field name="job_title" optional="show"/>
-                    </list>
-                </field>
-                <div class="text-muted" invisible="not is_import">
-                    Press <b>Add a line</b>, tick the drivers and press
-                    <b>Select</b>. Their trips for these days are imported
-                    from BAS and sent to the General Manager. The rest of
-                    the month stays in the batch.
+                    <group invisible="not open_sub_batch_ids">
+                        <field name="target" widget="radio" nolabel="1"
+                               colspan="2"/>
+                    </group>
+                    <group invisible="target != 'append'">
+                        <field name="sub_batch_id"
+                               required="mode == 'early' and target == 'append'"
+                               options="{'no_create': True, 'no_open': True}"/>
+                        <label for="sub_date_from" string="Days"/>
+                        <div class="o_row">
+                            <field name="sub_date_from"/>
+                            <span>→</span>
+                            <field name="sub_date_to"/>
+                        </div>
+                        <field name="sub_note" string="Why Early"/>
+                        <field name="sub_employee_names"
+                               string="Already in it"/>
+                    </group>
+                    <group invisible="target != 'new'">
+                        <label for="date_from" string="Days"/>
+                        <div class="o_row">
+                            <field name="date_from"
+                                   required="mode == 'early' and target == 'new'"/>
+                            <span>→</span>
+                            <field name="date_to"
+                                   required="mode == 'early' and target == 'new'"/>
+                        </div>
+                        <field name="note"
+                               required="mode == 'early' and target == 'new'"
+                               placeholder="e.g. Annual leave from 12 October"/>
+                    </group>
+                    <field name="employee_ids" nolabel="1"
+                           options="{'no_create': True}">
+                        <list>
+                            <field name="name"/>
+                            <field name="job_title" optional="show"/>
+                        </list>
+                    </field>
+                    <div class="text-muted">
+                        Press <b>Add a line</b>, tick the employees and press
+                        <b>Select</b>. All their entries for these days, in
+                        every component, go into one sub-batch.
+                        <b>Send to GM</b> hands it over now and closes it;
+                        <b>Add, Keep Open</b> lets you add more people first.
+                        Your batches stay open either way.
+                    </div>
+                    <div class="text-muted"
+                         invisible="not has_returned_sub_batch">
+                        Some employees were returned to you by the General
+                        Manager: correct them and resubmit from
+                        <b>Sub-Batches</b>.
+                    </div>
                 </div>
-                <div class="text-muted" invisible="is_import">
-                    Press <b>Add a line</b>, tick the employees and press
-                    <b>Select</b>. Their rows in this batch for these days
-                    are sent to the General Manager and locked. Everything
-                    else stays open.
+                <div class="alert alert-danger" role="alert"
+                     invisible="mode != 'month'">
+                    <b>This closes the month for the whole department.</b>
+                    Every component of every employee is handed over and
+                    frozen, and once the General Manager approves, nothing
+                    more can be added for anyone this month. Only do this
+                    when the month is complete.
                 </div>
                 <footer>
-                    <button name="action_send" string="Send to GM"
-                            type="object" class="btn-primary"/>
+                    <button name="action_confirm" string="Send to GM"
+                            type="object" class="btn-primary"
+                            invisible="mode != 'early'"/>
+                    <button name="action_add" string="Add, Keep Open"
+                            type="object" class="btn-secondary"
+                            invisible="mode != 'early'"/>
+                    <button name="action_confirm"
+                            string="Submit &amp; Close the Month"
+                            type="object" class="btn-danger"
+                            invisible="mode != 'month'"/>
                     <button string="Cancel" special="cancel"
                             class="btn-secondary"/>
                 </footer>

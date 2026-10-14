@@ -140,7 +140,7 @@ msgstr ""
 
 #. module: KSW_fleet
 #: model:ir.model.fields.selection,name:KSW_fleet.selection__ksw_fleet_vehicle__vehicle_type__tank
-msgid "Tank"
+msgid "Tedder (تيدر)"
 msgstr ""
 
 #. module: KSW_fleet
@@ -150,7 +150,7 @@ msgstr ""
 
 #. module: KSW_fleet
 #: model:ir.model.fields.selection,name:KSW_fleet.selection__ksw_fleet_vehicle__vehicle_type__trailer
-msgid "Trailer"
+msgid "Trailer (تريلا)"
 msgstr ""
 
 #. module: KSW_fleet
@@ -187,4 +187,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_fleet/models/ksw_fleet_vehicle.py:0
 msgid "Only draft vehicles can be confirmed."
+msgstr ""
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_vehicle.py:0
+msgid ""
+"Only the system administrator can add a vehicle. Pick it from the list, or "
+"ask the administrator to add it."
 msgstr ""

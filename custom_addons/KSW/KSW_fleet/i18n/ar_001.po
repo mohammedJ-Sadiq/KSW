@@ -141,8 +141,8 @@ msgstr "الحالة"
 
 #. module: KSW_fleet
 #: model:ir.model.fields.selection,name:KSW_fleet.selection__ksw_fleet_vehicle__vehicle_type__tank
-msgid "Tank"
-msgstr "صهريج"
+msgid "Tedder (تيدر)"
+msgstr "تيدر"
 
 #. module: KSW_fleet
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__tank_number
@@ -151,7 +151,7 @@ msgstr "رقم الصهريج"
 
 #. module: KSW_fleet
 #: model:ir.model.fields.selection,name:KSW_fleet.selection__ksw_fleet_vehicle__vehicle_type__trailer
-msgid "Trailer"
+msgid "Trailer (تريلا)"
 msgstr "تريلا"
 
 #. module: KSW_fleet
@@ -189,3 +189,13 @@ msgstr "لا يمكن اعتماد مركبة في حالة المسودة إل�
 #: code:addons/KSW_fleet/models/ksw_fleet_vehicle.py:0
 msgid "Only draft vehicles can be confirmed."
 msgstr "لا يمكن اعتماد إلا المركبات في حالة المسودة."
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_vehicle.py:0
+msgid ""
+"Only the system administrator can add a vehicle. Pick it from the list, or "
+"ask the administrator to add it."
+msgstr ""
+"لا يضيف المركبات إلا مسؤول النظام. اخترها من القائمة، أو اطلب من مسؤول "
+"النظام إضافتها."

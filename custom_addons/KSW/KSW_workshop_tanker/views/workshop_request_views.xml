@@ -14,7 +14,7 @@
             <xpath expr="//header/field[@name='state']" position="before">
                 <button name="action_submit" type="object" string="Submit Request"
                         class="oe_highlight" invisible="id"
-                        groups="KSW_workshop.group_workshop_requester,KSW_workshop.group_workshop_manager"/>
+                        groups="KSW_workshop.group_workshop_requester,KSW_workshop.group_workshop_requester_assistant,KSW_workshop.group_workshop_manager"/>
             </xpath>
             <xpath expr="//sheet/div[hasclass('oe_title')]" position="before">
                 <field name="x_driver_mismatch" invisible="1"/>

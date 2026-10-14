@@ -62,21 +62,24 @@ class TestKswFleetVehicle(TransactionCase):
         vehicle = self.env['ksw.fleet.vehicle'].create({'name': 'FLEETTEST-5'})
         self.assertEqual(vehicle.client_id, self.env.company.partner_id)
 
-    def test_state_defaults_confirmed_for_manager(self):
-        vehicle = self.env['ksw.fleet.vehicle'].with_user(self.user_hr).create({'name': 'FLEETTEST-6'})
+    def test_only_the_system_administrator_adds_vehicles(self):
+        # create() gives the reason before the ACL is consulted (Pitfall #12).
+        for user in (self.user_employee, self.user_hr):
+            with self.assertRaises(UserError):
+                self.env['ksw.fleet.vehicle'].with_user(user).create({'name': 'FLEETTEST-6'})
+        admin = self.env['res.users'].with_context(no_reset_password=True).create({
+            'name': 'Fleet Admin', 'login': 'fleet_admin_test',
+            'group_ids': [(6, 0, [self.env.ref('base.group_system').id])]})
+        vehicle = self.env['ksw.fleet.vehicle'].with_user(admin).create({'name': 'FLEETTEST-7'})
         self.assertEqual(vehicle.state, 'confirmed')
 
-    def test_state_defaults_draft_for_regular_employee(self):
-        vehicle = self.env['ksw.fleet.vehicle'].with_user(self.user_employee).create({'name': 'FLEETTEST-7'})
-        self.assertEqual(vehicle.state, 'draft')
-
     def test_action_confirm_requires_manager(self):
-        vehicle = self.env['ksw.fleet.vehicle'].with_user(self.user_employee).create({'name': 'FLEETTEST-8'})
+        vehicle = self.env['ksw.fleet.vehicle'].create({'name': 'FLEETTEST-8', 'state': 'draft'})
         with self.assertRaises(UserError):
             vehicle.with_user(self.user_employee).action_confirm()
 
     def test_action_confirm_by_manager(self):
-        vehicle = self.env['ksw.fleet.vehicle'].with_user(self.user_employee).create({'name': 'FLEETTEST-9'})
+        vehicle = self.env['ksw.fleet.vehicle'].create({'name': 'FLEETTEST-9', 'state': 'draft'})
         vehicle.with_user(self.user_hr).action_confirm()
         self.assertEqual(vehicle.state, 'confirmed')
 

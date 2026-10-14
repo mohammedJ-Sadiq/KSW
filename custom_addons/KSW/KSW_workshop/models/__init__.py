@@ -9,3 +9,4 @@ from . import ksw_workshop_part_line
 from . import ksw_workshop_labor_line
 from . import ksw_workshop_request
 from . import ksw_fleet_vehicle
+from . import res_users

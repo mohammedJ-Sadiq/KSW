@@ -13,6 +13,9 @@
                     <button name="action_update_drivers_from_bas" type="object"
                             string="Update Drivers from BAS" display="always"
                             groups="base.group_system"/>
+                    <button name="action_import_tanker_trailers_from_bas" type="object"
+                            string="Import Tedders from BAS" display="always"
+                            groups="base.group_system"/>
                 </header>
             </xpath>
             <xpath expr="//field[@name='driver_name']" position="after">

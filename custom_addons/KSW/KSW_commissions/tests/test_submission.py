@@ -168,10 +168,12 @@ class TestDepartmentScope(SubmissionCommon):
         yours = self._filled_batch(self.sup_b, self.dept_b, self.emp_b)
 
         run = mine.submission_id.run_id
-        # The button asks what goes; "every component" is the whole handover.
+        # The button asks what goes; "the whole month" is the handover.
         action = run.with_user(self.sup_a).action_submit_my_departments()
-        self.env['ksw.pay.submit.wizard'].with_user(self.sup_a).browse(
-            action['res_id']).action_confirm()
+        wizard = self.env['ksw.pay.submit.wizard'].with_user(
+            self.sup_a).browse(action['res_id'])
+        wizard.mode = 'month'
+        wizard.action_confirm()
 
         self.assertEqual(mine.submission_id.state, 'submitted')
         self.assertEqual(mine.state, 'submitted')

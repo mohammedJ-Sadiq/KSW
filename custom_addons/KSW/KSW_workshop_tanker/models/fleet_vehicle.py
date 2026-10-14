@@ -21,6 +21,13 @@ _FLEET_NAME_RE = {
     'trailer': re.compile(r'^T\s*(\d+)$', re.IGNORECASE),
 }
 _NEVER = re.compile(r'(?!)')
+# The BAS cost-centre group holding one account per tedder (the tanker
+# semi-trailer carrying the 32 m³ tank), «تيدر رقم 68». The fleet names them
+# «تيدر 68», beside the trailer heads that pull them (T068). By code: the
+# group's name carries a stray Latin T and its spacing has changed before.
+BAS_TANKER_TRAILER_GROUP = '144'
+BAS_TANKER_TRAILER_WORD = 'تيدر'
+TANKER_TRAILER_CODE = 'تيدر %d'
 # BAS's stand-in driver on walk-in sales, not a person.
 _NOT_A_DRIVER = 'customer car'
 # The window the "current" driver is judged over. A truck changes hands rarely
@@ -80,6 +87,18 @@ class KswFleetVehicle(models.Model):
         if self.env.su or user.has_group('base.group_system') \
                 or user.has_group('KSW_workshop.group_workshop_manager'):
             return None
+        # A Requester Assistant has no scope of his own: exactly his
+        # requesters', each worked out as that requester. Nobody to assist is
+        # an empty scope, not "no narrowing" (create() refuses it anyway).
+        if user.has_group('KSW_workshop.group_workshop_requester_assistant') \
+                and not user.has_group('KSW_workshop.group_workshop_requester'):
+            allowed = set()
+            for manager in self.env['res.users'].browse(user._ksw_workshop_assisted_manager_ids()):
+                scope = self.with_user(manager)._workshop_scope_vehicle_ids()
+                if scope is None:
+                    return None
+                allowed |= scope
+            return allowed
         employee = user.sudo().employee_id
         if not employee:
             return None
@@ -97,7 +116,8 @@ class KswFleetVehicle(models.Model):
         own = set(self._own_partner_ids())
         for vehicle in self:
             vehicle.x_workshop_in_scope = (
-                allowed is None or vehicle.client_id.id not in own or vehicle.id in allowed)
+                allowed is None or vehicle.client_id.id not in own
+                or vehicle.vehicle_type == 'tank' or vehicle.id in allowed)
 
     def _search_workshop_in_scope(self, operator, value):
         # Odoo 19 hands a boolean condition over as in/not in (gotcha #24).
@@ -111,10 +131,14 @@ class KswFleetVehicle(models.Model):
         if allowed is None:
             return [] if wanted else [('id', '=', False)]
         # A client's vehicle is the client's, not a supervisor's: never narrowed.
+        # Nor is a tedder: it is swapped between heads and nothing records
+        # which head pulls it, so every requester may book one in.
         own = self._own_partner_ids()
         if wanted:
-            return ['|', ('client_id', 'not in', own), ('id', 'in', list(allowed))]
-        return [('client_id', 'in', own), ('id', 'not in', list(allowed))]
+            return ['|', '|', ('client_id', 'not in', own), ('vehicle_type', '=', 'tank'),
+                    ('id', 'in', list(allowed))]
+        return [('client_id', 'in', own), ('vehicle_type', '!=', 'tank'),
+                ('id', 'not in', list(allowed))]
 
     # ------------------------------------------------------------------
     # BAS
@@ -264,3 +288,61 @@ class KswFleetVehicle(models.Model):
                 'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'},
             },
         }
+
+    # ------------------------------------------------------------------
+    # Tanker trailers
+    # ------------------------------------------------------------------
+    def _bas_fetch_tanker_trailers(self):
+        """(code, name) of every account in BAS's tedder cost-centre group."""
+        conn = self.env['ksw.bas.connector']._bas_connect()
+        try:
+            cur = conn.cursor(as_dict=True)
+            cur.execute("SELECT RTRIM(CODE) AS code, RTRIM(NAME) AS name FROM WREF10 WHERE MCOST = %s",
+                        (BAS_TANKER_TRAILER_GROUP,))
+            return cur.fetchall()
+        finally:
+            conn.close()
+
+    def action_import_tanker_trailers_from_bas(self):
+        """Create the tedders BAS has and the fleet does not, as «تيدر 68».
+
+        Create-only: one already in the fleet is left as it is (Odoo is the
+        master once a vehicle exists), and so is one BAS has dropped.
+        """
+        if not self.env.su and not self.env.user.has_group('base.group_system'):
+            raise UserError(_('Only a system administrator can import tedders from BAS.'))
+        Vehicle = self.sudo().with_context(active_test=False)
+        existing = {self._ksw_trailing_number(v.name)
+                    for v in Vehicle.search([('vehicle_type', '=', 'tank')])} - {''}
+        to_create, skipped = {}, []
+        for row in self._bas_fetch_tanker_trailers():
+            number = self._ksw_trailing_number(row['name']) \
+                if BAS_TANKER_TRAILER_WORD in (row['name'] or '') else ''
+            if not number:
+                skipped.append(row['name'])
+            elif number not in existing and number not in to_create:
+                to_create[number] = row['name']
+        Vehicle.create([{
+            'name': TANKER_TRAILER_CODE % int(number),
+            'vehicle_type': 'tank',
+            'x_bas_cost_centre': bas_name,
+        } for number, bas_name in sorted(to_create.items(), key=lambda kv: int(kv[0]))])
+        _logger.info('Tedders from BAS: %s created, %s already in fleet, skipped %s',
+                     len(to_create), len(existing), skipped)
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Tedders imported from BAS'),
+                'message': _('%(new)s tedders added, %(old)s were already in the fleet.',
+                             new=len(to_create), old=len(existing)),
+                'type': 'success',
+                'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'},
+            },
+        }
+
+    @staticmethod
+    def _ksw_trailing_number(name):
+        """«تيدر رقم 68», «تيدررقم 114», «تيدر 68» -> '68'; no number -> ''."""
+        nums = re.findall(r'\d+', name or '')
+        return nums[-1].lstrip('0') if nums else ''

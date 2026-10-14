@@ -70,12 +70,11 @@ class KswPaySubBatch(models.Model):
     currency_id = fields.Many2one(
         related='submission_id.currency_id', readonly=True)
 
-    # The one component batch this sends early — Driver Trips, Location
-    # Allowance, Overtime. One component, because that is how a supervisor
-    # thinks of it ("a sub-batch for the trips"): taking an employee's rows
-    # from every batch at once meant a Location Allowance sub-batch offered
-    # the 63 drivers the trips import had just filled. Empty only on
-    # sub-batches made before 19.0.4.26.0 that had no rows to tell from.
+    # Empty on every sub-batch made since Oct 2026: one sub-batch is one
+    # department, days and reason, across every component (Hafiz's Friday
+    # Work, Location Allowance and Other are one handover, not three). Set
+    # only on the per-component sub-batches of 19.0.4.26.0 – 4.38.0, which
+    # keep drawing from that one batch.
     batch_id = fields.Many2one(
         'ksw.pay.batch', string='Component Batch', readonly=True,
         index=True, ondelete='restrict')
@@ -198,7 +197,7 @@ class KswPaySubBatch(models.Model):
             rec.x_can_reopen = is_my_gm and month_open and bool(
                 rec.approved_count)
             rec.x_can_reimport = rec.x_can_edit and rec.state == 'returned' \
-                and bool(rec.batch_id.component_id.importer)
+                and bool(rec._importer_batches())
 
     # ------------------------------------------------------------------
     # CRUD
@@ -211,14 +210,17 @@ class KswPaySubBatch(models.Model):
             if not vals.get('name') or vals['name'] == 'New':
                 vals['name'] = Seq.next_by_code('ksw.pay.sub.batch') or 'New'
             employees.append(vals.pop('employee_ids', None))
-            if not vals.get('batch_id'):
+            if vals.get('batch_id'):
+                batch = self.env['ksw.pay.batch'].sudo().browse(
+                    vals['batch_id'])
+                if not batch.submission_id:
+                    batch._ensure_submission()
+                vals.setdefault('submission_id', batch.submission_id.id)
+            if not vals.get('submission_id'):
                 raise UserError(_(
-                    "A sub-batch is made from a component's batch: open "
-                    "the batch and press Send Early…."))
-            batch = self.env['ksw.pay.batch'].sudo().browse(vals['batch_id'])
-            if not batch.submission_id:
-                batch._ensure_submission()
-            vals.setdefault('submission_id', batch.submission_id.id)
+                    "A sub-batch belongs to a department's month: press "
+                    "Submit to GM on it, or Send Early… on one of its "
+                    "batches."))
             self._default_range(vals)
         records = super().create(vals_list)
         for rec, commands in zip(records, employees):
@@ -329,15 +331,18 @@ class KswPaySubBatch(models.Model):
         for rec in self:
             if rec.state not in OPEN_STATES:
                 continue
-            # Per component: a driver can have his trips and his location
-            # allowance sent early in two separate sub-batches at once.
-            clash = self.sudo().search([
+            # A department-wide sub-batch takes every component, so it clashes
+            # with any open one; an older per-component one only with its own
+            # batch's and the department-wide ones.
+            domain = [
                 ('id', '!=', rec.id),
                 ('submission_id', '=', rec.submission_id.id),
-                ('batch_id', 'in', [rec.batch_id.id, False]),
                 ('state', 'in', OPEN_STATES),
                 ('employee_ids', 'in', rec.employee_ids.ids),
-            ], limit=1)
+            ]
+            if rec.batch_id:
+                domain.append(('batch_id', 'in', [rec.batch_id.id, False]))
+            clash = self.sudo().search(domain, limit=1)
             if clash:
                 who = rec.employee_ids & clash.employee_ids
                 raise ValidationError(_(
@@ -388,6 +393,88 @@ class KswPaySubBatch(models.Model):
                     "Only %(gm)s, the General Manager of %(scope)s, can act "
                     "on %(name)s.", gm=rec.gm_id.name or _('the department GM'),
                     scope=rec.department_id.name or '', name=rec.name))
+
+    def _importer_batches(self):
+        """The imported components (Driver Trips) this sub-batch can fill:
+        its own batch, or the department's open importer batches."""
+        self.ensure_one()
+        if self.batch_id:
+            return self.batch_id.filtered('component_id.importer')
+        return self.sudo().submission_id.batch_ids.filtered(
+            lambda b: b.state == 'draft' and b.component_id.importer)
+
+    def _import_trips(self, drivers):
+        """Fetch ``drivers``' trips for this sub-batch's days, component by
+        component. An empty BAS answer for one component is reported, not
+        raised: it is no reason to refuse the driver's typed rows.
+        Returns the messages for whatever could not be imported."""
+        self.ensure_one()
+        Wizard = self.env['ksw.pay.submit.wizard']
+        skipped = []
+        for batch in self._importer_batches():
+            mine = drivers & Wizard._drivers(batch)
+            if not mine:
+                continue
+            batch = batch.with_env(self.env).with_context(
+                ksw_pay_importing=True)
+            try:
+                with self.env.cr.savepoint():
+                    result = batch._import_bas_trips(
+                        employees=mine, window=(self.date_from, self.date_to),
+                        sub_batch=self)
+            except UserError as err:
+                skipped.append('%s: %s' % (batch.component_id.name,
+                                           err.args[0]))
+                continue
+            got = batch.sudo().entry_ids.filtered(
+                lambda e: e.employee_id in mine and e.state == 'draft'
+                and (e.x_window_from, e.x_window_to)
+                == (self.date_from, self.date_to))
+            if not got:
+                skipped.append('%s: %s' % (
+                    batch.component_id.name,
+                    result['params']['message']))
+        return skipped
+
+    def _add_employees(self, employees):
+        """Put ``employees`` in this sub-batch with everything they have in
+        its days: their typed rows, and their trips imported for the days.
+
+        Only people with something to send are added. Returns messages for
+        what could not be imported."""
+        self.ensure_one()
+        self._check_can_prepare(_("Adding employees"))
+        if self.state != 'draft':
+            raise UserError(_(
+                "%(name)s has already been submitted, so nobody can be "
+                "added to it. Start a new sub-batch with its own days and "
+                "reason.", name=self.name))
+        picked = employees.sudo() & self.env['ksw.pay.submit.wizard']._pool(
+            self.submission_id, self.date_from, self.date_to)
+        if not picked:
+            return []
+        skipped = self._import_trips(picked)
+        has_rows = self.env['ksw.pay.entry'].sudo().search(
+            self._row_domain() + [
+                ('employee_id', 'in', picked.ids), ('state', '=', 'draft'),
+                ('x_sub_batch_id', 'in', [False, self.id]),
+            ]).filtered(
+            lambda e: e._within(self.date_from, self.date_to)).employee_id
+        if has_rows:
+            self.write({'employee_ids': [(4, e.id) for e in has_rows]})
+        return skipped
+
+    def action_add_employees(self):
+        """Add Employees…: the Submit to GM dialog, on this sub-batch."""
+        self.ensure_one()
+        self._check_can_prepare(_("Adding employees"))
+        if self.state != 'draft':
+            raise UserError(_(
+                "%(name)s has already been submitted, so nobody can be "
+                "added to it. Start a new sub-batch with its own days and "
+                "reason.", name=self.name))
+        return self.env['ksw.pay.submit.wizard']._open_for(
+            self.submission_id, sub_batch=self)
 
     def _collect_entries(self):
         """Tag every draft row of these employees in the department's month,
@@ -566,14 +653,25 @@ class KswPaySubBatch(models.Model):
         """
         self.ensure_one()
         self._check_can_prepare(_("Importing again"))
-        batch = self.batch_id
-        if not batch.component_id.importer:
+        if not self._importer_batches():
             raise UserError(_(
-                "%(name)s is typed, not imported — correct its rows in "
-                "%(batch)s.", name=self.name, batch=batch.name))
-        return batch.with_context(ksw_pay_importing=True)._import_bas_trips(
-            employees=self.sudo().employee_ids,
-            window=(self.date_from, self.date_to), sub_batch=self)
+                "%(name)s has no imported component — correct its rows in "
+                "their batches.", name=self.name))
+        skipped = self._import_trips(self.sudo().employee_ids)
+        self._collect_entries()
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Imported Again'),
+                'message': '\n'.join(skipped) or _(
+                    "%(name)s: trips imported again for its days.",
+                    name=self.name),
+                'type': 'warning' if skipped else 'success',
+                'sticky': bool(skipped),
+                'next': {'type': 'ir.actions.client', 'tag': 'reload'},
+            },
+        }
 
     def action_open_entries(self):
         self.ensure_one()

@@ -188,31 +188,115 @@ class TestSubBatchLock(SubBatchCommon):
 
 
 class TestSubmitPrompt(SubBatchCommon):
+    """Submit to GM: some employees now (the default), or the whole month.
 
-    def test_20_submit_always_asks(self):
+    KSWCO, Oct 2026: Maintenance and Supply Chain sent one employee early,
+    then pressed Submit to GM, whose default was "every component" — the
+    GM's approval closed October for everybody else in both departments.
+    And Hafiz's three components made three sub-batches: one handover is
+    one sub-batch, whatever it spans.
+    """
+
+    def _early(self, employees, note='Annual leave from the 12th',
+               source=None, send=True, **vals):
+        wizard = self._wizard(source)
+        wizard.write(dict(
+            {'employee_ids': [(6, 0, employees.ids)], 'note': note}, **vals))
+        action = wizard.action_confirm() if send else wizard.action_add()
+        return self.env['ksw.pay.sub.batch'].browse(
+            action['params']['next']['res_id'])
+
+    def test_20_one_sub_batch_across_components_month_stays_open(self):
         wizard = self._wizard()
-        self.assertFalse(wizard.has_open_sub_batch)
-        self.assertEqual(self.submission.state, 'draft')
-        wizard.action_confirm()
-        self.assertEqual(self.submission.state, 'submitted')
-
-    def test_21_an_open_sub_batch_is_offered(self):
-        self._sub_batch(self.emp_a)
-        self.assertTrue(self._wizard().has_open_sub_batch)
-
-    def test_22_only_the_sub_batch(self):
-        sub = self._sub_batch(self.emp_a)
-        wizard = self._wizard()
-        wizard.write({'mode': 'some', 'sub_batch_ids': [(6, 0, sub.ids)]})
-        wizard.action_confirm()
+        self.assertEqual(wizard.mode, 'early')
+        self.assertEqual(wizard.target, 'new')
+        self.assertEqual(wizard.allowed_employee_ids, self.emp_a | self.emp_a2)
+        sub = self._early(self.emp_a)
+        self.assertEqual(self.submission.sub_batch_ids, sub)
+        self.assertFalse(sub.batch_id)
+        self.assertEqual(sub.entry_ids, self.ot_a | self.meal_a)
         self.assertEqual(sub.state, 'submitted')
-        self.assertEqual(self.submission.state, 'draft')
+        self.assertEqual((self.ot_a | self.meal_a).mapped('state'),
+                         ['submitted', 'submitted'])
         self.assertEqual(self.ot_a2.state, 'draft')
+        self.assertEqual(self.ot.state, 'draft')
+        self.assertEqual(self.meals_batch.state, 'draft')
+        self.assertEqual(self.submission.state, 'draft')
 
-    def test_23_the_whole_department(self):
+    def test_21_the_gm_approving_the_early_ones_closes_nothing(self):
+        """The KSWCO incident, the way it should have gone."""
+        sub = self._early(self.emp_a)
+        sub.with_user(self.gm).action_approve()
+        self.assertEqual(self.ot_a.state, 'approved')
+        self.assertEqual(self.submission.state, 'draft')
+        self.assertEqual(self.ot.state, 'draft')
+        self.assertNotIn(self.run.state, ('approved', 'paid'))
+        self._entry(self.ot, self.emp_a2, user=self.sup_a)
+        self._batch(self.sup_a, self.dept_a, component=self.env.ref(
+            'KSW_commissions.pay_component_friday'))
+
+    def test_22_who_reason_and_days_are_required(self):
+        with self.assertRaises(UserError):
+            self._early(self.env['hr.employee'])
+        with self.assertRaises(UserError):
+            self._early(self.emp_a, note='  ')
+        with self.assertRaises(ValidationError):
+            self._early(self.emp_a, date_from='2029-02-20')
+        self.assertFalse(self.submission.sub_batch_ids)
+
+    def test_23_somebody_already_sent_is_not_offered_again(self):
+        self._early(self.emp_a)
+        self.assertEqual(self._wizard().allowed_employee_ids, self.emp_a2)
+
+    def test_24_an_open_sub_batch_is_offered_and_added_to(self):
+        sub = self._early(self.emp_a, send=False)
+        self.assertEqual(sub.state, 'draft')
+        self.assertEqual(self.ot_a.state, 'draft')
+        wizard = self._wizard()
+        self.assertEqual(wizard.target, 'append')
+        self.assertEqual(wizard.sub_batch_id, sub)
+        self.assertEqual(wizard.allowed_employee_ids, self.emp_a2)
+        again = self._early(self.emp_a2, note=False)
+        self.assertEqual(again, sub)
+        self.assertEqual(self.submission.sub_batch_ids, sub)
+        self.assertEqual(sub.state, 'submitted')
+        self.assertEqual(sub.entry_ids, self.ot_a | self.meal_a | self.ot_a2)
+
+    def test_25_a_submitted_sub_batch_takes_nobody_more(self):
+        sub = self._early(self.emp_a)
+        wizard = self._wizard()
+        self.assertEqual(wizard.target, 'new')
+        self.assertFalse(wizard.open_sub_batch_ids)
+        with self.assertRaises(UserError):
+            sub.with_user(self.sup_a).action_add_employees()
+        wizard.write({'target': 'append', 'sub_batch_id': sub.id,
+                      'employee_ids': [(6, 0, self.emp_a2.ids)]})
+        with self.assertRaises(UserError):
+            wizard.action_confirm()
+        # A new one, with its own days and reason.
+        second = self._early(self.emp_a2, note='Resigned')
+        self.assertNotEqual(second, sub)
+        self.assertEqual(second.note, 'Resigned')
+
+    def test_26_a_row_typed_while_it_is_open_joins_it(self):
+        sub = self._early(self.emp_a, send=False)
+        late = self._entry(self.meals_batch, self.emp_a, user=self.sup_a)
+        self.assertEqual(late.x_sub_batch_id, sub)
+        sub.with_user(self.sup_a).action_submit()
+        self.assertEqual(late.state, 'submitted')
+
+    def test_27_add_employees_from_the_sub_batch(self):
+        sub = self._early(self.emp_a, send=False)
+        action = sub.with_user(self.sup_a).action_add_employees()
+        wizard = self.env['ksw.pay.submit.wizard'].with_user(
+            self.sup_a).browse(action['res_id'])
+        self.assertEqual((wizard.target, wizard.sub_batch_id),
+                         ('append', sub))
+
+    def test_28_the_whole_month_is_the_explicit_second_choice(self):
         sub = self._sub_batch(self.emp_a)
         wizard = self._wizard()
-        wizard.mode = 'all'
+        wizard.mode = 'month'
         wizard.action_confirm()
         self.assertEqual(self.submission.state, 'submitted')
         self.assertEqual(sub.state, 'submitted')
@@ -220,117 +304,23 @@ class TestSubmitPrompt(SubBatchCommon):
             set((self.ot_a | self.ot_a2 | self.meal_a).mapped('state')),
             {'submitted'})
 
-
-class TestPickComponents(SubBatchCommon):
-    """From the Monthly Pay Run, the supervisor sends only some components;
-    the others stay open for him."""
-
-    def _send(self, components):
-        wizard = self._wizard(self.run)
-        wizard.write({'mode': 'some',
-                      'component_ids': [(6, 0, components.ids)]})
-        wizard.action_confirm()
-
-    def test_50_only_the_ticked_component_goes(self):
-        wizard = self._wizard(self.run)
-        self.assertEqual(wizard.allowed_component_ids,
-                         self.component | self.meals)
-        self._send(self.component)
-        self.assertEqual(self.ot.state, 'submitted')
-        self.assertTrue(self.ot.handed_over_date)
-        self.assertEqual(self.meals_batch.state, 'draft')
+    def test_29_from_the_monthly_pay_run_too(self):
+        self.assertEqual(self._wizard(self.run).mode, 'early')
+        self._early(self.emp_a2, source=self.run)
+        self.assertEqual(self.ot_a2.state, 'submitted')
+        self.assertEqual(self.ot_a.state, 'draft')
         self.assertEqual(self.submission.state, 'draft')
-        # Meals is still his to type in.
-        self._entry(self.meals_batch, self.emp_a2, user=self.sup_a)
 
-    def test_51_the_gm_has_it_in_front_of_him(self):
-        self._send(self.component)
-        self.submission.invalidate_recordset()
-        self.assertEqual(self.submission.pending_entry_ids,
-                         self.ot_a | self.ot_a2)
-        self.submission.with_user(self.gm).action_approve()
-        self.assertEqual(self.ot.state, 'approved')
-        self.assertEqual(self.meals_batch.state, 'draft')
-        self.assertNotIn(self.run.state, ('approved', 'paid'))
-
-    def test_52_the_last_component_does_not_hand_the_department_over(self):
-        """Only "Every component" says the month is finished: approving a
-        handed-over department can finalise and lock the whole month."""
-        self._send(self.component)
-        self._send(self.meals)
-        self.assertEqual(self.submission.state, 'draft')
-        self.submission.with_user(self.gm).action_approve()
-        self.assertNotIn(self.run.state, ('approved', 'paid'))
-        # New work for the month can still be recorded.
-        self._batch(self.sup_a, self.dept_a, component=self.env.ref(
-            'KSW_commissions.pay_component_friday'))
-
-    def test_53_he_may_take_it_back_before_the_gm_acts(self):
-        self._send(self.component)
-        self.ot.with_user(self.sup_a).action_reset_to_draft()
-        self.assertEqual(self.ot.state, 'draft')
-        self.assertFalse(self.ot.handed_over_date)
-        self.submission.invalidate_recordset()
-        self.assertFalse(self.submission.pending_entry_ids)
-
-    def test_54_returning_one_employee_keeps_the_rest_in_front_of_the_gm(self):
-        self._send(self.component)
-        self._review(self.submission, 'return', self.emp_a,
-                     approve_rest=True)
-        self.assertEqual(self.ot.state, 'draft')
-        self.assertEqual(self.ot_a2.state, 'approved')
-        self.ot_a.with_user(self.sup_a).write({'quantity': 1.0})
-
-    def test_55_nothing_ticked_is_refused(self):
-        wizard = self._wizard(self.run)
-        wizard.mode = 'some'
-        with self.assertRaises(UserError):
-            wizard.action_confirm()
-
-    def test_56_an_empty_batch_no_longer_blocks_the_handover(self):
+    def test_19_an_empty_batch_no_longer_blocks_the_handover(self):
         """KSWCO-shaped: an empty Driver Trips batch beside a filled one."""
         empty = self._batch(self.sup_a, self.dept_a,
                             component=self.env.ref(
                                 'KSW_commissions.pay_component_friday'))
-        self.assertNotIn(empty.component_id,
-                         self._wizard(self.run).allowed_component_ids)
-        self._wizard(self.run).action_confirm()
+        wizard = self._wizard(self.run)
+        wizard.mode = 'month'
+        wizard.action_confirm()
         self.assertEqual(self.submission.state, 'submitted')
         self.assertFalse(empty.exists())
-
-    def test_58_a_batch_submitted_on_its_own_can_still_be_sent(self):
-        """KSWCO shape (Sep 2026, 6 batches): the supervisor pressed the
-        batch's own Submit ("finished typing") and did not hand over the
-        department. That component must still be offered, and sending it
-        puts it in front of the GM."""
-        self.ot.with_user(self.sup_a).action_submit()
-        self.submission.invalidate_recordset()
-        self.assertFalse(self.submission.pending_entry_ids)
-        self.assertIn(self.component,
-                      self._wizard(self.run).allowed_component_ids)
-        self._send(self.component)
-        self.assertTrue(self.ot.handed_over_date)
-        self.submission.invalidate_recordset()
-        self.assertEqual(self.submission.pending_entry_ids,
-                         self.ot_a | self.ot_a2)
-        # And once it is with the GM, it is not offered again.
-        self.assertNotIn(self.component,
-                         self._wizard(self.run).allowed_component_ids)
-
-    def test_57_a_component_already_in_a_sub_batch_is_not_offered(self):
-        """KSWCO-shaped (PB016633): every row went early and was approved.
-        There is nothing to send, and sending it only closed the batch."""
-        sub = self._sub_batch(self.emp_a | self.emp_a2)
-        sub.with_user(self.sup_a).action_submit()
-        sub.with_user(self.gm).action_approve()
-        self.assertEqual(self.ot.state, 'draft')
-        self.assertNotIn(self.component,
-                         self._wizard(self.run).allowed_component_ids)
-        # Sent anyway (RPC): refused, and the batch stays open.
-        with self.assertRaises(UserError):
-            self.ot.with_user(self.sup_a).action_hand_over()
-        self.assertEqual(self.ot.state, 'draft')
-        self._entry(self.ot, self.emp_a, user=self.sup_a)
 
 
 class TestGmPartialReturn(SubBatchCommon):

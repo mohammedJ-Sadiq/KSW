@@ -581,7 +581,7 @@ class KswPaySubmission(models.Model):
         return True
 
     def action_submit_prompt(self):
-        """Submit — asking "every component, or only the ones I tick?"."""
+        """Submit to GM — some employees early, or the whole month?"""
         self._check_mine()
         return self.env['ksw.pay.submit.wizard']._open_for(self)
 

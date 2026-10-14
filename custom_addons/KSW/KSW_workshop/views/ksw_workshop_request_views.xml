@@ -20,7 +20,7 @@
                             class="oe_highlight"
                             groups="KSW_workshop.group_workshop_manager"
                             invisible="state != 'in_progress'"/>
-                    <button name="action_reject" type="object"
+                    <button name="action_open_reject_wizard" type="object"
                             string="Reject"
                             class="btn-danger"
                             groups="KSW_workshop.group_workshop_manager"
@@ -42,6 +42,7 @@
                                  already say, one field is not a section, and this
                                  is the column a requester fills in. -->
                             <field name="employee_id" readonly="1"/>
+                            <field name="x_on_behalf_of_id" invisible="not x_on_behalf_of_id"/>
                             <!-- Imported requests have no chatter, so the form is
                                  the only place their dates can be read. -->
                             <field name="create_date" string="Requested On"
@@ -78,11 +79,13 @@
                                    required="not is_cash_customer"
                                    readonly="state != 'new'"/>
                             <field name="vehicle_id"
+                                   options="{'no_create': True}"
                                    context="{'default_client_id': client_id, 'default_vehicle_type': vehicle_type}"
                                    invisible="is_cash_customer"
                                    required="not is_cash_customer"
                                    readonly="state != 'new'"/>
                             <field name="driver_id"
+                                   options="{'no_create': True}"
                                    invisible="is_cash_customer"
                                    required="not is_cash_customer"
                                    readonly="state != 'new'"/>
@@ -275,6 +278,7 @@
                 <field name="name"/>
                 <field name="create_date" string="Date"/>
                 <field name="employee_id"/>
+                <field name="x_on_behalf_of_id" optional="hide"/>
                 <field name="client_id"/>
                 <field name="vehicle_id"/>
                 <field name="request_type_ids" widget="many2many_tags"
@@ -337,7 +341,7 @@
                 <filter string="Completed" name="filter_completed" domain="[('state', '=', 'completed')]"/>
                 <filter string="Rejected" name="filter_rejected" domain="[('state', '=', 'rejected')]"/>
                 <separator/>
-                <filter string="My Requests" name="filter_mine" domain="[('employee_id.user_id', '=', uid)]"/>
+                <filter string="My Requests" name="filter_mine" domain="['|', ('employee_id.user_id', '=', uid), ('x_on_behalf_of_id', '=', uid)]"/>
                 <filter string="Cash Customer" name="filter_cash_customer" domain="[('is_cash_customer', '=', True)]"/>
                 <separator/>
                 <!-- Period filters. A <separator/> above is required or these
@@ -409,7 +413,8 @@
         <field name="res_model">ksw.workshop.request</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_ksw_workshop_request_search"/>
-        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+        <!-- Including what an assistant raised for me: it is my truck. -->
+        <field name="domain">['|', ('employee_id.user_id', '=', uid), ('x_on_behalf_of_id', '=', uid)]</field>
         <field name="context">{}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

@@ -94,3 +94,12 @@ class TestAuditTrail(TransactionCase):
         self.assertEqual(log.new_value, '12345.0')
         note = self._notes(self.employee)[:1]
         self.assertNotIn('12345', note.body or '')
+
+    def test_unsaved_record_write_not_audited(self):
+        """Users > New: gamification's karma compute writes next_rank_id on
+        the NewId record during onchange; posting on it raised ValueError."""
+        before = self.Log.search_count([])
+        new_user = self.env['res.users'].new({'name': 'Not Saved', 'login': 'ns'})
+        new_user.write({'name': 'Still Not Saved'})
+        self.env['res.users'].onchange({}, [], {'karma': {}, 'next_rank_id': {}})
+        self.assertEqual(self.Log.search_count([]), before)

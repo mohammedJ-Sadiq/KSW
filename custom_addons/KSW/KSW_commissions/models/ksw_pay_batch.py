@@ -1029,23 +1029,14 @@ class KswPayBatch(models.Model):
                         - rows._handed_over()))
 
     def action_send_early(self):
-        """Send Early…: some employees of this component, for some days,
-        to the General Manager now — one dialog, nothing else to press."""
+        """Send Early…: the department's Submit to GM dialog, on its
+        default — some employees now, in one sub-batch across every
+        component, the month staying open."""
         self.ensure_one()
         self._check_editable_batch(_("Sending employees early"))
         self._ensure_submission()
         self.submission_id._check_mine()
-        wizard = self.env['ksw.pay.send.early.wizard'].create({
-            'batch_id': self.id,
-        })
-        return {
-            'type': 'ir.actions.act_window',
-            'name': _('Send Early — %(name)s', name=self.component_id.name),
-            'res_model': wizard._name,
-            'res_id': wizard.id,
-            'view_mode': 'form',
-            'target': 'new',
-        }
+        return self.submission_id.action_submit_prompt()
 
     def action_new_sub_batch(self):
         """The old "Sub-Batch" button's name. A browser tab left open across

@@ -85,6 +85,12 @@ class KswWorkshopRequest(models.Model):
     # employee mirrors (work email, mobile, job title) were form-only and went
     # with the Requester section.
     department_id = fields.Many2one(related='employee_id.department_id', store=True, readonly=True)
+    # Set when a Requester Assistant raises the request: the requester whose
+    # trucks it is for. Written by create()/write() only, never by the client
+    # (see _apply_on_behalf); the requester reads the request through it.
+    x_on_behalf_of_id = fields.Many2one(
+        'res.users', string='On Behalf Of', readonly=True, copy=False, index=True,
+        help='The workshop requester this request was raised for by his assistant.')
 
     # The four original values keep their keys; the rest were added once the
     # 17k imported descriptions showed what the workshop actually does — tyres
@@ -148,9 +154,14 @@ class KswWorkshopRequest(models.Model):
         default=lambda self: self.env.company.partner_id,
     )
     vehicle_type = fields.Selection([
-        ('trailer', 'Trailer'),
+        # The truck head, T###. Called "Trailer" (تريلا) because that is what
+        # the workshop and the supervisors call it (a "Tractor Unit" label was
+        # tried on 2026-10-14 and got mixed up with the tedder within hours).
+        ('trailer', 'Trailer (تريلا)'),
         ('isuzu', 'Isuzu'),
-        ('tank', 'Tank'),
+        # The tanker semi-trailer the head pulls, carrying the 32 m³ tank:
+        # «تيدر 68», the name BAS and the workshop both use.
+        ('tank', 'Tedder (تيدر)'),
         ('other', 'Other'),
     ], string='Vehicle Type', tracking=True)
     # Note: the default-context for this field's quick-create dialog
@@ -451,6 +462,7 @@ class KswWorkshopRequest(models.Model):
                 'KSW_workshop.group_workshop_manager',
                 'KSW_workshop.group_workshop_technician',
                 'KSW_workshop.group_workshop_requester',
+                'KSW_workshop.group_workshop_requester_assistant',
             ))
 
     @api.model
@@ -490,10 +502,45 @@ class KswWorkshopRequest(models.Model):
                 derived = RequestType._match_description(vals.get('description'))
                 vals['request_type_ids'] = [fields.Command.set(derived.ids)]
                 vals['x_request_type_derived'] = True
+        assistant_managers = self._assistant_managers_or_raise()
+        for vals in vals_list:
+            if not self.env.su:
+                vals.pop('x_on_behalf_of_id', None)
+            if assistant_managers:
+                vals['x_on_behalf_of_id'] = self._pick_on_behalf(
+                    assistant_managers, vals.get('vehicle_id')).id
         requests = super().create(vals_list)
         for request in requests:
             request._notify_workshop_managers()
         return requests
+
+    @api.model
+    def _assistant_managers_or_raise(self):
+        """The requesters the current user raises requests for, as assistant.
+
+        Empty for everyone who raises his own (requesters, the workshop,
+        sudo). An assistant who assists nobody cannot raise anything: the
+        role alone is inert, and saying so beats an empty vehicle list.
+        """
+        user = self.env.user
+        if self.env.su or not user.has_group('KSW_workshop.group_workshop_requester_assistant') \
+                or user.has_group('KSW_workshop.group_workshop_requester') \
+                or user.has_group('KSW_workshop.group_workshop_manager'):
+            return self.env['res.users']
+        managers = self.env['res.users'].browse(user._ksw_workshop_assisted_manager_ids())
+        if not managers:
+            raise UserError(_(
+                'You raise workshop requests for your manager, but your manager is not '
+                'a workshop requester and nobody else is named on your user. Ask an '
+                'administrator to set this up.'))
+        return managers
+
+    @api.model
+    def _pick_on_behalf(self, managers, vehicle_id):
+        """Which of the assisted requesters a request is for. Without vehicle
+        scopes (KSW_workshop_tanker) there is nothing to tell them apart by,
+        so it is the assistant's own manager, who comes first."""
+        return managers[:1]
 
     def _check_report_edit_rights(self):
         """May the caller edit this request's repair report right now?
@@ -554,6 +601,16 @@ class KswWorkshopRequest(models.Model):
                     'can change it.'
                 ))
 
+        # Never from the client. When an assistant moves his request to
+        # another truck, it may now be for another of his requesters.
+        if not self.env.su:
+            vals = {k: v for k, v in vals.items() if k != 'x_on_behalf_of_id'}
+        if 'vehicle_id' in vals:
+            assistant_managers = self._assistant_managers_or_raise()
+            if assistant_managers:
+                vals['x_on_behalf_of_id'] = self._pick_on_behalf(
+                    assistant_managers, vals['vehicle_id']).id
+
         # A person choosing the tags ends the derivation, permanently: a
         # correction must not be undone by the next edit to the description.
         if 'request_type_ids' in vals and not deriving:
@@ -597,6 +654,23 @@ class KswWorkshopRequest(models.Model):
             if request.state != 'new':
                 raise UserError(_('Only new requests can be started.'))
         self.write({'state': 'in_progress'})
+
+    def action_open_reject_wizard(self):
+        self._check_manager()
+        self.ensure_one()
+        if self.state != 'new':
+            raise UserError(_('Only new requests can be rejected.'))
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Reject Request'),
+            'res_model': 'ksw.workshop.reject.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_request_id': self.id,
+                'default_rejection_reason': self.rejection_reason,
+            },
+        }
 
     def action_reject(self):
         self._check_manager()

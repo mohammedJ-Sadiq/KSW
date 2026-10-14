@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Where the Requester Assistant role gets its meaning. The role alone
+         is inert unless the user's manager is a requester, so the tab says
+         who he raises requests for right now, or that it is nobody. -->
+    <record id="view_users_form_ksw_workshop_assistant" model="ir.ui.view">
+        <field name="name">res.users.form.ksw.workshop.assistant</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="ksw_workshop_assistant" string="Workshop" groups="base.group_erp_manager">
+                    <div class="alert alert-success" role="status"
+                         invisible="not x_workshop_assists_display">
+                        Raises workshop requests for
+                        <b><field name="x_workshop_assists_display" readonly="1" nolabel="1" class="d-inline"/></b>,
+                        on their vehicles only.
+                    </div>
+                    <group>
+                        <field name="x_workshop_assisted_manager_ids" widget="many2many_tags"
+                               options="{'no_create': True}"
+                               placeholder="Only for requesters this user does not report to..."/>
+                    </group>
+                    <div class="text-muted">
+                        With the <b>Requester Assistant</b> role (Access Rights, KSW Workshop),
+                        this user raises requests for his own manager, if that manager is a
+                        workshop requester, and for anyone listed above. He picks only from
+                        their vehicles and sees only the requests he raised himself.
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

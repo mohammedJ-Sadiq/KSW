@@ -88,6 +88,22 @@
         <field name="sequence">10</field>
     </record>
 
+    <!--
+        Requester Assistant (Oct 2026): someone in a requester's team who
+        raises requests FOR him, because the supervisor is not always the one
+        at the keyboard. Same privilege as Requester, so it is one or the
+        other on the user form. Grants nothing of its own: whose trucks he may
+        book in is decided by res.users._ksw_workshop_assisted_manager_ids
+        (his own manager, plus anyone named on his user form) and applied by
+        KSW_workshop_tanker. No implied Requester: that would give him a scope
+        of his own, which is exactly what he must not have.
+    -->
+    <record id="group_workshop_requester_assistant" model="res.groups">
+        <field name="name">Requester Assistant</field>
+        <field name="privilege_id" ref="privilege_workshop_requests"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="sequence">5</field>
+    </record>
     <!-- ============================================================ -->
     <!-- Layer 3: Record Rules                                         -->
     <!-- ============================================================ -->
@@ -126,6 +142,22 @@
     </record>
 
     <!--
+        A requester reads what his assistants raised for him, and changes none
+        of it: it is the assistant's request (he is Requested By), and only
+        the own-records rule grants write. Read-only rules never take part in
+        a write check, so this cannot widen one.
+    -->
+    <record id="rule_ksw_workshop_request_on_behalf" model="ir.rule">
+        <field name="name">Workshop Request: requester reads requests raised on his behalf</field>
+        <field name="model_id" ref="model_ksw_workshop_request"/>
+        <field name="domain_force">[('x_on_behalf_of_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_workshop_requester'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    <!--
         Spare-part issue lines mirror the three request rules exactly, one
         level down. A line is part of its request: whoever can see the
         request can see what was fitted to it, and nobody else.
@@ -137,6 +169,16 @@
         <field name="groups" eval="[(4, ref('base.group_user'))]"/>
     </record>
 
+    <record id="rule_ksw_workshop_part_line_on_behalf" model="ir.rule">
+        <field name="name">Workshop Part Line: requester reads requests raised on his behalf</field>
+        <field name="model_id" ref="model_ksw_workshop_part_line"/>
+        <field name="domain_force">[('request_id.x_on_behalf_of_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_workshop_requester'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
     <record id="rule_ksw_workshop_part_line_technician" model="ir.rule">
         <field name="name">Workshop Part Line: technician sees in-progress + own assignments</field>
         <field name="model_id" ref="model_ksw_workshop_part_line"/>
