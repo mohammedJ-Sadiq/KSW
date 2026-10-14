@@ -114,3 +114,29 @@ class TestManagersBecomeReviewers(TransactionCase):
         self.migration.migrate(self.env.cr, '19.0.12.3.0')
         self.assertIn(self.manager_group, self.other.group_ids)
         self.assertNotIn(self.reviewer_group, self.other.group_ids)
+
+
+@tagged('post_install', '-at_install')
+class TestReviewerMenu(TransactionCase):
+
+    def _menu_ids(self, groups):
+        user = self.env['res.users'].with_context(no_reset_password=True).create({
+            'name': f'menu_{"_".join(g.split(".")[-1] for g in groups)}',
+            'login': f'menu_{"_".join(g.split(".")[-1] for g in groups)}',
+            'group_ids': [(6, 0, [self.env.ref(g).id for g in ('base.group_user',) + groups])]})
+        menus = self.env['ir.ui.menu'].with_user(user).load_menus(False)
+        return {m['id'] for m in menus.values() if isinstance(m, dict) and 'id' in m}
+
+    def test_reviewer_has_no_my_requests_but_all_requests(self):
+        my = self.env.ref('KSW_workshop.menu_ksw_workshop_my').id
+        all_ = self.env.ref('KSW_workshop.menu_ksw_workshop_all').id
+        reviewer = self._menu_ids(('KSW_workshop.group_workshop_reviewer',))
+        self.assertNotIn(my, reviewer)
+        self.assertIn(all_, reviewer)
+
+    def test_everyone_else_keeps_my_requests(self):
+        my = self.env.ref('KSW_workshop.menu_ksw_workshop_my').id
+        self.assertIn(my, self._menu_ids(()))
+        self.assertIn(my, self._menu_ids(('KSW_workshop.group_workshop_requester',)))
+        self.assertIn(my, self._menu_ids(('KSW_workshop.group_workshop_reviewer',
+                                          'KSW_workshop.group_workshop_requester')))
