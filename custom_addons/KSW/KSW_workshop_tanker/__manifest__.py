@@ -1,6 +1,6 @@
 {
     'name': 'KSW Workshop Tankers',
-    'version': '19.0.1.5.1',
+    'version': '19.0.1.6.0',
     'author': 'Mohammed Albadr',
     'category': 'Human Resources/Fleet',
     'summary': "Workshop vehicle picker follows the supervisor's tanker groups "
@@ -21,6 +21,7 @@ itself when all three are).
     'depends': ['KSW_workshop', 'KSW_water_delivery', 'KSW_commissions'],
     'data': [
         'views/fleet_vehicle_views.xml',
+        'views/hr_employee_views.xml',
         'views/workshop_request_views.xml',
     ],
     'auto_install': True,

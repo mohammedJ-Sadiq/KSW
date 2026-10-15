@@ -126,22 +126,37 @@ class KswFleetVehicle(models.Model):
         employee = user.sudo().employee_id
         if not employee:
             return None
-        return self._workshop_scope_for_employees(employee) or None
+        allowed = self._workshop_scope_for_employees(employee)
+        # Nothing at all is "no narrowing"; but a list an administrator has
+        # edited is his list, even when it was edited down to nothing.
+        if not allowed and not (employee.x_workshop_vehicle_added_ids
+                                or employee.x_workshop_vehicle_removed_ids):
+            return None
+        return allowed
 
     @api.model
-    def _workshop_scope_for_employees(self, employees):
-        """The own-fleet truck ids these supervisors answer for: their tanker
-        groups, and what their reporting lines drive (BAS driver, else the
-        default driver). Shared by the picker and the Supervisor search."""
-        employees = employees.sudo()
-        if not employees:
-            return set()
-        allowed = set(employees.x_water_tanker_group_ids.filtered('active').vehicle_ids.ids)
-        team = self.env['hr.employee'].sudo().search([('id', 'child_of', employees.ids)])
+    def _workshop_auto_scope(self, employee):
+        """The trucks a supervisor gets without any hand edit: his tanker
+        groups, and what his reporting line drives (BAS driver, else the
+        default driver)."""
+        employee = employee.sudo()
+        allowed = set(employee.x_water_tanker_group_ids.filtered('active').vehicle_ids.ids)
+        team = self.env['hr.employee'].sudo().search([('id', 'child_of', employee.id)])
         allowed |= set(self.sudo().search([
             '|', ('x_bas_driver_id', 'in', team.ids),
             '&', ('x_bas_driver_id', '=', False), ('driver_id', 'in', team.ids),
         ]).ids)
+        return allowed
+
+    @api.model
+    def _workshop_scope_for_employees(self, employees):
+        """The own-fleet truck ids these supervisors answer for: the automatic
+        list plus the trucks added by hand, minus the ones removed by hand.
+        Shared by the picker, the Supervisor search and the employee form."""
+        allowed = set()
+        for employee in employees.sudo():
+            scope = self._workshop_auto_scope(employee) | set(employee.x_workshop_vehicle_added_ids.ids)
+            allowed |= scope - set(employee.x_workshop_vehicle_removed_ids.ids)
         return allowed
 
     @api.depends_context('uid')

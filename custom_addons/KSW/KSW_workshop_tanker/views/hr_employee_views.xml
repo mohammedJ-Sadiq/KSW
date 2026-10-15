@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Beside the tanker groups, under the same Employees Administrator gate. -->
+    <record id="view_employee_form_workshop_vehicles" model="ir.ui.view">
+        <field name="name">hr.employee.form.workshop.vehicles</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="KSW_water_delivery.view_employee_form_water_clients"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='x_water_tanker_group_ids']" position="after">
+                <field name="x_workshop_vehicle_ids" widget="many2many_tags"
+                       options="{'no_create': True}"
+                       groups="hr.group_hr_manager"
+                       placeholder="Trucks this supervisor can pick on a workshop request"/>
+                <field name="x_workshop_vehicle_removed_ids" widget="many2many_tags"
+                       readonly="1" groups="hr.group_hr_manager"
+                       invisible="not x_workshop_vehicle_removed_ids"/>
+                <field name="x_workshop_vehicle_added_ids" widget="many2many_tags"
+                       readonly="1" groups="hr.group_hr_manager"
+                       invisible="not x_workshop_vehicle_added_ids"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

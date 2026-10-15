@@ -81,6 +81,36 @@ class TestWorkshopTanker(TransactionCase):
         self.assertNotIn(self.other_truck, by_name)
         self.assertFalse(Vehicle.search([('x_workshop_supervisor_id', 'ilike', 'WST Loner')]))
 
+    def test_admin_swaps_a_supervisors_truck_on_the_employee_form(self):
+        sup = self.supervisor
+        self.assertEqual(sup.x_workshop_vehicle_ids, self.in_group | self.team_truck)
+        # Remove the team truck, give him the outsider's instead.
+        sup.x_workshop_vehicle_ids = self.in_group | self.other_truck
+        self.assertEqual(sup.x_workshop_vehicle_removed_ids, self.team_truck)
+        self.assertEqual(sup.x_workshop_vehicle_added_ids, self.other_truck)
+        picked = self._pickable(self.sup_user)
+        self.assertNotIn(self.team_truck, picked)
+        self.assertIn(self.other_truck, picked)
+        by_search = self.env['ksw.fleet.vehicle'].search(
+            [('x_workshop_supervisor_id', '=', sup.id)])
+        self.assertEqual(by_search, self.in_group | self.other_truck)
+        # A BAS refresh does not undo the edit.
+        self.other_truck.x_bas_driver_id = self.outsider
+        self.team_truck.x_bas_driver_id = self.driver_a
+        self.assertNotIn(self.team_truck, self._pickable(self.sup_user))
+        self.assertIn(self.other_truck, self._pickable(self.sup_user))
+        # Adding the removed truck back clears the removal.
+        sup.invalidate_recordset()
+        sup.x_workshop_vehicle_ids = sup.x_workshop_vehicle_ids | self.team_truck
+        self.assertFalse(sup.x_workshop_vehicle_removed_ids)
+        self.assertIn(self.team_truck, self._pickable(self.sup_user))
+
+    def test_list_edited_down_to_nothing_is_not_the_full_fleet(self):
+        self.supervisor.x_workshop_vehicle_ids = False
+        picked = self._pickable(self.sup_user)
+        self.assertNotIn(self.other_truck, picked)
+        self.assertNotIn(self.in_group, picked)
+
     def test_workshop_manager_and_unscoped_requester_keep_full_list(self):
         for user in (self.mgr_user, self.loner_user):
             self.assertIn(self.other_truck, self._pickable(user))
