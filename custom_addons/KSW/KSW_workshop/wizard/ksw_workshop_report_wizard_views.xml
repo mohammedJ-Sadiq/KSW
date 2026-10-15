@@ -49,10 +49,11 @@
         </field>
     </record>
 
-    <!-- One action per report so each menu opens on its own defaults
-         (period, grouping and scope are set in default_get). -->
+    <!-- The printable report. The interactive reports are list/pivot
+         actions (views/ksw_workshop_report_views.xml); this is for a page to
+         hand someone. -->
     <record id="action_ksw_workshop_report_wizard_date" model="ir.actions.act_window">
-        <field name="name">Repairs by Date</field>
+        <field name="name">Print a Workshop Report</field>
         <field name="res_model">ksw.workshop.report.wizard</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
@@ -67,20 +68,6 @@
         <field name="context">{'default_report_type': 'vehicle'}</field>
     </record>
 
-    <record id="action_ksw_workshop_report_wizard_type" model="ir.actions.act_window">
-        <field name="name">Repairs by Type</field>
-        <field name="res_model">ksw.workshop.report.wizard</field>
-        <field name="view_mode">form</field>
-        <field name="target">new</field>
-        <field name="context">{'default_report_type': 'repair_type'}</field>
-    </record>
 
-    <record id="action_ksw_workshop_report_wizard_part" model="ir.actions.act_window">
-        <field name="name">Spare Part History</field>
-        <field name="res_model">ksw.workshop.report.wizard</field>
-        <field name="view_mode">form</field>
-        <field name="target">new</field>
-        <field name="context">{'default_report_type': 'spare_part'}</field>
-    </record>
 
 </odoo>

@@ -35,18 +35,19 @@ class KswFleetVehicle(models.Model):
             vehicle.workshop_request_count = count_map.get(vehicle.id, 0)
 
     def action_view_workshop_requests(self):
+        """This vehicle's workshop history: the Vehicle History report, by year."""
         self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'name': _('Workshop Visits'),
-            'res_model': 'ksw.workshop.request',
-            'view_mode': 'list,form,pivot,graph',
+        action = self.env['ir.actions.act_window']._for_xml_id(
+            'KSW_workshop.action_ksw_workshop_report_vehicle')
+        action.update({
+            'display_name': _('Workshop Visits — %s', self.display_name),
             'domain': [('vehicle_id', '=', self.id)],
             # no default vehicle_id: the request form derives it from the
             # client/vehicle-type cascade, and forcing it here would fight
             # _compute_vehicle_id.
-            'context': {'search_default_groupby_request_type': 1},
-        }
+            'context': {'group_by': ['create_date:year'], 'create': False},
+        })
+        return action
 
     def action_workshop_history_report(self):
         """Open the Vehicle History report already set to this vehicle."""

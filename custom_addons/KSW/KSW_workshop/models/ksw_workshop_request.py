@@ -189,7 +189,7 @@ class KswWorkshopRequest(models.Model):
     x_cash_driver_name = fields.Char(string='Driver Name (Cash)')
     x_cash_brand = fields.Char(string='Brand (Cash)')
     x_cash_model = fields.Char(string='Model (Cash)')
-    x_cash_year = fields.Integer(string='Year (Cash)')
+    x_cash_year = fields.Integer(string='Year (Cash)', aggregator=None)
 
     description = fields.Text(required=True, tracking=True)
 
@@ -211,12 +211,15 @@ class KswWorkshopRequest(models.Model):
     # store=True so it can be used as a pivot/graph measure — an unstored
     # compute cannot be grouped, sorted or measured. Same reason as
     # helpdesk.ticket.resolution_hours.
-    duration_days = fields.Integer(compute='_compute_duration_days', store=True)
+    # avg, not the default sum: a group header adding up days in the workshop
+    # across 40 jobs is a number nobody can use.
+    duration_days = fields.Integer(compute='_compute_duration_days', store=True, aggregator='avg')
 
     # --- Repair report (workshop technician / manager only) ---
     entry_datetime = fields.Datetime(string='Entry Date/Time')
     exit_datetime = fields.Datetime(string='Exit Date/Time')
-    odometer_reading = fields.Integer(string='Odometer Reading')
+    # max: on a vehicle's group header the highest reading is its latest one.
+    odometer_reading = fields.Integer(string='Odometer Reading', aggregator='max')
     tire_pressure = fields.Char(string='Tire Pressure')
     tire_bolts = fields.Char(string='Tire Bolts')
     work_statement = fields.Text(string='Statement of Required Work')
@@ -281,6 +284,29 @@ class KswWorkshopRequest(models.Model):
         string='Driver Jobs This Year', compute='_compute_history')
     x_vehicle_history_cost = fields.Float(
         string='Spent on This Vehicle', compute='_compute_history')
+
+    # What was done and what was fitted, as one line each, for the report
+    # lists. Unstored display columns: the list is paginated, and searching
+    # goes through the underlying fields (see the search view).
+    x_work_summary = fields.Char(string='Work Done', compute='_compute_report_summaries')
+    x_parts_summary = fields.Char(string='Spare Parts', compute='_compute_report_summaries')
+
+    @api.depends('labor_line_ids.description', 'work_statement',
+                 'part_line_ids.description', 'part_line_ids.quantity', 'repairs_parts')
+    def _compute_report_summaries(self):
+        """Itemised lines when there are any, else the legacy free text.
+
+        Most of the history predates itemised parts and labor: what was done
+        and fitted is written in work_statement / repairs_parts.
+        """
+        for request in self:
+            work = request.labor_line_ids.mapped('description')
+            request.x_work_summary = ' · '.join(work) if work else (request.work_statement or False)
+            parts = [
+                '%s × %g' % (line.description or line.part_id.display_name or '', line.quantity)
+                for line in request.part_line_ids
+            ]
+            request.x_parts_summary = ' · '.join(parts) if parts else (request.repairs_parts or False)
 
     @api.depends('technician_id', 'technician_id.name', 'x_legacy_technician_name')
     def _compute_technician_label(self):

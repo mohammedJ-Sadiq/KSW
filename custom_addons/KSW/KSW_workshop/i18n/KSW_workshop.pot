@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-15 13:13+0000\n"
-"PO-Revision-Date: 2026-10-15 13:13+0000\n"
+"POT-Creation-Date: 2026-10-15 14:05+0000\n"
+"PO-Revision-Date: 2026-10-15 14:05+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -383,6 +383,13 @@ msgid "Cash customer"
 msgstr ""
 
 #. module: KSW_workshop
+#: model_terms:ir.actions.act_window,help:KSW_workshop.action_ksw_workshop_report_date
+msgid ""
+"Change the period from the <b>Request Date</b> filter, or remove it to see "
+"all history."
+msgstr ""
+
+#. module: KSW_workshop
 #. odoo-python
 #: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
 msgid "Choose the vehicle whose history you want."
@@ -455,6 +462,7 @@ msgstr ""
 #. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__completion_date
 #: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__date_basis__completion
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
 msgid "Completion Date"
 msgstr ""
 
@@ -490,6 +498,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.report_workshop_request_rows
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_list_report
 msgid "Cost"
 msgstr ""
 
@@ -538,6 +547,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.report_workshop_request_rows
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_list
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_list_report
 msgid "Date"
 msgstr ""
 
@@ -550,7 +560,14 @@ msgstr ""
 
 #. module: KSW_workshop
 #: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by__day
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_search
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
 msgid "Day"
+msgstr ""
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_list_report
+msgid "Days"
 msgstr ""
 
 #. module: KSW_workshop
@@ -873,7 +890,13 @@ msgstr ""
 
 #. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__issue_date
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_search
 msgid "Issue Date"
+msgstr ""
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_form
+msgid "Issued"
 msgstr ""
 
 #. module: KSW_workshop
@@ -1205,10 +1228,20 @@ msgid "No date"
 msgstr ""
 
 #. module: KSW_workshop
+#: model_terms:ir.actions.act_window,help:KSW_workshop.action_ksw_workshop_report_date
+msgid "No repairs in this period"
+msgstr ""
+
+#. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.report_workshop
 msgid ""
 "No spare part issues are recorded in Odoo for these filters.\n"
 "                                The repair-note mentions below are the history before parts were itemised."
+msgstr ""
+
+#. module: KSW_workshop
+#: model_terms:ir.actions.act_window,help:KSW_workshop.action_ksw_workshop_report_parts
+msgid "No spare parts issued yet"
 msgstr ""
 
 #. module: KSW_workshop
@@ -1225,6 +1258,11 @@ msgstr ""
 #. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.report_workshop
 msgid "No workshop activity matches these filters."
+msgstr ""
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "Not Rejected"
 msgstr ""
 
 #. module: KSW_workshop
@@ -1272,6 +1310,7 @@ msgstr ""
 
 #. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.report_workshop_request_rows
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_list_report
 msgid "Odometer"
 msgstr ""
 
@@ -1382,6 +1421,14 @@ msgid "Parts Issued (top %s by value)"
 msgstr ""
 
 #. module: KSW_workshop
+#: model_terms:ir.actions.act_window,help:KSW_workshop.action_ksw_workshop_report_parts
+msgid ""
+"Parts appear here once they are listed on a repair report. Older repairs\n"
+"               recorded their parts as text: search <b>Work Done / Spare Parts</b> in\n"
+"               Repairs by Date, or open an item and press <b>Repair Notes</b>."
+msgstr ""
+
+#. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
 msgid "Past jobs for this driver, under this client"
 msgstr ""
@@ -1459,6 +1506,16 @@ msgid "Print PDF"
 msgstr ""
 
 #. module: KSW_workshop
+#: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_report_print
+msgid "Print a Report (PDF)"
+msgstr ""
+
+#. module: KSW_workshop
+#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_report_wizard_date
+msgid "Print a Workshop Report"
+msgstr ""
+
+#. module: KSW_workshop
 #: model:ir.model,name:KSW_workshop.model_hr_employee_public
 msgid "Public Employee"
 msgstr ""
@@ -1478,6 +1535,7 @@ msgstr ""
 #: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__quantity
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.report_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_list_report
 msgid "Quantity"
 msgstr ""
 
@@ -1549,6 +1607,11 @@ msgid "Recorded on the Legacy Sheet"
 msgstr ""
 
 #. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_list_report
+msgid "Ref."
+msgstr ""
+
+#. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.report_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.report_workshop_request_rows
 msgid "Reference"
@@ -1581,6 +1644,16 @@ msgid "Rejection Reason"
 msgstr ""
 
 #. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_list_report
+msgid "Repair"
+msgstr ""
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_form
+msgid "Repair Notes"
+msgstr ""
+
+#. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
 msgid "Repair Report"
 msgstr ""
@@ -1607,6 +1680,12 @@ msgstr ""
 
 #. module: KSW_workshop
 #. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_part.py:0
+msgid "Repair notes mentioning “%s”"
+msgstr ""
+
+#. module: KSW_workshop
+#. odoo-python
 #: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
 msgid "Repair notes searched for"
 msgstr ""
@@ -1623,7 +1702,7 @@ msgid "Repairs & Spare Parts"
 msgstr ""
 
 #. module: KSW_workshop
-#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_report_wizard_date
+#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_report_date
 #: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_report_wizard_date
 msgid "Repairs by Date"
 msgstr ""
@@ -1631,7 +1710,7 @@ msgstr ""
 #. module: KSW_workshop
 #. odoo-python
 #: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
-#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_report_wizard_type
+#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_report_type
 #: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_report_wizard_type
 msgid "Repairs by Type"
 msgstr ""
@@ -1664,11 +1743,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_return_wizard__request_id
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.report_workshop_request_rows
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_list_report
 msgid "Request"
 msgstr ""
 
 #. module: KSW_workshop
 #: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__date_basis__request
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
 msgid "Request Date"
 msgstr ""
 
@@ -1820,12 +1901,6 @@ msgid "Spare Part"
 msgstr ""
 
 #. module: KSW_workshop
-#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_report_wizard_part
-#: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_report_wizard_part
-msgid "Spare Part History"
-msgstr ""
-
-#. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_list
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_search
 msgid "Spare Part Items"
@@ -1838,6 +1913,7 @@ msgid "Spare Part — %s"
 msgstr ""
 
 #. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_parts_summary
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.report_workshop_request_rows
 msgid "Spare Parts"
 msgstr ""
@@ -1848,8 +1924,15 @@ msgid "Spare Parts (Listed)"
 msgstr ""
 
 #. module: KSW_workshop
+#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_report_parts
+#: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_report_wizard_part
+msgid "Spare Parts History"
+msgstr ""
+
+#. module: KSW_workshop
 #. odoo-python
 #: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_list_report
 msgid "Spare Parts Issued"
 msgstr ""
 
@@ -1980,6 +2063,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.report_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.report_workshop_request_rows
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_search
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_list_report
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
 msgid "Technician"
 msgstr ""
@@ -2151,6 +2235,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_form
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_list
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_list_report
 msgid "Total"
 msgstr ""
 
@@ -2219,6 +2304,11 @@ msgid "Unit Cost"
 msgstr ""
 
 #. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_list_report
+msgid "Unit Cost (avg)"
+msgstr ""
+
+#. module: KSW_workshop
 #: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_part__x_bas_qty
 msgid "Units behind the BAS average, so Odoo issues weigh in correctly."
 msgstr ""
@@ -2237,6 +2327,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.report_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_list_report
 msgid "Value"
 msgstr ""
 
@@ -2262,6 +2353,7 @@ msgid "Vehicle"
 msgstr ""
 
 #. module: KSW_workshop
+#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_report_vehicle
 #: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_report_wizard_vehicle
 #: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_report_wizard_vehicle
 msgid "Vehicle History"
@@ -2320,6 +2412,11 @@ msgstr ""
 #. module: KSW_workshop
 #: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request__website_message_ids
 msgid "Website communication history"
+msgstr ""
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "Week"
 msgstr ""
 
 #. module: KSW_workshop
@@ -2383,8 +2480,14 @@ msgid ""
 msgstr ""
 
 #. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_work_summary
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.report_workshop_request_rows
 msgid "Work Done"
+msgstr ""
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "Work Done / Spare Parts"
 msgstr ""
 
 #. module: KSW_workshop
@@ -2429,6 +2532,11 @@ msgstr ""
 #. module: KSW_workshop
 #: model:res.groups.privilege,name:KSW_workshop.privilege_workshop_management
 msgid "Workshop Management"
+msgstr ""
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_list_report
+msgid "Workshop Repairs"
 msgstr ""
 
 #. module: KSW_workshop
@@ -2494,11 +2602,15 @@ msgid "Workshop Technicians"
 msgstr ""
 
 #. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_fleet_vehicle.py:0
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_fleet_vehicle__workshop_request_count
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_fleet_vehicle_form_workshop
 msgid "Workshop Visits"
+msgstr ""
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_fleet_vehicle.py:0
+msgid "Workshop Visits — %s"
 msgstr ""
 
 #. module: KSW_workshop
@@ -2608,12 +2720,6 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
 msgid "today"
-msgstr ""
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_fleet_vehicle.py:0
-msgid "vehicle_id"
 msgstr ""
 
 #. module: KSW_workshop

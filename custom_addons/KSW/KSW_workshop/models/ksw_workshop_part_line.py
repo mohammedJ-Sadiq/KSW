@@ -33,6 +33,7 @@ class KswWorkshopPartLine(models.Model):
         help="Copied from the item when the line was added; edit it to note a variant.")
     quantity = fields.Float(default=1.0, required=True)
     unit_cost = fields.Float(
+        aggregator='avg',
         help="Copied from the item when the line was added. It stays put if the item's "
              "cost changes later, so a past repair never restates itself.")
     subtotal = fields.Float(compute='_compute_subtotal', store=True)
@@ -50,6 +51,17 @@ class KswWorkshopPartLine(models.Model):
     client_id = fields.Many2one(related='request_id.client_id', store=True)
     technician_id = fields.Many2one(related='request_id.technician_id', store=True)
     state = fields.Selection(related='request_id.state', store=True)
+
+    def action_open_request(self):
+        """A row in the parts report opens the repair it was fitted on."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'ksw.workshop.request',
+            'res_id': self.request_id.id,
+            'view_mode': 'form',
+            'views': [(False, 'form')],
+        }
 
     @api.onchange('part_id')
     def _onchange_part_id(self):

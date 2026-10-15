@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ================================================================
+         Workshop ▸ Reporting ▸ Reports
+
+         Interactive reports the way SAP's order list (IW39/IW40) and
+         Oracle/JDE's Equipment History work: a grouped list you filter,
+         regroup and expand, with subtotals on every group header, each
+         row opening the repair itself; the pivot alongside, whose cells
+         drill into these same lists. Each menu differs only in its
+         default grouping and period: everything is changeable from the
+         search bar.
+         ================================================================ -->
+
+    <!-- One row per repair, carrying what a person needs to read it
+         without opening it: the vehicle, what was asked, what was done,
+         which parts were fitted, who did it. -->
+    <record id="view_ksw_workshop_request_list_report" model="ir.ui.view">
+        <field name="name">ksw.workshop.request.list.report</field>
+        <field name="model">ksw.workshop.request</field>
+        <field name="priority">30</field>
+        <field name="arch" type="xml">
+            <list string="Workshop Repairs" create="0" groups_limit="200"
+                  decoration-muted="state == 'rejected'" decoration-info="state == 'in_progress'">
+                <field name="create_date" string="Date" options="{'show_time': false}"/>
+                <field name="name" string="Ref."/>
+                <field name="vehicle_id"/>
+                <field name="vehicle_type" optional="hide"/>
+                <field name="client_id" optional="hide"/>
+                <field name="driver_id" optional="hide"/>
+                <field name="employee_id" optional="hide"/>
+                <field name="request_type_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                <field name="description" string="Request"/>
+                <field name="x_work_summary"/>
+                <field name="x_parts_summary"/>
+                <field name="technician_label" string="Technician"/>
+                <field name="odometer_reading" string="Odometer" optional="hide"/>
+                <field name="completion_date" options="{'show_time': false}" optional="hide"/>
+                <field name="duration_days" string="Days" optional="show"/>
+                <field name="total_cost" string="Cost" optional="show" sum="Total"/>
+                <field name="state" widget="badge" optional="show"
+                       decoration-success="state == 'completed'" decoration-info="state == 'in_progress'"
+                       decoration-warning="state in ('new', 'returned')"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- One row per part issued; the row opens the repair it went on. -->
+    <record id="view_ksw_workshop_part_line_list_report" model="ir.ui.view">
+        <field name="name">ksw.workshop.part.line.list.report</field>
+        <field name="model">ksw.workshop.part.line</field>
+        <field name="priority">30</field>
+        <field name="arch" type="xml">
+            <list string="Spare Parts Issued" create="0" groups_limit="200"
+                  action="action_open_request" type="object">
+                <field name="issue_date"/>
+                <field name="request_id" string="Repair"/>
+                <field name="vehicle_id"/>
+                <field name="part_id"/>
+                <field name="description"/>
+                <field name="client_id" optional="hide"/>
+                <field name="technician_id" optional="show"/>
+                <field name="quantity" sum="Quantity"/>
+                <field name="unit_cost" string="Unit Cost (avg)"/>
+                <field name="subtotal" string="Value" sum="Value"/>
+                <field name="state" widget="badge" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Actions                                                           -->
+    <!-- ================================================================ -->
+    <record id="action_ksw_workshop_report_date" model="ir.actions.act_window">
+        <field name="name">Repairs by Date</field>
+        <field name="res_model">ksw.workshop.request</field>
+        <field name="view_mode">list,pivot,graph,form</field>
+        <field name="search_view_id" ref="view_ksw_workshop_request_search"/>
+        <field name="context">{'search_default_filter_request_date': 1, 'search_default_filter_completed': 1, 'search_default_groupby_day': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No repairs in this period</p>
+            <p>Change the period from the <b>Request Date</b> filter, or remove it to see all history.</p>
+        </field>
+    </record>
+
+    <record id="action_ksw_workshop_report_vehicle" model="ir.actions.act_window">
+        <field name="name">Vehicle History</field>
+        <field name="res_model">ksw.workshop.request</field>
+        <field name="view_mode">list,pivot,graph,form</field>
+        <field name="search_view_id" ref="view_ksw_workshop_request_search"/>
+        <!-- Vehicles first, busiest on top, each opening on its years. -->
+        <field name="context">{'search_default_filter_not_rejected': 1, 'search_default_groupby_vehicle': 1, 'search_default_groupby_year': 2}</field>
+    </record>
+
+    <record id="action_ksw_workshop_report_type" model="ir.actions.act_window">
+        <field name="name">Repairs by Type</field>
+        <field name="res_model">ksw.workshop.request</field>
+        <field name="view_mode">list,pivot,graph,form</field>
+        <field name="search_view_id" ref="view_ksw_workshop_request_search"/>
+        <field name="context">{'search_default_filter_completed': 1, 'search_default_groupby_request_type': 1, 'search_default_groupby_month': 2}</field>
+    </record>
+
+    <record id="action_ksw_workshop_report_parts" model="ir.actions.act_window">
+        <field name="name">Spare Parts History</field>
+        <field name="res_model">ksw.workshop.part.line</field>
+        <field name="view_mode">list,pivot,graph</field>
+        <field name="search_view_id" ref="view_ksw_workshop_part_line_search"/>
+        <field name="context">{'search_default_groupby_part': 1, 'search_default_groupby_month': 2}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No spare parts issued yet</p>
+            <p>Parts appear here once they are listed on a repair report. Older repairs
+               recorded their parts as text: search <b>Work Done / Spare Parts</b> in
+               Repairs by Date, or open an item and press <b>Repair Notes</b>.</p>
+        </field>
+    </record>
+
+    <!-- The list and pivot each report opens with; a pivot cell drills into
+         the same list, so the numbers can always be checked row by row. -->
+    <record id="action_ksw_workshop_report_date_list" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_ksw_workshop_request_list_report"/>
+        <field name="act_window_id" ref="action_ksw_workshop_report_date"/>
+    </record>
+    <record id="action_ksw_workshop_report_vehicle_list" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_ksw_workshop_request_list_report"/>
+        <field name="act_window_id" ref="action_ksw_workshop_report_vehicle"/>
+    </record>
+    <record id="action_ksw_workshop_report_type_list" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_ksw_workshop_request_list_report"/>
+        <field name="act_window_id" ref="action_ksw_workshop_report_type"/>
+    </record>
+    <record id="action_ksw_workshop_report_parts_list" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_ksw_workshop_part_line_list_report"/>
+        <field name="act_window_id" ref="action_ksw_workshop_report_parts"/>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Menus                                                             -->
+    <!-- ================================================================ -->
+    <menuitem id="menu_ksw_workshop_report_wizard_date" name="Repairs by Date"
+              parent="menu_ksw_workshop_reports" action="action_ksw_workshop_report_date" sequence="10"
+              groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
+    <menuitem id="menu_ksw_workshop_report_wizard_vehicle" name="Vehicle History"
+              parent="menu_ksw_workshop_reports" action="action_ksw_workshop_report_vehicle" sequence="20"
+              groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
+    <menuitem id="menu_ksw_workshop_report_wizard_type" name="Repairs by Type"
+              parent="menu_ksw_workshop_reports" action="action_ksw_workshop_report_type" sequence="30"
+              groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
+    <menuitem id="menu_ksw_workshop_report_wizard_part" name="Spare Parts History"
+              parent="menu_ksw_workshop_reports" action="action_ksw_workshop_report_parts" sequence="40"
+              groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
+    <!-- The printable version stays, one menu, for a page to hand someone. -->
+    <menuitem id="menu_ksw_workshop_report_print" name="Print a Report (PDF)"
+              parent="menu_ksw_workshop_reports" action="action_ksw_workshop_report_wizard_date" sequence="90"
+              groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
+
+</odoo>

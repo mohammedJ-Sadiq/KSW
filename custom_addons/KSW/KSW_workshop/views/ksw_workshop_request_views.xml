@@ -348,17 +348,27 @@
                 <field name="client_id"/>
                 <field name="vehicle_id"/>
                 <field name="description"/>
+                <!-- What was done and fitted: itemised lines for new repairs,
+                     the free-text notes for the history before them. -->
+                <field name="repairs_parts" string="Work Done / Spare Parts"
+                       filter_domain="['|', '|', '|', ('repairs_parts', 'ilike', self), ('work_statement', 'ilike', self), ('part_line_ids.description', 'ilike', self), ('labor_line_ids.description', 'ilike', self)]"/>
+                <field name="technician_label" string="Technician"/>
                 <filter string="New" name="filter_new" domain="[('state', '=', 'new')]"/>
                 <filter string="Returned" name="filter_returned" domain="[('state', '=', 'returned')]"/>
                 <filter string="In Progress" name="filter_in_progress" domain="[('state', '=', 'in_progress')]"/>
                 <filter string="Completed" name="filter_completed" domain="[('state', '=', 'completed')]"/>
                 <filter string="Rejected" name="filter_rejected" domain="[('state', '=', 'rejected')]"/>
+                <filter string="Not Rejected" name="filter_not_rejected" domain="[('state', '!=', 'rejected')]"/>
                 <separator/>
                 <filter string="My Requests" name="filter_mine" domain="['|', ('employee_id.user_id', '=', uid), ('x_on_behalf_of_id', '=', uid)]"/>
                 <filter string="Cash Customer" name="filter_cash_customer" domain="[('is_cash_customer', '=', True)]"/>
                 <separator/>
                 <!-- Period filters. A <separator/> above is required or these
                      would be OR:ed with the status filters instead of AND:ed. -->
+                <!-- Period pickers (month / quarter / year, several at once). -->
+                <filter string="Request Date" name="filter_request_date" date="create_date" default_period="month"/>
+                <filter string="Completion Date" name="filter_completion_date" date="completion_date"/>
+                <separator/>
                 <filter string="This Month" name="filter_this_month"
                         domain="[('create_date', '&gt;=', context_today().strftime('%Y-%m-01'))]"/>
                 <filter string="This Quarter" name="filter_this_quarter"
@@ -382,6 +392,10 @@
                     <filter string="Department" name="groupby_department" context="{'group_by': 'department_id'}"/>
                     <filter string="Driver" name="groupby_driver" context="{'group_by': 'driver_id'}"/>
                     <separator/>
+                    <filter string="Day" name="groupby_day" domain="[]"
+                            context="{'group_by': 'create_date:day'}"/>
+                    <filter string="Week" name="groupby_week" domain="[]"
+                            context="{'group_by': 'create_date:week'}"/>
                     <filter string="Month" name="groupby_month" domain="[]"
                             context="{'group_by': 'create_date:month'}"/>
                     <filter string="Quarter" name="groupby_quarter" domain="[]"
@@ -507,18 +521,6 @@
          header in the dropdown. -->
     <menuitem id="menu_ksw_workshop_reports" name="Reports"
               parent="menu_ksw_workshop_reporting" sequence="5"
-              groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
-    <menuitem id="menu_ksw_workshop_report_wizard_date" name="Repairs by Date"
-              parent="menu_ksw_workshop_reports" action="action_ksw_workshop_report_wizard_date" sequence="10"
-              groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
-    <menuitem id="menu_ksw_workshop_report_wizard_vehicle" name="Vehicle History"
-              parent="menu_ksw_workshop_reports" action="action_ksw_workshop_report_wizard_vehicle" sequence="20"
-              groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
-    <menuitem id="menu_ksw_workshop_report_wizard_type" name="Repairs by Type"
-              parent="menu_ksw_workshop_reports" action="action_ksw_workshop_report_wizard_type" sequence="30"
-              groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
-    <menuitem id="menu_ksw_workshop_report_wizard_part" name="Spare Part History"
-              parent="menu_ksw_workshop_reports" action="action_ksw_workshop_report_wizard_part" sequence="40"
               groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
 
     <menuitem id="menu_ksw_workshop_analysis" name="Analysis"

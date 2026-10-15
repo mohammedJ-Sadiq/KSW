@@ -1,6 +1,6 @@
 {
     'name': 'KSW - Mobile Layout',
-    'version': '19.0.1.3.0',
+    'version': '19.0.1.3.1',
     'author': 'Mohammed Albadr',
     'summary': 'Phone-only layout for the most-used KSW screens; desktop unchanged',
     'description': """
@@ -41,9 +41,15 @@ Phone layout rules (pattern taken from SAP Fiori / Oracle Redwood / Odoo Enterpr
     'assets': {
         'web.assets_backend': [
             'KSW_mobile_ui/static/src/js/list_renderer_patch.js',
-            'KSW_mobile_ui/static/src/js/pivot_model_patch.js',
             'KSW_mobile_ui/static/src/scss/mobile.scss',
             'KSW_mobile_ui/static/src/xml/list_renderer_mobile.xml',
+        ],
+        # Odoo 19 loads the pivot and graph views lazily (web.assets_backend_lazy),
+        # so a patch importing @web/views/pivot/pivot_model must ship in that
+        # bundle. In web.assets_backend it never applied, and the module loader
+        # logged a missing-dependency error on every page load.
+        'web.assets_backend_lazy': [
+            'KSW_mobile_ui/static/src/js/pivot_model_patch.js',
         ],
     },
     'installable': True,

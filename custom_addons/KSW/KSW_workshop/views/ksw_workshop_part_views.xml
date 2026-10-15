@@ -29,6 +29,14 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
+                    <div class="oe_button_box" name="button_box"
+                         groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager">
+                        <button name="action_view_issues" type="object" class="oe_stat_button" icon="fa-wrench">
+                            <field name="issued_qty" widget="statinfo" string="Issued"/>
+                        </button>
+                        <button name="action_view_note_mentions" type="object" class="oe_stat_button"
+                                icon="fa-file-text-o" string="Repair Notes"/>
+                    </div>
                     <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
                             invisible="active"/>
                     <div class="oe_title">
@@ -144,6 +152,9 @@
                 <field name="vehicle_id"/>
                 <field name="client_id"/>
                 <field name="technician_id"/>
+                <field name="description"/>
+                <filter string="Issue Date" name="filter_issue_date" date="issue_date"/>
+                <separator/>
                 <filter string="This Month" name="filter_this_month"
                         domain="[('issue_date', '&gt;=', context_today().strftime('%Y-%m-01'))]"/>
                 <filter string="This Year" name="filter_this_year"
@@ -154,6 +165,8 @@
                     <filter string="Client" name="groupby_client" context="{'group_by': 'client_id'}"/>
                     <filter string="Technician" name="groupby_technician" context="{'group_by': 'technician_id'}"/>
                     <separator/>
+                    <filter string="Day" name="groupby_day" domain="[]"
+                            context="{'group_by': 'issue_date:day'}"/>
                     <filter string="Month" name="groupby_month" domain="[]"
                             context="{'group_by': 'issue_date:month'}"/>
                     <filter string="Year" name="groupby_year" domain="[]"

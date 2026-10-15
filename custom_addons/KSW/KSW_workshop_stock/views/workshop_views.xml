@@ -111,4 +111,32 @@
         </field>
     </record>
 
+    <!-- Spare Parts History: rows and groups by stock item -->
+    <record id="view_ksw_workshop_part_line_list_report_stock" model="ir.ui.view">
+        <field name="name">ksw.workshop.part.line.list.report.stock</field>
+        <field name="model">ksw.workshop.part.line</field>
+        <field name="inherit_id" ref="KSW_workshop.view_ksw_workshop_part_line_list_report"/>
+        <field name="arch" type="xml">
+            <field name="part_id" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </field>
+            <field name="part_id" position="after">
+                <field name="product_id"/>
+            </field>
+        </field>
+    </record>
+    <record id="view_ksw_workshop_part_line_search_stock" model="ir.ui.view">
+        <field name="name">ksw.workshop.part.line.search.stock</field>
+        <field name="model">ksw.workshop.part.line</field>
+        <field name="inherit_id" ref="KSW_workshop.view_ksw_workshop_part_line_search"/>
+        <field name="arch" type="xml">
+            <field name="part_id" position="after">
+                <field name="product_id"/>
+            </field>
+            <filter name="groupby_part" position="attributes">
+                <attribute name="context">{'group_by': 'product_id'}</attribute>
+            </filter>
+        </field>
+    </record>
+
 </odoo>

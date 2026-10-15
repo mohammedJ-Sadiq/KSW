@@ -1,6 +1,6 @@
 {
     'name': 'KSW Workshop',
-    'version': '19.0.12.13.1',
+    'version': '19.0.12.14.0',
     'summary': 'Workshop service requests: submission, triage, and repair report',
     'description': """
 Workshop Service Requests
@@ -57,6 +57,7 @@ is the lighter thing asked for instead, not a resumption of that design.
         'views/hr_employee_views.xml',
         'views/ksw_workshop_client_views.xml',
         'views/ksw_workshop_part_views.xml',
+        'views/ksw_workshop_report_views.xml',
         'views/ksw_fleet_vehicle_views.xml',
         'views/ksw_fleet_vehicle_menu.xml',
     ],

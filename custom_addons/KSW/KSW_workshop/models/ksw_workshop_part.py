@@ -99,6 +99,28 @@ class KswWorkshopPart(models.Model):
                                            price=f'{value / qty:,.2f}', qty=f'{qty:g}')
             part.price_note = note
 
+    def action_view_issues(self):
+        """Every issue of this item, by month, each row opening its repair."""
+        self.ensure_one()
+        action = self.env['ir.actions.act_window']._for_xml_id(
+            'KSW_workshop.action_ksw_workshop_report_parts')
+        action['domain'] = [('part_id', '=', self.id)]
+        action['context'] = {'group_by': ['issue_date:month']}
+        action['display_name'] = self.display_name
+        return action
+
+    def action_view_note_mentions(self):
+        """Repairs whose notes mention this item — the history before itemised parts."""
+        self.ensure_one()
+        text = self.description or self.name
+        action = self.env['ir.actions.act_window']._for_xml_id(
+            'KSW_workshop.action_ksw_workshop_report_date')
+        action['domain'] = ['|', '|', ('repairs_parts', 'ilike', text),
+                            ('work_statement', 'ilike', text), ('description', 'ilike', text)]
+        action['context'] = {'group_by': ['create_date:year', 'vehicle_id']}
+        action['display_name'] = self.env._('Repair notes mentioning “%s”', text)
+        return action
+
     @api.depends('line_ids.quantity', 'line_ids.subtotal')
     def _compute_issued(self):
         grouped = {
