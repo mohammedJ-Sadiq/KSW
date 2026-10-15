@@ -21,7 +21,8 @@ class TestRequesterGate(TransactionCase):
 
         cls.plain = _user('gate_plain', ('base.group_user',))
         cls.requester = _user('gate_requester', ('base.group_user', 'KSW_workshop.group_workshop_requester'))
-        cls.vehicle = cls.env['ksw.fleet.vehicle'].create({'name': 'GATE1', 'vehicle_type': 'isuzu'})
+        cls.vehicle = cls.env['ksw.fleet.vehicle'].create({'name': 'GATE1', 'vehicle_type': 'isuzu',
+                                                         'driver_id': cls.requester.employee_id.id})
 
     def _vals(self):
         return {'vehicle_type': 'isuzu', 'vehicle_id': self.vehicle.id,

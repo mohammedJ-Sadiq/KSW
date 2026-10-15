@@ -56,16 +56,18 @@ class TestKswWorkshopRequest(TransactionCase):
     def _make_request(self, employee_user=None, **kwargs):
         vehicle = self.env['ksw.fleet.vehicle'].browse(
             kwargs['vehicle_id']) if kwargs.get('vehicle_id') else self.vehicle
-        vals = {
-            'vehicle_id': vehicle.id,
-            'vehicle_type': vehicle.vehicle_type,
-            'driver_id': self.other_employee.id,
-            'description': 'Battery problem',
-        }
-        vals.update(kwargs)
         model = self.env['ksw.workshop.request']
         if employee_user:
             model = model.with_user(employee_user)
+        # A requester may name only his own reporting line as driver.
+        vals = {
+            'vehicle_id': vehicle.id,
+            'vehicle_type': vehicle.vehicle_type,
+            'driver_id': (employee_user.employee_id or self.other_employee).id
+            if employee_user else self.other_employee.id,
+            'description': 'Battery problem',
+        }
+        vals.update(kwargs)
         return model.create(vals)
 
     # ------------------------------------------------------------------
@@ -402,7 +404,7 @@ class TestKswWorkshopRequest(TransactionCase):
             'description': 'Battery problem',
             'vehicle_id': self.vehicle.id,
             'vehicle_type': 'isuzu',
-            'driver_id': self.other_employee.id,
+            'driver_id': self.employee.id,
             'is_cash_customer': True,
             'x_cash_customer_name': 'Should be ignored',
             'x_cash_vehicle_number': '999',

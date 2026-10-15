@@ -396,6 +396,53 @@ class KswWorkshopRequest(models.Model):
                 request.driver_id = request.vehicle_id.driver_id
 
     @api.model
+    def _workshop_driver_ids(self):
+        """None = anyone; otherwise the employee ids the current user may name
+        as a request's driver: his reporting line, himself included. An
+        assistant gets his requesters' lines. No employee is an empty list,
+        never the whole company."""
+        user = self.env.user
+        if self.env.su or user.has_group('base.group_system') \
+                or user.has_group('KSW_workshop.group_workshop_manager'):
+            return None
+        managers = self.env['res.users'].browse(user._ksw_workshop_assisted_manager_ids())
+        if managers:
+            allowed = set()
+            for manager in managers:
+                scope = self.with_user(manager)._workshop_driver_ids()
+                if scope is None:
+                    return None
+                allowed |= scope
+            return allowed
+        employee = user.sudo().employee_id
+        if not employee:
+            return set()
+        Employee = self.env['hr.employee'].sudo().with_context(ksw_workshop_driver_picker=False)
+        return set(Employee.search([('id', 'child_of', employee.id)]).ids)
+
+    def _driver_from_vehicle(self, vehicle):
+        """The driver picking this vehicle fills in, when the fill-in is on.
+        The tanker bridge adds the BAS driver."""
+        return vehicle.sudo().driver_id
+
+    @api.model
+    def _check_driver_allowed(self, driver_id, vehicle_id):
+        if self.env.su or not driver_id:
+            return
+        allowed = self._workshop_driver_ids()
+        if allowed is None or driver_id in allowed:
+            return
+        # The fill-in may name a driver from another team: the truck's own.
+        vehicle = self.env['ksw.fleet.vehicle'].browse(vehicle_id)
+        if vehicle_id and self._driver_follows_vehicle() \
+                and driver_id in self._driver_from_vehicle(vehicle).ids:
+            return
+        raise UserError(_(
+            '%s is not in your team. You can name as driver only yourself and '
+            'the employees who report to you.',
+            self.env['hr.employee'].sudo().browse(driver_id).name))
+
+    @api.model
     def _driver_follows_vehicle(self):
         """Does picking a vehicle fill in its driver? Switched off (Oct 2026):
         the vehicle's recorded driver is not reliably who brings it in, so
@@ -503,6 +550,8 @@ class KswWorkshopRequest(models.Model):
             if not is_manager:
                 vals['employee_id'] = self.env.user.employee_id.id
                 vals['is_cash_customer'] = False
+            if not vals.get('x_imported') and not vals.get('is_cash_customer'):
+                self._check_driver_allowed(vals.get('driver_id'), vals.get('vehicle_id'))
             if not vals.get('name') or vals['name'] == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code('ksw.workshop.request') or 'New'
             # Tags come from the words the requester wrote. An explicit list
@@ -627,6 +676,11 @@ class KswWorkshopRequest(models.Model):
         # correction must not be undone by the next edit to the description.
         if 'request_type_ids' in vals and not deriving:
             vals = dict(vals, x_request_type_derived=False)
+
+        if vals.get('driver_id') and not self.env.su:
+            for request in self.filtered(lambda r: r.driver_id.id != vals['driver_id']):
+                request._check_driver_allowed(
+                    vals['driver_id'], vals.get('vehicle_id', request.vehicle_id.id))
 
         res = super().write(vals)
 

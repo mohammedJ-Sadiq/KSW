@@ -104,8 +104,8 @@ class KswFleetVehicle(models.Model):
 
         A supervisor answers for the trucks in his tanker groups and for the
         trucks his people drive (his whole reporting line, himself included).
-        Someone with neither — and the workshop itself — keeps the full list:
-        narrowing him to nothing would stop him raising any request at all.
+        Someone with neither gets no own-fleet truck until an administrator
+        gives him some; only the workshop itself keeps the full list.
         """
         user = self.env.user
         if self.env.su or user.has_group('base.group_system') \
@@ -123,16 +123,12 @@ class KswFleetVehicle(models.Model):
                     return None
                 allowed |= scope
             return allowed
+        # No trucks of his own is an empty list, never the whole fleet: a
+        # supervisor nobody has set up yet must not see every truck.
         employee = user.sudo().employee_id
         if not employee:
-            return None
-        allowed = self._workshop_scope_for_employees(employee)
-        # Nothing at all is "no narrowing"; but a list an administrator has
-        # edited is his list, even when it was edited down to nothing.
-        if not allowed and not (employee.x_workshop_vehicle_added_ids
-                                or employee.x_workshop_vehicle_removed_ids):
-            return None
-        return allowed
+            return set()
+        return self._workshop_scope_for_employees(employee)
 
     @api.model
     def _workshop_auto_scope(self, employee):

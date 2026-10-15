@@ -49,7 +49,8 @@ class TestWorkshopIssue(TransactionCase):
         plan = cls.env['account.analytic.plan'].create({'name': 'WSS cost centres'})
         cls.cost_centre = cls.env['account.analytic.account'].create({'name': 'ايسوزو 777', 'plan_id': plan.id})
         cls.vehicle = cls.env['ksw.fleet.vehicle'].create({
-            'name': 'IS777', 'vehicle_type': 'isuzu', 'x_analytic_account_id': cls.cost_centre.id})
+            'name': 'IS777', 'vehicle_type': 'isuzu', 'x_analytic_account_id': cls.cost_centre.id,
+            'driver_id': cls.employee.id})
 
     def _repair(self, qty=2.0, vehicle=None):
         vehicle = vehicle or self.vehicle
@@ -93,7 +94,8 @@ class TestWorkshopIssue(TransactionCase):
         self.assertEqual(self.tyre.with_context(location=self.wh.lot_stock_id.id).qty_available, 4.0)
 
     def test_vehicle_without_cost_centre_blocks_completion(self):
-        bare = self.env['ksw.fleet.vehicle'].create({'name': 'IS778', 'vehicle_type': 'isuzu'})
+        bare = self.env['ksw.fleet.vehicle'].create({'name': 'IS778', 'vehicle_type': 'isuzu',
+                                                     'driver_id': self.employee.id})
         request = self._repair(vehicle=bare)
         with self.assertRaises(UserError):
             request.with_user(self.user_manager).action_complete()

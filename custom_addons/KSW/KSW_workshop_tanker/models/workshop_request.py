@@ -44,6 +44,9 @@ class KswWorkshopRequest(models.Model):
             if attached:
                 request.driver_id = attached
 
+    def _driver_from_vehicle(self, vehicle):
+        return super()._driver_from_vehicle(vehicle) | vehicle.sudo().x_attached_driver_id
+
     @api.model
     def _pick_on_behalf(self, managers, vehicle_id):
         """The first assisted requester (own manager first) whose trucks
@@ -89,6 +92,9 @@ class KswWorkshopRequest(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        # Someone who may not raise requests at all is told that, not that the
+        # truck is not his: with no trucks of his own he fails both.
+        self.check_access('create')
         Vehicle = self.env['ksw.fleet.vehicle'].sudo()
         for vals in vals_list:
             vals.pop('x_attached_driver_id', None)

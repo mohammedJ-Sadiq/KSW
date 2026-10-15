@@ -43,7 +43,7 @@ class TestWorkshopLaborLines(TransactionCase):
         })
 
         cls.vehicle = cls.env['ksw.fleet.vehicle'].create({
-            'name': 'WSL-301', 'vehicle_type': 'isuzu',
+            'name': 'WSL-301', 'vehicle_type': 'isuzu', 'driver_id': cls.employee.id,
         })
         cls.external = cls.env.ref('KSW_workshop.technician_external_service_location')
 

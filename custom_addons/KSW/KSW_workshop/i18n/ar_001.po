@@ -1987,3 +1987,11 @@ msgstr "زيت, فلتر, oil change"
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_type_form
 msgid "فرامل, بريك, قماشات, brake"
 msgstr "فرامل, بريك, قماشات, brake"
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid ""
+"%s is not in your team. You can name as driver only yourself and the "
+"employees who report to you."
+msgstr "%s ليس من فريقك. يمكنك اختيار نفسك أو الموظفين التابعين لك فقط كسائق."

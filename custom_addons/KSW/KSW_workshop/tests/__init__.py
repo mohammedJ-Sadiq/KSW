@@ -9,3 +9,4 @@ from . import test_workshop_labor_lines
 from . import test_request_type_tags
 from . import test_keyword_maintenance
 from . import test_reviewer_role
+from . import test_driver_picker

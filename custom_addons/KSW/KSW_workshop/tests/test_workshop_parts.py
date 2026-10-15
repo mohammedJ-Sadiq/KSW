@@ -42,7 +42,7 @@ class TestWorkshopParts(TransactionCase):
         })
 
         cls.vehicle = cls.env['ksw.fleet.vehicle'].create({
-            'name': 'WSP-101', 'vehicle_type': 'isuzu',
+            'name': 'WSP-101', 'vehicle_type': 'isuzu', 'driver_id': cls.employee.id,
         })
         cls.part = cls.env['ksw.workshop.part'].create({
             'name': '90915-YZZD4', 'description': 'Oil filter', 'standard_cost': 25.0,

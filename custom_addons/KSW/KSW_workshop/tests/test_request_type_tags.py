@@ -34,7 +34,7 @@ class TestRequestTypeTags(TransactionCase):
         cls.env['hr.employee'].create({'name': 'WST Manager', 'user_id': cls.user_manager.id})
 
         cls.vehicle = cls.env['ksw.fleet.vehicle'].create({
-            'name': 'WST-401', 'vehicle_type': 'isuzu',
+            'name': 'WST-401', 'vehicle_type': 'isuzu', 'driver_id': cls.employee.id,
         })
         cls.oil = cls.env.ref('KSW_workshop.request_type_oil_filters')
         cls.brakes = cls.env.ref('KSW_workshop.request_type_brakes')

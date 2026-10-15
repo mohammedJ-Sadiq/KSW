@@ -86,6 +86,7 @@
                                    readonly="state != 'new'"/>
                             <field name="driver_id"
                                    options="{'no_create': True}"
+                                   context="{'ksw_workshop_driver_picker': True}"
                                    invisible="is_cash_customer"
                                    required="not is_cash_customer"
                                    readonly="state != 'new'"/>

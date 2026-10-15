@@ -111,9 +111,19 @@ class TestWorkshopTanker(TransactionCase):
         self.assertNotIn(self.other_truck, picked)
         self.assertNotIn(self.in_group, picked)
 
-    def test_workshop_manager_and_unscoped_requester_keep_full_list(self):
-        for user in (self.mgr_user, self.loner_user):
-            self.assertIn(self.other_truck, self._pickable(user))
+    def test_workshop_manager_keeps_full_list(self):
+        self.assertIn(self.other_truck, self._pickable(self.mgr_user))
+
+    def test_unscoped_requester_sees_no_own_truck(self):
+        # No tanker groups, no team, no hand edits: an empty list, not the fleet.
+        picked = self._pickable(self.loner_user)
+        self.assertNotIn(self.other_truck, picked)
+        self.assertNotIn(self.team_truck, picked)
+        self.assertNotIn(self.in_group, picked)
+        with self.assertRaises(UserError):
+            self.env['ksw.workshop.request'].with_user(self.loner_user).create({
+                'vehicle_type': 'isuzu', 'vehicle_id': self.other_truck.id,
+                'description': 'Oil change'})
 
     def test_request_outside_scope_is_refused(self):
         with self.assertRaises(UserError):

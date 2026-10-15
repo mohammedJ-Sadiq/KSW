@@ -1,4 +1,17 @@
 from odoo import api, fields, models
+from odoo.fields import Domain
+
+
+def _driver_picker_domain(records, domain):
+    """The request's Driver picker (context ksw_workshop_driver_picker): only
+    the employees the current user may name as driver. Applied on hr.employee
+    AND hr.employee.public, because a non-HR user's search is answered by the
+    public model (CLAUDE.md gotcha #34)."""
+    if records.env.context.get('ksw_workshop_driver_picker'):
+        allowed = records.env['ksw.workshop.request']._workshop_driver_ids()
+        if allowed is not None:
+            return Domain.AND([domain, [('id', 'in', list(allowed))]])
+    return domain
 
 
 class HrEmployee(models.Model):
@@ -60,3 +73,13 @@ class HrEmployee(models.Model):
         registered = self.env['ksw.workshop.technician'].sudo().search(
             [('employee_id', '!=', False)]).employee_id.ids
         return [('id', 'in' if positive_wanted else 'not in', registered)]
+
+    def _search(self, domain, *args, **kwargs):
+        return super()._search(_driver_picker_domain(self, domain), *args, **kwargs)
+
+
+class HrEmployeePublic(models.Model):
+    _inherit = 'hr.employee.public'
+
+    def _search(self, domain, *args, **kwargs):
+        return super()._search(_driver_picker_domain(self, domain), *args, **kwargs)

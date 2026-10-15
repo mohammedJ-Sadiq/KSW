@@ -27,7 +27,8 @@ class TestReviewerRole(TransactionCase):
         cls.reviewer = _user('rev_reviewer', ('KSW_workshop.group_workshop_reviewer',))
         cls.manager = _user('rev_manager', ('KSW_workshop.group_workshop_manager',))
         cls.requester = _user('rev_requester', ('KSW_workshop.group_workshop_requester',))
-        cls.vehicle = cls.env['ksw.fleet.vehicle'].create({'name': 'REV1', 'vehicle_type': 'isuzu'})
+        cls.vehicle = cls.env['ksw.fleet.vehicle'].create({'name': 'REV1', 'vehicle_type': 'isuzu',
+                                                         'driver_id': cls.requester.employee_id.id})
         cls.request = cls.env['ksw.workshop.request'].with_user(cls.requester).create({
             'vehicle_type': 'isuzu', 'vehicle_id': cls.vehicle.id,
             'driver_id': cls.requester.employee_id.id, 'description': 'Oil change'})
