@@ -6,16 +6,27 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-15 12:11+0000\n"
-"PO-Revision-Date: 2026-07-15 12:11+0000\n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:59+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar_001\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
-"X-Generator: KSW ar-engine v2\n"
+"Plural-Forms: \n"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/hr_payslip.py:0
+msgid " — pulled forward, due %(period)s"
+msgstr " — مقدم، مستحق في %(period)s"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "\"From\" must be on or before \"To\"."
+msgstr "يجب أن يكون \"من\" في تاريخ \"إلى\" أو قبله."
 
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_line__settlement_label
@@ -27,6 +38,117 @@ msgstr ""
 "<date>\" للبنود اليدوية."
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__pct_of_gross
+msgid "% of Gross"
+msgstr "% من الإجمالي"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"%(emp)s already has %(n)d other personal loan(s) in progress, with %(out).2f"
+" still outstanding. This request can still be approved, but the %(role)s "
+"must click '⚠ Accept Concurrent Loan' first so the decision is on record."
+msgstr ""
+"لدى %(emp)s عدد %(n)d قرض شخصي آخر قيد السداد، والمتبقي منها %(out).2f. لا "
+"يزال بالإمكان اعتماد هذا الطلب، لكن يجب على %(role)s الضغط على '⚠ قبول القرض"
+" المتزامن' أولا ليسجل القرار."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"%(emp)s has no other personal loan in progress — there is nothing to accept."
+msgstr "ليس لدى %(emp)s قرض شخصي آخر قيد السداد — لا يوجد ما يقبل."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"%(name)s can no longer be deleted. You may delete your own request only "
+"while it is still waiting for the first approval — afterwards use Cancel, "
+"which keeps a trace of the request."
+msgstr ""
+"لم يعد بالإمكان حذف %(name)s. يمكنك حذف طلبك فقط ما دام بانتظار الاعتماد "
+"الأول — بعد ذلك استخدم الإلغاء، الذي يحتفظ بأثر الطلب."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"%(name)s can no longer be edited. A request can only be changed by the "
+"employee who raised it, and only while it is still waiting for the first "
+"approval."
+msgstr ""
+"لم يعد بالإمكان تعديل %(name)s. لا يمكن تغيير الطلب إلا من الموظف الذي قدمه،"
+" وفقط ما دام بانتظار الاعتماد الأول."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/hr_payslip.py:0
+msgid ""
+"%(type)s [%(ref)s] inst %(n)s/%(total)s — already collected in %(slip)s"
+msgstr ""
+"%(type)s [%(ref)s] القسط %(n)s/%(total)s — تم تحصيله بالفعل في %(slip)s"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"%(type)s deductions are a single installment. A system administrator can "
+"unlock this on the deduction type."
+msgstr ""
+"خصومات %(type)s تكون بقسط واحد. يمكن لمدير النظام إلغاء هذا القيد من نوع "
+"الخصم."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "%(type)s granted — %(n)s installment(s)"
+msgstr "تم منح %(type)s — %(n)s قسط"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"'%(type)s' deductions are handled by the Accounting Data Entry team. Ask an "
+"administrator to grant you Settings → Users → Access Rights → KSW Deductions"
+" → Deduction Management = Accounting Data Entry (Non-Loan)."
+msgstr ""
+"خصومات '%(type)s' يتولاها فريق إدخال بيانات المحاسبة. اطلب من مدير النظام "
+"منحك الإعدادات ← المستخدمون ← صلاحيات الوصول ← خصومات KSW ← إدارة الخصومات ="
+" إدخال بيانات المحاسبة (غير القروض)."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"'%(type)s' deductions are handled by the Officer / Accounting (Loans) team. "
+"Ask an administrator to grant you Settings → Users → Access Rights → KSW "
+"Deductions → Deduction Management = Officer, or Loan Modification = Full."
+msgstr ""
+"خصومات '%(type)s' يتولاها فريق المسؤول / المحاسبة (القروض). اطلب من مدير "
+"النظام منحك الإعدادات ← المستخدمون ← صلاحيات الوصول ← خصومات KSW ← إدارة "
+"الخصومات = مسؤول، أو تعديل القروض = كامل."
+
+#. module: KSW_deduction
+#: model:ir.actions.report,print_report_name:KSW_deduction.action_report_deduction_statement
+msgid ""
+"'Statement of Account - %s - %s' % (object.employee_id.name or '', "
+"object.date_to)"
+msgstr ""
+"'كشف حساب - %s - %s' % (object.employee_id.name or '', object.date_to)"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid ""
+".\n"
+"                            Balances are stated as at"
+msgstr ""
+".\n"
+"                            الأرصدة كما في"
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "<b>At step:</b>"
 msgstr "<b>عند المرحلة:</b>"
@@ -35,6 +157,15 @@ msgstr "<b>عند المرحلة:</b>"
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "<b>Reason:</b>"
 msgstr "<b>السبب:</b>"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
+msgid ""
+"<br/>Later installments keep their original\n"
+"                                amounts and dates."
+msgstr ""
+"<br/>تحتفظ الأقساط اللاحقة بمبالغها\n"
+"                                وتواريخها الأصلية."
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_refuse_wizard_form
@@ -51,6 +182,8 @@ msgid ""
 "<i class=\"fa fa-check-circle me-1\"/>\n"
 "                                <strong>Full payment</strong> — all"
 msgstr ""
+"<i class=\"fa fa-check-circle me-1\"/>\n"
+"                                <strong>سداد كامل</strong> — جميع"
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_request_wizard_form
@@ -62,11 +195,37 @@ msgstr ""
 " aria-label=\"معلومة\"/>"
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_reschedule_wizard_view_form
+msgid ""
+"<i class=\"fa fa-info-circle me-1\" title=\"Info\" role=\"img\" aria-label=\"Info\"/>\n"
+"                        Only the <b>outstanding</b> balance is re-spread.\n"
+"                        Installments already collected stay exactly as they\n"
+"                        are, and the total amount of each deduction does not\n"
+"                        change — this changes the plan, not the debt."
+msgstr ""
+"<i class=\"fa fa-info-circle me-1\" title=\"معلومة\" role=\"img\" aria-label=\"معلومة\"/>\n"
+"                        يعاد توزيع الرصيد <b>المتبقي</b> فقط.\n"
+"                        تبقى الأقساط المحصلة كما هي تماما،\n"
+"                        ولا يتغير المبلغ الإجمالي لأي خصم\n"
+"                        — هذا يغير الخطة، لا الدين."
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 msgid ""
 "<i class=\"fa fa-info-circle me-1\"/>\n"
-"                                <strong>Partial payment</strong> — remaining"
+"                                <strong>Redistribute</strong> — remaining"
 msgstr ""
+"<i class=\"fa fa-info-circle me-1\"/>\n"
+"                                <strong>إعادة التوزيع</strong> — المتبقي"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
+msgid ""
+"<i class=\"fa fa-info-circle me-1\"/>\n"
+"                                <strong>Settle earliest first</strong> —"
+msgstr ""
+"<i class=\"fa fa-info-circle me-1\"/>\n"
+"                                <strong>تسوية الأقدم أولا</strong> —"
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
@@ -80,11 +239,46 @@ msgid ""
 "                                split payments that don't match a scheduled\n"
 "                                installment."
 msgstr ""
+"<i class=\"fa fa-info-circle\" title=\"معلومة\" role=\"img\" aria-label=\"معلومة\"/>\n"
+"                                <b class=\"ms-1\">تلميح</b> — اكتب ملاحظة\n"
+"                                اختيارية في عمود <i>الملاحظة</i>، ثم اضغط\n"
+"                                <b>تحديد كمسدد</b> في الصف لتسجيل\n"
+"                                سداد تم <b>خارج الرواتب</b>.\n"
+"                                استخدم <i>إضافة بند</i> فقط للسداد الجزئي\n"
+"                                أو المجزأ الذي لا يطابق قسطا\n"
+"                                مجدولا."
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_reschedule_wizard_view_form
+msgid ""
+"<i class=\"fa fa-lightbulb-o me-1\" title=\"Tip\" role=\"img\" aria-label=\"Tip\"/>\n"
+"                            A monthly figure is a decision about the\n"
+"                            <b>employee</b>, not about one contract. Leave\n"
+"                            these selected to bring the whole outstanding book\n"
+"                            down to a single monthly total; each deduction\n"
+"                            still keeps its own reference and ledger."
+msgstr ""
+"<i class=\"fa fa-lightbulb-o me-1\" title=\"تلميح\" role=\"img\" aria-label=\"تلميح\"/>\n"
+"                            المبلغ الشهري قرار يخص\n"
+"                            <b>الموظف</b>، لا عقدا بعينه. اترك\n"
+"                            هذه محددة لخفض كامل الرصيد المتبقي\n"
+"                            إلى إجمالي شهري واحد؛ ويحتفظ كل خصم\n"
+"                            بمرجعه وسجله الخاص."
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "<span class=\"mx-1\">/</span>"
 msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid "<span class=\"mx-1\">is still outstanding.</span>"
+msgstr "<span class=\"mx-1\">لا يزال متبقيا.</span>"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid "<span class=\"mx-1\">loan(s) still in progress, of which</span>"
+msgstr "<span class=\"mx-1\">قرض (قروض) قيد السداد، منها</span>"
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
@@ -101,9 +295,88 @@ msgstr ""
 "                            <b>بواسطة:</b>"
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_employee_view_form_inherit_ksw_deduction
+msgid ""
+"<span class=\"o_stat_text\">Statement</span>\n"
+"                        <span class=\"o_stat_text\">of Account</span>"
+msgstr ""
+"<span class=\"o_stat_text\">كشف</span>\n"
+"                        <span class=\"o_stat_text\">الحساب</span>"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "<strong>Deduction Types</strong>"
+msgstr "<strong>أنواع الخصومات</strong>"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_hr_payslip_form_inherit_ksw_deduction_coverage
+msgid ""
+"<strong>Deductions exceed this payslip.</strong>\n"
+"                    The full outstanding amount is shown below for review.\n"
+"                    Only the part marked <em>Collected by This Payslip</em>\n"
+"                    is settled as paid — the rest stays\n"
+"                    <strong>pending</strong> on the deduction schedule and is\n"
+"                    collected by a later payroll run."
+msgstr ""
+"<strong>الخصومات تتجاوز كشف الراتب هذا.</strong>\n"
+"                    يعرض المبلغ المتبقي كاملا أدناه للمراجعة.\n"
+"                    يسوى كمدفوع فقط الجزء المحدد ب <em>المحصل بكشف الراتب هذا</em>\n"
+"                    — ويبقى الباقي\n"
+"                    <strong>معلقا</strong> في جدول الخصم\n"
+"                    ويحصل في دورة رواتب لاحقة."
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "<strong>Department</strong>"
+msgstr "<strong>القسم</strong>"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "<strong>Employee No.</strong>"
+msgstr "<strong>الرقم الوظيفي</strong>"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_payslip_deduction_coverage
+msgid "<strong>Employee total outstanding (all months)</strong>"
+msgstr "<strong>إجمالي المتبقي على الموظف (جميع الأشهر)</strong>"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "<strong>Employee</strong>"
+msgstr "<strong>الموظف</strong>"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "<strong>Job Position</strong>"
+msgstr "<strong>المسمى الوظيفي</strong>"
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "<strong>Loan Approval:</strong>"
 msgstr "<strong>اعتماد القرض:</strong>"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_leave_deduction_picture
+msgid "<strong>Outstanding Loans &amp; Deductions (all months)</strong>"
+msgstr "<strong>القروض والخصومات المتبقية (جميع الأشهر)</strong>"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "<strong>Period</strong>"
+msgstr "<strong>الفترة</strong>"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_leave_view_form_inherit_ksw_deduction_picture
+msgid ""
+"<strong>Possible double charge.</strong>\n"
+"                    Payroll now collects the employee's\n"
+"                    <strong>whole</strong> outstanding balance\n"
+"                    ("
+msgstr ""
+"<strong>احتمال خصم مزدوج.</strong>\n"
+"                    تحصل الرواتب الآن رصيد الموظف\n"
+"                    <strong>المتبقي بالكامل</strong>\n"
+"                    ("
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_refuse_wizard_form
@@ -131,9 +404,48 @@ msgid "<strong>Summary</strong>"
 msgstr "<strong>الملخص</strong>"
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_leave_view_form_inherit_ksw_deduction_picture
+msgid ""
+"<strong>The payslip cannot cover every deduction.</strong>\n"
+"                    The full amount is shown so the employee's position is\n"
+"                    visible, which is why the net may be negative. Only the\n"
+"                    <em>Collected by the Payslip</em> part is settled as paid —\n"
+"                    the rest stays <strong>pending</strong> and is collected by\n"
+"                    a later payroll run."
+msgstr ""
+"<strong>لا يغطي كشف الراتب جميع الخصومات.</strong>\n"
+"                    يعرض المبلغ الكامل لإظهار وضع الموظف،\n"
+"                    ولهذا قد يكون الصافي سالبا. يسوى كمدفوع فقط\n"
+"                    الجزء <em>المحصل بكشف الراتب</em> —\n"
+"                    ويبقى الباقي <strong>معلقا</strong> ويحصل في\n"
+"                    دورة رواتب لاحقة."
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_refuse_wizard_form
 msgid "<strong>You are about to refuse this loan request.</strong>"
 msgstr "<strong>أنت على وشك رفض طلب القرض هذا.</strong>"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid ""
+"<strong>You can still change this request.</strong>\n"
+"                        The amount, installments, start month and\n"
+"                        justification stay editable, and you can delete the\n"
+"                        request entirely, until the first approver acts on\n"
+"                        it. After that, use <b>Cancel</b> — it keeps a trace\n"
+"                        of the request."
+msgstr ""
+"<strong>لا يزال بإمكانك تغيير هذا الطلب.</strong>\n"
+"                        يبقى المبلغ والأقساط وشهر البداية\n"
+"                        والمبرر قابلة للتعديل، ويمكنك حذف\n"
+"                        الطلب كليا، حتى يتخذ المعتمد الأول إجراء\n"
+"                        عليه. بعد ذلك استخدم <b>إلغاء</b> — فهو يحتفظ بأثر\n"
+"                        الطلب."
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid "<strong>⚠️ This employee already has another personal loan</strong>"
+msgstr "<strong>⚠️ لدى هذا الموظف قرض شخصي آخر بالفعل</strong>"
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
@@ -149,6 +461,22 @@ msgid ""
 msgstr ""
 "شرح واضح وموضوعي لسبب رفض طلب القرض هذا. سيكون مرئيا للموظف على نموذج القرض "
 "ومسجلا في سجل المحادثات."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+#: code:addons/KSW_deduction/wizard/loan_refuse_wizard.py:0
+msgid "A refusal reason is required."
+msgstr "سبب الرفض مطلوب."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_reschedule_wizard.py:0
+msgid ""
+"A repayment plan cannot exceed 120 months — you entered %(n)d. Check the "
+"monthly amount."
+msgstr ""
+"لا يمكن أن تتجاوز خطة السداد 120 شهرا — أدخلت %(n)d. تحقق من المبلغ الشهري."
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__acc_approved_by
@@ -171,15 +499,26 @@ msgid "Acc Original Installments"
 msgstr "الأقساط الأصلية (المحاسبة)"
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid "Account"
+msgstr "الحساب"
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_line__manual_by
 msgid "Accountant who recorded this manual payment."
 msgstr "المحاسب الذي سجل هذا الدفع اليدوي."
 
 #. module: KSW_deduction
-#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_type__managed_by__accounting
+#: model:ksw.loan.return.step,name:KSW_deduction.loan_return_step_pending_acc
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
 msgid "Accounting"
 msgstr "المحاسبة"
+
+#. module: KSW_deduction
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_type__managed_by__accounting
+msgid "Accounting (Loans)"
+msgstr "المحاسبة (القروض)"
 
 #. module: KSW_deduction
 #: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_loan_refuse_wizard__step__pending_acc
@@ -190,6 +529,26 @@ msgstr "اعتماد المحاسبة"
 #: model:res.groups,name:KSW_deduction.group_loan_acc
 msgid "Accounting Approver"
 msgstr "معتمد المحاسبة"
+
+#. module: KSW_deduction
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_type__managed_by__acc_data_entry
+msgid "Accounting Data Entry"
+msgstr "مدخل بيانات المحاسبة"
+
+#. module: KSW_deduction
+#: model:res.groups,name:KSW_deduction.group_acc_data_entry
+msgid "Accounting Data Entry (Non-Loan)"
+msgstr "مدخل بيانات المحاسبة (غير القروض)"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"Accounting cannot approve until the checkbox 'Budget confirmed' is ticked in"
+" the Decision Support tab."
+msgstr ""
+"لا يمكن للمحاسبة الاعتماد حتى يتم تحديد خانة 'تأكيد الميزانية' في تبويب دعم "
+"القرار."
 
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_acc_budget_confirmed
@@ -204,6 +563,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_acc_budget_confirmed
 msgid "Accounting: Budget confirmed"
 msgstr "المحاسبة: الموازنة مؤكدة"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_concurrent_ack_acc
+msgid "Accounting: Concurrent loan accepted"
+msgstr "المحاسبة: تم قبول القرض المتزامن"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_vac_balance_days
@@ -239,12 +603,12 @@ msgstr "تفاصيل الخصومات الفعالة"
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_search
 msgid "Active Deductions Only"
-msgstr ""
+msgstr "الخصومات السارية فقط"
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_search
 msgid "Active Portfolio"
-msgstr ""
+msgstr "المحفظة السارية"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__activity_ids
@@ -267,6 +631,17 @@ msgid "Activity Type Icon"
 msgstr "أيقونة نوع النشاط"
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"Adding a manual installment requires either the 'Loan Installment "
+"Modification' privilege or the Accounting Data Entry role. Ask an "
+"administrator to grant the appropriate access on your user."
+msgstr ""
+"إضافة قسط يدوي تتطلب صلاحية 'تعديل أقساط القروض' أو دور إدخال بيانات "
+"المحاسبة. اطلب من مدير النظام منح الصلاحية المناسبة لمستخدمك."
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_request_wizard_form
 msgid "Additional notes, repayment preferences..."
 msgstr "ملاحظات إضافية، تفضيلات السداد..."
@@ -275,6 +650,21 @@ msgstr "ملاحظات إضافية، تفضيلات السداد..."
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Additional notes..."
 msgstr "ملاحظات إضافية..."
+
+#. module: KSW_deduction
+#: model:res.groups,comment:KSW_deduction.group_deduction_manager
+msgid ""
+"Administrator role: full access to every deduction including delete, so the "
+"system stays administrable when the accounting data-entry staff are "
+"unavailable. Loan-specific edit/delete still requires the dedicated \"Loan "
+"Modification\" privilege — Manager does NOT auto-grant it, so an HR/Admin "
+"can be Deduction Manager without being able to touch loan "
+"amount/installments or delete loans."
+msgstr ""
+"صلاحية كاملة على الخصومات غير القرضية بما في ذلك الحذف. يبقى تعديل/حذف "
+"القروض يتطلب صلاحية \"تعديل القرض\" المخصصة — لا يمنحها دور المدير تلقائيا، "
+"فيمكن أن يكون موظف الموارد البشرية / المسؤول مدير خصومات دون القدرة على "
+"تعديل مبلغ/أقساط القرض أو حذف القروض."
 
 #. module: KSW_deduction
 #: model:ir.actions.act_window,name:KSW_deduction.action_ksw_deduction_advances
@@ -288,23 +678,80 @@ msgid "All Deductions"
 msgstr "جميع الخصومات"
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid "All deduction types"
+msgstr "جميع أنواع الخصومات"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_reschedule_wizard.py:0
+msgid "All selected deductions must belong to the same employee."
+msgstr "يجب أن تخص جميع الخصومات المحددة الموظف نفسه."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_employee__x_deduction_outstanding_total
+msgid ""
+"All still-pending installments across every active deduction, regardless of "
+"the month they fall in."
+msgstr "جميع الأقساط المعلقة في كل خصم سار، بغض النظر عن الشهر الذي تقع فيه."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_emp_outstanding_total
+msgid ""
+"All still-pending installments of this employee across every active "
+"deduction, regardless of month."
+msgstr ""
+"جميع الأقساط المعلقة على هذا الموظف في كل خصم سار، بغض النظر عن الشهر."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "All types"
+msgstr "جميع الأنواع"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__allocation_html
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_reschedule_wizard_view_form
+msgid "Allocation"
+msgstr "التخصيص"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__sibling_ids
+msgid "Also reschedule"
+msgstr "إعادة الجدولة أيضا"
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__amount
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__amount
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__amount
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__amount
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__amount
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_kanban
 msgid "Amount"
 msgstr "المبلغ"
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+#: code:addons/KSW_deduction/wizard/loan_request_wizard.py:0
+msgid "Amount must be greater than zero."
+msgstr "يجب أن يكون المبلغ أكبر من صفر."
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_payment_wizard__payment_amount
 msgid "Amount the employee paid outside the payroll cycle."
-msgstr ""
+msgstr "المبلغ الذي سدده الموظف خارج دورة الرواتب."
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Annual Vacation Balance"
 msgstr "رصيد الإجازة السنوية"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__application_mode
+msgid "Application Method"
+msgstr "طريقة التطبيق"
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
@@ -362,12 +809,38 @@ msgid "Attachments"
 msgstr "المرفقات"
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/hr_payslip.py:0
+msgid ""
+"Automatically opened from payslip revision %(revision)s (revision of "
+"%(source)s). Recomputing the period with current data produced a net "
+"%(amount).2f lower than the amount already paid to the employee."
+msgstr ""
+"فتح تلقائيا من تعديل كشف الراتب %(revision)s (تعديل ل %(source)s). أدت إعادة"
+" احتساب الفترة بالبيانات الحالية إلى صاف أقل بمقدار %(amount).2f من المبلغ "
+"المدفوع للموظف بالفعل."
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_request_wizard__employee_id
 msgid ""
 "Automatically set to the current user's employee. A user can only request a "
 "loan for themselves."
 msgstr ""
 "يحدد تلقائيا إلى موظف المستخدم الحالي. لا يمكن للمستخدم طلب قرض إلا لنفسه."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__available_sibling_ids
+msgid "Available Sibling"
+msgstr "الشقيق المتاح"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__balance
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Balance"
+msgstr "الرصيد"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__installment_amount
@@ -431,12 +904,16 @@ msgid ""
 "Can create and submit loan requests for direct subordinates. Scope limited "
 "to own employee + direct reports."
 msgstr ""
+"يمكنه إنشاء وتقديم طلبات القروض للمرؤوسين المباشرين. النطاق مقتصر على الموظف"
+" نفسه والمرؤوسين المباشرين."
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_reschedule_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_refuse_wizard_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_request_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_return_approver_wizard_form
 msgid "Cancel"
 msgstr "إلغاء"
 
@@ -448,6 +925,18 @@ msgid "Cancelled"
 msgstr "ملغي"
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "Cancelled — uncollected balance written off"
+msgstr "ملغى — شطب الرصيد غير المحصل"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Cannot reset to draft: some installments are already paid."
+msgstr "لا يمكن الإعادة إلى مسودة: بعض الأقساط مسددة بالفعل."
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__category
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__category
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_search
@@ -455,9 +944,78 @@ msgid "Category"
 msgstr "الفئة"
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__debit
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_statement_line__row_kind__charge
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Charge"
+msgstr "قيد مدين"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_charge_date
+msgid "Charge Date"
+msgstr "تاريخ القيد"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid "Charged"
+msgstr "المقيد"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Charged during the period"
+msgstr "المقيد خلال الفترة"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid "Close"
+msgstr "إغلاق"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__closing_balance
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_statement_line__row_kind__closing
+msgid "Closing Balance"
+msgstr "الرصيد الختامي"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "Closing balance"
+msgstr "الرصيد الختامي"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid ""
+"Closing balance\n"
+"                                        ("
+msgstr ""
+"الرصيد الختامي\n"
+"                                        ("
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "Closing balance — all types"
+msgstr "الرصيد الختامي — جميع الأنواع"
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__code
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_step__code
 msgid "Code"
 msgstr "رمز"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__credit
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_statement_line__row_kind__credit
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Collected"
+msgstr "المحصل"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__manual_by
@@ -468,6 +1026,27 @@ msgstr "حصل بواسطة"
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__manual_date
 msgid "Collected On"
 msgstr "تاريخ التحصيل"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_payslip__x_ksw_ded_collected
+msgid "Collected by This Payslip"
+msgstr "المحصل بكشف الراتب هذا"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_leave__x_ksw_ded_collected
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_leave_deduction_picture
+msgid "Collected by the Payslip"
+msgstr "المحصل بكشف الراتب"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_payslip_deduction_coverage
+msgid "Collected by this payslip"
+msgstr "المحصل بكشف الراتب هذا"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Collected during the period"
+msgstr "المحصل خلال الفترة"
 
 #. module: KSW_deduction
 #: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_type__category__company_paid
@@ -487,6 +1066,32 @@ msgid "Completed"
 msgstr "مكتمل"
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Completed deductions cannot be cancelled."
+msgstr "لا يمكن إلغاء الخصومات المكتملة."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_concurrent_ack_pending
+msgid "Concurrent Loan Awaiting My Acceptance"
+msgstr "قرض متزامن بانتظار قبولي"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_concurrent_loan_summary
+msgid "Concurrent Loans Breakdown"
+msgstr "تفاصيل القروض المتزامنة"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid "Concurrent Personal Loan"
+msgstr "قرض شخصي متزامن"
+
+#. module: KSW_deduction
+#: model:ir.model,name:KSW_deduction.model_res_config_settings
+msgid "Config Settings"
+msgstr "تهيئة الإعدادات"
+
+#. module: KSW_deduction
 #: model:ir.ui.menu,name:KSW_deduction.menu_ksw_deduction_config
 msgid "Configuration"
 msgstr "التهيئة"
@@ -494,7 +1099,7 @@ msgstr "التهيئة"
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 msgid "Confirm Payment"
-msgstr ""
+msgstr "تأكيد الدفع"
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_refuse_wizard_form
@@ -504,51 +1109,74 @@ msgstr "تأكيد الرفض"
 #. module: KSW_deduction
 #: model:res.groups,comment:KSW_deduction.group_deduction_officer
 msgid ""
-"Create and edit deductions for all employees (loans and non-loan). Implies "
-"\"HR Officer (Non-Loan)\" since the full Officer scope is a superset of it."
+"Create and edit loan deductions for all employees, and read every deduction."
+" Non-loan (Accounting Data Entry) deductions are read-only for this role."
 msgstr "إنشاء وتعديل الخصومات غير القرضية لجميع الموظفين."
 
 #. module: KSW_deduction
-#: model:res.groups,comment:KSW_deduction.group_hr_deduction_officer
+#: model:res.groups,comment:KSW_deduction.group_acc_data_entry
 msgid ""
-"Create and manage HR-managed non-loan deductions (penalties, salary "
-"advances) for all employees. Does NOT grant loan visibility or loan-approval"
-" rights."
+"Create and manage non-loan deductions (penalties, salary advances) for all "
+"employees — the accounting data-entry role. Does NOT grant loan visibility "
+"or loan-approval rights."
 msgstr ""
+"إنشاء وإدارة الخصومات غير القروض (الجزاءات، السلف) لجميع الموظفين — دور "
+"إدخال بيانات المحاسبة. لا يمنح رؤية القروض أو صلاحيات اعتمادها."
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__create_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__create_uid
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__create_uid
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__create_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__create_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__create_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__create_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_step__create_uid
 msgid "Created by"
 msgstr "أنشئ بواسطة"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__create_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__create_date
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__create_date
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__create_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__create_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__create_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__create_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_step__create_date
 msgid "Created on"
 msgstr "أنشئ في"
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__currency_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__currency_id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__currency_id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__currency_id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__currency_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__currency_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__currency_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__currency_id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__currency_id
 msgid "Currency"
 msgstr "العملة"
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__current_state_label
+msgid "Current State Label"
+msgstr "تسمية الحالة الحالية"
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_gross_salary
 msgid "Current contract wage of the employee."
-msgstr ""
+msgstr "الأجر الحالي في عقد الموظف."
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_allow_delete
@@ -564,6 +1192,11 @@ msgstr "يحق للمستخدم الحالي تعديل المبلغ"
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_allow_edit_installments
 msgid "Current user may edit installments"
 msgstr "يحق للمستخدم الحالي تعديل الأقساط"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_return_approver_wizard_form
+msgid "Currently At"
+msgstr "حاليا عند"
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
@@ -582,6 +1215,42 @@ msgid "Dashboard"
 msgstr "لوحة البيانات"
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__date
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Date"
+msgstr "التاريخ"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_writeoff_date
+msgid ""
+"Date the deduction was cancelled and its still-pending installments written "
+"off. Without it a cancelled deduction would carry its unrecovered balance "
+"forever on the statement."
+msgstr ""
+"تاريخ إلغاء الخصم وشطب أقساطه المعلقة. بدونه سيحمل الخصم الملغى رصيده غير "
+"المسترد في كشف الحساب إلى الأبد."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_charge_date
+msgid ""
+"Date the deduction was charged to the employee — i.e. when it went active. "
+"The debit side of the Statement of Account."
+msgstr ""
+"تاريخ قيد الخصم على الموظف — أي تاريخ سريانه. الطرف المدين في كشف الحساب."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_line__x_settlement_date
+msgid ""
+"Date the installment was actually settled: the payslip period end for "
+"payroll-collected lines, the collection date for manual ones. Empty while "
+"the installment is still pending."
+msgstr ""
+"تاريخ التسوية الفعلية للقسط: نهاية فترة كشف الراتب للبنود المحصلة عبر "
+"الرواتب، وتاريخ التحصيل للبنود اليدوية. فارغ ما دام القسط معلقا."
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_line__manual_date
 msgid "Date the manual payment was recorded."
 msgstr "تاريخ تسجيل الدفع اليدوي."
@@ -593,10 +1262,50 @@ msgstr "دعم القرار"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__deduction_id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__deduction_id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__deduction_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__deduction_id
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_list
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_search
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 msgid "Deduction"
 msgstr "الخصم"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"Deduction %(name)s cannot be deleted because %(n)s installment(s) have "
+"already been paid. Cancel it instead."
+msgstr ""
+"لا يمكن حذف الخصم %(name)s لأن %(n)s قسط سدد بالفعل. ألغه بدلا من ذلك."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"Deduction '%(name)s' is a loan managed by Accounting. Manually closing it "
+"requires the 'Loan Installment Modification' privilege, not the Accounting "
+"Data Entry role."
+msgstr ""
+"الخصم '%(name)s' قرض تديره المحاسبة. إغلاقه يدويا يتطلب صلاحية 'تعديل أقساط "
+"القروض'، وليس دور إدخال بيانات المحاسبة."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"Deduction '%(name)s' is a loan managed by Accounting. Modifying its "
+"installments requires the 'Loan Installment Modification' privilege."
+msgstr ""
+"الخصم '%(name)s' قرض تديره المحاسبة. تعديل أقساطه يتطلب صلاحية 'تعديل أقساط "
+"القروض'."
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_payslip_deduction_coverage
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_hr_payslip_form_inherit_ksw_deduction_coverage
+msgid "Deduction Coverage"
+msgstr "تغطية الخصومات"
 
 #. module: KSW_deduction
 #: model:res.groups.privilege,name:KSW_deduction.privilege_deduction_management
@@ -604,14 +1313,39 @@ msgid "Deduction Management"
 msgstr "إدارة الخصومات"
 
 #. module: KSW_deduction
+#: model:ir.model,name:KSW_deduction.model_ksw_deduction_statement_line
+msgid "Deduction Statement Line"
+msgstr "بند كشف حساب الخصومات"
+
+#. module: KSW_deduction
+#: model:ir.model,name:KSW_deduction.model_ksw_deduction_statement_wizard
+msgid "Deduction Statement of Account"
+msgstr "كشف حساب الخصومات"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
 #: model:ir.actions.act_window,name:KSW_deduction.action_ksw_deduction_type
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__type_ids
 #: model:ir.ui.menu,name:KSW_deduction.menu_ksw_deduction_types
 msgid "Deduction Types"
 msgstr "أنواع الخصومات"
 
 #. module: KSW_deduction
-#: model:ir.actions.act_window,name:KSW_deduction.action_ksw_deduction_hr_managed
-#: model:ir.ui.menu,name:KSW_deduction.menu_ksw_deduction_hr_managed
+#: model:ir.model.fields,help:KSW_deduction.field_res_config_settings__ksw_overpay_recovery_type_id
+msgid ""
+"Deduction type used when a payslip revision shows the employee was over-"
+"paid. Confirming such a revision cancels it and opens a draft deduction of "
+"this type for the difference, so the amount is recovered from a later "
+"payroll run instead of a negative net being paid."
+msgstr ""
+"نوع الخصم المستخدم عندما يظهر تعديل كشف الراتب أن الموظف تقاضى أكثر من "
+"المستحق. اعتماد هذا التعديل يلغيه ويفتح خصما مسودة من هذا النوع بالفرق، "
+"ليسترد المبلغ من دورة رواتب لاحقة بدلا من دفع صاف سالب."
+
+#. module: KSW_deduction
+#: model:ir.actions.act_window,name:KSW_deduction.action_ksw_deduction_acc_data_entry
+#: model:ir.ui.menu,name:KSW_deduction.menu_ksw_deduction_acc_data_entry
 #: model:ir.ui.menu,name:KSW_deduction.menu_ksw_deduction_root
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_employee_view_form_inherit_ksw_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_graph
@@ -620,9 +1354,56 @@ msgid "Deductions"
 msgstr "الخصومات"
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/hr_leave.py:0
+msgid "Deductions Due Now — %s"
+msgstr "الخصومات المستحقة الآن — %s"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_payslip__x_ksw_ded_presented
+msgid "Deductions Presented"
+msgstr "الخصومات المعروضة"
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_kanban
 msgid "Deductions This Month"
+msgstr "خصومات هذا الشهر"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Deductions This Month — %s"
+msgstr "خصومات هذا الشهر — %s"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_single_installment
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_type__x_single_installment
+msgid ""
+"Deductions of this type are always one installment: the number of "
+"installments cannot be changed on the deduction or by Reschedule "
+"Installments. Only a system administrator can change this setting."
 msgstr ""
+"خصومات هذا النوع دائما بقسط واحد: لا يمكن تغيير عدد الأقساط في الخصم أو عبر "
+"إعادة جدولة الأقساط. مدير النظام وحده يمكنه تغيير هذا الإعداد."
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_payslip_deduction_coverage
+msgid "Deductions presented on this payslip"
+msgstr "الخصومات المعروضة في كشف الراتب هذا"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_statement_wizard__out_of_scope_count
+msgid ""
+"Deductions this employee has that your access rights do not let you see. "
+"They are excluded from every figure here."
+msgstr ""
+"خصومات على هذا الموظف لا تسمح لك صلاحياتك برؤيتها. وهي مستبعدة من جميع "
+"الأرقام هنا."
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_reschedule_wizard_view_form
+msgid "Deductions to Reschedule"
+msgstr "الخصومات المراد إعادة جدولتها"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__default_installments
@@ -640,6 +1421,15 @@ msgid "Delete only"
 msgstr "حذف فقط"
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"Deleting a manual installment requires the 'Loan Installment Modification' "
+"privilege."
+msgstr "حذف قسط يدوي يتطلب صلاحية 'تعديل أقساط القروض'."
+
+#. module: KSW_deduction
+#: model:ir.model,name:KSW_deduction.model_hr_department
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__department_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__department_id
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_search
@@ -648,10 +1438,20 @@ msgid "Department"
 msgstr "القسم"
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_return_approver_wizard_form
+msgid "Describe what needs to be corrected..."
+msgstr "اشرح ما يجب تصحيحه..."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__description
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__label
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__description
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__description
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_type_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
 msgid "Description"
 msgstr "الوصف"
 
@@ -661,25 +1461,40 @@ msgid "Details"
 msgstr "التفاصيل"
 
 #. module: KSW_deduction
+#: model:ksw.loan.return.step,name:KSW_deduction.loan_return_step_pending_dm
+msgid "Direct Manager"
+msgstr "المدير المباشر"
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__disbursement_confirmed_by
 msgid "Disbursement Confirmed By"
-msgstr ""
+msgstr "أكد الصرف"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__disbursement_confirmed_date
 msgid "Disbursement Confirmed Date"
-msgstr ""
+msgstr "تاريخ تأكيد الصرف"
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_department__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_employee_public__display_name
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_leave__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_payslip__display_name
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_payslip_input__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_ir_ui_menu__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__display_name
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__display_name
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_step__display_name
+#: model:ir.model.fields,field_description:KSW_deduction.field_res_config_settings__display_name
 msgid "Display Name"
 msgstr "اسم العرض"
 
@@ -700,6 +1515,12 @@ msgid "Draft"
 msgstr "مسودة"
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_leave__x_ksw_ded_month_total
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_leave_deduction_picture
+msgid "Due at This Payroll Run"
+msgstr "المستحق في دورة الرواتب هذه"
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_eos_resignation_amount
 msgid "EOS — Resignation (Art. 85)"
 msgstr "نهاية الخدمة — استقالة (المادة 85)"
@@ -708,6 +1529,11 @@ msgstr "نهاية الخدمة — استقالة (المادة 85)"
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_eos_termination_amount
 msgid "EOS — Termination (Art. 84)"
 msgstr "نهاية الخدمة — إنهاء عقد (المادة 84)"
+
+#. module: KSW_deduction
+#: model:ir.model.constraint,message:KSW_deduction.constraint_ksw_loan_return_step_code_uniq
+msgid "Each return step must have a unique code."
+msgstr "يجب أن يكون لكل خطوة إعادة رمز فريد."
 
 #. module: KSW_deduction
 #: model:res.groups,name:KSW_deduction.group_loan_edit_delete
@@ -731,30 +1557,84 @@ msgid "Edit only"
 msgstr "تعديل فقط"
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"Editing installments on non-loan deductions requires the Accounting Data "
+"Entry role or the 'Loan Installment Modification' privilege."
+msgstr ""
+"تعديل الأقساط في الخصومات غير القروض يتطلب دور إدخال بيانات المحاسبة أو "
+"صلاحية 'تعديل أقساط القروض'."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
 #: model:ir.model,name:KSW_deduction.model_hr_employee
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__employee_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__employee_id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__employee_id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__employee_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__employee_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__employee_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__employee_id
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_search
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_reschedule_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_kanban
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_search
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_return_approver_wizard_form
 msgid "Employee"
 msgstr "الموظف"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_leave_view_form_inherit_ksw_deduction_picture
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_leave_deduction_picture
+msgid "Employee Deduction Picture"
+msgstr "الصورة الكاملة لخصومات الموظف"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_has_concurrent_loan
+msgid "Employee Has Another Loan"
+msgstr "لدى الموظف قرض آخر"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_can_employee_edit
+msgid "Employee May Edit"
+msgstr "يمكن للموظف التعديل"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__employee_name
+msgid "Employee Name"
+msgstr "اسم الموظف"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_emp_employee_no
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.view_employee_filter_add_loan_acc_no
 msgid "Employee No."
-msgstr ""
+msgstr "الرقم الوظيفي"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_payslip__x_ksw_ded_outstanding
+msgid "Employee Total Outstanding"
+msgstr "إجمالي المتبقي على الموظف"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Employee deductions — loans, advances and penalties"
+msgstr "خصومات الموظفين — القروض والسلف والجزاءات"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_hr_employee__x_loan_acc_no
-#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_emp_loan_acc_no
 msgid "Employee loan account number in BAS (bank loan/financing system)."
-msgstr ""
+msgstr "رقم حساب قرض الموظف في BAS (نظام القروض/التمويل البنكي)."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_emp_outstanding_total
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_list
+msgid "Employee's Total Outstanding"
+msgstr "إجمالي المتبقي على الموظف"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_emp_monthly_total
@@ -768,10 +1648,39 @@ msgid "End-of-Service (Saudi Art. 84–88)"
 msgstr "مكافأة نهاية الخدمة (المواد 84–88 من نظام العمل)"
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_reschedule_wizard.py:0
+msgid "Enter a number of months (or a monthly amount) greater than zero."
+msgstr "أدخل عدد أشهر (أو مبلغا شهريا) أكبر من صفر."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_reschedule_wizard__plan_by
+msgid ""
+"Enter whichever of the two you decided on — the other is derived and shown "
+"below, so you can check both before confirming."
+msgstr ""
+"أدخل أيا من القيمتين التي قررتها — تشتق الأخرى وتظهر أدناه، لتتحقق من "
+"كلتيهما قبل الاعتماد."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_leave__x_ksw_ded_manual_total
+msgid "Entered by Hand"
+msgstr "مدخل يدويا"
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_request_wizard__installment_amount
 msgid ""
 "Estimated amount deducted each month (loan amount / number of installments)."
 msgstr "المبلغ التقديري المخصوم كل شهر (إجمالي القرض ÷ عدد الأقساط)."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_payslip__x_ksw_ded_outstanding
+msgid ""
+"Every still-pending installment the employee owes across all active "
+"deductions, whatever month it falls in."
+msgstr ""
+"كل قسط معلق مستحق على الموظف في جميع الخصومات السارية، أيا كان الشهر الذي "
+"يقع فيه."
 
 #. module: KSW_deduction
 #: model:res.groups,comment:KSW_deduction.group_installment_edit
@@ -785,6 +1694,15 @@ msgstr ""
 "بنفس الفارق الشهري."
 
 #. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_leave__x_ksw_ded_outstanding
+msgid ""
+"Everything the employee still owes: all pending installments across every "
+"active deduction, whatever month they fall in."
+msgstr ""
+"كل ما لا يزال على الموظف: جميع الأقساط المعلقة في كل خصم سار، أيا كان الشهر "
+"الذي تقع فيه."
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_refuse_wizard_form
 msgid ""
 "Explain clearly why this loan request is being refused. The employee will "
@@ -792,9 +1710,19 @@ msgid ""
 msgstr "وضح بشكل واضح سبب رفض طلب القرض. سيرى الموظف هذا السبب."
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid "Export Excel"
+msgstr "تصدير Excel"
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Financials"
 msgstr "المالية"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__start_month
+msgid "First Installment"
+msgstr "القسط الأول"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_line__period_date
@@ -834,22 +1762,20 @@ msgid ""
 msgstr "ملاحظة حرة للدفعة اليدوية (رقم المرجع، قناة التحصيل، إلخ)."
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__date_from
+msgid "From"
+msgstr "من"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "From the beginning"
+msgstr "من البداية"
+
+#. module: KSW_deduction
 #: model:res.groups,name:KSW_deduction.group_installment_edit
 msgid "Full (incl. active installments)"
 msgstr "تعديل كامل (شامل الأقساط النشطة)"
-
-#. module: KSW_deduction
-#: model:res.groups,comment:KSW_deduction.group_deduction_manager
-msgid ""
-"Full access to non-loan deductions including delete. Loan-specific "
-"edit/delete still requires the dedicated \"Loan Modification\" privilege — "
-"Manager does NOT auto-grant it, so an HR/Admin can be Deduction Manager "
-"without being able to touch loan amount/installments or delete loans."
-msgstr ""
-"صلاحية كاملة على الخصومات غير القرضية بما في ذلك الحذف. يبقى تعديل/حذف "
-"القروض يتطلب صلاحية \"تعديل القرض\" المخصصة — لا يمنحها دور المدير تلقائيا، "
-"فيمكن أن يكون موظف الموارد البشرية / المسؤول مدير خصومات دون القدرة على "
-"تعديل مبلغ/أقساط القرض أو حذف القروض."
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
@@ -858,6 +1784,7 @@ msgstr "المدير العام"
 
 #. module: KSW_deduction
 #: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_loan_refuse_wizard__step__pending_gm
+#: model:ksw.loan.return.step,name:KSW_deduction.loan_return_step_pending_gm
 msgid "GM Final Approval"
 msgstr "الاعتماد النهائي من المدير العام"
 
@@ -865,6 +1792,16 @@ msgstr "الاعتماد النهائي من المدير العام"
 #: model:res.groups,name:KSW_deduction.group_loan_gm
 msgid "GM Final Approver"
 msgstr "معتمد المدير العام النهائي"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_concurrent_ack_gm
+msgid "GM: Concurrent loan accepted"
+msgstr "المدير العام: تم قبول القرض المتزامن"
+
+#. module: KSW_deduction
+#: model:ir.model,name:KSW_deduction.model_ksw_loan_return_approver_wizard
+msgid "GM: Return Loan Request to Approver"
+msgstr "المدير العام: إعادة طلب القرض إلى معتمد سابق"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__gm_approved_by
@@ -893,9 +1830,15 @@ msgstr "غرامة حكومية"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_gross_salary
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__gross_salary
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_kanban
 msgid "Gross Salary"
-msgstr ""
+msgstr "إجمالي الراتب"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__group_by_type
+msgid "Group by Type"
+msgstr "تجميع حسب النوع"
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
@@ -908,19 +1851,22 @@ msgid "HR Approval"
 msgstr "اعتماد الموارد البشرية"
 
 #. module: KSW_deduction
+#: model:ksw.loan.return.step,name:KSW_deduction.loan_return_step_pending_hr
 #: model:res.groups,name:KSW_deduction.group_loan_hr
 msgid "HR Approver"
 msgstr "معتمد الموارد البشرية"
 
 #. module: KSW_deduction
-#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_type__managed_by__hr
-msgid "HR Department"
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"HR cannot approve until the checkbox 'No pending penalties on this employee'"
+" is ticked in the Decision Support tab. If a penalty is pending, create it "
+"first via 'New Penalty'."
 msgstr ""
-
-#. module: KSW_deduction
-#: model:res.groups,name:KSW_deduction.group_hr_deduction_officer
-msgid "HR Officer (Non-Loan)"
-msgstr ""
+"لا يمكن للموارد البشرية الاعتماد حتى يتم تحديد خانة 'لا توجد جزاءات معلقة "
+"على هذا الموظف' في تبويب دعم القرار. إذا كان هناك جزاء معلق، أنشئه أولا عبر "
+"'جزاء جديد'."
 
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_hr_no_penalties_confirmed
@@ -930,6 +1876,11 @@ msgid ""
 msgstr ""
 "يجب على الموارد البشرية تأكيد هذا قبل الاعتماد. إذا كانت هناك غرامة معلقة، "
 "أنشئها أولا عبر زر \"غرامة جديدة\" لتنعكس على بيانات دعم القرار."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_concurrent_ack_hr
+msgid "HR: Concurrent loan accepted"
+msgstr "الموارد البشرية: تم قبول القرض المتزامن"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_hr_no_penalties_confirmed
@@ -942,6 +1893,31 @@ msgid "Has Message"
 msgstr "يحتوي على رسالة"
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__has_siblings
+msgid "Has Siblings"
+msgstr "له أشقاء"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_reschedule_wizard__installments
+msgid "How many monthly installments the remaining balance is spread over."
+msgstr "عدد الأقساط الشهرية التي يوزع عليها الرصيد المتبقي."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_payment_wizard__application_mode
+msgid ""
+"How the payment is applied to the schedule.\n"
+"\n"
+"• Settle earliest installments first: closes the nearest due installments one by one. The installment the payment lands inside is split — the covered part is marked paid and the remainder stays pending in the same month. Later installments keep their original amounts and dates.\n"
+"\n"
+"• Redistribute across remaining installments: records the payment as one manual line and spreads the remaining balance evenly over every pending installment."
+msgstr ""
+"كيفية تطبيق الدفعة على الجدول.\n"
+"\n"
+"• تسوية الأقساط الأقدم أولا: تغلق الأقساط الأقرب استحقاقا واحدا تلو الآخر. ويقسم القسط الذي تقع الدفعة داخله — يحدد الجزء المغطى كمسدد ويبقى الباقي معلقا في الشهر نفسه. تحتفظ الأقساط اللاحقة بمبالغها وتواريخها الأصلية.\n"
+"\n"
+"• إعادة التوزيع على الأقساط المتبقية: تسجل الدفعة كبند يدوي واحد ويوزع الرصيد المتبقي بالتساوي على كل قسط معلق."
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__hr_approved_by
 msgid "Hr Approved By"
 msgstr "اعتمدته الموارد البشرية"
@@ -952,20 +1928,35 @@ msgid "Hr Approved Date"
 msgstr "تاريخ اعتماد الموارد البشرية"
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Human Resources"
+msgstr "الموارد البشرية"
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_vac_balance_breakdown
 msgid "Human-readable per-version daily-rate breakdown."
 msgstr "تفصيل النسب اليومية لكل إصدار بصيغة قابلة للقراءة."
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_department__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_employee__id
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_employee_public__id
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_leave__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_payslip__id
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_payslip_input__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ir_ui_menu__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_step__id
+#: model:ir.model.fields,field_description:KSW_deduction.field_res_config_settings__id
 msgid "ID"
 msgstr "المعرف"
 
@@ -1000,6 +1991,49 @@ msgid "If checked, some messages have a delivery error."
 msgstr "إذا كان محددا، فقد حدث خطأ في تسليم بعض الرسائل."
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_form
+msgid "Installment"
+msgstr "القسط"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "Installment %(label)s"
+msgstr "القسط %(label)s"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"Installment %(label)s has been paid via payslip %(slip)s and cannot be "
+"deleted. Reset the payslip to draft first if you need to undo it."
+msgstr ""
+"القسط %(label)s سدد عبر كشف الراتب %(slip)s ولا يمكن حذفه. أعد كشف الراتب "
+"إلى مسودة أولا إذا أردت التراجع عنه."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"Installment %(label)s is part of the auto-generated schedule. It cannot be "
+"deleted directly — cancel the whole loan or reset it to draft to regenerate "
+"the schedule."
+msgstr ""
+"القسط %(label)s جزء من الجدول المنشأ تلقائيا. لا يمكن حذفه مباشرة — ألغ "
+"القرض كاملا أو أعده إلى مسودة لإعادة إنشاء الجدول."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"Installment %(label)s on loan %(loan)s is '%(state)s' and cannot be "
+"modified. Only pending installments (or manual paid entries) can be "
+"rescheduled or re-valued."
+msgstr ""
+"القسط %(label)s في القرض %(loan)s حالته '%(state)s' ولا يمكن تعديله. يمكن "
+"فقط إعادة جدولة أو إعادة تقييم الأقساط المعلقة (أو قيود السداد اليدوية)."
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__installment_amount
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__installment_amount
 msgid "Installment Amount"
@@ -1017,15 +2051,28 @@ msgstr "الأقساط"
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_pivot
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_search
 msgid "Installment Schedule"
-msgstr ""
+msgstr "جدول الأقساط"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__installments
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__installments
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__installments
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__installments
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Installments"
 msgstr "الأقساط"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__seq_settled_count
+msgid "Installments Fully Settled"
+msgstr "الأقساط مسددة بالكامل"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+#: code:addons/KSW_deduction/wizard/loan_request_wizard.py:0
+msgid "Installments must be at least 1."
+msgstr "يجب ألا يقل عدد الأقساط عن 1."
 
 #. module: KSW_deduction
 #: model:ksw.deduction.type,name:KSW_deduction.type_internal_penalty
@@ -1033,9 +2080,20 @@ msgid "Internal Penalty"
 msgstr "جزاء داخلي"
 
 #. module: KSW_deduction
-#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_emp_employee_no
-msgid "Internal employee number used by HR."
-msgstr ""
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Invalid refusal step."
+msgstr "خطوة رفض غير صالحة."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__is_admin_mode
+msgid "Is Admin Mode"
+msgstr "وضع المسؤول"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__is_balance_row
+msgid "Is Balance Row"
+msgstr "صف رصيد"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__message_is_follower
@@ -1045,7 +2103,12 @@ msgstr "متابع"
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__is_full_payment
 msgid "Is Full Payment"
-msgstr ""
+msgstr "سداد كامل"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Issued by"
+msgstr "أصدره"
 
 #. module: KSW_deduction
 #: model:ir.model,name:KSW_deduction.model_ksw_deduction
@@ -1079,22 +2142,37 @@ msgid "KSW Loan Request (Self-Service)"
 msgstr "طلب سلفة خاصة (خدمة ذاتية)"
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__end_month
+msgid "Last Installment"
+msgstr "القسط الأخير"
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__write_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__write_uid
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__write_uid
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__write_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__write_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__write_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__write_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_step__write_uid
 msgid "Last Updated by"
 msgstr "آخر تحديث بواسطة"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__write_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__write_date
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__write_date
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__write_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__write_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__write_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__write_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_step__write_date
 msgid "Last Updated on"
 msgstr "آخر تحديث في"
 
@@ -1104,9 +2182,26 @@ msgid "Last Wage"
 msgstr "آخر راتب"
 
 #. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_statement_wizard__type_ids
+msgid ""
+"Leave empty for every type. Pick one to state a single account — a loan, the"
+" penalties, the salary advances."
+msgstr ""
+"اتركه فارغا لجميع الأنواع. اختر نوعا لعرض حساب واحد — قرض، أو الجزاءات، أو "
+"السلف."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_statement_wizard__date_from
+msgid ""
+"Leave empty to start from the very first movement. When set, everything "
+"before it is folded into the opening balance."
+msgstr ""
+"اتركه فارغا للبدء من أول حركة. عند تحديده، يضم كل ما قبله إلى الرصيد "
+"الافتتاحي."
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_kanban
-#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 msgid "Loan"
 msgstr "القرض"
 
@@ -1119,13 +2214,13 @@ msgstr "قرض (اعتماد بخمس خطوات)"
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_emp_loan_acc_no
 msgid "Loan Acc No. in BAS"
-msgstr ""
+msgstr "رقم حساب القرض في BAS"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_employee__x_loan_acc_no
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.view_employee_filter_add_loan_acc_no
 msgid "Loan Acc No. in Bas"
-msgstr ""
+msgstr "رقم حساب القرض في BAS"
 
 #. module: KSW_deduction
 #: model:res.groups.privilege,name:KSW_deduction.privilege_loan_approval
@@ -1148,9 +2243,28 @@ msgid "Loan Modification"
 msgstr "تعديل طلب القرض (قبل التأكيد)"
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/loan_refuse_wizard.py:0
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__deduction_id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__deduction_id
 msgid "Loan Request"
 msgstr "طلب قرض"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/loan_request_wizard.py:0
+msgid "Loan Request #%s"
+msgstr "طلب القرض رقم %s"
+
+#. module: KSW_deduction
+#: model:ir.model,name:KSW_deduction.model_ksw_loan_return_step
+msgid "Loan Request Return Target"
+msgstr "جهة إعادة طلب القرض"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_return_approver_wizard_form
+msgid "Loan Summary"
+msgstr "ملخص القرض"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__type_id
@@ -1158,11 +2272,39 @@ msgid "Loan Type"
 msgstr "نوع القرض"
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Loan is not in Pending Disbursement state."
+msgstr "القرض ليس في حالة بانتظار الصرف."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"Loan terms (amount, installments, start month) cannot be changed once the "
+"loan is pending disbursement."
+msgstr ""
+"لا يمكن تغيير شروط القرض (المبلغ، الأقساط، شهر البداية) بعد أن يصبح بانتظار "
+"الصرف."
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_request_wizard__type_id
 msgid "Loan-category deduction type. Non-loan types are hidden."
 msgstr "نوع خصم من فئة القروض. الأنواع غير القرضية مخفية."
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"Loan-type deductions can only be created by Accounting Approvers, Deduction "
+"Officers, or Supervisors."
+msgstr ""
+"لا يمكن إنشاء خصومات من نوع القرض إلا من المعتمدين المحاسبيين أو مسؤولي "
+"الخصومات أو المشرفين."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ir_ui_menu.py:0
 #: model:ir.actions.act_window,name:KSW_deduction.action_ksw_deduction_loans
 #: model:ir.ui.menu,name:KSW_deduction.menu_ksw_deduction_loans
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_employee_view_form_inherit_ksw_deduction
@@ -1171,22 +2313,33 @@ msgid "Loans"
 msgstr "السلف الخاصة"
 
 #. module: KSW_deduction
+#: model_terms:ir.actions.act_window,help:KSW_deduction.action_ksw_my_deductions
+msgid ""
+"Loans, salary advances and penalties recorded against you\n"
+"                appear here, with the installment schedule of each."
+msgstr ""
+"تظهر هنا القروض والسلف والجزاءات المسجلة عليك،\n"
+"                مع جدول أقساط كل منها."
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_line__payroll_priority
 msgid ""
 "Lower is collected first when salary is insufficient (used to order "
 "deduction collection at payroll time)."
 msgstr ""
+"الأقل يحصل أولا عندما لا يكفي الراتب (يستخدم لترتيب تحصيل الخصومات وقت "
+"الرواتب)."
 
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__payroll_priority
 msgid "Lower is collected first when salary is insufficient."
-msgstr ""
+msgstr "الأقل يحصل أولا عندما لا يكفي الراتب."
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__managed_by
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__managed_by
 msgid "Managed By"
-msgstr ""
+msgstr "تديره"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__manager_id
@@ -1207,7 +2360,23 @@ msgstr "إدخال يدوي"
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_search
 msgid "Manual Payments"
+msgstr "السداد اليدوي"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid "Manual by %(u)s%(d)s"
+msgstr "يدوي بواسطة %(u)s%(d)s"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"Manual installment entries cannot be linked to a payslip — they represent "
+"payments collected outside the payroll system."
 msgstr ""
+"لا يمكن ربط قيود الأقساط اليدوية بكشف راتب — فهي تمثل مبالغ حصلت خارج نظام "
+"الرواتب."
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
@@ -1217,7 +2386,12 @@ msgstr "تسجيل السداد"
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Mark this installment as settled outside payroll"
-msgstr ""
+msgstr "تحديد هذا القسط كمسوى خارج الرواتب"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_return_step__code
+msgid "Matches the ksw.deduction.approval_state value this step returns to."
+msgstr "يطابق قيمة ksw.deduction.approval_state التي تعود إليها هذه الخطوة."
 
 #. module: KSW_deduction
 #: model:res.groups,comment:KSW_deduction.group_loan_delete
@@ -1248,6 +2422,12 @@ msgid "Message Delivery error"
 msgstr "خطأ في تسليم الرسائل"
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__reason
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_return_approver_wizard_form
+msgid "Message to Approver"
+msgstr "رسالة إلى المعتمد"
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__message_ids
 msgid "Messages"
 msgstr "الرسائل"
@@ -1263,6 +2443,7 @@ msgstr ""
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__month
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_list
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_search
 msgid "Month"
@@ -1289,6 +2470,26 @@ msgid "Month number (1-12)"
 msgstr "رقم الشهر (1-12)"
 
 #. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_payment_wizard__seq_partial_label
+msgid "Month of the installment the payment lands inside, if any."
+msgstr "شهر القسط الذي تقع الدفعة داخله، إن وجد."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_reschedule_wizard__start_month
+msgid ""
+"Month the new plan starts. Any day is accepted — only the month is used. A "
+"month already in the past is still collected by the next payslip, so "
+"backdating is harmless."
+msgstr ""
+"الشهر الذي تبدأ فيه الخطة الجديدة. يقبل أي يوم — يستخدم الشهر فقط. الشهر "
+"الماضي يحصل أيضا في كشف الراتب التالي، لذا لا ضرر من التاريخ بأثر رجعي."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__target_monthly
+msgid "Monthly Amount"
+msgstr "المبلغ الشهري"
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_employee__x_deduction_monthly_total
 msgid "Monthly Deduction Total"
 msgstr "إجمالي الخصم الشهري"
@@ -1299,9 +2500,41 @@ msgid "Monthly Impact (other)"
 msgstr "الأثر الشهري (أخرى)"
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__monthly_total
+msgid "Monthly Total"
+msgstr "الإجمالي الشهري"
+
+#. module: KSW_deduction
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_reschedule_wizard__plan_by__monthly
+msgid "Monthly amount"
+msgstr "المبلغ الشهري"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__effective_installments
+msgid "Months"
+msgstr "شهور"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__movement_count
+msgid "Movement Count"
+msgstr "عدد الحركات"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Movements"
+msgstr "الحركات"
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__my_activity_date_deadline
 msgid "My Activity Deadline"
 msgstr "الموعد النهائي لنشاطاتي"
+
+#. module: KSW_deduction
+#: model:ir.actions.act_window,name:KSW_deduction.action_ksw_my_deductions
+#: model:ir.ui.menu,name:KSW_deduction.menu_ksw_my_deductions
+msgid "My Deductions"
+msgstr "خصوماتي"
 
 #. module: KSW_deduction
 #: model:ir.actions.act_window,name:KSW_deduction.action_ksw_my_loans
@@ -1317,13 +2550,30 @@ msgstr "طلبات بانتظار اعتمادي"
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__name
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__name
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_step__name
 msgid "Name"
 msgstr "الاسم"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__new_installment_amount
 msgid "New Amount / Installment"
-msgstr ""
+msgstr "المبلغ الجديد / القسط"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "New Penalty for %s"
+msgstr "جزاء جديد ل %s"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_reschedule_wizard_view_form
+msgid "New Plan"
+msgstr "الخطة الجديدة"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
+msgid "New Statement"
+msgstr "كشف حساب جديد"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__activity_calendar_event_id
@@ -1346,9 +2596,80 @@ msgid "Next Activity Type"
 msgstr "نوع النشاط التالي"
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"No General Manager is set for %(dept)s, so this step cannot be approved. Ask"
+" HR to set the department's General Manager."
+msgstr ""
+"لم يحدد مدير عام ل %(dept)s، لذا لا يمكن اعتماد هذه الخطوة. اطلب من الموارد "
+"البشرية تحديد المدير العام للإدارة."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/loan_refuse_wizard.py:0
+msgid "No loan request selected."
+msgstr "لم يحدد طلب قرض."
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid ""
+"No movements in this period. The opening and closing\n"
+"                        balances still tell you where the account stands."
+msgstr ""
+"لا توجد حركات في هذه الفترة. ومع ذلك يوضح الرصيدان\n"
+"                        الافتتاحي والختامي وضع الحساب."
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_search
 msgid "Non-loans"
 msgstr "غير السلف الخاصة"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_payslip_input__x_ksw_uncollected
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_hr_payslip_form_inherit_ksw_deduction_coverage
+msgid "Not Collected"
+msgstr "غير محصل"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_leave__x_ksw_ded_carried
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_payslip__x_ksw_ded_carried
+msgid "Not Collected (Still Pending)"
+msgstr "غير محصل (لا يزال معلقا)"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_leave_deduction_picture
+msgid "Not Collected — still pending"
+msgstr "غير محصل — لا يزال معلقا"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_payslip_deduction_coverage
+msgid "Not collected — still pending"
+msgstr "غير محصل — لا يزال معلقا"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Not pending DM approval."
+msgstr "ليس بانتظار اعتماد المدير المباشر."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Not pending GM final approval."
+msgstr "ليس بانتظار الاعتماد النهائي من المدير العام."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Not pending HR approval."
+msgstr "ليس بانتظار اعتماد الموارد البشرية."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Not pending accounting approval."
+msgstr "ليس بانتظار اعتماد المحاسبة."
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__manual_note
@@ -1358,9 +2679,19 @@ msgid "Note"
 msgstr "الملاحظات"
 
 #. module: KSW_deduction
+#: model_terms:ir.actions.act_window,help:KSW_deduction.action_ksw_my_deductions
+msgid "Nothing is being deducted from your salary"
+msgstr "لا يخصم شيء من راتبك"
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__message_needaction_counter
 msgid "Number of Actions"
 msgstr "عدد الإجراءات"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__installments
+msgid "Number of Months"
+msgstr "عدد الأشهر"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__message_has_error_counter
@@ -1385,8 +2716,27 @@ msgstr "عدد الأقساط الشهرية."
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__installments
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_refuse_wizard__installments
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_return_approver_wizard__installments
 msgid "Number of monthly installments. Defaults to the type suggestion."
 msgstr "عدد الأقساط الشهرية. يتم استخدام افتراضي النوع."
+
+#. module: KSW_deduction
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_reschedule_wizard__plan_by__months
+msgid "Number of months"
+msgstr "عدد الأشهر"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_statement_wizard__overdue_amount
+msgid ""
+"Of the closing balance, how much was scheduled for a month that has already "
+"passed and is still pending."
+msgstr "من الرصيد الختامي، المبلغ الذي كان مجدولا لشهر مضى ولا يزال معلقا."
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Of which overdue"
+msgstr "منها متأخر"
 
 #. module: KSW_deduction
 #: model:res.groups,name:KSW_deduction.group_deduction_officer
@@ -1394,9 +2744,202 @@ msgid "Officer"
 msgstr "مسؤول"
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_leave_view_form_inherit_ksw_deduction_picture
+msgid "On the Vacation / EOS Payslip"
+msgstr "في كشف راتب الإجازة / نهاية الخدمة"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"Only %(gm)s, the General Manager of %(dept)s, can act at the GM step of this"
+" request."
+msgstr ""
+"فقط %(gm)s، المدير العام ل %(dept)s، يمكنه اتخاذ الإجراء في خطوة المدير "
+"العام لهذا الطلب."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Only Accounting Approvers can approve at the Accounting step."
+msgstr "المعتمدون المحاسبيون وحدهم يمكنهم الاعتماد في خطوة المحاسبة."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Only Accounting Approvers can refuse at the Accounting step."
+msgstr "المعتمدون المحاسبيون وحدهم يمكنهم الرفض في خطوة المحاسبة."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Only HR Approvers can approve at the HR step."
+msgstr "معتمدو الموارد البشرية وحدهم يمكنهم الاعتماد في خطوة الموارد البشرية."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Only HR Approvers can refuse at the HR step."
+msgstr "معتمدو الموارد البشرية وحدهم يمكنهم الرفض في خطوة الموارد البشرية."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_type.py:0
+msgid ""
+"Only a system administrator can lock or unlock the number of installments of"
+" a deduction type."
+msgstr "مدير النظام وحده يمكنه قفل أو فتح عدد أقساط نوع الخصم."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_type.py:0
+msgid ""
+"Only a system administrator can lock the number of installments of a "
+"deduction type."
+msgstr "مدير النظام وحده يمكنه قفل عدد أقساط نوع الخصم."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_reschedule_wizard.py:0
+msgid "Only active deductions can be rescheduled."
+msgstr "لا يمكن إعادة جدولة إلا الخصومات السارية."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Only draft deductions can be submitted."
+msgstr "لا يمكن تقديم إلا الخصومات في حالة مسودة."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/loan_request_wizard.py:0
+msgid ""
+"Only loan-type deductions can be submitted through this form. Chosen type "
+"%(t)s is not a loan."
+msgstr ""
+"لا يمكن تقديم إلا الخصومات من نوع القرض عبر هذا النموذج. النوع المختار %(t)s"
+" ليس قرضا."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"Only pending installments can be marked as paid. '%(label)s' is already "
+"'%(state)s'."
+msgstr ""
+"لا يمكن تحديد كمسدد إلا الأقساط المعلقة. '%(label)s' حالته '%(state)s' "
+"بالفعل."
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__approval_state
 msgid "Only relevant for loan types. Drives the 5-step approval chain."
 msgstr "يستخدم فقط لأنواع القروض. يحرك سلسلة الاعتماد بخمس خطوات."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Only the %(role)s can accept the concurrent-loan warning at this step."
+msgstr "فقط %(role)s يمكنه قبول تنبيه القرض المتزامن في هذه الخطوة."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Only the General Manager can return a loan request to an approver."
+msgstr "المدير العام وحده يمكنه إعادة طلب القرض إلى معتمد سابق."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Only the Loan Disbursement Officer can confirm disbursement."
+msgstr "مسؤول صرف السلف الخاصة وحده يمكنه تأكيد الصرف."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"Only the employee who submitted the loan request can cancel it. Approvers "
+"must use the 'Refuse' button, which records a mandatory reason that is shown"
+" to the employee."
+msgstr ""
+"الموظف الذي قدم طلب القرض وحده يمكنه إلغاؤه. على المعتمدين استخدام زر 'رفض'،"
+" الذي يسجل سببا إلزاميا يظهر للموظف."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"Only the employee's direct manager (or a Deduction Officer/Manager) can "
+"perform the DM approval step."
+msgstr ""
+"المدير المباشر للموظف (أو مسؤول/مدير الخصومات) وحده يمكنه تنفيذ خطوة اعتماد "
+"المدير المباشر."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"Only the employee's direct manager (or a Deduction Officer/Manager) can "
+"refuse at the DM step."
+msgstr ""
+"المدير المباشر للموظف (أو مسؤول/مدير الخصومات) وحده يمكنه الرفض في خطوة "
+"المدير المباشر."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"Only the requesting employee or a Deduction Officer/Manager can reset a "
+"refused loan request to draft."
+msgstr ""
+"الموظف مقدم الطلب أو مسؤول/مدير الخصومات وحده يمكنه إعادة طلب قرض مرفوض إلى "
+"مسودة."
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_list
+msgid "Open"
+msgstr "فتح"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_form
+msgid "Open Deduction"
+msgstr "فتح الخصم"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
+msgid ""
+"Open a blank Statement of Account dialog, the same as Deductions → Reports →"
+" Statement of Account"
+msgstr "فتح نافذة كشف حساب فارغة، كما في الخصومات ← التقارير ← كشف الحساب"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_list
+msgid "Open the deduction this installment belongs to"
+msgstr "فتح الخصم التابع له هذا القسط"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__opening_balance
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_statement_line__row_kind__opening
+msgid "Opening Balance"
+msgstr "الرصيد الافتتاحي"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Opening balance"
+msgstr "الرصيد الافتتاحي"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "Opening balance — %(type)s"
+msgstr "الرصيد الافتتاحي — %(type)s"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "Opening balance — all types"
+msgstr "الرصيد الافتتاحي — جميع الأنواع"
 
 #. module: KSW_deduction
 #: model:ir.ui.menu,name:KSW_deduction.menu_ksw_deduction_operations
@@ -1421,11 +2964,14 @@ msgid ""
 "penalties before loans). The unaffordable remainder is forwarded to the next"
 " month."
 msgstr ""
+"ترتيب تحصيل هذا النوع من الخصومات عندما لا يغطي راتب الموظف جميع خصومات "
+"الشهر. الأقل يحصل أولا (مثلا الجزاءات قبل القروض). ويرحل الباقي غير المغطى "
+"إلى الشهر التالي."
 
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_line__split_origin_id
 msgid "Original installment this pending remainder was split from."
-msgstr ""
+msgstr "القسط الأصلي الذي قسم منه هذا الباقي المعلق."
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_active_deductions_count
@@ -1438,20 +2984,74 @@ msgid "Other Active Deductions (same employee)"
 msgstr "خصومات فعالة أخرى (لنفس الموظف)"
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_concurrent_loan_outstanding
+msgid "Other Loans Outstanding"
+msgstr "القروض الأخرى المتبقية"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_concurrent_loan_count
+msgid "Other Loans in Progress"
+msgstr "القروض الأخرى قيد السداد"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_reschedule_wizard__sibling_ids
+msgid ""
+"Other active deductions of this employee with a balance left. Include them "
+"to spread the whole outstanding book over the same window — the monthly "
+"total then lands on the target pro-rata instead of having to be split by "
+"hand."
+msgstr ""
+"خصومات سارية أخرى لهذا الموظف لها رصيد متبق. ضمنها لتوزيع كامل الرصيد "
+"المتبقي على الفترة نفسها — فيقع الإجمالي الشهري على المستهدف بالتناسب بدلا "
+"من تقسيمه يدويا."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__out_of_scope_count
+msgid "Out Of Scope Count"
+msgstr "عدد خارج النطاق"
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 msgid "Outstanding Balance"
-msgstr ""
+msgstr "الرصيد المتبقي"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__total_outstanding
 msgid "Outstanding Before Payment"
-msgstr ""
+msgstr "المتبقي قبل السداد"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_employee__x_deduction_outstanding_total
+msgid "Outstanding Deduction Total"
+msgstr "إجمالي الخصومات المتبقية"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/hr_leave.py:0
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Outstanding Deductions — %s"
+msgstr "الخصومات المتبقية — %s"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_leave__x_ksw_ded_outstanding
+msgid "Outstanding Loans & Deductions"
+msgstr "القروض والخصومات المتبقية"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_res_config_settings__ksw_overpay_recovery_type_id
+msgid "Over-payment Recovery Type"
+msgstr "نوع استرداد الدفع الزائد"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__x_is_overdue
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_search
 msgid "Overdue"
 msgstr "متأخر"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__overdue_amount
+msgid "Overdue Amount"
+msgstr "المبلغ المتأخر"
 
 #. module: KSW_deduction
 #: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_line__state__paid
@@ -1466,6 +3066,27 @@ msgid "Paid / Total"
 msgstr "المسدد / الإجمالي"
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__seq_partial_paid
+msgid "Paid on That Installment"
+msgstr "المسدد من ذلك القسط"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_payslip_input__x_ksw_uncollected
+msgid ""
+"Part of this installment the payslip could not afford. It is shown on the "
+"payslip for visibility but is NOT settled as paid — the installment stays "
+"pending for this amount and is collected by a later payroll run."
+msgstr ""
+"الجزء من هذا القسط الذي لم يستطع كشف الراتب تغطيته. يظهر في كشف الراتب "
+"للاطلاع لكنه لا يسوى كمدفوع — يبقى القسط معلقا بهذا المبلغ ويحصل في دورة "
+"رواتب لاحقة."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__seq_partial_label
+msgid "Partially Settled Installment"
+msgstr "قسط مسدد جزئيا"
+
+#. module: KSW_deduction
 #: model:ir.model,name:KSW_deduction.model_hr_payslip
 msgid "Pay Slip"
 msgstr "كشف الراتب"
@@ -1473,7 +3094,7 @@ msgstr "كشف الراتب"
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__payment_amount
 msgid "Payment Amount"
-msgstr ""
+msgstr "المبلغ المدفوع"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__payment_date
@@ -1483,24 +3104,49 @@ msgstr "تاريخ الدفع"
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 msgid "Payment Details"
-msgstr ""
+msgstr "تفاصيل الدفع"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_loan_payment_wizard.py:0
+msgid ""
+"Payment amount (%(pay).2f) exceeds the outstanding balance (%(out).2f "
+"%(cur)s)."
+msgstr "مبلغ الدفعة (%(pay).2f) يتجاوز الرصيد المتبقي (%(out).2f %(cur)s)."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_loan_payment_wizard.py:0
+msgid "Payment amount must be greater than zero."
+msgstr "يجب أن يكون مبلغ الدفعة أكبر من صفر."
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Payroll Impact"
-msgstr ""
+msgstr "الأثر على الرواتب"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__payroll_priority
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__payroll_priority
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__payroll_priority
 msgid "Payroll Priority"
-msgstr ""
+msgstr "أولوية الرواتب"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__payslip_id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__payslip_id
 msgid "Payslip"
 msgstr "كشف الراتب"
+
+#. module: KSW_deduction
+#: model:ir.model,name:KSW_deduction.model_hr_payslip_input
+msgid "Payslip Input"
+msgstr "مدخلات المرتب"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.res_config_settings_view_form_ksw_deduction
+msgid "Payslip Revisions"
+msgstr "تعديلات كشوف الراتب"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_line__payslip_id
@@ -1510,7 +3156,7 @@ msgstr "كشف الراتب التي خصمت هذا القسط."
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_line__forwarded_from_payslip_id
 msgid "Payslip whose shortfall created/forwarded this pending line."
-msgstr ""
+msgstr "كشف الراتب الذي أنشأ عجزه هذا البند المعلق أو رحله."
 
 #. module: KSW_deduction
 #: model:ir.actions.act_window,name:KSW_deduction.action_ksw_deduction_penalties
@@ -1548,7 +3194,7 @@ msgstr "بانتظار اعتماد المدير المباشر"
 #: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction__approval_state__pending_disbursement
 #: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction__x_refused_at_step__pending_disbursement
 msgid "Pending Disbursement"
-msgstr ""
+msgstr "بانتظار الصرف"
 
 #. module: KSW_deduction
 #: model:ir.actions.act_window,name:KSW_deduction.action_ksw_deduction_pending_gm
@@ -1578,7 +3224,7 @@ msgstr "بانتظار اعتماد الموارد البشرية"
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__pending_count
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 msgid "Pending Installments"
-msgstr ""
+msgstr "الأقساط المعلقة"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_is_pending_my_action
@@ -1588,17 +3234,45 @@ msgstr "بانتظار إجرائي"
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_line__x_is_overdue
 msgid "Pending installment whose scheduled month has already passed."
+msgstr "قسط معلق انقضى شهره المجدول."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_leave__x_ksw_ded_month_total
+msgid ""
+"Pending installments payroll will try to collect now: those scheduled for "
+"the current month plus anything still pending from an earlier month."
 msgstr ""
+"الأقساط المعلقة التي ستحاول الرواتب تحصيلها الآن: المجدولة للشهر الحالي "
+"إضافة إلى أي معلق من شهر سابق."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_employee__x_deduction_monthly_total
+msgid ""
+"Pending installments the next payroll will collect: those scheduled up to "
+"the payroll month in progress (last month until its payslip is confirmed) "
+"plus any still pending from earlier months."
+msgstr ""
+"الأقساط المعلقة التي ستحصلها دورة الرواتب التالية: المجدولة حتى شهر الرواتب "
+"الجاري (الشهر الماضي حتى يعتمد كشف راتبه) إضافة إلى أي معلق من أشهر سابقة."
 
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_payment_wizard__new_installment_amount
-msgid "Pending installments will each be reduced to this amount."
-msgstr ""
+msgid ""
+"Pending installments will each be reduced to this amount (redistribute mode "
+"only)."
+msgstr "سيخفض كل قسط معلق إلى هذا المبلغ (في وضع إعادة التوزيع فقط)."
 
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__progress_percent
 msgid "Percentage of the total amount already paid."
 msgstr "النسبة المئوية من إجمالي المبلغ المسدد."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid "Period"
+msgstr "الفترة"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__period_date
@@ -1611,6 +3285,26 @@ msgid "Personal Loan"
 msgstr "قرض شخصي"
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__plan_by
+msgid "Plan by"
+msgstr "التخطيط حسب"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_leave__x_ksw_ded_presented
+msgid "Presented on the Payslip"
+msgstr "المعروض في كشف الراتب"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_leave_deduction_picture
+msgid "Presented on the Vacation / EOS Payslip"
+msgstr "المعروض في كشف راتب الإجازة / نهاية الخدمة"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid "Print"
+msgstr "طباعة"
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Progress %"
 msgstr "نسبة الإنجاز ٪"
@@ -1621,9 +3315,19 @@ msgid "Progress Percent"
 msgstr "نسبة الإنجاز"
 
 #. module: KSW_deduction
+#: model:ir.model,name:KSW_deduction.model_hr_employee_public
+msgid "Public Employee"
+msgstr "موظف في القطاع العام"
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__rating_ids
 msgid "Ratings"
 msgstr "التقييمات"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__allowed_step_ids
+msgid "Reachable Steps"
+msgstr "الخطوات المتاحة"
 
 #. module: KSW_deduction
 #: model:res.groups,comment:KSW_deduction.group_deduction_user
@@ -1634,6 +3338,7 @@ msgstr "الاطلاع على خصوماته وعلى خصومات مرؤوسي�
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__reason
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__reason
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__reason
 msgid "Reason"
 msgstr "السبب"
@@ -1661,28 +3366,53 @@ msgstr ""
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 msgid "Receipt #, bank reference…"
-msgstr ""
+msgstr "رقم الإيصال، المرجع البنكي…"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_payment_wizard__note
 msgid "Receipt number, bank reference, or any other identifier."
-msgstr ""
+msgstr "رقم الإيصال أو المرجع البنكي أو أي معرف آخر."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__reconciliation_warning
+msgid "Reconciliation Warning"
+msgstr "تنبيه مطابقة"
 
 #. module: KSW_deduction
 #: model:ir.model,name:KSW_deduction.model_ksw_loan_payment_wizard
-#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
-msgid "Record Loan Payment"
+msgid "Record Deduction Payment"
 msgstr "تسجيل سداد قرض"
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 msgid "Record Payment"
-msgstr ""
+msgstr "تسجيل دفعة"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Record Payment — %s"
+msgstr "تسجيل دفعة — %s"
+
+#. module: KSW_deduction
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_loan_payment_wizard__application_mode__redistribute
+msgid "Redistribute across remaining installments"
+msgstr "إعادة التوزيع على الأقساط المتبقية"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__ref
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Reference"
+msgstr "الرقم المرجعي"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__note
 msgid "Reference / Note"
-msgstr ""
+msgstr "المرجع / ملاحظة"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_refusal_reason
@@ -1691,6 +3421,8 @@ msgid "Refusal Reason"
 msgstr "سبب الرفض"
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_refuse_wizard_form
 msgid "Refuse Loan Request"
 msgstr "رفض طلب القرض"
@@ -1722,7 +3454,13 @@ msgstr "حالة الرفض عند"
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__remaining_after
 msgid "Remaining After Payment"
+msgstr "المتبقي بعد السداد"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_leave__x_ksw_ded_manual_total
+msgid "Remaining Loans plus Additional Deductions as typed on this form."
 msgstr ""
+"القروض المتبقية مضافا إليها الخصومات الإضافية كما أدخلت في هذا النموذج."
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
@@ -1743,6 +3481,28 @@ msgid "Request a Loan"
 msgstr "طلب سلفة خاصة"
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_reschedule_wizard_view_form
+msgid "Reschedule"
+msgstr "إعادة جدولة"
+
+#. module: KSW_deduction
+#: model:ir.model,name:KSW_deduction.model_ksw_deduction_reschedule_wizard
+msgid "Reschedule Deduction Installments"
+msgstr "إعادة جدولة أقساط الخصم"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_reschedule_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid "Reschedule Installments"
+msgstr "إعادة جدولة الأقساط"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Reschedule Installments — %s"
+msgstr "إعادة جدولة الأقساط — %s"
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Reset to Draft"
 msgstr "إعادة التعيين كمسودة"
@@ -1753,9 +3513,69 @@ msgid "Responsible User"
 msgstr "المستخدم المسؤول"
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_reschedule_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 msgid "Result"
+msgstr "النتيجة"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_return_approver_wizard_form
+msgid "Return Loan Request for Revision"
+msgstr "إعادة طلب القرض للمراجعة"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_return_approver_wizard_form
+msgid "Return Settings"
+msgstr "إعدادات الإعادة"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__target_step_id
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_return_approver_wizard_form
+msgid "Return To"
+msgstr "العودة إلى"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_return_approver_wizard_form
+msgid "Return for Revision"
+msgstr "إعادة للمراجعة"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+#: model:ir.actions.act_window,name:KSW_deduction.action_ksw_loan_return_approver_wizard
+msgid "Return to Approver"
+msgstr "إعادة إلى المعتمد"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__row_kind
+msgid "Row Kind"
+msgstr "نوع الصف"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_leave_view_form_inherit_ksw_deduction_picture
+msgid ""
+"SAR typed by hand in\n"
+"                    <em>Remaining Loans</em> / <em>Additional Deductions</em>.\n"
+"                    If that was entered to make up for the balance not being\n"
+"                    taken, remove it — otherwise the employee is charged\n"
+"                    twice."
 msgstr ""
+"ريال أدخلت يدويا في\n"
+"                    <em>القروض المتبقية</em> / <em>الخصومات الإضافية</em>.\n"
+"                    إذا أدخلت لتعويض عدم\n"
+"                    احتساب الرصيد، فاحذفها — وإلا سيخصم من الموظف\n"
+"                    مرتين."
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_leave_view_form_inherit_ksw_deduction_picture
+msgid ""
+"SAR) on the settlement\n"
+"                    payslip automatically, including installments not yet\n"
+"                    due. This form also carries"
+msgstr ""
+"ريال) في كشف راتب\n"
+"                    التسوية تلقائيا، بما في ذلك الأقساط غير\n"
+"                    المستحقة بعد. ويحمل هذا النموذج أيضا"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__message_has_sms_error
@@ -1765,7 +3585,7 @@ msgstr "خطأ في تسليم الرسائل النصية القصيرة"
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_emp_ssnid
 msgid "SSN No."
-msgstr ""
+msgstr "رقم التأمينات الاجتماعية"
 
 #. module: KSW_deduction
 #: model:ksw.deduction.type,name:KSW_deduction.type_advance
@@ -1773,9 +3593,20 @@ msgid "Salary Advance"
 msgstr "سلفة راتب"
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/hr_payslip.py:0
+msgid "Salary over-payment for %(date_from)s → %(date_to)s"
+msgstr "دفع زائد في الراتب عن %(date_from)s ← %(date_to)s"
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Schedule"
 msgstr "الجدول"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid "Scope"
+msgstr "النطاق"
 
 #. module: KSW_deduction
 #: model:ir.ui.menu,name:KSW_deduction.menu_ksw_deduction_self_service
@@ -1783,7 +3614,9 @@ msgid "Self-Service"
 msgstr "الخدمة الذاتية"
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__sequence
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__sequence
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_step__sequence
 msgid "Sequence"
 msgstr "تسلسل"
 
@@ -1793,16 +3626,49 @@ msgid "Service Years"
 msgstr "سنوات الخدمة"
 
 #. module: KSW_deduction
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_loan_payment_wizard__application_mode__sequential
+msgid "Settle earliest installments first"
+msgstr "تسوية الأقساط الأقدم أولا"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__x_settlement_date
+msgid "Settled On"
+msgstr "تاريخ التسوية"
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__settlement_label
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_list
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Settlement"
 msgstr "التسوية"
 
 #. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_reschedule_wizard__pct_of_gross
+msgid "Share of the monthly gross salary this plan withholds."
+msgstr "نسبة إجمالي الراتب الشهري التي تقتطعها هذه الخطة."
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_type__code
 msgid "Short unique code used on payslip input lines (e.g. LOAN, GOVPEN)."
 msgstr "رمز قصير فريد يستخدم على بنود كشف الراتب (مثل LOAN, GOVPEN)."
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid "Show every pending installment of this employee"
+msgstr "عرض جميع الأقساط المستحقة على هذا الموظف"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_leave_view_form_inherit_ksw_deduction_picture
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid "Show the installments behind this total"
+msgstr "عرض الأقساط المكوّنة لهذا الإجمالي"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_single_installment
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__x_single_installment
+msgid "Single Installment Only"
+msgstr "قسط واحد فقط"
 
 #. module: KSW_deduction
 #: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_line__state__skipped
@@ -1811,14 +3677,9 @@ msgid "Skipped"
 msgstr "مستبعد"
 
 #. module: KSW_deduction
-#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_emp_ssnid
-msgid "Social Security Number"
-msgstr "رقم الضمان الاجتماعي"
-
-#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__split_origin_id
 msgid "Split Origin"
-msgstr ""
+msgstr "أصل التقسيم"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__start_month
@@ -1835,6 +3696,39 @@ msgid "State"
 msgstr "الحالة"
 
 #. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_statement_wizard__group_by_type
+msgid ""
+"State each deduction type as its own account, with its own opening balance "
+"and subtotal, instead of one combined ledger."
+msgstr ""
+"عرض كل نوع خصم كحساب مستقل، برصيده الافتتاحي ومجموعه الفرعي، بدلا من دفتر "
+"واحد مجمع."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__line_ids
+msgid "Statement Lines"
+msgstr "بنود كشف الحساب"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+#: model:ir.actions.act_window,name:KSW_deduction.action_ksw_deduction_statement
+#: model:ir.actions.report,name:KSW_deduction.action_report_deduction_statement
+#: model:ir.ui.menu,name:KSW_deduction.menu_ksw_deduction_statement
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Statement of Account"
+msgstr "كشف حساب"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "Statement of Account — %(name)s"
+msgstr "كشف الحساب — %(name)s"
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__activity_state
 msgid ""
 "Status based on activities\n"
@@ -1848,6 +3742,16 @@ msgstr ""
 "المخطط: الأنشطة المستقبلية."
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_leave_view_form_inherit_ksw_deduction_picture
+msgid "Still Owed"
+msgstr "المتبقي المستحق"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__seq_partial_remainder
+msgid "Still Pending in That Month"
+msgstr "لا يزال معلقا في ذلك الشهر"
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Submit"
 msgstr "إرسال"
@@ -1858,6 +3762,17 @@ msgid "Submit Request"
 msgstr "تقديم الطلب"
 
 #. module: KSW_deduction
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_statement_line__row_kind__subtotal
+msgid "Subtotal"
+msgstr "المجموع الفرعي"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "Subtotal — %(type)s"
+msgstr "المجموع الفرعي — %(type)s"
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_type__default_installments
 msgid ""
 "Suggested number of installments when creating a new deduction of this type."
@@ -1866,9 +3781,15 @@ msgstr ""
 "عدد الأقساط المقترح عند إنشاء خصم جديد من هذا النوع. يمكن تجاوزه لكل سجل."
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Summary"
+msgstr "الملخص"
+
+#. module: KSW_deduction
 #: model:res.groups,name:KSW_deduction.group_deduction_supervisor
 msgid "Supervisor"
-msgstr ""
+msgstr "المشرف"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__attachment_ids
@@ -1877,9 +3798,107 @@ msgid "Supporting Documents"
 msgstr "المستندات الداعمة"
 
 #. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_reschedule_wizard__available_sibling_ids
+msgid "Technical: domain source for sibling_ids."
+msgstr "تقني: مصدر النطاق ل sibling_ids."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"The concurrent-loan warning is only accepted between the HR and the GM Final"
+" approval steps."
+msgstr ""
+"لا يقبل تنبيه القرض المتزامن إلا بين خطوتي اعتماد الموارد البشرية والاعتماد "
+"النهائي للمدير العام."
+
+#. module: KSW_deduction
 #: model:ir.model.constraint,message:KSW_deduction.constraint_ksw_deduction_type_unique_code
 msgid "The deduction type code must be unique."
 msgstr "يجب أن يكون رمز نوع الخصم فريدا."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_statement_wizard__employee_id
+msgid "The employee whose deduction account is being stated."
+msgstr "الموظف الذي يعرض كشف حساب خصوماته."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "The loan must be at the GM Final Approval step to use this action."
+msgstr ""
+"يجب أن يكون القرض في خطوة الاعتماد النهائي للمدير العام لاستخدام هذا "
+"الإجراء."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid ""
+"The openpyxl library is required to export to Excel. Print the PDF instead, "
+"or ask an administrator to install it."
+msgstr ""
+"مكتبة openpyxl مطلوبة للتصدير إلى Excel. اطبع ملف PDF بدلا من ذلك، أو اطلب "
+"من مدير النظام تثبيتها."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_payslip__x_ksw_ded_collected
+msgid ""
+"The part of the presented deductions the pay could actually absorb. Only "
+"this part is settled as paid."
+msgstr ""
+"الجزء من الخصومات المعروضة الذي استطاع الراتب استيعابه فعلا. يسوى هذا الجزء "
+"فقط كمدفوع."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_leave__x_ksw_ded_collected
+msgid ""
+"The part the pay could actually absorb. Only this part is marked paid on the"
+" deduction schedule."
+msgstr ""
+"الجزء الذي استطاع الراتب استيعابه فعلا. يحدد هذا الجزء فقط كمسدد في جدول "
+"الخصم."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_leave__x_ksw_ded_carried
+msgid ""
+"The part the pay could not cover. It is NOT marked paid — it stays pending "
+"and is collected by a later payroll run."
+msgstr ""
+"الجزء الذي لم يستطع الراتب تغطيته. لا يحدد كمسدد — يبقى معلقا ويحصل في دورة "
+"رواتب لاحقة."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_payslip__x_ksw_ded_carried
+msgid ""
+"The part the pay could not cover. It stays pending on the deduction schedule"
+" and is collected by a later payroll run."
+msgstr ""
+"الجزء الذي لم يستطع الراتب تغطيته. يبقى معلقا في جدول الخصم ويحصل في دورة "
+"رواتب لاحقة."
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_payslip_deduction_coverage
+msgid ""
+"The pay could not cover every deduction shown. Only the\n"
+"                        collected amount is settled as paid — the rest stays\n"
+"                        pending and is collected by a later payroll run."
+msgstr ""
+"لم يستطع الراتب تغطية جميع الخصومات المعروضة. يسوى كمدفوع\n"
+"                        المبلغ المحصل فقط — ويبقى الباقي\n"
+"                        معلقا ويحصل في دورة رواتب لاحقة."
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_leave_deduction_picture
+msgid ""
+"The payslip could not cover every deduction, which is why the\n"
+"                net may be negative. Only the collected part is settled as\n"
+"                paid — the rest stays pending and is collected by a later\n"
+"                payroll run."
+msgstr ""
+"لم يستطع كشف الراتب تغطية جميع الخصومات، ولهذا قد\n"
+"                يكون الصافي سالبا. يسوى كمدفوع الجزء المحصل فقط\n"
+"                — ويبقى الباقي معلقا ويحصل في دورة رواتب\n"
+"                لاحقة."
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_refuse_wizard_form
@@ -1895,6 +3914,132 @@ msgstr ""
 "                                يرجى أن يكون واضحا ومهذبا."
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid ""
+"The request can still go through — but HR, Accounting and\n"
+"                            the GM must each click <b>⚠ Accept Concurrent Loan</b>\n"
+"                            before their own approval will be accepted."
+msgstr ""
+"لا يزال بإمكان الطلب المضي — لكن يجب على الموارد البشرية والمحاسبة\n"
+"                            والمدير العام كل الضغط على <b>⚠ قبول القرض المتزامن</b>\n"
+"                            قبل قبول اعتماد كل منهم."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_reschedule_wizard.py:0
+msgid ""
+"The selected deductions have no pending installments left to reschedule."
+msgstr "لم يتبق في الخصومات المحددة أقساط معلقة لإعادة جدولتها."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"The sum of the installments on %(name)s no longer matches the total amount.\n"
+"\n"
+"  • Total amount      : %(amt).2f %(cur)s\n"
+"  • Sum of installments: %(tot).2f %(cur)s\n"
+"  • Difference        : %(diff).2f %(cur)s\n"
+"\n"
+"Adjust one or more of the other pending installments so the totals match, then save again."
+msgstr ""
+"مجموع الأقساط في %(name)s لم يعد يطابق المبلغ الإجمالي.\n"
+"\n"
+"  • المبلغ الإجمالي      : %(amt).2f %(cur)s\n"
+"  • مجموع الأقساط: %(tot).2f %(cur)s\n"
+"  • الفرق        : %(diff).2f %(cur)s\n"
+"\n"
+"عدل قسطا أو أكثر من الأقساط المعلقة الأخرى لتتطابق المجاميع، ثم احفظ مرة أخرى."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid ""
+"The total amount does not match the installment schedule on: %(refs)s. The "
+"balance below is derived from the recorded amounts and should be reconciled "
+"before the statement is relied on."
+msgstr ""
+"المبلغ الإجمالي لا يطابق جدول الأقساط في: %(refs)s. الرصيد أدناه مشتق من "
+"المبالغ المسجلة ويجب مطابقته قبل الاعتماد على كشف الحساب."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_reschedule_wizard.py:0
+msgid ""
+"These deductions are a single installment and cannot be spread over several "
+"months: %(names)s. A system administrator can unlock this on the deduction "
+"type."
+msgstr ""
+"هذه الخصومات بقسط واحد ولا يمكن توزيعها على عدة أشهر: %(names)s. يمكن لمدير "
+"النظام إلغاء هذا القيد من نوع الخصم."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "This action is only available for loan-type deductions."
+msgstr "هذا الإجراء متاح فقط للخصومات من نوع القرض."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_loan_payment_wizard.py:0
+msgid "This deduction has no pending installments."
+msgstr "ليس لهذا الخصم أقساط معلقة."
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid ""
+"This employee already has another personal loan in progress. Accepting "
+"records that you approved the additional exposure at your step. Continue?"
+msgstr ""
+"لدى هذا الموظف قرض شخصي آخر قيد السداد بالفعل. القبول يسجل أنك اعتمدت "
+"الالتزام الإضافي في خطوتك. هل تريد المتابعة؟"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid ""
+"This employee has deductions your access rights do\n"
+"                        not cover. They are excluded from every figure\n"
+"                        below, so this is a partial statement."
+msgstr ""
+"لدى هذا الموظف خصومات لا تشملها صلاحياتك.\n"
+"                        وهي مستبعدة من جميع الأرقام\n"
+"                        أدناه، لذا هذا كشف حساب جزئي."
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid ""
+"This is a partial statement: some of this\n"
+"                            employee's deductions are outside your access\n"
+"                            rights and are excluded from every figure below."
+msgstr ""
+"هذا كشف حساب جزئي: بعض خصومات\n"
+"                            هذا الموظف خارج صلاحياتك\n"
+"                            ومستبعدة من جميع الأرقام أدناه."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "This loan is not currently at the %s step."
+msgstr "هذا القرض ليس حاليا في خطوة %s."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"This loan request has already been submitted and is currently %(s)s. It "
+"cannot be submitted again."
+msgstr ""
+"تم تقديم طلب القرض هذا بالفعل وحالته حاليا %(s)s. لا يمكن تقديمه مرة أخرى."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid ""
+"This movement was not settled through a payslip — there is no payslip to "
+"open."
+msgstr "لم تسو هذه الحركة عبر كشف راتب — لا يوجد كشف راتب لفتحه."
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_line__is_manual
 msgid ""
 "Ticked for installment lines added by hand by the accountant (payment "
@@ -1904,20 +4049,45 @@ msgstr ""
 "البنود المولدة تلقائيا غير مفعلة."
 
 #. module: KSW_deduction
+#: model:ir.model,name:KSW_deduction.model_hr_leave
+msgid "Time Off"
+msgstr "الإجازات"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__date_to
+msgid "To"
+msgstr "إلى"
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_list
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_list
 msgid "Total"
 msgstr "الإجمالي"
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__total_charged
+msgid "Total Charged"
+msgstr "إجمالي المقيد"
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Total Deductions This Month"
-msgstr ""
+msgstr "إجمالي خصومات هذا الشهر"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__total_outstanding
+msgid "Total Outstanding"
+msgstr "إجمالي المتبقي"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_active_deductions_total_outstanding
 msgid "Total Outstanding (other)"
 msgstr "الإجمالي المتبقي (أخرى)"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid "Total Outstanding Deductions"
+msgstr "إجمالي الخصومات المتبقية"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__total_paid
@@ -1932,10 +4102,71 @@ msgid "Total Pending"
 msgstr "الإجمالي المعلق"
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__total_settled
+msgid "Total Settled"
+msgstr "إجمالي المسوى"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__total_written_off
+msgid "Total Written Off"
+msgstr "إجمالي المشطوب"
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__amount
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_refuse_wizard__amount
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_return_approver_wizard__amount
 msgid "Total amount of the deduction."
 msgstr "إجمالي مبلغ الخصم."
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
+msgid "Total charged"
+msgstr "إجمالي المقيد"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
+msgid "Total collected"
+msgstr "إجمالي المحصل"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_leave__x_ksw_ded_presented
+msgid ""
+"Total deduction installments carried on the vacation / EOS payslip. The full"
+" amount is shown even when it drives the net negative."
+msgstr ""
+"إجمالي أقساط الخصومات في كشف راتب الإجازة / نهاية الخدمة. يعرض المبلغ كاملا "
+"حتى لو أدى إلى صاف سالب."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_payslip__x_ksw_ded_presented
+msgid "Total of the KSW deduction installments shown on this payslip."
+msgstr "إجمالي أقساط خصومات KSW المعروضة في كشف الراتب هذا."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_reschedule_wizard__target_monthly
+msgid ""
+"Total to deduct from this employee each month across every selected "
+"deduction. The number of months is derived from it."
+msgstr ""
+"الإجمالي المراد خصمه من هذا الموظف شهريا عبر جميع الخصومات المحددة. ويشتق "
+"منه عدد الأشهر."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_can_admin_return
+msgid ""
+"True for a Deduction Manager, who may return a loan request to any earlier "
+"approval step, from any step it has already reached (except once fully "
+"disbursed). Deliberately gated on group_deduction_manager rather than the "
+"Settings Administrator group: this module never grants the latter any "
+"ksw.deduction access (unlike hr.leave), while Deduction Manager already has "
+"unconditional read/write on every deduction — see "
+"ksw_deduction_rule_manager_all."
+msgstr ""
+"صحيح لمدير الخصومات، الذي يمكنه إعادة طلب القرض إلى أي خطوة اعتماد سابقة، من"
+" أي خطوة بلغها (عدا بعد الصرف الكامل). مقيد عمدا ب group_deduction_manager "
+"بدلا من مجموعة مسؤول الإعدادات: فهذه الوحدة لا تمنح الأخيرة أي وصول إلى "
+"ksw.deduction (بخلاف hr.leave)، بينما يملك مدير الخصومات قراءة/كتابة غير "
+"مشروطة على كل خصم — راجع ksw_deduction_rule_manager_all."
 
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_can_dm_approve
@@ -1973,15 +4204,54 @@ msgid ""
 "True if the current user may add manual installment lines or reschedule "
 "pending installments on this deduction."
 msgstr ""
+"صحيح إذا كان بإمكان المستخدم الحالي إضافة بنود أقساط يدوية أو إعادة جدولة "
+"الأقساط المعلقة في هذا الخصم."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_leave__x_ksw_ded_manual_duplicate
+msgid ""
+"True when amounts were typed by hand while the employee also has outstanding"
+" installments — which payroll now collects automatically, so the two may be "
+"charging the same money twice."
+msgstr ""
+"صحيح عندما تكون المبالغ مدخلة يدويا بينما للموظف أقساط متبقية — تحصلها "
+"الرواتب الآن تلقائيا، فقد يخصم المبلغ نفسه مرتين."
 
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_payment_wizard__is_full_payment
 msgid "True when payment_amount covers the full outstanding balance."
-msgstr ""
+msgstr "صحيح عندما يغطي مبلغ الدفعة الرصيد المتبقي بالكامل."
 
 #. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_concurrent_ack_pending
+msgid ""
+"True when the employee carries another personal loan, the request sits at a "
+"step that must accept it, and the current user is the role acting at that "
+"step."
+msgstr ""
+"صحيح عندما يكون على الموظف قرض شخصي آخر، والطلب في خطوة يجب أن تقبله، "
+"والمستخدم الحالي هو الدور الذي يتخذ الإجراء في تلك الخطوة."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_leave__x_ksw_ded_shortfall
+msgid "True when the payslip could not cover every deduction presented on it."
+msgstr "صحيح عندما لا يستطيع كشف الراتب تغطية جميع الخصومات المعروضة فيه."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_can_employee_edit
+msgid ""
+"True when you may still correct or delete this request yourself, because it "
+"is your own and no approver has acted on it yet."
+msgstr ""
+"صحيح عندما لا يزال بإمكانك تصحيح هذا الطلب أو حذفه بنفسك، لأنه طلبك ولم يتخذ"
+" أي معتمد إجراء عليه بعد."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__type_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__type_id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__type_id
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_search
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_kanban
@@ -1993,6 +4263,18 @@ msgstr "النوع"
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__activity_exception_decoration
 msgid "Type of the exception activity on record."
 msgstr "نوع النشاط المستثنى في السجل."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Unknown"
+msgstr "غير معروف"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid "Unknown user"
+msgstr "مستخدم غير معروف"
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_type_view_form
@@ -2033,6 +4315,11 @@ msgid "Vacation Balance Value"
 msgstr "قيمة رصيد الإجازة"
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid "View"
+msgstr "أداة العرض"
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_eos_last_wage
 msgid "Wage of the current active version."
 msgstr "راتب الإصدار الفعال الحالي."
@@ -2051,6 +4338,31 @@ msgstr "رسائل الموقع الإلكتروني"
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__website_message_ids
 msgid "Website communication history"
 msgstr "سجل تواصل الموقع الإلكتروني"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_emp_monthly_total
+msgid ""
+"What the next payroll will collect from this employee across every active "
+"deduction (this one included): installments scheduled up to the payroll "
+"month in progress (last month until its payslip is confirmed) plus any left "
+"pending from earlier months."
+msgstr ""
+"ما ستحصله دورة الرواتب التالية من هذا الموظف عبر جميع الخصومات السارية (بما "
+"فيها هذا): الأقساط المجدولة حتى شهر الرواتب الجاري (الشهر الماضي حتى يعتمد "
+"كشف راتبه) إضافة إلى أي معلق من أشهر سابقة."
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.res_config_settings_view_form_ksw_deduction
+msgid ""
+"When a revision shows the employee was over-paid it cannot\n"
+"                                be confirmed. It is cancelled instead, and a draft deduction\n"
+"                                of this type is opened for the difference so it is recovered\n"
+"                                from a later payroll run."
+msgstr ""
+"عندما يظهر التعديل أن الموظف تقاضى أكثر من المستحق فلا يمكن\n"
+"                                اعتماده. بل يلغى، ويفتح خصم مسودة\n"
+"                                من هذا النوع بالفرق ليسترد\n"
+"                                من دورة رواتب لاحقة."
 
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__is_loan
@@ -2072,15 +4384,52 @@ msgstr "مرحلة الاعتماد التي كان عندها القرض عند
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__managed_by
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_type__managed_by
 msgid ""
-"Which department can manually close (mark as paid) deductions of this type "
-"outside payroll. HR: gov. penalties, internal penalties, salary advances. "
-"Accounting: loans."
+"Who can create and manually close (mark as paid) deductions of this type "
+"outside payroll. Accounting Data Entry: gov. penalties, internal penalties, "
+"salary advances. Accounting (Loans): loans, which additionally require the "
+"\"Loan Modification: Full\" privilege."
 msgstr ""
+"من يمكنه إنشاء خصومات هذا النوع وإغلاقها يدويا (تحديدها كمسددة) خارج "
+"الرواتب. إدخال بيانات المحاسبة: الغرامات الحكومية، والجزاءات، والسلف. "
+"المحاسبة (القروض): القروض، التي تتطلب أيضا صلاحية \"تعديل القروض: كامل\"."
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_request_wizard_form
 msgid "Why do you need this loan? (required)"
 msgstr "لماذا تحتاج هذا القرض؟ (مطلوب)"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_reschedule_wizard__reason
+msgid ""
+"Why the plan is being changed. Recorded in the chatter of every deduction "
+"rescheduled."
+msgstr "سبب تغيير الخطة. يسجل في سجل الرسائل لكل خصم تمت إعادة جدولته."
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__wizard_id
+msgid "Wizard"
+msgstr "المعالج"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_writeoff_date
+msgid "Write-off Date"
+msgstr "تاريخ الشطب"
+
+#. module: KSW_deduction
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_statement_line__row_kind__writeoff
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
+msgid "Written Off"
+msgstr "مشطوب"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "Written off"
+msgstr "مشطوب"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_can_admin_return
+msgid "X Can Admin Return"
+msgstr "يمكن للمسؤول الإعادة"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_can_cancel
@@ -2095,12 +4444,17 @@ msgstr "يمكن للمدير المباشر الاعتماد"
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_can_edit_installments
 msgid "X Can Edit Installments"
-msgstr ""
+msgstr "يمكنه تعديل الأقساط"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_can_gm_return
+msgid "X Can Gm Return"
+msgstr "يمكن للمدير العام الإعادة"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_can_select_loan_type
 msgid "X Can Select Loan Type"
-msgstr ""
+msgstr "يمكنه اختيار نوع القرض"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_can_submit
@@ -2111,6 +4465,21 @@ msgstr "يمكن الإرسال"
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_employee__x_deduction_currency_id
 msgid "X Deduction Currency"
 msgstr "عملة الخصم"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_leave__x_ksw_ded_has_calc
+msgid "X Ksw Ded Has Calc"
+msgstr "لديه احتساب خصومات KSW"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_leave__x_ksw_ded_manual_duplicate
+msgid "X Ksw Ded Manual Duplicate"
+msgstr "تكرار يدوي لخصومات KSW"
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_leave__x_ksw_ded_shortfall
+msgid "X Ksw Ded Shortfall"
+msgstr "عجز خصومات KSW"
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_refused_date
@@ -2132,14 +4501,147 @@ msgstr ""
 "التقويمية / 365.25)."
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"You are not allowed to delete loan deduction %(name)s. Deleting loans "
+"requires the \"Delete only\" or \"Edit and Delete\" level of the Loan "
+"Modification privilege. Ask an administrator to set it on your user (Access "
+"Rights → KSW Deductions → Loan Modification)."
+msgstr ""
+"غير مسموح لك بحذف خصم القرض %(name)s. حذف القروض يتطلب مستوى \"حذف فقط\" أو "
+"\"تعديل وحذف\" من صلاحية تعديل القروض. اطلب من مدير النظام تعيينها لمستخدمك "
+"(صلاحيات الوصول ← خصومات KSW ← تعديل القروض)."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_loan_payment_wizard.py:0
+msgid ""
+"You are not allowed to record a payment on this deduction. Accounting staff "
+"with the 'Loan Modification: Full' privilege can settle any type; the "
+"Accounting Data Entry role can settle non-loan deductions (salary advances "
+"and penalties) only."
+msgstr ""
+"غير مسموح لك بتسجيل دفعة على هذا الخصم. يمكن لموظفي المحاسبة الذين لديهم "
+"صلاحية 'تعديل القروض: كامل' تسوية أي نوع؛ ويمكن لدور إدخال بيانات المحاسبة "
+"تسوية الخصومات غير القروض (السلف والجزاءات) فقط."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_reschedule_wizard.py:0
+msgid ""
+"You are not allowed to reschedule %(name)s. Accounting staff with the 'Loan "
+"Modification: Full' privilege can reschedule any type; the Accounting Data "
+"Entry role can reschedule non-loan deductions (salary advances and "
+"penalties) only."
+msgstr ""
+"غير مسموح لك بإعادة جدولة %(name)s. يمكن لموظفي المحاسبة الذين لديهم صلاحية "
+"'تعديل القروض: كامل' إعادة جدولة أي نوع؛ ويمكن لدور إدخال بيانات المحاسبة "
+"إعادة جدولة الخصومات غير القروض (السلف والجزاءات) فقط."
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_request_wizard_form
 msgid "You are requesting"
 msgstr "أنت تطلب"
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_return_approver_wizard_form
+msgid ""
+"You are returning this request as a Deduction\n"
+"                            Manager. Only the steps the request has already\n"
+"                            passed are listed. Everything the approvers\n"
+"                            entered is kept — only the stamps from the step\n"
+"                            you pick onward are cleared."
+msgstr ""
+"أنت تعيد هذا الطلب بصفتك مدير\n"
+"                            الخصومات. تعرض فقط الخطوات التي اجتازها\n"
+"                            الطلب. يحتفظ بكل ما أدخله\n"
+"                            المعتمدون — وتمسح فقط الأختام من الخطوة\n"
+"                            التي تختارها فما بعدها."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/loan_request_wizard.py:0
+msgid "You can only request a loan for yourself."
+msgstr "لا يمكنك طلب قرض إلا لنفسك."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"You can only submit loan requests for yourself, as a supervisor for your "
+"direct subordinates, or as an assistant for the direct subordinates of a "
+"manager you assist."
+msgstr ""
+"لا يمكنك تقديم طلبات القروض إلا لنفسك، أو بصفتك مشرفا لمرؤوسيك المباشرين، أو"
+" بصفتك مساعدا للمرؤوسين المباشرين لمدير تساعده."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/loan_request_wizard.py:0
+msgid ""
+"You cannot request a loan because your user account is not linked to an "
+"employee record. Please contact HR to link your account before requesting a "
+"loan."
+msgstr ""
+"لا يمكنك طلب قرض لأن حساب المستخدم الخاص بك غير مرتبط بسجل موظف. يرجى "
+"التواصل مع الموارد البشرية لربط حسابك قبل طلب القرض."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid "You do not have access to deduction %(name)s."
+msgstr "ليس لديك صلاحية الوصول إلى الخصم %(name)s."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "You do not have access to payslip %(name)s."
+msgstr "ليس لديك صلاحية الوصول إلى كشف الراتب %(name)s."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"You do not have permission to modify installments. Contact your "
+"administrator."
+msgstr "ليست لديك صلاحية تعديل الأقساط. تواصل مع مدير النظام."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"You do not have the 'Loan Installment Modification' privilege. Ask an "
+"administrator to grant it on your user (Settings → Users → Access Rights → "
+"KSW Deductions → Loan Installment Modification = Edit)."
+msgstr ""
+"ليست لديك صلاحية 'تعديل أقساط القروض'. اطلب من مدير النظام منحها لمستخدمك "
+"(الإعدادات ← المستخدمون ← صلاحيات الوصول ← خصومات KSW ← تعديل أقساط القروض ="
+" تعديل)."
+
+#. module: KSW_deduction
 #: model_terms:ir.actions.act_window,help:KSW_deduction.action_ksw_my_loans
 msgid "You have no loan requests yet"
 msgstr "لا توجد لديك طلبات قروض بعد"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"You may only change the amount, installments, start month, reason, "
+"description and attachments of your own loan request. Not allowed here: "
+"%(fields)s."
+msgstr ""
+"لا يمكنك تغيير سوى المبلغ والأقساط وشهر البداية والسبب والوصف والمرفقات في "
+"طلب قرضك. غير مسموح هنا: %(fields)s."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"You may only raise requests for the direct subordinates of the managers you "
+"assist."
+msgstr "لا يمكنك رفع الطلبات إلا للمرؤوسين المباشرين للمديرين الذين تساعدهم."
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_request_wizard_form
@@ -2165,11 +4667,40 @@ msgstr ""
 "                                تابع التقدم من <b>قروضي</b>."
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "active"
+msgstr "سار"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_reschedule_wizard_view_form
+msgid "e.g. Agreed with the employee to clear both loans by March"
+msgstr "مثال: اتفق مع الموظف على سداد القرضين بحلول مارس"
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "inception"
+msgstr "من البداية"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
+msgid "installment(s) will be fully settled."
+msgstr "قسط (أقساط) ستسوى بالكامل."
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 msgid ""
 "installment(s):\n"
 "                                each becomes"
 msgstr ""
+"قسط (أقساط):\n"
+"                                يصبح كل منها"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
+msgid "is partially settled:"
+msgstr "مسوى جزئيا:"
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_request_wizard_form
@@ -2181,14 +4712,24 @@ msgstr ""
 "                            تقريبا"
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "on"
+msgstr "في"
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_request_wizard_form
 msgid "over"
 msgstr "على مدى"
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
+msgid "paid,"
+msgstr "مسدد،"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 msgid "pending installment(s) will be marked as paid."
-msgstr ""
+msgstr "قسط (أقساط) معلقة ستحدد كمسددة."
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_request_wizard_form
@@ -2197,8 +4738,34 @@ msgstr "شهريا ابتداء من"
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
+msgid "stays pending in the same month."
+msgstr "يبقى معلقا في الشهر نفسه."
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "this department"
+msgstr "هذه الإدارة"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+msgid "to"
+msgstr "إلى"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 msgid "will be redistributed across"
-msgstr ""
+msgstr "سيعاد توزيعه على"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid "↩ Return to Approver"
+msgstr "↩ إعادة إلى المعتمد"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid "⚠ Accept Concurrent Loan"
+msgstr "⚠ قبول القرض المتزامن"
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
@@ -2223,7 +4790,7 @@ msgstr "✅ اعتماد (الموارد البشرية)"
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "✅ Confirm Disbursement"
-msgstr ""
+msgstr "✅ تأكيد الصرف"
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
@@ -2236,77 +4803,32 @@ msgid "➕ Record New Penalty"
 msgstr "➕ تسجيل غرامة جديدة"
 
 #. module: KSW_deduction
-#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
-msgid "Total Outstanding Deductions"
-msgstr "إجمالي الخصومات المتبقية"
+#: model:res.groups,comment:KSW_deduction.group_deduction_officer
+msgid ""
+"Create and edit deductions for all employees (loans and non-loan). Implies "
+"\"HR Officer (Non-Loan)\" since the full Officer scope is a superset of it."
+msgstr "إنشاء وتعديل الخصومات غير القرضية لجميع الموظفين."
 
 #. module: KSW_deduction
-#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_emp_outstanding_total
-#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_list
-msgid "Employee's Total Outstanding"
-msgstr "إجمالي المتبقي على الموظف"
+#: model:res.groups,comment:KSW_deduction.group_deduction_manager
+msgid ""
+"Full access to non-loan deductions including delete. Loan-specific "
+"edit/delete still requires the dedicated \"Loan Modification\" privilege — "
+"Manager does NOT auto-grant it, so an HR/Admin can be Deduction Manager "
+"without being able to touch loan amount/installments or delete loans."
+msgstr ""
+"صلاحية كاملة على الخصومات غير القرضية بما في ذلك الحذف. يبقى تعديل/حذف "
+"القروض يتطلب صلاحية \"تعديل القرض\" المخصصة — لا يمنحها دور المدير تلقائيا، "
+"فيمكن أن يكون موظف الموارد البشرية / المسؤول مدير خصومات دون القدرة على "
+"تعديل مبلغ/أقساط القرض أو حذف القروض."
 
 #. module: KSW_deduction
-#: model:ir.model.fields,field_description:KSW_deduction.field_hr_employee__x_deduction_outstanding_total
-msgid "Outstanding Deduction Total"
-msgstr "إجمالي الخصومات المتبقية"
+#: model:ir.model,name:KSW_deduction.model_ksw_loan_payment_wizard
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
+msgid "Record Loan Payment"
+msgstr "تسجيل سداد قرض"
 
 #. module: KSW_deduction
-#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
-msgid "Show the installments behind this total"
-msgstr "عرض الأقساط المكوّنة لهذا الإجمالي"
-
-#. module: KSW_deduction
-#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
-msgid "Show every pending installment of this employee"
-msgstr "عرض جميع الأقساط المستحقة على هذا الموظف"
-
-#. module: KSW_deduction
-#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_list
-msgid "Open"
-msgstr "فتح"
-
-#. module: KSW_deduction
-#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_list
-msgid "Open the deduction this installment belongs to"
-msgstr "فتح الخصم التابع له هذا القسط"
-
-#. module: KSW_deduction
-#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_form
-msgid "Open Deduction"
-msgstr "فتح الخصم"
-
-#. module: KSW_deduction
-#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_form
-msgid "Installment"
-msgstr "القسط"
-
-#. module: KSW_deduction
-#: code:addons/KSW_deduction/models/ksw_deduction.py:0
-msgid "Deductions This Month — %s"
-msgstr "خصومات هذا الشهر — %s"
-
-#. module: KSW_deduction
-#: code:addons/KSW_deduction/models/ksw_deduction.py:0
-msgid "Outstanding Deductions — %s"
-msgstr "الخصومات المتبقية — %s"
-
-#. module: KSW_deduction
-#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
-msgid "You do not have access to deduction %(name)s."
-msgstr "ليس لديك صلاحية الوصول إلى الخصم %(name)s."
-
-#. module: KSW_deduction
-#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_type__managed_by__acc_data_entry
-msgid "Accounting Data Entry"
-msgstr "مدخل بيانات المحاسبة"
-
-#. module: KSW_deduction
-#: model:res.groups,name:KSW_deduction.group_acc_data_entry
-msgid "Accounting Data Entry (Non-Loan)"
-msgstr "مدخل بيانات المحاسبة (غير القروض)"
-
-#. module: KSW_deduction
-#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_type__managed_by__accounting
-msgid "Accounting (Loans)"
-msgstr "المحاسبة (القروض)"
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_emp_ssnid
+msgid "Social Security Number"
+msgstr "رقم الضمان الاجتماعي"

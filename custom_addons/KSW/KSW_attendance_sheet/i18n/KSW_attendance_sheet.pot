@@ -1,0 +1,994 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_attendance_sheet
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid ""
+"\n"
+"      The return was never confirmed, so this leave is treated as still running to the end of the month — there is no evidence the employee came back on %(planned)s."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid ""
+"%(count)s day(s) are marked Attended while %(type)s (%(from_)s → %(to_)s) is"
+" approved: %(days)s%(note)s"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet_line.py:0
+msgid "%(count)s day(s) changed after confirmation: %(days)s"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid "%(count)s day(s) fall before the joining date %(joining)s: %(days)s"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid "%(count)s day(s) of employment are missing from the sheet: %(days)s"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet_line.py:0
+msgid ""
+"%(date)s is outside the period %(employee)s is employed in on this sheet "
+"(%(first)s to %(last)s)."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid "%(done)s Sent to Payroll — %(failed)s Refused"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid "%(done)s Withdrawn — %(failed)s Refused"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid ""
+"%(employee)s joins on %(joining)s, after %(month)s/%(year)s ends. There is "
+"no attendance to record for that month."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid ""
+"%(period)s has not been sent to payroll, so there is nothing to withdraw."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid "(no direct manager)"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid "(unknown)"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_form
+msgid "<b>Waiting on:</b>"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_form
+msgid ""
+"<small class=\"ms-2 text-muted\">\n"
+"                                Marks the clashing days absent to match the\n"
+"                                approved request. Does not affect a pending\n"
+"                                return confirmation.\n"
+"                            </small>"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_form
+msgid ""
+"<small>\n"
+"                            Until this is resolved and the month is\n"
+"                            confirmed, payroll will pay this employee as\n"
+"                            <b>zero attendance</b>.\n"
+"                        </small>"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet_line.py:0
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__total_absent
+msgid "Absent"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__message_needaction
+msgid "Action Needed"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid ""
+"All %(count)s of your attendance sheets for %(period)s have already been "
+"sent to payroll. There is nothing left to confirm."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_form
+msgid "Apply Approved Time Off"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields.selection,name:KSW_attendance_sheet.selection__ksw_attendance_sheet__month__4
+msgid "April"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__message_attachment_count
+msgid "Attachment Count"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model,name:KSW_attendance_sheet.model_hr_attendance
+msgid "Attendance"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.actions.act_window,name:KSW_attendance_sheet.action_ksw_attendance_sheet_overview
+msgid "Attendance Overview"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet_line__attendance_id
+msgid "Attendance Record"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:res.groups.privilege,name:KSW_attendance_sheet.privilege_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.hr_employee_view_form_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_form
+msgid "Attendance Sheet"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_hr_employee__x_attendance_sheet_count
+msgid "Attendance Sheet Count"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model,name:KSW_attendance_sheet.model_ksw_attendance_sheet_line
+msgid "Attendance Sheet Daily Line"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.hr_attendance_view_filter_inherit_sheet
+msgid "Attendance Sheet Employees"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.actions.act_window,name:KSW_attendance_sheet.action_ksw_attendance_sheet
+#: model:ir.ui.menu,name:KSW_attendance_sheet.menu_ksw_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.hr_employee_view_form_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_graph
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_list
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_pivot
+msgid "Attendance Sheets"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid "Attendance Sheets Awaiting Confirmation"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.actions.act_window,help:KSW_attendance_sheet.action_ksw_attendance_sheet
+msgid ""
+"Attendance sheets are auto-generated monthly for employees\n"
+"               marked with \"Uses Attendance Sheet\"."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid "Attendance sheets due today — %(count)s employee(s)"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid "Attendance sheets with no direct manager — %(count)s employee(s)"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet_line.py:0
+msgid "Attendance updated:"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__total_attended
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet_line__is_attended
+msgid "Attended"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields.selection,name:KSW_attendance_sheet.selection__ksw_attendance_sheet__month__8
+msgid "August"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_hr_attendance__x_is_auto_generated
+msgid "Auto Generated"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__x_blocked_reason
+msgid "Blocked Reason"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__x_can_confirm
+msgid "Can Confirm"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__x_can_reset
+msgid "Can Withdraw"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields.selection,name:KSW_attendance_sheet.selection__ksw_attendance_sheet__state__confirmed
+msgid "Confirmed"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__x_confirmed_by
+msgid "Confirmed By"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__x_confirmed_on
+msgid "Confirmed On"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__create_uid
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet_line__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__create_date
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet_line__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__line_ids
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_form
+msgid "Daily Attendance"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet_line__date
+msgid "Date"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet_line__day_name
+msgid "Day"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields.selection,name:KSW_attendance_sheet.selection__ksw_attendance_sheet__month__12
+msgid "December"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__department_id
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_search
+msgid "Department"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_hr_attendance__display_name
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_hr_version__display_name
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__display_name
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet_line__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields.selection,name:KSW_attendance_sheet.selection__ksw_attendance_sheet__state__draft
+msgid "Draft"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__is_editable_period
+msgid "Editable Period"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model,name:KSW_attendance_sheet.model_hr_employee
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__employee_id
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_search
+msgid "Employee"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model,name:KSW_attendance_sheet.model_hr_version
+msgid "Employee Contract"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid ""
+"Every attendance sheet for %(period)s has already been sent to payroll — "
+"there is nothing left to confirm."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,help:KSW_attendance_sheet.field_ksw_attendance_sheet_line__is_workday
+msgid "False for weekends / non-scheduled days."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,help:KSW_attendance_sheet.field_ksw_attendance_sheet__is_editable_period
+msgid ""
+"False once the sheet is confirmed/locked, or — for supervisors — once it is "
+"no longer the current calendar month. Older months are kept open for review "
+"only."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields.selection,name:KSW_attendance_sheet.selection__ksw_attendance_sheet__month__2
+msgid "February"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.hr_attendance_view_filter_inherit_sheet
+msgid "Fingerprint Employees"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__message_follower_ids
+msgid "Followers"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__message_partner_ids
+msgid "Followers (Partners)"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.actions.server,name:KSW_attendance_sheet.cron_generate_attendance_sheets_ir_actions_server
+msgid "Generate Monthly Attendance Sheets (1st of Month, 3 AM GMT+3)"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__has_message
+msgid "Has Message"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_hr_attendance__id
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_hr_employee__id
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_hr_version__id
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__id
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet_line__id
+msgid "ID"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,help:KSW_attendance_sheet.field_ksw_attendance_sheet__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,help:KSW_attendance_sheet.field_ksw_attendance_sheet__message_has_error
+#: model:ir.model.fields,help:KSW_attendance_sheet.field_ksw_attendance_sheet__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,help:KSW_attendance_sheet.field_hr_employee__x_is_attendance_sheet
+msgid ""
+"If checked, this employee's attendance is managed via the monthly attendance"
+" sheet by their manager, instead of biometric device punch-in/punch-out."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__message_is_follower
+msgid "Is Follower"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields.selection,name:KSW_attendance_sheet.selection__ksw_attendance_sheet__month__1
+msgid "January"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields.selection,name:KSW_attendance_sheet.selection__ksw_attendance_sheet__month__7
+msgid "July"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields.selection,name:KSW_attendance_sheet.selection__ksw_attendance_sheet__month__6
+msgid "June"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.module.category,name:KSW_attendance_sheet.module_category_attendance_sheet
+msgid "KSW Attendance Sheet"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__write_uid
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet_line__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__write_date
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet_line__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,help:KSW_attendance_sheet.field_ksw_attendance_sheet_line__attendance_id
+msgid "Linked hr.attendance record (auto-synced)."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__is_locked
+msgid "Locked"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,help:KSW_attendance_sheet.field_ksw_attendance_sheet__is_locked
+msgid "Locked sheets cannot be edited. Set automatically when the month ends."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/hr_employee.py:0
+msgid "Main Work Schedule"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/hr_employee.py:0
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__manager_id
+#: model:res.groups,name:KSW_attendance_sheet.group_attendance_sheet_manager
+msgid "Manager"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:res.groups,comment:KSW_attendance_sheet.group_attendance_sheet_manager
+msgid ""
+"Managers have full access to all attendance sheets\n"
+"            regardless of the employee's manager."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields.selection,name:KSW_attendance_sheet.selection__ksw_attendance_sheet__month__3
+msgid "March"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields.selection,name:KSW_attendance_sheet.selection__ksw_attendance_sheet__month__5
+msgid "May"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__message_has_error
+msgid "Message Delivery error"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__message_ids
+msgid "Messages"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__month
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_search
+msgid "Month"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model,name:KSW_attendance_sheet.model_ksw_attendance_sheet
+msgid "Monthly Attendance Sheet"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_search
+msgid "My Team"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__x_is_blocked
+msgid "Needs Attention"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.actions.act_window,help:KSW_attendance_sheet.action_ksw_attendance_sheet
+msgid "No attendance sheets yet."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid ""
+"None of the selected attendance sheets could be sent to payroll:\n"
+"\n"
+"%(problems)s"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid ""
+"None of the selected attendance sheets could be withdrawn from payroll:\n"
+"\n"
+"%(problems)s"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_search
+msgid "Not Sent to Payroll"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid ""
+"Nothing was selected, and you are not the direct manager of any employee, so there is no team to confirm on your own behalf.\n"
+"\n"
+"%(period)s still has %(count)s unconfirmed sheet(s), held by:\n"
+"%(listing)s\n"
+"\n"
+"As an administrator you can confirm any of them — tick the rows you want in the list first, then press the button again."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields.selection,name:KSW_attendance_sheet.selection__ksw_attendance_sheet__month__11
+msgid "November"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__message_needaction_counter
+msgid "Number of Actions"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__message_has_error_counter
+msgid "Number of errors"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,help:KSW_attendance_sheet.field_ksw_attendance_sheet__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,help:KSW_attendance_sheet.field_ksw_attendance_sheet__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields.selection,name:KSW_attendance_sheet.selection__ksw_attendance_sheet__month__10
+msgid "October"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid ""
+"Only %(manager)s (the direct manager) can act on this attendance sheet."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.constraint,message:KSW_attendance_sheet.constraint_ksw_attendance_sheet_unique_employee_month_year
+msgid "Only one attendance sheet per employee per month is allowed."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_list
+msgid "Payroll"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet_line.py:0
+msgid "Present"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__rating_ids
+msgid "Ratings"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid "Re-confirm attendance for %(employee)s"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.actions.server,name:KSW_attendance_sheet.cron_month_end_confirmation_reminder_ir_actions_server
+msgid ""
+"Remind Supervisors to Send Attendance to Payroll (Month End, 6 AM GMT+3)"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_form
+msgid "Review Only"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_search
+msgid "Search Attendance Sheets"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid "Select the attendance sheets you want to withdraw from payroll first."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_search
+msgid "Sent to Payroll"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields.selection,name:KSW_attendance_sheet.selection__ksw_attendance_sheet__month__9
+msgid "September"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet_line__sheet_id
+msgid "Sheet"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__state
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_search
+msgid "Status"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_form
+msgid "Summary"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:res.groups,name:KSW_attendance_sheet.group_attendance_sheet_supervisor
+msgid "Supervisor"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:res.groups,comment:KSW_attendance_sheet.group_attendance_sheet_supervisor
+msgid ""
+"Supervisors (managers) can view and manage attendance\n"
+"            sheets of employees who report to them (parent_id)."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid ""
+"Supervisors can only act on the current month. %(period)s has already closed"
+" — ask HR to handle it for you."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/hr_employee.py:0
+msgid ""
+"The attendance sheet cannot be activated until these are set:\n"
+"%(problems)s"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid ""
+"The employee joins on %(joining)s, after this month ends. This sheet should "
+"not exist — delete it."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,help:KSW_attendance_sheet.field_ksw_attendance_sheet__x_action_owner_id
+msgid ""
+"The person who has to act next before this month can be sent to payroll."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,help:KSW_attendance_sheet.field_ksw_attendance_sheet__x_confirmed_by
+msgid "The supervisor who released this month to payroll."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/hr_employee.py:0
+msgid ""
+"These attendance sheets were already sent to payroll. Withdraw them from payroll first, then turn off \"Uses Attendance Sheet\":\n"
+"%(sheets)s"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid ""
+"These employees have no Direct Manager, so nobody can confirm their "
+"attendance sheet:"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid ""
+"These sheets still contradict approved time off and were left unconfirmed:\n"
+"\n"
+"%(problems)s"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid ""
+"These sheets were left as they were:\n"
+"\n"
+"%(problems)s"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_search
+msgid "This Year"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid ""
+"This attendance cannot be sent to payroll — it contradicts approved time off or the employment period.\n"
+"\n"
+"%(problems)s\n"
+"\n"
+"Correct the days above (or the time-off request / contract start date), then confirm again."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,help:KSW_attendance_sheet.field_hr_attendance__x_is_auto_generated
+msgid ""
+"This attendance record was auto-generated by the Attendance Sheet module."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_list
+msgid ""
+"This marks every day covered by an approved time-off request as absent on "
+"the selected sheets. Continue?"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_form
+msgid ""
+"This marks every day covered by an approved time-off request as absent, "
+"matching the time-off record. Continue?"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,help:KSW_attendance_sheet.field_ksw_attendance_sheet__x_is_blocked
+msgid "This month cannot be sent to payroll yet. See Blocked Reason."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_form
+msgid "This releases the month's attendance to payroll. Continue?"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid "This sheet has no daily attendance lines yet."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid "This sheet is already confirmed."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid ""
+"This sheet is already confirmed. Reset it to draft first if the days need "
+"correcting."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_form
+msgid ""
+"This takes the month back out of payroll and reopens it for editing. Until "
+"you confirm it again, payroll reads this employee as zero attendance. "
+"Continue?"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_list
+msgid ""
+"This takes the selected months back out of payroll and reopens them for "
+"editing. Until they are confirmed again, payroll reads those employees as "
+"zero attendance. Continue?"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid ""
+"Today is the last day of the month and these attendance sheets have not been"
+" sent to payroll yet:"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,help:KSW_attendance_sheet.field_ksw_attendance_sheet_line__is_attended
+msgid "Toggle off to mark the employee as absent on this day."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__total_days
+msgid "Total Days"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,help:KSW_attendance_sheet.field_ksw_attendance_sheet__x_can_confirm
+msgid ""
+"True when the current user may release this sheet to payroll. Drives the "
+"Confirm button; the real gate is the server-side check in "
+"action_supervisor_confirm."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,help:KSW_attendance_sheet.field_ksw_attendance_sheet__x_can_reset
+msgid ""
+"True when the current user may take this sheet back out of payroll. Drives "
+"the Withdraw button; the real gate is the server-side check in "
+"action_reset_to_draft."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_hr_employee__x_is_attendance_sheet
+msgid "Uses Attendance Sheet"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__x_action_owner_id
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_list
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_search
+msgid "Waiting On"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_search
+msgid "Waiting On Me"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__website_message_ids
+msgid "Website Messages"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,help:KSW_attendance_sheet.field_ksw_attendance_sheet__website_message_ids
+msgid "Website communication history"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet_line__is_workday
+msgid "Workday"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model:ir.model.fields,field_description:KSW_attendance_sheet.field_ksw_attendance_sheet__year
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_search
+msgid "Year"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid ""
+"You have no attendance sheets for %(period)s.\n"
+"\n"
+"Attendance sheets are only created for employees marked \"Uses Attendance Sheet\" whose Manager is you. If someone should be on your list, ask HR to check that employee's Manager field."
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#. odoo-python
+#: code:addons/KSW_attendance_sheet/models/attendance_sheet.py:0
+msgid "the direct manager"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_list
+msgid "↩ Withdraw from Payroll"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_list
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_search
+msgid "⚠ Needs Attention"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_form
+msgid "⚠ This month cannot be sent to payroll yet"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_list
+msgid "⚡ Apply Approved Time Off"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_form
+msgid "✓ All Present"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_list
+msgid "✓ Confirm & Send to Payroll"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_form
+msgid "✗ All Absent"
+msgstr ""
+
+#. module: KSW_attendance_sheet
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_sheet.ksw_attendance_sheet_view_list
+msgid "⟳ Generate All Sheets"
+msgstr ""

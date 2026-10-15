@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-31 06:36+0000\n"
-"PO-Revision-Date: 2026-08-31 06:36+0000\n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:41+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,10 +16,100 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/hr_payslip.py:0
+msgid " — pulled forward, due %(period)s"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "\"From\" must be on or before \"To\"."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_line__settlement_label
 msgid ""
 "\"Payslip <ref>\" for auto-paid lines, \"Manual by <user> on <date>\" for "
 "manual lines."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__pct_of_gross
+msgid "% of Gross"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"%(emp)s already has %(n)d other personal loan(s) in progress, with %(out).2f"
+" still outstanding. This request can still be approved, but the %(role)s "
+"must click '⚠ Accept Concurrent Loan' first so the decision is on record."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"%(emp)s has no other personal loan in progress — there is nothing to accept."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"%(name)s can no longer be deleted. You may delete your own request only "
+"while it is still waiting for the first approval — afterwards use Cancel, "
+"which keeps a trace of the request."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"%(name)s can no longer be edited. A request can only be changed by the "
+"employee who raised it, and only while it is still waiting for the first "
+"approval."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/hr_payslip.py:0
+msgid ""
+"%(type)s [%(ref)s] inst %(n)s/%(total)s — already collected in %(slip)s"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"%(type)s deductions are a single installment. A system administrator can "
+"unlock this on the deduction type."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "%(type)s granted — %(n)s installment(s)"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"'%(type)s' deductions are handled by the Accounting Data Entry team. Ask an "
+"administrator to grant you Settings → Users → Access Rights → KSW Deductions"
+" → Deduction Management = Accounting Data Entry (Non-Loan)."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"'%(type)s' deductions are handled by the Officer / Accounting (Loans) team. "
+"Ask an administrator to grant you Settings → Users → Access Rights → KSW "
+"Deductions → Deduction Management = Officer, or Loan Modification = Full."
 msgstr ""
 
 #. module: KSW_deduction
@@ -75,6 +165,16 @@ msgid ""
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_reschedule_wizard_view_form
+msgid ""
+"<i class=\"fa fa-info-circle me-1\" title=\"Info\" role=\"img\" aria-label=\"Info\"/>\n"
+"                        Only the <b>outstanding</b> balance is re-spread.\n"
+"                        Installments already collected stay exactly as they\n"
+"                        are, and the total amount of each deduction does not\n"
+"                        change — this changes the plan, not the debt."
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 msgid ""
 "<i class=\"fa fa-info-circle me-1\"/>\n"
@@ -102,8 +202,29 @@ msgid ""
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_reschedule_wizard_view_form
+msgid ""
+"<i class=\"fa fa-lightbulb-o me-1\" title=\"Tip\" role=\"img\" aria-label=\"Tip\"/>\n"
+"                            A monthly figure is a decision about the\n"
+"                            <b>employee</b>, not about one contract. Leave\n"
+"                            these selected to bring the whole outstanding book\n"
+"                            down to a single monthly total; each deduction\n"
+"                            still keeps its own reference and ledger."
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "<span class=\"mx-1\">/</span>"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid "<span class=\"mx-1\">is still outstanding.</span>"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid "<span class=\"mx-1\">loan(s) still in progress, of which</span>"
 msgstr ""
 
 #. module: KSW_deduction
@@ -131,6 +252,17 @@ msgid "<strong>Deduction Types</strong>"
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_hr_payslip_form_inherit_ksw_deduction_coverage
+msgid ""
+"<strong>Deductions exceed this payslip.</strong>\n"
+"                    The full outstanding amount is shown below for review.\n"
+"                    Only the part marked <em>Collected by This Payslip</em>\n"
+"                    is settled as paid — the rest stays\n"
+"                    <strong>pending</strong> on the deduction schedule and is\n"
+"                    collected by a later payroll run."
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
 msgid "<strong>Department</strong>"
 msgstr ""
@@ -138,6 +270,11 @@ msgstr ""
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
 msgid "<strong>Employee No.</strong>"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_payslip_deduction_coverage
+msgid "<strong>Employee total outstanding (all months)</strong>"
 msgstr ""
 
 #. module: KSW_deduction
@@ -156,8 +293,22 @@ msgid "<strong>Loan Approval:</strong>"
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_leave_deduction_picture
+msgid "<strong>Outstanding Loans &amp; Deductions (all months)</strong>"
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
 msgid "<strong>Period</strong>"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_leave_view_form_inherit_ksw_deduction_picture
+msgid ""
+"<strong>Possible double charge.</strong>\n"
+"                    Payroll now collects the employee's\n"
+"                    <strong>whole</strong> outstanding balance\n"
+"                    ("
 msgstr ""
 
 #. module: KSW_deduction
@@ -186,6 +337,17 @@ msgid "<strong>Summary</strong>"
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_leave_view_form_inherit_ksw_deduction_picture
+msgid ""
+"<strong>The payslip cannot cover every deduction.</strong>\n"
+"                    The full amount is shown so the employee's position is\n"
+"                    visible, which is why the net may be negative. Only the\n"
+"                    <em>Collected by the Payslip</em> part is settled as paid —\n"
+"                    the rest stays <strong>pending</strong> and is collected by\n"
+"                    a later payroll run."
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_refuse_wizard_form
 msgid "<strong>You are about to refuse this loan request.</strong>"
 msgstr ""
@@ -203,6 +365,11 @@ msgstr ""
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid "<strong>⚠️ This employee already has another personal loan</strong>"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "<strong>⛔ Loan Request Refused</strong>"
 msgstr ""
 
@@ -212,6 +379,21 @@ msgid ""
 "A clear, factual explanation of why this loan request is being refused. This"
 " will be visible to the employee on the loan form and recorded in the "
 "chatter history."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+#: code:addons/KSW_deduction/wizard/loan_refuse_wizard.py:0
+msgid "A refusal reason is required."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_reschedule_wizard.py:0
+msgid ""
+"A repayment plan cannot exceed 120 months — you entered %(n)d. Check the "
+"monthly amount."
 msgstr ""
 
 #. module: KSW_deduction
@@ -277,6 +459,14 @@ msgid "Accounting Data Entry (Non-Loan)"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"Accounting cannot approve until the checkbox 'Budget confirmed' is ticked in"
+" the Decision Support tab."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_acc_budget_confirmed
 msgid ""
 "Accounting must tick this before approving — confirms monthly budget impact "
@@ -286,6 +476,11 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_acc_budget_confirmed
 msgid "Accounting: Budget confirmed"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_concurrent_ack_acc
+msgid "Accounting: Concurrent loan accepted"
 msgstr ""
 
 #. module: KSW_deduction
@@ -348,6 +543,15 @@ msgid "Activity Type Icon"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"Adding a manual installment requires either the 'Loan Installment "
+"Modification' privilege or the Accounting Data Entry role. Ask an "
+"administrator to grant the appropriate access on your user."
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_request_wizard_form
 msgid "Additional notes, repayment preferences..."
 msgstr ""
@@ -385,6 +589,12 @@ msgid "All deduction types"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_reschedule_wizard.py:0
+msgid "All selected deductions must belong to the same employee."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_hr_employee__x_deduction_outstanding_total
 msgid ""
 "All still-pending installments across every active deduction, regardless of "
@@ -399,8 +609,21 @@ msgid ""
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
 msgid "All types"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__allocation_html
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_reschedule_wizard_view_form
+msgid "Allocation"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__sibling_ids
+msgid "Also reschedule"
 msgstr ""
 
 #. module: KSW_deduction
@@ -411,6 +634,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__amount
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_kanban
 msgid "Amount"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+#: code:addons/KSW_deduction/wizard/loan_request_wizard.py:0
+msgid "Amount must be greater than zero."
 msgstr ""
 
 #. module: KSW_deduction
@@ -480,6 +710,15 @@ msgid "Attachments"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/hr_payslip.py:0
+msgid ""
+"Automatically opened from payslip revision %(revision)s (revision of "
+"%(source)s). Recomputing the period with current data produced a net "
+"%(amount).2f lower than the amount already paid to the employee."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_request_wizard__employee_id
 msgid ""
 "Automatically set to the current user's employee. A user can only request a "
@@ -487,6 +726,13 @@ msgid ""
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__available_sibling_ids
+msgid "Available Sibling"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__balance
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
@@ -551,6 +797,7 @@ msgid ""
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_reschedule_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_refuse_wizard_form
@@ -567,6 +814,18 @@ msgid "Cancelled"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "Cancelled — uncollected balance written off"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Cannot reset to draft: some installments are already paid."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__category
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__category
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_search
@@ -574,6 +833,8 @@ msgid "Category"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__debit
 #: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_statement_line__row_kind__charge
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
@@ -608,10 +869,22 @@ msgid "Closing Balance"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "Closing balance"
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
 msgid ""
 "Closing balance\n"
 "                                        ("
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "Closing balance — all types"
 msgstr ""
 
 #. module: KSW_deduction
@@ -621,6 +894,8 @@ msgid "Code"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__credit
 #: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_statement_line__row_kind__credit
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
@@ -637,6 +912,22 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__manual_date
 msgid "Collected On"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_payslip__x_ksw_ded_collected
+msgid "Collected by This Payslip"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_leave__x_ksw_ded_collected
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_leave_deduction_picture
+msgid "Collected by the Payslip"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_payslip_deduction_coverage
+msgid "Collected by this payslip"
 msgstr ""
 
 #. module: KSW_deduction
@@ -659,6 +950,27 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_search
 msgid "Completed"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Completed deductions cannot be cancelled."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_concurrent_ack_pending
+msgid "Concurrent Loan Awaiting My Acceptance"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_concurrent_loan_summary
+msgid "Concurrent Loans Breakdown"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid "Concurrent Personal Loan"
 msgstr ""
 
 #. module: KSW_deduction
@@ -699,6 +1011,7 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__create_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__create_uid
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__create_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__create_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__create_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__create_uid
@@ -713,6 +1026,7 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__create_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__create_date
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__create_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__create_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__create_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__create_date
@@ -725,8 +1039,11 @@ msgid "Created on"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__currency_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__currency_id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__currency_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__currency_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__currency_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__currency_id
@@ -783,6 +1100,8 @@ msgid "Dashboard"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__date
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
 msgid "Date"
@@ -823,12 +1142,44 @@ msgstr ""
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__deduction_id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__deduction_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__deduction_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__deduction_id
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_list
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_search
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 msgid "Deduction"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"Deduction %(name)s cannot be deleted because %(n)s installment(s) have "
+"already been paid. Cancel it instead."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"Deduction '%(name)s' is a loan managed by Accounting. Manually closing it "
+"requires the 'Loan Installment Modification' privilege, not the Accounting "
+"Data Entry role."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"Deduction '%(name)s' is a loan managed by Accounting. Modifying its "
+"installments requires the 'Loan Installment Modification' privilege."
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_payslip_deduction_coverage
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_hr_payslip_form_inherit_ksw_deduction_coverage
+msgid "Deduction Coverage"
 msgstr ""
 
 #. module: KSW_deduction
@@ -847,6 +1198,8 @@ msgid "Deduction Statement of Account"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
 #: model:ir.actions.act_window,name:KSW_deduction.action_ksw_deduction_type
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__type_ids
 #: model:ir.ui.menu,name:KSW_deduction.menu_ksw_deduction_types
@@ -873,8 +1226,39 @@ msgid "Deductions"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/hr_leave.py:0
+msgid "Deductions Due Now — %s"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_payslip__x_ksw_ded_presented
+msgid "Deductions Presented"
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_kanban
 msgid "Deductions This Month"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Deductions This Month — %s"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_single_installment
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_type__x_single_installment
+msgid ""
+"Deductions of this type are always one installment: the number of "
+"installments cannot be changed on the deduction or by Reschedule "
+"Installments. Only a system administrator can change this setting."
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_payslip_deduction_coverage
+msgid "Deductions presented on this payslip"
 msgstr ""
 
 #. module: KSW_deduction
@@ -882,6 +1266,11 @@ msgstr ""
 msgid ""
 "Deductions this employee has that your access rights do not let you see. "
 "They are excluded from every figure here."
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_reschedule_wizard_view_form
+msgid "Deductions to Reschedule"
 msgstr ""
 
 #. module: KSW_deduction
@@ -900,6 +1289,14 @@ msgid "Delete only"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"Deleting a manual installment requires the 'Loan Installment Modification' "
+"privilege."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model,name:KSW_deduction.model_hr_department
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__department_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__department_id
@@ -914,6 +1311,8 @@ msgid "Describe what needs to be corrected..."
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__description
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__label
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__description
@@ -948,10 +1347,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_department__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_employee__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_employee_public__display_name
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_leave__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_payslip__display_name
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_payslip_input__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_ir_ui_menu__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__display_name
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__display_name
@@ -978,6 +1380,12 @@ msgstr ""
 #: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction__state__draft
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_search
 msgid "Draft"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_leave__x_ksw_ded_month_total
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_leave_deduction_picture
+msgid "Due at This Payroll Run"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1014,21 +1422,44 @@ msgid "Edit only"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"Editing installments on non-loan deductions requires the Accounting Data "
+"Entry role or the 'Loan Installment Modification' privilege."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
 #: model:ir.model,name:KSW_deduction.model_hr_employee
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__employee_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__employee_id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__employee_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__employee_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__employee_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__employee_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__employee_id
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_search
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_reschedule_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_kanban
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_search
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_return_approver_wizard_form
 msgid "Employee"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_leave_view_form_inherit_ksw_deduction_picture
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_leave_deduction_picture
+msgid "Employee Deduction Picture"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_has_concurrent_loan
+msgid "Employee Has Another Loan"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1045,6 +1476,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_emp_employee_no
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.view_employee_filter_add_loan_acc_no
 msgid "Employee No."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_payslip__x_ksw_ded_outstanding
+msgid "Employee Total Outstanding"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1075,9 +1511,34 @@ msgid "End-of-Service (Saudi Art. 84–88)"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_reschedule_wizard.py:0
+msgid "Enter a number of months (or a monthly amount) greater than zero."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_reschedule_wizard__plan_by
+msgid ""
+"Enter whichever of the two you decided on — the other is derived and shown "
+"below, so you can check both before confirming."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_leave__x_ksw_ded_manual_total
+msgid "Entered by Hand"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_request_wizard__installment_amount
 msgid ""
 "Estimated amount deducted each month (loan amount / number of installments)."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_payslip__x_ksw_ded_outstanding
+msgid ""
+"Every still-pending installment the employee owes across all active "
+"deductions, whatever month it falls in."
 msgstr ""
 
 #. module: KSW_deduction
@@ -1086,6 +1547,13 @@ msgid ""
 "Everything in \"Edit and Delete\" plus post-confirmation installment edits "
 "on active loans, the loan payment wizard, and closing any deduction type. "
 "Typically granted to accounting staff."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_leave__x_ksw_ded_outstanding
+msgid ""
+"Everything the employee still owes: all pending installments across every "
+"active deduction, whatever month they fall in."
 msgstr ""
 
 #. module: KSW_deduction
@@ -1103,6 +1571,11 @@ msgstr ""
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Financials"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__start_month
+msgid "First Installment"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1175,6 +1648,11 @@ msgid "GM Final Approver"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_concurrent_ack_gm
+msgid "GM: Concurrent loan accepted"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model,name:KSW_deduction.model_ksw_loan_return_approver_wizard
 msgid "GM: Return Loan Request to Approver"
 msgstr ""
@@ -1206,6 +1684,7 @@ msgstr ""
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_gross_salary
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__gross_salary
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_kanban
 msgid "Gross Salary"
 msgstr ""
@@ -1232,10 +1711,24 @@ msgid "HR Approver"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"HR cannot approve until the checkbox 'No pending penalties on this employee'"
+" is ticked in the Decision Support tab. If a penalty is pending, create it "
+"first via 'New Penalty'."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_hr_no_penalties_confirmed
 msgid ""
 "HR must tick this before approving. If a penalty is pending, create it first"
 " via \"New Penalty\" button so the decision-support values reflect it."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_concurrent_ack_hr
+msgid "HR: Concurrent loan accepted"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1246,6 +1739,16 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__has_message
 msgid "Has Message"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__has_siblings
+msgid "Has Siblings"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_reschedule_wizard__installments
+msgid "How many monthly installments the remaining balance is spread over."
 msgstr ""
 
 #. module: KSW_deduction
@@ -1282,10 +1785,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_department__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_employee__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_employee_public__id
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_leave__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_payslip__id
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_payslip_input__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ir_ui_menu__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__id
@@ -1332,6 +1838,38 @@ msgid "Installment"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "Installment %(label)s"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"Installment %(label)s has been paid via payslip %(slip)s and cannot be "
+"deleted. Reset the payslip to draft first if you need to undo it."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"Installment %(label)s is part of the auto-generated schedule. It cannot be "
+"deleted directly — cancel the whole loan or reset it to draft to regenerate "
+"the schedule."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"Installment %(label)s on loan %(loan)s is '%(state)s' and cannot be "
+"modified. Only pending installments (or manual paid entries) can be "
+"rescheduled or re-valued."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__installment_amount
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__installment_amount
 msgid "Installment Amount"
@@ -1366,8 +1904,21 @@ msgid "Installments Fully Settled"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+#: code:addons/KSW_deduction/wizard/loan_request_wizard.py:0
+msgid "Installments must be at least 1."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ksw.deduction.type,name:KSW_deduction.type_internal_penalty
 msgid "Internal Penalty"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Invalid refusal step."
 msgstr ""
 
 #. module: KSW_deduction
@@ -1427,8 +1978,14 @@ msgid "KSW Loan Request (Self-Service)"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__end_month
+msgid "Last Installment"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__write_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__write_uid
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__write_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__write_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__write_uid
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__write_uid
@@ -1443,6 +2000,7 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__write_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__write_date
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__write_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__write_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__write_date
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__write_date
@@ -1517,9 +2075,17 @@ msgid "Loan Modification"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/loan_refuse_wizard.py:0
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_refuse_wizard__deduction_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_return_approver_wizard__deduction_id
 msgid "Loan Request"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/loan_request_wizard.py:0
+msgid "Loan Request #%s"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1538,11 +2104,35 @@ msgid "Loan Type"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Loan is not in Pending Disbursement state."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"Loan terms (amount, installments, start month) cannot be changed once the "
+"loan is pending disbursement."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_request_wizard__type_id
 msgid "Loan-category deduction type. Non-loan types are hidden."
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"Loan-type deductions can only be created by Accounting Approvers, Deduction "
+"Officers, or Supervisors."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ir_ui_menu.py:0
 #: model:ir.actions.act_window,name:KSW_deduction.action_ksw_deduction_loans
 #: model:ir.ui.menu,name:KSW_deduction.menu_ksw_deduction_loans
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_employee_view_form_inherit_ksw_deduction
@@ -1594,6 +2184,20 @@ msgstr ""
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_search
 msgid "Manual Payments"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid "Manual by %(u)s%(d)s"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"Manual installment entries cannot be linked to a payslip — they represent "
+"payments collected outside the payroll system."
 msgstr ""
 
 #. module: KSW_deduction
@@ -1687,6 +2291,19 @@ msgid "Month of the installment the payment lands inside, if any."
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_reschedule_wizard__start_month
+msgid ""
+"Month the new plan starts. Any day is accepted — only the month is used. A "
+"month already in the past is still collected by the next payslip, so "
+"backdating is harmless."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__target_monthly
+msgid "Monthly Amount"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_employee__x_deduction_monthly_total
 msgid "Monthly Deduction Total"
 msgstr ""
@@ -1694,6 +2311,21 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_active_deductions_monthly_impact
 msgid "Monthly Impact (other)"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__monthly_total
+msgid "Monthly Total"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_reschedule_wizard__plan_by__monthly
+msgid "Monthly amount"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__effective_installments
+msgid "Months"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1742,6 +2374,22 @@ msgid "New Amount / Installment"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "New Penalty for %s"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_reschedule_wizard_view_form
+msgid "New Plan"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
+msgid "New Statement"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__activity_calendar_event_id
 msgid "Next Activity Calendar Event"
 msgstr ""
@@ -1762,6 +2410,20 @@ msgid "Next Activity Type"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"No General Manager is set for %(dept)s, so this step cannot be approved. Ask"
+" HR to set the department's General Manager."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/loan_refuse_wizard.py:0
+msgid "No loan request selected."
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
 msgid ""
 "No movements in this period. The opening and closing\n"
@@ -1771,6 +2433,52 @@ msgstr ""
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_search
 msgid "Non-loans"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_payslip_input__x_ksw_uncollected
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.view_hr_payslip_form_inherit_ksw_deduction_coverage
+msgid "Not Collected"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_leave__x_ksw_ded_carried
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_payslip__x_ksw_ded_carried
+msgid "Not Collected (Still Pending)"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_leave_deduction_picture
+msgid "Not Collected — still pending"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_payslip_deduction_coverage
+msgid "Not collected — still pending"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Not pending DM approval."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Not pending GM final approval."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Not pending HR approval."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Not pending accounting approval."
 msgstr ""
 
 #. module: KSW_deduction
@@ -1788,6 +2496,11 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__message_needaction_counter
 msgid "Number of Actions"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__installments
+msgid "Number of Months"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1818,6 +2531,11 @@ msgid "Number of monthly installments. Defaults to the type suggestion."
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_reschedule_wizard__plan_by__months
+msgid "Number of months"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_statement_wizard__overdue_amount
 msgid ""
 "Of the closing balance, how much was scheduled for a month that has already "
@@ -1836,13 +2554,144 @@ msgid "Officer"
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_leave_view_form_inherit_ksw_deduction_picture
+msgid "On the Vacation / EOS Payslip"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"Only %(gm)s, the General Manager of %(dept)s, can act at the GM step of this"
+" request."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Only Accounting Approvers can approve at the Accounting step."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Only Accounting Approvers can refuse at the Accounting step."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Only HR Approvers can approve at the HR step."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Only HR Approvers can refuse at the HR step."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_type.py:0
+msgid ""
+"Only a system administrator can lock or unlock the number of installments of"
+" a deduction type."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_type.py:0
+msgid ""
+"Only a system administrator can lock the number of installments of a "
+"deduction type."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_reschedule_wizard.py:0
+msgid "Only active deductions can be rescheduled."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Only draft deductions can be submitted."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/loan_request_wizard.py:0
+msgid ""
+"Only loan-type deductions can be submitted through this form. Chosen type "
+"%(t)s is not a loan."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"Only pending installments can be marked as paid. '%(label)s' is already "
+"'%(state)s'."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__approval_state
 msgid "Only relevant for loan types. Drives the 5-step approval chain."
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Only the %(role)s can accept the concurrent-loan warning at this step."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Only the General Manager can return a loan request to an approver."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Only the Loan Disbursement Officer can confirm disbursement."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"Only the employee who submitted the loan request can cancel it. Approvers "
+"must use the 'Refuse' button, which records a mandatory reason that is shown"
+" to the employee."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"Only the employee's direct manager (or a Deduction Officer/Manager) can "
+"perform the DM approval step."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"Only the employee's direct manager (or a Deduction Officer/Manager) can "
+"refuse at the DM step."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"Only the requesting employee or a Deduction Officer/Manager can reset a "
+"refused loan request to draft."
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_list
-#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
 msgid "Open"
 msgstr ""
 
@@ -1853,7 +2702,9 @@ msgstr ""
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
-msgid "Open the deduction behind this movement"
+msgid ""
+"Open a blank Statement of Account dialog, the same as Deductions → Reports →"
+" Statement of Account"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1868,8 +2719,22 @@ msgid "Opening Balance"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
 msgid "Opening balance"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "Opening balance — %(type)s"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "Opening balance — all types"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1912,6 +2777,25 @@ msgid "Other Active Deductions (same employee)"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_concurrent_loan_outstanding
+msgid "Other Loans Outstanding"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_concurrent_loan_count
+msgid "Other Loans in Progress"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_reschedule_wizard__sibling_ids
+msgid ""
+"Other active deductions of this employee with a balance left. Include them "
+"to spread the whole outstanding book over the same window — the monthly "
+"total then lands on the target pro-rata instead of having to be split by "
+"hand."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_wizard__out_of_scope_count
 msgid "Out Of Scope Count"
 msgstr ""
@@ -1929,6 +2813,18 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_employee__x_deduction_outstanding_total
 msgid "Outstanding Deduction Total"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/hr_leave.py:0
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Outstanding Deductions — %s"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_leave__x_ksw_ded_outstanding
+msgid "Outstanding Loans & Deductions"
 msgstr ""
 
 #. module: KSW_deduction
@@ -1965,6 +2861,14 @@ msgid "Paid on That Installment"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_payslip_input__x_ksw_uncollected
+msgid ""
+"Part of this installment the payslip could not afford. It is shown on the "
+"payslip for visibility but is NOT settled as paid — the installment stays "
+"pending for this amount and is collected by a later payroll run."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_payment_wizard__seq_partial_label
 msgid "Partially Settled Installment"
 msgstr ""
@@ -1990,6 +2894,20 @@ msgid "Payment Details"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_loan_payment_wizard.py:0
+msgid ""
+"Payment amount (%(pay).2f) exceeds the outstanding balance (%(out).2f "
+"%(cur)s)."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_loan_payment_wizard.py:0
+msgid "Payment amount must be greater than zero."
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Payroll Impact"
 msgstr ""
@@ -2003,7 +2921,13 @@ msgstr ""
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__payslip_id
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__payslip_id
 msgid "Payslip"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model,name:KSW_deduction.model_hr_payslip_input
+msgid "Payslip Input"
 msgstr ""
 
 #. module: KSW_deduction
@@ -2100,10 +3024,18 @@ msgid "Pending installment whose scheduled month has already passed."
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_leave__x_ksw_ded_month_total
+msgid ""
+"Pending installments payroll will try to collect now: those scheduled for "
+"the current month plus anything still pending from an earlier month."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_hr_employee__x_deduction_monthly_total
 msgid ""
-"Pending installments this month's payroll will collect: those scheduled for "
-"the current month plus any still pending from earlier months."
+"Pending installments the next payroll will collect: those scheduled up to "
+"the payroll month in progress (last month until its payslip is confirmed) "
+"plus any still pending from earlier months."
 msgstr ""
 
 #. module: KSW_deduction
@@ -2119,6 +3051,8 @@ msgid "Percentage of the total amount already paid."
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
 msgid "Period"
 msgstr ""
@@ -2131,6 +3065,21 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ksw.deduction.type,name:KSW_deduction.type_loan
 msgid "Personal Loan"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__plan_by
+msgid "Plan by"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_leave__x_ksw_ded_presented
+msgid "Presented on the Payslip"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_leave_deduction_picture
+msgid "Presented on the Vacation / EOS Payslip"
 msgstr ""
 
 #. module: KSW_deduction
@@ -2172,6 +3121,7 @@ msgstr ""
 
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__reason
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__reason
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_loan_request_wizard__reason
 msgid "Reason"
 msgstr ""
@@ -2221,11 +3171,19 @@ msgid "Record Payment"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Record Payment — %s"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_loan_payment_wizard__application_mode__redistribute
 msgid "Redistribute across remaining installments"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__ref
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
@@ -2244,6 +3202,8 @@ msgid "Refusal Reason"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_refuse_wizard_form
 msgid "Refuse Loan Request"
 msgstr ""
@@ -2278,6 +3238,11 @@ msgid "Remaining After Payment"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_leave__x_ksw_ded_manual_total
+msgid "Remaining Loans plus Additional Deductions as typed on this form."
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Repayment progress"
 msgstr ""
@@ -2296,6 +3261,28 @@ msgid "Request a Loan"
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_reschedule_wizard_view_form
+msgid "Reschedule"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model,name:KSW_deduction.model_ksw_deduction_reschedule_wizard
+msgid "Reschedule Deduction Installments"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_reschedule_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid "Reschedule Installments"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Reschedule Installments — %s"
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Reset to Draft"
 msgstr ""
@@ -2306,6 +3293,7 @@ msgid "Responsible User"
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_reschedule_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
 msgid "Result"
 msgstr ""
@@ -2332,6 +3320,8 @@ msgid "Return for Revision"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
 #: model:ir.actions.act_window,name:KSW_deduction.action_ksw_loan_return_approver_wizard
 msgid "Return to Approver"
 msgstr ""
@@ -2339,6 +3329,24 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__row_kind
 msgid "Row Kind"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_leave_view_form_inherit_ksw_deduction_picture
+msgid ""
+"SAR typed by hand in\n"
+"                    <em>Remaining Loans</em> / <em>Additional Deductions</em>.\n"
+"                    If that was entered to make up for the balance not being\n"
+"                    taken, remove it — otherwise the employee is charged\n"
+"                    twice."
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_leave_view_form_inherit_ksw_deduction_picture
+msgid ""
+"SAR) on the settlement\n"
+"                    payslip automatically, including installments not yet\n"
+"                    due. This form also carries"
 msgstr ""
 
 #. module: KSW_deduction
@@ -2354,6 +3362,12 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ksw.deduction.type,name:KSW_deduction.type_advance
 msgid "Salary Advance"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/hr_payslip.py:0
+msgid "Salary over-payment for %(date_from)s → %(date_to)s"
 msgstr ""
 
 #. module: KSW_deduction
@@ -2402,6 +3416,11 @@ msgid "Settlement"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_reschedule_wizard__pct_of_gross
+msgid "Share of the monthly gross salary this plan withholds."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_type__code
 msgid "Short unique code used on payslip input lines (e.g. LOAN, GOVPEN)."
 msgstr ""
@@ -2412,8 +3431,15 @@ msgid "Show every pending installment of this employee"
 msgstr ""
 
 #. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_leave_view_form_inherit_ksw_deduction_picture
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Show the installments behind this total"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_single_installment
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_type__x_single_installment
+msgid "Single Installment Only"
 msgstr ""
 
 #. module: KSW_deduction
@@ -2454,6 +3480,8 @@ msgid "Statement Lines"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
 #: model:ir.actions.act_window,name:KSW_deduction.action_ksw_deduction_statement
 #: model:ir.actions.report,name:KSW_deduction.action_report_deduction_statement
 #: model:ir.ui.menu,name:KSW_deduction.menu_ksw_deduction_statement
@@ -2465,12 +3493,23 @@ msgid "Statement of Account"
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "Statement of Account — %(name)s"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__activity_state
 msgid ""
 "Status based on activities\n"
 "Overdue: Due date is already passed\n"
 "Today: Activity date is today\n"
 "Planned: Future activities."
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.hr_leave_view_form_inherit_ksw_deduction_picture
+msgid "Still Owed"
 msgstr ""
 
 #. module: KSW_deduction
@@ -2491,6 +3530,12 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ir.model.fields.selection,name:KSW_deduction.selection__ksw_deduction_statement_line__row_kind__subtotal
 msgid "Subtotal"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "Subtotal — %(type)s"
 msgstr ""
 
 #. module: KSW_deduction
@@ -2518,6 +3563,19 @@ msgid "Supporting Documents"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_reschedule_wizard__available_sibling_ids
+msgid "Technical: domain source for sibling_ids."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"The concurrent-loan warning is only accepted between the HR and the GM Final"
+" approval steps."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.constraint,message:KSW_deduction.constraint_ksw_deduction_type_unique_code
 msgid "The deduction type code must be unique."
 msgstr ""
@@ -2528,12 +3586,136 @@ msgid "The employee whose deduction account is being stated."
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "The loan must be at the GM Final Approval step to use this action."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid ""
+"The openpyxl library is required to export to Excel. Print the PDF instead, "
+"or ask an administrator to install it."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_payslip__x_ksw_ded_collected
+msgid ""
+"The part of the presented deductions the pay could actually absorb. Only "
+"this part is settled as paid."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_leave__x_ksw_ded_collected
+msgid ""
+"The part the pay could actually absorb. Only this part is marked paid on the"
+" deduction schedule."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_leave__x_ksw_ded_carried
+msgid ""
+"The part the pay could not cover. It is NOT marked paid — it stays pending "
+"and is collected by a later payroll run."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_payslip__x_ksw_ded_carried
+msgid ""
+"The part the pay could not cover. It stays pending on the deduction schedule"
+" and is collected by a later payroll run."
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_payslip_deduction_coverage
+msgid ""
+"The pay could not cover every deduction shown. Only the\n"
+"                        collected amount is settled as paid — the rest stays\n"
+"                        pending and is collected by a later payroll run."
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_leave_deduction_picture
+msgid ""
+"The payslip could not cover every deduction, which is why the\n"
+"                net may be negative. Only the collected part is settled as\n"
+"                paid — the rest stays pending and is collected by a later\n"
+"                payroll run."
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_refuse_wizard_form
 msgid ""
 "The reason you provide below\n"
 "                                <b>will be shown to the employee</b>\n"
 "                                and recorded permanently in the approval\n"
 "                                history. Please be clear and respectful."
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid ""
+"The request can still go through — but HR, Accounting and\n"
+"                            the GM must each click <b>⚠ Accept Concurrent Loan</b>\n"
+"                            before their own approval will be accepted."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_reschedule_wizard.py:0
+msgid ""
+"The selected deductions have no pending installments left to reschedule."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"The sum of the installments on %(name)s no longer matches the total amount.\n"
+"\n"
+"  • Total amount      : %(amt).2f %(cur)s\n"
+"  • Sum of installments: %(tot).2f %(cur)s\n"
+"  • Difference        : %(diff).2f %(cur)s\n"
+"\n"
+"Adjust one or more of the other pending installments so the totals match, then save again."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid ""
+"The total amount does not match the installment schedule on: %(refs)s. The "
+"balance below is derived from the recorded amounts and should be reconciled "
+"before the statement is relied on."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_reschedule_wizard.py:0
+msgid ""
+"These deductions are a single installment and cannot be spread over several "
+"months: %(names)s. A system administrator can unlock this on the deduction "
+"type."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "This action is only available for loan-type deductions."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_loan_payment_wizard.py:0
+msgid "This deduction has no pending installments."
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid ""
+"This employee already has another personal loan in progress. Accepting "
+"records that you approved the additional exposure at your step. Continue?"
 msgstr ""
 
 #. module: KSW_deduction
@@ -2553,10 +3735,37 @@ msgid ""
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "This loan is not currently at the %s step."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"This loan request has already been submitted and is currently %(s)s. It "
+"cannot be submitted again."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid ""
+"This movement was not settled through a payslip — there is no payslip to "
+"open."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_line__is_manual
 msgid ""
 "Ticked for installment lines added by hand by the accountant (payment "
 "collected outside payroll). Auto-generated schedule lines stay False."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model,name:KSW_deduction.model_hr_leave
+msgid "Time Off"
 msgstr ""
 
 #. module: KSW_deduction
@@ -2578,6 +3787,11 @@ msgstr ""
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "Total Deductions This Month"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_reschedule_wizard__total_outstanding
+msgid "Total Outstanding"
 msgstr ""
 
 #. module: KSW_deduction
@@ -2630,6 +3844,25 @@ msgid "Total collected"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_leave__x_ksw_ded_presented
+msgid ""
+"Total deduction installments carried on the vacation / EOS payslip. The full"
+" amount is shown even when it drives the net negative."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_payslip__x_ksw_ded_presented
+msgid "Total of the KSW deduction installments shown on this payslip."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_reschedule_wizard__target_monthly
+msgid ""
+"Total to deduct from this employee each month across every selected "
+"deduction. The number of months is derived from it."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_can_admin_return
 msgid ""
 "True for a Deduction Manager, who may return a loan request to any earlier "
@@ -2672,8 +3905,29 @@ msgid ""
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_leave__x_ksw_ded_manual_duplicate
+msgid ""
+"True when amounts were typed by hand while the employee also has outstanding"
+" installments — which payroll now collects automatically, so the two may be "
+"charging the same money twice."
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_loan_payment_wizard__is_full_payment
 msgid "True when payment_amount covers the full outstanding balance."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_concurrent_ack_pending
+msgid ""
+"True when the employee carries another personal loan, the request sits at a "
+"step that must accept it, and the current user is the role acting at that "
+"step."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_hr_leave__x_ksw_ded_shortfall
+msgid "True when the payslip could not cover every deduction presented on it."
 msgstr ""
 
 #. module: KSW_deduction
@@ -2684,6 +3938,8 @@ msgid ""
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__type_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_line__type_id
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__type_id
@@ -2697,6 +3953,18 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__activity_exception_decoration
 msgid "Type of the exception activity on record."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "Unknown"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid "Unknown user"
 msgstr ""
 
 #. module: KSW_deduction
@@ -2761,9 +4029,10 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_emp_monthly_total
 msgid ""
-"What this month's payroll will collect from this employee across every "
-"active deduction (this one included): installments scheduled for the current"
-" month plus any left pending from earlier months."
+"What the next payroll will collect from this employee across every active "
+"deduction (this one included): installments scheduled up to the payroll "
+"month in progress (last month until its payslip is confirmed) plus any left "
+"pending from earlier months."
 msgstr ""
 
 #. module: KSW_deduction
@@ -2802,6 +4071,13 @@ msgstr ""
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.view_ksw_loan_request_wizard_form
 msgid "Why do you need this loan? (required)"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction_reschedule_wizard__reason
+msgid ""
+"Why the plan is being changed. Recorded in the chatter of every deduction "
+"rescheduled."
 msgstr ""
 
 #. module: KSW_deduction
@@ -2866,6 +4142,21 @@ msgid "X Deduction Currency"
 msgstr ""
 
 #. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_leave__x_ksw_ded_has_calc
+msgid "X Ksw Ded Has Calc"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_leave__x_ksw_ded_manual_duplicate
+msgid "X Ksw Ded Manual Duplicate"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_hr_leave__x_ksw_ded_shortfall
+msgid "X Ksw Ded Shortfall"
+msgstr ""
+
+#. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_refused_date
 msgid "X Refused Date"
 msgstr ""
@@ -2880,6 +4171,36 @@ msgstr ""
 msgid ""
 "Years of service from earliest contract_date_start of any version to today "
 "(calendar days / 365.25)."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"You are not allowed to delete loan deduction %(name)s. Deleting loans "
+"requires the \"Delete only\" or \"Edit and Delete\" level of the Loan "
+"Modification privilege. Ask an administrator to set it on your user (Access "
+"Rights → KSW Deductions → Loan Modification)."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_loan_payment_wizard.py:0
+msgid ""
+"You are not allowed to record a payment on this deduction. Accounting staff "
+"with the 'Loan Modification: Full' privilege can settle any type; the "
+"Accounting Data Entry role can settle non-loan deductions (salary advances "
+"and penalties) only."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_reschedule_wizard.py:0
+msgid ""
+"You are not allowed to reschedule %(name)s. Accounting staff with the 'Loan "
+"Modification: Full' privilege can reschedule any type; the Accounting Data "
+"Entry role can reschedule non-loan deductions (salary advances and "
+"penalties) only."
 msgstr ""
 
 #. module: KSW_deduction
@@ -2898,8 +4219,78 @@ msgid ""
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/loan_request_wizard.py:0
+msgid "You can only request a loan for yourself."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"You can only submit loan requests for yourself, as a supervisor for your "
+"direct subordinates, or as an assistant for the direct subordinates of a "
+"manager you assist."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/loan_request_wizard.py:0
+msgid ""
+"You cannot request a loan because your user account is not linked to an "
+"employee record. Please contact HR to link your account before requesting a "
+"loan."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid "You do not have access to deduction %(name)s."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "You do not have access to payslip %(name)s."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"You do not have permission to modify installments. Contact your "
+"administrator."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction_line.py:0
+msgid ""
+"You do not have the 'Loan Installment Modification' privilege. Ask an "
+"administrator to grant it on your user (Settings → Users → Access Rights → "
+"KSW Deductions → Loan Installment Modification = Edit)."
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.actions.act_window,help:KSW_deduction.action_ksw_my_loans
 msgid "You have no loan requests yet"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"You may only change the amount, installments, start month, reason, "
+"description and attachments of your own loan request. Not allowed here: "
+"%(fields)s."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"You may only raise requests for the direct subordinates of the managers you "
+"assist."
 msgstr ""
 
 #. module: KSW_deduction
@@ -2914,6 +4305,23 @@ msgid ""
 "                                <i class=\"fa fa-angle-right mx-1\" title=\"then\" role=\"img\" aria-hidden=\"true\"/>\n"
 "                                <span class=\"badge text-bg-secondary mx-1\">4. GM</span>.\n"
 "                                Track progress under <b>My Loans</b>."
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "active"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_reschedule_wizard_view_form
+msgid "e.g. Agreed with the employee to clear both loans by March"
+msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/wizard/ksw_deduction_statement_wizard.py:0
+msgid "inception"
 msgstr ""
 
 #. module: KSW_deduction
@@ -2971,6 +4379,12 @@ msgid "stays pending in the same month."
 msgstr ""
 
 #. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid "this department"
+msgstr ""
+
+#. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
 msgid "to"
 msgstr ""
@@ -2983,6 +4397,11 @@ msgstr ""
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "↩ Return to Approver"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
+msgid "⚠ Accept Concurrent Loan"
 msgstr ""
 
 #. module: KSW_deduction
@@ -3018,4 +4437,31 @@ msgstr ""
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_form
 msgid "➕ Record New Penalty"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:res.groups,comment:KSW_deduction.group_deduction_officer
+msgid ""
+"Create and edit deductions for all employees (loans and non-loan). Implies "
+"\"HR Officer (Non-Loan)\" since the full Officer scope is a superset of it."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:res.groups,comment:KSW_deduction.group_deduction_manager
+msgid ""
+"Full access to non-loan deductions including delete. Loan-specific "
+"edit/delete still requires the dedicated \"Loan Modification\" privilege — "
+"Manager does NOT auto-grant it, so an HR/Admin can be Deduction Manager "
+"without being able to touch loan amount/installments or delete loans."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model,name:KSW_deduction.model_ksw_loan_payment_wizard
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
+msgid "Record Loan Payment"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_emp_ssnid
+msgid "Social Security Number"
 msgstr ""

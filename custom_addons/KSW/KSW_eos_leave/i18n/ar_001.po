@@ -6,16 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-15 12:11+0000\n"
-"PO-Revision-Date: 2026-07-15 12:11+0000\n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:59+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar_001\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
-"X-Generator: KSW ar-engine v2\n"
+"Plural-Forms: \n"
 
 #. module: KSW_eos_leave
 #: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
@@ -28,6 +27,8 @@ msgid ""
 "<span class=\"o_stat_text\">Recompute</span>\n"
 "                        <span class=\"o_stat_text\">EOS Payslip</span>"
 msgstr ""
+"<span class=\"o_stat_text\">إعادة احتساب</span>\n"
+"                        <span class=\"o_stat_text\">قسيمة نهاية الخدمة</span>"
 
 #. module: KSW_eos_leave
 #: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_adjusted_resignation_amount
@@ -92,6 +93,11 @@ msgid "Base Service Years (Unadjusted)"
 msgstr "سنوات الخدمة الأساسية (غير معدلة)"
 
 #. module: KSW_eos_leave
+#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_unpaid_days_counted
+msgid "Days of this leave that do not count as service."
+msgstr "أيام هذه الإجازة التي لا تحتسب ضمن مدة الخدمة."
+
+#. module: KSW_eos_leave
 #: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_termination_reason
 msgid ""
 "Determines which EOS formula applies. Article 84 = employer-initiated "
@@ -109,9 +115,19 @@ msgid "Display Name"
 msgstr "اسم العرض"
 
 #. module: KSW_eos_leave
+#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_list_eos_unpaid
+msgid "Duration (Days)"
+msgstr "المدة (أيام)"
+
+#. module: KSW_eos_leave
 #: model:hr.salary.rule,name:KSW_eos_leave.hr_rule_eos_amount
 msgid "EOS Amount"
 msgstr "مكافأة نهاية الخدمة"
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_inputs_editable
+msgid "EOS Inputs Editable"
+msgstr "مدخلات نهاية الخدمة قابلة للتعديل"
 
 #. module: KSW_eos_leave
 #: model:hr.salary.rule,name:KSW_eos_leave.hr_rule_eos_notice_pay
@@ -139,9 +155,31 @@ msgid "EOS Previous Payments"
 msgstr "مدفوعات نهاية الخدمة السابقة"
 
 #. module: KSW_eos_leave
+#. odoo-python
+#: code:addons/KSW_eos_leave/models/hr_leave.py:0
+msgid ""
+"EOS financial figures can only be filled while the request is at the HR Approval step.\n"
+"\n"
+"If a figure needs correcting later, the GM must return the request to HR first."
+msgstr ""
+"لا يمكن تعبئة الأرقام المالية لمكافأة نهاية الخدمة إلا عندما يكون الطلب في خطوة اعتماد الموارد البشرية.\n"
+"\n"
+"إذا احتاج رقم إلى تصحيح لاحقا، فيجب على المدير العام إعادة الطلب إلى الموارد البشرية أولا."
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_employee_archived
+msgid "Employee Archived by This Request"
+msgstr "الموظف مؤرشف بهذا الطلب"
+
+#. module: KSW_eos_leave
 #: model:hr.leave.type,name:KSW_eos_leave.leave_type_eos
 msgid "End of Service Request"
 msgstr "طلب مكافأة نهاية الخدمة"
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_unpaid_days
+msgid "Extra Unpaid Days"
+msgstr "أيام بدون أجر إضافية"
 
 #. module: KSW_eos_leave
 #: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_payout_amount
@@ -185,6 +223,24 @@ msgstr ""
 "كشف الراتب خلال سلسلة الاعتماد متعددة الخطوات."
 
 #. module: KSW_eos_leave
+#. odoo-python
+#: code:addons/KSW_eos_leave/models/hr_leave.py:0
+msgid "No EOS payslip found for this leave."
+msgstr "لم يعثر على كشف راتب نهاية خدمة لهذه الإجازة."
+
+#. module: KSW_eos_leave
+#. odoo-python
+#: code:addons/KSW_eos_leave/models/hr_leave.py:0
+msgid "No EOS payslip found on this leave to recompute."
+msgstr "لم يعثر على كشف راتب نهاية خدمة في هذه الإجازة لإعادة احتسابه."
+
+#. module: KSW_eos_leave
+#. odoo-python
+#: code:addons/KSW_eos_leave/models/hr_leave.py:0
+msgid "Not specified"
+msgstr "غير محدد"
+
+#. module: KSW_eos_leave
 #: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_notice_pay
 msgid "Notice Pay (Deduction)"
 msgstr "تعويض مهلة الإشعار (خصم)"
@@ -199,17 +255,19 @@ msgstr ""
 "فترة الإشعار)."
 
 #. module: KSW_eos_leave
-#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_unpaid_days
-msgid ""
-"Unpaid days the system does not record (e.g. before go-live, or agreed with "
-"the employee). Added to the System Unpaid Days; both are excluded from the "
-"service period before recomputing the Article 84/85 EOS entitlement. Do not "
-"repeat days the system already counts."
+#. odoo-python
+#: code:addons/KSW_eos_leave/models/hr_leave.py:0
+msgid "Only HR Approvers can fill EOS financial fields."
 msgstr ""
-"أيام بدون أجر غير مسجلة في النظام (مثل ما قبل تشغيل النظام، أو ما اتفق عليه "
-"مع الموظف). تضاف إلى أيام بدون أجر حسب النظام، ويستبعد المجموع من فترة "
-"الخدمة قبل إعادة حساب استحقاق نهاية الخدمة وفق المادتين 84/85. لا تكرر "
-"الأيام التي يحتسبها النظام."
+"معتمدو الموارد البشرية وحدهم يمكنهم تعبئة الحقول المالية لنهاية الخدمة."
+
+#. module: KSW_eos_leave
+#. odoo-python
+#: code:addons/KSW_eos_leave/models/hr_leave.py:0
+msgid "Only HR Payroll users or HR Approvers can recompute EOS payslips."
+msgstr ""
+"مستخدمو رواتب الموارد البشرية أو معتمدو الموارد البشرية وحدهم يمكنهم إعادة "
+"احتساب كشوف رواتب نهاية الخدمة."
 
 #. module: KSW_eos_leave
 #: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_previous_payments
@@ -222,6 +280,18 @@ msgid "Salary Rule"
 msgstr "قاعدة الراتب"
 
 #. module: KSW_eos_leave
+#. odoo-python
+#: code:addons/KSW_eos_leave/models/hr_leave.py:0
+msgid ""
+"Select a Termination Reason (Article 84 — Termination or Article 85 — Resignation) in the EOS Review tab first.\n"
+"\n"
+"Without it the End-of-Service payout is computed as 0 and will not appear on the EOS payslip."
+msgstr ""
+"اختر سبب انتهاء الخدمة (المادة 84 — إنهاء الخدمة أو المادة 85 — الاستقالة) في تبويب مراجعة نهاية الخدمة أولا.\n"
+"\n"
+"بدونه تحتسب مكافأة نهاية الخدمة صفرا ولن تظهر في كشف راتب نهاية الخدمة."
+
+#. module: KSW_eos_leave
 #: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
 msgid "Service Period Reference"
 msgstr "بيانات فترة الخدمة المرجعية"
@@ -232,6 +302,21 @@ msgid ""
 "Service years after subtracting unpaid leave days from the total service "
 "period."
 msgstr "سنوات الخدمة بعد خصم أيام الإجازة بدون أجر من إجمالي فترة الخدمة."
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_system_unpaid_days
+msgid "System Unpaid Days"
+msgstr "أيام بدون أجر حسب النظام"
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_system_unpaid_snapshot
+msgid "System Unpaid Days (Frozen)"
+msgstr "أيام بدون أجر حسب النظام (مثبتة)"
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_system_unpaid_locked
+msgid "System Unpaid Days Frozen"
+msgstr "تثبيت أيام بدون أجر حسب النظام"
 
 #. module: KSW_eos_leave
 #: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
@@ -249,11 +334,25 @@ msgid "The EOS payslip generated at GM Final Approval."
 msgstr "كشف نهاية الخدمة المنشأة عند الاعتماد النهائي للمدير العام."
 
 #. module: KSW_eos_leave
+#. odoo-python
+#: code:addons/KSW_eos_leave/models/hr_leave.py:0
+msgid ""
+"This end-of-service request has a payslip a payroll officer confirmed by "
+"hand (%(slip)s), so it is treated as paid. Handle the payslip first — the "
+"request cannot be %(what)s until then."
+msgstr ""
+"لطلب نهاية الخدمة هذا كشف راتب اعتمده موظف رواتب يدويا (%(slip)s)، لذا يعامل"
+" على أنه مدفوع. عالج كشف الراتب أولا — ولا يمكن %(what)s الطلب حتى ذلك "
+"الحين."
+
+#. module: KSW_eos_leave
 #: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
 msgid ""
 "This will cancel the existing EOS payslip and recreate it from the current "
 "leave inputs. Continue?"
 msgstr ""
+"سيؤدي هذا إلى إلغاء قسيمة نهاية الخدمة الحالية وإعادة إنشائها من مدخلات "
+"الإجازة الحالية. هل تريد المتابعة؟"
 
 #. module: KSW_eos_leave
 #: model:ir.model,name:KSW_eos_leave.model_hr_leave
@@ -266,62 +365,41 @@ msgid "Time Off Type"
 msgstr "نوع الإجازة"
 
 #. module: KSW_eos_leave
+#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_list_eos_unpaid
+msgid "Total"
+msgstr "الإجمالي"
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_employee_archived
+msgid ""
+"True when GM final approval on THIS request is what archived the employee. "
+"Reversing the request restores the employee only when this is set — an "
+"employee archived for any other reason stays archived, because provenance is"
+" recorded here rather than guessed from the fact that they are inactive."
+msgstr ""
+"صحيح عندما يكون الاعتماد النهائي من المدير العام لهذا الطلب هو ما أرشف "
+"الموظف. لا يستعاد الموظف عند عكس الطلب إلا إذا كان هذا محددا — فالموظف "
+"المؤرشف لأي سبب آخر يبقى مؤرشفا، لأن المصدر يسجل هنا بدلا من استنتاجه من "
+"كونه غير نشط."
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_inputs_editable
+msgid ""
+"True when the current user may still fill or correct the HR-owned EOS "
+"financial inputs on this request."
+msgstr ""
+"صحيح عندما لا يزال بإمكان المستخدم الحالي تعبئة أو تصحيح المدخلات المالية "
+"لنهاية الخدمة التي تملكها الموارد البشرية في هذا الطلب."
+
+#. module: KSW_eos_leave
 #: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_is_eos_leave
 msgid "True when the leave type is flagged as an EOS request."
 msgstr "صحيح عندما يكون نوع الإجازة محددا كطلب نهاية خدمة."
 
 #. module: KSW_eos_leave
-#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_unpaid_days
-msgid "Extra Unpaid Days"
-msgstr "أيام بدون أجر إضافية"
-
-#. module: KSW_eos_leave
-#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
-msgid "🏢 EOS Review"
-msgstr "🏢 مراجعة نهاية الخدمة"
-
-#. module: KSW_eos_leave
-#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_system_unpaid_days
-msgid "System Unpaid Days"
-msgstr "أيام بدون أجر حسب النظام"
-
-#. module: KSW_eos_leave
-#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_system_unpaid_days
-msgid ""
-"Unpaid days recorded in the system between the joining date and the "
-"termination date: validated unpaid leaves, plus the excess accepted as "
-"unpaid on annual leaves. Same rule as the annual leave balance. Counted live "
-"up to the HR Approval step and frozen once HR approves."
-msgstr ""
-"أيام بدون أجر المسجلة في النظام بين تاريخ المباشرة وتاريخ انتهاء الخدمة: "
-"الإجازات بدون أجر المعتمدة، إضافة إلى الأيام الزائدة المقبولة بدون أجر في "
-"الإجازات السنوية. بنفس قاعدة رصيد الإجازة السنوية. تحتسب تلقائيا حتى مرحلة "
-"اعتماد الموارد البشرية، وتثبت عند اعتمادها."
-
-#. module: KSW_eos_leave
 #: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_unpaid_days_counted
 msgid "Unpaid Days Counted"
 msgstr "الأيام المحتسبة بدون أجر"
-
-#. module: KSW_eos_leave
-#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_unpaid_days_counted
-msgid "Days of this leave that do not count as service."
-msgstr "أيام هذه الإجازة التي لا تحتسب ضمن مدة الخدمة."
-
-#. module: KSW_eos_leave
-#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
-msgid "View Leaves"
-msgstr "عرض الإجازات"
-
-#. module: KSW_eos_leave
-#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_list_eos_unpaid
-msgid "Duration (Days)"
-msgstr "المدة (أيام)"
-
-#. module: KSW_eos_leave
-#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_list_eos_unpaid
-msgid "Total"
-msgstr "الإجمالي"
 
 #. module: KSW_eos_leave
 #. odoo-python
@@ -330,11 +408,37 @@ msgid "Unpaid Days — %s"
 msgstr "أيام بدون أجر — %s"
 
 #. module: KSW_eos_leave
-#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_system_unpaid_locked
-msgid "System Unpaid Days Frozen"
-msgstr "تثبيت أيام بدون أجر حسب النظام"
+#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_system_unpaid_days
+msgid ""
+"Unpaid days recorded in the system between the joining date and the "
+"termination date: validated unpaid leaves, plus the excess accepted as "
+"unpaid on annual leaves. Same rule as the annual leave balance. Counted live"
+" up to the HR Approval step and frozen once HR approves."
+msgstr ""
+"أيام بدون أجر المسجلة في النظام بين تاريخ المباشرة وتاريخ انتهاء الخدمة: "
+"الإجازات بدون أجر المعتمدة، إضافة إلى الأيام الزائدة المقبولة بدون أجر في "
+"الإجازات السنوية. بنفس قاعدة رصيد الإجازة السنوية. تحتسب تلقائيا حتى مرحلة "
+"اعتماد الموارد البشرية، وتثبت عند اعتمادها."
 
 #. module: KSW_eos_leave
-#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_system_unpaid_snapshot
-msgid "System Unpaid Days (Frozen)"
-msgstr "أيام بدون أجر حسب النظام (مثبتة)"
+#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_unpaid_days
+msgid ""
+"Unpaid days the system does not record (e.g. before go-live, or agreed with "
+"the employee). Added to the System Unpaid Days; both are excluded from the "
+"service period before recomputing the Article 84/85 EOS entitlement. Do not "
+"repeat days the system already counts."
+msgstr ""
+"أيام بدون أجر غير مسجلة في النظام (مثل ما قبل تشغيل النظام، أو ما اتفق عليه "
+"مع الموظف). تضاف إلى أيام بدون أجر حسب النظام، ويستبعد المجموع من فترة "
+"الخدمة قبل إعادة حساب استحقاق نهاية الخدمة وفق المادتين 84/85. لا تكرر "
+"الأيام التي يحتسبها النظام."
+
+#. module: KSW_eos_leave
+#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
+msgid "View Leaves"
+msgstr "عرض الإجازات"
+
+#. module: KSW_eos_leave
+#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
+msgid "🏢 EOS Review"
+msgstr "🏢 مراجعة نهاية الخدمة"

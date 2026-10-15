@@ -33,6 +33,6 @@ class HrEmployee(models.Model):
         'ksw.water.tanker.group', 'ksw_water_tanker_group_employee_rel',
         'employee_id', 'group_id', string='Tanker Groups',
         groups='hr.group_hr_manager',
-        help='Water Delivery > Tankers shows this supervisor only the tankers '
+        help='Water Delivery > Fleet Management shows this supervisor only the tankers '
              'in these groups.',
     )

@@ -6,16 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-15 12:11+0000\n"
-"PO-Revision-Date: 2026-07-15 12:11+0000\n"
+"POT-Creation-Date: 2026-10-14 19:40+0000\n"
+"PO-Revision-Date: 2026-10-14 19:59+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar_001\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
-"X-Generator: KSW ar-engine v2\n"
+"Plural-Forms: \n"
 
 #. module: KSW_working_schedule
 #: model:ir.model.fields,field_description:KSW_working_schedule.field_resource_calendar_group__active
@@ -30,18 +29,18 @@ msgstr "بعد الظهر"
 #. module: KSW_working_schedule
 #: model:ir.model.fields,field_description:KSW_working_schedule.field_resource_calendar_group__line_ids
 msgid "Attendance Lines"
-msgstr ""
+msgstr "بنود الحضور"
 
 #. module: KSW_working_schedule
 #: model:ir.model.fields.selection,name:KSW_working_schedule.selection__resource_calendar_group_line__day_period__break
 msgid "Break"
-msgstr ""
+msgstr "استراحة"
 
 #. module: KSW_working_schedule
 #: model:ir.model.fields,field_description:KSW_working_schedule.field_resource_calendar_attendance__calendar_group_id
 #: model:ir.model.fields,field_description:KSW_working_schedule.field_resource_calendar_group_line__calendar_group_id
 msgid "Calendar Group"
-msgstr ""
+msgstr "مجموعة التقويم"
 
 #. module: KSW_working_schedule
 #: model:ir.actions.act_window,name:KSW_working_schedule.action_resource_calendar_group
@@ -49,7 +48,7 @@ msgstr ""
 #: model:ir.ui.menu,name:KSW_working_schedule.menu_resource_calendar_group
 #: model_terms:ir.ui.view,arch_db:KSW_working_schedule.view_resource_calendar_form_inherit
 msgid "Calendar Groups"
-msgstr ""
+msgstr "مجموعات التقويم"
 
 #. module: KSW_working_schedule
 #: model:ir.model.fields,field_description:KSW_working_schedule.field_resource_calendar_group__create_uid
@@ -71,7 +70,7 @@ msgstr "فترة اليوم"
 #. module: KSW_working_schedule
 #: model:ir.model.fields,field_description:KSW_working_schedule.field_resource_calendar_group_line__dayofweek
 msgid "Day of Week"
-msgstr ""
+msgstr "يوم الأسبوع"
 
 #. module: KSW_working_schedule
 #: model:ir.model.fields,field_description:KSW_working_schedule.field_resource_calendar_group_line__name
@@ -125,12 +124,12 @@ msgstr "المعرف"
 #. module: KSW_working_schedule
 #: model:ir.model.fields,help:KSW_working_schedule.field_resource_calendar__is_temp_schedule
 msgid "Indicates if this calendar is a temporary work schedule for employees"
-msgstr ""
+msgstr "يُشير إلى ما إذا كان هذا التقويم جدول عمل مؤقتاً للموظفين"
 
 #. module: KSW_working_schedule
 #: model:ir.model.fields,field_description:KSW_working_schedule.field_resource_calendar__is_temp_schedule
 msgid "Is temporary Schedule"
-msgstr ""
+msgstr "جدول مؤقت"
 
 #. module: KSW_working_schedule
 #: model:ir.model.fields,field_description:KSW_working_schedule.field_resource_calendar_group__write_uid
@@ -167,12 +166,12 @@ msgstr "الاسم"
 #. module: KSW_working_schedule
 #: model:ir.model,name:KSW_working_schedule.model_resource_calendar_group
 msgid "Resource Calendar Group"
-msgstr ""
+msgstr "مجموعة تقويم الموارد"
 
 #. module: KSW_working_schedule
 #: model:ir.model,name:KSW_working_schedule.model_resource_calendar_group_line
 msgid "Resource Calendar Group Line"
-msgstr ""
+msgstr "بند مجموعة تقويم الموارد"
 
 #. module: KSW_working_schedule
 #: model:ir.model,name:KSW_working_schedule.model_resource_calendar
@@ -192,7 +191,7 @@ msgstr "السبت"
 #. module: KSW_working_schedule
 #: model:ir.model.fields,field_description:KSW_working_schedule.field_resource_calendar__x_saturday_required
 msgid "Saturday Required (Deduct + Overtime Offset)"
-msgstr ""
+msgstr "السبت المطلوب (خصم + تعويض الإضافي)"
 
 #. module: KSW_working_schedule
 #: model:ir.model.fields,field_description:KSW_working_schedule.field_resource_calendar__x_saturday_short_overtime
@@ -227,13 +226,13 @@ msgstr "جدول دوام مؤقت"
 #. module: KSW_working_schedule
 #: model:ir.model.fields,help:KSW_working_schedule.field_hr_employee__main_calendar_id
 msgid "The main work schedule for the employee, used for attendance analysis"
-msgstr ""
+msgstr "جدول العمل الرئيسي للموظف، يُستخدم في تحليل الحضور"
 
 #. module: KSW_working_schedule
 #: model:ir.model.fields,help:KSW_working_schedule.field_hr_employee__temp_calendar_id
 msgid ""
 "The temporary work schedule for the employee, used for attendance analysis"
-msgstr ""
+msgstr "جدول العمل المؤقت للموظف، يُستخدم في تحليل الحضور"
 
 #. module: KSW_working_schedule
 #: model:ir.model.fields.selection,name:KSW_working_schedule.selection__resource_calendar_group_line__dayofweek__3
@@ -259,6 +258,10 @@ msgid ""
 "option). Used for schedules such as \"Standard 44 hours/week\" (Sat 3h) and "
 "\"Abdullah Mutawa Special Shift\" (Sat 4h)."
 msgstr ""
+"عند التفعيل، يكون السبت وردية قصيرة (أقل من 8 ساعات). يُخصَم الفرق بين يوم "
+"العمل الكامل (8 ساعات) والساعات المجدولة الفعلية من قسيمة الراتب ثم يُردُّ "
+"كرصيد إضافي للسبت — مما يُحقق تأثيراً صفرياً على الأجر مع التصنيف الصحيح "
+"للوقت."
 
 #. module: KSW_working_schedule
 #: model:ir.model.fields,help:KSW_working_schedule.field_resource_calendar__x_saturday_required
@@ -268,6 +271,8 @@ msgid ""
 "deducted normally and an equal amount is credited back as Saturday overtime "
 "on the payslip."
 msgstr ""
+"عند التفعيل، يُعامَل السبت كيوم عمل مطلوب لأغراض كشف الحضور. يُعاقَب الغياب "
+"يوم السبت بنفس طريقة أيام العمل العادية."
 
 #. module: KSW_working_schedule
 #: model:ir.model.fields,help:KSW_working_schedule.field_resource_calendar__x_skip_attendance_issues
@@ -276,6 +281,8 @@ msgid ""
 "employees using this schedule. Use for roles where shift times vary "
 "frequently (e.g. executives). Absence detection is still active."
 msgstr ""
+"عند التفعيل، لا تُسجَّل دقائق التأخر والخروج المبكر للموظفين على هذا الجدول."
+" مفيد لوظائف المستوى الإداري أو المرونة في ساعات العمل."
 
 #. module: KSW_working_schedule
 #: model:ir.model,name:KSW_working_schedule.model_resource_calendar_attendance
@@ -285,12 +292,12 @@ msgstr "تفاصيل العمل"
 #. module: KSW_working_schedule
 #: model:ir.model.fields,field_description:KSW_working_schedule.field_resource_calendar_group_line__hour_from
 msgid "Work From"
-msgstr ""
+msgstr "العمل من"
 
 #. module: KSW_working_schedule
 #: model:ir.model.fields,field_description:KSW_working_schedule.field_resource_calendar_group_line__hour_to
 msgid "Work To"
-msgstr ""
+msgstr "العمل إلى"
 
 #. module: KSW_working_schedule
 #: model_terms:ir.ui.view,arch_db:KSW_working_schedule.view_resource_calendar_group_form

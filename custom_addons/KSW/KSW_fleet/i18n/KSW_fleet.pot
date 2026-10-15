@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-13 13:16+0000\n"
-"PO-Revision-Date: 2026-10-13 13:16+0000\n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:41+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -119,6 +119,26 @@ msgid "Model"
 msgstr ""
 
 #. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_vehicle.py:0
+msgid "Only a fleet/workshop manager can confirm a draft vehicle."
+msgstr ""
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_vehicle.py:0
+msgid "Only draft vehicles can be confirmed."
+msgstr ""
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_vehicle.py:0
+msgid ""
+"Only the system administrator can add a vehicle. Pick it from the list, or "
+"ask the administrator to add it."
+msgstr ""
+
+#. module: KSW_fleet
 #: model:ir.model.fields.selection,name:KSW_fleet.selection__ksw_fleet_vehicle__vehicle_type__other
 msgid "Other"
 msgstr ""
@@ -139,13 +159,13 @@ msgid "Status"
 msgstr ""
 
 #. module: KSW_fleet
-#: model:ir.model.fields.selection,name:KSW_fleet.selection__ksw_fleet_vehicle__vehicle_type__tank
-msgid "Tedder (تيدر)"
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__tank_number
+msgid "Tank Number"
 msgstr ""
 
 #. module: KSW_fleet
-#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__tank_number
-msgid "Tank Number"
+#: model:ir.model.fields.selection,name:KSW_fleet.selection__ksw_fleet_vehicle__vehicle_type__tank
+msgid "Tedder (تيدر)"
 msgstr ""
 
 #. module: KSW_fleet
@@ -175,24 +195,4 @@ msgstr ""
 #. module: KSW_fleet
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__year
 msgid "Year"
-msgstr ""
-
-#. module: KSW_fleet
-#. odoo-python
-#: code:addons/KSW_fleet/models/ksw_fleet_vehicle.py:0
-msgid "Only a fleet/workshop manager can confirm a draft vehicle."
-msgstr ""
-
-#. module: KSW_fleet
-#. odoo-python
-#: code:addons/KSW_fleet/models/ksw_fleet_vehicle.py:0
-msgid "Only draft vehicles can be confirmed."
-msgstr ""
-
-#. module: KSW_fleet
-#. odoo-python
-#: code:addons/KSW_fleet/models/ksw_fleet_vehicle.py:0
-msgid ""
-"Only the system administrator can add a vehicle. Pick it from the list, or "
-"ask the administrator to add it."
 msgstr ""

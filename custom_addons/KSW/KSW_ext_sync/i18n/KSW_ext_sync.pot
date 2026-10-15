@@ -1,0 +1,548 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_ext_sync
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__bas_code
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_customer__bas_code
+msgid "Account Code"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__amount
+msgid "Amount"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_account_list
+msgid "BAS Accounts"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.actions.act_window,name:KSW_ext_sync.action_bas_account
+msgid "BAS Accounts (Loans & Advances)"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model,name:KSW_ext_sync.model_ksw_bas_customer
+msgid "BAS Customer Account"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.actions.act_window,name:KSW_ext_sync.action_bas_customer
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_customer_list
+msgid "BAS Customers"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model,name:KSW_ext_sync.model_ksw_bas_account
+msgid "BAS GL Account (Loans & Advances)"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__bas_key
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__bas_key
+msgid "BAS Key"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model,name:KSW_ext_sync.model_ksw_bas_payment
+msgid "BAS Payment Voucher"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.actions.act_window,name:KSW_ext_sync.action_bas_payment
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_payment_list
+msgid "BAS Payment Vouchers"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model,name:KSW_ext_sync.model_ksw_bas_connector
+msgid "BAS SQL Server Connector"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model,name:KSW_ext_sync.model_ksw_bas_invoice
+msgid "BAS Sales Invoice"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.actions.act_window,name:KSW_ext_sync.action_bas_invoice
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_invoice_list
+msgid "BAS Sales Invoices"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.ui.menu,name:KSW_ext_sync.menu_bas_root
+msgid "BAS Sync"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,help:KSW_ext_sync.field_res_partner__x_client_account_number
+#: model:ir.model.fields,help:KSW_ext_sync.field_res_users__x_client_account_number
+msgid ""
+"BAS customer account code (COD10.DCODE1, e.g. \"120301080\") for this "
+"contact. Set automatically by \"Match / Create Contacts\" on BAS Sync > "
+"Customers, or manually. Used elsewhere (e.g. KSW_commissions) as the primary"
+" key to match BAS sales/collection activity to this customer."
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__balance
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_account_list
+msgid "Balance"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields.selection,name:KSW_ext_sync.selection__ksw_bas_account__category__loan
+msgid "Bank Loan"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_account_search
+msgid "Bank Loans"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__branch_code
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__branch_code
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_invoice_search
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_payment_search
+msgid "Branch"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,help:KSW_ext_sync.field_ksw_bas_customer__invoice_term_days
+msgid ""
+"COD10.INVDAYS: the days BAS gives this customer to pay an invoice (it is "
+"copied onto every document as DUTY_DAY). Applied to the linked contact's "
+"Customer Payment Terms."
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,help:KSW_ext_sync.field_ksw_bas_customer__credit_term_days
+msgid ""
+"COD10.LIMT_DAYS — the payment term BAS itself assigns to this customer (e.g."
+" 30/60/90). Matches this project's \"عمر الدين\" (debt age) column. Used by "
+"KSW_commissions to decide how much of the outstanding balance counts as "
+"overdue for the BAS-derived collection target. Falls back to 30 days when "
+"unset/zero."
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,help:KSW_ext_sync.field_ksw_bas_customer__seller_code
+msgid ""
+"COD10.SELLER — the sales rep BAS itself assigns to this customer. Verified "
+"2026-08-11 against real sales transactions (the transaction-level "
+"vou10.SELLER on this customer's invoices always matches this code)."
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,help:KSW_ext_sync.field_ksw_bas_customer__collector_code
+msgid ""
+"COD10.SELLER2 — the collection rep BAS itself assigns to this customer. "
+"Verified 2026-08-11 against real receipt transactions."
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__category
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_account_search
+msgid "Category"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_res_partner__x_client_account_number
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_res_users__x_client_account_number
+msgid "Client Account Number"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_customer_list
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_customer_search
+msgid "Collection Rep (BAS)"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_customer__collector_code
+msgid "Collection Rep Code"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_customer__collector_name
+msgid "Collection Rep Name (BAS)"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model,name:KSW_ext_sync.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,help:KSW_ext_sync.field_ksw_bas_customer__partner_id
+msgid ""
+"Contact linked to this BAS customer account, either matched by name to an "
+"existing contact or created automatically by \"Match / Create Contacts\"."
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__create_uid
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_customer__create_uid
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__create_uid
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__create_date
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_customer__create_date
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__create_date
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_account_list
+msgid "Credit"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_customer__credit_term_days
+msgid "Credit Term (Days)"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__current_credit
+msgid "Current Credit"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__current_debit
+msgid "Current Debit"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.ui.menu,name:KSW_ext_sync.menu_bas_customers
+msgid "Customers"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__invoice_date
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__payment_date
+msgid "Date"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_account_list
+msgid "Debit"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__remark
+msgid "Description"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__display_name
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_connector__display_name
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_customer__display_name
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__display_name
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__display_name
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_res_partner__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__ftype
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_invoice_search
+msgid "Doc Type"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields.selection,name:KSW_ext_sync.selection__ksw_bas_account__category__advance
+msgid "Employee Advance"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_account_search
+msgid "Employee Advances"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__from_account
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__from_account
+msgid "From Account"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__id
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_connector__id
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_customer__id
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__id
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__id
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_res_partner__id
+msgid "ID"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__number
+msgid "Invoice No."
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.actions.server,name:KSW_ext_sync.cron_bas_sync_ir_actions_server
+msgid "KSW BAS: Sync from SQL Server (every 10 min)"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__last_synced
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_customer__last_synced
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__last_synced
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__last_synced
+msgid "Last Synced"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__write_uid
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_customer__write_uid
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__write_uid
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__write_date
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_customer__write_date
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__write_date
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.ui.menu,name:KSW_ext_sync.menu_bas_accounts
+msgid "Loans & Advances"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_customer_list
+msgid "Match / Create Contacts"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_customer_list
+msgid ""
+"Match every unlinked BAS customer to an existing contact by name, or create "
+"a new contact when no match is found. Continue?"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_invoice_search
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_payment_search
+msgid "Month"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__name_ar
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_customer__name_ar
+msgid "Name (Arabic)"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__name_en
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_customer__name_en
+msgid "Name (English)"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_customer_list
+msgid "New Contact"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_customer_search
+msgid "No Contact Linked"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_account_search
+msgid "Non-Zero Balance"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_customer__partner_id
+msgid "Odoo Contact"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_account_list
+msgid "Opening"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__opening_balance
+msgid "Opening Balance"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields.selection,name:KSW_ext_sync.selection__ksw_bas_account__category__other
+msgid "Other"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_customer__partner_created
+msgid "Partner Created"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__pay_mode
+msgid "Payment Mode"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_customer__invoice_term_days
+msgid "Payment Term (Days)"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_res_partner__x_payment_term_from_bas
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_res_users__x_payment_term_from_bas
+msgid "Payment Terms from BAS"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.ui.menu,name:KSW_ext_sync.menu_bas_payments
+msgid "Payment Vouchers"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_payment_search
+msgid "Payments"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_payment_search
+msgid "Receipts"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,help:KSW_ext_sync.field_ksw_bas_customer__seller_name
+msgid ""
+"Resolved from VOU10.SELLERNAME for this SELLER code. Matched to an "
+"hr.employee via x_commission_import_name (or name) by \"Pull from BAS\" on "
+"the Sales/Collection Commission Sheet."
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.ui.menu,name:KSW_ext_sync.menu_bas_invoices
+msgid "Sales Invoices"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_customer_list
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_customer_search
+msgid "Sales Rep (BAS)"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_customer__seller_code
+msgid "Sales Rep Code"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_customer__seller_name
+msgid "Sales Rep Name (BAS)"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__status
+msgid "Status"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_customer__is_stopped
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_customer_search
+msgid "Stopped in BAS"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__subtotal
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_invoice_list
+msgid "Subtotal"
+msgstr ""
+
+#. module: KSW_ext_sync
+#. odoo-python
+#: code:addons/KSW_ext_sync/models/bas_connector.py:0
+msgid ""
+"The BAS connection is not configured: set the System Parameter "
+"\"ksw_bas.%s\" (Settings > Technical > System Parameters)."
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,help:KSW_ext_sync.field_res_partner__x_payment_term_from_bas
+#: model:ir.model.fields,help:KSW_ext_sync.field_res_users__x_payment_term_from_bas
+msgid ""
+"The Customer Payment Terms on this contact were set by the BAS customer sync"
+" (COD10.INVDAYS) and follow BAS. Changing the terms by hand clears this, and"
+" the sync then leaves them alone."
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_invoice_search
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_payment_search
+msgid "This Month"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__to_account
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__to_account
+msgid "To Account"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__total
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_invoice_list
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_payment_list
+msgid "Total"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,help:KSW_ext_sync.field_ksw_bas_customer__partner_created
+msgid ""
+"True when the linked contact was created by \"Match / Create Contacts\" "
+"rather than matched to a pre-existing one."
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_account__acc_type
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_payment_search
+msgid "Type"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_invoice__tax_amount
+#: model_terms:ir.ui.view,arch_db:KSW_ext_sync.view_bas_invoice_list
+msgid "VAT"
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__number
+msgid "Voucher No."
+msgstr ""
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__ftype
+msgid "Voucher Type"
+msgstr ""

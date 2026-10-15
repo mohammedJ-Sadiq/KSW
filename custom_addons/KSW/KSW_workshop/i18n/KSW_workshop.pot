@@ -6,14 +6,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-14 07:16+0000\n"
-"PO-Revision-Date: 2026-10-14 07:16+0000\n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:41+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request_type.py:0
+msgid ""
+"%(added)s tags added, %(removed)s removed. Requests whose type was set by "
+"hand were left alone."
+msgstr ""
 
 #. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_users_form_ksw_workshop_assistant
@@ -23,12 +31,26 @@ msgid ""
 msgstr ""
 
 #. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_keyword_suggestion.py:0
+msgid ""
+"<p class=\"o_view_nocontent_smiling_face\">Nothing to suggest</p><p>Every "
+"request in the system already matched at least one type.</p>"
+msgstr ""
+
+#. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_type_form
 msgid ""
 "A request is tagged with this type when any of these words appears\n"
 "                        in its description. Matching ignores case and matches inside longer\n"
 "                        words. A request can carry several types at once — an oil change\n"
 "                        that also replaced brake pads is both."
+msgstr ""
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_technician.py:0
+msgid "A workshop technician needs a name. Link an employee, or type one."
 msgstr ""
 
 #. module: KSW_workshop
@@ -137,6 +159,12 @@ msgid "Attachment Count"
 msgstr ""
 
 #. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_part.py:0
+msgid "Avg %(price)s (%(qty)s pcs)"
+msgstr ""
+
+#. module: KSW_workshop
 #: model:ksw.workshop.request.type,name:KSW_workshop.request_type_axles_shafts
 msgid "Axles & Drive Shafts"
 msgstr ""
@@ -198,10 +226,21 @@ msgid "By Vehicle"
 msgstr ""
 
 #. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_reject_wizard_form
+msgid "Cancel"
+msgstr ""
+
+#. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__is_cash_customer
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
 msgid "Cash Customer"
+msgstr ""
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Cash Customer can only be changed while the request is New."
 msgstr ""
 
 #. module: KSW_workshop
@@ -212,6 +251,13 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_search
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
 msgid "Client"
+msgstr ""
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid ""
+"Client and Vehicle are required unless this is a Cash Customer request."
 msgstr ""
 
 #. module: KSW_workshop
@@ -291,6 +337,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_labor_line__create_uid
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__create_uid
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__create_uid
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_reject_wizard__create_uid
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__create_uid
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request_type__create_uid
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_technician__create_uid
@@ -304,6 +351,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_labor_line__create_date
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__create_date
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__create_date
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_reject_wizard__create_date
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__create_date
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request_type__create_date
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_technician__create_date
@@ -356,6 +404,7 @@ msgstr ""
 
 #. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:KSW_workshop.field_ir_ui_menu__display_name
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_fleet_vehicle__display_name
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_client__display_name
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_keyword_ignored__display_name
@@ -363,6 +412,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_labor_line__display_name
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__display_name
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__display_name
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_reject_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__display_name
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request_type__display_name
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_technician__display_name
@@ -494,6 +544,7 @@ msgstr ""
 
 #. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_hr_employee__id
+#: model:ir.model.fields,field_description:KSW_workshop.field_ir_ui_menu__id
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_fleet_vehicle__id
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_client__id
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_keyword_ignored__id
@@ -501,6 +552,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_labor_line__id
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__id
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__id
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_reject_wizard__id
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__id
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request_type__id
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_technician__id
@@ -664,6 +716,12 @@ msgid "Labor / Service Performed"
 msgstr ""
 
 #. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_part.py:0
+msgid "Last %(price)s"
+msgstr ""
+
+#. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
 msgid "Last 12 Months"
 msgstr ""
@@ -675,6 +733,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_labor_line__write_uid
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__write_uid
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__write_uid
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_reject_wizard__write_uid
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__write_uid
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request_type__write_uid
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_technician__write_uid
@@ -688,6 +747,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_labor_line__write_date
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part__write_date
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__write_date
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_reject_wizard__write_date
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__write_date
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request_type__write_date
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_technician__write_date
@@ -743,6 +803,11 @@ msgid "Mechanical"
 msgstr ""
 
 #. module: KSW_workshop
+#: model:ir.model,name:KSW_workshop.model_ir_ui_menu
+msgid "Menu"
+msgstr ""
+
+#. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__message_has_error
 msgid "Message Delivery error"
 msgstr ""
@@ -784,6 +849,8 @@ msgid "Name"
 msgstr ""
 
 #. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_client.py:0
 #: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__state__new
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
 msgid "New"
@@ -867,11 +934,47 @@ msgid "Only for requesters this user does not report to..."
 msgstr ""
 
 #. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Only in-progress requests can be completed."
+msgstr ""
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Only new requests can be rejected."
+msgstr ""
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Only new requests can be started."
+msgstr ""
+
+#. module: KSW_workshop
 #: model_terms:ir.actions.act_window,help:KSW_workshop.action_ksw_workshop_client
 msgid ""
 "Only the clients listed here are offered on a workshop request\n"
 "                and on a fleet vehicle. Archive a row to retire a client\n"
 "                without touching its past requests."
+msgstr ""
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Only the workshop manager can do this."
+msgstr ""
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Only the workshop manager can toggle Cash Customer."
+msgstr ""
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Only the workshop manager or a technician can edit the repair report."
 msgstr ""
 
 #. module: KSW_workshop
@@ -908,6 +1011,12 @@ msgid "Periodic Inspection"
 msgstr ""
 
 #. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_keyword_suggestion.py:0
+msgid "Pick a type in \"File Under\" first — that is where %s will be added."
+msgstr ""
+
+#. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
 msgid "Pick a vehicle to see what it already had done this year."
 msgstr ""
@@ -920,6 +1029,12 @@ msgstr ""
 #. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_cash_plate_number
 msgid "Plate Number (Cash)"
+msgstr ""
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Please provide a rejection reason before rejecting the request."
 msgstr ""
 
 #. module: KSW_workshop
@@ -993,6 +1108,17 @@ msgid "Re-scan All Requests"
 msgstr ""
 
 #. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request_type.py:0
+msgid "Re-scan complete"
+msgstr ""
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_reject_wizard_form
+msgid "Reason"
+msgstr ""
+
+#. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
 msgid "Recorded on the Legacy Sheet"
 msgstr ""
@@ -1013,8 +1139,20 @@ msgid "Register a workshop technician"
 msgstr ""
 
 #. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_reject_wizard_form
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
 msgid "Reject"
+msgstr ""
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Reject Request"
+msgstr ""
+
+#. module: KSW_workshop
+#: model:ir.model,name:KSW_workshop.model_ksw_workshop_reject_wizard
+msgid "Reject Workshop Request"
 msgstr ""
 
 #. module: KSW_workshop
@@ -1024,6 +1162,7 @@ msgid "Rejected"
 msgstr ""
 
 #. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_reject_wizard__rejection_reason
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__rejection_reason
 msgid "Rejection Reason"
 msgstr ""
@@ -1046,6 +1185,7 @@ msgstr ""
 #. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_labor_line__request_id
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__request_id
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_reject_wizard__request_id
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
 msgid "Request"
 msgstr ""
@@ -1224,6 +1364,8 @@ msgid "Suggested Keyword"
 msgstr ""
 
 #. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_keyword_suggestion.py:0
 #: model:ir.actions.server,name:KSW_workshop.action_ksw_workshop_keyword_suggestions
 #: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_keyword_suggestions
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_keyword_suggestion_list
@@ -1258,11 +1400,6 @@ msgstr ""
 msgid ""
 "Taken from the linked employee and kept in step if they are renamed. Free "
 "text for a technician who has no employee record."
-msgstr ""
-
-#. module: KSW_workshop
-#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__vehicle_type__tank
-msgid "Tedder (تيدر)"
 msgstr ""
 
 #. module: KSW_workshop
@@ -1302,6 +1439,11 @@ msgid "Technicians"
 msgstr ""
 
 #. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__vehicle_type__tank
+msgid "Tedder (تيدر)"
+msgstr ""
+
+#. module: KSW_workshop
 #: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_client__partner_id
 msgid ""
 "The contact carrying the customer role. Registering it here is what makes it"
@@ -1325,6 +1467,44 @@ msgstr ""
 msgid ""
 "The name typed into the legacy form, kept for reference even when "
 "employee_id had to fall back to a placeholder (no matching Odoo account)."
+msgstr ""
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_part_line.py:0
+msgid "The quantity issued must be greater than zero."
+msgstr ""
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "The repair report can only be edited while the request is In Progress."
+msgstr ""
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid ""
+"The request type is set from the description. Only the workshop can change "
+"it."
+msgstr ""
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "The requester of a workshop request cannot be changed."
+msgstr ""
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "The selected vehicle does not belong to %s."
+msgstr ""
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "The selected vehicle is not a %s."
 msgstr ""
 
 #. module: KSW_workshop
@@ -1485,6 +1665,13 @@ msgid "Vehicle Type"
 msgstr ""
 
 #. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid ""
+"Vehicle Type and Driver are required unless this is a Cash Customer request."
+msgstr ""
+
+#. module: KSW_workshop
 #: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_vehicles
 msgid "Vehicles"
 msgstr ""
@@ -1526,6 +1713,11 @@ msgid ""
 "Whoever is listed here can be named on a repair's Labor / Service lines.\n"
 "                Ticking \"Workshop Technician\" on an employee form adds them here, and the\n"
 "                built-in \"External Service Location\" entry covers work sent outside."
+msgstr ""
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_reject_wizard_form
+msgid "Why is this request being rejected?"
 msgstr ""
 
 #. module: KSW_workshop
@@ -1641,6 +1833,8 @@ msgid "Workshop Technicians"
 msgstr ""
 
 #. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_fleet_vehicle.py:0
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_fleet_vehicle__workshop_request_count
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_fleet_vehicle_form_workshop
 msgid "Workshop Visits"
@@ -1676,48 +1870,18 @@ msgid "Year (Cash)"
 msgstr ""
 
 #. module: KSW_workshop
-#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_form
-msgid "e.g. 90915-YZZD4"
-msgstr ""
-
-#. module: KSW_workshop
-#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_type_list
-msgid "زيت, فلتر, oil change"
-msgstr ""
-
-#. module: KSW_workshop
-#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_type_form
-msgid "فرامل, بريك, قماشات, brake"
-msgstr ""
-
-#. module: KSW_workshop
 #. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_technician.py:0
-msgid "A workshop technician needs a name. Link an employee, or type one."
-msgstr ""
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_part_line.py:0
-msgid "The quantity issued must be greater than zero."
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "You can only edit your own request while it is New."
 msgstr ""
 
 #. module: KSW_workshop
 #. odoo-python
 #: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
-msgid "Only the workshop manager or a technician can edit the repair report."
-msgstr ""
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
-msgid "Only the workshop manager can do this."
-msgstr ""
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
-msgid "Your workshop request was rejected."
+msgid ""
+"You raise workshop requests for your manager, but your manager is not a "
+"workshop requester and nobody else is named on your user. Ask an "
+"administrator to set this up."
 msgstr ""
 
 #. module: KSW_workshop
@@ -1729,124 +1893,26 @@ msgstr ""
 #. module: KSW_workshop
 #. odoo-python
 #: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
-msgid ""
-"Client and Vehicle are required unless this is a Cash Customer request."
+msgid "Your workshop request was rejected."
+msgstr ""
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_form
+msgid "e.g. 90915-YZZD4"
 msgstr ""
 
 #. module: KSW_workshop
 #. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
-msgid ""
-"Vehicle Type and Driver are required unless this is a Cash Customer request."
+#: code:addons/KSW_workshop/models/ksw_fleet_vehicle.py:0
+msgid "vehicle_id"
 msgstr ""
 
 #. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
-msgid "The selected vehicle does not belong to %s."
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_type_list
+msgid "زيت, فلتر, oil change"
 msgstr ""
 
 #. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
-msgid "The selected vehicle is not a %s."
-msgstr ""
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
-msgid "The repair report can only be edited while the request is In Progress."
-msgstr ""
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
-msgid "The requester of a workshop request cannot be changed."
-msgstr ""
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
-msgid ""
-"The request type is set from the description. Only the workshop can change "
-"it."
-msgstr ""
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
-msgid "Only new requests can be started."
-msgstr ""
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
-msgid "Only new requests can be rejected."
-msgstr ""
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
-msgid "Please provide a rejection reason before rejecting the request."
-msgstr ""
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
-msgid "Only in-progress requests can be completed."
-msgstr ""
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
-msgid "Only the workshop manager can toggle Cash Customer."
-msgstr ""
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
-msgid "Cash Customer can only be changed while the request is New."
-msgstr ""
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
-msgid "You can only edit your own request while it is New."
-msgstr ""
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_request_type.py:0
-msgid "Re-scan complete"
-msgstr ""
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_request_type.py:0
-msgid ""
-"%(added)s tags added, %(removed)s removed. Requests whose type was set by "
-"hand were left alone."
-msgstr ""
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_keyword_suggestion.py:0
-msgid ""
-"<p class=\"o_view_nocontent_smiling_face\">Nothing to suggest</p><p>Every "
-"request in the system already matched at least one type.</p>"
-msgstr ""
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_keyword_suggestion.py:0
-msgid "Pick a type in \"File Under\" first — that is where %s will be added."
-msgstr ""
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
-msgid ""
-"You raise workshop requests for your manager, but your manager is not a "
-"workshop requester and nobody else is named on your user. Ask an "
-"administrator to set this up."
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_type_form
+msgid "فرامل, بريك, قماشات, brake"
 msgstr ""

@@ -1,0 +1,403 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_eos_leave
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_eos_leave
+#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
+msgid "<span class=\"o_stat_text\">EOS Payslip</span>"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
+msgid ""
+"<span class=\"o_stat_text\">Recompute</span>\n"
+"                        <span class=\"o_stat_text\">EOS Payslip</span>"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_adjusted_resignation_amount
+msgid "Adjusted EOS — Resignation (Art. 85)"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_adjusted_termination_amount
+msgid "Adjusted EOS — Termination (Art. 84)"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_adjusted_service_years
+msgid "Adjusted Service Years"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_previous_payments
+msgid ""
+"Amount of EOS payments already made to the employee in prior instalments. "
+"Deducted from the EOS payslip."
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_adjusted_termination_amount
+msgid "Article 84 EOS amount computed on the adjusted service years."
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields.selection,name:KSW_eos_leave.selection__hr_leave__x_eos_termination_reason__84
+msgid "Article 84 — Termination by Employer"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_adjusted_resignation_amount
+msgid "Article 85 EOS amount computed on the adjusted service years."
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields.selection,name:KSW_eos_leave.selection__hr_leave__x_eos_termination_reason__85
+msgid "Article 85 — Resignation"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_resignation_amount
+#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
+msgid "Base EOS — Resignation (Art. 85, Unadjusted)"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_termination_amount
+#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
+msgid "Base EOS — Termination (Art. 84, Unadjusted)"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_service_years
+#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
+msgid "Base Service Years (Unadjusted)"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_unpaid_days_counted
+msgid "Days of this leave that do not count as service."
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_termination_reason
+msgid ""
+"Determines which EOS formula applies. Article 84 = employer-initiated "
+"termination (full entitlement). Article 85 = employee resignation (tiered "
+"entitlement)."
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__display_name
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave_type__display_name
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_salary_rule__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_list_eos_unpaid
+msgid "Duration (Days)"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:hr.salary.rule,name:KSW_eos_leave.hr_rule_eos_amount
+msgid "EOS Amount"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_inputs_editable
+msgid "EOS Inputs Editable"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:hr.salary.rule,name:KSW_eos_leave.hr_rule_eos_notice_pay
+msgid "EOS Notice Pay (Deduction)"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_payout_amount
+msgid "EOS Payout Amount"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
+msgid "EOS Payout Summary"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_payslip_id
+msgid "EOS Payslip"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:hr.salary.rule,name:KSW_eos_leave.hr_rule_eos_prev_payments
+msgid "EOS Previous Payments"
+msgstr ""
+
+#. module: KSW_eos_leave
+#. odoo-python
+#: code:addons/KSW_eos_leave/models/hr_leave.py:0
+msgid ""
+"EOS financial figures can only be filled while the request is at the HR Approval step.\n"
+"\n"
+"If a figure needs correcting later, the GM must return the request to HR first."
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_employee_archived
+msgid "Employee Archived by This Request"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:hr.leave.type,name:KSW_eos_leave.leave_type_eos
+msgid "End of Service Request"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_unpaid_days
+msgid "Extra Unpaid Days"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_payout_amount
+msgid ""
+"Final EOS amount: the adjusted Art. 84 or Art. 85 figure, depending on the "
+"selected Termination Reason."
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
+msgid "HR Inputs"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__id
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave_type__id
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_salary_rule__id
+msgid "ID"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_is_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave_type__is_eos_leave
+msgid "Is EOS Leave"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_last_wage
+msgid "Last Wage (SAR)"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave_type__is_eos_leave
+msgid ""
+"Mark this leave type as an End of Service request. Enables EOS-specific "
+"fields and payslip generation during the multi-step approval chain."
+msgstr ""
+
+#. module: KSW_eos_leave
+#. odoo-python
+#: code:addons/KSW_eos_leave/models/hr_leave.py:0
+msgid "No EOS payslip found for this leave."
+msgstr ""
+
+#. module: KSW_eos_leave
+#. odoo-python
+#: code:addons/KSW_eos_leave/models/hr_leave.py:0
+msgid "No EOS payslip found on this leave to recompute."
+msgstr ""
+
+#. module: KSW_eos_leave
+#. odoo-python
+#: code:addons/KSW_eos_leave/models/hr_leave.py:0
+msgid "Not specified"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_notice_pay
+msgid "Notice Pay (Deduction)"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_notice_pay
+msgid ""
+"Notice period pay deducted from the EOS payslip (e.g. when the employee did "
+"not serve the notice period)."
+msgstr ""
+
+#. module: KSW_eos_leave
+#. odoo-python
+#: code:addons/KSW_eos_leave/models/hr_leave.py:0
+msgid "Only HR Approvers can fill EOS financial fields."
+msgstr ""
+
+#. module: KSW_eos_leave
+#. odoo-python
+#: code:addons/KSW_eos_leave/models/hr_leave.py:0
+msgid "Only HR Payroll users or HR Approvers can recompute EOS payslips."
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_previous_payments
+msgid "Previous Payments"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model,name:KSW_eos_leave.model_hr_salary_rule
+msgid "Salary Rule"
+msgstr ""
+
+#. module: KSW_eos_leave
+#. odoo-python
+#: code:addons/KSW_eos_leave/models/hr_leave.py:0
+msgid ""
+"Select a Termination Reason (Article 84 — Termination or Article 85 — Resignation) in the EOS Review tab first.\n"
+"\n"
+"Without it the End-of-Service payout is computed as 0 and will not appear on the EOS payslip."
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
+msgid "Service Period Reference"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_adjusted_service_years
+msgid ""
+"Service years after subtracting unpaid leave days from the total service "
+"period."
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_system_unpaid_days
+msgid "System Unpaid Days"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_system_unpaid_snapshot
+msgid "System Unpaid Days (Frozen)"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_system_unpaid_locked
+msgid "System Unpaid Days Frozen"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
+msgid "Termination Date"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_termination_reason
+msgid "Termination Reason"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_payslip_id
+msgid "The EOS payslip generated at GM Final Approval."
+msgstr ""
+
+#. module: KSW_eos_leave
+#. odoo-python
+#: code:addons/KSW_eos_leave/models/hr_leave.py:0
+msgid ""
+"This end-of-service request has a payslip a payroll officer confirmed by "
+"hand (%(slip)s), so it is treated as paid. Handle the payslip first — the "
+"request cannot be %(what)s until then."
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
+msgid ""
+"This will cancel the existing EOS payslip and recreate it from the current "
+"leave inputs. Continue?"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model,name:KSW_eos_leave.model_hr_leave
+msgid "Time Off"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model,name:KSW_eos_leave.model_hr_leave_type
+msgid "Time Off Type"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_list_eos_unpaid
+msgid "Total"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_employee_archived
+msgid ""
+"True when GM final approval on THIS request is what archived the employee. "
+"Reversing the request restores the employee only when this is set — an "
+"employee archived for any other reason stays archived, because provenance is"
+" recorded here rather than guessed from the fact that they are inactive."
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_inputs_editable
+msgid ""
+"True when the current user may still fill or correct the HR-owned EOS "
+"financial inputs on this request."
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_is_eos_leave
+msgid "True when the leave type is flagged as an EOS request."
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,field_description:KSW_eos_leave.field_hr_leave__x_eos_unpaid_days_counted
+msgid "Unpaid Days Counted"
+msgstr ""
+
+#. module: KSW_eos_leave
+#. odoo-python
+#: code:addons/KSW_eos_leave/models/hr_leave.py:0
+msgid "Unpaid Days — %s"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_system_unpaid_days
+msgid ""
+"Unpaid days recorded in the system between the joining date and the "
+"termination date: validated unpaid leaves, plus the excess accepted as "
+"unpaid on annual leaves. Same rule as the annual leave balance. Counted live"
+" up to the HR Approval step and frozen once HR approves."
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model:ir.model.fields,help:KSW_eos_leave.field_hr_leave__x_eos_unpaid_days
+msgid ""
+"Unpaid days the system does not record (e.g. before go-live, or agreed with "
+"the employee). Added to the System Unpaid Days; both are excluded from the "
+"service period before recomputing the Article 84/85 EOS entitlement. Do not "
+"repeat days the system already counts."
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
+msgid "View Leaves"
+msgstr ""
+
+#. module: KSW_eos_leave
+#: model_terms:ir.ui.view,arch_db:KSW_eos_leave.hr_leave_view_form_inherit_eos
+msgid "🏢 EOS Review"
+msgstr ""

@@ -1,0 +1,87 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_hr_dashboard
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_hr_dashboard
+#. odoo-javascript
+#: code:addons/KSW_hr_dashboard/data/files/ksw_hr_dashboard.json:0
+msgid "Absent Days"
+msgstr ""
+
+#. module: KSW_hr_dashboard
+#. odoo-javascript
+#: code:addons/KSW_hr_dashboard/data/files/ksw_hr_dashboard.json:0
+msgid "Amount"
+msgstr ""
+
+#. module: KSW_hr_dashboard
+#. odoo-javascript
+#: code:addons/KSW_hr_dashboard/data/files/ksw_hr_dashboard.json:0
+msgid "Approval Step"
+msgstr ""
+
+#. module: KSW_hr_dashboard
+#. odoo-javascript
+#: code:addons/KSW_hr_dashboard/data/files/ksw_hr_dashboard.json:0
+msgid "Attendance Absence Trend"
+msgstr ""
+
+#. module: KSW_hr_dashboard
+#. odoo-javascript
+#: code:addons/KSW_hr_dashboard/data/files/ksw_hr_dashboard.json:0
+msgid "Department"
+msgstr ""
+
+#. module: KSW_hr_dashboard
+#: model:spreadsheet.dashboard,name:KSW_hr_dashboard.spreadsheet_dashboard_ksw_hr
+msgid "KSW HR Overview"
+msgstr ""
+
+#. module: KSW_hr_dashboard
+#. odoo-javascript
+#: code:addons/KSW_hr_dashboard/data/files/ksw_hr_dashboard.json:0
+msgid "Month"
+msgstr ""
+
+#. module: KSW_hr_dashboard
+#. odoo-javascript
+#: code:addons/KSW_hr_dashboard/data/files/ksw_hr_dashboard.json:0
+msgid "Outstanding"
+msgstr ""
+
+#. module: KSW_hr_dashboard
+#. odoo-javascript
+#: code:addons/KSW_hr_dashboard/data/files/ksw_hr_dashboard.json:0
+msgid "Outstanding Deduction Balance"
+msgstr ""
+
+#. module: KSW_hr_dashboard
+#. odoo-javascript
+#: code:addons/KSW_hr_dashboard/data/files/ksw_hr_dashboard.json:0
+msgid "Payroll by Department"
+msgstr ""
+
+#. module: KSW_hr_dashboard
+#. odoo-javascript
+#: code:addons/KSW_hr_dashboard/data/files/ksw_hr_dashboard.json:0
+msgid "Pending Leave Approvals by Step"
+msgstr ""
+
+#. module: KSW_hr_dashboard
+#. odoo-javascript
+#: code:addons/KSW_hr_dashboard/data/files/ksw_hr_dashboard.json:0
+msgid "Requests"
+msgstr ""

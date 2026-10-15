@@ -20,6 +20,35 @@
         </field>
     </record>
 
+    <!-- The default kanban for vehicles. On a phone every vehicle picker
+         (Workshop request, parts...) opens its select dialog in kanban, and
+         without a view here Odoo borrowed the only one there was: the Water
+         Delivery Tankers card, which shows tanker groups that a workshop
+         requester may not read (AccessError on x_tanker_group_ids). Keep this
+         card to fields every vehicle reader can see. The Tankers action binds
+         its own card explicitly, so it is unaffected. -->
+    <record id="view_ksw_fleet_vehicle_kanban" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.kanban</field>
+        <field name="model">ksw.fleet.vehicle</field>
+        <field name="arch" type="xml">
+            <kanban create="0">
+                <templates>
+                    <t t-name="card">
+                        <span class="fw-bold"><field name="name"/></span>
+                        <div class="small text-muted">
+                            <field name="vehicle_type"/>
+                            <t t-if="record.plate_number.raw_value"> · <field name="plate_number"/></t>
+                            <t t-if="record.tank_number.raw_value"> · <field name="tank_number"/></t>
+                        </div>
+                        <div class="small" t-if="record.driver_name.raw_value">
+                            <field name="driver_name"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
     <record id="view_ksw_fleet_vehicle_form" model="ir.ui.view">
         <field name="name">ksw.fleet.vehicle.form</field>
         <field name="model">ksw.fleet.vehicle</field>

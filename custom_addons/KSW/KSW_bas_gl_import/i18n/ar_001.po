@@ -1,0 +1,571 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_bas_gl_import
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:59+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar_001\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_bas_gl_import
+#. odoo-python
+#: code:addons/KSW_bas_gl_import/models/bas_gl_import.py:0
+msgid ""
+"%(accounts)s analytic accounts and %(plans)s plans created; %(skipped)s "
+"already in Odoo."
+msgstr ""
+"تم إنشاء %(accounts)s حساب تحليلي و%(plans)s خطة؛ و%(skipped)s موجودة مسبقا "
+"في Odoo."
+
+#. module: KSW_bas_gl_import
+#. odoo-python
+#: code:addons/KSW_bas_gl_import/models/bas_gl_import.py:0
+msgid "%(lines)s journal lines given their BAS cost centre."
+msgstr "تم إسناد مركز تكلفة BAS إلى %(lines)s من بنود القيود."
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.constraint,message:KSW_bas_gl_import.constraint_account_move_x_bas_key_uniq
+msgid "A journal entry for this BAS voucher already exists."
+msgstr "يوجد قيد يومية لسند BAS هذا بالفعل."
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.constraint,message:KSW_bas_gl_import.constraint_account_analytic_plan_x_bas_code_uniq
+msgid "A plan for this BAS cost centre already exists."
+msgstr "توجد خطة لمركز تكلفة BAS هذا بالفعل."
+
+#. module: KSW_bas_gl_import
+#: model:ir.model,name:KSW_bas_gl_import.model_account_account
+msgid "Account"
+msgstr "الحساب"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model,name:KSW_bas_gl_import.model_account_group
+msgid "Account Group"
+msgstr "مجموعة الحسابات"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,help:KSW_bas_gl_import.field_account_group__x_bas_code
+msgid "Account code in BAS (COD10.DCODE1) for hierarchy levels 1-4."
+msgstr "رمز الحساب في BAS (COD10.DCODE1) لمستويات الشجرة 1-4."
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset__accum_open
+msgid "Accumulated at 1 Jan"
+msgstr "مجمع الإهلاك في 1 يناير"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset_event__dep_amount
+msgid "Accumulated at disposal"
+msgstr "مجمع الإهلاك عند الاستبعاد"
+
+#. module: KSW_bas_gl_import
+#: model_terms:ir.ui.view,arch_db:KSW_bas_gl_import.view_ksw_bas_gl_import_form
+msgid "Activate English Names"
+msgstr "تفعيل الأسماء الإنجليزية"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields.selection,name:KSW_bas_gl_import.selection__ksw_bas_fixed_asset_event__kind__add
+msgid "Addition"
+msgstr "إضافة"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset__amount
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset_event__amount
+msgid "Amount"
+msgstr "المبلغ"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.constraint,message:KSW_bas_gl_import.constraint_account_analytic_account_x_bas_code_uniq
+msgid ""
+"An analytic account for this BAS cost centre already exists in this plan."
+msgstr "يوجد حساب تحليلي لمركز تكلفة BAS هذا في هذه الخطة بالفعل."
+
+#. module: KSW_bas_gl_import
+#: model:ir.model,name:KSW_bas_gl_import.model_account_analytic_account
+msgid "Analytic Account"
+msgstr "الحساب التحليلي"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model,name:KSW_bas_gl_import.model_account_analytic_plan
+msgid "Analytic Plans"
+msgstr "الخطط التحليلية"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset__rate
+msgid "Annual rate %"
+msgstr "نسبة الإهلاك السنوية %"
+
+#. module: KSW_bas_gl_import
+#: model_terms:ir.ui.view,arch_db:KSW_bas_gl_import.view_ksw_bas_gl_import_form
+msgid "Apply Cost Centres"
+msgstr "تطبيق مراكز التكلفة"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model,name:KSW_bas_gl_import.model_account_asset
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset_event__asset_id
+msgid "Asset"
+msgstr "أصل"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset__asset_account_id
+msgid "Asset Account"
+msgstr "حساب الأصل"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model,name:KSW_bas_gl_import.model_account_asset_line
+msgid "Asset depreciation table line"
+msgstr "أصل خط إستهلاك"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_res_partner__x_bas_code
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_res_users__x_bas_code
+msgid "BAS Account Code"
+msgstr "رقم الحساب في BAS"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_asset__x_bas_depreciation_account_id
+msgid "BAS Accumulated Depreciation Account"
+msgstr "حساب مجمع الإهلاك في BAS"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_asset__x_bas_annual_rate
+msgid "BAS Annual Rate (%)"
+msgstr "نسبة الإهلاك السنوية في BAS (%)"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_bank_statement_line__x_bas_branch
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_move__x_bas_branch
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_stock_picking__x_bas_branch
+msgid "BAS Branch"
+msgstr "فرع BAS"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_account__x_bas_code
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_analytic_plan__x_bas_code
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_group__x_bas_code
+msgid "BAS Code"
+msgstr "رمز BAS"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_analytic_account__x_bas_code
+msgid "BAS Cost Centre"
+msgstr "مركز تكلفة BAS"
+
+#. module: KSW_bas_gl_import
+#. odoo-python
+#: code:addons/KSW_bas_gl_import/models/bas_gl_import.py:0
+msgid "BAS Cost Centres"
+msgstr "مراكز تكلفة BAS"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_stock_picking__x_bas_key
+msgid "BAS Delivery Note"
+msgstr "سند تسليم BAS"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_asset__x_bas_expense_account_id
+msgid "BAS Depreciation Expense Account"
+msgstr "حساب مصروف الإهلاك في BAS"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_bank_statement_line__x_bas_ftype
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_move__x_bas_ftype
+msgid "BAS FTYPE"
+msgstr "نوع الحركة في BAS (FTYPE)"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model,name:KSW_bas_gl_import.model_ksw_bas_fixed_asset
+msgid "BAS Fixed Asset (depreciation basis)"
+msgstr "أصل ثابت في BAS (أساس الإهلاك)"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model,name:KSW_bas_gl_import.model_ksw_bas_fixed_asset_event
+msgid "BAS Fixed Asset Addition / Disposal"
+msgstr "إضافة / استبعاد أصل ثابت في BAS"
+
+#. module: KSW_bas_gl_import
+#: model:ir.actions.act_window,name:KSW_bas_gl_import.action_ksw_bas_gl_import
+#: model:ir.ui.menu,name:KSW_bas_gl_import.menu_ksw_bas_gl_import
+#: model_terms:ir.ui.view,arch_db:KSW_bas_gl_import.view_ksw_bas_gl_import_form
+msgid "BAS GL Import"
+msgstr "استيراد دفتر الأستاذ من BAS"
+
+#. module: KSW_bas_gl_import
+#: model_terms:ir.ui.view,arch_db:KSW_bas_gl_import.view_ksw_bas_gl_import_list
+msgid "BAS GL Imports"
+msgstr "استيرادات دفتر الأستاذ من BAS"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model,name:KSW_bas_gl_import.model_ksw_bas_gl_import
+msgid "BAS General Ledger Import"
+msgstr "استيراد دفتر الأستاذ العام من BAS"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_product_product__x_bas_code
+msgid "BAS Item Code"
+msgstr "رمز صنف BAS"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_account__x_bas_name_ar
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_res_partner__x_bas_name_ar
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_res_users__x_bas_name_ar
+msgid "BAS Name (Arabic)"
+msgstr "اسم BAS (عربي)"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_account__x_bas_name_en
+msgid "BAS Name (English)"
+msgstr "اسم BAS (إنجليزي)"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_res_partner__x_bas_vat
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_res_users__x_bas_vat
+msgid "BAS TAX_ID (raw)"
+msgstr "TAX_ID في BAS (خام)"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_bank_statement_line__x_bas_key
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_move__x_bas_key
+msgid "BAS Voucher Key"
+msgstr "مفتاح سند BAS"
+
+#. module: KSW_bas_gl_import
+#. odoo-python
+#: code:addons/KSW_bas_gl_import/models/bas_gl_import.py:0
+msgid "BAS client ledger: tag the client on its receivable lines"
+msgstr "دفتر عملاء BAS: إسناد العميل إلى بنود الذمم المدينة الخاصة به"
+
+#. module: KSW_bas_gl_import
+#: model:ir.actions.server,name:KSW_bas_gl_import.cron_bas_depreciation_day_ir_actions_server
+msgid "BAS: reload fixed-asset depreciation basis"
+msgstr "BAS: إعادة تحميل أساس إهلاك الأصول الثابتة"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_gl_import__branch_code
+msgid "Branch Code"
+msgstr "رمز الفرع"
+
+#. module: KSW_bas_gl_import
+#: model_terms:ir.ui.view,arch_db:KSW_bas_gl_import.view_ksw_bas_gl_import_form
+msgid ""
+"Bring in BAS cost centres (WREF10) Odoo does not have yet as analytic "
+"accounts. Never renames or removes one already in Odoo."
+msgstr ""
+"جلب مراكز تكلفة BAS (WREF10) غير الموجودة في Odoo كحسابات تحليلية. لا يعيد "
+"تسمية أو يحذف أي حساب موجود في Odoo."
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,help:KSW_bas_gl_import.field_account_asset__x_bas_expense_account_id
+msgid "COD10.DDEP_CODE for this asset. Overrides the profile."
+msgstr "COD10.DDEP_CODE لهذا الأصل. يتجاوز الملف التعريفي."
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,help:KSW_bas_gl_import.field_account_asset__x_bas_annual_rate
+msgid "COD10.DDEP_PER -- straight-line percentage of cost, as BAS holds it."
+msgstr "COD10.DDEP_PER -- نسبة القسط الثابت من التكلفة، كما هي في BAS."
+
+#. module: KSW_bas_gl_import
+#: model_terms:ir.ui.view,arch_db:KSW_bas_gl_import.view_ksw_bas_gl_import_form
+msgid "Chart Names: Arabic (default)"
+msgstr "أسماء الدليل: العربية (افتراضي)"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset__code
+msgid "Code"
+msgstr "رمز"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset__company_id
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_gl_import__company_id
+msgid "Company"
+msgstr "الشركة"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model,name:KSW_bas_gl_import.model_res_partner
+msgid "Contact"
+msgstr "جهة الاتصال"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset__create_uid
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset_event__create_uid
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_gl_import__create_uid
+msgid "Created by"
+msgstr "أنشئ بواسطة"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset__create_date
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset_event__create_date
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_gl_import__create_date
+msgid "Created on"
+msgstr "أنشئ في"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset__date
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset_event__date
+msgid "Date"
+msgstr "التاريخ"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_gl_import__date_from
+msgid "Date From"
+msgstr "التاريخ من"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_gl_import__date_to
+msgid "Date To"
+msgstr "التاريخ إلى"
+
+#. module: KSW_bas_gl_import
+#. odoo-python
+#: code:addons/KSW_bas_gl_import/models/bas_gl_import.py:0
+msgid ""
+"Depreciation is charged daily in the income statement (BAS method) and is "
+"not posted to the journal."
+msgstr "يحمل الإهلاك يوميا في قائمة الدخل (طريقة BAS) ولا يرحل إلى اليومية."
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_account__display_name
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_analytic_account__display_name
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_analytic_plan__display_name
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_asset__display_name
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_asset_line__display_name
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_group__display_name
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_move__display_name
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset__display_name
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset_event__display_name
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_gl_import__display_name
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_product_product__display_name
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_res_partner__display_name
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_stock_picking__display_name
+msgid "Display Name"
+msgstr "اسم العرض"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields.selection,name:KSW_bas_gl_import.selection__ksw_bas_fixed_asset_event__kind__dispose
+msgid "Disposal"
+msgstr "استبعاد"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields.selection,name:KSW_bas_gl_import.selection__ksw_bas_gl_import__state__draft
+msgid "Draft"
+msgstr "مسودة"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset__event_ids
+msgid "Event"
+msgstr "الفعالية"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset__expense_account_id
+msgid "Expense Account"
+msgstr "حساب المصروف"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset__expense_group
+msgid "Expense Group"
+msgstr "مجموعة المصروفات"
+
+#. module: KSW_bas_gl_import
+#: model_terms:ir.ui.view,arch_db:KSW_bas_gl_import.view_ksw_bas_gl_import_form
+msgid ""
+"Give imported BAS journal lines the cost centre BAS has on them "
+"(vehicle/department in Cost Centres, driver in Employee Cost Centre). Lines "
+"that already have one are left alone."
+msgstr ""
+"إسناد مركز التكلفة الموجود في BAS إلى بنود قيود BAS المستوردة "
+"(المركبة/الإدارة في مراكز التكلفة، والسائق في مركز تكلفة الموظف). تترك "
+"البنود التي لديها مركز تكلفة كما هي."
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_account__id
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_analytic_account__id
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_analytic_plan__id
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_asset__id
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_asset_line__id
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_group__id
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_account_move__id
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset__id
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset_event__id
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_gl_import__id
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_product_product__id
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_res_partner__id
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_stock_picking__id
+msgid "ID"
+msgstr "المُعرف"
+
+#. module: KSW_bas_gl_import
+#: model_terms:ir.ui.view,arch_db:KSW_bas_gl_import.view_ksw_bas_gl_import_form
+msgid "Import Cost Centres"
+msgstr "استيراد مراكز التكلفة"
+
+#. module: KSW_bas_gl_import
+#: model_terms:ir.ui.view,arch_db:KSW_bas_gl_import.view_ksw_bas_gl_import_form
+msgid "Import Ledger"
+msgstr "استيراد دفتر الأستاذ"
+
+#. module: KSW_bas_gl_import
+#. odoo-python
+#: code:addons/KSW_bas_gl_import/models/bas_gl_import.py:0
+msgid "Import the BAS chart of accounts first."
+msgstr "استورد دليل حسابات BAS أولا."
+
+#. module: KSW_bas_gl_import
+#. odoo-python
+#: code:addons/KSW_bas_gl_import/models/bas_gl_import.py:0
+msgid "Import the cost centres first."
+msgstr "استورد مراكز التكلفة أولا."
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields.selection,name:KSW_bas_gl_import.selection__ksw_bas_gl_import__state__done
+msgid "Imported"
+msgstr "مستورد"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model,name:KSW_bas_gl_import.model_account_move
+msgid "Journal Entry"
+msgstr "قيد اليومية"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset_event__kind
+msgid "Kind"
+msgstr "النوع"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset__write_uid
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset_event__write_uid
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_gl_import__write_uid
+msgid "Last Updated by"
+msgstr "آخر تحديث بواسطة"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset__write_date
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset_event__write_date
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_gl_import__write_date
+msgid "Last Updated on"
+msgstr "آخر تحديث في"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,help:KSW_bas_gl_import.field_account_account__x_bas_code
+msgid "Leaf account code in BAS (COD10.DCODE1, DLEVEL=5)."
+msgstr "رمز الحساب الفرعي في BAS (COD10.DCODE1، DLEVEL=5)."
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_gl_import__log
+msgid "Log"
+msgstr "السجل"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_gl_import__move_count
+msgid "Move Count"
+msgstr "عدد الحركات"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_gl_import__name
+msgid "Name"
+msgstr "الاسم"
+
+#. module: KSW_bas_gl_import
+#. odoo-python
+#: code:addons/KSW_bas_gl_import/models/bas_gl_import.py:0
+msgid "No warehouse for %s"
+msgstr "لا يوجد مستودع ل %s"
+
+#. module: KSW_bas_gl_import
+#. odoo-python
+#: code:addons/KSW_bas_gl_import/models/bas_gl_import.py:0
+msgid "Opening balances do not balance: %(d).2f vs %(c).2f"
+msgstr "الأرصدة الافتتاحية غير متوازنة: %(d).2f مقابل %(c).2f"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,help:KSW_bas_gl_import.field_ksw_bas_gl_import__branch_code
+msgid "Optional BAS branch (CODE2). Leave empty for all branches."
+msgstr "فرع BAS اختياري (CODE2). اتركه فارغا لجميع الفروع."
+
+#. module: KSW_bas_gl_import
+#: model_terms:ir.ui.view,arch_db:KSW_bas_gl_import.view_ksw_bas_gl_import_form
+msgid "Problems"
+msgstr "المشكلات"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model,name:KSW_bas_gl_import.model_product_product
+msgid "Product Variant"
+msgstr "متغير المنتج"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset__cost
+msgid "Register cost at 1 Jan"
+msgstr "التكلفة الدفترية في 1 يناير"
+
+#. module: KSW_bas_gl_import
+#. odoo-python
+#: code:addons/KSW_bas_gl_import/models/bas_gl_import.py:0
+msgid "Run action_setup_inventory first."
+msgstr "شغل action_setup_inventory أولا."
+
+#. module: KSW_bas_gl_import
+#: model_terms:ir.ui.view,arch_db:KSW_bas_gl_import.view_ksw_bas_gl_import_form
+msgid "Show the BAS Arabic name in every language."
+msgstr "عرض اسم BAS العربي في جميع اللغات."
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_gl_import__skipped_count
+msgid "Skipped Count"
+msgstr "عدد المستبعد"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_gl_import__state
+msgid "State"
+msgstr "الحالة"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,help:KSW_bas_gl_import.field_account_asset__x_bas_depreciation_account_id
+msgid "The 24xx counterpart for this asset. Overrides the profile."
+msgstr "الحساب المقابل 24xx لهذا الأصل. يتجاوز الملف التعريفي."
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.constraint,message:KSW_bas_gl_import.constraint_stock_picking_x_bas_key_uniq
+msgid "This BAS delivery note is already imported."
+msgstr "سند تسليم BAS هذا مستورد بالفعل."
+
+#. module: KSW_bas_gl_import
+#: model:ir.model,name:KSW_bas_gl_import.model_stock_picking
+msgid "Transfer"
+msgstr "تحويل"
+
+#. module: KSW_bas_gl_import
+#: model_terms:ir.ui.view,arch_db:KSW_bas_gl_import.view_ksw_bas_gl_import_form
+msgid ""
+"Use BAS's English name in English where BAS has one (1,872 of 4,402); the "
+"rest keep their Arabic. Nothing is machine-translated."
+msgstr ""
+"استخدام اسم BAS الإنجليزي في الواجهة الإنجليزية حيثما وجد (1,872 من 4,402)؛ "
+"وتبقى البقية بالعربية. لا توجد ترجمة آلية."
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_gl_import__voucher_count
+msgid "Voucher Count"
+msgstr "عدد السندات"
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,help:KSW_bas_gl_import.field_account_analytic_account__x_bas_code
+msgid "WREF10.CODE of the BAS cost centre this account was imported from."
+msgstr "WREF10.CODE لمركز تكلفة BAS الذي استورد منه هذا الحساب."
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,field_description:KSW_bas_gl_import.field_ksw_bas_fixed_asset__year
+msgid "Year"
+msgstr "السنة"
+
+#. module: KSW_bas_gl_import
+#: model_terms:ir.ui.view,arch_db:KSW_bas_gl_import.view_ksw_bas_gl_import_form
+msgid "all branches"
+msgstr "جميع الفروع"

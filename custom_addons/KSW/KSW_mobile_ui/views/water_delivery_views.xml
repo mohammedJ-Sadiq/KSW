@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Water Delivery, supervisor and billing side, on a phone. The driver's
+         own screen is the /water/ app (KSW_water_delivery/static/src/app). -->
+
+    <!-- Delivery Notes opens grouped by client: on a phone that stays a
+         grouped list (tap a client to open it) instead of one card column
+         per client, swiped sideways. Only mobile_view_mode is written here;
+         KSW_water_delivery never declares it, so its upgrades keep this. -->
+    <record id="KSW_water_delivery.action_water_delivery_all_notes" model="ir.actions.act_window">
+        <field name="mobile_view_mode">list</field>
+    </record>
+
+    <record id="view_water_delivery_note_list_mobile" model="ir.ui.view">
+        <field name="name">stock.picking.list.mobile</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="KSW_water_delivery.view_water_delivery_note_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list/field[@name='x_delivery_date']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='partner_id']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='x_branch_code']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='x_driver_id']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='x_off_route']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='x_location_exception']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='x_invoice_status']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- A client location sent from the site: who, when, how precise, the
+         map, and Approve. Approve asks first because the record page tells
+         the reviewer to check the map; Reject needs a reason, so it stays on
+         the record page. -->
+    <record id="view_water_location_request_kanban_mobile" model="ir.ui.view">
+        <field name="name">ksw.water.location.request.kanban.mobile</field>
+        <field name="model">ksw.water.location.request</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <kanban class="ksw_m_cards" create="0" sample="1">
+                <field name="map_url"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between align-items-start gap-2">
+                            <field name="partner_id" class="fw-bold"/>
+                            <field name="state" widget="badge"
+                                   decoration-success="state == 'approved'"
+                                   decoration-warning="state == 'pending'"/>
+                        </div>
+                        <div class="small text-muted">
+                            <field name="employee_id"/> · <field name="received_at"/>
+                        </div>
+                        <div class="small mt-1">
+                            <span>Accuracy</span> ±<field name="accuracy_m"/> m
+                        </div>
+                        <div class="d-flex mt-2 ksw_m_actions">
+                            <a t-if="record.map_url.raw_value" t-att-href="record.map_url.raw_value"
+                               target="_blank" class="btn btn-sm btn-secondary py-0">Open Map</a>
+                            <button name="action_approve" type="object"
+                                    class="btn btn-sm btn-primary py-0"
+                                    invisible="state != 'pending'"
+                                    groups="KSW_water_delivery.group_water_dispatcher"
+                                    confirm="Approve this location? Check the pin on the map first.">Approve</button>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_water_location_requests_view_list_mobile" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="KSW_water_delivery.view_water_location_request_list"/>
+        <field name="act_window_id" ref="KSW_water_delivery.action_water_location_requests"/>
+    </record>
+    <record id="action_water_location_requests_view_kanban_mobile" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_water_location_request_kanban_mobile"/>
+        <field name="act_window_id" ref="KSW_water_delivery.action_water_location_requests"/>
+    </record>
+
+    <!-- A delivery from the driver app: what, for whom, how far from the
+         client, and the supervisor's decision on a held one. -->
+    <record id="view_water_capture_kanban_mobile" model="ir.ui.view">
+        <field name="name">ksw.water.capture.kanban.mobile</field>
+        <field name="model">ksw.water.capture</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <kanban class="ksw_m_cards" create="0" sample="1">
+                <field name="hold_reason"/>
+                <field name="picking_id"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between align-items-start gap-2">
+                            <field name="partner_id" class="fw-bold"/>
+                            <field name="state" widget="badge"
+                                   decoration-success="state == 'issued'"
+                                   decoration-warning="state == 'held'"
+                                   decoration-danger="state == 'failed'"/>
+                        </div>
+                        <div class="small text-muted">
+                            <field name="driver_id"/> · <field name="captured_at"/>
+                        </div>
+                        <div class="d-flex justify-content-between mt-1">
+                            <span><field name="entered_qty"/> · <field name="product_id"/></span>
+                            <span class="small" invisible="not distance_m">
+                                <field name="distance_m"/> <span>m from the client</span>
+                            </span>
+                        </div>
+                        <div t-if="record.hold_reason.raw_value" class="small text-warning mt-1">
+                            <field name="hold_reason"/>
+                        </div>
+                        <div class="small mt-1" t-if="record.picking_id.raw_value">
+                            <span>Note</span> <field name="picking_id"/>
+                        </div>
+                        <div class="d-flex mt-2 ksw_m_actions">
+                            <button name="action_accept" type="object"
+                                    class="btn btn-sm btn-primary py-0"
+                                    invisible="state != 'held'"
+                                    groups="KSW_water_delivery.group_water_dispatcher"
+                                    confirm="Accept this delivery and issue the note?">Accept</button>
+                            <button name="action_reject" type="object"
+                                    class="btn btn-sm btn-secondary py-0"
+                                    invisible="state != 'held'"
+                                    groups="KSW_water_delivery.group_water_dispatcher"
+                                    confirm="Reject this delivery? The note will be cancelled.">Reject</button>
+                            <button name="action_retry" type="object"
+                                    class="btn btn-sm btn-primary py-0"
+                                    invisible="state != 'failed'"
+                                    groups="KSW_water_delivery.group_water_dispatcher">Try Again</button>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_water_captures_view_list_mobile" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="KSW_water_delivery.view_water_capture_list"/>
+        <field name="act_window_id" ref="KSW_water_delivery.action_water_captures"/>
+    </record>
+    <record id="action_water_captures_view_kanban_mobile" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_water_capture_kanban_mobile"/>
+        <field name="act_window_id" ref="KSW_water_delivery.action_water_captures"/>
+    </record>
+
+    <!-- Fleet Management (tankers). Desktop keeps its edit-in-place list. A
+         phone gets one card per tanker, and a tap opens a short page with
+         exactly the fields dispatch changes there. The two Driver pickers
+         are the list's own: a supervisor picks from his team only, an
+         administrator from everyone; the write guard (_water_check_team)
+         is the same either way. -->
+    <record id="view_water_tanker_kanban_mobile" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.kanban.water.tankers.mobile</field>
+        <field name="model">ksw.fleet.vehicle</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <kanban class="ksw_m_cards" create="0" delete="0" sample="1">
+                <field name="driver_id"/>
+                <field name="x_driver_client_ids"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between align-items-start gap-2">
+                            <span class="fw-bold fs-5"><field name="name"/></span>
+                            <div class="d-flex flex-wrap justify-content-end gap-1">
+                                <span t-if="!record.driver_id.raw_value" class="badge text-bg-warning">No Driver</span>
+                                <field name="x_picking_type_id" class="badge text-bg-light"/>
+                            </div>
+                        </div>
+                        <div class="small text-muted">
+                            <field name="vehicle_type"/>
+                            <t t-if="record.plate_number.raw_value"> · <field name="plate_number"/></t>
+                            · <field name="x_capacity_m3"/> m³
+                        </div>
+                        <div class="mt-1" t-if="record.driver_id.raw_value">
+                            <span class="text-muted small">Driver</span>
+                            <field name="driver_id" class="fw-semibold ms-1"/>
+                        </div>
+                        <div class="small mt-1">
+                            <t t-esc="record.x_driver_client_ids.raw_value.length"/> <span>clients</span>
+                        </div>
+                        <field name="x_tanker_group_ids" widget="many2many_tags" class="mt-1"/>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_water_tanker_form_mobile" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.form.water.tankers.mobile</field>
+        <field name="model">ksw.fleet.vehicle</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <form create="0" delete="0" duplicate="0">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                        <div class="text-muted">
+                            <field name="vehicle_type" readonly="1"/>
+                            <span invisible="not plate_number"> · <field name="plate_number" readonly="1"/></span>
+                        </div>
+                    </div>
+                    <group>
+                        <group string="Assignment">
+                            <field name="driver_id" string="Driver"
+                                   groups="!base.group_system"
+                                   domain="['|', '|', ('parent_id.user_id', '=', uid), ('parent_id.parent_id.user_id', '=', uid), ('parent_id.parent_id.parent_id.user_id', '=', uid)]"
+                                   options="{'no_create': True, 'no_open': True}"/>
+                            <field name="driver_id" string="Driver"
+                                   groups="base.group_system"
+                                   options="{'no_create': True, 'no_open': True}"/>
+                            <field name="x_picking_type_id" string="Branch"
+                                   options="{'no_create': True, 'no_open': True}"/>
+                            <field name="x_capacity_m3"/>
+                        </group>
+                        <group string="Clients">
+                            <div colspan="2" class="text-muted" invisible="driver_id">
+                                Pick a driver first: the clients belong to the driver of this tanker.
+                            </div>
+                            <field name="x_driver_client_ids" nolabel="1" colspan="2" invisible="not driver_id"
+                                   widget="many2many_tags"
+                                   options="{'no_create': True}"
+                                   context="{'res_partner_search_mode': 'customer'}"
+                                   placeholder="Add the clients this driver serves"/>
+                        </group>
+                        <group string="Groups">
+                            <field name="x_tanker_group_ids" nolabel="1" colspan="2"
+                                   widget="many2many_tags" readonly="1"/>
+                        </group>
+                    </group>
+                    <field name="state" invisible="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_water_tankers_view_list_mobile" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="KSW_water_delivery.view_water_tanker_list"/>
+        <field name="act_window_id" ref="KSW_water_delivery.action_water_tankers"/>
+    </record>
+    <record id="action_water_tankers_view_kanban_mobile" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_water_tanker_kanban_mobile"/>
+        <field name="act_window_id" ref="KSW_water_delivery.action_water_tankers"/>
+    </record>
+    <record id="action_water_tankers_view_form_mobile" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_water_tanker_form_mobile"/>
+        <field name="act_window_id" ref="KSW_water_delivery.action_water_tankers"/>
+    </record>
+
+    <record id="view_water_rate_list_mobile" model="ir.ui.view">
+        <field name="name">ksw.water.rate.list.mobile</field>
+        <field name="model">ksw.water.rate</field>
+        <field name="inherit_id" ref="KSW_water_delivery.view_water_rate_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list/field[@name='uom_name']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='source']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+            <xpath expr="//list/field[@name='x_bas_price']" position="attributes">
+                <attribute name="class" add="ksw_m_hide" separator=" "/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

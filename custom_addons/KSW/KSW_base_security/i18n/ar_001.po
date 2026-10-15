@@ -6,16 +6,78 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-15 12:11+0000\n"
-"PO-Revision-Date: 2026-07-15 12:11+0000\n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:59+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar_001\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
-"X-Generator: KSW ar-engine v2\n"
+"Plural-Forms: \n"
+
+#. module: KSW_base_security
+#. odoo-python
+#: code:addons/KSW_base_security/models/hr_department.py:0
+msgid ""
+"%(name)s has no user account, so they cannot be the General Manager of "
+"%(dept)s. Link a user to the employee record first."
+msgstr ""
+"لا يملك %(name)s حساب مستخدم، لذا لا يمكن تعيينه مديرا عاما ل %(dept)s. اربط"
+" مستخدما بسجل الموظف أولا."
+
+#. module: KSW_base_security
+#. odoo-python
+#: code:addons/KSW_base_security/models/hr_department.py:0
+msgid ""
+"%(names)s has no user account, so they cannot be an Accounting Approver of "
+"%(dept)s. Link a user to the employee record first."
+msgstr ""
+"لا يملك %(names)s حساب مستخدم، لذا لا يمكن تعيينه معتمدا محاسبيا ل %(dept)s."
+" اربط مستخدما بسجل الموظف أولا."
+
+#. module: KSW_base_security
+#. odoo-python
+#: code:addons/KSW_base_security/models/res_users.py:0
+msgid "A user cannot be their own assistant."
+msgstr "لا يمكن للمستخدم أن يكون مساعدا لنفسه."
+
+#. module: KSW_base_security
+#: model:ir.model,name:KSW_base_security.model_res_groups
+msgid "Access Groups"
+msgstr "مجموعات الوصول"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__group_id
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_ksw_user_group_log_search
+msgid "Access Right"
+msgstr "صلاحية الوصول"
+
+#. module: KSW_base_security
+#: model:ir.actions.act_window,name:KSW_base_security.action_ksw_user_group_log
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_users__x_group_log_ids
+#: model:ir.ui.menu,name:KSW_base_security.menu_ksw_user_group_log
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_users_form_ksw_group_log
+msgid "Access Right History"
+msgstr "سجل صلاحيات الوصول"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_department__x_accountant_ids
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.hr_department_view_tree_gm
+msgid "Accounting Approvers"
+msgstr "المعتمدون المحاسبيون"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_company__x_default_accountant_ids
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_config_settings__x_default_accountant_ids
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.res_config_settings_view_form_gm
+msgid "Accounting Team"
+msgstr "فريق المحاسبة"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__action
+msgid "Action"
+msgstr "الإجراء"
 
 #. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__active_employee
@@ -28,6 +90,11 @@ msgid "Additional Information"
 msgstr "معلومات إضافية"
 
 #. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_users_form_ksw_manager_assistant
+msgid "Additional Managers Assisted"
+msgstr "مديرون إضافيون يساعدهم"
+
+#. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__additional_note
 msgid "Additional Note"
 msgstr "ملاحظة إضافية"
@@ -35,7 +102,67 @@ msgstr "ملاحظة إضافية"
 #. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__allowed_country_state_ids
 msgid "Allowed Country State"
+msgstr "الولاية/المحافظة المسموح بها"
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_users_form_ksw_manager_assistant
+msgid ""
+"An assistant may create and edit time off (any type) and\n"
+"                        loan requests for the <b>direct reports</b> of the\n"
+"                        managers they assist, and only until the first approver\n"
+"                        signs off. They can never approve, refuse or delete a\n"
+"                        request — the manager still does that personally.\n"
+"                        <br/>\n"
+"                        Their own manager is included automatically; the list\n"
+"                        above is only for managers they do not report to."
 msgstr ""
+"يمكن للمساعد إنشاء وتعديل طلبات الإجازات (بجميع أنواعها) وطلبات\n"
+"                        القروض <b>للمرؤوسين المباشرين</b> للمديرين\n"
+"                        الذين يساعدهم، وذلك فقط حتى يعتمد المعتمد الأول.\n"
+"                        ولا يمكنه أبدا اعتماد أي طلب أو رفضه أو حذفه —\n"
+"                        إذ يتولى المدير ذلك بنفسه.\n"
+"                        <br/>\n"
+"                        يضاف مديره المباشر تلقائيا؛ والقائمة\n"
+"                        أعلاه مخصصة فقط للمديرين الذين لا يتبع لهم."
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.res_config_settings_view_form_gm
+msgid "Approvals"
+msgstr "الموافقات"
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.res_config_settings_view_form_gm
+msgid ""
+"Approves the GM step for departments with no GM of their own, and for "
+"employees with no department."
+msgstr ""
+"يعتمد خطوة المدير العام للإدارات التي ليس لها مدير عام خاص بها، وللموظفين "
+"غير المرتبطين بإدارة."
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_res_company__x_default_gm_id
+#: model:ir.model.fields,help:KSW_base_security.field_res_config_settings__x_default_gm_id
+msgid ""
+"Approves the GM step for employees whose department has no GM of its own "
+"(and for employees with no department at all)."
+msgstr ""
+"يعتمد خطوة المدير العام للموظفين الذين ليس لإدارتهم مدير عام خاص بها "
+"(وللموظفين غير المرتبطين بأي إدارة)."
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_department__x_gm_id
+msgid ""
+"Approves the GM step of time off, loan and commission requests for this "
+"department. Leave empty to inherit the parent department's GM, then the "
+"company default."
+msgstr ""
+"يعتمد خطوة المدير العام لطلبات الإجازات والقروض والعمولات لهذه الإدارة. "
+"اتركه فارغا ليورث المدير العام للإدارة الأم، ثم الافتراضي للشركة."
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_users__x_assistant_ids
+msgid "Assistants"
+msgstr "المساعدون"
 
 #. module: KSW_base_security
 #: model_terms:ir.ui.view,arch_db:KSW_base_security.hr_employee_view_form_bank_accounts
@@ -46,6 +173,22 @@ msgstr "الحسابات البنكية"
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__birthday
 msgid "Birthday"
 msgstr "يوم الميلاد"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__changed_by_id
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_ksw_user_group_log_search
+msgid "Changed By"
+msgstr "تم التغيير بواسطة"
+
+#. module: KSW_base_security
+#: model:ir.model,name:KSW_base_security.model_res_company
+msgid "Companies"
+msgstr "الشركات"
+
+#. module: KSW_base_security
+#: model:ir.model,name:KSW_base_security.model_res_config_settings
+msgid "Config Settings"
+msgstr "تهيئة الإعدادات"
 
 #. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__contract_date_end
@@ -79,6 +222,16 @@ msgid "Country Code"
 msgstr "رمز الدولة"
 
 #. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__create_uid
+msgid "Created by"
+msgstr "أنشئ بواسطة"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__create_date
+msgid "Created on"
+msgstr "أنشئ في"
+
+#. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__currency_id
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__currency_id
 msgid "Currency"
@@ -100,9 +253,24 @@ msgid "Current Time Off Type"
 msgstr "نوع الإجازة الحالية"
 
 #. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_users__x_effective_managers_display
+msgid "Currently Assists"
+msgstr "يساعد حاليا"
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_users_form_ksw_manager_assistant
+msgid "Currently assists:"
+msgstr "يساعد حاليا:"
+
+#. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__da
 msgid "DA"
-msgstr ""
+msgstr "بدل الغلاء"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__date
+msgid "Date"
+msgstr "التاريخ"
 
 #. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__date_end
@@ -125,14 +293,22 @@ msgstr "نسخة بتاريخ"
 #. module: KSW_base_security
 #: model:ir.model.fields,help:KSW_base_security.field_hr_employee__da
 msgid "Dearness allowance"
-msgstr ""
+msgstr "بدل الغلاء المعيشي"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_company__x_default_gm_id
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_config_settings__x_default_gm_id
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.res_config_settings_view_form_gm
+msgid "Default General Manager"
+msgstr "المدير العام الافتراضي"
 
 #. module: KSW_base_security
 #: model:ir.model.fields,help:KSW_base_security.field_hr_employee__schedule_pay
 msgid "Defines the frequency of the wage payment."
-msgstr ""
+msgstr "يحدد دورية صرف الراتب."
 
 #. module: KSW_base_security
+#: model:ir.model,name:KSW_base_security.model_hr_department
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__department_id
 msgid "Department"
 msgstr "القسم"
@@ -154,11 +330,33 @@ msgid "Dependent Children"
 msgstr "الأطفال المعالون"
 
 #. module: KSW_base_security
+#. odoo-javascript
+#: code:addons/KSW_base_security/static/src/js/form_no_autosave.js:0
+msgid "Discard changes"
+msgstr "إهمال التغييرات"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_department__display_name
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__display_name
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__display_name
 #: model:ir.model.fields,field_description:KSW_base_security.field_ir_mail_server__display_name
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__display_name
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_company__display_name
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_groups__display_name
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_users__display_name
 msgid "Display Name"
 msgstr "اسم العرض"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_department__x_effective_accountant_ids
+msgid "Effective Accounting Approvers"
+msgstr "المعتمدون المحاسبيون الفعليون"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_department__x_effective_gm_id
+msgid "Effective GM"
+msgstr "المدير العام الفعلي"
 
 #. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__emergency_contact
@@ -202,7 +400,7 @@ msgstr "نسخ الموظف"
 #. module: KSW_base_security
 #: model:ir.model.fields,help:KSW_base_security.field_hr_employee__type_id
 msgid "Employee category"
-msgstr ""
+msgstr "فئة الموظف"
 
 #. module: KSW_base_security
 #: model:ir.model.fields,help:KSW_base_security.field_hr_employee__wage
@@ -256,6 +454,31 @@ msgid "Gender"
 msgstr "الجنس"
 
 #. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_department__x_gm_id
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.hr_department_view_tree_gm
+msgid "General Manager"
+msgstr "المدير العام"
+
+#. module: KSW_base_security
+#: model:ir.model.fields.selection,name:KSW_base_security.selection__ksw_user_group_log__action__added
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_ksw_user_group_log_search
+msgid "Granted"
+msgstr "تم المنح"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_ksw_user_group_log__is_implied
+msgid ""
+"Granted or revoked through another group that implies it, not ticked "
+"directly on the user."
+msgstr ""
+"منحت أو سحبت من خلال مجموعة أخرى تتضمنها، وليس بتحديدها مباشرة على المستخدم."
+
+#. module: KSW_base_security
+#: model:ir.model.fields.selection,name:KSW_base_security.selection__ksw_user_group_log__source__group
+msgid "Group form"
+msgstr "نموذج المجموعة"
+
+#. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__hr_responsible_id
 msgid "HR Responsible"
 msgstr "مسؤول الموارد البشرية"
@@ -263,7 +486,12 @@ msgstr "مسؤول الموارد البشرية"
 #. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__hra
 msgid "HRA"
-msgstr ""
+msgstr "بدل السكن"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_users__x_has_manager_assistant_right
+msgid "Has Manager Assistant Right"
+msgstr "لديه صلاحية مساعد المدير"
 
 #. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__distance_home_work
@@ -283,12 +511,18 @@ msgstr "وحدة قياس المسافة بين المنزل والعمل"
 #. module: KSW_base_security
 #: model:ir.model.fields,help:KSW_base_security.field_hr_employee__hra
 msgid "House rent allowance."
-msgstr ""
+msgstr "بدل إيجار المسكن."
 
 #. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_department__id
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__id
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__id
 #: model:ir.model.fields,field_description:KSW_base_security.field_ir_mail_server__id
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__id
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_company__id
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_config_settings__id
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_groups__id
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_users__id
 msgid "ID"
 msgstr "المعرف"
 
@@ -304,6 +538,16 @@ msgid ""
 "record without removing it."
 msgstr ""
 "إذا تم تحويل قيمة الحقل النشط إلى خطأ، يمكنك إخفاء سجل مورد دون إزالته."
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__is_implied
+msgid "Implied"
+msgstr "ضمنية"
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.hr_department_view_form_gm
+msgid "Inherited from the parent department"
+msgstr "موروث من الإدارة الأم"
 
 #. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__is_current
@@ -361,6 +605,16 @@ msgid "Last Modified on"
 msgstr "آخر تعديل في"
 
 #. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__write_uid
+msgid "Last Updated by"
+msgstr "آخر تحديث بواسطة"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__write_date
+msgid "Last Updated on"
+msgstr "آخر تحديث في"
+
+#. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__legal_name
 msgid "Legal Name"
 msgstr "الاسم القانوني"
@@ -376,30 +630,103 @@ msgid "Male"
 msgstr "ذكر"
 
 #. module: KSW_base_security
+#: model:res.groups,name:KSW_base_security.group_manager_assistant
+msgid "Manager Assistant"
+msgstr "مساعد المدير"
+
+#. module: KSW_base_security
+#: model:res.groups.privilege,name:KSW_base_security.privilege_manager_delegation
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_users_form_ksw_manager_assistant
+msgid "Manager Delegation"
+msgstr "تفويض المدير"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_users__x_assisted_manager_ids
+msgid "Managers I Assist"
+msgstr "المديرون الذين أساعدهم"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_res_users__x_assisted_manager_ids
+msgid ""
+"Managers whose direct reports this user may prepare time off and loan "
+"requests for. Has no effect unless this user also holds the 'Manager "
+"Assistant' access right."
+msgstr ""
+"المديرون الذين يمكن لهذا المستخدم إعداد طلبات الإجازات والقروض لمرؤوسيهم "
+"المباشرين. لا أثر لذلك ما لم يكن لدى المستخدم أيضا صلاحية 'مساعد المدير'."
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_ksw_user_group_log_search
+msgid "Manual changes"
+msgstr "تغييرات يدوية"
+
+#. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__marital
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__marital
 msgid "Marital Status"
 msgstr "الحالة الاجتماعية"
 
 #. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.res_config_settings_view_form_gm
+msgid ""
+"May approve the accounting step of time off for departments with no "
+"Accounting Approvers of their own, and for employees with no department. Any"
+" one of them can clear the step."
+msgstr ""
+"يمكنهم اعتماد الخطوة المحاسبية للإجازات للإدارات التي ليس لها معتمدون "
+"محاسبيون خاصون بها، وللموظفين غير المرتبطين بإدارة. يكفي أن يعتمد أي منهم."
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_res_config_settings__x_default_accountant_ids
+msgid ""
+"May approve the accounting step of time off for employees whose department "
+"has no Accounting Approvers of its own (and for employees with no department"
+" at all)."
+msgstr ""
+"يمكنهم اعتماد الخطوة المحاسبية للإجازات للموظفين الذين ليس لإدارتهم معتمدون "
+"محاسبيون خاصون بها (وللموظفين غير المرتبطين بأي إدارة)."
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_res_company__x_default_accountant_ids
+msgid ""
+"May approve the accounting step of time off for employees whose department "
+"has no Accounting Approvers of its own (and for employees with no department"
+" at all). A team, not one manager: any one of them can clear the step."
+msgstr ""
+"يمكنهم اعتماد الخطوة المحاسبية للإجازات للموظفين الذين ليس لإدارتهم معتمدون "
+"محاسبيون خاصون بها (وللموظفين غير المرتبطين بأي إدارة). فريق وليس مديرا "
+"واحدا: يكفي أن يعتمد أي منهم."
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_department__x_accountant_ids
+msgid ""
+"May approve the accounting step of time off requests for this department. "
+"Any one of them can clear the step. Leave empty to inherit the parent "
+"department's accountants, then the company default accounting team."
+msgstr ""
+"يمكنهم اعتماد الخطوة المحاسبية لطلبات الإجازات لهذه الإدارة. يكفي أن يعتمد "
+"أي منهم. اتركه فارغا ليورث محاسبو الإدارة الأم، ثم فريق المحاسبة الافتراضي "
+"للشركة."
+
+#. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__meal_allowance
 msgid "Meal Allowance"
-msgstr ""
+msgstr "بدل الوجبة"
 
 #. module: KSW_base_security
 #: model:ir.model.fields,help:KSW_base_security.field_hr_employee__meal_allowance
 msgid "Meal allowance"
-msgstr ""
+msgstr "بدل الوجبة"
 
 #. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__medical_allowance
 msgid "Medical Allowance"
-msgstr ""
+msgstr "البدل الطبي"
 
 #. module: KSW_base_security
 #: model:ir.model.fields,help:KSW_base_security.field_hr_employee__medical_allowance
 msgid "Medical allowance"
-msgstr ""
+msgstr "البدل الطبي"
 
 #. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__member_of_department
@@ -407,9 +734,24 @@ msgid "Member of department"
 msgstr "عضو في قسم"
 
 #. module: KSW_base_security
+#: model:ir.model.fields.selection,name:KSW_base_security.selection__ksw_user_group_log__source__module
+msgid "Module install/upgrade"
+msgstr "تثبيت/ترقية وحدة"
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_users_form_ksw_manager_assistant
+msgid "My Assistants"
+msgstr "مساعدي"
+
+#. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__country_id
 msgid "Nationality (Country)"
 msgstr "الجنسية (البلد)"
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_users_form_ksw_manager_assistant
+msgid "Only needed for managers this user does NOT report to..."
+msgstr "مطلوب فقط للمديرين الذين لا يتبع لهم هذا المستخدم..."
 
 #. module: KSW_base_security
 #: model:ir.model.fields.selection,name:KSW_base_security.selection__hr_version__sex__other
@@ -419,17 +761,17 @@ msgstr "غير ذلك"
 #. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__other_allowance
 msgid "Other Allowance"
-msgstr ""
+msgstr "بدل آخر"
 
 #. module: KSW_base_security
 #: model:ir.model.fields,help:KSW_base_security.field_hr_employee__other_allowance
 msgid "Other allowances"
-msgstr ""
+msgstr "بدلات أخرى"
 
 #. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__passport_expiration_date
 msgid "Passport Expiration Date"
-msgstr ""
+msgstr "تاريخ انتهاء الجواز"
 
 #. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__passport_id
@@ -440,12 +782,26 @@ msgstr "رقم جواز السفر"
 #. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__permit_no
 msgid "Permit No"
-msgstr ""
+msgstr "رقم التصريح"
 
 #. module: KSW_base_security
 #: model:ir.model.fields,help:KSW_base_security.field_hr_employee__hr_responsible_id
 msgid "Person responsible for validating the employee's contracts."
 msgstr "الشخص المسؤول عن تصديق عقود الموظفين."
+
+#. module: KSW_base_security
+#: model:res.groups,comment:KSW_base_security.group_manager_assistant
+msgid ""
+"Prepare and edit time off and loan requests on behalf of the direct reports "
+"of the managers who listed this user as their assistant. Can never approve "
+"or refuse a request. May delete a request they prepared only while it is "
+"still awaiting the manager's own first approval — the window closes the "
+"moment the manager (or the first KSW chain step) acts."
+msgstr ""
+"إعداد وتعديل طلبات الإجازات والقروض نيابة عن المرؤوسين المباشرين للمديرين "
+"الذين أدرجوا هذا المستخدم مساعدا لهم. لا يمكنه أبدا اعتماد أي طلب أو رفضه. "
+"يمكنه حذف طلب أعده فقط ما دام بانتظار الاعتماد الأول من المدير — وتغلق هذه "
+"المهلة بمجرد أن يتخذ المدير (أو الخطوة الأولى في سلسلة KSW) إجراء."
 
 #. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__private_city
@@ -490,6 +846,12 @@ msgid "Private Zip"
 msgstr "رمز Zip خاص"
 
 #. module: KSW_base_security
+#: model:ir.model.fields.selection,name:KSW_base_security.selection__ksw_user_group_log__action__removed
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_ksw_user_group_log_search
+msgid "Revoked"
+msgstr "ملغي"
+
+#. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__ruleset_id
 msgid "Ruleset"
 msgstr "مجموعة القواعد"
@@ -527,6 +889,11 @@ msgid "Social Security Number"
 msgstr "رقم الضمان الاجتماعي"
 
 #. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__source
+msgid "Source"
+msgstr "المصدر"
+
+#. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__spouse_birthdate
 msgid "Spouse Birthdate"
 msgstr "تاريخ ميلاد الزوج/الزوجة"
@@ -537,16 +904,49 @@ msgid "Spouse Legal Name"
 msgstr "الاسم القانوني للزوج/الزوجة"
 
 #. module: KSW_base_security
+#. odoo-javascript
+#: code:addons/KSW_base_security/static/src/js/form_no_autosave.js:0
+msgid "Stay here"
+msgstr "البقاء هنا"
+
+#. module: KSW_base_security
 #: model:res.groups,name:KSW_base_security.group_hr_attendance_supervisor
 #: model:res.groups,name:KSW_base_security.group_hr_employee_supervisor
 msgid "Supervisor"
-msgstr ""
+msgstr "المشرف"
 
 #. module: KSW_base_security
 #: model:res.groups,name:KSW_base_security.group_hr_attendance_supervisor_cascading
 #: model:res.groups,name:KSW_base_security.group_hr_employee_supervisor_cascading
 msgid "Supervisor Cascading"
+msgstr "تسلسل المشرفين"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_res_users__x_has_manager_assistant_right
+msgid "Technical: drives the delegation banners on the user form."
+msgstr "تقني: يتحكم في لافتات التفويض في نموذج المستخدم."
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_department__x_effective_gm_id
+msgid ""
+"Technical: the GM actually responsible for this department once the parent "
+"departments and the company default have been taken into account. Record "
+"rules and approval guards read this, never x_gm_id."
 msgstr ""
+"تقني: المدير العام المسؤول فعليا عن هذه الإدارة بعد احتساب الإدارات الأم "
+"والافتراضي للشركة. قواعد السجلات وضوابط الاعتماد تقرأ هذا الحقل، وليس "
+"x_gm_id."
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_department__x_effective_accountant_ids
+msgid ""
+"Technical: the accounting approvers actually responsible for this department"
+" once the parent departments and the company default have been taken into "
+"account. Record rules and approval guards read this, never x_accountant_ids."
+msgstr ""
+"تقني: المعتمدون المحاسبيون المسؤولون فعليا عن هذه الإدارة بعد احتساب "
+"الإدارات الأم والافتراضي للشركة. قواعد السجلات وضوابط الاعتماد تقرأ هذا "
+"الحقل، وليس x_accountant_ids."
 
 #. module: KSW_base_security
 #: model:ir.model.fields,help:KSW_base_security.field_hr_employee__country_code
@@ -558,17 +958,37 @@ msgstr ""
 "يمكنك استخدام هذا الحقل لإجراء بحث سريع."
 
 #. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_res_users__x_effective_managers_display
+msgid ""
+"The managers whose teams this user can actually prepare requests for right "
+"now, automatic and explicit combined."
+msgstr ""
+"المديرون الذين يمكن لهذا المستخدم فعليا إعداد الطلبات لفرقهم الآن، "
+"التلقائيون والمحددون معا."
+
+#. module: KSW_base_security
 #: model:res.groups,comment:KSW_base_security.group_hr_attendance_employee_subordinate
 msgid ""
 "The user will be able to view their own and their subordinates' attendances."
-msgstr ""
+msgstr "سيتمكن المستخدم من عرض سجلات حضوره وحضور مرؤوسيه."
 
 #. module: KSW_base_security
 #: model:res.groups,comment:KSW_base_security.group_hr_employee_subordinate
 msgid ""
 "The user will be able to view their own and their subordinates' employee "
 "profiles."
+msgstr "سيتمكن المستخدم من عرض ملفه الشخصي وملفات مرؤوسيه."
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_users_form_ksw_manager_assistant
+msgid ""
+"These delegations are inactive: this user does not hold\n"
+"                        the <b>Manager Assistant</b> access right. Grant it under\n"
+"                        <b>Access Rights → Manager Delegation</b>."
 msgstr ""
+"هذه التفويضات غير فعالة: هذا المستخدم لا يملك\n"
+"                        صلاحية <b>مساعد المدير</b>. امنحه إياها من\n"
+"                        <b>صلاحيات الوصول ← تفويض المدير</b>."
 
 #. module: KSW_base_security
 #: model:ir.model.fields,help:KSW_base_security.field_hr_employee__exceptional_location_id
@@ -580,6 +1000,26 @@ msgstr "هذا هو الموقع الاستثنائي وغير الأسبوعي 
 #: model:ir.model.fields,help:KSW_base_security.field_hr_version__sex
 msgid "This is the legal sex recognized by the state."
 msgstr "هذا هو الجنس القانوني المعترف به من الدولة."
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_users_form_ksw_manager_assistant
+msgid ""
+"This user holds the <b>Manager Assistant</b> access right\n"
+"                        but assists nobody, so it currently does nothing. Their\n"
+"                        own manager is picked up automatically — set\n"
+"                        <b>Manager</b> on their employee record, or name the\n"
+"                        manager(s) explicitly below."
+msgstr ""
+"يملك هذا المستخدم صلاحية <b>مساعد المدير</b>\n"
+"                        لكنه لا يساعد أحدا، لذا لا أثر لها حاليا. يضاف\n"
+"                        مديره المباشر تلقائيا — حدد\n"
+"                        <b>المدير</b> في سجل الموظف الخاص به، أو سم\n"
+"                        المدير (المديرين) صراحة أدناه."
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_ksw_user_group_log_search
+msgid "Ticked directly"
+msgstr "محددة مباشرة"
 
 #. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__allocations_count
@@ -594,12 +1034,56 @@ msgstr "إجمالي عدد الأيام المخصصة."
 #. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__travel_allowance
 msgid "Travel Allowance"
-msgstr ""
+msgstr "بدل السفر"
 
 #. module: KSW_base_security
 #: model:ir.model.fields,help:KSW_base_security.field_hr_employee__travel_allowance
 msgid "Travel allowance"
+msgstr "بدل السفر"
+
+#. module: KSW_base_security
+#. odoo-javascript
+#: code:addons/KSW_base_security/static/src/js/form_no_autosave.js:0
+msgid "Unsaved changes"
+msgstr "التغييرات غير المحفوظة"
+
+#. module: KSW_base_security
+#: model:ir.model,name:KSW_base_security.model_res_users
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__user_id
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_ksw_user_group_log_search
+msgid "User"
+msgstr "المستخدم"
+
+#. module: KSW_base_security
+#: model:ir.model,name:KSW_base_security.model_ksw_user_group_log
+msgid "User Access Right Change"
+msgstr "تغيير صلاحية وصول المستخدم"
+
+#. module: KSW_base_security
+#: model:ir.model.fields.selection,name:KSW_base_security.selection__ksw_user_group_log__source__create
+msgid "User created"
+msgstr "تم إنشاء المستخدم"
+
+#. module: KSW_base_security
+#: model:ir.model.fields.selection,name:KSW_base_security.selection__ksw_user_group_log__source__user
+msgid "User form"
+msgstr "نموذج المستخدم"
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_res_users__x_assistant_ids
+msgid ""
+"Users allowed to PREPARE time off and loan requests for this manager's "
+"direct reports. They can never approve any step. Has no effect unless the "
+"assistant also holds the 'Manager Assistant' access right."
 msgstr ""
+"المستخدمون المسموح لهم بإعداد طلبات الإجازات والقروض للمرؤوسين المباشرين "
+"لهذا المدير. لا يمكنهم أبدا اعتماد أي خطوة. لا أثر لذلك ما لم يكن لدى "
+"المساعد أيضا صلاحية 'مساعد المدير'."
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_users_form_ksw_manager_assistant
+msgid "Users who may prepare requests for this user's team..."
+msgstr "المستخدمون الذين يمكنهم إعداد الطلبات لفريق هذا المستخدم..."
 
 #. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__version_id
@@ -619,7 +1103,7 @@ msgstr "تاريخ انتهاء صلاحية التأشيرة"
 #. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__visa_expire
 msgid "Visa Expire"
-msgstr ""
+msgstr "انتهاء التأشيرة"
 
 #. module: KSW_base_security
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__visa_no
@@ -664,3 +1148,18 @@ msgstr "رقم تصريح العمل"
 #: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__resource_calendar_id
 msgid "Working Hours"
 msgstr "ساعات العمل"
+
+#. module: KSW_base_security
+#. odoo-javascript
+#: code:addons/KSW_base_security/static/src/js/form_no_autosave.js:0
+msgid ""
+"You have unsaved changes. Are you sure you want to leave without saving? "
+"Your changes will be discarded."
+msgstr ""
+"لديك تغييرات غير محفوظة. هل أنت متأكد أنك تريد المغادرة دون حفظ؟ سيتم تجاهل "
+"تغييراتك."
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_users_form_ksw_manager_assistant
+msgid "— and can prepare requests for their direct reports."
+msgstr "— ويمكنه إعداد الطلبات لمرؤوسيهم المباشرين."

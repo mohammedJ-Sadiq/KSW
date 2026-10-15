@@ -830,6 +830,7 @@ function render() {
     if (!state.reference) {
         root.innerHTML = `
             <div class="ksw-boot">
+                <div class="ksw-boot-icon">&#128167;</div>
                 <h1>Water Delivery</h1>
                 <p>${state.online
                     ? "Loading your clients…"
@@ -841,11 +842,13 @@ function render() {
             </div>`;
         return;
     }
+    const action = state.view === "new" ? renderActionBar() : "";
     root.innerHTML = `
         ${renderTop()}
-        ${state.banner ? `<div class="ksw-banner ksw-${esc(state.banner.kind)}">${esc(state.banner.message)}</div>` : ""}
+        ${state.banner ? `<div class="ksw-banner ksw-${esc(state.banner.kind)}" role="status">${esc(state.banner.message)}</div>` : ""}
         ${renderReadiness()}
-        <main class="ksw-main">${state.view === "new" ? renderForm() : renderQueue()}</main>
+        <main class="ksw-main ${action ? "ksw-has-action" : ""}">${state.view === "new" ? renderForm() : renderQueue()}</main>
+        ${action}
         ${renderTabs()}`;
     wire();
 }
@@ -853,13 +856,14 @@ function render() {
 /**
  * Always on screen, not tucked into a settings page. A driver has to be able to
  * see at the depot whether this phone will work at the next site, because that
- * is the only place he can still do something about it.
+ * is the only place he can still do something about it. When all is well it
+ * shrinks to one quiet line; when it is not, it stays loud.
  */
 function renderReadiness() {
     const message = readinessMessage();
     if (message.kind === "good") {
-        return `<div class="ksw-ready ksw-ready-good">
-            <span>&#10003; ${esc(message.title)} ${esc(message.detail)}</span>
+        return `<div class="ksw-ready ksw-ready-good ksw-ready-compact">
+            &#10003; ${esc(message.title.replace(/\.$/, ""))} · ${esc(message.detail)}
         </div>`;
     }
     return `<div class="ksw-ready ksw-ready-${esc(message.kind)}">
@@ -872,117 +876,198 @@ function renderReadiness() {
 function renderTop() {
     const reference = state.reference;
     const queued = state.queue.length;
+    const pins = state.pins.length;
     return `
         <header class="ksw-top">
             <div class="ksw-top-row">
-                <strong>${esc(reference.driver.name)}</strong>
+                <div class="ksw-who">
+                    <span class="ksw-avatar">&#128666;</span>
+                    <div>
+                        <div class="ksw-driver" dir="auto">${esc(reference.driver.name)}</div>
+                        <div class="ksw-sub">${reference.vehicle
+                            ? `Tanker <b dir="auto">${esc(reference.vehicle.name)}</b>`
+                            : `<span class="ksw-text-warn">No tanker</span>`}</div>
+                    </div>
+                </div>
                 <span class="ksw-chip ${state.online ? "ksw-on" : "ksw-off"}">
-                    ${state.online ? "Online" : "Offline"}
+                    <span class="ksw-dot"></span>${state.online ? "Online" : "Offline"}
                 </span>
             </div>
-            <div class="ksw-top-row ksw-sub">
-                <span>${esc(reference.vehicle ? reference.vehicle.name : "No tanker")}</span>
+            ${queued || pins ? `<div class="ksw-top-chips">
                 ${queued ? `<span class="ksw-chip ksw-warnchip">${queued} waiting to send</span>` : ""}
-                ${state.pins.length ? `<span class="ksw-chip ksw-warnchip">${state.pins.length} location${state.pins.length === 1 ? "" : "s"} to send</span>` : ""}
-            </div>
+                ${pins ? `<span class="ksw-chip ksw-warnchip">${pins} location${pins === 1 ? "" : "s"} to send</span>` : ""}
+            </div>` : ""}
         </header>`;
 }
 
 function renderTabs() {
-    const queued = state.queue.length;
+    const queued = state.queue.length + state.pins.length;
     return `
         <nav class="ksw-tabs">
-            <button data-view="new" class="${state.view === "new" ? "active" : ""}">New Delivery</button>
+            <button data-view="new" class="${state.view === "new" ? "active" : ""}">
+                <span class="ksw-tab-icon">&#65291;</span><span class="ksw-tab-label">New Delivery</span>
+            </button>
             <button data-view="queue" class="${state.view === "queue" ? "active" : ""}">
-                Sent &amp; Waiting${queued ? ` (${queued})` : ""}
+                <span class="ksw-tab-icon">&#8645;</span><span class="ksw-tab-label">Sent &amp; Waiting${queued ? `<span class="ksw-count">${queued}</span>` : ""}</span>
             </button>
         </nav>`;
 }
 
+function renderGps() {
+    const status = state.positionStatus;
+    const icon = status === "located" ? "&#128205;" : status === "locating" ? "&#8987;" : "&#9888;";
+    return `
+        <section class="ksw-gps ksw-gps-${esc(status)}">
+            <span class="ksw-gps-icon">${icon}</span>
+            <span class="ksw-gps-text">${esc(state.positionMessage || "")}</span>
+            ${status !== "located" && status !== "locating"
+                ? `<button id="ksw-locate" class="ksw-secondary">Retry</button>`
+                : ""}
+        </section>`;
+}
+
+function clientTags(client) {
+    const tags = [];
+    if (strictLocation() && !isLocated(client)) {
+        tags.push(awaitingApproval(client)
+            ? `<span class="ksw-tag ksw-tag-info">Location pending</span>`
+            : `<span class="ksw-tag ksw-tag-warn">Needs location</span>`);
+    }
+    if (!client.usual) {
+        tags.push(`<span class="ksw-tag">Off route</span>`);
+    }
+    return tags.join("");
+}
+
 function renderForm() {
     const form = state.form;
-    const rules = state.reference.rules;
     const problem = locationProblem(form);
-    const clients = visibleClients();
-
     const tankerProblem = state.reference.vehicle
         ? ""
         : state.reference.vehicle_problem || "No tanker is assigned to you. Ask your supervisor.";
     return `
-        ${tankerProblem ? `<div class="ksw-warnbox">${esc(tankerProblem)} You cannot issue notes until then.</div>` : ""}
-        <section class="ksw-gps ksw-gps-${esc(state.positionStatus)}">
-            <div>${esc(state.positionMessage || "")}</div>
-            ${state.positionStatus !== "located"
-                ? `<button id="ksw-locate" class="ksw-secondary">Record my location</button>`
-                : ""}
-        </section>
-
-        <label class="ksw-label">Client</label>
-        ${form.partner
-            ? `<div class="ksw-picked">
-                    <span>${esc(form.partner.name)}</span>
-                    <button id="ksw-clear-client" class="ksw-link">change</button>
-               </div>`
-            : `<input id="ksw-search" class="ksw-input" placeholder="Type a client name"
-                      value="${esc(form.search)}" autocomplete="off"/>
-               <ul class="ksw-list">
-                   ${clients.map((c) => `
-                       <li><button data-client="${c.id}" class="${c.usual ? "" : "ksw-off-route"}">
-                           ${esc(c.name)}${c.usual ? "" : " · off your usual route"}${strictLocation() && !isLocated(c) ? " · needs location" : ""}
-                       </button></li>`).join("")}
-                   ${clients.length ? "" : `<li class="ksw-empty">No match.</li>`}
-               </ul>
-               <label class="ksw-check">
-                   <input type="checkbox" id="ksw-show-all" ${form.showAll ? "checked" : ""}/>
-                   Client not listed — show every priced client
-               </label>`}
-
+        ${tankerProblem ? `<div class="ksw-warnbox"><b>&#9888; You cannot issue notes yet.</b> ${esc(tankerProblem)}</div>` : ""}
+        ${renderGps()}
+        ${form.partner ? renderClientCard() : renderClientPicker()}
         ${renderPinBox()}
-
-        ${problem && canDeliver(form.partner) ? `<div class="ksw-warnbox">${esc(problem)}
+        ${problem && canDeliver(form.partner) ? `<div class="ksw-warnbox">&#9888; ${esc(problem)}
             If you save, your supervisor has to approve the note.</div>` : ""}
+        ${canDeliver(form.partner) ? renderDelivery() : ""}`;
+}
 
-        ${canDeliver(form.partner) ? renderProduct() : ""}
+function renderClientPicker() {
+    const form = state.form;
+    const clients = visibleClients();
+    return `
+        <label class="ksw-label" for="ksw-search">Client</label>
+        <div class="ksw-search-wrap">
+            <span class="ksw-search-icon">&#128269;</span>
+            <input id="ksw-search" class="ksw-input ksw-search" placeholder="Search client name" dir="auto"
+                   value="${esc(form.search)}" autocomplete="off" type="search"/>
+        </div>
+        <ul class="ksw-list">
+            ${clients.map((c) => `
+                <li><button data-client="${c.id}" class="ksw-client-row">
+                    <span class="ksw-client-name" dir="auto">${esc(c.name)}</span>
+                    <span class="ksw-tags">${clientTags(c)}</span>
+                    <span class="ksw-chevron">&#8250;</span>
+                </button></li>`).join("")}
+            ${clients.length ? "" : `<li class="ksw-empty">No client matches “${esc(form.search)}”.</li>`}
+        </ul>
+        <label class="ksw-check">
+            <input type="checkbox" id="ksw-show-all" ${form.showAll ? "checked" : ""}/>
+            <span>Client not listed? Show every priced client</span>
+        </label>`;
+}
 
-        ${canDeliver(form.partner) && rules.signature_required ? `
-            <label class="ksw-label">Signed by</label>
-            <input id="ksw-signed-by" class="ksw-input" value="${esc(form.signedBy)}"
+function renderClientCard() {
+    const client = state.form.partner;
+    return `
+        <label class="ksw-label">Client</label>
+        <div class="ksw-card ksw-client-card">
+            <div class="ksw-client-card-main">
+                <span class="ksw-client-name ksw-strong" dir="auto">${esc(client.name)}</span>
+                <span class="ksw-tags">${clientTags(client)}</span>
+            </div>
+            <button id="ksw-clear-client" class="ksw-link">Change</button>
+        </div>`;
+}
+
+function renderDelivery() {
+    const form = state.form;
+    const rules = state.reference.rules;
+    return `
+        ${renderProduct()}
+        ${rules.signature_required ? `
+            <label class="ksw-label" for="ksw-signed-by">Signed by</label>
+            <input id="ksw-signed-by" class="ksw-input" dir="auto" value="${esc(form.signedBy)}"
                    placeholder="Name of the person signing"/>
-            <label class="ksw-label">Signature</label>
-            <canvas id="ksw-sign" class="ksw-sign"></canvas>
-            <button id="ksw-clear-sign" class="ksw-link">clear signature</button>` : ""}
+            <div class="ksw-label-row">
+                <label class="ksw-label">Signature</label>
+                <button id="ksw-clear-sign" class="ksw-link">Clear</button>
+            </div>
+            <canvas id="ksw-sign" class="ksw-sign"></canvas>` : ""}
+        <label class="ksw-label" for="ksw-note">Remark <span class="ksw-optional">optional</span></label>
+        <input id="ksw-note" class="ksw-input" dir="auto" value="${esc(form.note)}"
+               placeholder="Anything the client should see"/>`;
+}
 
-        ${canDeliver(form.partner) ? `
-            <label class="ksw-label">Remark</label>
-            <input id="ksw-note" class="ksw-input" value="${esc(form.note)}"
-                   placeholder="Anything the client should see"/>
-            <button id="ksw-save" class="ksw-primary" ${tankerProblem ? "disabled" : ""}>
-                ${problem ? "Save for Supervisor Approval" : "Save Delivery"}</button>` : ""}`;
+/** The Save button lives in a bar fixed above the tabs, so it is always one
+ * tap away however long the form gets. */
+function renderActionBar() {
+    const form = state.form;
+    if (!canDeliver(form.partner)) {
+        return "";
+    }
+    const problem = locationProblem(form);
+    const blocked = !state.reference.vehicle;
+    return `
+        <div class="ksw-actionbar">
+            <button id="ksw-save" class="ksw-primary ${problem ? "ksw-primary-warn" : ""}" ${blocked ? "disabled" : ""}>
+                ${problem ? "Save for Supervisor Approval" : "Save Delivery"}
+            </button>
+        </div>`;
 }
 
 function renderPinBox() {
     const client = state.form.partner;
     if (awaitingApproval(client)) {
         return `
-        <section class="ksw-pinbox">
-            <div>Location sent — waiting for the office to approve it.${strictLocation()
-                ? " You can issue a note for this client once it is approved." : ""}</div>
-            <button id="ksw-pin-check" class="ksw-secondary" ${state.online ? "" : "disabled"}>Check again</button>
+        <section class="ksw-pinbox ksw-pinbox-pending">
+            <div class="ksw-pinbox-head"><span class="ksw-pinbox-icon">&#9203;</span>
+                <b>Location sent, waiting for approval</b></div>
+            <p>The office checks it on the map.${strictLocation()
+                ? " You can issue a note for this client once it is approved." : ""}</p>
+            <button id="ksw-pin-check" class="ksw-secondary ksw-wide" ${state.online ? "" : "disabled"}>
+                ${state.online ? "Check again" : "Check again (needs signal)"}</button>
         </section>`;
     }
     if (!needsPin(client)) {
         return "";
     }
     const waiting = state.pinWaiting && state.pinWaiting.id === client.id;
+    if (waiting) {
+        const now = state.position ? Math.round(state.position.accuracy) : null;
+        const target = pinMaxAccuracy();
+        const pct = now ? Math.max(5, Math.min(100, Math.round((target / now) * 100))) : 5;
+        return `
+        <section class="ksw-pinbox">
+            <div class="ksw-pinbox-head"><span class="ksw-pinbox-icon ksw-spin">&#8987;</span>
+                <b>Getting an accurate fix…</b></div>
+            <div class="ksw-meter"><span style="width:${pct}%"></span></div>
+            <p class="ksw-hint">Needs ±${esc(target)} m${now ? ` · now ±${esc(now)} m` : ""}.
+                Stand outside the cab, away from the tank.</p>
+            <button id="ksw-pin-cancel" class="ksw-link">Cancel</button>
+        </section>`;
+    }
     return `
         <section class="ksw-pinbox">
-            <div>This client has no location on file yet.${strictLocation()
-                ? " No note can be issued until the office approves one." : ""}</div>
-            ${waiting
-                ? `<div class="ksw-hint">Getting an accurate fix (needs ±${esc(pinMaxAccuracy())} m)…
-                       ${state.position ? ` now ±${esc(Math.round(state.position.accuracy))} m` : ""}</div>
-                   <button id="ksw-pin-cancel" class="ksw-link">cancel</button>`
-                : `<button id="ksw-pin" class="ksw-secondary">&#128205; Send my location for this client</button>`}
+            <div class="ksw-pinbox-head"><span class="ksw-pinbox-icon">&#128205;</span>
+                <b>No location on file for this client</b></div>
+            <p>${strictLocation()
+                ? "No note can be issued until the office approves one. "
+                : ""}Stand at the client's site, outside the cab, and send your position.</p>
+            <button id="ksw-pin" class="ksw-primary ksw-tight">&#128205; Send my location</button>
         </section>`;
 }
 
@@ -994,10 +1079,10 @@ function renderProduct() {
     const delivering = form.uom === "trip" ? form.qty * capacity : form.qty;
 
     return `
-        <label class="ksw-label">Product</label>
+        <label class="ksw-label" for="ksw-product">Product</label>
         ${products.length === 1
-            ? `<div class="ksw-picked ksw-locked"><span>${esc(products[0].name)}</span></div>`
-            : `<select id="ksw-product" class="ksw-input">
+            ? `<div class="ksw-static" dir="auto">${esc(products[0].name)}</div>`
+            : `<select id="ksw-product" class="ksw-input" dir="auto">
                    <option value="">Choose…</option>
                    ${products.map((p) => `
                        <option value="${p.id}" ${form.product && form.product.id === p.id ? "selected" : ""}>
@@ -1005,24 +1090,27 @@ function renderProduct() {
                        </option>`).join("")}
                </select>`}
 
-        <label class="ksw-label">Quantity</label>
-        <div class="ksw-row">
-            <input id="ksw-qty" class="ksw-input" type="number" inputmode="decimal"
-                   step="0.01" min="0" value="${esc(form.qty)}"/>
+        <label class="ksw-label" for="ksw-qty">Quantity</label>
+        <div class="ksw-qty-row">
+            <div class="ksw-stepper">
+                <button id="ksw-qty-minus" type="button" aria-label="Less">&#8722;</button>
+                <input id="ksw-qty" class="ksw-qty" type="number" inputmode="decimal"
+                       step="0.01" min="0" value="${esc(form.qty)}"/>
+                <button id="ksw-qty-plus" type="button" aria-label="More">&#43;</button>
+            </div>
             ${canTrips
-                ? `<select id="ksw-uom" class="ksw-input ksw-narrow">
-                       <option value="product" ${form.uom === "product" ? "selected" : ""}>m³</option>
-                       <option value="trip" ${form.uom === "trip" ? "selected" : ""}>Trips</option>
-                   </select>`
-                : ""}
+                ? `<div class="ksw-segment">
+                       <button data-uom="product" class="${form.uom === "product" ? "active" : ""}">m³</button>
+                       <button data-uom="trip" class="${form.uom === "trip" ? "active" : ""}">Trips</button>
+                   </div>`
+                : form.product ? `<span class="ksw-unit">${esc(form.product.uom)}</span>` : ""}
         </div>
         ${form.product ? `
             <div class="ksw-hint">
                 ${form.uom === "trip"
-                    ? `Delivering ${esc(delivering)} ${esc(form.product.uom)} (${esc(capacity)} per trip). `
+                    ? `<b>${esc(delivering)} ${esc(form.product.uom)}</b> (${esc(capacity)} per trip) · `
                     : ""}
-                Agreed rate ${esc(form.product.price)} / ${esc(form.product.uom)} —
-                the office prices the note from today's register.
+                Agreed rate ${esc(form.product.price)} / ${esc(form.product.uom)}. The office prices the note from today's register.
             </div>` : ""}`;
 }
 
@@ -1030,46 +1118,52 @@ function renderQueue() {
     const queue = state.queue;
     const recent = state.recent;
     const pins = state.pins;
+    const sendButton = `
+        <button id="ksw-sync" class="ksw-primary" ${state.online && !state.syncing ? "" : "disabled"}>
+            ${state.syncing ? "Sending…" : state.online ? "Send now" : "No signal yet"}
+        </button>`;
     return `
         ${pins.length ? `
             <h2 class="ksw-h2">Client locations to send</h2>
             <ul class="ksw-cards">
                 ${pins.map((p) => `
                     <li class="ksw-card ksw-pending">
-                        <strong>${esc(p.clientName)}</strong>
-                        <span class="ksw-sub">±${esc(Math.round(p.payload.accuracy))} m · ${esc(p.payload.captured_at)}</span>
+                        <div class="ksw-card-row">
+                            <strong dir="auto">${esc(p.clientName)}</strong>
+                            <span class="ksw-tag ksw-tag-warn">Not sent</span>
+                        </div>
+                        <span class="ksw-sub">&#128205; ±${esc(Math.round(p.payload.accuracy))} m · ${esc(p.payload.captured_at)}</span>
                     </li>`).join("")}
-            </ul>
-            ${queue.length ? "" : `
-                <button id="ksw-sync" class="ksw-primary" ${state.online ? "" : "disabled"}>
-                    ${state.syncing ? "Sending…" : state.online ? "Send now" : "No signal yet"}
-                </button>`}` : ""}
+            </ul>` : ""}
         ${queue.length ? `
             <h2 class="ksw-h2">Waiting to send</h2>
             <ul class="ksw-cards">
                 ${queue.map((c) => `
                     <li class="ksw-card ksw-pending">
-                        <strong>${esc(c.clientName)}</strong>
-                        <span>${esc(c.payload.entered_qty)} ${c.payload.entered_uom === "trip" ? "trip(s)" : ""}</span>
-                        <span class="ksw-sub">Saved ${esc(c.savedAt.slice(0, 16).replace("T", " "))}</span>
+                        <div class="ksw-card-row">
+                            <strong dir="auto">${esc(c.clientName)}</strong>
+                            <span class="ksw-tag ksw-tag-warn">Not sent</span>
+                        </div>
+                        <span class="ksw-sub">${esc(c.payload.entered_qty)} ${c.payload.entered_uom === "trip" ? "trip(s)" : "m³"}
+                            · saved ${esc(c.savedAt.slice(0, 16).replace("T", " "))}</span>
                     </li>`).join("")}
-            </ul>
-            <button id="ksw-sync" class="ksw-primary" ${state.online ? "" : "disabled"}>
-                ${state.syncing ? "Sending…" : state.online ? "Send now" : "No signal yet"}
-            </button>` : pins.length ? "" : `<p class="ksw-empty">Nothing waiting to send.</p>`}
+            </ul>` : ""}
+        ${queue.length || pins.length ? sendButton : `
+            <div class="ksw-allclear">&#10003; Nothing waiting to send.</div>`}
 
         <h2 class="ksw-h2">Recently issued</h2>
         <ul class="ksw-cards">
             ${recent.length ? recent.map((n) => `
-                <li class="ksw-card ${n.held ? "ksw-held" : ""}">
-                    <strong>${esc(n.name)}</strong>
-                    <span>${esc(n.client)}</span>
-                    <span class="ksw-sub">
-                        ${esc(n.qty)} · ${esc(n.total)}
-                        ${n.offline ? " · offline" : ""}
-                        ${n.held ? " · waiting for a supervisor" : ""}
-                    </span>
-                </li>`).join("") : `<li class="ksw-empty">Nothing yet.</li>`}
+                <li class="ksw-card ${n.held ? "ksw-held" : "ksw-done"}">
+                    <div class="ksw-card-row">
+                        <strong>${esc(n.name)}</strong>
+                        ${n.held
+                            ? `<span class="ksw-tag ksw-tag-warn">Waiting for supervisor</span>`
+                            : `<span class="ksw-tag ksw-tag-ok">Issued</span>`}
+                    </div>
+                    <span dir="auto">${esc(n.client)}</span>
+                    <span class="ksw-sub">${esc(n.qty)} · ${esc(n.total)}${n.offline ? " · sent later" : ""}</span>
+                </li>`).join("") : `<li class="ksw-empty">Nothing issued yet.</li>`}
         </ul>`;
 }
 
@@ -1130,10 +1224,19 @@ function wire() {
     on("ksw-qty", "input", (event) => {
         state.form.qty = parseFloat(event.target.value) || 0;
     });
-    on("ksw-uom", "change", (event) => {
-        state.form.uom = event.target.value;
+    const step = (delta) => {
+        const next = Math.round(((state.form.qty || 0) + delta) * 100) / 100;
+        state.form.qty = Math.max(next, 0);
         render();
-    });
+    };
+    on("ksw-qty-minus", "click", () => step(-1));
+    on("ksw-qty-plus", "click", () => step(1));
+    document.querySelectorAll("[data-uom]").forEach((button) =>
+        button.addEventListener("click", () => {
+            state.form.uom = button.dataset.uom;
+            render();
+        })
+    );
     on("ksw-signed-by", "input", (event) => {
         state.form.signedBy = event.target.value;
     });

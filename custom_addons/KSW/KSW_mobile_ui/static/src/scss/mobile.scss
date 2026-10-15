@@ -1,6 +1,59 @@
 // Phone only: nothing in this file reaches a desktop-width screen.
 @include media-breakpoint-down(md) {
 
+    // Top bar: taller, with thumb-sized targets (the default is 46px with
+    // a 36px-wide menu button and 14px text).
+    .o_main_navbar {
+        height: 56px !important;
+        min-height: 56px;
+        > .o_menu_toggle {
+            min-width: 52px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.45rem;
+        }
+        .o_last_breadcrumb_item {
+            font-size: 1.2rem !important;
+            font-weight: 600;
+        }
+        .o_menu_systray {
+            align-items: center;
+            > div > button,
+            > button,
+            > div > .dropdown > button {
+                min-width: 44px;
+                height: 56px;
+                font-size: 1.2rem;
+            }
+            .o_avatar, img.o_user_avatar, .o_user_menu img {
+                width: 34px !important;
+                height: 34px !important;
+            }
+        }
+    }
+
+    // The menu opened from the top bar: every entry a full-size row,
+    // sub-menu entries included (they were small and grey).
+    // (entries are <li>s: top level li.py-3, sub-menu entries li.py-2 in a
+    // nested list)
+    .o_burger_menu_content {
+        > ul > li {
+            font-size: 1.05rem;
+        }
+        ul ul > li {
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            padding-top: 0.75rem !important;
+            padding-bottom: 0.75rem !important;
+            font-size: 1rem;
+            color: $body-color !important;
+            border-top: 1px solid $border-color;
+        }
+    }
+
     // Record header: a long title wrapped to five lines under the ribbon.
     // (.o_hr_leave_title is core Time Off's own title block)
     .o_form_view .o_form_sheet .oe_title h1,
@@ -37,6 +90,418 @@
         }
     }
 
+    // Grouped card boards (Deductions by state, tickets and workshop
+    // requests by stage...): on a phone the groups stack top to bottom, each
+    // a full-width section, instead of side-by-side columns swiped sideways.
+    // SCROLLING: core lets each column scroll on its own and the board only
+    // sideways (overflow-y hidden). Stacked, the board must scroll
+    // vertically and the groups must take their natural height, or the
+    // page freezes with nothing scrollable (found on a real phone,
+    // Oct 2026: screenshots only ever show the top of the page).
+    .o_kanban_renderer.o_kanban_grouped {
+        flex-direction: column !important;
+        flex-wrap: nowrap !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        gap: 0.5rem;
+        padding: 0.5rem !important;
+        > .o_kanban_group {
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: none !important;
+            height: auto !important;
+            min-height: 0 !important;
+            max-height: none !important;
+            overflow: visible !important;
+            flex: 0 0 auto !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: transparent;
+            .o_kanban_header {
+                position: static !important;
+                padding: 0.6rem 0.75rem;
+                border-radius: 0.6rem;
+                background: $gray-100;
+            }
+            .o_kanban_record {
+                width: 100% !important;
+                margin: 0.4rem 0 0 !important;
+            }
+        }
+        // A folded group is a plain bar, not a vertical strip.
+        > .o_kanban_group.o_column_folded {
+            writing-mode: horizontal-tb !important;
+            .o_column_title, .o_kanban_header_title {
+                writing-mode: horizontal-tb !important;
+                transform: none !important;
+            }
+        }
+        > .o_column_quick_create {
+            display: none !important;
+        }
+    }
+
+    // Every card board looks like the list cards: rounded cards with the
+    // same spacing, so card screens and list screens read as one app.
+    .o_kanban_renderer {
+        .o_kanban_record:not(.o_kanban_ghost) {
+            margin: 0.4rem 0.75rem !important;
+            padding: 0.75rem 0.85rem !important;
+            border: 1px solid $border-color !important;
+            border-radius: 0.75rem !important;
+            background: $o-view-background-color;
+            box-shadow: none !important;
+        }
+        &.o_kanban_ungrouped .o_kanban_record:not(.o_kanban_ghost) {
+            width: auto !important;
+            flex: 1 1 100% !important;
+        }
+    }
+    .o_kanban_renderer.o_kanban_grouped > .o_kanban_group {
+        .o_kanban_header {
+            margin: 0.25rem 0.75rem 0 !important;
+        }
+        .o_kanban_record:not(.o_kanban_ghost) {
+            width: auto !important;
+        }
+    }
+
+    // Cards built with Bootstrap rows (payroll configuration, payslips)
+    // stuck 8px past the screen edge through the row's negative margins.
+    .o_kanban_record .row {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    // A record group declared with 4 columns (cells spanning 4) left its
+    // first grid track at 0px on a phone, so its labels printed one letter
+    // per line (salary rule "Condition Based on"). Stack those groups into
+    // one column, label above value.
+    .o_form_view .o_inner_group.grid:has(> .o_cell[style*="span: 4"]) {
+        grid-template-columns: minmax(0, 1fr) !important;
+        > .o_cell {
+            grid-column: 1 / -1 !important;
+        }
+    }
+
+    // Inline inputs (oe_inline: account code, short fields) keep a fixed
+    // desktop width that ran 20px past a phone screen.
+    .o_form_view .oe_inline,
+    .o_form_view .oe_inline .o_input {
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    // Reports (pivot) on a phone: the summary table fills the width, row
+    // names wrap, figures stay right-aligned and readable.
+    .o_pivot {
+        table {
+            width: 100% !important;
+            font-size: 0.95rem;
+        }
+        th, td {
+            white-space: normal !important;
+        }
+        .o_pivot_header_cell_closed,
+        .o_pivot_header_cell_opened {
+            min-height: 2.75rem;
+        }
+        td.o_pivot_cell_value {
+            font-weight: 600;
+        }
+    }
+
+    // EVERY list screen (.o_list_view: menus, "Search More" dialogs) on a
+    // phone: each record is a card. The first column is the card's title;
+    // the others are small "label / value" pairs in two columns, so nothing
+    // runs off the screen and nothing is hidden. Columns a view marks
+    // ksw_m_hide are dropped first (list_renderer_patch.js). Screens that
+    // have their own kanban cards never reach this: Odoo opens those.
+    .o_list_view .o_list_renderer {
+        overflow: visible !important;
+        .o_list_table {
+            display: block;
+            width: 100% !important;
+            table-layout: auto !important;
+            border: 0;
+            background: transparent;
+        }
+        thead {
+            display: none;
+        }
+        tbody, tfoot {
+            display: block;
+        }
+        tr.o_data_row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.35rem 0.9rem;
+            margin: 0.5rem 0.75rem;
+            padding: 0.7rem 0.85rem;
+            border: 1px solid $border-color;
+            border-radius: 0.75rem;
+            background: $o-view-background-color;
+        }
+        tr.o_data_row > td {
+            display: block !important;
+            width: auto !important;
+            min-width: 0;
+            padding: 0 !important;
+            border: 0 !important;
+            white-space: normal !important;
+            text-align: start !important;
+            overflow-wrap: anywhere;
+            .text-truncate {
+                white-space: normal !important;
+            }
+            &:empty,
+            &.o_list_record_selector,
+            &.o_handle_cell {
+                display: none !important;
+            }
+        }
+        tr.o_data_row > td.o_data_cell::before {
+            content: attr(data-label);
+            display: block;
+            font-size: 0.72rem;
+            line-height: 1.3;
+            color: $text-muted;
+        }
+        // The first column is what the record IS: full width, no label.
+        tr.o_data_row > td.o_data_cell:first-child {
+            grid-column: 1 / -1;
+            font-size: 1.02rem;
+            font-weight: 600;
+            &::before {
+                display: none;
+            }
+        }
+        // Row buttons and badges that need room take the whole line.
+        tr.o_data_row > td.o_list_button,
+        tr.o_data_row > td.o_list_record_remove,
+        tr.o_data_row > td.o_list_record_open_form_view {
+            grid-column: 1 / -1;
+            text-align: end !important;
+        }
+        // Group headings ("May 2026 (12)  3,603 SAR"): one full-width bar.
+        tr.o_group_header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.25rem 0.75rem;
+            margin: 0.5rem 0.75rem 0;
+            padding: 0.6rem 0.75rem;
+            border-radius: 0.6rem;
+            background: $gray-100;
+            > th, > td {
+                display: block !important;
+                width: auto !important;
+                padding: 0 !important;
+                border: 0 !important;
+                white-space: normal !important;
+            }
+            > .o_group_name {
+                flex: 1 1 100%;
+            }
+            > td:empty,
+            > td:not(:has(span)) {
+                display: none !important;
+            }
+            // "Loads 252 · Amount 1,304.10 SAR" instead of bare numbers
+            > td[data-label]::before {
+                content: attr(data-label) " ";
+                font-size: 0.75rem;
+                font-weight: 400;
+                color: $text-muted;
+            }
+        }
+        // Odoo's blank filler rows
+        tbody tr:not(.o_data_row):not(.o_group_header):not(:has(a, button)) {
+            display: none !important;
+        }
+        tbody tr:not(.o_data_row):not(.o_group_header) {
+            display: block;
+            > td { display: block !important; border: 0 !important; }
+        }
+        // Totals: one labelled line per summed column.
+        tfoot tr {
+            display: block;
+            margin: 0.5rem 0.75rem;
+            padding: 0.5rem 0.85rem;
+            border-radius: 0.6rem;
+            background: $gray-100;
+            > td {
+                display: flex !important;
+                width: 100% !important;
+                justify-content: space-between !important;
+                gap: 0.75rem;
+                padding: 0.15rem 0 !important;
+                border: 0 !important;
+                &:empty,
+                &:not(:has(span)) {
+                    display: none !important;
+                }
+            }
+            > td[data-label]::before {
+                content: attr(data-label);
+                flex: 1 1 auto;
+                text-align: start;
+                font-weight: 400;
+                color: $text-muted;
+                font-size: 0.85rem;
+            }
+        }
+    }
+
+    // Line tables inside a record (one2many / many2many lists): every row
+    // becomes a card of "Label  value" lines instead of a table that runs
+    // off the screen. Nothing is hidden, so every editable field stays
+    // editable; the label comes from data-label (list_renderer_mobile.xml).
+    // Columns a view marks ksw_m_hide are still dropped before this.
+    .o_field_x2many_list .o_list_renderer {
+        overflow: visible !important;
+        .o_list_table {
+            display: block;
+            width: 100% !important;
+            table-layout: auto !important;
+            border: 0;
+            background: transparent;
+        }
+        thead {
+            display: none;
+        }
+        tbody, tfoot {
+            display: block;
+        }
+        tr.o_data_row {
+            display: block;
+            position: relative;
+            margin: 0 0 0.6rem;
+            padding: 0.4rem 0.75rem;
+            border: 1px solid $border-color;
+            border-radius: 0.6rem;
+            background: $o-view-background-color;
+        }
+        tr.o_data_row > td {
+            display: flex !important;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            width: auto !important;
+            min-height: 2.1rem;
+            padding: 0.25rem 0 !important;
+            border: 0 !important;
+            white-space: normal !important;
+            text-align: end;
+            &:empty,
+            &.o_list_record_selector {
+                display: none !important;
+            }
+            > * {
+                min-width: 0;
+            }
+            .text-truncate {
+                white-space: normal !important;
+            }
+        }
+        tr.o_data_row > td.o_data_cell::before {
+            content: attr(data-label);
+            flex: 0 0 42%;
+            text-align: start;
+            color: $text-muted;
+            font-size: 0.85rem;
+        }
+        tr.o_data_row > td.o_data_cell + td.o_data_cell {
+            border-top: 1px solid $border-color !important;
+        }
+        // Row buttons (delete, duplicate, explain) share one line at the end.
+        tr.o_data_row {
+            text-align: end;
+        }
+        tr.o_data_row > td.o_list_record_remove,
+        tr.o_data_row > td.o_list_button {
+            display: inline-flex !important;
+            min-height: 0;
+            padding: 0.35rem 0 0.15rem 0.75rem !important;
+        }
+        // Odoo pads short tables with blank filler rows: on a card layout
+        // they are just grey blocks.
+        tbody tr:not(.o_data_row):not(:has(a, button, .o_group_name)) {
+            display: none !important;
+        }
+        // "Add a line" (tbody only: a bare tr:not(.o_data_row) would also
+        // catch the totals row and, being more specific, win over it)
+        tbody tr:not(.o_data_row) {
+            display: block;
+            > td {
+                display: block !important;
+                border: 0 !important;
+                padding: 0.5rem 0 !important;
+            }
+            > td:empty {
+                display: none !important;
+            }
+        }
+        // Totals: one labelled line per summed column.
+        tfoot tr {
+            display: block;
+            padding: 0.4rem 0.75rem;
+            border-radius: 0.6rem;
+            background: $gray-100;
+            > td {
+                display: flex !important;
+                justify-content: space-between;
+                padding: 0.2rem 0 !important;
+                border: 0 !important;
+                &:empty,
+                &:not(:has(span)) {
+                    display: none !important;
+                }
+            }
+            > td {
+                width: 100% !important;
+                justify-content: space-between !important;
+                gap: 0.75rem;
+            }
+            > td[data-label]::before {
+                content: attr(data-label);
+                flex: 1 1 auto;
+                text-align: start;
+                font-weight: 400;
+                color: $text-muted;
+                font-size: 0.85rem;
+            }
+        }
+    }
+
+    // A record's totals block (Before Tax / After Tax…) stays two columns,
+    // label left and amount right, instead of collapsing to one stacked
+    // column pushed to the right.
+    .o_form_view .o_inner_group.oe_subtotal_footer {
+        grid-template-columns: 1fr auto !important;
+        gap: 0.35rem 1rem;
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.6rem;
+        background: $gray-100;
+        > .o_cell {
+            grid-column: auto !important;
+            width: auto !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        > .o_wrap_label {
+            text-align: start !important;
+            justify-content: flex-start !important;
+            .o_form_label { font-weight: 400; }
+        }
+        > .o_wrap_input {
+            text-align: end;
+            font-weight: 700;
+        }
+    }
+
     // People's names wrap instead of being cut to "ABBAS SH…".
     // (beats core's `.o_data_row:not(.o_selected_row) .o_list_many2one`)
     .o_list_renderer .o_list_table .o_data_row td.o_data_cell[name="employee_id"] {
@@ -54,7 +519,7 @@
     // always on the end side, so one-button and two-button cards line up.
     .o_hr_holidays_kanban_mobile :has(> button.btn:not(.btn-link)) {
         justify-content: flex-start !important;
-        flex-wrap: nowrap;
+        flex-wrap: wrap;   // more than two buttons wrap, never overflow
         width: 100%;
     }
     .o_hr_holidays_kanban_mobile button.btn:not(.btn-link) {

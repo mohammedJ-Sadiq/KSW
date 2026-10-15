@@ -1,0 +1,474 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_leave_extension
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid ""
+"%(name)s can no longer be extended: the manager has already confirmed that "
+"the employee came back."
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "A Vacation Extension must name the vacation it extends."
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid ""
+"A Vacation Extension starts the day after the vacation it extends. Expected "
+"%(expected)s, got %(actual)s."
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,help:KSW_leave_extension.field_hr_leave__x_ext_passport_fee
+msgid ""
+"A fixed 120.0 SAR when the passport fee applies, otherwise 0. Derived from "
+"the tick box — never typed."
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "A fixed government charge of 120.00 SAR."
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "A request cannot extend itself."
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "A vacation can only be extended once it has passed GM final approval."
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "Accounting Comment"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "Accounting Documents"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_ext_acc_note
+msgid "Accounting Note"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,help:KSW_leave_extension.field_hr_leave__x_ext_acc_note
+msgid "Accounting remarks on the extension (filled by Accounting)."
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "Accounting — Vacation Extension"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,help:KSW_leave_extension.field_hr_leave__x_ext_extra_fee
+msgid ""
+"Any further cost the extension makes due from the employee (filled by HR)."
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "Bank"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_ext_bank_fee
+msgid "Bank Fees"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,help:KSW_leave_extension.field_hr_leave__x_ext_bank_fee
+msgid "Bank charges due from the employee (filled by HR)."
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_can_extend
+msgid "Can Be Extended"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,help:KSW_leave_extension.field_hr_leave_type__is_leave_extension
+msgid ""
+"Check this box if this leave type extends an already approved vacation. "
+"Requests of this type must name the vacation they continue and start the day"
+" after it ends."
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid ""
+"Comment on the extension fees, the settlement, or anything the GM should "
+"read before final approval..."
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "Confirmed By"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields.selection,name:KSW_leave_extension.selection__hr_leave__x_return_state__extended
+msgid "Continued by Extension"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__display_name
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave_type__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "Extend Vacation"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_extendable_leave_ids
+msgid "Extendable Vacations"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_extended_leave_id
+msgid "Extends Vacation"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "Extension Fees — Due from the Employee"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,help:KSW_leave_extension.field_hr_leave__x_extension_ids
+msgid "Extension requests that continue this vacation."
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_extension_ids
+msgid "Extensions"
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "Extra"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_ext_extra_fee
+msgid "Extra Fees"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__id
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave_type__id
+msgid "ID"
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "Iqama"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,help:KSW_leave_extension.field_hr_leave__x_ext_iqama_fee
+msgid ""
+"Iqama (الإقامة) cost due from the employee for the extension period (filled "
+"by HR)."
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_ext_iqama_fee
+msgid "Iqama Fees"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_is_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave_type__is_leave_extension
+msgid "Is Vacation Extension"
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "No Vacation Extension leave type is configured."
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid ""
+"Only %(employee)s, their direct manager or HR can request an extension of "
+"this vacation."
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "Only Accounting Approvers can fill the accounting note."
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "Only HR Approvers can fill the extension fees."
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "Only a Vacation Extension request can extend another vacation."
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid ""
+"Only a vacation that has passed GM final approval can be extended. %(name)s "
+"is still being approved."
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid ""
+"Only the current vacation can be extended, and that is %(current)s, not "
+"%(name)s. Extensions run one after another."
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid ""
+"Only the current vacation can be extended, and that is %(current)s, not this"
+" one. Extend that request instead — extensions run one after another."
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "Passport"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_ext_passport_fee
+msgid "Passport Fees"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_ext_passport_fee_applied
+msgid "Passport Fees Apply"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_return_state
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "Return Status"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,help:KSW_leave_extension.field_hr_leave__x_is_leave_extension
+msgid "Stored related field for reliable use in view invisible expressions."
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,help:KSW_leave_extension.field_hr_leave__x_ext_total_fees
+msgid ""
+"Sum of every extension fee. Recorded on the request for the approvers; it is"
+" not posted to payroll."
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid ""
+"The accounting note can only be filled while the request is at the "
+"Accounting step."
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "The approved vacation this request continues."
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,help:KSW_leave_extension.field_hr_leave__x_extended_leave_id
+msgid ""
+"The approved vacation this request continues. The extension starts the day "
+"after that vacation ends."
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "The day the employee actually came back. Days after it are paid again."
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid ""
+"The extension and the vacation it extends must belong to the same employee."
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid ""
+"The extension fees can only be filled while the request is at the HR "
+"Approval step. Ask the GM to return it to HR if a figure has to change."
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid ""
+"The passport fee and the extension total are worked out from the fees above "
+"— they cannot be entered directly."
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,help:KSW_leave_extension.field_hr_leave__x_extendable_leave_ids
+msgid ""
+"The vacation this request may extend — the employee's current one, and only "
+"that. Published as a field because a Many2one domain can name a field but "
+"cannot call a method."
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid ""
+"This vacation can no longer be extended: the manager has already confirmed "
+"that the employee came back."
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "This would make the extension chain loop back on itself."
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,help:KSW_leave_extension.field_hr_leave__x_ext_passport_fee_applied
+msgid ""
+"Tick when the passport (الجوازات) fee is due. It is a fixed government "
+"charge of 120.0 SAR."
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model,name:KSW_leave_extension.model_hr_leave
+msgid "Time Off"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model,name:KSW_leave_extension.model_hr_leave_type
+msgid "Time Off Type"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave_type__leave_validation_type
+msgid "Time Off Validation"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_ext_total_fees
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "Total Fees Due"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,help:KSW_leave_extension.field_hr_leave__x_ext_violations_fee
+msgid ""
+"Traffic or labour violations (مخالفات) due from the employee (filled by HR)."
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,help:KSW_leave_extension.field_hr_leave__x_can_extend
+msgid ""
+"True on the one vacation the Extend button applies to, for a user entitled "
+"to request the extension."
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:hr.leave.type,name:KSW_leave_extension.leave_type_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "Vacation Extension"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields.selection,name:KSW_leave_extension.selection__hr_leave_type__leave_validation_type__extension_multi
+msgid "Vacation Extension – Multi-Step Approval"
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_ext_violations_fee
+msgid "Violations"
+msgstr ""
+
+#. module: KSW_leave_extension
+#. odoo-python
+#: code:addons/KSW_leave_extension/models/hr_leave.py:0
+msgid "Work Permit"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,field_description:KSW_leave_extension.field_hr_leave__x_ext_work_permit_fee
+msgid "Work Permit Fees"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model:ir.model.fields,help:KSW_leave_extension.field_hr_leave__x_ext_work_permit_fee
+msgid ""
+"Work permit (رخصة العمل) cost due from the employee for the extension period"
+" (filled by HR)."
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "➕ Continued by Extension"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "➕ Extend Vacation"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_form_inherit_extension
+msgid "➕ Vacation Extension"
+msgstr ""
+
+#. module: KSW_leave_extension
+#: model_terms:ir.ui.view,arch_db:KSW_leave_extension.hr_leave_view_search_inherit_extension
+msgid "➕ Vacation Extensions"
+msgstr ""

@@ -1,0 +1,327 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_attendance_report
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_attendance_report
+#: model:ir.actions.report,print_report_name:KSW_attendance_report.action_report_monthly_attendance
+msgid ""
+"\n"
+"            'Attendance - %s - %s %s' % (object.employee_id.name, dict(object._fields['month'].selection).get(object.month), object.year)\n"
+"        "
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "<span style=\"color:#1565c0;\">⬛ Weekend</span>"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "<span style=\"color:#2e7d32;\">✓ Present</span>"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "<span style=\"color:#4527a0;\">★ Public Holiday</span>"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "<span style=\"color:#6a1b9a;\">☑ Covered</span>"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "<span style=\"color:#90a4ae;\">⬜ Weekend</span>"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "<span style=\"color:#bdbdbd;\">—</span>"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "<span style=\"color:#c62828;\">✗ Absent</span>"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "<span style=\"color:#e65100;\">🏖 Leave</span>"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "<span style=\"color:#f9a825;\">⚠ No Record</span>"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "<strong>Company:</strong>"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "<strong>Department:</strong>"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "<strong>Employee:</strong>"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "<strong>Job Title:</strong>"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "<strong>★ Public Holidays</strong>"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "<strong>⚠ No Record</strong>"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "<strong>✓ Present Days</strong>"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "<strong>✗ Absent Days</strong>"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "<strong>⬛ Weekend (Worked)</strong>"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "<strong>⬜ Weekend Days</strong>"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "<strong>🏖 Leave Days</strong>"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.model.fields.selection,name:KSW_attendance_report.selection__attendance_report_wizard__month__4
+msgid "April"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.model.fields.selection,name:KSW_attendance_report.selection__attendance_report_wizard__month__8
+msgid "August"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.view_attendance_report_wizard_form
+msgid "Cancel"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "Check In"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "Check Out"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.model.fields,field_description:KSW_attendance_report.field_attendance_report_wizard__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.model.fields,field_description:KSW_attendance_report.field_attendance_report_wizard__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "Date"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "Day"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.model.fields.selection,name:KSW_attendance_report.selection__attendance_report_wizard__month__12
+msgid "December"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.model.fields,field_description:KSW_attendance_report.field_attendance_report_wizard__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "Early Leave (min)"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.model.fields,field_description:KSW_attendance_report.field_attendance_report_wizard__employee_id
+msgid "Employee"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.model.fields.selection,name:KSW_attendance_report.selection__attendance_report_wizard__month__2
+msgid "February"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.model.fields,field_description:KSW_attendance_report.field_attendance_report_wizard__id
+msgid "ID"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.model.fields.selection,name:KSW_attendance_report.selection__attendance_report_wizard__month__1
+msgid "January"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.model.fields.selection,name:KSW_attendance_report.selection__attendance_report_wizard__month__7
+msgid "July"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.model.fields.selection,name:KSW_attendance_report.selection__attendance_report_wizard__month__6
+msgid "June"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.model.fields,field_description:KSW_attendance_report.field_attendance_report_wizard__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.model.fields,field_description:KSW_attendance_report.field_attendance_report_wizard__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "Late (min)"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.model.fields.selection,name:KSW_attendance_report.selection__attendance_report_wizard__month__3
+msgid "March"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.model.fields.selection,name:KSW_attendance_report.selection__attendance_report_wizard__month__5
+msgid "May"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.model.fields,field_description:KSW_attendance_report.field_attendance_report_wizard__month
+msgid "Month"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.actions.act_window,name:KSW_attendance_report.action_attendance_report_wizard
+#: model:ir.actions.report,name:KSW_attendance_report.action_report_monthly_attendance
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.view_attendance_report_wizard_form
+msgid "Monthly Attendance Report"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.model,name:KSW_attendance_report.model_attendance_report_wizard
+msgid "Monthly Attendance Report Wizard"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.ui.menu,name:KSW_attendance_report.menu_attendance_report
+msgid "Monthly Report"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "Notes"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.model.fields.selection,name:KSW_attendance_report.selection__attendance_report_wizard__month__11
+msgid "November"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.model.fields.selection,name:KSW_attendance_report.selection__attendance_report_wizard__month__10
+msgid "October"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.view_attendance_report_wizard_form
+msgid "Selection"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.model.fields.selection,name:KSW_attendance_report.selection__attendance_report_wizard__month__9
+msgid "September"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "Status"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "Summary"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "Total Early Leave Minutes"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "Total Late Minutes"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "Total Worked Hours"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.report_monthly_attendance
+msgid "Worked Hrs"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model:ir.model.fields,field_description:KSW_attendance_report.field_attendance_report_wizard__year
+msgid "Year"
+msgstr ""
+
+#. module: KSW_attendance_report
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_report.view_attendance_report_wizard_form
+msgid "🖨 Print Report"
+msgstr ""

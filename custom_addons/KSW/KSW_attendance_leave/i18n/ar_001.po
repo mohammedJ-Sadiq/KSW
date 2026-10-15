@@ -6,18 +6,117 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-15 12:11+0000\n"
-"PO-Revision-Date: 2026-07-15 12:11+0000\n"
+"POT-Creation-Date: 2026-10-14 19:40+0000\n"
+"PO-Revision-Date: 2026-10-14 19:59+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar_001\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
-"X-Generator: KSW ar-engine v2\n"
+"Plural-Forms: \n"
 
 #. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/wizard/ksw_attendance_download_wizard.py:0
+msgid ""
+"\n"
+"No punches came back for this period. Check that the period is right and that the device still holds logs that far back — \"Clear Attendance\" wipes them on the device too."
+msgstr ""
+"\n"
+"لم ترجع أي بصمات لهذه الفترة. تحقق من صحة الفترة ومن أن الجهاز لا يزال يحتفظ بسجلات تعود لتلك المدة — \"مسح الحضور\" يحذفها من الجهاز أيضا."
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/wizard/ksw_biometric_scope_mixin.py:0
+msgid "\"From\" must be on or before \"To\"."
+msgstr "يجب أن يكون \"من\" في تاريخ \"إلى\" أو قبله."
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/wizard/ksw_weekend_grant_wizard.py:0
+msgid ""
+"%(created)d weekend day(s) granted, %(revoked)d stale grant(s) revoked for "
+"%(emp)d employee(s)."
+msgstr ""
+"تم منح %(created)d يوم عطلة أسبوعية، وإلغاء %(revoked)d منحة قديمة لعدد "
+"%(emp)d موظف."
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/models/hr_leave.py:0
+msgid "%(date_from)s to %(date_to)s"
+msgstr "%(date_from)s إلى %(date_to)s"
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/models/resource_calendar_leaves.py:0
+msgid ""
+"%(granted)s employee-day(s) granted, %(revoked)s revoked. Days still in the "
+"future are granted automatically on the day."
+msgstr ""
+"تم منح %(granted)s يوم-موظف، وإلغاء %(revoked)s. الأيام التي لم تأت بعد تمنح"
+" تلقائيا في يومها."
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/models/hr_leave.py:0
+msgid "%(leave_type)s: %(duration)s (%(start)s)"
+msgstr "%(leave_type)s: %(duration)s (%(start)s)"
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/models/hr_leave.py:0
+msgid "%(name)s: %(duration)s"
+msgstr "%(name)s: %(duration)s"
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/models/hr_leave.py:0
+msgid ""
+"%(person)s on %(leave_type)s: %(duration)s (%(start)s — %(count)s records)"
+msgstr ""
+"%(person)s في %(leave_type)s: %(duration)s (%(start)s — %(count)s سجلات)"
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/models/biometric_device_details.py:0
+msgid "%d minutes ago"
+msgstr "منذ %d دقائق مضت"
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.biometric_device_details_view_form_ksw
+msgid ""
+"<strong>Download Specific Attendance:</strong> Re-downloads\n"
+"                one period only, optionally for selected employees, and rebuilds\n"
+"                that period's absences and weekend grants. Use this after\n"
+"                clearing and re-downloading attendance."
+msgstr ""
+"<strong>تنزيل حضور محدد:</strong> يعيد تنزيل\n"
+"                فترة واحدة فقط، اختياريا لموظفين محددين، ويعيد بناء\n"
+"                الغياب ومنح العطلات الأسبوعية لتلك الفترة. استخدمه بعد\n"
+"                مسح الحضور وإعادة تنزيله."
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.biometric_device_details_view_form_ksw
+msgid ""
+"<strong>Weekend Grants:</strong> Checks for and re-creates\n"
+"                the granted Friday/Saturday days on their own. These live only\n"
+"                in Odoo, so the device never gives them back."
+msgstr ""
+"<strong>منح العطلات الأسبوعية:</strong> يتحقق من أيام\n"
+"                الجمعة/السبت الممنوحة ويعيد إنشاءها منفردة. هذه موجودة\n"
+"                في Odoo فقط، لذا لا يعيدها الجهاز أبدا."
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/wizard/ksw_attendance_download_wizard.py:0
+msgid "Absence records created: %d"
+msgstr "سجلات الغياب المنشأة: %d"
+
+#. module: KSW_attendance_leave
+#. odoo-javascript
+#: code:addons/KSW_attendance_leave/static/src/leave_stats/leave_stats.xml:0
 #: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_list_inherit_coverage
 msgid "Absent"
 msgstr "غائب"
@@ -25,17 +124,63 @@ msgstr "غائب"
 #. module: KSW_attendance_leave
 #: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_form_inherit_leaves
 msgid "Absent (Net)"
-msgstr ""
+msgstr "غائب (صافي)"
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave__x_total_absent_days
 msgid "Absent Days"
-msgstr ""
+msgstr "أيام الغياب"
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__accepted_minutes
 msgid "Accepted (min)"
+msgstr "مقبول (دقيقة)"
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/models/hr_leave_attendance_line.py:0
+msgid ""
+"Accepted minutes (%(accepted)s) cannot exceed the total duration "
+"(%(total)s)."
 msgstr ""
+"لا يمكن أن تتجاوز الدقائق المقبولة (%(accepted)s) المدة الإجمالية "
+"(%(total)s)."
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/models/hr_leave_attendance_line.py:0
+msgid "Accepted minutes cannot be negative."
+msgstr "لا يمكن أن تكون الدقائق المقبولة سالبة."
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/models/hr_leave_attendance_line.py:0
+msgid "Accepted minutes cannot exceed the total duration (%(total)s min)."
+msgstr "لا يمكن أن تتجاوز الدقائق المقبولة المدة الإجمالية (%(total)s دقيقة)."
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,help:KSW_attendance_leave.field_ksw_attendance_download_wizard__include_unassigned
+#: model:ir.model.fields,help:KSW_attendance_leave.field_ksw_biometric_scope_mixin__include_unassigned
+#: model:ir.model.fields,help:KSW_attendance_leave.field_ksw_weekend_grant_wizard__include_unassigned
+msgid ""
+"Also process employees that have a biometric ID but no device assigned. "
+"Those employees are skipped by the device-level buttons, so they are never "
+"processed at all."
+msgstr ""
+"معالجة الموظفين الذين لديهم رقم بصمة ولكن دون جهاز مسند أيضا. هؤلاء الموظفون"
+" تتجاوزهم أزرار مستوى الجهاز، لذا لا تتم معالجتهم إطلاقا."
+
+#. module: KSW_attendance_leave
+#. odoo-javascript
+#: code:addons/KSW_attendance_leave/static/src/leave_stats/leave_stats.xml:0
+msgid "Arrow"
+msgstr "سهم"
+
+#. module: KSW_attendance_leave
+#. odoo-javascript
+#: code:addons/KSW_attendance_leave/static/src/leave_stats/leave_stats.xml:0
+msgid "Arrow icon"
+msgstr "أيقونة السهم"
 
 #. module: KSW_attendance_leave
 #: model:ir.model,name:KSW_attendance_leave.model_hr_attendance
@@ -45,13 +190,13 @@ msgstr "الحضور والانصراف"
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave__x_attendance_line_ids
 msgid "Attendance Issue Hours"
-msgstr ""
+msgstr "ساعات مشكلة الحضور"
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave__x_attendance_ids
 #: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_form_inherit_leaves
 msgid "Attendance Issues"
-msgstr ""
+msgstr "مشكلات الحضور"
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__attendance_id
@@ -61,12 +206,12 @@ msgstr "سجل الحضور والانصراف"
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave__x_attendance_count
 msgid "Attendance Records"
-msgstr ""
+msgstr "سجلات الحضور"
 
 #. module: KSW_attendance_leave
 #: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_employee_view_form_check_in_only
 msgid "Attendance Tracking"
-msgstr ""
+msgstr "تتبع الحضور"
 
 #. module: KSW_attendance_leave
 #: model:ir.model,name:KSW_attendance_leave.model_biometric_attendance_sync
@@ -79,6 +224,11 @@ msgid "Biometric Device"
 msgstr "جهاز البصمة"
 
 #. module: KSW_attendance_leave
+#: model:ir.model,name:KSW_attendance_leave.model_ksw_biometric_scope_mixin
+msgid "Biometric Device / Period / Employee Scope"
+msgstr "جهاز البصمة / الفترة / نطاق الموظفين"
+
+#. module: KSW_attendance_leave
 #: model:ir.model,name:KSW_attendance_leave.model_biometric_device_details
 msgid "Biometric Device Details"
 msgstr "بيانات جهاز البصمة"
@@ -89,9 +239,50 @@ msgid "Biometric Schedule Helper"
 msgstr "مساعد جداول البصمة"
 
 #. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/models/biometric_device_details.py:0
+msgid "Biometric device \"%s\" sync is stale"
+msgstr "مزامنة جهاز البصمة \"%s\" متأخرة"
+
+#. module: KSW_attendance_leave
+#: model:ir.actions.server,name:KSW_attendance_leave.ir_cron_ksw_generate_weekend_grants_ir_actions_server
+msgid "Biometric: Generate Weekend Grants (manual trigger)"
+msgstr "البصمة: إنشاء منح العطلات الأسبوعية (تشغيل يدوي)"
+
+#. module: KSW_attendance_leave
 #: model:ir.actions.server,name:KSW_attendance_leave.cron_check_stale_biometric_devices_ir_actions_server
 msgid "Biometric: Stale Device Alert (every 30 minutes)"
 msgstr "البصمة: تنبيه توقف الجهاز (كل 30 دقيقة)"
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.ksw_weekend_grant_wizard_view_form
+msgid "Cancel"
+msgstr "إلغاء"
+
+#. module: KSW_attendance_leave
+#: model:ir.model,name:KSW_attendance_leave.model_ksw_weekend_grant_wizard
+msgid "Check / Generate Granted Weekend Days"
+msgstr "فحص / إنشاء أيام العطلة الأسبوعية الممنوحة"
+
+#. module: KSW_attendance_leave
+#: model:ir.actions.act_window,name:KSW_attendance_leave.ksw_weekend_grant_wizard_action
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.ksw_weekend_grant_wizard_view_form
+msgid "Check / Generate Weekend Grants"
+msgstr "فحص / إنشاء منح العطلات الأسبوعية"
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.ksw_weekend_grant_wizard_view_form
+msgid "Check Only"
+msgstr "فحص فقط"
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.biometric_device_details_view_form_ksw
+msgid ""
+"Check for and re-create missing granted Friday/Saturday days without re-"
+"running the absence scan."
+msgstr ""
+"التحقق من أيام الجمعة/السبت الممنوحة المفقودة وإعادة إنشائها دون إعادة فحص "
+"الغياب."
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,help:KSW_attendance_leave.field_hr_leave__holiday_status_is_attendance_issue
@@ -100,11 +291,36 @@ msgid ""
 "Check this box if this leave type requires linking to specific attendance "
 "records (late, early leave, or absence)."
 msgstr ""
+"فعّل هذا الخيار إذا كان هذا النوع من الإجازات يتطلب الربط بسجلات حضور محددة "
+"(تأخير، أو خروج مبكر، أو غياب)."
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_employee__x_check_in_only
 msgid "Check-in Only"
+msgstr "تسجيل دخول فقط"
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/wizard/ksw_weekend_grant_wizard.py:0
+msgid ""
+"Checked %(emp)d employee(s) from %(start)s to %(end)s.\n"
+"\n"
+"Missing weekend grants that would be created: %(created)d\n"
+"Stale grants that would be revoked (both adjacent workdays absent): %(revoked)d\n"
+"\n"
+"Nothing has been changed yet. Click \"Generate Weekend Grants\" to apply."
 msgstr ""
+"تم فحص %(emp)d موظف من %(start)s إلى %(end)s.\n"
+"\n"
+"منح العطلات الأسبوعية المفقودة التي ستنشأ: %(created)d\n"
+"المنح القديمة التي ستلغى (غياب في يومي العمل المجاورين): %(revoked)d\n"
+"\n"
+"لم يتغير شيء بعد. اضغط \"إنشاء منح العطلات الأسبوعية\" للتطبيق."
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.ksw_attendance_download_wizard_view_form
+msgid "Close"
+msgstr "إغلاق"
 
 #. module: KSW_attendance_leave
 #: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_list_inherit_coverage
@@ -117,12 +333,26 @@ msgid "Covered by Time Off"
 msgstr "مشمول بإجازة"
 
 #. module: KSW_attendance_leave
+#: model:ir.model.fields,help:KSW_attendance_leave.field_ksw_attendance_download_wizard__generate_absences
+msgid ""
+"Create the absence records for scheduled workdays with no punch in this "
+"period. These are Odoo-side rows, so a re-download does not restore them on "
+"its own."
+msgstr ""
+"إنشاء سجلات الغياب لأيام العمل المجدولة التي لا توجد لها بصمة في هذه الفترة."
+" هذه سجلات في Odoo، لذا لا تستعيدها إعادة التنزيل وحدها."
+
+#. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__create_uid
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_attendance_download_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_weekend_grant_wizard__create_uid
 msgid "Created by"
 msgstr "أنشئ بواسطة"
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__create_date
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_attendance_download_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_weekend_grant_wizard__create_date
 msgid "Created on"
 msgstr "أنشئ في"
 
@@ -132,10 +362,49 @@ msgid "Date"
 msgstr "التاريخ"
 
 #. module: KSW_attendance_leave
+#: model:ir.model.fields,help:KSW_attendance_leave.field_hr_leave_attendance_line__attendance_id
+msgid ""
+"Deleting attendance for a re-download (the sanctioned repair: clear + re-"
+"download) must not destroy the accepted_minutes an HR user already approved "
+"here. The line survives as an orphan (attendance_id = False, "
+"date/hour_from/hour_to/accepted_minutes intact) and "
+"hr.attendance._relink_attendance_issue_lines() re-attaches it once the punch"
+" comes back under a new id."
+msgstr ""
+"حذف الحضور لإعادة تنزيله (الإصلاح المعتمد: مسح + إعادة تنزيل) يجب ألا يتلف "
+"الدقائق المقبولة التي اعتمدها مستخدم الموارد البشرية هنا. يبقى البند يتيما "
+"(attendance_id = False، مع بقاء date/hour_from/hour_to/accepted_minutes)، "
+"ويعيد hr.attendance._relink_attendance_issue_lines() ربطه عند عودة البصمة "
+"بمعرف جديد."
+
+#. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave__holiday_status_is_attendance_issue
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_type__is_attendance_issue
 msgid "Depends on Attendance Issue"
+msgstr "يعتمد على مشكلة الحضور"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_attendance_download_wizard__device_id
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_biometric_scope_mixin__device_id
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_weekend_grant_wizard__device_id
+msgid "Device"
+msgstr "الجهاز"
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/wizard/ksw_attendance_download_wizard.py:0
+msgid ""
+"Device: %(device)s\n"
+"Period: %(start)s to %(end)s\n"
+"Employees: %(emp)d\n"
+"\n"
+"Punches downloaded: %(created)d day(s) created, %(updated)d updated."
 msgstr ""
+"الجهاز: %(device)s\n"
+"الفترة: %(start)s إلى %(end)s\n"
+"الموظفون: %(emp)d\n"
+"\n"
+"البصمات المنزلة: أنشئ %(created)d يوم، وحدث %(updated)d."
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_biometric_attendance_sync__display_name
@@ -146,13 +415,34 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave__display_name
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__display_name
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_type__display_name
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_attendance_download_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_biometric_scope_mixin__display_name
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_weekend_grant_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_resource_calendar_leaves__display_name
 msgid "Display Name"
 msgstr "اسم العرض"
 
 #. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.ksw_attendance_download_wizard_view_form
+msgid "Download"
+msgstr "تنزيل"
+
+#. module: KSW_attendance_leave
+#: model:ir.model,name:KSW_attendance_leave.model_ksw_attendance_download_wizard
+msgid "Download Attendance for a Specific Period"
+msgstr "تنزيل الحضور لفترة محددة"
+
+#. module: KSW_attendance_leave
+#: model:ir.actions.act_window,name:KSW_attendance_leave.ksw_attendance_download_wizard_action
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.biometric_device_details_view_form_ksw
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.ksw_attendance_download_wizard_view_form
+msgid "Download Specific Attendance"
+msgstr "تنزيل حضور محدد"
+
+#. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__duration_minutes
 msgid "Duration (min)"
-msgstr ""
+msgstr "المدة (دقيقة)"
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields.selection,name:KSW_attendance_leave.selection__hr_leave_attendance_line__issue_type__early_leave
@@ -168,12 +458,12 @@ msgstr "دقائق الانصراف المبكر"
 #. module: KSW_attendance_leave
 #: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_form_inherit_leaves
 msgid "Early Leave Minutes (Net)"
-msgstr ""
+msgstr "دقائق الخروج المبكر (صافي)"
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,help:KSW_attendance_leave.field_hr_attendance__x_net_early_leave_minutes
 msgid "Early leave minutes remaining after deducting approved time-off."
-msgstr ""
+msgstr "دقائق الخروج المبكر المتبقية بعد خصم الإجازة المعتمدة."
 
 #. module: KSW_attendance_leave
 #: model:ir.model,name:KSW_attendance_leave.model_hr_employee
@@ -181,9 +471,83 @@ msgid "Employee"
 msgstr "الموظف"
 
 #. module: KSW_attendance_leave
+#: model:ir.model.fields,help:KSW_attendance_leave.field_resource_calendar_leaves__x_granted_count
+msgid "Employee-days this public holiday has been granted to."
+msgstr "أيام-الموظفين التي منحت لها هذه العطلة الرسمية."
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_attendance_download_wizard__employee_ids
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_biometric_scope_mixin__employee_ids
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_weekend_grant_wizard__employee_ids
+msgid "Employees"
+msgstr "الموظفون"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_attendance_download_wizard__employee_count
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_biometric_scope_mixin__employee_count
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_weekend_grant_wizard__employee_count
+msgid "Employees in scope"
+msgstr "الموظفون ضمن النطاق"
+
+#. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__hour_from
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_attendance_download_wizard__date_from
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_biometric_scope_mixin__date_from
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_weekend_grant_wizard__date_from
 msgid "From"
 msgstr "من"
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.ksw_weekend_grant_wizard_view_form
+msgid "Generate Weekend Grants"
+msgstr "إنشاء منح العطلات الأسبوعية"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_attendance_download_wizard__generate_absences
+msgid "Generate absences"
+msgstr "إنشاء الغياب"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_attendance_download_wizard__generate_weekend_grants
+msgid "Generate weekend grants"
+msgstr "إنشاء منح العطلات الأسبوعية"
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.resource_calendar_leaves_tree_inherit_ksw_grant
+msgid "Grant to Employees"
+msgstr "منح للموظفين"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_resource_calendar_leaves__x_granted_count
+msgid "Granted"
+msgstr "تم المنح"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_resource_calendar_leaves__x_granted_attendance_ids
+msgid "Granted Days"
+msgstr "الأيام الممنوحة"
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.ksw_weekend_grant_wizard_view_form
+msgid ""
+"Granted Friday/Saturday records exist only in Odoo, so they\n"
+"                    are lost whenever attendance is cleared and re-downloaded.\n"
+"                    This re-creates the missing ones for the selected range\n"
+"                    without re-running the full absence scan."
+msgstr ""
+"سجلات الجمعة/السبت الممنوحة موجودة في Odoo فقط، لذا\n"
+"                    تفقد كلما مسح الحضور وأعيد تنزيله.\n"
+"                    يعيد هذا إنشاء المفقود منها للفترة المحددة\n"
+"                    دون إعادة فحص الغياب بالكامل."
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_form_inherit_leaves
+msgid ""
+"Granted as a full scheduled day because of this public\n"
+"                        holiday: no punch was needed and nothing is deducted."
+msgstr ""
+"منح كيوم مجدول كامل بسبب هذه العطلة\n"
+"                        الرسمية: لم تكن البصمة مطلوبة ولا يخصم شيء."
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_biometric_attendance_sync__id
@@ -194,6 +558,10 @@ msgstr "من"
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave__id
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__id
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_type__id
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_attendance_download_wizard__id
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_biometric_scope_mixin__id
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_weekend_grant_wizard__id
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_resource_calendar_leaves__id
 msgid "ID"
 msgstr "المعرف"
 
@@ -204,31 +572,44 @@ msgid ""
 "suppressed; the scheduled end is used as the effective checkout for worked-"
 "hours calculation."
 msgstr ""
+"عند التفعيل، يُكتفى بتسجيل الدخول فقط. يتم تجاهل خصومات الخروج المبكر لهذا "
+"النوع."
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_attendance_download_wizard__include_unassigned
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_biometric_scope_mixin__include_unassigned
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_weekend_grant_wizard__include_unassigned
+msgid "Include employees with no device"
+msgstr "تضمين الموظفين بلا جهاز"
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,help:KSW_attendance_leave.field_hr_attendance__x_is_covered
 msgid ""
 "Indicates whether this attendance issue has been covered by an approved "
 "time-off request."
-msgstr ""
+msgstr "يُشير إلى ما إذا كانت مشكلة الحضور هذه مغطاة بطلب إجازة معتمد."
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_attendance__x_net_is_absent
 msgid "Is Absent"
-msgstr ""
+msgstr "غائب"
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__issue_type
 msgid "Issue Type"
-msgstr ""
+msgstr "نوع المشكلة"
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__write_uid
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_attendance_download_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_weekend_grant_wizard__write_uid
 msgid "Last Updated by"
 msgstr "آخر تحديث بواسطة"
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__write_date
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_attendance_download_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_weekend_grant_wizard__write_date
 msgid "Last Updated on"
 msgstr "آخر تحديث في"
 
@@ -241,27 +622,58 @@ msgstr "متأخر"
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_attendance__x_net_late_minutes
 #: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_list_inherit_coverage
 msgid "Late Minutes"
-msgstr ""
+msgstr "دقائق التأخير"
 
 #. module: KSW_attendance_leave
 #: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_form_inherit_leaves
 msgid "Late Minutes (Net)"
-msgstr ""
+msgstr "دقائق التأخير (صافي)"
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,help:KSW_attendance_leave.field_hr_attendance__x_net_late_minutes
 msgid "Late minutes remaining after deducting approved time-off."
+msgstr "دقائق التأخير المتبقية بعد خصم الإجازة المعتمدة."
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_leave_view_form_inherit_attendance_issue
+msgid ""
+"Late: scheduled shift start. Early Leave: the employee's check-out time."
+msgstr "التأخير: بداية الوردية المجدولة. المغادرة المبكرة: وقت انصراف الموظف."
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_leave_view_form_inherit_attendance_issue
+msgid ""
+"Late: the employee's check-in time. Early Leave: the scheduled shift end -- "
+"this already accounts for any unpaid break built into the shift (e.g. "
+"lunch), so it reflects net working hours, not just a clock time the employee"
+" missed by."
 msgstr ""
+"التأخير: وقت حضور الموظف. المغادرة المبكرة: نهاية الوردية المجدولة -- وهذا "
+"يراعي أي استراحة غير مدفوعة ضمن الوردية (مثل الغداء)، فيعكس صافي ساعات "
+"العمل، لا مجرد وقت فاته الموظف."
 
 #. module: KSW_attendance_leave
 #: model:ir.model,name:KSW_attendance_leave.model_hr_leave_attendance_line
 msgid "Leave Attendance Issue Hours"
-msgstr ""
+msgstr "ساعات مشكلة حضور الإجازة"
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__leave_id
 msgid "Leave Request"
-msgstr ""
+msgstr "طلب إجازة"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,help:KSW_attendance_leave.field_ksw_attendance_download_wizard__employee_ids
+#: model:ir.model.fields,help:KSW_attendance_leave.field_ksw_biometric_scope_mixin__employee_ids
+#: model:ir.model.fields,help:KSW_attendance_leave.field_ksw_weekend_grant_wizard__employee_ids
+msgid "Leave empty to process every biometric employee on the device."
+msgstr "اتركه فارغا لمعالجة جميع موظفي البصمة على الجهاز."
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.ksw_attendance_download_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.ksw_weekend_grant_wizard_view_form
+msgid "Limit to specific employees (optional)"
+msgstr "تحديد موظفين معينين (اختياري)"
 
 #. module: KSW_attendance_leave
 #: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_leave_view_form_inherit_attendance_issue
@@ -269,45 +681,123 @@ msgid "Minutes"
 msgstr "الدقائق"
 
 #. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/wizard/ksw_biometric_scope_mixin.py:0
+msgid "No biometric employees match this selection."
+msgstr "لا يوجد موظفو بصمة مطابقون لهذا الاختيار."
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/models/resource_calendar_leaves.py:0
+msgid "Not granted (overlapping attendance, fix by hand): %(names)s"
+msgstr "لم يمنح (حضور متداخل، صححه يدويا): %(names)s"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_attendance__x_public_holiday_id
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_filter_inherit_public_holiday
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_form_inherit_leaves
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_list_inherit_coverage
+msgid "Public Holiday"
+msgstr "عطلة رسمية"
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/models/resource_calendar_leaves.py:0
+msgid "Public holiday applied"
+msgstr "تم تطبيق العطلة الرسمية"
+
+#. module: KSW_attendance_leave
 #: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_form_inherit_leaves
 msgid "Raw Absent"
-msgstr ""
+msgstr "غياب خام"
 
 #. module: KSW_attendance_leave
 #: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_form_inherit_leaves
 msgid "Raw Early Leave Minutes"
-msgstr ""
+msgstr "دقائق الخروج المبكر الخام"
 
 #. module: KSW_attendance_leave
 #: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_list_inherit_coverage
 msgid "Raw Early Min"
-msgstr ""
+msgstr "دق. خروج مبكر خام"
 
 #. module: KSW_attendance_leave
 #: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_list_inherit_coverage
 msgid "Raw Late Min"
-msgstr ""
+msgstr "دق. تأخير خام"
 
 #. module: KSW_attendance_leave
 #: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_form_inherit_leaves
 msgid "Raw Late Minutes"
-msgstr ""
+msgstr "دقائق التأخير الخام"
 
 #. module: KSW_attendance_leave
 #: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_form_inherit_leaves
 #: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_list_inherit_coverage
 msgid "Raw Worked Hours"
+msgstr "ساعات العمل الخام"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,help:KSW_attendance_leave.field_ksw_attendance_download_wizard__generate_weekend_grants
+msgid ""
+"Re-create the granted Friday/Saturday records for this period. These exist "
+"only in Odoo and are always lost when attendance is cleared and re-"
+"downloaded."
 msgstr ""
+"إعادة إنشاء سجلات الجمعة/السبت الممنوحة لهذه الفترة. هذه موجودة في Odoo فقط "
+"وتفقد دائما عند مسح الحضور وإعادة تنزيله."
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.biometric_device_details_view_form_ksw
+msgid ""
+"Re-download one period, optionally for specific employees only, and rebuild "
+"that period's absences and weekend grants."
+msgstr ""
+"إعادة تنزيل فترة واحدة، اختياريا لموظفين محددين فقط، وإعادة بناء الغياب ومنح"
+" العطلات الأسبوعية لتلك الفترة."
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.ksw_attendance_download_wizard_view_form
+msgid ""
+"Re-downloads the punches for one period and, if you want,\n"
+"                    only certain employees, instead of re-processing the whole\n"
+"                    device history. The absence rows and weekend grants for\n"
+"                    that period are rebuilt straight afterwards, since neither\n"
+"                    of those comes back from the device on its own."
+msgstr ""
+"يعيد تنزيل البصمات لفترة واحدة، وإن أردت،\n"
+"                    لموظفين معينين فقط، بدلا من إعادة معالجة سجل\n"
+"                    الجهاز بالكامل. يعاد بناء سجلات الغياب ومنح العطلات\n"
+"                    الأسبوعية لتلك الفترة مباشرة بعد ذلك، لأن أيا منهما\n"
+"                    لا يعود من الجهاز وحده."
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_attendance__x_leave_ids
 msgid "Related Leaves"
-msgstr ""
+msgstr "الإجازات المرتبطة"
 
 #. module: KSW_attendance_leave
 #: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_form_inherit_leaves
 msgid "Related Time Off"
-msgstr ""
+msgstr "الإجازة المرتبطة"
+
+#. module: KSW_attendance_leave
+#: model:ir.model,name:KSW_attendance_leave.model_resource_calendar_leaves
+msgid "Resource Time Off Detail"
+msgstr "تفاصيل إجازة المَورد"
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_attendance_download_wizard__result_message
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_biometric_scope_mixin__result_message
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_weekend_grant_wizard__result_message
+msgid "Result Message"
+msgstr "رسالة النتيجة"
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/wizard/ksw_weekend_grant_wizard.py:0
+msgid "Scheduled"
+msgstr "تمت الجدولة"
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,help:KSW_attendance_leave.field_hr_leave__x_attendance_ids
@@ -315,6 +805,31 @@ msgid ""
 "Select the attendance records with issues (late, early leave, or absence) "
 "that this time-off request is meant to cover."
 msgstr ""
+"اختر سجلات الحضور التي تحتوي على مشكلات (تأخير، خروج مبكر، أو غياب) والتي "
+"يُقصد أن يغطيها طلب الإجازة هذا."
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,help:KSW_attendance_leave.field_hr_attendance__x_public_holiday_id
+msgid ""
+"Set on the full scheduled day written to grant this public holiday.  Cleared"
+" when a real punch lands on that day."
+msgstr ""
+"يحدد على اليوم المجدول الكامل المكتوب لمنح هذه العطلة الرسمية. يمسح عند "
+"تسجيل بصمة فعلية في ذلك اليوم."
+
+#. module: KSW_attendance_leave
+#: model:ir.model.fields,help:KSW_attendance_leave.field_hr_leave_attendance_line__date
+msgid ""
+"Set once at creation from attendance_id.check_in — plain, not computed. "
+"attendance_id can later be nulled by a re-download (see its ondelete help) "
+"and a compute depending on it would wipe this back to False at that exact "
+"moment, destroying the only way left to match the orphaned line back to its "
+"date."
+msgstr ""
+"يحدد مرة واحدة عند الإنشاء من attendance_id.check_in — حقل عادي، غير محتسب. "
+"قد يفرغ attendance_id لاحقا بإعادة التنزيل (راجع تعليمات ondelete الخاصة "
+"به)، والحقل المحتسب المعتمد عليه سيعود إلى False في تلك اللحظة تحديدا، فيتلف"
+" الطريقة الوحيدة المتبقية لمطابقة البند اليتيم بتاريخه."
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,help:KSW_attendance_leave.field_biometric_device_details__x_stale_alert_sent
@@ -323,6 +838,17 @@ msgid ""
 "cleared once the device syncs successfully again so the next outage can re-"
 "alert."
 msgstr ""
+"يُحدَّد عند إرسال بريد تنبيه لانقطاع مزامنة الجهاز؛ يُمسح تلقائياً عند "
+"استئناف المزامنة."
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/models/hr_leave_attendance_line.py:0
+msgid ""
+"The accepted minutes of a time off request cannot be changed once it has "
+"been approved, refused or cancelled."
+msgstr ""
+"لا يمكن تغيير الدقائق المقبولة لطلب إجازة بعد اعتماده أو رفضه أو إلغائه."
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,help:KSW_attendance_leave.field_hr_leave_attendance_line__accepted_minutes
@@ -330,13 +856,47 @@ msgid ""
 "The approved portion of this issue in minutes. Cannot exceed the total "
 "duration."
 msgstr ""
+"الجزء المعتمد من هذه المشكلة بالدقائق. لا يمكن أن يتجاوز المدة الكلية."
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/wizard/ksw_weekend_grant_wizard.py:0
+msgid ""
+"The background job for weekend grants is missing. Upgrade the "
+"KSW_attendance_leave module and try again."
+msgstr ""
+"المهمة الخلفية لمنح العطلات الأسبوعية مفقودة. حدث الوحدة "
+"KSW_attendance_leave ثم حاول مرة أخرى."
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,help:KSW_attendance_leave.field_hr_employee__device_id
 msgid "The biometric device this employee is registered on"
-msgstr ""
+msgstr "الجهاز البيومتري المسجَّل عليه الموظف"
 
 #. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/wizard/ksw_weekend_grant_wizard.py:0
+msgid ""
+"This range covers %(emp)d employees and is too large to run on screen, so it"
+" was scheduled in the background. Progress is written to the server log."
+msgstr ""
+"يغطي هذا النطاق %(emp)d موظف وهو أكبر من أن يشغل على الشاشة، لذا جدول في "
+"الخلفية. يكتب التقدم في سجل الخادم."
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/wizard/ksw_attendance_download_wizard.py:0
+msgid ""
+"This selection covers %(emp)d employees over %(days)d days, which is too "
+"large to download in one request. Narrow the period or pick specific "
+"employees."
+msgstr ""
+"يغطي هذا الاختيار %(emp)d موظف على مدى %(days)d يوم، وهو أكبر من أن ينزل في "
+"طلب واحد. ضيق الفترة أو اختر موظفين محددين."
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/models/hr_leave.py:0
 #: model:ir.model,name:KSW_attendance_leave.model_hr_leave
 msgid "Time Off"
 msgstr "الإجازات"
@@ -347,7 +907,26 @@ msgid "Time Off Type"
 msgstr "نوع الإجازة"
 
 #. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/models/hr_leave.py:0
+msgid ""
+"Time off request must be confirmed (\"To Approve\") in order to approve it."
+msgstr ""
+"يجب أن يتم تأكيد طلب الإجازة (\"بانتظار الموافقة\") حتى تتم الموافقة عليه. "
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/models/hr_leave.py:0
+msgid ""
+"Time off request state must be \"Confirmed\" or \"Refused\" in order to "
+"reset to Draft."
+msgstr "يجب أن تكون حالة طلب الإجازة \"مؤكد\" أو \"مرفوض\" لإعادته إلى مسودة."
+
+#. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave_attendance_line__hour_to
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_attendance_download_wizard__date_to
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_biometric_scope_mixin__date_to
+#: model:ir.model.fields,field_description:KSW_attendance_leave.field_ksw_weekend_grant_wizard__date_to
 msgid "To"
 msgstr "إلى"
 
@@ -359,42 +938,98 @@ msgstr "إجمالي دقائق الانصراف المبكر"
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_leave__x_total_late_minutes
 msgid "Total Late Minutes"
-msgstr ""
+msgstr "إجمالي دقائق التأخير"
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,help:KSW_attendance_leave.field_hr_attendance__x_net_is_absent
 msgid ""
 "True if the employee is absent and not fully covered by an approved time-"
 "off."
-msgstr ""
+msgstr "صحيح إذا كان الموظف غائباً وغير مغطى بالكامل بإجازة معتمدة."
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/models/hr_leave_attendance_line.py:0
+msgid "Value Adjusted"
+msgstr "القيمة المعدلة"
+
+#. module: KSW_attendance_leave
+#: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.biometric_device_details_view_form_ksw
+msgid "Weekend Grants"
+msgstr "منح العطلات الأسبوعية"
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/wizard/ksw_weekend_grant_wizard.py:0
+msgid "Weekend Grants Updated"
+msgstr "تم تحديث منح العطلات الأسبوعية"
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/wizard/ksw_attendance_download_wizard.py:0
+msgid "Weekend grants: %(created)d granted, %(revoked)d revoked"
+msgstr "منح العطلات الأسبوعية: منح %(created)d، وإلغاء %(revoked)d"
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_hr_attendance__x_net_worked_hours
 #: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_list_inherit_coverage
 msgid "Worked Hours"
-msgstr ""
+msgstr "ساعات العمل"
 
 #. module: KSW_attendance_leave
 #: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_attendance_view_form_inherit_leaves
 msgid "Worked Hours (Net)"
-msgstr ""
+msgstr "ساعات العمل (صافي)"
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,help:KSW_attendance_leave.field_hr_attendance__x_net_worked_hours
 msgid "Worked hours including time covered by approved time-off."
-msgstr ""
+msgstr "ساعات العمل بما في ذلك الوقت المغطى بإجازة معتمدة."
 
 #. module: KSW_attendance_leave
 #: model:ir.model.fields,field_description:KSW_attendance_leave.field_biometric_device_details__x_stale_alert_sent
 msgid "X Stale Alert Sent"
+msgstr "تم إرسال تنبيه التقادم"
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/models/hr_leave_attendance_line.py:0
+msgid ""
+"You cannot %(op)s the attendance issue lines of a time off request you do "
+"not have access to."
 msgstr ""
+"لا يمكنك %(op)s بنود مشكلات الحضور لطلب إجازة ليس لديك صلاحية الوصول إليه."
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/models/hr_leave.py:0
+msgid "You must select at least one attendance issue to cover."
+msgstr "يجب اختيار مشكلة حضور واحدة على الأقل لتغطيتها."
+
+#. module: KSW_attendance_leave
+#. odoo-javascript
+#: code:addons/KSW_attendance_leave/static/src/leave_stats/leave_stats.xml:0
+msgid "days"
+msgstr "أيام"
+
+#. module: KSW_attendance_leave
+#. odoo-javascript
+#: code:addons/KSW_attendance_leave/static/src/leave_stats/leave_stats.xml:0
+msgid "hours"
+msgstr "ساعات"
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/models/biometric_device_details.py:0
+msgid "never synced"
+msgstr "لم تتم المزامنة قط"
 
 #. module: KSW_attendance_leave
 #: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_leave_view_form_inherit_attendance_issue
 msgid "✅ Submit"
-msgstr ""
+msgstr "✅ إرسال"
 
 #. module: KSW_attendance_leave
 #: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_leave_view_form_inherit_attendance_issue
 msgid "✔ Accepted"
-msgstr ""
+msgstr "✔ مقبول"

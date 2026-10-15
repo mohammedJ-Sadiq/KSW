@@ -77,7 +77,7 @@ else:
     <!-- Who drives which tanker. The app fetches the tanker from here and
          never lets the driver choose, so this is dispatch's daily lever. -->
     <menuitem id="menu_water_delivery_tankers"
-              name="Tankers"
+              name="Fleet Management"
               parent="menu_water_delivery_root"
               action="action_water_tankers"
               sequence="47"

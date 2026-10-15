@@ -15,6 +15,10 @@ class TestMobileViews(TransactionCase):
         'KSW_payroll.action_ksw_my_revision_requests',
         'KSW_payroll.action_ksw_revision_requests_todo',
         'KSW_payroll.action_ksw_revision_requests_all',
+        'KSW_water_delivery.action_water_location_requests',
+        'KSW_water_delivery.action_water_captures',
+        'KSW_water_delivery.action_water_tankers',
+        'KSW_commissions.action_ksw_pay_run',
     ]
 
     def test_desktop_still_opens_list_and_phone_has_cards(self):
@@ -23,7 +27,7 @@ class TestMobileViews(TransactionCase):
             modes = [mode for _view, mode in action.views]
             self.assertEqual(modes[0], 'list', xmlid)
             self.assertIn('kanban', modes, xmlid)
-            if 'form' in action.view_mode:
+            if 'form' in action.view_mode or action.view_ids.filtered(lambda v: v.view_mode == 'form'):
                 self.assertIn('form', modes, xmlid)
             self.assertEqual(action.mobile_view_mode, 'kanban', xmlid)
 
@@ -73,9 +77,8 @@ class TestMobileViews(TransactionCase):
 
         self.assertIn('ksw_m_hide', classes('rate'))
         self.assertIn('ksw_m_hide', classes('x_overlap_note'))
-        self.assertIn('ksw_m_hide', classes('reason'))
-        # What decides the money must stay editable on a phone.
-        for name in ('employee_id', 'option_id', 'date', 'quantity', 'location_id', 'amount'):
+        # What a supervisor types must stay editable on a phone.
+        for name in ('employee_id', 'option_id', 'date', 'quantity', 'location_id', 'reason', 'amount'):
             self.assertNotIn('ksw_m_hide', classes(name), name)
 
     def test_card_labels_are_arabic_in_arabic(self):
@@ -88,7 +91,27 @@ class TestMobileViews(TransactionCase):
             'KSW_mobile_ui.ksw_deduction_view_kanban_my_mobile': 'الرصيد المتبقي',
             'KSW_mobile_ui.hr_attendance_view_kanban_mobile': 'مشمول بإجازة',
             'KSW_mobile_ui.ksw_payslip_revision_request_view_kanban_mobile': 'الفرق',
+            'KSW_mobile_ui.view_water_location_request_kanban_mobile': 'فتح الخريطة',
+            'KSW_mobile_ui.view_water_capture_kanban_mobile': 'إعادة المحاولة',
+            'KSW_mobile_ui.view_water_tanker_kanban_mobile': 'بدون سائق',
+            'KSW_mobile_ui.view_ksw_pay_run_kanban_mobile': 'الإجمالي المستحق',
         }
         for xmlid, term in views.items():
             arch = self.env.ref(xmlid).with_context(lang='ar_001').arch_db
             self.assertIn(term, arch, xmlid)
+
+    def test_grouped_water_notes_open_as_a_list_on_a_phone(self):
+        action = self.env.ref('KSW_water_delivery.action_water_delivery_all_notes')
+        self.assertEqual(action.mobile_view_mode, 'list')
+        self.assertEqual(action.views[0][1], 'list')
+
+    def test_line_tables_carry_their_column_labels(self):
+        # The phone card layout for line tables (mobile.scss) reads each
+        # cell's data-label; the template extension must ship in the bundle.
+        from odoo.tools.misc import file_open
+        with file_open('KSW_mobile_ui/static/src/xml/list_renderer_mobile.xml') as f:
+            self.assertIn('t-att-data-label', f.read())
+        bundle = self.env['ir.qweb']._get_asset_bundle('web.assets_backend', debug_assets=False)
+        self.assertTrue(any(
+            'list_renderer_mobile.xml' in getattr(a, 'url', '') for a in bundle.templates
+        ))

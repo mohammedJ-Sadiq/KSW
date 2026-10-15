@@ -1,0 +1,1101 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_base_security
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_base_security
+#. odoo-python
+#: code:addons/KSW_base_security/models/hr_department.py:0
+msgid ""
+"%(name)s has no user account, so they cannot be the General Manager of "
+"%(dept)s. Link a user to the employee record first."
+msgstr ""
+
+#. module: KSW_base_security
+#. odoo-python
+#: code:addons/KSW_base_security/models/hr_department.py:0
+msgid ""
+"%(names)s has no user account, so they cannot be an Accounting Approver of "
+"%(dept)s. Link a user to the employee record first."
+msgstr ""
+
+#. module: KSW_base_security
+#. odoo-python
+#: code:addons/KSW_base_security/models/res_users.py:0
+msgid "A user cannot be their own assistant."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model,name:KSW_base_security.model_res_groups
+msgid "Access Groups"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__group_id
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_ksw_user_group_log_search
+msgid "Access Right"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.actions.act_window,name:KSW_base_security.action_ksw_user_group_log
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_users__x_group_log_ids
+#: model:ir.ui.menu,name:KSW_base_security.menu_ksw_user_group_log
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_users_form_ksw_group_log
+msgid "Access Right History"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_department__x_accountant_ids
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.hr_department_view_tree_gm
+msgid "Accounting Approvers"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_company__x_default_accountant_ids
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_config_settings__x_default_accountant_ids
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.res_config_settings_view_form_gm
+msgid "Accounting Team"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__action
+msgid "Action"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__active_employee
+msgid "Active Employee"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__departure_description
+msgid "Additional Information"
+msgstr ""
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_users_form_ksw_manager_assistant
+msgid "Additional Managers Assisted"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__additional_note
+msgid "Additional Note"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__allowed_country_state_ids
+msgid "Allowed Country State"
+msgstr ""
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_users_form_ksw_manager_assistant
+msgid ""
+"An assistant may create and edit time off (any type) and\n"
+"                        loan requests for the <b>direct reports</b> of the\n"
+"                        managers they assist, and only until the first approver\n"
+"                        signs off. They can never approve, refuse or delete a\n"
+"                        request — the manager still does that personally.\n"
+"                        <br/>\n"
+"                        Their own manager is included automatically; the list\n"
+"                        above is only for managers they do not report to."
+msgstr ""
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.res_config_settings_view_form_gm
+msgid "Approvals"
+msgstr ""
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.res_config_settings_view_form_gm
+msgid ""
+"Approves the GM step for departments with no GM of their own, and for "
+"employees with no department."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_res_company__x_default_gm_id
+#: model:ir.model.fields,help:KSW_base_security.field_res_config_settings__x_default_gm_id
+msgid ""
+"Approves the GM step for employees whose department has no GM of its own "
+"(and for employees with no department at all)."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_department__x_gm_id
+msgid ""
+"Approves the GM step of time off, loan and commission requests for this "
+"department. Leave empty to inherit the parent department's GM, then the "
+"company default."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_users__x_assistant_ids
+msgid "Assistants"
+msgstr ""
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.hr_employee_view_form_bank_accounts
+msgid "Bank Accounts"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__birthday
+msgid "Birthday"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__changed_by_id
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_ksw_user_group_log_search
+msgid "Changed By"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model,name:KSW_base_security.model_res_company
+msgid "Companies"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model,name:KSW_base_security.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__contract_date_end
+msgid "Contract End Date"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__contract_date_start
+msgid "Contract Start Date"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__contract_template_id
+msgid "Contract Template"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__contract_type_id
+msgid "Contract Type"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__contract_wage
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__contract_wage
+msgid "Contract Wage"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__country_code
+msgid "Country Code"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__currency_id
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__currency_id
+msgid "Currency"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__exceptional_location_id
+msgid "Current"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__current_leave_state
+msgid "Current Time Off Status"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__current_leave_id
+msgid "Current Time Off Type"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_users__x_effective_managers_display
+msgid "Currently Assists"
+msgstr ""
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_users_form_ksw_manager_assistant
+msgid "Currently assists:"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__da
+msgid "DA"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__date
+msgid "Date"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__date_end
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__date_end
+msgid "Date End"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__date_start
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__date_start
+msgid "Date Start"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__date_version
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__date_version
+msgid "Date Version"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__da
+msgid "Dearness allowance"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_company__x_default_gm_id
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_config_settings__x_default_gm_id
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.res_config_settings_view_form_gm
+msgid "Default General Manager"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__schedule_pay
+msgid "Defines the frequency of the wage payment."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model,name:KSW_base_security.model_hr_department
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__department_id
+msgid "Department"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__departure_date
+msgid "Departure Date"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__departure_reason_id
+msgid "Departure Reason"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__children
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__children
+msgid "Dependent Children"
+msgstr ""
+
+#. module: KSW_base_security
+#. odoo-javascript
+#: code:addons/KSW_base_security/static/src/js/form_no_autosave.js:0
+msgid "Discard changes"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_department__display_name
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__display_name
+#: model:ir.model.fields,field_description:KSW_base_security.field_ir_mail_server__display_name
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__display_name
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_company__display_name
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_groups__display_name
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_users__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_department__x_effective_accountant_ids
+msgid "Effective Accounting Approvers"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_department__x_effective_gm_id
+msgid "Effective GM"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__emergency_contact
+msgid "Emergency Contact"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__emergency_phone
+msgid "Emergency Phone"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model,name:KSW_base_security.model_hr_employee
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__employee_id
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__employee_id
+#: model:res.groups,name:KSW_base_security.group_hr_attendance_employee_subordinate
+#: model:res.groups,name:KSW_base_security.group_hr_employee_subordinate
+msgid "Employee"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__type_id
+msgid "Employee Category"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model,name:KSW_base_security.model_hr_version
+msgid "Employee Contract"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__employee_type
+msgid "Employee Type"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__version_ids
+msgid "Employee Versions"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__type_id
+msgid "Employee category"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__wage
+msgid "Employee's monthly gross wage."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__resource_calendar_id
+msgid "Employee's working schedule."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__contract_date_end
+msgid "End date of the contract (if it's a fixed-term contract)."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__trial_date_end
+msgid "End date of the trial period (if there is one)."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__trial_date_end
+msgid "End of Trial Period"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__identification_id
+msgid ""
+"Enter the employee's National Identification Number issued by the government"
+" (e.g., Aadhaar, SIN, NIN). This is used for official records and statutory "
+"compliance."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields.selection,name:KSW_base_security.selection__hr_version__sex__female
+msgid "Female"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__leave_date_from
+msgid "From Date"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__sex
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__sex
+msgid "Gender"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_department__x_gm_id
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.hr_department_view_tree_gm
+msgid "General Manager"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields.selection,name:KSW_base_security.selection__ksw_user_group_log__action__added
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_ksw_user_group_log_search
+msgid "Granted"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_ksw_user_group_log__is_implied
+msgid ""
+"Granted or revoked through another group that implies it, not ticked "
+"directly on the user."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields.selection,name:KSW_base_security.selection__ksw_user_group_log__source__group
+msgid "Group form"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__hr_responsible_id
+msgid "HR Responsible"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__hra
+msgid "HRA"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_users__x_has_manager_assistant_right
+msgid "Has Manager Assistant Right"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__distance_home_work
+msgid "Home-Work Distance"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__km_home_work
+msgid "Home-Work Distance in Km"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__distance_home_work_unit
+msgid "Home-Work Distance unit"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__hra
+msgid "House rent allowance."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_department__id
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__id
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__id
+#: model:ir.model.fields,field_description:KSW_base_security.field_ir_mail_server__id
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__id
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_company__id
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_config_settings__id
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_groups__id
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_users__id
+msgid "ID"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__identification_id
+msgid "Identification No"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__active_employee
+msgid ""
+"If the active field is set to False, it will allow you to hide the resource "
+"record without removing it."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__is_implied
+msgid "Implied"
+msgstr ""
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.hr_department_view_form_gm
+msgid "Inherited from the parent department"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__is_current
+msgid "Is Current"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__is_custom_job_title
+msgid "Is Custom Job Title"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__is_flexible
+msgid "Is Flexible"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__is_fully_flexible
+msgid "Is Fully Flexible"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__is_future
+msgid "Is Future"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__is_in_contract
+msgid "Is In Contract"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__is_past
+msgid "Is Past"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__job_id
+msgid "Job"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__job_title
+msgid "Job Title"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__last_modified_uid
+msgid "Last Modified by"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__last_modified_date
+msgid "Last Modified on"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__legal_name
+msgid "Legal Name"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model,name:KSW_base_security.model_ir_mail_server
+msgid "Mail Server"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields.selection,name:KSW_base_security.selection__hr_version__sex__male
+msgid "Male"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:res.groups,name:KSW_base_security.group_manager_assistant
+msgid "Manager Assistant"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:res.groups.privilege,name:KSW_base_security.privilege_manager_delegation
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_users_form_ksw_manager_assistant
+msgid "Manager Delegation"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_res_users__x_assisted_manager_ids
+msgid "Managers I Assist"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_res_users__x_assisted_manager_ids
+msgid ""
+"Managers whose direct reports this user may prepare time off and loan "
+"requests for. Has no effect unless this user also holds the 'Manager "
+"Assistant' access right."
+msgstr ""
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_ksw_user_group_log_search
+msgid "Manual changes"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__marital
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__marital
+msgid "Marital Status"
+msgstr ""
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.res_config_settings_view_form_gm
+msgid ""
+"May approve the accounting step of time off for departments with no "
+"Accounting Approvers of their own, and for employees with no department. Any"
+" one of them can clear the step."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_res_config_settings__x_default_accountant_ids
+msgid ""
+"May approve the accounting step of time off for employees whose department "
+"has no Accounting Approvers of its own (and for employees with no department"
+" at all)."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_res_company__x_default_accountant_ids
+msgid ""
+"May approve the accounting step of time off for employees whose department "
+"has no Accounting Approvers of its own (and for employees with no department"
+" at all). A team, not one manager: any one of them can clear the step."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_department__x_accountant_ids
+msgid ""
+"May approve the accounting step of time off requests for this department. "
+"Any one of them can clear the step. Leave empty to inherit the parent "
+"department's accountants, then the company default accounting team."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__meal_allowance
+msgid "Meal Allowance"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__meal_allowance
+msgid "Meal allowance"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__medical_allowance
+msgid "Medical Allowance"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__medical_allowance
+msgid "Medical allowance"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__member_of_department
+msgid "Member of department"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields.selection,name:KSW_base_security.selection__ksw_user_group_log__source__module
+msgid "Module install/upgrade"
+msgstr ""
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_users_form_ksw_manager_assistant
+msgid "My Assistants"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__country_id
+msgid "Nationality (Country)"
+msgstr ""
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_users_form_ksw_manager_assistant
+msgid "Only needed for managers this user does NOT report to..."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields.selection,name:KSW_base_security.selection__hr_version__sex__other
+msgid "Other"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__other_allowance
+msgid "Other Allowance"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__other_allowance
+msgid "Other allowances"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__passport_expiration_date
+msgid "Passport Expiration Date"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__passport_id
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__passport_id
+msgid "Passport No"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__permit_no
+msgid "Permit No"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__hr_responsible_id
+msgid "Person responsible for validating the employee's contracts."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:res.groups,comment:KSW_base_security.group_manager_assistant
+msgid ""
+"Prepare and edit time off and loan requests on behalf of the direct reports "
+"of the managers who listed this user as their assistant. Can never approve "
+"or refuse a request. May delete a request they prepared only while it is "
+"still awaiting the manager's own first approval — the window closes the "
+"moment the manager (or the first KSW chain step) acts."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__private_city
+msgid "Private City"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__private_country_id
+msgid "Private Country"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__private_email
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__private_email
+msgid "Private Email"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__private_phone
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__private_phone
+msgid "Private Phone"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__private_state_id
+msgid "Private State"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__private_street
+msgid "Private Street"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__private_street2
+msgid "Private Street2"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__private_zip
+msgid "Private Zip"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields.selection,name:KSW_base_security.selection__ksw_user_group_log__action__removed
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_ksw_user_group_log_search
+msgid "Revoked"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__ruleset_id
+msgid "Ruleset"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__ssnid
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__ssnid
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_employee_filter_add_ssnid
+msgid "SSN No"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__structure_type_id
+msgid "Salary Structure Type"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__schedule_pay
+msgid "Scheduled Pay"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__contract_template_id
+msgid ""
+"Select a contract template to auto-fill the contract form with predefined "
+"values. You can still edit the fields as needed after applying the template."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__ssnid
+#: model:ir.model.fields,help:KSW_base_security.field_hr_version__ssnid
+msgid "Social Security Number"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__source
+msgid "Source"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__spouse_birthdate
+msgid "Spouse Birthdate"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__spouse_complete_name
+msgid "Spouse Legal Name"
+msgstr ""
+
+#. module: KSW_base_security
+#. odoo-javascript
+#: code:addons/KSW_base_security/static/src/js/form_no_autosave.js:0
+msgid "Stay here"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:res.groups,name:KSW_base_security.group_hr_attendance_supervisor
+#: model:res.groups,name:KSW_base_security.group_hr_employee_supervisor
+msgid "Supervisor"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:res.groups,name:KSW_base_security.group_hr_attendance_supervisor_cascading
+#: model:res.groups,name:KSW_base_security.group_hr_employee_supervisor_cascading
+msgid "Supervisor Cascading"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_res_users__x_has_manager_assistant_right
+msgid "Technical: drives the delegation banners on the user form."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_department__x_effective_gm_id
+msgid ""
+"Technical: the GM actually responsible for this department once the parent "
+"departments and the company default have been taken into account. Record "
+"rules and approval guards read this, never x_gm_id."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_department__x_effective_accountant_ids
+msgid ""
+"Technical: the accounting approvers actually responsible for this department"
+" once the parent departments and the company default have been taken into "
+"account. Record rules and approval guards read this, never x_accountant_ids."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__country_code
+msgid ""
+"The ISO country code in two chars. \n"
+"You can use this field for quick search."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_res_users__x_effective_managers_display
+msgid ""
+"The managers whose teams this user can actually prepare requests for right "
+"now, automatic and explicit combined."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:res.groups,comment:KSW_base_security.group_hr_attendance_employee_subordinate
+msgid ""
+"The user will be able to view their own and their subordinates' attendances."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:res.groups,comment:KSW_base_security.group_hr_employee_subordinate
+msgid ""
+"The user will be able to view their own and their subordinates' employee "
+"profiles."
+msgstr ""
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_users_form_ksw_manager_assistant
+msgid ""
+"These delegations are inactive: this user does not hold\n"
+"                        the <b>Manager Assistant</b> access right. Grant it under\n"
+"                        <b>Access Rights → Manager Delegation</b>."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__exceptional_location_id
+msgid "This is the exceptional, non-weekly, location set for today."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__sex
+#: model:ir.model.fields,help:KSW_base_security.field_hr_version__sex
+msgid "This is the legal sex recognized by the state."
+msgstr ""
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_users_form_ksw_manager_assistant
+msgid ""
+"This user holds the <b>Manager Assistant</b> access right\n"
+"                        but assists nobody, so it currently does nothing. Their\n"
+"                        own manager is picked up automatically — set\n"
+"                        <b>Manager</b> on their employee record, or name the\n"
+"                        manager(s) explicitly below."
+msgstr ""
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_ksw_user_group_log_search
+msgid "Ticked directly"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__allocations_count
+msgid "Total number of allocations"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__allocation_count
+msgid "Total number of days allocated."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__travel_allowance
+msgid "Travel Allowance"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__travel_allowance
+msgid "Travel allowance"
+msgstr ""
+
+#. module: KSW_base_security
+#. odoo-javascript
+#: code:addons/KSW_base_security/static/src/js/form_no_autosave.js:0
+msgid "Unsaved changes"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model,name:KSW_base_security.model_res_users
+#: model:ir.model.fields,field_description:KSW_base_security.field_ksw_user_group_log__user_id
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_ksw_user_group_log_search
+msgid "User"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model,name:KSW_base_security.model_ksw_user_group_log
+msgid "User Access Right Change"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields.selection,name:KSW_base_security.selection__ksw_user_group_log__source__create
+msgid "User created"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields.selection,name:KSW_base_security.selection__ksw_user_group_log__source__user
+msgid "User form"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_res_users__x_assistant_ids
+msgid ""
+"Users allowed to PREPARE time off and loan requests for this manager's "
+"direct reports. They can never approve any step. Has no effect unless the "
+"assistant also holds the 'Manager Assistant' access right."
+msgstr ""
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_users_form_ksw_manager_assistant
+msgid "Users who may prepare requests for this user's team..."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__version_id
+msgid "Version"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__versions_count
+msgid "Versions Count"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__visa_expire
+msgid "Visa Expiration Date"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__visa_expire
+msgid "Visa Expire"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__visa_no
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__visa_no
+msgid "Visa No"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__wage
+msgid "Wage"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,help:KSW_base_security.field_hr_employee__member_of_department
+msgid ""
+"Whether the employee is a member of the active user's department or one of "
+"it's child department."
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__address_id
+msgid "Work Address"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__work_location_id
+msgid "Work Location"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__work_permit_expiration_date
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_version__work_permit_expiration_date
+msgid "Work Permit Expiration Date"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__permit_no
+msgid "Work Permit No"
+msgstr ""
+
+#. module: KSW_base_security
+#: model:ir.model.fields,field_description:KSW_base_security.field_hr_employee__resource_calendar_id
+msgid "Working Hours"
+msgstr ""
+
+#. module: KSW_base_security
+#. odoo-javascript
+#: code:addons/KSW_base_security/static/src/js/form_no_autosave.js:0
+msgid ""
+"You have unsaved changes. Are you sure you want to leave without saving? "
+"Your changes will be discarded."
+msgstr ""
+
+#. module: KSW_base_security
+#: model_terms:ir.ui.view,arch_db:KSW_base_security.view_users_form_ksw_manager_assistant
+msgid "— and can prepare requests for their direct reports."
+msgstr ""

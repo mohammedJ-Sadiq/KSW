@@ -6,16 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-15 12:11+0000\n"
-"PO-Revision-Date: 2026-07-15 12:11+0000\n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:59+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar_001\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
-"X-Generator: KSW ar-engine v2\n"
+"Plural-Forms: \n"
 
 #. module: KSW_leave_approval
 #: model:ir.model,name:KSW_leave_approval.model_res_company
@@ -47,11 +46,39 @@ msgid "HR Leave Manager"
 msgstr "مدير إجازات الموارد البشرية"
 
 #. module: KSW_leave_approval
+#. odoo-python
+#: code:addons/KSW_leave_approval/models/hr_leave.py:0
+msgid "HR Leave Manager is not configured in settings."
+msgstr "لم يتم إعداد مدير إجازات الموارد البشرية في الإعدادات."
+
+#. module: KSW_leave_approval
 #: model:ir.model.fields,field_description:KSW_leave_approval.field_hr_leave__id
 #: model:ir.model.fields,field_description:KSW_leave_approval.field_res_company__id
 #: model:ir.model.fields,field_description:KSW_leave_approval.field_res_config_settings__id
 msgid "ID"
 msgstr "المعرف"
+
+#. module: KSW_leave_approval
+#. odoo-python
+#: code:addons/KSW_leave_approval/models/hr_leave.py:0
+msgid ""
+"No direct manager user found for %s. Please assign a manager with a linked "
+"user to this employee."
+msgstr ""
+"لم يعثر على مستخدم مدير مباشر ل %s. يرجى إسناد مدير لديه مستخدم مرتبط لهذا "
+"الموظف."
+
+#. module: KSW_leave_approval
+#. odoo-python
+#: code:addons/KSW_leave_approval/models/hr_leave.py:0
+msgid "Only the configured HR Manager (%s) can give the final approval."
+msgstr "فقط مدير الموارد البشرية المعد (%s) يمكنه منح الاعتماد النهائي."
+
+#. module: KSW_leave_approval
+#. odoo-python
+#: code:addons/KSW_leave_approval/models/hr_leave.py:0
+msgid "Only the direct manager (%s) can approve this step."
+msgstr "فقط المدير المباشر (%s) يمكنه اعتماد هذه الخطوة."
 
 #. module: KSW_leave_approval
 #: model:ir.model.fields,help:KSW_leave_approval.field_res_company__x_hr_leave_manager_id
@@ -68,3 +95,11 @@ msgstr "الإجازات"
 #: model_terms:ir.ui.view,arch_db:KSW_leave_approval.res_config_settings_view_form
 msgid "Time Off Approval"
 msgstr "اعتماد الإجازات"
+
+#. module: KSW_leave_approval
+#. odoo-python
+#: code:addons/KSW_leave_approval/models/hr_leave.py:0
+msgid ""
+"Time off request must be confirmed (\"To Approve\") in order to approve it."
+msgstr ""
+"يجب أن يتم تأكيد طلب الإجازة (\"بانتظار الموافقة\") حتى تتم الموافقة عليه. "

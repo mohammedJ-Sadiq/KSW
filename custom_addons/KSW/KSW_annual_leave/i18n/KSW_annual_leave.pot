@@ -1,0 +1,2273 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_annual_leave
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_absent_days_wizard__entitlement_days
+msgid "21 days if < 5 years, 30 days if ≥ 5 years."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_ksw_annual_leave__daily_rate
+msgid "21/365 for the first 5 years, 30/365 after that."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_bal_daily_rate
+msgid ""
+"21/365 for the first five years of service, 30/365 after that (Saudi Labour "
+"Law Art. 109)."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:mail.template,body_html:KSW_annual_leave.mail_template_return_punch_unconfirmed
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p>Dear <t t-out=\"object.employee_id.name or ''\"/>,</p>\n"
+"                    <p>\n"
+"                        Your attendance has been recorded\n"
+"                        <t t-if=\"ctx.get('ksw_punch_date')\">\n"
+"                            on <t t-out=\"ctx.get('ksw_punch_date')\"/>\n"
+"                        </t>,\n"
+"                        but the system still shows you as being on vacation\n"
+"                        (<t t-out=\"object.request_date_from\"/> →\n"
+"                        <t t-out=\"object.request_date_to\"/>).\n"
+"                    </p>\n"
+"                    <p>\n"
+"                        Your direct manager<t t-if=\"object.employee_id.leave_manager_id\">,\n"
+"                        <b t-out=\"object.employee_id.leave_manager_id.name\"/>,</t>\n"
+"                        still needs to confirm the date you actually returned\n"
+"                        to work.\n"
+"                    </p>\n"
+"                    <p>\n"
+"                        <b>Until this is confirmed your monthly payslip cannot\n"
+"                        be processed.</b> Please ask your manager to open your\n"
+"                        time off request and press <b>Confirm Return</b>.\n"
+"                    </p>\n"
+"                    <br/>\n"
+"                    Best Regards,\n"
+"                    <br/>\n"
+"                    HR Department\n"
+"                    <br/>\n"
+"                </div>\n"
+"            "
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.opening_balance_wizard_view_form
+msgid ""
+"<strong>Go-Live Baseline Setup</strong><br/>\n"
+"                        For each employee, enter their last vacation return date as the\n"
+"                        <em>Opening Reset Date</em>. From that date, the system will treat\n"
+"                        the employee's balance as starting from zero (plus any extra carry-over\n"
+"                        days you specify). All annual leaves validated on or after this date\n"
+"                        will be tracked automatically by the system."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_acc_approved_by
+msgid "ACC Approved By"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_acc_approved_date
+msgid "ACC Approved On"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_excess_days_accepted
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Accept Excess as Unpaid"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ksw.leave.return.step,name:KSW_annual_leave.return_step_pending_acc
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Accounting"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:res.groups,name:KSW_annual_leave.group_annual_leave_acc
+msgid "Accounting Approver"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.ksw_annual_leave_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_absent_days_wizard_form
+msgid "Accrual"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_bal_accrued_since_start
+msgid "Accrued since Effective Start"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_bal_total_accrued
+msgid ""
+"Accrued since effective start plus the opening extra days. Gross entitlement"
+" — leaves taken are not deducted here."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__message_needaction
+msgid "Action Needed"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Actual Days Away"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_actual_vacation_days
+msgid "Actual Vacation Days"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Additional Commissions Detail"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Additional Deductions Detail"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.ksw_annual_leave_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.ksw_annual_leave_view_list
+msgid "Allocation"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Allowances & Loans"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_commission_line__amount
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_deduction_line__amount
+msgid "Amount"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_absent_days_wizard__entitlement_days
+msgid "Annual Entitlement"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.actions.act_window,name:KSW_annual_leave.action_ksw_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_gm_return_approver_wizard__leave_id
+#: model:ir.ui.menu,name:KSW_annual_leave.menu_ksw_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_graph_ksw_annual
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_pivot_ksw_annual
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.ksw_annual_leave_view_form
+msgid "Annual Leave"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:res.groups.privilege,name:KSW_annual_leave.privilege_annual_leave_approval
+msgid "Annual Leave Approval"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_absent_days_wizard_form
+msgid "Annual Leave Balance"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model,name:KSW_annual_leave.model_ksw_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.ksw_annual_leave_view_list
+msgid "Annual Leave Dashboard"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.actions.act_window,name:KSW_annual_leave.hr_leave_action_annual_pivot
+msgid "Annual Leave Overview"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields.selection,name:KSW_annual_leave.selection__hr_leave_type__leave_validation_type__annual_multi
+msgid "Annual Leave – Multi-Step Approval"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_annual_portion_days
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Annual Portion (Days)"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_balance_at_request
+msgid ""
+"Annual leave balance available when this request was made. For validated "
+"leaves, reconstructed by adding back the days deducted by this leave."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.opening_balance_wizard_view_form
+msgid "Apply Opening Balances"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_annual_approval_state
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_search_inherit_annual_return
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_tree_inherit_annual_return
+msgid "Approval Progress"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields.selection,name:KSW_annual_leave.selection__hr_leave__x_annual_approval_state__approved
+msgid "Approved"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_bal_leaves_taken
+msgid ""
+"Approved annual leave days already consumed, from the linked allocation."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_opening_balance_wizard_line__opening_reset_date
+msgid ""
+"As of this date, the balance is treated as starting from zero (plus any "
+"extra days below). Typically the employee's last vacation return date."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__message_attachment_count
+msgid "Attachment Count"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_attachment_ids
+msgid "Attachments"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model,name:KSW_annual_leave.model_hr_attendance
+msgid "Attendance"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_absent_days_wizard__annual_leave_balance
+msgid "Available Balance"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ksw.leave.return.step,name:KSW_annual_leave.return_step_confirm
+msgid "Back to Approval"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_clearance_balance
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Balance Consumed"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_balance_at_request
+msgid "Balance at Request"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Balance at Request (Days)"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_eos_resignation_amount
+msgid "Base EOS — Resignation (Art. 85, Unadjusted)"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_eos_termination_amount
+msgid "Base EOS — Termination (Art. 84, Unadjusted)"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_eos_service_years
+msgid "Base Service Years (Unadjusted)"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.ksw_annual_leave_view_form
+msgid "Baseline"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.opening_balance_wizard_view_form
+msgid "Bulk Opening Balance Setup"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model,name:KSW_annual_leave.model_opening_balance_wizard
+msgid "Bulk Opening Balance Wizard"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_can_edit_return_date
+msgid "Can Amend Return Date"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_can_open_balance_record
+msgid "Can Open Balance Record"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_can_refresh_balance
+msgid "Can Refresh Balance"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:res.groups,comment:KSW_annual_leave.group_annual_leave_acc
+msgid ""
+"Can approve annual leave requests at the accounting step (additional "
+"commissions, remaining loans), for the departments they are set as "
+"Accounting Approver of."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:res.groups,comment:KSW_annual_leave.group_annual_leave_gm
+msgid ""
+"Can perform Initial and Final approval of annual leave requests, for the "
+"departments they are set as General Manager of."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:res.groups,comment:KSW_annual_leave.group_annual_leave_hr
+msgid ""
+"Can perform the HR step of annual leave approval (penalty / iqama renewal / "
+"flight ticket)."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.opening_balance_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_gm_return_approver_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_hr_confirm_signature_wizard_form
+msgid "Cancel"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave_type__is_annual_leave
+msgid "Check this box if this leave type represents annual leave."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_absent_days_wizard_form
+msgid "Close"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_leave_return_step__code
+msgid "Code"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_commission_line_ids
+msgid "Commission Lines"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.actions.act_window,name:KSW_annual_leave.action_ksw_hr_confirm_signature_wizard
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_hr_confirm_signature_wizard_form
+msgid "Confirm Signed Vacation Form"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Confirmed By"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:res.groups,comment:KSW_annual_leave.group_leave_self
+msgid "Create, view, edit and delete one's own leave requests only."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_absent_days_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_commission_line__create_uid
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_deduction_line__create_uid
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__create_uid
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_gm_return_approver_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_hr_confirm_signature_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_leave_return_step__create_uid
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_absent_days_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_commission_line__create_date
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_deduction_line__create_date
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__create_date
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_gm_return_approver_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_hr_confirm_signature_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_leave_return_step__create_date
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__current_balance
+msgid "Current Balance"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_gm_return_approver_wizard__current_state_label
+msgid "Current State Label"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_gm_return_approver_wizard_form
+msgid "Currently At"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_is_on_vacation
+msgid "Currently On Vacation"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "DM"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_dm_approved_by
+msgid "DM Approved By"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_dm_approved_date
+msgid "DM Approved On"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_bal_daily_rate
+msgid "Daily Accrual Rate"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__daily_rate
+msgid "Daily Rate"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Date"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_absent_days_wizard__annual_leave_taken
+msgid "Days Taken (All Time)"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_bal_accrued_since_start
+msgid ""
+"Days earned by daily accrual since the effective start date, excluding any "
+"manual opening adjustment."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model,name:KSW_annual_leave.model_hr_department
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__department_id
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__department_id
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.ksw_annual_leave_view_search
+msgid "Department"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_gm_return_approver_wizard_form
+msgid "Describe what needs to be corrected..."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_deduction_line__name
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Description"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Details..."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ksw.leave.return.step,name:KSW_annual_leave.return_step_pending_dm
+msgid "Direct Manager"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_absent_days_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_attendance__display_name
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_department__display_name
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__display_name
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_commission_line__display_name
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_deduction_line__display_name
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_type__display_name
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_version__display_name
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__display_name
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_gm_return_approver_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_hr_confirm_signature_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_leave_return_step__display_name
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave_commission_line__name
+msgid "E.g. \"January 2026\", \"Feb 2026 bonus\", etc."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave_deduction_line__name
+msgid "E.g. \"Uniform cost\", \"Traffic fine Jan 2026\", etc."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.constraint,message:KSW_annual_leave.constraint_ksw_leave_return_step_code_uniq
+msgid "Each return step must have a unique code."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.ksw_annual_leave_view_list
+msgid "Effective Start"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_bal_effective_start_date
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__x_effective_start_date
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.ksw_annual_leave_view_form
+msgid "Effective Start Date"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_absent_days_wizard__employee_id
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__employee_id
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__employee_id
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.ksw_annual_leave_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_absent_days_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_gm_return_approver_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_hr_confirm_signature_wizard_form
+msgid "Employee"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_tree_inherit_annual_return
+msgid "Employee Alerted"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model,name:KSW_annual_leave.model_hr_version
+msgid "Employee Contract"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_gm_return_approver_wizard__employee_name
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_hr_confirm_signature_wizard__employee_name
+msgid "Employee Name"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_return_punch_notified_on
+msgid "Employee Notified of Unconfirmed Return"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard__line_ids
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.opening_balance_wizard_view_form
+msgid "Employees"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.actions.act_window,help:KSW_annual_leave.hr_leave_action_return_confirmation
+msgid ""
+"Employees currently on annual vacation whose return has not\n"
+"                yet been confirmed."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "End-of-Service (Saudi Art. 84–88)"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_exceeds_annual_balance
+msgid "Exceeds Annual Balance"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__opening_extra_days
+msgid "Extra Days"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_hr_confirm_signature_wizard__attachment_filename
+msgid "File Name"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Flight Ticket"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_flight_ticket_amount
+msgid "Flight Ticket Amount"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_flight_ticket_description
+msgid "Flight Ticket Description"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_flight_ticket_amount
+msgid "Flight ticket allowance to add to the vacation payslip (filled by HR)."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__message_follower_ids
+msgid "Followers"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__message_partner_ids
+msgid "Followers (Partners)"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_is_full_clearance
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Full Balance Clearance"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_tree_inherit_annual_return
+msgid "Full Clearance"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:res.groups,comment:KSW_annual_leave.group_leave_officer
+msgid ""
+"Full create/view/edit/delete on every leave request company-wide. Implies "
+"\"Time Off Officer\" for full menu access."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:res.groups,comment:KSW_annual_leave.group_leave_supervisor_cascading
+msgid ""
+"Full create/view/edit/delete on own leaves and those of all subordinates "
+"(recursive, whole sub-tree)."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:res.groups,comment:KSW_annual_leave.group_leave_supervisor
+msgid ""
+"Full create/view/edit/delete on own leaves and those of direct subordinates."
+" Implies \"Time Off Responsible\" so the Approvals menu is visible."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ksw.leave.return.step,name:KSW_annual_leave.return_step_pending_gm_final
+msgid "GM (Final Approval)"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "GM (Final)"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ksw.leave.return.step,name:KSW_annual_leave.return_step_pending_gm_initial
+msgid "GM (Initial Review)"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "GM (Initial)"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:res.groups,name:KSW_annual_leave.group_annual_leave_gm
+msgid "GM Approver"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_gm_final_approved_by
+msgid "GM Final Approved By"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_gm_final_approved_date
+msgid "GM Final Approved On"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_gm_initial_approved_by
+msgid "GM Initial Approved By"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_gm_initial_approved_date
+msgid "GM Initial Approved On"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model,name:KSW_annual_leave.model_ksw_gm_return_approver_wizard
+msgid "GM: Return Annual Leave to Approver"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.actions.server,name:KSW_annual_leave.action_generate_all_annual_leave
+msgid "Generate / Refresh All"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_ksw_annual_leave__x_opening_reset_date
+msgid ""
+"Go-live baseline date. Accrual starts from this date (using the correct "
+"service-tier rate based on total employment duration). Only annual leaves "
+"validated on or after this date are counted against the balance. Leave this "
+"blank to track the full history from the joining date."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_bal_opening_reset_date
+msgid ""
+"Go-live baseline. When set, accrual is counted from this date instead of the"
+" joining date."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_ksw_annual_leave__total_accrued_days
+msgid ""
+"Gross annual leave days accrued since the effective start date (opening "
+"reset date if set, otherwise joining date). Opening extra days are included."
+" Leaves taken are NOT deducted here — see remaining_balance for the net "
+"figure."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "HR"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_hr_approved_by
+msgid "HR Approved By"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_hr_approved_date
+msgid "HR Approved On"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ksw.leave.return.step,name:KSW_annual_leave.return_step_pending_hr
+#: model:res.groups,name:KSW_annual_leave.group_annual_leave_hr
+msgid "HR Approver"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ksw.leave.return.step,name:KSW_annual_leave.return_step_pending_employee_signature
+msgid "HR Confirmation"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_hr_return_confirmed_by
+msgid "HR Confirmed By"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_hr_return_date
+msgid "HR Confirmed On"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model,name:KSW_annual_leave.model_ksw_hr_confirm_signature_wizard
+msgid "HR: Confirm Signed Vacation Form"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__has_message
+msgid "Has Message"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.ksw_annual_leave_view_search
+msgid "Has Opening Reset Date"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_requested_days_display
+msgid ""
+"Human-readable form of Total Days Requested, used next to the request dates "
+"in place of the core Requested duration."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_absent_days_wizard__id
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_attendance__id
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_department__id
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__id
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_commission_line__id
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_deduction_line__id
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_type__id
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_version__id
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__id
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_gm_return_approver_wizard__id
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_hr_confirm_signature_wizard__id
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_leave_return_step__id
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard__id
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__id
+msgid "ID"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_ksw_annual_leave__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_ksw_annual_leave__message_has_error
+#: model:ir.model.fields,help:KSW_annual_leave.field_ksw_annual_leave__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_opening_balance_wizard_line__lock_after_apply
+msgid ""
+"If checked, the opening balance fields will be locked for this employee "
+"after the wizard applies, preventing accidental changes."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_commission_line_ids
+msgid "Individual monthly commission entries (filled by Accounting)."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_deduction_line_ids
+msgid "Individual other-deduction entries (filled by Accounting)."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_iqama_renewal_amount
+msgid "Iqama Renewal Amount"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_iqama_renewal_description
+msgid "Iqama Renewal Description"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_iqama_renewal_amount
+msgid "Iqama renewal cost to deduct from the vacation payslip (filled by HR)."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_gm_return_approver_wizard__is_admin_mode
+msgid "Is Admin Mode"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_type__is_annual_leave
+msgid "Is Annual Leave"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_is_annual_leave_type
+msgid "Is Annual Leave Type"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__message_is_follower
+msgid "Is Follower"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_absent_days_wizard__joining_date
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_joining_date
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__joining_date
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Joining Date"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.module.category,name:KSW_annual_leave.module_category_ksw_leaves
+msgid "KSW Leaves"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_last_return_date
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Last Return Date"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_absent_days_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_commission_line__write_uid
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_deduction_line__write_uid
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__write_uid
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_gm_return_approver_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_hr_confirm_signature_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_leave_return_step__write_uid
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_absent_days_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_commission_line__write_date
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_deduction_line__write_date
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__write_date
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_gm_return_approver_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_hr_confirm_signature_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_leave_return_step__write_date
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_eos_last_wage
+msgid "Last Wage (SAR)"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_commission_line__leave_id
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_deduction_line__leave_id
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_hr_confirm_signature_wizard__leave_id
+msgid "Leave"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.ksw_annual_leave_view_form
+msgid "Leave Balance"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model,name:KSW_annual_leave.model_hr_leave_commission_line
+msgid "Leave Commission Line"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:res.groups.privilege,name:KSW_annual_leave.privilege_leave_management
+msgid "Leave Management"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model,name:KSW_annual_leave.model_hr_leave_deduction_line
+msgid "Leave Other Deduction Line"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_gm_return_approver_wizard__leave_period
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_hr_confirm_signature_wizard__leave_period
+msgid "Leave Period"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_gm_return_approver_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_hr_confirm_signature_wizard_form
+msgid "Leave Summary"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_bal_leaves_taken
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__leaves_taken
+msgid "Leaves Taken"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__allocation_id
+msgid "Linked Allocation"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.opening_balance_wizard_view_form
+msgid "Load All Unlocked Employees"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.ksw_annual_leave_view_form
+msgid "Lock"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__lock_after_apply
+msgid "Lock After Apply"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_ksw_annual_leave__x_opening_is_locked
+msgid ""
+"Lock the Opening Reset Date and Opening Extra Days fields after go-live to "
+"prevent accidental changes. A manager can unlock if corrections are needed."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_manager_return_confirmed_by
+msgid "Manager Confirmed By"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_manager_return_date
+msgid "Manager Confirmed On"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_opening_balance_wizard_line__opening_extra_days
+msgid ""
+"Manual carry-over adjustment (positive = grant extra days, negative = reduce"
+" balance)."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_ksw_leave_return_step__code
+msgid ""
+"Matches the x_annual_approval_state value this step returns to (or 'confirm'"
+" for leave types with no KSW chain)."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__message_has_error
+msgid "Message Delivery error"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_gm_return_approver_wizard__reason
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_gm_return_approver_wizard_form
+msgid "Message to Approver"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__message_ids
+msgid "Messages"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.ksw_annual_leave_view_search
+msgid "Missing Joining Date"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_commission_line__name
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Month / Description"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields.selection,name:KSW_annual_leave.selection__hr_leave__x_return_state__not_applicable
+msgid "N/A"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_leave_return_step__name
+msgid "Name"
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid ""
+"No Accounting Approver is set for %(dept)s, so this step cannot be approved."
+" Ask HR to set the department's Accounting Approvers."
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid ""
+"No General Manager is set for %(dept)s, so this step cannot be approved. Ask"
+" HR to set the department's General Manager."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid ""
+"No annual leave balance record exists for this\n"
+"                            employee yet, so there is nothing to break down.\n"
+"                            An HR Approver can create one from\n"
+"                            <strong>Time Off → Management → Annual Leave</strong>."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.actions.act_window,help:KSW_annual_leave.action_ksw_annual_leave
+msgid "No annual leave records yet."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.actions.act_window,help:KSW_annual_leave.hr_leave_action_return_confirmation
+msgid "No pending return confirmations."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__note
+msgid "Note"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Notes"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__message_needaction_counter
+msgid "Number of Actions"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_annual_portion_days
+msgid "Number of days covered by the annual leave balance."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__message_has_error_counter
+msgid "Number of errors"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_unpaid_portion_days
+msgid "Number of excess days treated as unpaid leave."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_ksw_annual_leave__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_ksw_annual_leave__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:res.groups,name:KSW_annual_leave.group_leave_officer
+msgid "Officer"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields.selection,name:KSW_annual_leave.selection__hr_leave__x_return_state__on_vacation
+msgid "On Vacation"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_bal_opening_extra_days
+msgid ""
+"One-time manual adjustment applied at the opening reset date (carry-over "
+"from a prior system, or a negative correction)."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_ksw_annual_leave__x_opening_extra_days
+msgid ""
+"One-time manual balance adjustment added at the opening reset date (e.g. "
+"carry-over days from a manual prior system, or a negative correction). "
+"Positive = extra days granted."
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid "Only %(gm)s, the General Manager of %(dept)s, can approve this step."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.constraint,message:KSW_annual_leave.constraint_ksw_annual_leave_unique_employee
+msgid "Only one annual leave record per employee is allowed."
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid ""
+"Only the Accounting Approvers of %(dept)s can approve this step: %(names)s."
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid ""
+"Oops! %(state)s Time-Off requests can only be deleted by Administrators."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.ksw_annual_leave_view_form
+msgid "Opening Balance (Go-Live Setup)"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model,name:KSW_annual_leave.model_opening_balance_wizard_line
+msgid "Opening Balance Wizard Line"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__x_opening_is_locked
+msgid "Opening Data Locked"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_bal_opening_extra_days
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__x_opening_extra_days
+msgid "Opening Extra Days"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.ksw_annual_leave_view_search
+msgid "Opening Locked"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_bal_opening_reset_date
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__x_opening_reset_date
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__opening_reset_date
+msgid "Opening Reset Date"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Options"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_deduction_line_ids
+msgid "Other Deduction Lines"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_other_deductions
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Other Deductions"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Penalty"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_penalty_amount
+msgid "Penalty Amount"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_penalty_description
+msgid "Penalty Description"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_penalty_amount
+msgid "Penalty amount to deduct from the vacation payslip (filled by HR)."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields.selection,name:KSW_annual_leave.selection__hr_leave__x_annual_approval_state__pending_acc
+msgid "Pending Accounting"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields.selection,name:KSW_annual_leave.selection__hr_leave__x_annual_approval_state__pending_dm
+msgid "Pending DM Approval"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields.selection,name:KSW_annual_leave.selection__hr_leave__x_annual_approval_state__pending_gm_final
+msgid "Pending GM Final"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields.selection,name:KSW_annual_leave.selection__hr_leave__x_annual_approval_state__pending_gm_initial
+msgid "Pending GM Initial"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields.selection,name:KSW_annual_leave.selection__hr_leave__x_annual_approval_state__pending_hr
+msgid "Pending HR Approval"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields.selection,name:KSW_annual_leave.selection__hr_leave__x_annual_approval_state__pending_employee_signature
+msgid "Pending HR Confirmation"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_is_pending_my_action
+msgid "Pending My Action"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_gm_return_approver_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_hr_confirm_signature_wizard_form
+msgid "Period"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave_deduction_line__amount
+msgid "Positive amount. It is deducted from the vacation payslip."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__rating_ids
+msgid "Ratings"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_gm_return_approver_wizard__allowed_step_ids
+msgid "Reachable Steps"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Reason..."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.ksw_annual_leave_view_list
+msgid "Refresh All"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.actions.server,name:KSW_annual_leave.cron_refresh_annual_leave_ir_actions_server
+msgid "Refresh Annual Leave Dashboard"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_bal_remaining
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__remaining_balance
+msgid "Remaining Balance"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_remaining_loans
+msgid "Remaining Loans"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_remaining_loans_description
+msgid "Remaining Loans Description"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_remaining_loans
+msgid ""
+"Remaining loan amount to deduct from the vacation payslip (filled by "
+"Accounting)."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_requested_days_display
+msgid "Requested"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.actions.act_window,name:KSW_annual_leave.hr_leave_action_return_confirmation
+#: model:ir.ui.menu,name:KSW_annual_leave.hr_leave_menu_return_confirmation
+msgid "Return Confirmation"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields.selection,name:KSW_annual_leave.selection__hr_leave__x_return_state__hr_confirmed
+msgid "Return Confirmed"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_return_date
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_tree_inherit_annual_return
+msgid "Return Date"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_gm_return_approver_wizard_form
+msgid "Return Leave for Revision"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_gm_return_approver_wizard_form
+msgid "Return Settings"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_return_state
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_search_inherit_annual_return
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_tree_inherit_annual_return
+msgid "Return Status"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_gm_return_approver_wizard__target_step_id
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_gm_return_approver_wizard_form
+msgid "Return To"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_last_return_date
+msgid ""
+"Return date of the employee most recent annual vacation whose return was "
+"confirmed.  When there is no previous confirmed return, the annual-leave "
+"effective start date is shown instead (the opening reset date if one is set,"
+" otherwise the joining date)."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_gm_return_approver_wizard_form
+msgid "Return for Revision"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.actions.act_window,name:KSW_annual_leave.action_gm_return_approver_wizard
+msgid "Return to Approver"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.ksw_annual_leave_view_search
+msgid "Search Annual Leave"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:res.groups,name:KSW_annual_leave.group_leave_self
+msgid "Self"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_commission_line__sequence
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_deduction_line__sequence
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_leave_return_step__sequence
+msgid "Sequence"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.ksw_annual_leave_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_absent_days_wizard_form
+msgid "Service"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.actions.act_window,name:KSW_annual_leave.action_absent_days_wizard
+#: model:ir.model,name:KSW_annual_leave.model_absent_days_wizard
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_absent_days_wizard_form
+msgid "Service Days Calculator"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_absent_days_wizard__service_years
+msgid "Service Years"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.actions.act_window,name:KSW_annual_leave.action_opening_balance_wizard
+#: model:ir.ui.menu,name:KSW_annual_leave.menu_opening_balance_wizard
+msgid "Setup Opening Balances"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Signature"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_employee_signed_by
+msgid "Signature Confirmed By"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_employee_signed_date
+msgid "Signature Confirmed On"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_hr_confirm_signature_wizard__attachment_file
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_hr_confirm_signature_wizard_form
+msgid "Signed Vacation Form"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__skip_if_locked
+msgid "Skip (Already Locked)"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard__skip_locked
+msgid "Skip Already-Locked Records"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_is_annual_leave_type
+msgid "Stored related field for reliable use in view invisible expressions."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_additional_commissions
+msgid "Sum of all commission lines. Automatically computed."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_other_deductions
+msgid ""
+"Sum of all other-deduction lines. Automatically computed. Deducted from the "
+"vacation payslip."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:res.groups,name:KSW_annual_leave.group_leave_supervisor
+msgid "Supervisor"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:res.groups,name:KSW_annual_leave.group_leave_supervisor_cascading
+msgid "Supervisor Cascading"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Supporting Documents"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_attachment_ids
+msgid ""
+"Supporting documents (penalty notices, flight tickets, accounting documents,"
+" etc.)."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_return_date
+msgid "The actual date the employee returned from annual vacation."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_ksw_annual_leave__allocation_id
+msgid "The auto-managed hr.leave.allocation record."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_opening_balance_wizard_line__current_balance
+msgid ""
+"The current remaining balance from ksw.annual.leave (read-only preview)."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_bal_effective_start_date
+msgid ""
+"The date accrual actually starts from — the opening reset date when one is "
+"set, otherwise the joining date."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_ksw_annual_leave__x_effective_start_date
+msgid ""
+"The date from which accrual and balance counting begins. This is the Opening"
+" Reset Date if set, otherwise the Joining Date."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_joining_date
+msgid ""
+"The employee joining date — the earliest contract start date across all of "
+"the employee versions."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_clearance_balance
+msgid "The full remaining balance consumed by this clearance leave."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_actual_vacation_days
+msgid ""
+"The real number of calendar days the employee is on vacation (from request "
+"dates). Shown when Full Balance Clearance is used."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid ""
+"This re-runs the accrual for this employee and re-syncs the leave "
+"allocation. Continue?"
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid ""
+"This time off request has already been approved by one of the approvers and "
+"can no longer be cancelled. Ask HR to refuse it instead."
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid ""
+"This time off request has already been approved by one of the approvers and "
+"can no longer be deleted. Ask HR to refuse it instead."
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid ""
+"This time off request is already approved and can no longer be %s. Only the "
+"system administrator can do that."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model,name:KSW_annual_leave.model_hr_leave
+msgid "Time Off"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model,name:KSW_annual_leave.model_ksw_leave_return_step
+msgid "Time Off Return Target"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model,name:KSW_annual_leave.model_hr_leave_type
+msgid "Time Off Type"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave_type__leave_validation_type
+msgid "Time Off Validation"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_absent_days_wizard__today_date
+msgid "Today"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Total"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_bal_total_accrued
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__total_accrued_days
+msgid "Total Accrued"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_absent_days_wizard__total_accrued_days
+msgid "Total Accrued Days"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_additional_commissions
+msgid "Total Additional Commissions"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_absent_days_wizard__total_days
+msgid "Total Calendar Days"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Total Commissions"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_requested_days
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Total Days Requested"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_absent_days_wizard__annual_leave_balance
+msgid "Total accrued minus all-time days taken."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_bal_remaining
+msgid "Total accrued minus leaves taken."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_absent_days_wizard__total_accrued_days
+msgid "Total annual leave days accrued from joining date to today."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_ksw_annual_leave__leaves_taken
+msgid ""
+"Total approved annual leave days taken (from linked allocation). When an "
+"opening reset date is set, only leaves after that date are counted (the "
+"allocation date_from is set accordingly)."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_absent_days_wizard__annual_leave_taken
+msgid "Total approved annual leave days taken."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_requested_days
+msgid ""
+"Total calendar days covered by the request dates, whether or not the annual "
+"leave balance pays for all of them.  On combined and full-clearance leaves "
+"this is larger than the duration deducted from the allocation."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_annual_approval_state
+msgid "Tracks the multi-step annual leave approval chain."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_can_refresh_balance
+msgid ""
+"True for HR approvers and Leave Officers, who may re-run the accrual for "
+"this employee."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_can_admin_return
+msgid ""
+"True for the Settings Administrator, who may return a request to any "
+"approval step at any time."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_can_edit_return_date
+msgid ""
+"True for the employee leave manager, who may correct the return date even "
+"after the return has been confirmed."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_opening_balance_wizard_line__skip_if_locked
+msgid "True if the employee's ksw.annual.leave record is already locked."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_can_sign
+msgid "True when the current user may confirm the employee signature step."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_can_dm_approve
+msgid "True when the current user may perform the DM approval step."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_can_open_balance_record
+msgid ""
+"True when the current user may read the underlying annual leave balance "
+"record."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_exceeds_annual_balance
+msgid ""
+"True when the requested calendar days exceed the remaining annual leave "
+"balance.  Set by _compute_duration."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_unpaid_portion_days
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Unpaid Portion (Days)"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_hr_confirm_signature_wizard_form
+msgid "Upload Signed Form"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.ksw_annual_leave_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_absent_days_wizard_form
+msgid "Usage"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.actions.act_window,help:KSW_annual_leave.action_ksw_annual_leave
+msgid ""
+"Use the Generate / Refresh All action to create records for all employees."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:mail.template,name:KSW_annual_leave.mail_template_return_punch_unconfirmed
+msgid "Vacation Return Not Confirmed — Employee Alert"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__validation_type
+msgid "Validation Type"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_search_inherit_annual_return
+msgid "Waiting For Me"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__website_message_ids
+msgid "Website Messages"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_ksw_annual_leave__website_message_ids
+msgid "Website communication history"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_opening_balance_wizard__skip_locked
+msgid ""
+"When checked, employees whose opening balance is already locked will be "
+"silently skipped instead of raising an error."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_excess_days_accepted
+msgid ""
+"When checked, the days exceeding the annual leave balance are treated as "
+"unpaid leave within this same request."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_is_full_clearance
+msgid ""
+"When checked, this leave consumes the entire remaining annual leave balance "
+"instead of only the requested days."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_return_punch_notified_on
+msgid ""
+"When the employee was told that they had punched in while this vacation was "
+"still open. Stamped once per leave so a bulk device sync cannot send the "
+"same alert repeatedly."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_opening_balance_wizard_line__wizard_id
+msgid "Wizard"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_can_acc_approve
+msgid "X Can Acc Approve"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_can_admin_return
+msgid "X Can Admin Return"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_can_confirm_return_hr
+msgid "X Can Confirm Return Hr"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_can_confirm_return_manager
+msgid "X Can Confirm Return Manager"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_can_dm_approve
+msgid "X Can Dm Approve"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_can_gm_final_approve
+msgid "X Can Gm Final Approve"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_can_gm_initial_approve
+msgid "X Can Gm Initial Approve"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_can_gm_return
+msgid "X Can Gm Return"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_can_hr_approve
+msgid "X Can Hr Approve"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_can_sign
+msgid "X Can Sign"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_is_acc_approver
+msgid "X Is Acc Approver"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_is_hr_approver
+msgid "X Is Hr Approver"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_annual_leave__years_of_service
+msgid "Years of Service"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_gm_return_approver_wizard_form
+msgid ""
+"You are returning this request as the system\n"
+"                            administrator. Only the steps the request has\n"
+"                            already passed are listed. Everything the approvers\n"
+"                            entered is kept — only the stamps from the step you\n"
+"                            pick onward are cleared."
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid ""
+"You cannot change %(fields)s on your own time off request %(leave)s. Once an"
+" approver has signed it, the request can only be changed by returning it; "
+"calculated and approver figures are never yours to set."
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid ""
+"You may only prepare requests for the direct reports of the managers you "
+"assist."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:mail.template,subject:KSW_annual_leave.mail_template_return_punch_unconfirmed
+msgid "Your return from vacation has not been confirmed"
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid "Your return from vacation is not confirmed"
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid "cancelled"
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid "days"
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid "deleted"
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid "not set"
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid "refused"
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid "reset to draft"
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid "reversed"
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid "sent back to approval"
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid "this department"
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid "this employee"
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid "your direct manager"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "↩ Return to Approver"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_search_inherit_annual_return
+msgid "⏳ Pending Approval"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "⚠ Combined Leave"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "⚠ Full Clearance"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_search_inherit_annual_return
+msgid "✅ Annual — Fully Approved"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "✅ Approve (Accounting)"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "✅ Approve (DM)"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "✅ Approve (HR)"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_hr_confirm_signature_wizard_form
+msgid "✅ Confirm & Finalise"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "✅ Confirm Return"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "✅ Final Approve (GM)"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "✅ Initial Approve (GM)"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_search_inherit_annual_return
+msgid "✅ Return Confirmed"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_search_inherit_annual_return
+msgid "✍️ Pending Signature"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_search_inherit_annual_return
+msgid "🏖️ Currently On Vacation"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "🏖️ On Vacation"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "💰 Accounting"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "📊 Decision Support"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_search_inherit_annual_return
+msgid "📋 Full Clearance"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "📎 Attachments"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "📜 Approval Trail"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "📝 HR Review"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "🔄 Refresh Balance"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "🔎 Open Balance Record"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "🧮 Balance Calculation"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_leave_attendance_wizard_form
+msgid ""
+"<strong>Attendance Sheet Employee</strong><br/>\n"
+"                        This employee is tracked on a monthly attendance sheet.\n"
+"                        The leave period below covers workdays that are currently\n"
+"                        marked as <em>attended</em>. You can mark them absent now,\n"
+"                        or update the attendance sheet manually later."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_leave_attendance_wizard__affected_months
+msgid "Affected Month(s)"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_leave_attendance_wizard_form
+msgid "Attendance Sheet Impact"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model,name:KSW_annual_leave.model_ksw_leave_attendance_wizard
+msgid "Attendance Sheet Update on Annual Leave DM Approval"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_leave_attendance_wizard_form
+msgid "Attended Workdays in Period"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:res.groups,comment:KSW_annual_leave.group_annual_leave_acc
+msgid ""
+"Can approve annual leave requests at the accounting step (additional "
+"commissions, remaining loans)."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:res.groups,comment:KSW_annual_leave.group_annual_leave_gm
+msgid "Can perform Initial and Final approval of annual leave requests."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_leave_attendance_wizard_form
+msgid "I'll Update Manually"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_leave_attendance_wizard_form
+msgid "Leave Details"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_leave_attendance_wizard_form
+msgid "Leave From"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_leave_attendance_wizard_form
+msgid "Leave To"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_leave_attendance_wizard_form
+msgid "Mark All Absent"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_leave_attendance_wizard_form
+msgid "Month(s) Affected"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_leave_attendance_wizard__date_to
+msgid "Request End Date"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_leave_attendance_wizard__date_from
+msgid "Request Start Date"
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid ""
+"This annual leave has already received final GM approval and can no longer "
+"be refused."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.view_ksw_leave_attendance_wizard_form
+msgid "Update Attendance Sheet"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_leave_attendance_wizard__affected_count
+msgid "Workdays Currently Attended"
+msgstr ""

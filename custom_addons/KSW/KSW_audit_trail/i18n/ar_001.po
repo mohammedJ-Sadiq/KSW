@@ -1,0 +1,260 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_audit_trail
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:59+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar_001\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_audit_trail
+#. odoo-python
+#: code:addons/KSW_audit_trail/models/audited_models.py:0
+msgid "%(what)s updated by %(user)s"
+msgstr "تم تحديث %(what)s بواسطة %(user)s"
+
+#. module: KSW_audit_trail
+#. odoo-python
+#: code:addons/KSW_audit_trail/models/audited_models.py:0
+msgid "%s lines"
+msgstr "%s بنود"
+
+#. module: KSW_audit_trail
+#. odoo-python
+#: code:addons/KSW_audit_trail/models/audited_models.py:0
+msgid "(changed)"
+msgstr "(تم التغيير)"
+
+#. module: KSW_audit_trail
+#. odoo-python
+#: code:addons/KSW_audit_trail/models/audited_models.py:0
+msgid "(empty)"
+msgstr "(فارغ)"
+
+#. module: KSW_audit_trail
+#. odoo-python
+#: code:addons/KSW_audit_trail/models/audited_models.py:0
+msgid "(set)"
+msgstr "(تم التعيين)"
+
+#. module: KSW_audit_trail
+#: model_terms:ir.ui.view,arch_db:KSW_audit_trail.ksw_audit_log_view_search
+msgid "Access Rights"
+msgstr "صلاحيات الوصول"
+
+#. module: KSW_audit_trail
+#: model:ir.actions.act_window,name:KSW_audit_trail.ksw_audit_log_action
+#: model:ir.model,name:KSW_audit_trail.model_ksw_audit_log
+#: model:ir.ui.menu,name:KSW_audit_trail.ksw_audit_log_menu_hr
+#: model:ir.ui.menu,name:KSW_audit_trail.ksw_audit_log_menu_settings
+msgid "Audit Log"
+msgstr "سجل التدقيق"
+
+#. module: KSW_audit_trail
+#. odoo-python
+#: code:addons/KSW_audit_trail/models/ksw_audit_log.py:0
+msgid "Audit log entries cannot be changed."
+msgstr "لا يمكن تعديل قيود سجل التدقيق."
+
+#. module: KSW_audit_trail
+#. odoo-python
+#: code:addons/KSW_audit_trail/models/ksw_audit_log.py:0
+msgid "Audit log entries cannot be deleted."
+msgstr "لا يمكن حذف قيود سجل التدقيق."
+
+#. module: KSW_audit_trail
+#: model:ir.model,name:KSW_audit_trail.model_ksw_audit_mixin
+msgid "Audit trail hooks"
+msgstr "خطافات سجل التدقيق"
+
+#. module: KSW_audit_trail
+#: model:ir.model,name:KSW_audit_trail.model_res_partner_bank
+#: model_terms:ir.ui.view,arch_db:KSW_audit_trail.ksw_audit_log_view_search
+msgid "Bank Accounts"
+msgstr "الحسابات البنكية"
+
+#. module: KSW_audit_trail
+#: model:ir.model.fields.selection,name:KSW_audit_trail.selection__ksw_audit_log__operation__write
+msgid "Changed"
+msgstr "تاريخ التغيير"
+
+#. module: KSW_audit_trail
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_ksw_audit_log__user_id
+#: model_terms:ir.ui.view,arch_db:KSW_audit_trail.ksw_audit_log_view_search
+msgid "Changed By"
+msgstr "تم التغيير بواسطة"
+
+#. module: KSW_audit_trail
+#: model:ir.model.fields.selection,name:KSW_audit_trail.selection__ksw_audit_log__operation__create
+msgid "Created"
+msgstr "أنشئ في"
+
+#. module: KSW_audit_trail
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_ksw_audit_log__create_uid
+msgid "Created by"
+msgstr "أنشئ بواسطة"
+
+#. module: KSW_audit_trail
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_ksw_audit_log__create_date
+msgid "Created on"
+msgstr "أنشئ في"
+
+#. module: KSW_audit_trail
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_ksw_audit_log__date
+msgid "Date"
+msgstr "التاريخ"
+
+#. module: KSW_audit_trail
+#: model:ir.model.fields.selection,name:KSW_audit_trail.selection__ksw_audit_log__operation__unlink
+msgid "Deleted"
+msgstr "تم الحذف"
+
+#. module: KSW_audit_trail
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_hr_version__display_name
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_ksw_audit_log__display_name
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_ksw_audit_mixin__display_name
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_res_partner_bank__display_name
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_res_users__display_name
+msgid "Display Name"
+msgstr "اسم العرض"
+
+#. module: KSW_audit_trail
+#: model:ir.model,name:KSW_audit_trail.model_hr_employee
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_ksw_audit_log__employee_id
+#: model_terms:ir.ui.view,arch_db:KSW_audit_trail.ksw_audit_log_view_search
+msgid "Employee"
+msgstr "الموظف"
+
+#. module: KSW_audit_trail
+#: model:ir.model,name:KSW_audit_trail.model_hr_version
+msgid "Employee Contract"
+msgstr "عقد الموظف"
+
+#. module: KSW_audit_trail
+#: model_terms:ir.ui.view,arch_db:KSW_audit_trail.ksw_audit_log_view_search
+msgid "Employees"
+msgstr "الموظفون"
+
+#. module: KSW_audit_trail
+#: model_terms:ir.actions.act_window,help:KSW_audit_trail.ksw_audit_log_action
+msgid ""
+"Every change to users, employees, contracts and salary bank\n"
+"            accounts appears here. Entries cannot be edited or deleted."
+msgstr ""
+"يظهر هنا كل تغيير على المستخدمين والموظفين والعقود والحسابات البنكية\n"
+"            للرواتب. لا يمكن تعديل القيود أو حذفها."
+
+#. module: KSW_audit_trail
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_ksw_audit_log__field_label
+msgid "Field"
+msgstr "حقل"
+
+#. module: KSW_audit_trail
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_ksw_audit_log__field_name
+msgid "Field (technical)"
+msgstr "الحقل (تقني)"
+
+#. module: KSW_audit_trail
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_hr_employee__id
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_hr_version__id
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_ksw_audit_log__id
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_ksw_audit_mixin__id
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_res_partner_bank__id
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_res_users__id
+msgid "ID"
+msgstr "المُعرف"
+
+#. module: KSW_audit_trail
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_ksw_audit_log__write_uid
+msgid "Last Updated by"
+msgstr "آخر تحديث بواسطة"
+
+#. module: KSW_audit_trail
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_ksw_audit_log__write_date
+msgid "Last Updated on"
+msgstr "آخر تحديث في"
+
+#. module: KSW_audit_trail
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_ksw_audit_log__model
+msgid "Model"
+msgstr "الموديل"
+
+#. module: KSW_audit_trail
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_ksw_audit_log__new_value
+msgid "New Value"
+msgstr "قيمة جديدة"
+
+#. module: KSW_audit_trail
+#. odoo-python
+#: code:addons/KSW_audit_trail/models/audited_models.py:0
+msgid "No"
+msgstr "لا"
+
+#. module: KSW_audit_trail
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_ksw_audit_log__old_value
+msgid "Old Value"
+msgstr "القيمة القديمة"
+
+#. module: KSW_audit_trail
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_ksw_audit_log__operation
+msgid "Operation"
+msgstr "العملية"
+
+#. module: KSW_audit_trail
+#. odoo-python
+#: code:addons/KSW_audit_trail/models/audited_models.py:0
+msgid "Password changed by %s"
+msgstr "تم تغيير كلمة المرور بواسطة %s"
+
+#. module: KSW_audit_trail
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_ksw_audit_log__record_name
+msgid "Record"
+msgstr "السجل"
+
+#. module: KSW_audit_trail
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_ksw_audit_log__res_id
+msgid "Record ID"
+msgstr "معرف السجل"
+
+#. module: KSW_audit_trail
+#: model:ir.model.fields,field_description:KSW_audit_trail.field_ksw_audit_log__model_label
+#: model_terms:ir.ui.view,arch_db:KSW_audit_trail.ksw_audit_log_view_search
+msgid "Record Type"
+msgstr "نوع السجل"
+
+#. module: KSW_audit_trail
+#: model_terms:ir.ui.view,arch_db:KSW_audit_trail.ksw_audit_log_view_search
+msgid "Today"
+msgstr "اليوم"
+
+#. module: KSW_audit_trail
+#: model:ir.model,name:KSW_audit_trail.model_res_users
+msgid "User"
+msgstr "المستخدم"
+
+#. module: KSW_audit_trail
+#: model_terms:ir.ui.view,arch_db:KSW_audit_trail.ksw_audit_log_view_search
+msgid "Users"
+msgstr "المستخدمون"
+
+#. module: KSW_audit_trail
+#. odoo-python
+#: code:addons/KSW_audit_trail/models/audited_models.py:0
+msgid "Yes"
+msgstr "نعم"
+
+#. module: KSW_audit_trail
+#. odoo-python
+#: code:addons/KSW_audit_trail/models/audited_models.py:0
+msgid "changed — see the Audit Log"
+msgstr "تم التغيير — راجع سجل التدقيق"

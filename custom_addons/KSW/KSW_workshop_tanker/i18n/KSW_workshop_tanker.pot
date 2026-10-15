@@ -6,15 +6,56 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-13 12:23+0000\n"
-"PO-Revision-Date: 2026-10-13 12:23+0000\n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:41+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: KSW_workshop_tanker
+#. odoo-python
+#: code:addons/KSW_workshop_tanker/models/fleet_vehicle.py:0
+msgid "%(n)s BAS trucks have no single match in the fleet: %(list)s"
+msgstr ""
+
+#. module: KSW_workshop_tanker
+#. odoo-python
+#: code:addons/KSW_workshop_tanker/models/fleet_vehicle.py:0
+msgid ""
+"%(n)s drivers BAS names are not linked to an employee (set their BAS Driver "
+"Cost Center): %(list)s"
+msgstr ""
+
+#. module: KSW_workshop_tanker
+#. odoo-python
+#: code:addons/KSW_workshop_tanker/models/fleet_vehicle.py:0
+msgid "%(new)s tedders added, %(old)s were already in the fleet."
+msgstr ""
+
+#. module: KSW_workshop_tanker
+#. odoo-python
+#: code:addons/KSW_workshop_tanker/models/fleet_vehicle.py:0
+msgid ""
+"%(updated)s trucks changed driver, %(unchanged)s unchanged (last %(days)s "
+"days of BAS sales)."
+msgstr ""
+
+#. module: KSW_workshop_tanker
+#. odoo-python
+#: code:addons/KSW_workshop_tanker/models/workshop_request.py:0
+msgid ""
+"%s is not one of your vehicles: it is not in your tanker groups and none of "
+"your team drives it."
+msgstr ""
+
+#. module: KSW_workshop_tanker
+#. odoo-python
+#: code:addons/KSW_workshop_tanker/models/workshop_request.py:0
+msgid "%s was sent to the workshop."
+msgstr ""
 
 #. module: KSW_workshop_tanker
 #: model_terms:ir.ui.view,arch_db:KSW_workshop_tanker.view_ksw_workshop_request_form_tanker
@@ -59,14 +100,59 @@ msgid "Driver Differs"
 msgstr ""
 
 #. module: KSW_workshop_tanker
+#. odoo-python
+#: code:addons/KSW_workshop_tanker/models/fleet_vehicle.py:0
+msgid "Drivers updated from BAS"
+msgstr ""
+
+#. module: KSW_workshop_tanker
 #: model:ir.model.fields,field_description:KSW_workshop_tanker.field_ksw_fleet_vehicle__id
 #: model:ir.model.fields,field_description:KSW_workshop_tanker.field_ksw_workshop_request__id
 msgid "ID"
 msgstr ""
 
 #. module: KSW_workshop_tanker
+#: model_terms:ir.ui.view,arch_db:KSW_workshop_tanker.view_ksw_fleet_vehicle_list_bas_driver
+msgid "Import Tedders from BAS"
+msgstr ""
+
+#. module: KSW_workshop_tanker
 #: model:ir.model.fields,field_description:KSW_workshop_tanker.field_ksw_fleet_vehicle__x_bas_driver_date
 msgid "Last Seen in BAS"
+msgstr ""
+
+#. module: KSW_workshop_tanker
+#: model:ir.model.fields,field_description:KSW_workshop_tanker.field_ksw_fleet_vehicle__x_workshop_in_scope
+msgid "My Workshop Vehicle"
+msgstr ""
+
+#. module: KSW_workshop_tanker
+#. odoo-python
+#: code:addons/KSW_workshop_tanker/models/fleet_vehicle.py:0
+msgid "Only a system administrator can import tedders from BAS."
+msgstr ""
+
+#. module: KSW_workshop_tanker
+#. odoo-python
+#: code:addons/KSW_workshop_tanker/models/fleet_vehicle.py:0
+msgid "Only a system administrator can update the drivers from BAS."
+msgstr ""
+
+#. module: KSW_workshop_tanker
+#. odoo-python
+#: code:addons/KSW_workshop_tanker/models/workshop_request.py:0
+msgid "Request submitted"
+msgstr ""
+
+#. module: KSW_workshop_tanker
+#: model_terms:ir.ui.view,arch_db:KSW_workshop_tanker.view_ksw_workshop_request_form_tanker
+msgid "Submit Request"
+msgstr ""
+
+#. module: KSW_workshop_tanker
+#. odoo-python
+#: code:addons/KSW_workshop_tanker/models/fleet_vehicle.py:0
+msgid "Tedders imported from BAS"
 msgstr ""
 
 #. module: KSW_workshop_tanker
@@ -124,70 +210,6 @@ msgid "Workshop Service Request"
 msgstr ""
 
 #. module: KSW_workshop_tanker
-#: model:ir.model.fields,field_description:KSW_workshop_tanker.field_ksw_fleet_vehicle__x_workshop_in_scope
-msgid "My Workshop Vehicle"
-msgstr ""
-
-#. module: KSW_workshop_tanker
 #: model_terms:ir.ui.view,arch_db:KSW_workshop_tanker.view_ksw_workshop_request_form_tanker
 msgid "is not the driver attached to this vehicle. The attached driver is"
-msgstr ""
-
-#. module: KSW_workshop_tanker
-#. odoo-python
-#: code:addons/KSW_workshop_tanker/models/workshop_request.py:0
-msgid ""
-"%s is not one of your vehicles: it is not in your tanker groups and none of "
-"your team drives it."
-msgstr ""
-
-#. module: KSW_workshop_tanker
-#. odoo-python
-#: code:addons/KSW_workshop_tanker/models/fleet_vehicle.py:0
-msgid "Only a system administrator can update the drivers from BAS."
-msgstr ""
-
-#. module: KSW_workshop_tanker
-#. odoo-python
-#: code:addons/KSW_workshop_tanker/models/fleet_vehicle.py:0
-msgid ""
-"%(updated)s trucks changed driver, %(unchanged)s unchanged (last %(days)s "
-"days of BAS sales)."
-msgstr ""
-
-#. module: KSW_workshop_tanker
-#. odoo-python
-#: code:addons/KSW_workshop_tanker/models/fleet_vehicle.py:0
-msgid ""
-"%(n)s drivers BAS names are not linked to an employee (set their BAS Driver "
-"Cost Center): %(list)s"
-msgstr ""
-
-#. module: KSW_workshop_tanker
-#. odoo-python
-#: code:addons/KSW_workshop_tanker/models/fleet_vehicle.py:0
-msgid "%(n)s BAS trucks have no single match in the fleet: %(list)s"
-msgstr ""
-
-#. module: KSW_workshop_tanker
-#. odoo-python
-#: code:addons/KSW_workshop_tanker/models/fleet_vehicle.py:0
-msgid "Drivers updated from BAS"
-msgstr ""
-
-#. module: KSW_workshop_tanker
-#: model_terms:ir.ui.view,arch_db:KSW_workshop_tanker.view_ksw_workshop_request_form_tanker
-msgid "Submit Request"
-msgstr ""
-
-#. module: KSW_workshop_tanker
-#. odoo-python
-#: code:addons/KSW_workshop_tanker/models/workshop_request.py:0
-msgid "Request submitted"
-msgstr ""
-
-#. module: KSW_workshop_tanker
-#. odoo-python
-#: code:addons/KSW_workshop_tanker/models/workshop_request.py:0
-msgid "%s was sent to the workshop."
 msgstr ""

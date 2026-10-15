@@ -16,7 +16,7 @@ DRIVER_GROUP = 'KSW_water_delivery.group_water_driver'
 # worker keys its cache on it, so a bump is how a driver's phone picks up a new
 # version of the app -- there is no other route in, because the whole point is
 # that it does not go to the network to find out.
-APP_VERSION = '1.0.6'
+APP_VERSION = '1.0.7'
 
 
 class KswWaterApp(http.Controller):

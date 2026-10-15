@@ -3,112 +3,267 @@
    no browser chrome, so the top row sits under the notch without it. */
 :root {
     --ksw-blue: #0b5ed7;
+    --ksw-blue-soft: #e8f0fe;
     --ksw-warn: #b45309;
+    --ksw-warn-soft: #fef3c7;
     --ksw-ok: #15803d;
-    --ksw-line: #d7dbe0;
+    --ksw-ok-soft: #dcfce7;
+    --ksw-bad: #b91c1c;
+    --ksw-bad-soft: #fee2e2;
+    --ksw-line: #e2e6ea;
+    --ksw-muted: #6b7280;
+    --ksw-bg: #f3f5f8;
+    --ksw-radius: 12px;
+    --ksw-tabs-h: 64px;
+    --ksw-action-h: 76px;
     color-scheme: light;
 }
 
-* { box-sizing: border-box; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 body {
     margin: 0;
-    font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #f5f6f8;
-    color: #111;
-    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+    font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Arabic", sans-serif;
+    background: var(--ksw-bg);
+    color: #111827;
+    padding-bottom: calc(var(--ksw-tabs-h) + env(safe-area-inset-bottom, 0px));
 }
 
-.ksw-boot { padding: 2rem 1rem; text-align: center; color: #555; }
+button { font: inherit; cursor: pointer; }
 
+/* -- Boot -------------------------------------------------------------- */
+.ksw-boot { padding: 3rem 1.25rem; text-align: center; color: #374151; }
+.ksw-boot h1 { font-size: 1.4rem; margin: 0.5rem 0; }
+.ksw-boot-icon { font-size: 2.6rem; }
+.ksw-boot .ksw-ready { text-align: start; border-radius: var(--ksw-radius); margin-top: 1rem; }
+
+/* -- Header ------------------------------------------------------------ */
 .ksw-top {
     position: sticky;
     top: 0;
     z-index: 5;
     background: #fff;
     border-bottom: 1px solid var(--ksw-line);
-    padding: calc(0.6rem + env(safe-area-inset-top, 0px)) 1rem 0.6rem;
+    padding: calc(0.65rem + env(safe-area-inset-top, 0px)) 1rem 0.65rem;
 }
-.ksw-top-row { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
-.ksw-sub { font-size: 0.82rem; color: #666; margin-top: 0.15rem; }
+.ksw-top-row { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; }
+.ksw-who { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
+.ksw-avatar {
+    flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%;
+    display: grid; place-items: center; background: var(--ksw-blue-soft); font-size: 1.2rem;
+}
+.ksw-driver { font-weight: 700; font-size: 1rem; line-height: 1.2; overflow-wrap: anywhere; }
+.ksw-sub { font-size: 0.82rem; color: var(--ksw-muted); }
+.ksw-text-warn { color: var(--ksw-warn); font-weight: 600; }
+.ksw-top-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.5rem; }
 
-.ksw-chip { font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 999px; }
-.ksw-on { background: #dcfce7; color: var(--ksw-ok); }
-.ksw-off { background: #fee2e2; color: #b91c1c; }
-.ksw-warnchip { background: #fef3c7; color: var(--ksw-warn); }
+.ksw-chip {
+    flex: 0 0 auto; display: inline-flex; align-items: center; gap: 0.35rem;
+    font-size: 0.78rem; font-weight: 600; padding: 0.25rem 0.6rem; border-radius: 999px; white-space: nowrap;
+}
+.ksw-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.ksw-on { background: var(--ksw-ok-soft); color: var(--ksw-ok); }
+.ksw-off { background: var(--ksw-bad-soft); color: var(--ksw-bad); }
+.ksw-warnchip { background: var(--ksw-warn-soft); color: var(--ksw-warn); }
 
-.ksw-banner { padding: 0.7rem 1rem; font-size: 0.9rem; }
-.ksw-ok { background: #dcfce7; color: #14532d; }
-.ksw-warn { background: #fef3c7; color: #78350f; }
+/* -- Messages ---------------------------------------------------------- */
+.ksw-banner { padding: 0.75rem 1rem; font-size: 0.92rem; font-weight: 500; }
+.ksw-ok { background: var(--ksw-ok-soft); color: #14532d; }
+.ksw-warn { background: var(--ksw-warn-soft); color: #78350f; }
 
+/* Offline readiness. Deliberately loud whenever it is not good: the failure
+   this prevents is a driver who believes the app is ready, drives to a site
+   with no coverage, and finds out there. When it IS good it is one quiet line. */
+.ksw-ready { padding: 0.75rem 1rem; font-size: 0.88rem; }
+.ksw-ready-good { background: var(--ksw-ok-soft); color: #14532d; }
+.ksw-ready-warn { background: var(--ksw-warn-soft); color: #78350f; }
+.ksw-ready-bad { background: var(--ksw-bad-soft); color: #7f1d1d; }
+.ksw-ready strong { display: block; margin-bottom: 0.15rem; }
+.ksw-ready .ksw-secondary { margin-top: 0.6rem; }
+.ksw-ready-compact { padding: 0.4rem 1rem; font-size: 0.78rem; font-weight: 500; }
+
+/* -- Layout ------------------------------------------------------------ */
 .ksw-main { padding: 1rem; }
+.ksw-main.ksw-has-action { padding-bottom: calc(var(--ksw-action-h) + 0.5rem); }
 
-.ksw-label { display: block; font-size: 0.8rem; color: #555; margin: 1rem 0 0.25rem; text-transform: uppercase; letter-spacing: 0.02em; }
-.ksw-h2 { font-size: 0.95rem; color: #555; margin: 1.2rem 0 0.5rem; }
+.ksw-label {
+    display: block; font-size: 0.78rem; font-weight: 600; color: var(--ksw-muted);
+    margin: 1.1rem 0 0.4rem; text-transform: uppercase; letter-spacing: 0.04em;
+}
+.ksw-label-row { display: flex; justify-content: space-between; align-items: baseline; }
+.ksw-optional { text-transform: none; font-weight: 400; letter-spacing: 0; }
+.ksw-h2 { font-size: 0.8rem; font-weight: 700; color: var(--ksw-muted); text-transform: uppercase; letter-spacing: 0.04em; margin: 1.3rem 0 0.6rem; }
 
 /* 16px minimum, or iOS zooms the whole page in on focus and the driver loses
    the form behind his own keyboard. */
 .ksw-input {
     width: 100%;
     font-size: 16px;
-    padding: 0.7rem 0.75rem;
+    padding: 0.8rem 0.85rem;
     border: 1px solid var(--ksw-line);
-    border-radius: 8px;
+    border-radius: 10px;
     background: #fff;
+    color: inherit;
 }
-.ksw-row { display: flex; gap: 0.5rem; }
-.ksw-narrow { width: 40%; }
-
-.ksw-list { list-style: none; margin: 0.4rem 0 0; padding: 0; max-height: 45vh; overflow-y: auto; border: 1px solid var(--ksw-line); border-radius: 8px; background: #fff; }
-.ksw-list li + li { border-top: 1px solid #eef0f2; }
-.ksw-list button { width: 100%; text-align: left; padding: 0.8rem 0.75rem; border: 0; background: none; font-size: 1rem; }
-.ksw-off-route { color: var(--ksw-warn); }
-.ksw-empty { padding: 0.8rem 0.75rem; color: #888; }
-
-.ksw-picked { display: flex; justify-content: space-between; align-items: center; background: #fff; border: 1px solid var(--ksw-line); border-radius: 8px; padding: 0.7rem 0.75rem; }
-.ksw-locked { color: #444; background: #f1f2f4; }
-.ksw-check { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.6rem; font-size: 0.88rem; color: #555; }
-
-.ksw-hint { font-size: 0.82rem; color: #555; margin-top: 0.4rem; }
-.ksw-warnbox { margin-top: 0.7rem; padding: 0.7rem; background: #fef3c7; color: #78350f; border-radius: 8px; font-size: 0.88rem; }
-
-.ksw-gps { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; font-size: 0.85rem; padding: 0.6rem 0.75rem; border-radius: 8px; background: #fff; border: 1px solid var(--ksw-line); }
-.ksw-gps-located { border-color: #86efac; color: var(--ksw-ok); }
-.ksw-gps-locating { color: #555; }
-.ksw-gps-denied, .ksw-gps-failed, .ksw-gps-unavailable { border-color: #fcd34d; color: var(--ksw-warn); }
-
-.ksw-primary, .ksw-secondary {
-    display: block; width: 100%; margin-top: 1.2rem;
-    padding: 0.9rem; font-size: 1rem; font-weight: 600;
-    border: 0; border-radius: 10px; background: var(--ksw-blue); color: #fff;
+.ksw-input:focus { outline: 2px solid var(--ksw-blue); outline-offset: -1px; border-color: transparent; }
+.ksw-static {
+    padding: 0.8rem 0.85rem; border-radius: 10px; background: #fff;
+    border: 1px solid var(--ksw-line); font-weight: 500;
 }
-.ksw-primary[disabled] { background: #9aa4b2; }
-.ksw-secondary { width: auto; margin: 0; padding: 0.45rem 0.7rem; font-size: 0.82rem; background: #e5e7eb; color: #111; }
-.ksw-link { border: 0; background: none; color: var(--ksw-blue); font-size: 0.85rem; padding: 0.2rem 0; }
 
-.ksw-sign { width: 100%; height: 180px; background: #fff; border: 1px dashed #9aa4b2; border-radius: 8px; touch-action: none; }
+/* -- GPS status --------------------------------------------------------- */
+.ksw-gps {
+    display: flex; align-items: center; gap: 0.6rem; font-size: 0.88rem;
+    padding: 0.6rem 0.75rem; border-radius: var(--ksw-radius); background: #fff; border: 1px solid var(--ksw-line);
+}
+.ksw-gps-icon { font-size: 1.1rem; }
+.ksw-gps-text { flex: 1; }
+.ksw-gps-located { border-color: #bbf7d0; background: #f0fdf4; color: var(--ksw-ok); }
+.ksw-gps-locating { color: var(--ksw-muted); }
+.ksw-gps-denied, .ksw-gps-failed, .ksw-gps-unavailable { border-color: #fcd34d; background: #fffbeb; color: var(--ksw-warn); }
 
+/* -- Client picker ------------------------------------------------------ */
+.ksw-search-wrap { position: relative; }
+.ksw-search-icon { position: absolute; inset-inline-start: 0.8rem; top: 50%; transform: translateY(-50%); opacity: 0.55; pointer-events: none; }
+.ksw-search { padding-inline-start: 2.4rem; }
+
+.ksw-list {
+    list-style: none; margin: 0.5rem 0 0; padding: 0; max-height: 52vh; overflow-y: auto;
+    border: 1px solid var(--ksw-line); border-radius: var(--ksw-radius); background: #fff;
+}
+.ksw-list li + li { border-top: 1px solid #eef0f3; }
+.ksw-client-row {
+    width: 100%; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+    text-align: start; padding: 0.85rem 0.85rem; border: 0; background: none; color: inherit;
+    min-height: 52px;
+}
+.ksw-client-row:active { background: var(--ksw-blue-soft); }
+.ksw-client-name { flex: 1 1 60%; font-size: 1rem; font-weight: 500; overflow-wrap: anywhere; }
+.ksw-chevron { color: #9ca3af; font-size: 1.4rem; line-height: 1; }
+.ksw-empty { padding: 0.9rem 0.85rem; color: var(--ksw-muted); list-style: none; }
+
+.ksw-tags { display: inline-flex; flex-wrap: wrap; gap: 0.3rem; }
+.ksw-tag {
+    font-size: 0.72rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 999px;
+    background: #f3f4f6; color: #4b5563; white-space: nowrap;
+}
+.ksw-tag-warn { background: var(--ksw-warn-soft); color: var(--ksw-warn); }
+.ksw-tag-info { background: var(--ksw-blue-soft); color: var(--ksw-blue); }
+.ksw-tag-ok { background: var(--ksw-ok-soft); color: var(--ksw-ok); }
+
+.ksw-check { display: flex; gap: 0.6rem; align-items: center; margin-top: 0.75rem; font-size: 0.9rem; color: #374151; }
+.ksw-check input { width: 20px; height: 20px; flex: 0 0 auto; }
+
+/* -- Cards -------------------------------------------------------------- */
 .ksw-cards { list-style: none; margin: 0; padding: 0; }
-.ksw-card { display: flex; flex-direction: column; gap: 0.1rem; background: #fff; border: 1px solid var(--ksw-line); border-radius: 8px; padding: 0.7rem 0.75rem; margin-bottom: 0.5rem; }
-.ksw-card .ksw-sub { font-size: 0.8rem; color: #666; }
-.ksw-pending { border-left: 4px solid var(--ksw-warn); }
-.ksw-held { border-left: 4px solid var(--ksw-warn); }
+.ksw-card {
+    display: flex; flex-direction: column; gap: 0.2rem; background: #fff;
+    border: 1px solid var(--ksw-line); border-radius: var(--ksw-radius);
+    padding: 0.8rem 0.9rem; margin-bottom: 0.6rem;
+}
+.ksw-card-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; }
+.ksw-card-row strong { overflow-wrap: anywhere; }
+.ksw-pending { border-inline-start: 4px solid var(--ksw-warn); }
+.ksw-held { border-inline-start: 4px solid var(--ksw-warn); }
+.ksw-done { border-inline-start: 4px solid var(--ksw-ok); }
 
+.ksw-client-card { flex-direction: row; align-items: center; justify-content: space-between; gap: 0.75rem; margin: 0; }
+.ksw-client-card-main { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
+.ksw-strong { font-weight: 700; font-size: 1.05rem; }
+
+.ksw-allclear {
+    padding: 0.9rem; border-radius: var(--ksw-radius); background: var(--ksw-ok-soft);
+    color: #14532d; font-weight: 500; text-align: center;
+}
+
+/* -- Quantity ----------------------------------------------------------- */
+.ksw-qty-row { display: flex; gap: 0.6rem; align-items: stretch; }
+.ksw-stepper {
+    flex: 1; display: flex; border: 1px solid var(--ksw-line); border-radius: 10px; background: #fff; overflow: hidden;
+}
+.ksw-stepper button {
+    flex: 0 0 52px; border: 0; background: #f3f4f6; font-size: 1.5rem; color: #111827;
+}
+.ksw-stepper button:active { background: #e5e7eb; }
+.ksw-qty {
+    flex: 1; min-width: 0; border: 0; text-align: center; font-size: 1.25rem; font-weight: 700;
+    padding: 0.6rem 0.25rem; background: #fff; color: inherit;
+}
+.ksw-qty:focus { outline: none; background: var(--ksw-blue-soft); }
+.ksw-segment { display: flex; border: 1px solid var(--ksw-line); border-radius: 10px; overflow: hidden; background: #fff; }
+.ksw-segment button { border: 0; background: none; padding: 0 0.95rem; font-weight: 600; color: var(--ksw-muted); }
+.ksw-segment button.active { background: var(--ksw-blue); color: #fff; }
+.ksw-unit { align-self: center; font-weight: 600; color: var(--ksw-muted); padding: 0 0.4rem; }
+
+.ksw-hint { font-size: 0.82rem; color: var(--ksw-muted); margin-top: 0.5rem; }
+.ksw-warnbox {
+    margin-top: 0.75rem; padding: 0.75rem 0.85rem; background: var(--ksw-warn-soft); color: #78350f;
+    border-radius: var(--ksw-radius); font-size: 0.9rem;
+}
+.ksw-warnbox:first-child { margin-top: 0; margin-bottom: 0.75rem; }
+
+/* -- Client location (pin) --------------------------------------------- */
+.ksw-pinbox {
+    margin-top: 0.85rem; padding: 0.95rem; background: #fff; border: 1px solid #bfdbfe;
+    border-radius: var(--ksw-radius); font-size: 0.9rem; display: flex; flex-direction: column; gap: 0.55rem;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+.ksw-pinbox-pending { border-color: #fcd34d; background: #fffbeb; }
+.ksw-pinbox-head { display: flex; align-items: center; gap: 0.55rem; font-size: 1rem; }
+.ksw-pinbox-icon {
+    width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--ksw-blue-soft); font-size: 1.1rem; flex: 0 0 auto;
+}
+.ksw-pinbox-pending .ksw-pinbox-icon { background: var(--ksw-warn-soft); }
+.ksw-pinbox p { margin: 0; color: #374151; }
+.ksw-meter { height: 8px; border-radius: 999px; background: #e5e7eb; overflow: hidden; }
+.ksw-meter span { display: block; height: 100%; background: var(--ksw-blue); transition: width 0.4s; }
+.ksw-spin { animation: ksw-spin 1.6s linear infinite; }
+@keyframes ksw-spin { to { transform: rotate(360deg); } }
+
+/* -- Buttons ------------------------------------------------------------ */
+.ksw-primary, .ksw-secondary {
+    display: block; width: 100%; margin-top: 1.1rem;
+    padding: 0.95rem; font-size: 1.02rem; font-weight: 700;
+    border: 0; border-radius: var(--ksw-radius); background: var(--ksw-blue); color: #fff;
+}
+.ksw-primary:active { filter: brightness(0.92); }
+.ksw-primary[disabled] { background: #9aa4b2; }
+.ksw-primary-warn { background: var(--ksw-warn); }
+.ksw-tight { margin-top: 0.2rem; }
+.ksw-secondary {
+    width: auto; margin: 0; padding: 0.5rem 0.85rem; font-size: 0.85rem; font-weight: 600;
+    background: #e5e7eb; color: #111827; border-radius: 10px;
+}
+.ksw-secondary[disabled] { opacity: 0.55; }
+.ksw-wide { width: 100%; padding: 0.7rem; }
+.ksw-link { border: 0; background: none; color: var(--ksw-blue); font-size: 0.92rem; font-weight: 600; padding: 0.4rem 0.2rem; }
+
+.ksw-sign { width: 100%; height: 180px; background: #fff; border: 1px dashed #9aa4b2; border-radius: 10px; touch-action: none; }
+
+/* The one action of the delivery screen, always reachable above the tabs. */
+.ksw-actionbar {
+    position: fixed; left: 0; right: 0; z-index: 6;
+    bottom: calc(var(--ksw-tabs-h) + env(safe-area-inset-bottom, 0px));
+    padding: 0.6rem 1rem; background: rgba(243, 245, 248, 0.96);
+    border-top: 1px solid var(--ksw-line); backdrop-filter: blur(6px);
+}
+.ksw-actionbar .ksw-primary { margin: 0; }
+
+/* -- Tabs --------------------------------------------------------------- */
 .ksw-tabs {
-    position: fixed; bottom: 0; left: 0; right: 0; display: flex;
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 7; display: flex;
     background: #fff; border-top: 1px solid var(--ksw-line);
     padding-bottom: env(safe-area-inset-bottom, 0px);
 }
-.ksw-tabs button { flex: 1; padding: 1rem 0.5rem; border: 0; background: none; font-size: 0.9rem; color: #555; }
-.ksw-tabs button.active { color: var(--ksw-blue); font-weight: 600; box-shadow: inset 0 2px 0 var(--ksw-blue); }
-
-/* Offline readiness. Deliberately loud and deliberately always visible: the
-   failure this prevents is a driver who believes the app is ready, drives to a
-   site with no coverage, and finds out there. */
-.ksw-ready { padding: 0.7rem 1rem; font-size: 0.85rem; }
-.ksw-ready-good { background: #dcfce7; color: #14532d; }
-.ksw-ready-warn { background: #fef3c7; color: #78350f; }
-.ksw-ready-bad { background: #fee2e2; color: #7f1d1d; }
-.ksw-ready strong { display: block; margin-bottom: 0.15rem; }
-.ksw-ready .ksw-secondary { margin-top: 0.5rem; }
-.ksw-pinbox { margin-top: 0.7rem; padding: 0.7rem; background: #eff6ff; color: #1e3a8a; border: 1px solid #bfdbfe; border-radius: 8px; font-size: 0.88rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.ksw-tabs button {
+    flex: 1; height: var(--ksw-tabs-h); border: 0; background: none; font-size: 0.82rem; font-weight: 600;
+    color: var(--ksw-muted); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.1rem;
+}
+.ksw-tab-icon { font-size: 1.15rem; line-height: 1; }
+.ksw-tab-label { display: inline-flex; align-items: center; white-space: nowrap; }
+.ksw-tabs button.active { color: var(--ksw-blue); box-shadow: inset 0 3px 0 var(--ksw-blue); }
+.ksw-count {
+    display: inline-block; min-width: 1.3rem; padding: 0 0.35rem; margin-inline-start: 0.2rem;
+    border-radius: 999px; background: var(--ksw-warn); color: #fff; font-size: 0.72rem; line-height: 1.3rem;
+}

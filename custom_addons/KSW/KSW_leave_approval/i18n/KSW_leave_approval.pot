@@ -1,0 +1,101 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_leave_approval
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_leave_approval
+#: model:ir.model,name:KSW_leave_approval.model_res_company
+msgid "Companies"
+msgstr ""
+
+#. module: KSW_leave_approval
+#: model:ir.model,name:KSW_leave_approval.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: KSW_leave_approval
+#: model_terms:ir.ui.view,arch_db:KSW_leave_approval.res_config_settings_view_form
+msgid "Configure the global HR Manager for final leave approvals."
+msgstr ""
+
+#. module: KSW_leave_approval
+#: model:ir.model.fields,field_description:KSW_leave_approval.field_hr_leave__display_name
+#: model:ir.model.fields,field_description:KSW_leave_approval.field_res_company__display_name
+#: model:ir.model.fields,field_description:KSW_leave_approval.field_res_config_settings__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: KSW_leave_approval
+#: model:ir.model.fields,field_description:KSW_leave_approval.field_res_company__x_hr_leave_manager_id
+#: model:ir.model.fields,field_description:KSW_leave_approval.field_res_config_settings__x_hr_leave_manager_id
+#: model_terms:ir.ui.view,arch_db:KSW_leave_approval.res_config_settings_view_form
+msgid "HR Leave Manager"
+msgstr ""
+
+#. module: KSW_leave_approval
+#. odoo-python
+#: code:addons/KSW_leave_approval/models/hr_leave.py:0
+msgid "HR Leave Manager is not configured in settings."
+msgstr ""
+
+#. module: KSW_leave_approval
+#: model:ir.model.fields,field_description:KSW_leave_approval.field_hr_leave__id
+#: model:ir.model.fields,field_description:KSW_leave_approval.field_res_company__id
+#: model:ir.model.fields,field_description:KSW_leave_approval.field_res_config_settings__id
+msgid "ID"
+msgstr ""
+
+#. module: KSW_leave_approval
+#. odoo-python
+#: code:addons/KSW_leave_approval/models/hr_leave.py:0
+msgid ""
+"No direct manager user found for %s. Please assign a manager with a linked "
+"user to this employee."
+msgstr ""
+
+#. module: KSW_leave_approval
+#. odoo-python
+#: code:addons/KSW_leave_approval/models/hr_leave.py:0
+msgid "Only the configured HR Manager (%s) can give the final approval."
+msgstr ""
+
+#. module: KSW_leave_approval
+#. odoo-python
+#: code:addons/KSW_leave_approval/models/hr_leave.py:0
+msgid "Only the direct manager (%s) can approve this step."
+msgstr ""
+
+#. module: KSW_leave_approval
+#: model:ir.model.fields,help:KSW_leave_approval.field_res_company__x_hr_leave_manager_id
+#: model:ir.model.fields,help:KSW_leave_approval.field_res_config_settings__x_hr_leave_manager_id
+msgid "The person responsible for the final approval of time off requests."
+msgstr ""
+
+#. module: KSW_leave_approval
+#: model:ir.model,name:KSW_leave_approval.model_hr_leave
+msgid "Time Off"
+msgstr ""
+
+#. module: KSW_leave_approval
+#: model_terms:ir.ui.view,arch_db:KSW_leave_approval.res_config_settings_view_form
+msgid "Time Off Approval"
+msgstr ""
+
+#. module: KSW_leave_approval
+#. odoo-python
+#: code:addons/KSW_leave_approval/models/hr_leave.py:0
+msgid ""
+"Time off request must be confirmed (\"To Approve\") in order to approve it."
+msgstr ""

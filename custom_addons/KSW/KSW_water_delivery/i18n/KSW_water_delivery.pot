@@ -1,0 +1,2885 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_water_delivery
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_capture__picking_state
+msgid ""
+" * Draft: The transfer is not confirmed yet. Reservation doesn't apply.\n"
+" * Waiting another operation: This transfer is waiting for another operation before being ready.\n"
+" * Waiting: The transfer is waiting for the availability of some products.\n"
+"(a) The shipping policy is \"As soon as possible\": no product could be reserved.\n"
+"(b) The shipping policy is \"When all products are ready\": not all the products could be reserved.\n"
+" * Ready: The transfer is ready to be processed.\n"
+"(a) The shipping policy is \"As soon as possible\": at least one product has been reserved.\n"
+"(b) The shipping policy is \"When all products are ready\": all product have been reserved.\n"
+" * Done: The transfer has been processed.\n"
+" * Cancelled: The transfer has been cancelled."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_tanker_group__vehicle_count
+msgid "# Tankers"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking.py:0
+msgid ""
+"%(client)s has no approved location yet. Send the location from the client's"
+" site and wait for the office to approve it."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/wizard/ksw_water_invoice_wizard.py:0
+msgid ""
+"%(client)s has no delivered notes waiting to be invoiced between %(start)s "
+"and %(end)s."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking.py:0
+msgid ""
+"%(client)s is not on %(driver)s's client list for this branch, so a "
+"supervisor has to confirm the delivery."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking_invoice.py:0
+msgid "%(count)s delivery notes, %(start)s to %(end)s"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking.py:0
+msgid ""
+"%(driver)s is assigned to %(count)d tankers (%(tankers)s). Ask your "
+"supervisor to leave only the one being driven today (Water Delivery ▸ Fleet "
+"Management)."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/wizard/ksw_water_invoice_wizard.py:0
+msgid "%(n)s not signed by the client: %(names)s"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/wizard/ksw_water_invoice_wizard.py:0
+msgid "%(n)s not validated yet (held for a supervisor): %(names)s"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/wizard/ksw_water_invoice_wizard.py:0
+msgid "%(n)s taken off this invoice by you: %(names)s"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking_invoice.py:0
+msgid "%(product)s is sold in %(uom)s and cannot be shown in %(unit)s."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking_invoice.py:0
+msgid "%(product)s: %(qty)s %(uom)s at %(price)s (%(count)s notes)"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/res_partner.py:0
+msgid "%s already has a location."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/res_partner.py:0
+msgid "%s client(s) located from their delivery notes."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_fleet_vehicle.py:0
+msgid ""
+"%s has no Water Delivery driver login, so he could not issue notes on this "
+"tanker. Ask the administrator to link his user and give it the Driver role "
+"first."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_capture.py:0
+msgid ""
+"%s has no approved location. Approve its location first (Water Delivery ▸ "
+"Client Locations), then accept this delivery."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_fleet_vehicle.py:0
+msgid "%s has no driver. Assign the driver first, then his clients."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_fleet_vehicle.py:0
+msgid ""
+"%s is not in your tanker groups. Ask the Employees administrator to add it "
+"to one of your groups."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_fleet_vehicle.py:0
+msgid ""
+"%s is not in your team, so you cannot change his tanker or his clients. Ask "
+"his own supervisor."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_location_request.py:0
+msgid ", adjusted before approval"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:account.payment.term,name:KSW_water_delivery.account_payment_term_120days
+msgid "120 Days"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:account.payment.term,name:KSW_water_delivery.account_payment_term_60days
+msgid "60 Days"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:account.payment.term,name:KSW_water_delivery.account_payment_term_90days
+msgid "90 Days"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_wizard_form
+msgid ""
+"<i class=\"fa fa-exclamation-triangle me-1\"/>\n"
+"                        This client is not one your branch normally serves. The\n"
+"                        note will be marked as off the usual route."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_invoice_wizard_form
+msgid "<span>to</span>"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_invoice_wizard_form
+msgid "<strong>Not on this invoice</strong>"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_form
+msgid "<strong>Waiting for a supervisor.</strong>"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.report_water_delivery_note
+msgid "<strong>الإجمالي بعد الضريبة / After Tax</strong>"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.report_water_delivery_note
+msgid "<strong>الإجمالي قبل الضريبة / Before Tax</strong>"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.report_water_delivery_note
+msgid "<strong>الردات / Loads</strong>"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.report_water_delivery_note
+msgid "<strong>السائق / Driver</strong>"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.report_water_delivery_note
+msgid "<strong>السعر / Unit Price</strong>"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.report_water_delivery_note
+msgid "<strong>الصنف / Description</strong>"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.report_water_delivery_note
+msgid "<strong>الفرع / Branch</strong>"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.report_water_delivery_note
+msgid "<strong>الوايت / Tanker</strong>"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.report_water_delivery_note
+msgid "<strong>ضريبة القيمة المضافة / VAT</strong>"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.report_water_delivery_note
+msgid "<strong>قبل الضريبة / Before Tax</strong>"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.actions.act_window,help:KSW_water_delivery.action_water_client_branches
+msgid ""
+"A client can be served by more than one branch — 93 of them are.\n"
+"                While a branch has no list at all, its drivers see every client\n"
+"                with an agreed rate."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/wizard/ksw_water_delivery_wizard.py:0
+msgid "A driver can only record his own deliveries."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_rate.py:0
+msgid "A rate has to be greater than zero."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.actions.act_window,help:KSW_water_delivery.action_water_rates
+msgid ""
+"A rate is what one client pays for one product. It decides the\n"
+"                price on the delivery note, which clients the drivers may\n"
+"                deliver to, and which products they may pick."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.constraint,message:KSW_water_delivery.constraint_ksw_water_tanker_group_name_uniq
+msgid "A tanker group with this name already exists."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_capture_form
+msgid "Accept and Issue"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_revenue_account_search
+msgid "Account"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__accuracy_m
+msgid "Accuracy (m)"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__message_needaction
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__message_needaction
+msgid "Action Needed"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_client_branch__active
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_rate__active
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_tanker_group__active
+msgid "Active"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_client_branch_search
+msgid "Added in Odoo"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard_line__amount_total
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_list
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_invoice_wizard_form
+msgid "After Tax"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_wizard_form
+msgid "Agreed rate"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking_type__x_location_radius_m
+msgid "Allowed Distance (m)"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__allowed_partner_ids
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard__allowed_partner_ids
+msgid "Allowed Partner"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__allowed_product_ids
+msgid "Allowed Product"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard_line__allowed_uom_ids
+msgid "Allowed Uom"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_amount_total
+msgid "Amount After Tax"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_amount_untaxed
+msgid "Amount Before Tax"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard__amount_total
+msgid "Amount Total"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard__amount_untaxed
+msgid "Amount Untaxed"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_location_request.py:0
+msgid "Another location was approved for this client."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_wizard_form
+msgid "Anything the client should see on the note"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.actions.act_window,name:KSW_water_delivery.action_water_captures
+#: model:ir.ui.menu,name:KSW_water_delivery.menu_water_delivery_captures
+msgid "App Deliveries"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_capture_form
+msgid "App Delivery"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__app_version
+msgid "App Version"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_location_request_form
+msgid "Approve Location"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_location_request__state__approved
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_location_request_search
+msgid "Approved"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_tanker_group_form
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_tanker_group_search
+msgid "Archived"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_tanker_search
+msgid "Assigned"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__message_attachment_count
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__message_attachment_count
+msgid "Attachment Count"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_revenue_account__x_bas_account_code
+msgid "BAS Account"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_revenue_account_search
+msgid "BAS Account Missing Here"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_rate_search
+msgid "BAS Branch"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_rate__x_bas_branch
+msgid "BAS Branch (CODE2)"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_revenue_account__x_bas_share
+msgid "BAS Lines on It (%)"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_rate_list
+msgid "BAS Price"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_rate__x_bas_price
+msgid "BAS Price at Import"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_rate.py:0
+msgid "BAS Rate Import"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_revenue_account.py:0
+msgid "BAS Revenue Accounts"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard_line__amount_untaxed
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_list
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_invoice_wizard_form
+msgid "Before Tax"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:res.groups,name:KSW_water_delivery.group_water_billing
+msgid "Billing"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_client_branch_search
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_search
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_revenue_account_search
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_tanker_list
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_tanker_search
+msgid "Branch"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_client_branch__branch_code
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_revenue_account__branch_code
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_branch_code
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking_type__x_branch_code
+msgid "Branch (CODE2)"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.actions.act_window,name:KSW_water_delivery.action_water_client_branches
+#: model:ir.ui.menu,name:KSW_water_delivery.menu_water_delivery_branch_clients
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_client_branch_list
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_client_branch_search
+msgid "Branch Clients"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard__line_ids
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_invoice_wizard_form
+msgid "By Product"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__can_enter_trips
+msgid "Can Enter Trips"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_invoice_wizard_form
+msgid "Cancel"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__uuid
+msgid "Capture Reference"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__captured_at
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__captured_at
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_captured_at
+msgid "Captured At"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_capture_search
+msgid "Captured Today"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_stock_picking__x_issued_offline
+msgid "Captured at the client with no connection and sent later."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__partner_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_client_branch__partner_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__partner_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard__partner_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__partner_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_rate__partner_id
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_capture_search
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_client_branch_search
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_location_request_search
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_rate_search
+msgid "Client"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_location_request_form
+msgid "Client Location"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model,name:KSW_water_delivery.model_ksw_water_location_request
+msgid "Client Location Request"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/res_partner.py:0
+#: model:ir.actions.act_window,name:KSW_water_delivery.action_water_location_requests
+#: model:ir.ui.menu,name:KSW_water_delivery.menu_water_delivery_locations
+msgid "Client Locations"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.actions.act_window,name:KSW_water_delivery.action_water_rates
+#: model:ir.ui.menu,name:KSW_water_delivery.menu_water_delivery_rates
+msgid "Client Rates"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model,name:KSW_water_delivery.model_ksw_water_client_branch
+msgid "Client Served by Branch"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__show_all_clients
+msgid "Client not listed"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_tanker_list
+msgid "Clients"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__clock_skew_s
+msgid "Clock Skew (s)"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__company_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_client_branch__company_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_rate__company_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_revenue_account__company_id
+msgid "Company"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard__company_currency_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard_line__currency_id
+msgid "Company Currency"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.ui.menu,name:KSW_water_delivery.menu_water_delivery_config
+msgid "Configuration"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model,name:KSW_water_delivery.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_capture__state__failed
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_capture_search
+msgid "Could Not Be Issued"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-javascript
+#: code:addons/KSW_water_delivery/static/src/js/geolocation_widget.js:0
+msgid "Could not get your location."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-javascript
+#: code:addons/KSW_water_delivery/static/src/js/client_location_pin.js:0
+msgid ""
+"Could not get your location. Move somewhere with a clearer view of the sky."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_invoice_wizard_form
+msgid "Create Invoice"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.actions.act_window,help:KSW_water_delivery.action_water_tanker_groups
+msgid "Create a tanker group"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__create_uid
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_client_branch__create_uid
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard_line__create_uid
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__create_uid
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_rate__create_uid
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_revenue_account__create_uid
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_tanker_group__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__create_date
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_client_branch__create_date
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard_line__create_date
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__create_date
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_rate__create_date
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_revenue_account__create_date
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_tanker_group__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/wizard/ksw_water_invoice_wizard.py:0
+msgid ""
+"Creating the invoice needs the Invoicing right (Accounting: Invoicing or "
+"above). Ask an administrator to add it."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_rate__currency_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_currency_id
+msgid "Currency"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_search
+msgid "Customer"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__signature
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__signature
+msgid "Customer Signature"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_capture.py:0
+msgid "Dated in %(month)s, which is already invoiced or closed in accounting."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_invoice_wizard_form
+msgid "Delivered"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard__date_from
+msgid "Delivered From"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_delivery_date
+msgid "Delivered On"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard__date_to
+msgid "Delivered To"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_wizard_form
+msgid "Delivering"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_capture_form
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_form
+msgid "Delivery"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_search
+msgid "Delivery Date"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_capture.py:0
+#: code:addons/KSW_water_delivery/wizard/ksw_water_delivery_wizard.py:0
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__picking_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__picking_id
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_form
+msgid "Delivery Note"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_fleet_vehicle__x_picking_type_id
+msgid "Delivery Note Type"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.actions.act_window,name:KSW_water_delivery.action_water_delivery_all_notes
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard__picking_ids
+#: model:ir.ui.menu,name:KSW_water_delivery.menu_water_delivery_all_notes
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_list
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_search
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_invoice_wizard_form
+msgid "Delivery Notes"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_capture__clock_skew_s
+msgid ""
+"Difference between the phone's clock and the server's at the moment the "
+"capture was sent. Large values mean the captured timestamp cannot be taken "
+"at face value."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_rate_search
+msgid "Differs from BAS9"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_account_move__display_name
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_account_move_line__display_name
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_fleet_vehicle__display_name
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__display_name
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_client_branch__display_name
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard_line__display_name
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__display_name
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_rate__display_name
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_revenue_account__display_name
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_tanker_group__display_name
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_res_partner__display_name
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_sale_order_line__display_name
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__display_name
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking_type__display_name
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_uom_uom__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_stock_picking__x_gps_distance_m
+msgid ""
+"Distance between where the note was issued and the client's recorded "
+"location. Empty when the client has no location yet."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__distance_m
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_gps_distance_m
+msgid "Distance from Client (m)"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_delivery_wizard__location_rule__off
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__stock_picking_type__x_location_rule__off
+msgid "Do not record"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__driver_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__driver_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_driver_id
+#: model:res.groups,name:KSW_water_delivery.group_water_driver
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_capture_search
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_search
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_tanker_list
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_tanker_search
+msgid "Driver"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking_type__x_location_rule
+msgid "Driver Location"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_fleet_vehicle__x_driver_client_ids
+msgid "Driver's Clients"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.actions.act_window,help:KSW_water_delivery.action_water_location_requests
+msgid ""
+"Drivers send a client's location from the site with the\n"
+"               📍 button in the Water app. A client needs an approved location\n"
+"               before any delivery note can be issued for it."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model,name:KSW_water_delivery.model_hr_employee
+msgid "Employee"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_delivery_wizard__location_rule__enforce
+msgid "Enforce"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_stock_picking_type__x_location_rule
+msgid ""
+"Enforce: no note can be issued for a client until a supervisor has approved "
+"its location (drivers send it from the site), and then only within the "
+"allowed distance of it."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__entered_uom
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__entered_uom
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_entered_uom
+msgid "Entered In"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_entered_qty
+msgid "Entered Quantity"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_client_branch__source__manual
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_rate__source__manual
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_revenue_account__source__manual
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_rate_search
+msgid "Entered in Odoo"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.actions.act_window,help:KSW_water_delivery.action_water_captures
+msgid ""
+"Every delivery a driver saves in the app lands here: at once\n"
+"                with signal, or when his phone gets back into coverage. Most\n"
+"                are issued straight away; the ones outside the client's range\n"
+"                (or with no location fix) wait for you to accept or reject."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard__excluded_summary
+msgid "Excluded Summary"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking.py:0
+msgid ""
+"Expected exactly one delivery for this order, got %s. Ask a supervisor to "
+"check the warehouse configuration."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-javascript
+#: code:addons/KSW_water_delivery/static/src/js/geolocation_widget.js:0
+msgid "Finding your location…"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.actions.act_window,name:KSW_water_delivery.action_water_tankers
+#: model:ir.ui.menu,name:KSW_water_delivery.menu_water_delivery_tankers
+msgid "Fleet Management"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_tanker_search
+msgid "Fleet No."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__message_follower_ids
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__message_follower_ids
+msgid "Followers"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__message_partner_ids
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__message_partner_ids
+msgid "Followers (Partners)"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_fleet_vehicle.py:0
+msgid ""
+"From Water Delivery you can only change the driver, his clients, the branch "
+"and the trip volume of a tanker. Ask fleet/HR to change anything else."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__gps_accuracy
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_gps_accuracy
+msgid "GPS Accuracy (m)"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-javascript
+#: code:addons/KSW_water_delivery/static/src/xml/geolocation_widget.xml:0
+msgid "Getting an accurate fix"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__gps_accuracy
+msgid "Gps Accuracy"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__gps_latitude
+msgid "Gps Latitude"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__gps_longitude
+msgid "Gps Longitude"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.actions.act_window,help:KSW_water_delivery.action_water_tanker_groups
+msgid ""
+"Group the tankers (Trailers, Isuzu, Tanks...) and attach the\n"
+"               supervisors who look after them. In Water Delivery &gt; Fleet Management a\n"
+"               supervisor sees only the tankers in his groups."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_tanker_list
+msgid "Groups"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__has_message
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__has_message
+msgid "Has Message"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_stock_picking_type__x_location_radius_m
+msgid ""
+"How far from the client's recorded location a delivery note may be issued."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_capture__queued_seconds
+msgid ""
+"How long the capture sat on the phone before it reached a connection. A "
+"large gap is not wrong in itself -- it is what offline capture is for -- but"
+" it is what makes the position and the timestamp worth reading together."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_fleet_vehicle__x_capacity_m3
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_delivery_wizard__trip_volume_m3
+msgid ""
+"How many cubic metres one full trip of this tanker delivers. Used when the "
+"driver enters a quantity in trips instead of m³."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_account_move__id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_account_move_line__id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_hr_employee__id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_fleet_vehicle__id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_client_branch__id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard__id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard_line__id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_rate__id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_revenue_account__id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_tanker_group__id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_res_partner__id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_sale_order_line__id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking_type__id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_uom_uom__id
+msgid "ID"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_capture__message_needaction
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_location_request__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_capture__message_has_error
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_capture__message_has_sms_error
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_location_request__message_has_error
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_location_request__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_rate_list
+msgid "Import Rates from BAS9"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_revenue_account_list
+msgid "Import from BAS9"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_client_branch__source__bas
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_rate__source__bas
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_revenue_account__source__bas
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_client_branch_search
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_rate_search
+msgid "Imported from BAS9"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/wizard/ksw_water_invoice_wizard.py:0
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_invoice_id
+msgid "Invoice"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard__invoice_date
+msgid "Invoice Date"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.actions.act_window,name:KSW_water_delivery.action_water_invoice_wizard
+#: model:ir.ui.menu,name:KSW_water_delivery.menu_water_delivery_invoice
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_invoice_wizard_form
+msgid "Invoice Delivery Notes"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_list
+msgid "Invoice Selected Notes"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_invoice_status
+msgid "Invoice Status"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model,name:KSW_water_delivery.model_ksw_water_invoice_wizard
+msgid "Invoice Water Delivery Notes"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model,name:KSW_water_delivery.model_ksw_water_invoice_wizard_line
+msgid "Invoice Water Delivery Notes: By Product"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_search
+msgid "Invoiced"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__message_is_follower
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__message_is_follower
+msgid "Is Follower"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_wizard_form
+msgid "Issue Delivery Note"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking.py:0
+msgid ""
+"Issued %(distance)d m from %(client)s; this branch allows %(radius)d m."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_issued_offline
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_search
+msgid "Issued Offline"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_search
+msgid "Issued Without a Signature"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:res.groups,comment:KSW_water_delivery.group_water_driver
+msgid "Issues delivery notes for his own trips and sees only those."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_tanker_search
+msgid "Isuzu"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model,name:KSW_water_delivery.model_account_move
+msgid "Journal Entry"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model,name:KSW_water_delivery.model_account_move_line
+msgid "Journal Item"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.module.category,name:KSW_water_delivery.module_category_water_delivery
+msgid "KSW Water Delivery"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_client_branch__x_bas_last_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_rate__x_bas_date
+msgid "Last BAS Delivery"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__write_uid
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_client_branch__write_uid
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard_line__write_uid
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__write_uid
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_rate__write_uid
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_revenue_account__write_uid
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_tanker_group__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__write_date
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_client_branch__write_date
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard_line__write_date
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__write_date
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_rate__write_date
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_revenue_account__write_date
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_tanker_group__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__gps_latitude
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__latitude
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_gps_latitude
+msgid "Latitude"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_hr_employee__x_water_client_ids
+msgid ""
+"Leave empty to let this driver deliver to every client his branch serves. "
+"Fill it in to narrow him to these clients only."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_employee_form_water_clients
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_ksw_fleet_vehicle_form_water
+msgid "Leave empty to use the branch's client list"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_employee_form_water_clients
+msgid ""
+"Leave this empty and the driver sees every client his\n"
+"                        branch serves. Fill it in to narrow him to these clients\n"
+"                        only — he can still reach the others by ticking\n"
+"                        <b>Client not listed</b>, which marks the note as off\n"
+"                        the usual route."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_load_qty
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_list
+msgid "Loads"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_delivery_wizard__partner_location_state__located
+msgid "Located"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_location_request.py:0
+msgid "Location"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_location_exception
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_search
+msgid "Location Not Confirmed"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__location_rule
+msgid "Location Rule"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-javascript
+#: code:addons/KSW_water_delivery/static/src/js/client_location_pin.js:0
+#: code:addons/KSW_water_delivery/static/src/js/geolocation_widget.js:0
+msgid ""
+"Location needs a secure (https) connection — unavailable on this address."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-javascript
+#: code:addons/KSW_water_delivery/static/src/js/geolocation_widget.js:0
+msgid "Location permission refused."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-javascript
+#: code:addons/KSW_water_delivery/static/src/js/client_location_pin.js:0
+msgid ""
+"Location permission refused. Allow location for this site and try again."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-javascript
+#: code:addons/KSW_water_delivery/static/src/js/geolocation_widget.js:0
+msgid "Location recorded (±%(m)s m)"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-javascript
+#: code:addons/KSW_water_delivery/static/src/js/client_location_pin.js:0
+msgid "Location sent for %(client)s — waiting for the office to approve it."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-javascript
+#: code:addons/KSW_water_delivery/static/src/xml/geolocation_widget.xml:0
+msgid ""
+"Location sent: waiting for the office to approve it. You can issue a\n"
+"                note for this client once it is approved."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_location_request_form
+msgid "Location to approve"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__gps_longitude
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__longitude
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_gps_longitude
+msgid "Longitude"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__map_url
+msgid "Map"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__message_has_error
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__message_has_error
+msgid "Message Delivery error"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__message_ids
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__message_ids
+msgid "Messages"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-javascript
+#: code:addons/KSW_water_delivery/static/src/js/geolocation_widget.js:0
+msgid "Move somewhere with a clearer view of the sky and try again."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.actions.act_window,name:KSW_water_delivery.action_water_delivery_my_notes
+#: model:ir.ui.menu,name:KSW_water_delivery.menu_water_delivery_my_notes
+msgid "My Deliveries"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_tanker_group__name
+msgid "Name"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_wizard_form
+msgid "Name of the person signing"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_capture_search
+msgid "Needs Someone"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.actions.act_window,name:KSW_water_delivery.action_water_delivery_wizard
+#: model:ir.ui.menu,name:KSW_water_delivery.menu_water_delivery_new
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_kanban
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_list
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_wizard_form
+msgid "New Delivery"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_tanker_search
+msgid "No Branch"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_tanker_search
+msgid "No Driver"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_search
+msgid "No Position Recorded"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_tanker_search
+msgid "No Trip Volume"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.actions.act_window,help:KSW_water_delivery.action_water_client_branches
+msgid "No branch client lists yet"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.actions.act_window,help:KSW_water_delivery.action_water_location_requests
+msgid "No client locations waiting."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.actions.act_window,help:KSW_water_delivery.action_water_captures
+msgid "No deliveries from the driver app yet."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.actions.act_window,help:KSW_water_delivery.action_water_delivery_my_notes
+msgid "No deliveries recorded today"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_capture.py:0
+msgid "No delivery note was issued for this capture."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_delivery_wizard__partner_location_state__missing
+msgid "No location"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking.py:0
+msgid ""
+"No position was recorded for this delivery, and this branch issues delivery "
+"notes at the client's site."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.actions.act_window,help:KSW_water_delivery.action_water_rates
+msgid "No rates yet"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.actions.act_window,help:KSW_water_delivery.action_water_revenue_accounts
+msgid "No revenue accounts yet"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_wizard_form
+msgid "No tanker assigned: ask your supervisor"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking.py:0
+msgid ""
+"No tanker is assigned to %s. Ask your supervisor to assign one (Water "
+"Delivery ▸ Fleet Management)."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking.py:0
+msgid "No tanker was recorded for this delivery."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.actions.act_window,help:KSW_water_delivery.action_water_tankers
+msgid "No tankers."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking.py:0
+msgid ""
+"No water delivery operation type is configured. Set one on the tanker, or "
+"restore the default one."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/res_partner.py:0
+msgid ""
+"None of the selected clients has a delivery note carrying a recorded "
+"position yet. Locations are learned from the notes the drivers issue on "
+"site."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/wizard/ksw_water_invoice_wizard.py:0
+msgid "None of the selected notes is waiting to be invoiced."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_search
+msgid "Not Signed"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_search
+msgid "Not Yet Invoiced"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard__note_count
+msgid "Note Count"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_capture__state__issued
+msgid "Note Issued"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__picking_state
+msgid "Note Status"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard_line__note_count
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_invoice_wizard_form
+msgid "Notes"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking.py:0
+msgid "Notes are issued in your own name; %(driver)s must issue their own."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_rate.py:0
+msgid ""
+"Nothing to match the BAS rates against yet.\n"
+"\n"
+"%(partners)s BAS customers are linked to contacts: run \"Match / Create Contacts\" on BAS Customers first.\n"
+"%(products)s products carry a BAS item code: put the BAS item code in each water product's Internal Reference."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__message_needaction_counter
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__message_needaction_counter
+msgid "Number of Actions"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__message_has_error_counter
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__message_has_error_counter
+msgid "Number of errors"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_capture__message_needaction_counter
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_location_request__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_capture__message_has_error_counter
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_location_request__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__off_route
+msgid "Off Route"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__off_route
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_off_route
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_capture_search
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_search
+msgid "Off the Usual Route"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_capture_id
+msgid "Offline Capture"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_capture.py:0
+msgid "Offline delivery accepted by"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_capture.py:0
+msgid "Offline delivery rejected by"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-javascript
+#: code:addons/KSW_water_delivery/static/src/js/geolocation_widget.js:0
+msgid ""
+"On iPhone check Settings > Privacy & Security > Location Services is on and "
+"Safari Websites is set to While Using the App, then tap below."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking_invoice.py:0
+#: code:addons/KSW_water_delivery/wizard/ksw_water_invoice_wizard.py:0
+msgid "One invoice is for one client. The selected notes belong to: %s"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_rate.py:0
+msgid "Only Water Delivery Billing may import rates."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_revenue_account.py:0
+msgid "Only Water Delivery Billing may import revenue accounts."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_capture.py:0
+msgid "Only a delivery that could not be issued can be retried."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_capture.py:0
+msgid "Only a delivery waiting for review can be accepted."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_capture.py:0
+msgid "Only a delivery waiting for review can be rejected."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_location_request.py:0
+msgid "Only a location waiting for approval can be approved."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_location_request.py:0
+msgid "Only a location waiting for approval can be rejected."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_location_request.py:0
+msgid "Only a supervisor can approve or reject a client location."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_fleet_vehicle.py:0
+msgid "Only a supervisor can change a driver's clients."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_capture.py:0
+msgid "Only a supervisor may review offline deliveries."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/controllers/water_app.py:0
+#: code:addons/KSW_water_delivery/wizard/ksw_water_delivery_wizard.py:0
+msgid "Only drivers can issue water delivery notes."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/wizard/ksw_water_invoice_wizard.py:0
+msgid "Only water delivery billing can invoice delivery notes."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_location_request_form
+msgid "Open in Google Maps"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_location_request_list
+msgid "Open map"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_capture_form
+msgid "Open the Note"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_fleet_vehicle__x_picking_type_id
+msgid ""
+"Operation type (and therefore branch and note numbering) used for delivery "
+"notes issued from this tanker."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_stock_picking_type__x_is_water_delivery
+msgid ""
+"Operation types flagged here produce a priced, signable water delivery note "
+"instead of an ordinary delivery slip."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_capture_form
+msgid "Outcome"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__partner_location_state
+msgid "Partner Location State"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:account.payment.term,note:KSW_water_delivery.account_payment_term_120days
+msgid "Payment terms: 120 Days"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:account.payment.term,note:KSW_water_delivery.account_payment_term_60days
+msgid "Payment terms: 60 Days"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:account.payment.term,note:KSW_water_delivery.account_payment_term_90days
+msgid "Payment terms: 90 Days"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_rate__uom_name
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_rate_list
+msgid "Per"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__phone_latitude
+msgid "Phone Latitude"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__phone_longitude
+msgid "Phone Longitude"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.actions.act_window,help:KSW_water_delivery.action_water_tankers
+msgid ""
+"Pick a driver in the Driver column to assign him. Each driver\n"
+"               drives one tanker: assigning him here moves him off the one he\n"
+"               had. The Water app uses this tanker automatically."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model,name:KSW_water_delivery.model_stock_picking_type
+msgid "Picking Type"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_capture_form
+msgid "Price"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__cached_price
+msgid "Price Shown on the Phone"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__issued_price
+msgid "Price on the Note"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_rate__price
+msgid "Price per unit of the product, before VAT."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_capture.py:0
+msgid "Priced on the note:"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_account_move_line__x_display_uom_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard_line__display_uom_id
+msgid "Print In"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_account_bank_statement_line__x_water_summary
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_account_move__x_water_summary
+msgid "Print One Line per Product"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_invoice_wizard__show_notes
+msgid ""
+"Print every delivery note on the invoice, under its product. Unticked, the "
+"invoice prints one line per product."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard_line__display_quantity
+msgid "Printed Quantity"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard_line__display_price
+msgid "Printed Rate"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__product_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__product_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard_line__product_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_rate__product_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_revenue_account__product_id
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_rate_search
+msgid "Product"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__product_locked
+msgid "Product Locked"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model,name:KSW_water_delivery.model_uom_uom
+msgid "Product Unit of Measure"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_capture__entered_uom__product
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_delivery_wizard__entered_uom__product
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__stock_picking__x_entered_uom__product
+msgid "Product unit"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__entered_qty
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__entered_qty
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard_line__quantity
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_invoice_wizard_form
+msgid "Quantity"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__quantity_preview
+msgid "Quantity Preview"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard_line__price_unit
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_rate__price
+msgid "Rate"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__price_changed
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_capture_search
+msgid "Rate Changed Since Capture"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__rate_preview
+msgid "Rate Preview"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_rate.py:0
+msgid ""
+"Rates imported from BAS9.\n"
+"\n"
+"%(created)s created, %(updated)s refreshed, %(skipped)s left alone (edited in Odoo).\n"
+"%(products)s products switched to invoicing on delivered quantity, %(taxed)s given the default sales tax.\n"
+"%(coverage)s new client/branch pairs recorded.\n"
+"Unmatched client accounts: %(nc)s. Unmatched item codes: %(ni)s %(codes)s"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__rating_ids
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__rating_ids
+msgid "Ratings"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:res.groups,comment:KSW_water_delivery.group_water_billing
+msgid ""
+"Reads every water delivery note for month-end invoicing. Does not issue or "
+"correct notes."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_capture__state__pending
+msgid "Received"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__received_at
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__received_at
+msgid "Received At"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_delivery_wizard__location_rule__capture
+msgid "Record"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-javascript
+#: code:addons/KSW_water_delivery/static/src/xml/geolocation_widget.xml:0
+msgid "Record my location"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking.py:0
+msgid "Record the name of the person who signed."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__stock_picking_type__x_location_rule__capture
+msgid "Record where the driver was"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_capture.py:0
+msgid ""
+"Recorded %(when)s, after it reached the server — the phone's clock cannot be"
+" trusted."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_capture_form
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_location_request_form
+msgid "Reject"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__reject_reason
+msgid "Reject Reason"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_capture_form
+msgid "Reject this delivery? The note will be cancelled."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_capture__state__rejected
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_location_request__state__rejected
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_location_request_search
+msgid "Rejected"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__note
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__note
+msgid "Remark"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking_type__x_signature_required
+msgid "Require a Signature"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__stock_picking_type__x_location_rule__enforce
+msgid "Require an approved client location, and the driver at it"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_location_request_form
+msgid "Required to reject"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_revenue_account__account_id
+msgid "Revenue Account"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.actions.act_window,name:KSW_water_delivery.action_water_revenue_accounts
+#: model:ir.ui.menu,name:KSW_water_delivery.menu_water_delivery_revenue_accounts
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_revenue_account_list
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_revenue_account_search
+msgid "Revenue Accounts"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_revenue_account.py:0
+msgid ""
+"Revenue accounts imported from BAS9: %(created)s created, %(updated)s "
+"refreshed. %(missing)s branch/product pairs point at a BAS account this "
+"chart of accounts does not have. Unmatched item codes: %(items)s"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_location_request_form
+msgid "Review"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_form
+msgid "Review it here"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__reviewed_by
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__reviewed_by
+msgid "Reviewed By"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__reviewed_on
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__reviewed_on
+msgid "Reviewed On"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__review_note
+msgid "Reviewer's Note"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__message_has_sms_error
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model,name:KSW_water_delivery.model_sale_order_line
+msgid "Sales Order Line"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_capture.py:0
+msgid ""
+"Say why this delivery is being rejected. The driver recorded it as "
+"delivered, so the reason is the record."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking_invoice.py:0
+msgid "Select at least one water delivery note to invoice."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-javascript
+#: code:addons/KSW_water_delivery/static/src/js/client_location_pin.js:0
+msgid "Send location"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-javascript
+#: code:addons/KSW_water_delivery/static/src/xml/geolocation_widget.xml:0
+msgid "Send my location for this client"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-javascript
+#: code:addons/KSW_water_delivery/static/src/js/client_location_pin.js:0
+msgid "Send this client's location?"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_capture.py:0
+msgid "Sent %(hours).0f hours after the delivery (limit %(limit).0f)."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__sent_live
+msgid "Sent Immediately"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__employee_id
+msgid "Sent by"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__user_id
+msgid "Sent by (user)"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_location_request_form
+msgid "Sent from the site"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_capture__sent_live
+msgid ""
+"Sent the moment the driver saved it, with a connection. Off means it waited "
+"on the phone for signal."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_tanker_group__sequence
+msgid "Sequence"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.actions.server,name:KSW_water_delivery.action_partner_locate_from_deliveries
+msgid "Set Location from Delivery Notes"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_revenue_account__x_bas_share
+msgid ""
+"Share of BAS lines for this branch and product that went to this account. "
+"Below 100 means BAS occasionally posted elsewhere."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard__show_notes
+msgid "Show Each Delivery Note"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_delivery_wizard__show_all_clients
+msgid ""
+"Show every client that has an agreed rate, not just the ones this branch "
+"normally serves. The note records that it was issued off the usual route."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_capture.py:0
+msgid "Shown on the phone:"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_capture_form
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_form
+msgid "Signature"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__signature_origin
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__signature_origin
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_signature_origin
+msgid "Signature Captured"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__signature_required
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_signature_required
+msgid "Signature Required"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__signed_by
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__signed_by
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_signed_by
+msgid "Signed By"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_signed_on
+msgid "Signed On"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_search
+msgid "Signed at the Depot"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_capture__signature_origin__on_site
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_delivery_wizard__signature_origin__on_site
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__stock_picking__x_signature_origin__on_site
+msgid "Signed at the customer"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_capture__signature_origin__depot
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_delivery_wizard__signature_origin__depot
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__stock_picking__x_signature_origin__depot
+msgid "Signed at the depot"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard_line__uom_id
+msgid "Sold In"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_client_branch__source
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_rate__source
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_revenue_account__source
+msgid "Source"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__state
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__state
+msgid "State"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__state_sequence
+msgid "State Sequence"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_capture_search
+msgid "Status"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:res.groups,comment:KSW_water_delivery.group_water_dispatcher
+msgid ""
+"Supervises the drivers: sees every delivery note, accepts offline "
+"deliveries, approves client locations, and assigns tankers and each driver's"
+" clients. Does not issue notes."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:res.groups,name:KSW_water_delivery.group_water_dispatcher
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_employee_form_water_clients
+msgid "Supervisor"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_tanker_group__supervisor_ids
+msgid "Supervisors"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:product.template,name:KSW_water_delivery.product_water_load_product_template
+msgid "Sweet Water — Load"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__vehicle_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__vehicle_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_vehicle_id
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_tanker_group_search
+msgid "Tanker"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking.py:0
+msgid ""
+"Tanker %(tanker)s is not assigned to %(driver)s, so its trip volume cannot "
+"be used without a supervisor checking it."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model,name:KSW_water_delivery.model_ksw_water_tanker_group
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_tanker_search
+msgid "Tanker Group"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.actions.act_window,name:KSW_water_delivery.action_water_tanker_groups
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_hr_employee__x_water_tanker_group_ids
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_fleet_vehicle__x_tanker_group_ids
+#: model:ir.ui.menu,name:KSW_water_delivery.menu_water_tanker_groups
+msgid "Tanker Groups"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_employee_form_water_clients
+msgid "Tanker groups this supervisor looks after"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_tanker_group__vehicle_ids
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_tanker_group_form
+msgid "Tankers"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.actions.act_window,help:KSW_water_delivery.action_water_delivery_my_notes
+msgid "Tap <b>New Delivery</b> when you arrive at the customer."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.actions.act_window,help:KSW_water_delivery.action_water_tankers
+msgid ""
+"The Clients column is the driver's usual client list. Leave it\n"
+"               empty and he sees every client his branch serves."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_capture.py:0
+msgid "The capture is missing its reference."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_fleet_vehicle__x_driver_client_ids
+msgid ""
+"The clients this tanker's driver normally serves. Leave empty to let him "
+"deliver to every client his branch serves."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking.py:0
+msgid "The customer has to sign before the note can be issued."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_stock_picking__x_driver_id
+msgid "The driver who delivered the load and collected the signature."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-javascript
+#: code:addons/KSW_water_delivery/static/src/js/client_location_pin.js:0
+msgid ""
+"The fix is still too rough (±%(m)s m). Step out of the cab, away from the "
+"tank, and try again."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_location_request.py:0
+msgid "The location is not a valid position."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-javascript
+#: code:addons/KSW_water_delivery/static/src/js/client_location_pin.js:0
+msgid "The location was not accepted."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_stock_picking__x_location_exception
+msgid ""
+"The note was issued outside the allowed distance from the client, or with no"
+" position at all, and is waiting for a supervisor to accept it."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_location_request__captured_at
+msgid "The phone's clock at the client."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_capture.py:0
+msgid ""
+"The phone's clock was %(minutes)d minutes away from the server's, so the "
+"captured time cannot be taken at face value."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/res_partner.py:0
+msgid ""
+"The position was too rough (±%(accuracy)d m; at most %(limit)d m is "
+"accepted)."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/res_partner.py:0
+msgid "The position was unreadable."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_account_bank_statement_line__x_water_summary
+#: model:ir.model.fields,help:KSW_water_delivery.field_account_move__x_water_summary
+msgid ""
+"The printed invoice shows one line per product. The delivery notes stay on "
+"the invoice underneath; untick to print each one."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking.py:0
+msgid ""
+"The quantity must be greater than zero. If you entered trips, check that the"
+" tanker has a trip volume set."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_capture.py:0
+msgid "The rate changed between capture and issue."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_capture_form
+msgid ""
+"The rate changed between the moment the driver captured this\n"
+"                        and the moment it reached the server. The note carries the\n"
+"                        live rate; the phone showed the other one."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_capture_form
+msgid ""
+"The water was delivered — this note exists and is waiting,\n"
+"                            not lost. Accepting it validates the note so it can be\n"
+"                            invoiced; rejecting it cancels the note."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking.py:0
+msgid ""
+"There is no agreed rate for %(product)s with %(client)s, so the note cannot "
+"be priced. Ask accounting to add one."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking_invoice.py:0
+msgid "These notes are already on an invoice: %s"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking_invoice.py:0
+msgid ""
+"These notes cannot share one invoice: their orders differ in invoice "
+"address, currency or fiscal position."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking_invoice.py:0
+msgid ""
+"These notes have not been delivered (validated) yet, so there is nothing to "
+"invoice on them: %s"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_search
+msgid "This Month"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.constraint,message:KSW_water_delivery.constraint_ksw_water_revenue_account_branch_product_uniq
+msgid "This branch already has a revenue account for this product."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking.py:0
+msgid ""
+"This branch issues delivery notes at the client's site, so your location is "
+"needed. Allow location access in the browser and try again."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_capture.py:0
+msgid "This capture has no delivery note to accept."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.constraint,message:KSW_water_delivery.constraint_ksw_water_rate_partner_product_uniq
+msgid "This client already has a rate for this product."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-javascript
+#: code:addons/KSW_water_delivery/static/src/xml/geolocation_widget.xml:0
+msgid "This client has no approved location yet, so no note can be issued."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.constraint,message:KSW_water_delivery.constraint_ksw_water_client_branch_partner_branch_uniq
+msgid "This client is already listed for that branch."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/res_partner.py:0
+msgid "This client is not one you deliver to."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.constraint,message:KSW_water_delivery.constraint_ksw_water_capture_uuid_uniq
+msgid "This delivery has already been received from the driver's phone."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/wizard/ksw_water_delivery_wizard.py:0
+msgid "This delivery note has already been issued as %s."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.actions.act_window,help:KSW_water_delivery.action_water_client_branches
+msgid ""
+"This is what each branch's drivers see in their client picker.\n"
+"                It is filled by <b>Import Rates from BAS9</b> on the Client\n"
+"                Rates screen, from the branches that actually delivered."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.constraint,message:KSW_water_delivery.constraint_ksw_water_location_request_uuid_unique
+msgid "This location was already received."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__queued_seconds
+msgid "Time in the Queue (s)"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-javascript
+#: code:addons/KSW_water_delivery/static/src/js/geolocation_widget.js:0
+msgid "Timed out looking for your location."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_search
+msgid "Today"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_tanker_search
+msgid "Trailers"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model,name:KSW_water_delivery.model_stock_picking
+msgid "Transfer"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_form
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_wizard_form
+msgid "Trip"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_fleet_vehicle__x_capacity_m3
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_delivery_wizard__trip_volume_m3
+msgid "Trip Volume (m³)"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_capture__entered_uom__trip
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_delivery_wizard__entered_uom__trip
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__stock_picking__x_entered_uom__trip
+msgid "Trips"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_capture_form
+msgid "Try Again"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_tanker_search
+msgid "Type"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_capture.py:0
+msgid "Unknown client"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_location_request_form
+msgid ""
+"Until this is approved, no delivery note can be issued for this\n"
+"                        client. Open the map and check the pin is at the client's site.\n"
+"                        You may correct the position before approving it."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.actions.act_window,help:KSW_water_delivery.action_water_rates
+msgid ""
+"Use <b>Import Rates from BAS9</b> to seed them from what BAS actually "
+"charged."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__uuid
+msgid "Uuid"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_amount_tax
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_list
+msgid "VAT"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model,name:KSW_water_delivery.model_ksw_fleet_vehicle
+msgid "Vehicle"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_location_request__state__pending
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_location_request_search
+msgid "Waiting for Approval"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_capture__state__held
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_capture_search
+msgid "Waiting for Review"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_delivery_wizard__partner_location_state__pending
+msgid "Waiting for approval"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_hr_employee__x_water_client_ids
+msgid "Water Clients"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.actions.server,name:KSW_water_delivery.action_water_delivery_home
+#: model:ir.ui.menu,name:KSW_water_delivery.menu_water_delivery_root
+#: model:res.groups.privilege,name:KSW_water_delivery.privilege_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_employee_form_water_clients
+msgid "Water Delivery"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_hr_employee__x_water_tanker_group_ids
+msgid ""
+"Water Delivery > Fleet Management shows this supervisor only the tankers in "
+"these groups."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.actions.act_url,name:KSW_water_delivery.action_water_driver_app
+msgid "Water Delivery App"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:res.groups.privilege,name:KSW_water_delivery.privilege_water_billing
+msgid "Water Delivery Billing"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model,name:KSW_water_delivery.model_ksw_water_delivery_wizard
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_is_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking_type__x_is_water_delivery
+msgid "Water Delivery Note"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:stock.picking.type,name:KSW_water_delivery.picking_type_water_out
+msgid "Water Delivery Notes"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model,name:KSW_water_delivery.model_ksw_water_rate
+msgid "Water Delivery Rate"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model,name:KSW_water_delivery.model_ksw_water_revenue_account
+msgid "Water Delivery Revenue Account"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model,name:KSW_water_delivery.model_ksw_water_capture
+msgid "Water Delivery from the Driver App"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_rate_list
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_rate_search
+msgid "Water Rates"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__website_message_ids
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__website_message_ids
+msgid "Website Messages"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_capture__website_message_ids
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_location_request__website_message_ids
+msgid "Website communication history"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_stock_picking_type__x_signature_required
+msgid ""
+"When off, a driver can issue the delivery note without capturing a "
+"signature. Notes issued while this is off are not counted as missing a "
+"signature."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_stock_picking__x_captured_at
+msgid ""
+"When the driver's phone recorded the delivery. This is the phone's own "
+"clock, so it is kept separate from when the server received it."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_capture__captured_at
+msgid ""
+"When the driver's phone says the delivery happened. The phone's own clock, "
+"which the driver can change."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_capture__received_at
+msgid "When the server received it. Set here, not by the phone."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_capture_form
+msgid "Where and When"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_form
+msgid "Where it was issued"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.actions.act_window,help:KSW_water_delivery.action_water_revenue_accounts
+msgid ""
+"Which account a delivery note's sale posts to, per branch and\n"
+"               product, the way BAS posts it. Use <b>Import from BAS9</b>."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_wizard_form
+msgid "Who are you delivering to?"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__failure_reason
+msgid "Why It Failed"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_capture__hold_reason
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_location_exception_reason
+msgid "Why It Is Held"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_capture_form
+msgid ""
+"Why it was rejected — the driver recorded it as delivered, so the reason is "
+"the record"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_invoice_wizard_line__wizard_id
+msgid "Wizard"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_location_request.py:0
+msgid "Write the reason for rejecting it first, so the driver knows."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_account_bank_statement_line__x_has_water_sections
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_account_move__x_has_water_sections
+msgid "X Has Water Sections"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_fleet_vehicle__x_in_my_tanker_groups
+msgid "X In My Tanker Groups"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_fleet_vehicle__x_is_own_vehicle
+msgid "X Is Own Vehicle"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_account_move_line__x_water_section
+msgid "X Water Section"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking.py:0
+msgid ""
+"You appear to be %(distance)d m from %(client)s, and notes for this branch "
+"may only be issued within %(radius)d m of the client. Check you have picked "
+"the right client."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/wizard/ksw_water_delivery_wizard.py:0
+msgid "You are not allowed to send client locations."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.actions.act_window,help:KSW_water_delivery.action_water_tankers
+msgid ""
+"You see the tankers in your tanker groups. If one is missing,\n"
+"               ask the Employees administrator to add it to one of your groups."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_location_request.py:0
+msgid ""
+"You sent this location yourself, so another supervisor has to approve it."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-javascript
+#: code:addons/KSW_water_delivery/static/src/js/client_location_pin.js:0
+msgid ""
+"Your current position will be sent as the location of %(client)s. Only do "
+"this standing at the client's site, outside the cab. The office approves it "
+"before notes can be issued for this client."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/controllers/water_app.py:0
+#: code:addons/KSW_water_delivery/wizard/ksw_water_delivery_wizard.py:0
+msgid ""
+"Your user account is not linked to an employee record, so the delivery note "
+"cannot record who delivered it. Ask HR to link them."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/wizard/ksw_water_delivery_wizard.py:0
+msgid ""
+"Your user account is not linked to an employee record. Ask HR to link them."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking.py:0
+msgid "Your user is not linked to an employee record."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_tanker_group_form
+msgid "e.g. Trailers"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_kanban
+msgid "load(s) ·"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking.py:0
+msgid "the driver"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/stock_picking.py:0
+msgid "you"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:product.template,description_sale:KSW_water_delivery.product_water_load_product_template
+msgid "مياه عذبة — ردة"
+msgstr ""

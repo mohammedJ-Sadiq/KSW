@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-06 12:59+0000\n"
-"PO-Revision-Date: 2026-10-06 12:59+0000\n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:59+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar_001\n"
@@ -36,6 +36,14 @@ msgstr ""
 "<b>تشغيل الإعداد</b> يقرأ من BAS وينشئ ما ينقص فقط: فئات الأصناف بحسابات "
 "المخزون والصرف في BAS، والأصناف الناقصة، ومستودعات ومعارض BAS، وعملية صرف "
 "مخزون لكل مستودع. يمكن تشغيله أكثر من مرة بأمان."
+
+#. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW_inventory/wizard/bas_inventory_setup.py:0
+msgid "Account %s is missing from the chart; run the BAS GL import first."
+msgstr ""
+"الحساب %s غير موجود في دليل الحسابات؛ شغّل استيراد دفتر الأستاذ من BAS "
+"أولاً."
 
 #. module: KSW_inventory
 #: model:ir.model.fields,help:KSW_inventory.field_stock_picking__x_issue_account_id
@@ -187,6 +195,19 @@ msgid "Run setup"
 msgstr "تشغيل الإعداد"
 
 #. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW_inventory/wizard/bas_inventory_setup.py:0
+msgid "Run the setup first: no BAS warehouses yet."
+msgstr "شغّل الإعداد أولاً: لا توجد مستودعات من BAS بعد."
+
+#. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW_inventory/models/stock.py:0
+msgid ""
+"Set a cost centre on every line of %(name)s before validating: %(items)s."
+msgstr "حدّد مركز تكلفة لكل سطر في %(name)s قبل الاعتماد: %(items)s."
+
+#. module: KSW_inventory
 #: model:ir.model.fields.selection,name:KSW_inventory.selection__stock_warehouse__x_bas_kind__showroom
 msgid "Showroom"
 msgstr "معرض"
@@ -209,6 +230,12 @@ msgid "Stock Move"
 msgstr "حركة المخزون"
 
 #. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW_inventory/models/stock.py:0
+msgid "Stock issue %(name)s must go to a consumption location, not %(loc)s."
+msgstr "إذن الصرف %(name)s يجب أن يذهب إلى موقع استهلاك، وليس إلى %(loc)s."
+
+#. module: KSW_inventory
 #: model:ir.model.fields,help:KSW_inventory.field_stock_location__x_ksw_consumption
 msgid ""
 "Stock sent here is used up (BAS 101 «فاتورة صرف»). The entry debits the "
@@ -216,6 +243,12 @@ msgid ""
 msgstr ""
 "المخزون المحوَّل إلى هنا يُستهلك (فاتورة صرف 101 في BAS). القيد يُحمَّل على "
 "حساب الصرف بدلاً من حساب هذا الموقع."
+
+#. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW_inventory/wizard/bas_inventory_setup.py:0
+msgid "The company has no Stock Journal (Inventory Valuation)."
+msgstr "لا يوجد للشركة دفتر يومية للمخزون (تقييم المخزون)."
 
 #. module: KSW_inventory
 #: model:ir.model,name:KSW_inventory.model_stock_picking
@@ -236,36 +269,3 @@ msgid ""
 msgstr ""
 "رمز المستودع في BAS (WSHOW.CODE)، مثل 15. مستندات هذا المستودع تحمل رمز "
 "الفرع 1 ثم الرمز (115)، والمعارض 2 ثم الرمز."
-
-#. module: KSW_inventory
-#. odoo-python
-#: code:addons/KSW_inventory/wizard/bas_inventory_setup.py:0
-msgid "Account %s is missing from the chart; run the BAS GL import first."
-msgstr ""
-"الحساب %s غير موجود في دليل الحسابات؛ شغّل استيراد دفتر الأستاذ من BAS "
-"أولاً."
-
-#. module: KSW_inventory
-#. odoo-python
-#: code:addons/KSW_inventory/wizard/bas_inventory_setup.py:0
-msgid "The company has no Stock Journal (Inventory Valuation)."
-msgstr "لا يوجد للشركة دفتر يومية للمخزون (تقييم المخزون)."
-
-#. module: KSW_inventory
-#. odoo-python
-#: code:addons/KSW_inventory/wizard/bas_inventory_setup.py:0
-msgid "Run the setup first: no BAS warehouses yet."
-msgstr "شغّل الإعداد أولاً: لا توجد مستودعات من BAS بعد."
-
-#. module: KSW_inventory
-#. odoo-python
-#: code:addons/KSW_inventory/models/stock.py:0
-msgid "Stock issue %(name)s must go to a consumption location, not %(loc)s."
-msgstr "إذن الصرف %(name)s يجب أن يذهب إلى موقع استهلاك، وليس إلى %(loc)s."
-
-#. module: KSW_inventory
-#. odoo-python
-#: code:addons/KSW_inventory/models/stock.py:0
-msgid ""
-"Set a cost centre on every line of %(name)s before validating: %(items)s."
-msgstr "حدّد مركز تكلفة لكل سطر في %(name)s قبل الاعتماد: %(items)s."

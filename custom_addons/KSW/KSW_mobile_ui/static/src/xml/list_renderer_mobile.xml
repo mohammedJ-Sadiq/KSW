@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!-- Each cell carries its column's label, so on a phone a line table
+         inside a form can show every row as a card of "Label  value" lines
+         (mobile.scss). Harmless on desktop: nothing reads it there. -->
+    <t t-inherit="web.ListRenderer.RecordRow" t-inherit-mode="extension">
+        <xpath expr="//td[@t-att-name='column.name']" position="attributes">
+            <attribute name="t-att-data-label">column.label</attribute>
+        </xpath>
+    </t>
+    <t t-inherit="web.ListRenderer.GroupRow" t-inherit-mode="extension">
+        <xpath expr="//td[@t-foreach='getAggregateColumns(group)']" position="attributes">
+            <attribute name="t-att-data-label">column.label</attribute>
+        </xpath>
+    </t>
+    <t t-inherit="web.ListRenderer" t-inherit-mode="extension">
+        <xpath expr="//td[@t-foreach='getAggregateColumns()']" position="attributes">
+            <attribute name="t-att-data-label">column.label</attribute>
+        </xpath>
+    </t>
+
+</templates>

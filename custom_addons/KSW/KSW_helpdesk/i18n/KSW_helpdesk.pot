@@ -1,0 +1,2590 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_helpdesk
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_consumable.py:0
+msgid ""
+"%(name)s (%(code)s) is at %(qty)d %(uom)s, at or below the minimum stock of "
+"%(min)d. Suggested reorder quantity: %(reorder)d."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.actions.report,print_report_name:KSW_helpdesk.action_report_it_consumable_purchase_request
+msgid "'Purchase Request - %s' % (object.name)"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:mail.template,body_html:KSW_helpdesk.mail_template_ticket_closed
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p>Dear <t t-out=\"object.employee_id.name or ''\"/>,</p>\n"
+"                    <p>Your helpdesk ticket <strong><t t-out=\"object.ticket_ref\"/></strong>\n"
+"                        (\"<t t-out=\"object.name\"/>\") has been closed\n"
+"                        <t t-if=\"object.closed_by\">by <t t-out=\"object.closed_by.name\"/></t>.\n"
+"                    </p>\n"
+"                    <p>If the issue is not fully resolved, you can reopen it or reply on\n"
+"                        the ticket's message log and the IT Team will follow up.</p>\n"
+"                    <br/>\n"
+"                    Best Regards,\n"
+"                    <br/>\n"
+"                    IT Helpdesk Team\n"
+"                    <br/>\n"
+"                </div>\n"
+"            "
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_form
+msgid "<i class=\"fa fa-lightbulb-o fa-lg me-2 mt-1\" title=\"Tip\"/>"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.actions.act_window,help:KSW_helpdesk.action_helpdesk_ticket_my_tickets
+msgid "<strong>1.</strong> Click <strong>New</strong> above."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.actions.act_window,help:KSW_helpdesk.action_helpdesk_ticket_my_tickets
+msgid ""
+"<strong>2.</strong> Choose <strong>Incident</strong> (something\n"
+"                        broken) or <strong>Service Request</strong> (something you need)."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.actions.act_window,help:KSW_helpdesk.action_helpdesk_ticket_my_tickets
+msgid ""
+"<strong>3.</strong> Give it a short, clear subject\n"
+"                        (e.g. \"Laptop won't turn on\") and pick a\n"
+"                        <strong>Category</strong>."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.actions.act_window,help:KSW_helpdesk.action_helpdesk_ticket_my_tickets
+msgid ""
+"<strong>4.</strong> Describe the issue with as much\n"
+"                        detail as you can, and link the affected asset if any."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.actions.act_window,help:KSW_helpdesk.action_helpdesk_ticket_my_tickets
+msgid ""
+"<strong>5.</strong> Click <strong>Save</strong> — the\n"
+"                        IT team is notified automatically and you can track\n"
+"                        progress right here."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.report_it_consumable_purchase_request
+msgid "<strong>Approved by (Manager)</strong>"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.report_it_consumable_purchase_request
+msgid "<strong>Date</strong>"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.report_it_consumable_purchase_request
+msgid "<strong>For Approval By</strong>"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.report_it_consumable_purchase_request
+msgid "<strong>Notes for Supply Chain</strong>"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_form
+msgid ""
+"<strong>Quick tips for a faster fix:</strong> choose whether\n"
+"                            this is an <strong>Incident</strong> (something broken) or a\n"
+"                            <strong>Service Request</strong> (something you need), pick the\n"
+"                            matching <strong>Category</strong>, describe the issue with as\n"
+"                            much detail as you can, and link the <strong>Related Asset</strong>\n"
+"                            if it applies. The IT team is notified the moment you save."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.report_it_consumable_purchase_request
+msgid "<strong>Reference</strong>"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.report_it_consumable_purchase_request
+msgid "<strong>Requested By</strong>"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.constraint,message:KSW_helpdesk.constraint_helpdesk_ticket_category_name_type_uniq
+msgid "A category with this name already exists for this ticket type."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.constraint,message:KSW_helpdesk.constraint_it_asset_category_name_company_uniq
+#: model:ir.model.constraint,message:KSW_helpdesk.constraint_it_consumable_category_name_company_uniq
+msgid "A category with this name already exists."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:helpdesk.ticket.category,name:KSW_helpdesk.ticket_category_access
+msgid "Access & Permissions"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:helpdesk.ticket.category,name:KSW_helpdesk.ticket_category_access_request
+msgid "Access / Permission Request"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:it.asset.category,name:KSW_helpdesk.category_accessory
+msgid "Accessory"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__message_needaction
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__message_needaction
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__message_needaction
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__message_needaction
+msgid "Action Needed"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__active
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket_category__active
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__active
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_category__active
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__active
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_category__active
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset_assignment__state__active
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_assignment_view_search
+msgid "Active"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__activity_ids
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__activity_ids
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__activity_ids
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__activity_ids
+msgid "Activities"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__activity_exception_decoration
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__activity_exception_decoration
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__activity_exception_decoration
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__activity_state
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__activity_state
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__activity_state
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__activity_state
+msgid "Activity State"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__activity_type_icon
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__activity_type_icon
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__activity_type_icon
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__activity_type_icon
+msgid "Activity Type Icon"
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_consumable_purchase_request.py:0
+msgid "Add at least one item before marking this request as purchased."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_move_view_search
+msgid "Adjustments"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.actions.act_window,name:KSW_helpdesk.action_helpdesk_ticket_all
+#: model:ir.ui.menu,name:KSW_helpdesk.menu_helpdesk_all_tickets
+msgid "All Tickets"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable_receive_wizard__update_unit_cost
+msgid "Also update the item's standard unit cost to the value above."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__amount_total
+msgid "Amount Total"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_purchase_request_view_form
+msgid "Anything supply chain should know..."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_search
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_view_search
+msgid "Archived"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_form
+msgid "Are you sure you want to mark this asset as lost or stolen?"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assign_wizard__asset_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assignment__asset_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_maintenance__asset_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_return_wizard__asset_id
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_kanban
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_search
+msgid "Asset"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.actions.act_window,name:KSW_helpdesk.it_asset_category_action
+#: model:ir.ui.menu,name:KSW_helpdesk.menu_helpdesk_asset_categories
+msgid "Asset Categories"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_category__asset_count
+msgid "Asset Count"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__name
+msgid "Asset Name"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__asset_tag
+msgid "Asset Tag"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.actions.act_window,name:KSW_helpdesk.action_it_asset_all
+#: model:ir.ui.menu,name:KSW_helpdesk.menu_helpdesk_assets
+#: model:ir.ui.menu,name:KSW_helpdesk.menu_helpdesk_assets_all
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_category_view_form
+msgid "Assets"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_pivot
+msgid "Assets Analysis"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_graph
+msgid "Assets by Category"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_asset__is_printer
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_asset_category__is_printer
+msgid ""
+"Assets in this category are printers: their form shows the matching "
+"ink/toner cartridge type, fetched from the Consumables register."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_assign_wizard_view_form
+msgid "Assign"
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_asset.py:0
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_assign_wizard_view_form
+msgid "Assign Asset"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model,name:KSW_helpdesk.model_it_asset_assign_wizard
+msgid "Assign IT Asset"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_form
+msgid "Assign to Employee"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_form
+msgid "Assign to Me"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset__state__assigned
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_search
+msgid "Assigned"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assignment__assigned_by
+msgid "Assigned By"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__user_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__employee_id
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_search
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_search
+msgid "Assigned To"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_search
+msgid "Assigned to Me"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__assignment_count
+msgid "Assignment Count"
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_asset.py:0
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__assignment_ids
+msgid "Assignment History"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.actions.act_window,name:KSW_helpdesk.it_asset_assignment_action
+#: model:ir.ui.menu,name:KSW_helpdesk.menu_helpdesk_assets_assignments
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_form
+msgid "Assignments"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__message_attachment_count
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__message_attachment_count
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__message_attachment_count
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__message_attachment_count
+msgid "Attachment Count"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__attachment_ids
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_form
+msgid "Attachments"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset__state__available
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_search
+msgid "Available"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:it.consumable.category,name:KSW_helpdesk.consumable_category_battery
+msgid "Batteries"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__helpdesk_ticket__kanban_state__blocked
+msgid "Blocked"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_consumable__uom__box
+msgid "Box"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__brand
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__brand
+msgid "Brand"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_form
+msgid "Briefly describe the issue..."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:it.consumable.category,name:KSW_helpdesk.consumable_category_cable
+msgid "Cables & Adapters"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_form
+msgid "Caller"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_assign_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_return_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_issue_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_purchase_request_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_receive_wizard_view_form
+msgid "Cancel"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_consumable_purchase_request__state__cancelled
+msgid "Cancelled"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_asset__cartridge_type
+msgid ""
+"Cartridge category (Ink / Toner) fetched from the matching consumable(s), "
+"based on this printer's model."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.actions.act_window,name:KSW_helpdesk.helpdesk_ticket_category_action
+msgid "Categories"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__category_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__category_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assignment__category_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_maintenance__category_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__category_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_move__category_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request_line__category_id
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_search
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_assignment_view_search
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_maintenance_view_search
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_search
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_move_view_search
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_view_search
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.report_it_consumable_purchase_request
+msgid "Category"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__close_date
+msgid "Close Date"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_form
+msgid "Close Ticket"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:helpdesk.ticket.stage,name:KSW_helpdesk.stage_closed
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_search
+msgid "Closed"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__closed_by
+msgid "Closed By"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__color
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket_category__color
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__color
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_category__color
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__color
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_category__color
+msgid "Color"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__company_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__company_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assignment__company_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_category__company_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_maintenance__company_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__company_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_category__company_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_move__company_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__company_id
+msgid "Company"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__compatible_with
+msgid "Compatible With"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assign_wizard__condition_out
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_return_wizard__condition_in
+msgid "Condition"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assignment__condition_out
+msgid "Condition (Out)"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assignment__condition_in
+msgid "Condition (Returned)"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.ui.menu,name:KSW_helpdesk.menu_helpdesk_config
+msgid "Configuration"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_issue_wizard__consumable_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_move__consumable_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request_line__consumable_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_receive_wizard__consumable_id
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_move_view_search
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_view_search
+msgid "Consumable"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.actions.act_window,name:KSW_helpdesk.it_consumable_category_action
+#: model:ir.ui.menu,name:KSW_helpdesk.menu_helpdesk_consumable_categories
+msgid "Consumable Categories"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_category__consumable_count
+msgid "Consumable Count"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.actions.act_window,name:KSW_helpdesk.it_consumable_move_action
+#: model:ir.ui.menu,name:KSW_helpdesk.menu_helpdesk_assets_consumable_moves
+msgid "Consumable Moves"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.actions.act_window,name:KSW_helpdesk.action_it_consumable_all
+#: model:ir.ui.menu,name:KSW_helpdesk.menu_helpdesk_assets_consumables
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_category_view_form
+msgid "Consumables"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_asset__cartridge_ids
+msgid ""
+"Consumables from the Consumables register whose 'Compatible With' matches "
+"this printer's model."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable_category__is_ink_toner
+msgid ""
+"Consumables in this category are printer ink/toner cartridges: they are "
+"matched onto printer assets by their 'Compatible With' field."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_maintenance__cost
+msgid "Cost"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__create_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket_category__create_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket_stage__create_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__create_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assign_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assignment__create_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_category__create_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_maintenance__create_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_return_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__create_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_category__create_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_issue_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_move__create_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__create_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request_line__create_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_receive_wizard__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__create_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket_category__create_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket_stage__create_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__create_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assign_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assignment__create_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_category__create_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_maintenance__create_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_return_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__create_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_category__create_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_issue_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_move__create_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__create_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request_line__create_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_receive_wizard__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__currency_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_maintenance__currency_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__currency_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__currency_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request_line__currency_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_receive_wizard__currency_id
+msgid "Currency"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request_line__qty_on_hand
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.report_it_consumable_purchase_request
+msgid "Current Stock"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable__qty_on_hand
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable_issue_wizard__qty_on_hand
+msgid ""
+"Current stock, derived from every Receive / Issue / Adjustment move recorded"
+" for this item."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_move__date
+msgid "Date"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assign_wizard__date_assigned
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assignment__date_assigned
+msgid "Date Assigned"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_maintenance__date_end
+msgid "Date End"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__date_request
+msgid "Date Request"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assignment__date_returned
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_return_wizard__date_returned
+msgid "Date Returned"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_maintenance__date_start
+msgid "Date Start"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__deadline
+msgid "Deadline"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__caller_department_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__department_id
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_search
+msgid "Department"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_form
+msgid "Describe the issue in as much detail as possible..."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket_stage__description
+msgid "Description"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:it.asset.category,name:KSW_helpdesk.category_desktop
+msgid "Desktop"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__description
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_form
+msgid "Detailed Description"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__display_name
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket_category__display_name
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket_stage__display_name
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__display_name
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assign_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assignment__display_name
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_category__display_name
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_maintenance__display_name
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_return_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__display_name
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_category__display_name
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_issue_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_move__display_name
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__display_name
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request_line__display_name
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_receive_wizard__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset_maintenance__state__done
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_maintenance_view_search
+msgid "Done"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_move__done_by
+msgid "Done By"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_consumable_purchase_request__state__draft
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_purchase_request_view_search
+msgid "Draft"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:helpdesk.ticket.category,name:KSW_helpdesk.ticket_category_email
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__caller_email
+msgid "Email"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assign_wizard__employee_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assignment__employee_id
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_assignment_view_search
+msgid "Employee"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.actions.act_window,help:KSW_helpdesk.it_consumable_move_action
+msgid ""
+"Every receipt, issue and adjustment for every consumable is\n"
+"                logged here - the audit trail for \"who took what, when\"."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.actions.act_window,help:KSW_helpdesk.action_helpdesk_ticket_history
+msgid ""
+"Every ticket that has been resolved and closed shows up\n"
+"                here for reference."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset__warranty_status__expired
+msgid "Expired"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset__warranty_status__expiring
+msgid "Expiring Soon"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_form
+msgid "Explain how this was (or is being) resolved..."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset_assign_wizard__condition_out__fair
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset_assignment__condition_in__fair
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset_assignment__condition_out__fair
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset_return_wizard__condition_in__fair
+msgid "Fair"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket_stage__fold
+msgid "Fold"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__message_follower_ids
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__message_follower_ids
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__message_follower_ids
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__message_follower_ids
+msgid "Followers"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__message_partner_ids
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__message_partner_ids
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__message_partner_ids
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__message_partner_ids
+msgid "Followers (Partners)"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_helpdesk_ticket_category__icon
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_asset_category__icon
+msgid "Font Awesome icon class, e.g. fa-laptop"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable_category__icon
+msgid "Font Awesome icon class, e.g. fa-tint"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_helpdesk_ticket__activity_type_icon
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_asset__activity_type_icon
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable__activity_type_icon
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable_purchase_request__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:res.groups,comment:KSW_helpdesk.group_helpdesk_agent
+msgid ""
+"Full access: manage every ticket (assign, change stage, close, delete), "
+"configure stages/categories, and manage the IT asset register."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_view_list
+msgid "Generate Purchase Request"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.actions.act_window,help:KSW_helpdesk.action_it_consumable_purchase_request
+msgid ""
+"Generate one from the Consumables list once an item is low\n"
+"                on stock - select specific items first, or leave nothing\n"
+"                selected to pull in everything currently low."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset_assign_wizard__condition_out__good
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset_assignment__condition_in__good
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset_assignment__condition_out__good
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset_return_wizard__condition_in__good
+msgid "Good"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__helpdesk_ticket__satisfaction__great
+msgid "Great"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:helpdesk.ticket.category,name:KSW_helpdesk.ticket_category_hardware
+msgid "Hardware"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__has_message
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__has_message
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__has_message
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__has_message
+msgid "Has Message"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.module.category,name:KSW_helpdesk.module_category_ksw_helpdesk
+#: model:ir.ui.menu,name:KSW_helpdesk.menu_helpdesk_root
+msgid "Helpdesk"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:res.groups.privilege,name:KSW_helpdesk.privilege_helpdesk_management
+msgid "Helpdesk Management"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model,name:KSW_helpdesk.model_helpdesk_ticket
+msgid "Helpdesk Ticket"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model,name:KSW_helpdesk.model_helpdesk_ticket_category
+msgid "Helpdesk Ticket Category"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model,name:KSW_helpdesk.model_helpdesk_ticket_stage
+msgid "Helpdesk Ticket Stage"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:mail.template,name:KSW_helpdesk.mail_template_ticket_closed
+msgid "Helpdesk Ticket: Closed"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__helpdesk_ticket__priority__2
+msgid "High"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_search
+msgid "High Priority"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_helpdesk_ticket__resolution_hours
+msgid ""
+"Hours between creation and closing. Used for reporting on solved tickets."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_helpdesk_ticket__resolution_notes
+msgid ""
+"How the IT agent actually solved this ticket - kept as a reference for the "
+"next time the same issue comes up."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket_category__id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket_stage__id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assign_wizard__id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assignment__id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_category__id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_maintenance__id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_return_wizard__id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_category__id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_issue_wizard__id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_move__id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request_line__id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_receive_wizard__id
+msgid "ID"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model,name:KSW_helpdesk.model_it_asset
+msgid "IT Asset"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model,name:KSW_helpdesk.model_it_asset_assignment
+msgid "IT Asset Assignment"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model,name:KSW_helpdesk.model_it_asset_category
+msgid "IT Asset Category"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model,name:KSW_helpdesk.model_it_asset_maintenance
+msgid "IT Asset Maintenance"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.actions.server,name:KSW_helpdesk.ir_cron_it_asset_warranty_reminder_ir_actions_server
+msgid "IT Assets: Warranty Expiry Reminder"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model,name:KSW_helpdesk.model_it_consumable
+msgid "IT Consumable"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model,name:KSW_helpdesk.model_it_consumable_category
+msgid "IT Consumable Category"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model,name:KSW_helpdesk.model_it_consumable_purchase_request
+msgid "IT Consumable Purchase Request"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model,name:KSW_helpdesk.model_it_consumable_purchase_request_line
+msgid "IT Consumable Purchase Request Line"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model,name:KSW_helpdesk.model_it_consumable_move
+msgid "IT Consumable Stock Move"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.report_it_consumable_purchase_request
+msgid "IT Consumables Restock"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.actions.server,name:KSW_helpdesk.ir_cron_it_consumable_low_stock_reminder_ir_actions_server
+msgid "IT Consumables: Low Stock Reminder"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:res.groups,name:KSW_helpdesk.group_helpdesk_agent
+msgid "IT Team"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__activity_exception_icon
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket_category__icon
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__activity_exception_icon
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_category__icon
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__activity_exception_icon
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_category__icon
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__activity_exception_icon
+msgid "Icon"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_helpdesk_ticket__activity_exception_icon
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_asset__activity_exception_icon
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable__activity_exception_icon
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable_purchase_request__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_helpdesk_ticket__message_needaction
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_asset__message_needaction
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable__message_needaction
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable_purchase_request__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_helpdesk_ticket__message_has_error
+#: model:ir.model.fields,help:KSW_helpdesk.field_helpdesk_ticket__message_has_sms_error
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_asset__message_has_error
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_asset__message_has_sms_error
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable__message_has_error
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable__message_has_sms_error
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable_purchase_request__message_has_error
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable_purchase_request__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__image_1920
+msgid "Image 1920"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset__state__maintenance
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_search
+msgid "In Maintenance"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:helpdesk.ticket.stage,name:KSW_helpdesk.stage_in_progress
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__helpdesk_ticket__kanban_state__normal
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset_maintenance__state__in_progress
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_maintenance_view_search
+msgid "In Progress"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__helpdesk_ticket__ticket_type__incident
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__helpdesk_ticket_category__ticket_type__incident
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_category_view_search
+msgid "Incident"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_helpdesk_ticket__ticket_type
+msgid ""
+"Incident: something is broken or not working as expected.\n"
+"Service Request: a planned ask - new access, new software, information, etc.\n"
+"Fixed once the ticket is created (it decides the ticket number prefix: INC/... or REQ/...)."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_search
+msgid "Incidents"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:helpdesk.ticket.category,name:KSW_helpdesk.ticket_category_information
+msgid "Information / How-To"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__cartridge_ids
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_form_my
+msgid "Ink / Cartridge"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__cartridge_type
+msgid "Ink / Cartridge Type"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_category__is_ink_toner
+msgid "Ink / Toner Category"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:it.consumable.category,name:KSW_helpdesk.consumable_category_ink
+msgid "Ink Cartridge"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_form
+msgid "Internal notes about this asset..."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_view_form
+msgid "Internal notes about this item..."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__is_closed
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket_stage__is_closed
+msgid "Is Closed"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__message_is_follower
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__message_is_follower
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__message_is_follower
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__message_is_follower
+msgid "Is Follower"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__is_low_stock
+msgid "Is Low Stock"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__is_overdue
+msgid "Is Overdue"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_maintenance__issue
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_consumable_move__move_type__out
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_issue_wizard_view_form
+msgid "Issue"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model,name:KSW_helpdesk.model_it_consumable_issue_wizard
+msgid "Issue IT Consumable"
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_consumable.py:0
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_issue_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_view_form
+msgid "Issue Stock"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_move_view_search
+msgid "Issued"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_issue_wizard__employee_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_move__employee_id
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_move_view_search
+msgid "Issued To"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.report_it_consumable_purchase_request
+msgid "Item"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__line_ids
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_purchase_request_view_form
+msgid "Items"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__caller_job_title
+msgid "Job Position"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__kanban_state
+msgid "Kanban State"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_form
+msgid ""
+"Kept as a reference for the next time this\n"
+"                                kind of issue comes up."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:it.asset.category,name:KSW_helpdesk.category_laptop
+msgid "Laptop"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.actions.act_window,help:KSW_helpdesk.action_it_asset_my_assets
+msgid ""
+"Laptops, phones, printers and other IT equipment assigned to\n"
+"                you will appear here."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__write_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket_category__write_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket_stage__write_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__write_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assign_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assignment__write_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_category__write_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_maintenance__write_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_return_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__write_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_category__write_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_issue_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_move__write_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__write_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request_line__write_uid
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_receive_wizard__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__write_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket_category__write_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket_stage__write_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__write_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assign_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assignment__write_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_category__write_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_maintenance__write_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_return_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__write_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_category__write_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_issue_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_move__write_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__write_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request_line__write_date
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_receive_wizard__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__location
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__location
+msgid "Location"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset__state__lost
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_search
+msgid "Lost / Stolen"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__helpdesk_ticket__priority__0
+msgid "Low"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_view_kanban
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_view_search
+msgid "Low Stock"
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_consumable.py:0
+msgid "Low stock: %s"
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_asset.py:0
+#: model:ir.actions.act_window,name:KSW_helpdesk.it_asset_maintenance_action
+#: model:ir.ui.menu,name:KSW_helpdesk.menu_helpdesk_assets_maintenance
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_form
+msgid "Maintenance"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__maintenance_count
+msgid "Maintenance Count"
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_asset.py:0
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__maintenance_ids
+msgid "Maintenance History"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable_purchase_request__approver_id
+msgid ""
+"Manager expected to approve this request. Informational only - printed on "
+"the PDF for the physical signature."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_form
+msgid "Mark as Lost / Stolen"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_purchase_request_view_form
+msgid "Mark as Purchased"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__helpdesk_ticket__priority__1
+msgid "Medium"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__message_has_error
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__message_has_error
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__message_has_error
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__message_has_error
+msgid "Message Delivery error"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__message_ids
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__message_ids
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__message_ids
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__message_ids
+msgid "Messages"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__reorder_min
+msgid "Minimum Stock"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__caller_mobile_phone
+msgid "Mobile"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:it.asset.category,name:KSW_helpdesk.category_mobile
+msgid "Mobile Phone"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__model_name
+msgid "Model"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:it.asset.category,name:KSW_helpdesk.category_monitor
+msgid "Monitor"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__move_count
+msgid "Move Count"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_move__move_type
+msgid "Move Type"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_view_form
+msgid "Moves"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__my_activity_date_deadline
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__my_activity_date_deadline
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__my_activity_date_deadline
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.actions.act_window,name:KSW_helpdesk.action_it_asset_my_assets
+#: model:ir.ui.menu,name:KSW_helpdesk.menu_helpdesk_my_assets
+msgid "My Assets"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.actions.act_window,name:KSW_helpdesk.action_helpdesk_ticket_my_tickets
+#: model:ir.ui.menu,name:KSW_helpdesk.menu_helpdesk_my_tickets
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_search
+msgid "My Tickets"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket_category__name
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket_stage__name
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_category__name
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__name
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_category__name
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__name
+msgid "Name"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.actions.act_window,help:KSW_helpdesk.action_helpdesk_ticket_my_tickets
+msgid ""
+"Need help with hardware, software, network access, or\n"
+"                    anything else IT-related? Here's how to get help fast:"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:helpdesk.ticket.category,name:KSW_helpdesk.ticket_category_network
+msgid "Network & Internet"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:it.asset.category,name:KSW_helpdesk.category_network
+msgid "Networking Equipment"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:helpdesk.ticket.stage,name:KSW_helpdesk.stage_new
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset_assign_wizard__condition_out__new
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset_assignment__condition_in__new
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset_assignment__condition_out__new
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset_return_wizard__condition_in__new
+msgid "New"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:helpdesk.ticket.category,name:KSW_helpdesk.ticket_category_new_hardware
+msgid "New Hardware Request"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:helpdesk.ticket.category,name:KSW_helpdesk.ticket_category_new_software
+msgid "New Software Installation"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__activity_calendar_event_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__activity_calendar_event_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__activity_calendar_event_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__activity_calendar_event_id
+msgid "Next Activity Calendar Event"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__activity_date_deadline
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__activity_date_deadline
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__activity_date_deadline
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__activity_summary
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__activity_summary
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__activity_summary
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__activity_summary
+msgid "Next Activity Summary"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__activity_type_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__activity_type_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__activity_type_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__activity_type_id
+msgid "Next Activity Type"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.actions.act_window,help:KSW_helpdesk.action_it_asset_my_assets
+msgid "No IT equipment assigned to you yet"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset__warranty_status__none
+msgid "No Warranty"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.actions.act_window,help:KSW_helpdesk.action_helpdesk_ticket_history
+msgid "No closed tickets yet"
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_consumable.py:0
+msgid "No consumables are currently low on stock."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.report_it_consumable_purchase_request
+msgid "No items on this request."
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_asset.py:0
+msgid "No matching consumable registered"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.actions.act_window,help:KSW_helpdesk.action_it_consumable_purchase_request
+msgid "No purchase requests yet"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.actions.act_window,help:KSW_helpdesk.it_consumable_move_action
+msgid "No stock moves yet"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.actions.act_window,help:KSW_helpdesk.action_helpdesk_ticket_all
+msgid "No tickets yet"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__helpdesk_ticket__satisfaction__bad
+msgid "Not Good"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_issue_wizard__note
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_move__note
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_receive_wizard__note
+msgid "Note"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_move_view_form
+msgid "Note..."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__notes
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assign_wizard__notes
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assignment__notes
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_maintenance__notes
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_return_wizard__notes
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__notes
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_view_form
+msgid "Notes"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__note
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_purchase_request_view_form
+msgid "Notes for Supply Chain"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_assignment_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_maintenance_view_form
+msgid "Notes..."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__message_needaction_counter
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__message_needaction_counter
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__message_needaction_counter
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__message_needaction_counter
+msgid "Number of Actions"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__message_has_error_counter
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__message_has_error_counter
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__message_has_error_counter
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__message_has_error_counter
+msgid "Number of errors"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_helpdesk_ticket__message_needaction_counter
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_asset__message_needaction_counter
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable__message_needaction_counter
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable_purchase_request__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_helpdesk_ticket__message_has_error_counter
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_asset__message_has_error_counter
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable__message_has_error_counter
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable_purchase_request__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__helpdesk_ticket__satisfaction__okay
+msgid "Okay"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__qty_on_hand
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_issue_wizard__qty_on_hand
+msgid "On Hand"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:helpdesk.ticket.stage,name:KSW_helpdesk.stage_on_hold
+msgid "On Hold"
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/wizard/it_consumable_issue_wizard.py:0
+msgid "Only %(available)d %(item)s in stock - cannot issue %(requested)d."
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/helpdesk_ticket.py:0
+msgid ""
+"Only IT Helpdesk agents can change the stage, kanban state or assignee of a "
+"ticket."
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/helpdesk_ticket.py:0
+msgid "Only IT Helpdesk agents can do this."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_helpdesk_ticket__user_id
+msgid "Only IT Helpdesk agents/managers can be assigned a ticket."
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_consumable_purchase_request.py:0
+msgid "Only a draft request can be marked as purchased."
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/wizard/it_asset_assign_wizard.py:0
+msgid "Only an available asset can be assigned."
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_asset.py:0
+msgid "Only an available asset can be assigned. Return or repair it first."
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_asset.py:0
+msgid "Only an available asset can be sent to maintenance."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_search
+msgid "Open"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:helpdesk.ticket.category,name:KSW_helpdesk.ticket_category_other
+#: model:helpdesk.ticket.category,name:KSW_helpdesk.ticket_category_request_other
+#: model:it.consumable.category,name:KSW_helpdesk.consumable_category_other
+msgid "Other"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_kanban
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_search
+msgid "Overdue"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_consumable__uom__pack
+msgid "Pack"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:it.consumable.category,name:KSW_helpdesk.consumable_category_paper
+msgid "Paper"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable__reorder_min
+msgid ""
+"Par level. When On Hand drops to this quantity or below, the item is flagged"
+" Low Stock and the IT Team gets a reminder."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:helpdesk.ticket.category,name:KSW_helpdesk.ticket_category_password_reset
+msgid "Password Reset"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__image_128
+msgid "Photo (128)"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_asset__location
+msgid "Physical location, e.g. 'HQ - 3rd Floor Store'."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable__location
+msgid "Physical storage location, e.g. 'IT Store Room - Shelf 2'."
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/helpdesk_ticket.py:0
+msgid ""
+"Please fill in the Resolution Notes before closing \"%s\" - explain how it "
+"was solved so it can be used as a reference next time."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset_assign_wizard__condition_out__poor
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset_assignment__condition_in__poor
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset_assignment__condition_out__poor
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset_return_wizard__condition_in__poor
+msgid "Poor"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__supplier_id
+msgid "Preferred Vendor"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_purchase_request_view_form
+msgid "Print PDF"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.report_it_consumable_purchase_request
+msgid "Printed on"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:helpdesk.ticket.category,name:KSW_helpdesk.ticket_category_printer
+#: model:it.asset.category,name:KSW_helpdesk.category_printer
+msgid "Printer"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__is_printer
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_category__is_printer
+msgid "Printer Category"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable__compatible_with
+msgid "Printer/device model(s) this item fits, e.g. 'HP LaserJet P1102'."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__priority
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_search
+msgid "Priority"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__purchase_date
+msgid "Purchase Date"
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_consumable.py:0
+#: model:ir.actions.report,name:KSW_helpdesk.action_report_it_consumable_purchase_request
+msgid "Purchase Request"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.report_it_consumable_purchase_request
+msgid "Purchase Request <span class=\"fs-4\" dir=\"rtl\">/ طلب شراء</span>"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.actions.act_window,name:KSW_helpdesk.action_it_consumable_purchase_request
+#: model:ir.ui.menu,name:KSW_helpdesk.menu_helpdesk_assets_purchase_requests
+msgid "Purchase Requests"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__purchase_value
+msgid "Purchase Value"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_consumable_purchase_request__state__purchased
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_purchase_request_view_search
+msgid "Purchased"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.report_it_consumable_purchase_request
+msgid "Qty to Order"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_issue_wizard__quantity
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_move__quantity
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_receive_wizard__quantity
+msgid "Quantity"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request_line__quantity
+msgid "Quantity to Order"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__rating_ids
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__rating_ids
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__rating_ids
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__rating_ids
+msgid "Ratings"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_form
+msgid "Reactivate"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__helpdesk_ticket__kanban_state__done
+msgid "Ready"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_consumable_move__move_type__in
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_receive_wizard_view_form
+msgid "Receive"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model,name:KSW_helpdesk.model_it_consumable_receive_wizard
+msgid "Receive IT Consumable Stock"
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_consumable.py:0
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_receive_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_view_form
+msgid "Receive Stock"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_move_view_search
+msgid "Received"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_move__supplier_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_receive_wizard__supplier_id
+msgid "Received From"
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_consumable_purchase_request.py:0
+msgid "Received via Purchase Request %s"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__ticket_ref
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__code
+msgid "Reference"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.actions.act_window,help:KSW_helpdesk.action_it_asset_all
+msgid "Register your first IT asset"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.actions.act_window,help:KSW_helpdesk.action_it_consumable_all
+msgid "Register your first IT consumable"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__asset_id
+msgid "Related Asset"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_form
+msgid "Reopen"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__reorder_qty
+msgid "Reorder Quantity"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_maintenance__vendor_id
+msgid "Repaired By"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__employee_id
+msgid "Reported By"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.actions.act_window,name:KSW_helpdesk.action_helpdesk_ticket_reporting
+#: model:ir.ui.menu,name:KSW_helpdesk.menu_helpdesk_reporting
+msgid "Reporting"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request_line__request_id
+msgid "Request"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__requested_by
+msgid "Requested By"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_purchase_request_view_form
+msgid "Reset to Draft"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_form
+msgid "Resolution"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_list
+msgid "Resolution (h)"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_form
+msgid "Resolution Feedback"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__resolution_notes
+msgid "Resolution Notes"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__resolution_hours
+msgid "Resolution Time (h)"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__activity_user_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__activity_user_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__activity_user_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__activity_user_id
+msgid "Responsible User"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_form
+msgid "Retire"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_form
+msgid "Retire this asset? It will be archived."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset__state__retired
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_search
+msgid "Retired"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_return_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_form
+msgid "Return"
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_asset.py:0
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_return_wizard_view_form
+msgid "Return Asset"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model,name:KSW_helpdesk.model_it_asset_return_wizard
+msgid "Return IT Asset"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_form
+msgid "Return from Maintenance"
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_asset.py:0
+msgid "Return or repair this asset before retiring it."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset_assignment__state__returned
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_assignment_view_search
+msgid "Returned"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__message_has_sms_error
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__message_has_sms_error
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__message_has_sms_error
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__satisfaction
+msgid "Satisfaction"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_helpdesk_ticket__attachment_ids
+msgid ""
+"Screenshots, error logs, or any other file that helps explain the issue."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_form
+msgid "Send to Maintenance"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket_category__sequence
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket_stage__sequence
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_category__sequence
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_category__sequence
+msgid "Sequence"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__serial_number
+msgid "Serial / IMEI"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__helpdesk_ticket__ticket_type__request
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__helpdesk_ticket_category__ticket_type__request
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_category_view_search
+msgid "Service Request"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_search
+msgid "Service Requests"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__name
+msgid "Short Description"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_asset__name
+msgid "Short description, e.g. 'Dell Latitude 5420 Laptop'."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:helpdesk.ticket.category,name:KSW_helpdesk.ticket_category_software
+msgid "Software"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:it.asset.category,name:KSW_helpdesk.category_software
+msgid "Software License"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:it.consumable.category,name:KSW_helpdesk.consumable_category_spare_part
+msgid "Spare Parts"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__stage_id
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_search
+msgid "Stage"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.actions.act_window,name:KSW_helpdesk.helpdesk_ticket_stage_action
+msgid "Stages"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__state
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_assignment__state
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset_maintenance__state
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__state
+msgid "State"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_assignment_view_search
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_maintenance_view_search
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_search
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_purchase_request_view_search
+msgid "Status"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_helpdesk_ticket__activity_state
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_asset__activity_state
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable__activity_state
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable_purchase_request__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_consumable_move__move_type__adjustment
+msgid "Stock Count Adjustment"
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_consumable.py:0
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__move_ids
+msgid "Stock Moves"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:res.groups,comment:KSW_helpdesk.group_helpdesk_user
+msgid "Submit tickets and follow up on their own, or a direct report's."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request_line__subtotal
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.report_it_consumable_purchase_request
+msgid "Subtotal"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable__reorder_qty
+msgid "Suggested quantity to buy when restocking this item."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_helpdesk_ticket__asset_id
+msgid "The IT asset this ticket is about, if any."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable_issue_wizard__asset_id
+msgid ""
+"The asset (e.g. printer) this item was used on, if any. Only assets "
+"currently assigned to the selected employee are shown."
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/helpdesk_ticket.py:0
+msgid "The category \"%(category)s\" is not valid for a %(type)s ticket."
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/wizard/it_consumable_issue_wizard.py:0
+#: code:addons/KSW_helpdesk/wizard/it_consumable_receive_wizard.py:0
+msgid "The quantity must be greater than zero."
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_consumable_move.py:0
+msgid "The quantity of a stock move must be greater than zero."
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_asset.py:0
+#: code:addons/KSW_helpdesk/wizard/it_asset_return_wizard.py:0
+msgid "This asset is not currently assigned."
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_asset.py:0
+msgid "This asset is not in maintenance."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.constraint,message:KSW_helpdesk.constraint_it_asset_asset_tag_uniq
+msgid "This asset tag already exists."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.constraint,message:KSW_helpdesk.constraint_it_consumable_code_uniq
+msgid "This reference already exists."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_helpdesk_ticket_stage__fold
+msgid "This stage is folded in the kanban view when there are no records."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_search
+msgid "Ticket"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.ui.menu,name:KSW_helpdesk.menu_helpdesk_categories
+msgid "Ticket Categories"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_calendar
+msgid "Ticket Deadlines"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_form
+msgid "Ticket Details"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.actions.act_window,name:KSW_helpdesk.action_helpdesk_ticket_history
+#: model:ir.ui.menu,name:KSW_helpdesk.menu_helpdesk_history
+msgid "Ticket History"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.ui.menu,name:KSW_helpdesk.menu_helpdesk_stages
+msgid "Ticket Stages"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__ticket_type
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket_category__ticket_type
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_category_view_search
+msgid "Ticket Type"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_pivot
+msgid "Tickets Analysis"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_graph
+msgid "Tickets by Category"
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/helpdesk_ticket.py:0
+msgid "Tickets can only be assigned to an IT Helpdesk agent or manager."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_helpdesk_ticket__is_closed
+#: model:ir.model.fields,help:KSW_helpdesk.field_helpdesk_ticket_stage__is_closed
+msgid "Tickets in this stage are considered resolved/closed."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.actions.act_window,help:KSW_helpdesk.action_helpdesk_ticket_all
+msgid "Tickets raised by employees will show up here for triage."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__approver_id
+msgid "To Be Signed By"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:it.consumable.category,name:KSW_helpdesk.consumable_category_toner
+msgid "Toner Cartridge"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_purchase_request_view_list
+msgid "Total"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_maintenance_view_list
+msgid "Total Cost"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.report_it_consumable_purchase_request
+msgid "Total Estimated Cost"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.actions.act_window,help:KSW_helpdesk.action_it_consumable_all
+msgid ""
+"Track ink, toner, cables and any other IT consumable stock:\n"
+"                how much is on hand, who took what, and when it's time to\n"
+"                reorder."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.actions.act_window,help:KSW_helpdesk.action_it_asset_all
+msgid ""
+"Track laptops, monitors, phones, licenses and any other IT\n"
+"                equipment, and see who currently holds each one."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_search
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_move_view_search
+msgid "Type"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_helpdesk_ticket__activity_exception_decoration
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_asset__activity_exception_decoration
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable__activity_exception_decoration
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable_purchase_request__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_view_search
+msgid "Unassigned"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_consumable__uom__unit
+msgid "Unit"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__unit_cost
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request_line__unit_cost
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_receive_wizard__unit_cost
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.report_it_consumable_purchase_request
+msgid "Unit Cost"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__uom
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request_line__uom
+msgid "Unit of Measure"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_receive_wizard__update_unit_cost
+msgid "Update Unit Cost"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__helpdesk_ticket__priority__3
+msgid "Urgent"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_issue_wizard__asset_id
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_move__asset_id
+msgid "Used For"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:res.groups,name:KSW_helpdesk.group_helpdesk_user
+msgid "User"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_view_list
+msgid ""
+"Uses the selected rows, or every item currently low on stock if nothing is "
+"selected."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields.selection,name:KSW_helpdesk.selection__it_asset__warranty_status__valid
+msgid "Valid"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__supplier_id
+msgid "Vendor"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_kanban
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_search
+msgid "Warranty Expired"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_kanban
+msgid "Warranty Expiring"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_search
+msgid "Warranty Expiring Soon"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_calendar
+msgid "Warranty Expiry"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__warranty_expiry_date
+msgid "Warranty Expiry Date"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__warranty_status
+msgid "Warranty Status"
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_asset.py:0
+msgid "Warranty expiring in %d days"
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_asset.py:0
+msgid "Warranty for %(asset)s (%(tag)s) expires on %(date)s."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__website_message_ids
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_asset__website_message_ids
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable__website_message_ids
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_it_consumable_purchase_request__website_message_ids
+msgid "Website Messages"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_helpdesk_ticket__website_message_ids
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_asset__website_message_ids
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable__website_message_ids
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable_purchase_request__website_message_ids
+msgid "Website communication history"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_helpdesk_ticket_category__ticket_type
+msgid ""
+"Which ticket type this category applies to. An Incident is something broken "
+"or not working; a Service Request is a planned ask (new access, new "
+"software, information, etc.)."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_helpdesk_ticket__employee_id
+msgid ""
+"Who the ticket is for. You can only pick yourself, unless you are a manager "
+"- then you may also pick a direct report."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,field_description:KSW_helpdesk.field_helpdesk_ticket__caller_work_phone
+msgid "Work Phone"
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/helpdesk_ticket.py:0
+msgid ""
+"You can only create or edit tickets for yourself or your direct reports."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.actions.act_window,help:KSW_helpdesk.action_helpdesk_ticket_my_tickets
+msgid "You have no support tickets yet"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:mail.template,subject:KSW_helpdesk.mail_template_ticket_closed
+msgid "Your ticket {{ object.ticket_ref }} has been closed"
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_asset.py:0
+msgid "asset_id"
+msgstr ""
+
+#. module: KSW_helpdesk
+#. odoo-python
+#: code:addons/KSW_helpdesk/models/it_consumable.py:0
+msgid "consumable_id"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model:ir.model.fields,help:KSW_helpdesk.field_it_consumable__name
+msgid "e.g. 'HP 12A Black Toner Cartridge'."
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_view_form
+msgid "e.g. Dell Latitude 5420 Laptop"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_view_form
+msgid "e.g. HP 12A Black Toner Cartridge"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_asset_category_view_form
+msgid "fa-laptop"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.helpdesk_ticket_category_view_form
+msgid "fa-question-circle"
+msgstr ""
+
+#. module: KSW_helpdesk
+#: model_terms:ir.ui.view,arch_db:KSW_helpdesk.it_consumable_category_view_form
+msgid "fa-tint"
+msgstr ""

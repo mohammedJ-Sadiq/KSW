@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-06 12:59+0000\n"
-"PO-Revision-Date: 2026-10-06 12:59+0000\n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:41+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -28,6 +28,12 @@ msgid ""
 "<b>Run setup</b> reads BAS and creates only what is missing: the item classes with their\n"
 "                        BAS stock and issue accounts, missing items, the BAS warehouses and showrooms, and a\n"
 "                        Stock Issue operation per warehouse. Safe to run again."
+msgstr ""
+
+#. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW_inventory/wizard/bas_inventory_setup.py:0
+msgid "Account %s is missing from the chart; run the BAS GL import first."
 msgstr ""
 
 #. module: KSW_inventory
@@ -173,6 +179,19 @@ msgid "Run setup"
 msgstr ""
 
 #. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW_inventory/wizard/bas_inventory_setup.py:0
+msgid "Run the setup first: no BAS warehouses yet."
+msgstr ""
+
+#. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW_inventory/models/stock.py:0
+msgid ""
+"Set a cost centre on every line of %(name)s before validating: %(items)s."
+msgstr ""
+
+#. module: KSW_inventory
 #: model:ir.model.fields.selection,name:KSW_inventory.selection__stock_warehouse__x_bas_kind__showroom
 msgid "Showroom"
 msgstr ""
@@ -195,10 +214,22 @@ msgid "Stock Move"
 msgstr ""
 
 #. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW_inventory/models/stock.py:0
+msgid "Stock issue %(name)s must go to a consumption location, not %(loc)s."
+msgstr ""
+
+#. module: KSW_inventory
 #: model:ir.model.fields,help:KSW_inventory.field_stock_location__x_ksw_consumption
 msgid ""
 "Stock sent here is used up (BAS 101 «فاتورة صرف»). The entry debits the "
 "issue's account instead of this location's."
+msgstr ""
+
+#. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW_inventory/wizard/bas_inventory_setup.py:0
+msgid "The company has no Stock Journal (Inventory Valuation)."
 msgstr ""
 
 #. module: KSW_inventory
@@ -217,35 +248,4 @@ msgstr ""
 msgid ""
 "Warehouse code in BAS (WSHOW.CODE), e.g. 15. Documents of this warehouse "
 "carry the branch code 1 + it (115), showrooms 2 + it."
-msgstr ""
-
-#. module: KSW_inventory
-#. odoo-python
-#: code:addons/KSW_inventory/wizard/bas_inventory_setup.py:0
-msgid "Account %s is missing from the chart; run the BAS GL import first."
-msgstr ""
-
-#. module: KSW_inventory
-#. odoo-python
-#: code:addons/KSW_inventory/wizard/bas_inventory_setup.py:0
-msgid "The company has no Stock Journal (Inventory Valuation)."
-msgstr ""
-
-#. module: KSW_inventory
-#. odoo-python
-#: code:addons/KSW_inventory/wizard/bas_inventory_setup.py:0
-msgid "Run the setup first: no BAS warehouses yet."
-msgstr ""
-
-#. module: KSW_inventory
-#. odoo-python
-#: code:addons/KSW_inventory/models/stock.py:0
-msgid "Stock issue %(name)s must go to a consumption location, not %(loc)s."
-msgstr ""
-
-#. module: KSW_inventory
-#. odoo-python
-#: code:addons/KSW_inventory/models/stock.py:0
-msgid ""
-"Set a cost centre on every line of %(name)s before validating: %(items)s."
 msgstr ""

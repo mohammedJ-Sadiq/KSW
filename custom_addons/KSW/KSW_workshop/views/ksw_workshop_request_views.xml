@@ -442,12 +442,15 @@
         <field name="context">{}</field>
     </record>
 
+    <!-- The number on each search_default_groupby_* is the grouping ORDER.
+         With equal numbers Odoo falls back to the search view's filter
+         order, which put Repair Type before Technician on "By Technician". -->
     <record id="action_ksw_workshop_report_by_vehicle" model="ir.actions.act_window">
         <field name="name">By Vehicle</field>
         <field name="res_model">ksw.workshop.request</field>
         <field name="view_mode">pivot,graph,list,form</field>
         <field name="search_view_id" ref="view_ksw_workshop_request_search"/>
-        <field name="context">{'search_default_groupby_vehicle': 1, 'search_default_groupby_month': 1}</field>
+        <field name="context">{'search_default_groupby_vehicle': 1, 'search_default_groupby_month': 2}</field>
     </record>
 
     <record id="action_ksw_workshop_report_by_type" model="ir.actions.act_window">
@@ -455,7 +458,7 @@
         <field name="res_model">ksw.workshop.request</field>
         <field name="view_mode">pivot,graph,list,form</field>
         <field name="search_view_id" ref="view_ksw_workshop_request_search"/>
-        <field name="context">{'search_default_groupby_request_type': 1, 'search_default_groupby_year': 1}</field>
+        <field name="context">{'search_default_groupby_request_type': 1, 'search_default_groupby_year': 2}</field>
     </record>
 
     <record id="action_ksw_workshop_report_by_technician" model="ir.actions.act_window">
@@ -463,7 +466,7 @@
         <field name="res_model">ksw.workshop.request</field>
         <field name="view_mode">pivot,graph,list,form</field>
         <field name="search_view_id" ref="view_ksw_workshop_request_search"/>
-        <field name="context">{'search_default_groupby_technician': 1, 'search_default_groupby_request_type': 1}</field>
+        <field name="context">{'search_default_groupby_technician': 1, 'search_default_groupby_request_type': 2}</field>
     </record>
 
     <!-- ================================================================ -->

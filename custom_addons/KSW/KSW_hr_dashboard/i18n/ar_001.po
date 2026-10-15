@@ -1,0 +1,88 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_hr_dashboard
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:59+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar_001\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_hr_dashboard
+#. odoo-javascript
+#: code:addons/KSW_hr_dashboard/data/files/ksw_hr_dashboard.json:0
+msgid "Absent Days"
+msgstr "أيام الغياب"
+
+#. module: KSW_hr_dashboard
+#. odoo-javascript
+#: code:addons/KSW_hr_dashboard/data/files/ksw_hr_dashboard.json:0
+msgid "Amount"
+msgstr "المبلغ"
+
+#. module: KSW_hr_dashboard
+#. odoo-javascript
+#: code:addons/KSW_hr_dashboard/data/files/ksw_hr_dashboard.json:0
+msgid "Approval Step"
+msgstr "خطوة الاعتماد"
+
+#. module: KSW_hr_dashboard
+#. odoo-javascript
+#: code:addons/KSW_hr_dashboard/data/files/ksw_hr_dashboard.json:0
+msgid "Attendance Absence Trend"
+msgstr "اتجاه الغياب في الحضور والانصراف"
+
+#. module: KSW_hr_dashboard
+#. odoo-javascript
+#: code:addons/KSW_hr_dashboard/data/files/ksw_hr_dashboard.json:0
+msgid "Department"
+msgstr "القسم"
+
+#. module: KSW_hr_dashboard
+#: model:spreadsheet.dashboard,name:KSW_hr_dashboard.spreadsheet_dashboard_ksw_hr
+msgid "KSW HR Overview"
+msgstr "نظرة عامة على الموارد البشرية KSW"
+
+#. module: KSW_hr_dashboard
+#. odoo-javascript
+#: code:addons/KSW_hr_dashboard/data/files/ksw_hr_dashboard.json:0
+msgid "Month"
+msgstr "الشهر"
+
+#. module: KSW_hr_dashboard
+#. odoo-javascript
+#: code:addons/KSW_hr_dashboard/data/files/ksw_hr_dashboard.json:0
+msgid "Outstanding"
+msgstr "المستحق"
+
+#. module: KSW_hr_dashboard
+#. odoo-javascript
+#: code:addons/KSW_hr_dashboard/data/files/ksw_hr_dashboard.json:0
+msgid "Outstanding Deduction Balance"
+msgstr "رصيد الخصومات المستحق"
+
+#. module: KSW_hr_dashboard
+#. odoo-javascript
+#: code:addons/KSW_hr_dashboard/data/files/ksw_hr_dashboard.json:0
+msgid "Payroll by Department"
+msgstr "الرواتب حسب الإدارة"
+
+#. module: KSW_hr_dashboard
+#. odoo-javascript
+#: code:addons/KSW_hr_dashboard/data/files/ksw_hr_dashboard.json:0
+msgid "Pending Leave Approvals by Step"
+msgstr "طلبات الإجازة بانتظار الاعتماد حسب الخطوة"
+
+#. module: KSW_hr_dashboard
+#. odoo-javascript
+#: code:addons/KSW_hr_dashboard/data/files/ksw_hr_dashboard.json:0
+msgid "Requests"
+msgstr "الطلبات"

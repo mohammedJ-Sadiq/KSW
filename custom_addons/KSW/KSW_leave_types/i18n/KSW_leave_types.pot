@@ -1,0 +1,169 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_leave_types
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_leave_types
+#: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_list_balance
+msgid "Allocated"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_search_balance
+msgid "Annual Leave"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_list_balance
+msgid "Balance"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model:ir.model.fields,field_description:KSW_leave_types.field_hr_leave_type__x_code_sort
+msgid "Code Sort Key"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_search_balance
+msgid "Currently Valid"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_search_balance
+msgid "Department"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model:ir.model.fields,field_description:KSW_leave_types.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:KSW_leave_types.field_hr_leave__display_name
+#: model:ir.model.fields,field_description:KSW_leave_types.field_hr_leave_type__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model:ir.model,name:KSW_leave_types.model_hr_employee
+#: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_search_balance
+msgid "Employee"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model:hr.leave.type,name:KSW_leave_types.leave_type_hajj
+#: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_search_balance
+msgid "Hajj Leave"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model:ir.model.fields,field_description:KSW_leave_types.field_hr_employee__id
+#: model:ir.model.fields,field_description:KSW_leave_types.field_hr_leave__id
+#: model:ir.model.fields,field_description:KSW_leave_types.field_hr_leave_type__id
+msgid "ID"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model:ir.model.fields,field_description:KSW_leave_types.field_hr_leave_type__is_hajj_leave
+msgid "Is Hajj Leave"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model:ir.model.fields,field_description:KSW_leave_types.field_hr_leave_type__is_maternity_leave
+msgid "Is Maternity Leave"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model:ir.model.fields,field_description:KSW_leave_types.field_hr_leave_type__is_paternity_leave
+msgid "Is Paternity Leave"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model:ir.model.fields,field_description:KSW_leave_types.field_hr_leave_type__is_sick_leave
+msgid "Is Sick Leave"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model:ir.actions.server,name:KSW_leave_types.cron_create_leave_allocations_ir_actions_server
+msgid "KSW: Auto-create Leave Allocations"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model:ir.actions.act_window,name:KSW_leave_types.action_leave_balances
+#: model:ir.ui.menu,name:KSW_leave_types.menu_leave_balances
+msgid "Leave Balances"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_list_balance
+#: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_search_balance
+msgid "Leave Type"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model:hr.leave.type,name:KSW_leave_types.leave_type_maternity
+#: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_search_balance
+msgid "Maternity Leave"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model_terms:ir.actions.act_window,help:KSW_leave_types.action_leave_balances
+msgid "No leave balances found"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model:hr.leave.type,name:KSW_leave_types.leave_type_paternity
+#: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_search_balance
+msgid "Paternity Leave"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model:hr.leave.type,name:KSW_leave_types.leave_type_sick
+#: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_search_balance
+msgid "Sick Leave"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_list_balance
+msgid "Taken"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model:ir.model,name:KSW_leave_types.model_hr_leave
+msgid "Time Off"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model:ir.model,name:KSW_leave_types.model_hr_leave_type
+msgid "Time Off Type"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_list_balance
+msgid "Total Allocated"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_list_balance
+msgid "Valid From"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_list_balance
+msgid "Valid Until"
+msgstr ""
+
+#. module: KSW_leave_types
+#: model_terms:ir.actions.act_window,help:KSW_leave_types.action_leave_balances
+msgid ""
+"Validated leave allocations appear here with their allocated, taken and "
+"remaining days."
+msgstr ""

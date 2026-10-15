@@ -20,9 +20,24 @@ msgstr ""
 "<span class=\"badge text-bg-danger\">⚠ <span>تحتاج إلى مراجعة</span></span>"
 
 #. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_tanker_kanban_mobile
+msgid "<span class=\"text-muted small\">Driver</span>"
+msgstr "<span class=\"text-muted small\">السائق</span>"
+
+#. module: KSW_mobile_ui
 #: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.ksw_attendance_sheet_view_kanban_mobile
 msgid "<span>Absent</span>"
 msgstr "<span>غياب</span>"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_location_request_kanban_mobile
+msgid "<span>Accuracy</span> ±"
+msgstr "<span>الدقة</span> ±"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_ksw_pay_run_kanban_mobile
+msgid "<span>Approved by</span>"
+msgstr "<span>اعتمده</span>"
 
 #. module: KSW_mobile_ui
 #: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.ksw_attendance_sheet_view_kanban_mobile
@@ -30,9 +45,19 @@ msgid "<span>Attended</span>"
 msgstr "<span>حضور</span>"
 
 #. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_ksw_pay_run_kanban_mobile
+msgid "<span>Batches</span>"
+msgstr "<span>دفعات</span>"
+
+#. module: KSW_mobile_ui
 #: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.hr_attendance_view_kanban_mobile
 msgid "<span>Deduction</span>"
 msgstr "<span>الخصم</span>"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_ksw_pay_run_kanban_mobile
+msgid "<span>Departments In</span>"
+msgstr "<span>أقسام مُسلَّمة</span>"
 
 #. module: KSW_mobile_ui
 #: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.ksw_payslip_revision_request_view_kanban_mobile
@@ -45,19 +70,55 @@ msgid "<span>Early Leave</span>"
 msgstr "<span>انصراف مبكر</span>"
 
 #. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_ksw_pay_run_kanban_mobile
+msgid "<span>Employees</span>"
+msgstr "<span>موظفين</span>"
+
+#. module: KSW_mobile_ui
 #: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.hr_attendance_view_kanban_mobile
 msgid "<span>Late</span>"
 msgstr "<span>تأخير</span>"
 
 #. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_capture_kanban_mobile
+msgid "<span>Note</span>"
+msgstr "<span>سند التسليم</span>"
+
+#. module: KSW_mobile_ui
 #: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.ksw_attendance_sheet_view_kanban_mobile
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_ksw_pay_run_kanban_mobile
 msgid "<span>Waiting On</span>"
 msgstr "<span>بانتظار</span>"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_tanker_kanban_mobile
+msgid "<span>clients</span>"
+msgstr "<span>عملاء</span>"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_capture_kanban_mobile
+msgid "<span>m from the client</span>"
+msgstr "<span>م من موقع العميل</span>"
 
 #. module: KSW_mobile_ui
 #: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.hr_attendance_view_kanban_mobile
 msgid "Absent"
 msgstr "غائب"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_capture_kanban_mobile
+msgid "Accept"
+msgstr "قبول"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_capture_kanban_mobile
+msgid "Accept this delivery and issue the note?"
+msgstr "قبول هذا التسليم وإصدار السند؟"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_tanker_form_mobile
+msgid "Add the clients this driver serves"
+msgstr "أضف العملاء الذين يخدمهم هذا السائق"
 
 #. module: KSW_mobile_ui
 #: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.ksw_deduction_view_kanban_my_mobile
@@ -67,8 +128,29 @@ msgstr "المبلغ"
 #. module: KSW_mobile_ui
 #: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.hr_leave_view_kanban_mobile_steps
 #: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.ksw_payslip_revision_request_view_kanban_mobile
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_location_request_kanban_mobile
 msgid "Approve"
 msgstr "موافقة"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_location_request_kanban_mobile
+msgid "Approve this location? Check the pin on the map first."
+msgstr "اعتماد هذا الموقع؟ تحقق من الدبوس على الخريطة أولاً."
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_tanker_form_mobile
+msgid "Assignment"
+msgstr "التعيين"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_tanker_form_mobile
+msgid "Branch"
+msgstr "الفرع"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_tanker_form_mobile
+msgid "Clients"
+msgstr "العملاء"
 
 #. module: KSW_mobile_ui
 #: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.hr_leave_view_kanban_return_mobile
@@ -81,9 +163,29 @@ msgid "Covered by Time Off"
 msgstr "مشمول بإجازة"
 
 #. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_tanker_form_mobile
+msgid "Driver"
+msgstr "السائق"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_ksw_pay_run_kanban_mobile
+msgid "Earnings"
+msgstr "المستحقات"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_tanker_form_mobile
+msgid "Groups"
+msgstr "المجموعات"
+
+#. module: KSW_mobile_ui
 #: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.ksw_deduction_view_kanban_my_mobile
 msgid "Monthly Installment"
 msgstr "القسط الشهري"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_tanker_kanban_mobile
+msgid "No Driver"
+msgstr "بدون سائق"
 
 #. module: KSW_mobile_ui
 #: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.ksw_attendance_sheet_view_kanban_mobile
@@ -91,14 +193,39 @@ msgid "Not Sent"
 msgstr "لم يرسل"
 
 #. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_location_request_kanban_mobile
+msgid "Open Map"
+msgstr "فتح الخريطة"
+
+#. module: KSW_mobile_ui
 #: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.ksw_deduction_view_kanban_my_mobile
 msgid "Paid"
 msgstr "المسدد"
 
 #. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_ksw_pay_run_kanban_mobile
+msgid "Payable"
+msgstr "الإجمالي المستحق"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_tanker_form_mobile
+msgid "Pick a driver first: the clients belong to the driver of this tanker."
+msgstr "اختر السائق أولاً: العملاء مرتبطون بسائق هذا الصهريج."
+
+#. module: KSW_mobile_ui
 #: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.hr_attendance_view_kanban_mobile
 msgid "Public Holiday"
 msgstr "عطلة رسمية"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_capture_kanban_mobile
+msgid "Reject"
+msgstr "رفض"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_capture_kanban_mobile
+msgid "Reject this delivery? The note will be cancelled."
+msgstr "رفض هذا التسليم؟ سيُلغى السند."
 
 #. module: KSW_mobile_ui
 #: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.ksw_deduction_view_kanban_my_mobile
@@ -111,6 +238,16 @@ msgid "Sent to Payroll"
 msgstr "أرسل للرواتب"
 
 #. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_capture_kanban_mobile
+msgid "Try Again"
+msgstr "إعادة المحاولة"
+
+#. module: KSW_mobile_ui
 #: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.hr_attendance_view_kanban_mobile
 msgid "Weekend"
 msgstr "عطلة أسبوعية"
+
+#. module: KSW_mobile_ui
+#: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_tanker_kanban_mobile
+msgid "m³"
+msgstr "م³"

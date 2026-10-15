@@ -6,15 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-05 13:42+0000\n"
-"PO-Revision-Date: 2026-10-05 13:42+0000\n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:59+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar_001\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
+"Plural-Forms: \n"
 
 #. module: KSW_accounting_ux
 #: model:ir.model,name:KSW_accounting_ux.model_account_account
@@ -83,10 +83,10 @@ msgstr "BAS (محتسب)"
 
 #. module: KSW_accounting_ux
 #. odoo-python
+#: code:addons/KSW_accounting_ux/wizard/bs_cf_wizard.py:0
 #: model:ir.actions.act_window,name:KSW_accounting_ux.action_ksw_bs_wizard
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_bs
 #: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.ksw_bs_wizard_view_form
-#: code:addons/KSW_accounting_ux/wizard/bs_cf_wizard.py:0
 msgid "Balance Sheet"
 msgstr "قائمة المركز المالي"
 
@@ -156,10 +156,10 @@ msgstr "إلغاء"
 
 #. module: KSW_accounting_ux
 #. odoo-python
+#: code:addons/KSW_accounting_ux/wizard/bs_cf_wizard.py:0
 #: model:ir.actions.act_window,name:KSW_accounting_ux.action_ksw_cf_wizard
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_cf
 #: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.ksw_cf_wizard_view_form
-#: code:addons/KSW_accounting_ux/wizard/bs_cf_wizard.py:0
 msgid "Cash Flow Statement"
 msgstr "قائمة التدفقات النقدية"
 
@@ -182,6 +182,11 @@ msgstr "المقارنة"
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_asset_compute
 msgid "Compute Depreciation"
 msgstr "احتساب الإهلاك"
+
+#. module: KSW_accounting_ux
+#: model:ir.model,name:KSW_accounting_ux.model_res_partner
+msgid "Contact"
+msgstr "جهة الاتصال"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_bs_wizard__create_uid
@@ -213,7 +218,11 @@ msgstr "إشعارات مدينة"
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_account__display_name
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_group__display_name
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_journal__display_name
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_move__display_name
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_move_line__display_name
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_payment__display_name
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_payment_register__display_name
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ir_ui_menu__display_name
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_bs_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cf_wizard__display_name
@@ -223,6 +232,7 @@ msgstr "إشعارات مدينة"
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_mis_report__display_name
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_mis_report_instance__display_name
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_res_partner__display_name
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_statement_common_wizard__display_name
 msgid "Display Name"
 msgstr "اسم العرض"
@@ -278,7 +288,11 @@ msgstr "المجموعة"
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_account__id
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_group__id
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_journal__id
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_move__id
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_move_line__id
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_payment__id
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_payment_register__id
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ir_ui_menu__id
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_bs_wizard__id
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cf_wizard__id
@@ -288,6 +302,7 @@ msgstr "المجموعة"
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_wizard__id
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_mis_report__id
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_mis_report_instance__id
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_res_partner__id
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_statement_common_wizard__id
 msgid "ID"
 msgstr "المعرف"
@@ -302,6 +317,16 @@ msgstr "استورد كشف البنك (البنك والنقد &gt; استير�
 #: model:mis.report,name:KSW_accounting_ux.mis_pl_report
 msgid "Income Statement (KSW)"
 msgstr "قائمة الدخل (KSW)"
+
+#. module: KSW_accounting_ux
+#: model:ir.model,name:KSW_accounting_ux.model_account_journal
+msgid "Journal"
+msgstr "دفتر اليومية"
+
+#. module: KSW_accounting_ux
+#: model:ir.model,name:KSW_accounting_ux.model_account_move
+msgid "Journal Entry"
+msgstr "قيد اليومية"
 
 #. module: KSW_accounting_ux
 #: model:ir.model,name:KSW_accounting_ux.model_account_move_line
@@ -428,12 +453,12 @@ msgstr ""
 #. module: KSW_accounting_ux
 #: model:ir.model,name:KSW_accounting_ux.model_mis_report_instance
 msgid "MIS Report Instance"
-msgstr ""
+msgstr "نسخة تقرير MIS"
 
 #. module: KSW_accounting_ux
 #: model:ir.model,name:KSW_accounting_ux.model_mis_report
 msgid "MIS Report Template"
-msgstr ""
+msgstr "قالب تقرير MIS"
 
 #. module: KSW_accounting_ux
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_entries_management
@@ -443,7 +468,7 @@ msgstr "الإدارة"
 #. module: KSW_accounting_ux
 #: model:ir.model,name:KSW_accounting_ux.model_ir_ui_menu
 msgid "Menu"
-msgstr ""
+msgstr "القائمة"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_cf_wizard__layout__monthly
@@ -460,6 +485,12 @@ msgstr "بدون مقارنة"
 #: model_terms:ir.actions.act_window,help:KSW_accounting_ux.action_ksw_debit_notes
 msgid "No debit notes yet"
 msgstr "لا توجد إشعارات مدينة بعد"
+
+#. module: KSW_accounting_ux
+#. odoo-python
+#: code:addons/KSW_accounting_ux/models/res_partner.py:0
+msgid "No free receivable code left under %s."
+msgstr "لم يتبق رمز ذمم مدينة متاح تحت %s."
 
 #. module: KSW_accounting_ux
 #: model_terms:ir.actions.act_window,help:KSW_accounting_ux.action_ksw_payments_due
@@ -496,6 +527,16 @@ msgid "Partners"
 msgstr "الشركاء"
 
 #. module: KSW_accounting_ux
+#: model:ir.model,name:KSW_accounting_ux.model_account_payment_register
+msgid "Pay"
+msgstr "الدفع"
+
+#. module: KSW_accounting_ux
+#: model:ir.model,name:KSW_accounting_ux.model_account_payment
+msgid "Payments"
+msgstr "الدفعات"
+
+#. module: KSW_accounting_ux
 #: model:ir.actions.act_window,name:KSW_accounting_ux.action_ksw_payments_due
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_payments_due
 msgid "Payments Due"
@@ -515,11 +556,11 @@ msgstr ""
 
 #. module: KSW_accounting_ux
 #. odoo-python
+#: code:addons/KSW_accounting_ux/wizard/pl_wizard.py:0
 #: model:ir.actions.act_window,name:KSW_accounting_ux.action_ksw_pl_wizard
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_pl
 #: model:mis.report.instance,name:KSW_accounting_ux.mis_pl_instance
 #: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.ksw_pl_wizard_view_form
-#: code:addons/KSW_accounting_ux/wizard/pl_wizard.py:0
 msgid "Profit and Loss"
 msgstr "قائمة الدخل"
 
@@ -569,7 +610,7 @@ msgstr "المصدر"
 #. module: KSW_accounting_ux
 #: model:ir.model,name:KSW_accounting_ux.model_statement_common_wizard
 msgid "Statement Reports Common Wizard"
-msgstr ""
+msgstr "معالج تقارير كشوف الحساب المشترك"
 
 #. module: KSW_accounting_ux
 #: model:ir.actions.act_window,name:KSW_accounting_ux.action_ksw_activity_statement

@@ -1,6 +1,6 @@
 {
     'name': 'KSW - Mobile Layout',
-    'version': '19.0.1.2.0',
+    'version': '19.0.1.3.0',
     'author': 'Mohammed Albadr',
     'summary': 'Phone-only layout for the most-used KSW screens; desktop unchanged',
     'description': """
@@ -25,6 +25,7 @@ Phone layout rules (pattern taken from SAP Fiori / Oracle Redwood / Odoo Enterpr
         'KSW_payroll',
         'KSW_leave_types',
         'hr_attendance',
+        'KSW_water_delivery',
     ],
     'data': [
         'views/attendance_sheet_views.xml',
@@ -35,11 +36,14 @@ Phone layout rules (pattern taken from SAP Fiori / Oracle Redwood / Odoo Enterpr
         'views/ksw_commissions_views.xml',
         'views/ksw_payroll_views.xml',
         'views/hr_leave_allocation_views.xml',
+        'views/water_delivery_views.xml',
     ],
     'assets': {
         'web.assets_backend': [
             'KSW_mobile_ui/static/src/js/list_renderer_patch.js',
+            'KSW_mobile_ui/static/src/js/pivot_model_patch.js',
             'KSW_mobile_ui/static/src/scss/mobile.scss',
+            'KSW_mobile_ui/static/src/xml/list_renderer_mobile.xml',
         ],
     },
     'installable': True,

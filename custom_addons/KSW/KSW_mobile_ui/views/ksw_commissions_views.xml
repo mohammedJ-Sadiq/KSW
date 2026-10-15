@@ -64,4 +64,76 @@
         </field>
     </record>
 
+    <!-- Monthly Pay Run: one card per GM month. The month and its state up
+         top, where the month stands (departments in / still waiting), and
+         the money for the roles the list already shows it to. -->
+    <record id="view_ksw_pay_run_kanban_mobile" model="ir.ui.view">
+        <field name="name">ksw.pay.run.kanban.mobile</field>
+        <field name="model">ksw.pay.run</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <kanban class="ksw_m_cards" sample="1">
+                <field name="currency_id"/>
+                <field name="period"/>
+                <field name="pending_department_count"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between align-items-start gap-2">
+                            <!-- "October 2026", not the date picker's "Oct 1";
+                                 luxon follows the user's language -->
+                            <span class="fw-bold fs-4" t-if="record.period.raw_value"
+                                  t-esc="luxon.DateTime.fromISO(record.period.raw_value).toFormat('MMMM yyyy')"/>
+                            <field name="state" widget="badge"
+                                   decoration-info="state == 'submitted'"
+                                   decoration-success="state == 'approved'"/>
+                        </div>
+                        <div class="text-muted small">
+                            <field name="name"/> · <field name="gm_id"/>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2 mt-2">
+                            <span class="badge text-bg-light">
+                                <field name="submitted_department_count"/> <span>Departments In</span>
+                            </span>
+                            <span t-if="record.pending_department_count.raw_value" class="badge text-bg-warning">
+                                <field name="pending_department_count"/> <span>Waiting On</span>
+                            </span>
+                            <span class="badge text-bg-light">
+                                <field name="batch_count"/> <span>Batches</span>
+                            </span>
+                            <span class="badge text-bg-light">
+                                <field name="employee_count"/> <span>Employees</span>
+                            </span>
+                        </div>
+                        <div class="row g-0 mt-2 pt-2 border-top" groups="KSW_commissions.group_commission_gm,KSW_commissions.group_commission_accountant,KSW_commissions.group_commission_officer,base.group_system">
+                            <div class="col-6">
+                                <div class="small text-muted">Earnings</div>
+                                <field name="total_earnings" widget="monetary"/>
+                            </div>
+                            <div class="col-6 text-end">
+                                <div class="small text-muted">Payable</div>
+                                <field name="total_payable" widget="monetary" class="fw-bold"/>
+                            </div>
+                        </div>
+                        <div class="small text-muted mt-1" t-if="record.approved_by.raw_value">
+                            <span>Approved by</span> <field name="approved_by"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_ksw_pay_run_view_list_mobile" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="KSW_commissions.view_ksw_pay_run_list"/>
+        <field name="act_window_id" ref="KSW_commissions.action_ksw_pay_run"/>
+    </record>
+    <record id="action_ksw_pay_run_view_kanban_mobile" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_ksw_pay_run_kanban_mobile"/>
+        <field name="act_window_id" ref="KSW_commissions.action_ksw_pay_run"/>
+    </record>
+
 </odoo>

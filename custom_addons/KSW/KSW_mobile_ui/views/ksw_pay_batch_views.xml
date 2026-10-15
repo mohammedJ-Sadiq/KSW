@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Entries on a phone: Employee + Amount, plus option / date /
-         quantity / location when the component uses them. Odoo gives every
-         list column an 80px floor (buttons can't shrink at all), so more
-         than that cannot fit 390px. The vacation flags still colour the row
-         red; reason, flags and the row buttons stay on desktop. -->
+    <!-- Entries on a phone: each row is a card (mobile.scss, line tables),
+         so everything a supervisor types stays; only the derived and
+         read-only columns are dropped to keep the cards short. -->
     <record id="view_ksw_pay_batch_form_mobile" model="ir.ui.view">
         <field name="name">ksw.pay.batch.form.mobile</field>
         <field name="model">ksw.pay.batch</field>
@@ -47,18 +45,6 @@
             <xpath expr="//page[@name='entries']/field[@name='entry_ids']/list/field[@name='x_return_reason']" position="attributes">
                 <attribute name="class" add="ksw_m_hide" separator=" "/>
             </xpath>
-            <xpath expr="//page[@name='entries']/field[@name='entry_ids']/list/field[@name='x_vacation_hold']" position="attributes">
-                <attribute name="class" add="ksw_m_hide" separator=" "/>
-            </xpath>
-            <xpath expr="//page[@name='entries']/field[@name='entry_ids']/list/field[@name='x_vacation_settlement']" position="attributes">
-                <attribute name="class" add="ksw_m_hide" separator=" "/>
-            </xpath>
-            <xpath expr="//page[@name='entries']/field[@name='entry_ids']/list/field[@name='reason']" position="attributes">
-                <attribute name="class" add="ksw_m_hide" separator=" "/>
-            </xpath>
-            <xpath expr="//page[@name='entries']/field[@name='entry_ids']/list/button[@name='action_duplicate_line']" position="attributes">
-                <attribute name="class" add="ksw_m_hide" separator=" "/>
-            </xpath>
             <xpath expr="//page[@name='entries']/field[@name='entry_ids']/list/button[@name='action_explain']" position="attributes">
                 <attribute name="class" add="ksw_m_hide" separator=" "/>
             </xpath>
@@ -66,9 +52,6 @@
                 <attribute name="class" add="ksw_m_hide" separator=" "/>
             </xpath>
             <xpath expr="//page[@name='by_employee']/field[@name='entry_ids']/list/field[@name='date']" position="attributes">
-                <attribute name="class" add="ksw_m_hide" separator=" "/>
-            </xpath>
-            <xpath expr="//page[@name='by_employee']/field[@name='entry_ids']/list/field[@name='reason']" position="attributes">
                 <attribute name="class" add="ksw_m_hide" separator=" "/>
             </xpath>
         </field>

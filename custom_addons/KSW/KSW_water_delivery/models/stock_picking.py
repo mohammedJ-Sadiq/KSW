@@ -332,13 +332,13 @@ class StockPicking(models.Model):
         if not vehicles:
             return Vehicle, _(
                 'No tanker is assigned to %s. Ask your supervisor to assign one '
-                '(Water Delivery ▸ Tankers).',
+                '(Water Delivery ▸ Fleet Management).',
                 driver.sudo().name)
         if len(vehicles) > 1:
             return Vehicle, _(
                 '%(driver)s is assigned to %(count)d tankers (%(tankers)s). Ask '
                 'your supervisor to leave only the one being driven today '
-                '(Water Delivery ▸ Tankers).',
+                '(Water Delivery ▸ Fleet Management).',
                 driver=driver.sudo().name, count=len(vehicles),
                 tankers=', '.join(vehicles.mapped('display_name')))
         return vehicles, None

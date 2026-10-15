@@ -6,16 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-15 12:11+0000\n"
-"PO-Revision-Date: 2026-07-15 12:11+0000\n"
+"POT-Creation-Date: 2026-10-14 19:41+0000\n"
+"PO-Revision-Date: 2026-10-14 19:59+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar_001\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
-"X-Generator: KSW ar-engine v2\n"
+"Plural-Forms: \n"
 
 #. module: KSW_leave_types
 #: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_list_balance
@@ -25,12 +24,17 @@ msgstr "المخصصة"
 #. module: KSW_leave_types
 #: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_search_balance
 msgid "Annual Leave"
-msgstr ""
+msgstr "الإجازة السنوية"
 
 #. module: KSW_leave_types
 #: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_list_balance
 msgid "Balance"
 msgstr "الرصيد"
+
+#. module: KSW_leave_types
+#: model:ir.model.fields,field_description:KSW_leave_types.field_hr_leave_type__x_code_sort
+msgid "Code Sort Key"
+msgstr "مفتاح ترتيب الرمز"
 
 #. module: KSW_leave_types
 #: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_search_balance
@@ -44,6 +48,7 @@ msgstr "القسم"
 
 #. module: KSW_leave_types
 #: model:ir.model.fields,field_description:KSW_leave_types.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:KSW_leave_types.field_hr_leave__display_name
 #: model:ir.model.fields,field_description:KSW_leave_types.field_hr_leave_type__display_name
 msgid "Display Name"
 msgstr "اسم العرض"
@@ -62,6 +67,7 @@ msgstr "إجازة الحج"
 
 #. module: KSW_leave_types
 #: model:ir.model.fields,field_description:KSW_leave_types.field_hr_employee__id
+#: model:ir.model.fields,field_description:KSW_leave_types.field_hr_leave__id
 #: model:ir.model.fields,field_description:KSW_leave_types.field_hr_leave_type__id
 msgid "ID"
 msgstr "المعرف"
@@ -69,39 +75,39 @@ msgstr "المعرف"
 #. module: KSW_leave_types
 #: model:ir.model.fields,field_description:KSW_leave_types.field_hr_leave_type__is_hajj_leave
 msgid "Is Hajj Leave"
-msgstr ""
+msgstr "إجازة الحج"
 
 #. module: KSW_leave_types
 #: model:ir.model.fields,field_description:KSW_leave_types.field_hr_leave_type__is_maternity_leave
 msgid "Is Maternity Leave"
-msgstr ""
+msgstr "إجازة أمومة"
 
 #. module: KSW_leave_types
 #: model:ir.model.fields,field_description:KSW_leave_types.field_hr_leave_type__is_paternity_leave
 msgid "Is Paternity Leave"
-msgstr ""
+msgstr "إجازة أبوة"
 
 #. module: KSW_leave_types
 #: model:ir.model.fields,field_description:KSW_leave_types.field_hr_leave_type__is_sick_leave
 msgid "Is Sick Leave"
-msgstr ""
+msgstr "إجازة مرضية"
 
 #. module: KSW_leave_types
 #: model:ir.actions.server,name:KSW_leave_types.cron_create_leave_allocations_ir_actions_server
 msgid "KSW: Auto-create Leave Allocations"
-msgstr ""
+msgstr "KSW: إنشاء تخصيصات الإجازة تلقائياً"
 
 #. module: KSW_leave_types
 #: model:ir.actions.act_window,name:KSW_leave_types.action_leave_balances
 #: model:ir.ui.menu,name:KSW_leave_types.menu_leave_balances
 msgid "Leave Balances"
-msgstr ""
+msgstr "أرصدة الإجازة"
 
 #. module: KSW_leave_types
 #: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_list_balance
 #: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_search_balance
 msgid "Leave Type"
-msgstr ""
+msgstr "نوع الإجازة"
 
 #. module: KSW_leave_types
 #: model:hr.leave.type,name:KSW_leave_types.leave_type_maternity
@@ -112,7 +118,7 @@ msgstr "إجازة وضع"
 #. module: KSW_leave_types
 #: model_terms:ir.actions.act_window,help:KSW_leave_types.action_leave_balances
 msgid "No leave balances found"
-msgstr ""
+msgstr "لم يُعثَر على أرصدة إجازة"
 
 #. module: KSW_leave_types
 #: model:hr.leave.type,name:KSW_leave_types.leave_type_paternity
@@ -132,6 +138,11 @@ msgid "Taken"
 msgstr "تم أخذها"
 
 #. module: KSW_leave_types
+#: model:ir.model,name:KSW_leave_types.model_hr_leave
+msgid "Time Off"
+msgstr "الإجازات"
+
+#. module: KSW_leave_types
 #: model:ir.model,name:KSW_leave_types.model_hr_leave_type
 msgid "Time Off Type"
 msgstr "نوع الإجازة"
@@ -139,17 +150,17 @@ msgstr "نوع الإجازة"
 #. module: KSW_leave_types
 #: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_list_balance
 msgid "Total Allocated"
-msgstr ""
+msgstr "إجمالي المُخصَّص"
 
 #. module: KSW_leave_types
 #: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_list_balance
 msgid "Valid From"
-msgstr ""
+msgstr "صالح من"
 
 #. module: KSW_leave_types
 #: model_terms:ir.ui.view,arch_db:KSW_leave_types.hr_leave_allocation_view_list_balance
 msgid "Valid Until"
-msgstr ""
+msgstr "صالح حتى"
 
 #. module: KSW_leave_types
 #: model_terms:ir.actions.act_window,help:KSW_leave_types.action_leave_balances
@@ -157,3 +168,5 @@ msgid ""
 "Validated leave allocations appear here with their allocated, taken and "
 "remaining days."
 msgstr ""
+"تظهر هنا تخصيصات الإجازة المُصادَق عليها مع أيامها المُخصَّصة والمُستهلَكة "
+"والمتبقية."

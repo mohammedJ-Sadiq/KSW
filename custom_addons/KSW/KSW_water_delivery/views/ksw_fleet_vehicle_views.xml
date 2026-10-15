@@ -19,7 +19,7 @@
         </field>
     </record>
 
-    <!-- Water Delivery > Tankers: where dispatch assigns drivers.
+    <!-- Water Delivery > Fleet Management: where dispatch assigns drivers.
 
          Editable in the list on purpose: setting up 370 vehicles one form at
          a time is the job nobody would finish. Only the columns that are
@@ -88,7 +88,7 @@
     </record>
 
     <record id="action_water_tankers" model="ir.actions.act_window">
-        <field name="name">Tankers</field>
+        <field name="name">Fleet Management</field>
         <field name="res_model">ksw.fleet.vehicle</field>
         <field name="view_mode">list</field>
         <field name="view_id" ref="view_water_tanker_list"/>
