@@ -1,9 +1,11 @@
-"""Readable workshop reports: by date, by vehicle, by repair type, by spare part.
+"""Workshop reports: by date, by vehicle, by repair type, by spare part.
 
-The pivot/graph actions under Reporting answer "how many"; these answer "what
-happened" — a printed page a person can read top to bottom: the filters it was
-run with, a few headline figures, a summary table per grouping, and then the
-jobs themselves with what was done and what was fitted.
+The SAP way round — a selection screen, then the list. The wizard asks the
+questions (which period or all history, which vehicle / type / part, how to
+group, collapsed or expanded or flat) and Show turns the answers into the
+domain and group-bys of an interactive list (rows open the repair, pivot and
+graph alongside), so nobody has to build filters by hand. Print PDF renders
+the same selection as a page to hand someone.
 
 Nothing is stored. Every run reads the requests (and the issued part lines)
 with the caller's own rights, so a report can never show a job its reader
@@ -27,7 +29,7 @@ DETAIL_LIMIT = 2000
 # Free text is cut on the page, never in the data.
 TEXT_LIMIT = 160
 
-_TIME_GROUPS = ('day', 'month', 'year')
+_TIME_GROUPS = ('day', 'week', 'month', 'year')
 
 
 class KswWorkshopReportWizard(models.TransientModel):
@@ -41,6 +43,10 @@ class KswWorkshopReportWizard(models.TransientModel):
         ('spare_part', 'By Spare Part'),
     ], string='Report', required=True, default='date')
 
+    period_mode = fields.Selection([
+        ('period', 'A period'),
+        ('all', 'All history'),
+    ], string='Records', required=True, default='period')
     date_from = fields.Date(string='From')
     date_to = fields.Date(string='To', default=fields.Date.context_today)
     date_basis = fields.Selection([
@@ -66,22 +72,38 @@ class KswWorkshopReportWizard(models.TransientModel):
     part_id = fields.Many2one(
         'ksw.workshop.part', string='Spare Part',
         help="Leave empty for a ranking of every part issued in the period.")
+    part_source = fields.Selection([
+        ('issued', 'Issued on repairs (with quantities)'),
+        ('notes', 'Mentioned in the repair notes'),
+    ], string='Look In', required=True, default='issued',
+        help="Parts listed item by item on a repair carry a quantity and a cost. Most of "
+             "the history predates that: what was fitted is written in the repair notes.")
     text_search = fields.Char(
         string='Also Search Repair Notes For',
         help="Most of the history predates itemised parts: what was fitted is written "
              "in the repair notes. Requests whose notes contain this text are listed "
              "separately — they are mentions, not quantities.")
 
-    group_by = fields.Selection([
-        ('none', 'No Grouping'),
+    _GROUPINGS = [
+        ('none', 'Nothing'),
         ('day', 'Day'),
+        ('week', 'Week'),
         ('month', 'Month'),
         ('year', 'Year'),
         ('vehicle', 'Vehicle'),
         ('repair_type', 'Repair Type'),
+        ('part', 'Spare Part'),
         ('technician', 'Technician'),
         ('vehicle_type', 'Vehicle Type'),
-    ], string='Group By', required=True, default='day')
+        ('client', 'Client'),
+    ]
+    layout = fields.Selection([
+        ('collapsed', 'Grouped, collapsed (totals per group)'),
+        ('expanded', 'Grouped, expanded (every record under its group)'),
+        ('flat', 'All records, no grouping'),
+    ], string='Show', required=True, default='collapsed')
+    group_by = fields.Selection(_GROUPINGS, string='Group By', required=True, default='day')
+    group_by_2 = fields.Selection(_GROUPINGS, string='Then By', required=True, default='none')
     show_details = fields.Boolean(
         string='List Each Request', default=True,
         help="Untick for the summary tables only — useful over long periods.")
@@ -96,8 +118,12 @@ class KswWorkshopReportWizard(models.TransientModel):
         A vehicle's history includes the job it is in for today.
         """
         return {
+            'period_mode': 'period' if report_type == 'date' else 'all',
             'date_from': fields.Date.context_today(self).replace(day=1) if report_type == 'date' else False,
-            'group_by': 'day' if report_type == 'date' else 'month',
+            'group_by': {'date': 'day', 'vehicle': 'vehicle', 'repair_type': 'repair_type',
+                         'spare_part': 'part'}[report_type],
+            'group_by_2': {'date': 'none', 'vehicle': 'year'}.get(report_type, 'month'),
+            'layout': 'expanded' if report_type == 'date' else 'collapsed',
             'state_scope': 'active' if report_type == 'vehicle' else 'completed',
         }
 
@@ -108,7 +134,24 @@ class KswWorkshopReportWizard(models.TransientModel):
         for field, value in self._type_defaults(res.get('report_type') or 'date').items():
             if field in fields_list and not context.get('default_' + field):
                 res[field] = value
+        if res.get('vehicle_id') and res.get('group_by') == 'vehicle':
+            res.update(self._one_vehicle_layout())
         return res
+
+    @staticmethod
+    def _one_vehicle_layout():
+        # One vehicle: its years, every visit listed.
+        return {'group_by': 'year', 'group_by_2': 'none', 'layout': 'expanded'}
+
+    @api.onchange('vehicle_id')
+    def _onchange_vehicle_id(self):
+        for wizard in self:
+            if wizard.report_type != 'vehicle':
+                continue
+            if wizard.vehicle_id and wizard.group_by == 'vehicle':
+                wizard.update(wizard._one_vehicle_layout())
+            elif not wizard.vehicle_id and wizard.group_by != 'vehicle':
+                wizard.update({'group_by': 'vehicle', 'group_by_2': 'year', 'layout': 'collapsed'})
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -128,29 +171,150 @@ class KswWorkshopReportWizard(models.TransientModel):
         for wizard in self:
             wizard.update(wizard._type_defaults(wizard.report_type))
 
+    @api.onchange('period_mode')
+    def _onchange_period_mode(self):
+        for wizard in self:
+            if wizard.period_mode == 'all':
+                wizard.date_from = wizard.date_to = False
+            elif not wizard.date_from and not wizard.date_to:
+                today = fields.Date.context_today(wizard)
+                wizard.date_from, wizard.date_to = today.replace(day=1), today
+
     @api.onchange('part_id')
     def _onchange_part_id(self):
         for wizard in self:
             if wizard.part_id:
-                wizard.text_search = wizard._part_search_text()
+                wizard._apply_part_choice()
+
+    @api.onchange('part_source')
+    def _onchange_part_source(self):
+        # Notes are free text on the repair: there is no part to group them by.
+        for wizard in self:
+            if wizard.part_source == 'notes':
+                if wizard.group_by == 'part':
+                    wizard.group_by = 'year'
+                if wizard.group_by_2 == 'part':
+                    wizard.group_by_2 = 'none'
+
+    def _apply_part_choice(self):
+        """Prefill the notes search, and look in the notes when nothing was itemised.
+
+        A part chosen with no issued lines would otherwise open an empty
+        list — while its history sits in the notes.
+        """
+        self.text_search = self._part_search_text()
+        has_lines = self.env['ksw.workshop.part.line'].search_count(self._part_line_part_domain(), limit=1)
+        self.part_source = 'issued' if has_lines else 'notes'
+        self._onchange_part_source()
 
     # ------------------------------------------------------------------
     # Actions
     # ------------------------------------------------------------------
+    def action_show(self):
+        """Open the interactive list the answers describe."""
+        self.ensure_one()
+        self._check_inputs()
+        on_lines = self._shows_part_lines()
+        domain = self._part_line_domain() if on_lines else self._request_domain()
+        if self.report_type == 'spare_part' and not on_lines:
+            domain += self._notes_domain()
+        group_by = [] if self.layout == 'flat' else [
+            self._group_spec(key, on_lines) for key in (self.group_by, self.group_by_2) if key != 'none']
+        prefix = 'view_ksw_workshop_part_line_list_report' if on_lines else 'view_ksw_workshop_request_list_report'
+        list_view = self.env.ref('KSW_workshop.%s%s' % (prefix, '_expanded' if self.layout == 'expanded' else ''))
+        search_view = self.env.ref('KSW_workshop.view_ksw_workshop_part_line_search' if on_lines
+                                   else 'KSW_workshop.view_ksw_workshop_request_search')
+        views = [(list_view.id, 'list'), (False, 'pivot'), (False, 'graph')]
+        if not on_lines:
+            views.append((False, 'form'))
+        return {
+            'type': 'ir.actions.act_window',
+            'name': self._action_title(),
+            'res_model': 'ksw.workshop.part.line' if on_lines else 'ksw.workshop.request',
+            'views': views,
+            'search_view_id': [search_view.id, 'search'],
+            'domain': domain,
+            'context': {'group_by': group_by, 'create': False},
+            'target': 'current',
+        }
+
     def action_view(self):
+        if self.report_type == 'vehicle' and not self.vehicle_id:
+            raise UserError(_('Choose the vehicle whose history you want to print.'))
         self._check_inputs()
         return self.env.ref('KSW_workshop.action_report_workshop_html').report_action(self)
 
     def action_print(self):
+        if self.report_type == 'vehicle' and not self.vehicle_id:
+            raise UserError(_('Choose the vehicle whose history you want to print.'))
         self._check_inputs()
         return self.env.ref('KSW_workshop.action_report_workshop_pdf').report_action(self)
 
     def _check_inputs(self):
         for wizard in self:
-            if wizard.report_type == 'vehicle' and not wizard.vehicle_id:
-                raise UserError(_('Choose the vehicle whose history you want.'))
+            if wizard.period_mode == 'all':
+                wizard.write({'date_from': False, 'date_to': False})
+            elif not wizard.date_from and not wizard.date_to:
+                raise UserError(_('Enter the period: a start date, an end date, or both.'))
             if wizard.date_from and wizard.date_to and wizard.date_from > wizard.date_to:
                 raise UserError(_('The start date is after the end date.'))
+            if wizard.layout == 'flat':
+                # The printed report reads the same answer: no grouping.
+                wizard.group_by = 'none'
+            elif wizard.group_by == 'none':
+                raise UserError(_('Choose what to group by, or show all records without grouping.'))
+            # Fail on the form, not as an empty or crashing list.
+            on_lines = wizard._shows_part_lines()
+            for key in (wizard.group_by, wizard.group_by_2):
+                if key != 'none':
+                    wizard._group_spec(key, on_lines)
+
+    def _shows_part_lines(self):
+        return self.report_type == 'spare_part' and self.part_source == 'issued'
+
+    def _date_field(self):
+        return 'completion_date' if self.date_basis == 'completion' else 'create_date'
+
+    def _part_group_field(self):
+        return 'part_id'
+
+    def _group_spec(self, key, on_lines):
+        """A Group By answer as a list group-by, for requests or for part lines."""
+        if key in _TIME_GROUPS:
+            return '%s:%s' % ('issue_date' if on_lines else self._date_field(), key)
+        if on_lines:
+            spec = {'vehicle': 'vehicle_id', 'part': self._part_group_field(),
+                    'technician': 'technician_id', 'client': 'client_id'}.get(key)
+        else:
+            spec = {'vehicle': 'vehicle_id', 'repair_type': 'request_type_ids',
+                    'technician': 'technician_label', 'vehicle_type': 'vehicle_type',
+                    'client': 'client_id'}.get(key)
+        if not spec:
+            label = self._selection_label(self._name, 'group_by', key)
+            if on_lines:
+                raise UserError(_('Issued spare parts cannot be grouped by %s.', label))
+            raise UserError(_('Repairs cannot be grouped by %s. Choose Spare Part only when '
+                              'looking at issued parts.', label))
+        return spec
+
+    def _notes_domain(self):
+        text = (self.text_search or '').strip()
+        if not text:
+            raise UserError(_('Enter the text to look for in the repair notes, e.g. فلتر زيت.'))
+        return ['|', '|', '|', ('repairs_parts', 'ilike', text), ('work_statement', 'ilike', text),
+                ('description', 'ilike', text), ('part_line_ids.description', 'ilike', text)]
+
+    def _action_title(self):
+        """The list's title states the selection, since it is not a search facet."""
+        if self.period_mode == 'all':
+            period = _('all history')
+        else:
+            period = '%s → %s' % (self._fmt_date(self.date_from) or '…', self._fmt_date(self.date_to) or '…')
+        if self.report_type == 'spare_part' and not self._shows_part_lines():
+            subject = _('Repair notes mentioning “%s”', self.text_search)
+        else:
+            subject = self._title()
+        return '%s · %s' % (subject, period)
 
     # ------------------------------------------------------------------
     # Small helpers
@@ -188,6 +352,9 @@ class KswWorkshopReportWizard(models.TransientModel):
             return (('0',), _('No date'))
         if self.group_by == 'day':
             return ((day.isoformat(),), format_date(self.env, day, date_format='EEE d MMM yyyy'))
+        if self.group_by == 'week':
+            year, week, _weekday = day.isocalendar()
+            return (('%d-%02d' % (year, week),), _('Week %(week)s, %(year)s', week=week, year=year))
         if self.group_by == 'month':
             return ((day.strftime('%Y-%m'),), format_date(self.env, day, date_format='MMMM yyyy'))
         return ((str(day.year),), str(day.year))
@@ -268,6 +435,11 @@ class KswWorkshopReportWizard(models.TransientModel):
         if group_by == 'technician':
             label = request.technician_label or _('Not recorded')
             return [((label,), label)]
+        if group_by == 'client':
+            label = request.client_id.display_name or request.x_cash_customer_name or _('Not set')
+            return [((label,), label)]
+        if group_by == 'part':
+            return [((0,), _('All requests'))]
         label = self._selection_label('ksw.workshop.request', 'vehicle_type', request.vehicle_type) or _('Not set')
         return [((label,), label)]
 
@@ -444,6 +616,8 @@ class KswWorkshopReportWizard(models.TransientModel):
 
     def _title(self):
         if self.report_type == 'vehicle':
+            if not self.vehicle_id:
+                return _('Vehicle History')
             return _('Workshop History — %s', self.vehicle_id.display_name)
         if self.report_type == 'repair_type':
             names = self.request_type_ids.mapped('name')
@@ -600,6 +774,13 @@ class KswWorkshopReportWizard(models.TransientModel):
             return ((label,), label)
         if group_by == 'vehicle_type':
             label = self._selection_label('ksw.workshop.request', 'vehicle_type', request.vehicle_type) or _('Not set')
+            return ((label,), label)
+        if group_by == 'part':
+            _rec, code, name = self._line_part(line)
+            label = ' — '.join(v for v in (code, name) if v) or _('Not set')
+            return ((label,), label)
+        if group_by == 'client':
+            label = line.client_id.display_name or _('Not set')
             return ((label,), label)
         label = self._vehicle_label(request)
         return ((label,), label)

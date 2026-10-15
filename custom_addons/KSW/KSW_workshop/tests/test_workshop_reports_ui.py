@@ -79,3 +79,28 @@ class TestWorkshopReportsUI(HttpCase):
         self._open('KSW_workshop.action_ksw_workshop_report_parts', """
             await wait('.o_list_view, .o_view_nocontent');
         """)
+
+    def test_prompt_then_list(self):
+        # The menu's prompt, its defaults (this month, by day, expanded),
+        # Show, and the list it opens with those answers applied.
+        self._open('KSW_workshop.action_ksw_workshop_report_wizard_date', """
+            await wait('.modal .o_field_widget[name="period_mode"]');
+            if (!document.querySelector('.modal .o_field_widget[name="layout"]'))
+                throw new Error('the prompt does not ask how to show the records');
+            (await wait('.modal button[name="action_show"]')).click();
+            await wait('.o_list_view .o_group_header');
+            await wait('.o_data_row');
+            const row = [...document.querySelectorAll('.o_data_row')]
+                .find(r => r.textContent.includes('UI test oil change'));
+            if (!row) throw new Error('the repair is not listed');
+            if (!row.textContent.includes('UI oil filter')) throw new Error('row lacks the parts');
+            if (!document.querySelector('.o_breadcrumb').textContent.includes('Repairs by Date'))
+                throw new Error('the title does not state the selection');
+        """)
+
+    def test_prompt_shows_its_questions(self):
+        # Screenshot mode: the prompt itself, before Show.
+        self._open('KSW_workshop.action_ksw_workshop_report_wizard_part', """
+            await wait('.modal .o_field_widget[name="part_source"]');
+            await wait('.modal .o_field_widget[name="group_by_2"]');
+        """)

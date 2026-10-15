@@ -3,6 +3,12 @@
     <!-- ================================================================
          Workshop ▸ Reporting ▸ Reports
 
+         Each menu opens a prompt (wizard/ksw_workshop_report_wizard_views.xml)
+         that asks period, filters and grouping, and its Show button opens
+         the lists below with those answers applied. The actions here are the
+         lists' own entry points for buttons (a vehicle's Workshop Visits, a
+         part's Issued / Repair Notes).
+
          Interactive reports the way SAP's order list (IW39/IW40) and
          Oracle/JDE's Equipment History work: a grouped list you filter,
          regroup and expand, with subtotals on every group header, each
@@ -64,6 +70,32 @@
                 <field name="unit_cost" string="Unit Cost (avg)"/>
                 <field name="subtotal" string="Value" sum="Value"/>
                 <field name="state" widget="badge" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- "Grouped, expanded": same columns, every group opened. -->
+    <record id="view_ksw_workshop_request_list_report_expanded" model="ir.ui.view">
+        <field name="name">ksw.workshop.request.list.report.expanded</field>
+        <field name="model">ksw.workshop.request</field>
+        <field name="mode">primary</field>
+        <field name="priority">31</field>
+        <field name="inherit_id" ref="view_ksw_workshop_request_list_report"/>
+        <field name="arch" type="xml">
+            <list position="attributes">
+                <attribute name="expand">1</attribute>
+            </list>
+        </field>
+    </record>
+    <record id="view_ksw_workshop_part_line_list_report_expanded" model="ir.ui.view">
+        <field name="name">ksw.workshop.part.line.list.report.expanded</field>
+        <field name="model">ksw.workshop.part.line</field>
+        <field name="mode">primary</field>
+        <field name="priority">31</field>
+        <field name="inherit_id" ref="view_ksw_workshop_part_line_list_report"/>
+        <field name="arch" type="xml">
+            <list position="attributes">
+                <attribute name="expand">1</attribute>
             </list>
         </field>
     </record>
@@ -145,20 +177,16 @@
     <!-- Menus                                                             -->
     <!-- ================================================================ -->
     <menuitem id="menu_ksw_workshop_report_wizard_date" name="Repairs by Date"
-              parent="menu_ksw_workshop_reports" action="action_ksw_workshop_report_date" sequence="10"
+              parent="menu_ksw_workshop_reports" action="action_ksw_workshop_report_wizard_date" sequence="10"
               groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
     <menuitem id="menu_ksw_workshop_report_wizard_vehicle" name="Vehicle History"
-              parent="menu_ksw_workshop_reports" action="action_ksw_workshop_report_vehicle" sequence="20"
+              parent="menu_ksw_workshop_reports" action="action_ksw_workshop_report_wizard_vehicle" sequence="20"
               groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
     <menuitem id="menu_ksw_workshop_report_wizard_type" name="Repairs by Type"
-              parent="menu_ksw_workshop_reports" action="action_ksw_workshop_report_type" sequence="30"
+              parent="menu_ksw_workshop_reports" action="action_ksw_workshop_report_wizard_type" sequence="30"
               groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
     <menuitem id="menu_ksw_workshop_report_wizard_part" name="Spare Parts History"
-              parent="menu_ksw_workshop_reports" action="action_ksw_workshop_report_parts" sequence="40"
-              groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
-    <!-- The printable version stays, one menu, for a page to hand someone. -->
-    <menuitem id="menu_ksw_workshop_report_print" name="Print a Report (PDF)"
-              parent="menu_ksw_workshop_reports" action="action_ksw_workshop_report_wizard_date" sequence="90"
+              parent="menu_ksw_workshop_reports" action="action_ksw_workshop_report_wizard_part" sequence="40"
               groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
 
 </odoo>

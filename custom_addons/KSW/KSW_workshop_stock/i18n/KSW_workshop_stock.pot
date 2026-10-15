@@ -6,14 +6,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-15 14:06+0000\n"
-"PO-Revision-Date: 2026-10-15 14:06+0000\n"
+"POT-Creation-Date: 2026-10-15 15:04+0000\n"
+"PO-Revision-Date: 2026-10-15 15:04+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: KSW_workshop_stock
+#: model_terms:ir.ui.view,arch_db:KSW_workshop_stock.view_ksw_workshop_report_wizard_form_stock
+msgid "All spare parts"
+msgstr ""
 
 #. module: KSW_workshop_stock
 #. odoo-python

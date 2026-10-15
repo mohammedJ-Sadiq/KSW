@@ -9,8 +9,8 @@ from odoo.exceptions import UserError
 from odoo.tests import TransactionCase, tagged
 
 
-@tagged('post_install', '-at_install')
-class TestWorkshopReportWizard(TransactionCase):
+class WorkshopReportCase(TransactionCase):
+    """Fixtures shared by the report tests (no tests of its own)."""
 
     @classmethod
     def setUpClass(cls):
@@ -64,7 +64,7 @@ class TestWorkshopReportWizard(TransactionCase):
         Wizard = self.env['ksw.workshop.report.wizard'].with_user(user or self.reviewer)
         report_type = vals.get('report_type', 'date')
         defaults = Wizard.with_context(default_report_type=report_type).default_get(list(Wizard._fields))
-        defaults.update({'date_from': date(2001, 1, 1), 'date_to': date(2001, 12, 31)})
+        defaults.update({'period_mode': 'period', 'date_from': date(2001, 1, 1), 'date_to': date(2001, 12, 31)})
         defaults.update(vals)
         return Wizard.create(defaults)
 
@@ -72,6 +72,11 @@ class TestWorkshopReportWizard(TransactionCase):
         html, _type = self.env['ir.actions.report'].with_user(user or self.reviewer)._render_qweb_html(
             'KSW_workshop.action_report_workshop_html', wizard.ids)
         return html.decode()
+
+
+
+@tagged('post_install', '-at_install')
+class TestWorkshopReportWizard(WorkshopReportCase):
 
     # ------------------------------------------------------------------
     # Defaults per menu
@@ -83,10 +88,13 @@ class TestWorkshopReportWizard(TransactionCase):
         self.assertEqual(by_date['group_by'], 'day')
         self.assertEqual(by_date['date_from'].day, 1, "By Date opens on the current month")
         vehicle = Wizard.with_context(default_report_type='vehicle').default_get(fields_list)
-        self.assertEqual(vehicle['group_by'], 'month')
+        self.assertEqual((vehicle['group_by'], vehicle['group_by_2']), ('vehicle', 'year'))
         self.assertEqual(vehicle['state_scope'], 'active', "a history includes the job in progress")
-        self.assertFalse(vehicle.get('date_from'), "a history starts at the beginning")
-        self.assertEqual(Wizard.with_context(default_report_type='spare_part').default_get(fields_list)['group_by'], 'month')
+        self.assertEqual(vehicle['period_mode'], 'all', "a history starts at the beginning")
+        one = Wizard.with_context(default_report_type='vehicle', default_vehicle_id=self.truck.id).default_get(fields_list)
+        self.assertEqual((one['group_by'], one['layout']), ('year', 'expanded'))
+        part = Wizard.with_context(default_report_type='spare_part').default_get(fields_list)
+        self.assertEqual((part['group_by'], part['group_by_2']), ('part', 'month'))
 
     # ------------------------------------------------------------------
     # By date
@@ -180,7 +188,7 @@ class TestWorkshopReportWizard(TransactionCase):
         return {'part_id': self.part.id}
 
     def test_spare_part_statistics(self):
-        data = self._wizard(report_type='spare_part', **self._part_field()).get_report_data()
+        data = self._wizard(report_type='spare_part', group_by='month', **self._part_field()).get_report_data()
         kpis = dict(data['kpis'])
         self.assertEqual(kpis['Quantity Issued'], '3')
         self.assertEqual(kpis['Value Issued'], '96.00')
@@ -227,3 +235,77 @@ class TestWorkshopReportWizard(TransactionCase):
     def test_empty_report_says_so(self):
         html = self._render(self._wizard(date_from=date(2000, 1, 1), date_to=date(2000, 1, 2)))
         self.assertIn('No workshop activity matches these filters', html)
+
+
+@tagged('post_install', '-at_install')
+class TestWorkshopReportPrompt(WorkshopReportCase):
+    """Show: the prompt's answers become the list's domain, groups and layout."""
+
+    def _show(self, **vals):
+        wizard = self._wizard(**vals)
+        action = wizard.action_show()
+        records = self.env[action['res_model']].with_user(self.reviewer).search(action['domain'])
+        return wizard, action, records
+
+    def test_period_by_day_expanded(self):
+        _w, action, records = self._show(date_from=date(2001, 3, 1), date_to=date(2001, 3, 31))
+        self.assertEqual(action['res_model'], 'ksw.workshop.request')
+        self.assertEqual(action['context']['group_by'], ['create_date:day'])
+        self.assertEqual(action['views'][0][0],
+                         self.env.ref('KSW_workshop.view_ksw_workshop_request_list_report_expanded').id)
+        self.assertEqual(set(records.ids) & set((self.r_oil | self.r_both | self.r_other).ids),
+                         {self.r_oil.id, self.r_both.id})
+
+    def test_all_history_drops_the_dates(self):
+        wizard, action, records = self._show(period_mode='all', vehicle_id=self.truck.id)
+        self.assertFalse(wizard.date_from or wizard.date_to)
+        self.assertEqual(set(records.ids), {self.r_oil.id, self.r_both.id})
+
+    def test_flat_list_has_no_groups(self):
+        _w, action, _r = self._show(layout='flat')
+        self.assertEqual(action['context']['group_by'], [])
+
+    def test_two_levels_collapsed(self):
+        _w, action, _r = self._show(report_type='repair_type', group_by='repair_type', group_by_2='month',
+                                     layout='collapsed', request_type_ids=[(6, 0, [self.brakes.id])])
+        self.assertEqual(action['context']['group_by'], ['request_type_ids', 'create_date:month'])
+        self.assertEqual(action['views'][0][0], self.env.ref('KSW_workshop.view_ksw_workshop_request_list_report').id)
+
+    def test_completion_date_basis_groups_on_completion(self):
+        _w, action, _r = self._show(date_basis='completion', group_by='month')
+        self.assertEqual(action['context']['group_by'], ['completion_date:month'])
+
+    def test_vehicle_history_without_a_vehicle_is_every_vehicle(self):
+        _w, action, records = self._show(report_type='vehicle', period_mode='all')
+        self.assertEqual(action['context']['group_by'], ['vehicle_id', 'create_date:year'])
+        self.assertIn(self.r_other, records)
+
+    def test_spare_part_with_issues_opens_the_issues(self):
+        wizard = self._wizard(report_type='spare_part', part_id=self.part.id)
+        wizard._apply_part_choice()
+        self.assertEqual(wizard.part_source, 'issued')
+        action = wizard.action_show()
+        self.assertEqual(action['res_model'], 'ksw.workshop.part.line')
+        self.assertEqual(action['context']['group_by'], [wizard._part_group_field(), 'issue_date:month'])
+        records = self.env['ksw.workshop.part.line'].search(action['domain'])
+        self.assertEqual(records, self.line_a | self.line_b)
+
+    def test_spare_part_without_issues_looks_in_the_notes(self):
+        wizard = self._wizard(report_type='spare_part', part_id=self.unused_part.id)
+        wizard._apply_part_choice()
+        self.assertEqual(wizard.part_source, 'notes', "no issues: its history is in the notes")
+        self.assertEqual(wizard.text_search, 'قماش فرامل')
+        self.assertNotEqual(wizard.group_by, 'part', "notes have no part to group by")
+        wizard.text_search = 'فرامل'
+        action = wizard.action_show()
+        self.assertEqual(action['res_model'], 'ksw.workshop.request')
+        records = self.env['ksw.workshop.request'].search(action['domain'])
+        self.assertEqual(records, self.r_both | self.r_other)
+
+    def test_impossible_grouping_is_refused_on_the_form(self):
+        with self.assertRaises(UserError):
+            self._wizard(group_by='part').action_show()
+
+    def test_a_period_needs_dates(self):
+        with self.assertRaises(UserError):
+            self._wizard(date_from=False, date_to=False).action_show()

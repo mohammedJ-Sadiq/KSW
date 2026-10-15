@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-15 14:05+0000\n"
-"PO-Revision-Date: 2026-10-15 14:05+0000\n"
+"POT-Creation-Date: 2026-10-15 15:04+0000\n"
+"PO-Revision-Date: 2026-10-15 15:04+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar_001\n"
@@ -66,6 +66,11 @@ msgid ""
 msgstr ""
 "<strong>أعادت الورشة الطلب إليك.</strong>\n"
 "                        صحّح الطلب ثم اضغط «إعادة الإرسال»."
+
+#. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__period_mode__period
+msgid "A period"
+msgstr "فترة محددة"
 
 #. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_type_form
@@ -167,6 +172,11 @@ msgid "All Requests"
 msgstr "جميع الطلبات"
 
 #. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_report_wizard_form
+msgid "All clients"
+msgstr "كل العملاء"
+
+#. module: KSW_workshop
 #: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__state_scope__active
 msgid "All except rejected"
 msgstr "الكل عدا المرفوض"
@@ -174,6 +184,7 @@ msgstr "الكل عدا المرفوض"
 #. module: KSW_workshop
 #. odoo-python
 #: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__period_mode__all
 msgid "All history"
 msgstr "كامل السجل"
 
@@ -190,10 +201,35 @@ msgid "All parts"
 msgstr "كل القطع"
 
 #. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__layout__flat
+msgid "All records, no grouping"
+msgstr "كل السجلات بدون تجميع"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_report_wizard_form
+msgid "All repair types"
+msgstr "كل أنواع الإصلاح"
+
+#. module: KSW_workshop
 #. odoo-python
 #: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
 msgid "All requests"
 msgstr "كل الطلبات"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_report_wizard_form
+msgid "All spare parts"
+msgstr "كل قطع الغيار"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_report_wizard_form
+msgid "All types"
+msgstr "كل الأنواع"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_report_wizard_form
+msgid "All vehicles"
+msgstr "كل المركبات"
 
 #. module: KSW_workshop
 #. odoo-python
@@ -409,8 +445,14 @@ msgstr "غيّر الفترة من فلتر <b>تاريخ الطلب</b>، أو 
 #. module: KSW_workshop
 #. odoo-python
 #: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
-msgid "Choose the vehicle whose history you want."
-msgstr "اختر المركبة المطلوب عرض سجلها."
+msgid "Choose the vehicle whose history you want to print."
+msgstr "اختر المركبة المطلوب طباعة سجلها."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
+msgid "Choose what to group by, or show all records without grouping."
+msgstr "اختر طريقة التجميع، أو اعرض كل السجلات بدون تجميع."
 
 #. module: KSW_workshop
 #. odoo-python
@@ -420,6 +462,8 @@ msgstr "اختر المركبة المطلوب عرض سجلها."
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__client_id
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_report_wizard__client_id
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__client_id
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by_2__client
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by__client
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_search
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
 msgid "Client"
@@ -578,6 +622,7 @@ msgid "Date Basis"
 msgstr "التاريخ المعتمد"
 
 #. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by_2__day
 #: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by__day
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_search
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
@@ -692,6 +737,18 @@ msgid "Engine / Power Plant"
 msgstr "المحرك"
 
 #. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
+msgid "Enter the period: a start date, an end date, or both."
+msgstr "أدخل الفترة: تاريخ البداية أو تاريخ النهاية أو كليهما."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
+msgid "Enter the text to look for in the repair notes, e.g. فلتر زيت."
+msgstr "أدخل النص المطلوب البحث عنه في ملاحظات الإصلاح، مثال: فلتر زيت."
+
+#. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__entry_datetime
 msgid "Entry Date/Time"
 msgstr "تاريخ/وقت الدخول"
@@ -779,11 +836,6 @@ msgid "From"
 msgstr "من"
 
 #. module: KSW_workshop
-#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_report_wizard_form
-msgid "From the beginning"
-msgstr "من البداية"
-
-#. module: KSW_workshop
 #: model:ksw.workshop.request.type,name:KSW_workshop.request_type_fuel_system
 msgid "Fuel System"
 msgstr "نظام الوقود"
@@ -794,6 +846,16 @@ msgstr "نظام الوقود"
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_report_wizard__group_by
 msgid "Group By"
 msgstr "تجميع حسب"
+
+#. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__layout__collapsed
+msgid "Grouped, collapsed (totals per group)"
+msgstr "مجمّعة ومطوية (إجماليات لكل مجموعة)"
+
+#. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__layout__expanded
+msgid "Grouped, expanded (every record under its group)"
+msgstr "مجمّعة ومفتوحة (كل سجل تحت مجموعته)"
 
 #. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__has_message
@@ -815,6 +877,11 @@ msgstr "تقرير السجل"
 #: model:ksw.workshop.request.type,name:KSW_workshop.request_type_hoses
 msgid "Hoses"
 msgstr "الليّات"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_report_wizard_form
+msgid "How to Show Them"
+msgstr "طريقة العرض"
 
 #. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_hr_employee__id
@@ -943,6 +1010,17 @@ msgid "Issued Value"
 msgstr "قيمة المصروف"
 
 #. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__part_source__issued
+msgid "Issued on repairs (with quantities)"
+msgstr "مصروفة على الإصلاحات (بالكميات)"
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
+msgid "Issued spare parts cannot be grouped by %s."
+msgstr "لا يمكن تجميع قطع الغيار المصروفة حسب %s."
+
+#. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_form
 msgid "Issued to date"
 msgstr "المصروف حتى تاريخه"
@@ -1066,11 +1144,6 @@ msgid "Last Visit"
 msgstr "آخر زيارة"
 
 #. module: KSW_workshop
-#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_report_wizard_form
-msgid "Layout"
-msgstr "العرض"
-
-#. module: KSW_workshop
 #: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_report_wizard__part_id
 msgid "Leave empty for a ranking of every part issued in the period."
 msgstr "اتركه فارغاً لعرض ترتيب كل القطع المصروفة خلال الفترة."
@@ -1120,6 +1193,11 @@ msgstr ""
 "يُدرج هذا الموظف في عمود الفني بجدول الأعمال / الخدمات في إصلاحات الورشة."
 
 #. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_report_wizard__part_source
+msgid "Look In"
+msgstr "البحث في"
+
+#. module: KSW_workshop
 #: model:res.groups,name:KSW_workshop.group_workshop_manager
 msgid "Manager"
 msgstr "مدير"
@@ -1138,6 +1216,11 @@ msgstr ""
 #: model:ksw.workshop.request.type,name:KSW_workshop.request_type_mechanical
 msgid "Mechanical"
 msgstr "الميكانيكا"
+
+#. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__part_source__notes
+msgid "Mentioned in the repair notes"
+msgstr "مذكورة في ملاحظات الإصلاح"
 
 #. module: KSW_workshop
 #. odoo-python
@@ -1166,6 +1249,7 @@ msgid "Model (Cash)"
 msgstr "الموديل (نقدي)"
 
 #. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by_2__month
 #: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by__month
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_search
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
@@ -1209,11 +1293,6 @@ msgid "Name"
 msgstr "الاسم"
 
 #. module: KSW_workshop
-#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_report_wizard_form
-msgid "Narrow Down"
-msgstr "تضييق النتائج"
-
-#. module: KSW_workshop
 #. odoo-python
 #: code:addons/KSW_workshop/models/ksw_workshop_client.py:0
 #: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__state__new
@@ -1246,11 +1325,6 @@ msgstr "ملخص النشاط التالي"
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__activity_type_id
 msgid "Next Activity Type"
 msgstr "نوع النشاط التالي"
-
-#. module: KSW_workshop
-#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by__none
-msgid "No Grouping"
-msgstr "بدون تجميع"
 
 #. module: KSW_workshop
 #. odoo-python
@@ -1320,6 +1394,12 @@ msgstr "الملاحظات"
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__note_to_requester
 msgid "Note to Requester"
 msgstr "ملاحظة لمقدم الطلب"
+
+#. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by_2__none
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by__none
+msgid "Nothing"
+msgstr "بدون تجميع"
 
 #. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__message_needaction_counter
@@ -1467,6 +1547,15 @@ msgstr ""
 "أو افتح الصنف واضغط <b>ملاحظات الإصلاح</b>."
 
 #. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_report_wizard__part_source
+msgid ""
+"Parts listed item by item on a repair carry a quantity and a cost. Most of "
+"the history predates that: what was fitted is written in the repair notes."
+msgstr ""
+"القطع المدرجة صنفاً صنفاً في الإصلاح تحمل كمية وتكلفة. معظم السجل يسبق ذلك: "
+"ما تم تركيبه مكتوب في ملاحظات الإصلاح."
+
+#. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
 msgid "Past jobs for this driver, under this client"
 msgstr "الأعمال السابقة لهذا السائق لدى هذا العميل"
@@ -1479,7 +1568,6 @@ msgstr "الأعمال السابقة على هذه المركبة"
 #. module: KSW_workshop
 #. odoo-python
 #: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
-#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_report_wizard_form
 msgid "Period"
 msgstr "الفترة"
 
@@ -1542,16 +1630,6 @@ msgstr "سجل الأسعار"
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_report_wizard_form
 msgid "Print PDF"
 msgstr "طباعة PDF"
-
-#. module: KSW_workshop
-#: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_report_print
-msgid "Print a Report (PDF)"
-msgstr "طباعة تقرير (PDF)"
-
-#. module: KSW_workshop
-#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_report_wizard_date
-msgid "Print a Workshop Report"
-msgstr "الإصلاحات حسب التاريخ"
 
 #. module: KSW_workshop
 #: model:ir.model,name:KSW_workshop.model_hr_employee_public
@@ -1649,6 +1727,11 @@ msgid "Recorded on the Legacy Sheet"
 msgstr "المسجّل في الجدول القديم"
 
 #. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_report_wizard__period_mode
+msgid "Records"
+msgstr "السجلات"
+
+#. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_list_report
 msgid "Ref."
 msgstr "المرجع"
@@ -1703,6 +1786,7 @@ msgstr "تقرير الإصلاح"
 #. module: KSW_workshop
 #. odoo-python
 #: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by_2__repair_type
 #: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by__repair_type
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.report_workshop_request_rows
 msgid "Repair Type"
@@ -1723,6 +1807,7 @@ msgstr "ملاحظات الإصلاح التي تذكر “"
 #. module: KSW_workshop
 #. odoo-python
 #: code:addons/KSW_workshop/models/ksw_workshop_part.py:0
+#: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
 msgid "Repair notes mentioning “%s”"
 msgstr "ملاحظات الإصلاح التي تذكر “%s”"
 
@@ -1745,6 +1830,7 @@ msgstr "الإصلاحات وقطع الغيار"
 
 #. module: KSW_workshop
 #: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_report_date
+#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_report_wizard_date
 #: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_report_wizard_date
 msgid "Repairs by Date"
 msgstr "الإصلاحات حسب التاريخ"
@@ -1753,6 +1839,7 @@ msgstr "الإصلاحات حسب التاريخ"
 #. odoo-python
 #: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
 #: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_report_type
+#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_report_wizard_type
 #: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_report_wizard_type
 msgid "Repairs by Type"
 msgstr "الإصلاحات حسب النوع"
@@ -1764,8 +1851,16 @@ msgid "Repairs by Type — %s"
 msgstr "الإصلاحات حسب النوع — %s"
 
 #. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
+msgid ""
+"Repairs cannot be grouped by %s. Choose Spare Part only when looking at "
+"issued parts."
+msgstr ""
+"لا يمكن تجميع الإصلاحات حسب %s. اختر قطعة الغيار فقط عند عرض القطع المصروفة."
+
+#. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_report_wizard__report_type
-#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_report_wizard_form
 msgid "Report"
 msgstr "التقرير"
 
@@ -1930,6 +2025,12 @@ msgid "Sequence"
 msgstr "تسلسل"
 
 #. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_report_wizard__layout
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_report_wizard_form
+msgid "Show"
+msgstr "عرض"
+
+#. module: KSW_workshop
 #: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request__technician_label
 msgid ""
 "Single grouping axis for technician reporting: the linked employee for new "
@@ -1942,6 +2043,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_report_wizard__part_id
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by_2__part
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by__part
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.report_workshop
 msgid "Spare Part"
 msgstr "قطعة الغيار"
@@ -1971,6 +2074,7 @@ msgstr "قطع الغيار (المدرجة)"
 
 #. module: KSW_workshop
 #: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_report_parts
+#: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_report_wizard_part
 #: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_report_wizard_part
 msgid "Spare Parts History"
 msgstr "سجل قطعة الغيار"
@@ -2111,6 +2215,7 @@ msgstr "رقم الصهريج (نقدي)"
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_labor_line__technician_id
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__technician_id
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__technician_id
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by_2__technician
 #: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by__technician
 #: model:res.groups,name:KSW_workshop.group_workshop_technician
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.report_workshop
@@ -2232,6 +2337,11 @@ msgstr ""
 #: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_request__x_on_behalf_of_id
 msgid "The workshop requester this request was raised for by his assistant."
 msgstr "مقدم طلبات الورشة الذي رفع مساعده هذا الطلب نيابةً عنه."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_report_wizard__group_by_2
+msgid "Then By"
+msgstr "ثم حسب"
 
 #. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
@@ -2408,6 +2518,7 @@ msgstr "قيمة المصروف"
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_part_line__vehicle_id
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_report_wizard__vehicle_id
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__vehicle_id
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by_2__vehicle
 #: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by__vehicle
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.report_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.report_workshop_request_rows
@@ -2417,6 +2528,8 @@ msgid "Vehicle"
 msgstr "المركبة"
 
 #. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
 #: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_report_vehicle
 #: model:ir.actions.act_window,name:KSW_workshop.action_ksw_workshop_report_wizard_vehicle
 #: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_report_wizard_vehicle
@@ -2433,6 +2546,7 @@ msgstr "رقم المركبة (نقدي)"
 #: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_report_wizard__vehicle_type
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__vehicle_type
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by_2__vehicle_type
 #: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by__vehicle_type
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
 msgid "Vehicle Type"
@@ -2451,11 +2565,6 @@ msgstr "نوع المركبة والسائق مطلوبان ما لم يكن ا�
 #: model:ir.ui.menu,name:KSW_workshop.menu_ksw_workshop_vehicles
 msgid "Vehicles"
 msgstr "المركبات"
-
-#. module: KSW_workshop
-#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_report_wizard_form
-msgid "View"
-msgstr "عرض"
 
 #. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_vehicle_history_count
@@ -2479,9 +2588,17 @@ msgid "Website communication history"
 msgstr "سجل تواصل الموقع الإلكتروني"
 
 #. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by_2__week
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by__week
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
 msgid "Week"
 msgstr "الأسبوع"
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
+msgid "Week %(week)s, %(year)s"
+msgstr "الأسبوع %(week)s، %(year)s"
 
 #. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_return_wizard_form
@@ -2497,6 +2614,16 @@ msgstr "العجلات والصرر والرولمانات"
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_form
 msgid "Where it came from"
 msgstr "المصدر"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_report_wizard_form
+msgid "Which Period"
+msgstr "الفترة"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_report_wizard_form
+msgid "Which Records"
+msgstr "السجلات المطلوبة"
 
 #. module: KSW_workshop
 #: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_report_wizard__date_basis
@@ -2720,6 +2847,7 @@ msgid "X Imported"
 msgstr "مستورد"
 
 #. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by_2__year
 #: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_report_wizard__group_by__year
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_line_search
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
@@ -2760,6 +2888,12 @@ msgstr "تم إكمال طلب الورشة الخاص بك."
 msgid ""
 "Your workshop request was returned to you. Please correct it and resubmit."
 msgstr "أُعيد إليك طلب الورشة. يرجى تصحيحه ثم إعادة إرساله."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/wizard/ksw_workshop_report_wizard.py:0
+msgid "all history"
+msgstr "كامل السجل"
 
 #. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.report_workshop

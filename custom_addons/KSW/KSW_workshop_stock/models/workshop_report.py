@@ -18,7 +18,10 @@ class KswWorkshopReportWizard(models.TransientModel):
     def _onchange_product_id(self):
         for wizard in self:
             if wizard.product_id:
-                wizard.text_search = wizard._part_search_text()
+                wizard._apply_part_choice()
+
+    def _part_group_field(self):
+        return 'product_id'
 
     def _part_line_part_domain(self):
         if self.product_id:

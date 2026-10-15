@@ -106,7 +106,7 @@
             </field>
             <field name="part_id" position="after">
                 <field name="product_id" options="{'no_create': True}"
-                       invisible="report_type != 'spare_part'"/>
+                       invisible="report_type != 'spare_part'" placeholder="All spare parts"/>
             </field>
         </field>
     </record>

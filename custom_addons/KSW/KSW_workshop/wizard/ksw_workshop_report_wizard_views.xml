@@ -1,46 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- The selection screen. Each question in the order a person asks it:
+         what, which records, which period, how to show them. Show turns the
+         answers into the list's filters and groups. -->
     <record id="view_ksw_workshop_report_wizard_form" model="ir.ui.view">
         <field name="name">ksw.workshop.report.wizard.form</field>
         <field name="model">ksw.workshop.report.wizard</field>
         <field name="arch" type="xml">
             <form string="Workshop Report">
                 <sheet>
+                    <field name="report_type" invisible="1"/>
                     <group>
-                        <group string="Report">
-                            <field name="report_type" widget="radio"/>
+                        <group string="Which Records">
                             <field name="vehicle_id" options="{'no_create': True}"
-                                   required="report_type == 'vehicle'"
-                                   invisible="report_type == 'repair_type'"/>
+                                   invisible="report_type == 'repair_type'"
+                                   placeholder="All vehicles"/>
                             <field name="request_type_ids" widget="many2many_tags"
                                    options="{'no_create': True}"
-                                   invisible="report_type != 'repair_type'"/>
+                                   invisible="report_type != 'repair_type'"
+                                   placeholder="All repair types"/>
                             <field name="part_id" options="{'no_create': True}"
+                                   invisible="report_type != 'spare_part'"
+                                   placeholder="All spare parts"/>
+                            <field name="part_source" widget="radio"
                                    invisible="report_type != 'spare_part'"/>
-                            <field name="text_search" invisible="report_type != 'spare_part'"
+                            <field name="text_search"
+                                   invisible="report_type != 'spare_part' or part_source != 'notes'"
+                                   required="report_type == 'spare_part' and part_source == 'notes'"
                                    placeholder="e.g. فلتر زيت"/>
-                        </group>
-                        <group string="Period">
-                            <field name="date_from" placeholder="From the beginning"/>
-                            <field name="date_to"/>
-                            <field name="date_basis" invisible="report_type == 'spare_part'"/>
+                            <field name="vehicle_type" invisible="report_type == 'vehicle'"
+                                   placeholder="All types"/>
+                            <field name="client_id" options="{'no_create': True}"
+                                   invisible="report_type == 'vehicle'" placeholder="All clients"/>
                             <field name="state_scope"/>
                         </group>
-                        <group string="Narrow Down">
-                            <field name="vehicle_type" invisible="report_type == 'vehicle'"/>
-                            <field name="client_id" options="{'no_create': True}"
-                                   invisible="report_type == 'vehicle'"/>
+                        <group string="Which Period">
+                            <field name="period_mode" widget="radio" options="{'horizontal': true}"/>
+                            <field name="date_from" invisible="period_mode == 'all'"/>
+                            <field name="date_to" invisible="period_mode == 'all'"/>
+                            <field name="date_basis"
+                                   invisible="period_mode == 'all' or (report_type == 'spare_part' and part_source == 'issued')"/>
                         </group>
-                        <group string="Layout">
-                            <field name="group_by"/>
-                            <field name="show_details"/>
+                    </group>
+                    <group string="How to Show Them">
+                        <group>
+                            <field name="layout" widget="radio"/>
+                        </group>
+                        <group invisible="layout == 'flat'">
+                            <field name="group_by" required="layout != 'flat'"/>
+                            <field name="group_by_2" invisible="group_by == 'none'"/>
                         </group>
                     </group>
                 </sheet>
                 <footer>
-                    <button name="action_view" type="object" string="View"
-                            class="btn-primary" icon="fa-eye"/>
+                    <button name="action_show" type="object" string="Show"
+                            class="btn-primary" icon="fa-list"/>
                     <button name="action_print" type="object" string="Print PDF"
                             class="btn-secondary" icon="fa-print"/>
                     <button string="Close" class="btn-secondary" special="cancel"/>
@@ -49,11 +64,10 @@
         </field>
     </record>
 
-    <!-- The printable report. The interactive reports are list/pivot
-         actions (views/ksw_workshop_report_views.xml); this is for a page to
-         hand someone. -->
+    <!-- One prompt per report, so each menu opens on its own defaults
+         (period, grouping, layout: _type_defaults). -->
     <record id="action_ksw_workshop_report_wizard_date" model="ir.actions.act_window">
-        <field name="name">Print a Workshop Report</field>
+        <field name="name">Repairs by Date</field>
         <field name="res_model">ksw.workshop.report.wizard</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
@@ -68,6 +82,20 @@
         <field name="context">{'default_report_type': 'vehicle'}</field>
     </record>
 
+    <record id="action_ksw_workshop_report_wizard_type" model="ir.actions.act_window">
+        <field name="name">Repairs by Type</field>
+        <field name="res_model">ksw.workshop.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_report_type': 'repair_type'}</field>
+    </record>
 
+    <record id="action_ksw_workshop_report_wizard_part" model="ir.actions.act_window">
+        <field name="name">Spare Parts History</field>
+        <field name="res_model">ksw.workshop.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_report_type': 'spare_part'}</field>
+    </record>
 
 </odoo>
