@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-14 19:41+0000\n"
-"PO-Revision-Date: 2026-10-14 19:59+0000\n"
+"POT-Creation-Date: 2026-10-15 13:13+0000\n"
+"PO-Revision-Date: 2026-10-15 13:13+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar_001\n"
@@ -15,6 +15,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: KSW_workshop_stock
+#. odoo-python
+#: code:addons/KSW_workshop_stock/models/workshop_report.py:0
+msgid "Average Cost"
+msgstr "متوسط التكلفة"
 
 #. module: KSW_workshop_stock
 #: model:ir.model.fields,help:KSW_workshop_stock.field_ksw_fleet_vehicle__x_analytic_account_id
@@ -45,6 +51,7 @@ msgstr "مركز التكلفة"
 #. module: KSW_workshop_stock
 #: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_fleet_vehicle__display_name
 #: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_part_line__display_name
+#: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_report_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_request__display_name
 #: model:ir.model.fields,field_description:KSW_workshop_stock.field_product_category__display_name
 msgid "Display Name"
@@ -58,6 +65,7 @@ msgstr "الكمية المتاحة حالياً في مستودع قطع الغ
 #. module: KSW_workshop_stock
 #: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_fleet_vehicle__id
 #: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_part_line__id
+#: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_report_wizard__id
 #: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_request__id
 #: model:ir.model.fields,field_description:KSW_workshop_stock.field_product_category__id
 msgid "ID"
@@ -70,6 +78,11 @@ msgid "Item"
 msgstr "الصنف"
 
 #. module: KSW_workshop_stock
+#: model:ir.model.fields,help:KSW_workshop_stock.field_ksw_workshop_report_wizard__product_id
+msgid "Leave empty for a ranking of every part issued in the period."
+msgstr "اتركه فارغاً لعرض ترتيب كل القطع المصروفة خلال الفترة."
+
+#. module: KSW_workshop_stock
 #. odoo-python
 #: code:addons/KSW_workshop_stock/models/workshop_request.py:0
 msgid ""
@@ -80,6 +93,8 @@ msgstr ""
 "%(lines)s"
 
 #. module: KSW_workshop_stock
+#. odoo-python
+#: code:addons/KSW_workshop_stock/models/workshop_report.py:0
 #: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_part_line__x_available_qty
 msgid "On Hand"
 msgstr "المتوفر"
@@ -116,6 +131,11 @@ msgstr "فئة المنتج"
 #: model_terms:ir.ui.view,arch_db:KSW_workshop_stock.view_ksw_workshop_request_form_stock
 msgid "Set on the vehicle"
 msgstr "يُحدَّد في بطاقة المركبة"
+
+#. module: KSW_workshop_stock
+#: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_report_wizard__product_id
+msgid "Spare Part (Stock Item)"
+msgstr "قطعة الغيار (صنف مخزني)"
 
 #. module: KSW_workshop_stock
 #: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_request__x_issue_picking_id
@@ -164,6 +184,11 @@ msgstr "المستودع %s ليس له عملية صرف مخزون."
 #: model:ir.model.fields,help:KSW_workshop_stock.field_ksw_workshop_request__x_warehouse_id
 msgid "Warehouse the spare parts are issued from."
 msgstr "المستودع الذي تُصرف منه قطع الغيار."
+
+#. module: KSW_workshop_stock
+#: model:ir.model,name:KSW_workshop_stock.model_ksw_workshop_report_wizard
+msgid "Workshop Report"
+msgstr "تقرير الورشة"
 
 #. module: KSW_workshop_stock
 #: model:ir.model,name:KSW_workshop_stock.model_ksw_workshop_request

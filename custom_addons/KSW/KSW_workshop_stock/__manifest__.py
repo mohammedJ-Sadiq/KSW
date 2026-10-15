@@ -1,6 +1,6 @@
 {
     'name': 'KSW Workshop Stock',
-    'version': '19.0.1.1.0',
+    'version': '19.0.1.2.0',
     'author': 'Mohammed Albadr',
     'category': 'Inventory/Inventory',
     'summary': 'Workshop spare parts are issued from real stock, charged to the vehicle cost centre',

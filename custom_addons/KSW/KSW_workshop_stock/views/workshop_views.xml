@@ -94,4 +94,21 @@
         <value eval="[ref('KSW_workshop.menu_ksw_workshop_parts')]"/>
         <value eval="{'active': False}"/>
     </function>
+
+    <!-- Spare Part History: pick the stock item, not the pass-through item -->
+    <record id="view_ksw_workshop_report_wizard_form_stock" model="ir.ui.view">
+        <field name="name">ksw.workshop.report.wizard.form.stock</field>
+        <field name="model">ksw.workshop.report.wizard</field>
+        <field name="inherit_id" ref="KSW_workshop.view_ksw_workshop_report_wizard_form"/>
+        <field name="arch" type="xml">
+            <field name="part_id" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="part_id" position="after">
+                <field name="product_id" options="{'no_create': True}"
+                       invisible="report_type != 'spare_part'"/>
+            </field>
+        </field>
+    </record>
+
 </odoo>

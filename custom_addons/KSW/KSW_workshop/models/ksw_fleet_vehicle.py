@@ -47,3 +47,11 @@ class KswFleetVehicle(models.Model):
             # _compute_vehicle_id.
             'context': {'search_default_groupby_request_type': 1},
         }
+
+    def action_workshop_history_report(self):
+        """Open the Vehicle History report already set to this vehicle."""
+        self.ensure_one()
+        action = self.env['ir.actions.act_window']._for_xml_id(
+            'KSW_workshop.action_ksw_workshop_report_wizard_vehicle')
+        action['context'] = {'default_report_type': 'vehicle', 'default_vehicle_id': self.id}
+        return action

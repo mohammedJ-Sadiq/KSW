@@ -15,6 +15,9 @@
                             groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager">
                         <field name="workshop_request_count" widget="statinfo" string="Workshop Visits"/>
                     </button>
+                    <button name="action_workshop_history_report" type="object"
+                            class="oe_stat_button" icon="fa-file-text-o" string="History Report"
+                            groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
                 </div>
             </xpath>
         </field>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ksw_workshop_report_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.workshop.report.wizard.form</field>
+        <field name="model">ksw.workshop.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Workshop Report">
+                <sheet>
+                    <group>
+                        <group string="Report">
+                            <field name="report_type" widget="radio"/>
+                            <field name="vehicle_id" options="{'no_create': True}"
+                                   required="report_type == 'vehicle'"
+                                   invisible="report_type == 'repair_type'"/>
+                            <field name="request_type_ids" widget="many2many_tags"
+                                   options="{'no_create': True}"
+                                   invisible="report_type != 'repair_type'"/>
+                            <field name="part_id" options="{'no_create': True}"
+                                   invisible="report_type != 'spare_part'"/>
+                            <field name="text_search" invisible="report_type != 'spare_part'"
+                                   placeholder="e.g. فلتر زيت"/>
+                        </group>
+                        <group string="Period">
+                            <field name="date_from" placeholder="From the beginning"/>
+                            <field name="date_to"/>
+                            <field name="date_basis" invisible="report_type == 'spare_part'"/>
+                            <field name="state_scope"/>
+                        </group>
+                        <group string="Narrow Down">
+                            <field name="vehicle_type" invisible="report_type == 'vehicle'"/>
+                            <field name="client_id" options="{'no_create': True}"
+                                   invisible="report_type == 'vehicle'"/>
+                        </group>
+                        <group string="Layout">
+                            <field name="group_by"/>
+                            <field name="show_details"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_view" type="object" string="View"
+                            class="btn-primary" icon="fa-eye"/>
+                    <button name="action_print" type="object" string="Print PDF"
+                            class="btn-secondary" icon="fa-print"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- One action per report so each menu opens on its own defaults
+         (period, grouping and scope are set in default_get). -->
+    <record id="action_ksw_workshop_report_wizard_date" model="ir.actions.act_window">
+        <field name="name">Repairs by Date</field>
+        <field name="res_model">ksw.workshop.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_report_type': 'date'}</field>
+    </record>
+
+    <record id="action_ksw_workshop_report_wizard_vehicle" model="ir.actions.act_window">
+        <field name="name">Vehicle History</field>
+        <field name="res_model">ksw.workshop.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_report_type': 'vehicle'}</field>
+    </record>
+
+    <record id="action_ksw_workshop_report_wizard_type" model="ir.actions.act_window">
+        <field name="name">Repairs by Type</field>
+        <field name="res_model">ksw.workshop.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_report_type': 'repair_type'}</field>
+    </record>
+
+    <record id="action_ksw_workshop_report_wizard_part" model="ir.actions.act_window">
+        <field name="name">Spare Part History</field>
+        <field name="res_model">ksw.workshop.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_report_type': 'spare_part'}</field>
+    </record>
+
+</odoo>

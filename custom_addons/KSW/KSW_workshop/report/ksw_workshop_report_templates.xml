@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Landscape: the itemised tables carry eight or nine columns of free
+         text, which in portrait wrap into unreadable slivers. -->
+    <record id="paperformat_ksw_workshop_report" model="report.paperformat">
+        <field name="name">KSW Workshop Report (A4 Landscape)</field>
+        <field name="format">A4</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">62</field>
+        <field name="margin_bottom">18</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">57</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- Same template twice: "View" opens it as a page in the browser,
+         "Print PDF" downloads it. -->
+    <record id="action_report_workshop_html" model="ir.actions.report">
+        <field name="name">Workshop Report</field>
+        <field name="model">ksw.workshop.report.wizard</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">KSW_workshop.report_workshop</field>
+        <field name="report_file">KSW_workshop.report_workshop</field>
+        <field name="paperformat_id" ref="paperformat_ksw_workshop_report"/>
+    </record>
+
+    <record id="action_report_workshop_pdf" model="ir.actions.report">
+        <field name="name">Workshop Report (PDF)</field>
+        <field name="model">ksw.workshop.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">KSW_workshop.report_workshop</field>
+        <field name="report_file">KSW_workshop.report_workshop</field>
+        <field name="paperformat_id" ref="paperformat_ksw_workshop_report"/>
+        <field name="print_report_name">'Workshop Report - %s' % (object.date_to or '')</field>
+    </record>
+
+    <!-- A generic table: {'title', 'header', 'rows', 'total', 'numeric_from',
+         'key_value'}. Every report is built from these in Python
+         (ksw.workshop.report.wizard.get_report_data), so the four reports
+         share one look and one template. -->
+    <template id="report_workshop_table">
+        <h6 class="mt-3 mb-1" t-out="table['title']"/>
+        <table class="table table-sm table-bordered mb-3" style="font-size: 11px;">
+            <thead t-if="table.get('header')" class="table-light">
+                <tr>
+                    <t t-foreach="table['header']" t-as="col">
+                        <th t-att-class="'text-end' if col_index &gt;= table['numeric_from'] else ''"
+                            t-att-style="'width: 30%' if col_index == 0 and table['numeric_from'] == 1 else None"
+                            t-out="col"/>
+                    </t>
+                </tr>
+            </thead>
+            <tbody>
+                <tr t-foreach="table['rows']" t-as="row">
+                    <t t-foreach="row" t-as="cell">
+                        <td t-att-class="('text-end' if cell_index &gt;= table['numeric_from'] else '') + (' fw-bold' if table.get('key_value') and cell_index == 0 else '')"
+                            t-att-style="'width: 25%' if table.get('key_value') and cell_index == 0 else None"
+                            t-out="cell"/>
+                    </t>
+                </tr>
+                <!-- In the body, not a tfoot: wkhtmltopdf repeats a tfoot on
+                     every page, which prints "Total" halfway down the table. -->
+                <tr t-if="table.get('total')" class="fw-bold table-light">
+                    <t t-foreach="table['total']" t-as="cell">
+                        <td t-att-class="'text-end' if cell_index &gt;= table['numeric_from'] else ''" t-out="cell"/>
+                    </t>
+                </tr>
+            </tbody>
+        </table>
+    </template>
+
+    <!-- One request per row: what was asked, what was done, what was fitted. -->
+    <template id="report_workshop_request_rows">
+        <table class="table table-sm table-bordered mb-3" style="font-size: 10px;">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 7%">Date</th>
+                    <th style="width: 7%">Reference</th>
+                    <th t-if="rd.get('show_vehicle', True)" style="width: 7%">Vehicle</th>
+                    <th style="width: 9%">Repair Type</th>
+                    <th>Request</th>
+                    <th t-if="rd.get('show_work')">Work Done</th>
+                    <th t-if="rd.get('show_parts')">Spare Parts</th>
+                    <th t-if="rd.get('show_technician')" style="width: 7%">Technician</th>
+                    <th t-if="not rd.get('show_vehicle', True)" class="text-end" style="width: 6%">Odometer</th>
+                    <th style="width: 6%">Status</th>
+                    <th t-if="rd.get('show_cost')" class="text-end" style="width: 6%">Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr t-foreach="rows" t-as="r">
+                    <td t-out="r['date']"/>
+                    <td t-out="r['name']"/>
+                    <td t-if="rd.get('show_vehicle', True)" t-out="r['vehicle']"/>
+                    <td t-out="r['types']"/>
+                    <td t-out="r['request']"/>
+                    <td t-if="rd.get('show_work')" t-out="r['work']"/>
+                    <td t-if="rd.get('show_parts')" t-out="r['parts']"/>
+                    <td t-if="rd.get('show_technician')" t-out="r['technician']"/>
+                    <td t-if="not rd.get('show_vehicle', True)" class="text-end" t-out="r['odometer']"/>
+                    <td t-out="r['state']"/>
+                    <td t-if="rd.get('show_cost')" class="text-end" t-out="'{:,.2f}'.format(r['cost'] or 0.0)"/>
+                </tr>
+            </tbody>
+        </table>
+    </template>
+
+    <template id="report_workshop">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-set="rd" t-value="o.get_report_data()"/>
+                <t t-call="web.external_layout">
+                    <div class="page">
+
+                        <h4 class="text-center mb-1" t-out="rd['title']"/>
+                        <p class="text-center text-muted small mb-3">
+                            <span t-out="rd['report_label']"/> ·
+                            Printed <span t-out="rd['printed_on']"/> by <span t-out="rd['printed_by']"/>
+                        </p>
+
+                        <p class="small mb-2">
+                            <t t-foreach="rd['filters']" t-as="f">
+                                <span class="text-muted me-1" t-out="f[0]"/>
+                                <strong class="me-3" t-out="f[1]"/>
+                            </t>
+                        </p>
+
+                        <div t-if="rd['empty']" class="alert alert-info" role="alert">
+                            No workshop activity matches these filters.
+                        </div>
+
+                        <t t-else="">
+                            <!-- Headline figures -->
+                            <table class="table table-sm table-bordered text-center mb-3">
+                                <tr class="table-light small">
+                                    <t t-foreach="rd['kpis']" t-as="k"><td t-out="k[0]"/></t>
+                                </tr>
+                                <tr class="fw-bold">
+                                    <t t-foreach="rd['kpis']" t-as="k"><td t-out="k[1]"/></t>
+                                </tr>
+                            </table>
+
+                            <t t-foreach="rd['tables']" t-as="table">
+                                <t t-call="KSW_workshop.report_workshop_table"/>
+                            </t>
+
+                            <p t-if="rd.get('multi_count_note')" class="text-muted small">
+                                A request with several repair types is counted under each of
+                                them, so the groups add up to more than the total.
+                            </p>
+
+                            <!-- Itemised requests -->
+                            <t t-if="rd['groups']">
+                                <h5 class="mt-4 border-bottom pb-1">Requests</h5>
+                                <t t-foreach="rd['groups']" t-as="g">
+                                    <h6 t-if="rd['grouped']" class="mt-3 mb-1">
+                                        <span t-out="g['label']"/>
+                                        <span class="text-muted small">(<span t-out="g['count']"/>)</span>
+                                    </h6>
+                                    <t t-set="rows" t-value="g['rows']"/>
+                                    <t t-call="KSW_workshop.report_workshop_request_rows"/>
+                                </t>
+                            </t>
+
+                            <!-- Itemised spare-part issues -->
+                            <t t-if="rd.get('part_groups')">
+                                <h5 class="mt-4 border-bottom pb-1">Issues</h5>
+                                <t t-foreach="rd['part_groups']" t-as="g">
+                                    <h6 t-if="rd['grouped']" class="mt-3 mb-1">
+                                        <span t-out="g['label']"/>
+                                        <span class="text-muted small">(<span t-out="g['count']"/>)</span>
+                                    </h6>
+                                    <table class="table table-sm table-bordered mb-3" style="font-size: 10px;">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th style="width: 8%">Date</th>
+                                                <th style="width: 8%">Reference</th>
+                                                <th style="width: 9%">Vehicle</th>
+                                                <th t-if="rd['show_part']">Spare Part</th>
+                                                <th class="text-end" style="width: 7%">Quantity</th>
+                                                <th class="text-end" style="width: 9%">Unit Cost</th>
+                                                <th class="text-end" style="width: 9%">Value</th>
+                                                <th style="width: 10%">Technician</th>
+                                                <th style="width: 8%">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr t-foreach="g['rows']" t-as="r">
+                                                <td t-out="r['date']"/>
+                                                <td t-out="r['name']"/>
+                                                <td t-out="r['vehicle']"/>
+                                                <td t-if="rd['show_part']" t-out="r['part']"/>
+                                                <td class="text-end" t-out="r['qty']"/>
+                                                <td class="text-end" t-out="r['unit_cost']"/>
+                                                <td class="text-end" t-out="r['subtotal']"/>
+                                                <td t-out="r['technician']"/>
+                                                <td t-out="r['state']"/>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </t>
+                            </t>
+
+                            <div t-if="rd.get('no_lines') and rd.get('mentions')" class="alert alert-info" role="alert">
+                                No spare part issues are recorded in Odoo for these filters.
+                                The repair-note mentions below are the history before parts were itemised.
+                            </div>
+
+                            <p t-if="rd['truncated']" class="text-muted small">
+                                <span t-out="rd['truncated']"/> more rows are not listed.
+                                The summary tables above include them; narrow the period or
+                                filters to list them all.
+                            </p>
+
+                            <!-- Free-text mentions (pre-Odoo history) -->
+                            <t t-set="m" t-value="rd.get('mentions')"/>
+                            <t t-if="m">
+                                <h5 class="mt-4 border-bottom pb-1">
+                                    Repair notes mentioning “<span t-out="m['text']"/>”
+                                </h5>
+                                <p class="text-muted small">
+                                    <span t-out="m['count']"/> requests on <span t-out="m['vehicles']"/> vehicles.
+                                    These are mentions in the free-text repair notes, not issued
+                                    quantities, and are not included in any figure above.
+                                </p>
+                                <t t-if="m['table']">
+                                    <t t-set="table" t-value="m['table']"/>
+                                    <t t-call="KSW_workshop.report_workshop_table"/>
+                                </t>
+                                <t t-if="m['rows']">
+                                    <t t-set="rows" t-value="m['rows']"/>
+                                    <t t-call="KSW_workshop.report_workshop_request_rows"/>
+                                </t>
+                                <p t-if="m['truncated']" class="text-muted small">
+                                    <span t-out="m['truncated']"/> more requests are not listed.
+                                </p>
+                            </t>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

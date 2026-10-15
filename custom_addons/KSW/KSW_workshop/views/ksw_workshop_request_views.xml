@@ -501,17 +501,40 @@
     <menuitem id="menu_ksw_workshop_reporting" name="Reporting"
               parent="menu_ksw_workshop_root" sequence="30"
               groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
+    <!-- Two sections. "Reports" are the readable pages (wizard, then a
+         printed or on-screen report); "Analysis" keeps the pivots for
+         slicing the numbers. A menu with children renders as a section
+         header in the dropdown. -->
+    <menuitem id="menu_ksw_workshop_reports" name="Reports"
+              parent="menu_ksw_workshop_reporting" sequence="5"
+              groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
+    <menuitem id="menu_ksw_workshop_report_wizard_date" name="Repairs by Date"
+              parent="menu_ksw_workshop_reports" action="action_ksw_workshop_report_wizard_date" sequence="10"
+              groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
+    <menuitem id="menu_ksw_workshop_report_wizard_vehicle" name="Vehicle History"
+              parent="menu_ksw_workshop_reports" action="action_ksw_workshop_report_wizard_vehicle" sequence="20"
+              groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
+    <menuitem id="menu_ksw_workshop_report_wizard_type" name="Repairs by Type"
+              parent="menu_ksw_workshop_reports" action="action_ksw_workshop_report_wizard_type" sequence="30"
+              groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
+    <menuitem id="menu_ksw_workshop_report_wizard_part" name="Spare Part History"
+              parent="menu_ksw_workshop_reports" action="action_ksw_workshop_report_wizard_part" sequence="40"
+              groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
+
+    <menuitem id="menu_ksw_workshop_analysis" name="Analysis"
+              parent="menu_ksw_workshop_reporting" sequence="50"
+              groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
     <menuitem id="menu_ksw_workshop_report_analysis" name="Workshop Analysis"
-              parent="menu_ksw_workshop_reporting" action="action_ksw_workshop_report" sequence="10"
+              parent="menu_ksw_workshop_analysis" action="action_ksw_workshop_report" sequence="10"
               groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
     <menuitem id="menu_ksw_workshop_report_by_vehicle" name="By Vehicle"
-              parent="menu_ksw_workshop_reporting" action="action_ksw_workshop_report_by_vehicle" sequence="20"
+              parent="menu_ksw_workshop_analysis" action="action_ksw_workshop_report_by_vehicle" sequence="20"
               groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
     <menuitem id="menu_ksw_workshop_report_by_type" name="By Repair Type"
-              parent="menu_ksw_workshop_reporting" action="action_ksw_workshop_report_by_type" sequence="30"
+              parent="menu_ksw_workshop_analysis" action="action_ksw_workshop_report_by_type" sequence="30"
               groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
     <menuitem id="menu_ksw_workshop_report_by_technician" name="By Technician"
-              parent="menu_ksw_workshop_reporting" action="action_ksw_workshop_report_by_technician" sequence="40"
+              parent="menu_ksw_workshop_analysis" action="action_ksw_workshop_report_by_technician" sequence="40"
               groups="KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_manager"/>
 
     <menuitem id="menu_ksw_workshop_configuration" name="Configuration"

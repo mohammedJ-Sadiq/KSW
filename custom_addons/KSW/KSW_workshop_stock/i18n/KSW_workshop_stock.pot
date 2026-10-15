@@ -6,14 +6,20 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-14 19:41+0000\n"
-"PO-Revision-Date: 2026-10-14 19:41+0000\n"
+"POT-Creation-Date: 2026-10-15 13:13+0000\n"
+"PO-Revision-Date: 2026-10-15 13:13+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: KSW_workshop_stock
+#. odoo-python
+#: code:addons/KSW_workshop_stock/models/workshop_report.py:0
+msgid "Average Cost"
+msgstr ""
 
 #. module: KSW_workshop_stock
 #: model:ir.model.fields,help:KSW_workshop_stock.field_ksw_fleet_vehicle__x_analytic_account_id
@@ -43,6 +49,7 @@ msgstr ""
 #. module: KSW_workshop_stock
 #: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_fleet_vehicle__display_name
 #: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_part_line__display_name
+#: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_report_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_request__display_name
 #: model:ir.model.fields,field_description:KSW_workshop_stock.field_product_category__display_name
 msgid "Display Name"
@@ -56,6 +63,7 @@ msgstr ""
 #. module: KSW_workshop_stock
 #: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_fleet_vehicle__id
 #: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_part_line__id
+#: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_report_wizard__id
 #: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_request__id
 #: model:ir.model.fields,field_description:KSW_workshop_stock.field_product_category__id
 msgid "ID"
@@ -68,6 +76,11 @@ msgid "Item"
 msgstr ""
 
 #. module: KSW_workshop_stock
+#: model:ir.model.fields,help:KSW_workshop_stock.field_ksw_workshop_report_wizard__product_id
+msgid "Leave empty for a ranking of every part issued in the period."
+msgstr ""
+
+#. module: KSW_workshop_stock
 #. odoo-python
 #: code:addons/KSW_workshop_stock/models/workshop_request.py:0
 msgid ""
@@ -76,6 +89,8 @@ msgid ""
 msgstr ""
 
 #. module: KSW_workshop_stock
+#. odoo-python
+#: code:addons/KSW_workshop_stock/models/workshop_report.py:0
 #: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_part_line__x_available_qty
 msgid "On Hand"
 msgstr ""
@@ -111,6 +126,11 @@ msgstr ""
 #. module: KSW_workshop_stock
 #: model_terms:ir.ui.view,arch_db:KSW_workshop_stock.view_ksw_workshop_request_form_stock
 msgid "Set on the vehicle"
+msgstr ""
+
+#. module: KSW_workshop_stock
+#: model:ir.model.fields,field_description:KSW_workshop_stock.field_ksw_workshop_report_wizard__product_id
+msgid "Spare Part (Stock Item)"
 msgstr ""
 
 #. module: KSW_workshop_stock
@@ -157,6 +177,11 @@ msgstr ""
 #. module: KSW_workshop_stock
 #: model:ir.model.fields,help:KSW_workshop_stock.field_ksw_workshop_request__x_warehouse_id
 msgid "Warehouse the spare parts are issued from."
+msgstr ""
+
+#. module: KSW_workshop_stock
+#: model:ir.model,name:KSW_workshop_stock.model_ksw_workshop_report_wizard
+msgid "Workshop Report"
 msgstr ""
 
 #. module: KSW_workshop_stock
