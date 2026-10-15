@@ -1,4 +1,4 @@
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.tests.common import TransactionCase
 
 
@@ -107,31 +107,61 @@ class TestKswWorkshopRequest(TransactionCase):
         with self.assertRaises(UserError):
             request.with_user(self.user_manager).action_start()
 
-    def test_reject_requires_reason(self):
+    def test_reject_is_gone(self):
+        request = self._make_request(employee_user=self.user_employee)
+        self.assertFalse(hasattr(request, 'action_reject'))
+        self.assertFalse(hasattr(request, 'action_open_reject_wizard'))
+
+    def test_return_requires_reason(self):
         request = self._make_request(employee_user=self.user_employee)
         with self.assertRaises(UserError):
-            request.with_user(self.user_manager).action_reject()
+            request.with_user(self.user_manager).action_return('  ')
+        self.assertEqual(request.state, 'new')
 
-    def test_manager_can_reject_with_reason(self):
+    def test_return_button_prompts_for_reason(self):
         request = self._make_request(employee_user=self.user_employee)
-        request.with_user(self.user_manager).write({'rejection_reason': 'Duplicate request'})
-        request.with_user(self.user_manager).action_reject()
-        self.assertEqual(request.state, 'rejected')
-
-    def test_reject_button_prompts_for_reason(self):
-        request = self._make_request(employee_user=self.user_employee)
-        action = request.with_user(self.user_manager).action_open_reject_wizard()
-        self.assertEqual(action['res_model'], 'ksw.workshop.reject.wizard')
-        Wizard = self.env['ksw.workshop.reject.wizard'].with_user(self.user_manager)
-        wizard = Wizard.with_context(action['context']).create({'rejection_reason': 'Duplicate'})
+        action = request.with_user(self.user_manager).action_open_return_wizard()
+        self.assertEqual(action['res_model'], 'ksw.workshop.return.wizard')
+        Wizard = self.env['ksw.workshop.return.wizard'].with_user(self.user_manager)
+        wizard = Wizard.with_context(action['context']).create({'return_reason': 'Wrong truck'})
         wizard.action_confirm()
-        self.assertEqual(request.state, 'rejected')
-        self.assertEqual(request.rejection_reason, 'Duplicate')
+        self.assertEqual(request.state, 'returned')
+        self.assertEqual(request.return_reason, 'Wrong truck')
 
-    def test_employee_cannot_open_reject_prompt(self):
+    def test_employee_cannot_return(self):
         request = self._make_request(employee_user=self.user_employee)
         with self.assertRaises(UserError):
-            request.with_user(self.user_employee).action_open_reject_wizard()
+            request.with_user(self.user_employee).action_open_return_wizard()
+        with self.assertRaises(UserError):
+            request.with_user(self.user_employee).action_return('x')
+
+    def test_only_new_requests_can_be_returned(self):
+        request = self._make_request(employee_user=self.user_employee)
+        request.with_user(self.user_manager).action_start()
+        with self.assertRaises(UserError):
+            request.with_user(self.user_manager).action_return('x')
+
+    def test_requester_edits_and_resubmits_returned_request(self):
+        request = self._make_request(employee_user=self.user_employee)
+        request.with_user(self.user_manager).action_return('Describe the fault')
+        request.with_user(self.user_employee).write({'description': 'Brakes squeal'})
+        existing_ids = request.message_ids.ids
+        request.with_user(self.user_employee).action_resubmit()
+        self.assertEqual(request.state, 'new')
+        new_msgs = request.message_ids.filtered(lambda m: m.id not in existing_ids)
+        self.assertTrue(new_msgs.filtered(lambda m: self.user_manager.partner_id in m.partner_ids))
+
+    def test_other_employee_cannot_resubmit(self):
+        request = self._make_request(employee_user=self.user_employee)
+        request.with_user(self.user_manager).action_return('x')
+        # Another requester cannot even see it (own-requests record rule).
+        with self.assertRaises(AccessError):
+            request.with_user(self.user_other).action_resubmit()
+
+    def test_requester_cannot_resubmit_a_new_request(self):
+        request = self._make_request(employee_user=self.user_employee)
+        with self.assertRaises(UserError):
+            request.with_user(self.user_employee).action_resubmit()
 
     def test_employee_cannot_set_state_directly(self):
         request = self._make_request(employee_user=self.user_employee)
@@ -254,14 +284,14 @@ class TestKswWorkshopRequest(TransactionCase):
         notified = new_msgs.filtered(lambda m: self.user_employee.partner_id in m.partner_ids)
         self.assertTrue(notified)
 
-    def test_requester_notified_on_rejection(self):
+    def test_requester_notified_on_return_with_reason(self):
         request = self._make_request(employee_user=self.user_employee)
-        request.with_user(self.user_manager).write({'rejection_reason': 'Not needed'})
         existing_ids = request.message_ids.ids
-        request.with_user(self.user_manager).action_reject()
+        request.with_user(self.user_manager).action_return('Not needed')
         new_msgs = request.message_ids.filtered(lambda m: m.id not in existing_ids)
         notified = new_msgs.filtered(lambda m: self.user_employee.partner_id in m.partner_ids)
         self.assertTrue(notified)
+        self.assertIn('Not needed', notified[0].body)
 
     # ------------------------------------------------------------------
     # Client / Vehicle cascade

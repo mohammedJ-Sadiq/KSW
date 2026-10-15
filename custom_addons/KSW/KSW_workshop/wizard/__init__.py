@@ -1,1 +1,1 @@
-from . import ksw_workshop_reject_wizard
+from . import ksw_workshop_return_wizard

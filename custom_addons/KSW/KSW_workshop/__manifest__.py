@@ -1,6 +1,6 @@
 {
     'name': 'KSW Workshop',
-    'version': '19.0.12.11.0',
+    'version': '19.0.12.12.0',
     'summary': 'Workshop service requests: submission, triage, and repair report',
     'description': """
 Workshop Service Requests
@@ -8,7 +8,7 @@ Workshop Service Requests
 Replaces the Google Form + Google Sheet workflow employees used to request
 vehicle workshop service. A request goes Client -> Vehicle Type -> Vehicle
 (or "Cash Customer" free text for one-off walk-in work); the workshop
-manager triages it (New -> In Progress -> Completed/Rejected); a workshop
+manager triages it (New -> In Progress -> Completed, or Returned to the requester to correct and resubmit); a workshop
 technician fills in the repair report (entry/exit, odometer, spare parts
 issued, and the labor / service performed) while the request is In Progress.
 Labor is itemised one line per job, each naming a workshop technician or the
@@ -46,7 +46,7 @@ is the lighter thing asked for instead, not a resumption of that design.
         'data/sequence.xml',
         'data/workshop_technician.xml',
         'data/request_types.xml',
-        'wizard/ksw_workshop_reject_wizard_views.xml',
+        'wizard/ksw_workshop_return_wizard_views.xml',
         'views/ksw_workshop_request_views.xml',
         'views/res_users_views.xml',
         'views/ksw_workshop_technician_views.xml',

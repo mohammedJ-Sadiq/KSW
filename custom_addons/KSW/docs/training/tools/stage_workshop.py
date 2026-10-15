@@ -142,12 +142,9 @@ for key, vehicle, driver, description in SPECS:
         })
         req.action_complete()
     elif key == "workshop_rejected" and req.state == "new":
-        # The requester never sees rejection_reason (manager-only tab, and
-        # the reject message carries only note_to_requester), so a manager
-        # has to repeat the reason there for the requester to learn it.
-        reason = TEXT["reject_note"]
-        req.write({"rejection_reason": reason, "note_to_requester": reason})
-        req.action_reject()
+        # Reject was removed (Oct 2026): the manager returns the request to
+        # the requester with a reason, shown on the form and in the message.
+        req.action_return(TEXT["reject_note"])
     print(key, req.name, req.state, req.vehicle_id.name, req.x_driver_mismatch)
 
 print("group trucks", group_trucks.mapped("name"), "team truck", team_truck.name,

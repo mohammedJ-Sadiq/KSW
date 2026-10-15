@@ -57,7 +57,7 @@ class KswWorkshopRequest(models.Model):
     # both the guard and any future audit of "who can touch what" read
     # from the same place.
     _IMMUTABLE_FIELDS = {'employee_id'}
-    _STATE_FIELDS = {'state', 'rejection_reason', 'completion_date'}
+    _STATE_FIELDS = {'state', 'rejection_reason', 'return_reason', 'completion_date'}
     _INTERNAL_NOTE_FIELDS = {'note', 'note_to_requester'}
     _REPORT_FIELDS = {
         'entry_datetime', 'exit_datetime', 'odometer_reading', 'tire_pressure',
@@ -195,14 +195,18 @@ class KswWorkshopRequest(models.Model):
 
     state = fields.Selection([
         ('new', 'New'),
+        ('returned', 'Returned to Requester'),
         ('in_progress', 'In Progress'),
         ('completed', 'Completed'),
+        # History only since Oct 2026: the manager no longer rejects, he
+        # returns the request to the requester with a reason (action_return).
         ('rejected', 'Rejected'),
     ], default='new', tracking=True, copy=False, required=True)
 
     note = fields.Text(string='Internal Note')
     note_to_requester = fields.Text(string='Note to Requester')
     rejection_reason = fields.Text()
+    return_reason = fields.Text(string='Return Reason', copy=False)
     completion_date = fields.Datetime(readonly=True, copy=False)
     # store=True so it can be used as a pivot/graph measure — an unstored
     # compute cannot be grouped, sorted or measured. Same reason as
@@ -651,8 +655,10 @@ class KswWorkshopRequest(models.Model):
 
             if touched & self._REQUESTER_FIELDS and not is_manager:
                 for request in self:
-                    if request.employee_id.user_id != user or request.state != 'new':
-                        raise UserError(_('You can only edit your own request while it is New.'))
+                    if request.employee_id.user_id != user or request.state not in ('new', 'returned'):
+                        raise UserError(_(
+                            'You can only edit your own request while it is New or '
+                            'Returned to you.'))
 
             if touched & self._CLASSIFICATION_FIELDS and not (
                 is_manager or user.has_group('KSW_workshop.group_workshop_technician')
@@ -687,7 +693,8 @@ class KswWorkshopRequest(models.Model):
         # Still New and still untouched by a person: the tags follow the words.
         if 'description' in vals and 'request_type_ids' not in vals:
             stale = self.filtered(
-                lambda request: request.x_request_type_derived and request.state == 'new')
+                lambda request: request.x_request_type_derived
+                and request.state in ('new', 'returned'))
             stale._apply_derived_types()
         return res
 
@@ -721,33 +728,51 @@ class KswWorkshopRequest(models.Model):
                 raise UserError(_('Only new requests can be started.'))
         self.write({'state': 'in_progress'})
 
-    def action_open_reject_wizard(self):
+    def action_open_return_wizard(self):
         self._check_manager()
         self.ensure_one()
         if self.state != 'new':
-            raise UserError(_('Only new requests can be rejected.'))
+            raise UserError(_('Only new requests can be returned to the requester.'))
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Reject Request'),
-            'res_model': 'ksw.workshop.reject.wizard',
+            'name': _('Return to Requester'),
+            'res_model': 'ksw.workshop.return.wizard',
             'view_mode': 'form',
             'target': 'new',
-            'context': {
-                'default_request_id': self.id,
-                'default_rejection_reason': self.rejection_reason,
-            },
+            'context': {'default_request_id': self.id},
         }
 
-    def action_reject(self):
+    def action_return(self, reason):
+        """Send a New request back to its requester to correct and resubmit.
+
+        Replaces Reject (Oct 2026): the workshop manager may no longer close a
+        request on his own; the requester decides what happens to it next.
+        """
         self._check_manager()
+        if not (reason or '').strip():
+            raise UserError(_('Please give the reason for returning the request.'))
         for request in self:
             if request.state != 'new':
-                raise UserError(_('Only new requests can be rejected.'))
-            if not request.rejection_reason:
-                raise UserError(_('Please provide a rejection reason before rejecting the request.'))
-        self.write({'state': 'rejected'})
+                raise UserError(_('Only new requests can be returned to the requester.'))
+        self.write({'state': 'returned', 'return_reason': reason.strip()})
         for request in self:
-            request._notify_requester(_('Your workshop request was rejected.'))
+            request._notify_requester(
+                _('Your workshop request was returned to you. Please correct it and resubmit.'),
+                reason=request.return_reason)
+
+    def action_resubmit(self):
+        user = self.env.user
+        is_manager = self.env.su or user.has_group('KSW_workshop.group_workshop_manager')
+        for request in self:
+            if request.state != 'returned':
+                raise UserError(_('Only returned requests can be resubmitted.'))
+            if not is_manager and request.employee_id.user_id != user:
+                raise UserError(_('Only the requester can resubmit this request.'))
+        # sudo(): state is a manager field in write(); the requester was
+        # authorised just above.
+        self.sudo().write({'state': 'new'})
+        for request in self:
+            request._notify_workshop_managers(resubmitted=True)
 
     def action_complete(self):
         self._check_manager()
@@ -761,7 +786,7 @@ class KswWorkshopRequest(models.Model):
     # ------------------------------------------------------------------
     # Notifications
     # ------------------------------------------------------------------
-    def _notify_workshop_managers(self):
+    def _notify_workshop_managers(self, resubmitted=False):
         group = self.env.ref('KSW_workshop.group_workshop_manager', raise_if_not_found=False)
         # admin and OdooBot hold the group for system access, not as workshop
         # people: admin's address is the shared info@ mailbox, so every new
@@ -776,13 +801,14 @@ class KswWorkshopRequest(models.Model):
         client_text = self.x_cash_customer_name if self.is_cash_customer else self.client_id.display_name
         vehicle_text = self.x_cash_vehicle_number if self.is_cash_customer else self.vehicle_id.display_name
         body = Markup(
-            '<b>New workshop request %(name)s</b><br/>'
+            '<b>%(title)s</b><br/>'
             '<b>Requested by:</b> %(requester)s<br/>'
             '<b>Client:</b> %(client)s<br/>'
             '<b>Vehicle:</b> %(vehicle)s<br/>'
             '<b>Description:</b> %(description)s'
         ) % {
-            'name': self.name,
+            'title': (_('Workshop request %s resubmitted', self.name) if resubmitted
+                      else _('New workshop request %s', self.name)),
             'requester': self.employee_id.name,
             'client': client_text or '',
             'vehicle': vehicle_text or '',
@@ -790,12 +816,15 @@ class KswWorkshopRequest(models.Model):
         }
         self.sudo().message_post(body=body, partner_ids=partner_ids, subtype_xmlid='mail.mt_comment')
 
-    def _notify_requester(self, instruction):
+    def _notify_requester(self, instruction, reason=None):
         self.ensure_one()
         partner = self.employee_id.user_id.partner_id
         if not partner:
             return
         body = Markup('<b>%(instruction)s</b>') % {'instruction': instruction}
+        if reason:
+            body += Markup('<br/><b>%(label)s</b> %(reason)s') % {
+                'label': _('Reason:'), 'reason': reason}
         if self.note_to_requester:
             body += Markup('<br/>%(note)s') % {'note': self.note_to_requester}
         self.sudo().message_post(body=body, partner_ids=[partner.id], subtype_xmlid='mail.mt_comment')

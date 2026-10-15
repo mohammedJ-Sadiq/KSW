@@ -967,12 +967,6 @@ msgstr "لا يمكن إكمال إلا الطلبات قيد التنفيذ."
 #. module: KSW_workshop
 #. odoo-python
 #: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
-msgid "Only new requests can be rejected."
-msgstr "لا يمكن رفض إلا الطلبات الجديدة."
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
 msgid "Only new requests can be started."
 msgstr "لا يمكن بدء العمل إلا على الطلبات الجديدة."
 
@@ -1057,12 +1051,6 @@ msgstr "اختر النوع الذي تنتمي إليه هذه الكلمة، �
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_cash_plate_number
 msgid "Plate Number (Cash)"
 msgstr "رقم اللوحة (نقدي)"
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
-msgid "Please provide a rejection reason before rejecting the request."
-msgstr "يرجى إدخال سبب الرفض قبل رفض الطلب."
 
 #. module: KSW_workshop
 #: model:ir.model.fields,help:KSW_workshop.field_ksw_workshop_labor_line__line_no
@@ -1168,23 +1156,6 @@ msgstr "تسجيل عميل للورشة"
 #: model_terms:ir.actions.act_window,help:KSW_workshop.action_ksw_workshop_technician
 msgid "Register a workshop technician"
 msgstr "تسجيل فني للورشة"
-
-#. module: KSW_workshop
-#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_reject_wizard_form
-#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
-msgid "Reject"
-msgstr "رفض"
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
-msgid "Reject Request"
-msgstr "رفض الطلب"
-
-#. module: KSW_workshop
-#: model:ir.model,name:KSW_workshop.model_ksw_workshop_reject_wizard
-msgid "Reject Workshop Request"
-msgstr "رفض طلب الورشة"
 
 #. module: KSW_workshop
 #: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__state__rejected
@@ -1772,11 +1743,6 @@ msgstr ""
 "الأعمال المرسلة خارج الورشة."
 
 #. module: KSW_workshop
-#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_reject_wizard_form
-msgid "Why is this request being rejected?"
-msgstr "ما سبب رفض هذا الطلب؟"
-
-#. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_users_form_ksw_workshop_assistant
 msgid ""
 "With the <b>Requester Assistant</b> role (Access Rights, KSW Workshop),\n"
@@ -1941,12 +1907,6 @@ msgstr "السنة (نقدي)"
 #. module: KSW_workshop
 #. odoo-python
 #: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
-msgid "You can only edit your own request while it is New."
-msgstr "لا يمكنك تعديل طلبك إلا وهو في حالة جديد."
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
 msgid ""
 "You raise workshop requests for your manager, but your manager is not a "
 "workshop requester and nobody else is named on your user. Ask an "
@@ -1960,12 +1920,6 @@ msgstr ""
 #: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
 msgid "Your workshop request has been completed."
 msgstr "تم إكمال طلب الورشة الخاص بك."
-
-#. module: KSW_workshop
-#. odoo-python
-#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
-msgid "Your workshop request was rejected."
-msgstr "تم رفض طلب الورشة الخاص بك."
 
 #. module: KSW_workshop
 #: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_part_form
@@ -1995,3 +1949,106 @@ msgid ""
 "%s is not in your team. You can name as driver only yourself and the "
 "employees who report to you."
 msgstr "%s ليس من فريقك. يمكنك اختيار نفسك أو الموظفين التابعين لك فقط كسائق."
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid ""
+"<strong>Returned to you by the workshop.</strong>\n"
+"                        Correct the request and press Resubmit."
+msgstr ""
+"<strong>أعادت الورشة الطلب إليك.</strong>\n"
+"                        صحّح الطلب ثم اضغط «إعادة الإرسال»."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "New workshop request %s"
+msgstr "طلب ورشة جديد %s"
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Only new requests can be returned to the requester."
+msgstr "لا يمكن إعادة إلا الطلبات الجديدة إلى مقدم الطلب."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Only returned requests can be resubmitted."
+msgstr "لا يمكن إعادة إرسال إلا الطلبات المُعادة."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Only the requester can resubmit this request."
+msgstr "إعادة إرسال هذا الطلب لمقدم الطلب فقط."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Please give the reason for returning the request."
+msgstr "يرجى ذكر سبب إعادة الطلب."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Reason:"
+msgstr "السبب:"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+msgid "Resubmit"
+msgstr "إعادة الإرسال"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__return_reason
+#: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_return_wizard__return_reason
+msgid "Return Reason"
+msgstr "سبب الإعادة"
+
+#. module: KSW_workshop
+#: model:ir.model,name:KSW_workshop.model_ksw_workshop_return_wizard
+msgid "Return Workshop Request to Requester"
+msgstr "إعادة طلب الورشة إلى مقدم الطلب"
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_form
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_return_wizard_form
+msgid "Return to Requester"
+msgstr "إعادة إلى مقدم الطلب"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_request_search
+msgid "Returned"
+msgstr "مُعاد"
+
+#. module: KSW_workshop
+#: model:ir.model.fields.selection,name:KSW_workshop.selection__ksw_workshop_request__state__returned
+msgid "Returned to Requester"
+msgstr "مُعاد إلى مقدم الطلب"
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_ksw_workshop_return_wizard_form
+msgid "What should the requester correct before resubmitting?"
+msgstr "ما الذي يجب على مقدم الطلب تصحيحه قبل إعادة الإرسال؟"
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "Workshop request %s resubmitted"
+msgstr "أُعيد إرسال طلب الورشة %s"
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid "You can only edit your own request while it is New or Returned to you."
+msgstr "يمكنك تعديل طلبك فقط وهو جديد أو مُعاد إليك."
+
+#. module: KSW_workshop
+#. odoo-python
+#: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
+msgid ""
+"Your workshop request was returned to you. Please correct it and resubmit."
+msgstr "أُعيد إليك طلب الورشة. يرجى تصحيحه ثم إعادة إرساله."

@@ -21,4 +21,4 @@ access_ksw_workshop_request_type_manager,ksw.workshop.request.type.manager,model
 access_ksw_workshop_keyword_suggestion_manager,ksw.workshop.keyword.suggestion.manager,model_ksw_workshop_keyword_suggestion,group_workshop_manager,1,1,1,1
 access_ksw_workshop_keyword_ignored_user,ksw.workshop.keyword.ignored.user,model_ksw_workshop_keyword_ignored,base.group_user,1,0,0,0
 access_ksw_workshop_keyword_ignored_manager,ksw.workshop.keyword.ignored.manager,model_ksw_workshop_keyword_ignored,group_workshop_manager,1,1,1,1
-access_ksw_workshop_reject_wizard_manager,ksw.workshop.reject.wizard.manager,model_ksw_workshop_reject_wizard,group_workshop_manager,1,1,1,0
+access_ksw_workshop_return_wizard_manager,ksw.workshop.return.wizard.manager,model_ksw_workshop_return_wizard,group_workshop_manager,1,1,1,0

@@ -20,14 +20,25 @@
                             class="oe_highlight"
                             groups="KSW_workshop.group_workshop_manager"
                             invisible="state != 'in_progress'"/>
-                    <button name="action_open_reject_wizard" type="object"
-                            string="Reject"
-                            class="btn-danger"
+                    <!-- No Reject (Oct 2026): the manager returns the request
+                         to the requester with a reason instead. -->
+                    <button name="action_open_return_wizard" type="object"
+                            string="Return to Requester"
                             groups="KSW_workshop.group_workshop_manager"
                             invisible="state != 'new'"/>
+                    <button name="action_resubmit" type="object"
+                            string="Resubmit"
+                            class="oe_highlight"
+                            groups="KSW_workshop.group_workshop_requester,KSW_workshop.group_workshop_requester_assistant,KSW_workshop.group_workshop_manager"
+                            invisible="state != 'returned'"/>
                     <field name="state" widget="statusbar" statusbar_visible="new,in_progress,completed"/>
                 </header>
                 <sheet>
+                    <div class="alert alert-warning" role="alert" invisible="state != 'returned'">
+                        <strong>Returned to you by the workshop.</strong>
+                        Correct the request and press Resubmit.
+                        <field name="return_reason" readonly="1"/>
+                    </div>
                     <div class="oe_title">
                         <h1>
                             <field name="name" readonly="1"/>
@@ -73,37 +84,37 @@
                                    options="{'no_create': True}"
                                    invisible="is_cash_customer"
                                    required="not is_cash_customer"
-                                   readonly="state != 'new'"/>
+                                   readonly="state not in ('new', 'returned')"/>
                             <field name="vehicle_type"
                                    invisible="is_cash_customer"
                                    required="not is_cash_customer"
-                                   readonly="state != 'new'"/>
+                                   readonly="state not in ('new', 'returned')"/>
                             <field name="vehicle_id"
                                    options="{'no_create': True}"
                                    context="{'default_client_id': client_id, 'default_vehicle_type': vehicle_type}"
                                    invisible="is_cash_customer"
                                    required="not is_cash_customer"
-                                   readonly="state != 'new'"/>
+                                   readonly="state not in ('new', 'returned')"/>
                             <field name="driver_id"
                                    options="{'no_create': True}"
                                    context="{'ksw_workshop_driver_picker': True}"
                                    invisible="is_cash_customer"
                                    required="not is_cash_customer"
-                                   readonly="state != 'new'"/>
+                                   readonly="state not in ('new', 'returned')"/>
                         </group>
                         <!-- Walk-in work: every field optional on purpose. What
                              the counter gets told varies, and the description
                              (required for every request) is the part that is
                              always there. -->
                         <group string="Cash Customer" invisible="not is_cash_customer">
-                            <field name="x_cash_customer_name" readonly="state != 'new'"/>
-                            <field name="x_cash_vehicle_number" readonly="state != 'new'"/>
-                            <field name="x_cash_tank_number" readonly="state != 'new'"/>
-                            <field name="x_cash_plate_number" readonly="state != 'new'"/>
-                            <field name="x_cash_driver_name" readonly="state != 'new'"/>
-                            <field name="x_cash_brand" readonly="state != 'new'"/>
-                            <field name="x_cash_model" readonly="state != 'new'"/>
-                            <field name="x_cash_year" readonly="state != 'new'"/>
+                            <field name="x_cash_customer_name" readonly="state not in ('new', 'returned')"/>
+                            <field name="x_cash_vehicle_number" readonly="state not in ('new', 'returned')"/>
+                            <field name="x_cash_tank_number" readonly="state not in ('new', 'returned')"/>
+                            <field name="x_cash_plate_number" readonly="state not in ('new', 'returned')"/>
+                            <field name="x_cash_driver_name" readonly="state not in ('new', 'returned')"/>
+                            <field name="x_cash_brand" readonly="state not in ('new', 'returned')"/>
+                            <field name="x_cash_model" readonly="state not in ('new', 'returned')"/>
+                            <field name="x_cash_year" readonly="state not in ('new', 'returned')"/>
                         </group>
                     </group>
                     <group string="Request">
@@ -112,7 +123,7 @@
                              _apply_derived_types) and shown below to the workshop,
                              who can correct it. Asking a driver to classify his
                              own fault is asking the wrong person. -->
-                        <field name="description" readonly="state != 'new'"
+                        <field name="description" readonly="state not in ('new', 'returned')"
                                placeholder="Describe the problem: what is wrong, since when, and any warning light or noise."/>
                         <field name="request_type_ids" widget="many2many_tags"
                                options="{'color_field': 'color', 'no_create': True}"
@@ -275,7 +286,7 @@
         <field name="name">ksw.workshop.request.list</field>
         <field name="model">ksw.workshop.request</field>
         <field name="arch" type="xml">
-            <list string="Workshop Requests" decoration-danger="state == 'rejected'" decoration-success="state == 'completed'" decoration-info="state == 'in_progress'">
+            <list string="Workshop Requests" decoration-danger="state == 'rejected'" decoration-warning="state == 'returned'" decoration-success="state == 'completed'" decoration-info="state == 'in_progress'">
                 <field name="name"/>
                 <field name="create_date" string="Date"/>
                 <field name="employee_id"/>
@@ -338,6 +349,7 @@
                 <field name="vehicle_id"/>
                 <field name="description"/>
                 <filter string="New" name="filter_new" domain="[('state', '=', 'new')]"/>
+                <filter string="Returned" name="filter_returned" domain="[('state', '=', 'returned')]"/>
                 <filter string="In Progress" name="filter_in_progress" domain="[('state', '=', 'in_progress')]"/>
                 <filter string="Completed" name="filter_completed" domain="[('state', '=', 'completed')]"/>
                 <filter string="Rejected" name="filter_rejected" domain="[('state', '=', 'rejected')]"/>
