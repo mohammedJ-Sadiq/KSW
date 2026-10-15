@@ -42,13 +42,17 @@
          (ksw.workshop.report.wizard.get_report_data), so the four reports
          share one look and one template. -->
     <template id="report_workshop_table">
-        <h6 class="mt-3 mb-1" t-out="table['title']"/>
-        <table class="table table-sm table-bordered mb-3" style="font-size: 11px;">
+        <h5 class="mt-3 mb-1" t-out="table['title']"/>
+        <!-- width:auto + a floor: a 3-column summary stretched across a
+             landscape page spreads its few numbers so far apart that they
+             read as unrelated, and invites a smaller font to compensate. -->
+        <t t-set="ncols" t-value="len(table.get('header') or (table['rows'] and table['rows'][0]) or [])"/>
+        <table class="table table-sm table-bordered mb-3"
+               t-att-style="'font-size: 18px; width: %s;' % ('100%' if ncols &gt; 6 else '60%')">
             <thead t-if="table.get('header')" class="table-light">
                 <tr>
                     <t t-foreach="table['header']" t-as="col">
                         <th t-att-class="'text-end' if col_index &gt;= table['numeric_from'] else ''"
-                            t-att-style="'width: 30%' if col_index == 0 and table['numeric_from'] == 1 else None"
                             t-out="col"/>
                     </t>
                 </tr>
@@ -74,19 +78,19 @@
 
     <!-- One request per row: what was asked, what was done, what was fitted. -->
     <template id="report_workshop_request_rows">
-        <table class="table table-sm table-bordered mb-3" style="font-size: 10px;">
+        <table class="table table-sm table-bordered mb-3" style="font-size: 16px;">
             <thead class="table-light">
                 <tr>
-                    <th style="width: 7%">Date</th>
-                    <th style="width: 7%">Reference</th>
+                    <th style="width: 9%">Date</th>
+                    <th style="width: 8%">Reference</th>
                     <th t-if="rd.get('show_vehicle', True)" style="width: 7%">Vehicle</th>
-                    <th style="width: 9%">Repair Type</th>
+                    <th style="width: 14%">Repair Type</th>
                     <th>Request</th>
                     <th t-if="rd.get('show_work')">Work Done</th>
                     <th t-if="rd.get('show_parts')">Spare Parts</th>
                     <th t-if="rd.get('show_technician')" style="width: 7%">Technician</th>
                     <th t-if="not rd.get('show_vehicle', True)" class="text-end" style="width: 6%">Odometer</th>
-                    <th style="width: 6%">Status</th>
+                    <th style="width: 9%">Status</th>
                     <th t-if="rd.get('show_cost')" class="text-end" style="width: 6%">Cost</th>
                 </tr>
             </thead>
@@ -115,13 +119,13 @@
                 <t t-call="web.external_layout">
                     <div class="page">
 
-                        <h4 class="text-center mb-1" t-out="rd['title']"/>
-                        <p class="text-center text-muted small mb-3">
+                        <h2 class="text-center mb-1" t-out="rd['title']"/>
+                        <p class="text-center text-muted mb-3" style="font-size: 15px;">
                             <span t-out="rd['report_label']"/> ·
                             Printed <span t-out="rd['printed_on']"/> by <span t-out="rd['printed_by']"/>
                         </p>
 
-                        <p class="small mb-2">
+                        <p class="mb-2" style="font-size: 17px;">
                             <t t-foreach="rd['filters']" t-as="f">
                                 <span class="text-muted me-1" t-out="f[0]"/>
                                 <strong class="me-3" t-out="f[1]"/>
@@ -134,8 +138,8 @@
 
                         <t t-else="">
                             <!-- Headline figures -->
-                            <table class="table table-sm table-bordered text-center mb-3">
-                                <tr class="table-light small">
+                            <table class="table table-sm table-bordered text-center mb-3" style="font-size: 20px;">
+                                <tr class="table-light" style="font-size: 15px;">
                                     <t t-foreach="rd['kpis']" t-as="k"><td t-out="k[0]"/></t>
                                 </tr>
                                 <tr class="fw-bold">
@@ -156,10 +160,10 @@
                             <t t-if="rd['groups']">
                                 <h5 class="mt-4 border-bottom pb-1">Requests</h5>
                                 <t t-foreach="rd['groups']" t-as="g">
-                                    <h6 t-if="rd['grouped']" class="mt-3 mb-1">
+                                    <h5 t-if="rd['grouped']" class="mt-3 mb-1">
                                         <span t-out="g['label']"/>
                                         <span class="text-muted small">(<span t-out="g['count']"/>)</span>
-                                    </h6>
+                                    </h5>
                                     <t t-set="rows" t-value="g['rows']"/>
                                     <t t-call="KSW_workshop.report_workshop_request_rows"/>
                                 </t>
@@ -169,11 +173,11 @@
                             <t t-if="rd.get('part_groups')">
                                 <h5 class="mt-4 border-bottom pb-1">Issues</h5>
                                 <t t-foreach="rd['part_groups']" t-as="g">
-                                    <h6 t-if="rd['grouped']" class="mt-3 mb-1">
+                                    <h5 t-if="rd['grouped']" class="mt-3 mb-1">
                                         <span t-out="g['label']"/>
                                         <span class="text-muted small">(<span t-out="g['count']"/>)</span>
-                                    </h6>
-                                    <table class="table table-sm table-bordered mb-3" style="font-size: 10px;">
+                                    </h5>
+                                    <table class="table table-sm table-bordered mb-3" style="font-size: 16px;">
                                         <thead class="table-light">
                                             <tr>
                                                 <th style="width: 8%">Date</th>
