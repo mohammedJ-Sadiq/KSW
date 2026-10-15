@@ -72,6 +72,15 @@ class TestWorkshopTanker(TransactionCase):
         self.assertNotIn(self.team_truck, picked)
         self.assertIn(self.other_truck, picked)
 
+    def test_supervisor_search_matches_his_picker(self):
+        Vehicle = self.env['ksw.fleet.vehicle'].with_user(self.admin_user)
+        by_name = Vehicle.search([('x_workshop_supervisor_id', 'ilike', 'WST Supervisor')])
+        by_id = Vehicle.search([('x_workshop_supervisor_id', '=', self.supervisor.id)])
+        self.assertEqual(by_name, by_id)
+        self.assertEqual(by_name, self.in_group | self.team_truck)
+        self.assertNotIn(self.other_truck, by_name)
+        self.assertFalse(Vehicle.search([('x_workshop_supervisor_id', 'ilike', 'WST Loner')]))
+
     def test_workshop_manager_and_unscoped_requester_keep_full_list(self):
         for user in (self.mgr_user, self.loner_user):
             self.assertIn(self.other_truck, self._pickable(user))

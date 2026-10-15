@@ -67,10 +67,34 @@ class KswFleetVehicle(models.Model):
         string='My Workshop Vehicle', compute='_compute_workshop_in_scope',
         search='_search_workshop_in_scope')
 
+    # Search only: "which trucks does this supervisor answer for", the same
+    # answer his workshop picker gets, so an administrator can check it
+    # without logging in as him. Never displayed (always empty).
+    x_workshop_supervisor_id = fields.Many2one(
+        'hr.employee', string='Supervisor', compute='_compute_workshop_supervisor_id',
+        search='_search_workshop_supervisor_id')
+
     @api.depends('x_bas_driver_id', 'driver_id')
     def _compute_attached_driver_id(self):
         for vehicle in self:
             vehicle.x_attached_driver_id = vehicle.x_bas_driver_id or vehicle.driver_id
+
+    def _compute_workshop_supervisor_id(self):
+        self.x_workshop_supervisor_id = False
+
+    def _search_workshop_supervisor_id(self, operator, value):
+        Employee = self.env['hr.employee'].sudo()
+        if operator == 'any':
+            # Odoo 19 hands a typed name over as any(display_name ilike ...).
+            employees = Employee.search(value)
+        elif operator == 'ilike':
+            employees = Employee.search([('name', 'ilike', value)])
+        elif operator == 'in':
+            # Odoo 19 hands '=' over as 'in' with an OrderedSet (gotcha #24).
+            employees = Employee.browse([v for v in value if v])
+        else:
+            return NotImplemented
+        return [('id', 'in', list(self._workshop_scope_for_employees(employees)))]
 
     # ------------------------------------------------------------------
     # Workshop scope
@@ -102,13 +126,23 @@ class KswFleetVehicle(models.Model):
         employee = user.sudo().employee_id
         if not employee:
             return None
-        allowed = set(employee.x_water_tanker_group_ids.filtered('active').vehicle_ids.ids)
-        team = self.env['hr.employee'].sudo().search([('id', 'child_of', employee.id)])
+        return self._workshop_scope_for_employees(employee) or None
+
+    @api.model
+    def _workshop_scope_for_employees(self, employees):
+        """The own-fleet truck ids these supervisors answer for: their tanker
+        groups, and what their reporting lines drive (BAS driver, else the
+        default driver). Shared by the picker and the Supervisor search."""
+        employees = employees.sudo()
+        if not employees:
+            return set()
+        allowed = set(employees.x_water_tanker_group_ids.filtered('active').vehicle_ids.ids)
+        team = self.env['hr.employee'].sudo().search([('id', 'child_of', employees.ids)])
         allowed |= set(self.sudo().search([
             '|', ('x_bas_driver_id', 'in', team.ids),
             '&', ('x_bas_driver_id', '=', False), ('driver_id', 'in', team.ids),
         ]).ids)
-        return allowed or None
+        return allowed
 
     @api.depends_context('uid')
     def _compute_workshop_in_scope(self):

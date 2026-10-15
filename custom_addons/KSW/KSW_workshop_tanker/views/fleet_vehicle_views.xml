@@ -46,8 +46,23 @@
         <field name="arch" type="xml">
             <xpath expr="//search" position="inside">
                 <field name="x_bas_driver_id"/>
+                <field name="x_workshop_supervisor_id"
+                       groups="base.group_system,KSW_workshop.group_workshop_manager"/>
                 <filter string="BAS Driver Not Linked" name="filter_bas_driver_unlinked"
                         domain="[('x_bas_driver_label', '!=', False), ('x_bas_driver_id', '=', False)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Water Delivery > Fleet Management: same Supervisor search. -->
+    <record id="view_water_tanker_search_supervisor" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.search.water.tankers.supervisor</field>
+        <field name="model">ksw.fleet.vehicle</field>
+        <field name="inherit_id" ref="KSW_water_delivery.view_water_tanker_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='driver_id']" position="after">
+                <field name="x_workshop_supervisor_id"
+                       groups="base.group_system,KSW_workshop.group_workshop_manager"/>
             </xpath>
         </field>
     </record>

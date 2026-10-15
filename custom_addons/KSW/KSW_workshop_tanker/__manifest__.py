@@ -1,6 +1,6 @@
 {
     'name': 'KSW Workshop Tankers',
-    'version': '19.0.1.5.0',
+    'version': '19.0.1.5.1',
     'author': 'Mohammed Albadr',
     'category': 'Human Resources/Fleet',
     'summary': "Workshop vehicle picker follows the supervisor's tanker groups "
