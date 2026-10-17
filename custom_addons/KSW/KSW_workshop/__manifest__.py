@@ -1,6 +1,6 @@
 {
     'name': 'KSW Workshop',
-    'version': '19.0.12.15.0',
+    'version': '19.0.12.16.0',
     'summary': 'Workshop service requests: submission, triage, and repair report',
     'description': """
 Workshop Service Requests
@@ -61,6 +61,11 @@ is the lighter thing asked for instead, not a resumption of that design.
         'views/ksw_fleet_vehicle_views.xml',
         'views/ksw_fleet_vehicle_menu.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'KSW_workshop/static/src/scss/workshop_list.scss',
+        ],
+    },
     'post_init_hook': '_post_init_hook',
     'license': 'LGPL-3',
     'installable': True,

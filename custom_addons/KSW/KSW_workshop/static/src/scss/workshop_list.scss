@@ -1,0 +1,16 @@
+// Vehicle number on the Workshop Requests list: a plate-like chip so the
+// reader finds the vehicle at a glance. Purple on purpose: it matches none of
+// the row decorations (returned / rejected / in progress / completed), so the
+// chip stays distinct whatever colour the row takes.
+.o_list_renderer .o_data_cell.o_ksw_vehicle_cell .o_many2one > :is(span, a) {
+    display: inline-block;
+    width: auto !important;  // core sets w-100, which would stretch the chip
+    max-width: 100%;
+    padding: 1px 8px;
+    border: 1px solid rgba(111, 66, 193, 0.45);
+    border-radius: 4px;
+    background-color: rgba(111, 66, 193, 0.10);
+    color: #6f42c1;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}

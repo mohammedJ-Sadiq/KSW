@@ -110,6 +110,8 @@ YEAR_FILE_FIELDNAMES = [
 
 EXPLICIT_CODE_RE = re.compile(r'^(IS|T)?\d{1,4}$')
 NUMBER_RE = re.compile(r'\d+')
+# «خزان ٢٥», «خزان رقم 25», «تيدر 25»: the tank, i.e. the fleet's «تيدر 25».
+TEDDER_RE = re.compile(r'(?:خزان|تيدر)\s*(?:رقم)?\s*(\d+)')
 
 
 def _parse_date(value):
@@ -250,14 +252,22 @@ class _Caches:
 def _resolve_vehicle(caches, explicit_code, fallback_text, requester_email=None):
     """Returns (vehicle, flag_message_or_None)."""
     explicit_code = (explicit_code or '').strip().upper().replace(' ', '')
-    if explicit_code and EXPLICIT_CODE_RE.match(explicit_code):
+    if explicit_code and EXPLICIT_CODE_RE.match(explicit_code) and not explicit_code.isdigit():
         vehicle, created = caches.vehicle_by_code(explicit_code)
         flag = f"created new vehicle {explicit_code!r}" if created else None
         return vehicle, flag
 
-    match = NUMBER_RE.search(fallback_text or '')
+    # A code without its IS/T prefix is only a number: resolve it like one,
+    # never as a vehicle named "25" (Odoo had 86 such, typed Other or blank).
+    match = NUMBER_RE.search(explicit_code if explicit_code.isdigit() else fallback_text or '')
     if match:
         num = int(match.group(0))
+        tank = TEDDER_RE.search(fallback_text or '')
+        if tank and int(tank.group(1)) == num:
+            tedder = caches.env['ksw.fleet.vehicle'].search(
+                [('vehicle_type', '=', 'tank'), ('name', '=', 'تيدر %d' % num)], limit=1)
+            if tedder:
+                return tedder, None
         is_code, t_code = f"IS{num:03d}", f"T{num:03d}"
         is_vehicle = caches.env['ksw.fleet.vehicle'].search([('name', '=', is_code)], limit=1)
         t_vehicle = caches.env['ksw.fleet.vehicle'].search([('name', '=', t_code)], limit=1)
@@ -269,7 +279,7 @@ def _resolve_vehicle(caches, explicit_code, fallback_text, requester_email=None)
         # a usable fleet code, so resolve it by who submitted the row:
         #   - the Isuzu supervisors always mean an Isuzu
         #   - otherwise, when both series carry the number, it is the trailer
-        # Anything else still falls back to the bare number rather than
+        # Anything else is left Unspecified (with a flag) rather than
         # inventing a vehicle in a series that does not have it.
         # More than 3 digits is not a fleet number — the real series run to
         # ~400. Those are plate numbers or odometer readings typed into the
@@ -283,9 +293,8 @@ def _resolve_vehicle(caches, explicit_code, fallback_text, requester_email=None)
         if plausible and is_vehicle and t_vehicle:
             vehicle, _created = caches.vehicle_by_code(t_code, vehicle_type='trailer')
             return vehicle, None
-        vehicle, created = caches.vehicle_by_code(str(num))
-        flag = f"vehicle code ambiguous/unlisted — used bare number {num!r}"
-        return vehicle, flag
+        flag = f"vehicle number {num!r} matches no single fleet vehicle — left Unspecified"
+        return caches.get_unspecified_vehicle(), flag
 
     return caches.get_unspecified_vehicle(), 'no vehicle reference found in source row'
 

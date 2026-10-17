@@ -292,7 +292,7 @@
                 <field name="employee_id"/>
                 <field name="x_on_behalf_of_id" optional="hide"/>
                 <field name="client_id"/>
-                <field name="vehicle_id"/>
+                <field name="vehicle_id" class="o_ksw_vehicle_cell"/>
                 <field name="request_type_ids" widget="many2many_tags"
                        options="{'color_field': 'color'}"/>
                 <field name="description"/>
