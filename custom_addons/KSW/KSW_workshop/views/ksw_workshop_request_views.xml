@@ -322,9 +322,12 @@
                     <t t-name="card">
                         <div class="oe_kanban_card oe_kanban_global_click">
                             <strong><field name="name"/></strong>
-                            <div t-if="!record.is_cash_customer.raw_value"><field name="vehicle_id"/></div>
-                            <div t-if="record.is_cash_customer.raw_value">
-                                <field name="x_cash_customer_name"/> — <field name="x_cash_vehicle_number"/>
+                            <div t-if="!record.is_cash_customer.raw_value" class="my-1">
+                                <span t-if="record.vehicle_id.raw_value" class="o_ksw_vehicle_chip"><field name="vehicle_id"/></span>
+                            </div>
+                            <div t-if="record.is_cash_customer.raw_value" class="my-1">
+                                <span t-if="record.x_cash_vehicle_number.raw_value" class="o_ksw_vehicle_chip"><field name="x_cash_vehicle_number"/></span>
+                                <field name="x_cash_customer_name"/>
                             </div>
                             <div class="text-muted"><field name="description"/></div>
                             <div class="text-muted"><field name="employee_id"/></div>

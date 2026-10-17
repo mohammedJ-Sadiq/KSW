@@ -1,10 +1,9 @@
-// Vehicle number on the Workshop Requests list: a plate-like chip so the
-// reader finds the vehicle at a glance. Purple on purpose: it matches none of
-// the row decorations (returned / rejected / in progress / completed), so the
-// chip stays distinct whatever colour the row takes.
-.o_list_renderer .o_data_cell.o_ksw_vehicle_cell .o_many2one > :is(span, a) {
+// Vehicle number on the Workshop Requests list and cards: a plate-like chip so
+// the reader finds the vehicle at a glance. Purple on purpose: it matches none
+// of the row decorations (returned / rejected / in progress / completed), so
+// the chip stays distinct whatever colour the row takes.
+%o_ksw_vehicle_plate {
     display: inline-block;
-    width: auto !important;  // core sets w-100, which would stretch the chip
     max-width: 100%;
     padding: 1px 8px;
     border: 1px solid rgba(111, 66, 193, 0.45);
@@ -13,4 +12,22 @@
     color: #6f42c1;
     font-weight: 700;
     letter-spacing: 0.03em;
+}
+
+// List: core gives the many2one text w-100, which would stretch the chip.
+.o_list_renderer .o_data_cell.o_ksw_vehicle_cell .o_many2one > :is(span, a) {
+    @extend %o_ksw_vehicle_plate;
+    width: auto !important;
+}
+
+// Kanban card: the wrapper is the chip; the field inside keeps its own markup.
+.o_kanban_renderer .o_ksw_vehicle_chip {
+    @extend %o_ksw_vehicle_plate;
+
+    .o_field_widget, .o_many2one {
+        display: inline;
+    }
+    .o_many2one > :is(span, a) {
+        width: auto !important;
+    }
 }
