@@ -47,3 +47,16 @@ class ResUsers(models.Model):
             if manager != user and manager.active
             and manager.has_group('KSW_workshop.group_workshop_requester')
         ]
+
+    def _ksw_workshop_driver_root_ids(self):
+        """The employees whose reporting lines this user may name as a
+        workshop driver: his requesters' employees for an assistant, his own
+        otherwise. Read by rule_hr_employee_workshop_driver as `child_of`
+        roots, so the line itself is resolved live at search time; only these
+        roots sit in the rule cache (see _get_invalidation_fields)."""
+        self.ensure_one()
+        managers = self.browse(self._ksw_workshop_assisted_manager_ids())
+        return (managers or self).sudo().employee_id.ids
+
+    def _get_invalidation_fields(self):
+        return super()._get_invalidation_fields() | {'x_workshop_assisted_manager_ids'}

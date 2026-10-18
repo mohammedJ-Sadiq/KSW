@@ -198,3 +198,31 @@ class TestLoanReturnApproverWizard(DeductionCommon):
         wiz.action_confirm()
         self.assertEqual(ded.approval_state, 'pending_gm')
         self.assertFalse(ded.gm_approved_by)
+
+    def test_gm_who_is_also_officer_cannot_sign_the_dm_step(self):
+        """KSWCO LO00097 (Oct 2026): the GM also held Deduction Officer,
+        returned the loan to the DM, and then approved the DM step himself
+        — the officer role was treated as a stand-in for any manager. With
+        a real manager on the employee, the step is that manager's only."""
+        self.user_gm.sudo().write({'group_ids': [(4, self.env.ref(
+            'KSW_deduction.group_deduction_officer').id)]})
+        ded = self._loan_at_pending_gm()
+        target = self.env['ksw.loan.return.step'].search(
+            [('code', '=', 'pending_dm')], limit=1)
+        self.env['ksw.loan.return.approver.wizard'].with_user(
+            self.user_gm).create({
+                'deduction_id': ded.id,
+                'target_step_id': target.id,
+                'reason': 'Reduce to 4 installments.',
+            }).action_confirm()
+        self.assertEqual(ded.approval_state, 'pending_dm')
+
+        self.assertFalse(ded.with_user(self.user_gm).x_can_dm_approve)
+        with self.assertRaises(UserError):
+            ded.with_user(self.user_gm).action_dm_approve()
+        self.assertEqual(ded.approval_state, 'pending_dm')
+
+        # The real DM still can.
+        ded.with_user(self.user_dm).action_dm_approve()
+        self.assertEqual(ded.approval_state, 'pending_hr')
+        self.assertEqual(ded.dm_approved_by, self.manager_emp)

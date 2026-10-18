@@ -1,7 +1,7 @@
 """The request's Driver picker offers the requester's reporting line only,
 and saving refuses anyone else. Nothing set up is an empty list, never the
 whole company."""
-from odoo.exceptions import UserError
+from odoo.exceptions import AccessError, UserError
 from odoo.tests import TransactionCase, tagged
 
 
@@ -76,3 +76,68 @@ class TestDriverPicker(TransactionCase):
         picked = self._pickable(self.asst_user)
         self.assertIn(self.driver.id, picked)
         self.assertNotIn(self.outsider.id, picked)
+
+
+@tagged('post_install', '-at_install')
+class TestDriverPickerHrRoute(TransactionCase):
+    """A user holding an Employees group reads hr.employee itself, where
+    KSW_base_security limits him to himself and his immediate subordinates;
+    the picker must still offer his whole allowed line (a.mutawa, KSWCO
+    2026-10-18: an assistant saw only his own name). The class above never
+    reaches this path: its users are answered by hr.employee.public."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        Users = cls.env['res.users'].with_context(no_reset_password=True)
+        Employee = cls.env['hr.employee']
+        hr_supervisor = 'KSW_base_security.group_hr_employee_supervisor'
+
+        def _user(login, groups):
+            return Users.create({
+                'name': login, 'login': login, 'email': f'{login}@drvhr.test',
+                'group_ids': [(6, 0, [cls.env.ref(g).id for g in groups])]})
+
+        cls.sup_user = _user('drvhr_sup', ('KSW_workshop.group_workshop_requester', hr_supervisor))
+        cls.supervisor = Employee.create({'name': 'DRVHR Supervisor', 'user_id': cls.sup_user.id})
+        cls.driver = Employee.create({'name': 'DRVHR Driver', 'parent_id': cls.supervisor.id})
+        cls.sub_driver = Employee.create({'name': 'DRVHR Sub Driver', 'parent_id': cls.driver.id})
+        cls.outsider = Employee.create({'name': 'DRVHR Outsider'})
+        cls.asst_user = _user('drvhr_asst', (
+            'KSW_workshop.group_workshop_requester_assistant', hr_supervisor))
+        cls.assistant = Employee.create({'name': 'DRVHR Assistant', 'user_id': cls.asst_user.id,
+                                         'parent_id': cls.supervisor.id})
+        cls.other_sup_user = _user('drvhr_sup2', ('KSW_workshop.group_workshop_requester',))
+        cls.other_supervisor = Employee.create({'name': 'DRVHR Other Supervisor',
+                                                'user_id': cls.other_sup_user.id})
+        cls.other_driver = Employee.create({'name': 'DRVHR Other Driver',
+                                            'parent_id': cls.other_supervisor.id})
+
+    def _pickable(self, user):
+        self.env.invalidate_all()
+        Employee = self.env['hr.employee'].with_user(user).with_context(ksw_workshop_driver_picker=True)
+        self.assertTrue(Employee.browse().has_access('read'), 'fixture must take the hr.employee route')
+        return {r[0] for r in Employee.name_search('DRVHR', limit=None)}
+
+    def test_assistant_picks_his_requesters_whole_line(self):
+        picked = self._pickable(self.asst_user)
+        self.assertTrue({self.supervisor.id, self.driver.id, self.sub_driver.id,
+                         self.assistant.id} <= picked)
+        self.assertNotIn(self.outsider.id, picked)
+        self.assertNotIn(self.other_driver.id, picked)
+
+    def test_requester_picks_beyond_immediate_subordinates(self):
+        picked = self._pickable(self.sup_user)
+        self.assertIn(self.sub_driver.id, picked)
+        self.assertNotIn(self.outsider.id, picked)
+
+    def test_line_is_read_only(self):
+        with self.assertRaises(AccessError):
+            self.driver.with_user(self.asst_user).write({'name': 'Renamed'})
+
+    def test_moving_the_assistant_moves_his_line(self):
+        self.assertIn(self.driver.id, self._pickable(self.asst_user))
+        self.assistant.write({'parent_id': self.other_supervisor.id})
+        picked = self._pickable(self.asst_user)
+        self.assertIn(self.other_driver.id, picked)
+        self.assertNotIn(self.driver.id, picked)

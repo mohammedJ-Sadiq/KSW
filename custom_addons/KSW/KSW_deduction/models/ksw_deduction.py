@@ -1446,16 +1446,16 @@ class KswDeduction(models.Model):
         There is no dedicated 'DM Approver' group. Only one of the
         following may run this action:
           - The employee's direct manager (employee.parent_id.user_id),
-          - A Deduction Officer or Manager (fallback when the line
-            manager is unavailable),
-          - Superuser.
+          - A Deduction Officer, only when the employee has no manager
+            with a user account,
+          - A Deduction Manager / superuser.
         """
         self._check_loan()
         for rec in self:
             if rec.approval_state != 'pending_dm':
                 raise UserError(_("Not pending DM approval."))
             if not rec.x_can_dm_approve:
-                raise UserError(_(
+                rec._raise_not_the_dm(_(
                     "Only the employee's direct manager (or a Deduction "
                     "Officer/Manager) can perform the DM approval step."
                 ))
@@ -1730,7 +1730,7 @@ class KswDeduction(models.Model):
 
         Performs per-step authorization:
           * pending_dm: current user must qualify via ``x_can_dm_approve``
-            (derived — direct manager, or Deduction Officer/Manager).
+            (derived — see ``_compute_x_can_dm_approve``).
           * pending_hr/acc/gm: current user must hold the matching
             Loan Approval group.
 
@@ -1750,7 +1750,7 @@ class KswDeduction(models.Model):
         user = self.env.user
         if step == 'pending_dm':
             if not self.x_can_dm_approve:
-                raise UserError(_(
+                self._raise_not_the_dm(_(
                     "Only the employee's direct manager (or a Deduction "
                     "Officer/Manager) can refuse at the DM step."
                 ))
@@ -2077,10 +2077,13 @@ class KswDeduction(models.Model):
         Authority sources (any one is sufficient):
           1. The current user IS the employee's direct manager
              (employee.parent_id.user_id == env.user).
-          2. The current user holds Deduction Officer or Manager role
-             (covers admin / HR ops scenarios where the manager is
-             unavailable).
-          3. Superuser / odoo-bot.
+          2. The employee has NO direct manager with a user account, and
+             the current user is a Deduction Officer — someone has to
+             clear the step. When a manager exists, the officer role is
+             not a stand-in: a GM holding it approved the DM step of
+             LO00097 (KSWCO, Oct 2026) right after returning the loan to
+             that DM, signing a step that belonged to someone else.
+          3. Deduction Manager (the module's administrator) / superuser.
 
         A Manager Assistant is deliberately NOT an authority source: they
         prepare the request, the manager approves it. That is the whole
@@ -2090,15 +2093,17 @@ class KswDeduction(models.Model):
         test_manager_assistant_loans.
         """
         uid = self.env.uid
-        is_officer = self.env.user.has_group(
-            'KSW_deduction.group_deduction_officer')
-        is_super = self.env.su or uid == self.env.ref('base.user_root').id
+        user = self.env.user
+        is_officer = user.has_group('KSW_deduction.group_deduction_officer')
+        is_admin = (
+            self.env.su or uid == self.env.ref('base.user_root').id
+            or user.has_group('KSW_deduction.group_deduction_manager'))
         for rec in self:
             mgr_user_id = rec._manager_user_id()
-            rec.x_can_dm_approve = (
-                is_super
-                or is_officer
+            rec.x_can_dm_approve = bool(
+                is_admin
                 or (mgr_user_id and mgr_user_id == uid)
+                or (not mgr_user_id and is_officer)
             )
 
     # ------------------------------------------------------------------
@@ -2311,6 +2316,17 @@ class KswDeduction(models.Model):
         """Id of the user behind ``employee_id`` (0 when unlinked)."""
         self.ensure_one()
         return self.employee_id.sudo().user_id.id or 0
+
+    def _raise_not_the_dm(self, fallback_message):
+        """Refuse the DM step, naming the manager when there is one — an
+        officer refused here needs to know whose step it is."""
+        self.ensure_one()
+        manager = self.employee_id.sudo().parent_id
+        if manager.user_id:
+            raise UserError(_(
+                "This step belongs to %s, the employee's direct manager. "
+                "Only that manager can approve or refuse it.", manager.name))
+        raise UserError(fallback_message)
 
     def _manager_user_id(self):
         """Id of the user behind the employee's direct manager (0 when

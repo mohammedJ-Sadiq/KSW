@@ -107,6 +107,25 @@
     <!-- ============================================================ -->
     <!-- Layer 3: Record Rules                                         -->
     <!-- ============================================================ -->
+    <!--
+        The Driver picker offers the requester's reporting line
+        (ksw.workshop.request._workshop_driver_ids), but it searches as the
+        user. Anyone holding an Employees group reads hr.employee, not the
+        public model, and there KSW_base_security lets him read himself and at
+        most his immediate subordinates. An assistant has none of his own, so
+        his picker showed only himself (a.mutawa, KSWCO 2026-10-18). Read only:
+        the scope he may name, nothing he may change.
+    -->
+    <record id="rule_hr_employee_workshop_driver" model="ir.rule">
+        <field name="name">Employee: workshop requester reads the drivers he may name</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="domain_force">[('id', 'child_of', user._ksw_workshop_driver_root_ids())]</field>
+        <field name="groups" eval="[(4, ref('group_workshop_requester')), (4, ref('group_workshop_requester_assistant'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
     <record id="rule_ksw_workshop_request_own" model="ir.rule">
         <field name="name">Workshop Request: own records only</field>
         <field name="model_id" ref="model_ksw_workshop_request"/>

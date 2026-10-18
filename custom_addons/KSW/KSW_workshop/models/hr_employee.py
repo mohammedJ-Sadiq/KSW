@@ -77,6 +77,20 @@ class HrEmployee(models.Model):
     def _search(self, domain, *args, **kwargs):
         return super()._search(_driver_picker_domain(self, domain), *args, **kwargs)
 
+    def write(self, vals):
+        # An assistant's own manager is a child_of root of
+        # rule_hr_employee_workshop_driver, and rule domains are cached per
+        # user: moving him to another manager must drop the cached roots.
+        def has_assistant():
+            return any(user.has_group('KSW_workshop.group_workshop_requester_assistant')
+                       for user in self.sudo().user_id)
+        relinks = bool({'parent_id', 'user_id'} & vals.keys())
+        before = relinks and has_assistant()
+        res = super().write(vals)
+        if relinks and (before or has_assistant()):
+            self.env.registry.clear_cache()
+        return res
+
 
 class HrEmployeePublic(models.Model):
     _inherit = 'hr.employee.public'

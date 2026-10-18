@@ -8,7 +8,8 @@ Modification privilege level.
 
 Also covers:
     * `x_can_dm_approve` — derived DM-approval authority
-      (employee.parent_id.user_id OR Deduction Officer/Manager).
+      (employee.parent_id.user_id; a Deduction Officer only when there is
+      no manager; Deduction Manager always).
     * `x_can_submit` — Submit-button visibility logic.
 """
 from .common import DeductionCommon
@@ -119,11 +120,27 @@ class TestUserPermissions(DeductionCommon):
             "employee.parent_id.user_id must be allowed to DM-approve.",
         )
 
-    def test_officer_can_dm_approve_any_record(self):
+    def test_officer_cannot_dm_approve_when_employee_has_manager(self):
+        """The officer is a stand-in only for a missing manager, never a
+        second DM (KSWCO LO00097, Oct 2026)."""
+        from odoo.exceptions import UserError
         ded = self._make_deduction(self.type_loan)
         ded.action_submit()
         rec = ded.with_user(self.user_officer)
-        self.assertTrue(rec.x_can_dm_approve)
+        self.assertFalse(rec.x_can_dm_approve)
+        with self.assertRaises(UserError) as cm:
+            rec.action_dm_approve()
+        self.assertIn(self.manager_emp.name, str(cm.exception))
+
+    def test_officer_stands_in_when_employee_has_no_manager(self):
+        ded = self._make_deduction(self.type_loan, employee=self.employee_b)
+        ded.action_submit()
+        self.assertTrue(ded.with_user(self.user_officer).x_can_dm_approve)
+
+    def test_deduction_manager_can_dm_approve_any_record(self):
+        ded = self._make_deduction(self.type_loan)
+        ded.action_submit()
+        self.assertTrue(ded.with_user(self.user_ded_mgr).x_can_dm_approve)
 
     def test_peer_user_cannot_dm_approve(self):
         ded = self._make_deduction(self.type_loan)

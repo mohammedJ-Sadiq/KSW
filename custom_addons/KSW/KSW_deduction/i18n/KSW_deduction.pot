@@ -4465,3 +4465,11 @@ msgstr ""
 #: model:ir.model.fields,help:KSW_deduction.field_ksw_deduction__x_emp_ssnid
 msgid "Social Security Number"
 msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"This step belongs to %s, the employee's direct manager. Only that manager "
+"can approve or refuse it."
+msgstr ""
