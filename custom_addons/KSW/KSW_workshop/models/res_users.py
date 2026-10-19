@@ -17,9 +17,26 @@ class ResUsers(models.Model):
         help='Workshop requesters this user raises requests for although he '
              'does not report to them. His own manager is included '
              'automatically. Has no effect without the Requester Assistant role.')
+    # Odoo's own notification_type is one setting for every app. This one
+    # narrows it to the workshop: read by
+    # ksw.workshop.request._notify_get_recipients, so the user's mail from
+    # time off, loans, payroll... keeps following notification_type.
+    x_workshop_notify_in_odoo = fields.Boolean(
+        string='Workshop Notifications in Odoo Only',
+        help='Workshop request notifications arrive in the Odoo inbox only, '
+             'not by email. Notifications from other apps are not affected '
+             'and keep following the Notification setting above.')
     x_workshop_assists_display = fields.Char(
         string='Raises Workshop Requests For',
         compute='_compute_workshop_assists_display')
+
+    @property
+    def SELF_READABLE_FIELDS(self):
+        return super().SELF_READABLE_FIELDS + ['x_workshop_notify_in_odoo']
+
+    @property
+    def SELF_WRITEABLE_FIELDS(self):
+        return super().SELF_WRITEABLE_FIELDS + ['x_workshop_notify_in_odoo']
 
     @api.depends('group_ids', 'x_workshop_assisted_manager_ids', 'employee_ids.parent_id.user_id')
     def _compute_workshop_assists_display(self):

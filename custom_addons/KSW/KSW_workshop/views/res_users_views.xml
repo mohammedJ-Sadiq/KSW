@@ -17,6 +17,7 @@
                         on their vehicles only.
                     </div>
                     <group>
+                        <field name="x_workshop_notify_in_odoo"/>
                         <field name="x_workshop_assisted_manager_ids" widget="many2many_tags"
                                options="{'no_create': True}"
                                placeholder="Only for requesters this user does not report to..."/>
@@ -29,6 +30,20 @@
                     </div>
                 </page>
             </xpath>
+        </field>
+    </record>
+
+    <!-- The same switch in the user's own Preferences, next to Odoo's
+         Notification setting it narrows. Workshop roles only. -->
+    <record id="view_users_form_simple_modif_ksw_workshop_notify" model="ir.ui.view">
+        <field name="name">res.users.preferences.form.ksw.workshop.notify</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="mail.view_users_form_simple_modif_mail"/>
+        <field name="arch" type="xml">
+            <field name="notification_type" position="after">
+                <field name="x_workshop_notify_in_odoo" readonly="0"
+                       groups="KSW_workshop.group_workshop_manager,KSW_workshop.group_workshop_reviewer,KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_requester,KSW_workshop.group_workshop_requester_assistant"/>
+            </field>
         </field>
     </record>
 </odoo>

@@ -842,6 +842,21 @@ class KswWorkshopRequest(models.Model):
         }
         self.sudo().message_post(body=body, partner_ids=partner_ids, subtype_xmlid='mail.mt_comment')
 
+    def _notify_get_recipients(self, message, msg_vals=False, **kwargs):
+        """Deliver to the Odoo inbox instead of email for users who chose
+        Workshop Notifications in Odoo Only. Covers every message on a
+        request (new/resubmitted, follower replies, activities), and only
+        here: their notification_type still governs every other app."""
+        recipients = super()._notify_get_recipients(message, msg_vals=msg_vals, **kwargs)
+        uids = {r['uid'] for r in recipients if r.get('notif') == 'email' and r.get('uid')}
+        if uids:
+            inbox_uids = set(self.env['res.users'].sudo().browse(uids).filtered(
+                lambda u: u.x_workshop_notify_in_odoo and not u.share).ids)
+            for recipient in recipients:
+                if recipient.get('notif') == 'email' and recipient.get('uid') in inbox_uids:
+                    recipient['notif'] = 'inbox'
+        return recipients
+
     def _notify_requester(self, instruction, reason=None):
         self.ensure_one()
         partner = self.employee_id.user_id.partner_id
