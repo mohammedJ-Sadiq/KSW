@@ -291,6 +291,33 @@ class KswWorkshopRequest(models.Model):
     x_work_summary = fields.Char(string='Work Done', compute='_compute_report_summaries')
     x_parts_summary = fields.Char(string='Spare Parts', compute='_compute_report_summaries')
 
+    # ------------------------------------------------------------------
+    # Repairs by Type: only the chosen types as groups
+    # ------------------------------------------------------------------
+    def _keep_chosen_type_groups(self, groupby, rows):
+        """Drop the groups of types the report was not narrowed to.
+
+        The domain already keeps only repairs carrying a chosen type, but
+        grouping by a many2many opens a group for every type such a repair
+        carries — a report on Brakes listed 20 other types as well.
+        """
+        chosen = set(self.env.context.get('ksw_workshop_type_group_ids') or ())
+        if not chosen or 'request_type_ids' not in groupby:
+            return rows
+        index = list(groupby).index('request_type_ids')
+        return [row for row in rows if row[index].id in chosen]
+
+    @api.model
+    def _read_group(self, domain, groupby=(), aggregates=(), having=(), offset=0, limit=None, order=None):
+        rows = super()._read_group(domain, groupby, aggregates, having, offset, limit, order)
+        return self._keep_chosen_type_groups(groupby, rows)
+
+    @api.model
+    def _read_grouping_sets(self, domain, grouping_sets, aggregates=(), order=None):
+        results = super()._read_grouping_sets(domain, grouping_sets, aggregates, order)
+        return [self._keep_chosen_type_groups(groupby, rows)
+                for groupby, rows in zip(grouping_sets, results)]
+
     @api.depends('labor_line_ids.description', 'work_statement',
                  'part_line_ids.description', 'part_line_ids.quantity', 'repairs_parts')
     def _compute_report_summaries(self):

@@ -234,7 +234,10 @@ class KswWorkshopReportWizard(models.TransientModel):
             'views': views,
             'search_view_id': [search_view.id, 'search'],
             'domain': domain,
-            'context': {'group_by': group_by, 'create': False},
+            'context': {'group_by': group_by, 'create': False,
+                        # Grouping by a many2many opens a group for every type a
+                        # matching repair carries; keep only the chosen ones.
+                        'ksw_workshop_type_group_ids': self._chosen_types().ids},
             'target': 'current',
         }
 
@@ -413,6 +416,21 @@ class KswWorkshopReportWizard(models.TransientModel):
         value = request.completion_date if self.date_basis == 'completion' else request.create_date
         return self._local_date(value)
 
+    def _chosen_types(self):
+        """The repair types the user narrowed the report to, if any."""
+        if self.report_type == 'repair_type':
+            return self.request_type_ids
+        return self.env['ksw.workshop.request.type']
+
+    def _shown_types(self, request):
+        """A request's types as groups: only the chosen ones, when types were chosen.
+
+        A Brakes repair that also changed the oil must not open an Oil & Filters
+        group on a report the user narrowed to Brakes.
+        """
+        chosen = self._chosen_types()
+        return request.request_type_ids & chosen if chosen else request.request_type_ids
+
     def _group_keys(self, request):
         """Every (sort key, label) a request is counted under for group_by.
 
@@ -431,7 +449,7 @@ class KswWorkshopReportWizard(models.TransientModel):
         if group_by == 'repair_type':
             if not request.request_type_ids:
                 return [((1, 0), _('Unclassified'))]
-            return [((0, rtype.sequence, rtype.id), rtype.name) for rtype in request.request_type_ids]
+            return [((0, rtype.sequence, rtype.id), rtype.name) for rtype in self._shown_types(request)]
         if group_by == 'technician':
             label = request.technician_label or _('Not recorded')
             return [((label,), label)]
@@ -655,9 +673,7 @@ class KswWorkshopReportWizard(models.TransientModel):
         counts = defaultdict(list)
         order = {}
         for request in requests:
-            types = request.request_type_ids
-            if self.report_type == 'repair_type' and self.request_type_ids:
-                types &= self.request_type_ids
+            types = self._shown_types(request)
             if not types:
                 counts[_('Unclassified')].append(request.id)
                 order[_('Unclassified')] = (1, 0)
