@@ -110,15 +110,17 @@ class KswWorkshopPart(models.Model):
         return action
 
     def action_view_note_mentions(self):
-        """Repairs whose notes mention this item — the history before itemised parts."""
+        """Repairs that picked this item on a spare-part line.
+
+        Was a free-text match of the description against the repair notes:
+        a generic description («فلتر زيت») matched thousands of unrelated repairs.
+        """
         self.ensure_one()
-        text = self.description or self.name
         action = self.env['ir.actions.act_window']._for_xml_id(
             'KSW_workshop.action_ksw_workshop_report_date')
-        action['domain'] = ['|', '|', ('repairs_parts', 'ilike', text),
-                            ('work_statement', 'ilike', text), ('description', 'ilike', text)]
+        action['domain'] = [('part_line_ids.part_id', '=', self.id)]
         action['context'] = {'group_by': ['create_date:year', 'vehicle_id']}
-        action['display_name'] = self.env._('Repair notes mentioning “%s”', text)
+        action['display_name'] = self.env._('Repairs using “%s”', self.display_name)
         return action
 
     @api.depends('line_ids.quantity', 'line_ids.subtotal')

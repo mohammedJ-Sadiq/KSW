@@ -35,7 +35,7 @@
                             <field name="issued_qty" widget="statinfo" string="Issued"/>
                         </button>
                         <button name="action_view_note_mentions" type="object" class="oe_stat_button"
-                                icon="fa-file-text-o" string="Repair Notes"/>
+                                icon="fa-file-text-o" string="Repairs"/>
                     </div>
                     <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
                             invisible="active"/>
