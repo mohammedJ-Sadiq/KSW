@@ -1473,17 +1473,16 @@ class HrLeave(models.Model):
         back early loses those days of accrual (and one who came back late
         gains them).
 
-        The annual vacation is the settlement: its duration is capped at the
-        employee's balance (`_get_number_of_days`), so taking it consumes the
-        entitlement.  Accrual therefore **restarts from zero on the confirmed
-        return date, always** — `x_opening_reset_date` is set to it and
-        `x_opening_extra_days` cleared.
+        Accrual restarts on the confirmed return date, and whatever the
+        vacation did not spend is carried into `x_opening_extra_days` — see
+        `_unspent_balance_at_return`.  Only a Full Balance Clearance or an
+        Accept-Excess-as-Unpaid request consumes the whole balance.
 
-        Chosen deliberately over the safer variants (restart only when the
-        balance is used up; or carry the unused days into
-        `x_opening_extra_days`): an employee who took only *part* of their
-        entitlement loses the remainder here.  That is the accepted trade-off,
-        not an oversight.
+        This used to clear the carry-over unconditionally, on the theory that
+        a vacation settles the entitlement.  It does not: a plain request
+        charges only its own days.  KSWCO leave 5099 took 10 days against
+        ~32.5 and the restart wiped the other ~22.5 (and leave 5007, 5 days
+        against ~24.6, lost ~19.6).
 
         The single exception is a reset dated *after* this vacation — it
         belongs to a more recent settlement, and letting an old leave (or a
@@ -1535,7 +1534,9 @@ class HrLeave(models.Model):
             return
 
         was_locked = ksw_rec.x_opening_is_locked
-        dropped = ksw_rec.x_opening_extra_days or 0.0
+        old_extra = ksw_rec.x_opening_extra_days or 0.0
+        carry = self._unspent_balance_at_return(ksw_rec, planned_return)
+        dropped = old_extra if old_extra > 0 and not carry else 0.0
 
         # This write() triggers _refresh_accrual(), which resyncs
         # x_effective_start_date, total_accrued_days and the allocation.
@@ -1545,19 +1546,22 @@ class HrLeave(models.Model):
             ksw_allow_locked_opening_write=True,
         ).write({
             'x_opening_reset_date': self.x_return_date,
-            'x_opening_extra_days': 0.0,
+            'x_opening_extra_days': carry,
         })
 
         body = Markup(
             '<strong>🔄 Accrual Restarted on the Confirmed Return</strong><br/>'
             '<b>Was:</b> %(old)s<br/>'
             '<b>Now:</b> %(new)s<br/>'
+            '<b>Unused days carried forward:</b> %(carry).4f<br/>'
             '<b>Remaining balance:</b> %(balance).4f days<br/>'
-            '<i>The vacation settles the entitlement, so the annual leave '
-            'balance now accrues from the confirmed return date.</i><br/>'
+            '<i>The annual leave balance now accrues from the confirmed '
+            'return date, on top of the days this vacation did not use.'
+            '</i><br/>'
         ) % {
             'old': current or _('not set'),
             'new': self.x_return_date,
+            'carry': carry,
             'balance': ksw_rec.remaining_balance or 0.0,
         }
         if dropped:
@@ -1572,6 +1576,46 @@ class HrLeave(models.Model):
                 'return date.</i>'
             )
         self.sudo().message_post(body=body, subtype_xmlid='mail.mt_note')
+
+    def _unspent_balance_at_return(self, ksw_rec, planned_return):
+        """Days of entitlement this vacation leaves behind, carried across the restart.
+
+        Two shapes of baseline exist:
+
+        - HR already settled *this* vacation (its reset date is on or after
+          the vacation start, usually the planned return).  Its carry-over is
+          already net of the vacation, so it is kept as it is — moving the
+          restart date only shifts accrual by the early/late days.
+        - The baseline predates the vacation (go-live date, an older return).
+          Nothing has settled this vacation yet: carry the balance accrued up
+          to the return, minus the annual leave taken since that baseline.
+          Accrual is capped at the planned return so a late return earns
+          nothing for days not worked.
+
+        A Full Balance Clearance or an Accept-Excess-as-Unpaid request charged
+        the whole balance by design, so nothing is left to carry.  Never
+        negative: an overdraft is not carried into the new period.
+        """
+        self.ensure_one()
+        if self.x_is_full_clearance or self.x_excess_days_accepted:
+            return 0.0
+        current = ksw_rec.x_opening_reset_date
+        if current and current >= self.request_date_from:
+            return ksw_rec.x_opening_extra_days or 0.0
+
+        as_of = min(self.x_return_date, planned_return)
+        accrued = ksw_rec._compute_accrued_as_of(as_of)
+        baseline = ksw_rec.x_effective_start_date or ksw_rec.joining_date
+        taken_domain = [
+            ('employee_id', '=', self.employee_id.id),
+            ('holiday_status_id.is_annual_leave', '=', True),
+            ('request_date_from', '<', self.x_return_date),
+            '|', ('state', '=', 'validate'), ('id', '=', self.id),
+        ]
+        if baseline:
+            taken_domain.append(('request_date_from', '>=', baseline))
+        taken = sum(self.sudo().search(taken_domain).mapped('number_of_days'))
+        return max(round(accrued - taken, 4), 0.0)
 
     def action_confirm_return_manager(self):
         for leave in self:

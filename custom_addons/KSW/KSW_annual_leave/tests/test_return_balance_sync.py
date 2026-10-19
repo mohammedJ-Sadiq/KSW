@@ -7,11 +7,11 @@ the restart date has to follow it, otherwise an employee who came back early
 keeps losing accrual (KSWCO leave 4753: returned Jul 28, accrual restarted
 Aug 8).
 
-The annual vacation settles the entitlement (its duration is capped at the
-balance), so accrual **restarts from zero on the confirmed return date,
-always** — reset date set, carry-over cleared.  An employee who took only part
-of their entitlement loses the rest: an accepted trade-off, chosen over the
-safer variants.
+Accrual restarts on the confirmed return date and the days the vacation did
+not spend are carried into ``x_opening_extra_days``.  Clearing them instead
+wiped ~22.5 unused days from KSWCO leave 5099 (10 days taken of ~32.5) and
+~19.6 from leave 5007.  Only Full Balance Clearance / Accept Excess as Unpaid
+consume the whole balance.
 
 Two things still hold it back:
   - a reset dated *after* this vacation belongs to a more recent return and is
@@ -206,16 +206,72 @@ class TestReturnBalanceSync(TransactionCase):
         self.assertEqual(rec.x_opening_reset_date, self.EARLY_RETURN)
         self.assertEqual(rec.x_effective_start_date, self.EARLY_RETURN)
 
-    def test_carry_over_days_are_cleared_by_the_restart(self):
-        """Restart from zero: unused carry-over does not survive."""
+    def _give_joining_date(self, joining):
+        version = self.employee.current_version_id
+        version.write({
+            'date_version': joining,
+            'contract_date_start': joining,
+        })
+        self.employee._compute_current_version_id()
+
+    def test_carry_over_settled_by_hr_survives_the_restart(self):
+        """HR already settled this vacation: its carry-over stands."""
         rec = self._balance_record(reset_date=self.PLANNED_RETURN)
         rec.write({'x_opening_extra_days': 12.0})
         leave = self._on_vacation_leave()
+
+        self._confirm(leave, self.EARLY_RETURN)
+
+        self.assertEqual(rec.x_opening_reset_date, self.EARLY_RETURN)
+        self.assertEqual(rec.x_opening_extra_days, 12.0)
+
+    def test_unspent_balance_is_carried_across_the_restart(self):
+        """KSWCO leave 5099: a short vacation against an older baseline must
+        not wipe the days it did not use."""
+        self._give_joining_date(date(2025, 3, 1))
+        baseline = date(2027, 3, 1)
+        rec = self._balance_record(reset_date=baseline)
+        rec.write({'x_opening_extra_days': 19.0})
+        leave = self._on_vacation_leave()
+        taken = leave.number_of_days
+        accrued = (self.EARLY_RETURN - baseline).days * 21.0 / 365.0 + 19.0
         existing_ids = leave.message_ids.ids
 
         self._confirm(leave, self.EARLY_RETURN)
 
         self.assertEqual(rec.x_opening_reset_date, self.EARLY_RETURN)
+        self.assertAlmostEqual(
+            rec.x_opening_extra_days, accrued - taken, places=3)
+        self.assertNotIn(
+            'were cleared', self._bodies_since(leave, existing_ids))
+
+    def test_late_return_does_not_carry_unworked_days(self):
+        """Accrual is capped at the planned return."""
+        self._give_joining_date(date(2025, 3, 1))
+        baseline = date(2027, 3, 1)
+        rec = self._balance_record(reset_date=baseline)
+        leave = self._on_vacation_leave()
+        taken = leave.number_of_days
+        accrued = (self.PLANNED_RETURN - baseline).days * 21.0 / 365.0
+
+        self._confirm(leave, self.LATE_RETURN)
+
+        self.assertAlmostEqual(
+            rec.x_opening_extra_days, accrued - taken, places=3)
+
+    def test_full_clearance_carries_nothing(self):
+        """A Full Balance Clearance spent everything by design."""
+        self._give_joining_date(date(2025, 3, 1))
+        rec = self._balance_record(reset_date=date(2027, 3, 1))
+        rec.write({'x_opening_extra_days': 19.0})
+        leave = self._on_vacation_leave()
+        leave.sudo().with_context(_skip_toggle_validity=True).write(
+            {'x_is_full_clearance': True})
+        existing_ids = leave.message_ids.ids
+
+        leave.sudo().write({'x_return_date': self.EARLY_RETURN})
+        leave.sudo()._sync_opening_reset_to_return()
+
         self.assertEqual(rec.x_opening_extra_days, 0.0)
         self.assertIn(
             'carry-over', self._bodies_since(leave, existing_ids))
