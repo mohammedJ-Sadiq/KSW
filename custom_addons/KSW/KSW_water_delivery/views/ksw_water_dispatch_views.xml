@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- The dispatcher's desk. Only used on a branch switched to
+         "Dispatcher dispatches, driver confirms"; elsewhere drivers keep
+         starting their own deliveries. -->
+    <record id="view_water_dispatch_list" model="ir.ui.view">
+        <field name="name">ksw.water.dispatch.list</field>
+        <field name="model">ksw.water.dispatch</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="state == 'cancelled'" decoration-info="state == 'draft'"
+                  decoration-success="state == 'delivered'">
+                <field name="name"/>
+                <field name="dispatched_on"/>
+                <field name="picking_type_id" optional="hide"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="entered_qty"/>
+                <field name="entered_uom"/>
+                <field name="driver_user_id"/>
+                <field name="vehicle_id" optional="show"/>
+                <field name="picking_id" optional="show"/>
+                <field name="note_held" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'dispatched'"
+                       decoration-success="state == 'delivered'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_water_dispatch_form" model="ir.ui.view">
+        <field name="name">ksw.water.dispatch.form</field>
+        <field name="model">ksw.water.dispatch</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_dispatch" type="object" string="Dispatch"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_draft" type="object" string="Back to Draft"
+                            invisible="state != 'dispatched' or capture_id"
+                            groups="KSW_water_delivery.group_water_dispatch"/>
+                    <button name="action_cancel" type="object" string="Cancel Dispatch"
+                            invisible="state not in ('draft', 'dispatched') or capture_id"
+                            groups="KSW_water_delivery.group_water_dispatch"
+                            confirm="Cancel this dispatch? The driver will no longer see it."/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,dispatched,delivered"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <field name="allowed_picking_type_ids" invisible="1"/>
+                    <field name="allowed_partner_ids" invisible="1"/>
+                    <field name="allowed_product_ids" invisible="1"/>
+                    <field name="allowed_driver_user_ids" invisible="1"/>
+                    <field name="product_locked" invisible="1"/>
+                    <field name="client_located" invisible="1"/>
+                    <field name="branch_in_dispatch_mode" invisible="1"/>
+                    <field name="capture_id" invisible="1"/>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not picking_type_id or branch_in_dispatch_mode">
+                        This branch is set so that drivers start their own
+                        deliveries. Switch it to <b>Dispatcher dispatches,
+                        driver confirms</b> before dispatching.
+                    </div>
+                    <div class="alert alert-info" role="alert"
+                         invisible="not partner_id or client_located or state != 'draft'">
+                        This client has no approved location yet. The driver
+                        will be asked to send it from the site, and can deliver
+                        once a supervisor approves it.
+                    </div>
+                    <group>
+                        <group string="Delivery">
+                            <field name="picking_type_id" readonly="state != 'draft'"
+                                   options="{'no_create': True, 'no_open': True}"/>
+                            <field name="partner_id" readonly="state != 'draft'"
+                                   options="{'no_create': True}"
+                                   context="{'res_partner_search_mode': 'customer'}"/>
+                            <field name="product_id" force_save="1"
+                                   readonly="state != 'draft' or product_locked"
+                                   options="{'no_create': True, 'no_open': True}"/>
+                            <label for="entered_qty"/>
+                            <div class="o_row">
+                                <field name="entered_qty" readonly="state != 'draft'"/>
+                                <field name="entered_uom" readonly="state != 'draft'"/>
+                            </div>
+                            <field name="quantity_m3" invisible="entered_uom != 'trip'"/>
+                            <field name="note" readonly="state != 'draft'"
+                                   placeholder="Anything the driver should know"/>
+                        </group>
+                        <group string="Driver">
+                            <field name="driver_user_id" readonly="state != 'draft'"
+                                   options="{'no_create': True, 'no_open': True}"/>
+                            <field name="vehicle_id" options="{'no_open': True}"/>
+                            <field name="dispatcher_id" invisible="not dispatcher_id"
+                                   options="{'no_open': True}"/>
+                            <field name="dispatched_on" invisible="not dispatched_on"/>
+                        </group>
+                    </group>
+                    <group string="Outcome" invisible="not picking_id">
+                        <field name="picking_id" options="{'no_open': True}"/>
+                        <field name="note_state"/>
+                        <field name="note_held" invisible="not note_held"/>
+                        <field name="delivered_on"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_water_dispatch_search" model="ir.ui.view">
+        <field name="name">ksw.water.dispatch.search</field>
+        <field name="model">ksw.water.dispatch</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="driver_user_id"/>
+                <field name="picking_type_id"/>
+                <filter name="open" string="Open"
+                        domain="[('state', 'in', ('draft', 'dispatched'))]"/>
+                <filter name="with_driver" string="With the Driver"
+                        domain="[('state', '=', 'dispatched')]"/>
+                <filter name="delivered" string="Delivered"
+                        domain="[('state', '=', 'delivered')]"/>
+                <separator/>
+                <filter name="today" string="Today"
+                        domain="[('create_date', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <group>
+                    <filter name="group_driver" string="Driver" context="{'group_by': 'driver_user_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_branch" string="Branch" context="{'group_by': 'picking_type_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_water_dispatches" model="ir.actions.act_window">
+        <field name="name">Dispatches</field>
+        <field name="res_model">ksw.water.dispatch</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_water_dispatch_search"/>
+        <field name="context">{'search_default_open': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Dispatch a delivery</p>
+            <p>Pick the client, what to deliver and the driver. The driver
+               sees it in his app and confirms it at the client's site.</p>
+        </field>
+    </record>
+
+    <!-- The switch, per branch, where it is easy to find. -->
+    <record id="view_water_branch_list" model="ir.ui.view">
+        <field name="name">stock.picking.type.water.branch.list</field>
+        <field name="model">stock.picking.type</field>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" create="0" delete="0">
+                <field name="name" readonly="1"/>
+                <field name="x_branch_code" readonly="1"/>
+                <field name="x_issue_mode"/>
+                <field name="x_dispatcher_user_ids" widget="many2many_tags"
+                       options="{'no_create': True}"/>
+                <field name="x_signature_required" optional="show"/>
+                <field name="x_location_rule" optional="show"/>
+                <field name="x_location_radius_m" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_water_branches" model="ir.actions.act_window">
+        <field name="name">Branches</field>
+        <field name="res_model">stock.picking.type</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_water_branch_list"/>
+        <field name="domain">[('x_is_water_delivery', '=', True)]</field>
+    </record>
+
+</odoo>

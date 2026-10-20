@@ -114,6 +114,8 @@ const state = {
     syncing: false,
     view: "new",
     form: null,
+    // The dispatch the driver has open, on a branch in dispatch mode.
+    dispatch: null,
     banner: null,
     // Whether this phone can actually work with no signal. Checked and SHOWN,
     // never assumed: the failure mode that matters is a driver who thinks the
@@ -503,11 +505,15 @@ function canDeliver(client) {
 }
 
 async function markPending(partnerId) {
-    const client = state.reference && state.reference.clients.find((c) => c.id === partnerId);
-    if (!client) {
+    const reference = state.reference;
+    const copies = reference ? [
+        ...reference.clients.filter((c) => c.id === partnerId),
+        ...(reference.dispatches || []).map((d) => d.client).filter((c) => c.id === partnerId),
+    ] : [];
+    if (!copies.length) {
         return;
     }
-    client.location_pending = true;
+    copies.forEach((client) => { client.location_pending = true; });
     await dbPut(STORE_REF, { id: "current", reference: state.reference, at: state.refreshedAt });
 }
 
@@ -521,7 +527,8 @@ async function checkApproval() {
         return banner("warn", `Could not check: ${error.message}`);
     }
     const id = state.form.partner && state.form.partner.id;
-    const fresh = state.reference.clients.find((c) => c.id === id);
+    const fresh = state.reference.clients.find((c) => c.id === id)
+        || (state.reference.dispatches || []).map((d) => d.client).find((c) => c.id === id);
     if (fresh) {
         state.form.partner = fresh;
     }
@@ -653,6 +660,124 @@ async function saveCapture() {
     banner("ok", navigator.onLine ? "Saved. Sending…" : "Saved on the phone. It will send itself when you have signal.");
     render();
     flushQueue({ quiet: true, live: capture.uuid });
+}
+
+// ---------------------------------------------------------------------------
+// Dispatches — a branch where the dispatcher starts the delivery
+// ---------------------------------------------------------------------------
+/**
+ * On such a branch the driver does not choose anything: the dispatcher picked
+ * the client, the product, the quantity and him. He opens the order at the
+ * client and presses Deliver. Everything after that is the ordinary queue, so
+ * the location rule, the offline send and the supervisor's hold are the same.
+ */
+function dispatchMode() {
+    const rules = state.reference && state.reference.rules;
+    return Boolean(rules && rules.issue_mode === "dispatch");
+}
+
+/** Open dispatches, minus the ones already saved on this phone. */
+function openDispatches() {
+    const queued = new Set(state.queue.map((c) => c.payload.dispatch_id).filter(Boolean));
+    return ((state.reference && state.reference.dispatches) || [])
+        .filter((d) => !queued.has(d.id));
+}
+
+function openDispatch(dispatch) {
+    // The client list may hold a fresher location status than the dispatch.
+    const known = state.reference.clients.find((c) => c.id === dispatch.client.id);
+    state.dispatch = dispatch;
+    state.form = newForm();
+    state.form.partner = known || dispatch.client;
+    state.form.product = dispatch.product;
+    state.form.qty = dispatch.qty;
+    state.form.uom = dispatch.uom;
+    state.form.signedBy = dispatch.client.name;
+    render();
+}
+
+function closeDispatch() {
+    state.pinWaiting = null;
+    state.dispatch = null;
+    state.form = newForm();
+    render();
+}
+
+async function deliverDispatch() {
+    const dispatch = state.dispatch;
+    const form = state.form;
+    const reference = state.reference;
+    if (!dispatch) {
+        return;
+    }
+    if (!canDeliver(form.partner)) {
+        return banner("warn", `${form.partner.name} has no approved location yet.`);
+    }
+    if (reference.rules.signature_required && !form.signature) {
+        return banner("warn", "The customer has to sign before the note can be issued.");
+    }
+    if (reference.rules.signature_required && !form.signedBy.trim()) {
+        return banner("warn", "Record the name of the person who signed.");
+    }
+    const problem = locationProblem(form);
+    if (problem && !window.confirm(
+        `${problem}\n\nDeliver anyway? The note will not count until your ` +
+        "supervisor approves it."
+    )) {
+        return;
+    }
+    const capture = {
+        uuid: uuid(),
+        savedAt: new Date().toISOString(),
+        clientName: `${dispatch.name} · ${dispatch.client.name}`,
+        payload: {
+            uuid: null,
+            // The server takes the client, product and quantity from the
+            // dispatch itself; these copies only matter if it has vanished.
+            dispatch_id: dispatch.id,
+            partner_id: dispatch.client.id,
+            product_id: dispatch.product.id,
+            entered_qty: dispatch.qty,
+            entered_uom: dispatch.uom,
+            vehicle_id: dispatch.vehicle_id || (reference.vehicle ? reference.vehicle.id : false),
+            signature: form.signature || false,
+            signed_by: form.signedBy.trim() || false,
+            signature_origin: "on_site",
+            note: dispatch.note || false,
+            off_route: false,
+            gps_latitude: state.position ? state.position.lat : 0,
+            gps_longitude: state.position ? state.position.lon : 0,
+            gps_accuracy: state.position ? state.position.accuracy : 0,
+            captured_at: new Date().toISOString().slice(0, 19).replace("T", " "),
+            cached_price: dispatch.product.price,
+            app_version: APP_VERSION,
+        },
+    };
+    capture.payload.uuid = capture.uuid;
+
+    await enqueue(capture);
+    // Off the list at once, and in the stored copy too, so a reopened app
+    // with no signal cannot offer the same order twice.
+    reference.dispatches = (reference.dispatches || []).filter((d) => d.id !== dispatch.id);
+    await dbPut(STORE_REF, { id: "current", reference, at: state.refreshedAt });
+    state.dispatch = null;
+    state.form = newForm();
+    state.view = "queue";
+    banner("ok", navigator.onLine ? "Delivered. Sending…" : "Delivered — saved on the phone. It will send itself when you have signal.");
+    render();
+    flushQueue({ quiet: true, live: capture.uuid });
+}
+
+async function refreshDispatches() {
+    if (!navigator.onLine) {
+        return banner("warn", "You need a connection to check for new dispatches.");
+    }
+    try {
+        await refreshReference();
+        banner("ok", `${openDispatches().length} dispatch${openDispatches().length === 1 ? "" : "es"} waiting.`);
+    } catch (error) {
+        banner("warn", `Could not check: ${error.message}`);
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -842,12 +967,14 @@ function render() {
             </div>`;
         return;
     }
-    const action = state.view === "new" ? renderActionBar() : "";
+    const action = state.view !== "new" ? ""
+        : dispatchMode() ? renderDispatchActionBar() : renderActionBar();
     root.innerHTML = `
         ${renderTop()}
         ${state.banner ? `<div class="ksw-banner ksw-${esc(state.banner.kind)}" role="status">${esc(state.banner.message)}</div>` : ""}
         ${renderReadiness()}
-        <main class="ksw-main ${action ? "ksw-has-action" : ""}">${state.view === "new" ? renderForm() : renderQueue()}</main>
+        <main class="ksw-main ${action ? "ksw-has-action" : ""}">${state.view !== "new" ? renderQueue()
+            : dispatchMode() ? renderDispatches() : renderForm()}</main>
         ${action}
         ${renderTabs()}`;
     wire();
@@ -904,9 +1031,13 @@ function renderTabs() {
     const queued = state.queue.length + state.pins.length;
     return `
         <nav class="ksw-tabs">
+            ${dispatchMode() ? `
+            <button data-view="new" class="${state.view === "new" ? "active" : ""}">
+                <span class="ksw-tab-icon">&#128203;</span><span class="ksw-tab-label">My Dispatches${openDispatches().length ? `<span class="ksw-count">${openDispatches().length}</span>` : ""}</span>
+            </button>` : `
             <button data-view="new" class="${state.view === "new" ? "active" : ""}">
                 <span class="ksw-tab-icon">&#65291;</span><span class="ksw-tab-label">New Delivery</span>
-            </button>
+            </button>`}
             <button data-view="queue" class="${state.view === "queue" ? "active" : ""}">
                 <span class="ksw-tab-icon">&#8645;</span><span class="ksw-tab-label">Sent &amp; Waiting${queued ? `<span class="ksw-count">${queued}</span>` : ""}</span>
             </button>
@@ -953,6 +1084,84 @@ function renderForm() {
         ${problem && canDeliver(form.partner) ? `<div class="ksw-warnbox">&#9888; ${esc(problem)}
             If you save, your supervisor has to approve the note.</div>` : ""}
         ${canDeliver(form.partner) ? renderDelivery() : ""}`;
+}
+
+function dispatchQty(d) {
+    return d.uom === "trip"
+        ? `${d.qty} trip${d.qty === 1 ? "" : "s"}${d.qty_m3 ? ` (${d.qty_m3} ${d.product.uom})` : ""}`
+        : `${d.qty} ${d.product.uom}`;
+}
+
+function renderDispatches() {
+    const tankerProblem = state.reference.vehicle
+        ? ""
+        : state.reference.vehicle_problem || "No tanker is assigned to you. Ask your supervisor.";
+    const head = tankerProblem
+        ? `<div class="ksw-warnbox"><b>&#9888; You cannot deliver yet.</b> ${esc(tankerProblem)}</div>`
+        : "";
+    const dispatch = state.dispatch;
+    if (dispatch) {
+        const problem = locationProblem(state.form);
+        return `
+            ${head}
+            ${renderGps()}
+            <div class="ksw-card ksw-client-card">
+                <div class="ksw-client-card-main">
+                    <span class="ksw-sub">${esc(dispatch.name)}</span>
+                    <span class="ksw-client-name ksw-strong" dir="auto">${esc(dispatch.client.name)}</span>
+                    <span class="ksw-tags">${clientTags(state.form.partner)}</span>
+                </div>
+                <button id="ksw-close-dispatch" class="ksw-link">Back</button>
+            </div>
+            <div class="ksw-card">
+                <div class="ksw-card-row"><span>Product</span><strong dir="auto">${esc(dispatch.product.name)}</strong></div>
+                <div class="ksw-card-row"><span>Quantity</span><strong>${esc(dispatchQty(dispatch))}</strong></div>
+                ${dispatch.note ? `<div class="ksw-sub" dir="auto">${esc(dispatch.note)}</div>` : ""}
+            </div>
+            ${renderPinBox()}
+            ${problem && canDeliver(state.form.partner) ? `<div class="ksw-warnbox">&#9888; ${esc(problem)}
+                If you deliver, your supervisor has to approve the note.</div>` : ""}
+            ${canDeliver(state.form.partner) && state.reference.rules.signature_required ? `
+                <label class="ksw-label" for="ksw-signed-by">Signed by</label>
+                <input id="ksw-signed-by" class="ksw-input" dir="auto" value="${esc(state.form.signedBy)}"
+                       placeholder="Name of the person signing"/>
+                <div class="ksw-label-row">
+                    <label class="ksw-label">Signature</label>
+                    <button id="ksw-clear-sign" class="ksw-link">Clear</button>
+                </div>
+                <canvas id="ksw-sign" class="ksw-sign"></canvas>` : ""}`;
+    }
+    const dispatches = openDispatches();
+    return `
+        ${head}
+        <div class="ksw-label-row">
+            <h2 class="ksw-h2">My Dispatches</h2>
+            <button id="ksw-refresh-dispatches" class="ksw-link" ${state.online ? "" : "disabled"}>Refresh</button>
+        </div>
+        <ul class="ksw-list">
+            ${dispatches.map((d) => `
+                <li><button data-dispatch="${d.id}" class="ksw-client-row">
+                    <span class="ksw-client-name" dir="auto">${esc(d.client.name)}
+                        <span class="ksw-sub">${esc(d.name)} · ${esc(dispatchQty(d))}</span></span>
+                    <span class="ksw-tags">${clientTags(d.client)}</span>
+                    <span class="ksw-chevron">&#8250;</span>
+                </button></li>`).join("")}
+            ${dispatches.length ? "" : `<li class="ksw-empty">No dispatches for you right now.</li>`}
+        </ul>`;
+}
+
+function renderDispatchActionBar() {
+    if (!state.dispatch || !canDeliver(state.form.partner)) {
+        return "";
+    }
+    const problem = locationProblem(state.form);
+    const blocked = !state.reference.vehicle;
+    return `
+        <div class="ksw-actionbar">
+            <button id="ksw-deliver" class="ksw-primary ${problem ? "ksw-primary-warn" : ""}" ${blocked ? "disabled" : ""}>
+                ${problem ? "Deliver for Supervisor Approval" : "Deliver"}
+            </button>
+        </div>`;
 }
 
 function renderClientPicker() {
@@ -1244,6 +1453,18 @@ function wire() {
         state.form.note = event.target.value;
     });
     on("ksw-save", "click", saveCapture);
+    document.querySelectorAll("[data-dispatch]").forEach((button) =>
+        button.addEventListener("click", () => {
+            const id = Number(button.dataset.dispatch);
+            const dispatch = openDispatches().find((d) => d.id === id);
+            if (dispatch) {
+                openDispatch(dispatch);
+            }
+        })
+    );
+    on("ksw-close-dispatch", "click", closeDispatch);
+    on("ksw-deliver", "click", deliverDispatch);
+    on("ksw-refresh-dispatches", "click", refreshDispatches);
     on("ksw-sync", "click", () => flushQueue());
     on("ksw-locate", "click", startWatching);
     on("ksw-pin", "click", requestPin);
@@ -1343,12 +1564,23 @@ async function boot() {
     document.addEventListener("visibilitychange", () => {
         if (!document.hidden) {
             // iOS has no Background Sync, so reopening the app IS the sync
-            // trigger. Cheap enough to do unconditionally.
+            // trigger. Cheap enough to do unconditionally. The reference is
+            // refreshed too: that is how a new dispatch reaches the driver.
             flushQueue({ quiet: true });
+            if (navigator.onLine) {
+                refreshReference().then(render).catch(() => {});
+            }
         }
     });
 
     startWatching();
+
+    // New dispatches arrive while the app is open on the dashboard.
+    setInterval(() => {
+        if (navigator.onLine && dispatchMode() && !document.hidden && !state.dispatch) {
+            refreshReference().then(render).catch(() => {});
+        }
+    }, 60000);
 
     if (navigator.onLine) {
         try {

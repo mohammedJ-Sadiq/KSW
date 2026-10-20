@@ -9,3 +9,4 @@ from . import test_client_pin
 from . import test_tanker_assignment
 from . import test_client_pin_ui
 from . import test_tanker_driver_clients
+from . import test_water_dispatch

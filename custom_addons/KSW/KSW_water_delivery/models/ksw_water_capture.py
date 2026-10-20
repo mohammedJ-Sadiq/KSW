@@ -75,6 +75,11 @@ class KswWaterCapture(models.Model):
     )
     note = fields.Char(string='Remark', readonly=True)
     off_route = fields.Boolean(string='Off the Usual Route', readonly=True)
+    # Set only when the server matched the capture to an open dispatch of
+    # this driver. The client, product and quantity then come from the
+    # dispatch, not from the phone.
+    dispatch_id = fields.Many2one('ksw.water.dispatch', string='Dispatch',
+                                  readonly=True, index='btree_not_null')
 
     gps_latitude = fields.Float(string='Latitude', digits=(10, 7), readonly=True)
     gps_longitude = fields.Float(string='Longitude', digits=(10, 7), readonly=True)
@@ -226,6 +231,8 @@ class KswWaterCapture(models.Model):
         if phone_time and abs(skew) > self._CLOCK_TOLERANCE_S:
             captured_at = captured_at - timedelta(seconds=skew)
 
+        dispatch, dispatch_problem = self._match_dispatch(payload, driver)
+
         values = {
             'uuid': uuid,
             'driver_id': driver.id,
@@ -249,9 +256,33 @@ class KswWaterCapture(models.Model):
             'app_version': payload.get('app_version') or False,
             'sent_live': bool(payload.get('sent_live')),
         }
+        if dispatch:
+            values.update(dispatch._water_capture_values())
+            if not dispatch_problem:
+                values['dispatch_id'] = dispatch.id
         capture = self.sudo().create(values)
+        if dispatch_problem:
+            # Recorded, not refused: the driver says he delivered. The office
+            # sees it next to the other captures that could not be issued.
+            capture.write({'state': 'failed', 'failure_reason': dispatch_problem})
+            return capture
+        if dispatch:
+            dispatch.capture_id = capture
         capture._try_issue()
         return capture
+
+    @api.model
+    def _match_dispatch(self, payload, driver):
+        """(dispatch, problem) for a capture the phone says confirms a
+        dispatch. (empty, None) for an ordinary capture."""
+        Dispatch = self.env['ksw.water.dispatch'].sudo()
+        dispatch_id = payload.get('dispatch_id')
+        if not dispatch_id:
+            return Dispatch, None
+        dispatch = Dispatch.browse(int(dispatch_id)).exists()
+        if not dispatch:
+            return Dispatch, _('The dispatch this delivery confirms no longer exists.')
+        return dispatch, dispatch._water_capture_problem(driver)
 
     # ------------------------------------------------------------------
     # Issuing
@@ -325,6 +356,7 @@ class KswWaterCapture(models.Model):
             'gps_accuracy': self.gps_accuracy,
             'note': self.note,
             'off_route': self.off_route,
+            'dispatch_id': self.dispatch_id.id,
             'issued_offline': not self.sent_live,
             'captured_at': self.captured_at,
         }
@@ -377,6 +409,8 @@ class KswWaterCapture(models.Model):
                 'distance_m': picking.x_gps_distance_m,
                 'issued_price': picking.sale_id.sudo().order_line[:1].price_unit,
             })
+            if capture.dispatch_id:
+                capture.dispatch_id._water_on_capture_issued(capture)
             if capture.price_changed:
                 # The customer signed a screen showing the cached figure. The
                 # note carries the live one, which is the right answer -- and
@@ -495,6 +529,7 @@ class KswWaterCapture(models.Model):
                 'reviewed_by': self.env.user.id,
                 'reviewed_on': fields.Datetime.now(),
             })
+            capture.dispatch_id.sudo()._water_on_capture_rejected(capture)
 
     def action_retry(self):
         """Re-run a capture that could not be issued, after somebody has fixed

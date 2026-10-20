@@ -13,11 +13,14 @@
         <field name="name">Water Delivery</field>
         <field name="model_id" ref="stock.model_stock_picking"/>
         <field name="state">code</field>
-        <field name="group_ids" eval="[(6, 0, [ref('KSW_water_delivery.group_water_driver'), ref('KSW_water_delivery.group_water_dispatcher'), ref('KSW_water_delivery.group_water_billing')])]"/>
+        <field name="group_ids" eval="[(6, 0, [ref('KSW_water_delivery.group_water_driver'), ref('KSW_water_delivery.group_water_dispatcher'), ref('KSW_water_delivery.group_water_billing'), ref('KSW_water_delivery.group_water_dispatch')])]"/>
         <field name="code">
 oversees = (env.user.has_group('KSW_water_delivery.group_water_dispatcher')
             or env.user.has_group('KSW_water_delivery.group_water_billing'))
-if oversees:
+if env.user.has_group('KSW_water_delivery.group_water_dispatch'):
+    action = env['ir.actions.act_window']._for_xml_id(
+        'KSW_water_delivery.action_water_dispatches')
+elif oversees:
     action = env['ir.actions.act_window']._for_xml_id(
         'KSW_water_delivery.action_water_delivery_all_notes')
 else:
@@ -31,7 +34,7 @@ else:
               action="action_water_delivery_home"
               web_icon="KSW_water_delivery,static/description/icon.png"
               sequence="47"
-              groups="KSW_water_delivery.group_water_driver,KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing"/>
+              groups="KSW_water_delivery.group_water_driver,KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing,KSW_water_delivery.group_water_dispatch"/>
 
     <menuitem id="menu_water_delivery_new"
               name="New Delivery"
@@ -46,6 +49,14 @@ else:
               action="action_water_delivery_my_notes"
               sequence="20"
               groups="KSW_water_delivery.group_water_driver"/>
+
+    <!-- Only does anything on a branch switched to dispatch mode. -->
+    <menuitem id="menu_water_delivery_dispatches"
+              name="Dispatches"
+              parent="menu_water_delivery_root"
+              action="action_water_dispatches"
+              sequence="25"
+              groups="KSW_water_delivery.group_water_dispatch,KSW_water_delivery.group_water_dispatcher"/>
 
     <menuitem id="menu_water_delivery_all_notes"
               name="Delivery Notes"
@@ -91,11 +102,22 @@ else:
               sequence="50"
               groups="KSW_water_delivery.group_water_billing"/>
 
+    <!-- base.group_system too: Branches below is the administrator's, and a
+         child under a narrower parent is orphaned (KSW gotcha #41). -->
     <menuitem id="menu_water_delivery_config"
               name="Configuration"
               parent="menu_water_delivery_root"
               sequence="90"
-              groups="KSW_water_delivery.group_water_billing"/>
+              groups="KSW_water_delivery.group_water_billing,base.group_system"/>
+
+    <!-- Per branch: who starts a delivery (driver, or dispatcher) and who
+         dispatches. The switch for the dispatch sequence. -->
+    <menuitem id="menu_water_delivery_branches"
+              name="Branches"
+              parent="menu_water_delivery_config"
+              action="action_water_branches"
+              sequence="5"
+              groups="base.group_system"/>
 
     <menuitem id="menu_water_delivery_rates"
               name="Client Rates"

@@ -21,3 +21,8 @@ access_water_location_request_billing,ksw.water.location.request.billing,model_k
 access_water_tanker_dispatcher,ksw.fleet.vehicle.water.dispatcher,KSW_fleet.model_ksw_fleet_vehicle,group_water_dispatcher,1,1,0,0
 access_water_tanker_group_hr_manager,ksw.water.tanker.group.hr.manager,model_ksw_water_tanker_group,hr.group_hr_manager,1,1,1,1
 access_water_tanker_group_dispatcher,ksw.water.tanker.group.dispatcher,model_ksw_water_tanker_group,group_water_dispatcher,1,0,0,0
+access_water_dispatch_dispatch,ksw.water.dispatch.dispatch,model_ksw_water_dispatch,group_water_dispatch,1,1,1,1
+access_water_dispatch_supervisor,ksw.water.dispatch.supervisor,model_ksw_water_dispatch,group_water_dispatcher,1,0,0,0
+access_water_rate_dispatch,ksw.water.rate.dispatch,model_ksw_water_rate,group_water_dispatch,1,0,0,0
+access_water_client_branch_dispatch,ksw.water.client.branch.dispatch,model_ksw_water_client_branch,group_water_dispatch,1,0,0,0
+access_water_tanker_dispatch,ksw.fleet.vehicle.water.dispatch,KSW_fleet.model_ksw_fleet_vehicle,group_water_dispatch,1,0,0,0

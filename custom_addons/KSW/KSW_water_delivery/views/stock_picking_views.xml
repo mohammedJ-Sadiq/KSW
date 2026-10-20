@@ -36,6 +36,9 @@
                             <field name="x_branch_code" readonly="1"/>
                             <field name="x_off_route" readonly="1"
                                    invisible="not x_off_route"/>
+                            <field name="x_dispatch_id" readonly="1"
+                                   invisible="not x_dispatch_id"
+                                   groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_dispatch"/>
                             <field name="state" readonly="1"/>
                         </group>
                     </group>
@@ -290,6 +293,10 @@
                 <field name="x_location_rule" invisible="not x_is_water_delivery"/>
                 <field name="x_location_radius_m"
                        invisible="not x_is_water_delivery or x_location_rule != 'enforce'"/>
+                <field name="x_issue_mode" invisible="not x_is_water_delivery"/>
+                <field name="x_dispatcher_user_ids" widget="many2many_tags"
+                       options="{'no_create': True}"
+                       invisible="not x_is_water_delivery or x_issue_mode != 'dispatch'"/>
             </xpath>
         </field>
     </record>

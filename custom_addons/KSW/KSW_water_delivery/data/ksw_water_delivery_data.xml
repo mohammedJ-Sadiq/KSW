@@ -23,6 +23,15 @@
             <field name="print_label" eval="False"/>
         </record>
 
+        <!-- Dispatch numbers. -->
+        <record id="seq_water_dispatch" model="ir.sequence">
+            <field name="name">Water Delivery Dispatch</field>
+            <field name="code">ksw.water.dispatch</field>
+            <field name="prefix">DSP/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
         <!-- One load ("ردة") of sweet water. Non-storable, like every water
              product in the BAS import: there is no stock and no valuation
              behind a tanker load. Delivered-quantity invoicing is the whole

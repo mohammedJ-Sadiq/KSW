@@ -1,6 +1,6 @@
 {
     'name': 'KSW Water Delivery Notes',
-    'version': '19.0.1.16.0',
+    'version': '19.0.1.17.0',
     'summary': 'Issue the water delivery note at the client, online or off',
     'description': """
 Water Delivery Notes
@@ -63,6 +63,7 @@ accounting the finished list.
         'views/ksw_fleet_vehicle_views.xml',
         'views/ksw_water_capture_views.xml',
         'views/ksw_water_location_request_views.xml',
+        'views/ksw_water_dispatch_views.xml',
         'views/ksw_water_delivery_menus.xml',
     ],
     'assets': {

@@ -57,6 +57,26 @@ class StockPickingType(models.Model):
         help='How far from the client\'s recorded location a delivery note may '
              'be issued.',
     )
+    # Who starts a delivery on this branch. A switch, per branch, so the
+    # dispatch sequence can be trialled on one branch while the others keep
+    # working as before. Not required on purpose: a column added later holds
+    # NULL on existing rows (gotcha #146), and every reader compares to
+    # 'dispatch', so NULL reads as the old behaviour.
+    x_issue_mode = fields.Selection(
+        [('driver', 'Driver issues the delivery'),
+         ('dispatch', 'Dispatcher dispatches, driver confirms')],
+        string='Who Starts a Delivery', default='driver',
+        help='Driver: the driver picks the client, product and quantity in '
+             'his app. Dispatcher: the branch\'s dispatcher picks all of that '
+             'and the driver; the driver only presses Deliver at the client.',
+    )
+    x_dispatcher_user_ids = fields.Many2many(
+        'res.users', 'ksw_water_branch_dispatcher_rel', 'picking_type_id', 'user_id',
+        string='Dispatchers',
+        domain=lambda self: [('all_group_ids', 'in', self.env.ref(
+            'KSW_water_delivery.group_water_dispatch').ids)],
+        help='Users who dispatch deliveries for this branch.',
+    )
 
 
 class StockPicking(models.Model):
@@ -147,6 +167,10 @@ class StockPicking(models.Model):
     )
     x_capture_id = fields.Many2one(
         'ksw.water.capture', string='Offline Capture', copy=False, index='btree_not_null',
+        ondelete='set null',
+    )
+    x_dispatch_id = fields.Many2one(
+        'ksw.water.dispatch', string='Dispatch', copy=False, index='btree_not_null',
         ondelete='set null',
     )
 
@@ -311,6 +335,24 @@ class StockPicking(models.Model):
                 client=partner.sudo().display_name,
                 driver=driver.sudo().name or _('the driver'))
         return None
+
+    @api.model
+    def _water_dispatch_mode_check(self, picking_type, dispatched):
+        """On a branch in dispatch mode a delivery starts with a dispatch.
+
+        One the driver started himself is held for the supervisor, not
+        refused, when it comes through the queue: it may be a phone that
+        captured it before the branch was switched, and the water is in the
+        tank either way.
+        """
+        if dispatched or picking_type.x_issue_mode != 'dispatch':
+            return None
+        if self.env.uid == SUPERUSER_ID or self.env.user.has_group(
+                'KSW_water_delivery.group_water_dispatcher'):
+            return None
+        return _(
+            '%s delivers against dispatches, and this delivery was not '
+            'dispatched.', picking_type.display_name)
 
     @api.model
     def _water_assigned_vehicle(self, driver):
@@ -483,12 +525,21 @@ class StockPicking(models.Model):
                 distance=int(distance or 0), client=partner.display_name,
                 radius=picking_type.x_location_radius_m or 300,
             ))
+        # A dispatched delivery: the dispatcher already chose this client for
+        # this driver, which is the authority his client list stands in for.
+        # `dispatch_id` only ever reaches here from a capture the server
+        # matched to an open dispatch of that driver -- never from the phone.
+        dispatched = bool(payload.get('dispatch_id'))
+        dispatch_problem = self._water_dispatch_mode_check(picking_type, dispatched)
+        if dispatch_problem and location_mode == 'raise':
+            raise UserError(dispatch_problem)
         # Everything that makes the note a dispatcher's call rather than
         # the driver's: wrong tanker (offline), a client outside the driver's
         # list or branch, and the capture's timing (offline only).
         problems = [p for p in (
             vehicle_problem,
-            self._water_scope_check(partner, driver, picking_type),
+            dispatch_problem,
+            None if dispatched else self._water_scope_check(partner, driver, picking_type),
             location_problem,
             *(payload.get('hold_reasons') or []),
         ) if p]
@@ -553,6 +604,7 @@ class StockPicking(models.Model):
             'x_gps_accuracy': payload.get('gps_accuracy') or 0.0,
             'x_gps_distance_m': distance or 0.0,
             'x_off_route': bool(payload.get('off_route')),
+            'x_dispatch_id': payload.get('dispatch_id') or False,
             'x_issued_offline': bool(payload.get('issued_offline')),
             'x_captured_at': payload.get('captured_at') or False,
             'x_location_exception': held,

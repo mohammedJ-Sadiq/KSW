@@ -16,7 +16,7 @@ DRIVER_GROUP = 'KSW_water_delivery.group_water_driver'
 # worker keys its cache on it, so a bump is how a driver's phone picks up a new
 # version of the app -- there is no other route in, because the whole point is
 # that it does not go to the network to find out.
-APP_VERSION = '1.0.7'
+APP_VERSION = '1.0.8'
 
 
 class KswWaterApp(http.Controller):
@@ -155,8 +155,9 @@ class KswWaterApp(http.Controller):
         normal_ids = set(normal.ids)
         # So the phone can say "sent, waiting for the office" instead of
         # offering the button again to the next driver at the same gate.
+        open_dispatches = env['ksw.water.dispatch'].sudo()._water_open_for_driver(employee)
         pending_ids = env['ksw.water.location.request'].sudo()._pending_partner_ids(
-            rated.ids)
+            (rated | open_dispatches.partner_id).ids)
         clients = [{
             'id': partner.id,
             'name': partner.display_name,
@@ -167,6 +168,40 @@ class KswWaterApp(http.Controller):
             'products': by_partner.get(partner.id, []),
         } for partner in rated.sudo() if by_partner.get(partner.id)]
         clients.sort(key=lambda c: (not c['usual'], c['name']))
+
+        # Open dispatches, cached with the rest so the driver can confirm one
+        # at a site with no signal. Listed whatever the branch's mode: a
+        # dispatch that exists is work he has been given.
+        dispatches = []
+        for dispatch in open_dispatches:
+            partner, product = dispatch.partner_id, dispatch.product_id
+            rate = Rate._rate_for(partner, product)
+            dispatches.append({
+                'id': dispatch.id,
+                'name': dispatch.name,
+                'client': {
+                    'id': partner.id,
+                    'name': partner.display_name,
+                    'lat': partner.partner_latitude or 0.0,
+                    'lon': partner.partner_longitude or 0.0,
+                    'usual': True,
+                    'location_pending': partner.id in pending_ids,
+                    'products': [],
+                },
+                'product': {
+                    'id': product.id,
+                    'name': product.display_name,
+                    'uom': product.uom_id.name,
+                    'price': rate.price if rate else 0.0,
+                },
+                'qty': dispatch.entered_qty,
+                'uom': dispatch.entered_uom,
+                'qty_m3': dispatch.quantity_m3,
+                'vehicle_id': dispatch.vehicle_id.id,
+                'note': dispatch.note or '',
+                'dispatched_on': dispatch.dispatched_on.isoformat()
+                if dispatch.dispatched_on else '',
+            })
 
         return {
             'app_version': APP_VERSION,
@@ -186,8 +221,11 @@ class KswWaterApp(http.Controller):
                 'location_rule': picking_type.x_location_rule or 'capture',
                 'radius_m': picking_type.x_location_radius_m or 300,
                 'pin_max_accuracy_m': PIN_MAX_ACCURACY_M,
+                # 'dispatch': the app shows My Dispatches and no free form.
+                'issue_mode': picking_type.x_issue_mode or 'driver',
             },
             'clients': clients,
+            'dispatches': dispatches,
             'server_time': request.env['ksw.water.capture'].sudo()._now_iso(),
         }
 

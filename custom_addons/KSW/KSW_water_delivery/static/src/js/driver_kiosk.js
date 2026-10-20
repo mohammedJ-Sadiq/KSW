@@ -45,16 +45,17 @@ function launchedFromTheAppIcon() {
 const driverKioskService = {
     dependencies: [],
     async start() {
-        const [isDriver, isDispatcher, isBilling] = await Promise.all([
+        const [isDriver, isDispatcher, isBilling, isDispatch] = await Promise.all([
             user.hasGroup("KSW_water_delivery.group_water_driver"),
             user.hasGroup("KSW_water_delivery.group_water_dispatcher"),
             user.hasGroup("KSW_water_delivery.group_water_billing"),
+            user.hasGroup("KSW_water_delivery.group_water_dispatch"),
         ]);
-        if (!isDriver && !isDispatcher && !isBilling) {
+        if (!isDriver && !isDispatcher && !isBilling && !isDispatch) {
             // Nothing to lock down for someone with no part in this app.
             return;
         }
-        const isDriverOnly = !isDispatcher && !isBilling;
+        const isDriverOnly = !isDispatcher && !isBilling && !isDispatch;
         if (isDriverOnly || launchedFromTheAppIcon()) {
             document.body.classList.add("o_ksw_driver_kiosk");
         }

@@ -102,6 +102,7 @@
                         <group string="Outcome">
                             <field name="picking_id" readonly="1"/>
                             <field name="picking_state" readonly="1"/>
+                            <field name="dispatch_id" readonly="1" invisible="not dispatch_id"/>
                             <field name="reviewed_by" readonly="1"/>
                             <field name="reviewed_on" readonly="1"/>
                             <field name="review_note"
