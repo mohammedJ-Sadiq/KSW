@@ -28,6 +28,7 @@ from . import ksw_sales_commission_sheet  # sales: paid separately, not an entry
 from . import ksw_sales_commission_addition_line   # accountant manual bonus/reward lines
 from . import ksw_sales_commission_deduction_line  # accountant manual penalty/correction lines
 from . import res_partner                 # commission import name alias
+from . import ksw_bas_sales_rep           # BAS rep code -> employee, picked once
 from . import ksw_bas_customer            # BAS-native rep resolution + AR aging target
 from . import ksw_deduction               # adds awaiting-commission helpers
 from . import ksw_deduction_line          # parked installments + pay-run settlement link

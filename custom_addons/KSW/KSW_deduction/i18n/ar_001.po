@@ -1014,6 +1014,7 @@ msgstr "رمز"
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_annual_vacation_deduction_picture
 msgid "Collected"
 msgstr "المحصل"
 
@@ -1268,6 +1269,7 @@ msgstr "دعم القرار"
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_list
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_search
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_annual_vacation_deduction_picture
 msgid "Deduction"
 msgstr "الخصم"
 
@@ -1992,6 +1994,7 @@ msgstr "إذا كان محددا، فقد حدث خطأ في تسليم بعض �
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_annual_vacation_deduction_picture
 msgid "Installment"
 msgstr "القسط"
 
@@ -2628,6 +2631,7 @@ msgstr "غير السلف الخاصة"
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_payslip_input__x_ksw_uncollected
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.view_hr_payslip_form_inherit_ksw_deduction_coverage
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_annual_vacation_deduction_picture
 msgid "Not Collected"
 msgstr "غير محصل"
 
@@ -3406,6 +3410,7 @@ msgstr "إعادة التوزيع على الأقساط المتبقية"
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__ref
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_annual_vacation_deduction_picture
 msgid "Reference"
 msgstr "الرقم المرجعي"
 
@@ -4061,6 +4066,7 @@ msgstr "إلى"
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_list
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_list
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_annual_vacation_deduction_picture
 msgid "Total"
 msgstr "الإجمالي"
 
@@ -4842,3 +4848,23 @@ msgid ""
 msgstr ""
 "هذه الخطوة من صلاحية %s، المدير المباشر للموظف، ولا يملك اعتمادها أو رفضها "
 "أحد غيره."
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_annual_vacation_deduction_picture
+msgid "Deductions on the Vacation Payslip"
+msgstr "الخصومات في كشف راتب الإجازة"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_annual_vacation_deduction_picture
+msgid "Outstanding Installments"
+msgstr "الأقساط المتبقية"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_annual_vacation_deduction_picture
+msgid "Due Month"
+msgstr "شهر الاستحقاق"
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_annual_vacation_deduction_picture
+msgid "Amount (SAR)"
+msgstr "المبلغ (ريال)"

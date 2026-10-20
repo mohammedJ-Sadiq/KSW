@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- BAS rep code to employee: filled from BAS on every pull, the user
+         only picks the employee once per rep. -->
+    <record id="view_ksw_bas_sales_rep_list" model="ir.ui.view">
+        <field name="name">ksw.bas.sales.rep.list</field>
+        <field name="model">ksw.bas.sales.rep</field>
+        <field name="arch" type="xml">
+            <list string="BAS Sales Reps" editable="bottom" create="0"
+                  decoration-warning="state == 'todo'"
+                  decoration-muted="state == 'house'">
+                <field name="code"/>
+                <field name="bas_name"/>
+                <field name="employee_id" options="{'no_create': True}"
+                       readonly="is_house"/>
+                <field name="is_house"/>
+                <field name="sales_customer_count"/>
+                <field name="collection_customer_count"/>
+                <field name="state" widget="badge"
+                       decoration-warning="state == 'todo'"
+                       decoration-success="state == 'mapped'"/>
+                <field name="customer_count" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_bas_sales_rep_search" model="ir.ui.view">
+        <field name="name">ksw.bas.sales.rep.search</field>
+        <field name="model">ksw.bas.sales.rep</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="bas_name"/>
+                <field name="code"/>
+                <field name="employee_id"/>
+                <filter name="todo" string="Needs an Employee"
+                        domain="[('state', '=', 'todo')]"/>
+                <filter name="mapped" string="Mapped"
+                        domain="[('state', '=', 'mapped')]"/>
+                <filter name="house" string="No Commission"
+                        domain="[('state', '=', 'house')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_bas_sales_rep" model="ir.actions.act_window">
+        <field name="name">BAS Sales Reps</field>
+        <field name="res_model">ksw.bas.sales.rep</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No BAS reps yet</p>
+            <p>Press <b>Pull from BAS</b> on a Sales &amp; Collection sheet:
+               every rep BAS assigns to a customer is listed here.
+               Link each one to its employee once.</p>
+        </field>
+    </record>
+
+</odoo>

@@ -85,3 +85,5 @@ access_ksw_pay_recurring_vacation_wizard_supervisor,ksw.pay.recurring.vacation.w
 access_ksw_pay_recurring_vacation_wizard_line_supervisor,ksw.pay.recurring.vacation.wizard.line supervisor,model_ksw_pay_recurring_vacation_wizard_line,group_commission_supervisor,1,1,1,1
 access_ksw_pay_run_paid_wizard_accountant,ksw.pay.run.paid.wizard accountant,model_ksw_pay_run_paid_wizard,group_commission_accountant,1,1,1,1
 access_ksw_pay_run_paid_wizard_line_accountant,ksw.pay.run.paid.wizard.line accountant,model_ksw_pay_run_paid_wizard_line,group_commission_accountant,1,1,1,1
+access_ksw_bas_sales_rep_entry,ksw.bas.sales.rep entry,model_ksw_bas_sales_rep,group_entry_sales,1,1,0,0
+access_ksw_bas_sales_rep_officer,ksw.bas.sales.rep officer,model_ksw_bas_sales_rep,group_commission_officer,1,1,1,1

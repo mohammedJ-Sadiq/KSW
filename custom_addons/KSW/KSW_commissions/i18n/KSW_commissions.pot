@@ -2016,6 +2016,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__batch_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_gm_review_line__batch_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_recurring_vacation_wizard__batch_id
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_annual_vacation_commission_detail
 msgid "Batch"
 msgstr ""
 
@@ -2905,6 +2906,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_leave_commission_entry__date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__date
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.employee_review_sections
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_annual_vacation_commission_detail
 msgid "Date"
 msgstr ""
 
@@ -4878,6 +4880,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_search
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_search
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_vacation_release_search
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_annual_vacation_commission_detail
 msgid "Month"
 msgstr ""
 
@@ -5911,6 +5914,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_commissions/models/hr_leave.py:0
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_leave_commission_entry__pay_type
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_annual_vacation_commission_detail
 msgid "Pay Type"
 msgstr ""
 
@@ -8137,6 +8141,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_line_form_full
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_list
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_annual_vacation_commission_detail
 msgid "Total"
 msgstr ""
 
@@ -9567,4 +9572,14 @@ msgstr ""
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__x_review_has_prev
 msgid "Has Previous"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_annual_vacation_commission_detail
+msgid "Commissions &amp; Allowances"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.report_annual_vacation_commission_detail
+msgid "Amount (SAR)"
 msgstr ""

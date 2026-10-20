@@ -901,6 +901,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_annual_vacation_deduction_picture
 msgid "Collected"
 msgstr ""
 
@@ -1148,6 +1149,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_list
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_search
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_loan_payment_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_annual_vacation_deduction_picture
 msgid "Deduction"
 msgstr ""
 
@@ -1834,6 +1836,7 @@ msgstr ""
 
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_annual_vacation_deduction_picture
 msgid "Installment"
 msgstr ""
 
@@ -2438,6 +2441,7 @@ msgstr ""
 #. module: KSW_deduction
 #: model:ir.model.fields,field_description:KSW_deduction.field_hr_payslip_input__x_ksw_uncollected
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.view_hr_payslip_form_inherit_ksw_deduction_coverage
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_annual_vacation_deduction_picture
 msgid "Not Collected"
 msgstr ""
 
@@ -3187,6 +3191,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction_statement_line__ref
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_statement_line_view_list
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.report_deduction_statement
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_annual_vacation_deduction_picture
 msgid "Reference"
 msgstr ""
 
@@ -3776,6 +3781,7 @@ msgstr ""
 #. module: KSW_deduction
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_line_view_list
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.ksw_deduction_view_list
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_annual_vacation_deduction_picture
 msgid "Total"
 msgstr ""
 
@@ -4472,4 +4478,24 @@ msgstr ""
 msgid ""
 "This step belongs to %s, the employee's direct manager. Only that manager "
 "can approve or refuse it."
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_annual_vacation_deduction_picture
+msgid "Deductions on the Vacation Payslip"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_annual_vacation_deduction_picture
+msgid "Outstanding Installments"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_annual_vacation_deduction_picture
+msgid "Due Month"
+msgstr ""
+
+#. module: KSW_deduction
+#: model_terms:ir.ui.view,arch_db:KSW_deduction.report_annual_vacation_deduction_picture
+msgid "Amount (SAR)"
 msgstr ""

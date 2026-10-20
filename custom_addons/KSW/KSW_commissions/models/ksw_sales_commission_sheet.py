@@ -57,6 +57,10 @@ class KswSalesCommissionSheet(models.Model):
         default='draft', required=True, copy=False, tracking=True,
     )
     is_locked = fields.Boolean(readonly=True, copy=False)
+    x_unmapped_rep_count = fields.Integer(
+        'BAS Reps to Link', compute='_compute_unmapped_rep_count',
+        help='BAS rep codes with customers but no employee linked: their '
+             'sales and collections are credited to nobody.')
     currency_id = fields.Many2one(
         'res.currency', required=True,
         default=lambda s: s.env.company.currency_id,
@@ -152,6 +156,18 @@ class KswSalesCommissionSheet(models.Model):
             },
         }
 
+    def _compute_unmapped_rep_count(self):
+        count = self.env['ksw.bas.sales.rep'].sudo().search_count(
+            [('state', '=', 'todo')])
+        for rec in self:
+            rec.x_unmapped_rep_count = count
+
+    def action_open_bas_sales_reps(self):
+        action = self.env['ir.actions.act_window']._for_xml_id(
+            'KSW_commissions.action_ksw_bas_sales_rep')
+        action['context'] = {'search_default_todo': 1}
+        return action
+
     # ------------------------------------------------------------------
     # Pull achieved sales/collection directly from BAS
     # ------------------------------------------------------------------
@@ -222,22 +238,46 @@ class KswSalesCommissionSheet(models.Model):
                 collection_by_account.get(acc, 0.0) + pay.amount)
 
         # -- BAS customer master: identity + resolved effective reps ------
-        # (effective_sales_rep_id/effective_collector_id already fold in
-        # the partner-level manual override — see
-        # ksw.bas.customer._recompute_effective_reps in KSW_commissions).
+        # Refresh the rep-code mapping from BAS first (new codes, renamed
+        # labels), then re-resolve every customer against it, so a pull
+        # never runs on a stale assignment. sudo: the Sales & Collection
+        # role reads these mirrors, it does not maintain them.
+        self.env['ksw.bas.sales.rep']._sync_from_bas_customers()
+        BasCustomer.sudo()._recompute_effective_reps()
+        house_codes = self.env['ksw.bas.sales.rep']._house_codes()
         customer_by_code = {c.bas_code: c for c in BasCustomer.search([])}
 
         # -- attribute to employees via BAS's own rep assignment ---------
+        # Anything that cannot be attributed is reported by REASON, not
+        # account by account: a cash/branch account (no customer), a house
+        # rep (no commission due), or a rep code nobody has mapped yet.
+        gaps = {
+            'cash_sales': 0.0,
+            'house': {},      # rep name -> [sales, collected]
+            'unmapped': {},   # (code, name) -> [sales, collected, customers]
+        }
+
+        def _gap(customer, code, name, idx, amount):
+            if code in house_codes:
+                bucket = gaps['house'].setdefault(name or code, [0.0, 0.0])
+            else:
+                bucket = gaps['unmapped'].setdefault(
+                    (code or '', name or ''), [0.0, 0.0, set()])
+                bucket[2].add(customer.bas_code)
+            bucket[idx] += amount
+
         sales_by_employee = {}
-        unmatched_sales_accounts = []
         for acc, amount in sales_by_account.items():
             customer = customer_by_code.get(acc)
-            rep = customer.effective_sales_rep_id if customer else False
+            if not customer:
+                # A cash/branch account (1201*), not a customer: nobody's
+                # rep sold it.
+                gaps['cash_sales'] += amount
+                continue
+            rep = customer.effective_sales_rep_id
             if not rep:
-                label = (
-                    f"{acc} — {customer.seller_name}"
-                    if customer and customer.seller_name else acc)
-                unmatched_sales_accounts.append(label)
+                _gap(customer, customer.seller_code, customer.seller_name,
+                     0, amount)
                 continue
             bucket = sales_by_employee.setdefault(
                 rep, {'total': 0.0, 'by_account': {}, 'by_customer': {}})
@@ -246,7 +286,6 @@ class KswSalesCommissionSheet(models.Model):
                 bucket['by_account'].get(acc.lower(), 0.0) + amount)
 
         collection_by_employee = {}
-        unmatched_collection_accounts = []
         grand_collected = 0.0
         for acc, amount in collection_by_account.items():
             customer = customer_by_code.get(acc)
@@ -258,10 +297,8 @@ class KswSalesCommissionSheet(models.Model):
             grand_collected += amount
             rep = customer.effective_collector_id
             if not rep:
-                label = (
-                    f"{acc} — {customer.collector_name}"
-                    if customer.collector_name else acc)
-                unmatched_collection_accounts.append(label)
+                _gap(customer, customer.collector_code,
+                     customer.collector_name, 1, amount)
                 continue
             bucket = collection_by_employee.setdefault(
                 rep, {'collected': 0.0, 'target': None})
@@ -271,9 +308,7 @@ class KswSalesCommissionSheet(models.Model):
             sales_by_employee, collection_by_employee,
             collection_grand_totals=(grand_collected, None))
 
-        self._post_bas_pull_summary(
-            date_from, date_to, imported_lines,
-            unmatched_sales_accounts, unmatched_collection_accounts)
+        self._post_bas_pull_summary(date_from, date_to, imported_lines, gaps)
 
         return {
             'type': 'ir.actions.act_window',
@@ -550,35 +585,46 @@ class KswSalesCommissionSheet(models.Model):
         return lines_html
 
     def _post_bas_pull_summary(self, date_from, date_to, imported_lines,
-                                unmatched_sales_accounts,
-                                unmatched_collection_accounts):
+                                gaps):
         """Post a chatter note summarising an action_pull_from_bas() run."""
         self.ensure_one()
         lines_html = self._format_commission_lines_html(imported_lines)
 
+        def _sar(amount):
+            return f'SAR {amount:,.2f}'
+
         warn_html = Markup('')
-        if unmatched_sales_accounts or unmatched_collection_accounts:
-            warn_html = Markup('<br/>')
-            if unmatched_sales_accounts:
-                items = Markup('').join(
-                    Markup('<li>{n}</li>').format(n=escape(n))
-                    for n in sorted(set(unmatched_sales_accounts)))
-                warn_html += Markup(
-                    '<b>⚠ Sales with no Sales Rep set on the customer:</b>'
-                    '<ul>{items}</ul>'
-                ).format(items=items)
-            if unmatched_collection_accounts:
-                items = Markup('').join(
-                    Markup('<li>{n}</li>').format(n=escape(n))
-                    for n in sorted(set(unmatched_collection_accounts)))
-                warn_html += Markup(
-                    '<b>⚠ Collections with no Collection Rep set on the '
-                    'customer:</b><ul>{items}</ul>'
-                ).format(items=items)
+        if gaps['unmapped']:
+            items = Markup('').join(
+                Markup('<li><b>{name}</b> (BAS code {code}, {n} customer(s)) '
+                       '— Sales: {s} | Collected: {c}</li>').format(
+                    name=name or _('(no name in BAS)'), code=code or '—',
+                    n=len(custs), s=_sar(s_amt), c=_sar(c_amt))
+                for (code, name), (s_amt, c_amt, custs) in sorted(
+                    gaps['unmapped'].items(),
+                    key=lambda kv: -(kv[1][0] + kv[1][1])))
             warn_html += Markup(
-                'Set the <i>Sales Rep</i> / <i>Collection Rep</i> field on '
-                'the corresponding customer record(s) to fix the '
-                'attribution.')
+                '<br/><b>⚠ BAS reps not linked to an employee — not '
+                'credited to anyone:</b><ul>{items}</ul>'
+                'Link them once under <i>Sales &amp; Collection ▸ BAS Sales '
+                'Reps</i> (or mark them <i>No Commission</i>), then pull '
+                'again.<br/>'
+            ).format(items=items)
+        info = []
+        if gaps['house']:
+            for name, (s_amt, c_amt) in sorted(gaps['house'].items()):
+                info.append(Markup(
+                    '<li>House account <b>{name}</b> (no commission) — '
+                    'Sales: {s} | Collected: {c}</li>').format(
+                        name=name, s=_sar(s_amt), c=_sar(c_amt)))
+        if gaps['cash_sales']:
+            info.append(Markup(
+                '<li>Cash / branch sales with no customer account: '
+                '{s}</li>').format(s=_sar(gaps['cash_sales'])))
+        if info:
+            warn_html += Markup('<br/><b>Not commissionable:</b>'
+                                '<ul>{items}</ul>').format(
+                items=Markup('').join(info))
 
         body = Markup(
             '<b>🔄 BAS Pull completed</b> '

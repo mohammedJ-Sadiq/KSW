@@ -473,3 +473,43 @@ class TestVacationFullDeductions(DeductionCommon):
         action = self.leave.action_view_leave_outstanding_installments()
         lines = self.env['ksw.deduction.line'].search(action['domain'])
         self.assertEqual(lines, pen.line_ids | adv.line_ids)
+
+    # ------------------------------------------------------------------
+    # Annual Vacation Report: the installments behind the summary
+    # ------------------------------------------------------------------
+
+    def test_report_rows_before_a_payslip(self):
+        """Before the payslip: every pending installment, adding up to the
+        "Outstanding Loans & Deductions" figure printed above them."""
+        cur = self.env.company.currency_id
+        pen, adv = self._unaffordable_deductions()
+        self.leave.invalidate_recordset()
+        rows, from_payslip = self.leave._ksw_report_deduction_rows()
+        self.assertFalse(from_payslip)
+        self.assertEqual({r['ref'] for r in rows}, {pen.name, adv.name})
+        self.assertEqual(cur.round(sum(r['amount'] for r in rows)),
+                         cur.round(self.leave.x_ksw_ded_outstanding))
+
+    def test_report_rows_from_the_payslip(self):
+        """Once the payslip exists its inputs are the record: the rows add
+        up to what it presented, split into collected and not collected."""
+        cur = self.env.company.currency_id
+        self._unaffordable_deductions()
+        slip = self._make_payslip(leave=self.leave)
+        slip.compute_sheet()
+        self.leave.invalidate_recordset()
+        rows, from_payslip = self.leave._ksw_report_deduction_rows()
+        self.assertTrue(from_payslip)
+        self.assertEqual(cur.round(sum(r['amount'] for r in rows)),
+                         cur.round(slip.x_ksw_ded_presented))
+        self.assertEqual(cur.round(sum(r['collected'] for r in rows)),
+                         cur.round(slip.x_ksw_ded_collected))
+        self.assertEqual(cur.round(sum(r['uncollected'] for r in rows)),
+                         cur.round(slip.x_ksw_ded_carried))
+
+    def test_report_renders_deduction_detail(self):
+        self._unaffordable_deductions()
+        html = self.env['ir.actions.report']._render_qweb_html(
+            'KSW_payroll.report_annual_vacation', [self.leave.id])[0].decode()
+        self.assertIn('Outstanding Installments', html)
+        self.assertIn('o_ksw_vacation_deductions', html)

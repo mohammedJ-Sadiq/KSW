@@ -27,7 +27,7 @@
                             type="object" class="btn-secondary"
                             icon="fa-refresh"
                             invisible="state != 'draft'"
-                            title="Pull achieved sales &amp; collection for this period directly from BAS (customers must have Sales Rep / Collection Rep set)"/>
+                            title="Pull achieved sales &amp; collection for this period directly from BAS, using the rep BAS assigns to each customer (see BAS Sales Reps)"/>
                     <button name="action_open_import_wizard"
                             string="Import from Excel"
                             type="object" class="btn-secondary"
@@ -38,6 +38,16 @@
                                statusbar_visible="draft,confirmed"/>
                 </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_bas_sales_reps"
+                                type="object" class="oe_stat_button"
+                                icon="fa-user-plus"
+                                invisible="x_unmapped_rep_count == 0">
+                            <field name="x_unmapped_rep_count"
+                                   widget="statinfo"
+                                   string="BAS Reps to Link"/>
+                        </button>
+                    </div>
                     <div class="oe_title">
                         <h1><field name="name" readonly="1"/></h1>
                     </div>

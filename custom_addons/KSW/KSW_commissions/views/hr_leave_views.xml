@@ -126,4 +126,56 @@
         </field>
     </record>
 
+    <!-- Annual Vacation Report: the commission entries the settlement pays,
+         after End-of-Service Data and before the deductions section
+         (KSW_deduction) and the Vacation Payslip. Same rows as the leave's
+         Accounting page (_commission_rows_for_display), so the printed copy
+         and the form never disagree. -->
+    <template id="report_annual_vacation_commission_detail"
+              inherit_id="KSW_payroll.report_annual_vacation">
+        <xpath expr="//div[hasclass('o_ksw_vacation_deductions')]"
+               position="before">
+            <t t-if="o.x_commission_entries_applies">
+                <!-- Included rows only: entries awaiting GM approval are
+                     not paid by this settlement, so the report omits them. -->
+                <t t-set="_com_rows" t-value="o.sudo()._commission_rows_for_display()[0]"/>
+                <t t-if="_com_rows">
+                        <h5 class="border-bottom pb-1 mb-2">Commissions &amp; Allowances</h5>
+                        <table class="table table-sm table-bordered mb-4">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Pay Type</th>
+                                    <th class="text-center">Date</th>
+                                    <th>Batch</th>
+                                    <th class="text-end">Amount (SAR)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="_com_rows" t-as="r">
+                                    <td t-out="r['period'].strftime('%m/%Y') if r['period'] else ''"/>
+                                    <td t-out="r['what']"/>
+                                    <td class="text-center">
+                                        <span t-if="r['date']" t-out="r['date']" t-options="{'widget': 'date'}"/>
+                                    </td>
+                                    <td>
+                                        <t t-out="r['batch_name'] or ''"/>
+                                        <span t-if="r['state']" class="text-muted">(<t t-out="r['state']"/>)</span>
+                                    </td>
+                                    <td class="text-end" t-out="'%.2f' % r['amount']"/>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="fw-bold">
+                                    <td colspan="4">Total</td>
+                                    <td class="text-end"
+                                        t-out="'%.2f' % sum(r['amount'] for r in _com_rows)"/>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </t>
+            </t>
+        </xpath>
+    </template>
+
 </odoo>

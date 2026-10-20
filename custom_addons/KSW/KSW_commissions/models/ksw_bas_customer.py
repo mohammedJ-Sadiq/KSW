@@ -68,22 +68,33 @@ class KswBasCustomer(models.Model):
             if alias:
                 alias_map[alias] = emp
             name_map[emp.name.strip().lower()] = emp
+        # The rep-code mapping (ksw.bas.sales.rep) is authoritative; the
+        # name match below only covers codes nobody has mapped yet.
+        Rep = self.env['ksw.bas.sales.rep']
+        by_code = Rep._employee_by_code()
+        house = Rep._house_codes()
 
-        def _resolve(name):
+        def _resolve(code, name):
+            if code in house:
+                return Employee.browse()
+            if code in by_code:
+                return by_code[code]
             key = (name or '').strip().lower()
             if not key:
                 return Employee.browse()
             return alias_map.get(key) or name_map.get(key) or Employee.browse()
 
-        for rec in self.search([]):
+        for rec in (self or self.search([])):
             override_sales = (
                 rec.partner_id.x_sales_rep_id
                 if rec.partner_id else Employee.browse())
             override_coll = (
                 rec.partner_id.x_collection_rep_id
                 if rec.partner_id else Employee.browse())
-            eff_sales = override_sales or _resolve(rec.seller_name)
-            eff_coll = override_coll or _resolve(rec.collector_name)
+            eff_sales = override_sales or _resolve(
+                rec.seller_code, rec.seller_name)
+            eff_coll = override_coll or _resolve(
+                rec.collector_code, rec.collector_name)
             vals = {}
             if rec.effective_sales_rep_id != eff_sales:
                 vals['effective_sales_rep_id'] = eff_sales.id

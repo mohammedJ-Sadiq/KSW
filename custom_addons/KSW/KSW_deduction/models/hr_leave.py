@@ -2,6 +2,8 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models, _
 
+from .hr_payslip import _KSW_LINE_ORDER
+
 
 class HrLeave(models.Model):
     """Full deduction picture on the leave's Accounting page.
@@ -116,6 +118,59 @@ class HrLeave(models.Model):
             leave.x_ksw_ded_collected = payslip.x_ksw_ded_collected
             leave.x_ksw_ded_carried = payslip.x_ksw_ded_carried
             leave.x_ksw_ded_shortfall = bool(payslip.x_ksw_ded_carried)
+
+    # ------------------------------------------------------------------
+    # Per-installment detail for the Annual Vacation Report
+    # ------------------------------------------------------------------
+
+    def _ksw_report_deduction_rows(self):
+        """``(rows, from_payslip)`` — one row per installment.
+
+        Once the vacation / EOS payslip exists, its ``KSW_DED_<line id>``
+        inputs are the record: what it presented, and what it collected
+        (``amount - x_ksw_uncollected``, the same split
+        `hr.payslip._sync_deductions_on_done` settles). Before that, the
+        pending installments the payslip will carry — every one, not just
+        this month's (`_ksw_pending_lines_domain(full=True)`), so the rows add
+        up to "Outstanding Loans & Deductions".
+        """
+        self.ensure_one()
+        Line = self.env['ksw.deduction.line'].sudo()
+        payslip = self._current_vacation_payslip()
+        if payslip:
+            rows = []
+            for inp in payslip.sudo().input_line_ids.sorted('sequence'):
+                if not (inp.code and inp.code.startswith('KSW_DED_')
+                        and inp.code[8:].isdigit()):
+                    continue
+                line = Line.browse(int(inp.code[8:])).exists()
+                uncollected = inp.x_ksw_uncollected or 0.0
+                rows.append(self._ksw_report_deduction_row(
+                    line, inp.amount, inp.amount - uncollected, uncollected,
+                    fallback=inp.name))
+            return rows, True
+        if not self.employee_id:
+            return [], False
+        lines = Line.search(
+            self.env['hr.payslip']._ksw_pending_lines_domain(
+                [self.employee_id.id], False, full=True),
+            order=_KSW_LINE_ORDER)
+        return [self._ksw_report_deduction_row(l, l.amount) for l in lines], False
+
+    @api.model
+    def _ksw_report_deduction_row(self, line, amount, collected=0.0,
+                                  uncollected=0.0, fallback=''):
+        ded = line.deduction_id
+        return {
+            'type': ded.type_id.name or fallback,
+            'ref': ded.name or '',
+            'installment': ('%d/%d' % (line.sequence, ded.installments)
+                            if ded else ''),
+            'period': line.period_date,
+            'amount': amount,
+            'collected': collected,
+            'uncollected': uncollected,
+        }
 
     # ------------------------------------------------------------------
     # Drill-downs — same domains as the totals above, so the list always

@@ -57,12 +57,70 @@
         </t>
     </template>
 
-    <!-- Annual / EOS vacation approval sheet — before End-of-Service Data. -->
+    <!-- Annual / EOS vacation approval sheet — after End-of-Service Data,
+         just before the Vacation Payslip: the summary, then every
+         installment behind it. The wrapper div is always rendered, even
+         empty: KSW_commissions anchors its section before it (selector
+         handle, keep the class). -->
     <template id="report_annual_vacation_deduction_picture"
               inherit_id="KSW_payroll.report_annual_vacation">
-        <xpath expr="//t[@t-if='o.x_eos_service_years or o.x_eos_last_wage']"
-               position="before">
-            <t t-call="KSW_deduction.report_leave_deduction_picture"/>
+        <xpath expr="//t[@t-set='_vac_payslips'][1]" position="before">
+            <div class="o_ksw_vacation_deductions">
+                <t t-call="KSW_deduction.report_leave_deduction_picture"/>
+                <t t-set="_ded_detail" t-value="o._ksw_report_deduction_rows()"/>
+                <t t-set="_ded_rows" t-value="_ded_detail[0]"/>
+                <t t-set="_ded_on_slip" t-value="_ded_detail[1]"/>
+                <t t-if="_ded_rows">
+                    <h6 class="fw-bold mb-1">
+                        <t t-if="_ded_on_slip">Deductions on the Vacation Payslip</t>
+                        <t t-else="">Outstanding Installments</t>
+                    </h6>
+                    <table class="table table-sm table-bordered mb-4">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Deduction</th>
+                                <th>Reference</th>
+                                <th class="text-center">Installment</th>
+                                <th class="text-center">Due Month</th>
+                                <th class="text-end">Amount (SAR)</th>
+                                <t t-if="_ded_on_slip">
+                                    <th class="text-end">Collected</th>
+                                    <th class="text-end">Not Collected</th>
+                                </t>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="_ded_rows" t-as="r">
+                                <td t-out="r['type']"/>
+                                <td t-out="r['ref']"/>
+                                <td class="text-center" t-out="r['installment']"/>
+                                <td class="text-center"
+                                    t-out="r['period'].strftime('%m/%Y') if r['period'] else ''"/>
+                                <td class="text-end" t-out="'%.2f' % r['amount']"/>
+                                <t t-if="_ded_on_slip">
+                                    <td class="text-end text-success"
+                                        t-out="'%.2f' % r['collected']"/>
+                                    <td t-attf-class="text-end #{'text-danger fw-bold' if r['uncollected'] else ''}"
+                                        t-out="'%.2f' % r['uncollected']"/>
+                                </t>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="fw-bold">
+                                <td colspan="4">Total</td>
+                                <td class="text-end"
+                                    t-out="'%.2f' % sum(r['amount'] for r in _ded_rows)"/>
+                                <t t-if="_ded_on_slip">
+                                    <td class="text-end"
+                                        t-out="'%.2f' % sum(r['collected'] for r in _ded_rows)"/>
+                                    <td class="text-end"
+                                        t-out="'%.2f' % sum(r['uncollected'] for r in _ded_rows)"/>
+                                </t>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </t>
+            </div>
         </xpath>
     </template>
 

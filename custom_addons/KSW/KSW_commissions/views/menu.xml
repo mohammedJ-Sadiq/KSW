@@ -147,6 +147,13 @@
               sequence="10"
               groups="KSW_commissions.group_entry_sales"/>
 
+    <menuitem id="menu_ksw_bas_sales_rep"
+              name="BAS Sales Reps"
+              parent="menu_ksw_sales_commission_section"
+              action="action_ksw_bas_sales_rep"
+              sequence="20"
+              groups="KSW_commissions.group_entry_sales"/>
+
     <!-- ══ 5. Configuration ═════════════════════════════════════════ -->
     <!--
         The database carries an extra Accountant group on this menu from an

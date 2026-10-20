@@ -202,4 +202,16 @@
         </field>
     </record>
 
+    <!-- Annual Vacation Report: End-of-Service Data belongs to an EOS
+         request only. KSW_payroll computes the figures for every annual
+         leave (the form keeps them as a reference panel, gotcha #30), so
+         without this an ordinary vacation printed an EOS section. -->
+    <template id="report_annual_vacation_eos_only"
+              inherit_id="KSW_payroll.report_annual_vacation">
+        <xpath expr="//t[@t-if='o.x_eos_service_years or o.x_eos_last_wage']"
+               position="attributes">
+            <attribute name="t-if">o.x_is_eos_leave and (o.x_eos_service_years or o.x_eos_last_wage)</attribute>
+        </xpath>
+    </template>
+
 </odoo>
