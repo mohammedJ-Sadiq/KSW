@@ -33,7 +33,7 @@
                         <group string="Trip">
                             <field name="x_driver_id" readonly="1"/>
                             <field name="x_vehicle_id" readonly="1"/>
-                            <field name="x_branch_code" readonly="1"/>
+                            <field name="x_branch_name"/>
                             <field name="x_off_route" readonly="1"
                                    invisible="not x_off_route"/>
                             <field name="x_dispatch_id" readonly="1"
@@ -104,7 +104,9 @@
                 <field name="date_done" optional="hide"/>
                 <field name="x_delivery_date"/>
                 <field name="partner_id"/>
-                <field name="x_branch_code" optional="show"/>
+                <!-- Kept (hidden) for KSW_mobile_ui's xpath; the name is shown. -->
+                <field name="x_branch_code" column_invisible="1"/>
+                <field name="x_branch_name" optional="show"/>
                 <field name="x_driver_id" optional="show"/>
                 <field name="x_vehicle_id" optional="hide"/>
                 <field name="x_load_qty" sum="Loads"/>
@@ -169,7 +171,7 @@
                 <field name="partner_id"/>
                 <field name="x_driver_id"/>
                 <field name="x_vehicle_id"/>
-                <field name="x_branch_code"/>
+                <field name="picking_type_id" string="Branch"/>
                 <filter name="today" string="Today"
                         domain="[('date_done', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"/>
                 <filter name="this_month" string="This Month"
@@ -210,7 +212,7 @@
                 <group>
                     <filter name="group_partner" string="Customer" context="{'group_by': 'partner_id'}"/>
                     <filter name="group_driver" string="Driver" context="{'group_by': 'x_driver_id'}"/>
-                    <filter name="group_branch" string="Branch" context="{'group_by': 'x_branch_code'}"/>
+                    <filter name="group_branch" string="Branch" context="{'group_by': 'picking_type_id'}"/>
                     <filter name="group_date" string="Delivery Date" context="{'group_by': 'x_delivery_date'}"/>
                 </group>
             </search>
@@ -288,7 +290,8 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='sequence_code']" position="after">
                 <field name="x_is_water_delivery" invisible="code != 'outgoing'"/>
-                <field name="x_branch_code" invisible="not x_is_water_delivery"/>
+                <field name="x_branch_code" invisible="not x_is_water_delivery"
+                       string="BAS Branch Code"/>
                 <field name="x_signature_required" invisible="not x_is_water_delivery"/>
                 <field name="x_location_rule" invisible="not x_is_water_delivery"/>
                 <field name="x_location_radius_m"

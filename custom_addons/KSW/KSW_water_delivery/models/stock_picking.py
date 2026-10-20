@@ -70,6 +70,15 @@ class StockPickingType(models.Model):
              'his app. Dispatcher: the branch\'s dispatcher picks all of that '
              'and the driver; the driver only presses Deliver at the client.',
     )
+    @api.depends('warehouse_id', 'name', 'x_is_water_delivery')
+    def _compute_display_name(self):
+        """A water branch is known by its name ("Nabiya"), never as
+        "Warehouse: Water Delivery Notes 120": nobody knows the BAS numbers."""
+        water = self.filtered('x_is_water_delivery')
+        super(StockPickingType, self - water)._compute_display_name()
+        for ptype in water:
+            ptype.display_name = ptype.name
+
     x_dispatcher_user_ids = fields.Many2many(
         'res.users', 'ksw_water_branch_dispatcher_rel', 'picking_type_id', 'user_id',
         string='Dispatchers',
@@ -90,6 +99,11 @@ class StockPicking(models.Model):
     # field would retroactively move notes in and out of people's scope.
     x_is_water_delivery = fields.Boolean(string='Water Delivery Note', index=True, copy=False)
     x_branch_code = fields.Char(string='Branch (CODE2)', index=True, copy=False)
+    # What the user reads. The code above stays the stamped fact; the name is
+    # looked up from the branch that carries that code, so renaming a branch
+    # relabels its notes without re-filing them.
+    x_branch_name = fields.Char(string='Branch', compute='_compute_branch_name',
+                                compute_sudo=True)
     # Stamped for the same reason: whether a signature was expected is a fact
     # about the day the note was issued. Without it, turning signing on at the
     # end of the proof of concept would retrospectively mark every POC note as
@@ -267,6 +281,18 @@ class StockPicking(models.Model):
                 if not picking.x_signed_by and picking.partner_id:
                     picking.x_signed_by = picking.partner_id.name
         return res
+
+    @api.depends('x_branch_code')
+    def _compute_branch_name(self):
+        codes = set(self.mapped('x_branch_code')) - {False}
+        names = {}
+        if codes:
+            for ptype in self.env['stock.picking.type'].sudo().with_context(
+                    active_test=False).search([('x_is_water_delivery', '=', True),
+                                               ('x_branch_code', 'in', list(codes))]):
+                names.setdefault(ptype.x_branch_code, ptype.name)
+        for picking in self:
+            picking.x_branch_name = names.get(picking.x_branch_code) or picking.x_branch_code
 
     @api.depends('x_is_water_delivery', 'state', 'move_ids.quantity',
                  'move_ids.product_uom_qty', 'sale_id.amount_untaxed',

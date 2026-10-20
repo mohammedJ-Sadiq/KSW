@@ -21,7 +21,7 @@
         <xpath expr="//div[@id='informations']" position="inside">
             <div t-if="o.x_is_water_delivery and o.x_branch_code" class="col col-3 mw-100 mb-2" name="div_water_branch">
                 <strong>الفرع / Branch</strong>
-                <div t-field="o.x_branch_code" class="m-0"/>
+                <div t-out="o.x_branch_name" class="m-0"/>
             </div>
             <div t-if="o.x_is_water_delivery and o.x_driver_id" class="col col-3 mw-100 mb-2" name="div_water_driver">
                 <strong>السائق / Driver</strong>
