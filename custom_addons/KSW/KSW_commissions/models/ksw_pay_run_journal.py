@@ -14,8 +14,8 @@ Gross, not netted (Oct 2026, the user's rule): the commission is first
 credited to the accrual pool in full — the employee's right to it — and
 every deduction taken out of it is its own record, Dr accrual / Cr his
 advance. A deduction that existed on the month end is in this voucher; one
-charged later is a voucher of its own, dated the day it was charged
-(``_bas_recovery_rows``) — never back-dated into the month.
+charged later goes on a settlement voucher (``ksw.pay.settlement``),
+with the payments — never back-dated into the month.
 
 The accounts come from the pay component (see
 :class:`ksw.pay.component`), the loan account from the employee's own
@@ -274,7 +274,8 @@ class KswPayRun(models.Model):
 
     def _bas_recovery_rows(self):
         """``{posting date: rows}`` for the deductions charged after the
-        month end — each date one voucher of its own."""
+        month end — what the month voucher leaves out. They reach BAS on a
+        settlement voucher (``ksw.pay.settlement``)."""
         self.ensure_one()
         Journal = self.env['ksw.bas.journal']
         lang = Journal.voucher_lang()
@@ -293,29 +294,6 @@ class KswPayRun(models.Model):
                 if when != month_end:
                     by_date.setdefault(when, []).extend(rows)
         return by_date
-
-    def _bas_recovery_workbooks(self, number=''):
-        """``[(filename, bytes)]`` — one voucher per posting date."""
-        self.ensure_one()
-        by_date = self._bas_recovery_rows()
-        if not by_date:
-            raise UserError(_(
-                'Nothing was deducted from the %(month)s commission after '
-                'its month end.',
-                month=self.display_name))
-        number = (number or '').strip()
-        Journal = self.env['ksw.bas.journal']
-        files = []
-        for when in sorted(by_date):
-            data = Journal.build_workbook(
-                by_date[when], when,
-                sheet_name='%s %s' % (_('Recoveries'),
-                                      when.strftime('%d-%m-%Y')),
-                number=int(number) if number.isdigit() else number,
-            )
-            files.append(('CommissionRecoveries_%s.xlsx'
-                          % when.strftime('%Y-%m-%d'), data))
-        return files
 
     # ------------------------------------------------------------------
     # Accounts

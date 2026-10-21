@@ -948,8 +948,10 @@ class KswPayRun(models.Model):
             'KSW_commissions.group_commission_accountant',
             _("Only the Commission Accountant can mark the month paid."))
         groups = self._unpaid_bank_groups()
-        if len(groups) <= 1:
-            return self.action_mark_paid()
+        # Always the dialog, even for one account: Mark Paid posts the
+        # payment to BAS and needs its voucher number and date.
+        if not groups:
+            raise UserError(_('Every line of this month is already paid.'))
         wizard = self.env['ksw.pay.run.paid.wizard'].create({
             'run_id': self.id,
             'line_ids': [(0, 0, {
@@ -1083,7 +1085,7 @@ class KswPayRun(models.Model):
             self.env['hr.payslip']._ksw_drop_committed_commissions(
                 run, employees)
 
-    def _resync_vacation_line(self, employees):
+    def _resync_vacation_line(self, employees, title=None):
         """Re-derive an approved month's register line for ``employees``
         after a vacation payslip took entries out of it (or gave them back).
 
@@ -1148,8 +1150,8 @@ class KswPayRun(models.Model):
                         '<b>%(l_after)s</b> %(after).2f<br/>'
                         '%(note)s'
                     ) % {
-                        'title': _('Register line updated by a vacation '
-                                   'settlement'),
+                        'title': title or _('Register line updated by a '
+                                            'vacation settlement'),
                         'l_emp': _('Employee:'),
                         'emp': employee.sudo().display_name,
                         'l_before': _('Earnings before:'), 'before': before,
@@ -1763,6 +1765,27 @@ class KswPayRunLine(models.Model):
                     touched |= line.deduction_id
                     remaining = 0.0
 
+            # An installment given back is owed again: a deduction that had
+            # completed on it is active again, or nothing collects it — the
+            # re-apply that follows (and every later run) only looks at
+            # active deductions. Same rule as payroll's _unmark_lines_paid.
+            # KSWCO PE00208 / PE00209 (Oct 2026): completed on 10 Oct, their
+            # August installments given back by a recovery on 19-20 Oct and
+            # never collected again.
+            reopened = touched.filtered(
+                lambda d: d.state == 'completed'
+                and d.line_ids.filtered(lambda l: l.state == 'pending'))
+            if reopened:
+                reopened.sudo().write({'state': 'active'})
+                for ded in reopened:
+                    ded.sudo().message_post(
+                        body=Markup('<strong>%(title)s</strong><br/>%(why)s') % {
+                            'title': _('Active again'),
+                            'why': _('An installment settled from %(run)s was '
+                                     'given back to pending, so it is owed '
+                                     'again.', run=rec.run_id.display_name),
+                        }, subtype_xmlid='mail.mt_note')
+
             for ded in touched:
                 ded._validate_installments_total()
 
@@ -1808,6 +1831,27 @@ class KswPayRunLine(models.Model):
                 if new:
                     new.with_context(
                         _skip_installment_total_check=True).unlink()
+
+            # An installment given back is owed again: a deduction that had
+            # completed on it is active again, or nothing collects it — the
+            # re-apply that follows (and every later run) only looks at
+            # active deductions. Same rule as payroll's _unmark_lines_paid.
+            # KSWCO PE00208 / PE00209 (Oct 2026): completed on 10 Oct, their
+            # August installments given back by a recovery on 19-20 Oct and
+            # never collected again.
+            reopened = touched.filtered(
+                lambda d: d.state == 'completed'
+                and d.line_ids.filtered(lambda l: l.state == 'pending'))
+            if reopened:
+                reopened.sudo().write({'state': 'active'})
+                for ded in reopened:
+                    ded.sudo().message_post(
+                        body=Markup('<strong>%(title)s</strong><br/>%(why)s') % {
+                            'title': _('Active again'),
+                            'why': _('An installment settled from %(run)s was '
+                                     'given back to pending, so it is owed '
+                                     'again.', run=rec.run_id.display_name),
+                        }, subtype_xmlid='mail.mt_note')
 
             for ded in touched:
                 ded._validate_installments_total()

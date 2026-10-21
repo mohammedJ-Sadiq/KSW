@@ -10,6 +10,17 @@
                     Tick the bank accounts whose transfer has gone out. The rest stay
                     unpaid, and the month is marked paid once every account is.
                 </p>
+                <div class="alert alert-info" role="status">
+                    Mark Paid also posts the payment to BAS: Dr commissions
+                    accrual, Cr the BAS bank account of each paying account
+                    ticked below, plus any later deduction of these employees
+                    not yet posted. If an account is missing, nothing is
+                    marked paid.
+                </div>
+                <group>
+                    <field name="journal_number" required="1" placeholder="26007264"/>
+                    <field name="voucher_date"/>
+                </group>
                 <field name="line_ids" nolabel="1">
                     <list editable="bottom" create="0" delete="0">
                         <field name="selected" widget="boolean_toggle"/>

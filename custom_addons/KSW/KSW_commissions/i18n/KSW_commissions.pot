@@ -763,6 +763,7 @@ msgstr ""
 
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_bank_export_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
 msgid "26007264"
 msgstr ""
 
@@ -1340,6 +1341,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__message_needaction
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_needaction
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_needaction
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__message_needaction
 msgid "Action Needed"
 msgstr ""
 
@@ -1576,6 +1578,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_addition_line__amount
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_deduction_line__amount
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.employee_review_sections
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__amount
 msgid "Amount"
 msgstr ""
 
@@ -1808,6 +1811,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__message_attachment_count
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_attachment_count
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_attachment_count
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__message_attachment_count
 msgid "Attachment Count"
 msgstr ""
 
@@ -2138,6 +2142,7 @@ msgstr ""
 #: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
 #: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
 #: code:addons/KSW_commissions/wizard/ksw_pay_handover_wizards.py:0
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
 msgid "By:"
 msgstr ""
 
@@ -2155,6 +2160,8 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submit_wizard_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_import_wizard_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_override_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_new_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_bas_baseline_wizard_form
 msgid "Cancel"
 msgstr ""
 
@@ -2618,6 +2625,7 @@ msgstr ""
 #: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
 #: code:addons/KSW_commissions/models/ksw_pay_batch_export.py:0
 #: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__company_id
 msgid "Company"
 msgstr ""
 
@@ -2798,6 +2806,10 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_client_split__create_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_target_line__create_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__create_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__create_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__create_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_new_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_bas_baseline_wizard__create_uid
 msgid "Created by"
 msgstr ""
 
@@ -2839,6 +2851,10 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_client_split__create_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_target_line__create_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__create_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__create_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__create_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_new_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_bas_baseline_wizard__create_date
 msgid "Created on"
 msgstr ""
 
@@ -2870,6 +2886,9 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__currency_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__currency_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_target_line__currency_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__currency_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__currency_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_new_wizard__currency_id
 msgid "Currency"
 msgstr ""
 
@@ -2907,6 +2926,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__date
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.employee_review_sections
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_annual_vacation_commission_detail
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__event_date
 msgid "Date"
 msgstr ""
 
@@ -2950,6 +2970,8 @@ msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_component__kind__deduction
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__deduction_id
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_settlement_item__kind__deduction
 msgid "Deduction"
 msgstr ""
 
@@ -2973,6 +2995,7 @@ msgstr ""
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_component_search
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_line_form_full
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_item_search
 msgid "Deductions"
 msgstr ""
 
@@ -3109,6 +3132,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_tier__description
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_line_form_full
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_rule_form
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__label
 msgid "Description"
 msgstr ""
 
@@ -3181,6 +3205,10 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_res_partner__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_res_users__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_resource_calendar_leaves__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_new_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_bas_baseline_wizard__display_name
 msgid "Display Name"
 msgstr ""
 
@@ -3201,6 +3229,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_sales_commission_sheet__state__draft
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_batch_search
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_search
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_settlement__state__draft
 msgid "Draft"
 msgstr ""
 
@@ -3383,6 +3412,9 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_employee_rate_search
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_entry_search
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_vacation_release_search
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__employee_id
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_item_search
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_search
 msgid "Employee"
 msgstr ""
 
@@ -3811,6 +3843,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__message_follower_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_follower_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_follower_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__message_follower_ids
 msgid "Followers"
 msgstr ""
 
@@ -3821,6 +3854,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__message_partner_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_partner_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_partner_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__message_partner_ids
 msgid "Followers (Partners)"
 msgstr ""
 
@@ -3984,6 +4018,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__has_message
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__has_message
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__has_message
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__has_message
 msgid "Has Message"
 msgstr ""
 
@@ -4133,6 +4168,10 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_res_partner__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_res_users__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_resource_calendar_leaves__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_new_wizard__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_bas_baseline_wizard__id
 msgid "ID"
 msgstr ""
 
@@ -4168,6 +4207,7 @@ msgstr ""
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_submission__message_needaction
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_sheet__message_needaction
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__message_needaction
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement__message_needaction
 msgid "If checked, new messages require your attention."
 msgstr ""
 
@@ -4184,6 +4224,8 @@ msgstr ""
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_sheet__message_has_sms_error
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__message_has_error
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__message_has_sms_error
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement__message_has_error
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
 msgstr ""
 
@@ -4297,6 +4339,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__message_is_follower
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_is_follower
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_is_follower
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__message_is_follower
 msgid "Is Follower"
 msgstr ""
 
@@ -4329,6 +4372,7 @@ msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_bank_export_wizard__journal_number
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__journal_number
 msgid "Journal Number"
 msgstr ""
 
@@ -4563,6 +4607,10 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_client_split__write_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_target_line__write_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__write_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__write_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__write_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_new_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_bas_baseline_wizard__write_uid
 msgid "Last Updated by"
 msgstr ""
 
@@ -4604,6 +4652,10 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_client_split__write_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_target_line__write_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__write_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__write_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__write_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_new_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_bas_baseline_wizard__write_date
 msgid "Last Updated on"
 msgstr ""
 
@@ -4829,6 +4881,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__message_has_error
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_has_error
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_has_error
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__message_has_error
 msgid "Message Delivery error"
 msgstr ""
 
@@ -4839,6 +4892,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__message_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__message_ids
 msgid "Messages"
 msgstr ""
 
@@ -5277,6 +5331,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run__note
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__note
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__note
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__note
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
 msgid "Note"
 msgstr ""
 
@@ -5336,6 +5392,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__message_needaction_counter
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_needaction_counter
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_needaction_counter
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__message_needaction_counter
 msgid "Number of Actions"
 msgstr ""
 
@@ -5346,6 +5403,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__message_has_error_counter
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_has_error_counter
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_has_error_counter
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__message_has_error_counter
 msgid "Number of errors"
 msgstr ""
 
@@ -5356,6 +5414,7 @@ msgstr ""
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_submission__message_needaction_counter
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_sheet__message_needaction_counter
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__message_needaction_counter
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement__message_needaction_counter
 msgid "Number of messages requiring action"
 msgstr ""
 
@@ -5366,6 +5425,7 @@ msgstr ""
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_submission__message_has_error_counter
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_sheet__message_has_error_counter
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__message_has_error_counter
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement__message_has_error_counter
 msgid "Number of messages with delivery error"
 msgstr ""
 
@@ -6170,6 +6230,7 @@ msgstr ""
 #: model:ksw.pay.component,qty_label:KSW_commissions.pay_component_mobile
 #: model:ksw.pay.component,qty_label:KSW_commissions.pay_component_other
 #: model:ksw.pay.component,qty_label:KSW_commissions.pay_component_project_management
+#: model:ksw.pay.component,qty_label:KSW_commissions.pay_component_gm_extra
 msgid "Quantity"
 msgstr ""
 
@@ -6234,6 +6295,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__rating_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__rating_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__rating_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__rating_ids
 msgid "Ratings"
 msgstr ""
 
@@ -6691,6 +6753,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_line__run_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_paid_wizard__run_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_review__run_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_bas_baseline_wizard__run_id
 msgid "Run"
 msgstr ""
 
@@ -6718,6 +6781,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__message_has_sms_error
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_has_sms_error
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_has_sms_error
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr ""
 
@@ -7185,6 +7249,9 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_search
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_search
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_search
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__state
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__state
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_search
 msgid "Status"
 msgstr ""
 
@@ -8142,6 +8209,9 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_list
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_annual_vacation_commission_detail
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_list
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_item_list
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
 msgid "Total"
 msgstr ""
 
@@ -8380,6 +8450,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__website_message_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__website_message_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__website_message_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__website_message_ids
 msgid "Website Messages"
 msgstr ""
 
@@ -8390,6 +8461,7 @@ msgstr ""
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_submission__website_message_ids
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_sheet__website_message_ids
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__website_message_ids
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement__website_message_ids
 msgid "Website communication history"
 msgstr ""
 
@@ -9582,4 +9654,1252 @@ msgstr ""
 #. module: KSW_commissions
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.report_annual_vacation_commission_detail
 msgid "Amount (SAR)"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "%(name)s: %(amount).2f is settled out of his %(month)s commission, but there is no accrual left in it to take it from."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_partner_bank_form_inherit_ksw_commission_bas
+msgid "1202010005"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "A line of a posted settlement voucher cannot be removed."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.actions.act_window,help:KSW_commissions.action_ksw_pay_settlement
+msgid ""
+"A new voucher collects everything paid or deducted since the\n"
+"                last one. Generating its file records those lines as posted,\n"
+"                so the next voucher carries only what happened after."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "A posted settlement voucher cannot be changed: it is what BAS was told."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "A posted settlement voucher cannot be deleted: its transactions are recorded as being in BAS through it."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__accrual_split
+msgid "Accrual Split"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+msgid "Already in BAS (no file)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_res_partner_bank__x_bas_account_code
+#: model:ir.model.fields,field_description:KSW_commissions.field_account_setup_bank_manual_config__x_bas_account_code
+msgid "BAS Account Code"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_res_partner_bank__x_bas_account_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_account_setup_bank_manual_config__x_bas_account_name
+msgid "BAS Account Name"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__attachment_id
+msgid "BAS File"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_partner_bank_form_inherit_ksw_commission_bas
+msgid "BAS Ledger"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.actions.act_window,name:KSW_commissions.action_ksw_pay_settlement
+#: model:ir.ui.menu,name:KSW_commissions.menu_ksw_pay_settlement
+msgid "BAS Settlement Vouchers"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__run_id
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_item_search
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__run_id
+msgid "Commission Month"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_pay_settlement
+msgid "Commission Settlement Voucher"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_pay_settlement_item
+msgid "Commission Settlement Voucher Line"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "Commission paid"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "Commission transfer"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__total_deducted
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_new_wizard__pending_deducted
+msgid "Deducted"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "Deducted:"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+msgid "Download BAS File"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "Enter the journal number before generating."
+msgstr ""
+
+#. module: KSW_commissions
+msgid ""
+"Every commission payment (Mark Paid) and every\n"
+"                        deduction taken from an unpaid commission after its\n"
+"                        month end, not yet posted to BAS. Remove a line to\n"
+"                        leave it for the next voucher."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement__item_ids
+msgid "Every payment and later deduction not yet posted to BAS when the voucher was collected. Remove a line to leave it for the next voucher."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+msgid "Generate BAS File"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__deduction_line_id
+msgid "Installment"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__item_count
+msgid "Item Count"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__key
+msgid "Key"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement__posted_manually
+msgid "Marked as already in BAS without generating a file — used for transactions the accountant had already entered by hand."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement_item__amount
+msgid "Negative: a reversal of something posted earlier and since undone."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "New"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run__x_bas_unsettled_count
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form_settlement
+msgid "Not in BAS"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "Only the Commission Accountant may prepare a settlement voucher."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__total_paid
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_settlement_item__kind__payment
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_new_wizard__pending_paid
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_item_search
+msgid "Paid by Bank"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "Paid by bank:"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "Paid with no paying bank account: %(names)s"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "Pay components with no BAS Accrual Account: %(names)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__bank_account_id
+msgid "Paying Account"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "Paying bank accounts with no BAS account (set it on the bank account, \"BAS Account Code\"): %(banks)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form_settlement
+msgid "Payments and later deductions not yet posted to BAS"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_run__x_bas_unsettled_count
+msgid "Payments and later deductions of this month not yet on any settlement voucher."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.actions.act_window,help:KSW_commissions.action_ksw_pay_settlement
+msgid "Post commission payments and later deductions to BAS"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_search
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_item_search
+msgid "Posted"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__done_by_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_new_wizard__last_posted_by_id
+msgid "Posted By"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__done_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_new_wizard__last_posted_on
+msgid "Posted On"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_settlement__state__done
+msgid "Posted to BAS"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__posted_manually
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_search
+msgid "Recorded Without File"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "Recorded as already in BAS (no file)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+msgid "Recorded as already in BAS: no file was produced."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__name
+msgid "Reference"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+msgid "Refresh"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "Reversal"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__run_line_id
+msgid "Run Line"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__settlement_id
+msgid "Settlement"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_settlement__origin__voucher
+msgid "Settlement Voucher"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "Settlement voucher posted"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+msgid "Start again from everything not yet in BAS (lines you removed come back)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_res_partner_bank__x_bas_account_code
+#: model:ir.model.fields,help:KSW_commissions.field_account_setup_bank_manual_config__x_bas_account_code
+msgid "The BAS ledger account (1202…) credited when commission is paid out of this account."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement__date
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement_new_wizard__last_posted_date
+msgid "The date of the BAS voucher (the \"fdate\" column). Each line still names the month and the event it settles."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid ""
+"The settlement voucher cannot be written yet:\n"
+"\n"
+"%(rows)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement__journal_number
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement_new_wizard__last_posted_number
+msgid "The voucher number reserved in BAS, written in the \"number\" column of every line."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "There is nothing to post — every payment and deduction is already in BAS."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "There is nothing to record."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid ""
+"These transactions changed after the voucher was collected:\n"
+"\n"
+"%(rows)s\n"
+"\n"
+"Press \"Refresh\" and check the voucher again."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+msgid "This records every line as posted to BAS. The next voucher will not carry them again. Continue?"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "This voucher has already been posted."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "This voucher has no file."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__kind
+msgid "Transaction"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__item_ids
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_list
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_new_wizard_form
+msgid "Transactions"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "Transactions:"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+msgid "Use this only for transactions already entered in BAS by hand. They are recorded as posted and no file is produced. Continue?"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_new_wizard__last_posted_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_bank_export_wizard__journal_date
+msgid "Voucher Date"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement_item__accrual_split
+msgid "[[code, name, amount]] — the accrual accounts this line was posted against. Stamped when the voucher is posted."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_new_wizard__last_posted_number
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_paid_wizard__journal_number
+msgid "BAS Journal Number"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.actions.act_window,name:KSW_commissions.action_ksw_pay_settlement_item
+#: model:ir.ui.menu,name:KSW_commissions.menu_ksw_pay_settlement_item
+msgid "BAS Settlement Lines"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form_settlement
+msgid "BAS Vouchers"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_new_wizard_form
+msgid "Create New Voucher"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+msgid "Delete this draft? Its transactions go back to waiting and will be offered on the next voucher."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+msgid "Discard Draft"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_new_wizard__draft_ids
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_search
+msgid "Drafts Holding Transactions"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_item_search
+msgid "Held by a Draft"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_new_wizard__confirmed
+msgid "I have reviewed the vouchers above and want a new one carrying only what came after them"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_new_wizard__is_first
+msgid "Is First"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_new_wizard__last_posted_id
+msgid "Last Posted Voucher"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_new_wizard_form
+msgid "Last voucher posted to BAS"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_pay_settlement_new_wizard
+msgid "New Commission Settlement Voucher"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_list
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_new_wizard_form
+msgid "New Settlement Voucher"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_new_wizard__pending_count
+msgid "New Transactions"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_new_wizard_form
+msgid "Nothing new: every payment and deduction is already on a voucher."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "Only a draft voucher can be discarded."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_list
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_new_wizard_form
+msgid "Prepared By"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_list
+msgid "Prepared On"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_item_search
+msgid "Reversals"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_new_wizard_form
+msgid "Review Draft"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run__x_settlement_count
+msgid "Settlement Vouchers"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form_settlement
+msgid "Settlement vouchers, draft or posted, carrying this month"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "Start a new settlement voucher with \"New Settlement Voucher\": it shows the drafts still holding transactions and the last voucher posted before you confirm."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_new_wizard_form
+msgid "The new voucher would carry"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_settlement_new_wizard.py:0
+msgid "There is nothing new to post: every payment and deduction is already on a voucher."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_new_wizard_form
+msgid ""
+"These drafts are still holding transactions. Those\n"
+"                    transactions will NOT be on the new voucher. Review a\n"
+"                    draft first: generate its file or discard it."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_new_wizard_form
+msgid ""
+"This is the first settlement voucher. It collects every\n"
+"                    commission ever marked paid and every later deduction.\n"
+"                    Whatever was already entered in BAS by hand should be\n"
+"                    recorded with \"Already in BAS (no file)\" on the voucher."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_settlement_new_wizard.py:0
+msgid "Tick the confirmation first: there are vouchers before this one, and the new voucher carries only what they do not."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_item_search
+msgid "Voucher"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_new_wizard_form
+msgid "Voucher History"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_search
+msgid "Voucher Month"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+msgid ""
+"While this draft exists, its transactions are held\n"
+"                        for it and appear on no other voucher. Generate its\n"
+"                        file, or Discard Draft to release them."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_run_paid_wizard.py:0
+msgid "Enter the BAS journal number of the payment."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid "Every line of this month is already paid."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__origin
+msgid "Made By"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.ksw_pay_run_paid_wizard_form
+msgid ""
+"Mark Paid also posts the payment to BAS: Dr commissions\n"
+"                    accrual, Cr the BAS bank account of each paying account\n"
+"                    ticked below, plus any later deduction of these employees\n"
+"                    not yet posted. If an account is missing, nothing is\n"
+"                    marked paid."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "Mark Paid posts the payment to BAS, and the journal writer (KSW_payroll) is not up to date on this system. Ask IT to deploy it."
+msgstr ""
+
+#. module: KSW_commissions
+msgid "Mark Paid: posted by Mark Paid itself, at the moment the transfer was recorded. Settlement Voucher: prepared by the accountant for what happened since (later deductions, reversals, history)."
+msgstr ""
+
+#. module: KSW_commissions
+msgid "Paid Month"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_paid_wizard__voucher_date
+msgid "Payment Date"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid ""
+"Payment NOT recorded: Mark Paid posts the transfer to BAS and could not.\n"
+"\n"
+"%(reason)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_search
+msgid "Posted by Mark Paid"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_run_paid_wizard.py:0
+msgid "Posted to BAS on voucher"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_run_paid_wizard__voucher_date
+msgid "The date of the BAS payment voucher: the day the transfer went out."
+msgstr ""
+
+#. module: KSW_commissions
+msgid "The month whose Mark Paid posted this voucher."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_run_paid_wizard__journal_number
+msgid "The voucher number reserved in BAS for this payment, written in the \"number\" column of every line."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid ""
+"These employees are paid a figure the entries no longer add up to, so the month voucher cannot have proved it and the payment has no accrual to clear:\n"
+"\n"
+"%(who)s\n"
+"\n"
+"Rebuild the register (or correct the entries) first."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_bas_baseline_wizard.py:0
+msgid "  right %(r)+.2f · deductions %(d)+.2f"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_bas_baseline_wizard.py:0
+msgid "%(n)s BAS line(s) match nothing in the month today and will be reversed by the next export:"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_bas_baseline_wizard.py:0
+msgid "%(n)s employee(s) whose BAS lines do not net to zero (expense − deductions − accrual):"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_bas_baseline_wizard_form
+msgid "26008282"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__accrual_code
+msgid "Accrual Code"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__accrual_name
+msgid "Accrual Name"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_commission_bank_export_wizard__journal_history
+msgid "Already in BAS"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__bas_voucher_number
+msgid "BAS Voucher Loaded"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_bas_baseline_wizard__voucher_number
+msgid "BAS Voucher Number"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_bas_baseline_wizard.py:0
+msgid "BAS has no voucher %(number)s."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/bank_file_export_wizard.py:0
+msgid "BAS no."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_bas_baseline_wizard.py:0
+msgid "BAS voucher %(n)s is already loaded."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_bas_baseline_wizard.py:0
+msgid "BAS voucher %(number)s of %(date)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_run__x_bas_unsettled_count
+msgid "Changes to this month BAS does not hold yet: its right, deductions taken from it, its transfer."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__total_right
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_new_wizard__pending_right
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_settlement_item__kind__accrual
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_item_search
+msgid "Commission Right"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "Commission right:"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__cost_center
+msgid "Cost Center"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__counter_code
+msgid "Counter Account"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__counter_name
+msgid "Counter Name"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_bas_baseline_wizard.py:0
+msgid "Enter the BAS voucher number (digits only)."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+msgid ""
+"Everything BAS does not hold yet, across months: a\n"
+"                        right not exported or changed since its last export,\n"
+"                        deductions taken from it, transfers. Remove a line to\n"
+"                        leave it for the next file."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__expense_code
+msgid "Expense Code"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__expense_name
+msgid "Expense Name"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_bas_baseline_wizard_form
+msgid ""
+"For a month already entered in BAS before Odoo kept its\n"
+"                    voucher history: the BAS voucher is read (nothing is\n"
+"                    written to BAS) and recorded as what BAS already holds.\n"
+"                    The month's next journal export then posts only the\n"
+"                    difference."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_bas_baseline_wizard.py:0
+msgid "In BAS for this month: right %(right).2f, deductions %(ded).2f"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_settlement__origin__month
+msgid "Journal Export"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement__origin
+msgid "Journal Export: the month's Export ▸ Journal entries — the first one posts the month, each later one only what changed. Mark Paid: the final settlement, posted when the transfer is recorded. Settlement Voucher: prepared by the accountant across months. Loaded from BAS: a voucher already in BAS, recorded as the starting point."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_search
+msgid "Journal Exports"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_commission_bank_export_wizard__export_mode__journal_entry
+msgid "Journal entries – BAS import file (what changed since the last one)"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_bas_baseline_wizard.py:0
+msgid "Left out (accounts this month does not use, e.g. sales commission):"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+#: code:addons/KSW_commissions/wizard/ksw_pay_bas_baseline_wizard.py:0
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_bas_baseline_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form_settlement
+msgid "Load BAS Voucher"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_pay_bas_baseline_wizard
+msgid "Load a BAS Voucher as the Month Starting Point"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_settlement__origin__baseline
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_search
+msgid "Loaded from BAS"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_settlement__origin__mark_paid
+msgid "Mark Paid (Final Settlement)"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "Nothing changed since the last BAS file of this month (%(name)s, %(date)s): BAS already holds it as it stands."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "Only an approved or paid month can be exported."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_bas_baseline_wizard.py:0
+msgid "Only an approved or paid month can be loaded."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "Pay types with no BAS expense or accrual account (set them on the pay component, BAS Journal tab): %(names)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_bas_baseline_wizard__preview
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_bas_baseline_wizard_form
+msgid "Preview"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_bas_baseline_wizard__previewed
+msgid "Previewed"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_bas_baseline_wizard_form
+msgid "Record as Already in BAS"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_bas_baseline_wizard_form
+msgid "Record this BAS voucher as the month's starting point? Exports from now on post only the difference from it."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement_item__counter_code
+msgid "The advance (deduction) or bank (payment) account this line posted to — stamped when posted, so a reversal uses the same."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_commission_bank_export_wizard__journal_date
+msgid "The date of the BAS voucher. The month end for the month's first file (where the cost belongs), today for a later file carrying only what changed since."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_commission_bank_export_wizard_form
+msgid ""
+"The first journal file of a month posts the whole month.\n"
+"                    Every later one posts only what changed since the files\n"
+"                    already in BAS (listed below); they stay in the month's\n"
+"                    history. Mark Paid posts the final settlement."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_bas_baseline_wizard.py:0
+msgid "The month in Odoo now: right %(right).2f, deductions %(ded).2f"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement__run_id
+msgid "The month this voucher was made for (journal export, Mark Paid or a BAS voucher loaded for it)."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_bas_baseline_wizard.py:0
+msgid "The next journal export will post the difference:"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_bas_baseline_wizard__voucher_number
+msgid "The number of the voucher already in BAS for this month, e.g. 26008282."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_bas_baseline_wizard.py:0
+msgid "This month already has BAS vouchers. A voucher loaded from BAS is the starting point, so it can only be the first."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form_settlement
+msgid "This month is already in BAS: record that voucher as the starting point, so exports post only the difference"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+msgid "Cancel: Not Imported into BAS"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_settlement__state__cancel
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_search
+msgid "Cancelled: Not Imported"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "Cancelled: this file was not imported into BAS"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+msgid ""
+"Cancelled: this file was not imported into BAS. Do not\n"
+"                        import it; the month's next export carries its lines."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_bas_baseline_wizard.py:0
+msgid "Left as they are in BAS: %(n)s line(s), %(amount).2f, for people no longer in the month's register (paid on a vacation payslip, held, or settled by an entry of their own):"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "Only a posted voucher can be cancelled."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+msgid "Only if this file was NEVER imported into BAS. It stops counting as held by BAS, and the month's next export carries its lines again. Do not import this file afterwards. Continue?"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_bas_baseline_wizard.py:0
+msgid "Reversed by the next export: %(n)s line(s) for people still in the register whose figures changed:"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "These later files were worked out on top of this one, so it cannot be cancelled on its own: %(names)s"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "File rebuilt from the same lines (layout only)"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+msgid "Only a posted voucher that has a file can be rebuilt."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+msgid "Rebuild File"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+msgid "Write the file again from the same lines (layout only; amounts and the record do not change)"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement_bas_check.py:0
+msgid "Added in BAS on this file's accounts:"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement_bas_check.py:0
+msgid "Also in the BAS voucher, on accounts this file does not use (e.g. sales commission typed in the same voucher):"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__bas_check_state
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+msgid "BAS Check"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement_bas_check.py:0
+msgid "BAS check: %(state)s"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+msgid ""
+"BAS does not hold this voucher as Odoo produced it:\n"
+"                        see the BAS Check tab."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement_bas_check.py:0
+msgid "BAS has no voucher %(number)s yet."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+msgid "BAS holds this voucher exactly as Odoo produced it."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement_bas_check.py:0
+msgid "BAS voucher %(number)s: %(bas)s line(s); file: %(odoo)s line(s); %(same)s identical."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement_bas_check.py:0
+msgid "Changed in BAS (file → BAS):"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+msgid "Check against BAS"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__bas_check_by_id
+msgid "Checked By"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__bas_check_date
+msgid "Checked On"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.actions.server,name:KSW_commissions.cron_ksw_pay_settlement_bas_check_ir_actions_server
+msgid "Commissions: check posted BAS files against BAS"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__bas_check_report
+msgid "Comparison with BAS"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__bas_check_diff_count
+msgid "Differences"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_settlement__bas_check_state__differs
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_search
+msgid "Differs from BAS"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement_bas_check.py:0
+msgid "In the file but not in BAS:"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_settlement__bas_check_state__match
+msgid "Matches BAS"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_settlement__bas_check_state__not_checked
+msgid "Not Checked"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_settlement__bas_check_state__missing
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_search
+msgid "Not in BAS Yet"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement_bas_check.py:0
+msgid "Only a posted voucher with a file can be checked against BAS."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
+msgid "Read this voucher number back from BAS and compare it line by line with the file Odoo produced (nothing is written to BAS)"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement__bas_check_state
+msgid "The last time this file was compared with the voucher of the same number in BAS."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement_bas_check.py:0
+msgid "This voucher has no BAS journal number to look up."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement_bas_check.py:0
+msgid "This voucher has no file to compare."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_settlement_bas_check.py:0
+msgid "openpyxl is required to read the file."
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ksw.pay.component,name:KSW_commissions.pay_component_gm_extra
+msgid "External Amount by the GM"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid "Register line updated: rows approved by the General Manager after the month was approved"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid "Active again"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid "An installment settled from %(run)s was given back to pending, so it is owed again."
 msgstr ""

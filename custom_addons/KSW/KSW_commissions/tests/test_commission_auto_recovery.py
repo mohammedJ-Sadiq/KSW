@@ -169,7 +169,6 @@ class TestRecoveryJournal(AutoRecoveryCommon):
         self.assertAlmostEqual(rows[0]['debit'], 2306.0)
         self.assertAlmostEqual(rows[1]['credit'], 2306.0)
         self.assertIn(ded.name, rows[0]['ref'])
-        self.assertEqual(len(run._bas_recovery_workbooks('26010001')), 1)
 
     def test_02_existing_on_the_month_end_is_a_record_in_the_month(self):
         run = self._approve(self._commission_entry(self.emp_a, 2456.0).batch_id)

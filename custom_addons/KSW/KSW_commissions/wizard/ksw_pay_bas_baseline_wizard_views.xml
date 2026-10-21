@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ksw_pay_bas_baseline_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.pay.bas.baseline.wizard.form</field>
+        <field name="model">ksw.pay.bas.baseline.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Load BAS Voucher">
+                <field name="previewed" invisible="1"/>
+                <div class="alert alert-info" role="status">
+                    For a month already entered in BAS before Odoo kept its
+                    voucher history: the BAS voucher is read (nothing is
+                    written to BAS) and recorded as what BAS already holds.
+                    The month's next journal export then posts only the
+                    difference.
+                </div>
+                <group>
+                    <field name="run_id"/>
+                    <field name="voucher_number" placeholder="26008282"
+                           readonly="previewed"/>
+                </group>
+                <field name="preview" invisible="not previewed" nolabel="1"
+                       class="font-monospace"/>
+                <footer>
+                    <button name="action_preview" type="object" string="Preview"
+                            class="btn-primary" invisible="previewed"/>
+                    <button name="action_load" type="object"
+                            string="Record as Already in BAS" class="btn-primary"
+                            invisible="not previewed"
+                            confirm="Record this BAS voucher as the month's starting point? Exports from now on post only the difference from it."/>
+                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

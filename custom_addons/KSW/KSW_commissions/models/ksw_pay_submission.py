@@ -432,23 +432,27 @@ class KswPaySubmission(models.Model):
         act (see ksw.pay.run.action_approve / action_close_month).
         """
         self._check_is_my_department()
+        approved = self.env['ksw.pay.entry']
         for rec in self:
             check_period_unlocked(
                 self.env, rec.period, _("Approving this department"),
                 gm=rec.sudo().run_id.gm_id)
-            if rec.state == 'approved':
-                raise UserError(_(
-                    "%(name)s has already been approved.",
-                    name=rec.display_name))
             # Everything in front of him: the department's handover, and
             # any sub-batch sent early. Rows he returned are not in it.
             pending = rec._pending_entries()
+            # An approved department can still have rows waiting: the GM
+            # may add to a month after approving it (the lock exempts him).
+            if rec.state == 'approved' and not pending:
+                raise UserError(_(
+                    "%(name)s has already been approved.",
+                    name=rec.display_name))
             if not pending:
                 raise UserError(_(
                     "%(name)s has not been submitted yet, so there is "
                     "nothing to approve.", name=rec.display_name))
             pending._wf_approve()
             pending._sync_containers()
+            approved |= pending
             # sudo(): mail.message create is gated on access to the document,
             # and a GM's scope here is one department. Authorisation was
             # settled by _check_is_my_department above.
@@ -466,6 +470,16 @@ class KswPaySubmission(models.Model):
         runs = self.mapped('run_id')
         runs._sync_state()
         runs._refresh_register()
+        # Rows added to a month already approved (only the GM may: the lock
+        # exempts him) would be approved and never paid — an approved
+        # register is frozen. Bring their lines up to the entries, the same
+        # way a vacation settlement does.
+        late = self.sudo().run_id.filtered(lambda r: r.state == 'approved')
+        if late:
+            late._resync_vacation_line(
+                approved.employee_id,
+                title=_('Register line updated: rows approved by the General '
+                        'Manager after the month was approved'))
         # Approving the last department is the same decision whichever
         # screen it is made on, so the company GM is told here too. The
         # month itself is only ever finalised by him (action_close_month).

@@ -82,6 +82,15 @@
               sequence="20"
               groups="KSW_commissions.group_commission_supervisor,KSW_commissions.group_commission_gm,KSW_commissions.group_commission_accountant"/>
 
+    <!-- The accountant's: the month voucher proves the commission, these
+         post what happened to it afterwards (payments, later deductions). -->
+    <menuitem id="menu_ksw_pay_settlement"
+              name="BAS Settlement Vouchers"
+              parent="menu_ksw_commissions_root"
+              action="action_ksw_pay_settlement"
+              sequence="22"
+              groups="KSW_commissions.group_commission_accountant,KSW_commissions.group_commission_officer"/>
+
     <menuitem id="menu_ksw_pay_submission"
               name="Department Submissions"
               parent="menu_ksw_commissions_root"
@@ -125,6 +134,13 @@
               parent="menu_ksw_commissions_root"
               sequence="30"
               groups="KSW_commissions.group_commission_officer,KSW_commissions.group_commission_gm,KSW_commissions.group_commission_accountant"/>
+
+    <menuitem id="menu_ksw_pay_settlement_item"
+              name="BAS Settlement Lines"
+              parent="menu_ksw_reports_section"
+              action="action_ksw_pay_settlement_item"
+              sequence="20"
+              groups="KSW_commissions.group_commission_accountant,KSW_commissions.group_commission_officer"/>
 
     <menuitem id="menu_ksw_pay_run_line"
               name="Payment Register"

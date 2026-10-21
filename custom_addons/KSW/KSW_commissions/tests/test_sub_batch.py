@@ -14,6 +14,8 @@ Both need the decision on the row. These tests pin that down: what a
 sub-batch takes, what it locks and what it leaves open, what the GM sees,
 that nothing approved can be deleted, and that nothing paid can be reopened.
 """
+from unittest.mock import patch
+
 from odoo.exceptions import UserError, ValidationError
 
 from .test_submission import SubmissionCommon
@@ -527,7 +529,11 @@ class TestPaidIsFinal(SubBatchCommon):
     def test_42_a_paid_month_is_reopened_by_nobody(self):
         self._approved_early()
         self.run.sudo().action_close_month()
-        self.run.sudo().action_mark_paid()
+        # Posting the payment to BAS is test_commission_settlement's subject;
+        # this fixture's employees have no paying bank account.
+        with patch.object(type(self.env['ksw.pay.settlement']),
+                          '_post_payment', lambda self, *a, **k: self.browse()):
+            self.run.sudo().action_mark_paid()
         with self.assertRaises(UserError):
             self.run.sudo().action_reopen()
         with self.assertRaises(UserError):

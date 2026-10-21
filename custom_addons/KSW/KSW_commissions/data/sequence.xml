@@ -58,6 +58,13 @@
             <field name="padding">6</field>
             <field name="company_id" eval="False"/>
         </record>
+        <record id="seq_ksw_pay_settlement" model="ir.sequence">
+            <field name="name">KSW Commission Settlement Voucher</field>
+            <field name="code">ksw.pay.settlement</field>
+            <field name="prefix">CST/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
     </data>
 </odoo>
 

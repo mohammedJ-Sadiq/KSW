@@ -16,6 +16,7 @@ it; September is not the settlement's business. (2031, so no real pay
 run on the dev database locks the months.)
 """
 from datetime import date
+from unittest.mock import patch
 
 from odoo.exceptions import UserError
 from odoo.tests.common import TransactionCase
@@ -479,7 +480,11 @@ class TestCommissionNeverPaidTwice(_SettlementCommon):
         return self._run_line(period, self.employee, earnings, 'approved')
 
     def _mark_paid(self, run):
-        run.action_mark_paid()
+        # A hand-built register line has no pay entries, so no accrual to
+        # post against; BAS posting is covered by test_commission_settlement.
+        with patch.object(type(self.env['ksw.pay.settlement']),
+                          '_post_payment', lambda self, *a, **k: self.browse()):
+            run.action_mark_paid()
         return run
 
     def test_an_exported_but_unpaid_month_is_still_settled(self):

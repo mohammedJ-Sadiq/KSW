@@ -16,6 +16,17 @@ class KswPayRunPaidWizard(models.TransientModel):
     run_id = fields.Many2one('ksw.pay.run', required=True, readonly=True,
                              ondelete='cascade')
     line_ids = fields.One2many('ksw.pay.run.paid.wizard.line', 'wizard_id')
+    # Mark Paid posts the transfer to BAS (Dr accrual / Cr bank) there and
+    # then: the month voucher proved the right, this proves the issue.
+    journal_number = fields.Char(
+        string='BAS Journal Number',
+        help='The voucher number reserved in BAS for this payment, written '
+             'in the "number" column of every line.')
+    voucher_date = fields.Date(
+        string='Payment Date', required=True,
+        default=fields.Date.context_today,
+        help='The date of the BAS payment voucher: the day the transfer '
+             'went out.')
 
     def action_confirm(self):
         self.ensure_one()
@@ -31,11 +42,19 @@ class KswPayRunPaidWizard(models.TransientModel):
                 lines |= bank_lines
         if not lines:
             raise UserError(_('The selected bank accounts have nothing left to mark as paid.'))
-        run._mark_lines_paid(lines)
+        if not (self.journal_number or '').strip():
+            raise UserError(_('Enter the BAS journal number of the payment.'))
+        voucher = run._mark_lines_paid(
+            lines, journal_number=self.journal_number,
+            voucher_date=self.voucher_date)
         body = Markup('<strong>%(title)s</strong><br/>') % {
             'title': _('Marked paid for some bank accounts')
             if run.state != 'paid' else _('Marked paid'),
         }
+        if voucher:
+            body += Markup('🧾 %(label)s %(name)s<br/>') % {
+                'label': _('Posted to BAS on voucher'), 'name': voucher.name,
+            }
         for line in chosen:
             body += Markup('✅ %(bank)s: %(n)s<br/>') % {
                 'bank': line.label, 'n': line.line_count,
@@ -46,6 +65,8 @@ class KswPayRunPaidWizard(models.TransientModel):
                 'n': len(bank_lines),
             }
         run.sudo().message_post(body=body, subtype_xmlid='mail.mt_note')
+        if voucher:
+            return voucher._open_form()
         return {'type': 'ir.actions.act_window_close'}
 
 

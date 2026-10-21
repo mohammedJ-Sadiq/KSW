@@ -6,13 +6,25 @@
         <field name="model">ksw.commission.bank.export.wizard</field>
         <field name="arch" type="xml">
             <form string="Export Bank File">
+                <div class="alert alert-info" role="status"
+                     invisible="export_mode != 'journal_entry'">
+                    The first journal file of a month posts the whole month.
+                    Every later one posts only what changed since the files
+                    already in BAS (listed below); they stay in the month's
+                    history. Mark Paid posts the final settlement.
+                </div>
                 <group>
                     <field name="run_id" readonly="1"/>
                     <field name="export_mode" widget="radio"/>
                     <field name="journal_number"
                            placeholder="26007264"
-                           invisible="export_mode not in ('journal_entry', 'recovery_entry')"
-                           required="export_mode in ('journal_entry', 'recovery_entry')"/>
+                           invisible="export_mode != 'journal_entry'"
+                           required="export_mode == 'journal_entry'"/>
+                    <field name="journal_date"
+                           invisible="export_mode != 'journal_entry'"
+                           required="export_mode == 'journal_entry'"/>
+                    <field name="journal_history"
+                           invisible="export_mode != 'journal_entry' or not journal_history"/>
                     <field name="excel_layout" widget="radio"
                            invisible="export_mode != 'all_excel'"/>
                     <field name="bank_account_id"

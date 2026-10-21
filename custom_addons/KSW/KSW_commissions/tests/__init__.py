@@ -33,3 +33,4 @@ from . import test_run_totals_visibility
 from . import test_supervisor_gm_role
 from . import test_gm_runs
 from . import test_bas_sales_rep
+from . import test_commission_settlement

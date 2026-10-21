@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ksw_pay_settlement_new_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.pay.settlement.new.wizard.form</field>
+        <field name="model">ksw.pay.settlement.new.wizard</field>
+        <field name="arch" type="xml">
+            <form string="New Settlement Voucher">
+                <field name="is_first" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+
+                <div class="alert alert-info" role="status" invisible="not is_first">
+                    This is the first settlement voucher. It collects every
+                    commission ever marked paid and every later deduction.
+                    Whatever was already entered in BAS by hand should be
+                    recorded with "Already in BAS (no file)" on the voucher.
+                </div>
+
+                <div class="alert alert-warning" role="alert" invisible="not draft_ids">
+                    These drafts are still holding transactions. Those
+                    transactions will NOT be on the new voucher. Review a
+                    draft first: generate its file or discard it.
+                </div>
+                <field name="draft_ids" invisible="not draft_ids" readonly="1">
+                    <list>
+                        <field name="name"/>
+                        <field name="date"/>
+                        <field name="create_uid" string="Prepared By"/>
+                        <field name="item_count" string="Transactions"/>
+                        <field name="total_paid"/>
+                        <field name="total_deducted"/>
+                        <field name="currency_id" column_invisible="1"/>
+                    </list>
+                </field>
+
+                <group string="Last voucher posted to BAS" invisible="not last_posted_id">
+                    <group>
+                        <field name="last_posted_id"/>
+                        <field name="last_posted_date"/>
+                        <field name="last_posted_number"/>
+                    </group>
+                    <group>
+                        <field name="last_posted_by_id"/>
+                        <field name="last_posted_on"/>
+                    </group>
+                </group>
+
+                <group string="The new voucher would carry">
+                    <group>
+                        <field name="pending_count"/>
+                    </group>
+                    <group>
+                        <field name="pending_right"/>
+                        <field name="pending_paid"/>
+                        <field name="pending_deducted"/>
+                    </group>
+                </group>
+                <div class="alert alert-secondary" role="status" invisible="pending_count">
+                    Nothing new: every payment and deduction is already on a voucher.
+                </div>
+
+                <div class="d-flex gap-2 mt-2" invisible="is_first or not pending_count">
+                    <field name="confirmed"/>
+                    <label for="confirmed"/>
+                </div>
+
+                <footer>
+                    <button name="action_create" type="object"
+                            string="Create New Voucher" class="btn-primary"
+                            invisible="not pending_count or (not is_first and not confirmed)"/>
+                    <button name="action_open_draft" type="object"
+                            string="Review Draft" class="btn-secondary"
+                            invisible="not draft_ids"/>
+                    <button name="action_open_history" type="object"
+                            string="Voucher History" class="btn-secondary"/>
+                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

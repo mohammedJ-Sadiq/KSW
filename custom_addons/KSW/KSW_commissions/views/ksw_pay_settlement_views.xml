@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ksw_pay_settlement_list" model="ir.ui.view">
+        <field name="name">ksw.pay.settlement.list</field>
+        <field name="model">ksw.pay.settlement</field>
+        <field name="arch" type="xml">
+            <!-- No plain "New": a voucher holds its transactions, so a new
+                 one starts from New Settlement Voucher, which shows the
+                 drafts and the last posted voucher first. -->
+            <list create="0" decoration-info="state == 'draft'"
+                  decoration-muted="state == 'cancel'">
+                <header>
+                    <button name="action_new_voucher" type="object"
+                            string="New Settlement Voucher"
+                            class="btn-primary" display="always"/>
+                </header>
+                <field name="name"/>
+                <field name="date"/>
+                <field name="journal_number" optional="show"/>
+                <field name="origin" optional="show"/>
+                <field name="run_id" optional="show"/>
+                <field name="item_count" string="Transactions"/>
+                <field name="total_right" sum="Total"/>
+                <field name="total_paid" sum="Total"/>
+                <field name="total_deducted" sum="Total"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="done_by_id" optional="show"/>
+                <field name="done_date" optional="show"/>
+                <field name="posted_manually" optional="show"/>
+                <field name="bas_check_state" widget="badge" optional="show"
+                       decoration-success="bas_check_state == 'match'"
+                       decoration-danger="bas_check_state == 'differs'"
+                       decoration-warning="bas_check_state == 'missing'"/>
+                <field name="create_uid" string="Prepared By" optional="hide"/>
+                <field name="create_date" string="Prepared On" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state == 'done'"
+                       decoration-muted="state == 'cancel'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_settlement_form" model="ir.ui.view">
+        <field name="name">ksw.pay.settlement.form</field>
+        <field name="model">ksw.pay.settlement</field>
+        <field name="arch" type="xml">
+            <form string="Settlement Voucher" create="0">
+                <header>
+                    <button name="action_generate" string="Generate BAS File"
+                            type="object" class="btn-primary"
+                            invisible="state != 'draft'"
+                            confirm="This records every line as posted to BAS. The next voucher will not carry them again. Continue?"/>
+                    <button name="action_collect" string="Refresh"
+                            type="object" class="btn-secondary"
+                            invisible="state != 'draft'"
+                            title="Start again from everything not yet in BAS (lines you removed come back)"/>
+                    <button name="action_mark_posted"
+                            string="Already in BAS (no file)"
+                            type="object" class="btn-secondary"
+                            invisible="state != 'draft'"
+                            confirm="Use this only for transactions already entered in BAS by hand. They are recorded as posted and no file is produced. Continue?"/>
+                    <button name="action_discard" string="Discard Draft"
+                            type="object" class="btn-secondary"
+                            invisible="state != 'draft'"
+                            confirm="Delete this draft? Its transactions go back to waiting and will be offered on the next voucher."/>
+                    <button name="action_download" string="Download BAS File"
+                            type="object" class="btn-primary"
+                            invisible="state != 'done' or not attachment_id"/>
+                    <button name="action_check_against_bas" string="Check against BAS"
+                            type="object" class="btn-secondary"
+                            invisible="state != 'done' or not attachment_id"
+                            title="Read this voucher number back from BAS and compare it line by line with the file Odoo produced (nothing is written to BAS)"/>
+                    <button name="action_rebuild_file" string="Rebuild File"
+                            type="object" class="btn-secondary"
+                            invisible="state != 'done' or not attachment_id"
+                            title="Write the file again from the same lines (layout only; amounts and the record do not change)"/>
+                    <button name="action_cancel_not_imported"
+                            string="Cancel: Not Imported into BAS"
+                            type="object" class="btn-secondary"
+                            invisible="state != 'done'"
+                            confirm="Only if this file was NEVER imported into BAS. It stops counting as held by BAS, and the month's next export carries its lines again. Do not import this file afterwards. Continue?"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <div class="alert alert-info" role="status"
+                         invisible="state != 'draft'">
+                        Everything BAS does not hold yet, across months: a
+                        right not exported or changed since its last export,
+                        deductions taken from it, transfers. Remove a line to
+                        leave it for the next file.
+                    </div>
+                    <div class="alert alert-warning" role="status"
+                         invisible="state != 'draft' or not item_count">
+                        While this draft exists, its transactions are held
+                        for it and appear on no other voucher. Generate its
+                        file, or Discard Draft to release them.
+                    </div>
+                    <div class="alert alert-danger" role="alert"
+                         invisible="bas_check_state != 'differs'">
+                        BAS does not hold this voucher as Odoo produced it:
+                        see the BAS Check tab.
+                    </div>
+                    <div class="alert alert-success" role="status"
+                         invisible="bas_check_state != 'match'">
+                        BAS holds this voucher exactly as Odoo produced it.
+                    </div>
+                    <div class="alert alert-danger" role="status"
+                         invisible="state != 'cancel'">
+                        Cancelled: this file was not imported into BAS. Do not
+                        import it; the month's next export carries its lines.
+                    </div>
+                    <div class="alert alert-warning" role="status"
+                         invisible="not posted_manually">
+                        Recorded as already in BAS: no file was produced.
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="journal_number" placeholder="26007264"
+                                   readonly="state != 'draft'"/>
+                            <field name="origin"/>
+                            <field name="run_id" invisible="not run_id"/>
+                            <field name="bas_voucher_number" invisible="not bas_voucher_number"/>
+                            <field name="attachment_id"
+                                   invisible="not attachment_id"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="posted_manually" invisible="1"/>
+                            <field name="item_count" invisible="1"/>
+                            <field name="create_uid" string="Prepared By"/>
+                            <field name="create_date" string="Prepared On"/>
+                            <field name="total_right"/>
+                            <field name="total_paid"/>
+                            <field name="total_deducted"/>
+                            <field name="done_by_id" invisible="state != 'done'"/>
+                            <field name="done_date" invisible="state != 'done'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Transactions" name="items">
+                            <field name="item_ids" readonly="state != 'draft'">
+                                <list create="0" decoration-danger="amount &lt; 0">
+                                    <field name="run_id"/>
+                                    <field name="employee_id"/>
+                                    <field name="kind"/>
+                                    <field name="label"/>
+                                    <field name="event_date"/>
+                                    <field name="expense_code" optional="show"/>
+                                    <field name="accrual_code" optional="hide"/>
+                                    <field name="counter_code" optional="hide"/>
+                                    <field name="bank_account_id" optional="show"/>
+                                    <field name="deduction_id" optional="hide"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="amount" sum="Total"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="BAS Check" name="bas_check"
+                              invisible="bas_check_state == 'not_checked'">
+                            <group>
+                                <group>
+                                    <field name="bas_check_state"/>
+                                    <field name="bas_check_diff_count"/>
+                                </group>
+                                <group>
+                                    <field name="bas_check_date"/>
+                                    <field name="bas_check_by_id"/>
+                                </group>
+                            </group>
+                            <field name="bas_check_report" nolabel="1"
+                                   class="font-monospace"/>
+                        </page>
+                        <page string="Note" name="note">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_settlement_search" model="ir.ui.view">
+        <field name="name">ksw.pay.settlement.search</field>
+        <field name="model">ksw.pay.settlement</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="journal_number"/>
+                <field name="item_ids" string="Employee"
+                       filter_domain="[('item_ids.employee_id', 'ilike', self)]"/>
+                <filter name="draft" string="Drafts Holding Transactions" domain="[('state', '=', 'draft')]"/>
+                <filter name="done" string="Posted" domain="[('state', '=', 'done')]"/>
+                <filter name="cancelled" string="Cancelled: Not Imported" domain="[('state', '=', 'cancel')]"/>
+                <filter name="bas_differs" string="Differs from BAS" domain="[('bas_check_state', '=', 'differs')]"/>
+                <filter name="bas_missing" string="Not in BAS Yet" domain="[('bas_check_state', '=', 'missing')]"/>
+                <filter name="manual" string="Recorded Without File" domain="[('posted_manually', '=', True)]"/>
+                <filter name="from_mark_paid" string="Posted by Mark Paid" domain="[('origin', '=', 'mark_paid')]"/>
+                <filter name="from_month" string="Journal Exports" domain="[('origin', '=', 'month')]"/>
+                <filter name="from_bas" string="Loaded from BAS" domain="[('origin', '=', 'baseline')]"/>
+                <separator/>
+                <filter name="by_state" string="Status" context="{'group_by': 'state'}"/>
+                <filter name="by_month" string="Voucher Month" context="{'group_by': 'date:month'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_pay_settlement" model="ir.actions.act_window">
+        <field name="name">BAS Settlement Vouchers</field>
+        <field name="res_model">ksw.pay.settlement</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Post commission payments and later deductions to BAS
+            </p>
+            <p>
+                A new voucher collects everything paid or deducted since the
+                last one. Generating its file records those lines as posted,
+                so the next voucher carries only what happened after.
+            </p>
+        </field>
+    </record>
+
+    <!-- Transaction history: which voucher carried which payment/deduction. -->
+    <record id="view_ksw_pay_settlement_item_list" model="ir.ui.view">
+        <field name="name">ksw.pay.settlement.item.list</field>
+        <field name="model">ksw.pay.settlement.item</field>
+        <field name="arch" type="xml">
+            <list create="0" edit="0" delete="0"
+                  decoration-info="state == 'draft'"
+                  decoration-danger="amount &lt; 0">
+                <field name="settlement_id"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state == 'done'"/>
+                <field name="run_id"/>
+                <field name="employee_id"/>
+                <field name="kind"/>
+                <field name="label"/>
+                <field name="event_date"/>
+                <field name="expense_code" optional="show"/>
+                <field name="counter_code" optional="hide"/>
+                <field name="bank_account_id" optional="show"/>
+                <field name="deduction_id" optional="hide"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="amount" sum="Total"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_settlement_item_search" model="ir.ui.view">
+        <field name="name">ksw.pay.settlement.item.search</field>
+        <field name="model">ksw.pay.settlement.item</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="settlement_id"/>
+                <field name="run_id"/>
+                <filter name="draft" string="Held by a Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="done" string="Posted" domain="[('state', '=', 'done')]"/>
+                <separator/>
+                <filter name="accrual" string="Commission Right" domain="[('kind', '=', 'accrual')]"/>
+                <filter name="payment" string="Paid by Bank" domain="[('kind', '=', 'payment')]"/>
+                <filter name="deduction" string="Deductions" domain="[('kind', '=', 'deduction')]"/>
+                <filter name="reversal" string="Reversals" domain="[('amount', '&lt;', 0)]"/>
+                <separator/>
+                <filter name="by_voucher" string="Voucher" context="{'group_by': 'settlement_id'}"/>
+                <filter name="by_run" string="Commission Month" context="{'group_by': 'run_id'}"/>
+                <filter name="by_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_pay_settlement_item" model="ir.actions.act_window">
+        <field name="name">BAS Settlement Lines</field>
+        <field name="res_model">ksw.pay.settlement.item</field>
+        <field name="view_mode">list</field>
+        <field name="context">{'search_default_by_voucher': 1}</field>
+    </record>
+
+    <!-- The BAS bank account a commission transfer is credited to. -->
+    <record id="view_partner_bank_form_inherit_ksw_commission_bas" model="ir.ui.view">
+        <field name="name">res.partner.bank.form.inherit.ksw.commission.bas</field>
+        <field name="model">res.partner.bank</field>
+        <field name="inherit_id" ref="base.view_partner_bank_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="BAS Ledger" name="ksw_bas_ledger">
+                    <field name="x_bas_account_code" placeholder="1202010005"/>
+                    <field name="x_bas_account_name"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_run_form_settlement" model="ir.ui.view">
+        <field name="name">ksw.pay.run.form.settlement</field>
+        <field name="model">ksw.pay.run</field>
+        <field name="inherit_id" ref="KSW_commissions.view_ksw_pay_run_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[@name='action_open_mark_paid_wizard']" position="after">
+                <button name="action_open_bas_baseline_wizard" type="object"
+                        string="Load BAS Voucher" class="btn-secondary"
+                        groups="KSW_commissions.group_commission_accountant"
+                        invisible="not x_bas_can_load"
+                        title="This month is already in BAS: record that voucher as the starting point, so exports post only the difference"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_open_settlement_history" type="object"
+                        class="oe_stat_button" icon="fa-history"
+                        groups="KSW_commissions.group_commission_accountant,KSW_commissions.group_commission_officer"
+                        invisible="not x_settlement_count"
+                        title="Settlement vouchers, draft or posted, carrying this month">
+                    <field name="x_settlement_count" widget="statinfo"
+                           string="BAS Vouchers"/>
+                </button>
+                <button name="action_open_settlement" type="object"
+                        class="oe_stat_button" icon="fa-university"
+                        groups="KSW_commissions.group_commission_accountant"
+                        invisible="not x_bas_unsettled_count"
+                        title="Payments and later deductions not yet posted to BAS">
+                    <field name="x_bas_unsettled_count" widget="statinfo"
+                           string="Not in BAS"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

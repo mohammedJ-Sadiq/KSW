@@ -5,6 +5,8 @@ the ticked accounts paid; the run turns Paid with the last one. A paid
 line is as final as a paid run: ``_months_paid_to`` reads either, so a
 vacation never pays that month again, and the month cannot be reopened.
 """
+from unittest.mock import patch
+
 from odoo.exceptions import UserError
 
 from .test_vacation_commission_settlement import _SettlementCommon, JUL
@@ -15,6 +17,12 @@ class TestMarkPaidByBank(_SettlementCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        # These register lines are built by hand, with no pay entries and so
+        # no accrual: posting the payment to BAS is not what is under test
+        # (test_commission_settlement.py covers it).
+        cls.startClassPatcher(patch.object(
+            type(cls.env['ksw.pay.settlement']), '_post_payment',
+            lambda self, *a, **k: self.browse()))
         partner = cls.env.company.partner_id
         Bank = cls.env['res.partner.bank']
         cls.bank_a = Bank.create({'acc_number': 'MPB-WPS-A', 'partner_id': partner.id})
@@ -35,7 +43,9 @@ class TestMarkPaidByBank(_SettlementCommon):
     def _wizard(self, run):
         action = run.action_open_mark_paid_wizard()
         self.assertEqual(action['res_model'], 'ksw.pay.run.paid.wizard')
-        return self.env['ksw.pay.run.paid.wizard'].browse(action['res_id'])
+        wizard = self.env['ksw.pay.run.paid.wizard'].browse(action['res_id'])
+        wizard.journal_number = '26009300'
+        return wizard
 
     def _tick_only(self, wizard, bank):
         for line in wizard.line_ids:
@@ -69,8 +79,11 @@ class TestMarkPaidByBank(_SettlementCommon):
         wizard = self._wizard(run)
         self._tick_only(wizard, self.bank_a)
         wizard.action_confirm()
-        # Only one account left: Mark Paid marks it paid straight away.
-        run.action_open_mark_paid_wizard()
+        # One account left: the dialog still opens (it asks for the BAS
+        # voucher of the payment), listing just that account.
+        last = self._wizard(run)
+        self.assertEqual(last.line_ids.bank_account_id, self.bank_b)
+        last.action_confirm()
         self.assertEqual(run.state, 'paid')
         self.assertTrue(all(run.line_ids.mapped('x_paid')))
 

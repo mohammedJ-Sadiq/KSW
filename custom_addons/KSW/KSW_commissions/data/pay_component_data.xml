@@ -263,6 +263,31 @@
             <field name="x_bas_accrual_name">مصروفات مستحقة عمولات سائقين التريلات</field>
         </record>
 
+        <!-- ── An amount the General Manager ordered on top ─────────── -->
+        <!--
+            KSWCO August 2026: the GM ordered 500 more for three drivers on
+            top of their Driver Trips (the 50-trip rule stays as it is). It
+            had been typed into the BAS voucher by hand, so Odoo paid and
+            reported one figure and BAS held another. An extra the GM orders
+            is a pay type of its own: entered, approved and paid like any
+            other, and described as what it is in the voucher. The accounts
+            are the drivers' (where BAS already holds August's); change them
+            on the component for an extra paid to someone else.
+        -->
+        <record id="pay_component_gm_extra" model="ksw.pay.component">
+            <field name="name">External Amount by the GM</field>
+            <field name="code">GM_EXTRA</field>
+            <field name="calculation">fixed</field>
+            <field name="scope">department</field>
+            <field name="needs_reason" eval="True"/>
+            <field name="sequence">190</field>
+            <field name="x_bas_ref">مبلغ إضافي بأمر المدير العام</field>
+            <field name="x_bas_expense_code">3203020007</field>
+            <field name="x_bas_expense_name">حساب مصروفات - عمولات سائقين التريلات</field>
+            <field name="x_bas_accrual_code">2107010001</field>
+            <field name="x_bas_accrual_name">مصروفات مستحقة عمولات سائقين التريلات</field>
+        </record>
+
         <!-- ── Sequence for batches ─────────────────────────────────── -->
         <record id="seq_ksw_pay_batch" model="ir.sequence">
             <field name="name">KSW Pay Entry Batch</field>

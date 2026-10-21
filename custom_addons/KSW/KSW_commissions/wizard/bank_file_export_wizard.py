@@ -23,8 +23,11 @@ EXPORT_MODES = [
     ('all_txt',      'All banks – Text files (Kawthar and WPS)'),
     ('specific_excel', 'Specific bank – Excel'),
     ('specific_txt', 'Specific bank – Text file'),
-    ('journal_entry', 'Journal entries – BAS import file'),
-    ('recovery_entry', 'Commission deductions after month end – BAS import file'),
+    ('journal_entry', 'Journal entries – BAS import file (what changed since the last one)'),
+    # Deductions charged after the month end used to be a mode here too. It
+    # wrote a file and recorded nothing, so nothing stopped the same
+    # recovery being posted twice; they are on the settlement voucher now
+    # (ksw.pay.settlement), which records what it posted.
 ]
 
 
@@ -66,6 +69,14 @@ class KswCommissionBankExportWizard(models.TransientModel):
         help='The voucher number in BAS. Written in the "number" column of '
              'every line of the journal-entry file.',
     )
+    journal_date = fields.Date(
+        string='Voucher Date', compute='_compute_journal_date', store=True,
+        readonly=False,
+        help='The date of the BAS voucher. The month end for the month\'s '
+             'first file (where the cost belongs), today for a later file '
+             'carrying only what changed since.')
+    journal_history = fields.Text(
+        string='Already in BAS', compute='_compute_journal_date')
     excel_layout = fields.Selection(
         [('merged', 'One file: every bank in one workbook'),
          ('split', 'One file per bank (zip)')],
@@ -85,6 +96,21 @@ class KswCommissionBankExportWizard(models.TransientModel):
         except ImportError:
             return [('2', 'Load Funds - تحميل رصيد')]
         return OPERATION_CODES
+
+    @api.depends('run_id')
+    def _compute_journal_date(self):
+        for rec in self:
+            run = rec.run_id
+            vouchers = (run._bas_vouchers().filtered(
+                lambda v: v.state == 'done') if run else run)
+            rec.journal_date = (fields.Date.context_today(rec) if vouchers
+                                else run and run._bas_journal_date())
+            rec.journal_history = '\n'.join(
+                '%s · %s · %s %s · %s' % (
+                    v.name, v.date or '', _('BAS no.'), v.journal_number or '-',
+                    dict(v._fields['origin']._description_selection(v.env)
+                         ).get(v.origin, v.origin))
+                for v in vouchers) if vouchers else False
 
     @api.depends('run_id')
     def _compute_company_partner(self):
@@ -605,16 +631,16 @@ class KswCommissionBankExportWizard(models.TransientModel):
             'specific_excel': self._export_specific_excel,
             'specific_txt':  self._export_specific_txt,
             'journal_entry': self._export_journal_entry,
-            'recovery_entry': self._export_recovery_entry,
         }
         return handlers[mode]()
 
     def _export_journal_entry(self):
-        """The month as one BAS journal entry, ready to import.
+        """The month in BAS — only what BAS does not hold yet.
 
-        No bank grouping: the entry is the month's posting, not a payment
-        instruction, so it covers the whole register whichever bank each
-        employee is paid from.
+        The first export posts the whole month; each later one posts the
+        difference from every file before it (a correction, a reopened and
+        re-approved month, a deduction taken since). Each file is a voucher
+        kept in the month's history (BAS Vouchers on the run).
         """
         run = self.run_id
         # The writer (`ksw.bas.journal`) lives in KSW_payroll, which this
@@ -631,24 +657,9 @@ class KswCommissionBankExportWizard(models.TransientModel):
                 'exports above.'))
         if not (self.journal_number or '').strip():
             raise UserError(_('Enter the journal number before exporting.'))
-        data = run._bas_journal_workbook(number=self.journal_number)
-        return self._bundle_and_download(
-            [('JournalEntry_%s.xlsx' % self._batch_label(), data)])
-
-    def _export_recovery_entry(self):
-        """Deductions recovered from this month's commission after the
-        fact — Dr accrued commission / Cr the employee's advance, one
-        voucher per posting date. Kept out of the month's own journal,
-        which is dated the month end."""
-        if 'ksw.bas.journal' not in self.env:
-            raise UserError(_(
-                'The journal-entry export is not available on this system '
-                'yet: it is written by KSW_payroll, which has not been '
-                'updated. Ask IT to deploy it.'))
-        if not (self.journal_number or '').strip():
-            raise UserError(_('Enter the journal number before exporting.'))
-        return self._bundle_and_download(
-            self.run_id._bas_recovery_workbooks(number=self.journal_number))
+        voucher = run._bas_export_month(
+            journal_number=self.journal_number, date=self.journal_date)
+        return voucher.action_download()
 
     def _export_all_excel(self):
         groups = {
