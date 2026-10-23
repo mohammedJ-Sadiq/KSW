@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Invoice: the delivery notes BAS billed on it -->
+    <record id="view_move_form_bas_deliveries" model="ir.ui.view">
+        <field name="name">account.move.form.bas.deliveries</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button name="action_view_bas_deliveries" type="object"
+                        class="oe_stat_button" icon="fa-truck"
+                        invisible="not x_bas_delivery_count">
+                    <field name="x_bas_delivery_count" widget="statinfo" string="Delivery Notes"/>
+                </button>
+            </div>
+        </field>
+    </record>
+
+    <!-- Delivery note: the invoice it was billed on -->
+    <record id="view_picking_form_bas_invoice" model="ir.ui.view">
+        <field name="name">stock.picking.form.bas.invoice</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <field name="origin" position="after">
+                <field name="x_bas_branch_id" invisible="not x_bas_branch_id"/>
+                <field name="x_bas_invoice_id" invisible="not x_bas_invoice_key"/>
+                <field name="x_bas_invoice_key" invisible="not x_bas_invoice_key or x_bas_invoice_id"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="vpicktree_bas_invoice" model="ir.ui.view">
+        <field name="name">stock.picking.list.bas.invoice</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.vpicktree"/>
+        <field name="arch" type="xml">
+            <field name="origin" position="after">
+                <field name="x_bas_invoice_id" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_picking_internal_search_bas_invoice" model="ir.ui.view">
+        <field name="name">stock.picking.search.bas.invoice</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_internal_search"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="x_bas_invoice_id"/>
+            </field>
+            <filter name="picking_type" position="after">
+                <filter string="Billed On" name="group_by_bas_invoice" context="{'group_by': 'x_bas_invoice_id'}"/>
+            </filter>
+        </field>
+    </record>
+</odoo>

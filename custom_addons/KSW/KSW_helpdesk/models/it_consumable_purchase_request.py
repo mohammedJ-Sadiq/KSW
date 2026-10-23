@@ -62,7 +62,8 @@ class ItConsumablePurchaseRequest(models.Model):
             if not request.line_ids:
                 raise UserError(_(
                     'Add at least one item before marking this request as purchased.'))
-            for line in request.line_ids.filtered(lambda l: l.quantity > 0):
+            # Free-text lines (no consumable, e.g. a laptop) have no stock to receive into
+            for line in request.line_ids.filtered(lambda l: l.consumable_id and l.quantity > 0):
                 self.env['it.consumable.move'].create({
                     'consumable_id': line.consumable_id.id,
                     'move_type': 'in',

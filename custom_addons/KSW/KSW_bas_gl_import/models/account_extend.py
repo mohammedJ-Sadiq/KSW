@@ -47,13 +47,13 @@ class AccountAnalyticAccount(models.Model):
 
 
 class AccountMove(models.Model):
-    _inherit = 'account.move'
+    _name = 'account.move'
+    _inherit = ['account.move', 'ksw.bas.branch.mixin']
 
     # Idempotency key: FTYPE/FTYPE2/CODE2/NUMBER1 of the BAS voucher.
     # Unique so a re-run updates nothing and duplicates nothing.
     x_bas_key = fields.Char(string='BAS Voucher Key', index=True, copy=False)
     x_bas_ftype = fields.Char(string='BAS FTYPE', copy=False)
-    x_bas_branch = fields.Char(string='BAS Branch', index=True, copy=False)
 
     # Odoo 19 dropped ``_sql_constraints`` -- it is silently ignored and only
     # logs "Model attribute '_sql_constraints' is no longer supported".  The
@@ -83,10 +83,10 @@ class ProductProduct(models.Model):
 
 
 class StockPicking(models.Model):
-    _inherit = 'stock.picking'
+    _name = 'stock.picking'
+    _inherit = ['stock.picking', 'ksw.bas.branch.mixin']
 
     x_bas_key = fields.Char(string='BAS Delivery Note', index=True, copy=False)
-    x_bas_branch = fields.Char(string='BAS Branch', index=True, copy=False)
 
     _x_bas_key_uniq = models.Constraint(
         'UNIQUE (x_bas_key)', 'This BAS delivery note is already imported.')

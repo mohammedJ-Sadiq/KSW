@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_ksw_finance_dashboard" model="ir.actions.client">
+        <field name="name">Accounting Overview</field>
+        <field name="tag">ksw_finance_dashboard</field>
+    </record>
+    <record id="action_ksw_inventory_dashboard" model="ir.actions.client">
+        <field name="name">Inventory Overview</field>
+        <field name="tag">ksw_inventory_dashboard</field>
+    </record>
+
+    <!-- The apps' landing menus open the overview; the standard journal and
+         operation cards stay one click away (header button). A function, not a
+         menuitem override: KSW gotcha #1 (a partial override wipes parent/name). -->
+    <function model="ir.ui.menu" name="write">
+        <value eval="[ref('account.menu_board_journal_1')]"/>
+        <value eval="{'action': 'ir.actions.client,%d' % ref('KSW_erp_dashboard.action_ksw_finance_dashboard')}"/>
+    </function>
+    <function model="ir.ui.menu" name="write">
+        <value eval="[ref('stock.stock_picking_type_menu')]"/>
+        <value eval="{'action': 'ir.actions.client,%d' % ref('KSW_erp_dashboard.action_ksw_inventory_dashboard')}"/>
+    </function>
+</odoo>

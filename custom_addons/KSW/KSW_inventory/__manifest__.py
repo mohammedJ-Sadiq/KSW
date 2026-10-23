@@ -1,6 +1,6 @@
 {
     'name': 'KSW Inventory',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'author': 'Mohammed Albadr',
     'category': 'Inventory/Inventory',
     'summary': 'BAS warehouses and item classes, perpetual stock valuation, stock issues to an account and cost centre',
@@ -20,6 +20,10 @@ Inventory / Odoo Enterprise:
   driver's own 1207 account). A cost centre is required on every issue.
 * Opening stock loads BAS's register (ITMW10/ITMS10) per warehouse at BAS unit
   cost without posting anything.
+* BAS purchases linked to items: BAS records a stock purchase as an account
+  and free text, so the vendor bills carried no product. A review screen
+  suggests the item and quantity per bill line; a person confirms (or splits),
+  and the product gets a Vendor Bills history. No stock moves are created.
 """,
     'depends': ['stock_account', 'purchase_stock', 'stock_analytic', 'KSW_bas_gl_import'],
     'data': [
@@ -27,6 +31,7 @@ Inventory / Odoo Enterprise:
         'data/stock_data.xml',
         'views/stock_views.xml',
         'wizard/bas_inventory_setup_views.xml',
+        'views/purchase_link_views.xml',
         'views/menus.xml',
     ],
     'installable': True,

@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_item_movement_wizard_readonly,ksw.bas.item.movement.wizard readonly,model_ksw_bas_item_movement_wizard,account.group_account_readonly,1,1,1,1
+access_item_movement_wizard_invoice,ksw.bas.item.movement.wizard invoice,model_ksw_bas_item_movement_wizard,account.group_account_invoice,1,1,1,1
+access_item_movement_line_readonly,ksw.bas.item.movement.line readonly,model_ksw_bas_item_movement_line,account.group_account_readonly,1,0,1,1
+access_item_movement_line_invoice,ksw.bas.item.movement.line invoice,model_ksw_bas_item_movement_line,account.group_account_invoice,1,0,1,1

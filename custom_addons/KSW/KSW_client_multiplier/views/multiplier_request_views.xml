@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_multiplier_request_form" model="ir.ui.view">
+        <field name="name">ksw.client.multiplier.request.form</field>
+        <field name="model">ksw.client.multiplier.request</field>
+        <field name="arch" type="xml">
+            <form string="Multiplier Change Request">
+                <header>
+                    <button name="action_submit" type="object" string="Send to GM"
+                            class="btn-primary" invisible="state != 'draft'"
+                            groups="KSW_water_delivery.group_water_dispatcher"/>
+                    <button name="action_approve" type="object" string="Approve"
+                            class="btn-primary" invisible="not can_approve"/>
+                    <button name="action_refuse_open" type="object" string="Refuse"
+                            class="btn-danger" invisible="not can_approve"/>
+                    <button name="action_cancel" type="object" string="Cancel Request"
+                            invisible="not can_cancel"
+                            confirm="Cancel this request?"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,pending,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Client">
+                            <field name="client_id" options="{'no_create': True, 'no_open': True}"
+                                   readonly="state != 'draft'"/>
+                            <field name="bas_code"/>
+                            <field name="current_multiplier"/>
+                        </group>
+                        <group string="Change">
+                            <field name="old_multiplier" invisible="state == 'draft'"/>
+                            <field name="new_multiplier" readonly="state != 'draft'"/>
+                            <field name="effective_date" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="reason" readonly="state != 'draft'"
+                               placeholder="Why should this client's multiplier change?"/>
+                    </group>
+                    <group>
+                        <group string="Requested">
+                            <field name="requested_by_id"/>
+                            <field name="request_date"/>
+                            <field name="department_id" invisible="state == 'draft'"/>
+                        </group>
+                        <group string="Decision" invisible="state == 'draft'">
+                            <field name="gm_employee_id"/>
+                            <field name="approved_by_id" invisible="not approved_by_id"/>
+                            <field name="approved_on" invisible="not approved_on"/>
+                            <field name="refuse_reason" invisible="state != 'refused'"/>
+                        </group>
+                    </group>
+                    <field name="can_approve" invisible="1"/>
+                    <field name="can_cancel" invisible="1"/>
+                    <field name="gm_user_id" invisible="1"/>
+                    <field name="company_id" invisible="1"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_multiplier_request_list" model="ir.ui.view">
+        <field name="name">ksw.client.multiplier.request.list</field>
+        <field name="model">ksw.client.multiplier.request</field>
+        <field name="arch" type="xml">
+            <list string="Multiplier Requests" create="0"
+                  decoration-info="state == 'pending'" decoration-muted="state in ('refused', 'cancel')">
+                <field name="name"/>
+                <field name="request_date"/>
+                <field name="client_id"/>
+                <field name="old_multiplier"/>
+                <field name="new_multiplier"/>
+                <field name="effective_date"/>
+                <field name="requested_by_id"/>
+                <field name="gm_employee_id"/>
+                <field name="state" widget="badge" decoration-info="state == 'pending'"
+                       decoration-success="state == 'approved'" decoration-danger="state == 'refused'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_multiplier_request_search" model="ir.ui.view">
+        <field name="name">ksw.client.multiplier.request.search</field>
+        <field name="model">ksw.client.multiplier.request</field>
+        <field name="arch" type="xml">
+            <search string="Multiplier Requests">
+                <field name="client_id"/>
+                <field name="name"/>
+                <field name="requested_by_id"/>
+                <filter name="to_decide" string="Waiting for Me"
+                        domain="[('state', '=', 'pending'), ('gm_user_id', '=', uid)]"/>
+                <filter name="pending" string="Waiting for GM" domain="[('state', '=', 'pending')]"/>
+                <filter name="approved" string="Approved" domain="[('state', '=', 'approved')]"/>
+                <group>
+                    <filter name="g_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="g_client" string="Client" context="{'group_by': 'client_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_multiplier_requests" model="ir.actions.act_window">
+        <field name="name">Multiplier Requests</field>
+        <field name="res_model">ksw.client.multiplier.request</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- For the GM, who may hold no Water Delivery role at all: his
+         activity opens the request; this lists everything waiting for him. -->
+    <record id="action_multiplier_requests_to_approve" model="ir.actions.act_window">
+        <field name="name">Multiplier Approvals</field>
+        <field name="res_model">ksw.client.multiplier.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_to_decide': 1}</field>
+    </record>
+
+</odoo>

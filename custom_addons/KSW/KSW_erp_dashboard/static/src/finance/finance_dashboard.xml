@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="KSW_erp_dashboard.Finance">
+        <div class="o_ksw_dashboard o_action">
+            <t t-call="KSW_erp_dashboard.Header"/>
+            <div t-if="state.loading and !state.data" class="o_ksw_empty">Loading…</div>
+            <t t-if="state.data" t-set="d" t-value="state.data"/>
+            <t t-if="state.data">
+                <!-- Headline figures -->
+                <div class="o_ksw_grid">
+                    <div class="o_ksw_card o_ksw_tile" t-on-click="() => this.openLines(labels.cash, d.cash.domain)">
+                        <div class="o_ksw_tile_label">Cash position</div>
+                        <div class="o_ksw_tile_value" t-esc="m(d.cash.total)"/>
+                        <div class="o_ksw_tile_sub"><t t-esc="d.cash.rows.length"/> bank and cash accounts</div>
+                    </div>
+                    <div class="o_ksw_card o_ksw_tile" t-on-click="() => this.openLines(labels.receivables, d.receivable.domain_open)">
+                        <div class="o_ksw_tile_label">Receivables</div>
+                        <div class="o_ksw_tile_value" t-esc="m(d.receivable.open)"/>
+                        <div class="o_ksw_tile_sub"><span class="o_ksw_bad" t-esc="m(d.receivable.overdue)"/> overdue</div>
+                    </div>
+                    <div class="o_ksw_card o_ksw_tile" t-on-click="() => this.openLines(labels.payables, d.payable.domain_open)">
+                        <div class="o_ksw_tile_label">Payables</div>
+                        <div class="o_ksw_tile_value" t-esc="m(d.payable.open)"/>
+                        <div class="o_ksw_tile_sub"><span class="o_ksw_warn" t-esc="m(d.payable.overdue)"/> overdue</div>
+                    </div>
+                    <div class="o_ksw_card o_ksw_tile">
+                        <div class="o_ksw_tile_label">Profit, this period</div>
+                        <div class="o_ksw_tile_value" t-att-class="d.pl.current.profit >= 0 ? 'o_ksw_good' : 'o_ksw_bad'" t-esc="m(d.pl.current.profit)"/>
+                        <div class="o_ksw_tile_sub">Previous <t t-esc="m(d.pl.previous.profit)"/> · Year <t t-esc="m(d.pl.ytd.profit)"/></div>
+                    </div>
+                    <div class="o_ksw_card o_ksw_tile" t-on-click="() => this.openLines(labels.overdueReceivables, d.receivable.domain_overdue)">
+                        <div class="o_ksw_tile_label">Days sales outstanding</div>
+                        <div class="o_ksw_tile_value"><t t-esc="d.dso"/> <small>days</small></div>
+                        <div class="o_ksw_tile_sub">Open receivables ÷ last 90 days' sales</div>
+                    </div>
+                    <div class="o_ksw_card o_ksw_tile" t-on-click="() => this.openLines(labels.overduePayables, d.payable.domain_overdue)">
+                        <div class="o_ksw_tile_label">Days payable outstanding</div>
+                        <div class="o_ksw_tile_value"><t t-esc="d.dpo"/> <small>days</small></div>
+                        <div class="o_ksw_tile_sub">Open payables ÷ last 90 days' costs</div>
+                    </div>
+                </div>
+
+                <!-- Aging -->
+                <div class="o_ksw_grid o_ksw_wide">
+                    <t t-foreach="[[labels.receivablesAging, d.receivable], [labels.payablesAging, d.payable]]" t-as="pair" t-key="pair[0]">
+                        <div class="o_ksw_card">
+                            <h5 t-esc="pair[0]"/>
+                            <table class="o_ksw_rows">
+                                <t t-foreach="pair[1].buckets" t-as="b" t-key="b.key">
+                                    <tr class="o_ksw_click" t-on-click="() => this.openLines(pair[0] + ': ' + b.label, b.domain)">
+                                        <td style="width: 110px" t-esc="b.label"/>
+                                        <td class="o_ksw_name"><div class="o_ksw_bar_track"><div class="o_ksw_bar" t-att-style="'width:' + bucketWidth(b, pair[1])"/></div></td>
+                                        <td class="o_ksw_num" t-att-class="b.key !== 'current' and b.amount ? 'o_ksw_bad' : ''" t-esc="m(b.amount, false)"/>
+                                    </tr>
+                                </t>
+                            </table>
+                        </div>
+                    </t>
+                </div>
+
+                <!-- Trend and P&L -->
+                <div class="o_ksw_grid o_ksw_wide">
+                    <div class="o_ksw_card">
+                        <h5>Revenue and expenses, 12 months</h5>
+                        <KswBarChart labels="trendLabels" series="trendSeries"/>
+                    </div>
+                    <div class="o_ksw_card">
+                        <h5>Profit and loss</h5>
+                        <table class="o_ksw_rows">
+                            <tr><td/><td class="o_ksw_num"><b>This period</b></td><td class="o_ksw_num"><b>Previous</b></td><td class="o_ksw_num"><b>Year to date</b></td></tr>
+                            <t t-foreach="[[labels.revenue, 'revenue'], [labels.expenses, 'expenses'], [labels.profit, 'profit']]" t-as="row" t-key="row[1]">
+                                <tr>
+                                    <td t-esc="row[0]"/>
+                                    <td class="o_ksw_num"><t t-esc="m(d.pl.current[row[1]])"/> <small class="text-muted" t-esc="change(d.pl.current[row[1]], d.pl.previous[row[1]])"/></td>
+                                    <td class="o_ksw_num" t-esc="m(d.pl.previous[row[1]])"/>
+                                    <td class="o_ksw_num" t-esc="m(d.pl.ytd[row[1]])"/>
+                                </tr>
+                            </t>
+                        </table>
+                        <h5 class="mt-4">Work waiting</h5>
+                        <table class="o_ksw_rows">
+                            <t t-foreach="d.todo" t-as="t" t-key="t.key">
+                                <tr class="o_ksw_click" t-on-click="() => this.openTodo(t)">
+                                    <td class="o_ksw_name" t-esc="t.label"/>
+                                    <td class="o_ksw_num"><span class="badge" t-att-class="t.count ? 'text-bg-warning' : 'text-bg-light'" t-esc="n(t.count)"/></td>
+                                </tr>
+                            </t>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Who and where -->
+                <div class="o_ksw_grid">
+                    <div class="o_ksw_card">
+                        <h5>Cash by account</h5>
+                        <table class="o_ksw_rows">
+                            <t t-foreach="d.cash.rows" t-as="r" t-key="r_index">
+                                <tr class="o_ksw_click" t-on-click="() => this.openLines(r.name, r.domain)">
+                                    <td class="o_ksw_name" t-att-title="r.name" t-esc="r.name"/>
+                                    <td class="o_ksw_num" t-esc="m(r.amount)"/>
+                                </tr>
+                            </t>
+                        </table>
+                    </div>
+                    <div class="o_ksw_card">
+                        <h5>Most overdue customers</h5>
+                        <div t-if="!d.receivable.top.length" class="o_ksw_empty">Nothing overdue.</div>
+                        <table class="o_ksw_rows">
+                            <t t-foreach="d.receivable.top" t-as="r" t-key="r_index">
+                                <tr class="o_ksw_click" t-on-click="() => this.openLines(r.name, r.domain)">
+                                    <td class="o_ksw_name" t-att-title="r.name" t-esc="r.name"/>
+                                    <td class="o_ksw_num o_ksw_bad" t-esc="m(r.amount)"/>
+                                </tr>
+                            </t>
+                        </table>
+                    </div>
+                    <div class="o_ksw_card">
+                        <h5>Vendors overdue to pay</h5>
+                        <div t-if="!d.payable.top.length" class="o_ksw_empty">Nothing overdue.</div>
+                        <table class="o_ksw_rows">
+                            <t t-foreach="d.payable.top" t-as="r" t-key="r_index">
+                                <tr class="o_ksw_click" t-on-click="() => this.openLines(r.name, r.domain)">
+                                    <td class="o_ksw_name" t-att-title="r.name" t-esc="r.name"/>
+                                    <td class="o_ksw_num o_ksw_warn" t-esc="m(r.amount)"/>
+                                </tr>
+                            </t>
+                        </table>
+                    </div>
+                    <div class="o_ksw_card">
+                        <h5>Expenses by cost centre, this period</h5>
+                        <div t-if="!d.cost_centres.length" class="o_ksw_empty">No tagged expenses.</div>
+                        <table class="o_ksw_rows">
+                            <t t-foreach="d.cost_centres" t-as="r" t-key="r_index">
+                                <tr class="o_ksw_click" t-on-click="() => this.openLines(r.name, r.domain)">
+                                    <td class="o_ksw_name" t-att-title="r.name" t-esc="r.name"/>
+                                    <td class="o_ksw_num" t-esc="m(r.amount)"/>
+                                </tr>
+                            </t>
+                        </table>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

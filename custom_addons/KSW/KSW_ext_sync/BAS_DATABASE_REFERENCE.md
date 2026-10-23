@@ -332,7 +332,7 @@ Also exists as: `VOU50` (71K), `VOU25` (11K), `VOU35` (15K), `VOU61` (1,709)
 | `600` | 2 | 314,834 | POS sale journal lines |
 | `600` | 3 | 110,010 | POS sale journal lines (secondary terminal) |
 | `018` | 0 | 51,710 | **Cash receipts** (قبض نقدي) — MAIN PAYMENT TYPE |
-| `002` | 3 | 8,505 | Sales return journal lines |
+| `002` | 3 | 8,505 | **Month-end customer invoice** — NOT a return. One line per credit customer per month debiting the `1203*` account (VAT incl., `TAX_AMOUNT`, `SELLER`/`SELLERNAME` = rep, `DUTY_DAY` = term). These are credit customers' real sales: the daily 600 tickets post 0 to the customer. Matched the March 2026 commission workbook 408/408 (2026-10-21). Mirrored in `ksw.bas.ledger.line` |
 | `001` | 0 | 6,389 | Standard invoice journal lines |
 | `001` | 3 | 6,249 | Standard invoice journal lines |
 | `015` | 0 | 1,075 | **Bank receipts** (قبض بنكي) |

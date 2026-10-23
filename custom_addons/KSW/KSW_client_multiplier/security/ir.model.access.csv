@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_client_multiplier_user,ksw.client.multiplier user,model_ksw_client_multiplier,base.group_user,1,0,0,0
+access_client_multiplier_system,ksw.client.multiplier system,model_ksw_client_multiplier,base.group_system,1,1,1,0
+access_client_multiplier_rate_user,ksw.client.multiplier.rate user,model_ksw_client_multiplier_rate,base.group_user,1,0,0,0
+access_client_multiplier_rate_system,ksw.client.multiplier.rate system,model_ksw_client_multiplier_rate,base.group_system,1,1,1,1
+access_multiplier_request_user,ksw.client.multiplier.request user,model_ksw_client_multiplier_request,base.group_user,1,0,0,0
+access_multiplier_request_supervisor,ksw.client.multiplier.request supervisor,model_ksw_client_multiplier_request,KSW_water_delivery.group_water_dispatcher,1,1,1,1
+access_multiplier_refuse_wizard,ksw.client.multiplier.refuse.wizard,model_ksw_client_multiplier_refuse_wizard,base.group_user,1,1,1,0

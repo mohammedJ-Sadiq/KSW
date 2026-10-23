@@ -57,6 +57,9 @@ class KswSalesCommissionSheet(models.Model):
         default='draft', required=True, copy=False, tracking=True,
     )
     is_locked = fields.Boolean(readonly=True, copy=False)
+    x_bas_detail_ids = fields.One2many(
+        'ksw.sales.commission.bas.line', 'sheet_id', string='BAS Detail')
+    x_bas_detail_count = fields.Integer(compute='_compute_bas_detail_count')
     x_unmapped_rep_count = fields.Integer(
         'BAS Reps to Link', compute='_compute_unmapped_rep_count',
         help='BAS rep codes with customers but no employee linked: their '
@@ -156,6 +159,10 @@ class KswSalesCommissionSheet(models.Model):
             },
         }
 
+    def _compute_bas_detail_count(self):
+        for rec in self:
+            rec.x_bas_detail_count = len(rec.x_bas_detail_ids)
+
     def _compute_unmapped_rep_count(self):
         count = self.env['ksw.bas.sales.rep'].sudo().search_count(
             [('state', '=', 'todo')])
@@ -172,26 +179,17 @@ class KswSalesCommissionSheet(models.Model):
     # Pull achieved sales/collection directly from BAS
     # ------------------------------------------------------------------
     def action_pull_from_bas(self):
-        """Pull achieved sales & collection for this sheet's period from
-        the BAS-synced mirror models (``ksw.bas.invoice`` /
-        ``ksw.bas.payment``, kept live by KSW_ext_sync's 10-minute cron —
-        no direct SQL Server query needed here).
+        """Read this month's sales, collections and collection targets from
+        the BAS customer ledger and write them onto the sheet's lines.
 
-        Customers are matched to employees via
-        ``ksw.bas.customer.effective_sales_rep_id`` / ``effective_collector_id``
-        — resolved (and kept fresh on every sync) from BAS's OWN
-        per-customer rep assignment (COD10.SELLER / SELLER2), with a
-        manual override on the linked contact's ``x_sales_rep_id`` /
-        ``x_collection_rep_id`` taking priority when set. Verified
-        2026-08-11: a customer's real transaction history (``vou10.SELLER``
-        on its actual invoices/receipts) always matches its
-        ``cod10.SELLER``/``SELLER2``, so this needs no manual per-customer
-        setup — unlike driver trips, which have no equivalent BAS-native
-        field and must use ``hr.employee.x_bas_driver_cost_center``.
+        How each figure is built (which documents, VAT, which ledgers, who
+        gets credited, how the target is worked out) is configuration —
+        see ``ksw.sales.commission.bas`` and Settings > KSW Commissions >
+        Sales & Collection from BAS. Sales targets still come from the
+        salesperson profiles; BAS has none.
 
-        Targets are left untouched: BAS has no target/quota table, so
-        ``target_sales`` / ``target_collection`` keep coming from
-        ``ksw.salesperson.profile`` as usual.
+        Every customer the figures came from is written to the sheet's
+        BAS Detail tab, credited or not, so the month reconciles.
         """
         self.ensure_one()
         if self.state != 'draft':
@@ -201,114 +199,93 @@ class KswSalesCommissionSheet(models.Model):
         if not self.period:
             raise UserError(_('Set the period before pulling from BAS.'))
 
-        date_from = fields.Date.to_date(self.period).replace(day=1)
-        date_to = date_from + relativedelta(months=1)
+        # New rep codes and renamed labels first, so attribution never runs
+        # on a stale mapping.
+        Rep = self.env['ksw.bas.sales.rep']
+        Rep._sync_from_bas_customers()
+        self.env['ksw.bas.customer'].sudo()._recompute_effective_reps()
+        house = Rep._house_codes()
 
-        BasInvoice = self.env['ksw.bas.invoice']
-        BasPayment = self.env['ksw.bas.payment']
-        BasCustomer = self.env['ksw.bas.customer']
+        figures = self.env['ksw.sales.commission.bas']._period_figures(
+            self.period)
+        date_from, date_to = figures['start'], figures['end']
 
-        # -- aggregate BAS mirror rows by customer account ---------------
-        # NOTE: on INV10, TCODE (-> to_account) is the revenue GL account
-        # credited by the sale (e.g. "مبيعات فرع تبوك 2 التريلات",
-        # DACC_TYPE='08') — NOT the customer. FCODE (-> from_account) is
-        # the customer's AR account actually debited (DACC_TYPE='01',
-        # same '1201*'/'1203*' format as x_client_account_number).
-        # Verified 2026-08-11 against live-synced ksw.bas.invoice data.
-        sales_by_account = {}
-        for inv in BasInvoice.search([
-            ('invoice_date', '>=', date_from),
-            ('invoice_date', '<', date_to),
-        ]):
-            acc = (inv.from_account or '').strip()
-            if not acc:
-                continue
-            sales_by_account[acc] = (
-                sales_by_account.get(acc, 0.0) + inv.subtotal)
+        # One bucket per (employee, commission type): the workbook pays a
+        # person separately as Salesman, Collector and Salesman & Collector,
+        # each on its own customers.
+        buckets = {}
+        gaps = {'house': {}, 'unmapped': {}, 'role': {}}
+        detail = []
 
-        collection_by_account = {}
-        for pay in BasPayment.search([
-            ('payment_date', '>=', date_from),
-            ('payment_date', '<', date_to),
-        ]):
-            acc = (pay.to_account or '').strip()
-            if not acc:
-                continue
-            collection_by_account[acc] = (
-                collection_by_account.get(acc, 0.0) + pay.amount)
+        def _bucket(row):
+            return buckets.setdefault(
+                (row['employee'], row['ctype']),
+                {'sales': 0.0, 'by_account': {}, 'collected': 0.0,
+                 'target': 0.0})
 
-        # -- BAS customer master: identity + resolved effective reps ------
-        # Refresh the rep-code mapping from BAS first (new codes, renamed
-        # labels), then re-resolve every customer against it, so a pull
-        # never runs on a stale assignment. sudo: the Sales & Collection
-        # role reads these mirrors, it does not maintain them.
-        self.env['ksw.bas.sales.rep']._sync_from_bas_customers()
-        BasCustomer.sudo()._recompute_effective_reps()
-        house_codes = self.env['ksw.bas.sales.rep']._house_codes()
-        customer_by_code = {c.bas_code: c for c in BasCustomer.search([])}
+        def _status(row):
+            if row['employee']:
+                return 'credited'
+            if row.get('blocked'):
+                return 'role'
+            return 'house' if row['code'] in house else 'unmapped'
 
-        # -- attribute to employees via BAS's own rep assignment ---------
-        # Anything that cannot be attributed is reported by REASON, not
-        # account by account: a cash/branch account (no customer), a house
-        # rep (no commission due), or a rep code nobody has mapped yet.
-        gaps = {
-            'cash_sales': 0.0,
-            'house': {},      # rep name -> [sales, collected]
-            'unmapped': {},   # (code, name) -> [sales, collected, customers]
-        }
-
-        def _gap(customer, code, name, idx, amount):
-            if code in house_codes:
-                bucket = gaps['house'].setdefault(name or code, [0.0, 0.0])
+        def _gap(row, idx):
+            name = row['rep_name'] or (
+                row['customer'].seller_name if idx == 0
+                else row['customer'].collector_name) or ''
+            if row.get('blocked'):
+                bucket = gaps['role'].setdefault(
+                    (row['code'], name), [0.0, 0.0, set()])
+                bucket[2].add(row['account'])
+            elif row['code'] in house:
+                bucket = gaps['house'].setdefault(name or row['code'],
+                                                  [0.0, 0.0])
             else:
                 bucket = gaps['unmapped'].setdefault(
-                    (code or '', name or ''), [0.0, 0.0, set()])
-                bucket[2].add(customer.bas_code)
-            bucket[idx] += amount
+                    (row['code'], name), [0.0, 0.0, set()])
+                bucket[2].add(row['account'])
+            bucket[idx] += row['net']
 
-        sales_by_employee = {}
-        for acc, amount in sales_by_account.items():
-            customer = customer_by_code.get(acc)
-            if not customer:
-                # A cash/branch account (1201*), not a customer: nobody's
-                # rep sold it.
-                gaps['cash_sales'] += amount
-                continue
-            rep = customer.effective_sales_rep_id
-            if not rep:
-                _gap(customer, customer.seller_code, customer.seller_name,
-                     0, amount)
-                continue
-            bucket = sales_by_employee.setdefault(
-                rep, {'total': 0.0, 'by_account': {}, 'by_customer': {}})
-            bucket['total'] += amount
-            bucket['by_account'][acc.lower()] = (
-                bucket['by_account'].get(acc.lower(), 0.0) + amount)
+        for row in figures['sales']:
+            if row['employee']:
+                b = _bucket(row)
+                b['sales'] += row['net']
+                acc = row['account'].lower()
+                b['by_account'][acc] = b['by_account'].get(acc, 0.0) + row['net']
+            else:
+                _gap(row, 0)
+            detail.append(('sales', row))
 
-        collection_by_employee = {}
         grand_collected = 0.0
-        for acc, amount in collection_by_account.items():
-            customer = customer_by_code.get(acc)
-            if not customer:
-                # Not a known customer account (e.g. an employee advance,
-                # bank, or other GL account) — not part of collection
-                # commission.
-                continue
-            grand_collected += amount
-            rep = customer.effective_collector_id
-            if not rep:
-                _gap(customer, customer.collector_code,
-                     customer.collector_name, 1, amount)
-                continue
-            bucket = collection_by_employee.setdefault(
-                rep, {'collected': 0.0, 'target': None})
-            bucket['collected'] += amount
+        for row in figures['collections']:
+            grand_collected += row['net']
+            if row['employee']:
+                _bucket(row)['collected'] += row['net']
+            else:
+                _gap(row, 1)
+            detail.append(('collection', row))
 
-        imported_lines = self._apply_commission_data(
-            sales_by_employee, collection_by_employee,
-            collection_grand_totals=(grand_collected, None))
+        grand_target = 0.0
+        if figures['cfg']['target_method'] == 'due_balance':
+            for row in figures['targets']:
+                # A No Commission code (defaulted accounts) stays out of the
+                # company-wide target, as in the workbook's "without
+                # defaulted" total.
+                if row['code'] not in house:
+                    grand_target += row['net']
+                if row['employee']:
+                    _bucket(row)['target'] += row['net']
+                detail.append(('target', row))
+        else:
+            grand_target = None
 
-        self._post_bas_pull_summary(date_from, date_to, imported_lines, gaps)
+        excluded = self._apply_sales_exclusions(buckets)
+        imported_lines = self._apply_bas_typed(
+            buckets, grand_collected, grand_target)
+        self._write_bas_detail(detail, _status, excluded)
+        self._post_bas_pull_summary(
+            date_from, date_to, imported_lines, gaps, figures['cfg'])
 
         return {
             'type': 'ir.actions.act_window',
@@ -317,6 +294,189 @@ class KswSalesCommissionSheet(models.Model):
             'view_mode': 'form',
             'target': 'current',
         }
+
+    def _apply_sales_exclusions(self, buckets):
+        """Take out of each employee's sales the customers his profile
+        lists under Sales Left Out. Returns ``{(employee_id, account)}``."""
+        excluded = set()
+        year = fields.Date.to_date(self.period).year
+        Profile = self.env['ksw.salesperson.profile'].sudo()
+        for (employee, _ctype), bucket in buckets.items():
+            profile = Profile.search([
+                ('employee_id', '=', employee.id), ('year', '=', year),
+                ('active', '=', True)], limit=1)
+            accounts = {a.strip().lower() for a in (
+                profile.x_sales_excluded_accounts or '').split(',')
+                if a.strip()}
+            for acc in accounts & set(bucket['by_account']):
+                bucket['sales'] -= bucket['by_account'].pop(acc)
+                excluded.add((employee.id, acc))
+        return excluded
+
+    def _apply_bas_typed(self, buckets, grand_collected, grand_target):
+        """Write one line per (employee, commission type) from the pull.
+
+        The month is rebuilt from BAS: every line's BAS figures are cleared
+        first, manual adjustments are kept and re-applied, an employee's
+        pre-type line (from before 19.0.4.51.0) is taken over by his first
+        type, and a leftover pre-type line with nothing manual on it is
+        removed. Split lines and the Collection-Based-on-Total line work as
+        before.
+        """
+        self.ensure_one()
+        Line = self.env['ksw.sales.commission.line']
+        Profile = self.env['ksw.salesperson.profile'].sudo()
+        year = fields.Date.to_date(self.period).year
+        imported = []
+
+        for line in self.line_ids:
+            line.write({
+                'achieved_sales': 0.0 if line.split_id
+                else max(0.0, line.x_sales_adjustment),
+                'achieved_collection': 0.0})
+
+        general = self.line_ids.filtered(lambda l: not l.split_id)
+        untyped = general.filtered(lambda l: not l.x_commission_type)
+        order = {'both': 0, 'sales': 1, 'collect': 2}
+        for (employee, ctype), b in sorted(
+                buckets.items(),
+                key=lambda kv: (kv[0][0].name or '', order[kv[0][1]])):
+            line = general.filtered(
+                lambda l: l.employee_id == employee
+                and l.x_commission_type == ctype)[:1]
+            status = 'updated'
+            if not line:
+                line = untyped.filtered(
+                    lambda l: l.employee_id == employee)[:1]
+                if line:
+                    untyped -= line
+                    line.x_commission_type = ctype
+                else:
+                    line = Line.create({
+                        'sheet_id': self.id, 'employee_id': employee.id,
+                        'x_commission_type': ctype})
+                    general |= line
+                    status = 'created'
+            line.write({
+                'achieved_sales': max(0.0, b['sales'] + line.x_sales_adjustment),
+                'achieved_collection': b['collected'],
+            })
+            imported.append((
+                f"{employee.display_name} — "
+                f"{dict(ROLE_SELECTION)[ctype]}",
+                b['sales'], b['collected'], b['target'], status, [], []))
+
+        # Pre-type lines nobody took over: gone unless something manual
+        # sits on them.
+        for line in untyped:
+            if not (line.x_addition_line_ids or line.x_deduction_line_ids
+                    or line.x_condition_override or line.x_sales_adjustment
+                    or line.x_target_collection_adjustment):
+                line.unlink()
+
+        # Client splits: their clients' sales, across every type.
+        by_emp = {}
+        for (employee, _ctype), b in buckets.items():
+            acc_map = by_emp.setdefault(employee, {})
+            for acc, amt in b['by_account'].items():
+                acc_map[acc] = acc_map.get(acc, 0.0) + amt
+        for employee, acc_map in by_emp.items():
+            profile = Profile.search([
+                ('employee_id', '=', employee.id), ('year', '=', year),
+                ('active', '=', True)], limit=1)
+            for split in profile.split_ids:
+                accounts = {
+                    (p.x_client_account_number or '').strip().lower()
+                    for p in split.rule_id.partner_ids
+                    if p.x_client_account_number}
+                split_sales = sum(a for k, a in acc_map.items()
+                                  if k in accounts)
+                line = self.line_ids.filtered(
+                    lambda l: l.employee_id == employee
+                    and l.split_id == split)[:1]
+                if not line:
+                    line = Line.create({
+                        'sheet_id': self.id, 'employee_id': employee.id,
+                        'split_id': split.id})
+                line.achieved_sales = split_sales
+                imported.append((
+                    f"{employee.display_name} [{split.label}]",
+                    split_sales, None, None, 'updated (split)', [], []))
+
+        # Collection Based on Total: the company's whole month.
+        for profile in Profile.search([
+                ('year', '=', year), ('active', '=', True),
+                ('x_collection_based_on_total', '=', True)]):
+            employee = profile.employee_id
+            line = self.line_ids.filtered(
+                lambda l: l.employee_id == employee and not l.split_id
+                and l.x_commission_type == profile.role)[:1]
+            if not line:
+                line = Line.create({
+                    'sheet_id': self.id, 'employee_id': employee.id,
+                    'x_commission_type': profile.role})
+            line.achieved_collection = grand_collected
+            imported.append((
+                f"{employee.display_name} [Total Collection]",
+                None, grand_collected, grand_target, 'updated', [], []))
+
+        # Role and both targets follow the profile and the BAS figures as
+        # they are now.
+        self.line_ids._compute_role_and_targets()
+        for profile in Profile.search([
+                ('year', '=', year), ('active', '=', True),
+                ('x_collection_based_on_total', '=', True)]):
+            line = self.line_ids.filtered(
+                lambda l: l.employee_id == profile.employee_id
+                and not l.split_id
+                and l.x_commission_type == profile.role)[:1]
+            if line and grand_target is not None:
+                line.target_collection = max(
+                    0.0, grand_target + line.x_target_collection_adjustment)
+        return imported
+
+    def _write_bas_detail(self, detail, status, excluded=()):
+        """Replace this sheet's BAS Detail rows with what was just read."""
+        self.ensure_one()
+        Detail = self.env['ksw.sales.commission.bas.line'].sudo()
+        Detail.search([('sheet_id', '=', self.id)]).unlink()
+        vals = []
+        for kind, row in detail:
+            customer = row['customer']
+            vals.append({
+                'sheet_id': self.id,
+                'kind': kind,
+                'employee_id': row['employee'].id or False,
+                'status': 'excluded' if kind == 'sales' and (
+                    row['employee'].id, row['account'].lower()) in excluded
+                    else status(row),
+                'rep_code': row['code'],
+                'commission_type': row.get('ctype'),
+                'rep_name': row['rep_name'] or (
+                    customer.collector_name if kind != 'sales'
+                    else customer.seller_name) if customer else row['rep_name'],
+                'account': row['account'],
+                'customer_name': (customer.name_ar or customer.name_en)
+                if customer else '',
+                'term_days': row.get('term_days', 0),
+                'balance': row.get('balance', 0.0),
+                'not_due': row.get('not_due', 0.0),
+                'gross': row['gross'],
+                'net': row['net'],
+                'doc_count': row.get('count', 0),
+            })
+        Detail.create(vals)
+
+    def action_open_bas_detail(self):
+        self.ensure_one()
+        action = self.env['ir.actions.act_window']._for_xml_id(
+            'KSW_commissions.action_ksw_sales_commission_bas_line')
+        action['domain'] = [('sheet_id', '=', self.id)]
+        action['context'] = {'search_default_group_employee': 1,
+                             'search_default_group_type': 1,
+                             'search_default_group_kind': 1}
+        action['name'] = _('BAS Detail: %s', self.name)
+        return action
 
     # ------------------------------------------------------------------
     # Shared upsert logic — used by both the Excel import wizard and
@@ -460,11 +620,15 @@ class KswSalesCommissionSheet(models.Model):
 
             gen_vals = {}
             if general_sales is not None:
-                gen_vals['achieved_sales'] = general_sales
+                gen_vals['achieved_sales'] = max(0.0, general_sales + (
+                    existing_general.x_sales_adjustment
+                    if existing_general else 0.0))
             if coll_amt is not None:
                 gen_vals['achieved_collection'] = coll_amt
             if target_amt is not None:
-                gen_vals['target_collection'] = target_amt
+                gen_vals['target_collection'] = max(0.0, target_amt + (
+                    existing_general.x_target_collection_adjustment
+                    if existing_general else 0.0))
 
             if gen_vals:
                 if existing_general:
@@ -585,7 +749,7 @@ class KswSalesCommissionSheet(models.Model):
         return lines_html
 
     def _post_bas_pull_summary(self, date_from, date_to, imported_lines,
-                                gaps):
+                                gaps, cfg):
         """Post a chatter note summarising an action_pull_from_bas() run."""
         self.ensure_one()
         lines_html = self._format_commission_lines_html(imported_lines)
@@ -610,6 +774,20 @@ class KswSalesCommissionSheet(models.Model):
                 'Reps</i> (or mark them <i>No Commission</i>), then pull '
                 'again.<br/>'
             ).format(items=items)
+        if gaps.get('role'):
+            items = Markup('').join(
+                Markup('<li><b>{name}</b> (BAS code {code}, {n} customer(s)) '
+                       '— Sales: {s} | Collected: {c}</li>').format(
+                    name=name or code, code=code or '—', n=len(custs),
+                    s=_sar(s_amt), c=_sar(c_amt))
+                for (code, name), (s_amt, c_amt, custs) in sorted(
+                    gaps['role'].items(),
+                    key=lambda kv: -(kv[1][0] + kv[1][1])))
+            warn_html += Markup(
+                '<br/><b>⚠ Not credited — not that rep\'s role (salesman / '
+                'collector on the profile) and the customer\'s own rep '
+                'could not take it either:</b><ul>{items}</ul>'
+            ).format(items=items)
         info = []
         if gaps['house']:
             for name, (s_amt, c_amt) in sorted(gaps['house'].items()):
@@ -617,22 +795,30 @@ class KswSalesCommissionSheet(models.Model):
                     '<li>House account <b>{name}</b> (no commission) — '
                     'Sales: {s} | Collected: {c}</li>').format(
                         name=name, s=_sar(s_amt), c=_sar(c_amt)))
-        if gaps['cash_sales']:
-            info.append(Markup(
-                '<li>Cash / branch sales with no customer account: '
-                '{s}</li>').format(s=_sar(gaps['cash_sales'])))
         if info:
             warn_html += Markup('<br/><b>Not commissionable:</b>'
                                 '<ul>{items}</ul>').format(
                 items=Markup('').join(info))
 
+        basis = Markup(
+            '<i>Amounts excl. VAT ({vat}%) · sales: doc {sd} · collections: '
+            'doc {cd} · ledgers {lg} · credited by {att} · target: {tm}. '
+            'Customer detail: BAS Detail button.</i>'
+        ).format(
+            vat=f"{cfg['vat_rate']:g}", sd=', '.join(cfg['sales_doc_types']),
+            cd=', '.join(cfg['collection_doc_types']),
+            lg=', '.join(cfg['ledger_prefixes']) or _('all'),
+            att=_('rep on each document') if cfg['attribution'] == 'document'
+            else _("customer's current rep"),
+            tm=_('due balance') if cfg['target_method'] == 'due_balance'
+            else _('FIFO aging'))
         body = Markup(
             '<b>🔄 BAS Pull completed</b> '
-            '(Period: {frm} – {to})<br/>'
+            '(Period: {frm} – {to})<br/>{basis}<br/>'
             '<b>{n} line(s) updated/created:</b>'
             '<ul>{lines}</ul>'
             '{warn}'
-        ).format(
+        ).format(basis=basis,
             frm=date_from.strftime('%Y-%m-%d'),
             to=(date_to - timedelta(days=1)).strftime('%Y-%m-%d'),
             n=len(imported_lines),
@@ -693,6 +879,28 @@ class KswSalesCommissionLine(models.Model):
     target_collection = fields.Monetary(
         compute='_compute_role_and_targets', store=True, readonly=False,
     )
+
+    x_commission_type = fields.Selection(
+        ROLE_SELECTION, string='Type', readonly=True, copy=False,
+        index=True,
+        help='Set by Pull from BAS: which of the employee\'s commissions '
+             'this line is. Salesman = customers he sells to and somebody '
+             'else collects; Collector = customers he collects from and '
+             'somebody else sold to; Salesman & Collector = both. One '
+             'employee can have a line of each type, each with its own '
+             'customers and rule.')
+    x_sales_adjustment = fields.Monetary(
+        string='Sales Adjustment',
+        help='Added to the sales BAS gives (negative to reduce it) and kept '
+             'across pulls — e.g. part of one BAS invoice that belongs to '
+             'another rep or is not commissionable.')
+    x_sales_adjustment_note = fields.Char(string='Sales Adjustment Reason')
+    x_target_collection_adjustment = fields.Monetary(
+        string='Target Adjustment',
+        help='Added to the collection target BAS gives (negative to '
+             'reduce it), e.g. a retention the client holds until the '
+             'project ends. Kept across pulls.')
+    x_target_adjustment_note = fields.Char(string='Adjustment Reason')
 
     achieved_sales = fields.Monetary(default=0.0)
     achieved_collection = fields.Monetary(default=0.0)
@@ -793,7 +1001,8 @@ class KswSalesCommissionLine(models.Model):
     # ------------------------------------------------------------------
     # Computes
     # ------------------------------------------------------------------
-    @api.constrains('sheet_id', 'employee_id', 'split_id')
+    @api.constrains('sheet_id', 'employee_id', 'split_id',
+                    'x_commission_type')
     def _check_unique_line(self):
         for rec in self:
             domain = [
@@ -801,6 +1010,7 @@ class KswSalesCommissionLine(models.Model):
                 ('employee_id', '=', rec.employee_id.id),
                 ('id', '!=', rec.id),
                 ('split_id', '=', rec.split_id.id if rec.split_id else False),
+                ('x_commission_type', '=', rec.x_commission_type or False),
             ]
             if self.search_count(domain):
                 if rec.split_id:
@@ -810,10 +1020,11 @@ class KswSalesCommissionLine(models.Model):
                     ))
                 else:
                     raise ValidationError(_(
-                        "A general commission line for %(e)s already exists "
-                        "on this sheet.", e=rec.employee_id.name,
+                        "A commission line of this type for %(e)s already "
+                        "exists on this sheet.", e=rec.employee_id.name,
                     ))
-    @api.depends('employee_id', 'sheet_id.period', 'split_id')
+    @api.depends('employee_id', 'sheet_id.period', 'split_id',
+                 'x_target_collection_adjustment', 'x_commission_type')
     def _compute_role_and_targets(self):
         Profile = self.env['ksw.salesperson.profile']
         for rec in self:
@@ -830,10 +1041,35 @@ class KswSalesCommissionLine(models.Model):
                 rec.target_collection = 0.0
             else:
                 sales_t, coll_t, profile = Profile._get_targets(
-                    rec.employee_id, rec.sheet_id.period)
-                rec.role = profile.role if profile else (rec.role or 'sales')
+                    rec.employee_id, rec.sheet_id.period,
+                    ctype=rec.x_commission_type or None)
+                if rec.x_commission_type:
+                    # A BAS-typed line IS its type; the sales target sits
+                    # on the line of the type the profile names.
+                    rec.role = rec.x_commission_type
+                    if profile and rec._sales_target_line_type(
+                            profile.role) != rec.x_commission_type:
+                        sales_t = 0.0
+                else:
+                    rec.role = (profile.role if profile
+                                else (rec.role or 'sales'))
                 rec.target_sales = sales_t
-                rec.target_collection = coll_t
+                rec.target_collection = max(
+                    0.0, coll_t + rec.x_target_collection_adjustment)
+
+    def _sales_target_line_type(self, profile_role):
+        """Which of this employee's typed lines on the sheet carries his
+        sales target: the one of his profile's role, else the nearest one
+        that exists (Salesman & Collector, then Salesman, then Collector)."""
+        self.ensure_one()
+        types = set(self.sheet_id.line_ids.filtered(
+            lambda l: l.employee_id == self.employee_id and not l.split_id
+            and l.x_commission_type).mapped('x_commission_type'))
+        types.add(self.x_commission_type)
+        for t in (profile_role, 'both', 'sales', 'collect'):
+            if t in types:
+                return t
+        return profile_role
 
     def _get_profile_rule(self, rec, kind):
         """Return the commission rule for this line, using the priority:
@@ -863,6 +1099,17 @@ class KswSalesCommissionLine(models.Model):
                 ('year', '=', fields.Date.to_date(rec.sheet_id.period).year),
                 ('active', '=', True),
             ], limit=1)
+            if profile and rec.x_commission_type:
+                typed = profile.x_type_rule_ids.filtered(
+                    lambda t: t.commission_type == rec.x_commission_type
+                    and t.rule_id.kind == kind)[:1].rule_id
+                if typed:
+                    return typed
+                if profile.x_type_rule_ids.filtered(
+                        lambda t: t.commission_type == rec.x_commission_type):
+                    # Rules are set per type for this employee and none of
+                    # this kind: this type earns nothing of this kind.
+                    return Rule
             if profile:
                 explicit = {
                     'sales': profile.sales_rule_id,

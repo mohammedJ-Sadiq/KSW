@@ -29,7 +29,7 @@
 
                         <h2 class="text-center mb-3">Purchase Request <span class="fs-4" dir="rtl">/ طلب شراء</span></h2>
                         <h4 class="text-center text-muted mb-4">
-                            IT Consumables Restock
+                            IT Purchase Request
                         </h4>
 
                         <!-- ── Header block ── -->
@@ -65,9 +65,9 @@
                                 <t t-foreach="o.line_ids" t-as="line">
                                     <tr>
                                         <td t-out="line_index + 1"/>
-                                        <td t-out="line.consumable_id.name or ''"/>
+                                        <td t-out="line.name or ''"/>
                                         <td t-out="line.category_id.name or ''"/>
-                                        <td class="text-end" t-out="line.qty_on_hand"/>
+                                        <td class="text-end" t-out="line.qty_on_hand if line.consumable_id else '-'"/>
                                         <td class="text-end" t-out="line.quantity"/>
                                         <td class="text-end">
                                             <t t-out="'%.2f' % line.unit_cost"/>

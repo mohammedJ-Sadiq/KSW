@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="KSW_erp_dashboard.ProductRows">
+        <div t-if="!rows.length" class="o_ksw_empty" t-esc="empty"/>
+        <table class="o_ksw_rows">
+            <t t-foreach="rows" t-as="r" t-key="r.id">
+                <tr class="o_ksw_click" t-on-click="() => this.openProducts(r.name, [r.id])">
+                    <td class="o_ksw_name" t-att-title="r.name" t-esc="r.name"/>
+                    <td class="o_ksw_num" t-esc="right(r)"/>
+                </tr>
+            </t>
+        </table>
+    </t>
+
+    <t t-name="KSW_erp_dashboard.Inventory">
+        <div class="o_ksw_dashboard o_action">
+            <t t-call="KSW_erp_dashboard.Header"/>
+            <div t-if="state.loading and !state.data" class="o_ksw_empty">Loading…</div>
+            <t t-if="state.data">
+                <t t-set="d" t-value="state.data"/>
+                <div class="o_ksw_grid">
+                    <div class="o_ksw_card o_ksw_tile" t-on-click="() => this.openStock(labels.stock, [])">
+                        <div class="o_ksw_tile_label">Stock value</div>
+                        <div class="o_ksw_tile_value" t-esc="m(d.value)"/>
+                        <div class="o_ksw_tile_sub"><t t-esc="n(d.items_in_stock)"/> items in stock</div>
+                    </div>
+                    <div class="o_ksw_card o_ksw_tile">
+                        <div class="o_ksw_tile_label">Stock turnover</div>
+                        <div class="o_ksw_tile_value"><t t-esc="d.turnover"/>×<small> / year</small></div>
+                        <div class="o_ksw_tile_sub"><t t-esc="n(d.dio)"/> days of inventory on hand</div>
+                    </div>
+                    <div class="o_ksw_card o_ksw_tile" t-on-click="() => this.openProducts(labels.dead, d.dead.ids)">
+                        <div class="o_ksw_tile_label">Dead stock</div>
+                        <div class="o_ksw_tile_value o_ksw_bad" t-esc="m(d.dead.value)"/>
+                        <div class="o_ksw_tile_sub"><t t-esc="d.dead.count"/> items, no issue for 180+ days</div>
+                    </div>
+                    <div class="o_ksw_card o_ksw_tile" t-on-click="() => this.openProducts(labels.slow, d.slow.ids)">
+                        <div class="o_ksw_tile_label">Slow moving</div>
+                        <div class="o_ksw_tile_value o_ksw_warn" t-esc="m(d.slow.value)"/>
+                        <div class="o_ksw_tile_sub"><t t-esc="d.slow.count"/> items, last issue 90–180 days ago</div>
+                    </div>
+                    <div class="o_ksw_card o_ksw_tile" t-on-click="() => this.openProducts(labels.low, d.running_low.ids)">
+                        <div class="o_ksw_tile_label">Running low</div>
+                        <div class="o_ksw_tile_value o_ksw_warn" t-esc="d.running_low.count"/>
+                        <div class="o_ksw_tile_sub">30 days of supply or less</div>
+                    </div>
+                    <div class="o_ksw_card o_ksw_tile" t-on-click="() => this.openProducts(labels.out, d.out_of_stock.ids)">
+                        <div class="o_ksw_tile_label">Out of stock</div>
+                        <div class="o_ksw_tile_value o_ksw_bad" t-esc="d.out_of_stock.count"/>
+                        <div class="o_ksw_tile_sub">used in the last 90 days, none left
+                            <t t-if="d.negative.count"> · <span class="o_ksw_bad"><t t-esc="d.negative.count"/> negative</span></t></div>
+                    </div>
+                </div>
+
+                <div class="o_ksw_grid o_ksw_wide">
+                    <div class="o_ksw_card">
+                        <h5>Received and issued, 12 months (value)</h5>
+                        <KswBarChart labels="trendLabels" series="trendSeries"/>
+                    </div>
+                    <div class="o_ksw_card">
+                        <h5>Stock value by category</h5>
+                        <table class="o_ksw_rows">
+                            <t t-foreach="d.by_category" t-as="r" t-key="r.id">
+                                <tr class="o_ksw_click" t-on-click="() => this.openStock(r.name, [['product_id.categ_id', 'child_of', r.id]])">
+                                    <td style="width: 45%" class="o_ksw_name" t-att-title="r.name" t-esc="r.name"/>
+                                    <td class="o_ksw_name"><div class="o_ksw_bar_track"><div class="o_ksw_bar" t-att-style="'width:' + width(r.value, d.by_category)"/></div></td>
+                                    <td class="o_ksw_num" t-esc="m(r.value)"/>
+                                </tr>
+                            </t>
+                        </table>
+                        <h5 class="mt-4">Stock value by warehouse</h5>
+                        <table class="o_ksw_rows">
+                            <t t-foreach="d.by_warehouse" t-as="r" t-key="r_index">
+                                <tr class="o_ksw_click" t-on-click="() => this.openStock(r.name, r.id ? [['warehouse_id', '=', r.id]] : [])">
+                                    <td style="width: 45%" class="o_ksw_name" t-att-title="r.name" t-esc="r.name"/>
+                                    <td class="o_ksw_name"><div class="o_ksw_bar_track"><div class="o_ksw_bar" t-att-style="'width:' + width(r.value, d.by_warehouse)"/></div></td>
+                                    <td class="o_ksw_num" t-esc="m(r.value)"/>
+                                </tr>
+                            </t>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="o_ksw_grid">
+                    <div class="o_ksw_card">
+                        <h5>Dead stock (largest value)</h5>
+                        <t t-call="KSW_erp_dashboard.ProductRows">
+                            <t t-set="rows" t-value="d.dead.rows"/>
+                            <t t-set="empty">No dead stock.</t>
+                            <t t-set="right" t-value="(r) => this.m(r.value)"/>
+                        </t>
+                    </div>
+                    <div class="o_ksw_card">
+                        <h5>Slow moving</h5>
+                        <t t-call="KSW_erp_dashboard.ProductRows">
+                            <t t-set="rows" t-value="d.slow.rows"/>
+                            <t t-set="empty">No slow movers.</t>
+                            <t t-set="right" t-value="(r) => r.idle_days + ' d'"/>
+                        </t>
+                    </div>
+                    <div class="o_ksw_card">
+                        <h5>Days of supply left</h5>
+                        <t t-call="KSW_erp_dashboard.ProductRows">
+                            <t t-set="rows" t-value="d.running_low.rows.concat(d.out_of_stock.rows)"/>
+                            <t t-set="empty">Nothing runs out within 30 days.</t>
+                            <t t-set="right" t-value="(r) => r.qty &lt;= 0 ? 'out' : r.days + ' d'"/>
+                        </t>
+                    </div>
+                    <div class="o_ksw_card">
+                        <h5>Issued to vehicles and cost centres, this period</h5>
+                        <div t-if="!d.issues_by_cost_centre.length" class="o_ksw_empty">No issues this period.</div>
+                        <table class="o_ksw_rows">
+                            <t t-foreach="d.issues_by_cost_centre" t-as="r" t-key="r.id">
+                                <tr class="o_ksw_click" t-on-click="() => this.openIssues(r)">
+                                    <td class="o_ksw_name" t-att-title="r.name" t-esc="r.name"/>
+                                    <td class="o_ksw_num" t-esc="m(r.value)"/>
+                                </tr>
+                            </t>
+                        </table>
+                    </div>
+                    <div class="o_ksw_card">
+                        <h5>Operations waiting</h5>
+                        <div t-if="!d.operations.length" class="o_ksw_empty">No open operations.</div>
+                        <table class="o_ksw_rows">
+                            <t t-foreach="d.operations" t-as="op" t-key="op.id">
+                                <tr>
+                                    <td class="o_ksw_name" t-att-title="op.name" t-esc="op.name"/>
+                                    <td class="o_ksw_num">
+                                        <span t-if="op.ready" class="badge text-bg-success me-1" style="cursor:pointer" t-on-click="() => this.openOperation(op, 'ready')"><t t-esc="op.ready"/> ready</span>
+                                        <span t-if="op.waiting" class="badge text-bg-secondary me-1" style="cursor:pointer" t-on-click="() => this.openOperation(op, 'waiting')"><t t-esc="op.waiting"/> waiting</span>
+                                        <span t-if="op.late" class="badge text-bg-danger" style="cursor:pointer" t-on-click="() => this.openOperation(op, 'late')"><t t-esc="op.late"/> late</span>
+                                    </td>
+                                </tr>
+                            </t>
+                        </table>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

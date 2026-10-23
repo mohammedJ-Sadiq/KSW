@@ -70,6 +70,11 @@
                                    options="{'no_create': True}"
                                    invisible="role != 'both'"/>
                         </group>
+                        <group string="Pull from BAS"
+                               invisible="role == 'collection'">
+                            <field name="x_sales_excluded_accounts"
+                                   placeholder="e.g. 120301309"/>
+                        </group>
                         <group string="Collection Manager Options"
                                invisible="role == 'sales'">
                             <field name="x_collection_based_on_total"
@@ -88,6 +93,24 @@
                         </group>
                     </group>
                     <notebook>
+                        <page string="Rule per Type" name="type_rules">
+                            <div class="text-muted mb-2">
+                                Pull from BAS gives this employee one line per
+                                commission type: <b>Salesman</b> (customers he
+                                sells to, somebody else collects),
+                                <b>Collector</b> (he collects, somebody else
+                                sold) and <b>Salesman &amp; Collector</b>
+                                (both). Choose the rule that pays each.
+                            </div>
+                            <field name="x_type_rule_ids">
+                                <list editable="bottom">
+                                    <field name="commission_type"/>
+                                    <field name="rule_id"
+                                           options="{'no_create': True}"/>
+                                    <field name="rule_kind"/>
+                                </list>
+                            </field>
+                        </page>
                         <page string="Client Splits">
                             <div class="alert alert-info col-12" role="alert"
                                  style="margin-bottom:8px;">

@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- The review: one row per stock-purchase bill line. Pick the item and
+         the quantity on the row, then Confirm; Split for a line that holds
+         several items. Nothing is linked unconfirmed. -->
+    <record id="view_ksw_purchase_review_list" model="ir.ui.view">
+        <field name="name">ksw.bas.purchase.review.list</field>
+        <field name="model">ksw.bas.purchase.review</field>
+        <field name="arch" type="xml">
+            <list string="BAS Purchases to Link" create="0" delete="0" editable="bottom"
+                  decoration-muted="state == 'not_stock'" decoration-success="state == 'linked'">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm Selected"
+                            class="btn-primary"/>
+                    <button name="action_not_stock" type="object" string="Not a Stock Item"/>
+                </header>
+                <field name="date" readonly="1"/>
+                <field name="partner_id" readonly="1" optional="show"/>
+                <field name="bill_ref" readonly="1" optional="hide"/>
+                <field name="text" readonly="1"/>
+                <field name="amount" readonly="1" sum="Total"/>
+                <field name="allowed_product_ids" column_invisible="1"/>
+                <field name="product_id" readonly="state != 'review' or part_count"
+                       options="{'no_create': True}"/>
+                <field name="quantity" readonly="state != 'review' or part_count"/>
+                <field name="unit_price" optional="show"/>
+                <field name="part_count" string="Items" optional="hide"/>
+                <field name="suggestion" optional="show"/>
+                <field name="state" widget="badge" decoration-success="state == 'linked'"
+                       decoration-info="state == 'review'"/>
+                <button name="action_confirm" type="object" string="Confirm" icon="fa-check"
+                        class="btn-link" invisible="state != 'review'"/>
+                <button name="action_split" type="object" string="Split" icon="fa-columns"
+                        class="btn-link" invisible="state != 'review'"/>
+                <button name="action_not_stock" type="object" string="Not a Stock Item" icon="fa-ban"
+                        class="btn-link" invisible="state != 'review'"/>
+                <button name="action_reset" type="object" string="Undo" icon="fa-undo"
+                        class="btn-link" invisible="state == 'review'"
+                        confirm="Unlink this purchase from its item(s)?"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_purchase_review_form" model="ir.ui.view">
+        <field name="name">ksw.bas.purchase.review.form</field>
+        <field name="model">ksw.bas.purchase.review</field>
+        <field name="arch" type="xml">
+            <form string="BAS Purchase" create="0" delete="0">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm" class="btn-primary"
+                            invisible="state != 'review'"/>
+                    <button name="action_not_stock" type="object" string="Not a Stock Item"
+                            invisible="state != 'review'"/>
+                    <button name="action_reset" type="object" string="Undo" invisible="state == 'review'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="text" readonly="1"/>
+                            <field name="bill_ref" readonly="1"/>
+                            <field name="move_id" readonly="1"
+                                   groups="account.group_account_readonly,account.group_account_invoice"/>
+                            <field name="partner_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="date" readonly="1"/>
+                            <field name="account_id" readonly="1"/>
+                            <field name="amount" readonly="1"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="allowed_product_ids" invisible="1"/>
+                        </group>
+                    </group>
+                    <separator string="Items on this line (quantities and amounts must add up to the line)"/>
+                    <field name="part_ids" readonly="state != 'review'">
+                        <list editable="bottom">
+                            <field name="product_id" options="{'no_create': True}"
+                                   domain="[('id', 'in', parent.allowed_product_ids)]"/>
+                            <field name="quantity"/>
+                            <field name="amount" sum="Total"/>
+                            <field name="unit_price"/>
+                            <field name="currency_id" column_invisible="1"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_purchase_review_search" model="ir.ui.view">
+        <field name="name">ksw.bas.purchase.review.search</field>
+        <field name="model">ksw.bas.purchase.review</field>
+        <field name="arch" type="xml">
+            <search string="BAS Purchases to Link">
+                <field name="text"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <filter name="to_review" string="To Review" domain="[('state', '=', 'review')]"/>
+                <filter name="suggested" string="Item Suggested"
+                        domain="[('state', '=', 'review'), ('product_id', '!=', False)]"/>
+                <filter name="linked" string="Linked" domain="[('state', '=', 'linked')]"/>
+                <filter name="not_stock" string="Not a Stock Item" domain="[('state', '=', 'not_stock')]"/>
+                <group>
+                    <filter name="g_pattern" string="Same Description" context="{'group_by': 'pattern'}"/>
+                    <filter name="g_partner" string="Vendor" context="{'group_by': 'partner_id'}"/>
+                    <filter name="g_account" string="Stock Account" context="{'group_by': 'account_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_purchase_review" model="ir.actions.act_window">
+        <field name="name">BAS Purchases to Link</field>
+        <field name="res_model">ksw.bas.purchase.review</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_to_review': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Nothing to review</p>
+            <p>Use Find Purchases to list the stock purchases on vendor bills that are not linked to an item.</p>
+        </field>
+    </record>
+
+    <record id="action_ksw_purchase_review_collect" model="ir.actions.server">
+        <field name="name">Find Purchases</field>
+        <field name="model_id" ref="model_ksw_bas_purchase_review"/>
+        <field name="binding_model_id" ref="model_ksw_bas_purchase_review"/>
+        <field name="binding_view_types">list</field>
+        <field name="group_ids" eval="[(6, 0, [ref('stock.group_stock_manager')])]"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_collect()</field>
+    </record>
+
+    <!-- The history a product's Vendor Bills button opens. -->
+    <record id="view_ksw_purchase_part_list" model="ir.ui.view">
+        <field name="name">ksw.bas.purchase.part.list</field>
+        <field name="model">ksw.bas.purchase.part</field>
+        <field name="arch" type="xml">
+            <list string="Purchase History" create="0" edit="0" delete="0">
+                <field name="date"/>
+                <field name="partner_id"/>
+                <field name="bill_ref"/>
+                <field name="product_id"/>
+                <field name="quantity" sum="Total"/>
+                <field name="unit_price"/>
+                <field name="amount" sum="Total"/>
+                <field name="text" optional="hide"/>
+                <field name="currency_id" column_invisible="1"/>
+                <button name="action_open_bill" type="object" string="Open Bill" icon="fa-file-text-o"
+                        class="btn-link"
+                        groups="account.group_account_readonly,account.group_account_invoice"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_purchase_part_pivot" model="ir.ui.view">
+        <field name="name">ksw.bas.purchase.part.pivot</field>
+        <field name="model">ksw.bas.purchase.part</field>
+        <field name="arch" type="xml">
+            <pivot string="Purchase History">
+                <field name="date" interval="month" type="col"/>
+                <field name="partner_id" type="row"/>
+                <field name="quantity" type="measure"/>
+                <field name="amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+<!-- One history per item, whatever system the purchase was made in:
+         Purchased = BAS + Odoo orders, Vendor Bills = BAS + Odoo bills. -->
+    <record id="view_ksw_product_purchase_history_list" model="ir.ui.view">
+        <field name="name">ksw.product.purchase.history.list</field>
+        <field name="model">ksw.product.purchase.history</field>
+        <field name="arch" type="xml">
+            <list string="Purchase History" create="0" edit="0" delete="0">
+                <field name="date"/>
+                <field name="partner_id"/>
+                <field name="document"/>
+                <field name="kind" widget="badge" decoration-muted="kind == 'bas'"
+                       decoration-info="kind == 'order'" decoration-success="kind == 'bill'"/>
+                <field name="product_id"/>
+                <field name="quantity" sum="Total"/>
+                <field name="unit_price"/>
+                <field name="amount" sum="Total"/>
+                <field name="description" optional="hide"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="order_id" column_invisible="1"/>
+                <button name="action_open_document" type="object" string="Open" icon="fa-external-link"
+                        class="btn-link" invisible="not order_id"
+                        groups="purchase.group_purchase_user"/>
+                <button name="action_open_document" type="object" string="Open" icon="fa-external-link"
+                        class="btn-link" invisible="order_id"
+                        groups="account.group_account_readonly,account.group_account_invoice"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_product_purchase_history_pivot" model="ir.ui.view">
+        <field name="name">ksw.product.purchase.history.pivot</field>
+        <field name="model">ksw.product.purchase.history</field>
+        <field name="arch" type="xml">
+            <pivot string="Purchase History">
+                <field name="date" interval="month" type="col"/>
+                <field name="partner_id" type="row"/>
+                <field name="quantity" type="measure"/>
+                <field name="amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_ksw_product_purchase_history_search" model="ir.ui.view">
+        <field name="name">ksw.product.purchase.history.search</field>
+        <field name="model">ksw.product.purchase.history</field>
+        <field name="arch" type="xml">
+            <search string="Purchase History">
+                <field name="product_id"/>
+                <field name="partner_id"/>
+                <field name="document"/>
+                <filter name="last_year" string="Last 365 Days"
+                        domain="[('date', '&gt;=', (context_today() - relativedelta(years=1)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter name="from_bas" string="From BAS" domain="[('kind', '=', 'bas')]"/>
+                <filter name="from_odoo" string="From Odoo" domain="[('kind', '!=', 'bas')]"/>
+                <group>
+                    <filter name="g_partner" string="Vendor" context="{'group_by': 'partner_id'}"/>
+                    <filter name="g_month" string="Month" context="{'group_by': 'date:month'}"/>
+                    <filter name="g_kind" string="Source" context="{'group_by': 'kind'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_product_purchase_history" model="ir.actions.act_window">
+        <field name="name">Purchase History</field>
+        <field name="res_model">ksw.product.purchase.history</field>
+        <field name="view_mode">list,pivot</field>
+    </record>
+
+    <!-- The button, beside Purchased (which counts purchase orders only). -->
+    <record id="view_product_template_vendor_bills_button" model="ir.ui.view">
+        <field name="name">product.template.ksw.vendor.bills.button</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button" name="action_view_vendor_bill_history" type="object"
+                        icon="fa-file-text-o" invisible="not x_vendor_bill_count"
+                        groups="stock.group_stock_user,purchase.group_purchase_user,account.group_account_readonly">
+                    <field name="x_vendor_bill_count" widget="statinfo" string="Vendor Bills"/>
+                </button>
+            </div>
+        </field>
+    </record>
+
+    <record id="view_product_product_vendor_bills_button" model="ir.ui.view">
+        <field name="name">product.product.ksw.vendor.bills.button</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button" name="action_view_vendor_bill_history" type="object"
+                        icon="fa-file-text-o" invisible="not x_vendor_bill_count"
+                        groups="stock.group_stock_user,purchase.group_purchase_user,account.group_account_readonly">
+                    <field name="x_vendor_bill_count" widget="statinfo" string="Vendor Bills"/>
+                </button>
+            </div>
+        </field>
+    </record>
+
+</odoo>

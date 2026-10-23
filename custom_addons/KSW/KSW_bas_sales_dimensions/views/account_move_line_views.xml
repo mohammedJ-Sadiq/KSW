@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_line_tree_ksw_salesperson" model="ir.ui.view">
+        <field name="name">account.move.line.list.ksw.salesperson</field>
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="KSW_accounting_ux.view_move_line_tree_ksw_cost_centres"/>
+        <field name="arch" type="xml">
+            <field name="x_employee_cost_centre_id" position="after">
+                <field name="x_salesperson_id" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_move_form_ksw_salesperson" model="ir.ui.view">
+        <field name="name">account.move.form.ksw.salesperson</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="KSW_accounting_ux.view_move_form_ksw_cost_centres"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='line_ids']/list/field[@name='x_employee_cost_centre_id']" position="after">
+                <field name="x_salesperson_id" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_account_move_line_filter_ksw_salesperson" model="ir.ui.view">
+        <field name="name">account.move.line.search.ksw.salesperson</field>
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="KSW_accounting_ux.view_account_move_line_filter_ksw_cost_centres"/>
+        <field name="arch" type="xml">
+            <field name="x_employee_cost_centre_id" position="after">
+                <field name="x_salesperson_id"/>
+            </field>
+            <filter name="g_ksw_employee_cost_centre" position="after">
+                <filter name="g_ksw_salesperson" string="Salesperson"
+                        context="{'group_by': 'x_salesperson_id'}"/>
+            </filter>
+        </field>
+    </record>
+</odoo>

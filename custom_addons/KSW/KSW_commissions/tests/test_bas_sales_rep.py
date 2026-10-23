@@ -34,7 +34,7 @@ class TestBasSalesRep(TransactionCase):
         cls.c_alias = cust('T9RC001', 'T901', 'Qwer Nick-K',
                            'T901', 'Qwer Nick-K')
         cls.c_words = cust('T9RC002', 'T902', 'Plmok Ygvtf',
-                           'T903', 'Company collector-K')
+                           'T903', 'Sales manager')
         cls.c_oneword = cust('T9RC003', 'T904', 'Plmok', 'T904', 'Plmok')
 
         cls.Rep = env['ksw.bas.sales.rep']
@@ -84,17 +84,23 @@ class TestBasSalesRep(TransactionCase):
 
     def test_pull_attributes_by_code(self):
         env = self.env
-        env['ksw.bas.invoice'].sudo().create({
-            'bas_key': 'T9RC-INV-1', 'invoice_date': '2031-02-10',
-            'from_account': 'T9RC003', 'subtotal': 1000.0})
-        env['ksw.bas.payment'].sudo().create({
-            'bas_key': 'T9RC-PAY-1', 'payment_date': '2031-02-11 08:00:00',
-            'to_account': 'T9RC003', 'amount': 400.0})
+        env['ir.config_parameter'].sudo().set_param(
+            'ksw_commissions.sc_ledger_prefixes', '*')
+        Ledger = env['ksw.bas.ledger.line'].sudo()
+        Ledger.create({
+            'bas_key': 'T9RC-INV-1', 'ftype': '002', 'date': '2031-02-28',
+            'debit_account': 'T9RC003', 'amount': 1150.0,
+            'seller_code': 'T904'})
+        Ledger.create({
+            'bas_key': 'T9RC-PAY-1', 'ftype': '018', 'date': '2031-02-11',
+            'credit_account': 'T9RC003', 'amount': 460.0,
+            'seller_code': 'T904'})
         self._rep('T904').write({'employee_id': self.emp_manual.id})
         sheet = env['ksw.sales.commission.sheet'].sudo().create(
             {'period': '2031-02-01'})
         sheet.action_pull_from_bas()
         line = sheet.line_ids.filtered(
             lambda l: l.employee_id == self.emp_manual)
-        self.assertEqual(line.achieved_sales, 1000.0)
-        self.assertEqual(line.achieved_collection, 400.0)
+        # VAT (15%) removed
+        self.assertAlmostEqual(line.achieved_sales, 1000.0, 2)
+        self.assertAlmostEqual(line.achieved_collection, 400.0, 2)

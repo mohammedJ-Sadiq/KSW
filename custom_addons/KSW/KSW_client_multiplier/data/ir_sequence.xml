@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="seq_multiplier_request" model="ir.sequence">
+        <field name="name">Client Multiplier Request</field>
+        <field name="code">ksw.client.multiplier.request</field>
+        <field name="prefix">MR/%(year)s/</field>
+        <field name="padding">4</field>
+    </record>
+</odoo>

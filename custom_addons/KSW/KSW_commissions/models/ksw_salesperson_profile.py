@@ -94,6 +94,23 @@ class KswSalespersonProfile(models.Model):
              'Use for the Collection Manager whose commission is driven '
              'by overall company collection performance.',
     )
+    x_sales_excluded_accounts = fields.Char(
+        string='Sales Left Out (BAS Accounts)',
+        tracking=True,
+        help='BAS customer accounts, comma separated, whose sales Pull from '
+             'BAS leaves out of this employee\'s sales line — e.g. the '
+             'distilled-water customer whose commission is worked '
+             'separately (7% of the margin, paid after collection) and '
+             'entered as an addition. Collections are not affected.',
+    )
+    x_type_rule_ids = fields.One2many(
+        'ksw.salesperson.profile.type.rule', 'profile_id',
+        string='Rule per Commission Type',
+        help='Which rule pays each of this employee\'s commission types '
+             '(Salesman / Collector / Salesman & Collector lines that Pull '
+             'from BAS creates). A type listed here with no rule of a kind '
+             'earns nothing of that kind. Types not listed fall back to the '
+             'rules above.')
     active = fields.Boolean(default=True)
     note = fields.Text()
 
@@ -181,7 +198,7 @@ class KswSalespersonProfile(models.Model):
     # Public lookup
     # ------------------------------------------------------------------
     @api.model
-    def _get_targets(self, employee, period):
+    def _get_targets(self, employee, period, ctype=None):
         """Return ``(sales_target, collection_target, profile)`` for the
         given employee/period. ``period`` is a date (first-of-month).
 
@@ -217,7 +234,7 @@ class KswSalespersonProfile(models.Model):
 
         period_end = period + relativedelta(months=1) - relativedelta(days=1)
         collection_target = self.env['ksw.bas.customer']._compute_collection_target(
-            employee, period_end)
+            employee, period_end, ctype=ctype)
 
         return (sales_target, collection_target, profile)
 
@@ -318,3 +335,24 @@ class KswSalespersonProfileClientSplit(models.Model):
 
 
 
+
+
+class KswSalespersonProfileTypeRule(models.Model):
+    """One commission type of one employee, and the rule that pays it.
+
+    The commission workbook pays the same person in several sections —
+    e.g. Abu Sadeq on the customers he sells and collects (50/75/100 tiers)
+    and, separately, on customers he only collects (65% threshold).
+    """
+    _name = 'ksw.salesperson.profile.type.rule'
+    _description = 'Salesperson Profile: rule per commission type'
+    _order = 'profile_id, commission_type, id'
+
+    profile_id = fields.Many2one(
+        'ksw.salesperson.profile', required=True, ondelete='cascade')
+    commission_type = fields.Selection(
+        ROLE_SELECTION, string='Type', required=True)
+    rule_id = fields.Many2one(
+        'ksw.sales.commission.rule', string='Rule', required=True,
+        ondelete='restrict')
+    rule_kind = fields.Selection(related='rule_id.kind')

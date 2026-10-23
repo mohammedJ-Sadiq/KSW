@@ -1,2 +1,11 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_ksw_bas_inventory_setup,ksw.bas.inventory.setup,model_ksw_bas_inventory_setup,stock.group_stock_manager,1,1,1,0
+access_ksw_purchase_review_manager,ksw.bas.purchase.review manager,model_ksw_bas_purchase_review,stock.group_stock_manager,1,1,1,1
+access_ksw_purchase_review_user,ksw.bas.purchase.review user,model_ksw_bas_purchase_review,stock.group_stock_user,1,0,0,0
+access_ksw_purchase_part_manager,ksw.bas.purchase.part manager,model_ksw_bas_purchase_part,stock.group_stock_manager,1,1,1,1
+access_ksw_purchase_part_stock,ksw.bas.purchase.part stock,model_ksw_bas_purchase_part,stock.group_stock_user,1,0,0,0
+access_ksw_purchase_part_purchase,ksw.bas.purchase.part purchase,model_ksw_bas_purchase_part,purchase.group_purchase_user,1,0,0,0
+access_ksw_purchase_part_account,ksw.bas.purchase.part account,model_ksw_bas_purchase_part,account.group_account_readonly,1,0,0,0
+access_ksw_product_purchase_history_stock,ksw.product.purchase.history stock,model_ksw_product_purchase_history,stock.group_stock_user,1,0,0,0
+access_ksw_product_purchase_history_purchase,ksw.product.purchase.history purchase,model_ksw_product_purchase_history,purchase.group_purchase_user,1,0,0,0
+access_ksw_product_purchase_history_account,ksw.product.purchase.history account,model_ksw_product_purchase_history,account.group_account_readonly,1,0,0,0

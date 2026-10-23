@@ -11,13 +11,26 @@
                         Stock Issue operation per warehouse. Safe to run again.</p>
                     <p><b>Load opening stock</b> sets each item's quantity per warehouse to BAS's register at BAS
                         unit cost. It posts no journal entry: the ledger already holds the 1206 balances.</p>
+                    <p><b>Link purchases from BAS</b> fills each item's purchase history from BAS's own purchase
+                        lines (din10): exact item and quantity per bill.</p>
+                    <p><b>Rebuild movement history</b> replays the year's BAS purchases and stock issues as dated
+                        receipts and issues, from a 1 January opening balance. Today's stock does not change and
+                        nothing is posted. Items whose BAS figures do not add up are listed, not replayed.</p>
                 </div>
+                <group>
+                    <field name="year" options="{'format': false}"/>
+                </group>
                 <field name="company_id" invisible="1"/>
                 <field name="log" nolabel="1" invisible="not log" class="o_ksw_log"/>
                 <footer>
                     <button name="action_run_setup" type="object" string="Run setup" class="btn-primary"/>
                     <button name="action_load_opening_stock" type="object" string="Load opening stock"
                             confirm="Replace the quantities of all stock items with BAS's register?"/>
+                    <button name="action_link_purchases_from_bas" type="object" string="Link purchases from BAS"/>
+                    <button name="action_convert_purchase_entries" type="object" string="Convert purchase entries to bills"
+                            confirm="Replace this year's BAS purchases still booked as journal entries by vendor bills (same accounts and amounts)?"/>
+                    <button name="action_rebuild_movement_history" type="object" string="Rebuild movement history"
+                            confirm="Replay this year's BAS purchases and issues as stock moves? Today's stock does not change."/>
                     <button special="cancel" string="Close"/>
                 </footer>
             </form>

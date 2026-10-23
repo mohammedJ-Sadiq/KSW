@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- What one Pull from BAS read, customer by customer: the check
+         against the accountant's workbook. Generated, never edited. -->
+    <record id="view_ksw_sales_commission_bas_line_list" model="ir.ui.view">
+        <field name="name">ksw.sales.commission.bas.line.list</field>
+        <field name="model">ksw.sales.commission.bas.line</field>
+        <field name="arch" type="xml">
+            <list string="BAS Detail" create="0" edit="0" delete="0"
+                  decoration-warning="status == 'unmapped'"
+                  decoration-muted="status == 'house'">
+                <field name="kind"/>
+                <field name="employee_id"/>
+                <field name="commission_type"/>
+                <field name="status" optional="show"/>
+                <field name="rep_code" optional="show"/>
+                <field name="rep_name" optional="show"/>
+                <field name="account"/>
+                <field name="customer_name"/>
+                <field name="term_days" optional="show"/>
+                <field name="balance" optional="show" sum="Total"/>
+                <field name="not_due" optional="hide" sum="Total"/>
+                <field name="gross" sum="Total"/>
+                <field name="net" sum="Total"/>
+                <field name="doc_count" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_sales_commission_bas_line_pivot" model="ir.ui.view">
+        <field name="name">ksw.sales.commission.bas.line.pivot</field>
+        <field name="model">ksw.sales.commission.bas.line</field>
+        <field name="arch" type="xml">
+            <pivot string="BAS Detail">
+                <field name="employee_id" type="row"/>
+                <field name="commission_type" type="row"/>
+                <field name="kind" type="col"/>
+                <field name="net" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_ksw_sales_commission_bas_line_search" model="ir.ui.view">
+        <field name="name">ksw.sales.commission.bas.line.search</field>
+        <field name="model">ksw.sales.commission.bas.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="customer_name"/>
+                <field name="account"/>
+                <field name="employee_id"/>
+                <field name="rep_name"/>
+                <filter name="sales" string="Sales" domain="[('kind', '=', 'sales')]"/>
+                <filter name="collection" string="Collections" domain="[('kind', '=', 'collection')]"/>
+                <filter name="target" string="Collection Targets" domain="[('kind', '=', 'target')]"/>
+                <separator/>
+                <filter name="not_credited" string="Not Credited"
+                        domain="[('status', '!=', 'credited')]"/>
+                <separator/>
+                <filter name="group_kind" string="Kind" context="{'group_by': 'kind'}"/>
+                <filter name="group_employee" string="Credited To" context="{'group_by': 'employee_id'}"/>
+                <filter name="group_type" string="Type" context="{'group_by': 'commission_type'}"/>
+                <filter name="group_rep" string="BAS Rep" context="{'group_by': 'rep_code'}"/>
+                <filter name="group_status" string="Status" context="{'group_by': 'status'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_sales_commission_bas_line" model="ir.actions.act_window">
+        <field name="name">BAS Detail</field>
+        <field name="res_model">ksw.sales.commission.bas.line</field>
+        <field name="view_mode">list,pivot</field>
+    </record>
+
+</odoo>

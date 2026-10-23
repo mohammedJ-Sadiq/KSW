@@ -1,6 +1,7 @@
 from . import helpdesk_ticket_stage
 from . import helpdesk_ticket_category
 from . import helpdesk_ticket
+from . import hr_employee
 from . import it_asset_category
 from . import it_asset
 from . import it_asset_assignment

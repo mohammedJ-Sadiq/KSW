@@ -152,6 +152,7 @@ class BASAccount(models.Model):
             ('customers', self.env['ksw.bas.customer']),
             ('invoices', self.env['ksw.bas.invoice']),
             ('payments', self.env['ksw.bas.payment']),
+            ('ledger', self.env['ksw.bas.ledger.line']),
         )
         incomplete = []
         for label, model in steps:

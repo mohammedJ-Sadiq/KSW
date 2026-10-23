@@ -1,0 +1,632 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-22 07:26+0000\n"
+"PO-Revision-Date: 2026-10-22 07:26+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar_001\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid "%(client)s already has a request waiting for the GM (%(ref)s)."
+msgstr "يوجد للعميل %(client)s طلب بانتظار اعتماد المدير العام (%(ref)s)."
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid "%(client)s is already at %(value)s on that date."
+msgstr "الرد المضاعف للعميل %(client)s هو %(value)s في ذلك التاريخ أصلاً."
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/client_multiplier.py:0
+msgid ""
+"%(new)s clients added, %(checked)s compared with BAS, %(differ)s differ."
+msgstr ""
+"تمت إضافة %(new)s عميل، ومقارنة %(checked)s مع BAS، ويختلف %(differ)s."
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid "%(ref)s has already been sent."
+msgstr "تم إرسال الطلب %(ref)s مسبقاً."
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid "%(ref)s has been sent and can no longer be edited."
+msgstr "تم إرسال الطلب %(ref)s ولا يمكن تعديله."
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid "%(ref)s is not waiting for approval."
+msgstr "الطلب %(ref)s ليس بانتظار الاعتماد."
+
+#. module: KSW_client_multiplier
+#: model:ir.model.constraint,message:KSW_client_multiplier.constraint_ksw_client_multiplier_rate_client_date_uniq
+msgid "A client can have only one multiplier per effective date."
+msgstr "لا يمكن أن يكون للعميل أكثر من رد مضاعف واحد لنفس تاريخ السريان."
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/client_multiplier.py:0
+msgid "A client can have only one opening value."
+msgstr "لا يمكن أن يكون للعميل أكثر من قيمة افتتاحية واحدة."
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid "A request that has been sent is kept; cancel it instead."
+msgstr "الطلب المرسل يُحتفظ به؛ قم بإلغائه بدلاً من حذفه."
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier__bas_code
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_request__bas_code
+msgid "Account Code"
+msgstr "رقم الحساب"
+
+#. module: KSW_client_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_client_multiplier_search
+msgid "Active in BAS"
+msgstr "نشط في BAS"
+
+#. module: KSW_client_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_multiplier_request_form
+msgid "Approve"
+msgstr "اعتماد"
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid "Approve «الرد المضاعف» change for %(client)s"
+msgstr "اعتماد تعديل «الرد المضاعف» للعميل %(client)s"
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+#: model:ir.model.fields.selection,name:KSW_client_multiplier.selection__ksw_client_multiplier_request__state__approved
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_multiplier_request_search
+msgid "Approved"
+msgstr "معتمد"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields.selection,name:KSW_client_multiplier.selection__ksw_client_multiplier_rate__source__request
+msgid "Approved request"
+msgstr "طلب معتمد"
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid ""
+"Approved. %(client)s is at <b>%(new)s</b> from %(day)s; loads before that "
+"keep %(old)s."
+msgstr ""
+"تم الاعتماد. الرد المضاعف للعميل %(client)s هو <b>%(new)s</b> اعتباراً من "
+"%(day)s، والردود قبل ذلك تبقى على %(old)s."
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_request__gm_employee_id
+msgid "Approver (GM)"
+msgstr "المعتمد (المدير العام)"
+
+#. module: KSW_client_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_client_multiplier_form
+msgid "BAS"
+msgstr "BAS"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier__bas_checked_on
+msgid "BAS Checked On"
+msgstr "تاريخ المقارنة مع BAS"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier__customer_id
+msgid "BAS Customer"
+msgstr "عميل BAS"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier__bas_factor
+msgid "BAS Value"
+msgstr "القيمة في BAS"
+
+#. module: KSW_client_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_multiplier_request_form
+msgid "Cancel Request"
+msgstr "إلغاء الطلب"
+
+#. module: KSW_client_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_multiplier_request_form
+msgid "Cancel this request?"
+msgstr "هل تريد إلغاء هذا الطلب؟"
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+#: model:ir.model.fields.selection,name:KSW_client_multiplier.selection__ksw_client_multiplier_request__state__cancel
+msgid "Cancelled"
+msgstr "ملغي"
+
+#. module: KSW_client_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_multiplier_request_form
+msgid "Change"
+msgstr "التعديل"
+
+#. module: KSW_client_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_client_multiplier_search
+msgid "Change Scheduled"
+msgstr "تعديل مجدول"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier__name
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_rate__client_id
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_request__client_id
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_multiplier_request_form
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_multiplier_request_search
+msgid "Client"
+msgstr "العميل"
+
+#. module: KSW_client_multiplier
+#: model:ir.model,name:KSW_client_multiplier.model_ksw_client_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_client_multiplier_form
+msgid "Client Multiplier"
+msgstr "الرد المضاعف للعميل"
+
+#. module: KSW_client_multiplier
+#: model:ir.model,name:KSW_client_multiplier.model_ksw_client_multiplier_request
+msgid "Client Multiplier Change Request"
+msgstr "طلب تعديل الرد المضاعف"
+
+#. module: KSW_client_multiplier
+#: model:ir.model,name:KSW_client_multiplier.model_ksw_client_multiplier_rate
+msgid "Client Multiplier History"
+msgstr "سجل الرد المضاعف"
+
+#. module: KSW_client_multiplier
+#: model:ir.actions.act_window,name:KSW_client_multiplier.action_client_multipliers
+#: model:ir.ui.menu,name:KSW_client_multiplier.menu_account_client_multipliers
+#: model:ir.ui.menu,name:KSW_client_multiplier.menu_water_client_multipliers
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_client_multiplier_list
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_client_multiplier_search
+msgid "Client Multipliers"
+msgstr "الرد المضاعف للعملاء"
+
+#. module: KSW_client_multiplier
+#: model:ir.actions.server,name:KSW_client_multiplier.cron_refresh_client_multipliers_ir_actions_server
+msgid "Client Multipliers: daily refresh"
+msgstr "الرد المضاعف للعملاء: التحديث اليومي"
+
+#. module: KSW_client_multiplier
+#: model_terms:ir.actions.act_window,help:KSW_client_multiplier.action_client_multipliers
+msgid ""
+"Clients come from the BAS customer accounts; the daily refresh adds them."
+msgstr "العملاء مأخوذون من حسابات العملاء في BAS ويضيفهم التحديث اليومي."
+
+#. module: KSW_client_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_multiplier_refuse_wizard_form
+msgid "Close"
+msgstr "إغلاق"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_request__company_id
+msgid "Company"
+msgstr "الشركة"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier__partner_id
+msgid "Contact"
+msgstr "جهة الاتصال"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_rate__approved_by_id
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_request__approved_by_id
+msgid "Decided By"
+msgstr "القرار بواسطة"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_request__approved_on
+msgid "Decided On"
+msgstr "تاريخ القرار"
+
+#. module: KSW_client_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_multiplier_request_form
+msgid "Decision"
+msgstr "القرار"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_request__department_id
+msgid "Department"
+msgstr "القسم"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier__differs_from_bas
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_client_multiplier_search
+msgid "Differs from BAS"
+msgstr "يختلف عن BAS"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields.selection,name:KSW_client_multiplier.selection__ksw_client_multiplier_request__state__draft
+msgid "Draft"
+msgstr "مسودة"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_rate__date_from
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_request__effective_date
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_client_multiplier_form
+msgid "Effective From"
+msgstr "ساري من"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,help:KSW_client_multiplier.field_ksw_client_multiplier_rate__date_from
+msgid ""
+"Empty on the opening value taken from BAS: it applies to everything before "
+"the first approved change."
+msgstr ""
+"فارغ في القيمة الافتتاحية المأخوذة من BAS: تسري على كل ما قبل أول تعديل "
+"معتمد."
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier__rate_ids
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_client_multiplier_form
+msgid "History"
+msgstr "السجل"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier__current_since
+msgid "In Force Since"
+msgstr "ساري منذ"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier__current_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_rate__multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_client_multiplier_search
+msgid "Multiplier"
+msgstr "الرد المضاعف"
+
+#. module: KSW_client_multiplier
+#: model:ir.actions.act_window,name:KSW_client_multiplier.action_multiplier_requests_to_approve
+msgid "Multiplier Approvals"
+msgstr "اعتمادات الرد المضاعف"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_request__old_multiplier
+msgid "Multiplier Before"
+msgstr "الرد المضاعف قبل التعديل"
+
+#. module: KSW_client_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_multiplier_request_form
+msgid "Multiplier Change Request"
+msgstr "طلب تعديل الرد المضاعف"
+
+#. module: KSW_client_multiplier
+#: model:ir.actions.act_window,name:KSW_client_multiplier.action_multiplier_requests
+#: model:ir.ui.menu,name:KSW_client_multiplier.menu_water_multiplier_requests
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_multiplier_request_list
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_multiplier_request_search
+msgid "Multiplier Requests"
+msgstr "طلبات تعديل الرد المضاعف"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_request__current_multiplier
+msgid "Multiplier Today"
+msgstr "الرد المضاعف اليوم"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_request__new_multiplier
+msgid "New Multiplier"
+msgstr "الرد المضاعف الجديد"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier__next_date
+msgid "Next Change On"
+msgstr "التعديل القادم في"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier__next_multiplier
+msgid "Next Multiplier"
+msgstr "الرد المضاعف القادم"
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid ""
+"No General Manager is set for %(dept)s, so nobody could approve this "
+"request. Ask HR to set the department's General Manager (or the company "
+"default GM)."
+msgstr ""
+"لم يتم تحديد مدير عام لـ %(dept)s، فلا يوجد من يعتمد هذا الطلب. اطلب من "
+"الموارد البشرية تحديد المدير العام للقسم (أو المدير العام الافتراضي للشركة)."
+
+#. module: KSW_client_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_client_multiplier_search
+msgid "No Multiplier"
+msgstr "بدون رد مضاعف"
+
+#. module: KSW_client_multiplier
+#: model_terms:ir.actions.act_window,help:KSW_client_multiplier.action_client_multipliers
+msgid "No clients yet"
+msgstr "لا يوجد عملاء بعد"
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid "Only %(gm)s, the General Manager of %(dept)s, can decide on %(ref)s."
+msgstr ""
+"فقط %(gm)s، المدير العام لـ %(dept)s، يمكنه اتخاذ القرار في الطلب %(ref)s."
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid "Only a Water Delivery Supervisor can edit a request."
+msgstr "فقط مشرف توصيل المياه يمكنه تعديل الطلب."
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid "Only a Water Delivery Supervisor can request a multiplier change."
+msgstr "فقط مشرف توصيل المياه يمكنه طلب تعديل الرد المضاعف."
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid "Only a Water Delivery Supervisor can send a request."
+msgstr "فقط مشرف توصيل المياه يمكنه إرسال الطلب."
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid "Only the requester can cancel %(ref)s, and only before the GM decides."
+msgstr "فقط مقدم الطلب يمكنه إلغاء %(ref)s، وقبل قرار المدير العام فقط."
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/client_multiplier.py:0
+msgid "Only the system administrator can refresh from BAS."
+msgstr "فقط مدير النظام يمكنه التحديث من BAS."
+
+#. module: KSW_client_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_client_multiplier_form
+msgid "Open Pending Request"
+msgstr "فتح الطلب المعلق"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields.selection,name:KSW_client_multiplier.selection__ksw_client_multiplier_rate__source__opening
+msgid "Opening value from BAS"
+msgstr "قيمة افتتاحية من BAS"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier__pending_request_id
+msgid "Pending Request"
+msgstr "طلب معلق"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_refuse_wizard__reason
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_request__reason
+msgid "Reason"
+msgstr "السبب"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_request__name
+msgid "Reference"
+msgstr "المرجع"
+
+#. module: KSW_client_multiplier
+#: model:ir.actions.server,name:KSW_client_multiplier.action_refresh_client_multipliers
+msgid "Refresh from BAS"
+msgstr "تحديث من BAS"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_request__refuse_reason
+msgid "Refusal Reason"
+msgstr "سبب الرفض"
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_multiplier_refuse_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_multiplier_request_form
+msgid "Refuse"
+msgstr "رفض"
+
+#. module: KSW_client_multiplier
+#: model:ir.model,name:KSW_client_multiplier.model_ksw_client_multiplier_refuse_wizard
+msgid "Refuse a Multiplier Change"
+msgstr "رفض تعديل الرد المضاعف"
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+#: model:ir.model.fields.selection,name:KSW_client_multiplier.selection__ksw_client_multiplier_request__state__refused
+msgid "Refused"
+msgstr "مرفوض"
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid "Refused by %(gm)s.<br/>Reason: %(reason)s"
+msgstr "تم الرفض بواسطة %(gm)s.<br/>السبب: %(reason)s"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_rate__request_id
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_refuse_wizard__request_id
+msgid "Request"
+msgstr "الطلب"
+
+#. module: KSW_client_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_client_multiplier_form
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_client_multiplier_list
+msgid "Request Change"
+msgstr "طلب تعديل"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_request__request_date
+msgid "Request Date"
+msgstr "تاريخ الطلب"
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/client_multiplier.py:0
+msgid "Request a Multiplier Change"
+msgstr "طلب تعديل الرد المضاعف"
+
+#. module: KSW_client_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_multiplier_request_form
+msgid "Requested"
+msgstr "الطلب"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_request__requested_by_id
+msgid "Requested By"
+msgstr "مقدم الطلب"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier__request_ids
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_client_multiplier_form
+msgid "Requests"
+msgstr "الطلبات"
+
+#. module: KSW_client_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_multiplier_request_form
+msgid "Send to GM"
+msgstr "إرسال للمدير العام"
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid ""
+"Sent to %(gm)s for approval: %(old)s → <b>%(new)s</b> from "
+"%(day)s.<br/>Reason: %(reason)s"
+msgstr ""
+"أُرسل إلى %(gm)s للاعتماد: %(old)s ← <b>%(new)s</b> اعتباراً من "
+"%(day)s.<br/>السبب: %(reason)s"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_rate__source
+msgid "Source"
+msgstr "المصدر"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_request__state
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_multiplier_request_search
+msgid "Status"
+msgstr "الحالة"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier__is_stopped
+msgid "Stopped in BAS"
+msgstr "موقوف في BAS"
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid ""
+"The effective date cannot be before the day the change was requested "
+"(%(day)s): a change applies from now on, never to loads already delivered."
+msgstr ""
+"لا يمكن أن يكون تاريخ السريان قبل تاريخ الطلب (%(day)s): التعديل يسري من "
+"الآن فصاعداً، ولا يطبق على ردود تم توصيلها."
+
+#. module: KSW_client_multiplier
+#: model:ir.model.constraint,message:KSW_client_multiplier.constraint_ksw_client_multiplier_rate_positive
+msgid "The multiplier must be positive."
+msgstr "يجب أن يكون الرد المضاعف أكبر من صفر."
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid "The new multiplier must be greater than zero."
+msgstr "يجب أن يكون الرد المضاعف الجديد أكبر من صفر."
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,help:KSW_client_multiplier.field_ksw_client_multiplier_request__old_multiplier
+msgid ""
+"The value in force on the effective date when the request was submitted."
+msgstr "القيمة السارية في تاريخ السريان عند إرسال الطلب."
+
+#. module: KSW_client_multiplier
+#: model:ir.model.constraint,message:KSW_client_multiplier.constraint_ksw_client_multiplier_customer_uniq
+msgid "This BAS customer already has a multiplier record."
+msgstr "يوجد سجل رد مضاعف لهذا العميل مسبقاً."
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields.selection,name:KSW_client_multiplier.selection__ksw_client_multiplier_request__state__pending
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_multiplier_request_search
+msgid "Waiting for GM"
+msgstr "بانتظار المدير العام"
+
+#. module: KSW_client_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_multiplier_request_search
+msgid "Waiting for Me"
+msgstr "بانتظار قراري"
+
+#. module: KSW_client_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_multiplier_refuse_wizard_form
+msgid "Why is this change refused?"
+msgstr "لماذا تم رفض هذا التعديل؟"
+
+#. module: KSW_client_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_multiplier_request_form
+msgid "Why should this client's multiplier change?"
+msgstr "لماذا يجب تعديل الرد المضاعف لهذا العميل؟"
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,help:KSW_client_multiplier.field_ksw_client_multiplier__bas_factor
+msgid ""
+"cod10.FACTORE as BAS holds it now. Shown only to confirm the transfer: Odoo "
+"does not read it after the opening value."
+msgstr ""
+"القيمة الحالية في BAS، للتأكد من صحة النقل فقط: أودو لا يعتمد عليها بعد "
+"القيمة الافتتاحية."
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/client_multiplier.py:0
+msgid "opening"
+msgstr "افتتاحي"
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid "the GM"
+msgstr "المدير العام"
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid "this department"
+msgstr "هذا القسم"
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid "your department"
+msgstr "قسمك"
+
+#. module: KSW_client_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_client_multiplier_form
+msgid "«الرد المضاعف»"
+msgstr "«الرد المضاعف»"
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid ""
+"«الرد المضاعف» %(old)s → <b>%(new)s</b> from %(day)s (%(ref)s, approved by "
+"%(gm)s)."
+msgstr ""
+"«الرد المضاعف» %(old)s ← <b>%(new)s</b> اعتباراً من %(day)s (%(ref)s، اعتمده"
+" %(gm)s)."
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields,help:KSW_client_multiplier.field_ksw_client_multiplier__current_multiplier
+#: model:ir.model.fields,help:KSW_client_multiplier.field_ksw_client_multiplier_request__current_multiplier
+msgid "«الرد المضاعف» in force today."
+msgstr "«الرد المضاعف» الساري اليوم."

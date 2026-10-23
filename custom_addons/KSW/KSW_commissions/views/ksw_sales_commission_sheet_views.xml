@@ -39,6 +39,13 @@
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
+                        <button name="action_open_bas_detail"
+                                type="object" class="oe_stat_button"
+                                icon="fa-table"
+                                invisible="x_bas_detail_count == 0">
+                            <field name="x_bas_detail_count"
+                                   widget="statinfo" string="BAS Detail"/>
+                        </button>
                         <button name="action_open_bas_sales_reps"
                                 type="object" class="oe_stat_button"
                                 icon="fa-user-plus"
@@ -83,6 +90,14 @@
                                     <field name="achieved_sales"/>
                                     <field name="sales_pct" string="Sales %"/>
                                     <field name="target_collection"/>
+                                    <field name="x_sales_adjustment"
+                                           optional="hide"/>
+                                    <field name="x_sales_adjustment_note"
+                                           optional="hide"/>
+                                    <field name="x_target_collection_adjustment"
+                                           optional="hide"/>
+                                    <field name="x_target_adjustment_note"
+                                           optional="hide"/>
                                     <field name="achieved_collection"/>
                                     <field name="collection_pct" string="Coll. %"/>
                                     <field name="sales_commission_amount"

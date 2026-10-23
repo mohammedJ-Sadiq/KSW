@@ -1,0 +1,43 @@
+.o_ksw_dashboard {
+    height: 100%;
+    overflow: auto;
+    padding: 16px;
+    background-color: $o-webclient-background-color;
+
+    .o_ksw_grid {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        margin-bottom: 12px;
+        &.o_ksw_wide { grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); }
+    }
+    .o_ksw_card {
+        background: $o-view-background-color;
+        border: 1px solid $border-color;
+        border-radius: 8px;
+        padding: 14px 16px;
+        min-width: 0;
+        h5 { font-size: 0.95rem; margin-bottom: 10px; color: $o-main-text-color; }
+    }
+    .o_ksw_tile {
+        cursor: pointer;
+        &:hover { border-color: $o-brand-primary; }
+        .o_ksw_tile_label { font-size: 0.8rem; color: $text-muted; text-transform: uppercase; letter-spacing: 0.03em; }
+        .o_ksw_tile_value { font-size: 1.6rem; font-weight: 600; line-height: 1.2; }
+        .o_ksw_tile_sub { font-size: 0.85rem; color: $text-muted; }
+    }
+    .o_ksw_good { color: $success; }
+    .o_ksw_bad { color: $danger; }
+    .o_ksw_warn { color: $warning; }
+    .o_ksw_rows {
+        width: 100%;
+        td { padding: 4px 0; border-bottom: 1px solid $border-color; vertical-align: middle; }
+        tr:last-child td { border-bottom: 0; }
+        tr.o_ksw_click { cursor: pointer; &:hover td { color: $o-brand-primary; } }
+        .o_ksw_num { text-align: end; white-space: nowrap; font-variant-numeric: tabular-nums; }
+        .o_ksw_name { max-width: 0; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-inline-end: 8px; }
+    }
+    .o_ksw_bar { height: 8px; border-radius: 4px; background: $o-brand-primary; opacity: 0.75; }
+    .o_ksw_bar_track { background: rgba($o-brand-primary, 0.1); border-radius: 4px; }
+    .o_ksw_empty { color: $text-muted; font-size: 0.9rem; }
+}

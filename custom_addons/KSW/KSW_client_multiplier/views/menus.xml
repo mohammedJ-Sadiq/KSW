@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Every menuitem repeats parent= and name= (KSW gotcha #1). -->
+
+    <!-- Water Delivery: the Supervisor's page, where a change is asked for. -->
+    <menuitem id="menu_water_client_multipliers"
+              name="Client Multipliers"
+              parent="KSW_water_delivery.menu_water_delivery_root"
+              action="action_client_multipliers"
+              sequence="46"
+              groups="KSW_water_delivery.group_water_dispatcher,base.group_system"/>
+    <menuitem id="menu_water_multiplier_requests"
+              name="Multiplier Requests"
+              parent="KSW_water_delivery.menu_water_delivery_root"
+              action="action_multiplier_requests"
+              sequence="46"
+              groups="KSW_water_delivery.group_water_dispatcher,base.group_system"/>
+
+    <!-- Accounting: the same list, read-only (no Supervisor group, no button). -->
+    <menuitem id="menu_account_client_multipliers"
+              name="Client Multipliers"
+              parent="account.menu_finance_receivables"
+              action="action_client_multipliers"
+              sequence="95"
+              groups="account.group_account_readonly,account.group_account_invoice"/>
+</odoo>

@@ -62,7 +62,9 @@
                         <page string="Items">
                             <field name="line_ids" readonly="state != 'draft'">
                                 <list editable="bottom">
-                                    <field name="consumable_id"/>
+                                    <field name="consumable_id" optional="show"
+                                           placeholder="Not a stocked item"/>
+                                    <field name="name"/>
                                     <field name="category_id" optional="hide"/>
                                     <field name="qty_on_hand"/>
                                     <field name="uom" optional="hide"/>
@@ -117,7 +119,10 @@
             <p>
                 Generate one from the Consumables list once an item is low
                 on stock - select specific items first, or leave nothing
-                selected to pull in everything currently low.
+                selected to pull in everything currently low. You can also
+                create one here directly, for items outside the consumables
+                list (e.g. a new laptop): leave Consumable empty and type a
+                Description.
             </p>
         </field>
     </record>

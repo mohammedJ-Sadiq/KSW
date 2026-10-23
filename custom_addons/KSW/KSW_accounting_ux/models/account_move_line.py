@@ -1,8 +1,43 @@
-from odoo import models
+from collections import defaultdict
+
+from odoo import api, fields, models
 
 
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
+
+    # The two BAS cost-centre dimensions as plain columns. The distribution
+    # widget shows both in one cell, and only to Analytic Accounting users; a
+    # line carries at most one of each (BAS tags one per column), so these
+    # can be shown, sorted, grouped and filtered like any field. A split
+    # distribution shows its largest share.
+    x_cost_centre_id = fields.Many2one(
+        'account.analytic.account', string='Cost Centre', compute='_compute_ksw_cost_centres',
+        store=True, index=True, help='Vehicle or department (BAS COST_CENTER).')
+    x_employee_cost_centre_id = fields.Many2one(
+        'account.analytic.account', string='Employee Cost Centre',
+        compute='_compute_ksw_cost_centres', store=True, index=True,
+        help='The driver or employee (BAS COST_CENTER2, «مركز تكلفة الموظف»).')
+
+    @api.depends('analytic_distribution')
+    def _compute_ksw_cost_centres(self):
+        lines = self.filtered('analytic_distribution')
+        (self - lines).update({'x_cost_centre_id': False, 'x_employee_cost_centre_id': False})
+        if not lines:
+            return
+        ids = {int(i) for line in lines for key in line.analytic_distribution for i in key.split(',')
+               if i.isdigit()}
+        Account = self.env['account.analytic.account'].sudo().with_context(active_test=False)
+        root = {a.id: a.root_plan_id.x_bas_code for a in Account.browse(ids).exists()}
+        for line in lines:
+            share = defaultdict(lambda: defaultdict(float))
+            for key, pct in line.analytic_distribution.items():
+                for i in key.split(','):
+                    if i.isdigit() and int(i) in root:
+                        share[root[int(i)]][int(i)] += pct or 0.0
+            pick = {plan: max(acc, key=acc.get) for plan, acc in share.items()}
+            line.x_cost_centre_id = pick.get('WREF10', False)
+            line.x_employee_cost_centre_id = pick.get('WREF10-EMP', False)
 
     def _get_computed_taxes(self):
         """Fall back to the company's default sale/purchase tax.

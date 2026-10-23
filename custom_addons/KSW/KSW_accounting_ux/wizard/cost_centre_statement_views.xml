@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cost_centre_statement_form" model="ir.ui.view">
+        <field name="name">ksw.cost.centre.statement.form</field>
+        <field name="model">ksw.cost.centre.statement</field>
+        <field name="arch" type="xml">
+            <form string="Cost Centre Statement">
+                <sheet>
+                    <group>
+                        <group string="Which Cost Centre">
+                            <field name="plan_filter" widget="radio"/>
+                            <field name="allowed_plan_ids" invisible="1"/>
+                            <field name="allowed_group_ids" invisible="1"/>
+                            <field name="selection_mode" widget="radio"/>
+                            <field name="analytic_account_id" options="{'no_create': True, 'no_open': True}"
+                                   invisible="selection_mode != 'one'" required="selection_mode == 'one'"
+                                   placeholder="Type a name or code, e.g. T197 or a driver"/>
+                            <field name="analytic_account_ids" widget="many2many_tags"
+                                   options="{'no_create': True}"
+                                   invisible="selection_mode != 'several'" required="selection_mode == 'several'"
+                                   placeholder="Type names or codes"/>
+                            <field name="code_from" invisible="selection_mode != 'range'" placeholder="e.g. 141"/>
+                            <field name="code_to" invisible="selection_mode != 'range'" placeholder="e.g. 142"/>
+                            <field name="group_plan_id" options="{'no_create': True, 'no_open': True}"
+                                   invisible="selection_mode != 'group'" required="selection_mode == 'group'"/>
+                            <field name="layout" widget="radio" invisible="selection_mode == 'one'"/>
+                        </group>
+                        <group string="Which Period">
+                            <field name="period_mode" widget="radio" options="{'horizontal': true}"/>
+                            <field name="date_from" invisible="period_mode == 'all'" required="period_mode == 'period'"/>
+                            <field name="date_to" invisible="period_mode == 'all'" required="period_mode == 'period'"/>
+                        </group>
+                    </group>
+                    <group string="Which Entries">
+                        <group>
+                            <field name="account_scope" widget="radio"/>
+                        </group>
+                        <group>
+                            <field name="account_ids" widget="many2many_tags" options="{'no_create': True}"
+                                   invisible="account_scope != 'accounts'"
+                                   required="account_scope == 'accounts'"/>
+                            <field name="posted_only"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_show" type="object" string="Show" class="btn-primary" icon="fa-list"/>
+                    <button name="action_print" type="object" string="Print PDF" class="btn-secondary" icon="fa-print"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cost_centre_statement" model="ir.actions.act_window">
+        <field name="name">Cost Centre Statement</field>
+        <field name="res_model">ksw.cost.centre.statement</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="view_cost_centre_statement_line_list" model="ir.ui.view">
+        <field name="name">ksw.cost.centre.statement.line.list</field>
+        <field name="model">ksw.cost.centre.statement.line</field>
+        <field name="arch" type="xml">
+            <list string="Cost Centre Statement" create="0" edit="0" delete="0"
+                  decoration-bf="is_opening" decoration-info="is_opening">
+                <field name="is_opening" column_invisible="1"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="move_id" column_invisible="1"/>
+                <field name="date"/>
+                <field name="document"/>
+                <field name="journal_id" optional="hide"/>
+                <field name="account_id"/>
+                <field name="partner_id" optional="show"/>
+                <field name="label"/>
+                <field name="share" optional="hide"/>
+                <field name="debit" sum="Total"/>
+                <field name="credit" sum="Total"/>
+                <field name="running_balance"/>
+                <button name="action_open_document" type="object" string="Open" icon="fa-external-link"
+                        class="btn-link" invisible="not move_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Several cost centres: one expanded group each, opening row first. -->
+    <record id="view_cost_centre_statement_line_list_grouped" model="ir.ui.view">
+        <field name="name">ksw.cost.centre.statement.line.list.grouped</field>
+        <field name="model">ksw.cost.centre.statement.line</field>
+        <field name="inherit_id" ref="view_cost_centre_statement_line_list"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <list position="attributes">
+                <attribute name="expand">1</attribute>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_cost_centre_statement_line_summary" model="ir.ui.view">
+        <field name="name">ksw.cost.centre.statement.line.summary</field>
+        <field name="model">ksw.cost.centre.statement.line</field>
+        <field name="arch" type="xml">
+            <list string="Cost Centres Summary" create="0" edit="0" delete="0">
+                <field name="currency_id" column_invisible="1"/>
+                <field name="cost_centre_id"/>
+                <field name="opening" sum="Total"/>
+                <field name="debit" sum="Total"/>
+                <field name="credit" sum="Total"/>
+                <field name="running_balance" string="Closing"/>
+                <button name="action_open_cost_centre_statement" type="object" string="Statement"
+                        icon="fa-list" class="btn-link"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_cost_centre_statement_line_pivot" model="ir.ui.view">
+        <field name="name">ksw.cost.centre.statement.line.pivot</field>
+        <field name="model">ksw.cost.centre.statement.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Cost Centre Statement">
+                <field name="cost_centre_id" type="row"/>
+                <field name="date" interval="month" type="col"/>
+                <field name="debit" type="measure"/>
+                <field name="credit" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_cost_centre_statement_line_search" model="ir.ui.view">
+        <field name="name">ksw.cost.centre.statement.line.search</field>
+        <field name="model">ksw.cost.centre.statement.line</field>
+        <field name="arch" type="xml">
+            <search string="Cost Centre Statement">
+                <field name="cost_centre_id"/>
+                <field name="account_id"/>
+                <field name="partner_id"/>
+                <field name="document"/>
+                <field name="label"/>
+                <group>
+                    <filter name="g_cost_centre" string="Cost Centre" context="{'group_by': 'cost_centre_id'}"/>
+                    <filter name="g_account" string="Account" context="{'group_by': 'account_id'}"/>
+                    <filter name="g_month" string="Month" context="{'group_by': 'date:month'}"/>
+                    <filter name="g_journal" string="Journal" context="{'group_by': 'journal_id'}"/>
+                    <filter name="g_partner" string="Partner" context="{'group_by': 'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_report_cost_centre_statement" model="ir.actions.report">
+        <field name="name">Cost Centre Statement</field>
+        <field name="model">ksw.cost.centre.statement</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">KSW_accounting_ux.report_cost_centre_statement</field>
+        <field name="report_file">KSW_accounting_ux.report_cost_centre_statement</field>
+        <field name="print_report_name">'Statement - %s' % object.analytic_account_id.name</field>
+    </record>
+
+    <template id="report_cost_centre_statement">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h4>Cost Centre Statement</h4>
+                        <p>
+                            <span t-if="o.period_mode == 'period'"><span t-field="o.date_from"/> to <span t-field="o.date_to"/></span>
+                            <span t-else="">All history</span>
+                        </p>
+                        <t t-if="o.layout == 'summary' and o.selection_mode != 'one'">
+                            <table class="table table-sm o_main_table">
+                                <thead><tr><th>Cost Centre</th><th class="text-end">Opening</th>
+                                    <th class="text-end">Debit</th><th class="text-end">Credit</th>
+                                    <th class="text-end">Closing</th></tr></thead>
+                                <tbody>
+                                    <tr t-foreach="o.line_ids" t-as="l">
+                                        <td><span t-field="l.cost_centre_id"/></td>
+                                        <td class="text-end"><span t-field="l.opening"/></td>
+                                        <td class="text-end"><span t-field="l.debit"/></td>
+                                        <td class="text-end"><span t-field="l.credit"/></td>
+                                        <td class="text-end"><span t-field="l.running_balance"/></td>
+                                    </tr>
+                                </tbody>
+                                <tfoot><tr class="fw-bold"><td>Total</td>
+                                    <td class="text-end"><span t-field="o.opening_balance"/></td>
+                                    <td class="text-end"><span t-field="o.total_debit"/></td>
+                                    <td class="text-end"><span t-field="o.total_credit"/></td>
+                                    <td class="text-end"><span t-field="o.closing_balance"/></td></tr></tfoot>
+                            </table>
+                        </t>
+                        <t t-else="">
+                            <t t-foreach="o._report_units()" t-as="unit">
+                                <h5 class="mt-4"><span t-out="unit[0].display_name"/></h5>
+                                <table class="table table-sm o_main_table">
+                                    <thead>
+                                        <tr><th>Date</th><th>Document</th><th>Account</th><th>Description</th>
+                                            <th class="text-end">Debit</th><th class="text-end">Credit</th>
+                                            <th class="text-end">Balance</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="unit[1]" t-as="l" t-att-class="'fw-bold' if l.is_opening else None">
+                                            <td><span t-field="l.date"/></td>
+                                            <td><span t-out="l.document or ''"/></td>
+                                            <td><span t-out="l.account_id.code or ''"/></td>
+                                            <td><span t-out="l.label or ''"/></td>
+                                            <td class="text-end"><span t-if="not l.is_opening" t-field="l.debit"/></td>
+                                            <td class="text-end"><span t-if="not l.is_opening" t-field="l.credit"/></td>
+                                            <td class="text-end"><span t-field="l.running_balance"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </t>
+                            <p t-if="len(o._report_units()) &gt; 1" class="fw-bold">
+                                Total: debit <span t-field="o.total_debit"/>, credit <span t-field="o.total_credit"/>,
+                                closing <span t-field="o.closing_balance"/>
+                            </p>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_cost_centres_statement" model="ir.actions.act_window">
+        <field name="name">Cost Centres Statement</field>
+        <field name="res_model">ksw.cost.centre.statement</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_selection_mode': 'range', 'default_plan_filter': 'cost_centre'}</field>
+    </record>
+
+    <menuitem id="menu_ksw_cost_centre_statement" name="Cost Centre Statement"
+              parent="account.account_reports_management_menu"
+              action="action_cost_centre_statement" sequence="25"/>
+    <menuitem id="menu_ksw_cost_centres_statement" name="Cost Centres Statement"
+              parent="account.account_reports_management_menu"
+              action="action_cost_centres_statement" sequence="26"/>
+</odoo>

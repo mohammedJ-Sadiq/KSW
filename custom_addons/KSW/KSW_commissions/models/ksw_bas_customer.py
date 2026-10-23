@@ -113,7 +113,21 @@ class KswBasCustomer(models.Model):
     # history via FIFO matching, not trusted from BAS's stored fields.
     # ------------------------------------------------------------------
     @api.model
-    def _compute_collection_target(self, employee, as_of_date):
+    def _compute_collection_target(self, employee, as_of_date, ctype=None):
+        """Net collection target for ``employee`` in the month containing
+        ``as_of_date``. The method is a setting (Sales & Collection from
+        BAS > Target Method): ``due_balance`` reads the customer ledger the
+        way the commission workbook does (see ksw.sales.commission.bas);
+        ``fifo`` is the original aging below, kept selectable.
+        """
+        Engine = self.env['ksw.sales.commission.bas']
+        if Engine._config()['target_method'] == 'due_balance':
+            return Engine._employee_collection_target(
+                employee, as_of_date, ctype=ctype)
+        return self._compute_collection_target_fifo(employee, as_of_date)
+
+    @api.model
+    def _compute_collection_target_fifo(self, employee, as_of_date):
         """Sum of the aged (overdue, past credit_term_days) open balance
         across every BAS customer whose effective collector is
         ``employee``, as of ``as_of_date`` (a date, typically a period

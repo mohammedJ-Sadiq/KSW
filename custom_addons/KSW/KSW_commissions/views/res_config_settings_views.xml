@@ -35,6 +35,59 @@
                             <field name="ksw_meal_dinner_price"/>
                         </setting>
                     </block>
+                    <block title="Sales &amp; Collection from BAS"
+                           name="ksw_sales_collection_bas"
+                           help="How Pull from BAS builds a month on the Sales &amp; Collection sheets. The defaults reproduce the accountant's March 2026 workbook; change one here and the next pull follows it.">
+                        <setting id="ksw_sc_vat_rate" string="VAT to Remove"
+                                 help="BAS amounts include VAT; commission is worked without it.">
+                            <field name="ksw_sc_vat_rate"/>
+                        </setting>
+                        <setting id="ksw_sc_ledgers" string="Customer Ledgers in Scope"
+                                 help="Customer account prefixes, comma separated. * = every customer.">
+                            <field name="ksw_sc_ledger_prefixes"/>
+                        </setting>
+                        <setting id="ksw_sc_docs" string="BAS Document Types"
+                                 help="Which BAS voucher types are sales (002 month-end invoice), sales returns, and collections (018 cash, 015 bank).">
+                            <div class="row">
+                                <label for="ksw_sc_sales_doc_types" class="col-lg-5 o_light_label"/>
+                                <field name="ksw_sc_sales_doc_types"/>
+                            </div>
+                            <div class="row">
+                                <label for="ksw_sc_sales_return_doc_types" class="col-lg-5 o_light_label"/>
+                                <field name="ksw_sc_sales_return_doc_types"/>
+                            </div>
+                            <div class="row">
+                                <label for="ksw_sc_collection_doc_types" class="col-lg-5 o_light_label"/>
+                                <field name="ksw_sc_collection_doc_types"/>
+                            </div>
+                        </setting>
+                        <setting id="ksw_sc_attribution" string="Credit To"
+                                 help="Who a sale or collection is credited to, and who owns a customer's collection target.">
+                            <div class="row">
+                                <label for="ksw_sc_attribution" class="col-lg-5 o_light_label"/>
+                                <field name="ksw_sc_attribution"/>
+                            </div>
+                            <div class="row">
+                                <label for="ksw_sc_target_owner" class="col-lg-5 o_light_label"/>
+                                <field name="ksw_sc_target_owner"/>
+                            </div>
+                        </setting>
+                        <setting id="ksw_sc_target" string="Collection Target"
+                                 help="Balance due = balance at the end of the previous month minus invoices still within the payment term.">
+                            <div class="row">
+                                <label for="ksw_sc_target_method" class="col-lg-5 o_light_label"/>
+                                <field name="ksw_sc_target_method"/>
+                            </div>
+                            <div class="row">
+                                <label for="ksw_sc_term_source" class="col-lg-5 o_light_label"/>
+                                <field name="ksw_sc_term_source"/>
+                            </div>
+                            <div class="row">
+                                <label for="ksw_sc_default_term_days" class="col-lg-5 o_light_label"/>
+                                <field name="ksw_sc_default_term_days"/>
+                            </div>
+                        </setting>
+                    </block>
                 </app>
             </xpath>
         </field>

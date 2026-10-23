@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- BAS has no CODE2 master: names come from each code's cash box and
+         sales accounts (COD10.DNAME, 2026-10-21). noupdate so corrections
+         made in Accounting > Configuration > BAS Branches survive upgrades. -->
+    <data noupdate="1">
+        <record id="bas_branch_010" model="ksw.bas.branch">
+            <field name="code">010</field>
+            <field name="name">Head Office (General Ledger)</field>
+            <field name="note">Only journal vouchers 018 and bank receipts 015</field>
+        </record>
+        <record id="bas_branch_110" model="ksw.bas.branch">
+            <field name="code">110</field>
+            <field name="name">Head Office - Kawthar Office</field>
+            <field name="note">Sales 4101120002 مبيعات المركز الرئيسي -مكتب الكوثر</field>
+        </record>
+        <record id="bas_branch_115" model="ksw.bas.branch">
+            <field name="code">115</field>
+            <field name="name">Tyres Store - Isuzu</field>
+            <field name="note">Stock issues on 1206010003 tyres; current account 2104010001 فرع الايسوزو. Unconfirmed</field>
+        </record>
+        <record id="bas_branch_120" model="ksw.bas.branch">
+            <field name="code">120</field>
+            <field name="name">Nabiya</field>
+            <field name="note">Cash 1201020001 حساب الصندوق (فرع النابية)</field>
+        </record>
+        <record id="bas_branch_125" model="ksw.bas.branch">
+            <field name="code">125</field>
+            <field name="name">Investment - Jubail Camps</field>
+            <field name="note">Cash 1201020012 صندوق الاستثمار A; sales مبيعات كمب الجبيل A</field>
+        </record>
+        <record id="bas_branch_135" model="ksw.bas.branch">
+            <field name="code">135</field>
+            <field name="name">Isuzu Sector</field>
+            <field name="note">Sales 4101130001 مبيعات قطاع الايسوزو (عملاء)</field>
+        </record>
+        <record id="bas_branch_140" model="ksw.bas.branch">
+            <field name="code">140</field>
+            <field name="name">Jubail</field>
+            <field name="note">Cash 1201020003 حساب الصندوق فرع (الجبيل)</field>
+        </record>
+        <record id="bas_branch_145" model="ksw.bas.branch">
+            <field name="code">145</field>
+            <field name="name">Manifa</field>
+            <field name="note">Cash 1201020004 حساب الصندوق (فرع منيفة)</field>
+        </record>
+        <record id="bas_branch_150" model="ksw.bas.branch">
+            <field name="code">150</field>
+            <field name="name">Tyres Store</field>
+            <field name="note">Stock issues on 1206010003 tyres only. Unconfirmed</field>
+        </record>
+        <record id="bas_branch_152" model="ksw.bas.branch">
+            <field name="code">152</field>
+            <field name="name">Qiddiya</field>
+            <field name="note">Sales 4101160002 مبيعات فرع القدية</field>
+        </record>
+        <record id="bas_branch_155" model="ksw.bas.branch">
+            <field name="code">155</field>
+            <field name="name">External Sales (Drivers)</field>
+            <field name="note">Cash 1201020016 صندوق المبيعات الخارجية</field>
+        </record>
+        <record id="bas_branch_160" model="ksw.bas.branch">
+            <field name="code">160</field>
+            <field name="name">External Sales - Tariq</field>
+            <field name="note">Cash 1201020013 صندوق / طارق ابو الحسن. Unconfirmed</field>
+        </record>
+        <record id="bas_branch_165" model="ksw.bas.branch">
+            <field name="code">165</field>
+            <field name="name">Maintenance &amp; Projects Store</field>
+            <field name="note">Maintenance spares 1206010002, مشتريات فرع المشاريع. Unconfirmed</field>
+        </record>
+        <record id="bas_branch_170" model="ksw.bas.branch">
+            <field name="code">170</field>
+            <field name="name">Othmaniya</field>
+            <field name="note">Cash 1201020006 حساب الصندوق (فرع العثمانية)</field>
+        </record>
+        <record id="bas_branch_171" model="ksw.bas.branch">
+            <field name="code">171</field>
+            <field name="name">North Manifa</field>
+            <field name="note">Cash 1201020015 صندوق فرع شمال منيفة</field>
+        </record>
+        <record id="bas_branch_172" model="ksw.bas.branch">
+            <field name="code">172</field>
+            <field name="name">Scope Factory</field>
+            <field name="note">Cash 1201020010 صندوق مصنع (سكوب)</field>
+        </record>
+        <record id="bas_branch_175" model="ksw.bas.branch">
+            <field name="code">175</field>
+            <field name="name">Al-Hayat Factory - Al-Ahsa</field>
+            <field name="note">Cash 1201020008 صندوق مصنع الاحساء; sales فرع الحياة H1</field>
+        </record>
+        <record id="bas_branch_180" model="ksw.bas.branch">
+            <field name="code">180</field>
+            <field name="name">Qairawan</field>
+            <field name="note">Cash 1201020007 حساب صندوق القيروان</field>
+        </record>
+        <record id="bas_branch_185" model="ksw.bas.branch">
+            <field name="code">185</field>
+            <field name="name">Tabuk 2</field>
+            <field name="note">Cash 1201020009 حساب الصندوق (فرع تبوك 2)</field>
+        </record>
+        <record id="bas_branch_190" model="ksw.bas.branch">
+            <field name="code">190</field>
+            <field name="name">Haradh</field>
+            <field name="note">Cash 1201020011 حساب صندوق فرع حرض</field>
+        </record>
+    </data>
+</odoo>

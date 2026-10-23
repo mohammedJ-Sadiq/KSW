@@ -29,4 +29,10 @@
         parent="menu_bas_root"
         action="action_bas_payment"
         sequence="30"/>
+
+    <menuitem id="menu_bas_ledger"
+        name="Customer Ledger"
+        parent="menu_bas_root"
+        action="action_bas_ledger_line"
+        sequence="35"/>
 </odoo>

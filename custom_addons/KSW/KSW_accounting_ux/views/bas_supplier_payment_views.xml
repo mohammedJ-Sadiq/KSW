@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_payment_form_ksw_bas" model="ir.ui.view">
+        <field name="name">account.payment.form.ksw.bas</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <div class="alert alert-info mb-0" role="status" invisible="not x_bas_mirror">
+                    Paid in BAS. The accounting entry is the BAS voucher
+                    <field name="x_bas_move_id" readonly="1" class="d-inline"/>; this payment has none of its own
+                    and cannot be edited.
+                </div>
+            </xpath>
+            <div name="button_box" position="inside">
+                <field name="x_bas_mirror" invisible="1"/>
+                <button class="oe_stat_button" name="action_view_bas_voucher" type="object" icon="fa-book"
+                        invisible="not x_bas_move_id" string="BAS Voucher"/>
+                <button class="oe_stat_button" name="action_view_bas_bills" type="object" icon="fa-file-text-o"
+                        invisible="not x_bas_bill_count">
+                    <field name="x_bas_bill_count" widget="statinfo" string="Bills Settled"/>
+                </button>
+            </div>
+        </field>
+    </record>
+
+    <record id="view_account_payment_search_ksw_bas" model="ir.ui.view">
+        <field name="name">account.payment.search.ksw.bas</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter name="ksw_from_bas" string="Paid in BAS" domain="[('x_bas_mirror', '=', True)]"/>
+                <filter name="ksw_from_odoo" string="Paid in Odoo" domain="[('x_bas_mirror', '=', False)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_move_form_ksw_bas_payments" model="ir.ui.view">
+        <field name="name">account.move.form.ksw.bas.payments</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button" name="action_view_bas_payments" type="object"
+                        icon="fa-money" invisible="not x_bas_payment_count">
+                    <field name="x_bas_payment_count" widget="statinfo" string="BAS Payments"/>
+                </button>
+            </div>
+        </field>
+    </record>
+</odoo>

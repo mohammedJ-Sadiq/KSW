@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Daily: a change effective today becomes the current value, new BAS
+         customers get their opening value, and BAS's own value is re-read
+         for the comparison column. -->
+    <record id="cron_refresh_client_multipliers" model="ir.cron">
+        <field name="name">Client Multipliers: daily refresh</field>
+        <field name="model_id" ref="model_ksw_client_multiplier"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_daily_refresh()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>

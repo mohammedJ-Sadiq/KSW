@@ -442,6 +442,33 @@ class TestWaterDeliveryScope(WaterDeliveryCommon):
         self.assertNotIn(theirs.id, visible.ids)
         self.assertIn(mine.id, visible.ids)
 
+    def test_inventory_user_with_water_role_sees_ordinary_deliveries(self):
+        # A water role's rule must not become the only grant on stock.picking
+        # for someone who is also an Inventory user.
+        wh = self.env['stock.warehouse'].search(
+            [('company_id', '=', self.company.id)], limit=1)
+        ordinary = self.env['stock.picking'].create({
+            'picking_type_id': wh.out_type_id.id,
+            'partner_id': self.customer.id,
+            'location_id': wh.lot_stock_id.id,
+            'location_dest_id': self.env.ref('stock.stock_location_customers').id,
+        })
+        note = self._issue_note().picking_id
+        clerk = self.env['res.users'].create({
+            'name': 'Billing Clerk', 'login': 'billing_clerk_inv',
+            'group_ids': [(6, 0, [
+                self.env.ref('base.group_user').id,
+                self.env.ref('stock.group_stock_user').id,
+                self.env.ref('KSW_water_delivery.group_water_billing').id,
+            ])],
+        })
+        visible = self.env['stock.picking'].with_user(clerk).search(
+            [('id', 'in', (ordinary | note).ids)])
+        self.assertEqual(set(visible.ids), {ordinary.id, note.id})
+        # ...and a driver still sees no ordinary delivery.
+        self.assertFalse(self.env['stock.picking'].with_user(
+            self.driver_user).search([('id', '=', ordinary.id)]))
+
     def test_a_driver_can_open_his_own_note(self):
         picking = self._issue_note().picking_id
         data = picking.with_user(self.driver_user).web_read({

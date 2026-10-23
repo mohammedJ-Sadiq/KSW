@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_multiplier_refuse_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.client.multiplier.refuse.wizard.form</field>
+        <field name="model">ksw.client.multiplier.refuse.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Refuse">
+                <field name="request_id" invisible="1"/>
+                <group>
+                    <field name="reason" placeholder="Why is this change refused?"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" type="object" string="Refuse" class="btn-danger"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

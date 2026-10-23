@@ -27,6 +27,9 @@ from . import ksw_pay_batch_export        # the batch as a spreadsheet
 from . import ksw_meal_settings           # res.config.settings: overtime params
 from . import ksw_salesperson_profile     # sales: yearly target + client splits
 from . import ksw_sales_commission_rule   # sales: rule + tier catalog
+from . import ksw_sales_commission_bas    # sales: one month read from the BAS ledger
+from . import ksw_sales_commission_bas_line  # sales: what a pull read, per customer
+from . import ksw_sales_commission_settings # sales: the BAS conventions, as settings
 from . import ksw_sales_commission_sheet  # sales: paid separately, not an entry type
 from . import ksw_sales_commission_addition_line   # accountant manual bonus/reward lines
 from . import ksw_sales_commission_deduction_line  # accountant manual penalty/correction lines

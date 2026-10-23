@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_item_movement_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.bas.item.movement.wizard.form</field>
+        <field name="model">ksw.bas.item.movement.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Item Movement">
+                <sheet>
+                    <group>
+                        <group string="Which Lines">
+                            <field name="branch_ids" widget="many2many_tags"
+                                   options="{'no_create': True}" placeholder="All branches"/>
+                            <field name="item_codes" placeholder="All items"/>
+                            <field name="only_differences"/>
+                        </group>
+                        <group string="Which Period">
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                    </group>
+                    <group string="How to Show Them">
+                        <group>
+                            <field name="layout" widget="radio"/>
+                        </group>
+                        <group invisible="layout == 'flat'">
+                            <field name="group_by" required="layout != 'flat'"/>
+                            <field name="group_by_2" invisible="group_by == 'none'"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_show" type="object" string="Show"
+                            class="btn-primary" icon="fa-list"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_item_movement_wizard" model="ir.actions.act_window">
+        <field name="name">Item Movement (BAS)</field>
+        <field name="res_model">ksw.bas.item.movement.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_item_movement"
+              name="Item Movement (BAS)"
+              parent="account.account_reports_management_menu"
+              action="action_item_movement_wizard"
+              sequence="90"/>
+
+</odoo>

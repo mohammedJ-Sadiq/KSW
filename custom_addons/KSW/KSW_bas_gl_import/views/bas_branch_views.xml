@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ksw_bas_branch_list" model="ir.ui.view">
+        <field name="name">ksw.bas.branch.list</field>
+        <field name="model">ksw.bas.branch</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="note" optional="show"/>
+                <field name="active" widget="boolean_toggle" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_ksw_bas_branch" model="ir.actions.act_window">
+        <field name="name">BAS Branches</field>
+        <field name="res_model">ksw.bas.branch</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <menuitem id="menu_ksw_bas_branch"
+              name="BAS Branches"
+              parent="account.menu_finance_configuration"
+              action="action_ksw_bas_branch"
+              groups="account.group_account_manager"
+              sequence="90"/>
+
+    <!-- Journal entries -->
+    <record id="view_account_move_filter_bas_branch" model="ir.ui.view">
+        <field name="name">account.move.filter.bas.branch</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_move_filter"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="x_bas_branch_id"/>
+            </field>
+            <filter name="journal" position="after">
+                <filter string="Branch" name="group_by_bas_branch" context="{'group_by': 'x_bas_branch_id'}"/>
+            </filter>
+        </field>
+    </record>
+
+    <record id="view_move_tree_bas_branch" model="ir.ui.view">
+        <field name="name">account.move.list.bas.branch</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_tree"/>
+        <field name="arch" type="xml">
+            <field name="journal_id" position="after">
+                <field name="x_bas_branch_id" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Invoices and bills -->
+    <record id="view_account_invoice_filter_bas_branch" model="ir.ui.view">
+        <field name="name">account.invoice.filter.bas.branch</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="x_bas_branch_id"/>
+            </field>
+            <filter name="groupy_by_journal" position="after">
+                <filter string="Branch" name="group_by_bas_branch" context="{'group_by': 'x_bas_branch_id'}"/>
+            </filter>
+        </field>
+    </record>
+
+    <record id="view_invoice_tree_bas_branch" model="ir.ui.view">
+        <field name="name">account.invoice.list.bas.branch</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="arch" type="xml">
+            <field name="ref" position="after">
+                <field name="x_bas_branch_id" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Transfers / delivery notes -->
+    <record id="view_picking_internal_search_bas_branch" model="ir.ui.view">
+        <field name="name">stock.picking.search.bas.branch</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_internal_search"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="x_bas_branch_id"/>
+            </field>
+            <filter name="picking_type" position="after">
+                <filter string="Branch" name="group_by_bas_branch" context="{'group_by': 'x_bas_branch_id'}"/>
+            </filter>
+        </field>
+    </record>
+
+    <record id="vpicktree_bas_branch" model="ir.ui.view">
+        <field name="name">stock.picking.list.bas.branch</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.vpicktree"/>
+        <field name="arch" type="xml">
+            <field name="origin" position="after">
+                <field name="x_bas_branch_id" optional="show"/>
+            </field>
+        </field>
+    </record>
+</odoo>

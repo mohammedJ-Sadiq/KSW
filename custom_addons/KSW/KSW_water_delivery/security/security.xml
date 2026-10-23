@@ -113,6 +113,20 @@
         <field name="perm_unlink" eval="False"/>
     </record>
 
+    <!-- Inventory users see every transfer, as in stock without this module.
+         Group rules are ORed per group the user holds, and stock ships no
+         group rule on stock.picking, so once a user also held Billing or
+         Supervisor the two rules above became the ONLY grant and every
+         non-water transfer vanished from Inventory (the 43,522 BAS delivery
+         orders on odoo_dev, 2026-10-21). No water role implies stock_user,
+         so drivers and supervisors keep exactly their scope. -->
+    <record id="rule_picking_stock_user_all" model="ir.rule">
+        <field name="name">Transfers: all (inventory user)</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="groups" eval="[(4, ref('stock.group_stock_user'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
     <!-- A driver sees what HIS phone sent, and nothing else. He needs to,
          because the app shows him what happened to each capture, but the
          queue of another driver's exceptions is not his business.

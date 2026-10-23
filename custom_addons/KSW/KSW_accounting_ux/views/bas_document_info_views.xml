@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- BAS's own information, one optional column away (hidden until wanted). -->
+    <record id="view_invoice_tree_ksw_bas_info" model="ir.ui.view">
+        <field name="name">account.invoice.list.ksw.bas.info</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="x_bas_doc_type" optional="hide"/>
+                <field name="x_bas_number" optional="hide"/>
+                <field name="x_bas_reference" optional="hide"/>
+                <field name="x_bas_remarks" optional="hide"/>
+                <field name="x_bas_entered_by" optional="hide"/>
+                <field name="x_bas_old_name" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_move_tree_ksw_bas_info" model="ir.ui.view">
+        <field name="name">account.move.list.ksw.bas.info</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="x_doc_category" optional="show"/>
+                <field name="x_bas_doc_type" optional="hide"/>
+                <field name="x_bas_number" optional="hide"/>
+                <field name="x_bas_reference" optional="hide"/>
+                <field name="x_bas_remarks" optional="hide"/>
+                <field name="x_bas_entered_by" optional="hide"/>
+                <field name="x_bas_old_name" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_move_form_ksw_bas_info" model="ir.ui.view">
+        <field name="name">account.move.form.ksw.bas.info</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="BAS" name="ksw_bas" invisible="not x_bas_key">
+                    <group>
+                        <group>
+                            <field name="x_bas_doc_type"/>
+                            <field name="x_bas_number"/>
+                            <field name="x_bas_key"/>
+                            <field name="x_bas_old_name"/>
+                        </group>
+                        <group>
+                            <field name="x_bas_reference"/>
+                            <field name="x_bas_remarks"/>
+                            <field name="x_bas_entered_by"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']/list/field[@name='name']" position="after">
+                <field name="x_bas_line_ref" optional="hide"/>
+                <field name="x_bas_line_remark" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_move_line_tree_ksw_bas_info" model="ir.ui.view">
+        <field name="name">account.move.line.list.ksw.bas.info</field>
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="account.view_move_line_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="x_doc_category" optional="hide"/>
+                <field name="x_bas_doc_type" optional="hide"/>
+                <field name="x_bas_number" optional="hide"/>
+                <field name="x_bas_line_ref" optional="hide"/>
+                <field name="x_bas_line_remark" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_account_payment_tree_ksw_bas_info" model="ir.ui.view">
+        <field name="name">account.payment.list.ksw.bas.info</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="x_bas_move_id" optional="hide"/>
+                <field name="x_bas_number" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Searchable by BAS number, reference and remarks. -->
+    <record id="view_account_move_filter_ksw_bas_info" model="ir.ui.view">
+        <field name="name">account.move.select.ksw.bas.info</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_move_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="x_bas_number"/>
+                <field name="x_bas_reference"/>
+                <field name="x_bas_remarks"/>
+                <field name="x_bas_old_name"/>
+                <field name="x_doc_category"/>
+                <group>
+                    <filter name="g_ksw_doc_category" string="Document Type"
+                            context="{'group_by': 'x_doc_category'}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_account_invoice_filter_ksw_bas_info" model="ir.ui.view">
+        <field name="name">account.invoice.select.ksw.bas.info</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="x_bas_number"/>
+                <field name="x_bas_reference"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_account_move_line_filter_ksw_doc_category" model="ir.ui.view">
+        <field name="name">account.move.line.search.ksw.doc.category</field>
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="account.view_account_move_line_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="x_doc_category"/>
+                <field name="x_bas_number"/>
+                <group>
+                    <filter name="g_ksw_line_doc_category" string="Document Type"
+                            context="{'group_by': 'x_doc_category'}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

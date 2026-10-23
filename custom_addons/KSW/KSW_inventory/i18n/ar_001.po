@@ -1,6 +1,3 @@
-# Translation of Odoo Server.
-# This file contains the translation of the following modules:
-# 	* KSW_inventory
 #
 msgid ""
 msgstr ""
@@ -15,6 +12,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW/KSW_inventory/models/purchase_link.py:0
+#: code:addons/KSW_inventory/models/purchase_link.py:0
+msgid "%(n)s new purchase lines to review."
+msgstr "تمت إضافة %(n)s سطر مشتريات جديد للمراجعة."
 
 #. module: KSW_inventory
 #: model_terms:ir.ui.view,arch_db:KSW_inventory.ksw_bas_inventory_setup_form
@@ -38,7 +42,13 @@ msgstr ""
 "مخزون لكل مستودع. يمكن تشغيله أكثر من مرة بأمان."
 
 #. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_review__account_id
+msgid "Account"
+msgstr "الحساب"
+
+#. module: KSW_inventory
 #. odoo-python
+#: code:addons/KSW/KSW_inventory/wizard/bas_inventory_setup.py:0
 #: code:addons/KSW_inventory/wizard/bas_inventory_setup.py:0
 msgid "Account %s is missing from the chart; run the BAS GL import first."
 msgstr ""
@@ -58,6 +68,13 @@ msgstr ""
 " موظف أو مشروع أو فرع كما يفعل BAS بحسابات 1207 و1212 و2104."
 
 #. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_part__amount
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_review__amount
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_product_purchase_history__amount
+msgid "Amount"
+msgstr "المبلغ"
+
+#. module: KSW_inventory
 #: model:ir.model.fields,field_description:KSW_inventory.field_stock_warehouse__x_bas_code
 msgid "BAS Code"
 msgstr "رمز BAS"
@@ -71,9 +88,51 @@ msgid "BAS Inventory Setup"
 msgstr "إعداد المخزون من BAS"
 
 #. module: KSW_inventory
+#: model:ir.model.fields.selection,name:KSW_inventory.selection__ksw_product_purchase_history__kind__bas
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_review_form
+msgid "BAS Purchase"
+msgstr "مشتريات BAS"
+
+#. module: KSW_inventory
+#: model:ir.model,name:KSW_inventory.model_ksw_bas_purchase_review
+msgid "BAS Purchase to Link"
+msgstr "مشتريات BAS للربط"
+
+#. module: KSW_inventory
+#: model:ir.actions.act_window,name:KSW_inventory.action_ksw_purchase_review
+#: model:ir.ui.menu,name:KSW_inventory.menu_ksw_purchase_review
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_review_list
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_review_search
+msgid "BAS Purchases to Link"
+msgstr "ربط مشتريات BAS بالأصناف"
+
+#. module: KSW_inventory
 #: model:ir.model.fields,field_description:KSW_inventory.field_stock_warehouse__x_bas_kind
 msgid "BAS Type"
 msgstr "نوع BAS"
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_part__bill_ref
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_review__bill_ref
+msgid "Bill"
+msgstr "الفاتورة"
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_part__text
+msgid "Bill Description"
+msgstr "بيان الفاتورة"
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_review__line_id
+msgid "Bill Line"
+msgstr "سطر الفاتورة"
+
+#. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW/KSW_inventory/models/purchase_link.py:0
+#: code:addons/KSW_inventory/models/purchase_link.py:0
+msgid "Choose the item and the quantity for \"%(text)s\", or split it."
+msgstr "اختر الصنف والكمية لـ \"%(text)s\"، أو قم بتقسيمه."
 
 #. module: KSW_inventory
 #: model_terms:ir.ui.view,arch_db:KSW_inventory.ksw_bas_inventory_setup_form
@@ -86,22 +145,62 @@ msgid "Company"
 msgstr "الشركة"
 
 #. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_review_form
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_review_list
+msgid "Confirm"
+msgstr "تأكيد"
+
+#. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_review_list
+msgid "Confirm Selected"
+msgstr "تأكيد المحدد"
+
+#. module: KSW_inventory
 #: model:ir.model.fields,field_description:KSW_inventory.field_stock_location__x_ksw_consumption
 msgid "Consumption Location"
 msgstr "موقع الاستهلاك"
 
 #. module: KSW_inventory
 #: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_inventory_setup__create_uid
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_part__create_uid
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_review__create_uid
 msgid "Created by"
 msgstr "أنشئ بواسطة"
 
 #. module: KSW_inventory
 #: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_inventory_setup__create_date
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_part__create_date
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_review__create_date
 msgid "Created on"
 msgstr "أنشئ في"
 
 #. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_part__currency_id
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_review__currency_id
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_product_purchase_history__currency_id
+msgid "Currency"
+msgstr "العملة"
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_part__date
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_review__date
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_product_purchase_history__date
+msgid "Date"
+msgstr "التاريخ"
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_review__text
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_product_purchase_history__description
+msgid "Description"
+msgstr "البيان"
+
+#. module: KSW_inventory
 #: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_inventory_setup__display_name
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_part__display_name
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_review__display_name
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_product_purchase_history__display_name
+#: model:ir.model.fields,field_description:KSW_inventory.field_product_product__display_name
+#: model:ir.model.fields,field_description:KSW_inventory.field_product_template__display_name
 #: model:ir.model.fields,field_description:KSW_inventory.field_stock_location__display_name
 #: model:ir.model.fields,field_description:KSW_inventory.field_stock_move__display_name
 #: model:ir.model.fields,field_description:KSW_inventory.field_stock_picking__display_name
@@ -111,7 +210,39 @@ msgid "Display Name"
 msgstr "اسم العرض"
 
 #. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_product_purchase_history__document
+msgid "Document"
+msgstr "المستند"
+
+#. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW/KSW_inventory/models/purchase_link.py:0
+#: code:addons/KSW_inventory/models/purchase_link.py:0
+msgid "Every item needs a product and a quantity."
+msgstr "كل بند يحتاج إلى صنف وكمية."
+
+#. module: KSW_inventory
+#: model:ir.actions.server,name:KSW_inventory.action_ksw_purchase_review_collect
+msgid "Find Purchases"
+msgstr "البحث عن المشتريات"
+
+#. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_product_purchase_history_search
+msgid "From BAS"
+msgstr "من BAS"
+
+#. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_product_purchase_history_search
+msgid "From Odoo"
+msgstr "من أودو"
+
+#. module: KSW_inventory
 #: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_inventory_setup__id
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_part__id
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_review__id
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_product_purchase_history__id
+#: model:ir.model.fields,field_description:KSW_inventory.field_product_product__id
+#: model:ir.model.fields,field_description:KSW_inventory.field_product_template__id
 #: model:ir.model.fields,field_description:KSW_inventory.field_stock_location__id
 #: model:ir.model.fields,field_description:KSW_inventory.field_stock_move__id
 #: model:ir.model.fields,field_description:KSW_inventory.field_stock_picking__id
@@ -146,19 +277,62 @@ msgid "Issue stock for use"
 msgstr "صرف المخزون للاستخدام"
 
 #. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_part__product_id
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_review__product_id
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_product_purchase_history__product_id
+msgid "Item"
+msgstr "الصنف"
+
+#. module: KSW_inventory
+#: model:ir.model,name:KSW_inventory.model_ksw_product_purchase_history
+msgid "Item Purchase History"
+msgstr "سجل مشتريات الصنف"
+
+#. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_review_search
+msgid "Item Suggested"
+msgstr "صنف مقترح"
+
+#. module: KSW_inventory
 #: model_terms:ir.ui.view,arch_db:KSW_inventory.view_picking_form_ksw_issue
 msgid "Item class account (e.g. 3102020002 tyres)"
 msgstr "حساب فئة الصنف (مثل 3102020002 الكفرات)"
 
 #. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_review__part_ids
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_review_list
+msgid "Items"
+msgstr "الأصناف"
+
+#. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_review_form
+msgid "Items on this line (quantities and amounts must add up to the line)"
+msgstr "الأصناف في هذا السطر (يجب أن يساوي مجموع المبالغ مبلغ السطر)"
+
+#. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_product_purchase_history_search
+msgid "Last 365 Days"
+msgstr "آخر 365 يوماً"
+
+#. module: KSW_inventory
 #: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_inventory_setup__write_uid
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_part__write_uid
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_review__write_uid
 msgid "Last Updated by"
 msgstr "آخر تحديث بواسطة"
 
 #. module: KSW_inventory
 #: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_inventory_setup__write_date
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_part__write_date
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_review__write_date
 msgid "Last Updated on"
 msgstr "آخر تحديث في"
+
+#. module: KSW_inventory
+#: model:ir.model.fields.selection,name:KSW_inventory.selection__ksw_bas_purchase_review__state__linked
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_review_search
+msgid "Linked"
+msgstr "مربوط"
 
 #. module: KSW_inventory
 #: model_terms:ir.ui.view,arch_db:KSW_inventory.ksw_bas_inventory_setup_form
@@ -169,6 +343,48 @@ msgstr "تحميل المخزون الافتتاحي"
 #: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_inventory_setup__log
 msgid "Log"
 msgstr "السجل"
+
+#. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_product_purchase_history_search
+msgid "Month"
+msgstr "الشهر"
+
+#. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW/KSW_inventory/models/purchase_link.py:0
+#: code:addons/KSW_inventory/models/purchase_link.py:0
+msgid "Name and size match (%(pct)s%%)"
+msgstr "تطابق الاسم والمقاس (%(pct)s%%)"
+
+#. module: KSW_inventory
+#: model:ir.model.fields.selection,name:KSW_inventory.selection__ksw_bas_purchase_review__state__not_stock
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_review_form
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_review_list
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_review_search
+msgid "Not a Stock Item"
+msgstr "ليس صنف مخزون"
+
+#. module: KSW_inventory
+#: model_terms:ir.actions.act_window,help:KSW_inventory.action_ksw_purchase_review
+msgid "Nothing to review"
+msgstr "لا يوجد ما يُراجع"
+
+#. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW/KSW_inventory/models/purchase_link.py:0
+#: code:addons/KSW_inventory/models/purchase_link.py:0
+msgid "Only an Inventory Administrator can link purchases."
+msgstr "فقط مدير المخزون يمكنه ربط المشتريات."
+
+#. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_product_purchase_history_list
+msgid "Open"
+msgstr "فتح"
+
+#. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_part_list
+msgid "Open Bill"
+msgstr "فتح الفاتورة"
 
 #. module: KSW_inventory
 #: model_terms:ir.actions.act_window,help:KSW_inventory.action_ksw_stock_issues
@@ -185,9 +401,54 @@ msgid "Picking Type"
 msgstr "نوع العملية"
 
 #. module: KSW_inventory
+#: model:ir.model,name:KSW_inventory.model_product_template
+msgid "Product"
+msgstr "الصنف"
+
+#. module: KSW_inventory
+#: model:ir.actions.act_window,name:KSW_inventory.action_ksw_product_purchase_history
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_product_purchase_history_list
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_product_purchase_history_pivot
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_product_purchase_history_search
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_part_list
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_part_pivot
+msgid "Purchase History"
+msgstr "سجل المشتريات"
+
+#. module: KSW_inventory
+#: model:ir.model,name:KSW_inventory.model_ksw_bas_purchase_part
+msgid "Purchase History Item"
+msgstr "بند سجل المشتريات"
+
+#. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW/KSW_inventory/models/purchase_link.py:0
+#: code:addons/KSW_inventory/models/purchase_link.py:0
+msgid "Purchase History for %s"
+msgstr "سجل مشتريات %s"
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_product_purchase_history__order_id
+#: model:ir.model.fields.selection,name:KSW_inventory.selection__ksw_product_purchase_history__kind__order
+msgid "Purchase Order"
+msgstr "أمر شراء"
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_part__quantity
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_review__quantity
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_product_purchase_history__quantity
+msgid "Quantity"
+msgstr "الكمية"
+
+#. module: KSW_inventory
 #: model_terms:ir.ui.view,arch_db:KSW_inventory.ksw_bas_inventory_setup_form
 msgid "Replace the quantities of all stock items with BAS's register?"
 msgstr "استبدال كميات جميع أصناف المخزون بسجل أصناف BAS؟"
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_part__review_id
+msgid "Review"
+msgstr "مراجعة"
 
 #. module: KSW_inventory
 #: model_terms:ir.ui.view,arch_db:KSW_inventory.ksw_bas_inventory_setup_form
@@ -196,21 +457,71 @@ msgstr "تشغيل الإعداد"
 
 #. module: KSW_inventory
 #. odoo-python
+#: code:addons/KSW/KSW_inventory/wizard/bas_inventory_setup.py:0
 #: code:addons/KSW_inventory/wizard/bas_inventory_setup.py:0
 msgid "Run the setup first: no BAS warehouses yet."
 msgstr "شغّل الإعداد أولاً: لا توجد مستودعات من BAS بعد."
 
 #. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_review_search
+msgid "Same Description"
+msgstr "نفس البيان"
+
+#. module: KSW_inventory
 #. odoo-python
+#: code:addons/KSW/KSW_inventory/models/purchase_link.py:0
+#: code:addons/KSW_inventory/models/purchase_link.py:0
+msgid "Same description as a line already linked"
+msgstr "نفس بيان سطر تم ربطه مسبقاً"
+
+#. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW/KSW_inventory/models/stock.py:0
 #: code:addons/KSW_inventory/models/stock.py:0
 msgid ""
 "Set a cost centre on every line of %(name)s before validating: %(items)s."
 msgstr "حدّد مركز تكلفة لكل سطر في %(name)s قبل الاعتماد: %(items)s."
 
 #. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW/KSW_inventory/models/purchase_link.py:0
+#: code:addons/KSW_inventory/models/purchase_link.py:0
+msgid "Several items on one line: split it"
+msgstr "عدة أصناف في سطر واحد: قم بتقسيمه"
+
+#. module: KSW_inventory
 #: model:ir.model.fields.selection,name:KSW_inventory.selection__stock_warehouse__x_bas_kind__showroom
 msgid "Showroom"
 msgstr "معرض"
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_product_purchase_history__kind
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_product_purchase_history_search
+msgid "Source"
+msgstr "المصدر"
+
+#. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_review_list
+msgid "Split"
+msgstr "تقسيم"
+
+#. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW/KSW_inventory/models/purchase_link.py:0
+#: code:addons/KSW_inventory/models/purchase_link.py:0
+msgid "Split into Items"
+msgstr "تقسيم إلى أصناف"
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_part__state
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_review__state
+msgid "State"
+msgstr "الحالة"
+
+#. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_review_search
+msgid "Stock Account"
+msgstr "حساب المخزون"
 
 #. module: KSW_inventory
 #: model:ir.model.fields,field_description:KSW_inventory.field_stock_picking__x_ksw_issue
@@ -231,6 +542,7 @@ msgstr "حركة المخزون"
 
 #. module: KSW_inventory
 #. odoo-python
+#: code:addons/KSW/KSW_inventory/models/stock.py:0
 #: code:addons/KSW_inventory/models/stock.py:0
 msgid "Stock issue %(name)s must go to a consumption location, not %(loc)s."
 msgstr "إذن الصرف %(name)s يجب أن يذهب إلى موقع استهلاك، وليس إلى %(loc)s."
@@ -245,15 +557,114 @@ msgstr ""
 "حساب الصرف بدلاً من حساب هذا الموقع."
 
 #. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_review__suggestion
+msgid "Suggestion"
+msgstr "الاقتراح"
+
+#. module: KSW_inventory
 #. odoo-python
+#: code:addons/KSW/KSW_inventory/wizard/bas_inventory_setup.py:0
 #: code:addons/KSW_inventory/wizard/bas_inventory_setup.py:0
 msgid "The company has no Stock Journal (Inventory Valuation)."
 msgstr "لا يوجد للشركة دفتر يومية للمخزون (تقييم المخزون)."
 
 #. module: KSW_inventory
+#: model:ir.model.fields,help:KSW_inventory.field_ksw_bas_purchase_review__pattern
+msgid "The description without quantity and invoice number."
+msgstr "البيان بدون الكمية ورقم الفاتورة."
+
+#. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW/KSW_inventory/models/purchase_link.py:0
+#: code:addons/KSW_inventory/models/purchase_link.py:0
+msgid "The items add up to %(parts)s but the bill line is %(line)s."
+msgstr "مجموع الأصناف %(parts)s بينما سطر الفاتورة %(line)s."
+
+#. module: KSW_inventory
+#: model:ir.model.fields,help:KSW_inventory.field_ksw_bas_purchase_review__product_id
+msgid "The stock item bought. For a line holding several items, use Split."
+msgstr "صنف المخزون المشترى. للسطر الذي يحتوي عدة أصناف استخدم التقسيم."
+
+#. module: KSW_inventory
+#: model:ir.model.constraint,message:KSW_inventory.constraint_ksw_bas_purchase_review_line_uniq
+msgid "This bill line is already listed."
+msgstr "سطر الفاتورة هذا مدرج مسبقاً."
+
+#. module: KSW_inventory
+#: model:ir.model.fields.selection,name:KSW_inventory.selection__ksw_bas_purchase_review__state__review
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_review_search
+msgid "To Review"
+msgstr "للمراجعة"
+
+#. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_product_purchase_history_list
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_part_list
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_review_form
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_review_list
+msgid "Total"
+msgstr "الإجمالي"
+
+#. module: KSW_inventory
 #: model:ir.model,name:KSW_inventory.model_stock_picking
 msgid "Transfer"
 msgstr "تحويل"
+
+#. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_review_form
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_review_list
+msgid "Undo"
+msgstr "تراجع"
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_part__unit_price
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_review__unit_price
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_product_purchase_history__unit_price
+msgid "Unit Price"
+msgstr "سعر الوحدة"
+
+#. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_review_list
+msgid "Unlink this purchase from its item(s)?"
+msgstr "فك ربط هذه المشتريات عن أصنافها؟"
+
+#. module: KSW_inventory
+#: model_terms:ir.actions.act_window,help:KSW_inventory.action_ksw_purchase_review
+msgid ""
+"Use Find Purchases to list the stock purchases on vendor bills that are not "
+"linked to an item."
+msgstr ""
+"استخدم \"البحث عن المشتريات\" لعرض مشتريات المخزون في فواتير الموردين غير "
+"المربوطة بصنف."
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_part__partner_id
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_review__partner_id
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_product_purchase_history__partner_id
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_product_purchase_history_search
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_ksw_purchase_review_search
+msgid "Vendor"
+msgstr "المورد"
+
+#. module: KSW_inventory
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_part__move_id
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_bas_purchase_review__move_id
+#: model:ir.model.fields,field_description:KSW_inventory.field_ksw_product_purchase_history__move_id
+#: model:ir.model.fields.selection,name:KSW_inventory.selection__ksw_product_purchase_history__kind__bill
+msgid "Vendor Bill"
+msgstr "فاتورة المورد"
+
+#. module: KSW_inventory
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_product_product_vendor_bills_button
+#: model_terms:ir.ui.view,arch_db:KSW_inventory.view_product_template_vendor_bills_button
+msgid "Vendor Bills"
+msgstr "فواتير الموردين"
+
+#. module: KSW_inventory
+#. odoo-python
+#: code:addons/KSW/KSW_inventory/models/purchase_link.py:0
+#: code:addons/KSW_inventory/models/purchase_link.py:0
+msgid "Vendor Bills for %s"
+msgstr "فواتير الموردين لـ %s"
 
 #. module: KSW_inventory
 #: model:ir.model,name:KSW_inventory.model_stock_warehouse
@@ -269,3 +680,8 @@ msgid ""
 msgstr ""
 "رمز المستودع في BAS (WSHOW.CODE)، مثل 15. مستندات هذا المستودع تحمل رمز "
 "الفرع 1 ثم الرمز (115)، والمعارض 2 ثم الرمز."
+
+#. module: KSW_inventory
+#: model:ir.model.fields,help:KSW_inventory.field_ksw_bas_purchase_review__suggestion
+msgid "Why the item was suggested."
+msgstr "سبب اقتراح الصنف."

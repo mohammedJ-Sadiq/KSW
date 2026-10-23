@@ -63,6 +63,12 @@ class BASCustomer(models.Model):
              'invoice (it is copied onto every document as DUTY_DAY). '
              'Applied to the linked contact\'s Customer Payment Terms.',
     )
+    opening_balance = fields.Float(
+        'Opening Balance', readonly=True, digits=(16, 2),
+        help='The balance the customer carried into this fiscal year, '
+             'positive when the customer owes us. COD10.DOLDACC stores it '
+             'with the opposite sign (negative = debit); reconciled '
+             '2026-10-21 against the March 2026 commission workbook.')
     last_synced = fields.Datetime('Last Synced', readonly=True)
     partner_id = fields.Many2one(
         'res.partner', string='Odoo Contact', ondelete='set null',
@@ -81,7 +87,7 @@ class BASCustomer(models.Model):
     _COMPARE_FIELDS = (
         'name_ar', 'name_en', 'is_stopped', 'seller_code', 'seller_name',
         'collector_code', 'collector_name', 'credit_term_days',
-        'invoice_term_days',
+        'invoice_term_days', 'opening_balance',
     )
 
     @api.model
@@ -97,7 +103,8 @@ class BASCustomer(models.Model):
             cursor.execute("""
                 SELECT DCODE1, DNAME, DNAME2, ISNULL(DSTOP, 0) AS DSTOP,
                        SELLER, SELLER2, ISNULL(LIMT_DAYS, 0) AS LIMT_DAYS,
-                       ISNULL(INVDAYS, 0) AS INVDAYS
+                       ISNULL(INVDAYS, 0) AS INVDAYS,
+                       ISNULL(DOLDACC, 0) AS DOLDACC
                 FROM COD10
                 WHERE DACC_TYPE = '01' AND DLEVEL = 5
                   AND DCODE1 LIKE '1203%'
@@ -159,6 +166,7 @@ class BASCustomer(models.Model):
                 'collector_name': seller_names.get(collector_code, ''),
                 'credit_term_days': int(row['LIMT_DAYS'] or 0),
                 'invoice_term_days': int(row['INVDAYS'] or 0),
+                'opening_balance': -float(row['DOLDACC'] or 0),
                 'last_synced': now,
             })
 

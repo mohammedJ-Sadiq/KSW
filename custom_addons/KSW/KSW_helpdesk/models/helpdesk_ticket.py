@@ -34,8 +34,9 @@ class HelpdeskTicket(models.Model):
     description = fields.Html(string='Detailed Description', required=True)
     employee_id = fields.Many2one(
         'hr.employee', string='Reported By', required=True, tracking=True,
-        default=lambda self: self.env.user.employee_id,
+        default=lambda self: self._default_employee_id(),
         domain=lambda self: self._domain_employee_id(),
+        context={'ksw_helpdesk_reporter': True},
         help="Who the ticket is for. You can only pick yourself, unless "
              "you are a manager - then you may also pick a direct report.",
     )
@@ -123,14 +124,34 @@ class HelpdeskTicket(models.Model):
     def _default_stage_id(self):
         return self.env['helpdesk.ticket.stage'].search([], order='sequence', limit=1)
 
+    def _is_helpdesk_agent(self):
+        return self.env.su or self.env.user.has_group('KSW_helpdesk.group_helpdesk_agent')
+
+    @api.model
+    def _reporter_own_employees(self):
+        # sudo() and no company filter on purpose: res.users.employee_id only
+        # returns the employee of the *active* company, and a plain employee
+        # may not even be able to read their own record (KSW_base_security
+        # rules, company rule). Either way "Reported By" came up empty.
+        own = self.env['hr.employee'].sudo().search([('user_id', '=', self.env.uid)])
+        return own.sorted(lambda e: e.company_id != self.env.company)
+
+    @api.model
+    def _reporter_employees(self):
+        """Employees the current user may report a ticket for: themselves
+        and their direct reports (sudo recordset)."""
+        own = self._reporter_own_employees()
+        if not own:
+            return own
+        return own | own.search([('parent_id', 'in', own.ids)])
+
+    def _default_employee_id(self):
+        return self._reporter_own_employees()[:1].id
+
     def _domain_employee_id(self):
-        if self.env.su or self.env.user.has_group('KSW_helpdesk.group_helpdesk_agent'):
+        if self._is_helpdesk_agent():
             return []
-        return [
-            '|',
-            ('user_id', '=', self.env.user.id),
-            ('parent_id.user_id', '=', self.env.user.id),
-        ]
+        return [('id', 'in', self._reporter_employees().ids)]
 
     @api.model
     def _read_group_stage_ids(self, stages, domain):
@@ -240,10 +261,9 @@ class HelpdeskTicket(models.Model):
                 orphans.sudo().write({'res_model': 'helpdesk.ticket', 'res_id': ticket.id})
 
     def _check_employee_scope(self, employee_id):
-        if not employee_id or self.env.su or self.env.user.has_group('KSW_helpdesk.group_helpdesk_agent'):
+        if not employee_id or self._is_helpdesk_agent():
             return
-        employee = self.env['hr.employee'].browse(employee_id)
-        if employee.user_id.id != self.env.user.id and employee.parent_id.user_id.id != self.env.user.id:
+        if employee_id not in self._reporter_employees().ids:
             raise UserError(_(
                 'You can only create or edit tickets for yourself or your '
                 'direct reports.'

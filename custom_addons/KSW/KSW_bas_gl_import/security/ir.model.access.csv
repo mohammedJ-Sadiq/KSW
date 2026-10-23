@@ -4,3 +4,5 @@ access_ksw_bas_fixed_asset_read,ksw.bas.fixed.asset.read,model_ksw_bas_fixed_ass
 access_ksw_bas_fixed_asset_mgr,ksw.bas.fixed.asset.manager,model_ksw_bas_fixed_asset,account.group_account_manager,1,1,1,1
 access_ksw_bas_fixed_asset_event_read,ksw.bas.fixed.asset.event.read,model_ksw_bas_fixed_asset_event,account.group_account_readonly,1,0,0,0
 access_ksw_bas_fixed_asset_event_mgr,ksw.bas.fixed.asset.event.manager,model_ksw_bas_fixed_asset_event,account.group_account_manager,1,1,1,1
+access_ksw_bas_branch_user,ksw.bas.branch.user,model_ksw_bas_branch,base.group_user,1,0,0,0
+access_ksw_bas_branch_mgr,ksw.bas.branch.manager,model_ksw_bas_branch,account.group_account_manager,1,1,1,1

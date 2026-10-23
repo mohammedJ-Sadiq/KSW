@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="KSW_erp_dashboard.BarChart">
+        <div class="o_ksw_chart" t-att-style="'height:' + (props.height or 260) + 'px'">
+            <canvas t-ref="canvas"/>
+        </div>
+    </t>
+
+    <!-- Header shared by both pages: title, period, refresh, and the standard page. -->
+    <t t-name="KSW_erp_dashboard.Header">
+        <div class="o_ksw_dash_header d-flex flex-wrap align-items-center gap-2 mb-3">
+            <h3 class="mb-0 me-auto" t-esc="title"/>
+            <div class="btn-group btn-group-sm" role="group">
+                <t t-foreach="periods" t-as="p" t-key="p[0]">
+                    <button type="button" class="btn"
+                            t-att-class="state.period === p[0] ? 'btn-primary' : 'btn-outline-secondary'"
+                            t-on-click="() => this.setPeriod(p[0])" t-esc="p[1]"/>
+                </t>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary" t-on-click="() => this.load()">
+                <i class="fa fa-refresh"/>
+            </button>
+            <button type="button" class="btn btn-sm btn-secondary" t-on-click="() => this.openStandard()"
+                    t-esc="standardLabel"/>
+        </div>
+    </t>
+</templates>

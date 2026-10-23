@@ -93,3 +93,7 @@ access_ksw_pay_settlement_item_accountant,ksw.pay.settlement.item accountant,mod
 access_ksw_pay_settlement_item_officer,ksw.pay.settlement.item officer,model_ksw_pay_settlement_item,group_commission_officer,1,0,0,0
 access_ksw_pay_settlement_new_wizard_accountant,ksw.pay.settlement.new.wizard accountant,model_ksw_pay_settlement_new_wizard,group_commission_accountant,1,1,1,1
 access_ksw_pay_bas_baseline_wizard_accountant,ksw.pay.bas.baseline.wizard accountant,model_ksw_pay_bas_baseline_wizard,group_commission_accountant,1,1,1,1
+access_ksw_sc_bas_line_entry,ksw.sales.commission.bas.line entry,model_ksw_sales_commission_bas_line,group_entry_sales,1,0,0,0
+access_ksw_sc_bas_line_officer,ksw.sales.commission.bas.line officer,model_ksw_sales_commission_bas_line,group_commission_officer,1,1,1,1
+access_ksw_sp_type_rule_user,ksw.salesperson.profile.type.rule read,model_ksw_salesperson_profile_type_rule,base.group_user,1,0,0,0
+access_ksw_sp_type_rule_officer,ksw.salesperson.profile.type.rule officer,model_ksw_salesperson_profile_type_rule,group_commission_officer,1,1,1,1

@@ -1,6 +1,6 @@
 {
     'name': 'KSW Accounting UX',
-    'version': '19.0.1.8.0',
+    'version': '19.0.1.12.0',
     'author': 'Mohammed Albadr',
     'category': 'Accounting',
     'summary': 'Accounting menus laid out like Odoo Enterprise, plus the statements Community lacks',
@@ -51,6 +51,10 @@ Partner Ledger and Bills Analysis.
         'views/actions.xml',
         'views/pl_depreciation_line_views.xml',
         'views/account_level_views.xml',
+        'views/account_move_cost_centre_views.xml',
+        'wizard/cost_centre_statement_views.xml',
+        'views/bas_supplier_payment_views.xml',
+        'views/bas_document_info_views.xml',
         'views/menus.xml',
     ],
     'installable': True,

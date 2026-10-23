@@ -8,7 +8,18 @@ class ItConsumablePurchaseRequestLine(models.Model):
     request_id = fields.Many2one(
         'it.consumable.purchase.request', required=True, ondelete='cascade', index=True,
     )
-    consumable_id = fields.Many2one('it.consumable', required=True)
+    # Optional: leave empty for a one-off purchase that is not a stocked
+    # consumable (e.g. a new laptop) - only the Description is then used,
+    # and Mark as Purchased creates no stock move for the line.
+    consumable_id = fields.Many2one(
+        'it.consumable', string='Consumable',
+        help="Pick a stocked consumable to restock it, or leave empty for a "
+             "one-off item outside the consumables list (e.g. a new laptop).",
+    )
+    name = fields.Char(
+        string='Description', required=True,
+        compute='_compute_name', store=True, readonly=False, precompute=True,
+    )
     category_id = fields.Many2one(related='consumable_id.category_id', store=True, readonly=True)
     uom = fields.Selection(related='consumable_id.uom', readonly=True)
     # Snapshot of the stock level when the line was added - deliberately not
@@ -21,6 +32,12 @@ class ItConsumablePurchaseRequestLine(models.Model):
     subtotal = fields.Monetary(
         compute='_compute_subtotal', store=True, currency_field='currency_id',
     )
+
+    @api.depends('consumable_id')
+    def _compute_name(self):
+        for line in self:
+            if line.consumable_id:
+                line.name = line.consumable_id.name
 
     @api.depends('quantity', 'unit_cost')
     def _compute_subtotal(self):

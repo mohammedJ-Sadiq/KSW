@@ -1,6 +1,6 @@
 {
     'name': 'KSW BAS External Sync',
-    'version': '19.0.1.3.0',
+    'version': '19.0.1.4.0',
     'author': 'Mohammed Albadr',
     'category': 'Custom',
     'summary': 'Read-only sync from BAS (bas9ss) SQL Server accounting system',
@@ -12,6 +12,7 @@
         'views/bas_customer_views.xml',
         'views/bas_invoice_views.xml',
         'views/bas_payment_views.xml',
+        'views/bas_ledger_views.xml',
         'views/menus.xml',
     ],
     'installable': True,

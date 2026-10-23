@@ -3,3 +3,7 @@ access_ksw_pl_wizard,ksw.pl.wizard,model_ksw_pl_wizard,account.group_account_rea
 access_ksw_pl_depreciation_line,ksw.pl.depreciation.line,model_ksw_pl_depreciation_line,account.group_account_readonly,1,1,1,0
 access_ksw_bs_wizard,ksw.bs.wizard,model_ksw_bs_wizard,account.group_account_readonly,1,1,1,0
 access_ksw_cf_wizard,ksw.cf.wizard,model_ksw_cf_wizard,account.group_account_readonly,1,1,1,0
+access_ksw_cc_statement_ro,ksw.cost.centre.statement readonly,model_ksw_cost_centre_statement,account.group_account_readonly,1,1,1,1
+access_ksw_cc_statement_inv,ksw.cost.centre.statement invoice,model_ksw_cost_centre_statement,account.group_account_invoice,1,1,1,1
+access_ksw_cc_statement_line_ro,ksw.cost.centre.statement.line readonly,model_ksw_cost_centre_statement_line,account.group_account_readonly,1,1,1,1
+access_ksw_cc_statement_line_inv,ksw.cost.centre.statement.line invoice,model_ksw_cost_centre_statement_line,account.group_account_invoice,1,1,1,1

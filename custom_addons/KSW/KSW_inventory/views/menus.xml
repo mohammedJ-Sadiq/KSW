@@ -5,4 +5,7 @@
     <menuitem id="menu_ksw_bas_inventory_setup" name="BAS Inventory Setup" sequence="90"
               parent="stock.menu_warehouse_config" action="action_ksw_bas_inventory_setup"
               groups="stock.group_stock_manager"/>
+    <menuitem id="menu_ksw_purchase_review" name="BAS Purchases to Link" sequence="91"
+              parent="stock.menu_warehouse_config" action="action_ksw_purchase_review"
+              groups="stock.group_stock_manager"/>
 </odoo>

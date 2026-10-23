@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-14 19:41+0000\n"
-"PO-Revision-Date: 2026-10-14 19:41+0000\n"
+"POT-Creation-Date: 2026-10-22 19:16+0000\n"
+"PO-Revision-Date: 2026-10-22 19:16+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,203 +16,501 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: KSW_accounting_ux
-#: model:ir.model,name:KSW_accounting_ux.model_account_account
-msgid "Account"
+#. odoo-python
+#: code:addons/KSW/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+#: code:addons/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+msgid "%(n)s cost centres"
+msgstr "%(n)s مركز تكلفة"
+
+#. module: KSW_accounting_ux
+#. odoo-python
+#: code:addons/KSW/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+#: code:addons/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+msgid ""
+"%(n)s cost centres match: too many for a statement each. Show the summary, "
+"or narrow the selection."
 msgstr ""
+"يطابق %(n)s مركز تكلفة: عدد كبير لكشف لكل منها. اعرض الملخص أو ضيّق "
+"الاختيار."
+
+#. module: KSW_accounting_ux
+#. odoo-python
+#: code:addons/KSW/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+#: code:addons/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+msgid "%(start)s to %(end)s"
+msgstr "%(start)s إلى %(end)s"
+
+#. module: KSW_accounting_ux
+#: model:ir.actions.report,print_report_name:KSW_accounting_ux.action_report_cost_centre_statement
+msgid "'Statement - %s' % object.analytic_account_id.name"
+msgstr ""
+
+#. module: KSW_accounting_ux
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.report_cost_centre_statement
+msgid ""
+",\n"
+"                                closing"
+msgstr ""
+
+#. module: KSW_accounting_ux
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.report_cost_centre_statement
+msgid ", credit"
+msgstr ""
+
+#. module: KSW_accounting_ux
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_account_payment_form_ksw_bas
+msgid ""
+"; this payment has none of its own\n"
+"                    and cannot be edited."
+msgstr ""
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_cost_centre_statement__period_mode__period
+msgid "A period"
+msgstr "فترة محددة"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_cost_centre_statement__selection_mode__range
+msgid "A range of codes"
+msgstr "نطاق من الرموز"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_cost_centre_statement__layout__detail
+msgid "A statement per cost centre"
+msgstr "كشف لكل مركز تكلفة"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_cost_centre_statement__selection_mode__group
+msgid "A whole group"
+msgstr "مجموعة كاملة"
+
+#. module: KSW_accounting_ux
+#: model:ir.model,name:KSW_accounting_ux.model_account_account
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__account_id
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.report_cost_centre_statement
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_line_search
+msgid "Account"
+msgstr "الحساب"
 
 #. module: KSW_accounting_ux
 #: model:ir.model,name:KSW_accounting_ux.model_account_group
 msgid "Account Group"
-msgstr ""
+msgstr "مجموعة الحسابات"
 
 #. module: KSW_accounting_ux
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_account_reconcile
 msgid "Account Reconciliation"
-msgstr ""
+msgstr "تسوية الحسابات"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__account_scope
+msgid "Accounts"
+msgstr "الحسابات"
 
 #. module: KSW_accounting_ux
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_entries_actions
 msgid "Actions"
-msgstr ""
+msgstr "الإجراءات"
 
 #. module: KSW_accounting_ux
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_aged_config
 msgid "Aged Report Intervals"
-msgstr ""
+msgstr "فترات أعمار الديون"
 
 #. module: KSW_accounting_ux
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_all_payments
 msgid "All Payments"
+msgstr "جميع الدفعات"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_cost_centre_statement__account_scope__all
+msgid "All accounts"
+msgstr "جميع الحسابات"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_cost_centre_statement__plan_filter__all
+msgid "All cost centres"
+msgstr "جميع مراكز التكلفة"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_cost_centre_statement__period_mode__all
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.report_cost_centre_statement
+msgid "All history"
+msgstr "كل السجل"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__allowed_group_ids
+msgid "Allowed Group"
+msgstr ""
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__allowed_plan_ids
+msgid "Allowed Plan"
 msgstr ""
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_depreciation_line__amount
 msgid "Amount"
-msgstr ""
+msgstr "المبلغ"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_bs_wizard__date_to
 msgid "As of"
-msgstr ""
+msgstr "كما في"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_depreciation_line__asset_id
 msgid "Asset"
-msgstr ""
+msgstr "الأصل"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_depreciation_line__asset_account_id
 msgid "Asset Account"
-msgstr ""
+msgstr "حساب الأصل"
 
 #. module: KSW_accounting_ux
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_asset_report
 msgid "Assets Report"
-msgstr ""
+msgstr "تقرير الأصول"
 
 #. module: KSW_accounting_ux
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_reports_audit
 msgid "Audit Reports"
-msgstr ""
+msgstr "تقارير التدقيق"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_pl_depreciation_line__source__bas
 msgid "BAS (computed)"
+msgstr "BAS (محتسب)"
+
+#. module: KSW_accounting_ux
+#: model:ir.model,name:KSW_accounting_ux.model_ksw_bas_gl_import
+msgid "BAS General Ledger Import"
 msgstr ""
 
 #. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_payment__x_bas_mirror
+msgid "BAS Payment"
+msgstr "دفعة BAS"
+
+#. module: KSW_accounting_ux
 #. odoo-python
+#: code:addons/KSW/KSW_accounting_ux/models/bas_supplier_payment.py:0
+#: code:addons/KSW_accounting_ux/models/bas_supplier_payment.py:0
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_bank_statement_line__x_bas_payment_ids
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_move__x_bas_payment_ids
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_move_form_ksw_bas_payments
+msgid "BAS Payments"
+msgstr "دفعات BAS"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_payment__x_bas_move_id
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_account_payment_form_ksw_bas
+msgid "BAS Voucher"
+msgstr "سند BAS"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_payment__x_bas_line_id
+msgid "BAS Voucher Line"
+msgstr "سطر سند BAS"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__running_balance
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.report_cost_centre_statement
+msgid "Balance"
+msgstr "الرصيد"
+
+#. module: KSW_accounting_ux
+#. odoo-python
+#: code:addons/KSW/KSW_accounting_ux/wizard/bs_cf_wizard.py:0
 #: code:addons/KSW_accounting_ux/wizard/bs_cf_wizard.py:0
 #: model:ir.actions.act_window,name:KSW_accounting_ux.action_ksw_bs_wizard
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_bs
 #: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.ksw_bs_wizard_view_form
 msgid "Balance Sheet"
-msgstr ""
+msgstr "قائمة المركز المالي"
 
 #. module: KSW_accounting_ux
 #: model:mis.report,name:KSW_accounting_ux.mis_bs_report
 msgid "Balance Sheet (KSW)"
-msgstr ""
+msgstr "قائمة المركز المالي (KSW)"
 
 #. module: KSW_accounting_ux
 #: model:ir.model,name:KSW_accounting_ux.model_ksw_bs_wizard
 msgid "Balance Sheet: choose date"
-msgstr ""
+msgstr "قائمة المركز المالي: اختيار التاريخ"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_cost_centre_statement__account_scope__bs
+msgid "Balance sheet only"
+msgstr "الميزانية فقط"
 
 #. module: KSW_accounting_ux
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_bank_accounts
 msgid "Bank Accounts"
-msgstr ""
+msgstr "الحسابات البنكية"
 
 #. module: KSW_accounting_ux
 #: model:ir.actions.act_window,name:KSW_accounting_ux.action_ksw_bank_reconcile
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_bank_reconcile
 msgid "Bank Reconciliation"
-msgstr ""
+msgstr "التسوية البنكية"
 
 #. module: KSW_accounting_ux
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_bank_cash
 msgid "Bank and Cash"
-msgstr ""
+msgstr "البنك والنقد"
 
 #. module: KSW_accounting_ux
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_config_banks
 msgid "Banks"
-msgstr ""
+msgstr "البنوك"
 
 #. module: KSW_accounting_ux
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_bills_analysis
 msgid "Bills Analysis"
-msgstr ""
+msgstr "تحليل فواتير الموردين"
+
+#. module: KSW_accounting_ux
+#. odoo-python
+#: code:addons/KSW/KSW_accounting_ux/models/bas_supplier_payment.py:0
+#: code:addons/KSW_accounting_ux/models/bas_supplier_payment.py:0
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_payment__x_bas_bill_ids
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_account_payment_form_ksw_bas
+msgid "Bills Settled"
+msgstr "الفواتير المسددة"
 
 #. module: KSW_accounting_ux
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_budget_analysis
 msgid "Budget Analysis"
-msgstr ""
+msgstr "تحليل الموازنات"
 
 #. module: KSW_accounting_ux
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_config_budgets
 msgid "Budgets"
-msgstr ""
+msgstr "الموازنات"
 
 #. module: KSW_accounting_ux
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_budgets_by_account
 msgid "Budgets by Account"
-msgstr ""
+msgstr "الموازنات حسب الحساب"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_bs_wizard__layout__account
 #: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_pl_wizard__layout__account
 msgid "By account"
-msgstr ""
+msgstr "حسب الحساب"
 
 #. module: KSW_accounting_ux
 #: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.ksw_bs_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.ksw_cf_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.ksw_pl_wizard_view_form
 msgid "Cancel"
-msgstr ""
+msgstr "إلغاء"
 
 #. module: KSW_accounting_ux
 #. odoo-python
+#: code:addons/KSW/KSW_accounting_ux/wizard/bs_cf_wizard.py:0
 #: code:addons/KSW_accounting_ux/wizard/bs_cf_wizard.py:0
 #: model:ir.actions.act_window,name:KSW_accounting_ux.action_ksw_cf_wizard
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_cf
 #: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.ksw_cf_wizard_view_form
 msgid "Cash Flow Statement"
-msgstr ""
+msgstr "قائمة التدفقات النقدية"
 
 #. module: KSW_accounting_ux
 #: model:mis.report,name:KSW_accounting_ux.mis_cf_report
 msgid "Cash Flow Statement (KSW)"
-msgstr ""
+msgstr "قائمة التدفقات النقدية (KSW)"
 
 #. module: KSW_accounting_ux
 #: model:ir.model,name:KSW_accounting_ux.model_ksw_cf_wizard
 msgid "Cash Flow Statement: choose period"
-msgstr ""
+msgstr "قائمة التدفقات النقدية: اختيار الفترة"
+
+#. module: KSW_accounting_ux
+#. odoo-python
+#: code:addons/KSW/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+#: code:addons/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+msgid "Choose the accounts, or show all accounts."
+msgstr "اختر الحسابات، أو اعرض جميع الحسابات."
+
+#. module: KSW_accounting_ux
+#. odoo-python
+#: code:addons/KSW/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+#: code:addons/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+msgid "Choose the cost centre."
+msgstr "اختر مركز التكلفة."
+
+#. module: KSW_accounting_ux
+#. odoo-python
+#: code:addons/KSW/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+#: code:addons/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+msgid "Choose the cost centres."
+msgstr "اختر مراكز التكلفة."
+
+#. module: KSW_accounting_ux
+#. odoo-python
+#: code:addons/KSW/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+#: code:addons/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+msgid "Choose the group."
+msgstr "اختر المجموعة."
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__account_ids
+msgid "Chosen Accounts"
+msgstr "الحسابات المحددة"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_cost_centre_statement__account_scope__accounts
+msgid "Chosen accounts"
+msgstr "حسابات محددة"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_cost_centre_statement__selection_mode__several
+msgid "Chosen cost centres"
+msgstr "مراكز تكلفة محددة"
+
+#. module: KSW_accounting_ux
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_form
+msgid "Close"
+msgstr "إغلاق"
+
+#. module: KSW_accounting_ux
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.report_cost_centre_statement
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_line_summary
+msgid "Closing"
+msgstr "الختامي"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__closing_balance
+msgid "Closing Balance"
+msgstr "الرصيد الختامي"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,help:KSW_accounting_ux.field_ksw_cost_centre_statement__code_to
+msgid "Codes are compared as text, so 141 to 142 covers 1410001, 1410999 …"
+msgstr "تُقارن الرموز كنص، فمن 141 إلى 142 يشمل 1410001 و1410999 …"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_bs_wizard__comparison
 msgid "Comparison"
-msgstr ""
+msgstr "المقارنة"
 
 #. module: KSW_accounting_ux
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_asset_compute
 msgid "Compute Depreciation"
-msgstr ""
+msgstr "احتساب الإهلاك"
 
 #. module: KSW_accounting_ux
 #: model:ir.model,name:KSW_accounting_ux.model_res_partner
 msgid "Contact"
-msgstr ""
+msgstr "جهة الاتصال"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_move_line__x_cost_centre_id
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__analytic_account_id
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__cost_centre_id
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.report_cost_centre_statement
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_account_move_line_filter_ksw_cost_centres
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_line_search
+msgid "Cost Centre"
+msgstr "مركز التكلفة"
+
+#. module: KSW_accounting_ux
+#: model:ir.actions.act_window,name:KSW_accounting_ux.action_cost_centre_statement
+#: model:ir.actions.report,name:KSW_accounting_ux.action_report_cost_centre_statement
+#: model:ir.model,name:KSW_accounting_ux.model_ksw_cost_centre_statement
+#: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_cost_centre_statement
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.report_cost_centre_statement
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_form
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_line_list
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_line_pivot
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_line_search
+msgid "Cost Centre Statement"
+msgstr "كشف حساب مركز التكلفة"
+
+#. module: KSW_accounting_ux
+#: model:ir.model,name:KSW_accounting_ux.model_ksw_cost_centre_statement_line
+msgid "Cost Centre Statement Line"
+msgstr "سطر كشف حساب مركز التكلفة"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__analytic_account_ids
+msgid "Cost Centres"
+msgstr "مراكز التكلفة"
+
+#. module: KSW_accounting_ux
+#: model:ir.actions.act_window,name:KSW_accounting_ux.action_cost_centres_statement
+#: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_cost_centres_statement
+msgid "Cost Centres Statement"
+msgstr "كشف حساب مراكز التكلفة"
+
+#. module: KSW_accounting_ux
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_line_summary
+msgid "Cost Centres Summary"
+msgstr "ملخص مراكز التكلفة"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_bs_wizard__create_uid
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cf_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__create_uid
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__create_uid
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_depreciation_line__create_uid
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_wizard__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "أنشئ بواسطة"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_bs_wizard__create_date
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cf_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__create_date
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__create_date
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_depreciation_line__create_date
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_wizard__create_date
 msgid "Created on"
+msgstr "أنشئ في"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__credit
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.report_cost_centre_statement
+msgid "Credit"
+msgstr "دائن"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__currency_id
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__currency_id
+msgid "Currency"
 msgstr ""
 
 #. module: KSW_accounting_ux
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_config_migration
 msgid "Data Migration"
-msgstr ""
+msgstr "استيراد البيانات"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__date
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.report_cost_centre_statement
+msgid "Date"
+msgstr "التاريخ"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__debit
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.report_cost_centre_statement
+msgid "Debit"
+msgstr "مدين"
 
 #. module: KSW_accounting_ux
 #: model:ir.actions.act_window,name:KSW_accounting_ux.action_ksw_debit_notes
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_debit_notes
 msgid "Debit Notes"
-msgstr ""
+msgstr "إشعارات مدينة"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__label
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.report_cost_centre_statement
+msgid "Description"
+msgstr "البيان"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_account__display_name
@@ -223,8 +521,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_payment__display_name
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_payment_register__display_name
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ir_ui_menu__display_name
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_bas_gl_import__display_name
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_bs_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cf_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__display_name
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__display_name
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_mis_period_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_mis_wizard_mixin__display_name
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_depreciation_line__display_name
@@ -234,55 +535,100 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_res_partner__display_name
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_statement_common_wizard__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "اسم العرض"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__document
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.report_cost_centre_statement
+msgid "Document"
+msgstr "المستند"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_move_line__x_employee_cost_centre_id
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_account_move_line_filter_ksw_cost_centres
+msgid "Employee Cost Centre"
+msgstr "مركز تكلفة الموظف"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_cost_centre_statement__plan_filter__employee
+msgid "Employees and drivers"
+msgstr "الموظفون والسائقون"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_bs_wizard__comparison__prev_month
 msgid "End of previous month"
-msgstr ""
+msgstr "نهاية الشهر السابق"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_bs_wizard__comparison__prev_year
 msgid "End of previous year"
-msgstr ""
+msgstr "نهاية السنة السابقة"
+
+#. module: KSW_accounting_ux
+#. odoo-python
+#: code:addons/KSW/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+#: code:addons/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+msgid "Enter the range: a first code, a last code, or both."
+msgstr "أدخل النطاق: الرمز الأول أو الأخير أو كليهما."
 
 #. module: KSW_accounting_ux
 #: model:ir.actions.act_window,name:KSW_accounting_ux.action_ksw_entries_to_review
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_entries_to_review
 msgid "Entries to Review"
+msgstr "قيود بانتظار المراجعة"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__move_id
+msgid "Entry"
+msgstr "القيد"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,help:KSW_accounting_ux.field_ksw_cost_centre_statement__group_plan_id
+msgid ""
+"Every cost centre in this group of the cost-centre tree, sub-groups "
+"included."
 msgstr ""
+"كل مراكز التكلفة في هذه المجموعة من شجرة مراكز التكلفة، شاملة المجموعات "
+"الفرعية."
 
 #. module: KSW_accounting_ux
 #: model_terms:ir.actions.act_window,help:KSW_accounting_ux.action_ksw_entries_to_review
 msgid "Everything has been reviewed"
-msgstr ""
+msgstr "تمت مراجعة جميع القيود"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_depreciation_line__account_id
 msgid "Expense Account"
-msgstr ""
+msgstr "حساب المصروف"
 
 #. module: KSW_accounting_ux
 #: model:ir.model,name:KSW_accounting_ux.model_ksw_mis_period_wizard
 msgid "Financial statement: choose period"
-msgstr ""
+msgstr "القوائم المالية: اختيار الفترة"
 
 #. module: KSW_accounting_ux
 #: model:ir.model,name:KSW_accounting_ux.model_ksw_mis_wizard_mixin
 msgid "Financial statement: open for chosen columns"
-msgstr ""
+msgstr "القوائم المالية: عرض للأعمدة المختارة"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cf_wizard__date_from
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__date_from
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_mis_period_wizard__date_from
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_wizard__date_from
 msgid "From"
-msgstr ""
+msgstr "من"
 
 #. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__code_from
+msgid "From Code"
+msgstr "من الرمز"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__group_plan_id
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_depreciation_line__expense_group
 msgid "Group"
-msgstr ""
+msgstr "المجموعة"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_account__id
@@ -293,8 +639,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_payment__id
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_payment_register__id
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ir_ui_menu__id
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_bas_gl_import__id
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_bs_wizard__id
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cf_wizard__id
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__id
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__id
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_mis_period_wizard__id
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_mis_wizard_mixin__id
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_depreciation_line__id
@@ -304,61 +653,83 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_res_partner__id
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_statement_common_wizard__id
 msgid "ID"
-msgstr ""
+msgstr "المعرف"
 
 #. module: KSW_accounting_ux
 #: model_terms:ir.actions.act_window,help:KSW_accounting_ux.action_ksw_bank_reconcile
 msgid ""
 "Import a bank statement (Bank and Cash &gt; Import Statement) to start."
-msgstr ""
+msgstr "استورد كشف البنك (البنك والنقد &gt; استيراد كشف البنك) للبدء."
 
 #. module: KSW_accounting_ux
 #: model:mis.report,name:KSW_accounting_ux.mis_pl_report
 msgid "Income Statement (KSW)"
+msgstr "قائمة الدخل (KSW)"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_cost_centre_statement__account_scope__pl
+msgid "Income and expenses only"
+msgstr "الإيرادات والمصروفات فقط"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__is_opening
+msgid "Is Opening"
+msgstr ""
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__is_summary
+msgid "Is Summary"
 msgstr ""
 
 #. module: KSW_accounting_ux
 #: model:ir.model,name:KSW_accounting_ux.model_account_journal
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__journal_id
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_line_search
 msgid "Journal"
-msgstr ""
+msgstr "دفتر اليومية"
 
 #. module: KSW_accounting_ux
 #: model:ir.model,name:KSW_accounting_ux.model_account_move
 msgid "Journal Entry"
-msgstr ""
+msgstr "قيد اليومية"
 
 #. module: KSW_accounting_ux
 #: model:ir.model,name:KSW_accounting_ux.model_account_move_line
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__move_line_id
 msgid "Journal Item"
-msgstr ""
+msgstr "بند اليومية"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_pl_depreciation_line__source__journal
 msgid "Journal entry"
-msgstr ""
+msgstr "قيد يومية"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_bs_wizard__write_uid
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cf_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__write_uid
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__write_uid
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_depreciation_line__write_uid
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_wizard__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "آخر تحديث بواسطة"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_bs_wizard__write_date
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cf_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__write_date
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__write_date
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_depreciation_line__write_date
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_wizard__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "آخر تحديث في"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_bs_wizard__layout
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cf_wizard__layout
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_wizard__layout
 msgid "Layout"
-msgstr ""
+msgstr "طريقة العرض"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_account__x_group_l1_id
@@ -366,7 +737,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_depreciation_line__x_group_l1_id
 #: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_account_move_line_filter_ksw_levels
 msgid "Level 1"
-msgstr ""
+msgstr "المستوى 1"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_account__x_group_l2_id
@@ -374,7 +745,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_depreciation_line__x_group_l2_id
 #: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_account_move_line_filter_ksw_levels
 msgid "Level 2"
-msgstr ""
+msgstr "المستوى 2"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_account__x_group_l3_id
@@ -383,7 +754,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.ksw_pl_depreciation_line_view_search
 #: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_account_move_line_filter_ksw_levels
 msgid "Level 3"
-msgstr ""
+msgstr "المستوى 3"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_account__x_group_l4_id
@@ -392,7 +763,17 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.ksw_pl_depreciation_line_view_search
 #: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_account_move_line_filter_ksw_levels
 msgid "Level 4"
+msgstr "المستوى 4"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__line_ids
+msgid "Line"
 msgstr ""
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__plan_filter
+msgid "Look In"
+msgstr "البحث في"
 
 #. module: KSW_accounting_ux
 #: model:mis.report.instance.period,name:KSW_accounting_ux.mis_pl_instance_monthly_p11
@@ -452,70 +833,132 @@ msgstr ""
 #. module: KSW_accounting_ux
 #: model:ir.model,name:KSW_accounting_ux.model_mis_report_instance
 msgid "MIS Report Instance"
-msgstr ""
+msgstr "نسخة تقرير MIS"
 
 #. module: KSW_accounting_ux
 #: model:ir.model,name:KSW_accounting_ux.model_mis_report
 msgid "MIS Report Template"
-msgstr ""
+msgstr "قالب تقرير MIS"
 
 #. module: KSW_accounting_ux
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_entries_management
 msgid "Management"
-msgstr ""
+msgstr "الإدارة"
 
 #. module: KSW_accounting_ux
 #: model:ir.model,name:KSW_accounting_ux.model_ir_ui_menu
 msgid "Menu"
-msgstr ""
+msgstr "القائمة"
+
+#. module: KSW_accounting_ux
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_line_search
+msgid "Month"
+msgstr "الشهر"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_cf_wizard__layout__monthly
 #: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_pl_wizard__layout__monthly
 msgid "Month by month"
-msgstr ""
+msgstr "شهرياً"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_bs_wizard__comparison__none
 msgid "No comparison"
-msgstr ""
+msgstr "بدون مقارنة"
+
+#. module: KSW_accounting_ux
+#. odoo-python
+#: code:addons/KSW/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+#: code:addons/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+msgid "No cost centre matches this selection."
+msgstr "لا يوجد مركز تكلفة يطابق هذا الاختيار."
 
 #. module: KSW_accounting_ux
 #: model_terms:ir.actions.act_window,help:KSW_accounting_ux.action_ksw_debit_notes
 msgid "No debit notes yet"
-msgstr ""
+msgstr "لا توجد إشعارات مدينة بعد"
 
 #. module: KSW_accounting_ux
 #. odoo-python
+#: code:addons/KSW/KSW_accounting_ux/models/res_partner.py:0
 #: code:addons/KSW_accounting_ux/models/res_partner.py:0
 msgid "No free receivable code left under %s."
-msgstr ""
+msgstr "لم يتبق رمز ذمم مدينة متاح تحت %s."
 
 #. module: KSW_accounting_ux
 #: model_terms:ir.actions.act_window,help:KSW_accounting_ux.action_ksw_payments_due
 msgid "Nothing to pay"
-msgstr ""
+msgstr "لا توجد مدفوعات مستحقة"
 
 #. module: KSW_accounting_ux
 #: model_terms:ir.actions.act_window,help:KSW_accounting_ux.action_ksw_bank_reconcile
 msgid "Nothing to reconcile"
-msgstr ""
+msgstr "لا يوجد ما يحتاج إلى تسوية"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_cost_centre_statement__selection_mode__one
+msgid "One cost centre"
+msgstr "مركز تكلفة واحد"
+
+#. module: KSW_accounting_ux
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_line_list
+msgid "Open"
+msgstr "فتح"
 
 #. module: KSW_accounting_ux
 #: model_terms:ir.actions.act_window,help:KSW_accounting_ux.action_ksw_debit_notes
 msgid "Open the customer invoice to be increased and click <b>Debit Note</b>."
-msgstr ""
+msgstr "افتح فاتورة العميل المراد زيادتها واضغط <b>إشعار مدين</b>."
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__opening
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.report_cost_centre_statement
+msgid "Opening"
+msgstr "الافتتاحي"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__opening_balance
+msgid "Opening Balance"
+msgstr "الرصيد الافتتاحي"
+
+#. module: KSW_accounting_ux
+#. odoo-python
+#: code:addons/KSW/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+#: code:addons/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+msgid "Opening balance"
+msgstr "الرصيد الافتتاحي"
 
 #. module: KSW_accounting_ux
 #: model:ir.actions.act_window,name:KSW_accounting_ux.action_ksw_outstanding_statement
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_outstanding_statement
 msgid "Outstanding Statement"
+msgstr "كشف الأرصدة المفتوحة"
+
+#. module: KSW_accounting_ux
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_account_payment_search_ksw_bas
+msgid "Paid in BAS"
+msgstr "مدفوعة في BAS"
+
+#. module: KSW_accounting_ux
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_account_payment_form_ksw_bas
+msgid "Paid in BAS. The accounting entry is the BAS voucher"
 msgstr ""
+
+#. module: KSW_accounting_ux
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_account_payment_search_ksw_bas
+msgid "Paid in Odoo"
+msgstr "مدفوعة في أودو"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__partner_id
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_line_search
+msgid "Partner"
+msgstr "الشريك"
 
 #. module: KSW_accounting_ux
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_partner_ledger
 msgid "Partner Ledger"
-msgstr ""
+msgstr "دفتر أستاذ الشركاء"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_activity_statement_wizard__partner_ids
@@ -523,130 +966,341 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_outstanding_statement_wizard__partner_ids
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_statement_common_wizard__partner_ids
 msgid "Partners"
-msgstr ""
+msgstr "الشركاء"
 
 #. module: KSW_accounting_ux
 #: model:ir.model,name:KSW_accounting_ux.model_account_payment_register
 msgid "Pay"
-msgstr ""
+msgstr "الدفع"
 
 #. module: KSW_accounting_ux
 #: model:ir.model,name:KSW_accounting_ux.model_account_payment
 msgid "Payments"
-msgstr ""
+msgstr "الدفعات"
 
 #. module: KSW_accounting_ux
 #: model:ir.actions.act_window,name:KSW_accounting_ux.action_ksw_payments_due
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_payments_due
 msgid "Payments Due"
-msgstr ""
+msgstr "المدفوعات المستحقة"
 
 #. module: KSW_accounting_ux
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_config_periods
 msgid "Periods"
-msgstr ""
+msgstr "الفترات المالية"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__posted_only
+msgid "Posted Entries Only"
+msgstr "القيود المرحلة فقط"
 
 #. module: KSW_accounting_ux
 #: model_terms:ir.actions.act_window,help:KSW_accounting_ux.action_ksw_payments_due
 msgid "Posted vendor bills with an open balance appear here by due date."
 msgstr ""
+"تظهر هنا فواتير الموردين المرحّلة ذات الرصيد المفتوح مرتبة حسب تاريخ "
+"الاستحقاق."
+
+#. module: KSW_accounting_ux
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_form
+msgid "Print PDF"
+msgstr "طباعة PDF"
 
 #. module: KSW_accounting_ux
 #. odoo-python
+#: code:addons/KSW/KSW_accounting_ux/wizard/pl_wizard.py:0
 #: code:addons/KSW_accounting_ux/wizard/pl_wizard.py:0
 #: model:ir.actions.act_window,name:KSW_accounting_ux.action_ksw_pl_wizard
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_pl
 #: model:mis.report.instance,name:KSW_accounting_ux.mis_pl_instance
 #: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.ksw_pl_wizard_view_form
 msgid "Profit and Loss"
-msgstr ""
+msgstr "قائمة الدخل"
 
 #. module: KSW_accounting_ux
 #: model:mis.report.instance,name:KSW_accounting_ux.mis_pl_instance_monthly
 msgid "Profit and Loss (Monthly)"
-msgstr ""
+msgstr "قائمة الدخل (شهرياً)"
 
 #. module: KSW_accounting_ux
 #: model:mis.report.instance,name:KSW_accounting_ux.mis_pl_instance_detail
 msgid "Profit and Loss (by Account)"
-msgstr ""
+msgstr "قائمة الدخل (حسب الحساب)"
 
 #. module: KSW_accounting_ux
 #: model:ir.model,name:KSW_accounting_ux.model_ksw_pl_wizard
 msgid "Profit and Loss: choose period"
-msgstr ""
+msgstr "قائمة الدخل: اختيار الفترة"
 
 #. module: KSW_accounting_ux
 #: model:ir.model,name:KSW_accounting_ux.model_ksw_pl_depreciation_line
 msgid "Profit and Loss: depreciation detail"
-msgstr ""
+msgstr "قائمة الدخل: تفاصيل الإهلاك"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_depreciation_line__rate
 msgid "Rate %"
+msgstr "النسبة %"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,help:KSW_accounting_ux.field_account_payment__x_bas_mirror
+msgid ""
+"Recorded in BAS inside a payment voucher. The voucher is the accounting "
+"entry; this payment has none of its own."
 msgstr ""
+"مسجلة في BAS ضمن سند صرف. السند هو القيد المحاسبي، ولا يوجد لهذه الدفعة قيد "
+"خاص بها."
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__period_mode
+msgid "Records"
+msgstr "السجلات"
 
 #. module: KSW_accounting_ux
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_config_reporting
 msgid "Reporting"
+msgstr "إعداد التقارير"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__sequence
+msgid "Sequence"
 msgstr ""
 
 #. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__share
+msgid "Share %"
+msgstr "النسبة %"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__layout
 #: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.ksw_bs_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.ksw_cf_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.ksw_pl_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_form
 msgid "Show"
-msgstr ""
+msgstr "عرض"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_depreciation_line__source
 #: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.ksw_pl_depreciation_line_view_search
 msgid "Source"
-msgstr ""
+msgstr "المصدر"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement_line__statement_id
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_line_summary
+msgid "Statement"
+msgstr "الكشف"
 
 #. module: KSW_accounting_ux
 #: model:ir.model,name:KSW_accounting_ux.model_statement_common_wizard
 msgid "Statement Reports Common Wizard"
-msgstr ""
+msgstr "معالج تقارير كشوف الحساب المشترك"
 
 #. module: KSW_accounting_ux
 #: model:ir.actions.act_window,name:KSW_accounting_ux.action_ksw_activity_statement
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_activity_statement
 msgid "Statement of Account"
-msgstr ""
+msgstr "كشف حساب"
+
+#. module: KSW_accounting_ux
+#. odoo-python
+#: code:addons/KSW/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+#: code:addons/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+msgid "Statement: %(cc)s, %(period)s"
+msgstr "كشف حساب: %(cc)s، %(period)s"
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_bs_wizard__layout__summary
 #: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_cf_wizard__layout__summary
 #: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_pl_wizard__layout__summary
 msgid "Summary"
+msgstr "ملخص"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_cost_centre_statement__layout__summary
+msgid "Summary: one row per cost centre"
+msgstr "ملخص: سطر لكل مركز تكلفة"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,help:KSW_accounting_ux.field_account_move_line__x_employee_cost_centre_id
+msgid "The driver or employee (BAS COST_CENTER2, «مركز تكلفة الموظف»)."
+msgstr "السائق أو الموظف («مركز تكلفة الموظف» في BAS)."
+
+#. module: KSW_accounting_ux
+#. odoo-python
+#: code:addons/KSW/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+#: code:addons/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+msgid "The first code is after the last code."
+msgstr "الرمز الأول بعد الرمز الأخير."
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,help:KSW_accounting_ux.field_ksw_cost_centre_statement_line__share
+msgid "The part of the journal line booked to this cost centre."
+msgstr "نسبة بند اليومية المحملة على مركز التكلفة هذا."
+
+#. module: KSW_accounting_ux
+#. odoo-python
+#: code:addons/KSW/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+#: code:addons/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+msgid "The start date is after the end date."
+msgstr "تاريخ البداية بعد تاريخ النهاية."
+
+#. module: KSW_accounting_ux
+#: model:ir.model.constraint,message:KSW_accounting_ux.constraint_account_payment_x_bas_line_uniq
+msgid "This BAS voucher line already has a payment."
+msgstr "يوجد دفعة لسطر سند BAS هذا مسبقاً."
+
+#. module: KSW_accounting_ux
+#. odoo-python
+#: code:addons/KSW/KSW_accounting_ux/models/bas_supplier_payment.py:0
+#: code:addons/KSW_accounting_ux/models/bas_supplier_payment.py:0
+msgid ""
+"This payment was made in BAS. Its amount, vendor, journal and date come from"
+" the BAS voucher %(voucher)s and cannot be changed here."
 msgstr ""
+"تمت هذه الدفعة في BAS. المبلغ والمورد واليومية والتاريخ مأخوذة من سند BAS "
+"رقم %(voucher)s ولا يمكن تعديلها هنا."
 
 #. module: KSW_accounting_ux
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cf_wizard__date_to
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__date_to
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_mis_period_wizard__date_to
 #: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_pl_wizard__date_to
 msgid "To"
-msgstr ""
+msgstr "إلى"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__code_to
+msgid "To Code"
+msgstr "إلى الرمز"
 
 #. module: KSW_accounting_ux
 #: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.ksw_pl_depreciation_line_view_list
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.report_cost_centre_statement
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_line_list
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_line_summary
 msgid "Total"
+msgstr "الإجمالي"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__total_credit
+msgid "Total Credit"
+msgstr "إجمالي الدائن"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__total_debit
+msgid "Total Debit"
+msgstr "إجمالي المدين"
+
+#. module: KSW_accounting_ux
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.report_cost_centre_statement
+msgid "Total: debit"
+msgstr ""
+
+#. module: KSW_accounting_ux
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_form
+msgid "Type a name or code, e.g. T197 or a driver"
+msgstr "اكتب اسماً أو رمزاً، مثل T197 أو اسم سائق"
+
+#. module: KSW_accounting_ux
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_form
+msgid "Type names or codes"
+msgstr "اكتب أسماء أو رموزاً"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,help:KSW_accounting_ux.field_ksw_cost_centre_statement__analytic_account_id
+msgid "Type part of the name or the code."
+msgstr "اكتب جزءاً من الاسم أو الرمز."
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__unit_count
+msgid "Unit Count"
 msgstr ""
 
 #. module: KSW_accounting_ux
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_update_chart
 msgid "Update Chart of Accounts"
+msgstr "تحديث دليل الحسابات"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,help:KSW_accounting_ux.field_account_move_line__x_cost_centre_id
+msgid "Vehicle or department (BAS COST_CENTER)."
+msgstr "المعدة أو القسم (مركز التكلفة في BAS)."
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__ksw_cost_centre_statement__plan_filter__cost_centre
+msgid "Vehicles and departments"
+msgstr "المعدات والأقسام"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_ksw_cost_centre_statement__selection_mode
+msgid "Which"
+msgstr "الاختيار"
+
+#. module: KSW_accounting_ux
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_form
+msgid "Which Cost Centre"
+msgstr "مركز التكلفة"
+
+#. module: KSW_accounting_ux
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_form
+msgid "Which Entries"
+msgstr "القيود"
+
+#. module: KSW_accounting_ux
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_form
+msgid "Which Period"
+msgstr "الفترة"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_payment__x_bas_bill_count
+msgid "X Bas Bill Count"
+msgstr ""
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_bank_statement_line__x_bas_payment_count
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_move__x_bas_payment_count
+msgid "X Bas Payment Count"
 msgstr ""
 
 #. module: KSW_accounting_ux
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_fy_closing
 msgid "Year-End Closing"
-msgstr ""
+msgstr "إقفال السنة المالية"
 
 #. module: KSW_accounting_ux
 #: model:ir.ui.menu,name:KSW_accounting_ux.menu_ksw_fy_closing_templates
 msgid "Year-End Closing Templates"
+msgstr "قوالب إقفال السنة المالية"
+
+#. module: KSW_accounting_ux
+#. odoo-python
+#: code:addons/KSW/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+#: code:addons/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+msgid "all history"
+msgstr "كل السجل"
+
+#. module: KSW_accounting_ux
+#. odoo-python
+#: code:addons/KSW/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+#: code:addons/KSW_accounting_ux/wizard/cost_centre_statement.py:0
+msgid "codes %(low)s to %(high)s"
+msgstr "الرموز من %(low)s إلى %(high)s"
+
+#. module: KSW_accounting_ux
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_form
+msgid "e.g. 141"
+msgstr "مثال: 141"
+
+#. module: KSW_accounting_ux
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_form
+msgid "e.g. 142"
+msgstr "مثال: 142"
+
+#. module: KSW_accounting_ux
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.report_cost_centre_statement
+msgid "to"
 msgstr ""
 
 #. module: KSW_accounting_ux

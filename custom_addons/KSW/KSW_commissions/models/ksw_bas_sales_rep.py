@@ -17,8 +17,12 @@ from odoo import api, fields, models
 
 # BAS appends/prepends a "-K" branch marker to some rep names.
 _BRANCH_MARKER = re.compile(r'(^\s*K\s*-\s*)|(\s*-\s*K\s*$)', re.IGNORECASE)
-# Names that are clearly an account, not a person: no commission is due.
-_HOUSE_NAME = re.compile(r'company\s+collector|عملاء\s+قسم', re.IGNORECASE)
+# Codes the commission workbook never pays: the defaulted accounts held by
+# "Sales manager" (120309*, المتعثر) and the projects-department customers.
+# NOT "Company collector": that is Mohamed Fares, who has a bonus scheme
+# (March 2026 workbook, row 31) — flagging it was a mistake corrected in
+# 19.0.4.47.0.
+_HOUSE_NAME = re.compile(r'sales\s+manager|عملاء\s+قسم', re.IGNORECASE)
 
 
 def _normalise(name):
@@ -104,6 +108,14 @@ class KswBasSalesRep(models.Model):
                 SELECT collector_code, collector_name, 0, 1
                   FROM ksw_bas_customer
                  WHERE COALESCE(collector_code, '') != ''
+                UNION ALL
+                -- Codes stamped on documents: a rep who has since lost all
+                -- his customers still has past months to be credited for,
+                -- and documents carry a name where COD10's map has none.
+                SELECT DISTINCT seller_code, NULLIF(TRIM(seller_name), ''),
+                       0, 0
+                  FROM ksw_bas_ledger_line
+                 WHERE COALESCE(seller_code, '') != ''
             ) t GROUP BY code
         """)
         rows = self.env.cr.fetchall()

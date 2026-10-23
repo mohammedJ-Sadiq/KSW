@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Columns in the order of the BAS report, then the cost centres and the
+         two multipliers. The group header carries the count (عدد الردود for
+         tanker water) and the sums. -->
+    <record id="view_item_movement_line_list" model="ir.ui.view">
+        <field name="name">ksw.bas.item.movement.line.list</field>
+        <field name="model">ksw.bas.item.movement.line</field>
+        <field name="arch" type="xml">
+            <list string="Item Movement" create="0" edit="0" delete="0"
+                  decoration-warning="factors_differ" decoration-danger="invoice_factor_missing">
+                <field name="date"/>
+                <field name="document"/>
+                <field name="branch_id" optional="show"/>
+                <field name="warehouse" optional="hide"/>
+                <field name="customer_name"/>
+                <field name="item_name" optional="show"/>
+                <field name="quantity" sum="Total"/>
+                <field name="unit" optional="hide"/>
+                <field name="price" optional="hide"/>
+                <field name="amount" sum="Total" optional="show"/>
+                <field name="tax_amount" sum="Total" optional="hide"/>
+                <field name="total" sum="Total" optional="hide"/>
+                <field name="vehicle_account_id" optional="show"/>
+                <field name="vehicle_cost_centre" optional="hide"/>
+                <field name="driver_account_id" optional="show"/>
+                <field name="driver_cost_centre" optional="hide"/>
+                <field name="customer_factor" sum="Total"/>
+                <field name="invoice_factor" sum="Total"/>
+                <field name="factor_difference" sum="Total" optional="hide"/>
+                <field name="factors_differ" column_invisible="1"/>
+                <field name="invoice_factor_missing" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_item_movement_line_list_expanded" model="ir.ui.view">
+        <field name="name">ksw.bas.item.movement.line.list.expanded</field>
+        <field name="model">ksw.bas.item.movement.line</field>
+        <field name="inherit_id" ref="view_item_movement_line_list"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <list position="attributes">
+                <attribute name="expand">1</attribute>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_item_movement_line_form" model="ir.ui.view">
+        <field name="name">ksw.bas.item.movement.line.form</field>
+        <field name="model">ksw.bas.item.movement.line</field>
+        <field name="arch" type="xml">
+            <form string="Item Movement Line" create="0" edit="0" delete="0">
+                <sheet>
+                    <group>
+                        <group string="Document">
+                            <field name="date"/>
+                            <field name="document"/>
+                            <field name="bas_key"/>
+                            <field name="branch_id"/>
+                            <field name="warehouse"/>
+                            <field name="customer_name"/>
+                            <field name="customer_code"/>
+                        </group>
+                        <group string="Item">
+                            <field name="item_code"/>
+                            <field name="item_name"/>
+                            <field name="quantity"/>
+                            <field name="unit"/>
+                            <field name="price"/>
+                            <field name="amount"/>
+                            <field name="tax_amount"/>
+                            <field name="total"/>
+                        </group>
+                        <group string="Cost Centres">
+                            <field name="vehicle_account_id"/>
+                            <field name="vehicle_cost_centre"/>
+                            <field name="driver_account_id"/>
+                            <field name="driver_cost_centre"/>
+                        </group>
+                        <group string="Multipliers">
+                            <field name="customer_factor"/>
+                            <field name="invoice_factor"/>
+                            <field name="factor_difference"/>
+                            <field name="factors_differ"/>
+                            <field name="invoice_factor_missing"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_item_movement_line_pivot" model="ir.ui.view">
+        <field name="name">ksw.bas.item.movement.line.pivot</field>
+        <field name="model">ksw.bas.item.movement.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Item Movement">
+                <field name="driver_account_id" type="row"/>
+                <field name="quantity" type="measure"/>
+                <field name="customer_factor" type="measure"/>
+                <field name="invoice_factor" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_item_movement_line_graph" model="ir.ui.view">
+        <field name="name">ksw.bas.item.movement.line.graph</field>
+        <field name="model">ksw.bas.item.movement.line</field>
+        <field name="arch" type="xml">
+            <graph string="Item Movement" type="bar">
+                <field name="date" interval="day"/>
+                <field name="invoice_factor" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_item_movement_line_search" model="ir.ui.view">
+        <field name="name">ksw.bas.item.movement.line.search</field>
+        <field name="model">ksw.bas.item.movement.line</field>
+        <field name="arch" type="xml">
+            <search string="Item Movement">
+                <field name="driver_account_id"/>
+                <field name="driver_cost_centre"/>
+                <field name="vehicle_account_id"/>
+                <field name="vehicle_cost_centre"/>
+                <field name="customer_name"/>
+                <field name="document"/>
+                <field name="item_name"/>
+                <field name="branch_id"/>
+                <field name="warehouse"/>
+                <filter name="differ" string="Multipliers Differ" domain="[('factors_differ', '=', True)]"/>
+                <filter name="missing" string="No Invoice Multiplier" domain="[('invoice_factor_missing', '=', True)]"/>
+                <separator/>
+                <filter name="no_vehicle_account" string="Vehicle Not an Analytic Account"
+                        domain="[('vehicle_account_id', '=', False), ('vehicle_cost_centre', '!=', False)]"/>
+                <filter name="no_driver_account" string="Driver Not an Analytic Account"
+                        domain="[('driver_account_id', '=', False), ('driver_cost_centre', '!=', False)]"/>
+                <group>
+                    <filter name="g_day" string="Day" context="{'group_by': 'date:day'}"/>
+                    <filter name="g_branch" string="Branch" context="{'group_by': 'branch_id'}"/>
+                    <filter name="g_warehouse" string="Warehouse" context="{'group_by': 'warehouse'}"/>
+                    <filter name="g_vehicle" string="Vehicle Cost Centre" context="{'group_by': 'vehicle_account_id'}"/>
+                    <filter name="g_driver" string="Driver Cost Centre" context="{'group_by': 'driver_account_id'}"/>
+                    <filter name="g_customer" string="Customer" context="{'group_by': 'customer_name'}"/>
+                    <filter name="g_item" string="Item" context="{'group_by': 'item_name'}"/>
+                    <filter name="g_invoice_factor" string="Invoice Multiplier" context="{'group_by': 'invoice_factor'}"/>
+                    <filter name="g_customer_factor" string="Customer Multiplier" context="{'group_by': 'customer_factor'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+</odoo>
