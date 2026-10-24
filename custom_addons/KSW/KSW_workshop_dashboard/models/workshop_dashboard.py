@@ -117,12 +117,20 @@ class KswWorkshopDashboard(models.AbstractModel):
         if count(cash):
             clients.append({'name': self.env._('Cash customers'), 'count': count(cash), 'domain': cash})
 
-        done_by = dict(top(completed, 'technician_label', 20))
-        busy = dict(top(in_progress, 'technician_label', 20))
-        technicians = sorted(({'name': name, 'completed': done_by.get(name, 0), 'open': busy.get(name, 0),
-                               'domain': [('technician_label', '=', name), '|', ('state', '=', 'in_progress'),
-                                          '&', '&'] + completed}
-                              for name in set(done_by) | set(busy)),
+        # Technicians come from the labour lines: the workshop names who did each
+        # job there (a technician, or External Service Location), and leaves the
+        # request's own technician_id empty (KSWCO Oct 2026: 153 named lines, 0 requests).
+        Labor = self.env['ksw.workshop.labor.line']
+
+        def by_technician(domain):
+            lines = [('request_id.' + f, op, v) for f, op, v in domain]
+            return dict(Labor._read_group(lines + [('technician_id', '!=', False)], ['technician_id'],
+                                          ['request_id:count_distinct']))
+        done_by, busy = by_technician(completed), by_technician(in_progress)
+        technicians = sorted(({'name': t.display_name, 'completed': done_by.get(t, 0), 'open': busy.get(t, 0),
+                               'domain': [('labor_line_ids.technician_id', '=', t.id), '|',
+                                          ('state', '=', 'in_progress'), '&', '&'] + completed}
+                              for t in set(done_by) | set(busy)),
                              key=lambda r: -(r['completed'] + r['open']))[:8]
 
         cost = dict(zip(('parts', 'other', 'labor', 'total'), Req._read_group(

@@ -50,6 +50,11 @@ class TestWorkshopDashboard(TransactionCase):
             cls.env.cr.execute("INSERT INTO ksw_workshop_request_type_rel (request_id, type_id) VALUES (%s, %s)",
                                (request.id, rtype))
         cls.env['ksw.workshop.request'].invalidate_model()
+        cls.jalal = cls.env['ksw.workshop.technician'].create({'name': 'DASH Jalal'})
+        cls.env['ksw.workshop.labor.line'].sudo().create([
+            {'request_id': cls.second.id, 'description': 'Pads', 'technician_id': cls.jalal.id},
+            {'request_id': cls.second.id, 'description': 'Discs', 'technician_id': cls.jalal.id},
+            {'request_id': cls.tyres.id, 'description': 'Tyres', 'technician_id': cls.jalal.id}])
 
     def _data(self, user, period='month'):
         return self.env['ksw.workshop.dashboard'].with_user(user).get_workshop_data(period)
@@ -97,6 +102,13 @@ class TestWorkshopDashboard(TransactionCase):
         self.assertNotIn(self.waiting, repeats)
         for row in d['repeat']['rows']:
             self.assertEqual(len(repeats & self.env['ksw.workshop.request'].search(row['domain'])), row['count'])
+
+    def test_technicians_come_from_the_labour_lines(self):
+        # The request's own technician_id is left empty in practice; who did the
+        # job is on its labour lines. Two lines on one request is one job.
+        row = next(r for r in self._data(self.reviewer)['technicians'] if r['name'] == 'DASH Jalal')
+        self.assertEqual((row['completed'], row['open']), (2, 0))
+        self.assertEqual(self.env['ksw.workshop.request'].search(row['domain']), self.second | self.tyres)
 
     def test_backlog_age(self):
         d = self._data(self.reviewer)
