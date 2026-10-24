@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-inherit="spreadsheet_dashboard.DashboardAction" t-inherit-mode="extension">
+        <!-- Share publishes a spreadsheet snapshot; an overview page has none. -->
+        <xpath expr="//SpreadsheetShareButton" position="attributes">
+            <attribute name="t-if">loader.getActiveDashboard()?.status !== kswClientStatus</attribute>
+        </xpath>
+        <!-- Before the spreadsheet status chain: an overview page renders itself. -->
+        <xpath expr="//h3[@class='dashboard-loading-status'][not(@t-if='!dashboard')]" position="before">
+            <t t-if="status === kswClientStatus">
+                <t t-set="kswComponent" t-value="kswClientComponent(dashboard)"/>
+                <div t-if="kswComponent" class="o_ksw_hub_page h-100 w-100 overflow-hidden">
+                    <t t-component="kswComponent" t-props="kswClientProps(dashboard)" t-key="dashboard.data.id"/>
+                </div>
+            </t>
+        </xpath>
+        <xpath expr="//h3[@class='dashboard-loading-status'][not(@t-if='!dashboard')]" position="attributes">
+            <attribute name="t-if">status !== kswClientStatus and status === Status.Loading</attribute>
+        </xpath>
+        <xpath expr="//div[hasclass('dashboard-loading-status')][hasclass('error')]" position="attributes">
+            <attribute name="t-elif">status !== kswClientStatus and status === Status.Error</attribute>
+        </xpath>
+        <xpath expr="//div[hasclass('dashboard-loading-status')][hasclass('error')]/following-sibling::t[1]" position="attributes">
+            <attribute name="t-else"/>
+            <attribute name="t-elif">status !== kswClientStatus</attribute>
+        </xpath>
+    </t>
+</templates>

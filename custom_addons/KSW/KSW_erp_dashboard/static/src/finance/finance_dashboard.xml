@@ -49,7 +49,7 @@
                             <table class="o_ksw_rows">
                                 <t t-foreach="pair[1].buckets" t-as="b" t-key="b.key">
                                     <tr class="o_ksw_click" t-on-click="() => this.openLines(pair[0] + ': ' + b.label, b.domain)">
-                                        <td style="width: 110px" t-esc="b.label"/>
+                                        <td class="text-nowrap pe-3" t-esc="b.label"/>
                                         <td class="o_ksw_name"><div class="o_ksw_bar_track"><div class="o_ksw_bar" t-att-style="'width:' + bucketWidth(b, pair[1])"/></div></td>
                                         <td class="o_ksw_num" t-att-class="b.key !== 'current' and b.amount ? 'o_ksw_bad' : ''" t-esc="m(b.amount, false)"/>
                                     </tr>

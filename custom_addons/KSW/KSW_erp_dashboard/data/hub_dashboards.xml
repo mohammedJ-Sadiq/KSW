@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- The overview pages in the Dashboards app, first in their groups. group_ids
+         match each overview's own menu (account.menu_board_journal_1,
+         stock.stock_picking_type_menu), so the entry shows to the same people. -->
+    <record id="hub_dashboard_finance" model="spreadsheet.dashboard">
+        <field name="name">Accounting Overview</field>
+        <field name="dashboard_group_id" ref="spreadsheet_dashboard.spreadsheet_dashboard_group_finance"/>
+        <field name="x_client_action_id" ref="action_ksw_finance_dashboard"/>
+        <field name="group_ids" eval="[Command.set([ref('account.group_account_basic')])]"/>
+        <field name="sequence">5</field>
+        <field name="is_published">True</field>
+    </record>
+    <record id="hub_dashboard_inventory" model="spreadsheet.dashboard">
+        <field name="name">Inventory Overview</field>
+        <field name="dashboard_group_id" ref="spreadsheet_dashboard.spreadsheet_dashboard_group_logistics"/>
+        <field name="x_client_action_id" ref="action_ksw_inventory_dashboard"/>
+        <field name="group_ids" eval="[Command.set([ref('stock.group_stock_user')])]"/>
+        <field name="sequence">5</field>
+        <field name="is_published">True</field>
+    </record>
+</odoo>

@@ -1,6 +1,6 @@
 {
     'name': 'KSW Workshop Dashboard',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'author': 'Mohammed Albadr',
     'category': 'Human Resources',
     'summary': 'Workshop overview for reviewers: open work and its age, throughput, turnaround, '
@@ -19,6 +19,7 @@ and installs by itself when both modules are present.
     'depends': ['KSW_workshop', 'KSW_erp_dashboard'],
     'data': [
         'views/workshop_dashboard_views.xml',
+        'data/hub_dashboard.xml',
     ],
     'assets': {
         'web.assets_backend': [

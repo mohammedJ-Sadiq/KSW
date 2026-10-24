@@ -115,3 +115,13 @@ class TestWorkshopDashboard(TransactionCase):
         bucket = next(b for b in d['age'] if b['key'] == '3_7')
         self.assertIn(self.waiting, self.env['ksw.workshop.request'].search(bucket['domain']))
         self.assertIn(self.waiting, self.env['ksw.workshop.request'].search(d['new']['stale_domain']))
+
+    def test_listed_in_the_dashboards_app_for_reviewers_only(self):
+        entry = self.env.ref('KSW_workshop_dashboard.hub_dashboard_workshop')
+        self.assertEqual(entry.x_client_action_tag, 'ksw_workshop_dashboard')
+        Dashboard = self.env['spreadsheet.dashboard']
+        self.assertIn(entry, Dashboard.with_user(self.reviewer).search([]))
+        self.assertIn(entry, Dashboard.with_user(self.manager).search([]))
+        self.assertNotIn(entry, Dashboard.with_user(self.technician).search([]))
+        self.assertNotIn(entry, Dashboard.with_user(self.requester).search([]))
+

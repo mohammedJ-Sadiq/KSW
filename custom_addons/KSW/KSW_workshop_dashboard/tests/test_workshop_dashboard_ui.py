@@ -16,3 +16,10 @@ class TestWorkshopDashboardUI(HttpCase):
             "console.log('test successful')",
             ready="document.querySelectorAll('.o_ksw_dashboard .o_ksw_chart canvas').length > 0",
             login='dash_ui_reviewer', timeout=120)
+        hub = self.env.ref('KSW_workshop_dashboard.hub_dashboard_workshop')
+        self.browser_js(
+            f'/odoo/dashboards?dashboard_id={hub.id}', "console.log('test successful')",
+            ready="document.querySelectorAll('.o_spreadsheet_dashboard_action .o_ksw_hub_page .o_ksw_chart canvas')"
+                  ".length > 0",
+            login='dash_ui_reviewer', timeout=120)
+

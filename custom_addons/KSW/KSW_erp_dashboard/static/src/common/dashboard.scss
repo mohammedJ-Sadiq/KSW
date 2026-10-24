@@ -12,7 +12,8 @@
         gap: 12px;
         // auto-fit, not auto-fill: unused tracks collapse so the cards stretch
         // across the page instead of leaving the right side empty.
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        // 200px: six headline tiles still fit one row beside the Dashboards sidebar.
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         margin-bottom: 12px;
         &.o_ksw_wide { grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); }
         @include media-breakpoint-up(xxl) {
@@ -52,4 +53,11 @@
     .o_ksw_bar { height: 8px; border-radius: 4px; background: $o-brand-primary; opacity: 0.75; }
     .o_ksw_bar_track { background: rgba($o-brand-primary, 0.1); border-radius: 4px; }
     .o_ksw_empty { color: $text-muted; font-size: 0.9rem; }
+}
+
+// An overview page shown inside the Dashboards app (static/src/hub): it takes the
+// space the spreadsheet would, beside the dashboards sidebar.
+.o_spreadsheet_dashboard_action .o_ksw_hub_page {
+    flex: 1 1 auto;
+    min-width: 0;
 }

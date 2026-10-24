@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- The Workshop Overview in the Dashboards app (see KSW_erp_dashboard's hub).
+         Its own group, after Logistics (400). Reviewer only, like its menu; the
+         Manager implies it. -->
+    <record id="hub_dashboard_group_workshop" model="spreadsheet.dashboard.group">
+        <field name="name">Workshop</field>
+        <field name="sequence">450</field>
+    </record>
+    <record id="hub_dashboard_workshop" model="spreadsheet.dashboard">
+        <field name="name">Workshop Overview</field>
+        <field name="dashboard_group_id" ref="hub_dashboard_group_workshop"/>
+        <field name="x_client_action_id" ref="action_ksw_workshop_dashboard"/>
+        <field name="group_ids" eval="[Command.set([ref('KSW_workshop.group_workshop_reviewer')])]"/>
+        <field name="sequence">5</field>
+        <field name="is_published">True</field>
+    </record>
+</odoo>

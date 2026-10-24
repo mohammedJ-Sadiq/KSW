@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 15:39+0000\n"
-"PO-Revision-Date: 2026-10-23 15:39+0000\n"
+"POT-Creation-Date: 2026-10-24 11:45+0000\n"
+"PO-Revision-Date: 2026-10-24 11:45+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar_001\n"
@@ -15,44 +15,39 @@ msgstr ""
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 msgid "/ year"
 msgstr "/ سنة"
 
 #. module: KSW_erp_dashboard
 #. odoo-python
-#: code:addons/KSW/KSW_erp_dashboard/models/erp_dashboard.py:0
 #: code:addons/KSW_erp_dashboard/models/erp_dashboard.py:0
 msgid "1–30 days"
 msgstr "1–30 يوماً"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 msgid "30 days of supply or less"
 msgstr "تكفي 30 يوماً أو أقل"
 
 #. module: KSW_erp_dashboard
 #. odoo-python
-#: code:addons/KSW/KSW_erp_dashboard/models/erp_dashboard.py:0
 #: code:addons/KSW_erp_dashboard/models/erp_dashboard.py:0
 msgid "31–60 days"
 msgstr "31–60 يوماً"
 
 #. module: KSW_erp_dashboard
 #. odoo-python
-#: code:addons/KSW/KSW_erp_dashboard/models/erp_dashboard.py:0
 #: code:addons/KSW_erp_dashboard/models/erp_dashboard.py:0
 msgid "61–90 days"
 msgstr "61–90 يوماً"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
 #: model:ir.actions.client,name:KSW_erp_dashboard.action_ksw_finance_dashboard
+#: model:spreadsheet.dashboard,name:KSW_erp_dashboard.hub_dashboard_finance
 msgid "Accounting Overview"
 msgstr "نظرة عامة على المحاسبة"
 
@@ -62,60 +57,63 @@ msgid "Accounting and Inventory Overview"
 msgstr "نظرة عامة على المحاسبة والمخزون"
 
 #. module: KSW_erp_dashboard
+#: model:ir.model.fields,help:KSW_erp_dashboard.field_spreadsheet_dashboard__x_client_action_tag
+msgid ""
+"An arbitrary string, interpreted by the client according to its own needs "
+"and wishes. There is no central tag repository across clients."
+msgstr ""
+"نص حر يفسّره العميل وفق احتياجاته، ولا يوجد سجل مركزي للوسوم بين العملاء."
+
+#. module: KSW_erp_dashboard
 #. odoo-python
-#: code:addons/KSW/KSW_erp_dashboard/models/erp_dashboard.py:0
 #: code:addons/KSW_erp_dashboard/models/erp_dashboard.py:0
 msgid "Bills due within 7 days"
 msgstr "فواتير موردين تستحق خلال 7 أيام"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 msgid "Cash by account"
 msgstr "النقدية حسب الحساب"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 msgid "Cash position"
 msgstr "المركز النقدي"
 
 #. module: KSW_erp_dashboard
+#: model:ir.model.fields,field_description:KSW_erp_dashboard.field_spreadsheet_dashboard__x_client_action_tag
+msgid "Client action tag"
+msgstr "وسم إجراء العميل"
+
+#. module: KSW_erp_dashboard
 #. odoo-python
-#: code:addons/KSW/KSW_erp_dashboard/models/erp_dashboard.py:0
 #: code:addons/KSW_erp_dashboard/models/erp_dashboard.py:0
 msgid "Customer invoices overdue"
 msgstr "فواتير عملاء متأخرة"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 msgid "Days of supply left"
 msgstr "أيام التغطية المتبقية"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 msgid "Days payable outstanding"
 msgstr "متوسط أيام السداد للموردين"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 msgid "Days sales outstanding"
 msgstr "متوسط أيام التحصيل"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
 #: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 msgid "Dead stock"
@@ -123,72 +121,74 @@ msgstr "مخزون راكد"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 msgid "Dead stock (largest value)"
 msgstr "المخزون الراكد (الأعلى قيمة)"
 
 #. module: KSW_erp_dashboard
+#: model:ir.model.fields,field_description:KSW_erp_dashboard.field_ksw_erp_dashboard__display_name
+#: model:ir.model.fields,field_description:KSW_erp_dashboard.field_spreadsheet_dashboard__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: KSW_erp_dashboard
 #. odoo-python
-#: code:addons/KSW/KSW_erp_dashboard/models/erp_dashboard.py:0
 #: code:addons/KSW_erp_dashboard/models/erp_dashboard.py:0
 msgid "Draft entries to post"
 msgstr "قيود مسودة بانتظار الترحيل"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
 msgid "Expenses"
 msgstr "المصروفات"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 msgid "Expenses by cost centre, this period"
 msgstr "المصروفات حسب مركز التكلفة، هذه الفترة"
 
 #. module: KSW_erp_dashboard
+#: model:ir.model.fields,field_description:KSW_erp_dashboard.field_ksw_erp_dashboard__id
+#: model:ir.model.fields,field_description:KSW_erp_dashboard.field_spreadsheet_dashboard__id
+msgid "ID"
+msgstr ""
+
+#. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
 #: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
 #: model:ir.actions.client,name:KSW_erp_dashboard.action_ksw_inventory_dashboard
+#: model:spreadsheet.dashboard,name:KSW_erp_dashboard.hub_dashboard_inventory
 msgid "Inventory Overview"
 msgstr "نظرة عامة على المخزون"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
 #: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
 msgid "Issued"
 msgstr "المنصرف"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 msgid "Issued to vehicles and cost centres, this period"
 msgstr "المنصرف للمعدات ومراكز التكلفة، هذه الفترة"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
 msgid "Journals"
 msgstr "اليوميات"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/common/dashboard_common.js:0
 #: code:addons/KSW_erp_dashboard/static/src/common/dashboard_common.js:0
 msgid "Last month"
 msgstr "الشهر الماضي"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 msgid "Loading…"
@@ -196,106 +196,90 @@ msgstr "جارٍ التحميل…"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 msgid "Most overdue customers"
 msgstr "العملاء الأكثر تأخراً"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 msgid "No dead stock."
 msgstr "لا يوجد مخزون راكد."
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 msgid "No issues this period."
 msgstr "لا يوجد صرف في هذه الفترة."
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 msgid "No open operations."
 msgstr "لا توجد عمليات مفتوحة."
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 msgid "No slow movers."
 msgstr "لا توجد أصناف بطيئة الحركة."
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 msgid "No tagged expenses."
 msgstr "لا توجد مصروفات بمراكز تكلفة."
 
 #. module: KSW_erp_dashboard
 #. odoo-python
-#: code:addons/KSW/KSW_erp_dashboard/models/erp_dashboard.py:0
 #: code:addons/KSW_erp_dashboard/models/erp_dashboard.py:0
 msgid "No warehouse"
 msgstr "بدون مستودع"
 
 #. module: KSW_erp_dashboard
 #. odoo-python
-#: code:addons/KSW/KSW_erp_dashboard/models/erp_dashboard.py:0
 #: code:addons/KSW_erp_dashboard/models/erp_dashboard.py:0
 msgid "Not due"
 msgstr "غير مستحق"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 msgid "Nothing overdue."
 msgstr "لا يوجد متأخرات."
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 msgid "Nothing runs out within 30 days."
 msgstr "لا شيء ينفد خلال 30 يوماً."
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 msgid "Open payables ÷ last 90 days' costs"
 msgstr "الذمم الدائنة ÷ تكاليف آخر 90 يوماً"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 msgid "Open receivables ÷ last 90 days' sales"
 msgstr "الذمم المدينة ÷ مبيعات آخر 90 يوماً"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
 #: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
 msgid "Operations"
 msgstr "العمليات"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 msgid "Operations waiting"
 msgstr "عمليات بالانتظار"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
 #: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
 msgid "Out of stock"
@@ -303,29 +287,29 @@ msgstr "نفد من المخزون"
 
 #. module: KSW_erp_dashboard
 #. odoo-python
-#: code:addons/KSW/KSW_erp_dashboard/models/erp_dashboard.py:0
 #: code:addons/KSW_erp_dashboard/models/erp_dashboard.py:0
 msgid "Over 90 days"
 msgstr "أكثر من 90 يوماً"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
 msgid "Overdue payables"
 msgstr "ذمم دائنة متأخرة"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
 msgid "Overdue receivables"
 msgstr "ذمم مدينة متأخرة"
 
 #. module: KSW_erp_dashboard
+#: model:ir.model.fields,field_description:KSW_erp_dashboard.field_spreadsheet_dashboard__x_client_action_id
+msgid "Overview Page"
+msgstr "صفحة النظرة العامة"
+
+#. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 msgid "Payables"
@@ -333,50 +317,42 @@ msgstr "الذمم الدائنة"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
 msgid "Payables aging"
 msgstr "أعمار الذمم الدائنة"
 
 #. module: KSW_erp_dashboard
 #. odoo-python
-#: code:addons/KSW/KSW_erp_dashboard/models/erp_dashboard.py:0
 #: code:addons/KSW_erp_dashboard/models/erp_dashboard.py:0
 msgid "Payments not fully matched"
 msgstr "دفعات غير مطابقة بالكامل"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 msgid "Previous"
 msgstr "السابقة"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
 msgid "Profit"
 msgstr "الربح"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 msgid "Profit and loss"
 msgstr "الأرباح والخسائر"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 msgid "Profit, this period"
 msgstr "الربح، هذه الفترة"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 msgid "Receivables"
@@ -384,235 +360,15 @@ msgstr "الذمم المدينة"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
 msgid "Receivables aging"
 msgstr "أعمار الذمم المدينة"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
 #: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
 msgid "Received"
 msgstr "المستلم"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
-#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
-msgid "Revenue"
-msgstr "الإيرادات"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
-#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-msgid "Running low"
-msgstr "قارب على النفاد"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
-#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-msgid "Slow moving"
-msgstr "بطيء الحركة"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
-#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
-msgid "Stock on hand"
-msgstr "المخزون المتوفر"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-msgid "Stock turnover"
-msgstr "معدل دوران المخزون"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-msgid "Stock value"
-msgstr "قيمة المخزون"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-msgid "Stock value by category"
-msgstr "قيمة المخزون حسب الفئة"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-msgid "Stock value by warehouse"
-msgstr "قيمة المخزون حسب المستودع"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/common/dashboard_common.js:0
-#: code:addons/KSW_erp_dashboard/static/src/common/dashboard_common.js:0
-msgid "This month"
-msgstr "هذا الشهر"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
-msgid "This period"
-msgstr "هذه الفترة"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/common/dashboard_common.js:0
-#: code:addons/KSW_erp_dashboard/static/src/common/dashboard_common.js:0
-msgid "This quarter"
-msgstr "هذا الربع"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/common/dashboard_common.js:0
-#: code:addons/KSW_erp_dashboard/static/src/common/dashboard_common.js:0
-msgid "This year"
-msgstr "هذه السنة"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
-msgid "Vendors overdue to pay"
-msgstr "موردون متأخر سدادهم"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
-msgid "Work waiting"
-msgstr "أعمال بالانتظار"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
-msgid "Year to date"
-msgstr "منذ بداية السنة"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
-msgid "bank and cash accounts"
-msgstr "حسابات بنكية ونقدية"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
-msgid "days"
-msgstr "يوماً"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-msgid "days of inventory on hand"
-msgstr "يوماً من المخزون المتوفر"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-msgid "items in stock"
-msgstr "صنف في المخزون"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-msgid "items, last issue 90–180 days ago"
-msgstr "صنف، آخر صرف قبل 90–180 يوماً"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-msgid "items, no issue for 180+ days"
-msgstr "صنف، بدون صرف منذ 180 يوماً أو أكثر"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-msgid "late"
-msgstr "متأخرة"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-msgid "negative"
-msgstr "سالب"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
-msgid "overdue"
-msgstr "متأخر"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-msgid "ready"
-msgstr "جاهزة"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-msgid "used in the last 90 days, none left"
-msgstr "استُخدم خلال 90 يوماً ولم يتبق منه شيء"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-msgid "waiting"
-msgstr "بالانتظار"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
-msgid "· Year"
-msgstr "· السنة"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
-msgid "Revenue and expenses, by day"
-msgstr "الإيرادات والمصروفات حسب اليوم"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
-msgid "Revenue and expenses, by week"
-msgstr "الإيرادات والمصروفات حسب الأسبوع"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
-msgid "Revenue and expenses, by month"
-msgstr "الإيرادات والمصروفات حسب الشهر"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
@@ -623,11 +379,210 @@ msgstr "المستلم والمنصرف حسب اليوم (القيمة)"
 #. module: KSW_erp_dashboard
 #. odoo-javascript
 #: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
+msgid "Received and issued by month (value)"
+msgstr "المستلم والمنصرف حسب الشهر (القيمة)"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
 msgid "Received and issued by week (value)"
 msgstr "المستلم والمنصرف حسب الأسبوع (القيمة)"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
+msgid "Revenue"
+msgstr "الإيرادات"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
+msgid "Revenue and expenses, by day"
+msgstr "الإيرادات والمصروفات حسب اليوم"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
+msgid "Revenue and expenses, by month"
+msgstr "الإيرادات والمصروفات حسب الشهر"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
+msgid "Revenue and expenses, by week"
+msgstr "الإيرادات والمصروفات حسب الأسبوع"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
 #: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
-msgid "Received and issued by month (value)"
-msgstr "المستلم والمنصرف حسب الشهر (القيمة)"
+#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
+msgid "Running low"
+msgstr "قارب على النفاد"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
+#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
+msgid "Slow moving"
+msgstr "بطيء الحركة"
+
+#. module: KSW_erp_dashboard
+#: model:ir.model,name:KSW_erp_dashboard.model_spreadsheet_dashboard
+msgid "Spreadsheet Dashboard"
+msgstr "لوحة معلومات جدول البيانات"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
+msgid "Stock on hand"
+msgstr "المخزون المتوفر"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
+msgid "Stock turnover"
+msgstr "معدل دوران المخزون"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
+msgid "Stock value"
+msgstr "قيمة المخزون"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
+msgid "Stock value by category"
+msgstr "قيمة المخزون حسب الفئة"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
+msgid "Stock value by warehouse"
+msgstr "قيمة المخزون حسب المستودع"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/common/dashboard_common.js:0
+msgid "This month"
+msgstr "هذا الشهر"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
+msgid "This period"
+msgstr "هذه الفترة"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/common/dashboard_common.js:0
+msgid "This quarter"
+msgstr "هذا الربع"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/common/dashboard_common.js:0
+msgid "This year"
+msgstr "هذه السنة"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
+msgid "Vendors overdue to pay"
+msgstr "موردون متأخر سدادهم"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
+msgid "Work waiting"
+msgstr "أعمال بالانتظار"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
+msgid "Year to date"
+msgstr "منذ بداية السنة"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
+msgid "bank and cash accounts"
+msgstr "حسابات بنكية ونقدية"
+
+#. module: KSW_erp_dashboard
+#. odoo-python
+#: code:addons/KSW_erp_dashboard/models/erp_dashboard.py:0
+msgid "company_id"
+msgstr ""
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
+msgid "days"
+msgstr "يوماً"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
+msgid "days of inventory on hand"
+msgstr "يوماً من المخزون المتوفر"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
+msgid "items in stock"
+msgstr "صنف في المخزون"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
+msgid "items, last issue 90–180 days ago"
+msgstr "صنف، آخر صرف قبل 90–180 يوماً"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
+msgid "items, no issue for 180+ days"
+msgstr "صنف، بدون صرف منذ 180 يوماً أو أكثر"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
+msgid "late"
+msgstr "متأخرة"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
+msgid "negative"
+msgstr "سالب"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
+msgid "overdue"
+msgstr "متأخر"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
+msgid "ready"
+msgstr "جاهزة"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
+msgid "used in the last 90 days, none left"
+msgstr "استُخدم خلال 90 يوماً ولم يتبق منه شيء"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
+msgid "waiting"
+msgstr "بالانتظار"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
+msgid "· Year"
+msgstr "· السنة"

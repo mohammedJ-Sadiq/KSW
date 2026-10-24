@@ -42,3 +42,25 @@ class TestErpDashboard(TransactionCase):
         for cat in d['by_category']:
             self.assertTrue(Quant.search_count([('location_id.usage', '=', 'internal'),
                                                 ('product_id.categ_id', 'child_of', cat['id'])]))
+
+    def test_overviews_are_listed_in_the_dashboards_app(self):
+        Dashboard = self.env['spreadsheet.dashboard']
+        for xmlid, tag, group in (
+                ('KSW_erp_dashboard.hub_dashboard_finance', 'ksw_finance_dashboard', 'account.group_account_basic'),
+                ('KSW_erp_dashboard.hub_dashboard_inventory', 'ksw_inventory_dashboard', 'stock.group_stock_user')):
+            entry = self.env.ref(xmlid)
+            self.assertEqual(entry.x_client_action_tag, tag)
+            self.assertTrue(entry.is_published)
+            self.assertEqual(entry.group_ids, self.env.ref(group))
+        # Seen only by the roles that open the overview's menu (the core ir.rule on group_ids).
+        clerk = self.env['res.users'].with_context(no_reset_password=True).create({
+            'name': 'hub clerk', 'login': 'hub_clerk',
+            'group_ids': [(6, 0, [self.env.ref('base.group_user').id])]})
+        keeper = self.env['res.users'].with_context(no_reset_password=True).create({
+            'name': 'hub keeper', 'login': 'hub_keeper',
+            'group_ids': [(6, 0, [self.env.ref('stock.group_stock_user').id])]})
+        inventory = self.env.ref('KSW_erp_dashboard.hub_dashboard_inventory')
+        self.assertNotIn(inventory, Dashboard.with_user(clerk).search([]))
+        self.assertIn(inventory, Dashboard.with_user(keeper).search([]))
+        self.assertNotIn(self.env.ref('KSW_erp_dashboard.hub_dashboard_finance'), Dashboard.with_user(keeper).search([]))
+
