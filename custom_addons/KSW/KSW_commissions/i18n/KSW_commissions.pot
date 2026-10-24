@@ -10903,3 +10903,8 @@ msgstr ""
 #: code:addons/KSW_commissions/models/ksw_pay_run.py:0
 msgid "An installment settled from %(run)s was given back to pending, so it is owed again."
 msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.ui.menu,name:KSW_commissions.menu_ksw_pay_month_section
+msgid "Monthly Pay"
+msgstr ""

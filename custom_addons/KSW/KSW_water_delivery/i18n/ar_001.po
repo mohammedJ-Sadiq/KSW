@@ -631,6 +631,7 @@ msgid "Client not listed"
 msgstr "العميل غير مدرج"
 
 #. module: KSW_water_delivery
+#: model:ir.ui.menu,name:KSW_water_delivery.menu_water_delivery_clients
 #: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_tanker_list
 msgid "Clients"
 msgstr "العملاء"
@@ -3058,3 +3059,8 @@ msgstr "إليك"
 #: model:product.template,description_sale:KSW_water_delivery.product_water_load_product_template
 msgid "مياه عذبة — ردة"
 msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.ui.menu,name:KSW_water_delivery.menu_water_delivery_operations
+msgid "Operations"
+msgstr "العمليات"

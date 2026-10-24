@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- utm ships a top-level "Link Tracker" app whose only content, without
+         the link_tracker module, is the UTMs folder (Campaigns, Mediums,
+         Sources): marketing plumbing nobody here works in. It goes under
+         Settings > Technical with the other technical tables, and the app
+         disappears from the switcher on its own: a menu with no action is
+         only shown while it has a visible child. write() rather than a
+         <menuitem> override, which would reset what it does not repeat
+         (gotcha #1). -->
+    <function model="ir.ui.menu" name="write">
+        <value eval="[ref('utm.marketing_utm')]"/>
+        <value eval="{'parent_id': ref('base.menu_custom'), 'sequence': 40}"/>
+    </function>
+</odoo>

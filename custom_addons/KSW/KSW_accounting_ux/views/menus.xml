@@ -153,6 +153,7 @@
             ('mis_builder.mis_report_style_view_menu', 'KSW_accounting_ux.menu_ksw_config_reporting', 20),
 
             ('KSW_bas_gl_import.menu_ksw_bas_gl_import', 'KSW_accounting_ux.menu_ksw_config_migration', 10),
+            ('KSW_bas_gl_import.menu_ksw_bas_branch', 'KSW_accounting_ux.menu_ksw_config_migration', 20),
         ]"/>
     </function>
 

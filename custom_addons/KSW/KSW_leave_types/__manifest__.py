@@ -1,6 +1,6 @@
 {
     'name': 'KSW Leave Types',
-    'version': '19.0.1.1.0',
+    'version': '19.0.1.1.1',
     'category': 'Human Resources',
     'summary': 'Saudi Labour Law leave types with automatic allocation/accrual',
     'author': 'Mohammed Albadr',

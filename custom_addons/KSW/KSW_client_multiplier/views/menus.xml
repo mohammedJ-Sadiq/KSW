@@ -5,15 +5,15 @@
     <!-- Water Delivery: the Supervisor's page, where a change is asked for. -->
     <menuitem id="menu_water_client_multipliers"
               name="Client Multipliers"
-              parent="KSW_water_delivery.menu_water_delivery_root"
+              parent="KSW_water_delivery.menu_water_delivery_clients"
               action="action_client_multipliers"
-              sequence="46"
+              sequence="20"
               groups="KSW_water_delivery.group_water_dispatcher,base.group_system"/>
     <menuitem id="menu_water_multiplier_requests"
               name="Multiplier Requests"
-              parent="KSW_water_delivery.menu_water_delivery_root"
+              parent="KSW_water_delivery.menu_water_delivery_clients"
               action="action_multiplier_requests"
-              sequence="46"
+              sequence="30"
               groups="KSW_water_delivery.group_water_dispatcher,base.group_system"/>
 
     <!-- Accounting: the same list, read-only (no Supervisor group, no button). -->

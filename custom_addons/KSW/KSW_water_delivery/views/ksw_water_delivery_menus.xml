@@ -50,19 +50,34 @@ else:
               sequence="20"
               groups="KSW_water_delivery.group_water_driver"/>
 
+    <!-- The overseers' work in two dropdowns, so the bar reads
+         New Delivery / My Deliveries for a driver and Operations / Clients /
+         Invoice / Configuration for everyone else. The headers carry no
+         groups= of their own: a folder menu shows while any child is
+         visible, so it can never orphan an item (gotcha #41). -->
+    <menuitem id="menu_water_delivery_operations"
+              name="Operations"
+              parent="menu_water_delivery_root"
+              sequence="30"/>
+
+    <menuitem id="menu_water_delivery_clients"
+              name="Clients"
+              parent="menu_water_delivery_root"
+              sequence="40"/>
+
     <!-- Only does anything on a branch switched to dispatch mode. -->
     <menuitem id="menu_water_delivery_dispatches"
               name="Dispatches"
-              parent="menu_water_delivery_root"
+              parent="menu_water_delivery_operations"
               action="action_water_dispatches"
-              sequence="25"
+              sequence="10"
               groups="KSW_water_delivery.group_water_dispatch,KSW_water_delivery.group_water_dispatcher"/>
 
     <menuitem id="menu_water_delivery_all_notes"
               name="Delivery Notes"
-              parent="menu_water_delivery_root"
+              parent="menu_water_delivery_operations"
               action="action_water_delivery_all_notes"
-              sequence="30"
+              sequence="20"
               groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing"/>
 
     <!-- The dispatcher's queue. Sits next to the notes rather than under
@@ -70,9 +85,9 @@ else:
          a driver has already made. -->
     <menuitem id="menu_water_delivery_captures"
               name="App Deliveries"
-              parent="menu_water_delivery_root"
+              parent="menu_water_delivery_operations"
               action="action_water_captures"
-              sequence="40"
+              sequence="30"
               groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing"/>
 
     <!-- Also day-to-day work: under the enforce rule a client with no
@@ -80,18 +95,18 @@ else:
          driver waiting to deliver. -->
     <menuitem id="menu_water_delivery_locations"
               name="Client Locations"
-              parent="menu_water_delivery_root"
+              parent="menu_water_delivery_clients"
               action="action_water_location_requests"
-              sequence="45"
+              sequence="10"
               groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing"/>
 
     <!-- Who drives which tanker. The app fetches the tanker from here and
          never lets the driver choose, so this is dispatch's daily lever. -->
     <menuitem id="menu_water_delivery_tankers"
               name="Fleet Management"
-              parent="menu_water_delivery_root"
+              parent="menu_water_delivery_operations"
               action="action_water_tankers"
-              sequence="47"
+              sequence="40"
               groups="KSW_water_delivery.group_water_dispatcher"/>
 
     <!-- Month end. -->

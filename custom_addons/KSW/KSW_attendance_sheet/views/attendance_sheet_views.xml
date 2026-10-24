@@ -271,7 +271,24 @@
         parent="hr_attendance.menu_hr_attendance_root"
         action="action_ksw_attendance_sheet"
         groups="KSW_attendance_sheet.group_attendance_sheet_supervisor"
-        sequence="30"/>
+        sequence="8"/>
+
+    <!-- The rest of the Attendances bar, in working order: Overview,
+         Management, Attendance Analysis, Attendance Sheets, Kiosk Mode,
+         Reporting, Configuration. The cybrosys Biometric Device folder held
+         one item of the same name at the top of the bar; the device is
+         setup, so it goes under Configuration. write() rather than a
+         <menuitem> override, which would reset what it does not repeat
+         (gotcha #1). Its own gate (base.group_system) still applies, and an
+         administrator holds Configuration's Attendance Administrator group. -->
+    <function model="ir.ui.menu" name="write">
+        <value eval="[ref('hr_biometric_attendance.daily_attendance_menu')]"/>
+        <value eval="{'sequence': 7}"/>
+    </function>
+    <function model="ir.ui.menu" name="write">
+        <value eval="[ref('hr_biometric_attendance.biometric_device_details_sub_menu')]"/>
+        <value eval="{'parent_id': ref('hr_attendance.menu_hr_attendance_configuration'), 'sequence': 50}"/>
+    </function>
 
     <!-- ============================================================ -->
     <!-- Pivot + Graph (dashboard data source)                        -->

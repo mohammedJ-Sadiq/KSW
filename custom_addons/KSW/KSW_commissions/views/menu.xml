@@ -2,9 +2,9 @@
 <odoo>
 
     <!--
-        Four top-level items. A supervisor lands on Pay Entries and works
-        there; the run, the reports and the configuration are for the roles
-        that need them.
+        Five dropdowns. A supervisor lands on Pay Entries and works there;
+        the month, the reports and the configuration are for the roles that
+        need them.
 
         Every <menuitem> repeats BOTH name= and parent=, including on
         overrides: _tag_menuitem defaults parent_id to False and name to the
@@ -74,28 +74,38 @@
         the three had a menu of their own before: the GM and the accountant
         reached it only through the Supervisor / Administrator groups they
         happened to also hold, so a GM-only user opened the app to nothing.
+
+        One dropdown, in the order the month moves: handover, early
+        handovers, the run, releases, then what accounting posts after it.
+        The header has no groups= of its own: a folder menu shows while any
+        child is visible, so it cannot orphan the GM or the accountant
+        (gotcha #41); each item keeps its own gate.
     -->
+    <menuitem id="menu_ksw_pay_month_section"
+              name="Monthly Pay"
+              parent="menu_ksw_commissions_root"
+              sequence="20"/>
     <menuitem id="menu_ksw_pay_run"
               name="Monthly Pay Run"
-              parent="menu_ksw_commissions_root"
+              parent="menu_ksw_pay_month_section"
               action="action_ksw_pay_run"
-              sequence="20"
+              sequence="30"
               groups="KSW_commissions.group_commission_supervisor,KSW_commissions.group_commission_gm,KSW_commissions.group_commission_accountant"/>
 
     <!-- The accountant's: the month voucher proves the commission, these
          post what happened to it afterwards (payments, later deductions). -->
     <menuitem id="menu_ksw_pay_settlement"
               name="BAS Settlement Vouchers"
-              parent="menu_ksw_commissions_root"
+              parent="menu_ksw_pay_month_section"
               action="action_ksw_pay_settlement"
-              sequence="22"
+              sequence="50"
               groups="KSW_commissions.group_commission_accountant,KSW_commissions.group_commission_officer"/>
 
     <menuitem id="menu_ksw_pay_submission"
               name="Department Submissions"
-              parent="menu_ksw_commissions_root"
+              parent="menu_ksw_pay_month_section"
               action="action_ksw_pay_submission"
-              sequence="25"
+              sequence="10"
               groups="KSW_commissions.group_commission_supervisor,KSW_commissions.group_commission_gm"/>
 
     <!-- Some employees' month handed over ahead of the rest. Beside the
@@ -103,13 +113,13 @@
          ones waiting on him without going through the month. -->
     <menuitem id="menu_ksw_pay_sub_batch"
               name="Sub-Batches"
-              parent="menu_ksw_commissions_root"
+              parent="menu_ksw_pay_month_section"
               action="action_ksw_pay_sub_batch"
-              sequence="26"
+              sequence="20"
               groups="KSW_commissions.group_commission_supervisor,KSW_commissions.group_commission_gm"/>
 
     <!--
-        Straight under the root, not under Configuration: a menu's effective
+        Under the month, not under Configuration: a menu's effective
         groups are the INTERSECTION of its own and every ancestor's, and
         Configuration is gated to the Administrator — which would orphan
         this item for the General Manager, who is the one who releases a
@@ -117,9 +127,9 @@
     -->
     <menuitem id="menu_ksw_pay_vacation_release"
               name="Vacation Releases"
-              parent="menu_ksw_commissions_root"
+              parent="menu_ksw_pay_month_section"
               action="action_ksw_pay_vacation_release"
-              sequence="27"
+              sequence="40"
               groups="KSW_commissions.group_commission_gm,KSW_commissions.group_commission_officer"/>
 
     <!-- ══ 3. Reports ═══════════════════════════════════════════════ -->

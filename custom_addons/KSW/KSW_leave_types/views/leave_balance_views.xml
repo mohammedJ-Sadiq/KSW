@@ -72,10 +72,13 @@
         </field>
     </record>
 
+    <!-- Under My Time, beside My Allocations: for most people it is their
+         own balance (the record rules scope it), so it sits with their own
+         time off rather than loose at the end of the bar. -->
     <menuitem id="menu_leave_balances"
               name="Leave Balances"
-              parent="hr_holidays.menu_hr_holidays_root"
+              parent="hr_holidays.menu_hr_holidays_my_leaves"
               action="action_leave_balances"
-              sequence="25"/>
+              sequence="40"/>
 
 </odoo>

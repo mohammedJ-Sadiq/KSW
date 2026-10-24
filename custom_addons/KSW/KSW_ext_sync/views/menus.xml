@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- A section of Accounting, not an app of its own: these are read-only
+         mirrors of BAS ledgers, and only the administrator opens them.
+         Between Reporting (20) and Configuration (35). The menu's groups are
+         the intersection with Accounting's (gotcha #41), which an
+         administrator holds. -->
     <menuitem id="menu_bas_root"
-        name="BAS Sync"
-        sequence="95"
-        groups="base.group_system"
-        web_icon="KSW_ext_sync,static/description/icon.png"/>
+        name="BAS Mirror"
+        parent="account.menu_finance"
+        sequence="30"
+        groups="base.group_system"/>
 
     <menuitem id="menu_bas_accounts"
         name="Loans &amp; Advances"

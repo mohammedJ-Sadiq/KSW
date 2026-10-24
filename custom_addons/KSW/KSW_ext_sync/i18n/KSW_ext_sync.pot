@@ -87,7 +87,7 @@ msgstr ""
 
 #. module: KSW_ext_sync
 #: model:ir.ui.menu,name:KSW_ext_sync.menu_bas_root
-msgid "BAS Sync"
+msgid "BAS Mirror"
 msgstr ""
 
 #. module: KSW_ext_sync

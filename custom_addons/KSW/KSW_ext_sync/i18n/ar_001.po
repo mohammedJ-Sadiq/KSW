@@ -88,8 +88,8 @@ msgstr "فواتير مبيعات BAS"
 
 #. module: KSW_ext_sync
 #: model:ir.ui.menu,name:KSW_ext_sync.menu_bas_root
-msgid "BAS Sync"
-msgstr "مزامنة BAS"
+msgid "BAS Mirror"
+msgstr "بيانات BAS"
 
 #. module: KSW_ext_sync
 #: model:ir.model.fields,help:KSW_ext_sync.field_res_partner__x_client_account_number
