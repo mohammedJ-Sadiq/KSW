@@ -7,6 +7,7 @@
         <field name="inherit_id" ref="account.view_invoice_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//list" position="inside">
+                <field name="x_sale_terms" optional="show"/>
                 <field name="x_bas_doc_type" optional="hide"/>
                 <field name="x_bas_number" optional="hide"/>
                 <field name="x_bas_reference" optional="hide"/>
@@ -118,6 +119,12 @@
             <xpath expr="//search" position="inside">
                 <field name="x_bas_number"/>
                 <field name="x_bas_reference"/>
+                <filter name="ksw_cash_sales" string="Cash" domain="[('x_sale_terms', '=', 'cash')]"/>
+                <filter name="ksw_credit_sales" string="Credit" domain="[('x_sale_terms', '=', 'credit')]"/>
+                <group>
+                    <filter name="g_ksw_sale_terms" string="Cash / Credit"
+                            context="{'group_by': 'x_sale_terms'}"/>
+                </group>
             </xpath>
         </field>
     </record>

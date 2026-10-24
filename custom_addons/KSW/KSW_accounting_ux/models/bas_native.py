@@ -195,6 +195,21 @@ class AccountMoveDocType(models.Model):
                 cat = 'journal_voucher'
             move.x_doc_category = cat
 
+    # Cash or credit, for the customer invoice list. A cash sale is a BAS 001
+    # or anything in the Cash Sales journal; a credit note follows its journal.
+    x_sale_terms = fields.Selection([('cash', 'Cash'), ('credit', 'Credit')], string='Cash / Credit',
+                                    compute='_compute_sale_terms', store=True, index=True)
+
+    @api.depends('move_type', 'x_doc_category', 'journal_id.code')
+    def _compute_sale_terms(self):
+        for move in self:
+            if not move.is_sale_document(include_receipts=True):
+                move.x_sale_terms = False
+            elif move.x_doc_category == 'cash_sale' or move.journal_id.code in ('CSAL', 'BCSAL'):
+                move.x_sale_terms = 'cash'
+            else:
+                move.x_sale_terms = 'credit'
+
 
 class AccountMoveLineDocType(models.Model):
     _inherit = 'account.move.line'

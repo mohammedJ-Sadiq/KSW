@@ -12,7 +12,9 @@ Everything is read as the calling user (record rules apply); only the unit
 cost of an item is read with sudo.
 """
 from collections import defaultdict
-from datetime import date, timedelta
+from datetime import date, datetime, time, timedelta
+
+import pytz
 
 from dateutil.relativedelta import relativedelta
 
@@ -42,9 +44,47 @@ def _period(period, today):
     return start, today, prev, start - timedelta(days=1)
 
 
+def _trend_buckets(period, today):
+    """The chart's bars for a period: (unit, [(label, first day, last day)]).
+
+    A month is shown by day, a quarter by week (seven-day steps from its first
+    day), a year by month, so the chart always covers the period the page is on.
+    """
+    start, end, _ps, _pe = _period(period, today)
+    buckets = []
+    if period == 'year':
+        month = start
+        while month <= end:
+            nxt = month + relativedelta(months=1)
+            buckets.append((month.strftime('%Y-%m'), month, min(nxt - timedelta(days=1), end)))
+            month = nxt
+        return 'month', buckets
+    step = 7 if period == 'quarter' else 1
+    day = start
+    while day <= end:
+        last = min(day + timedelta(days=step - 1), end)
+        buckets.append((day.strftime('%d/%m') if step > 1 else day.strftime('%d'), day, last))
+        day = last + timedelta(days=1)
+    return ('week' if step > 1 else 'day'), buckets
+
+
+def _sum_by_bucket(buckets, by_day):
+    """Spread {date: amount} over the buckets."""
+    return [sum(v for d, v in by_day.items() if a <= d <= b) for _l, a, b in buckets]
+
+
 class KswErpDashboard(models.AbstractModel):
     _name = 'ksw.erp.dashboard'
     _description = 'Accounting and Inventory Overview'
+
+    @api.model
+    def _datetime_span(self, start, end, field='date'):
+        """Domain on a Datetime field for local days start..end (stored UTC; Riyadh is +3)."""
+        tz = pytz.timezone(self.env.context.get('tz') or self.env.user.tz or 'UTC')
+
+        def utc(day):
+            return tz.localize(datetime.combine(day, time.min)).astimezone(pytz.utc).replace(tzinfo=None)
+        return [(field, '>=', utc(start)), (field, '<', utc(end + timedelta(days=1)))]
 
     # ------------------------------------------------------------------
     # Accounting
@@ -117,14 +157,17 @@ class KswErpDashboard(models.AbstractModel):
         current, previous = pl(start, end), pl(pstart, pend)
         ytd = pl(date(today.year, 1, 1), today)
 
-        # Twelve months of revenue and expenses.
-        trend = []
-        month = today.replace(day=1) - relativedelta(months=11)
-        for _i in range(12):
-            nxt = month + relativedelta(months=1)
-            p = pl(month, nxt - timedelta(days=1))
-            trend.append({'label': month.strftime('%Y-%m'), **p})
-            month = nxt
+        # Revenue and expenses across the period: by day, week or month.
+        trend_unit, buckets = _trend_buckets(period, today)
+
+        def by_day(types):
+            return {d: amt for d, amt in AML._read_group(
+                base + [('account_id.account_type', 'in', types), ('date', '>=', start), ('date', '<=', end)],
+                ['date:day'], ['balance:sum'])}
+        revenue = _sum_by_bucket(buckets, {d: -v for d, v in by_day(_INCOME).items()})
+        expenses = _sum_by_bucket(buckets, by_day(_EXPENSE))
+        trend = [{'label': label, 'revenue': r, 'expenses': e, 'profit': r - e}
+                 for (label, _a, _b), r, e in zip(buckets, revenue, expenses)]
 
         # Where the expenses went: cost centres (BAS vehicles, departments, branches).
         cc = []
@@ -164,7 +207,7 @@ class KswErpDashboard(models.AbstractModel):
             'receivable': receivable, 'payable': payable,
             'dso': round(dso), 'dpo': round(dpo),
             'pl': {'current': current, 'previous': previous, 'ytd': ytd},
-            'trend': trend, 'cost_centres': cc, 'todo': todo,
+            'trend': trend, 'trend_unit': trend_unit, 'cost_centres': cc, 'todo': todo,
         }
 
     # ------------------------------------------------------------------
@@ -261,11 +304,14 @@ class KswErpDashboard(models.AbstractModel):
         ops.sort(key=lambda o: -(o['late'] * 1000 + o['ready'] + o['waiting']))
 
         # Issues to vehicles / cost centres in the period, by value.
+        # stock.move only carries analytic_distribution when an analytic stock
+        # module is installed (on dev, OCA stock_analytic via KSW_inventory; KSWCO
+        # has none): without it there is nothing to group, and the card stays empty.
         issues = []
-        issue_dom = out_dom + [('date', '>=', start), ('date', '<=', fields.Datetime.to_datetime(end) + timedelta(days=1)),
-                               ('location_dest_id.usage', '!=', 'customer')]
+        issue_dom = out_dom + self._datetime_span(start, end) + [('location_dest_id.usage', '!=', 'customer')]
+        has_analytic = 'analytic_distribution' in Move._fields
         for row in Move.search_read(issue_dom, ['product_id', 'product_uom_qty', 'analytic_distribution'],
-                                    limit=20000):
+                                    limit=20000) if has_analytic else []:
             dist = row.get('analytic_distribution') or {}
             val = row['product_uom_qty'] * cost.get(row['product_id'][0], 0.0)
             for key, pct in dist.items():
@@ -275,23 +321,23 @@ class KswErpDashboard(models.AbstractModel):
             by_cc[k] += v
         accounts = self.env['account.analytic.account'].browse(
             [int(k) for k in by_cc if k.isdigit()]).exists()
-        top_cc = sorted(({'id': a.id, 'name': a.display_name, 'value': by_cc[str(a.id)]} for a in accounts),
+        top_cc = sorted(({'id': a.id, 'name': a.display_name, 'value': by_cc[str(a.id)],
+                          'domain': issue_dom + [('analytic_distribution', 'in', [a.id])]} for a in accounts),
                         key=lambda r: -r['value'])[:8]
 
-        # Twelve months of receipts and issues by value.
-        trend = []
-        month = today.replace(day=1) - relativedelta(months=11)
+        # Receipts and issues by value across the period: by day, week or month.
+        trend_unit, buckets = _trend_buckets(period, today)
         in_dom = [('state', '=', 'done'), ('company_id', '=', company.id), ('product_id.is_storable', '=', True),
                   ('location_dest_id.usage', '=', 'internal'), ('location_id.usage', 'not in', ('internal', 'inventory'))]
-        for _i in range(12):
-            nxt = month + relativedelta(months=1)
-            span = [('date', '>=', fields.Datetime.to_datetime(month)), ('date', '<', fields.Datetime.to_datetime(nxt))]
+        span = self._datetime_span(start, end)
 
-            def worth(dom):
-                return sum(q * unit_cost(p)
-                           for p, q in Move._read_group(dom + span, ['product_id'], ['product_uom_qty:sum']))
-            trend.append({'label': month.strftime('%Y-%m'), 'received': worth(in_dom), 'issued': worth(out_dom)})
-            month = nxt
+        def worth(dom):
+            values = defaultdict(float)
+            for day, p, q in Move._read_group(dom + span, ['date:day', 'product_id'], ['product_uom_qty:sum']):
+                values[day.date()] += q * unit_cost(p)
+            return _sum_by_bucket(buckets, values)
+        trend = [{'label': label, 'received': r, 'issued': i}
+                 for (label, _a, _b), r, i in zip(buckets, worth(in_dom), worth(out_dom))]
 
         cur = company.currency_id
         return {
@@ -310,5 +356,5 @@ class KswErpDashboard(models.AbstractModel):
             'below_min': len(below_min), 'below_min_ids': below_min,
             'negative': {'count': len(negative), 'ids': sorted(negative)},
             'turnover': round(turnover, 2), 'dio': round(dio),
-            'operations': ops[:10], 'issues_by_cost_centre': top_cc, 'trend': trend,
+            'operations': ops[:10], 'issues_by_cost_centre': top_cc, 'trend': trend, 'trend_unit': trend_unit,
         }

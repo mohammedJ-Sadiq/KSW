@@ -1149,3 +1149,22 @@ msgstr "مثال: 141"
 #: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_cost_centre_statement_form
 msgid "e.g. 142"
 msgstr "مثال: 142"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__account_move__x_sale_terms__cash
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_account_invoice_filter_ksw_bas_info
+msgid "Cash"
+msgstr "نقدي"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields.selection,name:KSW_accounting_ux.selection__account_move__x_sale_terms__credit
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_account_invoice_filter_ksw_bas_info
+msgid "Credit"
+msgstr "آجل"
+
+#. module: KSW_accounting_ux
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_bank_statement_line__x_sale_terms
+#: model:ir.model.fields,field_description:KSW_accounting_ux.field_account_move__x_sale_terms
+#: model_terms:ir.ui.view,arch_db:KSW_accounting_ux.view_account_invoice_filter_ksw_bas_info
+msgid "Cash / Credit"
+msgstr "نقدي / آجل"

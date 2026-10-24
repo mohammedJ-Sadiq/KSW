@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_ksw_workshop_dashboard" model="ir.actions.client">
+        <field name="name">Workshop Overview</field>
+        <field name="tag">ksw_workshop_dashboard</field>
+    </record>
+
+    <!-- Reviewer only (the Manager implies it). First child of the app, so a
+         reviewer lands on the overview; everyone else still opens on My
+         Requests or All Requests, since a menu they cannot see is skipped.
+         The root has no groups=, so nothing above narrows it (KSW gotcha #41).
+         get_workshop_data refuses anyone else server side. -->
+    <menuitem id="menu_ksw_workshop_overview" name="Overview"
+              parent="KSW_workshop.menu_ksw_workshop_root" action="action_ksw_workshop_dashboard" sequence="5"
+              groups="KSW_workshop.group_workshop_reviewer"/>
+</odoo>

@@ -54,7 +54,7 @@
 
                 <div class="o_ksw_grid o_ksw_wide">
                     <div class="o_ksw_card">
-                        <h5>Received and issued, 12 months (value)</h5>
+                        <h5 t-esc="trendTitle"/>
                         <KswBarChart labels="trendLabels" series="trendSeries"/>
                     </div>
                     <div class="o_ksw_card">

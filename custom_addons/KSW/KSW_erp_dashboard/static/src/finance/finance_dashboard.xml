@@ -40,10 +40,11 @@
                     </div>
                 </div>
 
-                <!-- Aging -->
-                <div class="o_ksw_grid o_ksw_wide">
+                <!-- Aging, trend, P&L and the top lists share one grid: twelve columns
+                     on a wide screen so the page fits without scrolling. -->
+                <div class="o_ksw_grid o_ksw_wide o_ksw_main">
                     <t t-foreach="[[labels.receivablesAging, d.receivable], [labels.payablesAging, d.payable]]" t-as="pair" t-key="pair[0]">
-                        <div class="o_ksw_card">
+                        <div class="o_ksw_card o_ksw_span3">
                             <h5 t-esc="pair[0]"/>
                             <table class="o_ksw_rows">
                                 <t t-foreach="pair[1].buckets" t-as="b" t-key="b.key">
@@ -56,15 +57,11 @@
                             </table>
                         </div>
                     </t>
-                </div>
-
-                <!-- Trend and P&L -->
-                <div class="o_ksw_grid o_ksw_wide">
-                    <div class="o_ksw_card">
-                        <h5>Revenue and expenses, 12 months</h5>
-                        <KswBarChart labels="trendLabels" series="trendSeries"/>
+                    <div class="o_ksw_card o_ksw_span6">
+                        <h5 t-esc="trendTitle"/>
+                        <KswBarChart labels="trendLabels" series="trendSeries" height="210"/>
                     </div>
-                    <div class="o_ksw_card">
+                    <div class="o_ksw_card o_ksw_span4">
                         <h5>Profit and loss</h5>
                         <table class="o_ksw_rows">
                             <tr><td/><td class="o_ksw_num"><b>This period</b></td><td class="o_ksw_num"><b>Previous</b></td><td class="o_ksw_num"><b>Year to date</b></td></tr>
@@ -87,11 +84,7 @@
                             </t>
                         </table>
                     </div>
-                </div>
-
-                <!-- Who and where -->
-                <div class="o_ksw_grid">
-                    <div class="o_ksw_card">
+                    <div class="o_ksw_card o_ksw_span2">
                         <h5>Cash by account</h5>
                         <table class="o_ksw_rows">
                             <t t-foreach="d.cash.rows" t-as="r" t-key="r_index">
@@ -102,7 +95,7 @@
                             </t>
                         </table>
                     </div>
-                    <div class="o_ksw_card">
+                    <div class="o_ksw_card o_ksw_span2">
                         <h5>Most overdue customers</h5>
                         <div t-if="!d.receivable.top.length" class="o_ksw_empty">Nothing overdue.</div>
                         <table class="o_ksw_rows">
@@ -114,7 +107,7 @@
                             </t>
                         </table>
                     </div>
-                    <div class="o_ksw_card">
+                    <div class="o_ksw_card o_ksw_span2">
                         <h5>Vendors overdue to pay</h5>
                         <div t-if="!d.payable.top.length" class="o_ksw_empty">Nothing overdue.</div>
                         <table class="o_ksw_rows">
@@ -126,7 +119,7 @@
                             </t>
                         </table>
                     </div>
-                    <div class="o_ksw_card">
+                    <div class="o_ksw_card o_ksw_span2">
                         <h5>Expenses by cost centre, this period</h5>
                         <div t-if="!d.cost_centres.length" class="o_ksw_empty">No tagged expenses.</div>
                         <table class="o_ksw_rows">

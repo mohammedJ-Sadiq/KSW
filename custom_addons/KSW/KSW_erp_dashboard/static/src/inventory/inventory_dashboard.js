@@ -21,6 +21,10 @@ export class KswInventoryDashboard extends Component {
             stock: _t("Stock on hand"), dead: _t("Dead stock"), slow: _t("Slow moving"),
             low: _t("Running low"), out: _t("Out of stock"),
         };
+        this.trendTitles = {
+            day: _t("Received and issued by day (value)"), week: _t("Received and issued by week (value)"),
+            month: _t("Received and issued by month (value)"),
+        };
         this.state = useState({ period: "month", data: null, loading: true });
         onWillStart(() => this.load());
     }
@@ -62,18 +66,21 @@ export class KswInventoryDashboard extends Component {
         const states = { ready: ["assigned"], waiting: ["confirmed", "waiting"], late: ["assigned", "confirmed", "waiting"] };
         const domain = [["picking_type_id", "=", op.id], ["state", "in", states[state]]];
         if (state === "late") {
-            domain.push(["scheduled_date", "<", luxon.DateTime.now().toFormat("yyyy-MM-dd HH:mm:ss")]);
+            domain.push(["scheduled_date", "<", luxon.DateTime.utc().toFormat("yyyy-MM-dd HH:mm:ss")]);
         }
         return openRecords(this.action, op.name, "stock.picking", domain);
     }
 
     openIssues(row) {
-        return openRecords(this.action, row.name, "stock.move",
-            [["state", "=", "done"], ["analytic_distribution", "in", [row.id]]]);
+        return openRecords(this.action, row.name, "stock.move", row.domain);
     }
 
     openStandard() {
         return this.action.doAction("stock.stock_picking_type_action");
+    }
+
+    get trendTitle() {
+        return this.trendTitles[this.state.data.trend_unit];
     }
 
     get trendLabels() {

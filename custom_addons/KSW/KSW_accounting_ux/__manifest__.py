@@ -1,6 +1,6 @@
 {
     'name': 'KSW Accounting UX',
-    'version': '19.0.1.13.0',
+    'version': '19.0.1.14.0',
     'author': 'Mohammed Albadr',
     'category': 'Accounting',
     'summary': 'Accounting menus laid out like Odoo Enterprise, plus the statements Community lacks',

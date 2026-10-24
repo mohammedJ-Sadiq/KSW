@@ -1,15 +1,27 @@
 .o_ksw_dashboard {
     height: 100%;
     overflow: auto;
+    // Odoo's `.o_web_client > .o_action_manager > .o_action { overflow: hidden }`
+    // outranks the rule above, which left the lower cards unreachable.
+    .o_web_client > .o_action_manager > &.o_action { overflow-y: auto; }
     padding: 16px;
     background-color: $o-webclient-background-color;
 
     .o_ksw_grid {
         display: grid;
         gap: 12px;
-        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        // auto-fit, not auto-fill: unused tracks collapse so the cards stretch
+        // across the page instead of leaving the right side empty.
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
         margin-bottom: 12px;
-        &.o_ksw_wide { grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); }
+        &.o_ksw_wide { grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); }
+        @include media-breakpoint-up(xxl) {
+            &.o_ksw_main { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+            &.o_ksw_main > .o_ksw_span2 { grid-column: span 2; }
+            &.o_ksw_main > .o_ksw_span3 { grid-column: span 3; }
+            &.o_ksw_main > .o_ksw_span4 { grid-column: span 4; }
+            &.o_ksw_main > .o_ksw_span6 { grid-column: span 6; }
+        }
     }
     .o_ksw_card {
         background: $o-view-background-color;

@@ -23,6 +23,10 @@ export class KswFinanceDashboard extends Component {
             cash: _t("Cash position"), receivables: _t("Receivables"), payables: _t("Payables"),
             overdueReceivables: _t("Overdue receivables"), overduePayables: _t("Overdue payables"),
         };
+        this.trendTitles = {
+            day: _t("Revenue and expenses, by day"), week: _t("Revenue and expenses, by week"),
+            month: _t("Revenue and expenses, by month"),
+        };
         this.state = useState({ period: "month", data: null, loading: true });
         onWillStart(() => this.load());
     }
@@ -69,6 +73,10 @@ export class KswFinanceDashboard extends Component {
 
     openStandard() {
         return this.action.doAction("account.open_account_journal_dashboard_kanban");
+    }
+
+    get trendTitle() {
+        return this.trendTitles[this.state.data.trend_unit];
     }
 
     get trendLabels() {

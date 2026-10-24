@@ -431,24 +431,10 @@ msgstr "المستلم"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.xml:0
-msgid "Received and issued, 12 months (value)"
-msgstr "المستلم والمنصرف، 12 شهراً (القيمة)"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
 #: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
 msgid "Revenue"
 msgstr "الإيرادات"
-
-#. module: KSW_erp_dashboard
-#. odoo-javascript
-#: code:addons/KSW/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
-#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
-msgid "Revenue and expenses, 12 months"
-msgstr "الإيرادات والمصروفات، 12 شهراً"
 
 #. module: KSW_erp_dashboard
 #. odoo-javascript
@@ -649,3 +635,39 @@ msgstr "بالانتظار"
 #: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.xml:0
 msgid "· Year"
 msgstr "· السنة"
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
+msgid "Revenue and expenses, by day"
+msgstr ""
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
+msgid "Revenue and expenses, by week"
+msgstr ""
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/finance/finance_dashboard.js:0
+msgid "Revenue and expenses, by month"
+msgstr ""
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
+msgid "Received and issued by day (value)"
+msgstr ""
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
+msgid "Received and issued by week (value)"
+msgstr ""
+
+#. module: KSW_erp_dashboard
+#. odoo-javascript
+#: code:addons/KSW_erp_dashboard/static/src/inventory/inventory_dashboard.js:0
+msgid "Received and issued by month (value)"
+msgstr ""

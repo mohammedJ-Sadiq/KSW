@@ -74,7 +74,8 @@ export class KswBarChart extends Component {
                 plugins: { legend: { position: "bottom", labels: { boxWidth: 12 } } },
                 scales: {
                     x: { grid: { display: false } },
-                    y: { ticks: { callback: (v) => formatFloat(v, { humanReadable: true, decimals: 0 }) } },
+                    // precision 0: whole steps, or small counts repeat a label (5, 5, 4, 4…).
+                    y: { ticks: { precision: 0, callback: (v) => formatFloat(v, { humanReadable: true, decimals: 0 }) } },
                 },
             },
         });

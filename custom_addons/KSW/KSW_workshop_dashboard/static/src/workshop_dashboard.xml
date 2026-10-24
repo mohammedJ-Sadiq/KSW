@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!-- Name, bar, count: a list of requests grouped by something. -->
+    <t t-name="KSW_workshop_dashboard.CountRows">
+        <div t-if="!rows.length" class="o_ksw_empty" t-esc="empty"/>
+        <table class="o_ksw_rows">
+            <t t-foreach="rows" t-as="r" t-key="r_index">
+                <tr class="o_ksw_click" t-on-click="() => this.open(r.name, r.domain)">
+                    <td style="width: 50%" class="o_ksw_name" t-att-title="r.name" t-esc="r.name"/>
+                    <td class="o_ksw_name"><div class="o_ksw_bar_track"><div class="o_ksw_bar" t-att-style="'width:' + width(r.count, rows)"/></div></td>
+                    <td class="o_ksw_num ps-2" t-esc="n(r.count)"/>
+                </tr>
+            </t>
+        </table>
+    </t>
+
+    <t t-name="KSW_workshop_dashboard.Workshop">
+        <div class="o_ksw_dashboard o_action">
+            <t t-call="KSW_erp_dashboard.Header"/>
+            <div t-if="state.loading and !state.data" class="o_ksw_empty">Loading…</div>
+            <t t-if="state.data">
+                <t t-set="d" t-value="state.data"/>
+                <!-- Headline figures: the first three are the backlog now, the last three the period. -->
+                <div class="o_ksw_grid">
+                    <div class="o_ksw_card o_ksw_tile" t-on-click="() => this.open(labels.open, d.open.domain)">
+                        <div class="o_ksw_tile_label">Open requests</div>
+                        <div class="o_ksw_tile_value" t-esc="n(d.open.count)"/>
+                        <div class="o_ksw_tile_sub">now · <t t-esc="n(d.open.returned)"/> returned to requester</div>
+                    </div>
+                    <div class="o_ksw_card o_ksw_tile" t-on-click="() => this.open(labels.triage, d.new.domain)">
+                        <div class="o_ksw_tile_label">Waiting for triage</div>
+                        <div class="o_ksw_tile_value" t-esc="n(d.new.count)"/>
+                        <div class="o_ksw_tile_sub" t-on-click.stop="() => this.open(labels.staleTriage, d.new.stale_domain)">
+                            <span t-att-class="d.new.stale ? 'o_ksw_bad' : ''"><t t-esc="n(d.new.stale)"/> over 2 days</span></div>
+                    </div>
+                    <div class="o_ksw_card o_ksw_tile" t-on-click="() => this.open(labels.inProgress, d.in_progress.domain)">
+                        <div class="o_ksw_tile_label">In the workshop</div>
+                        <div class="o_ksw_tile_value" t-esc="n(d.in_progress.count)"/>
+                        <div class="o_ksw_tile_sub">oldest raised <t t-esc="n(d.in_progress.oldest_days)"/> days ago</div>
+                    </div>
+                    <div class="o_ksw_card o_ksw_tile" t-on-click="() => this.open(labels.completed, d.completed.domain)">
+                        <div class="o_ksw_tile_label">Completed, this period</div>
+                        <div class="o_ksw_tile_value"><t t-esc="n(d.completed.count)"/> <small class="text-muted fs-6" t-esc="change(d.completed.count, d.completed.previous)"/></div>
+                        <div class="o_ksw_tile_sub"><t t-esc="n(d.received.count)"/> received · previous <t t-esc="n(d.completed.previous)"/></div>
+                    </div>
+                    <div class="o_ksw_card o_ksw_tile" t-on-click="() => this.open(labels.completed, d.completed.domain)">
+                        <div class="o_ksw_tile_label">Average turnaround</div>
+                        <div class="o_ksw_tile_value"><t t-esc="d.turnaround.days"/> <small>days</small></div>
+                        <div class="o_ksw_tile_sub">raised to completed · previous <t t-esc="d.turnaround.previous"/></div>
+                    </div>
+                    <div class="o_ksw_card o_ksw_tile" t-on-click="() => this.open(labels.repeat, d.repeat.domain)">
+                        <div class="o_ksw_tile_label">Repeat repairs</div>
+                        <div class="o_ksw_tile_value" t-att-class="d.repeat.count ? 'o_ksw_warn' : ''">
+                            <t t-esc="n(d.repeat.count)"/> <small class="fs-6"><t t-esc="d.repeat.rate"/>%</small></div>
+                        <div class="o_ksw_tile_sub">same repair again within <t t-esc="d.repeat.days"/> days</div>
+                    </div>
+                </div>
+
+                <div class="o_ksw_grid o_ksw_wide o_ksw_main">
+                    <div class="o_ksw_card o_ksw_span6">
+                        <h5 t-esc="trendTitle"/>
+                        <KswBarChart labels="trendLabels" series="trendSeries" height="340"/>
+                    </div>
+                    <div class="o_ksw_card o_ksw_span3">
+                        <h5>Open requests by age <small class="text-muted">now</small></h5>
+                        <table class="o_ksw_rows">
+                            <t t-foreach="d.age" t-as="b" t-key="b.key">
+                                <tr class="o_ksw_click" t-on-click="() => this.open(labels.openByAge + ': ' + b.label, b.domain)">
+                                    <td class="text-nowrap pe-3" t-esc="b.label"/>
+                                    <td class="o_ksw_name"><div class="o_ksw_bar_track"><div class="o_ksw_bar" t-att-style="'width:' + width(b.count, d.age)"/></div></td>
+                                    <td class="o_ksw_num ps-2" t-att-class="(b.key === '8_30' or b.key === '30p') and b.count ? 'o_ksw_bad' : ''" t-esc="n(b.count)"/>
+                                </tr>
+                            </t>
+                        </table>
+                        <h5 class="mt-4">Open requests by status</h5>
+                        <t t-call="KSW_workshop_dashboard.CountRows">
+                            <t t-set="rows" t-value="d.by_state.map((s) => ({name: s.label, count: s.count, domain: s.domain}))"/>
+                            <t t-set="empty">Nothing open.</t>
+                        </t>
+                    </div>
+                    <div class="o_ksw_card o_ksw_span3">
+                        <h5>Requests by repair type, this period</h5>
+                        <t t-call="KSW_workshop_dashboard.CountRows">
+                            <t t-set="rows" t-value="d.types"/>
+                            <t t-set="empty">No requests this period.</t>
+                        </t>
+                    </div>
+
+                    <div class="o_ksw_card o_ksw_span3">
+                        <h5>Most visited vehicles, this period</h5>
+                        <t t-call="KSW_workshop_dashboard.CountRows">
+                            <t t-set="rows" t-value="d.vehicles"/>
+                            <t t-set="empty">No vehicles this period.</t>
+                        </t>
+                    </div>
+                    <div class="o_ksw_card o_ksw_span3">
+                        <h5>Vehicles back for a repeat repair</h5>
+                        <t t-call="KSW_workshop_dashboard.CountRows">
+                            <t t-set="rows" t-value="d.repeat.rows"/>
+                            <t t-set="empty">No repeat repairs this period.</t>
+                        </t>
+                    </div>
+                    <div class="o_ksw_card o_ksw_span2">
+                        <h5>Technicians</h5>
+                        <div t-if="!d.technicians.length" class="o_ksw_empty">No technician recorded on this period's work.</div>
+                        <table t-else="" class="o_ksw_rows">
+                            <tr><td/><td class="o_ksw_num text-muted"><small>done</small></td><td class="o_ksw_num text-muted ps-2"><small>open</small></td></tr>
+                            <t t-foreach="d.technicians" t-as="r" t-key="r_index">
+                                <tr class="o_ksw_click" t-on-click="() => this.open(r.name, r.domain)">
+                                    <td class="o_ksw_name" t-att-title="r.name" t-esc="r.name"/>
+                                    <td class="o_ksw_num" t-esc="n(r.completed)"/>
+                                    <td class="o_ksw_num ps-2" t-esc="n(r.open)"/>
+                                </tr>
+                            </t>
+                        </table>
+                    </div>
+                    <div class="o_ksw_card o_ksw_span2">
+                        <h5>Requests by client, this period</h5>
+                        <t t-call="KSW_workshop_dashboard.CountRows">
+                            <t t-set="rows" t-value="d.clients"/>
+                            <t t-set="empty">No requests this period.</t>
+                        </t>
+                    </div>
+                    <div class="o_ksw_card o_ksw_span2">
+                        <h5>Cost of completed work</h5>
+                        <table class="o_ksw_rows">
+                            <tr><td>Spare parts</td><td class="o_ksw_num" t-esc="m(d.cost.parts)"/></tr>
+                            <tr><td>Other parts</td><td class="o_ksw_num" t-esc="m(d.cost.other)"/></tr>
+                            <tr><td>Labour</td><td class="o_ksw_num" t-esc="m(d.cost.labor)"/></tr>
+                            <tr class="o_ksw_click" t-on-click="() => this.open(labels.costly, d.completed.domain.concat([['total_cost', '>', 0]]))">
+                                <td><b>Total</b></td><td class="o_ksw_num"><b t-esc="m(d.cost.total)"/></td></tr>
+                        </table>
+                        <div class="o_ksw_tile_sub mt-1"><t t-esc="m(d.cost.per_job)"/> per costed job · <t t-esc="n(d.cost.costed)"/> of <t t-esc="n(d.completed.count)"/> jobs costed</div>
+                        <table t-if="d.cost.vehicles.length" class="o_ksw_rows mt-2">
+                            <t t-foreach="d.cost.vehicles" t-as="r" t-key="r_index">
+                                <tr class="o_ksw_click" t-on-click="() => this.open(r.name, r.domain)">
+                                    <td class="o_ksw_name" t-att-title="r.name" t-esc="r.name"/>
+                                    <td class="o_ksw_num" t-esc="m(r.amount)"/>
+                                </tr>
+                            </t>
+                        </table>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

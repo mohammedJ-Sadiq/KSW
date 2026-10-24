@@ -1,0 +1,359 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-24 10:57+0000\n"
+"PO-Revision-Date: 2026-10-24 10:57+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_workshop_dashboard
+#. odoo-python
+#: code:addons/KSW_workshop_dashboard/models/workshop_dashboard.py:0
+msgid "0–2 days"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-python
+#: code:addons/KSW_workshop_dashboard/models/workshop_dashboard.py:0
+msgid "3–7 days"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-python
+#: code:addons/KSW_workshop_dashboard/models/workshop_dashboard.py:0
+msgid "8–30 days"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.js:0
+msgid "All Requests"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "Average turnaround"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-python
+#: code:addons/KSW_workshop_dashboard/models/workshop_dashboard.py:0
+msgid "Cash customers"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.js:0
+msgid "Completed"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.js:0
+msgid "Completed work with a cost"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "Completed, this period"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "Cost of completed work"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#: model:ir.model.fields,field_description:KSW_workshop_dashboard.field_ksw_workshop_dashboard__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#: model:ir.model.fields,field_description:KSW_workshop_dashboard.field_ksw_workshop_dashboard__id
+msgid "ID"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.js:0
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "In the workshop"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "Labour"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "Loading…"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "Most visited vehicles, this period"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "No repeat repairs this period."
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "No requests this period."
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "No technician recorded on this period's work."
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "No vehicles this period."
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "Nothing open."
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.js:0
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "Open requests"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.js:0
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "Open requests by age"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "Open requests by status"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "Other parts"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-python
+#: code:addons/KSW_workshop_dashboard/models/workshop_dashboard.py:0
+msgid "Over 30 days"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#: model:ir.ui.menu,name:KSW_workshop_dashboard.menu_ksw_workshop_overview
+msgid "Overview"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.js:0
+msgid "Received"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.js:0
+msgid "Received and completed, by day"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.js:0
+msgid "Received and completed, by month"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.js:0
+msgid "Received and completed, by week"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.js:0
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "Repeat repairs"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "Requests by client, this period"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "Requests by repair type, this period"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "Spare parts"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "Technicians"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-python
+#: code:addons/KSW_workshop_dashboard/models/workshop_dashboard.py:0
+msgid "The workshop overview is for workshop reviewers and managers."
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "Total"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "Vehicles back for a repeat repair"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.js:0
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "Waiting for triage"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.js:0
+msgid "Waiting for triage over 2 days"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.js:0
+#: model:ir.actions.client,name:KSW_workshop_dashboard.action_ksw_workshop_dashboard
+#: model:ir.model,name:KSW_workshop_dashboard.model_ksw_workshop_dashboard
+msgid "Workshop Overview"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "days"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "days ago"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "done"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "jobs costed"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "now"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "now ·"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "of"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "oldest raised"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "open"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "over 2 days"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "per costed job ·"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "raised to completed · previous"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "received · previous"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "returned to requester"
+msgstr ""
+
+#. module: KSW_workshop_dashboard
+#. odoo-javascript
+#: code:addons/KSW_workshop_dashboard/static/src/workshop_dashboard.xml:0
+msgid "same repair again within"
+msgstr ""
