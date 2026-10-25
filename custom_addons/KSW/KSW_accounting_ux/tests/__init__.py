@@ -7,3 +7,4 @@ from . import test_payment_journal
 from . import test_cost_centre_columns
 from . import test_cost_centre_statement
 from . import test_bas_supplier_payment
+from . import test_bas_document_number

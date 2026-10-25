@@ -17,35 +17,55 @@
             </p>
             <t t-foreach="sections" t-as="section">
                 <t t-set="lead" t-value="int(section['show_date']) + int(section['show_option'])"/>
+                <t t-set="ncols" t-value="lead + int(section['show_ref']) + int(section['show_qty']) + 2 * int(section['show_threshold']) + int(section['show_reason']) + 2"/>
                 <h4 class="mt-3 mb-1" t-out="section['component'].name"/>
                 <table class="table table-sm table-hover mb-2">
                     <thead>
                         <tr>
                             <th t-if="section['show_date']">Date</th>
                             <th t-if="section['show_option']">Type</th>
+                            <th t-if="section['show_ref']" class="text-end" t-out="section['ref_label']"/>
                             <th t-if="section['show_qty']" class="text-end" t-out="section['qty_label']"/>
+                            <th t-if="section['show_threshold']" class="text-end">Free Allowance</th>
+                            <th t-if="section['show_threshold']" class="text-end">Above Allowance</th>
                             <th t-if="section['show_reason']">Reason</th>
                             <th>Status</th>
                             <th class="text-end">Amount</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr t-foreach="section['rows']" t-as="entry">
+                        <t t-foreach="section['rows']" t-as="entry">
+                        <tr>
                             <td t-if="section['show_date']" t-out="format_date(entry.date) if entry.date else ''"/>
                             <td t-if="section['show_option']" t-out="entry.option_id.name or ''"/>
+                            <td t-if="section['show_ref']" class="text-end" t-out="format_qty(entry.quantity_ref)"/>
                             <td t-if="section['show_qty']" class="text-end" t-out="format_qty(entry.quantity)"/>
+                            <td t-if="section['show_threshold']" class="text-end" t-out="format_qty(entry.threshold_qty)"/>
+                            <td t-if="section['show_threshold']" class="text-end" t-out="format_qty(max((entry.quantity or 0.0) - (entry.threshold_qty or 0.0), 0.0))"/>
                             <td t-if="section['show_reason']" t-out="entry.reason or ''"/>
                             <td t-out="state_labels.get(entry.state, entry.state)"/>
                             <td class="text-end" t-out="format_amount(entry.amount)"/>
                         </tr>
+                        <tr t-if="section['show_explanation']" class="o_ksw_review_explanation">
+                            <td t-att-colspan="ncols" class="small text-muted ps-4 pb-3">
+                                <t t-out="entry.explanation"/>
+                            </td>
+                        </tr>
+                        </t>
                     </tbody>
                     <tfoot>
                         <tr class="fw-bold border-top">
                             <td t-if="lead" t-att-colspan="lead">Subtotal</td>
+                            <td t-if="section['show_ref']" class="text-end">
+                                <t t-out="format_qty(section['quantity_ref'])"/>
+                                <t t-out="section['ref_label']"/>
+                            </td>
                             <td t-if="section['show_qty']" class="text-end">
                                 <t t-out="format_qty(section['quantity'])"/>
                                 <t t-out="section['qty_label']"/>
                             </td>
+                            <td t-if="section['show_threshold']" class="text-end" t-out="format_qty(section['threshold'])"/>
+                            <td t-if="section['show_threshold']" class="text-end" t-out="format_qty(section['earning'])"/>
                             <td t-if="section['show_reason']"/>
                             <td><t t-if="not lead">Subtotal · </t><t t-out="len(section['rows'])"/> entries</td>
                             <td class="text-end">
@@ -97,6 +117,7 @@
             <list string="Employees" create="false" edit="false"
                   delete="false" decoration-danger="vacation_hold">
                 <field name="employee_id"/>
+                <field name="x_employee_no" optional="show"/>
                 <field name="vacation_hold" optional="show"/>
                 <field name="component_names"/>
                 <field name="entry_count"/>
@@ -150,7 +171,12 @@
         <field name="model">ksw.pay.employee.review</field>
         <field name="arch" type="xml">
             <search>
-                <field name="employee_id"/>
+                <!-- employee_name, not employee_id: it is a column of this
+                     view, so the search never reaches hr.employee. -->
+                <field name="employee_name" string="Employee"
+                       filter_domain="['|', '|', ('employee_name', 'ilike', self), ('x_employee_no', 'ilike', self), ('x_ssnid', 'ilike', self)]"/>
+                <field name="x_employee_no"/>
+                <field name="x_ssnid"/>
                 <field name="submission_id"/>
             </search>
         </field>

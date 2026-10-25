@@ -26,6 +26,15 @@ def _name_key(line):
     return (line.employee_id.sudo().name or '').strip().casefold()
 
 
+def _search_key(line):
+    # What the Find box matches: name, employee no. or SSN. sudo: both
+    # identifiers are hr.group_hr_user fields and reviewers rarely are.
+    emp = line.employee_id.sudo()
+    return ' '.join(filter(None, (
+        _name_key(line), (emp.x_employee_no or '').casefold(),
+        emp.ssnid or '')))
+
+
 SORT_KEYS = {
     'department': lambda l: (
         (l.department_id.sudo().name or '').strip().casefold(), _name_key(l)),
@@ -158,7 +167,7 @@ class KswPayRunReview(models.TransientModel):
             lines = lines.filtered(lambda l: l.department_id in departments)
         if self.search_text and self.search_text.strip():
             needle = self.search_text.strip().casefold()
-            lines = lines.filtered(lambda l: needle in _name_key(l))
+            lines = lines.filtered(lambda l: needle in _search_key(l))
         return lines.sorted(SORT_KEYS[self.sort_by or 'department'])
 
     @api.depends('run_id')

@@ -34,7 +34,7 @@
                     <div class="d-flex align-items-center gap-2">
                         <span class="fa fa-search text-muted" title="Find"/>
                         <field name="search_text" nolabel="1"
-                               placeholder="Employee name…"/>
+                               placeholder="Name, employee no. or SSN…"/>
                     </div>
                     <span class="badge text-bg-secondary fs-6">
                         <field name="position" readonly="1"/>

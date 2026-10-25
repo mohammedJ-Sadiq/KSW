@@ -46,6 +46,14 @@ class KswPayEmployeeReview(models.Model):
         compute='_compute_review', string='On Vacation')
     sections_html = fields.Html(
         compute='_compute_review', sanitize=False, string='Sections')
+    # Searchable for every reviewer: supervisors and GMs are rarely HR users,
+    # and both identifiers sit behind hr.group_hr_user on hr.employee.
+    x_employee_no = fields.Char(
+        compute='_compute_employee_identifiers',
+        search='_search_x_employee_no', string='Employee No.')
+    x_ssnid = fields.Char(
+        compute='_compute_employee_identifiers',
+        search='_search_x_ssnid', string='SSN No.')
 
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
@@ -88,6 +96,28 @@ class KswPayEmployeeReview(models.Model):
                 (h for h in entries.mapped('x_vacation_hold') if h), False)
             rec.sections_html = rec._render_sections(entries, components)
 
+    @api.depends('employee_id')
+    def _compute_employee_identifiers(self):
+        for rec in self:
+            emp = rec.employee_id.sudo()
+            rec.x_employee_no = emp.x_employee_no
+            rec.x_ssnid = emp.ssnid
+
+    def _search_employee_identifier(self, fname, operator, value):
+        # sudo: the reviewer may not read the identifier; the result is only
+        # an employee id list, narrowed further by this view's own rules.
+        # active_test off: a past month still lists people since archived.
+        ids = self.env['hr.employee'].sudo().with_context(
+            active_test=False)._search([(fname, operator, value)])
+        return [('employee_id', 'in', ids)]
+
+    def _search_x_employee_no(self, operator, value):
+        return self._search_employee_identifier(
+            'x_employee_no', operator, value)
+
+    def _search_x_ssnid(self, operator, value):
+        return self._search_employee_identifier('ssnid', operator, value)
+
     def _render_sections(self, entries, components):
         return self._render_entry_sections(
             entries, self.currency_id or self.env.company.currency_id)
@@ -115,6 +145,21 @@ class KswPayEmployeeReview(models.Model):
                 'component': component,
                 'qty_label': component.qty_label or _('Quantity'),
                 'show_qty': any(rows.mapped('quantity')),
+                # Driver trips: the raw load count behind the weighted
+                # figure, and the free allowance the tiers start above.
+                'ref_label': component.qty_ref_label,
+                'show_ref': bool(component.qty_ref_label)
+                and any(rows.mapped('quantity_ref')),
+                'show_threshold': any(rows.mapped('threshold_qty')),
+                'quantity_ref': sum(rows.mapped('quantity_ref')),
+                'threshold': sum(rows.mapped('threshold_qty')),
+                'earning': sum(
+                    max((e.quantity or 0.0) - (e.threshold_qty or 0.0), 0.0)
+                    for e in rows),
+                # A tiered amount is not quantity × rate, so each row
+                # carries its own waterfall (same method as the entry's
+                # "how was this worked out").
+                'show_explanation': component.calculation == 'tiered',
                 'show_option': any(rows.mapped('option_id')),
                 'show_date': any(rows.mapped('date')),
                 'show_reason': any(rows.mapped('reason')),

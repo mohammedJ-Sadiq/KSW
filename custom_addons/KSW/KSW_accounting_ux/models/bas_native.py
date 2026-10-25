@@ -10,6 +10,7 @@ import logging
 from collections import defaultdict
 
 from odoo import api, fields, models
+from odoo.fields import Domain
 
 _logger = logging.getLogger(__name__)
 
@@ -30,8 +31,10 @@ class AccountMove(models.Model):
     _inherit = 'account.move'
 
     x_bas_doc_type = fields.Char(string='BAS Document Type', compute='_compute_bas_doc', store=True)
-    x_bas_number = fields.Char(string='BAS Document No.', compute='_compute_bas_doc', store=True,
-                               index=True, help='Branch / number of the document in BAS.')
+    # Not stored: the branch name is translated, and a stored Char holds one language.
+    x_bas_number = fields.Char(string='BAS Document No.', compute='_compute_bas_number',
+                               search='_search_bas_number',
+                               help='Branch / number of the document in BAS.')
     x_bas_reference = fields.Char(string='BAS Reference', readonly=True, copy=False,
                                   help="The document's reference text in BAS (REF).")
     x_bas_remarks = fields.Char(string='BAS Remarks', readonly=True, copy=False,
@@ -42,16 +45,36 @@ class AccountMove(models.Model):
     @api.depends('x_bas_key', 'x_bas_ftype')
     def _compute_bas_doc(self):
         for move in self:
+            ftype = (move.x_bas_key or '').split('/')[0]
+            move.x_bas_doc_type = BAS_TYPES.get(ftype, ftype) if move.x_bas_key else False
+
+    @api.depends('x_bas_key', 'x_bas_branch_id.name')
+    @api.depends_context('lang')
+    def _compute_bas_number(self):
+        """Branch name / number -- the branch as people call it, never CODE2."""
+        for move in self:
             parts = (move.x_bas_key or '').split('/')
             if len(parts) == 4:
-                ftype, _f2, code2, number = parts
-                move.x_bas_doc_type = BAS_TYPES.get(ftype, ftype)
-                move.x_bas_number = f'{code2}/{number}'
-            elif move.x_bas_key:
-                move.x_bas_doc_type = BAS_TYPES.get(parts[0], parts[0])
-                move.x_bas_number = move.x_bas_key
+                branch = move.sudo().x_bas_branch_id.name or parts[2]
+                move.x_bas_number = f'{branch} / {parts[3]}'
             else:
-                move.x_bas_doc_type = move.x_bas_number = False
+                move.x_bas_number = move.x_bas_key or False
+
+    def _search_bas_number(self, operator, value):
+        if operator not in ('ilike', '=ilike', '=', 'like') or not isinstance(value, str):
+            return NotImplemented
+        value = value.strip()
+        # "155/15401" as BAS prints it is the tail of x_bas_key; the number
+        # alone or the branch name are matched too.
+        domain = Domain('x_bas_key', '=like', f'%/{value}') if value.count('/') == 1 \
+            else Domain('x_bas_key', 'ilike', value)
+        domain |= Domain('x_bas_branch_id.name', 'ilike', value)
+        if ' / ' in value:
+            # The displayed form, "<branch> / <number>".
+            name, number = value.rsplit(' / ', 1)
+            domain |= Domain('x_bas_branch_id.name', 'ilike', name.strip()) \
+                & Domain('x_bas_key', '=like', f'%/{number.strip()}')
+        return domain
 
 
 class AccountMoveLine(models.Model):

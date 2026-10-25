@@ -61,6 +61,55 @@ class TestEmployeeReview(SubmissionCommon):
         review = self._review(submission, self.gm, self.emp_a)
         self.assertEqual(review.entry_count, 3)
 
+    def test_05_search_by_name_number_or_ssn_without_hr_rights(self):
+        submission = self._fill()
+        self.assertFalse(self.sup_a.has_group('hr.group_hr_user'))
+        self.emp_a.sudo().write({'x_employee_no': 'KSW-7781'})
+        self.emp_a.sudo().current_version_id.write({'ssnid': '1098765432'})
+        self.env.flush_all()
+        Review = self.env['ksw.pay.employee.review'].with_user(self.sup_a)
+        base = [('submission_id', '=', submission.id)]
+        for domain in (
+            [('x_employee_no', 'ilike', '7781')],
+            [('x_ssnid', 'ilike', '098765')],
+            # the search bar's combined Employee entry
+            ['|', '|', ('employee_name', 'ilike', '7781'),
+             ('x_employee_no', 'ilike', '7781'),
+             ('x_ssnid', 'ilike', '7781')],
+            ['|', '|', ('employee_name', 'ilike', 'Sub Emp A2'),
+             ('x_employee_no', 'ilike', 'Sub Emp A2'),
+             ('x_ssnid', 'ilike', 'Sub Emp A2')],
+        ):
+            rows = Review.search(base + domain)
+            self.assertEqual(len(rows), 1, domain)
+        self.assertEqual(
+            Review.search(base + [('x_ssnid', 'ilike', '098765')]).employee_id,
+            self.emp_a)
+        row = Review.search(base + [('employee_id', '=', self.emp_a.id)])
+        self.assertEqual(row.x_employee_no, 'KSW-7781')
+
+    def test_06_driver_trips_show_actual_weighted_and_allowance(self):
+        trips = self.env.ref('KSW_commissions.pay_component_driver_trips')
+        batch = self.env['ksw.pay.batch'].sudo().create({
+            'component_id': trips.id, 'department_id': self.dept_a.id,
+            'period': self.period})
+        entry = self._entry(batch, self.emp_a, quantity=150.5,
+                            quantity_ref=120.0, threshold_qty=100.0,
+                            reason=False)
+        html = str(self.env['ksw.pay.employee.review']
+                   ._render_entry_sections(entry, entry.currency_id))
+        for text in ('Actual Trips', 'Weighted Trips', 'Free Allowance',
+                     'Above Allowance', '>120<', '>150.5<', '>100<',
+                     '>50.5<',
+                     # the tier waterfall under the row
+                     'Earning quantity'):
+            self.assertIn(text, html)
+
+    def test_07_other_components_get_no_trip_columns(self):
+        html = str(self._review(self._fill(), self.sup_a, self.emp_a)
+                   .sections_html)
+        self.assertNotIn('Free Allowance', html)
+        self.assertNotIn('Earning quantity', html)
 
 class TestWhoGetsPaidReview(SubmissionCommon):
     """The run's Who Gets Paid tab, one employee at a time."""
@@ -183,3 +232,13 @@ class TestWhoGetsPaidReview(SubmissionCommon):
         html = str(line.x_review_sections_html)
         self.assertIn('Not in this payment', html)
         self.assertIn('Not handed over to the GM yet', html)
+
+    def test_05_find_matches_employee_no_and_ssn(self):
+        run = self._handed_over_run()
+        self.emp_b.sudo().write({'x_employee_no': 'KSW-5512'})
+        self.emp_b.sudo().current_version_id.write({'ssnid': '2233445566'})
+        review = self._session(run, self.gm)
+        for needle in ('ksw-5512', '5512', '3344556', 'Sub Emp B'):
+            review.search_text = needle
+            self.assertEqual(review._ordered_lines().employee_id,
+                             self.emp_b, needle)

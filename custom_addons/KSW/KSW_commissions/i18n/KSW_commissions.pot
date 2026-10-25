@@ -3415,6 +3415,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__employee_id
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_item_search
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_search
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_employee_review_search
 msgid "Employee"
 msgstr ""
 
@@ -3448,6 +3449,7 @@ msgstr ""
 #. module: KSW_commissions
 #. odoo-python
 #: code:addons/KSW_commissions/models/ksw_pay_batch_export.py:0
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_employee_review__x_employee_no
 msgid "Employee No."
 msgstr ""
 
@@ -3915,6 +3917,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_commissions/models/ksw_pay_batch_export.py:0
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__threshold_qty
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.employee_review_sections
 msgid "Free Allowance"
 msgstr ""
 
@@ -10907,4 +10910,19 @@ msgstr ""
 #. module: KSW_commissions
 #: model:ir.ui.menu,name:KSW_commissions.menu_ksw_pay_month_section
 msgid "Monthly Pay"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_review_form
+msgid "Name, employee no. or SSN…"
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.employee_review_sections
+msgid "Above Allowance"
+msgstr ""
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_employee_review__x_ssnid
+msgid "SSN No."
 msgstr ""
