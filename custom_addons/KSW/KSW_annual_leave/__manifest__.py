@@ -1,6 +1,6 @@
 {
     'name': 'KSW Annual Leave',
-    'version': '19.0.1.16.1',
+    'version': '19.0.1.17.0',
     'author': 'Mohammed Albadr',
     'category': 'Human Resources',
     'summary': 'Auto-computed annual leave allocation dashboard',

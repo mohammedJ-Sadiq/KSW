@@ -401,6 +401,11 @@ class HrLeave(models.Model):
         if leave.x_is_full_clearance:
             vacation_days = self._get_remaining_balance(leave, leave.request_date_from)
             label_prefix = 'Vacation Balance Settlement — Full Clearance'
+        elif leave.x_is_custom_consumption and leave.x_custom_consumption_days > 0:
+            # The System Administrator's figure, settled like a full
+            # clearance (KSW_annual_leave keeps it within the balance).
+            vacation_days = leave.x_custom_consumption_days
+            label_prefix = 'Vacation Balance Settlement — Custom Consumption'
         elif leave.x_excess_days_accepted and leave.x_annual_portion_days > 0:
             vacation_days = leave.x_annual_portion_days
             label_prefix = 'Vacation Balance Settlement — Annual Portion'
@@ -537,6 +542,7 @@ class HrLeave(models.Model):
         # leave.number_of_days already equals the paid-portion duration
         # in every branch of _compute_duration:
         #   - full clearance          → x_clearance_balance
+        #   - custom consumption      → x_custom_consumption_days
         #   - excess accepted (combo) → x_annual_portion_days
         #   - simple annual           → calendar days of the leave
         paid_months = own_month if unpaid_settlement else self._paid_months(leave)

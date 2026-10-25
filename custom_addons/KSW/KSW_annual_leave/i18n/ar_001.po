@@ -2416,3 +2416,87 @@ msgstr "تحديث كشف الحضور والانصراف"
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_leave_attendance_wizard__affected_count
 msgid "Workdays Currently Attended"
 msgstr "أيام العمل المسجلة حضورا"
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_is_custom_consumption
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Custom Balance Consumption"
+msgstr "استهلاك رصيد مخصص"
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_is_custom_consumption
+msgid ""
+"System Administrator only. When checked, this leave consumes the number of "
+"days entered in Days to Consume, from the days requested up to the whole "
+"remaining balance."
+msgstr ""
+"لمدير النظام فقط. عند التفعيل تستهلك هذه الإجازة عدد الأيام المُدخل في "
+"«الأيام المستهلكة من الرصيد»، بدءاً من الأيام المطلوبة وحتى كامل الرصيد "
+"المتبقي."
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_custom_consumption_days
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Days to Consume"
+msgstr "الأيام المستهلكة من الرصيد"
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_custom_consumption_days
+msgid ""
+"Days charged to the annual leave balance and settled on the vacation "
+"payslip. At least the days requested, at most the remaining balance."
+msgstr ""
+"الأيام المخصومة من رصيد الإجازة السنوية والمصروفة في كشف راتب الإجازة. لا "
+"تقل عن الأيام المطلوبة ولا تزيد عن الرصيد المتبقي."
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "⚠ Custom Consumption"
+msgstr "⚠ استهلاك رصيد مخصص"
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_tree_inherit_annual_return
+msgid "Custom Consumption"
+msgstr "استهلاك مخصص"
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_search_inherit_annual_return
+msgid "📋 Custom Consumption"
+msgstr "📋 استهلاك رصيد مخصص"
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid ""
+"Only the System Administrator can set a custom number of days to consume "
+"from the annual leave balance."
+msgstr ""
+"مدير النظام فقط يمكنه تحديد عدد مخصص من الأيام لاستهلاكه من رصيد الإجازة "
+"السنوية."
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid ""
+"A custom balance consumption is only possible on an annual leave request."
+msgstr "استهلاك الرصيد المخصص متاح لطلبات الإجازة السنوية فقط."
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid ""
+"Custom Balance Consumption cannot be combined with Full Balance Clearance or"
+" Accept Excess as Unpaid. Choose one."
+msgstr ""
+"لا يمكن الجمع بين استهلاك الرصيد المخصص وتصفية كامل الرصيد أو قبول الزيادة "
+"كإجازة بدون راتب. اختر خياراً واحداً."
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid ""
+"Days to Consume must be between the days requested (%(requested)s) and the "
+"remaining balance (%(balance)s). You entered %(days)s."
+msgstr ""
+"يجب أن تكون الأيام المستهلكة من الرصيد بين الأيام المطلوبة (%(requested)s) "
+"والرصيد المتبقي (%(balance)s). القيمة المُدخلة %(days)s."

@@ -17,3 +17,4 @@ from . import test_return_balance_sync
 from . import test_return_punch_notification
 from . import test_on_vacation_at_gm_final
 from . import test_owner_edit_lock
+from . import test_custom_consumption

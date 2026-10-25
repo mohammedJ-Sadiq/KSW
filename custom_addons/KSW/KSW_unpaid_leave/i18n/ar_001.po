@@ -610,3 +610,8 @@ msgstr "⛔ الإجازات بدون أجر"
 #: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.report_leave_approval
 msgid "✅ Approved"
 msgstr "✅ معتمد"
+
+#. module: KSW_unpaid_leave
+#: model_terms:ir.ui.view,arch_db:KSW_unpaid_leave.report_leave_approval
+msgid "<strong>Custom Consumption</strong>"
+msgstr "<strong>استهلاك مخصص</strong>"

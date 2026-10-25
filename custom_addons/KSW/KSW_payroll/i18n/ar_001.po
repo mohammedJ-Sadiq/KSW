@@ -5493,3 +5493,8 @@ msgstr "تفاصيل حسب فئات قواعد الراتب"
 #: model:ir.model.fields,field_description:om_hr_payroll.field_hr_salary_rule__parent_rule_id
 msgid "Parent Salary Rule"
 msgstr "قاعدة الراتب الأصل"
+
+#. module: KSW_payroll
+#: model_terms:ir.ui.view,arch_db:KSW_payroll.report_annual_vacation
+msgid "Custom Balance Consumption"
+msgstr "استهلاك رصيد مخصص"

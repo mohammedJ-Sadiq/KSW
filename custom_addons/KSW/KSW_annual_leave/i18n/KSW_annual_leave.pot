@@ -2271,3 +2271,76 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_annual_leave.field_ksw_leave_attendance_wizard__affected_count
 msgid "Workdays Currently Attended"
 msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_is_custom_consumption
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Custom Balance Consumption"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_is_custom_consumption
+msgid ""
+"System Administrator only. When checked, this leave consumes the number of "
+"days entered in Days to Consume, from the days requested up to the whole "
+"remaining balance."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_custom_consumption_days
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "Days to Consume"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,help:KSW_annual_leave.field_hr_leave__x_custom_consumption_days
+msgid ""
+"Days charged to the annual leave balance and settled on the vacation "
+"payslip. At least the days requested, at most the remaining balance."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_form_inherit_annual_return
+msgid "⚠ Custom Consumption"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_tree_inherit_annual_return
+msgid "Custom Consumption"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model_terms:ir.ui.view,arch_db:KSW_annual_leave.hr_leave_view_search_inherit_annual_return
+msgid "📋 Custom Consumption"
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid ""
+"Only the System Administrator can set a custom number of days to consume "
+"from the annual leave balance."
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid ""
+"A custom balance consumption is only possible on an annual leave request."
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid ""
+"Custom Balance Consumption cannot be combined with Full Balance Clearance or"
+" Accept Excess as Unpaid. Choose one."
+msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid ""
+"Days to Consume must be between the days requested (%(requested)s) and the "
+"remaining balance (%(balance)s). You entered %(days)s."
+msgstr ""

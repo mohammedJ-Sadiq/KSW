@@ -579,6 +579,33 @@ class TestCombinedLeave(TransactionCase):
         self.assertAlmostEqual(
             inputs_by_code['VACATION_BAL'].amount, expected_vac, places=2)
 
+    def test_custom_consumption_payslip_settles_the_admin_figure(self):
+        """VACATION_BAL settles the administrator's Days to Consume, not the
+        calendar days of the request."""
+        self._create_annual_balance()
+        self.assertGreater(self._get_actual_balance(), 14)
+        leave = self._create_leave(
+            date_from=date(2026, 6, 1), date_to=date(2026, 6, 10))
+        leave.sudo().write({
+            'x_is_custom_consumption': True,
+            'x_custom_consumption_days': 14,
+        })
+        self.assertAlmostEqual(leave.number_of_days, 14, places=4)
+
+        # The class fixture's HR user predates the HR-step group guard.
+        self.user_hr.group_ids = [(4, self.env.ref(
+            'KSW_annual_leave.group_annual_leave_hr').id)]
+        self._approve_through_step(leave, 'acc')
+        leave.with_user(self.user_gm).sudo().action_gm_final_approve()
+
+        inputs_by_code = {
+            i.code: i for i in leave.x_vacation_payslip_id.input_line_ids}
+        self.assertIn('VACATION_BAL', inputs_by_code)
+        self.assertIn('Custom Consumption', inputs_by_code['VACATION_BAL'].name)
+        self.assertAlmostEqual(
+            inputs_by_code['VACATION_BAL'].amount, 14 * self.daily_wage,
+            places=2)
+
     # ==================================================================
     # ACCRUAL IMPACT — UNPAID PORTION REDUCES SERVICE DAYS
     # ==================================================================

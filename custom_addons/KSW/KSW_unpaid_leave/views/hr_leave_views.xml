@@ -72,13 +72,18 @@
             <!-- ===== Hide full-clearance toggle for unpaid ===== -->
             <xpath expr="//field[@name='x_is_full_clearance'][@widget='boolean_toggle']" position="attributes">
                 <attribute name="invisible">
-                    not x_is_annual_leave_type or x_is_unpaid_leave_type or x_excess_days_accepted or x_exceeds_annual_balance
+                    not x_is_annual_leave_type or x_is_unpaid_leave_type or x_excess_days_accepted or x_exceeds_annual_balance or x_is_custom_consumption
                 </attribute>
             </xpath>
             <!-- Also hide the clearance-related fields -->
+            <xpath expr="//field[@name='x_is_custom_consumption'][@widget='boolean_toggle']" position="attributes">
+                <attribute name="invisible">
+                    not x_is_annual_leave_type or x_is_unpaid_leave_type or x_is_full_clearance or x_excess_days_accepted or x_exceeds_annual_balance
+                </attribute>
+            </xpath>
             <xpath expr="//field[@name='x_actual_vacation_days']" position="attributes">
                 <attribute name="invisible">
-                    not x_is_full_clearance or x_actual_vacation_days == 0 or x_is_unpaid_leave_type
+                    not (x_is_full_clearance or x_is_custom_consumption) or x_actual_vacation_days == 0 or x_is_unpaid_leave_type
                 </attribute>
             </xpath>
             <xpath expr="//field[@name='x_clearance_balance']" position="attributes">

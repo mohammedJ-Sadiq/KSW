@@ -45,6 +45,7 @@
                 <field name="x_can_confirm_return_hr" invisible="1"/>
                 <field name="x_can_edit_return_date" invisible="1"/>
                 <field name="x_is_full_clearance" invisible="1"/>
+                <field name="x_is_custom_consumption" invisible="1"/>
                 <field name="x_excess_days_accepted" invisible="1"/>
                 <field name="x_unpaid_portion_days" invisible="1"/>
                 <field name="validation_type" invisible="1"/>
@@ -155,6 +156,9 @@
                 <widget name="web_ribbon" title="⚠ Full Clearance"
                         bg_color="text-bg-danger"
                         invisible="not x_is_full_clearance"/>
+                <widget name="web_ribbon" title="⚠ Custom Consumption"
+                        bg_color="text-bg-danger"
+                        invisible="not x_is_custom_consumption"/>
                 <widget name="web_ribbon" title="⚠ Combined Leave"
                         bg_color="text-bg-warning"
                         invisible="not x_excess_days_accepted or x_unpaid_portion_days == 0"/>
@@ -192,11 +196,29 @@
                         <!-- Full clearance toggle (when balance covers the request) -->
                         <field name="x_is_full_clearance" widget="boolean_toggle"
                                string="Full Balance Clearance"
-                               invisible="x_excess_days_accepted or x_exceeds_annual_balance"
+                               invisible="x_excess_days_accepted or x_exceeds_annual_balance or x_is_custom_consumption"
                                readonly="state != 'confirm'"/>
+                        <!-- Custom consumption: the System Administrator picks
+                             any figure from the days requested up to the whole
+                             balance. Everyone else sees the figure read-only. -->
+                        <field name="x_is_custom_consumption" widget="boolean_toggle"
+                               string="Custom Balance Consumption"
+                               groups="base.group_system"
+                               invisible="x_is_full_clearance or x_excess_days_accepted or x_exceeds_annual_balance"
+                               readonly="state != 'confirm'"/>
+                        <field name="x_custom_consumption_days"
+                               string="Days to Consume"
+                               groups="base.group_system"
+                               invisible="not x_is_custom_consumption"
+                               required="x_is_custom_consumption"
+                               readonly="state != 'confirm'"/>
+                        <field name="x_custom_consumption_days"
+                               string="Balance Consumed" readonly="1"
+                               groups="!base.group_system"
+                               invisible="not x_is_custom_consumption"/>
                         <field name="x_actual_vacation_days"
                                string="Actual Days Away" readonly="1"
-                               invisible="not x_is_full_clearance or x_actual_vacation_days == 0"/>
+                               invisible="not (x_is_full_clearance or x_is_custom_consumption) or x_actual_vacation_days == 0"/>
                         <field name="x_clearance_balance"
                                string="Balance Consumed" readonly="1"
                                invisible="not x_is_full_clearance or x_clearance_balance == 0"/>
@@ -433,6 +455,8 @@
                        decoration-success="x_annual_approval_state == 'approved'"/>
                 <field name="x_is_full_clearance" widget="boolean_toggle"
                        optional="hidden" string="Full Clearance"/>
+                <field name="x_is_custom_consumption" widget="boolean_toggle"
+                       optional="hidden" string="Custom Consumption"/>
                 <field name="x_return_state" widget="badge" optional="show"
                        string="Return Status"
                        decoration-warning="x_return_state == 'on_vacation'"
@@ -496,6 +520,9 @@
                 <filter string="📋 Full Clearance"
                         name="full_clearance"
                         domain="[('x_is_full_clearance', '=', True)]"/>
+                <filter string="📋 Custom Consumption"
+                        name="custom_consumption"
+                        domain="[('x_is_custom_consumption', '=', True)]"/>
                 <separator/>
                 <filter string="⏳ Pending Approval"
                         name="pending_annual_approval"

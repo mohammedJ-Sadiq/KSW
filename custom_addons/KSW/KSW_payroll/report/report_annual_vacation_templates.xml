@@ -113,6 +113,13 @@
                                     <t t-if="o.x_clearance_balance"> — <t t-out="'%.2f' % o.x_clearance_balance"/> days consumed from balance</t>
                                 </td>
                             </tr>
+                            <tr t-if="o.x_is_custom_consumption">
+                                <td><strong>Leave Nature</strong></td>
+                                <td colspan="3" class="fw-bold text-danger">
+                                    Custom Balance Consumption
+                                    <t t-if="o.x_custom_consumption_days"> — <t t-out="'%.2f' % o.x_custom_consumption_days"/> days consumed from balance</t>
+                                </td>
+                            </tr>
                             <tr t-if="o.x_excess_days_accepted and o.x_unpaid_portion_days > 0">
                                 <td><strong>Leave Nature</strong></td>
                                 <td colspan="3">

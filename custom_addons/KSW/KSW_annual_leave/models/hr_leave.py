@@ -4,7 +4,7 @@ from datetime import timedelta
 from markupsafe import Markup
 
 from odoo import _, api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from odoo.fields import Domain
 from odoo.tools import float_round
 from odoo.osv import expression as odoo_expr
@@ -610,6 +610,30 @@ class HrLeave(models.Model):
     )
 
     # ------------------------------------------------------------------
+    # Custom Balance Consumption (System Administrator only)
+    # ------------------------------------------------------------------
+    # The two options above are the ends of a range: consume the days
+    # requested, or consume the whole balance. This one picks any figure
+    # in between and is charged exactly like Full Balance Clearance
+    # (number_of_days = the figure, the vacation payslip settles it, the
+    # employee is still away only the requested dates).
+
+    x_is_custom_consumption = fields.Boolean(
+        string='Custom Balance Consumption',
+        default=False, copy=False, tracking=True,
+        help='System Administrator only. When checked, this leave consumes '
+             'the number of days entered in Days to Consume, from the days '
+             'requested up to the whole remaining balance.',
+    )
+    x_custom_consumption_days = fields.Float(
+        string='Days to Consume',
+        digits=(10, 4), copy=False, tracking=True,
+        help='Days charged to the annual leave balance and settled on the '
+             'vacation payslip. At least the days requested, at most the '
+             'remaining balance.',
+    )
+
+    # ------------------------------------------------------------------
     # Excess Days (Combined Annual + Unpaid)
     # ------------------------------------------------------------------
 
@@ -1005,6 +1029,7 @@ class HrLeave(models.Model):
     # ==================================================================
 
     @api.depends('holiday_status_id', 'x_is_full_clearance', 'x_excess_days_accepted',
+                 'x_is_custom_consumption', 'x_custom_consumption_days',
                  'request_date_from', 'request_date_to',
                  'date_from', 'date_to',
                  'employee_id', 'resource_calendar_id')
@@ -1022,6 +1047,8 @@ class HrLeave(models.Model):
                     leave.with_context(_skip_toggle_validity=True).x_is_full_clearance = False
                 if leave.x_excess_days_accepted:
                     leave.with_context(_skip_toggle_validity=True).x_excess_days_accepted = False
+                if leave.x_is_custom_consumption:
+                    leave.with_context(_skip_toggle_validity=True).x_is_custom_consumption = False
 
         for leave in annual:
             cal_days, cal_hours = self._annual_cal_days(leave)
@@ -1041,6 +1068,10 @@ class HrLeave(models.Model):
             # When days > balance the user must use "Accept Excess as Unpaid".
             if exceeds and leave.x_is_full_clearance:
                 leave.with_context(_skip_toggle_validity=True).x_is_full_clearance = False
+            # Same for a custom figure: its range (requested days up to the
+            # balance) is empty once the request exceeds the balance.
+            if exceeds and leave.x_is_custom_consumption:
+                leave.with_context(_skip_toggle_validity=True).x_is_custom_consumption = False
 
             if leave.x_is_full_clearance and cal_days > 0:
                 if balance > 0:
@@ -1054,6 +1085,18 @@ class HrLeave(models.Model):
                     leave.x_actual_vacation_days = cal_days
                     leave.x_clearance_balance = 0
                 # Clear excess fields when full clearance
+                leave.x_annual_portion_days = 0
+                leave.x_unpaid_portion_days = 0
+
+            elif leave.x_is_custom_consumption and cal_days > 0:
+                # Charged like a full clearance, only the figure is the
+                # administrator's. _check_custom_consumption keeps it within
+                # [cal_days, balance].
+                days = leave.x_custom_consumption_days or cal_days
+                leave.number_of_days = days
+                leave.number_of_hours = days * daily_hours
+                leave.x_actual_vacation_days = cal_days
+                leave.x_clearance_balance = 0
                 leave.x_annual_portion_days = 0
                 leave.x_unpaid_portion_days = 0
 
@@ -1101,6 +1144,10 @@ class HrLeave(models.Model):
             if leave.x_is_full_clearance and leave.x_clearance_balance > 0:
                 result[leave.id] = (leave.x_clearance_balance,
                                     leave.x_clearance_balance * daily_hours)
+            elif (leave.x_is_custom_consumption
+                  and leave.x_custom_consumption_days > 0):
+                result[leave.id] = (leave.x_custom_consumption_days,
+                                    leave.x_custom_consumption_days * daily_hours)
             elif leave.x_excess_days_accepted and leave.x_annual_portion_days > 0:
                 result[leave.id] = (leave.x_annual_portion_days,
                                     leave.x_annual_portion_days * daily_hours)
@@ -1124,6 +1171,10 @@ class HrLeave(models.Model):
                     balance = self._get_remaining_balance(self)
                     if balance > 0:
                         return {'days': balance, 'hours': balance * daily_hours}
+                elif (self.x_is_custom_consumption
+                      and self.x_custom_consumption_days > 0):
+                    days = self.x_custom_consumption_days
+                    return {'days': days, 'hours': days * daily_hours}
                 elif self.x_excess_days_accepted:
                     balance = self._get_remaining_balance(self)
                     if balance > 0 and cal_days > balance:
@@ -1974,6 +2025,64 @@ class HrLeave(models.Model):
         'x_remaining_loans', 'x_remaining_loans_description',
         'x_flight_ticket_amount', 'x_flight_ticket_description',
     })
+    # Fields that only the System Administrator may set to meaningful
+    # values. Clearing them stays open to everyone, like the role fields
+    # above: _compute_duration and _reset_annual_multi_fields clear them.
+    _ADMIN_ONLY_FIELDS = frozenset({
+        'x_is_custom_consumption', 'x_custom_consumption_days',
+    })
+
+    def _check_custom_consumption_rights(self, vals):
+        if self.env.su or self.env.user.has_group(SETTINGS_ADMIN_GROUP):
+            return
+        if any(vals[k] for k in self._ADMIN_ONLY_FIELDS & set(vals)):
+            raise UserError(_(
+                'Only the System Administrator can set a custom number of '
+                'days to consume from the annual leave balance.'))
+
+    @api.constrains('x_is_custom_consumption', 'x_custom_consumption_days',
+                    'x_is_full_clearance', 'x_excess_days_accepted',
+                    'request_date_from', 'request_date_to', 'holiday_status_id')
+    def _check_custom_consumption(self):
+        for leave in self.filtered('x_is_custom_consumption'):
+            # Settle the duration first: _compute_duration clears the flag
+            # when the request no longer fits the balance or is no longer
+            # annual, exactly as it clears Full Balance Clearance.
+            leave.number_of_days
+            if not leave.x_is_custom_consumption:
+                continue
+            if not self._is_annual_leave(leave):
+                raise ValidationError(_(
+                    'A custom balance consumption is only possible on an '
+                    'annual leave request.'))
+            if leave.x_is_full_clearance or leave.x_excess_days_accepted:
+                raise ValidationError(_(
+                    'Custom Balance Consumption cannot be combined with Full '
+                    'Balance Clearance or Accept Excess as Unpaid. Choose one.'))
+            requested = self._annual_cal_days(leave)[0]
+            balance = self._get_remaining_balance(leave)
+            if leave.state == 'validate':
+                # Already deducted from the allocation: add it back, the
+                # same reconstruction as x_balance_at_request.
+                balance += leave.number_of_days
+            days = leave.x_custom_consumption_days
+            # 4 dp, the precision the balance is accrued in.
+            if (float_round(days - requested, 4) < 0
+                    or float_round(days - balance, 4) > 0):
+                raise ValidationError(_(
+                    'Days to Consume must be between the days requested '
+                    '(%(requested)s) and the remaining balance (%(balance)s). '
+                    'You entered %(days)s.',
+                    requested='%g' % requested,
+                    balance='%.2f' % balance,
+                    days='%g' % days))
+
+    @api.onchange('x_is_custom_consumption')
+    def _onchange_custom_consumption(self):
+        # Start from the days requested: the lower end of the range.
+        for leave in self:
+            if leave.x_is_custom_consumption and not leave.x_custom_consumption_days:
+                leave.x_custom_consumption_days = self._annual_cal_days(leave)[0]
 
     # ── The employee's own request, once somebody has signed it ─────────
     # What the approvers put their names to. After the first approval the
@@ -1986,6 +2095,7 @@ class HrLeave(models.Model):
         'request_unit_half', 'request_unit_hours', 'request_date_from_period',
         'request_hour_from', 'request_hour_to',
         'x_is_full_clearance', 'x_excess_days_accepted',
+        'x_is_custom_consumption', 'x_custom_consumption_days',
     })
     # Figures the system derives. Never the employee's to set, at any step.
     _DERIVED_FIELDS = frozenset({
@@ -2114,6 +2224,7 @@ class HrLeave(models.Model):
                 raise UserError(
                     'Only Accounting Approvers can fill in commission, '
                     'other deduction, loan, and flight ticket fields.')
+            self._check_custom_consumption_rights(vals)
 
         # A confirmed return date may still be corrected, but only by the
         # employee's leave manager (the same person who confirmed it).
@@ -2178,6 +2289,7 @@ class HrLeave(models.Model):
             'request_date_from', 'request_date_to',
             'date_from', 'date_to',
             'x_excess_days_accepted', 'x_is_full_clearance',
+            'x_is_custom_consumption', 'x_custom_consumption_days',
         }
         if revalidate_keys & vals.keys():
             annual_to_check = self.filtered(
@@ -2336,6 +2448,7 @@ class HrLeave(models.Model):
                 if vals.get('employee_id') in own_employee_ids:
                     for fname in strip & set(vals):
                         vals.pop(fname)
+                self._check_custom_consumption_rights(vals)
         records = super().create(vals_list)
         for leave in records:
             # Deliberately _is_annual_multi, NOT _uses_multi_step_chain:
@@ -2975,6 +3088,8 @@ class HrLeave(models.Model):
         self.write({
             'x_annual_approval_state': False,
             'x_is_full_clearance': False,
+            'x_is_custom_consumption': False,
+            'x_custom_consumption_days': 0,
             'x_penalty_amount': 0,
             'x_penalty_description': False,
             'x_iqama_renewal_amount': 0,

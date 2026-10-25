@@ -81,6 +81,14 @@
                                     <td t-out="'%.4f' % o.x_clearance_balance"/>
                                 </tr>
                             </t>
+                            <t t-if="o.x_is_custom_consumption">
+                                <tr>
+                                    <td><strong>Custom Consumption</strong></td>
+                                    <td>Yes</td>
+                                    <td><strong>Balance Consumed</strong></td>
+                                    <td t-out="'%.4f' % o.x_custom_consumption_days"/>
+                                </tr>
+                            </t>
                             <t t-if="o.x_excess_days_accepted and o.x_unpaid_portion_days">
                                 <tr>
                                     <td><strong>Combined Leave</strong></td>
