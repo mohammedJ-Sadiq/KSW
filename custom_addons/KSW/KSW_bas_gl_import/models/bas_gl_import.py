@@ -632,7 +632,11 @@ class BasGlImport(models.Model):
         for r in lines:
             tax = float(r['TAX_AMOUNT'] or 0.0)
             val = float((r['BAMOUNT'] if use_b else r['AMOUNT']) or 0.0)
-            if not val and not tax:
+            # TAX_AMOUNT is the document's VAT, repeated on every row, so it only
+            # counts where BAMOUNT types post it.  Elsewhere a zero AMOUNT is a
+            # header slot (INVACCPOS 1/3) the money was booked away from --
+            # BAS keeps it at 0/0 and so would we, as a meaningless line.
+            if not val and not (use_b and tax):
                 continue
             fcode, tcode = (r['FCODE'] or '').strip(), (r['TCODE'] or '').strip()
             code = fcode or tcode
