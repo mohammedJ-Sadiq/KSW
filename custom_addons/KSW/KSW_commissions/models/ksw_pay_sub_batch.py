@@ -541,8 +541,12 @@ class KswPaySubBatch(models.Model):
                     "%(name)s has nothing to submit: none of its employees "
                     "has a draft entry in %(scope)s.",
                     name=rec.name, scope=rec.submission_id.display_name))
-            rows.with_env(self.env)._check_not_held_for_submit(
-                _("Submitting %s") % rec.name)
+            # Held rows go along and the register leaves them out — see
+            # ksw.pay.batch._check_no_held_entries.
+            held = rows._held_for_submit()
+            if held:
+                rec.sudo().message_post(body=held._held_submit_note(),
+                                        subtype_xmlid='mail.mt_note')
             resubmitted = rec.state == 'returned'
             rows._wf_submit()
             rec.sudo().write({

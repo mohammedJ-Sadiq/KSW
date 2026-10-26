@@ -154,6 +154,14 @@ class KswPayRun(models.Model):
         compute='_compute_vacation_held_warning', compute_sudo=True,
         string='Held for Vacation',
     )
+    # Its twin: rows this month will not pay because a vacation payslip
+    # already did. Before this, the only trace was the chatter note
+    # _announce_settled posts at approval — so an open month (October
+    # 2026, KSWCO leave 5230) said nothing at all about money already paid.
+    x_vacation_settled_note = fields.Text(
+        compute='_compute_vacation_held_warning', compute_sudo=True,
+        string='Paid on Vacation',
+    )
 
     # The submitted departments this user is the GM of — what his Approve
     # button will actually act on, and the list the form shows him.
@@ -284,10 +292,13 @@ class KswPayRun(models.Model):
     def _compute_vacation_held_warning(self):
         for rec in self:
             rec.x_vacation_held_warning = False
+            rec.x_vacation_settled_note = False
             # Same reasoning as the batch banner: an approved or paid month
             # is history, and _build_register never touches it again.
             if not rec.period or rec.state in LOCKING_STATES:
                 continue
+            rec.x_vacation_settled_note = (
+                rec._all_entries()._vacation_settled_summary())
             held = rec._held_entries()
             if not held:
                 continue

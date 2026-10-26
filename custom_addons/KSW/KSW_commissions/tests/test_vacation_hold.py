@@ -343,15 +343,25 @@ class TestVacationHoldOnEntries(VacationHoldCommon):
         self.assertTrue(entry.x_vacation_hold)
         self.assertIn(self.emp.name, batch.x_vacation_hold_warning)
 
-    def test_submitting_a_batch_with_held_rows_is_refused(self):
+    def test_submitting_a_batch_with_held_rows_goes_through_unpaid(self):
+        """Held rows are handed over as the record of the month, never
+        deleted — and never paid (KSWCO PR000005, Sep 2026)."""
         batch = self._batch(AUG)
-        self._entry(batch, day=date(2026, 8, 4))
+        entry = self._entry(batch, day=date(2026, 8, 4))
         self._leave(date(2026, 8, 11), date(2026, 9, 16),
                     return_date=date(2026, 9, 17))
         batch.invalidate_recordset()
-        with self.assertRaises(UserError) as caught:
-            batch.with_user(self.officer).action_submit()
-        self.assertIn(self.emp.name, str(caught.exception))
+        existing = batch.message_ids.ids
+        batch.with_user(self.officer).action_submit()
+
+        self.assertEqual(entry.state, 'submitted')
+        new = batch.message_ids.filtered(lambda m: m.id not in existing)
+        self.assertTrue(
+            new.filtered(lambda m: self.emp.name in (m.body or '')),
+            'The batch must name whose rows were handed over unpaid.')
+        run = batch.submission_id.run_id
+        run.sudo()._build_register(preview=True)
+        self.assertNotIn(self.emp, run.line_ids.employee_id)
 
 
 class TestVacationHoldOnTheRegister(VacationHoldCommon):
@@ -402,6 +412,60 @@ class TestVacationHoldOnTheRegister(VacationHoldCommon):
         run = batch.submission_id.run_id
         run.invalidate_recordset()
         self.assertIn(self.emp.name, run.x_vacation_held_warning or '')
+
+
+class TestLeftOutBySettlement(VacationHoldCommon):
+    """A month the settlement listed but did not pay is owed, not held.
+
+    KSWCO leave 5230 (Oct 2026): he left on 11 Oct, before September was
+    paid. September's rows were still awaiting approval when Accounting
+    latched them, so the vacation payslip paid August and October only —
+    yet every screen called September "already paid" and the run held it.
+    """
+
+    def _settle(self, leave, entries, confirmed=True):
+        self.env['ksw.leave.commission.entry'].sudo().create([{
+            'leave_id': leave.id, 'entry_id': e.id, 'included': False,
+            'period': e.period, 'amount': e.amount} for e in entries])
+        version = self.emp.current_version_id
+        slip = self.env['hr.payslip'].sudo().create({
+            'employee_id': self.emp.id, 'date_from': OCT,
+            'date_to': date(2026, 10, 31), 'x_leave_id': leave.id,
+            'version_id': version.id,
+        })
+        if confirmed:
+            # Raw: only the state matters here, not the confirmation flow.
+            self.env.cr.execute(
+                "UPDATE hr_payslip SET state = 'done' WHERE id = %s",
+                [slip.id])
+            slip.invalidate_recordset(['state'])
+        return slip
+
+    def _september(self):
+        batch = self._batch(SEP)
+        listed = self._entry(batch, day=date(2026, 9, 30))
+        unlisted = self._entry(batch, day=date(2026, 9, 29))
+        leave = self._leave(date(2026, 10, 11), date(2027, 1, 8))
+        return batch, listed, unlisted, leave
+
+    def test_a_listed_unpaid_entry_is_payable(self):
+        batch, listed, unlisted, leave = self._september()
+        self._settle(leave, listed)
+        (listed | unlisted).invalidate_recordset()
+        self.assertFalse(listed.x_vacation_hold)
+        self.assertTrue(unlisted.x_vacation_hold,
+                        'A row the settlement never saw stays held.')
+        run = batch.submission_id.run_id
+        run.sudo()._build_register(preview=True)
+        self.assertNotIn(listed, run._held_entries())
+        self.assertIn(unlisted, run._held_entries())
+
+    def test_still_held_until_the_payslip_is_confirmed(self):
+        """Before then Accounting's Refresh may still take it in."""
+        _batch, listed, _unlisted, leave = self._september()
+        self._settle(leave, listed, confirmed=False)
+        listed.invalidate_recordset()
+        self.assertTrue(listed.x_vacation_hold)
 
 
 class TestVacationRelease(VacationHoldCommon):

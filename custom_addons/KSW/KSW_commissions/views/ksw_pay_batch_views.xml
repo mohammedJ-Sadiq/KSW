@@ -21,6 +21,7 @@
                 <field name="entries_import_only" invisible="1"/>
                 <field name="x_entries_readonly" invisible="1"/>
                 <field name="x_vacation_hold_warning" invisible="1"/>
+                <field name="x_vacation_settled_note" invisible="1"/>
                 <field name="x_can_reopen" invisible="1"/>
                 <field name="submission_state" invisible="1"/>
                 <field name="entry_count" invisible="1"/>
@@ -77,6 +78,13 @@
                         <field name="return_reason" readonly="1" nolabel="1"/>
                     </div>
 
+                    <div class="alert alert-info" role="alert"
+                         invisible="not x_vacation_settled_note">
+                        <strong>Already paid on a vacation payslip: not paid
+                        again this month.</strong>
+                        <field name="x_vacation_settled_note" readonly="1"
+                               nolabel="1"/>
+                    </div>
                     <div class="alert alert-danger" role="alert"
                          invisible="not x_vacation_hold_warning">
                         <strong>Already paid on a vacation request.</strong>

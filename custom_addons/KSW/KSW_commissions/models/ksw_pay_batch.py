@@ -200,6 +200,12 @@ class KswPayBatch(models.Model):
         compute='_compute_vacation_hold_warning', compute_sudo=True,
         string='On Vacation',
     )
+    # Rows already paid on a vacation payslip, said at the top of the form
+    # rather than only in a list column (KSWCO batch PB000120, Oct 2026).
+    x_vacation_settled_note = fields.Text(
+        compute='_compute_vacation_settled_note', compute_sudo=True,
+        string='Paid on Vacation',
+    )
 
     # Deliberately NOT a SQL UNIQUE. A department-scoped batch leaves
     # site_id NULL (and vice versa), and Postgres indexes are NULLS
@@ -432,6 +438,12 @@ class KswPayBatch(models.Model):
                 period=rec.period.strftime('%B %Y') if rec.period else '',
                 list='\n'.join(lines),
             )
+
+    @api.depends('entry_ids.x_vacation_payslip_id')
+    def _compute_vacation_settled_note(self):
+        for rec in self:
+            rec.x_vacation_settled_note = (
+                rec.entry_ids._vacation_settled_summary())
 
     @api.depends('skip_line_ids.outcome')
     def _compute_skip_counts(self):
@@ -759,26 +771,20 @@ class KswPayBatch(models.Model):
         return super().unlink()
 
     def _check_no_held_entries(self):
-        """Refuse to hand over a month that pays a settled vacation twice."""
-        if self.env.su:
-            return
+        """Held rows travel with the handover; they are not a refusal.
+
+        This used to raise and tell the supervisor to delete the rows \u2014
+        which destroyed the record of what the employee did that month
+        (KSWCO run PR000005, Sep 2026). The register, the bank file and the
+        BAS journal already leave held rows out (``ksw.pay.run.
+        _held_entries``) and the run announces them, so submitting them
+        pays nothing; the batch only has to say so.
+        """
         self.ensure_one()
         held = self._held_entries()
-        if not held:
-            return
-        raise UserError(_(
-            "%(name)s cannot be submitted: %(count)s entr%(plural)s "
-            "belong%(verb)s to somebody whose %(period)s was already "
-            "settled on his vacation request.\n\n%(who)s\n\n"
-            "Delete those entries, or ask the General Manager to release "
-            "the month (Commissions \u2192 Vacation Releases).",
-            name=self.name,
-            count=len(held),
-            plural=_('y') if len(held) == 1 else _('ies'),
-            verb=_('s') if len(held) == 1 else '',
-            period=self.period.strftime('%B %Y') if self.period else '',
-            who=', '.join(held.employee_id.sudo().mapped('display_name')),
-        ))
+        if held:
+            self.sudo().message_post(
+                body=held._held_submit_note(), subtype_xmlid='mail.mt_note')
 
     def _check_component_rights(self):
         """Server-side check that the user may record this component.
@@ -1551,6 +1557,20 @@ class KswPayEntry(models.Model):
                 if hold and (entry_blocked(hold, rec) or undated_unknown):
                     rec.x_vacation_hold = hold_reason(self.env, hold)
 
+    def _vacation_settled_summary(self):
+        """One line per vacation payslip that paid rows of ``self``, or
+        False. Shared by the batch and run banners."""
+        settled = self.sudo().filtered('x_vacation_payslip_id')
+        lines = []
+        for slip in settled.x_vacation_payslip_id:
+            rows = settled.filtered(
+                lambda e, s=slip: e.x_vacation_payslip_id == s)
+            lines.append('\u2022 %s \u2014 %s: %.2f (%s)' % (
+                slip.employee_id.display_name, slip.number or slip.name,
+                sum(rows.mapped('amount')),
+                ', '.join(rows.component_id.mapped('name'))))
+        return '\n'.join(lines) or False
+
     @api.depends('x_vacation_payslip_id')
     def _compute_vacation_settlement(self):
         for rec in self:
@@ -2083,10 +2103,8 @@ class KswPayEntry(models.Model):
                 entry=latched.entry_id.sudo().display_name,
                 leave=latched.leave_id.sudo().display_name))
 
-    def _check_not_held_for_submit(self, what):
-        """Refuse to hand over rows that pay a settled vacation twice."""
-        if self.env.su:
-            return
+    def _held_for_submit(self):
+        """The rows in ``self`` a vacation settlement holds."""
         entries = self.filtered('employee_id')
         by_period = defaultdict(lambda: self.env['ksw.pay.entry'])
         for rec in entries:
@@ -2097,14 +2115,28 @@ class KswPayEntry(models.Model):
             held |= rows.filtered(
                 lambda e: not e.x_vacation_payslip_id
                 and entry_blocked(holds.get(e.employee_id.id), e))
-        if held:
-            raise UserError(_(
-                "%(what)s is not possible: %(who)s went on vacation and "
-                "what they had earned was settled on the leave request. "
-                "Delete those entries, or ask the General Manager to release "
-                "the month (Commissions → Vacation Releases).",
-                what=what,
-                who=', '.join(held.employee_id.sudo().mapped('display_name'))))
+        return held
+
+    def _held_submit_note(self):
+        """Chatter body: these held rows were handed over but are not paid."""
+        body = Markup(
+            '<strong>%(title)s</strong><br/>%(text)s<br/>'
+        ) % {
+            'title': _('⏸ Submitted, not paid: settled on a vacation request'),
+            'text': _('These entries go to the General Manager as the '
+                      'record of the month, but the register and the bank '
+                      'file leave them out. To pay them after all, the '
+                      'General Manager releases the month under '
+                      'Commissions → Vacation Releases.'),
+        }
+        for employee in self.employee_id:
+            rows = self.filtered(lambda e, emp=employee: e.employee_id == emp)
+            body += Markup('• <b>%(name)s</b>: %(count)s, %(amount).2f<br/>') % {
+                'name': employee.sudo().display_name,
+                'count': len(rows),
+                'amount': sum(rows.mapped('amount')),
+            }
+        return body
 
     def _wf_submit(self):
         todo = self.filtered(lambda e: e.state == 'draft')

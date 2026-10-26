@@ -166,6 +166,11 @@
                                     <field name="x_overlap_note"
                                            decoration-warning="x_overlap_note"
                                            optional="show"/>
+                                    <!-- Paid with a vacation settlement:
+                                         the run will not pay it again. -->
+                                    <field name="x_vacation_settlement"
+                                           decoration-info="x_vacation_settlement"
+                                           optional="show"/>
                                     <field name="currency_id"
                                            column_invisible="1"/>
                                 </list>

@@ -316,6 +316,19 @@ class TestVacationCommissionSettlement(_SettlementCommon):
         self.assertNotIn(self.employee, paid)
         self.assertEqual(paid.get(other.employee_id), 450.0)
 
+    def test_batch_and_open_run_name_the_vacation_payslip(self):
+        """Said at the top of the batch and the open run, not only in a
+        list column or a chatter note at approval (KSWCO PB000120)."""
+        slip = self._payslip(self._leave())
+        slip.write({'state': 'done'})
+        batch = self.aug.batch_id
+        batch.invalidate_recordset()
+        self.assertIn(slip.number or slip.name, batch.x_vacation_settled_note)
+        self.assertIn(self.employee.name, batch.x_vacation_settled_note)
+        run = self._run(AUG)
+        run.invalidate_recordset()
+        self.assertIn(slip.number or slip.name, run.x_vacation_settled_note)
+
     def test_the_excel_summary_lists_it_as_paid_on_the_vacation(self):
         """Left out of the register and the bank files, but not out of the
         month's record: the summary lists it, marked, with no transfer."""

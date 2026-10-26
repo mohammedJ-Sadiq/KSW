@@ -16,6 +16,7 @@
                 <field name="x_can_export" invisible="1"/>
                 <field name="pending_department_count" invisible="1"/>
                 <field name="x_vacation_held_warning" invisible="1"/>
+                <field name="x_vacation_settled_note" invisible="1"/>
                 <field name="submitted_department_count" invisible="1"/>
 
                 <header>
@@ -101,6 +102,16 @@
 
                     <div class="oe_title">
                         <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <!-- Already paid on a vacation payslip: left out of
+                         the register, said here before approval. -->
+                    <div class="alert alert-info" role="alert"
+                         invisible="not x_vacation_settled_note">
+                        <strong>Already paid on a vacation payslip: not paid
+                        again this month.</strong>
+                        <field name="x_vacation_settled_note" readonly="1"
+                               nolabel="1"/>
                     </div>
 
                     <!-- Before the Approve button, not in the chatter

@@ -61,7 +61,11 @@ from .ksw_commission_lock import (
 #:   'partial'       — payable from ``payable_from`` onwards
 #: ``leave`` is the request that caused it, so every message can name dates
 #: the user recognises.
-VacationHold = namedtuple('VacationHold', 'kind payable_from leave')
+#: ``left_out`` is the ids of entries that request's CONFIRMED settlement
+#: listed and did not pay (awaiting approval when it was latched) — see
+#: :func:`_left_out_by_settlement`.
+VacationHold = namedtuple('VacationHold', 'kind payable_from leave left_out',
+                          defaults=(frozenset(),))
 
 #: Which answer wins when two requests both speak for one month.  A
 #: month he was actually away for explains itself better than one that
@@ -172,7 +176,42 @@ def vacation_holds(env, employees, period):
         current = holds.get(employee_id)
         if current is None or _outranks(candidate, current):
             holds[employee_id] = candidate
+    if holds:
+        left_out = _left_out_by_settlement(
+            env, [h.leave.id for h in holds.values()])
+        holds = {
+            employee_id: hold._replace(
+                left_out=left_out.get(hold.leave.id, frozenset()))
+            for employee_id, hold in holds.items()}
     return holds
+
+
+def _left_out_by_settlement(env, leave_ids):
+    """``{leave_id: frozenset(entry ids)}`` its confirmed settlement did
+    NOT pay.
+
+    The hold is a policy ("the settlement paid this month"), and here the
+    request says otherwise in writing: the entry was latched on it as
+    awaiting approval, and the vacation payslip has since been confirmed
+    without it. Holding it as well paid the employee nothing for it while
+    every screen said "already paid" (KSWCO leave 5230, Sep 2026: 700.03).
+    Only once the payslip is confirmed — before that, Accounting's Refresh
+    may still take the entry in, and the run must not race it.
+    """
+    settled = env['hr.payslip'].sudo().search([
+        ('x_leave_id', 'in', leave_ids), ('state', '=', 'done'),
+    ]).x_leave_id
+    if not settled:
+        return {}
+    rows = env['ksw.leave.commission.entry'].sudo().search_read([
+        ('leave_id', 'in', settled.ids), ('included', '=', False),
+        ('entry_id', '!=', False),
+    ], ['leave_id', 'entry_id'])
+    left_out = {}
+    for row in rows:
+        left_out.setdefault(row['leave_id'][0], set()).add(
+            row['entry_id'][0])
+    return {k: frozenset(v) for k, v in left_out.items()}
 
 
 def _outranks(candidate, current):
@@ -312,6 +351,9 @@ def entry_blocked(hold, entry):
     Holidays calendar (``ksw.pay.entry._apply_paid_day``), so they arrive
     dated.
     """
+    if hold and entry.id in hold.left_out:
+        # The settlement listed it and paid it nothing: it is owed here.
+        return False
     if (hold and hold.kind == 'partial' and not entry.date
             and entry.component_id.x_paid_day == 'friday'):
         return entry.quantity > fridays_from(hold.payable_from)

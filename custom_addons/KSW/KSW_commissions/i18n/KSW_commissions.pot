@@ -5881,6 +5881,8 @@ msgstr ""
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__x_vacation_settlement
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run__x_vacation_settled_note
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_batch__x_vacation_settled_note
 msgid "Paid on Vacation"
 msgstr ""
 
@@ -10925,4 +10927,24 @@ msgstr ""
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_employee_review__x_ssnid
 msgid "SSN No."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "⏸ Submitted, not paid: settled on a vacation request"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "These entries go to the General Manager as the record of the month, but the register and the bank file leave them out. To pay them after all, the General Manager releases the month under Commissions → Vacation Releases."
+msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_batch_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_form
+msgid ""
+"<strong>Already paid on a vacation payslip: not paid\n"
+"                        again this month.</strong>"
 msgstr ""
