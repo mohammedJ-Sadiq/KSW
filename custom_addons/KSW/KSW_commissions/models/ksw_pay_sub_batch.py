@@ -486,6 +486,7 @@ class KswPaySubBatch(models.Model):
             rows = Entry.search(rec._row_domain() + [
                 ('employee_id', 'in', rec.employee_ids.ids),
                 ('state', '=', 'draft'),
+                ('x_sub_batch_left_out', '=', False),
                 '|', ('x_sub_batch_id', '=', False),
                 ('x_sub_batch_id', '=', rec.id),
             ]).filtered(lambda e: e._within(rec.date_from, rec.date_to))

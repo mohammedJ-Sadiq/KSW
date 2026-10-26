@@ -84,9 +84,15 @@ class KswPaySubmitWizard(models.TransientModel):
         'employee_id', string='Employees',
         domain="[('id', 'in', allowed_employee_ids)]")
     has_returned_sub_batch = fields.Boolean(readonly=True)
+    # Opened from a component batch (Send Early): the picker offers that
+    # component's people only. Whoever is picked still goes with every
+    # component — one handover per employee.
+    batch_id = fields.Many2one('ksw.pay.batch', readonly=True)
+    batch_hint = fields.Char(compute='_compute_allowed_employees',
+                             compute_sudo=True)
 
     @api.model
-    def _open_for(self, submissions, sub_batch=None):
+    def _open_for(self, submissions, sub_batch=None, batch=None):
         subs = submissions.sudo().sub_batch_ids
         preparing = subs.filtered(lambda s: s.state == 'draft')
         if len(submissions) != 1:
@@ -101,6 +107,7 @@ class KswPaySubmitWizard(models.TransientModel):
             'sub_batch_id': sub_batch.id if sub_batch else False,
             'has_returned_sub_batch': bool(
                 subs.filtered(lambda s: s.state == 'returned')),
+            'batch_id': batch.id if batch else False,
         }
         if period:
             start = period.replace(day=1)
@@ -153,18 +160,25 @@ class KswPaySubmitWizard(models.TransientModel):
             return Employee
         pool = Employee
         for batch in self._open_batches_of(submissions):
-            if batch.component_id.importer:
-                pool |= self._drivers(batch)
-            else:
-                pool |= batch.entry_ids.filtered(
-                    lambda e: e.state == 'draft' and e.employee_id
-                    and e._within(date_from, date_to)).employee_id
-        busy = submissions.sudo().sub_batch_ids.filtered(
+            pool |= self._batch_pool(batch, date_from, date_to)
+        return pool - self._busy(submissions)
+
+    @api.model
+    def _batch_pool(self, batch, date_from, date_to):
+        """Who one component batch has something to send for."""
+        if batch.component_id.importer:
+            return self._drivers(batch)
+        return batch.sudo().entry_ids.filtered(
+            lambda e: e.state == 'draft' and e.employee_id
+            and e._within(date_from, date_to)).employee_id
+
+    @api.model
+    def _busy(self, submissions):
+        return submissions.sudo().sub_batch_ids.filtered(
             lambda s: s.state in OPEN_STATES).employee_ids
-        return pool - busy
 
     @api.depends('submission_ids', 'target', 'sub_batch_id',
-                 'date_from', 'date_to')
+                 'date_from', 'date_to', 'batch_id')
     def _compute_allowed_employees(self):
         Wizard = self.with_env(self.env(su=False))
         for wiz in self:
@@ -172,8 +186,21 @@ class KswPaySubmitWizard(models.TransientModel):
             submissions = wiz.sub_batch_id.submission_id \
                 if wiz.target == 'append' and wiz.sub_batch_id \
                 else wiz.submission_ids
-            wiz.allowed_employee_ids = Wizard._pool(
-                submissions, date_from, date_to)
+            pool = Wizard._pool(submissions, date_from, date_to)
+            wiz.batch_hint = False
+            if wiz.batch_id and date_from and date_to:
+                mine = Wizard._batch_pool(wiz.batch_id, date_from, date_to)
+                pool &= mine
+                # Said out loud, or an empty picker reads as a fault: they
+                # are already sent, and this component goes with them.
+                sent = mine & Wizard._busy(submissions)
+                if sent:
+                    wiz.batch_hint = _(
+                        "Already in a sub-batch, with their %(what)s "
+                        "entries: %(names)s",
+                        what=wiz.batch_id.component_id.name,
+                        names=', '.join(sent.mapped('name')))
+            wiz.allowed_employee_ids = pool
 
     # ------------------------------------------------------------------
     # Buttons

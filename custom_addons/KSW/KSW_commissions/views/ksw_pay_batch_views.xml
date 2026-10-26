@@ -265,6 +265,14 @@
                                     <field name="x_sub_batch_id"
                                            optional="show"
                                            options="{'no_open': True}"/>
+                                    <field name="x_sub_batch_left_out"
+                                           widget="boolean_toggle" readonly="1"
+                                           optional="hide"/>
+                                    <button name="action_put_back_in_sub_batch"
+                                            type="object" icon="fa-sign-in"
+                                            string="Put Back"
+                                            title="Put this pay type back into the employee's sub-batch"
+                                            invisible="not x_sub_batch_left_out or state != 'draft'"/>
                                     <field name="x_overlap_note"
                                            readonly="1" optional="show"
                                            decoration-warning="x_overlap_note"/>

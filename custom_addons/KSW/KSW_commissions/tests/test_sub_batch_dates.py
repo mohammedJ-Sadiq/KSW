@@ -111,13 +111,20 @@ class TestSendEarly(SendEarlyCommon):
         self.assertFalse(late.x_sub_batch_id)
         self.assertEqual(self.ot.state, 'draft')
 
-    def test_03_the_picker_offers_the_departments_people(self):
+    def test_03_the_picker_offers_the_components_people(self):
+        """Opened from a component batch, the picker lists who has entries
+        in that component — not the whole department (SUB00007, KSWCO Oct
+        2026). Whoever is picked still goes with every component."""
         wizard = self._dialog(self.meals_batch)
         self.assertIn(self.emp_a, wizard.allowed_employee_ids)
+        self.assertNotIn(self.emp_a2, wizard.allowed_employee_ids)
+        self.assertNotIn(self.driver_1, wizard.allowed_employee_ids)
+        # The Driver Trips batch offers whom it can import.
+        self.assertIn(self.driver_1,
+                      self._dialog(self.trips_batch).allowed_employee_ids)
+        # Days with nothing typed in them leave nobody from Overtime.
+        wizard = self._dialog(self.ot)
         self.assertIn(self.emp_a2, wizard.allowed_employee_ids)
-        # Drivers too: there is a Driver Trips batch to import into.
-        self.assertIn(self.driver_1, wizard.allowed_employee_ids)
-        # Days with nothing typed in them leave only what can be imported.
         self._entry(self.ot, self.emp_a2, user=self.sup_a, date='2029-03-20')
         wizard.write({'date_from': '2029-03-02', 'date_to': '2029-03-05'})
         self.assertNotIn(self.emp_a2, wizard.allowed_employee_ids)

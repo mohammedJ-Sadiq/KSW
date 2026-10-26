@@ -876,6 +876,9 @@ class KswPayBatch(models.Model):
                 'submitted_date': False,
                 'handed_over_date': False,
             })
+            # Back in draft, the rows go with any sub-batch their employee
+            # is being prepared in — as if typed now.
+            rec.entry_ids._join_open_sub_batch()
             rec.entry_ids.x_sub_batch_id._sync_state_from_entries()
             rec.sudo().message_post(
                 body=Markup(
@@ -935,6 +938,7 @@ class KswPayBatch(models.Model):
                     'state': 'draft', 'submitted_by': False,
                     'submitted_date': False, 'handed_over_date': False})
                 rec.submission_id._sync_state_from_entries()
+                rec.entry_ids._join_open_sub_batch()
                 continue
             if rec.state == 'approved':
                 raise UserError(_(
@@ -953,6 +957,10 @@ class KswPayBatch(models.Model):
             rec.with_context(ksw_entry_sync=True).write({
                 'state': 'draft', 'submitted_by': False,
                 'submitted_date': False, 'handed_over_date': False})
+            # Taken back while a sub-batch is being prepared for some of
+            # its employees: their rows join it, as if typed now (SUB00007,
+            # KSWCO Oct 2026 — the Friday Work row stayed behind).
+            rows._join_open_sub_batch()
         self.mapped('submission_id.run_id')._refresh_register()
         return True
 
@@ -1042,7 +1050,8 @@ class KswPayBatch(models.Model):
         self._check_editable_batch(_("Sending employees early"))
         self._ensure_submission()
         self.submission_id._check_mine()
-        return self.submission_id.action_submit_prompt()
+        return self.env['ksw.pay.submit.wizard']._open_for(
+            self.submission_id, batch=self)
 
     def action_new_sub_batch(self):
         """The old "Sub-Batch" button's name. A browser tab left open across
@@ -1131,6 +1140,14 @@ class KswPayEntry(models.Model):
     x_sub_batch_id = fields.Many2one(
         'ksw.pay.sub.batch', string='Sub-Batch', readonly=True, copy=False,
         index=True, ondelete='set null')
+    # Left out of the early handover for this component: the employee went
+    # in a sub-batch, but this pay type waits for the month end. Inherited
+    # by his later rows in the same batch, so typing one more Friday does
+    # not quietly put the component back in.
+    x_sub_batch_left_out = fields.Boolean(
+        string='Waits for Month End', readonly=True, copy=False,
+        help='Left out of the employee\'s sub-batch for this component — '
+             'paid with the rest of the month.')
     x_return_reason = fields.Text(
         string='Returned Because', readonly=True, copy=False)
     currency_id = fields.Many2one(
@@ -1958,6 +1975,7 @@ class KswPayEntry(models.Model):
         entries._apply_paid_day()
         entries._check_employee_allowed()
         entries._check_vacation_hold(_("Adding an entry"))
+        entries._inherit_sub_batch_left_out()
         entries._join_open_sub_batch()
         return entries
 
@@ -2008,7 +2026,7 @@ class KswPayEntry(models.Model):
         submitting the sub-batch takes everything he is owed so far."""
         SubBatch = self.env['ksw.pay.sub.batch'].sudo()
         for rec in self.sudo():
-            if rec.state != 'draft':
+            if rec.state != 'draft' or rec.x_sub_batch_left_out:
                 continue
             submission = rec.batch_id.submission_id
             target = SubBatch
@@ -2027,6 +2045,72 @@ class KswPayEntry(models.Model):
             if rec.x_sub_batch_id != target and (
                     target or rec.x_sub_batch_id.state in ('draft', 'returned')):
                 rec.x_sub_batch_id = target
+
+    def _inherit_sub_batch_left_out(self):
+        """A new row of an employee whose component was left out of his
+        sub-batch stays out with the others."""
+        Entry = self.env['ksw.pay.entry'].sudo()
+        for rec in self.sudo().filtered(
+                lambda e: e.state == 'draft' and not e.x_sub_batch_left_out):
+            if Entry.search_count([
+                    ('id', '!=', rec.id), ('batch_id', '=', rec.batch_id.id),
+                    ('employee_id', '=', rec.employee_id.id),
+                    ('state', '=', 'draft'),
+                    ('x_sub_batch_left_out', '=', True)], limit=1):
+                rec.x_sub_batch_left_out = True
+
+    def _component_rows(self):
+        """This employee's draft rows in this batch — the unit a component
+        is left out of, or put back into, a sub-batch."""
+        self.ensure_one()
+        return self.env['ksw.pay.entry'].sudo().search([
+            ('batch_id', '=', self.batch_id.id),
+            ('employee_id', '=', self.employee_id.id),
+            ('state', '=', 'draft')])
+
+    def action_leave_out_of_sub_batch(self):
+        """Keep this component of the employee out of his sub-batch: it
+        waits for the month end with everybody else's."""
+        self.ensure_one()
+        sub = self.sudo().x_sub_batch_id
+        if not sub:
+            raise UserError(_("This entry is not in a sub-batch."))
+        sub._check_can_prepare(_("Leaving entries out"))
+        rows = self._component_rows().filtered(
+            lambda e: e.x_sub_batch_id == sub)
+        rows.write({'x_sub_batch_left_out': True, 'x_sub_batch_id': False})
+        sub.sudo().message_post(
+            body=Markup(
+                '<b>%(l_out)s</b> %(what)s — %(emp)s (%(n)s, %(amt).2f)<br/>'
+                '<i>%(note)s</i>'
+            ) % {
+                'l_out': _('Left out:'),
+                'what': self.sudo().component_id.name,
+                'emp': self.employee_id.sudo().name,
+                'n': len(rows), 'amt': sum(rows.mapped('amount')),
+                'note': _('Paid with the rest of the month.'),
+            },
+            subtype_xmlid='mail.mt_note')
+        return {'type': 'ir.actions.client', 'tag': 'soft_reload'}
+
+    def action_put_back_in_sub_batch(self):
+        """Undo Leave Out: this component goes with the employee's open
+        sub-batch again."""
+        self.ensure_one()
+        self.batch_id._check_editable_batch(_("Putting entries back"))
+        rows = self._component_rows().filtered('x_sub_batch_left_out')
+        rows.write({'x_sub_batch_left_out': False})
+        rows._join_open_sub_batch()
+        sub = rows.x_sub_batch_id[:1]
+        if sub:
+            sub._check_can_prepare(_("Putting entries back"))
+            sub.sudo().message_post(
+                body=Markup('<b>%(l_in)s</b> %(what)s — %(emp)s') % {
+                    'l_in': _('Put back:'),
+                    'what': self.sudo().component_id.name,
+                    'emp': self.employee_id.sudo().name},
+                subtype_xmlid='mail.mt_note')
+        return {'type': 'ir.actions.client', 'tag': 'soft_reload'}
 
     def _handed_over(self):
         """The submitted rows the General Manager actually has in front of

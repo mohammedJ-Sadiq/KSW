@@ -171,6 +171,12 @@
                                     <field name="x_vacation_settlement"
                                            decoration-info="x_vacation_settlement"
                                            optional="show"/>
+                                    <button name="action_leave_out_of_sub_batch"
+                                            type="object" icon="fa-sign-out"
+                                            string="Leave Out"
+                                            title="Leave this pay type out of the sub-batch: it waits for the month end"
+                                            confirm="Leave this employee's entries of this pay type out of the sub-batch? They will be paid with the rest of the month."
+                                            invisible="state != 'draft' or not parent.x_can_edit"/>
                                     <field name="currency_id"
                                            column_invisible="1"/>
                                 </list>
@@ -269,6 +275,7 @@
                      computed from it (Odoo 19 Pitfalls #40). -->
                 <field name="allowed_employee_ids" invisible="1"/>
                 <field name="has_returned_sub_batch" invisible="1"/>
+                <field name="batch_id" invisible="1"/>
                 <p>What are you sending to the General Manager?</p>
                 <group>
                     <field name="mode" widget="radio" nolabel="1" colspan="2"/>
@@ -310,6 +317,16 @@
                                required="mode == 'early' and target == 'new'"
                                placeholder="e.g. Annual leave from 12 October"/>
                     </group>
+                    <div class="alert alert-info" role="status"
+                         invisible="not batch_hint">
+                        <field name="batch_hint" nolabel="1"/>
+                    </div>
+                    <div class="text-muted" invisible="not batch_id">
+                        Only employees with entries in
+                        <field name="batch_id" class="d-inline" readonly="1"
+                               options="{'no_open': True}"/>
+                        are listed.
+                    </div>
                     <field name="employee_ids" nolabel="1"
                            options="{'no_create': True}">
                         <list>

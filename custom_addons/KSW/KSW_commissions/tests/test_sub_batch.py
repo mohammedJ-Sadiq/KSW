@@ -550,3 +550,62 @@ class TestPaidIsFinal(SubBatchCommon):
         # The department's own approval steps back; the early one stands.
         self.assertEqual(self.ot_a2.state, 'submitted')
         self.assertEqual(self.ot_a.state, 'approved')
+
+
+class TestSubBatchComponentScope(TestSubmitPrompt):
+    """SUB00007, KSWCO Oct 2026: a supervisor submitted each component on
+    its own, took one back, sent the employee early, then took back his
+    Friday Work batch — whose row never joined the sub-batch. Sending early
+    from that batch then offered nobody ("No records found")."""
+
+    def test_80_a_batch_taken_back_joins_the_open_sub_batch(self):
+        self.meals_batch.with_user(self.sup_a).action_submit()
+        self.assertEqual(self.meal_a.state, 'submitted')
+        sub = self._early(self.emp_a, send=False)
+        self.assertNotIn(self.meal_a, sub.entry_ids)
+        self.meals_batch.with_user(self.sup_a).action_reset_to_draft()
+        self.assertEqual(self.meal_a.state, 'draft')
+        self.assertEqual(self.meal_a.x_sub_batch_id, sub)
+
+    def test_81_send_early_from_a_batch_lists_its_people_only(self):
+        action = self.meals_batch.with_user(self.sup_a).action_send_early()
+        wizard = self.env['ksw.pay.submit.wizard'].with_user(
+            self.sup_a).browse(action['res_id'])
+        self.assertEqual(wizard.batch_id, self.meals_batch)
+        # emp_a2 has Overtime only, no meals.
+        self.assertEqual(wizard.allowed_employee_ids, self.emp_a)
+        self.assertFalse(wizard.batch_hint)
+
+    def test_82_already_sent_is_said_not_left_empty(self):
+        self._early(self.emp_a, send=False)
+        action = self.meals_batch.with_user(self.sup_a).action_send_early()
+        wizard = self.env['ksw.pay.submit.wizard'].with_user(
+            self.sup_a).browse(action['res_id'])
+        self.assertFalse(wizard.allowed_employee_ids)
+        self.assertIn(self.emp_a.name, wizard.batch_hint)
+
+    def test_83_leave_one_component_out_and_put_it_back(self):
+        sub = self._early(self.emp_a, send=False)
+        self.assertEqual(sub.entry_ids, self.ot_a | self.meal_a)
+        self.meal_a.with_user(self.sup_a).action_leave_out_of_sub_batch()
+        self.assertEqual(sub.entry_ids, self.ot_a)
+        self.assertTrue(self.meal_a.x_sub_batch_left_out)
+        # A later meal of his stays out too, and submitting leaves it alone.
+        late = self._entry(self.meals_batch, self.emp_a, user=self.sup_a)
+        self.assertFalse(late.x_sub_batch_id)
+        sub.with_user(self.sup_a).action_submit()
+        self.assertEqual((self.meal_a | late).mapped('state'),
+                         ['draft', 'draft'])
+        self.assertEqual(self.ot_a.state, 'submitted')
+
+    def test_84_put_back_rejoins(self):
+        sub = self._early(self.emp_a, send=False)
+        self.meal_a.with_user(self.sup_a).action_leave_out_of_sub_batch()
+        self.meal_a.with_user(self.sup_a).action_put_back_in_sub_batch()
+        self.assertFalse(self.meal_a.x_sub_batch_left_out)
+        self.assertEqual(self.meal_a.x_sub_batch_id, sub)
+
+    def test_85_nobody_leaves_out_of_a_submitted_sub_batch(self):
+        self._early(self.emp_a)
+        with self.assertRaises(UserError):
+            self.meal_a.with_user(self.sup_a).action_leave_out_of_sub_batch()
