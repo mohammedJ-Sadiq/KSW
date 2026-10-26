@@ -114,6 +114,46 @@ NUMBER_RE = re.compile(r'\d+')
 TEDDER_RE = re.compile(r'(?:خزان|تيدر)\s*(?:رقم)?\s*(\d+)')
 
 
+# Which tank a request is about, judged on «المعني بالطلب» (who) AND «نوع الطلب»
+# (desc): «تريلا 171 رشيد» + «خزان 169 يحتاج لحام» is tedder 169, not T171.
+_DIGITS = str.maketrans('٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹', '01234567890123456789')
+TANK_RE = re.compile(r'(?:خزان|خزن|تيدر)\s*(?:رقم)?\s*[.,،:]*\s*(\d{1,3})(?!\d)')
+HEAD_RE = re.compile(r'(?:تريلا|تريله|سيارة|سياره|راس|رأس)\s*(?:رقم)?\s*[.,،:]*\s*(\d{1,3})(?!\d)')
+# Work that only a head has. One of these beside a tank number means the row
+# covers both vehicles: it goes to review, never to the tedder.
+HEAD_WORK_RE = re.compile(r'زيت|مكين|دركسون|ردكسيون|قير|كلتش|رديتر|راديتر|غمار|ديزل|سولار|راس|رأس|سياره|سيارة|التريلا|للتريلا|تريلا')
+# «(التريلا متوقفه)» says the rig is stopped, not that the head needs work.
+STOPPED_RE = re.compile(r'(?:ال)?(?:تريلا|سياره|سيارة)\s*(?:متوقف|منتظر|واقف)\S*')
+
+
+def _norm(text):
+    return (text or '').translate(_DIGITS)
+
+
+def _tank_of_request(who, desc):
+    """Returns ('move', N) / ('review', reason) / (None, None)."""
+    desc, who = _norm(desc), _norm(who)
+    d_tanks, d_heads = set(map(int, TANK_RE.findall(desc))), set(map(int, HEAD_RE.findall(desc)))
+    if d_tanks:
+        if len(d_tanks) > 1:
+            return 'review', 'description names several tanks %s' % sorted(d_tanks)
+        if d_heads:
+            return 'review', 'description names a head %s and a tank %s' % (sorted(d_heads), sorted(d_tanks))
+        if HEAD_WORK_RE.search(STOPPED_RE.sub(' ', desc)):
+            return 'review', 'description has head work beside tank %s' % sorted(d_tanks)
+        return 'move', d_tanks.pop()
+    if d_heads:
+        return None, None
+    w_tanks, w_heads = set(map(int, TANK_RE.findall(who))), set(map(int, HEAD_RE.findall(who)))
+    if len(w_tanks) == 1 and not w_heads:
+        if HEAD_WORK_RE.search(STOPPED_RE.sub(' ', desc)):
+            return 'review', 'description has head work, requester line names tank %s' % sorted(w_tanks)
+        return 'move', w_tanks.pop()
+    if w_tanks:
+        return 'review', 'requester line names %s' % who.strip()
+    return None, None
+
+
 def _parse_date(value):
     value = (value or '').strip()
     if not value:
@@ -330,6 +370,13 @@ def _import_row(env, caches, seen_uids, report, *, uid, employee_email, employee
 
     vehicle, vflag = _resolve_vehicle(
         caches, explicit_vehicle_code, vehicle_fallback_text, requester_email=employee_email)
+    code = (explicit_vehicle_code or '').strip().replace(' ', '')
+    verdict, tank_no = _tank_of_request(vehicle_fallback_text, description)
+    if verdict == 'move' and vehicle.vehicle_type != 'tank' and (not code or code.isdigit()):
+        tedder = env['ksw.fleet.vehicle'].search(
+            [('vehicle_type', '=', 'tank'), ('name', '=', 'تيدر %d' % tank_no)], limit=1)
+        if tedder:
+            vehicle, vflag = tedder, None
     if vflag:
         flags.append(vflag)
 
