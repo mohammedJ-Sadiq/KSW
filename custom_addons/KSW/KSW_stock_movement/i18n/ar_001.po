@@ -1,0 +1,521 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_stock_movement
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-27 18:44+0000\n"
+"PO-Revision-Date: 2026-10-27 18:44+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar_001\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_stock_movement
+#. odoo-python
+#: code:addons/KSW_stock_movement/wizard/stock_movement_wizard.py:0
+msgid ""
+"%(count)s movements match this selection, more than %(max)s can be shown at "
+"once. Choose a shorter period, fewer stocks or particular items."
+msgstr ""
+"يطابق هذا الاختيار %(count)s حركة، وهذا أكثر من %(max)s يمكن عرضها مرة "
+"واحدة. اختر فترة أقصر أو مخازن أقل أو أصنافاً محددة."
+
+#. module: KSW_stock_movement
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_wizard_form
+msgid "All categories"
+msgstr "كل الفئات"
+
+#. module: KSW_stock_movement
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_wizard_form
+msgid "All items"
+msgstr "كل الأصناف"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__layout__flat
+msgid "All lines, no grouping"
+msgstr "كل الحركات بدون تجميع"
+
+#. module: KSW_stock_movement
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_wizard_form
+msgid "All operations"
+msgstr "كل العمليات"
+
+#. module: KSW_stock_movement
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_wizard_form
+msgid "All partners"
+msgstr "كل الشركاء"
+
+#. module: KSW_stock_movement
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_wizard_form
+msgid "All stock locations"
+msgstr "كل مواقع المخزون"
+
+#. module: KSW_stock_movement
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_wizard_form
+msgid "All warehouses"
+msgstr "كل المستودعات"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,help:KSW_stock_movement.field_ksw_stock_movement_wizard__include_pending
+msgid ""
+"Also list transfers that are planned or ready but not validated. They are "
+"marked as such and are left out of the opening balance."
+msgstr ""
+"إظهار التحويلات المخططة أو الجاهزة التي لم تُعتمد بعد أيضاً. تُميَّز بذلك "
+"ولا تدخل في الرصيد الافتتاحي."
+
+#. module: KSW_stock_movement
+#. odoo-python
+#: code:addons/KSW_stock_movement/wizard/stock_movement_wizard.py:0
+msgid "Choose what to group by, or show all lines without grouping."
+msgstr "اختر طريقة التجميع، أو اعرض كل الحركات بدون تجميع."
+
+#. module: KSW_stock_movement
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_wizard_form
+msgid "Close"
+msgstr "إغلاق"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__create_uid
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_wizard__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__create_date
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_wizard__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__date
+msgid "Date"
+msgstr "التاريخ"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by_2__day
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by__day
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_search
+msgid "Day"
+msgstr "اليوم"
+
+#. module: KSW_stock_movement
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_search
+msgid "Delivered, Not Invoiced"
+msgstr "مسلَّم ولم يُفوتر"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__display_name
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_wizard__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__reference
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by_2__document
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by__document
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_search
+msgid "Document"
+msgstr "المستند"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_line__state__done
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_search
+msgid "Done"
+msgstr "منجز"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,help:KSW_stock_movement.field_ksw_stock_movement_wizard__warehouse_ids
+msgid "Every stock location inside these warehouses."
+msgstr "كل مواقع المخزون داخل هذه المستودعات."
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,help:KSW_stock_movement.field_ksw_stock_movement_line__invoice_status
+msgid ""
+"For a delivery made from a sales order: whether that order line has been "
+"invoiced yet."
+msgstr "للتسليم الناتج عن أمر بيع: هل تمت فوترة سطر الأمر بعد."
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_wizard__date_from
+msgid "From"
+msgstr "من"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__other_location_id
+msgid "From / To"
+msgstr "من / إلى"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_wizard__group_by
+msgid "Group By"
+msgstr "تجميع حسب"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__layout__collapsed
+msgid "Grouped, collapsed (totals per group)"
+msgstr "مجمّع ومطوي (إجماليات لكل مجموعة)"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__layout__expanded
+msgid "Grouped, expanded (every line under its group)"
+msgstr "مجمّع وموسّع (كل حركة تحت مجموعتها)"
+
+#. module: KSW_stock_movement
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_wizard_form
+msgid "How to Show Them"
+msgstr "طريقة العرض"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__id
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_wizard__id
+msgid "ID"
+msgstr ""
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__qty_in
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_line__kind__in
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_search
+msgid "In"
+msgstr "وارد"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by_2__kind
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by__kind
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_search
+msgid "In / Out"
+msgstr "وارد / صادر"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,help:KSW_stock_movement.field_ksw_stock_movement_line__qty_net
+msgid ""
+"In minus Out. Summed per item with the opening row, it is the balance at the"
+" end of the period."
+msgstr ""
+"الوارد ناقص الصادر. مجموعه لكل صنف مع سطر الرصيد الافتتاحي هو الرصيد في "
+"نهاية الفترة."
+
+#. module: KSW_stock_movement
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_wizard_form
+msgid "Include"
+msgstr "تضمين"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_wizard__include_pending
+msgid "Include Not Yet Validated"
+msgstr "تضمين غير المعتمد بعد"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__invoice_status
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by_2__invoice_status
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by__invoice_status
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_search
+msgid "Invoice Status"
+msgstr "حالة الفوترة"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_line__invoice_status__invoiced
+msgid "Invoiced"
+msgstr "مفوتر"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__product_id
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by_2__product
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by__product
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_search
+msgid "Item"
+msgstr "الصنف"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_wizard__categ_ids
+msgid "Item Categories"
+msgstr "فئات الأصناف"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__categ_id
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by_2__category
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by__category
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_search
+msgid "Item Category"
+msgstr "فئة الصنف"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_wizard__product_ids
+msgid "Items"
+msgstr "الأصناف"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__write_uid
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_wizard__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__write_date
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_wizard__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_wizard__line_ids
+msgid "Line"
+msgstr ""
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__location_id
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by_2__location
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by__location
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_search
+msgid "Location"
+msgstr "الموقع"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by_2__month
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by__month
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_search
+msgid "Month"
+msgstr "الشهر"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__kind
+msgid "Movement"
+msgstr "الحركة"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__qty_net
+msgid "Net"
+msgstr "الصافي"
+
+#. module: KSW_stock_movement
+#. odoo-python
+#: code:addons/KSW_stock_movement/wizard/stock_movement_wizard.py:0
+msgid "No stock location matches this selection."
+msgstr "لا يوجد موقع مخزون يطابق هذا الاختيار."
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_line__state__pending
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_search
+msgid "Not Yet Validated"
+msgstr "غير معتمد بعد"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by_2__none
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by__none
+msgid "Nothing"
+msgstr "بدون"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_line__invoice_status__no
+msgid "Nothing to Invoice"
+msgstr "لا شيء للفوترة"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,help:KSW_stock_movement.field_ksw_stock_movement_wizard__show_opening
+msgid ""
+"One row per item and location with what had moved in and out before the "
+"period, so grouping by item shows the closing balance."
+msgstr ""
+"سطر لكل صنف وموقع بما دخل وخرج قبل الفترة، فيظهر الرصيد الختامي عند التجميع "
+"حسب الصنف."
+
+#. module: KSW_stock_movement
+#. odoo-python
+#: code:addons/KSW_stock_movement/wizard/stock_movement_wizard.py:0
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_line__kind__opening
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_search
+msgid "Opening Balance"
+msgstr "الرصيد الافتتاحي"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_wizard__show_opening
+msgid "Opening Balance Row"
+msgstr "سطر الرصيد الافتتاحي"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__picking_type_id
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by_2__picking_type
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by__picking_type
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_search
+msgid "Operation Type"
+msgstr "نوع العملية"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_wizard__picking_type_ids
+msgid "Operation Types"
+msgstr "أنواع العمليات"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__qty_out
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_line__kind__out
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_search
+msgid "Out"
+msgstr "صادر"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,help:KSW_stock_movement.field_ksw_stock_movement_wizard__location_ids
+msgid ""
+"Particular stock locations (and the locations inside them). Leave both this "
+"and Warehouses empty for every stock location."
+msgstr ""
+"مواقع مخزون محددة (والمواقع داخلها). اترك هذا الحقل وحقل المستودعات فارغين "
+"لكل مواقع المخزون."
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__partner_id
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by_2__partner
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by__partner
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_search
+msgid "Partner"
+msgstr "الشريك"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_wizard__partner_ids
+msgid "Partners"
+msgstr "الشركاء"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__sequence
+msgid "Sequence"
+msgstr ""
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_wizard__layout
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_wizard_form
+msgid "Show"
+msgstr "عرض"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__origin
+msgid "Source Document"
+msgstr "المستند المصدر"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__state
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by_2__state
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by__state
+msgid "Status"
+msgstr "الحالة"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_wizard__location_ids
+msgid "Stock Locations"
+msgstr "مواقع المخزون"
+
+#. module: KSW_stock_movement
+#: model:ir.actions.act_window,name:KSW_stock_movement.action_stock_movement_wizard
+#: model:ir.model,name:KSW_stock_movement.model_ksw_stock_movement_wizard
+#: model:ir.ui.menu,name:KSW_stock_movement.menu_stock_movement
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_graph
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_list
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_pivot
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_search
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_wizard_form
+msgid "Stock Movement"
+msgstr "حركة المخزون"
+
+#. module: KSW_stock_movement
+#. odoo-python
+#: code:addons/KSW_stock_movement/wizard/stock_movement_wizard.py:0
+msgid "Stock Movement %(from)s → %(to)s"
+msgstr "حركة المخزون %(from)s ← %(to)s"
+
+#. module: KSW_stock_movement
+#: model:ir.model,name:KSW_stock_movement.model_ksw_stock_movement_line
+msgid "Stock Movement Line"
+msgstr "سطر حركة المخزون"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,help:KSW_stock_movement.field_ksw_stock_movement_line__location_id
+msgid "The chosen stock this row moved into or out of."
+msgstr "المخزون المختار الذي دخلت إليه هذه الحركة أو خرجت منه."
+
+#. module: KSW_stock_movement
+#. odoo-python
+#: code:addons/KSW_stock_movement/wizard/stock_movement_wizard.py:0
+msgid "The start date is after the end date."
+msgstr "تاريخ البداية بعد تاريخ النهاية."
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_wizard__group_by_2
+msgid "Then By"
+msgstr "ثم حسب"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_wizard__date_to
+msgid "To"
+msgstr "إلى"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_line__invoice_status__to_invoice
+msgid "To Invoice"
+msgstr "للفوترة"
+
+#. module: KSW_stock_movement
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_list
+msgid "Total"
+msgstr "الإجمالي"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__picking_id
+msgid "Transfer"
+msgstr "التحويل"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__uom_id
+msgid "Unit"
+msgstr "الوحدة"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_line__invoice_status__upselling
+msgid "Upselling Opportunity"
+msgstr "فرصة بيع إضافي"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__warehouse_id
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by_2__warehouse
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by__warehouse
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_search
+msgid "Warehouse"
+msgstr "المستودع"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_wizard__warehouse_ids
+msgid "Warehouses"
+msgstr "المستودعات"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by_2__week
+#: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by__week
+msgid "Week"
+msgstr "الأسبوع"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,help:KSW_stock_movement.field_ksw_stock_movement_line__other_location_id
+msgid "Where it came from (In) or went to (Out)."
+msgstr "من أين جاءت (وارد) أو إلى أين ذهبت (صادر)."
+
+#. module: KSW_stock_movement
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_wizard_form
+msgid "Which Movements"
+msgstr "أي الحركات"
+
+#. module: KSW_stock_movement
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_wizard_form
+msgid "Which Period"
+msgstr "أي فترة"
+
+#. module: KSW_stock_movement
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_wizard_form
+msgid "Which Stocks"
+msgstr "أي المخازن"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__wizard_id
+msgid "Wizard"
+msgstr ""

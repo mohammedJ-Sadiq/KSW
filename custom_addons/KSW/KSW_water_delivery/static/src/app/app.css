@@ -201,6 +201,10 @@ button { font: inherit; cursor: pointer; }
     border-radius: var(--ksw-radius); font-size: 0.9rem;
 }
 .ksw-warnbox:first-child { margin-top: 0; margin-bottom: 0.75rem; }
+.ksw-okbox {
+    margin-top: 0.75rem; padding: 0.75rem 0.85rem; background: var(--ksw-ok-soft); color: #14532d;
+    border-radius: var(--ksw-radius); font-size: 0.9rem;
+}
 
 /* -- Client location (pin) --------------------------------------------- */
 .ksw-pinbox {

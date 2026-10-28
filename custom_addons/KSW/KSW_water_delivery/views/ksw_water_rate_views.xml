@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- Client Rates: a view on the clients' own pricelist rules (Oct 2026).
+         The module used to keep its own rate register next to Odoo's
+         pricelists; a rate edited here IS the pricelist rule the Sales app
+         prices from, so the two can no longer disagree. A new row names the
+         client, and product.pricelist.item.create() files it in that
+         client's pricelist (creating and assigning it if needed). -->
     <record id="view_water_rate_list" model="ir.ui.view">
-        <field name="name">ksw.water.rate.list</field>
-        <field name="model">ksw.water.rate</field>
+        <field name="name">product.pricelist.item.water.rate.list</field>
+        <field name="model">product.pricelist.item</field>
+        <field name="priority">90</field>
         <field name="arch" type="xml">
-            <list string="Water Rates" editable="bottom" sample="1">
+            <list string="Client Rates" editable="bottom" sample="1">
                 <header>
                     <!-- display="always": a header button defaults to
                          display="selection" and only appears once a row is
@@ -15,41 +22,51 @@
                             class="btn-secondary"
                             groups="KSW_water_delivery.group_water_billing"/>
                 </header>
-                <field name="partner_id" context="{'res_partner_search_mode': 'customer'}"/>
-                <field name="product_id"/>
-                <field name="price"/>
-                <field name="uom_name" string="Per"/>
-                <field name="currency_id" column_invisible="1"/>
-                <field name="source" widget="badge"
-                       decoration-info="source == 'bas'"
-                       decoration-success="source == 'manual'"/>
+                <field name="x_client_id" string="Client" required="1"
+                       readonly="id"
+                       context="{'res_partner_search_mode': 'customer'}"
+                       options="{'no_create': True}"/>
+                <field name="product_id" string="Product" required="1"
+                       readonly="id" domain="[('sale_ok', '=', True)]"/>
+                <field name="fixed_price" string="Rate"/>
+                <field name="product_uom_name" string="Per"/>
+                <field name="min_quantity" optional="hide"/>
+                <field name="date_start" optional="hide"/>
+                <field name="date_end" optional="hide"/>
+                <field name="pricelist_id" optional="hide" readonly="1"/>
+                <field name="x_water_source" widget="badge" readonly="1"
+                       decoration-info="x_water_source == 'bas'"
+                       decoration-success="x_water_source == 'manual'"/>
                 <field name="x_bas_price" optional="show" string="BAS Price"/>
                 <field name="x_bas_date" optional="hide"/>
                 <field name="x_bas_branch" optional="hide"/>
+                <field name="compute_price" column_invisible="1"/>
+                <field name="applied_on" column_invisible="1"/>
+                <field name="currency_id" column_invisible="1"/>
                 <field name="company_id" column_invisible="1"/>
             </list>
         </field>
     </record>
 
     <record id="view_water_rate_search" model="ir.ui.view">
-        <field name="name">ksw.water.rate.search</field>
-        <field name="model">ksw.water.rate</field>
+        <field name="name">product.pricelist.item.water.rate.search</field>
+        <field name="model">product.pricelist.item</field>
+        <field name="priority">90</field>
         <field name="arch" type="xml">
-            <search string="Water Rates">
-                <field name="partner_id"/>
-                <field name="product_id"/>
+            <search string="Client Rates">
+                <field name="x_client_id" string="Client"/>
+                <field name="product_id" string="Product"/>
                 <filter name="from_bas" string="Imported from BAS9"
-                        domain="[('source', '=', 'bas')]"/>
+                        domain="[('x_water_source', '=', 'bas')]"/>
                 <filter name="manual" string="Entered in Odoo"
-                        domain="[('source', '=', 'manual')]"/>
+                        domain="[('x_water_source', '=', 'manual')]"/>
                 <separator/>
-                <!-- The register is maintained in Odoo from here on, so the
-                     useful question is which rates have since drifted from
-                     what BAS last charged. -->
+                <!-- Rates are maintained in Odoo, so the useful question is
+                     which have since drifted from what BAS last charged. -->
                 <filter name="differs_from_bas" string="Differs from BAS9"
-                        domain="[('x_bas_price', '!=', False), ('price', '!=', 'x_bas_price')]"/>
+                        domain="[('x_differs_from_bas', '=', True)]"/>
                 <group>
-                    <filter name="group_partner" string="Client" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_partner" string="Client" context="{'group_by': 'x_client_id'}"/>
                     <filter name="group_product" string="Product" context="{'group_by': 'product_id'}"/>
                     <filter name="group_branch" string="BAS Branch" context="{'group_by': 'x_bas_branch'}"/>
                 </group>
@@ -59,14 +76,18 @@
 
     <record id="action_water_rates" model="ir.actions.act_window">
         <field name="name">Client Rates</field>
-        <field name="res_model">ksw.water.rate</field>
+        <field name="res_model">product.pricelist.item</field>
         <field name="view_mode">list</field>
+        <field name="view_id" ref="view_water_rate_list"/>
         <field name="search_view_id" ref="view_water_rate_search"/>
+        <field name="domain">[('x_client_id', '!=', False), ('compute_price', '=', 'fixed'), ('applied_on', 'in', ['0_product_variant', '1_product'])]</field>
+        <field name="context">{'default_compute_price': 'fixed', 'default_applied_on': '0_product_variant'}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">No rates yet</p>
             <p>
-                A rate is what one client pays for one product. It decides the
-                price on the delivery note, which clients the drivers may
+                A rate is what one client pays for one product, kept on that
+                client's own pricelist. It decides the price on the delivery
+                note and on sales orders, which clients the drivers may
                 deliver to, and which products they may pick.
             </p>
             <p>Use <b>Import Rates from BAS9</b> to seed them from what BAS actually charged.</p>

@@ -4,9 +4,6 @@ access_water_delivery_wizard_dispatcher,ksw.water.delivery.wizard.dispatcher,mod
 access_water_picking_driver,stock.picking.water.driver,stock.model_stock_picking,group_water_driver,1,0,0,0
 access_water_picking_dispatcher,stock.picking.water.dispatcher,stock.model_stock_picking,group_water_dispatcher,1,1,0,0
 access_water_picking_billing,stock.picking.water.billing,stock.model_stock_picking,group_water_billing,1,0,0,0
-access_water_rate_driver,ksw.water.rate.driver,model_ksw_water_rate,group_water_driver,1,0,0,0
-access_water_rate_dispatcher,ksw.water.rate.dispatcher,model_ksw_water_rate,group_water_dispatcher,1,0,0,0
-access_water_rate_billing,ksw.water.rate.billing,model_ksw_water_rate,group_water_billing,1,1,1,1
 access_water_client_branch_driver,ksw.water.client.branch.driver,model_ksw_water_client_branch,group_water_driver,1,0,0,0
 access_water_client_branch_dispatcher,ksw.water.client.branch.dispatcher,model_ksw_water_client_branch,group_water_dispatcher,1,1,1,1
 access_water_client_branch_billing,ksw.water.client.branch.billing,model_ksw_water_client_branch,group_water_billing,1,1,1,1
@@ -23,6 +20,14 @@ access_water_tanker_group_hr_manager,ksw.water.tanker.group.hr.manager,model_ksw
 access_water_tanker_group_dispatcher,ksw.water.tanker.group.dispatcher,model_ksw_water_tanker_group,group_water_dispatcher,1,0,0,0
 access_water_dispatch_dispatch,ksw.water.dispatch.dispatch,model_ksw_water_dispatch,group_water_dispatch,1,1,1,1
 access_water_dispatch_supervisor,ksw.water.dispatch.supervisor,model_ksw_water_dispatch,group_water_dispatcher,1,0,0,0
-access_water_rate_dispatch,ksw.water.rate.dispatch,model_ksw_water_rate,group_water_dispatch,1,0,0,0
 access_water_client_branch_dispatch,ksw.water.client.branch.dispatch,model_ksw_water_client_branch,group_water_dispatch,1,0,0,0
 access_water_tanker_dispatch,ksw.fleet.vehicle.water.dispatch,KSW_fleet.model_ksw_fleet_vehicle,group_water_dispatch,1,0,0,0
+access_pricelist_water_billing,product.pricelist.water.billing,product.model_product_pricelist,group_water_billing,1,1,1,1
+access_pricelist_item_water_billing,product.pricelist.item.water.billing,product.model_product_pricelist_item,group_water_billing,1,1,1,1
+access_water_picking_gm,stock.picking.water.gm,stock.model_stock_picking,group_water_gm,1,0,0,0
+access_water_capture_gm,ksw.water.capture.gm,model_ksw_water_capture,group_water_gm,1,0,0,0
+access_water_dispatch_gm,ksw.water.dispatch.gm,model_ksw_water_dispatch,group_water_gm,1,0,0,0
+access_water_location_request_gm,ksw.water.location.request.gm,model_ksw_water_location_request,group_water_gm,1,0,0,0
+access_water_client_branch_gm,ksw.water.client.branch.gm,model_ksw_water_client_branch,group_water_gm,1,0,0,0
+access_water_tanker_group_gm,ksw.water.tanker.group.gm,model_ksw_water_tanker_group,group_water_gm,1,0,0,0
+access_water_revenue_account_gm,ksw.water.revenue.account.gm,model_ksw_water_revenue_account,group_water_gm,1,0,0,0

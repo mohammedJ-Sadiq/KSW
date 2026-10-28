@@ -239,8 +239,8 @@ class TestDispatchOverTheAppRoutes(HttpCase):
             'invoice_policy': 'delivery', 'sale_ok': True,
         })
         self.client = env['res.partner'].create({'name': 'Dispatch Client', 'customer_rank': 1})
-        env['ksw.water.rate'].create({
-            'partner_id': self.client.id, 'product_id': product.id, 'price': 50.0})
+        env['product.pricelist.item'].create({
+            'x_client_id': self.client.id, 'product_id': product.id, 'fixed_price': 50.0})
         env['ksw.water.client.branch'].create({
             'partner_id': self.client.id, 'branch_code': '172'})
         self.dispatch = env['ksw.water.dispatch'].create({

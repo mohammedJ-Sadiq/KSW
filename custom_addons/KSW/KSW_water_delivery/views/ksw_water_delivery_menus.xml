@@ -17,12 +17,14 @@
         <field name="code">
 oversees = (env.user.has_group('KSW_water_delivery.group_water_dispatcher')
             or env.user.has_group('KSW_water_delivery.group_water_billing'))
-if env.user.has_group('KSW_water_delivery.group_water_dispatch'):
-    action = env['ir.actions.act_window']._for_xml_id(
-        'KSW_water_delivery.action_water_dispatches')
-elif oversees:
+# Supervisor and General Manager include Dispatcher (Oct 2026), so whoever
+# oversees is asked first: only a pure Dispatcher opens on his dispatches.
+if oversees:
     action = env['ir.actions.act_window']._for_xml_id(
         'KSW_water_delivery.action_water_delivery_all_notes')
+elif env.user.has_group('KSW_water_delivery.group_water_dispatch'):
+    action = env['ir.actions.act_window']._for_xml_id(
+        'KSW_water_delivery.action_water_dispatches')
 else:
     action = env['ir.actions.act_url']._for_xml_id(
         'KSW_water_delivery.action_water_driver_app')
@@ -34,7 +36,7 @@ else:
               action="action_water_delivery_home"
               web_icon="KSW_water_delivery,static/description/icon.png"
               sequence="47"
-              groups="KSW_water_delivery.group_water_driver,KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing,KSW_water_delivery.group_water_dispatch"/>
+              groups="KSW_water_delivery.group_water_driver,KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing,KSW_water_delivery.group_water_dispatch,KSW_water_delivery.group_water_gm"/>
 
     <menuitem id="menu_water_delivery_new"
               name="New Delivery"
@@ -71,14 +73,14 @@ else:
               parent="menu_water_delivery_operations"
               action="action_water_dispatches"
               sequence="10"
-              groups="KSW_water_delivery.group_water_dispatch,KSW_water_delivery.group_water_dispatcher"/>
+              groups="KSW_water_delivery.group_water_dispatch,KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_gm"/>
 
     <menuitem id="menu_water_delivery_all_notes"
               name="Delivery Notes"
               parent="menu_water_delivery_operations"
               action="action_water_delivery_all_notes"
               sequence="20"
-              groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing"/>
+              groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing,KSW_water_delivery.group_water_gm"/>
 
     <!-- The dispatcher's queue. Sits next to the notes rather than under
          Configuration, because it is day-to-day work: a held delivery is one
@@ -88,7 +90,7 @@ else:
               parent="menu_water_delivery_operations"
               action="action_water_captures"
               sequence="30"
-              groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing"/>
+              groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing,KSW_water_delivery.group_water_gm"/>
 
     <!-- Also day-to-day work: under the enforce rule a client with no
          approved location cannot receive a note, so a pending one is a
@@ -98,7 +100,7 @@ else:
               parent="menu_water_delivery_clients"
               action="action_water_location_requests"
               sequence="10"
-              groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing"/>
+              groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing,KSW_water_delivery.group_water_gm"/>
 
     <!-- Who drives which tanker. The app fetches the tanker from here and
          never lets the driver choose, so this is dispatch's daily lever. -->
@@ -107,7 +109,7 @@ else:
               parent="menu_water_delivery_operations"
               action="action_water_tankers"
               sequence="40"
-              groups="KSW_water_delivery.group_water_dispatcher"/>
+              groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_gm"/>
 
     <!-- Month end. -->
     <menuitem id="menu_water_delivery_invoice"
@@ -123,7 +125,7 @@ else:
               name="Configuration"
               parent="menu_water_delivery_root"
               sequence="90"
-              groups="KSW_water_delivery.group_water_billing,base.group_system"/>
+              groups="KSW_water_delivery.group_water_billing,base.group_system,KSW_water_delivery.group_water_gm"/>
 
     <!-- Per branch: who starts a delivery (driver, or dispatcher) and who
          dispatches. The switch for the dispatch sequence. -->
@@ -139,7 +141,7 @@ else:
               parent="menu_water_delivery_config"
               action="action_water_rates"
               sequence="10"
-              groups="KSW_water_delivery.group_water_billing"/>
+              groups="KSW_water_delivery.group_water_billing,KSW_water_delivery.group_water_gm"/>
 
     <menuitem id="menu_water_delivery_revenue_accounts"
               name="Revenue Accounts"
@@ -153,6 +155,6 @@ else:
               parent="menu_water_delivery_config"
               action="action_water_client_branches"
               sequence="20"
-              groups="KSW_water_delivery.group_water_billing"/>
+              groups="KSW_water_delivery.group_water_billing,KSW_water_delivery.group_water_gm"/>
 
 </odoo>

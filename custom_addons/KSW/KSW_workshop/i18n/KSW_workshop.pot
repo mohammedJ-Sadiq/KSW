@@ -223,11 +223,6 @@ msgid "All, including unclassified"
 msgstr ""
 
 #. module: KSW_workshop
-#: model:ir.model.fields,field_description:KSW_workshop.field_res_users__x_workshop_assisted_manager_ids
-msgid "Also Raises Workshop Requests For"
-msgstr ""
-
-#. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_report_wizard__text_search
 msgid "Also Search Repair Notes For"
 msgstr ""
@@ -1411,11 +1406,6 @@ msgid "On Behalf Of"
 msgstr ""
 
 #. module: KSW_workshop
-#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_users_form_ksw_workshop_assistant
-msgid "Only for requesters this user does not report to..."
-msgstr ""
-
-#. module: KSW_workshop
 #. odoo-python
 #: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
 msgid "Only in-progress requests can be completed."
@@ -1628,6 +1618,7 @@ msgstr ""
 
 #. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_res_users__x_workshop_assists_display
+#: model:ir.model.fields,field_description:KSW_workshop.field_res_users__x_workshop_requester_for_ids
 msgid "Raises Workshop Requests For"
 msgstr ""
 
@@ -2575,15 +2566,6 @@ msgid ""
 msgstr ""
 
 #. module: KSW_workshop
-#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_users_form_ksw_workshop_assistant
-msgid ""
-"With the <b>Requester Assistant</b> role (Access Rights, KSW Workshop),\n"
-"                        this user raises requests for his own manager, if that manager is a\n"
-"                        workshop requester, and for anyone listed above. He picks only from\n"
-"                        their vehicles and sees only the requests he raised himself."
-msgstr ""
-
-#. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_keyword_suggestion__name
 msgid "Word"
 msgstr ""
@@ -2745,14 +2727,6 @@ msgid "Workshop request %s resubmitted"
 msgstr ""
 
 #. module: KSW_workshop
-#: model:ir.model.fields,help:KSW_workshop.field_res_users__x_workshop_assisted_manager_ids
-msgid ""
-"Workshop requesters this user raises requests for although he does not "
-"report to them. His own manager is included automatically. Has no effect "
-"without the Requester Assistant role."
-msgstr ""
-
-#. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_can_toggle_cash_customer
 msgid "X Can Toggle Cash Customer"
 msgstr ""
@@ -2883,4 +2857,55 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_workshop/models/ksw_workshop_part.py:0
 msgid "Repairs using “%s”"
+msgstr ""
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_res_users__x_workshop_assisted_manager_ids
+msgid "Added Workshop Requesters"
+msgstr ""
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_res_users__x_workshop_assisted_manager_ids
+msgid ""
+"Workshop requesters this user raises requests for although he does not "
+"report to them. Kept by the inverse of x_workshop_requester_for_ids; his own"
+" manager is included automatically unless excluded."
+msgstr ""
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_res_users__x_workshop_excluded_manager_ids
+msgid "Excluded Workshop Requesters"
+msgstr ""
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_res_users__x_workshop_requester_for_ids
+msgid ""
+"The workshop requesters this user raises requests for. Starts as his own "
+"manager; add or remove requesters for the workshop only, his reporting line "
+"elsewhere is unchanged."
+msgstr ""
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_users_form_ksw_workshop_assistant
+msgid "His own manager by default..."
+msgstr ""
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_users_form_ksw_workshop_assistant
+msgid ""
+"Whose vehicles a <b>Requester Assistant</b> follows is set in the\n"
+"                        Access Rights tab, under Raises Workshop Requests For."
+msgstr ""
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_users_form_ksw_workshop_assistant
+msgid ""
+"The workshop requesters this user raises requests for, on their vehicles\n"
+"                        only. It starts as his own manager; remove him or add others for the\n"
+"                        workshop only. Only those who are Workshop Requesters count."
+msgstr ""
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_res_users__x_workshop_is_assistant
+msgid "X Workshop Is Assistant"
 msgstr ""

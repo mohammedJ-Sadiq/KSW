@@ -101,7 +101,7 @@ class TestMonthEndInvoice(WaterDeliveryCommon):
 
     def test_a_rate_change_inside_the_period_is_its_own_section(self):
         self._note(entered_qty=1.0)
-        self.rate.price = 220.0
+        self.rate.fixed_price = 220.0
         self._note(entered_qty=1.0)
         invoice = self._invoice(self.customer)
         sections = invoice.invoice_line_ids.filtered(
@@ -363,8 +363,8 @@ class TestMonthEndInvoice(WaterDeliveryCommon):
         self.assertEqual(row.source, 'manual')
 
     def test_a_four_decimal_rate_shows_the_exact_trip_price(self):
-        self.rate.price = 16.5625
-        self.assertEqual(self.rate.price, 16.5625, 'the register keeps BAS\'s four decimals')
+        self.rate.fixed_price = 16.5625
+        self.assertEqual(self.rate.fixed_price, 16.5625, 'the register keeps BAS\'s four decimals')
         self._note(entered_qty=32.0)
         form = self._wizard(self.customer)
         with form.line_ids.edit(0) as row:

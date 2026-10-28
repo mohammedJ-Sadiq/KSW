@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- The group header carries In / Out / Net. Grouped by item, Net is the
+         closing balance: the opening row plus everything that moved. -->
+    <record id="view_stock_movement_line_list" model="ir.ui.view">
+        <field name="name">ksw.stock.movement.line.list</field>
+        <field name="model">ksw.stock.movement.line</field>
+        <field name="arch" type="xml">
+            <list string="Stock Movement" create="0" edit="0" delete="0"
+                  decoration-muted="state == 'pending'"
+                  decoration-info="kind == 'opening'"
+                  decoration-bf="kind == 'opening'">
+                <field name="date"/>
+                <field name="reference"/>
+                <field name="kind" optional="show"/>
+                <field name="location_id"/>
+                <field name="other_location_id" optional="show"/>
+                <field name="warehouse_id" optional="hide"/>
+                <field name="partner_id" optional="show"/>
+                <field name="product_id"/>
+                <field name="categ_id" optional="hide"/>
+                <field name="qty_in" sum="Total"/>
+                <field name="qty_out" sum="Total"/>
+                <field name="qty_net" sum="Total"/>
+                <field name="uom_id" optional="show"/>
+                <field name="picking_type_id" optional="hide"/>
+                <field name="origin" optional="hide"/>
+                <field name="state" optional="hide"/>
+                <field name="invoice_status" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_stock_movement_line_list_expanded" model="ir.ui.view">
+        <field name="name">ksw.stock.movement.line.list.expanded</field>
+        <field name="model">ksw.stock.movement.line</field>
+        <field name="inherit_id" ref="view_stock_movement_line_list"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <list position="attributes">
+                <attribute name="expand">1</attribute>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_stock_movement_line_pivot" model="ir.ui.view">
+        <field name="name">ksw.stock.movement.line.pivot</field>
+        <field name="model">ksw.stock.movement.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Stock Movement">
+                <field name="product_id" type="row"/>
+                <field name="kind" type="col"/>
+                <field name="qty_net" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_stock_movement_line_graph" model="ir.ui.view">
+        <field name="name">ksw.stock.movement.line.graph</field>
+        <field name="model">ksw.stock.movement.line</field>
+        <field name="arch" type="xml">
+            <graph string="Stock Movement" type="bar">
+                <field name="date" interval="day"/>
+                <field name="qty_out" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_stock_movement_line_search" model="ir.ui.view">
+        <field name="name">ksw.stock.movement.line.search</field>
+        <field name="model">ksw.stock.movement.line</field>
+        <field name="arch" type="xml">
+            <search string="Stock Movement">
+                <field name="product_id"/>
+                <field name="reference"/>
+                <field name="location_id"/>
+                <field name="partner_id"/>
+                <field name="origin"/>
+                <filter name="f_in" string="In" domain="[('kind', '=', 'in')]"/>
+                <filter name="f_out" string="Out" domain="[('kind', '=', 'out')]"/>
+                <filter name="f_opening" string="Opening Balance" domain="[('kind', '=', 'opening')]"/>
+                <separator/>
+                <filter name="f_done" string="Done" domain="[('state', '=', 'done')]"/>
+                <filter name="f_pending" string="Not Yet Validated" domain="[('state', '=', 'pending')]"/>
+                <separator/>
+                <filter name="f_to_invoice" string="Delivered, Not Invoiced"
+                        domain="[('invoice_status', '=', 'to invoice')]"/>
+                <group>
+                    <filter name="g_day" string="Day" context="{'group_by': 'date:day'}"/>
+                    <filter name="g_month" string="Month" context="{'group_by': 'date:month'}"/>
+                    <filter name="g_location" string="Location" context="{'group_by': 'location_id'}"/>
+                    <filter name="g_warehouse" string="Warehouse" context="{'group_by': 'warehouse_id'}"/>
+                    <filter name="g_product" string="Item" context="{'group_by': 'product_id'}"/>
+                    <filter name="g_categ" string="Item Category" context="{'group_by': 'categ_id'}"/>
+                    <filter name="g_kind" string="In / Out" context="{'group_by': 'kind'}"/>
+                    <filter name="g_partner" string="Partner" context="{'group_by': 'partner_id'}"/>
+                    <filter name="g_type" string="Operation Type" context="{'group_by': 'picking_type_id'}"/>
+                    <filter name="g_document" string="Document" context="{'group_by': 'reference'}"/>
+                    <filter name="g_invoice" string="Invoice Status" context="{'group_by': 'invoice_status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+</odoo>

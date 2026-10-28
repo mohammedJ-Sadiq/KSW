@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-22 07:26+0000\n"
-"PO-Revision-Date: 2026-10-22 07:26+0000\n"
+"POT-Creation-Date: 2026-10-28 06:46+0000\n"
+"PO-Revision-Date: 2026-10-28 06:46+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -61,6 +61,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_client_multiplier/models/client_multiplier.py:0
 msgid "A client can have only one opening value."
+msgstr ""
+
+#. module: KSW_client_multiplier
+#: model:ir.model.constraint,message:KSW_client_multiplier.constraint_ksw_client_multiplier_client_identified
+msgid "A client multiplier needs a contact or a BAS customer."
 msgstr ""
 
 #. module: KSW_client_multiplier
@@ -262,15 +267,9 @@ msgid "Company"
 msgstr ""
 
 #. module: KSW_client_multiplier
+#: model:ir.model,name:KSW_client_multiplier.model_res_partner
 #: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier__partner_id
 msgid "Contact"
-msgstr ""
-
-#. module: KSW_client_multiplier
-#: model:ir.model.fields,help:KSW_client_multiplier.field_ksw_client_multiplier__partner_id
-msgid ""
-"Contact linked to this BAS customer account, either matched by name to an "
-"existing contact or created automatically by \"Match / Create Contacts\"."
 msgstr ""
 
 #. module: KSW_client_multiplier
@@ -290,6 +289,13 @@ msgid "Created on"
 msgstr ""
 
 #. module: KSW_client_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_client_multiplier_form
+msgid ""
+"Customer created in Odoo, no BAS account. It started at 1;\n"
+"                            change it with Request Change."
+msgstr ""
+
+#. module: KSW_client_multiplier
 #: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_rate__approved_by_id
 #: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_request__approved_by_id
 msgid "Decided By"
@@ -303,6 +309,11 @@ msgstr ""
 #. module: KSW_client_multiplier
 #: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_multiplier_request_form
 msgid "Decision"
+msgstr ""
+
+#. module: KSW_client_multiplier
+#: model:ir.model.fields.selection,name:KSW_client_multiplier.selection__ksw_client_multiplier_rate__source__default
+msgid "Default for a new customer"
 msgstr ""
 
 #. module: KSW_client_multiplier
@@ -321,6 +332,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_rate__display_name
 #: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_refuse_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_request__display_name
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_res_partner__display_name
 msgid "Display Name"
 msgstr ""
 
@@ -382,6 +394,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_rate__id
 #: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_refuse_wizard__id
 #: model:ir.model.fields,field_description:KSW_client_multiplier.field_ksw_client_multiplier_request__id
+#: model:ir.model.fields,field_description:KSW_client_multiplier.field_res_partner__id
 msgid "ID"
 msgstr ""
 
@@ -457,6 +470,7 @@ msgstr ""
 
 #. module: KSW_client_multiplier
 #: model:ir.actions.act_window,name:KSW_client_multiplier.action_multiplier_requests_to_approve
+#: model:ir.ui.menu,name:KSW_client_multiplier.menu_water_multiplier_approvals
 msgid "Multiplier Approvals"
 msgstr ""
 
@@ -540,6 +554,12 @@ msgstr ""
 #. module: KSW_client_multiplier
 #: model_terms:ir.actions.act_window,help:KSW_client_multiplier.action_client_multipliers
 msgid "No clients yet"
+msgstr ""
+
+#. module: KSW_client_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_client_multiplier_list
+#: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_client_multiplier_search
+msgid "Not in BAS"
 msgstr ""
 
 #. module: KSW_client_multiplier
@@ -789,6 +809,11 @@ msgid "This BAS customer already has a multiplier record."
 msgstr ""
 
 #. module: KSW_client_multiplier
+#: model:ir.model.constraint,message:KSW_client_multiplier.constraint_ksw_client_multiplier_partner_uniq
+msgid "This contact already has a multiplier record."
+msgstr ""
+
+#. module: KSW_client_multiplier
 #: model:ir.model.fields,help:KSW_client_multiplier.field_ksw_client_multiplier_request__activity_exception_decoration
 msgid "Type of the exception activity on record."
 msgstr ""
@@ -824,6 +849,20 @@ msgstr ""
 #. module: KSW_client_multiplier
 #: model_terms:ir.ui.view,arch_db:KSW_client_multiplier.view_multiplier_request_form
 msgid "Why should this client's multiplier change?"
+msgstr ""
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid ""
+"You are the General Manager who would approve this request, so you cannot "
+"raise it yourself. Ask a Supervisor to raise it."
+msgstr ""
+
+#. module: KSW_client_multiplier
+#. odoo-python
+#: code:addons/KSW_client_multiplier/models/multiplier_request.py:0
+msgid "You cannot decide on a request you raised yourself (%(ref)s)."
 msgstr ""
 
 #. module: KSW_client_multiplier

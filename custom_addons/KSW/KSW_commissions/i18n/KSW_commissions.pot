@@ -10888,7 +10888,7 @@ msgstr ""
 
 #. module: KSW_commissions
 #: model:ksw.pay.component,name:KSW_commissions.pay_component_gm_extra
-msgid "External Amount by the GM"
+msgid "Driver Trips Remainder"
 msgstr ""
 
 #. module: KSW_commissions

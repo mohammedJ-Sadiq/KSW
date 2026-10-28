@@ -17,6 +17,10 @@
                                context="{'res_partner_search_mode': 'customer'}"
                                placeholder="Leave empty to use the branch's client list"/>
                     </group>
+                    <group string="Accounting" groups="hr.group_hr_user">
+                        <field name="x_analytic_account_id" options="{'no_create': True}"
+                               placeholder="His own cost centre (Employee Cost Centre)"/>
+                    </group>
                     <group string="Supervisor" groups="hr.group_hr_manager">
                         <field name="x_water_tanker_group_ids" widget="many2many_tags"
                                options="{'no_create': True}"

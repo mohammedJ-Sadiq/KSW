@@ -238,11 +238,6 @@ msgid "All, including unclassified"
 msgstr "الكل، بما فيها غير المصنفة"
 
 #. module: KSW_workshop
-#: model:ir.model.fields,field_description:KSW_workshop.field_res_users__x_workshop_assisted_manager_ids
-msgid "Also Raises Workshop Requests For"
-msgstr "يرفع طلبات الورشة أيضاً نيابةً عن"
-
-#. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_report_wizard__text_search
 msgid "Also Search Repair Notes For"
 msgstr "البحث أيضاً في ملاحظات الإصلاح عن"
@@ -1444,11 +1439,6 @@ msgid "On Behalf Of"
 msgstr "نيابةً عن"
 
 #. module: KSW_workshop
-#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_users_form_ksw_workshop_assistant
-msgid "Only for requesters this user does not report to..."
-msgstr "فقط لمقدمي الطلبات الذين لا يتبع لهم هذا المستخدم..."
-
-#. module: KSW_workshop
 #. odoo-python
 #: code:addons/KSW_workshop/models/ksw_workshop_request.py:0
 msgid "Only in-progress requests can be completed."
@@ -1668,6 +1658,7 @@ msgstr "ربع السنة"
 
 #. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_res_users__x_workshop_assists_display
+#: model:ir.model.fields,field_description:KSW_workshop.field_res_users__x_workshop_requester_for_ids
 msgid "Raises Workshop Requests For"
 msgstr "يرفع طلبات الورشة نيابةً عن"
 
@@ -2647,19 +2638,6 @@ msgstr ""
 "الأعمال المرسلة خارج الورشة."
 
 #. module: KSW_workshop
-#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_users_form_ksw_workshop_assistant
-msgid ""
-"With the <b>Requester Assistant</b> role (Access Rights, KSW Workshop),\n"
-"                        this user raises requests for his own manager, if that manager is a\n"
-"                        workshop requester, and for anyone listed above. He picks only from\n"
-"                        their vehicles and sees only the requests he raised himself."
-msgstr ""
-"بدور <b>مساعد مقدم الطلب</b> (صلاحيات الوصول، ورشة KSW) يرفع هذا المستخدم "
-"الطلبات نيابةً عن مديره المباشر إذا كان مقدم طلبات للورشة، ونيابةً عن أي شخص"
-" مذكور أعلاه. ولا يختار إلا من مركباتهم، ولا يرى إلا الطلبات التي رفعها "
-"بنفسه."
-
-#. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_keyword_suggestion__name
 msgid "Word"
 msgstr "الكلمة"
@@ -2827,17 +2805,6 @@ msgid "Workshop request %s resubmitted"
 msgstr "أُعيد إرسال طلب الورشة %s"
 
 #. module: KSW_workshop
-#: model:ir.model.fields,help:KSW_workshop.field_res_users__x_workshop_assisted_manager_ids
-msgid ""
-"Workshop requesters this user raises requests for although he does not "
-"report to them. His own manager is included automatically. Has no effect "
-"without the Requester Assistant role."
-msgstr ""
-"مقدمو طلبات الورشة الذين يرفع هذا المستخدم الطلبات نيابةً عنهم مع أنه لا "
-"يتبع لهم. مديره المباشر مشمول تلقائياً. لا أثر لهذا الحقل دون دور مساعد مقدم"
-" الطلب."
-
-#. module: KSW_workshop
 #: model:ir.model.fields,field_description:KSW_workshop.field_ksw_workshop_request__x_can_toggle_cash_customer
 msgid "X Can Toggle Cash Customer"
 msgstr "يمكنه تبديل العميل النقدي"
@@ -2977,3 +2944,64 @@ msgstr "فرامل, بريك, قماشات, brake"
 #: code:addons/KSW_workshop/models/ksw_workshop_part.py:0
 msgid "Repairs using “%s”"
 msgstr "الإصلاحات التي استخدمت «%s»"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_res_users__x_workshop_assisted_manager_ids
+msgid "Added Workshop Requesters"
+msgstr "مقدمو طلبات ورشة مضافون"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_res_users__x_workshop_assisted_manager_ids
+msgid ""
+"Workshop requesters this user raises requests for although he does not "
+"report to them. Kept by the inverse of x_workshop_requester_for_ids; his own"
+" manager is included automatically unless excluded."
+msgstr ""
+"مقدمو طلبات الورشة الذين يرفع هذا المستخدم الطلبات نيابةً عنهم مع أنه لا "
+"يتبع لهم. مديره المباشر مشمول تلقائياً ما لم يُستبعد."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_res_users__x_workshop_excluded_manager_ids
+msgid "Excluded Workshop Requesters"
+msgstr "مقدمو طلبات ورشة مستبعدون"
+
+#. module: KSW_workshop
+#: model:ir.model.fields,help:KSW_workshop.field_res_users__x_workshop_requester_for_ids
+msgid ""
+"The workshop requesters this user raises requests for. Starts as his own "
+"manager; add or remove requesters for the workshop only, his reporting line "
+"elsewhere is unchanged."
+msgstr ""
+"مقدمو طلبات الورشة الذين يرفع هذا المستخدم الطلبات نيابةً عنهم. تبدأ القائمة"
+" بمديره المباشر؛ أضف أو احذف مقدمي طلبات للورشة فقط، ويبقى تسلسله الإداري في"
+" بقية النظام دون تغيير."
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_users_form_ksw_workshop_assistant
+msgid "His own manager by default..."
+msgstr "مديره المباشر افتراضياً..."
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_users_form_ksw_workshop_assistant
+msgid ""
+"Whose vehicles a <b>Requester Assistant</b> follows is set in the\n"
+"                        Access Rights tab, under Raises Workshop Requests For."
+msgstr ""
+"يُحدَّد من يتبع <b>مساعد مقدم الطلب</b> مركباته في تبويب صلاحيات الوصول، تحت"
+" «يرفع طلبات الورشة نيابةً عن»."
+
+#. module: KSW_workshop
+#: model_terms:ir.ui.view,arch_db:KSW_workshop.view_users_form_ksw_workshop_assistant
+msgid ""
+"The workshop requesters this user raises requests for, on their vehicles\n"
+"                        only. It starts as his own manager; remove him or add others for the\n"
+"                        workshop only. Only those who are Workshop Requesters count."
+msgstr ""
+"مقدمو طلبات الورشة الذين يرفع هذا المستخدم الطلبات نيابةً عنهم، على مركباتهم"
+" فقط. تبدأ القائمة بمديره المباشر؛ يمكن حذفه أو إضافة آخرين للورشة فقط. لا "
+"يُحتسب إلا من لديه دور مقدم طلبات الورشة."
+
+#. module: KSW_workshop
+#: model:ir.model.fields,field_description:KSW_workshop.field_res_users__x_workshop_is_assistant
+msgid "X Workshop Is Assistant"
+msgstr "مساعد مقدم طلبات ورشة"

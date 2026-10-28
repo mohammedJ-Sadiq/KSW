@@ -121,6 +121,8 @@ class HrPayslip(models.Model):
                 [payslip.employee_id.id], payslip.date_to, full=full),
             order=_KSW_LINE_ORDER,
         )
+        if full:
+            lines |= self._ksw_vacation_held_lines(payslip.x_leave_id)
         if not lines:
             return
         version_id = (
@@ -150,6 +152,17 @@ class HrPayslip(models.Model):
                 'sequence': seq,
             })
             seq += 1
+
+    @api.model
+    def _ksw_vacation_held_lines(self, leave):
+        """Installments already marked paid by money this vacation / EOS
+        settlement takes over, so they are really still owed by it.
+
+        Hook, empty here. KSW_commissions returns those settled out of an
+        approved commission month that is not marked Paid: the vacation pays
+        that month instead, so the installment has to come with it.
+        """
+        return self.env['ksw.deduction.line']
 
     def _ksw_shows_full_deductions(self):
         """Present the WHOLE pending obligation, even into a negative net?

@@ -273,14 +273,14 @@
     </record>
 
     <record id="view_water_rate_list_mobile" model="ir.ui.view">
-        <field name="name">ksw.water.rate.list.mobile</field>
-        <field name="model">ksw.water.rate</field>
+        <field name="name">product.pricelist.item.water.rate.list.mobile</field>
+        <field name="model">product.pricelist.item</field>
         <field name="inherit_id" ref="KSW_water_delivery.view_water_rate_list"/>
         <field name="arch" type="xml">
-            <xpath expr="//list/field[@name='uom_name']" position="attributes">
+            <xpath expr="//list/field[@name='product_uom_name']" position="attributes">
                 <attribute name="class" add="ksw_m_hide" separator=" "/>
             </xpath>
-            <xpath expr="//list/field[@name='source']" position="attributes">
+            <xpath expr="//list/field[@name='x_water_source']" position="attributes">
                 <attribute name="class" add="ksw_m_hide" separator=" "/>
             </xpath>
             <xpath expr="//list/field[@name='x_bas_price']" position="attributes">

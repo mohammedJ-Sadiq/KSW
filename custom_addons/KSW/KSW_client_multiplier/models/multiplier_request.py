@@ -162,6 +162,12 @@ class KswClientMultiplierRequest(models.Model):
                     'this request. Ask HR to set the department\'s General Manager '
                     '(or the company default GM).',
                     dept=rec.department_id.display_name or _('your department')))
+            if rec.gm_user_id == rec.requested_by_id:
+                # The GM role includes Supervisor (Oct 2026), so a GM can raise
+                # a request; it must never land on his own desk.
+                raise UserError(_(
+                    'You are the General Manager who would approve this request, so '
+                    'you cannot raise it yourself. Ask a Supervisor to raise it.'))
             rec.sudo().activity_schedule(
                 'mail.mail_activity_data_todo', user_id=rec.gm_user_id.id,
                 summary=_('Approve «الرد المضاعف» change for %(client)s', client=rec.client_id.name))
@@ -179,6 +185,9 @@ class KswClientMultiplierRequest(models.Model):
         for rec in self:
             if rec.state != 'pending':
                 raise UserError(_('%(ref)s is not waiting for approval.', ref=rec.name))
+            if rec.requested_by_id == self.env.user:
+                raise UserError(_('You cannot decide on a request you raised yourself (%(ref)s).',
+                                  ref=rec.name))
             if rec.gm_user_id != self.env.user:
                 raise UserError(_('Only %(gm)s, the General Manager of %(dept)s, can decide on '
                                   '%(ref)s.', gm=rec.gm_user_id.name or _('the GM'),

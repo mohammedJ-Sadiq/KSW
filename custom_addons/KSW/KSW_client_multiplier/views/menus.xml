@@ -8,13 +8,20 @@
               parent="KSW_water_delivery.menu_water_delivery_clients"
               action="action_client_multipliers"
               sequence="20"
-              groups="KSW_water_delivery.group_water_dispatcher,base.group_system"/>
+              groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_gm,base.group_system"/>
     <menuitem id="menu_water_multiplier_requests"
               name="Multiplier Requests"
               parent="KSW_water_delivery.menu_water_delivery_clients"
               action="action_multiplier_requests"
               sequence="30"
-              groups="KSW_water_delivery.group_water_dispatcher,base.group_system"/>
+              groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_gm,base.group_system"/>
+    <!-- The GM's own list: what is waiting for his decision. -->
+    <menuitem id="menu_water_multiplier_approvals"
+              name="Multiplier Approvals"
+              parent="KSW_water_delivery.menu_water_delivery_clients"
+              action="action_multiplier_requests_to_approve"
+              sequence="25"
+              groups="KSW_water_delivery.group_water_gm,base.group_system"/>
 
     <!-- Accounting: the same list, read-only (no Supervisor group, no button). -->
     <menuitem id="menu_account_client_multipliers"

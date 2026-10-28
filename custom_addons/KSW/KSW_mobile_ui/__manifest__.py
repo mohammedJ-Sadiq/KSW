@@ -1,6 +1,6 @@
 {
     'name': 'KSW - Mobile Layout',
-    'version': '19.0.1.3.1',
+    'version': '19.0.1.3.2',
     'author': 'Mohammed Albadr',
     'summary': 'Phone-only layout for the most-used KSW screens; desktop unchanged',
     'description': """

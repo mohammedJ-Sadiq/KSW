@@ -1,0 +1,57 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_stock_movement_multiplier
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-28 07:16+0000\n"
+"PO-Revision-Date: 2026-10-28 07:16+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_stock_movement_multiplier
+#: model:ir.model.fields,field_description:KSW_stock_movement_multiplier.field_ksw_stock_movement_line__x_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement_multiplier.view_stock_movement_line_search_multiplier
+msgid "Client Multiplier"
+msgstr ""
+
+#. module: KSW_stock_movement_multiplier
+#: model:ir.model.fields,field_description:KSW_stock_movement_multiplier.field_ksw_stock_movement_line__display_name
+#: model:ir.model.fields,field_description:KSW_stock_movement_multiplier.field_ksw_stock_movement_wizard__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: KSW_stock_movement_multiplier
+#: model:ir.model.fields,field_description:KSW_stock_movement_multiplier.field_ksw_stock_movement_line__id
+#: model:ir.model.fields,field_description:KSW_stock_movement_multiplier.field_ksw_stock_movement_wizard__id
+msgid "ID"
+msgstr ""
+
+#. module: KSW_stock_movement_multiplier
+#: model:ir.model,name:KSW_stock_movement_multiplier.model_ksw_stock_movement_wizard
+msgid "Stock Movement"
+msgstr ""
+
+#. module: KSW_stock_movement_multiplier
+#: model:ir.model,name:KSW_stock_movement_multiplier.model_ksw_stock_movement_line
+msgid "Stock Movement Line"
+msgstr ""
+
+#. module: KSW_stock_movement_multiplier
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement_multiplier.view_stock_movement_line_list_multiplier
+msgid "Total"
+msgstr ""
+
+#. module: KSW_stock_movement_multiplier
+#: model:ir.model.fields,help:KSW_stock_movement_multiplier.field_ksw_stock_movement_line__x_multiplier
+msgid ""
+"«الرد المضاعف»: the customer's multiplier in force on the day of this "
+"movement. Summed in a group, it is the weighted load count. Empty when the "
+"row has no customer or the customer has none."
+msgstr ""

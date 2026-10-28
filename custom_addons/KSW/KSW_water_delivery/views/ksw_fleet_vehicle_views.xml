@@ -55,6 +55,7 @@
                        context="{'res_partner_search_mode': 'customer'}"
                        readonly="not driver_id"/>
                 <field name="x_capacity_m3"/>
+                <field name="x_analytic_account_id" optional="show" options="{'no_create': True}"/>
                 <field name="x_tanker_group_ids" string="Groups" widget="many2many_tags"
                        readonly="1" optional="show"/>
                 <field name="state" column_invisible="1"/>

@@ -273,15 +273,21 @@
             other, and described as what it is in the voucher. The accounts
             are the drivers' (where BAS already holds August's); change them
             on the component for an extra paid to someone else.
+            October 2026: renamed "Driver Trips Remainder". What it carries
+            is the part of the drivers' trips Driver Trips left unpaid (the
+            reasons say "فرق ردود السائقين"), not an undeserved extra. Kept
+            to administrators: it is a correction, never a pay type a
+            supervisor offers.
         -->
         <record id="pay_component_gm_extra" model="ksw.pay.component">
-            <field name="name">External Amount by the GM</field>
-            <field name="code">GM_EXTRA</field>
+            <field name="name">Driver Trips Remainder</field>
+            <field name="code">TRIPS_REMAINDER</field>
             <field name="calculation">fixed</field>
             <field name="scope">department</field>
             <field name="needs_reason" eval="True"/>
             <field name="sequence">190</field>
-            <field name="x_bas_ref">مبلغ إضافي بأمر المدير العام</field>
+            <field name="x_bas_ref">فرق ردود السائقين</field>
+            <field name="entry_group_ids" eval="[(6, 0, [ref('base.group_system')])]"/>
             <field name="x_bas_expense_code">3203020007</field>
             <field name="x_bas_expense_name">حساب مصروفات - عمولات سائقين التريلات</field>
             <field name="x_bas_accrual_code">2107010001</field>

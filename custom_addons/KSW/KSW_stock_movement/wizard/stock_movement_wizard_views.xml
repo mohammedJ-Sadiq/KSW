@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_stock_movement_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.stock.movement.wizard.form</field>
+        <field name="model">ksw.stock.movement.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Stock Movement">
+                <sheet>
+                    <group>
+                        <group string="Which Stocks">
+                            <field name="warehouse_ids" widget="many2many_tags"
+                                   options="{'no_create': True}" placeholder="All warehouses"/>
+                            <field name="location_ids" widget="many2many_tags"
+                                   options="{'no_create': True}" placeholder="All stock locations"/>
+                        </group>
+                        <group string="Which Period">
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                        <group string="Which Movements">
+                            <field name="product_ids" widget="many2many_tags"
+                                   options="{'no_create': True}" placeholder="All items"/>
+                            <field name="categ_ids" widget="many2many_tags"
+                                   options="{'no_create': True}" placeholder="All categories"/>
+                            <field name="partner_ids" widget="many2many_tags"
+                                   options="{'no_create': True}" placeholder="All partners"/>
+                            <field name="picking_type_ids" widget="many2many_tags"
+                                   options="{'no_create': True}" placeholder="All operations"/>
+                        </group>
+                        <group string="Include">
+                            <field name="show_opening"/>
+                            <field name="include_pending"/>
+                        </group>
+                    </group>
+                    <group string="How to Show Them">
+                        <group>
+                            <field name="layout" widget="radio"/>
+                        </group>
+                        <group invisible="layout == 'flat'">
+                            <field name="group_by" required="layout != 'flat'"/>
+                            <field name="group_by_2" invisible="group_by == 'none'"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_show" type="object" string="Show"
+                            class="btn-primary" icon="fa-list"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_stock_movement_wizard" model="ir.actions.act_window">
+        <field name="name">Stock Movement</field>
+        <field name="res_model">ksw.stock.movement.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_stock_movement"
+              name="Stock Movement"
+              parent="stock.menu_warehouse_report"
+              action="action_stock_movement_wizard"
+              groups="stock.group_stock_user"
+              sequence="5"/>
+
+</odoo>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- The dispatcher's desk. Only used on a branch switched to
-         "Dispatcher dispatches, driver confirms"; elsewhere drivers keep
-         starting their own deliveries. -->
+    <!-- The dispatcher's desk. Used on a branch switched to "Dispatcher
+         dispatches, driver confirms", and on every branch for cash sales,
+         which are always taken at the desk. -->
     <record id="view_water_dispatch_list" model="ir.ui.view">
         <field name="name">ksw.water.dispatch.list</field>
         <field name="model">ksw.water.dispatch</field>
@@ -12,6 +12,7 @@
                   decoration-success="state == 'delivered'">
                 <field name="name"/>
                 <field name="dispatched_on"/>
+                <field name="x_is_cash" optional="show" widget="boolean"/>
                 <field name="picking_type_id" optional="hide"/>
                 <field name="partner_id"/>
                 <field name="product_id"/>
@@ -20,6 +21,8 @@
                 <field name="driver_user_id"/>
                 <field name="vehicle_id" optional="show"/>
                 <field name="picking_id" optional="show"/>
+                <field name="x_cash_received" optional="show" sum="Total"/>
+                <field name="x_currency_id" column_invisible="1"/>
                 <field name="note_held" optional="hide"/>
                 <field name="state" widget="badge"
                        decoration-info="state == 'dispatched'"
@@ -35,7 +38,10 @@
             <form>
                 <header>
                     <button name="action_dispatch" type="object" string="Dispatch"
-                            class="btn-primary" invisible="state != 'draft'"/>
+                            class="btn-primary" invisible="state != 'draft' or x_is_pickup"/>
+                    <button name="action_dispatch" type="object" string="Sell and Deliver Now"
+                            class="btn-primary" invisible="state != 'draft' or not x_is_pickup"
+                            confirm="Take the cash and record it as collected by the customer's tanker now?"/>
                     <button name="action_draft" type="object" string="Back to Draft"
                             invisible="state != 'dispatched' or capture_id"
                             groups="KSW_water_delivery.group_water_dispatch"/>
@@ -64,8 +70,12 @@
                         deliveries. Switch it to <b>Dispatcher dispatches,
                         driver confirms</b> before dispatching.
                     </div>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not x_cash_problem or state != 'draft'">
+                        <field name="x_cash_problem" readonly="1" nolabel="1"/>
+                    </div>
                     <div class="alert alert-info" role="alert"
-                         invisible="not partner_id or client_located or state != 'draft'">
+                         invisible="not partner_id or client_located or state != 'draft' or x_is_cash">
                         This client has no approved location yet. The driver
                         will be asked to send it from the site, and can deliver
                         once a supervisor approves it.
@@ -74,7 +84,23 @@
                         <group string="Delivery">
                             <field name="picking_type_id" readonly="state != 'draft'"
                                    options="{'no_create': True, 'no_open': True}"/>
-                            <field name="partner_id" readonly="state != 'draft'"
+                            <!-- autosave off: boolean_toggle saves the record on every
+                                 click by default, which on a new dispatch fails on the
+                                 still-empty client and skips the onchange that fills it. -->
+                            <field name="x_is_cash" readonly="state != 'draft'" widget="boolean_toggle"
+                                   options="{'autosave': False}"/>
+                            <field name="x_buyer_name" invisible="not x_is_cash"
+                                   readonly="state != 'draft'" placeholder="Optional"/>
+                            <field name="x_buyer_phone" invisible="not x_is_cash"
+                                   readonly="state != 'draft'" placeholder="Optional" widget="phone"/>
+                            <field name="x_is_pickup" invisible="1"/>
+                            <field name="x_collected_by" widget="radio" invisible="not x_is_cash"
+                                   readonly="state != 'draft'"/>
+                            <field name="x_pickup_plate" invisible="not x_is_pickup"
+                                   readonly="state != 'draft'" placeholder="Optional"/>
+                            <field name="x_pickup_driver" invisible="not x_is_pickup"
+                                   readonly="state != 'draft'" placeholder="Optional"/>
+                            <field name="partner_id" readonly="state != 'draft' or x_is_cash"
                                    options="{'no_create': True}"
                                    context="{'res_partner_search_mode': 'customer'}"/>
                             <field name="product_id" force_save="1"
@@ -83,13 +109,16 @@
                             <label for="entered_qty"/>
                             <div class="o_row">
                                 <field name="entered_qty" readonly="state != 'draft'"/>
-                                <field name="entered_uom" readonly="state != 'draft'"/>
+                                <field name="entered_uom" readonly="state != 'draft' or x_is_pickup"/>
                             </div>
                             <field name="quantity_m3" invisible="entered_uom != 'trip'"/>
+                            <field name="x_currency_id" invisible="1"/>
+                            <field name="x_cash_amount" invisible="not x_is_cash or state != 'draft'"
+                                   class="fw-bold"/>
                             <field name="note" readonly="state != 'draft'"
                                    placeholder="Anything the driver should know"/>
                         </group>
-                        <group string="Driver">
+                        <group string="Driver" invisible="x_is_pickup">
                             <field name="driver_user_id" readonly="state != 'draft'"
                                    options="{'no_create': True, 'no_open': True}"/>
                             <field name="vehicle_id" options="{'no_open': True}"/>
@@ -97,6 +126,12 @@
                                    options="{'no_open': True}"/>
                             <field name="dispatched_on" invisible="not dispatched_on"/>
                         </group>
+                    </group>
+                    <group string="Cash" invisible="not x_is_cash or state == 'draft'">
+                        <field name="x_cash_received"/>
+                        <field name="x_cash_invoice_ref" invisible="not x_cash_invoice_ref"/>
+                        <field name="x_cash_payment_id" groups="account.group_account_invoice"/>
+                        <field name="x_cash_invoice_id" groups="account.group_account_invoice"/>
                     </group>
                     <group string="Outcome" invisible="not picking_id">
                         <field name="picking_id" options="{'no_open': True}"/>
@@ -125,6 +160,8 @@
                         domain="[('state', '=', 'dispatched')]"/>
                 <filter name="delivered" string="Delivered"
                         domain="[('state', '=', 'delivered')]"/>
+                <separator/>
+                <filter name="cash" string="Cash Sales" domain="[('x_is_cash', '=', True)]"/>
                 <separator/>
                 <filter name="today" string="Today"
                         domain="[('create_date', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
@@ -158,13 +195,29 @@
         <field name="arch" type="xml">
             <list editable="bottom" create="0" delete="0">
                 <field name="name" string="Branch"/>
-                <field name="x_branch_code" string="BAS Code" readonly="1" optional="hide"/>
+                <field name="x_branch_code" optional="show"/>
+                <field name="x_sales_account_id" optional="show" options="{'no_create': True}"/>
+                <field name="x_analytic_account_id" optional="show" options="{'no_create': True}"/>
+                <!-- Where this branch's water is issued from: every note is
+                     re-homed onto this operation type, and core's write() then
+                     takes the type's default source location. -->
+                <field name="default_location_src_id" string="Delivers From"
+                       domain="[('usage', '=', 'internal')]"
+                       options="{'no_create': True}"/>
                 <field name="x_issue_mode"/>
                 <field name="x_dispatcher_user_ids" widget="many2many_tags"
                        options="{'no_create': True}"/>
                 <field name="x_signature_required" optional="show"/>
                 <field name="x_location_rule" optional="show"/>
                 <field name="x_location_radius_m" optional="show"/>
+                <field name="x_cash_partner_id" optional="show" readonly="1"/>
+                <button name="action_create_cash_customer" type="object"
+                        string="Set Up Cash Sales" icon="fa-money" class="btn-link"
+                        invisible="x_cash_partner_id" groups="base.group_system"/>
+                <field name="x_cash_journal_id" optional="show"
+                       options="{'no_create': True}"/>
+                <field name="x_cash_sale_journal_id" optional="hide"
+                       options="{'no_create': True}" placeholder="Cash Sales (CSAL)"/>
             </list>
         </field>
     </record>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_stock_movement_line_list_multiplier" model="ir.ui.view">
+        <field name="name">ksw.stock.movement.line.list.multiplier</field>
+        <field name="model">ksw.stock.movement.line</field>
+        <field name="inherit_id" ref="KSW_stock_movement.view_stock_movement_line_list"/>
+        <field name="arch" type="xml">
+            <field name="uom_id" position="after">
+                <field name="x_multiplier" sum="Total" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_stock_movement_line_pivot_multiplier" model="ir.ui.view">
+        <field name="name">ksw.stock.movement.line.pivot.multiplier</field>
+        <field name="model">ksw.stock.movement.line</field>
+        <field name="inherit_id" ref="KSW_stock_movement.view_stock_movement_line_pivot"/>
+        <field name="arch" type="xml">
+            <field name="qty_net" position="after">
+                <field name="x_multiplier" type="measure"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_stock_movement_line_search_multiplier" model="ir.ui.view">
+        <field name="name">ksw.stock.movement.line.search.multiplier</field>
+        <field name="model">ksw.stock.movement.line</field>
+        <field name="inherit_id" ref="KSW_stock_movement.view_stock_movement_line_search"/>
+        <field name="arch" type="xml">
+            <filter name="g_invoice" position="after">
+                <filter name="g_multiplier" string="Client Multiplier"
+                        context="{'group_by': 'x_multiplier'}"/>
+            </filter>
+        </field>
+    </record>
+
+</odoo>

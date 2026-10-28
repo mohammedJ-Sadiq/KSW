@@ -21,7 +21,7 @@ class TestRateImportMatching(TransactionCase):
 
     def setUp(self):
         super().setUp()
-        self.Rate = self.env['ksw.water.rate']
+        self.Rate = self.env['product.pricelist.item']
         self.partner = self.env['res.partner'].create({'name': 'Zz Mirror Client'})
         self.env['ksw.bas.customer'].create({
             'bas_code': '1203888001', 'name_en': 'Zz Mirror Client',

@@ -176,9 +176,9 @@ class KswWaterDeliveryWizard(models.TransientModel):
 
     @api.depends('partner_id')
     def _compute_allowed_product_ids(self):
-        Rate = self.env['ksw.water.rate'].sudo()
+        Pricing = self.env['ksw.water.pricing']
         for wizard in self:
-            products = Rate._products_for_partner(wizard.partner_id)
+            products = Pricing._products_for_partner(wizard.partner_id)
             wizard.allowed_product_ids = products
             wizard.product_locked = len(products) == 1
 
@@ -234,7 +234,7 @@ class KswWaterDeliveryWizard(models.TransientModel):
 
     @api.depends('product_id', 'entered_qty', 'entered_uom', 'vehicle_id', 'partner_id')
     def _compute_quantity_preview(self):
-        Rate = self.env['ksw.water.rate'].sudo()
+        Pricing = self.env['ksw.water.pricing']
         for wizard in self:
             uom = wizard.product_id.uom_id
             # Trips only make sense for a product measured by volume. A product
@@ -247,10 +247,10 @@ class KswWaterDeliveryWizard(models.TransientModel):
                 '%(qty)s %(uom)s' % {'qty': f'{qty:g}', 'uom': uom.name or ''}
                 if qty and uom else ''
             )
-            rate = Rate._rate_for(wizard.partner_id, wizard.product_id)
+            rate = Pricing._rate_for(wizard.partner_id, wizard.product_id, qty or 1.0)
             if rate:
                 wizard.rate_preview = '%(price)s / %(uom)s' % {
-                    'price': f'{rate.price:g}', 'uom': uom.name or '',
+                    'price': f'{rate.fixed_price:g}', 'uom': uom.name or '',
                 }
             else:
                 wizard.rate_preview = ''
@@ -265,7 +265,7 @@ class KswWaterDeliveryWizard(models.TransientModel):
         # option in it is a question with one answer -- preselect it (KSW UX
         # rule). create() does the same server-side, because a readonly field
         # never reaches the server from the web client.
-        products = self.env['ksw.water.rate']._products_for_partner(self.partner_id)
+        products = self.env['ksw.water.pricing']._products_for_partner(self.partner_id)
         if self.product_id._origin not in products:
             self.product_id = products[:1]
 
@@ -280,12 +280,12 @@ class KswWaterDeliveryWizard(models.TransientModel):
         product: with a real choice to make, an empty value is a genuine
         omission and the form should say so.
         """
-        Rate = self.env['ksw.water.rate']
+        Pricing = self.env['ksw.water.pricing']
         Partner = self.env['res.partner']
         for vals in vals_list:
             if vals.get('product_id') or not vals.get('partner_id'):
                 continue
-            products = Rate._products_for_partner(Partner.browse(vals['partner_id']))
+            products = Pricing._products_for_partner(Partner.browse(vals['partner_id']))
             if len(products) == 1:
                 vals['product_id'] = products.id
         return super().create(vals_list)

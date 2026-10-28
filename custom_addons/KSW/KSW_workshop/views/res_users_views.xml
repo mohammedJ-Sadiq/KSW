@@ -8,6 +8,21 @@
         <field name="model">res.users</field>
         <field name="inherit_id" ref="base.view_users_form"/>
         <field name="arch" type="xml">
+            <!-- Next to the role it configures: an administrator choosing
+                 Requester Assistant sees whose trucks it means right there. -->
+            <xpath expr="//page[@name='access_rights']" position="inside">
+                <group groups="base.group_erp_manager" invisible="not x_workshop_is_assistant">
+                    <field name="x_workshop_is_assistant" invisible="1"/>
+                    <field name="x_workshop_requester_for_ids" widget="many2many_tags"
+                           options="{'no_create': True}"
+                           placeholder="His own manager by default..."/>
+                    <div colspan="2" class="text-muted">
+                        The workshop requesters this user raises requests for, on their vehicles
+                        only. It starts as his own manager; remove him or add others for the
+                        workshop only. Only those who are Workshop Requesters count.
+                    </div>
+                </group>
+            </xpath>
             <xpath expr="//notebook" position="inside">
                 <page name="ksw_workshop_assistant" string="Workshop" groups="base.group_erp_manager">
                     <div class="alert alert-success" role="status"
@@ -18,15 +33,10 @@
                     </div>
                     <group>
                         <field name="x_workshop_notify_in_odoo"/>
-                        <field name="x_workshop_assisted_manager_ids" widget="many2many_tags"
-                               options="{'no_create': True}"
-                               placeholder="Only for requesters this user does not report to..."/>
                     </group>
                     <div class="text-muted">
-                        With the <b>Requester Assistant</b> role (Access Rights, KSW Workshop),
-                        this user raises requests for his own manager, if that manager is a
-                        workshop requester, and for anyone listed above. He picks only from
-                        their vehicles and sees only the requests he raised himself.
+                        Whose vehicles a <b>Requester Assistant</b> follows is set in the
+                        Access Rights tab, under Raises Workshop Requests For.
                     </div>
                 </page>
             </xpath>

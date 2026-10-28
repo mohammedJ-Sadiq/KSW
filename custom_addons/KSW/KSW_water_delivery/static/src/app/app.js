@@ -369,6 +369,12 @@ function startWatching() {
     if (!window.isSecureContext || !navigator.geolocation) {
         state.positionStatus = "unavailable";
         state.positionMessage = "Location needs a secure (https) connection.";
+        // No fix can ever arrive here, so a "Send my location" waiting on one
+        // would spin on "Getting an accurate fix" forever. Say why instead.
+        if (state.pinWaiting) {
+            state.pinWaiting = null;
+            banner("warn", "This page cannot read your location: it was opened over http. Open the app from its https address and try again.");
+        }
         render();
         return;
     }
@@ -450,7 +456,7 @@ function distanceM(lat1, lon1, lat2, lon2) {
  */
 function locationProblem(form) {
     const rules = state.reference && state.reference.rules;
-    if (!rules || rules.location_rule !== "enforce" || !form.partner) {
+    if (!rules || rules.location_rule !== "enforce" || !form.partner || form.partner.anywhere) {
         return null;
     }
     if (!isLocated(form.partner)) {
@@ -484,7 +490,9 @@ function strictLocation() {
     return Boolean(rules && rules.location_rule === "enforce");
 }
 
-const isLocated = (client) => Boolean(client && (client.lat || client.lon));
+// A branch cash customer stands for whoever walked in, so it has no site to
+// be located at: it counts as located anywhere.
+const isLocated = (client) => Boolean(client && (client.anywhere || client.lat || client.lon));
 
 function awaitingApproval(client) {
     return Boolean(client) && !isLocated(client) && (
@@ -1116,8 +1124,10 @@ function renderDispatches() {
             <div class="ksw-card">
                 <div class="ksw-card-row"><span>Product</span><strong dir="auto">${esc(dispatch.product.name)}</strong></div>
                 <div class="ksw-card-row"><span>Quantity</span><strong>${esc(dispatchQty(dispatch))}</strong></div>
+                ${dispatch.buyer ? `<div class="ksw-card-row"><span>Buyer</span><strong dir="auto">${esc(dispatch.buyer)}</strong></div>` : ""}
                 ${dispatch.note ? `<div class="ksw-sub" dir="auto">${esc(dispatch.note)}</div>` : ""}
             </div>
+            ${dispatch.cash_paid ? `<div class="ksw-okbox">&#10003; <b>Paid at the desk.</b> Do not collect any money.</div>` : ""}
             ${renderPinBox()}
             ${problem && canDeliver(state.form.partner) ? `<div class="ksw-warnbox">&#9888; ${esc(problem)}
                 If you deliver, your supervisor has to approve the note.</div>` : ""}

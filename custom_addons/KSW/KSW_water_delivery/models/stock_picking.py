@@ -28,7 +28,19 @@ class StockPickingType(models.Model):
     # The branch dimension in BAS is CODE2 on the document, not an attribute of
     # the customer -- so it belongs on the operation type (one per branch),
     # which is also what gives each branch its own note numbering.
-    x_branch_code = fields.Char(string='Branch (CODE2)')
+    x_branch_code = fields.Char(
+        string='Branch Code',
+        help='Optional short code of the branch (the same code BAS uses, where the '
+             'branch exists there). It ties the branch to its imported history and '
+             'client list; a branch works without it.')
+    # Where this branch's water sales are booked (Oct 2026). Set on the branch
+    # itself, so a branch needs nothing from BAS to sell; Revenue Accounts can
+    # still send one product elsewhere.
+    x_sales_account_id = fields.Many2one(
+        'account.account', string='Sales Account', copy=False,
+        domain="[('account_type', 'in', ('income', 'income_other'))]",
+        help='The income account this branch\'s sales are booked to. A product line '
+             'in Revenue Accounts for this branch takes precedence.')
     # Off during the proof of concept: drivers issue the note at the customer to
     # prove they can, and the paper note still collects the wet signature. The
     # signing half of the module is built and tested -- ticking this box turns it
@@ -98,7 +110,7 @@ class StockPicking(models.Model):
     # old one -- and `x_is_water_delivery` carries the record rules, so a related
     # field would retroactively move notes in and out of people's scope.
     x_is_water_delivery = fields.Boolean(string='Water Delivery Note', index=True, copy=False)
-    x_branch_code = fields.Char(string='Branch (CODE2)', index=True, copy=False)
+    x_branch_code = fields.Char(string='Branch Code', index=True, copy=False)
     # What the user reads. The code above stays the stamped fact; the name is
     # looked up from the branch that carries that code, so renaming a branch
     # relabels its notes without re-filing them.
@@ -572,14 +584,6 @@ class StockPicking(models.Model):
         location_problem = ' '.join(problems) or False
         held = bool(location_problem)
 
-        rate = self.env['ksw.water.rate'].sudo()._rate_for(partner, product)
-        if not rate:
-            raise UserError(_(
-                'There is no agreed rate for %(product)s with %(client)s, so the '
-                'note cannot be priced. Ask accounting to add one.',
-                product=product.display_name, client=partner.display_name,
-            ))
-
         quantity = self._water_quantity_in_product_uom(
             vehicle, payload.get('entered_qty') or 0.0,
             payload.get('entered_uom') or 'product')
@@ -589,20 +593,36 @@ class StockPicking(models.Model):
                 'check that the tanker has a trip volume set.'
             ))
 
+        # Priced for the real quantity, so a quantity break on the client's
+        # pricelist applies exactly as it would on a sales order.
+        Pricing = self.env['ksw.water.pricing']
+        rate = Pricing._rate_for(partner, product, quantity)
+        if not rate:
+            raise UserError(_(
+                'There is no agreed rate for %(product)s with %(client)s, so the '
+                'note cannot be priced. Ask accounting to add one to the '
+                'client\'s pricelist (Water Delivery ▸ Configuration ▸ Client '
+                'Rates).',
+                product=product.display_name, client=partner.display_name,
+            ))
+
         # The full native chain, on purpose: one trip = one sale order, so that
         # month end is `qty_delivered` on real order lines and the consolidated
-        # invoice needs no code of ours at all. The price is the agreed rate --
-        # and it is resolved HERE, now, never taken from what the phone sent.
-        # A phone carrying a three-day-old snapshot must not be able to invoice
-        # a stale rate.
+        # invoice needs no code of ours at all. The price is the client's
+        # pricelist rule -- resolved HERE, now, never taken from what the phone
+        # sent. A phone carrying a three-day-old snapshot must not be able to
+        # invoice a stale rate. Set explicitly as well as through the order's
+        # pricelist: with the Pricelists setting off, Odoo ignores a partner's
+        # pricelist and would charge the list price.
         order = self.env['sale.order'].sudo().create({
             'partner_id': partner.id,
             'company_id': picking_type.company_id.id or self.env.company.id,
             'warehouse_id': picking_type.warehouse_id.id,
+            'pricelist_id': rate.pricelist_id.id,
             'order_line': [(0, 0, {
                 'product_id': product.id,
                 'product_uom_qty': quantity,
-                'price_unit': rate.price,
+                'price_unit': rate.fixed_price,
                 'name': payload.get('note')
                 or product.get_product_multiline_description_sale(),
             })],
@@ -693,9 +713,9 @@ class StockPicking(models.Model):
         shows `rated` behind the "client not listed" tick, and the phone has to
         cache both because offline is exactly when it cannot go and ask.
         """
-        Rate = self.env['ksw.water.rate'].sudo()
         Coverage = self.env['ksw.water.client.branch'].sudo()
-        rated = self.env['res.partner'].browse(Rate._rated_partner_ids())
+        rated = self.env['res.partner'].browse(
+            self.env['ksw.water.pricing']._rated_partner_ids())
         normal = rated
         driver_clients = driver.sudo().x_water_client_ids if driver else False
         if driver_clients:

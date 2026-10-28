@@ -82,12 +82,20 @@ class KswWaterRevenueAccount(models.Model):
             ('company_id', '=', self.env.company.id), ('account_id', '!=', False),
         ], limit=1).account_id
 
+    @api.model
+    def _account_for_branch(self, branch, product):
+        """The income account for `product` sold by `branch`: a Revenue Account
+        line for the branch's code and this product, else the branch's own
+        Sales Account. Empty means the product's own income account applies."""
+        branch = branch.sudo()
+        return self._account_for(branch.x_branch_code, product) or branch.x_sales_account_id
+
     def action_import_from_bas(self):
         if not self.env.user.has_group('KSW_water_delivery.group_water_billing') \
                 and not self.env.su:
             raise UserError(_('Only Water Delivery Billing may import revenue accounts.'))
 
-        products = self.env['ksw.water.rate']._bas_product_map()
+        products = self.env['product.pricelist.item']._bas_product_map()
         months = int(self.env['ir.config_parameter'].sudo().get_param(
             'ksw_water_delivery.rate_import_months', 12))
         conn = self.env['ksw.bas.connector']._bas_connect()
@@ -167,7 +175,8 @@ class SaleOrderLine(models.Model):
         note = self.order_id.picking_ids.filtered('x_is_water_delivery')[:1]
         if note:
             account = self.env['ksw.water.revenue.account']._account_for(
-                note.x_branch_code, self.product_id)
+                note.x_branch_code, self.product_id) \
+                or note.picking_type_id.sudo().x_sales_account_id
             if account:
                 res['account_id'] = account.id
         return res

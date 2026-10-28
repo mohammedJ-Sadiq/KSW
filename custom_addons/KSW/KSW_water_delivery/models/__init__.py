@@ -1,4 +1,4 @@
-from . import ksw_water_rate
+from . import water_pricing
 from . import ksw_water_client_branch
 from . import stock_picking
 from . import ksw_water_capture
@@ -11,3 +11,5 @@ from . import account_move_water
 from . import ksw_water_location_request
 from . import ksw_water_tanker_group
 from . import ksw_water_dispatch
+from . import water_cash
+from . import water_analytic

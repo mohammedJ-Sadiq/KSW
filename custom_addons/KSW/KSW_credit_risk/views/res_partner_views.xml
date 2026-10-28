@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_partner_view_risk_grace" model="ir.ui.view">
+        <field name="name">res.partner.view.risk.grace</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="account_financial_risk.res_partner_view_risk"/>
+        <field name="arch" type="xml">
+            <field name="risk_exception" position="before">
+                <field name="x_risk_grace_policy"
+                       readonly="not risk_allow_edit"
+                       placeholder="Company Default"/>
+                <field name="x_risk_grace_days"
+                       invisible="x_risk_grace_policy not in ('bas', 'customer')"
+                       readonly="not risk_allow_edit"/>
+                <field name="x_risk_effective_grace"/>
+            </field>
+        </field>
+    </record>
+</odoo>

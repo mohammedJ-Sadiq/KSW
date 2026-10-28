@@ -10,3 +10,7 @@ from . import test_tanker_assignment
 from . import test_client_pin_ui
 from . import test_tanker_driver_clients
 from . import test_water_dispatch
+from . import test_client_pricelist
+from . import test_water_cash
+from . import test_water_cash_ui
+from . import test_water_analytic

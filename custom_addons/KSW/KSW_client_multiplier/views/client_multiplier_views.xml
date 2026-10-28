@@ -10,8 +10,9 @@
         <field name="arch" type="xml">
             <list string="Client Multipliers" create="0" edit="0" delete="0"
                   decoration-muted="is_stopped" decoration-info="pending_request_id">
-                <field name="bas_code"/>
+                <field name="bas_code" placeholder="Not in BAS"/>
                 <field name="name"/>
+                <field name="partner_id" optional="show"/>
                 <field name="current_multiplier"/>
                 <field name="current_since" optional="show"/>
                 <field name="next_multiplier" optional="show" invisible="not next_date"/>
@@ -43,7 +44,12 @@
                 <sheet>
                     <div class="oe_title">
                         <h1><field name="name"/></h1>
-                        <field name="bas_code"/>
+                        <field name="bas_code" invisible="not customer_id"/>
+                        <field name="customer_id" invisible="1"/>
+                        <div invisible="customer_id" class="text-muted">
+                            Customer created in Odoo, no BAS account. It started at 1;
+                            change it with Request Change.
+                        </div>
                     </div>
                     <group>
                         <group string="«الرد المضاعف»">
@@ -57,7 +63,7 @@
                             <field name="bas_factor"/>
                             <field name="bas_checked_on"/>
                             <field name="differs_from_bas"/>
-                            <field name="partner_id"/>
+                            <field name="partner_id" readonly="1"/>
                             <field name="is_stopped"/>
                         </group>
                     </group>
@@ -99,12 +105,13 @@
         <field name="model">ksw.client.multiplier</field>
         <field name="arch" type="xml">
             <search string="Client Multipliers">
-                <field name="name" filter_domain="['|', ('name', 'ilike', self), ('bas_code', 'ilike', self)]"/>
+                <field name="name" filter_domain="['|', '|', ('name', 'ilike', self), ('bas_code', 'ilike', self), ('partner_id', 'ilike', self)]"/>
                 <field name="current_multiplier"/>
                 <filter name="active_clients" string="Active in BAS" domain="[('is_stopped', '=', False)]"/>
                 <filter name="scheduled" string="Change Scheduled" domain="[('next_date', '!=', False)]"/>
                 <filter name="differs" string="Differs from BAS" domain="[('differs_from_bas', '=', True)]"/>
                 <filter name="no_value" string="No Multiplier" domain="[('current_multiplier', '=', 0)]"/>
+                <filter name="odoo_only" string="Not in BAS" domain="[('customer_id', '=', False)]"/>
                 <group>
                     <filter name="g_multiplier" string="Multiplier" context="{'group_by': 'current_multiplier'}"/>
                 </group>

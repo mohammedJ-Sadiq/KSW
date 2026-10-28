@@ -1819,7 +1819,12 @@ class KswPayRunLine(models.Model):
                     name=rec.display_name))
             touched = self.env['ksw.deduction']
 
+            # Only what this payment still holds: a vacation payslip that
+            # took the month collects its installments itself and cuts the
+            # link (``hr.payslip._sync_deductions_on_done``).
             for line in Line.browse(payload.get('paid_ids') or []).exists():
+                if line.x_paid_via_pay_run_line_id != rec:
+                    continue
                 line.with_context(
                     _skip_installment_total_check=True,
                 ).write({
@@ -1833,6 +1838,8 @@ class KswPayRunLine(models.Model):
             for split in payload.get('splits') or []:
                 orig = Line.browse(split.get('orig')).exists()
                 new = Line.browse(split.get('new')).exists()
+                if new and new.x_paid_via_pay_run_line_id != rec:
+                    continue
                 if orig:
                     orig.with_context(
                         _skip_installment_total_check=True,

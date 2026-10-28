@@ -62,16 +62,16 @@ class WaterDeliveryCommon(TransactionCase):
             'name': 'Customer With No Rate', 'customer_rank': 1,
         })
 
-        Rate = cls.env['ksw.water.rate']
+        Rate = cls.env['product.pricelist.item']
         cls.rate = Rate.create({
-            'partner_id': cls.customer.id, 'product_id': cls.water.id, 'price': 200.0,
+            'x_client_id': cls.customer.id, 'product_id': cls.water.id, 'fixed_price': 200.0,
         })
         Rate.create({
-            'partner_id': cls.multi_customer.id, 'product_id': cls.water.id, 'price': 150.0,
+            'x_client_id': cls.multi_customer.id, 'product_id': cls.water.id, 'fixed_price': 150.0,
         })
         Rate.create({
-            'partner_id': cls.multi_customer.id, 'product_id': cls.water_other.id,
-            'price': 90.0,
+            'x_client_id': cls.multi_customer.id, 'product_id': cls.water_other.id,
+            'fixed_price': 90.0,
         })
 
         # This database already holds 455 real client/branch pairs imported
@@ -86,9 +86,9 @@ class WaterDeliveryCommon(TransactionCase):
         cls.other_branch_customer = cls.env['res.partner'].create({
             'name': 'Other Branch Customer', 'customer_rank': 1,
         })
-        cls.env['ksw.water.rate'].create({
-            'partner_id': cls.other_branch_customer.id,
-            'product_id': cls.water.id, 'price': 111.0,
+        cls.env['product.pricelist.item'].create({
+            'x_client_id': cls.other_branch_customer.id,
+            'product_id': cls.water.id, 'fixed_price': 111.0,
         })
         Coverage.create({
             'partner_id': cls.other_branch_customer.id, 'branch_code': '999',
@@ -181,6 +181,17 @@ class TestWaterDeliveryIssue(WaterDeliveryCommon):
         self.assertEqual(picking.x_amount_untaxed, 600.0)
         self.assertEqual(picking.x_amount_tax, 90.0)
         self.assertEqual(picking.x_amount_total, 690.0)
+
+    def test_the_note_leaves_from_the_branch_source_location(self):
+        """Set on Branches ▸ Delivers From; not always the main warehouse."""
+        depot = self.env['stock.location'].create({
+            'name': 'Branch Depot', 'usage': 'internal',
+            'location_id': self.picking_type.warehouse_id.view_location_id.id,
+        })
+        self.picking_type.default_location_src_id = depot
+        picking = self._issue_note().picking_id.sudo()
+        self.assertEqual(picking.location_id, depot)
+        self.assertEqual(picking.move_ids.location_id, depot)
 
     def test_a_client_with_no_rate_cannot_be_delivered_to(self):
         with self.assertRaises(UserError):
@@ -416,8 +427,8 @@ class TestWaterDeliveryGuards(WaterDeliveryCommon):
 
     def test_a_driver_cannot_change_a_rate(self):
         with self.assertRaises(Exception):
-            self.env['ksw.water.rate'].with_user(self.driver_user).browse(
-                self.rate.id).write({'price': 1.0})
+            self.env['product.pricelist.item'].with_user(self.driver_user).browse(
+                self.rate.id).write({'fixed_price': 1.0})
 
 
 @tagged('post_install', '-at_install')

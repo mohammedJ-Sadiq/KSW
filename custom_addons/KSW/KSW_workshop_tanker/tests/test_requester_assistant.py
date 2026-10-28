@@ -52,10 +52,10 @@ class TestRequesterAssistant(TransactionCase):
         return self.env['ksw.fleet.vehicle'].with_user(user).search(
             [('x_workshop_in_scope', '=', True), ('name', 'like', 'IS92')])
 
-    def _raise(self, user, vehicle, description='Oil change'):
+    def _raise(self, user, vehicle, description='Oil change', driver=None):
         return self.env['ksw.workshop.request'].with_user(user).create({
             'vehicle_type': 'isuzu', 'vehicle_id': vehicle.id,
-            'driver_id': self.driver.id, 'description': description})
+            'driver_id': (driver or self.driver).id, 'description': description})
 
     # ----------------------------------------------------------------- scope
     def test_assistant_picks_exactly_his_managers_trucks(self):
@@ -108,6 +108,52 @@ class TestRequesterAssistant(TransactionCase):
         self.assertEqual(request.x_on_behalf_of_id, self.other_user)
         request.with_user(self.asst_user).write({'vehicle_id': self.group_truck.id})
         self.assertEqual(request.x_on_behalf_of_id, self.sup_user)
+
+    # ---------------------------------------------- administrator's override
+    def test_list_defaults_to_his_own_manager(self):
+        self.assertEqual(self.asst_user.x_workshop_requester_for_ids, self.sup_user)
+
+    def test_admin_replaces_his_manager_for_the_workshop_only(self):
+        self.asst_user.x_workshop_requester_for_ids = self.other_user
+        self.assertEqual(self.asst_user.x_workshop_excluded_manager_ids, self.sup_user)
+        self.assertEqual(self.asst_user.x_workshop_assisted_manager_ids, self.other_user)
+        self.assertEqual(self._pickable(self.asst_user), self.other_truck)
+        with self.assertRaises(UserError):
+            self._raise(self.asst_user, self.group_truck)
+        other_driver = self.env['hr.employee'].create(
+            {'name': 'WRA Other Driver', 'parent_id': self.other_sup.id})
+        with self.assertRaises(UserError):
+            self._raise(self.asst_user, self.other_truck)  # driver from the old line
+        request = self._raise(self.asst_user, self.other_truck, driver=other_driver)
+        self.assertEqual(request.x_on_behalf_of_id, self.other_user)
+        # His reporting line is untouched.
+        self.assertEqual(self.asst.parent_id, self.supervisor)
+
+    def test_admin_adds_a_second_requester(self):
+        self.asst_user.x_workshop_requester_for_ids = self.sup_user | self.other_user
+        self.assertFalse(self.asst_user.x_workshop_excluded_manager_ids)
+        self.assertEqual(self._pickable(self.asst_user),
+                         self.group_truck | self.team_truck | self.other_truck)
+
+    def test_putting_the_manager_back_clears_the_exclusion(self):
+        self.asst_user.x_workshop_requester_for_ids = self.other_user
+        self.asst_user.x_workshop_requester_for_ids = self.sup_user
+        self.assertFalse(self.asst_user.x_workshop_excluded_manager_ids)
+        self.assertFalse(self.asst_user.x_workshop_assisted_manager_ids)
+
+    def test_list_shows_only_for_an_assistant_even_unsaved(self):
+        self.assertTrue(self.asst_user.x_workshop_is_assistant)
+        self.assertFalse(self.sup_user.x_workshop_is_assistant)
+        group = self.env.ref('KSW_workshop.group_workshop_requester_assistant')
+        draft = self.env['res.users'].new({'group_ids': [(6, 0, [
+            self.env.ref('base.group_user').id, group.id])]})
+        self.assertTrue(draft.x_workshop_is_assistant)
+
+    def test_a_new_manager_is_followed_by_default(self):
+        self.asst.parent_id = self.other_sup
+        self.asst_user.invalidate_recordset()
+        self.assertEqual(self.asst_user.x_workshop_requester_for_ids, self.other_user)
+        self.assertEqual(self._pickable(self.asst_user), self.other_truck)
 
     # ------------------------------------------------------------- the role
     def test_role_grants_nothing_but_internal_user(self):

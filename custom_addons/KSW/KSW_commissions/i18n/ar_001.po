@@ -11698,8 +11698,8 @@ msgstr "مكتبة openpyxl مطلوبة لقراءة الملف."
 
 #. module: KSW_commissions
 #: model:ksw.pay.component,name:KSW_commissions.pay_component_gm_extra
-msgid "External Amount by the GM"
-msgstr "مبلغ إضافي بأمر المدير العام"
+msgid "Driver Trips Remainder"
+msgstr "فرق ردود السائقين"
 
 #. module: KSW_commissions
 #. odoo-python

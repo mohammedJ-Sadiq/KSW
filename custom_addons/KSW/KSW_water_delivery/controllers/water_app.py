@@ -16,7 +16,7 @@ DRIVER_GROUP = 'KSW_water_delivery.group_water_driver'
 # worker keys its cache on it, so a bump is how a driver's phone picks up a new
 # version of the app -- there is no other route in, because the whole point is
 # that it does not go to the network to find out.
-APP_VERSION = '1.0.8'
+APP_VERSION = '1.0.10'
 
 
 class KswWaterApp(http.Controller):
@@ -132,25 +132,24 @@ class KswWaterApp(http.Controller):
         employee = self._check_driver()
         env = request.env
         Picking = env['stock.picking'].sudo()
-        Rate = env['ksw.water.rate'].sudo()
+        Pricing = env['ksw.water.pricing']
 
         # Fetched from the fleet assignment, never offered as a choice.
         vehicle, vehicle_problem = Picking._water_assigned_vehicle(employee)
         picking_type = Picking._water_picking_type_for(vehicle)
         normal, rated = Picking._water_client_scope(employee, picking_type)
 
-        rates = Rate.search([('partner_id', 'in', rated.ids)])
         by_partner = {}
-        for rate in rates:
-            by_partner.setdefault(rate.partner_id.id, []).append({
-                'id': rate.product_id.id,
-                'name': rate.product_id.display_name,
-                'uom': rate.product_id.uom_id.name,
-                # Display only. The note is priced from this register at the
-                # moment it is issued, never from what the phone is holding --
-                # see `stock.picking._issue_water_note`.
-                'price': rate.price,
-            })
+        for partner_id, entries in Pricing._partner_products(rated).items():
+            by_partner[partner_id] = [{
+                'id': product.id,
+                'name': product.display_name,
+                'uom': product.uom_id.name,
+                # Display only. The note is priced from the client's
+                # pricelist at the moment it is issued, never from what the
+                # phone is holding -- see `stock.picking._issue_water_note`.
+                'price': price,
+            } for product, price in entries]
 
         normal_ids = set(normal.ids)
         # So the phone can say "sent, waiting for the office" instead of
@@ -158,11 +157,14 @@ class KswWaterApp(http.Controller):
         open_dispatches = env['ksw.water.dispatch'].sudo()._water_open_for_driver(employee)
         pending_ids = env['ksw.water.location.request'].sudo()._pending_partner_ids(
             (rated | open_dispatches.partner_id).ids)
+        anywhere = env['stock.picking.type']._water_cash_partner_ids()
         clients = [{
             'id': partner.id,
             'name': partner.display_name,
             'lat': partner.partner_latitude or 0.0,
             'lon': partner.partner_longitude or 0.0,
+            # A branch cash customer stands for whoever walked in: no site.
+            'anywhere': partner.id in anywhere,
             'usual': partner.id in normal_ids,
             'location_pending': partner.id in pending_ids,
             'products': by_partner.get(partner.id, []),
@@ -175,7 +177,7 @@ class KswWaterApp(http.Controller):
         dispatches = []
         for dispatch in open_dispatches:
             partner, product = dispatch.partner_id, dispatch.product_id
-            rate = Rate._rate_for(partner, product)
+            rate = Pricing._rate_for(partner, product, dispatch.quantity_m3 or 1.0)
             dispatches.append({
                 'id': dispatch.id,
                 'name': dispatch.name,
@@ -185,14 +187,18 @@ class KswWaterApp(http.Controller):
                     'lat': partner.partner_latitude or 0.0,
                     'lon': partner.partner_longitude or 0.0,
                     'usual': True,
+                    'anywhere': partner.id in anywhere,
                     'location_pending': partner.id in pending_ids,
                     'products': [],
                 },
+                # Paid at the desk: the driver must not collect it again.
+                'cash_paid': bool(dispatch.x_is_cash and dispatch.x_cash_received),
+                'buyer': ' / '.join(filter(None, [dispatch.x_buyer_name, dispatch.x_buyer_phone])),
                 'product': {
                     'id': product.id,
                     'name': product.display_name,
                     'uom': product.uom_id.name,
-                    'price': rate.price if rate else 0.0,
+                    'price': rate.fixed_price if rate else 0.0,
                 },
                 'qty': dispatch.entered_qty,
                 'uom': dispatch.entered_uom,

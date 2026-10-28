@@ -290,8 +290,11 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='sequence_code']" position="after">
                 <field name="x_is_water_delivery" invisible="code != 'outgoing'"/>
-                <field name="x_branch_code" invisible="not x_is_water_delivery"
-                       string="BAS Branch Code"/>
+                <field name="x_branch_code" invisible="not x_is_water_delivery"/>
+                <field name="x_sales_account_id" invisible="not x_is_water_delivery"
+                       options="{'no_create': True}"/>
+                <field name="x_analytic_account_id" invisible="not x_is_water_delivery"
+                       options="{'no_create': True}"/>
                 <field name="x_signature_required" invisible="not x_is_water_delivery"/>
                 <field name="x_location_rule" invisible="not x_is_water_delivery"/>
                 <field name="x_location_radius_m"

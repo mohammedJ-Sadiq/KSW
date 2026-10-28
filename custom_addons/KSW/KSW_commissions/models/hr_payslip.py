@@ -85,6 +85,73 @@ class HrPayslip(models.Model):
         if to_drop:
             to_drop.sudo().unlink()
 
+    @api.model
+    def _ksw_vacation_held_lines(self, leave):
+        """Installments an approved, not-Paid commission month settled for
+        a month this vacation now pays itself.
+
+        The vacation takes the month's entries, and confirming it takes the
+        month out of its register (``_resync_vacation_line``). Its loan
+        offset goes with it, so these installments were never really
+        collected. Left out, the settlement paid the whole commission and
+        showed no deduction (KSWCO PE00260, leave 5256: 113 taken from
+        August at activation, August then paid in full on the vacation).
+        """
+        lines = super()._ksw_vacation_held_lines(leave)
+        if not leave or not leave.employee_id:
+            return lines
+        periods = list(set(self.env['hr.leave']._commission_entries_for_payslip(
+            leave).mapped('period')))
+        if not periods:
+            return lines
+        return lines | self.env['ksw.deduction.line'].sudo().search([
+            ('employee_id', '=', leave.employee_id.id),
+            ('state', '=', 'paid'),
+            ('payslip_id', '=', False),
+            ('x_paid_via_pay_run_line_id.run_id.state', '=', 'approved'),
+            ('x_paid_via_pay_run_line_id.x_paid', '=', False),
+            ('x_paid_via_pay_run_line_id.period', 'in', periods),
+        ], order='period_date, id')
+
+    def _sync_deductions_on_done(self, payslip):
+        """A held installment this payslip collected now belongs to it.
+
+        Cutting the link to the run line is what stops
+        ``_unwind_loan_offset`` giving it back to pending when the confirm
+        resyncs the month, and keeps it out of the month's BAS rows.
+        """
+        held = self.env['ksw.deduction.line'].sudo().search([
+            ('employee_id', '=', payslip.employee_id.id),
+            ('x_paid_via_pay_run_line_id', '!=', False),
+            ('state', '=', 'paid'),
+            ('payslip_id', '=', False),
+        ])
+        super()._sync_deductions_on_done(payslip)
+        taken = held.filtered(lambda l: l.payslip_id == payslip)
+        for line in taken:
+            line.deduction_id.sudo().message_post(
+                body=Markup(
+                    '<strong>%(title)s</strong><br/>'
+                    '<b>%(l_amt)s</b> %(amt).2f<br/>%(why)s'
+                ) % {
+                    'title': _('Collected by the vacation payslip'),
+                    'l_amt': _('Amount:'), 'amt': line.amount,
+                    'why': _('%(run)s had settled it, but the vacation pays '
+                             'that month instead, so %(slip)s collects it.',
+                             run=line.x_paid_via_pay_run_line_id.run_id
+                             .display_name or '',
+                             slip=payslip.number or payslip.display_name),
+                },
+                subtype_xmlid='mail.mt_note',
+            )
+        taken.with_context(_skip_installment_total_check=True).write({
+            'x_paid_via_pay_run_line_id': False,
+            'x_awaiting_commission': False,
+            'x_recover_from_run_id': False,
+            'x_recovery_date': False,
+            'x_recovery_by': False,
+        })
+
     # ------------------------------------------------------------------
     # Commission entries settled on a vacation payslip
     # ------------------------------------------------------------------

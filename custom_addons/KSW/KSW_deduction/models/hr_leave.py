@@ -155,6 +155,7 @@ class HrLeave(models.Model):
             self.env['hr.payslip']._ksw_pending_lines_domain(
                 [self.employee_id.id], False, full=True),
             order=_KSW_LINE_ORDER)
+        lines |= self.env['hr.payslip']._ksw_vacation_held_lines(self)
         return [self._ksw_report_deduction_row(l, l.amount) for l in lines], False
 
     @api.model

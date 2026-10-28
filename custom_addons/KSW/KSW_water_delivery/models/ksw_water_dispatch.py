@@ -166,13 +166,11 @@ class KswWaterDispatch(models.Model):
 
     @api.depends('partner_id')
     def _compute_allowed_product_ids(self):
-        Rate = self.env['ksw.water.rate'].sudo()
+        Pricing = self.env['ksw.water.pricing']
         for dispatch in self:
             # _origin: on an unsaved form the partner is NewId-wrapped and a
             # search on it matches nothing (KSW gotcha #149).
-            partner = dispatch.partner_id._origin
-            products = Rate.search([('partner_id', '=', partner.id)]).product_id \
-                if partner else self.env['product.product']
+            products = Pricing._products_for_partner(dispatch.partner_id)
             dispatch.allowed_product_ids = products
             dispatch.product_locked = len(products) == 1
 
@@ -244,13 +242,14 @@ class KswWaterDispatch(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        Rate = self.env['ksw.water.rate'].sudo()
+        Pricing = self.env['ksw.water.pricing']
+        Partner = self.env['res.partner']
         Picking = self.env['stock.picking']
         for vals in vals_list:
             if not vals.get('product_id') and vals.get('partner_id'):
                 # A read-only one-product field is left out of the browser's
                 # payload; create() is the guard that matters (gotcha #145).
-                products = Rate.search([('partner_id', '=', vals['partner_id'])]).product_id
+                products = Pricing._products_for_partner(Partner.browse(vals['partner_id']))
                 if len(products) == 1:
                     vals['product_id'] = products.id
             if vals.get('driver_user_id') and not vals.get('vehicle_id'):
@@ -288,12 +287,13 @@ class KswWaterDispatch(models.Model):
         the form's pickers are a convenience, not the guard."""
         self._check_branch_authority()
         Picking = self.env['stock.picking'].sudo()
-        Rate = self.env['ksw.water.rate'].sudo()
+        Pricing = self.env['ksw.water.pricing']
         for dispatch in self:
             if dispatch.state != 'draft':
                 raise UserError(_('Only a draft can be dispatched.'))
             branch = dispatch.picking_type_id.sudo()
-            if branch.x_issue_mode != 'dispatch':
+            # A cash sale is the desk's on every branch (models/water_cash.py).
+            if branch.x_issue_mode != 'dispatch' and not dispatch.x_is_cash:
                 raise UserError(_(
                     '%s is set so that drivers issue their own deliveries. '
                     'Switch the branch to "Dispatcher dispatches, driver '
@@ -304,7 +304,8 @@ class KswWaterDispatch(models.Model):
                     '%(client)s is not one of %(branch)s\'s priced clients.',
                     client=dispatch.partner_id.display_name,
                     branch=branch.display_name))
-            if not Rate._rate_for(dispatch.partner_id, dispatch.product_id):
+            if not Pricing._rate_for(dispatch.partner_id, dispatch.product_id,
+                                     dispatch.quantity_m3 or 1.0):
                 raise UserError(_(
                     'There is no agreed rate for %(product)s with %(client)s.',
                     product=dispatch.product_id.display_name,

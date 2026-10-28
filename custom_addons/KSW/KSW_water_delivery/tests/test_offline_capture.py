@@ -349,9 +349,9 @@ class TestNothingIsLost(OfflineCaptureCommon):
 
     def test_a_failed_capture_is_retried_once_the_data_is_fixed(self):
         capture = self._receive(partner_id=self.unrated_customer.id)
-        self.env['ksw.water.rate'].create({
-            'partner_id': self.unrated_customer.id,
-            'product_id': self.water.id, 'price': 175.0,
+        self.env['product.pricelist.item'].create({
+            'x_client_id': self.unrated_customer.id,
+            'product_id': self.water.id, 'fixed_price': 175.0,
         })
 
         capture.with_user(self.dispatcher_user).action_retry()
