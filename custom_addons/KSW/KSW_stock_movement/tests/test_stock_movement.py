@@ -121,3 +121,34 @@ class TestStockMovement(TransactionCase):
         rows, _action = self._rows()
         self.assertFalse(rows.filtered(lambda r: r.kind == 'opening'))
         self.assertEqual(rows.kind, 'out')
+
+    def test_a_sales_delivery_carries_its_price_and_vat(self):
+        if 'sale_line_id' not in self.env['stock.move']._fields:
+            self.skipTest('Sales is not installed')
+        tax = self.env['account.tax'].create({
+            'name': 'KSW SM VAT 15', 'amount': 15.0, 'amount_type': 'percent',
+            'type_tax_use': 'sale'})
+        partner = self.env['res.partner'].create({'name': 'KSW SM Customer'})
+        order = self.env['sale.order'].create({
+            'partner_id': partner.id,
+            'order_line': [(0, 0, {
+                'product_id': self.product.id, 'product_uom_qty': 4.0,
+                'price_unit': 12.5, 'discount': 20.0, 'tax_ids': [(6, 0, tax.ids)]})],
+        })
+        order.action_confirm()
+        picking = order.picking_ids
+        self._move(self.supplier, picking.location_id, 4.0)
+        picking.move_ids.write({'quantity': 4.0, 'picked': True})
+        picking.button_validate()
+        rows, _action = self._rows(location_ids=[(6, 0, picking.location_id.ids)])
+        row = rows.filtered(lambda r: r.kind == 'out' and r.picking_id == picking)
+        self.assertEqual(row.price_unit, 10.0, '12.5 less 20 %')
+        self.assertEqual(row.amount_untaxed, 40.0)
+        self.assertEqual(row.amount_tax, 6.0)
+        self.assertEqual(row.amount_total, 46.0)
+
+    def test_a_transfer_has_no_price(self):
+        self._move(self.supplier, self.loc_a, 3.0)
+        rows, _action = self._rows()
+        self.assertFalse(rows.price_unit)
+        self.assertFalse(rows.amount_untaxed)

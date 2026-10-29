@@ -519,3 +519,57 @@ msgstr "أي المخازن"
 #: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__wizard_id
 msgid "Wizard"
 msgstr ""
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__currency_id
+msgid "Currency"
+msgstr "العملة"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,help:KSW_stock_movement.field_ksw_stock_movement_line__price_unit
+msgid ""
+"Per unit of the item, after discount, before VAT, from the sales or purchase"
+" order line the movement belongs to."
+msgstr ""
+"لكل وحدة من الصنف، بعد الخصم وقبل الضريبة، من سطر أمر البيع أو الشراء الذي "
+"تنتمي إليه الحركة."
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__amount_untaxed
+msgid "Total (excl. VAT)"
+msgstr "الإجمالي (بدون الضريبة)"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__amount_total
+msgid "Total incl. VAT"
+msgstr "الإجمالي شامل الضريبة"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__price_unit
+msgid "Unit Price (excl. VAT)"
+msgstr "سعر الوحدة (بدون الضريبة)"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__amount_tax
+msgid "VAT"
+msgstr "ضريبة القيمة المضافة"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__invoice_name
+msgid "Invoice"
+msgstr "الفاتورة"
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__invoice_move_id
+msgid "Invoice ID"
+msgstr "رقم الفاتورة الداخلي"
+
+#. module: KSW_stock_movement
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_list
+msgid "Open the delivery"
+msgstr "فتح سند التسليم"
+
+#. module: KSW_stock_movement
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_list
+msgid "Open the invoice"
+msgstr "فتح الفاتورة"

@@ -60,6 +60,28 @@ class KswStockMovementLine(models.TransientModel):
         help='In minus Out. Summed per item with the opening row, it is the '
              'balance at the end of the period.')
 
+    # The price of the order behind the movement: the sales order line for a
+    # delivery, the purchase order line for a receipt. Empty for transfers and
+    # adjustments, which carry no price.
+    currency_id = fields.Many2one('res.currency', string='Currency', readonly=True)
+    price_unit = fields.Float(
+        string='Unit Price (excl. VAT)', readonly=True, aggregator=False,
+        digits='Product Price',
+        help='Per unit of the item, after discount, before VAT, from the sales '
+             'or purchase order line the movement belongs to.')
+    amount_untaxed = fields.Monetary(string='Total (excl. VAT)', readonly=True,
+                                     aggregator='sum', currency_field='currency_id')
+    amount_tax = fields.Monetary(string='VAT', readonly=True, aggregator='sum',
+                                 currency_field='currency_id')
+    amount_total = fields.Monetary(string='Total incl. VAT', readonly=True,
+                                   aggregator='sum', currency_field='currency_id')
+
+    # The invoice that billed it, kept as an id and a name: a stock user may
+    # have no right to read account.move, and a relation to it would fail on
+    # his screen. The Invoice button is shown to accounting only.
+    invoice_move_id = fields.Integer(string='Invoice ID', readonly=True)
+    invoice_name = fields.Char(string='Invoice', readonly=True)
+
     invoice_status = fields.Selection([
         ('invoiced', 'Invoiced'),
         ('to invoice', 'To Invoice'),
@@ -68,3 +90,33 @@ class KswStockMovementLine(models.TransientModel):
     ], string='Invoice Status', readonly=True,
         help='For a delivery made from a sales order: whether that order line '
              'has been invoiced yet.')
+
+    # ------------------------------------------------------------------
+    # Open the document behind the row, in a pop-up that can be expanded
+    # ------------------------------------------------------------------
+    def _picking_form_ref(self):
+        """The form to show the delivery in. Bridges override it (a water
+        delivery note has its own)."""
+        return False
+
+    def _record_dialog(self, record, form_ref):
+        view = self.env.ref(form_ref, raise_if_not_found=False) if form_ref else False
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'ksw_open_record_dialog',
+            'params': {
+                'res_model': record._name, 'res_id': record.id,
+                'title': record.display_name,
+                'view_id': view.id if view else False,
+                'form_view_ref': form_ref or False,
+            },
+        }
+
+    def action_open_picking(self):
+        self.ensure_one()
+        return self._record_dialog(self.picking_id, self._picking_form_ref())
+
+    def action_open_invoice(self):
+        self.ensure_one()
+        invoice = self.env['account.move'].browse(self.invoice_move_id).exists()
+        return self._record_dialog(invoice, 'account.view_move_form') if invoice else False

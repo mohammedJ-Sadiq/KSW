@@ -16,7 +16,7 @@ DRIVER_GROUP = 'KSW_water_delivery.group_water_driver'
 # worker keys its cache on it, so a bump is how a driver's phone picks up a new
 # version of the app -- there is no other route in, because the whole point is
 # that it does not go to the network to find out.
-APP_VERSION = '1.0.10'
+APP_VERSION = '1.0.11'
 
 
 class KswWaterApp(http.Controller):
@@ -158,6 +158,11 @@ class KswWaterApp(http.Controller):
         pending_ids = env['ksw.water.location.request'].sudo()._pending_partner_ids(
             (rated | open_dispatches.partner_id).ids)
         anywhere = env['stock.picking.type']._water_cash_partner_ids()
+        # Over the credit limit: the app refuses while it is online. A
+        # delivery made offline anyway is issued and held (models/water_credit.py).
+        no_product = env['product.product']
+        credit_hold = {p.id for p in rated.sudo()
+                       if Picking._water_credit_problem(p, no_product, 0.0)}
         clients = [{
             'id': partner.id,
             'name': partner.display_name,
@@ -165,6 +170,7 @@ class KswWaterApp(http.Controller):
             'lon': partner.partner_longitude or 0.0,
             # A branch cash customer stands for whoever walked in: no site.
             'anywhere': partner.id in anywhere,
+            'credit_hold': partner.id in credit_hold,
             'usual': partner.id in normal_ids,
             'location_pending': partner.id in pending_ids,
             'products': by_partner.get(partner.id, []),
@@ -188,6 +194,7 @@ class KswWaterApp(http.Controller):
                     'lon': partner.partner_longitude or 0.0,
                     'usual': True,
                     'anywhere': partner.id in anywhere,
+                    'credit_hold': partner.id in credit_hold,
                     'location_pending': partner.id in pending_ids,
                     'products': [],
                 },

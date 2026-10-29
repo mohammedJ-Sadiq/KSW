@@ -32,6 +32,8 @@
                         </group>
                         <group string="Trip">
                             <field name="x_driver_id" readonly="1"/>
+                            <field name="x_dispatcher_id" readonly="1" invisible="not x_dispatcher_id"
+                                   options="{'no_open': True}"/>
                             <field name="x_vehicle_id" readonly="1"/>
                             <field name="x_branch_name"/>
                             <field name="x_off_route" readonly="1"
@@ -108,6 +110,7 @@
                 <field name="x_branch_code" column_invisible="1"/>
                 <field name="x_branch_name" optional="show"/>
                 <field name="x_driver_id" optional="show"/>
+                <field name="x_dispatcher_id" optional="show"/>
                 <field name="x_vehicle_id" optional="hide"/>
                 <field name="x_load_qty" sum="Loads"/>
                 <field name="x_amount_untaxed" sum="Before Tax" optional="hide"/>

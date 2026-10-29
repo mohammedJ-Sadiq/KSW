@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="KSW_stock_movement.RecordLinkField">
+        <a t-if="linked" href="#" class="o_ksw_record_link" t-on-click="onClick" t-esc="value"/>
+        <span t-else="" t-esc="value"/>
+    </t>
+</templates>

@@ -90,6 +90,13 @@ class StockPickingType(models.Model):
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
+    # Who dispatched (or sold at the desk) the note, for everyone who can see
+    # the note: the dispatch link itself is only shown to dispatch roles.
+    x_dispatcher_id = fields.Many2one(
+        'res.users', string='Dispatcher', related='x_dispatch_id.dispatcher_id',
+        help='Who dispatched it, or sold it at the desk. Empty when the driver '
+             'issued the note himself.')
+
     def _water_location_check(self, picking_type, partner, latitude, longitude):
         # A cash customer stands for whoever walked in: there is no one site
         # to check the note against.

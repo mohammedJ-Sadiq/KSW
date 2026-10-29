@@ -234,6 +234,8 @@ class KswStockMovementWizard(models.TransientModel):
             'categ_id': product.categ_id.id,
             'uom_id': product.uom_id.id,
             'invoice_status': self._invoice_status(move),
+            **self._price_vals(move, product, qty),
+            **self._invoice_vals(move),
         }
         rows = []
         if src.id in scope_ids:
@@ -247,6 +249,42 @@ class KswStockMovementWizard(models.TransientModel):
                              warehouse_id=dest.warehouse_id.id or False,
                              qty_in=qty, qty_out=0.0, qty_net=qty))
         return rows
+
+    def _price_vals(self, move, product, qty):
+        """Unit price and amounts of the order line behind `move`, for `qty`
+        in the item's own unit. sale_stock / purchase_stock are not
+        dependencies, so each link is used only where it exists."""
+        line = False
+        for fname in ('sale_line_id', 'purchase_line_id'):
+            if fname in move._fields and move[fname]:
+                line = move[fname].sudo()
+                break
+        if not line or not qty:
+            return {}
+        price = line.price_unit * (1.0 - (line.discount or 0.0) / 100.0)
+        if line.product_uom_id:
+            price = line.product_uom_id._compute_price(price, product.uom_id)
+        currency = line.currency_id or self.env.company.currency_id
+        taxes = line.tax_ids.compute_all(
+            price, currency, qty, product=product, partner=line.order_id.partner_id)
+        return {
+            'currency_id': currency.id,
+            'price_unit': price,
+            'amount_untaxed': taxes['total_excluded'],
+            'amount_tax': taxes['total_included'] - taxes['total_excluded'],
+            'amount_total': taxes['total_included'],
+        }
+
+    def _invoice_vals(self, move):
+        """The customer invoice that billed this delivery, if any: a posted
+        one before a draft, the latest of each."""
+        line = move['sale_line_id'] if 'sale_line_id' in move._fields else False
+        if not line:
+            return {}
+        invoices = line.sudo().invoice_lines.move_id.filtered(
+            lambda m: m.move_type == 'out_invoice' and m.state != 'cancel')
+        invoice = (invoices.filtered(lambda m: m.state == 'posted') or invoices).sorted('id')[-1:]
+        return {'invoice_move_id': invoice.id, 'invoice_name': invoice.display_name} if invoice else {}
 
     def _invoice_status(self, move):
         # sale_stock is not a dependency: the report runs without Sales, and

@@ -13,3 +13,4 @@ from . import ksw_water_tanker_group
 from . import ksw_water_dispatch
 from . import water_cash
 from . import water_analytic
+from . import water_credit

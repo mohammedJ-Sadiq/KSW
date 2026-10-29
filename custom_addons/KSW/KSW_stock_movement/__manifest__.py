@@ -1,6 +1,6 @@
 {
     'name': 'KSW Stock Movement',
-    'version': '19.0.1.0.1',
+    'version': '19.0.1.3.0',
     'author': 'Mohammed Albadr',
     'category': 'Inventory/Inventory',
     'summary': 'Stock movement report: pick stocks, items and a period, then a '
@@ -21,6 +21,13 @@ stock moves (Inventory > Reporting > Stock Movement):
 Depends on stock only, so it runs wherever Inventory does.
 """,
     'depends': ['stock'],
+    'assets': {
+        'web.assets_backend': [
+            'KSW_stock_movement/static/src/record_dialog.js',
+            'KSW_stock_movement/static/src/record_link_field.js',
+            'KSW_stock_movement/static/src/record_link_field.xml',
+        ],
+    },
     'data': [
         'security/ir.model.access.csv',
         'views/stock_movement_line_views.xml',

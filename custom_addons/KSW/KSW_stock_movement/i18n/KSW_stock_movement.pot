@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-27 18:44+0000\n"
-"PO-Revision-Date: 2026-10-27 18:44+0000\n"
+"POT-Creation-Date: 2026-10-29 13:03+0000\n"
+"PO-Revision-Date: 2026-10-29 13:03+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -86,6 +86,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__create_date
 #: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_wizard__create_date
 msgid "Created on"
+msgstr ""
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__currency_id
+msgid "Currency"
 msgstr ""
 
 #. module: KSW_stock_movement
@@ -205,6 +210,16 @@ msgid "Include Not Yet Validated"
 msgstr ""
 
 #. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__invoice_name
+msgid "Invoice"
+msgstr ""
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__invoice_move_id
+msgid "Invoice ID"
+msgstr ""
+
+#. module: KSW_stock_movement
 #: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__invoice_status
 #: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by_2__invoice_status
 #: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_wizard__group_by__invoice_status
@@ -316,6 +331,16 @@ msgid ""
 msgstr ""
 
 #. module: KSW_stock_movement
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_list
+msgid "Open the delivery"
+msgstr ""
+
+#. module: KSW_stock_movement
+#: model_terms:ir.ui.view,arch_db:KSW_stock_movement.view_stock_movement_line_list
+msgid "Open the invoice"
+msgstr ""
+
+#. module: KSW_stock_movement
 #. odoo-python
 #: code:addons/KSW_stock_movement/wizard/stock_movement_wizard.py:0
 #: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_line__kind__opening
@@ -366,6 +391,13 @@ msgstr ""
 #. module: KSW_stock_movement
 #: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_wizard__partner_ids
 msgid "Partners"
+msgstr ""
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,help:KSW_stock_movement.field_ksw_stock_movement_line__price_unit
+msgid ""
+"Per unit of the item, after discount, before VAT, from the sales or purchase"
+" order line the movement belongs to."
 msgstr ""
 
 #. module: KSW_stock_movement
@@ -451,6 +483,16 @@ msgid "Total"
 msgstr ""
 
 #. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__amount_untaxed
+msgid "Total (excl. VAT)"
+msgstr ""
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__amount_total
+msgid "Total incl. VAT"
+msgstr ""
+
+#. module: KSW_stock_movement
 #: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__picking_id
 msgid "Transfer"
 msgstr ""
@@ -461,8 +503,18 @@ msgid "Unit"
 msgstr ""
 
 #. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__price_unit
+msgid "Unit Price (excl. VAT)"
+msgstr ""
+
+#. module: KSW_stock_movement
 #: model:ir.model.fields.selection,name:KSW_stock_movement.selection__ksw_stock_movement_line__invoice_status__upselling
 msgid "Upselling Opportunity"
+msgstr ""
+
+#. module: KSW_stock_movement
+#: model:ir.model.fields,field_description:KSW_stock_movement.field_ksw_stock_movement_line__amount_tax
+msgid "VAT"
 msgstr ""
 
 #. module: KSW_stock_movement

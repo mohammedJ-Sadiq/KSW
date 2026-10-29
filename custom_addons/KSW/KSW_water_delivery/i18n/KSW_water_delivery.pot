@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-28 12:36+0000\n"
-"PO-Revision-Date: 2026-10-28 12:36+0000\n"
+"POT-Creation-Date: 2026-10-29 13:03+0000\n"
+"PO-Revision-Date: 2026-10-29 13:03+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -145,6 +145,25 @@ msgstr ""
 
 #. module: KSW_water_delivery
 #. odoo-python
+#: code:addons/KSW_water_delivery/models/water_credit.py:0
+msgid "%s A Financial Risk Manager can approve this delivery."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/water_credit.py:0
+msgid ""
+"%s Call the office: a Financial Risk Manager can approve this delivery."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/water_credit.py:0
+msgid "%s Held for a supervisor."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
 #: code:addons/KSW_water_delivery/models/res_partner.py:0
 msgid "%s already has a location."
 msgstr ""
@@ -222,6 +241,12 @@ msgstr ""
 msgid ""
 "%s is not set up for cash sales yet. An administrator presses Set Up Cash "
 "Sales in Water Delivery ▸ Configuration ▸ Branches."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/water_credit.py:0
+msgid "%s is over the credit limit."
 msgstr ""
 
 #. module: KSW_water_delivery
@@ -630,6 +655,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_branch_code
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking_type__x_branch_code
 msgid "Branch Code"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_cc_branch_id
+msgid "Branch Cost Centre"
 msgstr ""
 
 #. module: KSW_water_delivery
@@ -1138,6 +1168,7 @@ msgid "Dispatched On"
 msgstr ""
 
 #. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_dispatcher_id
 #: model:res.groups,name:KSW_water_delivery.group_water_dispatch
 msgid "Dispatcher"
 msgstr ""
@@ -1272,6 +1303,11 @@ msgstr ""
 #. module: KSW_water_delivery
 #: model:ir.model,name:KSW_water_delivery.model_hr_employee
 msgid "Employee"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_cc_employee_id
+msgid "Employee Cost Centre"
 msgstr ""
 
 #. module: KSW_water_delivery
@@ -1606,6 +1642,12 @@ msgstr ""
 #. module: KSW_water_delivery
 #: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_search
 msgid "Issued Without a Signature"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/water_credit.py:0
+msgid "Issued over the credit limit, approved by %s."
 msgstr ""
 
 #. module: KSW_water_delivery
@@ -2892,8 +2934,8 @@ msgstr ""
 #. module: KSW_water_delivery
 #: model:ir.model.fields,help:KSW_water_delivery.field_stock_picking_type__x_analytic_account_id
 msgid ""
-"The branch's cost centre. A sale collected by the customer's own tanker is "
-"booked to it; one our tanker delivered goes to the tanker's."
+"The branch's cost centre (Branch Cost Centre plan). Every sale of the branch"
+" is tagged with it, beside the tanker and the driver."
 msgstr ""
 
 #. module: KSW_water_delivery
@@ -3336,6 +3378,11 @@ msgid "Vehicle"
 msgstr ""
 
 #. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_cc_vehicle_id
+msgid "Vehicle Cost Centre"
+msgstr ""
+
+#. module: KSW_water_delivery
 #: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_location_request__state__pending
 #: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_location_request_search
 msgid "Waiting for Approval"
@@ -3485,6 +3532,13 @@ msgstr ""
 #. module: KSW_water_delivery
 #: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_wizard_form
 msgid "Who are you delivering to?"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_stock_picking__x_dispatcher_id
+msgid ""
+"Who dispatched it, or sold it at the desk. Empty when the driver issued the "
+"note himself."
 msgstr ""
 
 #. module: KSW_water_delivery

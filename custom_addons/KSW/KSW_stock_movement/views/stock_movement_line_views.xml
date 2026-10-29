@@ -12,7 +12,9 @@
                   decoration-info="kind == 'opening'"
                   decoration-bf="kind == 'opening'">
                 <field name="date"/>
-                <field name="reference"/>
+                <field name="picking_id" column_invisible="1"/>
+                <field name="reference" widget="ksw_record_link"
+                       options="{'method': 'action_open_picking', 'when': 'picking_id'}"/>
                 <field name="kind" optional="show"/>
                 <field name="location_id"/>
                 <field name="other_location_id" optional="show"/>
@@ -24,10 +26,23 @@
                 <field name="qty_out" sum="Total"/>
                 <field name="qty_net" sum="Total"/>
                 <field name="uom_id" optional="show"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="price_unit" optional="show"/>
+                <field name="amount_untaxed" sum="Total" optional="show"/>
+                <field name="amount_tax" sum="Total" optional="hide"/>
+                <field name="amount_total" sum="Total" optional="hide"/>
                 <field name="picking_type_id" optional="hide"/>
                 <field name="origin" optional="hide"/>
                 <field name="state" optional="hide"/>
                 <field name="invoice_status" optional="show"/>
+                <field name="invoice_move_id" column_invisible="1"/>
+                <!-- A link for accounting, who can open invoices; plain text
+                     for everyone else. -->
+                <field name="invoice_name" optional="show" widget="ksw_record_link"
+                       options="{'method': 'action_open_invoice', 'when': 'invoice_move_id'}"
+                       groups="account.group_account_invoice,account.group_account_readonly"/>
+                <field name="invoice_name" optional="show"
+                       groups="!account.group_account_invoice,!account.group_account_readonly"/>
             </list>
         </field>
     </record>
@@ -52,6 +67,7 @@
                 <field name="product_id" type="row"/>
                 <field name="kind" type="col"/>
                 <field name="qty_net" type="measure"/>
+                <field name="amount_untaxed" type="measure"/>
             </pivot>
         </field>
     </record>

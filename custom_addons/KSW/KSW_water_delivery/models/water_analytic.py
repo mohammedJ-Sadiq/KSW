@@ -58,14 +58,33 @@ class HrEmployee(models.Model):
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
+    # What the note was tagged with when it was issued, one per plan. Kept on
+    # the note (not only on its order line) so reports can show the cost
+    # centres of EVERY delivery, invoiced or not, and group by them.
+    x_cc_vehicle_id = fields.Many2one('account.analytic.account', string='Vehicle Cost Centre',
+                                      readonly=True, copy=False, index='btree_not_null')
+    x_cc_branch_id = fields.Many2one('account.analytic.account', string='Branch Cost Centre',
+                                     readonly=True, copy=False, index='btree_not_null')
+    x_cc_employee_id = fields.Many2one('account.analytic.account', string='Employee Cost Centre',
+                                       readonly=True, copy=False, index='btree_not_null')
+
+    def _water_cost_centres(self):
+        """(vehicle, branch, employee) cost centres: as stamped at issue, else
+        (a note issued before stamping existed) as configured today."""
+        self.ensure_one()
+        note = self.sudo()
+        if note.x_cc_vehicle_id or note.x_cc_branch_id or note.x_cc_employee_id:
+            return note.x_cc_vehicle_id, note.x_cc_branch_id, note.x_cc_employee_id
+        return (note.x_vehicle_id.x_analytic_account_id,
+                note.picking_type_id.x_analytic_account_id,
+                note.x_driver_id.x_analytic_account_id)
+
     def _water_analytic_distribution(self):
         """{"<vehicle>,<branch>,<employee>": 100} for this note (whichever
         it has, one per plan), or False when it has none."""
         self.ensure_one()
         note = self.sudo()
-        accounts = [a for a in (note.x_vehicle_id.x_analytic_account_id,
-                                note.picking_type_id.x_analytic_account_id,
-                                note.x_driver_id.x_analytic_account_id) if a]
+        accounts = [a for a in note._water_cost_centres() if a]
         # One account per root plan in a key: two from the same plan would be
         # two keys, each at 100 %, counting the sale twice there.
         seen, ids = set(), []
@@ -78,6 +97,11 @@ class StockPicking(models.Model):
 
     def _water_stamp_analytic(self):
         for note in self.sudo():
+            note.write({
+                'x_cc_vehicle_id': note.x_vehicle_id.x_analytic_account_id.id or False,
+                'x_cc_branch_id': note.picking_type_id.x_analytic_account_id.id or False,
+                'x_cc_employee_id': note.x_driver_id.x_analytic_account_id.id or False,
+            })
             distribution = note._water_analytic_distribution()
             lines = note.sale_id.order_line.filtered(lambda l: not l.display_type)
             if distribution and lines:

@@ -3222,6 +3222,7 @@ msgid "Dispatched On"
 msgstr ""
 
 #. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_dispatcher_id
 #: model:res.groups,name:KSW_water_delivery.group_water_dispatch
 msgid "Dispatcher"
 msgstr "المرسِل"
@@ -3863,15 +3864,6 @@ msgid "His own cost centre (Employee Cost Centre)"
 msgstr "مركز تكلفته الخاص (مركز تكلفة الموظف)"
 
 #. module: KSW_water_delivery
-#: model:ir.model.fields,help:KSW_water_delivery.field_stock_picking_type__x_analytic_account_id
-msgid ""
-"The branch's cost centre. A sale collected by the customer's own tanker is "
-"booked to it; one our tanker delivered goes to the tanker's."
-msgstr ""
-"مركز تكلفة الفرع. البيع الذي يستلمه وايت العميل يُقيد عليه، والذي يسلمه "
-"وايتنا يُقيد على مركز تكلفة الوايت."
-
-#. module: KSW_water_delivery
 #: model:ir.model.fields,help:KSW_water_delivery.field_hr_employee__x_analytic_account_id
 msgid ""
 "This employee's own cost centre (Employee Cost Centre plan). Water he "
@@ -3879,3 +3871,63 @@ msgid ""
 msgstr ""
 "مركز التكلفة الخاص بهذا الموظف (خطة مركز تكلفة الموظف). المياه التي يوصلها "
 "كسائق تُوسم به."
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_cc_branch_id
+msgid "Branch Cost Centre"
+msgstr "مركز تكلفة الفرع"
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_cc_employee_id
+msgid "Employee Cost Centre"
+msgstr "مركز تكلفة الموظف"
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_stock_picking_type__x_analytic_account_id
+msgid ""
+"The branch's cost centre (Branch Cost Centre plan). Every sale of the branch"
+" is tagged with it, beside the tanker and the driver."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_cc_vehicle_id
+msgid "Vehicle Cost Centre"
+msgstr "مركز تكلفة السيارة"
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/water_credit.py:0
+msgid "%s A Financial Risk Manager can approve this delivery."
+msgstr "%s يمكن لمدير المخاطر المالية اعتماد هذا التسليم."
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/water_credit.py:0
+msgid ""
+"%s Call the office: a Financial Risk Manager can approve this delivery."
+msgstr "%s اتصل بالمكتب: يمكن لمدير المخاطر المالية اعتماد هذا التسليم."
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/water_credit.py:0
+msgid "%s Held for a supervisor."
+msgstr "%s محتجز لدى المشرف."
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/water_credit.py:0
+msgid "%s is over the credit limit."
+msgstr "العميل %s تجاوز حد الائتمان."
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/water_credit.py:0
+msgid "Issued over the credit limit, approved by %s."
+msgstr "صدر رغم تجاوز حد الائتمان، باعتماد %s."
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_stock_picking__x_dispatcher_id
+msgid ""
+"Who dispatched it, or sold it at the desk. Empty when the driver issued the "
+"note himself."
+msgstr "من أرسله أو باعه في المكتب. فارغ إذا أصدر السائق السند بنفسه."

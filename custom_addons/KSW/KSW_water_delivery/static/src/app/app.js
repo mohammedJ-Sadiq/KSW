@@ -508,8 +508,13 @@ function needsPin(client) {
     return Boolean(client) && !isLocated(client) && !awaitingApproval(client);
 }
 
+// Over the credit limit (snapshot from the last sync): refused while online.
+// A note issued from an older snapshot is held by the server, never lost.
+const creditHold = (client) => Boolean(client && client.credit_hold);
+const creditMessage = (client) => `${client.name} is over the credit limit. Call the office.`;
+
 function canDeliver(client) {
-    return Boolean(client) && (!strictLocation() || isLocated(client));
+    return Boolean(client) && !creditHold(client) && (!strictLocation() || isLocated(client));
 }
 
 async function markPending(partnerId) {
@@ -602,6 +607,9 @@ async function saveCapture() {
     }
     if (!form.partner) {
         return banner("warn", "Pick the client first.");
+    }
+    if (creditHold(form.partner)) {
+        return banner("warn", creditMessage(form.partner));
     }
     if (!canDeliver(form.partner)) {
         return banner("warn", `${form.partner.name} has no approved location yet.`);
@@ -717,6 +725,9 @@ async function deliverDispatch() {
     const reference = state.reference;
     if (!dispatch) {
         return;
+    }
+    if (creditHold(form.partner)) {
+        return banner("warn", creditMessage(form.partner));
     }
     if (!canDeliver(form.partner)) {
         return banner("warn", `${form.partner.name} has no approved location yet.`);
@@ -1075,6 +1086,9 @@ function clientTags(client) {
     if (!client.usual) {
         tags.push(`<span class="ksw-tag">Off route</span>`);
     }
+    if (creditHold(client)) {
+        tags.push(`<span class="ksw-tag ksw-tag-warn">Credit hold</span>`);
+    }
     return tags.join("");
 }
 
@@ -1088,6 +1102,7 @@ function renderForm() {
         ${tankerProblem ? `<div class="ksw-warnbox"><b>&#9888; You cannot issue notes yet.</b> ${esc(tankerProblem)}</div>` : ""}
         ${renderGps()}
         ${form.partner ? renderClientCard() : renderClientPicker()}
+        ${creditHold(form.partner) ? `<div class="ksw-warnbox"><b>&#9888; ${esc(creditMessage(form.partner))}</b></div>` : ""}
         ${renderPinBox()}
         ${problem && canDeliver(form.partner) ? `<div class="ksw-warnbox">&#9888; ${esc(problem)}
             If you save, your supervisor has to approve the note.</div>` : ""}

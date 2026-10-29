@@ -14,3 +14,4 @@ from . import test_client_pricelist
 from . import test_water_cash
 from . import test_water_cash_ui
 from . import test_water_analytic
+from . import test_water_credit

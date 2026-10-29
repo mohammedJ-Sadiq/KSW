@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_stock_movement_line_list_water" model="ir.ui.view">
+        <field name="name">ksw.stock.movement.line.list.water</field>
+        <field name="model">ksw.stock.movement.line</field>
+        <field name="inherit_id" ref="KSW_stock_movement.view_stock_movement_line_list"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="x_dispatcher"/>
+                <field name="x_driver" optional="show"/>
+                <field name="x_cc_branch_id" optional="show"/>
+                <field name="x_cc_vehicle_id" optional="show"/>
+                <field name="x_cc_employee_id" optional="hide"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_stock_movement_line_search_water" model="ir.ui.view">
+        <field name="name">ksw.stock.movement.line.search.water</field>
+        <field name="model">ksw.stock.movement.line</field>
+        <field name="inherit_id" ref="KSW_stock_movement.view_stock_movement_line_search"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="x_dispatcher"/>
+                <field name="x_driver"/>
+                <field name="x_cc_branch_id"/>
+                <field name="x_cc_vehicle_id"/>
+                <field name="x_cc_employee_id"/>
+            </field>
+            <filter name="g_invoice" position="after">
+                <filter name="g_dispatcher" string="Dispatcher" context="{'group_by': 'x_dispatcher'}"/>
+                <filter name="g_driver" string="Driver" context="{'group_by': 'x_driver'}"/>
+                <filter name="g_cc_branch" string="Branch Cost Centre" context="{'group_by': 'x_cc_branch_id'}"/>
+                <filter name="g_cc_vehicle" string="Vehicle Cost Centre" context="{'group_by': 'x_cc_vehicle_id'}"/>
+                <filter name="g_cc_employee" string="Employee Cost Centre" context="{'group_by': 'x_cc_employee_id'}"/>
+            </filter>
+        </field>
+    </record>
+
+</odoo>

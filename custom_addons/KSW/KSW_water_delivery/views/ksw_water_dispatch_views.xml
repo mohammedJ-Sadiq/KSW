@@ -19,6 +19,7 @@
                 <field name="entered_qty"/>
                 <field name="entered_uom"/>
                 <field name="driver_user_id"/>
+                <field name="dispatcher_id" optional="show"/>
                 <field name="vehicle_id" optional="show"/>
                 <field name="picking_id" optional="show"/>
                 <field name="x_cash_received" optional="show" sum="Total"/>
