@@ -127,11 +127,13 @@ class TestWorkshopIssue(TransactionCase):
         self.assertEqual(data[0]['part_line_ids'][0]['x_available_qty'], 4.0)
 
     def test_vehicle_cost_centre_matching(self):
-        plan = self.env['account.analytic.plan'].search(
-            [('name', '=', 'Cost Centres'), ('parent_id', '=', False)], limit=1)
-        if not plan:
+        # Under the Vehicle Cost Centre plan since Oct 2026 (it was a group of
+        # Cost Centres): found wherever the BAS cost centres put it.
+        roots = self.env['ksw.bas.gl.import']._cost_centre_root_plans()
+        isuzu = self.env['account.analytic.plan'].search(
+            [('name', '=', 'الايسوزو'), ('parent_id', 'child_of', roots.ids)], limit=1) if roots else False
+        if not isuzu:
             self.skipTest('BAS cost centres not imported in this database')
-        isuzu = self.env['account.analytic.plan'].search([('name', '=', 'الايسوزو'), ('parent_id', 'child_of', plan.id)], limit=1)
         acc = self.env['account.analytic.account'].create({'name': 'ايسوزو 9871', 'plan_id': isuzu.id})
         vehicle = self.env['ksw.fleet.vehicle'].create({'name': 'IS9871', 'vehicle_type': 'isuzu'})
         self.env['ksw.fleet.vehicle']._ksw_match_cost_centres()

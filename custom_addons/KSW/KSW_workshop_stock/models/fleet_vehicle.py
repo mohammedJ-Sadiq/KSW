@@ -46,13 +46,14 @@ class KswFleetVehicle(models.Model):
         master once set), when no account matches, or when more than one does:
         a guess would charge one truck's repairs to another.
         """
-        root = self.env['account.analytic.plan'].search(
-            [('name', '=', 'Cost Centres'), ('parent_id', '=', False)], limit=1)
-        if not root:
+        # Every BAS cost-centre root: vehicles became a top-level plan of
+        # their own in Oct 2026 (KSW_bas_gl_import 19.0.1.7.0).
+        roots = self.env['ksw.bas.gl.import']._cost_centre_root_plans()
+        if not roots:
             return {}
         index = defaultdict(list)
         for acc in self.env['account.analytic.account'].with_context(active_test=False).search(
-                [('root_plan_id', '=', root.id)]):
+                [('root_plan_id', 'in', roots.ids)]):
             kind = _PLAN_KIND.get(acc.plan_id.name)
             num = self._ksw_number(acc.name)
             if kind and num:

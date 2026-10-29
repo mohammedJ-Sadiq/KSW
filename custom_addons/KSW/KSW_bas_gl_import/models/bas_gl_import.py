@@ -200,6 +200,52 @@ class BasGlImport(models.Model):
     # as in BAS.  Each BAS group node is a sub-plan; every node, group or not,
     # is also an account (BAS posts to six group nodes directly).
     _COST_CENTRE_ROOT = 'WREF10'
+    # BAS groups that are top-level plans of their own in Odoo (Oct 2026), so
+    # a line can carry a branch, a vehicle AND an employee at once: one
+    # analytic column per root plan. Everything else of WREF10 stays under
+    # Cost Centres.
+    _BRANCH_GROUP = '12'                                  # الفروع
+    _VEHICLE_GROUPS = ('14', '210002', '210003', '210004')  # السيارات + Hayat's cars
+
+    def _cost_centre_root_plans(self):
+        """Every top-level plan holding BAS cost centres: Cost Centres
+        (WREF10) and the groups detached into plans of their own (branches,
+        vehicles). Not the Employee Cost Centre. Where a BAS cost-centre code
+        is looked up, look it up in all of these."""
+        Plan = self.env['account.analytic.plan'].sudo().with_context(active_test=False)
+        return Plan.search([('parent_id', '=', False), ('x_bas_code', '!=', False),
+                            ('x_bas_code', '!=', self._EMPLOYEE_ROOT)])
+
+    @api.model
+    def _ksw_split_cost_centre_plans(self):
+        """Branches and vehicles become top-level plans (idempotent).
+
+        Odoo moves the tags on existing analytic lines into the new plan's
+        column itself (account.analytic.plan.write); the accounts, their ids
+        and every move line's distribution are unchanged."""
+        Plan = self.env['account.analytic.plan'].sudo().with_context(active_test=False)
+        names = {
+            self._BRANCH_GROUP: ('Branch Cost Centre', 'مراكز تكلفة الفروع'),
+            self._VEHICLE_GROUPS[0]: ('Vehicle Cost Centre', 'مراكز تكلفة السيارات'),
+        }
+        roots = {}
+        for code, (english, arabic) in names.items():
+            plan = Plan.search([('x_bas_code', '=', code)], limit=1)
+            if not plan:
+                continue
+            if plan.parent_id:
+                plan.write({'parent_id': False})
+            plan.with_context(lang='en_US').name = english
+            if self.env['res.lang']._lang_get('ar_001'):
+                plan.update_field_translations('name', {'ar_001': arabic})
+            roots[code] = plan
+        vehicles = roots.get(self._VEHICLE_GROUPS[0])
+        if vehicles:
+            for code in self._VEHICLE_GROUPS[1:]:
+                plan = Plan.search([('x_bas_code', '=', code)], limit=1)
+                if plan and plan.parent_id != vehicles:
+                    plan.write({'parent_id': vehicles.id})
+        return roots
 
     def _cost_centre_root_plan(self):
         Plan = self.env['account.analytic.plan'].with_context(active_test=False)
@@ -252,7 +298,8 @@ class BasGlImport(models.Model):
         Account = self.env['account.analytic.account'].with_context(active_test=False)
         plans = {p.x_bas_code: p for p in Plan.search([('x_bas_code', 'in', list(groups))])}
         existing = set(Account.search([
-            ('x_bas_code', '!=', False), ('root_plan_id', '=', root.id),
+            ('x_bas_code', '!=', False),
+            ('root_plan_id', 'in', self._cost_centre_root_plans().ids),
         ]).mapped('x_bas_code'))
 
         made_p = 0
@@ -347,7 +394,8 @@ class BasGlImport(models.Model):
         emp_root = self._employee_root_plan()
         Account = self.env['account.analytic.account'].with_context(active_test=False)
         cc_acc = {a.x_bas_code: a.id for a in Account.search(
-            [('x_bas_code', '!=', False), ('root_plan_id', '=', cc_root.id)])}
+            [('x_bas_code', '!=', False),
+             ('root_plan_id', 'in', (cc_root | self._cost_centre_root_plans()).ids)])}
         if not cc_acc:
             raise UserError(_('Import the cost centres first.'))
         emp_acc = {a.x_bas_code: a.id for a in Account.search(

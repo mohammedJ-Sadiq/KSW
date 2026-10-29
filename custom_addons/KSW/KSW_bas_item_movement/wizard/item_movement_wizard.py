@@ -208,10 +208,12 @@ class KswBasItemMovementWizard(models.TransientModel):
         Plan = self.env['account.analytic.plan'].sudo().with_context(active_test=False)
         Account = self.env['account.analytic.account'].sudo().with_context(active_test=False)
         maps = []
-        for root_code in (Import._COST_CENTRE_ROOT, Import._EMPLOYEE_ROOT):
-            root = Plan.search([('x_bas_code', '=', root_code)], limit=1)
+        # "Main" is every BAS cost-centre root: branches and vehicles became
+        # top-level plans of their own in Oct 2026 (KSW_bas_gl_import 19.0.1.7.0).
+        emp_root = Plan.search([('x_bas_code', '=', Import._EMPLOYEE_ROOT)], limit=1)
+        for roots in (Import._cost_centre_root_plans(), emp_root):
             accounts = Account.search([('x_bas_code', '!=', False),
-                                       ('root_plan_id', '=', root.id)]) if root else Account
+                                       ('root_plan_id', 'in', roots.ids)]) if roots else Account
             maps.append({a.x_bas_code: a.id for a in accounts})
         return maps
 

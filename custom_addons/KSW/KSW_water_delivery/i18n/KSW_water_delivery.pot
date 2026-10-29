@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-28 11:40+0000\n"
-"PO-Revision-Date: 2026-10-28 11:40+0000\n"
+"POT-Creation-Date: 2026-10-28 12:36+0000\n"
+"PO-Revision-Date: 2026-10-28 12:36+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -375,6 +375,11 @@ msgid "Account"
 msgstr ""
 
 #. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_employee_form_water_clients
+msgid "Accounting"
+msgstr ""
+
+#. module: KSW_water_delivery
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__accuracy_m
 msgid "Accuracy (m)"
 msgstr ""
@@ -568,6 +573,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_water_delivery/models/ksw_water_revenue_account.py:0
 msgid "BAS Revenue Accounts"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_fleet_vehicle__x_analytic_account_id
+msgid ""
+"BAS cost centre of this vehicle. Spare parts issued to it in the workshop "
+"are charged here."
 msgstr ""
 
 #. module: KSW_water_delivery
@@ -879,6 +891,13 @@ msgstr ""
 #. module: KSW_water_delivery
 #: model:ir.model,name:KSW_water_delivery.model_res_partner
 msgid "Contact"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_hr_employee__x_analytic_account_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_fleet_vehicle__x_analytic_account_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking_type__x_analytic_account_id
+msgid "Cost Centre"
 msgstr ""
 
 #. module: KSW_water_delivery
@@ -1419,6 +1438,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_dispatch__has_message
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_location_request__has_message
 msgid "Has Message"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_employee_form_water_clients
+msgid "His own cost centre (Employee Cost Centre)"
 msgstr ""
 
 #. module: KSW_water_delivery
@@ -2866,6 +2890,13 @@ msgid ""
 msgstr ""
 
 #. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_stock_picking_type__x_analytic_account_id
+msgid ""
+"The branch's cost centre. A sale collected by the customer's own tanker is "
+"booked to it; one our tanker delivered goes to the tanker's."
+msgstr ""
+
+#. module: KSW_water_delivery
 #. odoo-python
 #: code:addons/KSW_water_delivery/models/ksw_water_capture.py:0
 msgid "The capture is missing its reference."
@@ -3173,6 +3204,13 @@ msgid ""
 "This dispatch has already been confirmed by the driver. A delivery that "
 "happened is reviewed by the supervisor on the delivery itself, not cancelled"
 " here."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_hr_employee__x_analytic_account_id
+msgid ""
+"This employee's own cost centre (Employee Cost Centre plan). Water he "
+"delivers as a driver is tagged with it."
 msgstr ""
 
 #. module: KSW_water_delivery

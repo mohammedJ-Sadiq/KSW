@@ -98,7 +98,8 @@ class BasGlImport(models.Model):
         cc_root, emp_root = self._cost_centre_root_plan(), self._employee_root_plan()
         Account = self.env['account.analytic.account'].sudo().with_context(active_test=False)
         cc_acc = {a.x_bas_code: a.id for a in Account.search(
-            [('x_bas_code', '!=', False), ('root_plan_id', '=', cc_root.id)])}
+            [('x_bas_code', '!=', False),
+             ('root_plan_id', 'in', (cc_root | self._cost_centre_root_plans()).ids)])}
         emp_acc = {a.x_bas_code: a.id for a in Account.search(
             [('x_bas_code', '!=', False), ('root_plan_id', '=', emp_root.id)])}
 

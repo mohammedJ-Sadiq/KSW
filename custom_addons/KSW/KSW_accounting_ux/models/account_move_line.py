@@ -36,7 +36,10 @@ class AccountMoveLine(models.Model):
                     if i.isdigit() and int(i) in root:
                         share[root[int(i)]][int(i)] += pct or 0.0
             pick = {plan: max(acc, key=acc.get) for plan, acc in share.items()}
-            line.x_cost_centre_id = pick.get('WREF10', False)
+            # Vehicles and branches are top-level plans of their own since Oct
+            # 2026 (BAS codes 14 and 12); BAS's COST_CENTER is the vehicle when
+            # there is one, else the department, else the branch.
+            line.x_cost_centre_id = pick.get('14') or pick.get('WREF10') or pick.get('12') or False
             line.x_employee_cost_centre_id = pick.get('WREF10-EMP', False)
 
     def _get_computed_taxes(self):

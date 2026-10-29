@@ -1,16 +1,17 @@
 """Cost centres on water sales (Oct 2026).
 
 Each invoice line of a water delivery note carries the note's cost centres,
-the way BAS tags a sale (COST_CENTER, COST_CENTER2):
+one per top-level analytic plan:
 
-* **Cost Centres** plan: the tanker that delivered it, or, when no tanker of
-  ours was involved (the customer collected with his own), the branch;
-* **Employee Cost Centre** plan: the driver who delivered it.
+* **Branch Cost Centre**: the branch that sold it, always;
+* **Vehicle Cost Centre**: the tanker that delivered it (none when the
+  customer collected with his own);
+* **Employee Cost Centre**: the driver who delivered it.
 
-Branch and tanker are both in the Cost Centres plan, as in BAS's single
-cost-centre column, so a line carries one of the two there; carrying both
-would count the sale twice in that plan. The branch is visible on every sale
-anyway through its own Sales Account.
+Branches and vehicles were split out of BAS's single Cost Centres plan for
+this (KSW_bas_gl_import 19.0.1.7.0). Where they still share one plan, the
+vehicle is kept and the branch dropped there: two accounts of one plan on a
+line would count the sale twice in it.
 
 Stamped on the note's sale order line when the note is ISSUED, so a later
 change to a tanker's or driver's cost centre never re-tags sales already made
@@ -27,8 +28,8 @@ class StockPickingType(models.Model):
 
     x_analytic_account_id = fields.Many2one(
         'account.analytic.account', string='Cost Centre', copy=False,
-        help='The branch\'s cost centre. A sale collected by the customer\'s own '
-             'tanker is booked to it; one our tanker delivered goes to the tanker\'s.')
+        help='The branch\'s cost centre (Branch Cost Centre plan). Every sale of '
+             'the branch is tagged with it, beside the tanker and the driver.')
 
 
 class KswFleetVehicle(models.Model):
@@ -58,14 +59,13 @@ class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
     def _water_analytic_distribution(self):
-        """{"<cost centre>,<employee cost centre>": 100} for this note, or
-        False when it has neither."""
+        """{"<vehicle>,<branch>,<employee>": 100} for this note (whichever
+        it has, one per plan), or False when it has none."""
         self.ensure_one()
         note = self.sudo()
-        cost_centre = note.x_vehicle_id.x_analytic_account_id \
-            or (not note.x_vehicle_id and note.picking_type_id.x_analytic_account_id)
-        employee = note.x_driver_id.x_analytic_account_id
-        accounts = [a for a in (cost_centre, employee) if a]
+        accounts = [a for a in (note.x_vehicle_id.x_analytic_account_id,
+                                note.picking_type_id.x_analytic_account_id,
+                                note.x_driver_id.x_analytic_account_id) if a]
         # One account per root plan in a key: two from the same plan would be
         # two keys, each at 100 %, counting the sale twice there.
         seen, ids = set(), []

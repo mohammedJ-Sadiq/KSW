@@ -99,7 +99,8 @@ class KswCostCentreStatement(models.TransientModel):
         by_code = {p.x_bas_code: p for p in roots if p.x_bas_code}
         for wiz in self:
             if wiz.plan_filter == 'cost_centre' and 'WREF10' in by_code:
-                wiz.allowed_plan_ids = by_code['WREF10']
+                # Branches and vehicles are top-level plans of their own too.
+                wiz.allowed_plan_ids = self.env['ksw.bas.gl.import']._cost_centre_root_plans()
             elif wiz.plan_filter == 'employee' and 'WREF10-EMP' in by_code:
                 wiz.allowed_plan_ids = by_code['WREF10-EMP']
             else:

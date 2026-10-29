@@ -414,5 +414,6 @@ class KswBasInventorySetup(models.TransientModel):
             if key in wanted:
                 codes.setdefault(key, r['code'])
         accounts = {a.x_bas_code: a.id for a in self.env['account.analytic.account'].sudo().search(
-            [('x_bas_code', 'in', list(codes.values())), ('root_plan_id.x_bas_code', '=', 'WREF10')])}
+            [('x_bas_code', 'in', list(codes.values())),
+             ('root_plan_id', 'in', self.env['ksw.bas.gl.import']._cost_centre_root_plans().ids)])}
         return {name: accounts[code] for name, code in codes.items() if code in accounts}
