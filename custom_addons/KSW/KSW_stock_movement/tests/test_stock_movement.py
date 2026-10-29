@@ -75,7 +75,7 @@ class TestStockMovement(TransactionCase):
     def test_the_opening_row_carries_what_moved_before_the_period(self):
         self._move(self.supplier, self.loc_a, 7.0, days_ago=40)
         self._move(self.loc_a, self.customer, 2.0)
-        rows, _action = self._rows()
+        rows, _action = self._rows(show_opening=True)
         opening = rows.filtered(lambda r: r.kind == 'opening')
         self.assertEqual(opening.qty_net, 7.0)
         self.assertEqual(opening.date, fields.Date.context_today(self.env.user).replace(day=1))
@@ -114,3 +114,10 @@ class TestStockMovement(TransactionCase):
             'date_from': fields.Date.today(), 'date_to': fields.Date.today() - timedelta(days=1)})
         with self.assertRaises(UserError):
             wizard.action_show()
+
+    def test_no_opening_row_unless_asked(self):
+        self._move(self.supplier, self.loc_a, 7.0, days_ago=40)
+        self._move(self.loc_a, self.customer, 2.0)
+        rows, _action = self._rows()
+        self.assertFalse(rows.filtered(lambda r: r.kind == 'opening'))
+        self.assertEqual(rows.kind, 'out')

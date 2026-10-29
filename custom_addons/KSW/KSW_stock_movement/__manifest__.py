@@ -1,6 +1,6 @@
 {
     'name': 'KSW Stock Movement',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.0.1',
     'author': 'Mohammed Albadr',
     'category': 'Inventory/Inventory',
     'summary': 'Stock movement report: pick stocks, items and a period, then a '

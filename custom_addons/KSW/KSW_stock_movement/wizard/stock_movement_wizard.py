@@ -85,7 +85,7 @@ class KswStockMovementWizard(models.TransientModel):
         help='Also list transfers that are planned or ready but not validated. '
              'They are marked as such and are left out of the opening balance.')
     show_opening = fields.Boolean(
-        string='Opening Balance Row', default=True,
+        string='Opening Balance Row', default=False,
         help='One row per item and location with what had moved in and out '
              'before the period, so grouping by item shows the closing balance.')
 
