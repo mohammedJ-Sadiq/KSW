@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- The branch master (Oct 2026): what describes a branch lives on its
+         warehouse. The water delivery settings (numbering, signature,
+         location rule, dispatchers) stay on its operation type, listed here. -->
+    <record id="view_warehouse_form_branch" model="ir.ui.view">
+        <field name="name">stock.warehouse.form.ksw.branch</field>
+        <field name="model">stock.warehouse</field>
+        <field name="inherit_id" ref="stock.view_warehouse"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='warehouse_config']" position="before">
+                <page string="Branch" name="ksw_branch">
+                    <group>
+                        <group string="Branch">
+                            <field name="x_branch_code"/>
+                            <field name="x_analytic_account_id" options="{'no_create': True}"/>
+                        </group>
+                        <group string="Accounting">
+                            <field name="x_sales_account_id" options="{'no_create': True}"/>
+                            <label for="x_cash_partner_id"/>
+                            <div class="o_row">
+                                <field name="x_cash_partner_id" readonly="1"/>
+                                <button name="action_create_cash_customer" type="object"
+                                        string="Set Up Cash Sales" class="btn-link" icon="fa-money"
+                                        invisible="x_cash_partner_id or not x_water_picking_type_ids"
+                                        groups="base.group_system"/>
+                            </div>
+                            <field name="x_cash_journal_id" options="{'no_create': True}"/>
+                            <field name="x_cash_sale_journal_id" options="{'no_create': True}"
+                                   placeholder="Cash Sales (CSAL)"/>
+                        </group>
+                    </group>
+                    <group string="Water Delivery Settings">
+                        <field name="x_water_picking_type_ids" nolabel="1" colspan="2" readonly="1">
+                            <list>
+                                <field name="name"/>
+                                <field name="x_issue_mode"/>
+                                <field name="x_signature_required"/>
+                                <field name="x_location_rule"/>
+                            </list>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- The customer's delivering branches (SAP keeps the delivering plant on
+         the customer). Edited by those who maintain the client lists. -->
+    <record id="view_partner_form_water_branches" model="ir.ui.view">
+        <field name="name">res.partner.form.ksw.water.branches</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='sales_purchases']//group[@name='sale']" position="inside">
+                <field name="x_water_branch_ids" widget="many2many_tags"
+                       options="{'no_create': True}"
+                       groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing,base.group_system"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

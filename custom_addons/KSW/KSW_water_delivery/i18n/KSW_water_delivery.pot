@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-29 13:03+0000\n"
-"PO-Revision-Date: 2026-10-29 13:03+0000\n"
+"POT-Creation-Date: 2026-10-30 16:09+0000\n"
+"PO-Revision-Date: 2026-10-30 16:09+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -401,6 +401,7 @@ msgstr ""
 
 #. module: KSW_water_delivery
 #: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_employee_form_water_clients
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_warehouse_form_branch
 msgid "Accounting"
 msgstr ""
 
@@ -625,8 +626,11 @@ msgid "Billing"
 msgstr ""
 
 #. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_client_branch__warehouse_id
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_dispatch__picking_type_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_revenue_account__warehouse_id
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_branch_name
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_warehouse_form_branch
 #: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_branch_list
 #: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_client_branch_search
 #: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_delivery_note_search
@@ -654,11 +658,14 @@ msgstr ""
 #. module: KSW_water_delivery
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_branch_code
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking_type__x_branch_code
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_warehouse__x_branch_code
 msgid "Branch Code"
 msgstr ""
 
 #. module: KSW_water_delivery
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__x_cc_branch_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking_type__x_analytic_account_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_warehouse__x_analytic_account_id
 msgid "Branch Cost Centre"
 msgstr ""
 
@@ -744,6 +751,7 @@ msgstr ""
 
 #. module: KSW_water_delivery
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking_type__x_cash_partner_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_warehouse__x_cash_partner_id
 msgid "Cash Customer"
 msgstr ""
 
@@ -779,17 +787,20 @@ msgid "Cash Sales"
 msgstr ""
 
 #. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_warehouse_form_branch
 #: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_branch_list
 msgid "Cash Sales (CSAL)"
 msgstr ""
 
 #. module: KSW_water_delivery
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking_type__x_cash_sale_journal_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_warehouse__x_cash_sale_journal_id
 msgid "Cash Sales Journal"
 msgstr ""
 
 #. module: KSW_water_delivery
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking_type__x_cash_journal_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_warehouse__x_cash_journal_id
 msgid "Cash Till"
 msgstr ""
 
@@ -926,7 +937,6 @@ msgstr ""
 #. module: KSW_water_delivery
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_hr_employee__x_analytic_account_id
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_fleet_vehicle__x_analytic_account_id
-#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking_type__x_analytic_account_id
 msgid "Cost Centre"
 msgstr ""
 
@@ -1078,6 +1088,12 @@ msgid "Delivering"
 msgstr ""
 
 #. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_res_partner__x_water_branch_ids
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_res_users__x_water_branch_ids
+msgid "Delivering Branches"
+msgstr ""
+
+#. module: KSW_water_delivery
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_dispatch__quantity_m3
 msgid "Delivers (m³)"
 msgstr ""
@@ -1210,6 +1226,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_sale_order_line__display_name
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__display_name
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking_type__display_name
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_warehouse__display_name
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_uom_uom__display_name
 msgid "Display Name"
 msgstr ""
@@ -1524,6 +1541,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_sale_order_line__id
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking__id
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking_type__id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_warehouse__id
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_uom_uom__id
 msgid "ID"
 msgstr ""
@@ -2271,14 +2289,6 @@ msgid "Optional"
 msgstr ""
 
 #. module: KSW_water_delivery
-#: model:ir.model.fields,help:KSW_water_delivery.field_stock_picking_type__x_branch_code
-msgid ""
-"Optional short code of the branch (the same code BAS uses, where the branch "
-"exists there). It ties the branch to its imported history and client list; a"
-" branch works without it."
-msgstr ""
-
-#. module: KSW_water_delivery
 #: model:ir.model.fields.selection,name:KSW_water_delivery.selection__ksw_water_dispatch__x_collected_by__ours
 msgid "Our driver"
 msgstr ""
@@ -2639,6 +2649,7 @@ msgstr ""
 
 #. module: KSW_water_delivery
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_picking_type__x_sales_account_id
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_warehouse__x_sales_account_id
 msgid "Sales Account"
 msgstr ""
 
@@ -2733,6 +2744,7 @@ msgid "Set Location from Delivery Notes"
 msgstr ""
 
 #. module: KSW_water_delivery
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_warehouse_form_branch
 #: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_branch_list
 msgid "Set Up Cash Sales"
 msgstr ""
@@ -2742,6 +2754,14 @@ msgstr ""
 msgid ""
 "Share of BAS lines for this branch and product that went to this account. "
 "Below 100 means BAS occasionally posted elsewhere."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_stock_picking_type__x_branch_code
+#: model:ir.model.fields,help:KSW_water_delivery.field_stock_warehouse__x_branch_code
+msgid ""
+"Short code of the branch (the same code BAS uses, e.g. 120 for Nabiya). Ties"
+" the branch to its imported history and client list."
 msgstr ""
 
 #. module: KSW_water_delivery
@@ -2932,10 +2952,25 @@ msgid ""
 msgstr ""
 
 #. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_client_branch__warehouse_id
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_revenue_account__warehouse_id
+msgid "The branch this code belongs to."
+msgstr ""
+
+#. module: KSW_water_delivery
 #: model:ir.model.fields,help:KSW_water_delivery.field_stock_picking_type__x_analytic_account_id
+#: model:ir.model.fields,help:KSW_water_delivery.field_stock_warehouse__x_analytic_account_id
 msgid ""
 "The branch's cost centre (Branch Cost Centre plan). Every sale of the branch"
-" is tagged with it, beside the tanker and the driver."
+" is tagged with it."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_res_partner__x_water_branch_ids
+#: model:ir.model.fields,help:KSW_water_delivery.field_res_users__x_water_branch_ids
+msgid ""
+"The branches whose drivers deliver to this customer. Empty: every branch "
+"may."
 msgstr ""
 
 #. module: KSW_water_delivery
@@ -2960,6 +2995,7 @@ msgstr ""
 
 #. module: KSW_water_delivery
 #: model:ir.model.fields,help:KSW_water_delivery.field_stock_picking_type__x_cash_partner_id
+#: model:ir.model.fields,help:KSW_water_delivery.field_stock_warehouse__x_cash_partner_id
 msgid ""
 "The contact this branch's cash sales are made out to. Its pricelist holds "
 "the branch's cash prices (Client Rates)."
@@ -3008,6 +3044,7 @@ msgstr ""
 
 #. module: KSW_water_delivery
 #: model:ir.model.fields,help:KSW_water_delivery.field_stock_picking_type__x_sales_account_id
+#: model:ir.model.fields,help:KSW_water_delivery.field_stock_warehouse__x_sales_account_id
 msgid ""
 "The income account this branch's sales are booked to. A product line in "
 "Revenue Accounts for this branch takes precedence."
@@ -3015,6 +3052,7 @@ msgstr ""
 
 #. module: KSW_water_delivery
 #: model:ir.model.fields,help:KSW_water_delivery.field_stock_picking_type__x_cash_sale_journal_id
+#: model:ir.model.fields,help:KSW_water_delivery.field_stock_warehouse__x_cash_sale_journal_id
 msgid ""
 "The journal cash sales are invoiced in. Empty uses the company's Cash Sales "
 "(CSAL) journal."
@@ -3405,6 +3443,12 @@ msgid "Waiting for approval"
 msgstr ""
 
 #. module: KSW_water_delivery
+#: model:ir.model,name:KSW_water_delivery.model_stock_warehouse
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_branch_list
+msgid "Warehouse"
+msgstr ""
+
+#. module: KSW_water_delivery
 #: model:ir.model.fields,field_description:KSW_water_delivery.field_hr_employee__x_water_client_ids
 msgid "Water Clients"
 msgstr ""
@@ -3454,6 +3498,12 @@ msgstr ""
 #. module: KSW_water_delivery
 #: model:ir.model,name:KSW_water_delivery.model_ksw_water_revenue_account
 msgid "Water Delivery Revenue Account"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_stock_warehouse__x_water_picking_type_ids
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_warehouse_form_branch
+msgid "Water Delivery Settings"
 msgstr ""
 
 #. module: KSW_water_delivery
@@ -3514,6 +3564,7 @@ msgstr ""
 
 #. module: KSW_water_delivery
 #: model:ir.model.fields,help:KSW_water_delivery.field_stock_picking_type__x_cash_journal_id
+#: model:ir.model.fields,help:KSW_water_delivery.field_stock_warehouse__x_cash_journal_id
 msgid "Where the dispatcher's cash goes: the branch till."
 msgstr ""
 
@@ -3723,4 +3774,57 @@ msgstr ""
 #. module: KSW_water_delivery
 #: model:product.template,description_sale:KSW_water_delivery.product_water_load_product_template
 msgid "مياه عذبة — ردة"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/water_branch.py:0
+msgid "%s has no branch code yet: set it on the branch first."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,field_description:KSW_water_delivery.field_ksw_water_revenue_account__branch_default_account_id
+msgid "Branch Default"
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/water_branch.py:0
+msgid "Choose the branch."
+msgstr ""
+
+#. module: KSW_water_delivery
+#. odoo-python
+#: code:addons/KSW_water_delivery/models/ksw_water_revenue_account.py:0
+msgid "Only an accounting administrator may import revenue accounts."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.actions.act_window,name:KSW_water_delivery.action_water_revenue_accounts
+#: model:ir.model,name:KSW_water_delivery.model_ksw_water_revenue_account
+#: model:ir.ui.menu,name:KSW_water_delivery.menu_water_delivery_revenue_accounts
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_revenue_account_list
+#: model_terms:ir.ui.view,arch_db:KSW_water_delivery.view_water_revenue_account_search
+msgid "Revenue Account Determination"
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_revenue_account__warehouse_id
+msgid "The branch whose sales of this product post to this account."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model:ir.model.fields,help:KSW_water_delivery.field_ksw_water_revenue_account__branch_default_account_id
+msgid ""
+"What this branch posts to for products with no line here. Set on the branch "
+"(Inventory > Warehouses > Branch)."
+msgstr ""
+
+#. module: KSW_water_delivery
+#: model_terms:ir.actions.act_window,help:KSW_water_delivery.action_water_revenue_accounts
+msgid ""
+"Which income account a branch's sale of a product posts to.\n"
+"               A product with no line here posts to the branch default (set on\n"
+"               the branch), else to the product's own income account.\n"
+"               Use <b>Import from BAS9</b> to copy how BAS posts it."
 msgstr ""

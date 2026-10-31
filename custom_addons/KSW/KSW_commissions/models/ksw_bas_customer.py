@@ -20,7 +20,7 @@ class KswBasCustomer(models.Model):
     effective_sales_rep_id = fields.Many2one(
         'hr.employee', string='Effective Sales Rep', readonly=True,
         help='The employee actually credited with sales commission on '
-             'this customer: partner_id.x_sales_rep_id if explicitly set '
+             'this customer: the employee of the partner\'s Salesperson if set '
              '(manual override), else seller_name resolved to an '
              'hr.employee via x_commission_import_name / name. Recomputed '
              'on every sync.',
@@ -54,7 +54,7 @@ class KswBasCustomer(models.Model):
     def _recompute_effective_reps(self):
         """Resolve + store effective_sales_rep_id / effective_collector_id
         for every synced customer: a manual override on the linked
-        partner (x_sales_rep_id / x_collection_rep_id) wins; otherwise
+        partner (Salesperson's employee / x_collection_rep_id) wins; otherwise
         resolve BAS's own seller_name / collector_name to an hr.employee
         via x_commission_import_name (falling back to the employee's
         plain name) — the same alias field/priority the Excel wizard uses.
@@ -86,7 +86,7 @@ class KswBasCustomer(models.Model):
 
         for rec in (self or self.search([])):
             override_sales = (
-                rec.partner_id.x_sales_rep_id
+                rec.partner_id._ksw_sales_rep_employee()
                 if rec.partner_id else Employee.browse())
             override_coll = (
                 rec.partner_id.x_collection_rep_id

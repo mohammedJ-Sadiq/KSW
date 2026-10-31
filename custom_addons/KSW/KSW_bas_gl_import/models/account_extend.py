@@ -68,8 +68,9 @@ class ResPartner(models.Model):
     _inherit = 'res.partner'
 
     # A BAS "customer"/"supplier" is a leaf GL account code, so it is the
-    # natural key back to BAS.
-    x_bas_code = fields.Char(string='BAS Account Code', index=True, copy=False)
+    # natural key back to BAS. Stored as the contact's Reference, shared with
+    # the customer sync (KSW_ext_sync), so one BAS account is one contact.
+    x_bas_code = fields.Char(related='ref', readonly=False, string='BAS Account Code')
     x_bas_name_ar = fields.Char(string='BAS Name (Arabic)')
     # Raw TAX_ID as BAS holds it -- kept even when it fails the ZATCA format,
     # so invalid registrations are visible rather than silently discarded.

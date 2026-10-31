@@ -33,8 +33,8 @@ class KswWaterRevenueAccount(models.Model):
     here, like the rate register.
     """
     _name = 'ksw.water.revenue.account'
-    _description = 'Water Delivery Revenue Account'
-    _order = 'branch_code, product_id'
+    _description = 'Revenue Account Determination'
+    _order = 'warehouse_id, branch_code, product_id'
 
     branch_code = fields.Char(string='Branch (CODE2)', required=True, index=True)
     product_id = fields.Many2one(
@@ -91,9 +91,10 @@ class KswWaterRevenueAccount(models.Model):
         return self._account_for(branch.x_branch_code, product) or branch.x_sales_account_id
 
     def action_import_from_bas(self):
-        if not self.env.user.has_group('KSW_water_delivery.group_water_billing') \
-                and not self.env.su:
-            raise UserError(_('Only Water Delivery Billing may import revenue accounts.'))
+        user = self.env.user
+        if not self.env.su and not (user.has_group('account.group_account_manager')
+                                    or user.has_group('KSW_water_delivery.group_water_billing')):
+            raise UserError(_('Only an accounting administrator may import revenue accounts.'))
 
         products = self.env['product.pricelist.item']._bas_product_map()
         months = int(self.env['ir.config_parameter'].sudo().get_param(

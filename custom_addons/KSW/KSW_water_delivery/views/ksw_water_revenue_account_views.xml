@@ -5,16 +5,18 @@
         <field name="name">ksw.water.revenue.account.list</field>
         <field name="model">ksw.water.revenue.account</field>
         <field name="arch" type="xml">
-            <list string="Revenue Accounts" editable="bottom">
+            <list string="Revenue Account Determination" editable="bottom">
                 <header>
                     <button name="action_import_from_bas" type="object"
                             string="Import from BAS9" display="always"
                             class="btn-secondary"
-                            groups="KSW_water_delivery.group_water_billing"/>
+                            groups="KSW_water_delivery.group_water_billing,account.group_account_manager"/>
                 </header>
-                <field name="branch_code"/>
+                <field name="warehouse_id" required="1" options="{'no_create': True}"/>
+                <field name="branch_code" readonly="1" optional="hide"/>
                 <field name="product_id"/>
                 <field name="account_id"/>
+                <field name="branch_default_account_id" optional="show"/>
                 <field name="source" widget="badge"
                        decoration-info="source == 'bas'"
                        decoration-success="source == 'manual'"/>
@@ -29,14 +31,15 @@
         <field name="name">ksw.water.revenue.account.search</field>
         <field name="model">ksw.water.revenue.account</field>
         <field name="arch" type="xml">
-            <search string="Revenue Accounts">
+            <search string="Revenue Account Determination">
+                <field name="warehouse_id"/>
                 <field name="branch_code"/>
                 <field name="product_id"/>
                 <field name="account_id"/>
                 <filter name="no_account" string="BAS Account Missing Here"
                         domain="[('account_id', '=', False)]"/>
                 <group>
-                    <filter name="group_branch" string="Branch" context="{'group_by': 'branch_code'}"/>
+                    <filter name="group_branch" string="Branch" context="{'group_by': 'warehouse_id'}"/>
                     <filter name="group_account" string="Account" context="{'group_by': 'account_id'}"/>
                 </group>
             </search>
@@ -44,14 +47,16 @@
     </record>
 
     <record id="action_water_revenue_accounts" model="ir.actions.act_window">
-        <field name="name">Revenue Accounts</field>
+        <field name="name">Revenue Account Determination</field>
         <field name="res_model">ksw.water.revenue.account</field>
         <field name="view_mode">list</field>
         <field name="search_view_id" ref="view_water_revenue_account_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">No revenue accounts yet</p>
-            <p>Which account a delivery note's sale posts to, per branch and
-               product, the way BAS posts it. Use <b>Import from BAS9</b>.</p>
+            <p>Which income account a branch's sale of a product posts to.
+               A product with no line here posts to the branch default (set on
+               the branch), else to the product's own income account.
+               Use <b>Import from BAS9</b> to copy how BAS posts it.</p>
         </field>
     </record>
 

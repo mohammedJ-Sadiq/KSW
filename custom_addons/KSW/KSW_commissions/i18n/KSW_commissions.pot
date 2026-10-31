@@ -10948,3 +10948,8 @@ msgid ""
 "<strong>Already paid on a vacation payslip: not paid\n"
 "                        again this month.</strong>"
 msgstr ""
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_partner_form_ksw_commission
+msgid "BAS account no., e.g. 120301080"
+msgstr ""

@@ -20,14 +20,11 @@ class ResPartner(models.Model):
              'Fallback when Commission Account Number is blank. '
              'Leave blank to fall back to the partner\'s regular Name.',
     )
-    x_sales_rep_id = fields.Many2one(
-        'hr.employee', string='Sales Rep',
-        help='Employee who earns sales commission on this customer\'s '
-             'BAS invoices. Used by "Pull from BAS" on the Sales/Collection '
-             'Commission Sheet to attribute achieved sales to the right '
-             'employee. Not restricted to attendance-sheet employees — '
-             'most sales/collection reps are not that type.',
-    )
+    # The sales rep is Odoo's own Salesperson (user_id, Sales & Purchase tab)
+    # since Oct 2026: `x_sales_rep_id` (an employee) was a second field for the
+    # same fact. Commissions read the Salesperson's employee
+    # (`_ksw_sales_rep_employee`); migrations/19.0.4.54.0 moved the values.
+
     x_collection_rep_id = fields.Many2one(
         'hr.employee', string='Collection Rep',
         help='Employee who earns collection commission on this customer\'s '
@@ -37,5 +34,8 @@ class ResPartner(models.Model):
              '— most sales/collection reps are not that type.',
     )
 
-
-
+    def _ksw_sales_rep_employee(self):
+        """The employee behind this customer's Salesperson, as the manual
+        sales-rep override for commissions (empty when none)."""
+        self.ensure_one()
+        return self.sudo().user_id.employee_id

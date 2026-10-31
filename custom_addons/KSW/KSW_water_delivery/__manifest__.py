@@ -1,6 +1,6 @@
 {
     'name': 'KSW Water Delivery Notes',
-    'version': '19.0.1.21.0',
+    'version': '19.0.1.24.0',
     'summary': 'Issue the water delivery note at the client, online or off',
     'description': """
 Water Delivery Notes
@@ -48,6 +48,7 @@ accounting the finished list.
         'views/ksw_water_client_branch_views.xml',
         'views/ksw_water_tanker_group_views.xml',
         'views/hr_employee_views.xml',
+        'views/stock_warehouse_views.xml',
         # Before stock_picking_views.xml: the notes list and kanban once
         # carried a header button `%(action_water_delivery_wizard)d` (now the
         # driver app action, defined in the templates file), and on a FRESH

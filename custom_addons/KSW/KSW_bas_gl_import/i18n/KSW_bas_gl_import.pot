@@ -559,3 +559,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_bas_gl_import.view_ksw_bas_gl_import_form
 msgid "all branches"
 msgstr ""
+
+#. module: KSW_bas_gl_import
+#: model:ir.model.fields,help:KSW_bas_gl_import.field_res_partner__x_bas_code
+#: model:ir.model.fields,help:KSW_bas_gl_import.field_res_users__x_bas_code
+msgid ""
+"The BAS account code of this customer or vendor (COD10.DCODE1, e.g. "
+"\"120301080\"): the key every BAS sync and import matches on."
+msgstr ""

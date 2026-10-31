@@ -112,11 +112,14 @@ else:
               groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_gm"/>
 
     <!-- Month end. -->
+    <!-- Billing is accounting work: it lives with customer invoices (Oct
+         2026; it used to be on the Water Delivery bar). The Billing role
+         includes Accounting's Invoicing for this. -->
     <menuitem id="menu_water_delivery_invoice"
               name="Invoice Delivery Notes"
-              parent="menu_water_delivery_root"
+              parent="account.menu_finance_receivables"
               action="action_water_invoice_wizard"
-              sequence="50"
+              sequence="5"
               groups="KSW_water_delivery.group_water_billing"/>
 
     <!-- base.group_system too: Branches below is the administrator's, and a
@@ -143,12 +146,14 @@ else:
               sequence="10"
               groups="KSW_water_delivery.group_water_billing,KSW_water_delivery.group_water_gm"/>
 
+    <!-- Revenue determination belongs to the chart of accounts (SAP VKOA,
+         Oracle AutoAccounting): Accounting > Configuration > Accounting. -->
     <menuitem id="menu_water_delivery_revenue_accounts"
-              name="Revenue Accounts"
-              parent="menu_water_delivery_config"
+              name="Revenue Account Determination"
+              parent="account.account_account_menu"
               action="action_water_revenue_accounts"
-              sequence="15"
-              groups="KSW_water_delivery.group_water_billing"/>
+              sequence="40"
+              groups="-KSW_water_delivery.group_water_billing,account.group_account_manager"/>
 
     <menuitem id="menu_water_delivery_branch_clients"
               name="Branch Clients"

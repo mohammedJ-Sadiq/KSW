@@ -8,6 +8,14 @@
         <field name="model">hr.employee</field>
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
+            <!-- The employee's cost centre is an HR fact (payroll will use it
+                 too), so it sits on HR Settings, not on the Water tab. -->
+            <xpath expr="//page[@name='hr_settings']" position="inside">
+                <group string="Accounting" name="ksw_cost_centre">
+                    <field name="x_analytic_account_id" options="{'no_create': True}"
+                           placeholder="His own cost centre (Employee Cost Centre)"/>
+                </group>
+            </xpath>
             <xpath expr="//notebook" position="inside">
                 <page name="water_delivery" string="Water Delivery"
                       groups="KSW_water_delivery.group_water_dispatcher,KSW_water_delivery.group_water_billing,hr.group_hr_manager">
@@ -16,10 +24,6 @@
                                options="{'no_create': True}"
                                context="{'res_partner_search_mode': 'customer'}"
                                placeholder="Leave empty to use the branch's client list"/>
-                    </group>
-                    <group string="Accounting" groups="hr.group_hr_user">
-                        <field name="x_analytic_account_id" options="{'no_create': True}"
-                               placeholder="His own cost centre (Employee Cost Centre)"/>
                     </group>
                     <group string="Supervisor" groups="hr.group_hr_manager">
                         <field name="x_water_tanker_group_ids" widget="many2many_tags"

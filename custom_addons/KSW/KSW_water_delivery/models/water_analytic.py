@@ -26,10 +26,9 @@ from odoo import api, fields, models
 class StockPickingType(models.Model):
     _inherit = 'stock.picking.type'
 
-    x_analytic_account_id = fields.Many2one(
-        'account.analytic.account', string='Cost Centre', copy=False,
-        help='The branch\'s cost centre (Branch Cost Centre plan). Every sale of '
-             'the branch is tagged with it, beside the tanker and the driver.')
+    # The branch's cost centre lives on the branch (the warehouse).
+    x_analytic_account_id = fields.Many2one(related='warehouse_id.x_analytic_account_id',
+                                            readonly=False)
 
 
 class KswFleetVehicle(models.Model):

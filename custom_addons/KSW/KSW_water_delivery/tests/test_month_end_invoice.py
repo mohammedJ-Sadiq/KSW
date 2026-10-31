@@ -313,11 +313,14 @@ class TestMonthEndInvoice(WaterDeliveryCommon):
             ).default_get(['partner_id'])
 
     # --- who may do it --------------------------------------------------------
-    def test_billing_without_the_invoicing_right_is_refused(self):
+    def test_the_billing_role_includes_invoicing(self):
+        """Month-end billing sits in Accounting > Customers since Oct 2026, so the
+        Billing role includes Accounting's Invoicing (it used to be refused here
+        without it; the wizard's own guard stays for anyone else)."""
+        self.assertTrue(self.billing_only_user.has_group('account.group_account_invoice'))
         self._note()
         wizard = self._wizard(self.customer, user=self.billing_only_user).save()
-        with self.assertRaises(UserError):
-            wizard.action_create_invoice()
+        wizard.action_create_invoice()
 
     def test_a_driver_is_refused(self):
         self._note()

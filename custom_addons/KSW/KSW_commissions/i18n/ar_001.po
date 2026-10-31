@@ -11760,3 +11760,8 @@ msgid ""
 msgstr ""
 "<strong>صُرف بالفعل في كشف راتب إجازة: لا يُصرف مرة أخرى\n"
 "                        هذا الشهر.</strong>"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_partner_form_ksw_commission
+msgid "BAS account no., e.g. 120301080"
+msgstr "رقم الحساب في BAS، مثل 120301080"

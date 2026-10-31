@@ -31,3 +31,4 @@ access_water_location_request_gm,ksw.water.location.request.gm,model_ksw_water_l
 access_water_client_branch_gm,ksw.water.client.branch.gm,model_ksw_water_client_branch,group_water_gm,1,0,0,0
 access_water_tanker_group_gm,ksw.water.tanker.group.gm,model_ksw_water_tanker_group,group_water_gm,1,0,0,0
 access_water_revenue_account_gm,ksw.water.revenue.account.gm,model_ksw_water_revenue_account,group_water_gm,1,0,0,0
+access_water_revenue_account_acc_manager,ksw.water.revenue.account.acc.manager,model_ksw_water_revenue_account,account.group_account_manager,1,1,1,1

@@ -575,3 +575,23 @@ msgstr "رقم السند"
 #: model:ir.model.fields,field_description:KSW_ext_sync.field_ksw_bas_payment__ftype
 msgid "Voucher Type"
 msgstr "نوع السند"
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,help:KSW_ext_sync.field_res_partner__ref
+#: model:ir.model.fields,help:KSW_ext_sync.field_res_users__ref
+msgid ""
+"The BAS account code of this customer or vendor (COD10.DCODE1, e.g. "
+"\"120301080\"): the key every BAS sync and import matches on."
+msgstr ""
+"رقم حساب هذا العميل أو المورد في BAS (COD10.DCODE1، مثل \"120301080\"): "
+"المفتاح الذي تطابق عليه كل مزامنة واستيراد من BAS."
+
+#. module: KSW_ext_sync
+#: model:ir.model.fields,help:KSW_ext_sync.field_res_partner__x_client_account_number
+#: model:ir.model.fields,help:KSW_ext_sync.field_res_users__x_client_account_number
+msgid ""
+"The BAS customer account code. Kept under this name for the callers that use"
+" it; stored as the contact's Reference."
+msgstr ""
+"رقم حساب العميل في BAS. محفوظ بهذا الاسم للبرامج التي تستخدمه، ويُخزَّن في "
+"حقل المرجع لجهة الاتصال."

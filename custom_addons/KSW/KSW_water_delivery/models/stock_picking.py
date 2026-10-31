@@ -28,19 +28,11 @@ class StockPickingType(models.Model):
     # The branch dimension in BAS is CODE2 on the document, not an attribute of
     # the customer -- so it belongs on the operation type (one per branch),
     # which is also what gives each branch its own note numbering.
-    x_branch_code = fields.Char(
-        string='Branch Code',
-        help='Optional short code of the branch (the same code BAS uses, where the '
-             'branch exists there). It ties the branch to its imported history and '
-             'client list; a branch works without it.')
-    # Where this branch's water sales are booked (Oct 2026). Set on the branch
-    # itself, so a branch needs nothing from BAS to sell; Revenue Accounts can
-    # still send one product elsewhere.
-    x_sales_account_id = fields.Many2one(
-        'account.account', string='Sales Account', copy=False,
-        domain="[('account_type', 'in', ('income', 'income_other'))]",
-        help='The income account this branch\'s sales are booked to. A product line '
-             'in Revenue Accounts for this branch takes precedence.')
+    # The branch itself is the WAREHOUSE (models/water_branch.py); these read
+    # and write through to it under their old names, so callers are unchanged.
+    x_branch_code = fields.Char(related='warehouse_id.x_branch_code', readonly=False)
+    x_sales_account_id = fields.Many2one(related='warehouse_id.x_sales_account_id',
+                                         readonly=False)
     # Off during the proof of concept: drivers issue the note at the customer to
     # prove they can, and the paper note still collects the wet signature. The
     # signing half of the module is built and tested -- ticking this box turns it

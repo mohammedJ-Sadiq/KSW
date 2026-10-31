@@ -4,13 +4,18 @@ from odoo import api, fields, models
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
+    # One BAS account code per contact, in Odoo's own Reference (Oct 2026).
+    # It used to be two fields -- this one, set by the customer sync, and
+    # KSW_bas_gl_import's x_bas_code, set by the GL import -- which made two
+    # contacts for one BAS customer. Both names now alias `ref`.
+    ref = fields.Char(
+        copy=False,
+        help='The BAS account code of this customer or vendor (COD10.DCODE1, '
+             'e.g. "120301080"): the key every BAS sync and import matches on.')
     x_client_account_number = fields.Char(
-        string='Client Account Number',
-        help='BAS customer account code (COD10.DCODE1, e.g. "120301080") '
-             'for this contact. Set automatically by "Match / Create '
-             'Contacts" on BAS Sync > Customers, or manually. Used '
-             'elsewhere (e.g. KSW_commissions) as the primary key to match '
-             'BAS sales/collection activity to this customer.',
+        related='ref', readonly=False, string='Client Account Number',
+        help='The BAS customer account code. Kept under this name for the '
+             'callers that use it; stored as the contact\'s Reference.',
     )
     x_payment_term_from_bas = fields.Boolean(
         string='Payment Terms from BAS', copy=False,

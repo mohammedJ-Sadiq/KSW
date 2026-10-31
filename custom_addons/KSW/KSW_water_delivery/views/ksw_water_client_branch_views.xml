@@ -6,8 +6,9 @@
         <field name="model">ksw.water.client.branch</field>
         <field name="arch" type="xml">
             <list string="Branch Clients" editable="bottom" sample="1"
-                  default_group_by="branch_code">
+                  default_group_by="warehouse_id">
                 <field name="branch_code"/>
+                <field name="warehouse_id" readonly="1" optional="show"/>
                 <field name="partner_id" context="{'res_partner_search_mode': 'customer'}"/>
                 <field name="source" widget="badge"
                        decoration-info="source == 'bas'"

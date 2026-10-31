@@ -4,3 +4,4 @@ from . import test_client_ledger
 from . import test_bas_branch
 from . import test_bas_links
 from . import test_bas_voucher_lines
+from . import test_one_bas_code

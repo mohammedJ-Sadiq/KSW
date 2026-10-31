@@ -1,6 +1,6 @@
 {
     'name': 'KSW Client Multiplier',
-    'version': '19.0.1.2.2',
+    'version': '19.0.1.3.0',
     'author': 'Mohammed Albadr',
     'category': 'Inventory/Delivery',
     'summary': '«الرد المضاعف» per client: dated history, changed only by a '
@@ -28,6 +28,7 @@ Odoo is the master of each client's «الرد المضاعف» (distance multip
         'wizard/refuse_wizard_views.xml',
         'views/client_multiplier_views.xml',
         'views/multiplier_request_views.xml',
+        'views/res_partner_views.xml',
         'views/menus.xml',
     ],
     'installable': True,

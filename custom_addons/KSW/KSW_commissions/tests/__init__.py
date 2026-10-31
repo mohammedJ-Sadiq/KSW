@@ -36,3 +36,4 @@ from . import test_bas_sales_rep
 from . import test_commission_settlement
 from . import test_sales_commission_bas
 from . import test_vacation_takes_recovered_deduction
+from . import test_salesperson_is_sales_rep

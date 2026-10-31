@@ -135,3 +135,12 @@ class TestNewCustomerMultiplier(TransactionCase):
         self.assertEqual(self._client(customer).current_multiplier, 1.0)
         self.assertFalse(self.Client._backfill_existing_customers().filtered(
             lambda c: c.partner_id == customer), 'running it twice adds nothing')
+
+    def test_the_customer_form_shows_the_multiplier(self):
+        partner = self.env['res.partner'].create({'name': 'Form Client', 'customer_rank': 1})
+        self.assertEqual(partner.x_multiplier, 1.0)
+        action = partner.action_open_multiplier()
+        self.assertEqual((action['res_model'], action['res_id']),
+                         ('ksw.client.multiplier', self._client(partner).id))
+        arch = self.env['res.partner'].get_views([(False, 'form')])['views']['form']['arch']
+        self.assertIn('x_multiplier', arch)

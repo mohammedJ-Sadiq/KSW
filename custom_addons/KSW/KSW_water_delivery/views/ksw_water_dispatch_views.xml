@@ -196,6 +196,7 @@
         <field name="arch" type="xml">
             <list editable="bottom" create="0" delete="0">
                 <field name="name" string="Branch"/>
+                <field name="warehouse_id" string="Warehouse" readonly="1" optional="show"/>
                 <field name="x_branch_code" optional="show"/>
                 <field name="x_sales_account_id" optional="show" options="{'no_create': True}"/>
                 <field name="x_analytic_account_id" optional="show" options="{'no_create': True}"/>

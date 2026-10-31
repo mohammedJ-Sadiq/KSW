@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_multiplier" model="ir.ui.view">
+        <field name="name">res.partner.form.ksw.multiplier</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='sales_purchases']//group[@name='sale']" position="inside">
+                <field name="x_multiplier_client_id" invisible="1"/>
+                <label for="x_multiplier" invisible="not x_multiplier_client_id"/>
+                <div class="o_row" invisible="not x_multiplier_client_id">
+                    <field name="x_multiplier" readonly="1"/>
+                    <button name="action_open_multiplier" type="object" string="History"
+                            class="btn-link" icon="fa-history"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

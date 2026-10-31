@@ -23,11 +23,7 @@
               sequence="25"
               groups="KSW_water_delivery.group_water_gm,base.group_system"/>
 
-    <!-- Accounting: the same list, read-only (no Supervisor group, no button). -->
-    <menuitem id="menu_account_client_multipliers"
-              name="Client Multipliers"
-              parent="account.menu_finance_receivables"
-              action="action_client_multipliers"
-              sequence="95"
-              groups="account.group_account_readonly,account.group_account_invoice"/>
+    <!-- One home (Oct 2026): accounting reads a customer's multiplier on the
+         customer form (Sales & Purchase), and the list here. The second menu
+         under Accounting > Customers was removed. -->
 </odoo>

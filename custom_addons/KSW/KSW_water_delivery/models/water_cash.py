@@ -26,19 +26,13 @@ from odoo.exceptions import UserError
 class StockPickingType(models.Model):
     _inherit = 'stock.picking.type'
 
-    x_cash_partner_id = fields.Many2one(
-        'res.partner', string='Cash Customer', copy=False,
-        help='The contact this branch\'s cash sales are made out to. Its '
-             'pricelist holds the branch\'s cash prices (Client Rates).')
-    x_cash_journal_id = fields.Many2one(
-        'account.journal', string='Cash Till', copy=False,
-        domain="[('type', '=', 'cash')]",
-        help='Where the dispatcher\'s cash goes: the branch till.')
-    x_cash_sale_journal_id = fields.Many2one(
-        'account.journal', string='Cash Sales Journal', copy=False,
-        domain="[('type', '=', 'sale')]",
-        help='The journal cash sales are invoiced in. Empty uses the '
-             'company\'s Cash Sales (CSAL) journal.')
+    # On the branch (the warehouse) since Oct 2026; read through here.
+    x_cash_partner_id = fields.Many2one(related='warehouse_id.x_cash_partner_id',
+                                        readonly=False)
+    x_cash_journal_id = fields.Many2one(related='warehouse_id.x_cash_journal_id',
+                                        readonly=False)
+    x_cash_sale_journal_id = fields.Many2one(related='warehouse_id.x_cash_sale_journal_id',
+                                             readonly=False)
 
     def action_create_cash_customer(self):
         """Give the branch its cash customer, with its own (empty) pricelist.

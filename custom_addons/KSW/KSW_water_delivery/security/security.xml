@@ -72,7 +72,9 @@
         <field name="name">Billing</field>
         <field name="sequence">1</field>
         <field name="privilege_id" ref="privilege_water_billing"/>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <!-- Invoicing: month-end billing now sits in Accounting > Customers,
+             and it creates customer invoices. -->
+        <field name="implied_ids" eval="[(4, ref('base.group_user')), (4, ref('account.group_account_invoice'))]"/>
         <field name="comment">Reads every water delivery note for month-end invoicing. Does not issue or correct notes.</field>
     </record>
 

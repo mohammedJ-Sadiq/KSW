@@ -91,7 +91,7 @@ class KswSalesCommissionBas(models.AbstractModel):
         """Return ``resolve(customer, kind, doc_code) -> (code, employee,
         blocked)``.
 
-        Priority: a manual rep on the customer's contact (x_sales_rep_id /
+        Priority: a manual rep on the customer's contact (the Salesperson's employee /
         x_collection_rep_id) > the rep code (on the document, or on the
         customer when attribution is 'customer') mapped through BAS Sales
         Reps. A No Commission code resolves to no employee.
@@ -141,7 +141,7 @@ class KswSalesCommissionBas(models.AbstractModel):
 
         def resolve(customer, kind, doc_code):
             if customer and customer.partner_id:
-                override = (customer.partner_id.x_sales_rep_id
+                override = (customer.partner_id._ksw_sales_rep_employee()
                             if kind == 'sales'
                             else customer.partner_id.x_collection_rep_id)
                 if override:

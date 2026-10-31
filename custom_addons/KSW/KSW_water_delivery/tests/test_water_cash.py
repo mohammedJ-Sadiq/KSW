@@ -291,3 +291,11 @@ class TestWaterCash(OfflineCaptureCommon):
         dispatch = self._pickup()
         line = dispatch.sudo().x_cash_invoice_id.invoice_line_ids
         self.assertEqual(line.analytic_distribution, {str(branch_cc.id): 100.0})
+
+    def test_billing_finds_month_end_billing_under_accounting(self):
+        billing = self.env['res.users'].create({
+            'name': 'Billing Clerk', 'login': 'billingclerk@ksw.test',
+            'group_ids': [(6, 0, [self.env.ref('KSW_water_delivery.group_water_billing').id])]})
+        menu = self.env.ref('KSW_water_delivery.menu_water_delivery_invoice')
+        self.assertEqual(menu.parent_id, self.env.ref('account.menu_finance_receivables'))
+        self.assertIn(menu.id, self.env['ir.ui.menu'].with_user(billing)._visible_menu_ids())
