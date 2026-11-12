@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- One sheet per page like the paper: A4 with narrow margins. -->
+    <record id="paperformat_vehicle_handover" model="report.paperformat">
+        <field name="name">HR-12 Vehicle Handover (A4)</field>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">7</field>
+        <field name="margin_bottom">7</field>
+        <field name="margin_left">8</field>
+        <field name="margin_right">8</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="action_report_vehicle_handover" model="ir.actions.report">
+        <field name="name">Vehicle Handover Form (HR-12)</field>
+        <field name="model">ksw.vehicle.handover</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">KSW_fleet_allocation.report_vehicle_handover</field>
+        <field name="report_file">KSW_fleet_allocation.report_vehicle_handover</field>
+        <field name="print_report_name">'HR-12 %s %s' % (object.name.replace('/', '-'), object.vehicle_id.name)</field>
+        <field name="binding_model_id" ref="model_ksw_vehicle_handover"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_vehicle_handover"/>
+    </record>
+
+    <!-- The paper form HR-12, page for page: the handover form, then the
+         vehicle inspection form. Bilingual like the original; blank lines
+         where the paper is signed by hand. -->
+    <template id="report_vehicle_handover_header">
+        <table class="hr12 mb-2" style="border: none;">
+            <tr>
+                <td style="width: 30%; border: none; text-align: left; vertical-align: middle;">
+                    <b>Form No.: HR-12</b><br/>
+                    <span t-out="o.name"/>
+                </td>
+                <td style="width: 40%; border: none; text-align: center;">
+                    <img src="/KSW_fleet_allocation/static/src/img/kawther_logo.png" style="max-height: 55px;"/>
+                </td>
+                <td style="width: 30%; border: none; text-align: right; vertical-align: middle;" dir="rtl">
+                    <b>إدارة الموارد البشرية</b><br/>والتطوير التنظيمي
+                </td>
+            </tr>
+        </table>
+    </template>
+
+    <template id="report_vehicle_handover_document">
+        <t t-set="types" t-value="dict(o._fields['vehicle_type']._description_selection(o.env))"/>
+        <t t-set="docs_by_type" t-value="{d.document_type: d for d in o.document_ids}"/>
+        <div class="page" style="font-size: 9.5px;">
+            <style>
+                table.hr12 { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+                table.hr12 td, table.hr12 th { border: 1px solid #555; padding: 2px 4px; vertical-align: top; }
+                table.hr12 th { background: #dfe9ea; text-align: center; }
+                .hr12-title { text-align: center; font-size: 15px; font-weight: bold; margin: 4px 0 6px; }
+                .hr12-ar { direction: rtl; text-align: right; }
+                .hr12-sign { height: 22px; }
+                table.hr12 td:empty::after { content: '\00a0'; }
+                .hr12-box { font-family: DejaVu Sans, sans-serif; }
+            </style>
+
+            <t t-call="KSW_fleet_allocation.report_vehicle_handover_header"/>
+            <div class="hr12-title">نموذج تسليم واستلام المركبة / Vehicle Handover Form</div>
+            <table class="hr12">
+                <tr><td style="width: 20%;">Date</td>
+                    <td style="text-align: center;" t-out="o.form_date"/>
+                    <td class="hr12-ar" style="width: 20%;">التاريخ</td></tr>
+            </table>
+
+            <table class="hr12">
+                <tr><th colspan="4">Vehicle Details / معلومات المركبة</th></tr>
+                <tr><th>Request type / نوع الطلب</th><th>Code # / رقم الكود</th>
+                    <th>Plate Num / رقم اللوحة</th><th>Vehicle Type / نوع المركبة</th></tr>
+                <tr>
+                    <td style="text-align: center;">
+                        <span class="hr12-box" t-out="'☑' if o.handover_type == 'handover' else '☐'"/> تسليم Hand over
+                        &#160;&#160;
+                        <span class="hr12-box" t-out="'☑' if o.handover_type == 'receive' else '☐'"/> استلام Received
+                    </td>
+                    <td style="text-align: center;" t-out="o.vehicle_id.name"/>
+                    <td style="text-align: center;" t-out="o.plate_number or ''"/>
+                    <td style="text-align: center;" t-out="types.get(o.vehicle_type, '')"/>
+                </tr>
+            </table>
+
+            <table class="hr12">
+                <tr><th colspan="4">Requesting Department / خاص بمقدم الطلب</th></tr>
+                <tr><th colspan="4">Previous Vehicle User Details / بيانات المستخدم القديم</th></tr>
+                <tr><th>Employee Name / اسم الموظف</th><th>Emp. No / رقم الموظف</th>
+                    <th>ID # / رقم الإقامة</th><th>Phone # / تلفون</th></tr>
+                <tr><td t-out="o.previous_name or ''"/><td t-out="o.previous_emp_no or ''"/>
+                    <td t-out="o.previous_iqama or ''"/><td t-out="o.previous_phone or ''"/></tr>
+                <tr><th colspan="4">New Vehicle User Details / بيانات المستخدم الجديد</th></tr>
+                <tr><th>Employee Name / اسم الموظف</th><th>Emp. No / رقم الموظف</th>
+                    <th>ID # / رقم الإقامة</th><th>Phone # / تلفون</th></tr>
+                <tr><td t-out="o.new_name or ''"/><td t-out="o.new_emp_no or ''"/>
+                    <td t-out="o.new_iqama or ''"/><td t-out="o.new_phone or ''"/></tr>
+            </table>
+
+            <table class="hr12">
+                <tr><th colspan="3">Reasons for user change / أسباب تغير المستخدم الحالي</th></tr>
+                <tr>
+                    <td style="width: 33%;"><span class="hr12-box" t-out="'☑' if o.change_reason == 'vacation' else '☐'"/> إجازة Vacation</td>
+                    <td style="width: 33%;"><span class="hr12-box" t-out="'☑' if o.change_reason == 'suspension' else '☐'"/> إيقاف عن العمل Suspension</td>
+                    <td><span class="hr12-box" t-out="'☑' if o.change_reason == 'other' else '☐'"/> أخرى Other</td>
+                </tr>
+                <tr><td colspan="3" t-out="o.change_reason_note or '&#160;'"/></tr>
+                <tr><th colspan="3">Reason to handover to the shop / سبب التسليم للورشة</th></tr>
+                <tr><td colspan="3" style="height: 26px;" t-out="o.workshop_reason or ''"/></tr>
+                <tr><td colspan="3" style="text-align: center;">
+                    * The car is not handed over without a valid regular license
+                    &#160;/&#160; <span dir="rtl">* لا يتم تسليم السيارة إلا بوجود رخصة نظامية سارية المفعول</span>
+                </td></tr>
+                <tr><th>Supervisor Name / اسم المشرف</th><th>Signature / التوقيع</th><th>Date / التاريخ</th></tr>
+                <tr><td class="hr12-sign" t-out="o.supervisor_id.name or ''"/><td/><td/></tr>
+            </table>
+
+            <table class="hr12">
+                <tr><th colspan="6">Administrative use only / خاص بقسم الشؤون الإدارية</th></tr>
+                <tr><th>#</th><th>Type / النوع</th><th>Remark / ملاحظة</th>
+                    <th>#</th><th>Type / النوع</th><th>Remark / ملاحظة</th></tr>
+                <t t-set="pairs" t-value="[('traffic_license', 'Traffic License / رخصة السير', 'operation_card', 'Operation Card / كرت التشغيل'),
+                                           ('insurance', 'Insurance Letter / وثيقة التأمين', 'driver_card', 'Driver Card / بطاقة السائق'),
+                                           ('inspection_card', 'Inspection Card / الفحص الدوري', 'other', 'Other / أخرى')]"/>
+                <tr t-foreach="pairs" t-as="pair">
+                    <t t-set="d1" t-value="docs_by_type.get(pair[0])"/>
+                    <t t-set="d2" t-value="docs_by_type.get(pair[2])"/>
+                    <td class="hr12-box" style="width: 5%; text-align: center;" t-out="'☑' if d1 and d1.present else '☐'"/>
+                    <td style="width: 22%;" t-out="pair[1]"/>
+                    <td style="width: 23%;" t-out="d1.remark if d1 and d1.remark else ''"/>
+                    <td class="hr12-box" style="width: 5%; text-align: center;" t-out="'☑' if d2 and d2.present else '☐'"/>
+                    <td style="width: 22%;" t-out="pair[3]"/>
+                    <td style="width: 23%;" t-out="d2.remark if d2 and d2.remark else ''"/>
+                </tr>
+                <tr><th colspan="2">License Type / نوع الرخصة</th><th colspan="2">Expiration / صلاحيتها</th>
+                    <th colspan="2">Position / المهنة</th></tr>
+                <tr><td colspan="2" t-out="o.license_type or ''"/><td colspan="2" t-out="o.license_expiry or ''"/>
+                    <td colspan="2" t-out="o.new_position or ''"/></tr>
+                <tr><th colspan="6">Remarks / ملاحظات</th></tr>
+                <tr><td colspan="6" style="height: 26px;" t-out="o.admin_remarks or ''"/></tr>
+                <tr><th colspan="2">Name / الاسم</th><th colspan="2">Signature / التوقيع</th><th colspan="2">Date / التاريخ</th></tr>
+                <tr><td colspan="2" class="hr12-sign"/><td colspan="2"/><td colspan="2"/></tr>
+            </table>
+
+            <table class="hr12">
+                <tr><th colspan="3">Financial Matters / متعلقات مالية</th></tr>
+                <tr><td style="width: 4%;">1</td><td colspan="2" t-out="o.financial_note_1 or ''"/></tr>
+                <tr><td>2</td><td colspan="2" t-out="o.financial_note_2 or ''"/></tr>
+                <tr><td>3</td><td colspan="2" t-out="o.financial_note_3 or ''"/></tr>
+            </table>
+            <table class="hr12" style="margin-top: -5px;">
+                <tr><th style="width: 34%;">Accounts manager / مدير الحسابات</th><th style="width: 33%;">Signature / التوقيع</th>
+                    <th>Date / التاريخ</th></tr>
+                <tr><td class="hr12-sign"/><td/><td/></tr>
+                <tr><td colspan="3" style="text-align: center;">(Attach driver account statement) / (إرفاق كشف حساب السائق)</td></tr>
+            </table>
+
+            <table class="hr12">
+                <tr><th colspan="2">For the official use / خاص بالاستخدام الرسمي</th></tr>
+                <tr><td colspan="2" style="height: 26px;" t-out="o.official_remarks or ''"/></tr>
+                <tr><th>Executive Director / المدير التنفيذي</th><th>Sign. / التوقيع</th></tr>
+                <tr><td class="hr12-sign"/><td/></tr>
+            </table>
+
+            <table class="hr12">
+                <tr><th colspan="4">Delegation Process / إجراءات التفويض</th></tr>
+                <tr><th colspan="2">Adding New User / إضافة المستخدم الجديد</th>
+                    <th colspan="2">Removing Old User / إلغاء المستخدم القديم</th></tr>
+                <tr><td colspan="2" style="text-align: center;" t-out="o.delegation_add_datetime and o.delegation_add_datetime.strftime('%Y-%m-%d %H:%M') or ''"/>
+                    <td colspan="2" style="text-align: center;" t-out="o.delegation_remove_datetime and o.delegation_remove_datetime.strftime('%Y-%m-%d %H:%M') or ''"/></tr>
+                <tr><th colspan="4">Remarks / ملاحظات</th></tr>
+                <tr><td colspan="4" style="height: 22px;" t-out="o.delegation_remarks or ''"/></tr>
+            </table>
+            <div class="text-center text-muted" style="font-size: 9px;">
+                This form will be kept in the Employee File. / سيتم وضع هذا النموذج في ملف الموظف.
+            </div>
+        </div>
+
+        <!-- Page 2: the vehicle inspection form. -->
+        <div class="page" style="font-size: 9.5px; page-break-before: always;">
+            <t t-call="KSW_fleet_allocation.report_vehicle_handover_header"/>
+            <div class="hr12-title">نموذج فحص المركبة / Vehicle Inspection Form</div>
+            <table class="hr12">
+                <tr><th colspan="4">Vehicle Details / بيانات المركبة</th></tr>
+                <tr><th>Date / التاريخ</th><th>Code # / رقم الكود</th><th>Plate Num / رقم اللوحة</th>
+                    <th>Vehicle Type / نوع المركبة</th></tr>
+                <tr><td style="text-align: center;" t-out="o.form_date"/>
+                    <td style="text-align: center;" t-out="o.vehicle_id.name"/>
+                    <td style="text-align: center;" t-out="o.plate_number or ''"/>
+                    <td style="text-align: center;" t-out="types.get(o.vehicle_type, '')"/></tr>
+            </table>
+            <table class="hr12">
+                <tr><th style="width: 5%;">#</th><th style="width: 35%;">Items / العناصر</th>
+                    <th style="width: 15%;">Depreciation % / نسبة الإهلاك</th>
+                    <th style="width: 15%;">Value / القيمة</th><th>Remarks / ملاحظة</th></tr>
+                <tr t-foreach="o.inspection_line_ids" t-as="line">
+                    <td style="text-align: center;" t-out="line_index + 1"/>
+                    <td t-out="line.name"/>
+                    <td style="text-align: center;" t-out="'%g' % line.depreciation if line.depreciation else ''"/>
+                    <td style="text-align: right;" t-out="'{:,.2f}'.format(line.value) if line.value else ''"/>
+                    <td t-out="line.remark or ''"/>
+                </tr>
+                <!-- Blank rows like the paper, for anything added by hand. -->
+                <tr t-foreach="range(max(0, 15 - len(o.inspection_line_ids)))" t-as="blank">
+                    <td style="text-align: center;" t-out="len(o.inspection_line_ids) + blank_index + 1"/>
+                    <td>&#160;</td><td/><td/><td/>
+                </tr>
+                <tr><th colspan="3" style="text-align: right;">Total / الإجمالي</th>
+                    <th style="text-align: right;" t-out="'{:,.2f}'.format(o.inspection_total)"/><th/></tr>
+            </table>
+            <table class="hr12">
+                <tr><th colspan="3">Vehicle Inspection Info / معلومات تشييك المركبة</th></tr>
+                <tr><th>Date / التاريخ</th><th>Day / اليوم</th><th>Time / الوقت</th></tr>
+                <t t-set="when" t-value="o.inspection_datetime and context_timestamp(o.inspection_datetime)"/>
+                <tr><td style="text-align: center;" t-out="when and when.strftime('%Y-%m-%d') or ''"/>
+                    <td style="text-align: center;" t-out="when and when.strftime('%A') or ''"/>
+                    <td style="text-align: center;" t-out="when and when.strftime('%H:%M') or ''"/></tr>
+            </table>
+            <table class="hr12">
+                <tr><th>Workshop official / مسؤول الورشة</th><th>Vehicle Handover / مسلم المركبة</th>
+                    <th>Vehicle receiver / مستلم المركبة</th></tr>
+                <tr><td>Name / الاسم: <span t-out="o.workshop_official_name or ''"/></td>
+                    <td>Name / الاسم: <span t-out="o.deliverer_name or ''"/></td>
+                    <td>Name / الاسم: <span t-out="o.receiver_name or o.new_name or ''"/></td></tr>
+                <tr><td class="hr12-sign">Sign. / التوقيع</td><td>Sign. / التوقيع</td><td>Sign. / التوقيع</td></tr>
+            </table>
+            <div class="text-center text-muted" style="font-size: 9px;">
+                This form will be kept in the Employee File. / سيتم وضع هذا النموذج في ملف الموظف.
+            </div>
+        </div>
+    </template>
+
+    <template id="report_vehicle_handover">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+                    <t t-call="KSW_fleet_allocation.report_vehicle_handover_document"/>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

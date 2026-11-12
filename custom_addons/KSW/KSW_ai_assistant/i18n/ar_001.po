@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 15:37+0000\n"
-"PO-Revision-Date: 2026-11-11 15:37+0000\n"
+"POT-Creation-Date: 2026-11-12 05:39+0000\n"
+"PO-Revision-Date: 2026-11-12 05:39+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar_001\n"
@@ -62,6 +62,12 @@ msgstr "مفتاح API"
 #: model_terms:ir.ui.view,arch_db:KSW_ai_assistant.res_config_settings_view_form_ksw_ai
 msgid "API key"
 msgstr "مفتاح API"
+
+#. module: KSW_ai_assistant
+#. odoo-javascript
+#: code:addons/KSW_ai_assistant/static/src/chat/ai_chat.xml:0
+msgid "About:"
+msgstr "بخصوص:"
 
 #. module: KSW_ai_assistant
 #. odoo-python
@@ -123,6 +129,12 @@ msgstr "اسأل عن بياناتك بالعربية أو الإنجليزية�
 #: code:addons/KSW_ai_assistant/static/src/chat/ai_chat.xml:0
 msgid "Ask the AI assistant"
 msgstr "اسأل المساعد الذكي"
+
+#. module: KSW_ai_assistant
+#. odoo-javascript
+#: code:addons/KSW_ai_assistant/static/src/chat/ai_chat.xml:0
+msgid "Ask without this record"
+msgstr "اسأل بدون هذا السجل"
 
 #. module: KSW_ai_assistant
 #: model_terms:ir.ui.view,arch_db:KSW_ai_assistant.view_ksw_ai_turn_form
@@ -212,6 +224,12 @@ msgstr "كل سؤال، وما نفذه المساعد، وعدد الرموز �
 
 #. module: KSW_ai_assistant
 #. odoo-javascript
+#: code:addons/KSW_ai_assistant/static/src/chat/ai_chat.js:0
+msgid "Explain this record"
+msgstr "اشرح هذا السجل"
+
+#. module: KSW_ai_assistant
+#. odoo-javascript
 #: code:addons/KSW_ai_assistant/static/src/chat/ai_chat.xml:0
 msgid "Filter used"
 msgstr "الفلتر المستخدم"
@@ -239,6 +257,19 @@ msgstr "Groq: مفتاح مجاني من console.groq.com. غير مطلوب ل�
 #: model:ir.model.fields.selection,name:KSW_ai_assistant.selection__res_config_settings__ksw_ai_effort__high
 msgid "High (most careful)"
 msgstr "عال (الأدق)"
+
+#. module: KSW_ai_assistant
+#. odoo-javascript
+#: code:addons/KSW_ai_assistant/static/src/chat/ai_chat.js:0
+msgid "How is this amount calculated?"
+msgstr "كيف تم احتساب هذا المبلغ؟"
+
+#. module: KSW_ai_assistant
+#: model:ir.model.fields,help:KSW_ai_assistant.field_res_config_settings__ksw_ai_effort
+msgid ""
+"How long the model thinks before answering. Higher is more accurate and "
+"slower."
+msgstr "مدة تفكير النموذج قبل الإجابة. الأعلى أدق وأبطأ."
 
 #. module: KSW_ai_assistant
 #. odoo-python
@@ -525,6 +556,12 @@ msgstr "المستخدم"
 #: model_terms:ir.ui.view,arch_db:KSW_ai_assistant.view_ksw_ai_turn_form
 msgid "What It Ran"
 msgstr "ما تم تنفيذه"
+
+#. module: KSW_ai_assistant
+#. odoo-javascript
+#: code:addons/KSW_ai_assistant/static/src/chat/ai_chat.js:0
+msgid "What changed compared with last month?"
+msgstr "ما الذي تغير مقارنة بالشهر الماضي؟"
 
 #. module: KSW_ai_assistant
 #. odoo-javascript

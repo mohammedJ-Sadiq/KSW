@@ -59,6 +59,12 @@
                         </div>
                     </div>
                 </div>
+                <div t-if="state.page and state.page.res_id" class="ksw_ai_page">
+                    <i class="fa fa-file-text-o me-1"/>
+                    <span>About: </span><strong t-esc="state.page.title or state.page.model"/>
+                    <button type="button" class="btn btn-link btn-sm p-0 ms-2" t-on-click="dropPage"
+                            title="Ask without this record">×</button>
+                </div>
                 <div class="ksw_ai_examples" t-if="!state.turns.length">
                     <button t-foreach="examples" t-as="ex" t-key="ex_index" type="button"
                             class="btn btn-sm btn-light ksw_ai_chip" t-on-click="() => this.useExample(ex)"
@@ -84,7 +90,7 @@
 
     <t t-name="KSW_ai_assistant.Dialog">
         <Dialog title.translate="Ask Odoo" size="'lg'" footer="false">
-            <KswAiChat compact="true" close="props.close"/>
+            <KswAiChat compact="true" close="props.close" page="props.page"/>
         </Dialog>
     </t>
 

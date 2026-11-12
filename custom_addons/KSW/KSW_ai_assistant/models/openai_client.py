@@ -26,7 +26,7 @@ MAX_WAIT = 30
 
 
 def chat_completion(base_url, api_key, model, messages, tools,
-                    max_tokens=2048):
+                    max_tokens=4096, effort='high'):
     url = base_url.rstrip('/') + '/chat/completions'
     headers = {'content-type': 'application/json'}
     if api_key:
@@ -39,6 +39,14 @@ def chat_completion(base_url, api_key, model, messages, tools,
         'max_tokens': max_tokens,
         'temperature': 0,
     }
+    # Reasoning models answer far better when allowed to think before
+    # choosing a tool ("it answers immediately" was the low default).
+    if 'gpt-oss' in model:
+        body['reasoning_effort'] = effort
+        body['include_reasoning'] = False
+    elif 'qwen3' in model and 'groq.com' in base_url:
+        body['reasoning_effort'] = 'default'
+        body['reasoning_format'] = 'hidden'
     for attempt in range(3):
         try:
             resp = requests.post(url, json=body, headers=headers,

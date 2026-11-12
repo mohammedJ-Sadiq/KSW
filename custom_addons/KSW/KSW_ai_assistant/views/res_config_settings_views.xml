@@ -20,7 +20,7 @@
                         <setting id="ksw_ai_model_setting" string="Model"
                                  help="Leave empty for the provider's default.">
                             <field name="ksw_ai_model" placeholder="default"/>
-                            <field name="ksw_ai_effort" invisible="ksw_ai_provider != 'anthropic'"/>
+                            <field name="ksw_ai_effort"/>
                         </setting>
                         <setting id="ksw_ai_url_setting" string="Server address"
                                  help="Ollama or another OpenAI-compatible server."

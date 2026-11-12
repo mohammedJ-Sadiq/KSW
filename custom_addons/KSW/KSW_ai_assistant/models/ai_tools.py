@@ -12,6 +12,7 @@ internals), and it is the same set the user sees in the apps.
 """
 import json
 import logging
+import re
 
 from odoo import api, fields, models, _
 from odoo.exceptions import AccessError, UserError, ValidationError
@@ -24,6 +25,25 @@ DEFAULT_ROWS = 20
 MAX_GROUPS = 60
 MAX_FIELDS = 60
 MAX_MODELS = 15
+# Never offered, even to an administrator who has the menus: system
+# parameters hold the API keys, and none of these answer a business
+# question. Whatever the model reads is sent to the provider.
+_TECHNICAL_PREFIX = ('ir.', 'base.', 'bus.', 'res.config', 'base_import.',
+                     'mail.', 'auth_', 'iap.', 'fetchmail.', 'ksw.ai.')
+_TECHNICAL_MODELS = {'res.users.apikeys', 'res.users.settings',
+                     'res.groups', 'res.lang', 'res.users.log'}
+# Field names that look like credentials are never read or offered.
+_SECRET_RE = re.compile(r'pass|secret|token|api_?key|signature|totp|pin\b',
+                        re.I)
+READ_FIELDS = 60
+READ_SUBTABLES = 6
+READ_LINES = 25
+# Sub-table columns worth showing, in this order; the rest only fill up.
+_LINE_PREFERRED = ('name', 'code', 'total', 'amount', 'number_of_days',
+                   'number_of_hours', 'x_ksw_uncollected', 'period_date',
+                   'date', 'state')
+_SKIP_SUBTABLE_PREFIX = ('ir.', 'mail.', 'bus.', 'rating.')
+_SKIP_SUBTABLES = {'details_by_salary_rule_category', 'website_message_ids'}
 MAX_MODELS_ALL = 80
 # Shown even when they do not match the keywords: filters nearly always
 # need them.
@@ -79,6 +99,26 @@ TOOLS = [
                                    'empty for all fields.'},
             },
             'required': ['model', 'keywords'],
+            'additionalProperties': False,
+        },
+        'strict': True,
+    },
+    {
+        'name': 'read_record',
+        'description': (
+            'Read ONE record completely: every field that has a value '
+            '(computed amounts included, with their help text) and the lines '
+            'of its sub-tables (payslip lines, installments, worked days...). '
+            'Use it for the record the user has open ("this", "here", '
+            '"هذا", "هنا") and to explain where an amount comes from. '
+            'Follow a many2one by reading that record too.'),
+        'input_schema': {
+            'type': 'object',
+            'properties': {
+                'model': {'type': 'string'},
+                'record_id': {'type': 'integer'},
+            },
+            'required': ['model', 'record_id'],
             'additionalProperties': False,
         },
         'strict': True,
@@ -171,6 +211,7 @@ class KswAiTools(models.AbstractModel):
             'find_models': self._tool_find_models,
             'get_fields': self._tool_get_fields,
             'search_records': self._tool_search_records,
+            'read_record': self._tool_read_record,
             'summarize_records': self._tool_summarize_records,
         }.get(name)
         if not method:
@@ -201,7 +242,9 @@ class KswAiTools(models.AbstractModel):
             if not action or action._name != 'ir.actions.act_window':
                 continue
             model = action.sudo().res_model
-            if not model or model not in self.env:
+            if not model or model not in self.env \
+                    or model.startswith(_TECHNICAL_PREFIX) \
+                    or model in _TECHNICAL_MODELS:
                 continue
             Model = self.env[model]
             if Model._transient or Model._abstract \
@@ -257,6 +300,8 @@ class KswAiTools(models.AbstractModel):
                     ('message_', 'activity_', 'website_', 'access_')) \
                     or name in _NOISE_FIELDS:
                 continue
+            if _SECRET_RE.search(name):
+                continue
             text = '%s %s "%s"' % (name, f['type'], f.get('string') or '')
             if words and not any(w in text.lower() for w in words) \
                     and name not in _ALWAYS_FIELDS:
@@ -275,6 +320,98 @@ class KswAiTools(models.AbstractModel):
             lines.append(text)
         return {'model': model, 'fields': lines,
                 'other_fields_not_shown': skipped}, None
+
+    @api.model
+    def _tool_read_record(self, model, record_id):
+        """Every non-empty readable field of one record, plus up to
+        READ_LINES lines of each sub-table, compactly."""
+        Model = self._check_model(model)
+        rec = Model.browse(int(record_id)).exists()
+        if not rec:
+            raise ToolInputError('No %s record with id %s (or no access).'
+                                 % (model, record_id))
+        rec.check_access('read')
+        readable = Model.fields_get(attributes=['type', 'string', 'help'])
+        values, subtables = {}, {}
+        # Amounts first: "why is it 7,114" is the usual question, and the
+        # field cap must never cut the figure being asked about.
+        order = {'monetary': 0, 'float': 0, 'integer': 1, 'many2one': 2,
+                 'selection': 2, 'date': 3, 'datetime': 3, 'boolean': 4}
+        for name, desc in sorted(readable.items(),
+                                 key=lambda kv: order.get(kv[1]['type'], 5)):
+            if desc['type'] in _SKIP_TYPES or name in _NOISE_FIELDS \
+                    or _SECRET_RE.search(name) \
+                    or name.startswith(('message_', 'activity_', 'website_',
+                                        'access_')):
+                continue
+            field = Model._fields[name]
+            try:
+                value = rec[name]
+            except Exception:  # noqa: BLE001 - one bad compute must not
+                continue       # hide the rest of the record
+            if desc['type'] in ('one2many', 'many2many'):
+                if field.comodel_name.startswith(_SKIP_SUBTABLE_PREFIX) \
+                        or name in _SKIP_SUBTABLES:
+                    continue
+                if value and desc['type'] == 'one2many' \
+                        and len(subtables) < READ_SUBTABLES:
+                    subtables[name] = self._subtable(desc['string'], value)
+                elif value:
+                    values[name] = self._format_value(field, value)
+                continue
+            if value in (False, None, '') or (
+                    desc['type'] in ('float', 'monetary', 'integer')
+                    and not value):
+                continue
+            text = self._format_value(field, value)
+            if isinstance(text, str) and len(text) > 200:
+                text = text[:200] + '…'
+            entry = '%s = %s' % (desc['string'], text)
+            if desc['type'] == 'many2one':
+                entry += ' [%s id %s]' % (field.comodel_name, value.id)
+            if desc['type'] in ('float', 'monetary', 'integer') \
+                    and desc.get('help'):
+                entry += '  (help: %s)' % desc['help'][:160].replace('\n', ' ')
+            values[name] = entry
+            if len(values) >= READ_FIELDS:
+                break
+        return {'model': model, 'id': rec.id, 'name': rec.display_name,
+                'fields': values, 'subtables': subtables}, None
+
+    @api.model
+    def _subtable(self, label, lines):
+        """A sub-table as ``{'columns': [...], 'rows': [[...]]}``: name /
+        code / numbers / dates / states, at most 6 columns."""
+        Line = lines.browse()
+        readable = Line.fields_get(attributes=['type'])
+        columns = [c for c in _LINE_PREFERRED if c in readable][:6]
+        for name, desc in readable.items():
+            if len(columns) >= 4:
+                break
+            field = Line._fields[name]
+            if name in columns or name in ('id', 'sequence') \
+                    or name in _NOISE_FIELDS or not field.store \
+                    or name.startswith(('condition_', 'amount_')):
+                continue
+            if desc['type'] in ('float', 'monetary', 'integer', 'date'):
+                columns.append(name)
+        rows = []
+        for line in lines[:READ_LINES]:
+            row = []
+            for name in columns:
+                try:
+                    row.append(self._format_value(Line._fields[name],
+                                                  line[name]))
+                except Exception:  # noqa: BLE001
+                    row.append('?')
+            rows.append(row)
+        return {
+            'label': label,
+            'columns': [Line._fields[c]._description_string(self.env)
+                        for c in columns],
+            'rows': rows,
+            'more_lines': max(0, len(lines) - READ_LINES),
+        }
 
     @api.model
     def _parse_domain(self, Model, domain):
@@ -317,7 +454,13 @@ class KswAiTools(models.AbstractModel):
         raw, dom = self._parse_domain(Model, domain)
         # fields_get already leaves out what the user's groups may not read.
         readable = Model.fields_get(attributes=['type'])
-        unknown = [f for f in fields if f not in readable]
+        # "employee_id.name" as a column means the employee: keep the
+        # first step instead of failing the call and costing a round.
+        fields = list(dict.fromkeys(
+            f.split('.')[0] if '.' in f and f.split('.')[0] in readable
+            else f for f in fields))
+        unknown = [f for f in fields
+                   if f not in readable or _SECRET_RE.search(f)]
         if unknown:
             raise ToolInputError(
                 'Unknown or restricted fields on %s: %s. Use get_fields.'
@@ -447,6 +590,15 @@ class KswAiTools(models.AbstractModel):
         label = self._path_label(Model, path)
         field = Model._fields.get(path.split('.')[0]) if '.' not in path \
             else None
+        if field is not None and field.type == 'many2one' and (
+                isinstance(value, int) or (
+                    isinstance(value, (list, tuple)) and value
+                    and all(isinstance(v, int) for v in value))):
+            ids = [value] if isinstance(value, int) else list(value)
+            names = self.env[field.comodel_name].browse(ids).exists() \
+                .mapped('display_name')
+            value = names[0] if isinstance(leaf[2], int) and names \
+                else (names or value)
         if field is not None and field.type == 'selection':
             sel = dict(field._description_selection(self.env))
             value = [sel.get(v, v) for v in value] \

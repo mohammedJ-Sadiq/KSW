@@ -39,6 +39,9 @@
     <menuitem id="menu_ksw_fleet_allocation_moves" name="Movement History"
               parent="menu_ksw_fleet_allocation_transfers" action="action_ksw_fleet_move" sequence="20"/>
 
+    <menuitem id="menu_ksw_fleet_allocation_handover" name="Handover Forms (HR-12)"
+              parent="menu_ksw_fleet_allocation_transfers" action="action_ksw_vehicle_handover" sequence="30"/>
+
     <menuitem id="menu_ksw_fleet_allocation_vehicles" name="Vehicles"
               parent="menu_ksw_fleet_allocation_root" action="action_ksw_fleet_allocation_vehicles" sequence="40"/>
 
@@ -57,4 +60,21 @@
     <menuitem id="menu_ksw_fleet_allocation_users" name="Department Users"
               parent="menu_ksw_fleet_allocation_config" action="action_ksw_fleet_department_users" sequence="20"/>
 
+
+    <menuitem id="menu_ksw_fleet_allocation_inspection_items" name="Inspection Checklist"
+              parent="menu_ksw_fleet_allocation_config" action="action_ksw_vehicle_inspection_item" sequence="30"/>
+
+    <!-- The workshop finds the same forms in its own app. -->
+    <menuitem id="menu_ksw_workshop_handover" name="Handover Forms (HR-12)"
+              parent="KSW_workshop.menu_ksw_workshop_root" action="action_ksw_vehicle_handover" sequence="25"
+              groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_reviewer"/>
+    <menuitem id="menu_ksw_workshop_inspection_items" name="Inspection Checklist"
+              parent="KSW_workshop.menu_ksw_workshop_configuration" action="action_ksw_vehicle_inspection_item"
+              sequence="60" groups="KSW_workshop.group_workshop_manager"/>
+
+    <!-- Administrative Affairs and Accounts: the forms, nothing else. -->
+    <menuitem id="menu_ksw_handover_officer_root" name="Vehicle Handover Forms"
+              web_icon="KSW_fleet_allocation,static/description/icon.png"
+              action="action_ksw_vehicle_handover" sequence="86"
+              groups="group_vehicle_handover_officer"/>
 </odoo>

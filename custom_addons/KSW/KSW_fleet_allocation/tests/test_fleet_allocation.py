@@ -1,4 +1,4 @@
-from odoo.exceptions import AccessError, UserError
+from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.tests import TransactionCase, tagged
 
 
@@ -57,6 +57,9 @@ class TestFleetAllocation(TransactionCase):
         wizard.action_confirm()
 
     def _receive(self, moves, user, **vals):
+        # The receiving department names the new driver on HR-12 first.
+        for form in moves.handover_ids.filtered(lambda f: not f.new_employee_id):
+            form.with_user(user).write({'new_employee_id': user.employee_id.id})
         action = moves.with_user(user).action_receive()
         wizard = self.env['ksw.fleet.receive.wizard'].with_user(user).with_context(**action['context']).create({})
         if vals:
@@ -351,3 +354,100 @@ class TestFleetAllocation(TransactionCase):
                          ('damaged', 152300, 'Cracked mirror'))
         self.assertTrue(release.message_ids.filtered(
             lambda m: self.gm.partner_id in m.partner_ids and 'Cracked mirror' in m.body))
+
+
+    # HR-12 ------------------------------------------------------------
+    def _attach_scan(self, form):
+        scan = self.env['ir.attachment'].create({'name': 'hr12.pdf', 'raw': b'%PDF-1.4 signed'})
+        form.sudo().write({'signed_attachment_ids': [(6, 0, scan.ids)]})
+
+    def test_workshop_handover_form_gates_the_checkup(self):
+        """GM sends a vehicle to the workshop: an HR-12 Handover to Workshop
+        comes with the checkup, prefilled, and the checkup cannot complete
+        until the signed copy is filed."""
+        driver = self.env['hr.employee'].create({'name': 'FA Old Driver', 'identification_id': '2400000001',
+                                                 'mobile_phone': '0500000001'})
+        self.isuzu_a1.driver_id = driver
+        if 'x_bas_driver_id' in self.isuzu_a1._fields:
+            self.isuzu_a1.x_bas_driver_id = False
+        release = self._release(self.user_a, self.dept_a, self.isuzu_a1)
+        self._decide_release(release.release_line_ids, decision='holding', workshop_description='Brakes noisy')
+        checkup = self.isuzu_a1.x_checkup_request_id
+        form = checkup.x_handover_ids
+        self.assertEqual(len(form), 1)
+        self.assertEqual((form.handover_type, form.previous_name, form.previous_iqama, form.previous_phone,
+                          form.workshop_reason, form.department_id),
+                         ('handover', 'FA Old Driver', '2400000001', '0500000001', 'Brakes noisy', self.dept_a))
+        self.assertEqual(form.supervisor_id, self.user_a.employee_id)
+        self.assertEqual(len(form.document_ids), 6)
+        self.assertIn('Clutch', form.inspection_line_ids.mapped('name'))
+        checkup.sudo().state = 'in_progress'
+        with self.assertRaises(UserError):
+            checkup.sudo().action_complete()
+        form.inspection_line_ids[:2].write({'depreciation': 20, 'value': 150})
+        self.assertEqual(form.inspection_total, 300)
+        with self.assertRaises(UserError):  # no scan yet
+            form.action_mark_signed()
+        self._attach_scan(form)
+        with self.assertRaises(ValidationError):  # inspection date missing
+            form.action_mark_signed()
+        form.inspection_datetime = '2026-11-12 08:00:00'
+        form.action_mark_signed()
+        self.assertEqual(form.state, 'signed')
+        with self.assertRaises(UserError):  # locked once signed
+            form.with_user(self.gm).write({'workshop_reason': 'changed'})
+        with self.assertRaises(UserError):
+            form.inspection_line_ids[0].with_user(self.gm).write({'value': 1})
+        checkup.sudo().action_complete()
+        self.assertEqual(checkup.state, 'completed')
+
+    def test_new_driver_form_on_transfer(self):
+        """A transfer brings an HR-12 Received by New Driver for the receiving
+        department; arrival needs the new driver, who becomes the driver. A
+        vehicle out of holding carries the workshop's inspection."""
+        release = self._release(self.user_a, self.dept_a, self.isuzu_a1)
+        self._decide_release(release.release_line_ids, decision='holding')
+        workshop_form = self.isuzu_a1.x_checkup_request_id.x_handover_ids
+        workshop_form.inspection_line_ids[:1].write({'value': 75, 'remark': 'Worn'})
+        workshop_form.inspection_datetime = '2026-11-12 08:00:00'
+        self._attach_scan(workshop_form)
+        workshop_form.action_mark_signed()
+        checkup = self.isuzu_a1.x_checkup_request_id.sudo()
+        checkup.state = 'in_progress'
+        checkup.action_complete()
+        addition = self._addition(self.user_b, self.dept_b, 'isuzu', 1)
+        self._allocate(addition.addition_line_ids, mode='internal', vehicle_ids=[(6, 0, self.isuzu_a1.ids)])
+        move = self.isuzu_a1.x_pending_move_id
+        form = move.handover_ids
+        self.assertEqual((form.handover_type, form.department_id), ('receive', self.dept_b))
+        self.assertEqual(form.inspection_total, 75)
+        # Bravo fills it; Alpha cannot read it.
+        self.assertTrue(self.env['ksw.vehicle.handover'].with_user(self.user_b).search([('id', '=', form.id)]))
+        self.assertFalse(self.env['ksw.vehicle.handover'].with_user(self.user_a).search([('id', '=', form.id)]))
+        wizard_action = move.with_user(self.user_b).action_receive()
+        wizard = self.env['ksw.fleet.receive.wizard'].with_user(self.user_b).with_context(
+            **wizard_action['context']).create({})
+        with self.assertRaises(UserError):  # new driver not named
+            wizard.action_confirm()
+        new_driver = self.env['hr.employee'].create({'name': 'FA New Driver', 'identification_id': '2400000002'})
+        form.with_user(self.user_b).write({'new_employee_id': new_driver.id})
+        self.assertEqual(form.new_iqama, '2400000002')
+        wizard.action_confirm()
+        self.assertEqual(self.isuzu_a1.driver_id, new_driver)
+
+    def test_cancelled_transfer_cancels_its_form(self):
+        release = self._release(self.user_a, self.dept_a, self.isuzu_a1)
+        self._decide_release(release.release_line_ids, decision='transfer', target_department_id=self.dept_b.id)
+        move = self.isuzu_a1.x_pending_move_id
+        move.with_user(self.gm).action_cancel()
+        self.assertEqual(move.handover_ids.state, 'cancelled')
+
+    def test_hr12_prints(self):
+        release = self._release(self.user_a, self.dept_a, self.isuzu_a1)
+        self._decide_release(release.release_line_ids, decision='holding')
+        form = self.isuzu_a1.x_checkup_request_id.x_handover_ids
+        html = self.env['ir.actions.report']._render_qweb_html(
+            'KSW_fleet_allocation.report_vehicle_handover', form.ids)[0].decode()
+        self.assertIn('Vehicle Inspection Form', html)
+        self.assertIn(self.isuzu_a1.name, html)
+        self.assertIn('Clutch', html)

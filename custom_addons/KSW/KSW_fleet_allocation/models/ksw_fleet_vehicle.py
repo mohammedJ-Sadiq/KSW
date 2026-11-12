@@ -232,6 +232,13 @@ class KswFleetVehicle(models.Model):
                 ', '.join('%s (%s)' % (self.browse(vid).name, request.name)
                           for vid, request in open_checkups.items())))
 
+    def _ksw_fleet_current_driver(self):
+        """Who drives it now: the BAS driver when known, else the default one."""
+        self.ensure_one()
+        vehicle = self.sudo()
+        return (vehicle['x_bas_driver_id'] if 'x_bas_driver_id' in vehicle._fields else False) \
+            or vehicle.driver_id
+
     def _ksw_fleet_start_transfer(self, target, note=False, addition_line=None, source='internal'):
         """GM decision: move this vehicle to `target`. The vehicle stays with
         its department, In Transfer, until the receiving side confirms. A
@@ -250,6 +257,20 @@ class KswFleetVehicle(models.Model):
             'addition_line_id': addition_line.id if addition_line else False,
             'source': source,
         })
+        # HR-12, Received by New Driver: the receiving department fills it.
+        # A vehicle coming out of holding carries the workshop's inspection.
+        workshop_form = self.env['ksw.vehicle.handover'].sudo().search([
+            ('vehicle_id', '=', self.id), ('handover_type', '=', 'handover'),
+            ('state', '!=', 'cancelled')], limit=1) if self.x_allocation_state == 'holding' else None
+        receive_form = self.env['ksw.vehicle.handover'].sudo().create({
+            'handover_type': 'receive', 'vehicle_id': self.id, 'department_id': target.id,
+            'move_id': move.id, 'previous_employee_id': self._ksw_fleet_current_driver().id,
+            'workshop_official_name': workshop_form.workshop_official_name if workshop_form else False,
+        })
+        if workshop_form:
+            receive_form.inspection_line_ids.unlink()
+            receive_form.inspection_datetime = workshop_form.inspection_datetime
+            receive_form._ksw_load_inspection_items(source=workshop_form)
         if release_line:
             release_line.write({
                 'decision': 'transfer', 'target_department_id': target.id,
@@ -299,6 +320,18 @@ class KswFleetVehicle(models.Model):
             'decided_by_id': self.env.user.id, 'note': note,
             'received_date': fields.Datetime.now(), 'received_by_id': self.env.user.id,
             'release_line_id': release_line.id, 'workshop_request_id': workshop_request.id,
+        })
+        # HR-12, Handover to Workshop: the workshop receives the vehicle and
+        # fills the inspection; its checkup cannot complete until the signed
+        # copy is filed (ksw.workshop.request.action_complete).
+        current = self._ksw_fleet_current_driver()
+        self.env['ksw.vehicle.handover'].sudo().create({
+            'handover_type': 'handover', 'vehicle_id': self.id, 'department_id': department.id,
+            'workshop_request_id': workshop_request.id,
+            'previous_employee_id': current.id,
+            'supervisor_id': release_line.request_id.user_id.employee_id.id if release_line else False,
+            'workshop_reason': description or _('Checkup before reallocation'),
+            'deliverer_name': current.name or False,
         })
         if release_line:
             release_line.write({

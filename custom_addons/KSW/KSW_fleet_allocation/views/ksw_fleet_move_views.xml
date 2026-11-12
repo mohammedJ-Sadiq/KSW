@@ -34,6 +34,8 @@
                        decoration-success="state == 'done'"/>
                 <field name="x_can_receive" column_invisible="True"/>
                 <field name="x_can_cancel" column_invisible="True"/>
+                <button name="action_open_handover_form" type="object" string="HR-12" icon="fa-file-text-o"
+                        invisible="kind != 'transfer' or state != 'in_transfer'"/>
                 <button name="action_receive" type="object" string="Received" icon="fa-check"
                         class="btn-primary" invisible="not x_can_receive"
                         confirm="Confirm the vehicle has arrived at your department?"/>

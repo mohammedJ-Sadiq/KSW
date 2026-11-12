@@ -26,6 +26,18 @@ def _reply(content, stop):
                       'cache_read_input_tokens': 50}}
 
 
+def _partner_menu(env):
+    """A Contacts menu of our own: the catalog only offers models the user
+    reaches through a menu, and a bare database has no Contacts app."""
+    action = env['ir.actions.act_window'].create({
+        'name': 'AI Test Contacts', 'res_model': 'res.partner',
+        'view_mode': 'list,form'})
+    env['ir.ui.menu'].create({
+        'name': 'AI Test Contacts', 'action': 'ir.actions.act_window,%d'
+        % action.id, 'group_ids': [(4, env.ref('base.group_user').id)]})
+    return action
+
+
 @tagged('post_install', '-at_install')
 class TestAiAssistant(TransactionCase):
 
@@ -44,6 +56,8 @@ class TestAiAssistant(TransactionCase):
             'group_ids': [(6, 0, [cls.env.ref('base.group_user').id])],
         })
         cls.Conv = cls.env['ksw.ai.conversation']
+        _partner_menu(cls.env)
+        cls.env.registry.clear_cache()
 
     # ------------------------------------------------------------------
     # Tools
@@ -51,8 +65,64 @@ class TestAiAssistant(TransactionCase):
     def test_no_tool_writes(self):
         self.assertEqual(
             sorted(t['name'] for t in TOOLS),
-            ['find_models', 'get_fields', 'search_records',
+            ['find_models', 'get_fields', 'read_record', 'search_records',
              'summarize_records'])
+
+    def test_read_record_lists_values_and_lines(self):
+        company = self.env['res.partner'].create({
+            'name': 'AI Read Co', 'is_company': True,
+            'child_ids': [(0, 0, {'name': 'AI Read Contact'})]})
+        result, _block = self.env['ksw.ai.tools']._run_tool(
+            'read_record', {'model': 'res.partner',
+                            'record_id': company.id})
+        self.assertEqual(result['name'], 'AI Read Co')
+        self.assertTrue(any('AI Read Co' in v
+                            for v in result['fields'].values()))
+        self.assertIn('child_ids', result['subtables'])
+        self.assertIn(['AI Read Contact'],
+                      [r[:1] for r in result['subtables']['child_ids']['rows']])
+
+    def test_read_record_missing_is_retryable(self):
+        with self.assertRaises(ToolInputError):
+            self.env['ksw.ai.tools']._run_tool(
+                'read_record', {'model': 'res.partner', 'record_id': 0})
+
+    def test_page_line_names_the_open_record(self):
+        partner = self.env['res.partner'].create({'name': 'AI Page Co'})
+        line = self.Conv._ksw_page_line(
+            {'model': 'res.partner', 'res_id': partner.id})
+        self.assertIn('CURRENT RECORD', line)
+        self.assertIn('AI Page Co', line)
+        self.assertIn('id %s' % partner.id, line)
+        # A model outside the user's menus, or junk, says nothing.
+        self.assertEqual(self.Conv._ksw_page_line(
+            {'model': 'ir.config_parameter', 'res_id': 1}), '')
+        self.assertEqual(self.Conv._ksw_page_line('junk'), '')
+
+    def test_page_line_hides_a_record_the_user_cannot_read(self):
+        group = self.env.ref('base.group_system')
+        rule_model = self.env['ir.model']._get('res.partner')
+        self.env['ir.rule'].create({
+            'name': 'AI test: hide one partner',
+            'model_id': rule_model.id,
+            'domain_force': "[('name', '!=', 'AI Secret Co')]",
+            'groups': [(4, self.env.ref('base.group_user').id)],
+        })
+        secret = self.env['res.partner'].create({'name': 'AI Secret Co'})
+        line = self.Conv.with_user(self.user)._ksw_page_line(
+            {'model': 'res.partner', 'res_id': secret.id})
+        self.assertNotIn('AI Secret Co', line)
+
+    def test_arabic_question_asks_for_an_arabic_reply(self):
+        seen = []
+
+        def fake(key, model, system, messages, tools, effort='medium'):
+            seen.append(messages[-1]['content'])
+            return _reply([{'type': 'text', 'text': 'تم'}], 'end_turn')
+
+        with patch.object(ai_conversation, 'create_message', fake):
+            self.Conv.ksw_ai_ask('كم عدد القروض؟')
+        self.assertIn('Reply in Arabic', seen[0])
 
     def test_catalog_follows_the_users_menus(self):
         admin = self.env['ksw.ai.tools']._catalog()
@@ -82,8 +152,6 @@ class TestAiAssistant(TransactionCase):
         """Record rules apply: a user's search never returns what he
         could not open himself."""
         tools = self.env['ksw.ai.tools'].with_user(self.user)
-        if 'res.partner' not in tools._catalog():
-            self.skipTest('no contacts menu for a plain user')
         mine = self.env['res.partner'].with_user(self.user).search_count([])
         result, block = tools._run_tool('search_records', {
             'model': 'res.partner', 'domain': '[]', 'fields': ['name'],
@@ -104,6 +172,17 @@ class TestAiAssistant(TransactionCase):
                 'title': 'Companies'})
         self.assertEqual(block['total'], 2)
         self.assertIn('AI Sum', block['filter_text'])
+
+    def test_filter_text_shows_names_not_ids(self):
+        parent = self.env['res.partner'].create({'name': 'AI Parent Co'})
+        result, block = self.env['ksw.ai.tools']._run_tool(
+            'search_records', {
+                'model': 'res.partner',
+                'domain': json.dumps([['parent_id', '=', parent.id]]),
+                'fields': ['name', 'parent_id.name'], 'order': '',
+                'limit': 5, 'title': 'x'})
+        self.assertIn('AI Parent Co', block['filter_text'])
+        self.assertNotIn(str(parent.id), block['filter_text'])
 
     # ------------------------------------------------------------------
     # The question loop
@@ -182,7 +261,8 @@ class TestAiAssistant(TransactionCase):
         ]
         sent = []
 
-        def fake(base_url, key, model, messages, tools, max_tokens=2048):
+        def fake(base_url, key, model, messages, tools, max_tokens=4096,
+                 effort='high'):
             sent.append(json.loads(json.dumps(messages)))
             self.assertEqual(base_url, 'https://api.groq.com/openai/v1')
             self.assertEqual(tools[0]['type'], 'function')
@@ -211,6 +291,36 @@ class TestAiAssistant(TransactionCase):
 
 @tagged('post_install', '-at_install')
 class TestAiAssistantUI(HttpCase):
+
+    def test_form_page_reaches_the_chat(self):
+        """Opened from a contact form, the chat shows "About: <record>"."""
+        self.env['ir.config_parameter'].sudo().set_param(
+            'ksw_ai.api_key', 'test-key')
+        partner = self.env['res.partner'].create({'name': 'AI Chip Co'})
+        action = _partner_menu(self.env)
+        self.browser_js(
+            '/odoo/action-%d/%d' % (action.id, partner.id),
+            """
+            const wait = (sel) => new Promise((ok, ko) => {
+                let n = 0;
+                const t = setInterval(() => {
+                    const el = document.querySelector(sel);
+                    if (el) { clearInterval(t); ok(el); }
+                    if (++n > 150) { clearInterval(t); ko(sel + ' not found'); }
+                }, 100);
+            });
+            wait('.o_form_view').then(() => wait('.ksw_ai_systray'))
+              .then((btn) => { btn.click(); return wait('.ksw_ai_page'); })
+              .then((chip) => {
+                  if (!chip.textContent.includes('AI Chip Co')) {
+                      throw new Error('chip shows ' + chip.textContent);
+                  }
+                  console.log('test successful');
+              })
+              .catch((e) => console.error(e));
+            """,
+            login='admin',
+        )
 
     def test_home_shows_ask_box_and_systray(self):
         self.env['ir.config_parameter'].sudo().set_param(

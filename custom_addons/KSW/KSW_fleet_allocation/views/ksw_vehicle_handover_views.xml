@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ksw_vehicle_handover_form" model="ir.ui.view">
+        <field name="name">ksw.vehicle.handover.form</field>
+        <field name="model">ksw.vehicle.handover</field>
+        <field name="arch" type="xml">
+            <!-- The paper HR-12, section by section, in its order. Filled
+                 here, printed, signed on paper, and the scan filed back. -->
+            <form string="Vehicle Handover Form (HR-12)">
+                <header>
+                    <button name="action_print" type="object" string="Print HR-12" icon="fa-print"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_mark_signed" type="object" string="Mark as Signed" icon="fa-check"
+                            invisible="state != 'draft'"
+                            confirm="The signed scan is attached and the form is final?"/>
+                    <button name="action_print" type="object" string="Print HR-12" icon="fa-print"
+                            invisible="state == 'draft'"/>
+                    <button name="action_reset_draft" type="object" string="Reopen"
+                            groups="base.group_system" invisible="state != 'signed'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,signed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_workshop_request" type="object" class="oe_stat_button"
+                                icon="fa-wrench" invisible="not workshop_request_id">
+                            <div class="o_stat_info"><span class="o_stat_text">Workshop Request</span></div>
+                        </button>
+                    </div>
+                    <div class="alert alert-info mb-3" role="status" invisible="state != 'draft'">
+                        Fill the form, press <b>Print HR-12</b>, have it signed on paper, attach the scan
+                        under <b>Signed Copy</b> and press <b>Mark as Signed</b>.
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                        <h3><field name="handover_type" readonly="1"/></h3>
+                    </div>
+                    <group>
+                        <group string="Vehicle Details">
+                            <field name="vehicle_id" readonly="1"/>
+                            <field name="plate_number"/>
+                            <field name="vehicle_type"/>
+                            <field name="department_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="form_date" readonly="state != 'draft'"/>
+                            <field name="workshop_request_id" invisible="1"/>
+                            <field name="move_id" invisible="not move_id" readonly="1"/>
+                            <field name="signed_attachment_ids" widget="many2many_binary"
+                                   readonly="state != 'draft'"/>
+                            <field name="signed_date" invisible="not signed_date"/>
+                            <field name="signed_by_id" invisible="not signed_by_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="users" string="Requesting Department">
+                            <group>
+                                <group string="Previous Vehicle User">
+                                    <field name="previous_employee_id" options="{'no_create': True}"
+                                           readonly="state != 'draft'"/>
+                                    <field name="previous_name" readonly="state != 'draft'"/>
+                                    <field name="previous_emp_no" readonly="state != 'draft'"/>
+                                    <field name="previous_iqama" readonly="state != 'draft'"/>
+                                    <field name="previous_phone" readonly="state != 'draft'"/>
+                                </group>
+                                <group string="New Vehicle User">
+                                    <field name="new_employee_id" options="{'no_create': True}"
+                                           readonly="state != 'draft'"
+                                           required="handover_type == 'receive' and state == 'draft'"/>
+                                    <field name="new_name" readonly="state != 'draft'"/>
+                                    <field name="new_emp_no" readonly="state != 'draft'"/>
+                                    <field name="new_iqama" readonly="state != 'draft'"/>
+                                    <field name="new_phone" readonly="state != 'draft'"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Reason for User Change">
+                                    <field name="change_reason" widget="radio" options="{'horizontal': true}"
+                                           readonly="state != 'draft'"/>
+                                    <field name="change_reason_note" readonly="state != 'draft'"/>
+                                </group>
+                                <group string="Supervisor">
+                                    <field name="supervisor_id" options="{'no_create': True}"
+                                           readonly="state != 'draft'"/>
+                                </group>
+                            </group>
+                            <group string="Reason to Hand Over to the Workshop">
+                                <field name="workshop_reason" nolabel="1" colspan="2" readonly="state != 'draft'"/>
+                            </group>
+                            <div class="text-muted small">
+                                The vehicle is not handed over without a valid regular license.
+                            </div>
+                        </page>
+                        <page name="admin" string="Administrative Affairs">
+                            <field name="document_ids" readonly="state != 'draft'">
+                                <list editable="bottom" create="0" delete="0">
+                                    <field name="sequence" column_invisible="True"/>
+                                    <field name="document_type" readonly="1"/>
+                                    <field name="present"/>
+                                    <field name="remark"/>
+                                </list>
+                            </field>
+                            <group>
+                                <group string="New User's License">
+                                    <field name="new_position" readonly="state != 'draft'"/>
+                                    <field name="license_type" readonly="state != 'draft'"/>
+                                    <field name="license_expiry" readonly="state != 'draft'"/>
+                                </group>
+                                <group string="Delegation Process">
+                                    <field name="delegation_add_datetime" readonly="state != 'draft'"/>
+                                    <field name="delegation_remove_datetime" readonly="state != 'draft'"/>
+                                    <field name="delegation_remarks" readonly="state != 'draft'"/>
+                                </group>
+                            </group>
+                            <group string="Remarks">
+                                <field name="admin_remarks" nolabel="1" colspan="2" readonly="state != 'draft'"/>
+                            </group>
+                        </page>
+                        <page name="finance" string="Financial Matters">
+                            <group>
+                                <field name="financial_note_1" readonly="state != 'draft'"/>
+                                <field name="financial_note_2" readonly="state != 'draft'"/>
+                                <field name="financial_note_3" readonly="state != 'draft'"/>
+                            </group>
+                            <div class="text-muted small mb-3">Attach the driver's account statement to the signed copy.</div>
+                            <group string="For the Official Use (Executive Director)">
+                                <field name="official_remarks" nolabel="1" colspan="2" readonly="state != 'draft'"/>
+                            </group>
+                        </page>
+                        <page name="inspection" string="Vehicle Inspection">
+                            <group>
+                                <group>
+                                    <field name="inspection_datetime" readonly="state != 'draft'"
+                                           required="handover_type == 'handover' and state == 'draft'"/>
+                                </group>
+                                <group>
+                                    <field name="inspection_total"/>
+                                </group>
+                            </group>
+                            <field name="inspection_line_ids" readonly="state != 'draft'">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="depreciation"/>
+                                    <field name="value" sum="Total"/>
+                                    <field name="remark"/>
+                                </list>
+                            </field>
+                            <group string="Names for the Signatures">
+                                <field name="workshop_official_name" readonly="state != 'draft'"/>
+                                <field name="deliverer_name" readonly="state != 'draft'"/>
+                                <field name="receiver_name" readonly="state != 'draft'"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_vehicle_handover_list" model="ir.ui.view">
+        <field name="name">ksw.vehicle.handover.list</field>
+        <field name="model">ksw.vehicle.handover</field>
+        <field name="arch" type="xml">
+            <list string="Handover Forms" create="0" decoration-muted="state == 'cancelled'"
+                  decoration-info="state == 'draft'">
+                <field name="name"/>
+                <field name="handover_type" widget="badge"
+                       decoration-warning="handover_type == 'handover'"
+                       decoration-success="handover_type == 'receive'"/>
+                <field name="vehicle_id"/>
+                <field name="department_id"/>
+                <field name="previous_name" optional="show"/>
+                <field name="new_name" optional="show"/>
+                <field name="form_date"/>
+                <field name="inspection_total" optional="hide" sum="Total"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'"
+                       decoration-success="state == 'signed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_vehicle_handover_search" model="ir.ui.view">
+        <field name="name">ksw.vehicle.handover.search</field>
+        <field name="model">ksw.vehicle.handover</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="vehicle_id"/>
+                <field name="previous_employee_id"/>
+                <field name="new_employee_id"/>
+                <field name="department_id"/>
+                <filter string="Being Filled" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Signed" name="filter_signed" domain="[('state', '=', 'signed')]"/>
+                <separator/>
+                <filter string="Handover to Workshop" name="filter_handover" domain="[('handover_type', '=', 'handover')]"/>
+                <filter string="Received by New Driver" name="filter_receive" domain="[('handover_type', '=', 'receive')]"/>
+                <group>
+                    <filter string="Request Type" name="groupby_type" context="{'group_by': 'handover_type'}"/>
+                    <filter string="Department" name="groupby_department" context="{'group_by': 'department_id'}"/>
+                    <filter string="Vehicle" name="groupby_vehicle" context="{'group_by': 'vehicle_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_vehicle_handover" model="ir.actions.act_window">
+        <field name="name">Handover Forms (HR-12)</field>
+        <field name="res_model">ksw.vehicle.handover</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ksw_vehicle_handover_search"/>
+        <field name="context">{'search_default_filter_draft': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No handover form to fill</p>
+            <p>A form is opened automatically when the GM sends a vehicle to the workshop
+               (Handover to Workshop) or transfers one to a department (Received by New Driver).</p>
+        </field>
+    </record>
+
+    <record id="view_ksw_vehicle_inspection_item_list" model="ir.ui.view">
+        <field name="name">ksw.vehicle.inspection.item.list</field>
+        <field name="model">ksw.vehicle.inspection.item</field>
+        <field name="arch" type="xml">
+            <list string="Inspection Checklist" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="vehicle_type" placeholder="Every type"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_ksw_vehicle_inspection_item" model="ir.actions.act_window">
+        <field name="name">Inspection Checklist</field>
+        <field name="res_model">ksw.vehicle.inspection.item</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p>The items the workshop checks on a handover. Leave Vehicle Type empty for an item
+               checked on every vehicle; set it for items of one type only.</p>
+        </field>
+    </record>
+
+    <!-- The checkup request shows its form, and why it cannot complete yet. -->
+    <record id="view_ksw_workshop_request_form_handover" model="ir.ui.view">
+        <field name="name">ksw.workshop.request.form.handover</field>
+        <field name="model">ksw.workshop.request</field>
+        <field name="inherit_id" ref="KSW_workshop.view_ksw_workshop_request_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/*[1]" position="before">
+                <field name="x_handover_count" invisible="1"/>
+                <field name="x_handover_pending" invisible="1"/>
+                <div class="alert alert-warning" role="alert" invisible="not x_handover_pending">
+                    This checkup comes with a vehicle handover form (HR-12). Fill it, print it, have it
+                    signed and file the scan before completing the request.
+                    <button name="action_open_handover_forms" type="object" class="btn btn-link p-0 ms-1"
+                            string="Open the form"/>
+                </div>
+                <div class="d-flex justify-content-end" invisible="not x_handover_count">
+                    <button name="action_open_handover_forms" type="object" class="btn btn-secondary btn-sm mb-2"
+                            icon="fa-file-text-o" string="Handover Form (HR-12)"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- A transfer shows its new-driver form. -->
+    <record id="view_ksw_fleet_move_form_handover" model="ir.ui.view">
+        <field name="name">ksw.fleet.move.form.handover</field>
+        <field name="model">ksw.fleet.move</field>
+        <field name="inherit_id" ref="view_ksw_fleet_move_form"/>
+        <field name="arch" type="xml">
+            <field name="note" position="after">
+                <field name="handover_ids" readonly="1" invisible="not handover_ids">
+                    <list>
+                        <field name="name"/>
+                        <field name="handover_type"/>
+                        <field name="new_name"/>
+                        <field name="state" widget="badge"/>
+                    </list>
+                </field>
+            </field>
+        </field>
+    </record>
+</odoo>

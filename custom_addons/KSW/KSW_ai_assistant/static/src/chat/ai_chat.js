@@ -5,6 +5,7 @@ import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { escape } from "@web/core/utils/strings";
 import { patch } from "@web/core/utils/patch";
+import { router } from "@web/core/browser/router";
 import { KswHome } from "@KSW_backend_theme/home/home";
 
 /** Plain text from the model -> safe HTML: escaped first, then **bold**
@@ -23,7 +24,12 @@ function renderAnswer(text) {
  */
 export class KswAiChat extends Component {
     static template = "KSW_ai_assistant.Chat";
-    static props = { compact: { type: Boolean, optional: true }, close: { type: Function, optional: true } };
+    static props = {
+        compact: { type: Boolean, optional: true },
+        close: { type: Function, optional: true },
+        // The screen the user opened the assistant from: {model, res_id, title}.
+        page: { type: [Object, { value: null }], optional: true },
+    };
 
     setup() {
         this.orm = useService("orm");
@@ -35,6 +41,7 @@ export class KswAiChat extends Component {
             conversationId: false,
             question: "",
             busy: false,
+            page: this.props.page || null,
         });
         onWillStart(async () => {
             this.state.status = await this.orm.call("ksw.ai.conversation", "ksw_ai_status", []);
@@ -42,6 +49,13 @@ export class KswAiChat extends Component {
     }
 
     get examples() {
+        if (this.state.page?.res_id) {
+            return [
+                _t("Explain this record"),
+                _t("How is this amount calculated?"),
+                _t("What changed compared with last month?"),
+            ];
+        }
         return [
             _t("Show me all loans above 5,000 SAR"),
             _t("Who is on annual leave this week?"),
@@ -75,6 +89,7 @@ export class KswAiChat extends Component {
             const res = await this.orm.call("ksw.ai.conversation", "ksw_ai_ask", [
                 question,
                 this.state.conversationId,
+                this.state.page,
             ]);
             this.state.conversationId = res.conversation_id;
             const last = this.state.turns[this.state.turns.length - 1];
@@ -89,6 +104,10 @@ export class KswAiChat extends Component {
             this.state.busy = false;
             this.inputRef.el?.focus();
         }
+    }
+
+    dropPage() {
+        this.state.page = null;
     }
 
     newChat() {
@@ -143,7 +162,23 @@ export class KswAiChat extends Component {
 export class KswAiDialog extends Component {
     static template = "KSW_ai_assistant.Dialog";
     static components = { Dialog, KswAiChat };
-    static props = { close: Function };
+    static props = { close: Function, page: { type: [Object, { value: null }], optional: true } };
+}
+
+/** The record or list on screen, so "this payslip" needs no explaining. */
+export function currentPage(actionService) {
+    const ctrl = actionService.currentController;
+    const model = ctrl?.props?.resModel || router.current.model;
+    if (!model) {
+        return null;
+    }
+    const resId = ctrl?.currentState?.resId || ctrl?.props?.resId || router.current.resId;
+    return {
+        model,
+        res_id: typeof resId === "number" ? resId : false,
+        title: ctrl?.displayName || ctrl?.action?.name || "",
+        url: window.location.pathname,
+    };
 }
 
 export class KswAiSystray extends Component {
@@ -151,9 +186,10 @@ export class KswAiSystray extends Component {
     static props = {};
     setup() {
         this.dialog = useService("dialog");
+        this.action = useService("action");
     }
     open() {
-        this.dialog.add(KswAiDialog);
+        this.dialog.add(KswAiDialog, { page: currentPage(this.action) });
     }
 }
 

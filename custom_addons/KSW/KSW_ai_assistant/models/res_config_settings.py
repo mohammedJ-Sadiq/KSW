@@ -27,7 +27,9 @@ class ResConfigSettings(models.TransientModel):
         [('low', 'Low (fastest)'), ('medium', 'Medium'),
          ('high', 'High (most careful)')],
         string='Reasoning Effort', config_parameter='ksw_ai.effort',
-        default='medium')
+        default='high',
+        help='How long the model thinks before answering. Higher is more '
+             'accurate and slower.')
 
     @api.onchange('ksw_ai_provider')
     def _onchange_ksw_ai_provider(self):

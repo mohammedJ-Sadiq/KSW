@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- The checklist of the paper HR-12 inspection page, for every vehicle
+         type. Tune it per type under Workshop ▸ Configuration ▸ Inspection
+         Checklist: the paper list is tanker-shaped. -->
+    <data noupdate="1">
+        <record id="inspection_item_clutch" model="ksw.vehicle.inspection.item"><field name="name">Clutch / الكلتش</field><field name="sequence">1</field></record>
+        <record id="inspection_item_front_tires" model="ksw.vehicle.inspection.item"><field name="name">Front tires / الكفرات الأمامية</field><field name="sequence">2</field></record>
+        <record id="inspection_item_rear_right_tires" model="ksw.vehicle.inspection.item"><field name="name">Rear right tires / الكفرات الخلفية يمين</field><field name="sequence">3</field></record>
+        <record id="inspection_item_rear_left_tires" model="ksw.vehicle.inspection.item"><field name="name">Rear left tires / الكفرات الخلفية يسار</field><field name="sequence">4</field></record>
+        <record id="inspection_item_front_brake" model="ksw.vehicle.inspection.item"><field name="name">Front brake / البريك الأمامي</field><field name="sequence">5</field></record>
+        <record id="inspection_item_rear_brake" model="ksw.vehicle.inspection.item"><field name="name">Rear brake / البريك الخلفي</field><field name="sequence">6</field></record>
+        <record id="inspection_item_water_tank" model="ksw.vehicle.inspection.item"><field name="name">Water tank / خزان المياه</field><field name="sequence">7</field></record>
+        <record id="inspection_item_water_motor" model="ksw.vehicle.inspection.item"><field name="name">Water motor / ماتور المياه</field><field name="sequence">8</field></record>
+        <record id="inspection_item_batteries" model="ksw.vehicle.inspection.item"><field name="name">Batteries / البطاريات</field><field name="sequence">9</field></record>
+        <record id="inspection_item_vehicle_plate" model="ksw.vehicle.inspection.item"><field name="name">Vehicle plate / لوحة المركبة</field><field name="sequence">10</field></record>
+    </data>
+</odoo>
