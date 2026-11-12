@@ -278,6 +278,7 @@ class KswFleetReleaseLine(models.Model):
 
     status = fields.Selection([
         ('pending', 'Waiting for GM'),
+        ('checkup', 'At Workshop Checkup'),
         ('in_transfer', 'In Transfer'),
         ('transferred', 'Transferred'),
         ('holding', 'In Holding'),
@@ -292,12 +293,13 @@ class KswFleetReleaseLine(models.Model):
             if line.request_id.state == 'cancelled':
                 status = 'cancelled'
             elif line.decision == 'transfer':
-                live = line.move_ids.filtered(lambda m: m.state != 'cancelled')[:1]
-                status = 'in_transfer' if live.state == 'in_transfer' else 'transferred'
+                live = line.move_ids.filtered(lambda m: m.kind == 'transfer' and m.state != 'cancelled')[:1]
+                status = 'checkup' if not live else (
+                    'in_transfer' if live.state == 'in_transfer' else 'transferred')
             else:
                 status = {'pending': 'pending', 'holding': 'holding', 'keep': 'kept'}[line.decision]
             line.status = status
-            line.is_closed = status not in ('pending', 'in_transfer')
+            line.is_closed = status not in ('pending', 'checkup', 'in_transfer')
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -402,12 +404,15 @@ class KswFleetAdditionLine(models.Model):
     _quantity_positive = models.Constraint('CHECK(quantity > 0)', 'The quantity must be at least 1.')
 
     @api.depends('quantity', 'external_quantity', 'refused_quantity', 'request_id.state',
-                 'move_ids.state', 'move_ids.source')
+                 'move_ids.state', 'move_ids.source', 'move_ids.kind', 'move_ids.vehicle_id')
     def _compute_quantities(self):
         for line in self:
             live = line.move_ids.filtered(lambda m: m.state != 'cancelled')
-            line.internal_quantity = len(live.filtered(lambda m: m.source == 'internal'))
-            line.external_received_quantity = len(live.filtered(lambda m: m.source == 'external'))
+            # Vehicles, not moves: a vehicle reserved for this line has its
+            # checkup move first, then its transfer.
+            line.internal_quantity = len(live.filtered(lambda m: m.source == 'internal').vehicle_id)
+            line.external_received_quantity = len(live.filtered(lambda m: m.source == 'external').vehicle_id)
+            arrived = live.filtered(lambda m: m.kind == 'transfer' and m.state == 'done').vehicle_id
             line.open_quantity = line.quantity - line.internal_quantity \
                 - line.external_quantity - line.refused_quantity
             if line.request_id.state == 'cancelled':
@@ -416,7 +421,7 @@ class KswFleetAdditionLine(models.Model):
                 status = 'pending'
             elif line.external_received_quantity < line.external_quantity:
                 status = 'waiting_external'
-            elif live.filtered(lambda m: m.state == 'in_transfer'):
+            elif live.vehicle_id - arrived:
                 status = 'in_transfer'
             elif line.refused_quantity == line.quantity:
                 status = 'refused'

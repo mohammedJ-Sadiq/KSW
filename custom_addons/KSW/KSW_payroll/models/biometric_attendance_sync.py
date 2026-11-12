@@ -29,6 +29,7 @@ class BiometricAttendanceSyncPayroll(models.AbstractModel):
             (version.wage or 0.0)
             + (version.travel_allowance or 0.0)
             + (version.mobile_allowance or 0.0)
+            + (version.collection_commission_allowance or 0.0)
             + (version.other_allowance or 0.0)
         )
         # Divisor = actual days in the synced day's month (e.g. 31, 30, 28/29).

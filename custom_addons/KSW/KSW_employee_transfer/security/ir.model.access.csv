@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ksw_employee_transfer_requester,ksw.employee.transfer.requester,model_ksw_employee_transfer,group_transfer_requester,1,1,1,1
+access_ksw_employee_transfer_gm,ksw.employee.transfer.gm,model_ksw_employee_transfer,group_transfer_gm,1,1,0,0
+access_ksw_employee_transfer_system,ksw.employee.transfer.system,model_ksw_employee_transfer,base.group_system,1,1,1,1
+access_ksw_employee_transfer_refuse_hr,ksw.employee.transfer.refuse.hr,model_ksw_employee_transfer_refuse_wizard,group_transfer_hr,1,1,1,1
+access_ksw_employee_transfer_refuse_gm,ksw.employee.transfer.refuse.gm,model_ksw_employee_transfer_refuse_wizard,group_transfer_gm,1,1,1,1

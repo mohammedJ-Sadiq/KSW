@@ -2,7 +2,7 @@
 <odoo>
 
     <!-- One sheet per page like the paper: A4 with narrow margins. -->
-    <record id="paperformat_vehicle_handover" model="report.paperformat">
+    <record id="paperformat_vehicle_custody" model="report.paperformat">
         <field name="name">HR-12 Vehicle Handover (A4)</field>
         <field name="format">A4</field>
         <field name="orientation">Portrait</field>
@@ -15,22 +15,22 @@
         <field name="dpi">90</field>
     </record>
 
-    <record id="action_report_vehicle_handover" model="ir.actions.report">
+    <record id="action_report_vehicle_custody" model="ir.actions.report">
         <field name="name">Vehicle Handover Form (HR-12)</field>
-        <field name="model">ksw.vehicle.handover</field>
+        <field name="model">ksw.vehicle.custody.request</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">KSW_fleet_allocation.report_vehicle_handover</field>
-        <field name="report_file">KSW_fleet_allocation.report_vehicle_handover</field>
+        <field name="report_name">KSW_vehicle_custody.report_vehicle_custody</field>
+        <field name="report_file">KSW_vehicle_custody.report_vehicle_custody</field>
         <field name="print_report_name">'HR-12 %s %s' % (object.name.replace('/', '-'), object.vehicle_id.name)</field>
-        <field name="binding_model_id" ref="model_ksw_vehicle_handover"/>
+        <field name="binding_model_id" ref="model_ksw_vehicle_custody_request"/>
         <field name="binding_type">report</field>
-        <field name="paperformat_id" ref="paperformat_vehicle_handover"/>
+        <field name="paperformat_id" ref="paperformat_vehicle_custody"/>
     </record>
 
     <!-- The paper form HR-12, page for page: the handover form, then the
          vehicle inspection form. Bilingual like the original; blank lines
          where the paper is signed by hand. -->
-    <template id="report_vehicle_handover_header">
+    <template id="report_vehicle_custody_header">
         <table class="hr12 mb-2" style="border: none;">
             <tr>
                 <td style="width: 30%; border: none; text-align: left; vertical-align: middle;">
@@ -38,7 +38,7 @@
                     <span t-out="o.name"/>
                 </td>
                 <td style="width: 40%; border: none; text-align: center;">
-                    <img src="/KSW_fleet_allocation/static/src/img/kawther_logo.png" style="max-height: 55px;"/>
+                    <img src="/KSW_vehicle_custody/static/src/img/kawther_logo.png" style="max-height: 55px;"/>
                 </td>
                 <td style="width: 30%; border: none; text-align: right; vertical-align: middle;" dir="rtl">
                     <b>إدارة الموارد البشرية</b><br/>والتطوير التنظيمي
@@ -47,7 +47,7 @@
         </table>
     </template>
 
-    <template id="report_vehicle_handover_document">
+    <template id="report_vehicle_custody_document">
         <t t-set="types" t-value="dict(o._fields['vehicle_type']._description_selection(o.env))"/>
         <t t-set="docs_by_type" t-value="{d.document_type: d for d in o.document_ids}"/>
         <div class="page" style="font-size: 9.5px;">
@@ -62,7 +62,7 @@
                 .hr12-box { font-family: DejaVu Sans, sans-serif; }
             </style>
 
-            <t t-call="KSW_fleet_allocation.report_vehicle_handover_header"/>
+            <t t-call="KSW_vehicle_custody.report_vehicle_custody_header"/>
             <div class="hr12-title">نموذج تسليم واستلام المركبة / Vehicle Handover Form</div>
             <table class="hr12">
                 <tr><td style="width: 20%;">Date</td>
@@ -76,9 +76,9 @@
                     <th>Plate Num / رقم اللوحة</th><th>Vehicle Type / نوع المركبة</th></tr>
                 <tr>
                     <td style="text-align: center;">
-                        <span class="hr12-box" t-out="'☑' if o.handover_type == 'handover' else '☐'"/> تسليم Hand over
+                        <span class="hr12-box" t-out="'☑' if o.kind in ('hand_in', 'driver_change') else '☐'"/> تسليم Hand over
                         &#160;&#160;
-                        <span class="hr12-box" t-out="'☑' if o.handover_type == 'receive' else '☐'"/> استلام Received
+                        <span class="hr12-box" t-out="'☑' if o.kind in ('receive', 'driver_change') else '☐'"/> استلام Received
                     </td>
                     <td style="text-align: center;" t-out="o.vehicle_id.name"/>
                     <td style="text-align: center;" t-out="o.plate_number or ''"/>
@@ -181,7 +181,7 @@
 
         <!-- Page 2: the vehicle inspection form. -->
         <div class="page" style="font-size: 9.5px; page-break-before: always;">
-            <t t-call="KSW_fleet_allocation.report_vehicle_handover_header"/>
+            <t t-call="KSW_vehicle_custody.report_vehicle_custody_header"/>
             <div class="hr12-title">نموذج فحص المركبة / Vehicle Inspection Form</div>
             <table class="hr12">
                 <tr><th colspan="4">Vehicle Details / بيانات المركبة</th></tr>
@@ -233,11 +233,11 @@
         </div>
     </template>
 
-    <template id="report_vehicle_handover">
+    <template id="report_vehicle_custody">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
                 <t t-call="web.basic_layout">
-                    <t t-call="KSW_fleet_allocation.report_vehicle_handover_document"/>
+                    <t t-call="KSW_vehicle_custody.report_vehicle_custody_document"/>
                 </t>
             </t>
         </t>

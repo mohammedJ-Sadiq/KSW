@@ -8,12 +8,5 @@
             <field name="padding">4</field>
             <field name="company_id" eval="False"/>
         </record>
-        <record id="seq_ksw_vehicle_handover" model="ir.sequence">
-            <field name="name">Vehicle Handover Form (HR-12)</field>
-            <field name="code">ksw.vehicle.handover</field>
-            <field name="prefix">HR12/%(year)s/</field>
-            <field name="padding">4</field>
-            <field name="company_id" eval="False"/>
-        </record>
     </data>
 </odoo>

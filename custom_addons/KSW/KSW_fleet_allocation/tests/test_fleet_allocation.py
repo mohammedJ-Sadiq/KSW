@@ -25,6 +25,10 @@ class TestFleetAllocation(TransactionCase):
         cls.user_a = _user('fa_user_a', 'KSW_fleet_allocation.group_fleet_allocation_user', [cls.dept_a])
         cls.user_b = _user('fa_user_b', 'KSW_fleet_allocation.group_fleet_allocation_user', [cls.dept_b])
         cls.gm = _user('fa_gm', 'KSW_fleet_allocation.group_fleet_allocation_gm')
+        # With Vehicle Custody installed (always, in KSW) a release goes
+        # through HR and a vehicle in use through a workshop checkup.
+        cls.hr = _user('fa_hr', 'KSW_vehicle_custody.group_custody_hr')
+        cls.workshop = _user('fa_workshop', 'KSW_workshop.group_workshop_manager')
 
         Vehicle = cls.env['ksw.fleet.vehicle']
         cls.isuzu_a1 = Vehicle.create({'name': 'FA-IS1', 'vehicle_type': 'isuzu', 'x_department_id': cls.dept_a.id})
@@ -32,11 +36,13 @@ class TestFleetAllocation(TransactionCase):
         cls.trailer_b = Vehicle.create({'name': 'FA-T1', 'vehicle_type': 'trailer', 'x_department_id': cls.dept_b.id})
 
     # helpers ----------------------------------------------------------
-    def _release(self, user, department, vehicles):
+    def _release(self, user, department, vehicles, hr_review=True):
         request = self.env['ksw.fleet.request'].with_user(user).create({
             'request_type': 'release', 'department_id': department.id, 'reason': 'Not needed',
             'release_line_ids': [(0, 0, {'vehicle_id': v.id}) for v in vehicles]})
         request.action_submit()
+        if hr_review and request.state == 'hr_review':
+            request.with_user(self.hr).action_hr_send_to_gm()
         return request
 
     def _addition(self, user, department, vehicle_type, quantity):
@@ -56,10 +62,45 @@ class TestFleetAllocation(TransactionCase):
             dict({'addition_line_id': line.id}, **vals))
         wizard.action_confirm()
 
+    def _attach_scan(self, form):
+        scan = self.env['ir.attachment'].create({'name': 'hr12.pdf', 'raw': b'%PDF-1.4 signed'})
+        form.sudo().write({'signed_attachment_ids': [(6, 0, scan.ids)]})
+
+    def _finish_custody(self, forms):
+        """Drive HR-12 forms to Signed: HR, the workshop, the signed scan."""
+        for form in forms.filtered(lambda f: f.state == 'hr'):
+            if form.new_employee_id:
+                form.sudo().write({'license_type': 'Heavy', 'license_expiry': '2030-01-01'})
+            form.with_user(self.hr).action_hr_approve()
+        for form in forms.filtered(lambda f: f.state == 'workshop'):
+            form.sudo().inspection_datetime = '2026-11-12 08:00:00'
+            form.with_user(self.workshop).action_workshop_done()
+        for form in forms.filtered(lambda f: f.state == 'done'):
+            self._attach_scan(form)
+            form.with_user(self.workshop).action_mark_signed()
+
+    def _finish_checkup(self, vehicle):
+        """The workshop checks the vehicle: its hand-in signed, the checkup
+        completed (which starts a reserved transfer)."""
+        request = self.env['ksw.workshop.request'].sudo().search(
+            [('vehicle_id', '=', vehicle.id), ('state', '!=', 'completed')], order='id desc', limit=1)
+        self._finish_custody(request.x_custody_request_ids)
+        request.state = 'in_progress'
+        request.with_user(self.workshop).action_complete()
+
+    def _transfer(self, lines, target):
+        """GM transfers released vehicles: checkup first, then on their way."""
+        self._decide_release(lines, decision='transfer', target_department_id=target.id)
+        for vehicle in lines.vehicle_id:
+            self._finish_checkup(vehicle)
+
     def _receive(self, moves, user, **vals):
-        # The receiving department names the new driver on HR-12 first.
-        for form in moves.handover_ids.filtered(lambda f: not f.new_employee_id):
+        # The receiving department names the new driver on HR-12; HR and the
+        # workshop approve it; then arrival is confirmed.
+        for form in moves.sudo().x_custody_request_ids.filtered(lambda f: f.state == 'draft'):
             form.with_user(user).write({'new_employee_id': user.employee_id.id})
+            form.with_user(user).action_submit()
+        self._finish_custody(moves.sudo().x_custody_request_ids)
         action = moves.with_user(user).action_receive()
         wizard = self.env['ksw.fleet.receive.wizard'].with_user(user).with_context(**action['context']).create({})
         if vals:
@@ -78,9 +119,15 @@ class TestFleetAllocation(TransactionCase):
         self.assertTrue(self.isuzu_a1.x_is_released)
         self._decide_release(release.release_line_ids, decision='transfer',
                              target_department_id=self.dept_b.id)
+        # A vehicle in use goes through the workshop first, reserved for Bravo.
+        self.assertEqual(self.isuzu_a1.x_allocation_state, 'holding')
+        self.assertEqual(self.isuzu_a1.x_reserved_department_id, self.dept_b)
+        self.assertEqual(release.release_line_ids.status, 'checkup')
+        self.assertEqual(addition.addition_line_ids.internal_quantity, 1)
+        self._finish_checkup(self.isuzu_a1)
         # Not moved until the receiving side confirms.
         self.assertEqual(self.isuzu_a1.x_allocation_state, 'in_transfer')
-        self.assertEqual(self.isuzu_a1.x_department_id, self.dept_a)
+        self.assertFalse(self.isuzu_a1.x_department_id)
         move = self.isuzu_a1.x_pending_move_id
         with self.assertRaises(UserError):
             move.with_user(self.user_a).action_receive()
@@ -142,17 +189,18 @@ class TestFleetAllocation(TransactionCase):
             self._allocate(addition.addition_line_ids, mode='internal',
                            vehicle_ids=[(6, 0, (self.isuzu_a1 | self.isuzu_a2).ids)])
 
-    def test_cancel_transfer_restores_vehicle(self):
+    def test_cancel_transfer_returns_vehicle_to_the_pool(self):
+        """The vehicle already left its department for the workshop: a
+        cancelled transfer leaves it in the pool, its custody form cancelled."""
         release = self._release(self.user_a, self.dept_a, self.isuzu_a1)
-        self._decide_release(release.release_line_ids, decision='transfer', target_department_id=self.dept_b.id)
+        self._transfer(release.release_line_ids, self.dept_b)
         move = self.isuzu_a1.x_pending_move_id
         with self.assertRaises(UserError):
             move.with_user(self.user_a).action_cancel()
         move.with_user(self.gm).action_cancel()
-        self.assertEqual(self.isuzu_a1.x_allocation_state, 'assigned')
-        self.assertEqual(self.isuzu_a1.x_department_id, self.dept_a)
-        self.assertEqual(release.release_line_ids.decision, 'pending')
-        self.assertEqual(release.state, 'submitted')
+        self.assertEqual(self.isuzu_a1.x_allocation_state, 'holding')
+        self.assertEqual(release.release_line_ids.status, 'holding')
+        self.assertEqual(move.sudo().x_custody_request_ids.state, 'cancelled')
 
     def test_department_scope(self):
         request_b = self._addition(self.user_b, self.dept_b, 'trailer', 1)
@@ -225,7 +273,9 @@ class TestFleetAllocation(TransactionCase):
         before = len(release.message_ids)
         self._decide_release(lines, decision='transfer', target_department_id=self.dept_b.id)
         self.assertEqual(len(release.message_ids) - before, 1)
-        self.assertEqual((self.isuzu_a1 | self.isuzu_a2).mapped('x_allocation_state'), ['in_transfer'] * 2)
+        # Both to the workshop first, reserved for Bravo.
+        self.assertEqual((self.isuzu_a1 | self.isuzu_a2).mapped('x_allocation_state'), ['holding'] * 2)
+        self.assertEqual((self.isuzu_a1 | self.isuzu_a2).x_reserved_department_id, self.dept_b)
         self.assertEqual(trailer_a.x_allocation_state, 'assigned')
         # One isuzu answers the request for one; the other goes unlinked.
         self.assertEqual(addition.addition_line_ids.internal_quantity, 1)
@@ -259,7 +309,7 @@ class TestFleetAllocation(TransactionCase):
         release = self._release(self.user_a, self.dept_a, self.isuzu_a1)
         addition = self._addition(self.user_b, self.dept_b, 'isuzu', 1)
         self.assertTrue(self._todo(release, decide, self.gm))
-        self._decide_release(release.release_line_ids, decision='transfer', target_department_id=self.dept_b.id)
+        self._transfer(release.release_line_ids, self.dept_b)
         self.assertFalse(self._todo(release, decide, self.gm))
         # Counted against Bravo's request, so the to-do sits on Bravo's own request.
         self.assertTrue(self._todo(addition, receive, self.user_b))
@@ -269,8 +319,10 @@ class TestFleetAllocation(TransactionCase):
 
     def test_cancelled_request_clears_gm_todo(self):
         release = self._release(self.user_a, self.dept_a, self.isuzu_a1)
+        hand_in = release.sudo().x_custody_request_ids
         release.with_user(self.user_a).action_cancel()
         self.assertFalse(self._todo(release, 'KSW_fleet_allocation.mail_activity_fleet_decide', self.gm))
+        self.assertEqual(hand_in.state, 'cancelled')
 
     def test_release_selected_from_vehicle_list(self):
         action = (self.isuzu_a1 | self.isuzu_a2).with_user(self.user_a).action_ksw_fleet_release_selected()
@@ -286,7 +338,7 @@ class TestFleetAllocation(TransactionCase):
 
     def test_to_receive_lists_only_incoming(self):
         release = self._release(self.user_a, self.dept_a, self.isuzu_a1)
-        self._decide_release(release.release_line_ids, decision='transfer', target_department_id=self.dept_b.id)
+        self._transfer(release.release_line_ids, self.dept_b)
         domain = [('state', '=', 'in_transfer'), ('x_is_incoming', '=', True)]
         Move = self.env['ksw.fleet.move']
         self.assertTrue(Move.with_user(self.user_b).search(domain))
@@ -335,6 +387,10 @@ class TestFleetAllocation(TransactionCase):
                            vehicle_ids=[(6, 0, self.isuzu_a1.ids)])
         self._allocate(line, mode='internal', include_assigned=True, note='Bravo has a new contract',
                        vehicle_ids=[(6, 0, self.isuzu_a1.ids)])
+        # Taken while in use: the workshop first, and HR checks its hand-in.
+        self.assertEqual(self.isuzu_a1.x_reserved_department_id, self.dept_b)
+        hand_in = self.isuzu_a1.x_checkup_request_id.sudo().x_custody_request_ids
+        self.assertEqual((hand_in.kind, hand_in.state), ('hand_in', 'hr'))
         told = addition.message_ids.filtered(lambda m: self.user_a.partner_id in m.partner_ids)
         self.assertTrue(told)
         self.assertIn('Taken from', told[0].body)
@@ -344,7 +400,7 @@ class TestFleetAllocation(TransactionCase):
 
     def test_handover_records_condition(self):
         release = self._release(self.user_a, self.dept_a, self.isuzu_a1)
-        self._decide_release(release.release_line_ids, decision='transfer', target_department_id=self.dept_b.id)
+        self._transfer(release.release_line_ids, self.dept_b)
         move = self.isuzu_a1.x_pending_move_id
         with self.assertRaises(UserError):  # damaged without saying what
             self._receive(move, self.user_b, condition='damaged')
@@ -354,100 +410,3 @@ class TestFleetAllocation(TransactionCase):
                          ('damaged', 152300, 'Cracked mirror'))
         self.assertTrue(release.message_ids.filtered(
             lambda m: self.gm.partner_id in m.partner_ids and 'Cracked mirror' in m.body))
-
-
-    # HR-12 ------------------------------------------------------------
-    def _attach_scan(self, form):
-        scan = self.env['ir.attachment'].create({'name': 'hr12.pdf', 'raw': b'%PDF-1.4 signed'})
-        form.sudo().write({'signed_attachment_ids': [(6, 0, scan.ids)]})
-
-    def test_workshop_handover_form_gates_the_checkup(self):
-        """GM sends a vehicle to the workshop: an HR-12 Handover to Workshop
-        comes with the checkup, prefilled, and the checkup cannot complete
-        until the signed copy is filed."""
-        driver = self.env['hr.employee'].create({'name': 'FA Old Driver', 'identification_id': '2400000001',
-                                                 'mobile_phone': '0500000001'})
-        self.isuzu_a1.driver_id = driver
-        if 'x_bas_driver_id' in self.isuzu_a1._fields:
-            self.isuzu_a1.x_bas_driver_id = False
-        release = self._release(self.user_a, self.dept_a, self.isuzu_a1)
-        self._decide_release(release.release_line_ids, decision='holding', workshop_description='Brakes noisy')
-        checkup = self.isuzu_a1.x_checkup_request_id
-        form = checkup.x_handover_ids
-        self.assertEqual(len(form), 1)
-        self.assertEqual((form.handover_type, form.previous_name, form.previous_iqama, form.previous_phone,
-                          form.workshop_reason, form.department_id),
-                         ('handover', 'FA Old Driver', '2400000001', '0500000001', 'Brakes noisy', self.dept_a))
-        self.assertEqual(form.supervisor_id, self.user_a.employee_id)
-        self.assertEqual(len(form.document_ids), 6)
-        self.assertIn('Clutch', form.inspection_line_ids.mapped('name'))
-        checkup.sudo().state = 'in_progress'
-        with self.assertRaises(UserError):
-            checkup.sudo().action_complete()
-        form.inspection_line_ids[:2].write({'depreciation': 20, 'value': 150})
-        self.assertEqual(form.inspection_total, 300)
-        with self.assertRaises(UserError):  # no scan yet
-            form.action_mark_signed()
-        self._attach_scan(form)
-        with self.assertRaises(ValidationError):  # inspection date missing
-            form.action_mark_signed()
-        form.inspection_datetime = '2026-11-12 08:00:00'
-        form.action_mark_signed()
-        self.assertEqual(form.state, 'signed')
-        with self.assertRaises(UserError):  # locked once signed
-            form.with_user(self.gm).write({'workshop_reason': 'changed'})
-        with self.assertRaises(UserError):
-            form.inspection_line_ids[0].with_user(self.gm).write({'value': 1})
-        checkup.sudo().action_complete()
-        self.assertEqual(checkup.state, 'completed')
-
-    def test_new_driver_form_on_transfer(self):
-        """A transfer brings an HR-12 Received by New Driver for the receiving
-        department; arrival needs the new driver, who becomes the driver. A
-        vehicle out of holding carries the workshop's inspection."""
-        release = self._release(self.user_a, self.dept_a, self.isuzu_a1)
-        self._decide_release(release.release_line_ids, decision='holding')
-        workshop_form = self.isuzu_a1.x_checkup_request_id.x_handover_ids
-        workshop_form.inspection_line_ids[:1].write({'value': 75, 'remark': 'Worn'})
-        workshop_form.inspection_datetime = '2026-11-12 08:00:00'
-        self._attach_scan(workshop_form)
-        workshop_form.action_mark_signed()
-        checkup = self.isuzu_a1.x_checkup_request_id.sudo()
-        checkup.state = 'in_progress'
-        checkup.action_complete()
-        addition = self._addition(self.user_b, self.dept_b, 'isuzu', 1)
-        self._allocate(addition.addition_line_ids, mode='internal', vehicle_ids=[(6, 0, self.isuzu_a1.ids)])
-        move = self.isuzu_a1.x_pending_move_id
-        form = move.handover_ids
-        self.assertEqual((form.handover_type, form.department_id), ('receive', self.dept_b))
-        self.assertEqual(form.inspection_total, 75)
-        # Bravo fills it; Alpha cannot read it.
-        self.assertTrue(self.env['ksw.vehicle.handover'].with_user(self.user_b).search([('id', '=', form.id)]))
-        self.assertFalse(self.env['ksw.vehicle.handover'].with_user(self.user_a).search([('id', '=', form.id)]))
-        wizard_action = move.with_user(self.user_b).action_receive()
-        wizard = self.env['ksw.fleet.receive.wizard'].with_user(self.user_b).with_context(
-            **wizard_action['context']).create({})
-        with self.assertRaises(UserError):  # new driver not named
-            wizard.action_confirm()
-        new_driver = self.env['hr.employee'].create({'name': 'FA New Driver', 'identification_id': '2400000002'})
-        form.with_user(self.user_b).write({'new_employee_id': new_driver.id})
-        self.assertEqual(form.new_iqama, '2400000002')
-        wizard.action_confirm()
-        self.assertEqual(self.isuzu_a1.driver_id, new_driver)
-
-    def test_cancelled_transfer_cancels_its_form(self):
-        release = self._release(self.user_a, self.dept_a, self.isuzu_a1)
-        self._decide_release(release.release_line_ids, decision='transfer', target_department_id=self.dept_b.id)
-        move = self.isuzu_a1.x_pending_move_id
-        move.with_user(self.gm).action_cancel()
-        self.assertEqual(move.handover_ids.state, 'cancelled')
-
-    def test_hr12_prints(self):
-        release = self._release(self.user_a, self.dept_a, self.isuzu_a1)
-        self._decide_release(release.release_line_ids, decision='holding')
-        form = self.isuzu_a1.x_checkup_request_id.x_handover_ids
-        html = self.env['ir.actions.report']._render_qweb_html(
-            'KSW_fleet_allocation.report_vehicle_handover', form.ids)[0].decode()
-        self.assertIn('Vehicle Inspection Form', html)
-        self.assertIn(self.isuzu_a1.name, html)
-        self.assertIn('Clutch', html)

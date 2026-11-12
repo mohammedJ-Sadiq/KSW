@@ -7,7 +7,11 @@
         <field name="inherit_id" ref="KSW_fleet.view_ksw_fleet_vehicle_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet/group" position="after">
-                <group string="Allocation" invisible="not x_is_own_fleet">
+                <!-- Only for people in this app: the movements, transfer and
+                     release below are models a workshop reviewer cannot read,
+                     and one failed read takes the whole vehicle form down. -->
+                <group string="Allocation" invisible="not x_is_own_fleet"
+                       groups="KSW_fleet_allocation.group_fleet_allocation_user,base.group_system">
                     <field name="x_is_own_fleet" invisible="1"/>
                     <group>
                         <!-- Set by the GM's decisions; only the administrator
@@ -25,9 +29,11 @@
                         <field name="x_pending_move_id" invisible="not x_pending_move_id"/>
                         <field name="x_release_request_id" invisible="not x_release_request_id"/>
                         <field name="x_checkup_label" invisible="not x_checkup_label"/>
+                        <field name="x_reserved_department_id" invisible="not x_reserved_department_id"/>
                     </group>
                 </group>
-                <field name="x_move_ids" readonly="1" invisible="not x_move_ids">
+                <field name="x_move_ids" readonly="1" invisible="not x_move_ids"
+                       groups="KSW_fleet_allocation.group_fleet_allocation_user,base.group_system">
                     <list>
                         <field name="date"/>
                         <field name="kind"/>

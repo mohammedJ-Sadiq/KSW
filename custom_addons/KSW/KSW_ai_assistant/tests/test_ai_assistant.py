@@ -343,3 +343,161 @@ class TestAiAssistantUI(HttpCase):
             """,
             login='admin',
         )
+
+
+@tagged('post_install', '-at_install')
+class TestAiSecurity(TransactionCase):
+    """The guard: only what the user's screens display, never credentials
+    or personal identifiers, pay of others only for payroll roles."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.Guard = cls.env['ksw.ai.guard']
+        cls.Tools = cls.env['ksw.ai.tools']
+        cls.user = cls.env['res.users'].create({
+            'name': 'AI Sec User', 'login': 'ai_sec_user',
+            'group_ids': [(6, 0, [cls.env.ref('base.group_user').id])]})
+        cls.partner_action = _partner_menu(cls.env)
+
+    def _walk(self, arch, model='res.partner'):
+        from lxml import etree
+        result = {}
+        self.Guard._walk(etree.fromstring(arch), model, False, result)
+        return result.get(model, set())
+
+    def test_only_displayed_fields_count(self):
+        seen = self._walk(
+            '<form><field name="name"/>'
+            '<field name="ref" invisible="1"/>'
+            '<field name="comment" invisible="True"/>'
+            '<group invisible="1"><field name="website"/></group>'
+            '<field name="email" invisible="not is_company"/>'
+            '<list><field name="phone" column_invisible="True"/></list>'
+            '</form>')
+        self.assertIn('name', seen)
+        self.assertIn('email', seen, 'a conditionally hidden field can show')
+        for hidden in ('ref', 'comment', 'website', 'phone'):
+            self.assertNotIn(hidden, seen)
+
+    def test_subview_fields_belong_to_the_comodel(self):
+        from lxml import etree
+        result = {}
+        self.Guard._walk(etree.fromstring(
+            '<form><field name="child_ids"><list><field name="email"/>'
+            '</list></field></form>'), 'res.partner', False, result)
+        self.assertIn('child_ids', result['res.partner'])
+        self.assertIn('email', result['res.partner'])  # same comodel here
+
+    def test_sensitive_fields_are_never_allowed(self):
+        for name in ('password', 'api_key', 'acc_number', 'iban',
+                     'identification_id', 'ssnid', 'passport_id',
+                     'private_email', 'birthday', 'bank_account_id'):
+            with self.assertRaises(ToolInputError, msg=name):
+                self.Guard._check_field('res.partner', name)
+
+    def test_sensitive_and_technical_models_are_blocked(self):
+        for model in ('res.partner.bank', 'res.users', 'res.users.apikeys',
+                      'ir.config_parameter', 'ir.attachment',
+                      'resource.resource', 'ksw.ai.turn'):
+            self.assertTrue(self.Guard._model_blocked(model), model)
+        self.assertFalse(self.Guard._model_blocked('res.partner'))
+
+    def test_hidden_field_refused_in_every_position(self):
+        """A field off the user's screens can be neither shown, filtered,
+        sorted, grouped nor summed."""
+        tools = self.Tools.with_user(self.user)
+        allowed = self.Guard.with_user(self.user)._allowed('res.partner')
+        hidden = next(f for f in ('barcode_sanitized', 'signup_type',
+                                  'partner_share', 'commercial_company_name',
+                                  'partner_gid')
+                      if f in self.env['res.partner']._fields
+                      and f not in allowed)
+        base = {'model': 'res.partner', 'order': '', 'limit': 3,
+                'title': 'x'}
+        attempts = [
+            ('search_records', dict(base, domain='[]', fields=[hidden])),
+            ('search_records', dict(base, domain=json.dumps(
+                [[hidden, '!=', False]]), fields=['name'])),
+            ('search_records', dict(base, domain='[]', fields=['name'],
+                                    order='%s desc' % hidden)),
+            ('search_records', dict(base, domain=json.dumps(
+                [['parent_id', 'any', [[hidden, '!=', False]]]]),
+                fields=['name'])),
+            ('search_records', dict(base, domain=json.dumps(
+                [['parent_id.%s' % hidden, '!=', False]]), fields=['name'])),
+            ('summarize_records', {'model': 'res.partner', 'domain': '[]',
+                                   'group_by': [hidden], 'measures': [],
+                                   'title': 'x'}),
+        ]
+        for name, args in attempts:
+            with self.assertRaises(ToolInputError, msg=str(args)):
+                tools._run_tool(name, args)
+
+    def test_order_cannot_carry_sql(self):
+        with self.assertRaises(ToolInputError):
+            self.Tools._run_tool('search_records', {
+                'model': 'res.partner', 'domain': '[]', 'fields': ['name'],
+                'order': 'id desc; select 1', 'limit': 3, 'title': 'x'})
+
+    def test_read_record_drops_hidden_and_sensitive_fields(self):
+        partner = self.env['res.partner'].create({
+            'name': 'AI Sec Co', 'barcode': 'SECRET-BARCODE'})
+        result, _b = self.Tools.with_user(self.user)._run_tool(
+            'read_record', {'model': 'res.partner',
+                            'record_id': partner.id})
+        dump = json.dumps(result, default=str)
+        self.assertNotIn('SECRET-BARCODE', dump)
+        allowed = self.Guard.with_user(self.user)._allowed('res.partner')
+        self.assertTrue(set(result['fields']) <= allowed)
+
+    def test_pay_of_others_needs_a_payroll_role(self):
+        plain = self.Guard.with_user(self.user)
+        self.assertFalse(plain._pay_privileged())
+        self.assertEqual(plain._pay_scope('hr.payslip', []),
+                         [('employee_id.user_id', '=', self.user.id)])
+        self.assertEqual(plain._pay_scope('hr.leave', ['x_eos_last_wage']),
+                         [('employee_id.user_id', '=', self.user.id)])
+        self.assertEqual(plain._pay_scope('hr.leave', ['state']), [])
+        with self.assertRaises(ToolInputError):
+            plain._pay_scope('hr.payslip.run', [])
+        officer = self.env['res.users'].create({
+            'name': 'AI Sec Officer', 'login': 'ai_sec_officer',
+            'group_ids': [(6, 0, [
+                self.env.ref('base.group_user').id,
+                self.env.ref('om_hr_payroll.group_hr_payroll_user').id])]})
+        self.assertEqual(
+            self.Guard.with_user(officer)._pay_scope('hr.payslip', []), [])
+
+    def test_portal_user_cannot_ask(self):
+        portal = self.env['res.users'].create({
+            'name': 'AI Portal', 'login': 'ai_portal',
+            'group_ids': [(6, 0, [self.env.ref('base.group_portal').id])]})
+        from odoo.exceptions import AccessError
+        with self.assertRaises(AccessError):
+            self.env['ksw.ai.conversation'].with_user(portal).ksw_ai_ask('x')
+        self.assertFalse(self.env['ksw.ai.conversation'].with_user(
+            portal).ksw_ai_status()['enabled'])
+
+    def test_daily_limit(self):
+        ICP = self.env['ir.config_parameter'].sudo()
+        ICP.set_param('ksw_ai.api_key', 'test-key')
+        ICP.set_param('ksw_ai.provider', 'anthropic')
+        ICP.set_param('ksw_ai.daily_limit', '2')
+        Conv = self.env['ksw.ai.conversation'].with_user(self.user)
+
+        def answer(*args, **kwargs):
+            return _reply([{'type': 'text', 'text': 'ok'}], 'end_turn')
+
+        with patch.object(ai_conversation, 'create_message', answer):
+            Conv.ksw_ai_ask('one')
+            Conv.ksw_ai_ask('two')
+            with self.assertRaises(UserError):
+                Conv.ksw_ai_ask('three')
+
+    def test_tool_results_are_marked_untrusted(self):
+        state = {'blocks': [], 'calls': [], 'usage': {}}
+        content, is_error = self.env['ksw.ai.conversation']._ksw_run_tool(
+            self.Tools, 'find_models', {'keywords': []}, state)
+        self.assertFalse(is_error)
+        self.assertIn('untrusted_data', json.loads(content))

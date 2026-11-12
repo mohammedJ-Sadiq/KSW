@@ -396,6 +396,7 @@ class HrPayslip(models.Model):
 
     @api.depends('date_from', 'version_id.wage',
                  'version_id.travel_allowance', 'version_id.mobile_allowance',
+                 'version_id.collection_commission_allowance',
                  'version_id.other_allowance')
     def _compute_wage_rates(self):
         for slip in self:
@@ -404,6 +405,7 @@ class HrPayslip(models.Model):
                 (v.wage or 0.0)
                 + (v.travel_allowance or 0.0)
                 + (v.mobile_allowance or 0.0)
+                + (v.collection_commission_allowance or 0.0)
                 + (v.other_allowance or 0.0)
             )
             daily = base / _days_in_month(slip.date_from) if base else 0.0
@@ -1007,6 +1009,7 @@ class HrPayslip(models.Model):
             (v.wage or 0.0)
             + (v.travel_allowance or 0.0)
             + (v.mobile_allowance or 0.0)
+            + (v.collection_commission_allowance or 0.0)
             + (v.other_allowance or 0.0)
         )
         daily_rate = base / _days_in_month(period_date) if base else 0.0
@@ -1085,6 +1088,7 @@ class HrPayslip(models.Model):
             (v.wage or 0.0)
             + (v.travel_allowance or 0.0)
             + (v.mobile_allowance or 0.0)
+            + (v.collection_commission_allowance or 0.0)
             + (v.other_allowance or 0.0)
         )
         daily_rate = base / _days_in_month(period_date) if base else 0.0
@@ -1446,6 +1450,7 @@ class HrPayslip(models.Model):
                 (v.wage or 0.0)
                 + (v.travel_allowance or 0.0)
                 + (v.mobile_allowance or 0.0)
+                + (v.collection_commission_allowance or 0.0)
                 + (v.other_allowance or 0.0)
             )
             daily_rate = base / _days_in_month(date_from) if base else 0.0
@@ -1533,6 +1538,7 @@ class HrPayslip(models.Model):
                 (v.wage or 0.0)
                 + (v.travel_allowance or 0.0)
                 + (v.mobile_allowance or 0.0)
+                + (v.collection_commission_allowance or 0.0)
                 + (v.other_allowance or 0.0)
             )
             daily_rate = base / _days_in_month(date_from) if base else 0.0
@@ -1598,6 +1604,7 @@ class HrPayslip(models.Model):
             (v.wage or 0.0)
             + (v.travel_allowance or 0.0)
             + (v.mobile_allowance or 0.0)
+            + (v.collection_commission_allowance or 0.0)
             + (v.other_allowance or 0.0)
         )
         daily_rate = base / _days_in_month(date_from) if base else 0.0
@@ -1766,6 +1773,7 @@ class HrPayslip(models.Model):
             (v.wage or 0.0)
             + (v.travel_allowance or 0.0)
             + (v.mobile_allowance or 0.0)
+            + (v.collection_commission_allowance or 0.0)
             + (v.other_allowance or 0.0)
         ) if v else 0.0
         daily_rate = base / _days_in_month(d_from) if base else 0.0

@@ -1,6 +1,6 @@
 {
     'name': 'KSW Vehicle Allocation',
-    'version': '19.0.1.5.0',
+    'version': '19.0.1.6.1',
     'summary': 'Move vehicles between departments: release and addition requests decided by the GM',
     'description': """
 Vehicle Allocation
@@ -36,8 +36,6 @@ history on the vehicle.
         'security/ir.model.access.csv',
         'data/sequence.xml',
         'data/mail_activity_type.xml',
-        'data/inspection_items.xml',
-        'report/report_vehicle_handover.xml',
         'wizard/ksw_fleet_release_decision_wizard_views.xml',
         'wizard/ksw_fleet_allocate_wizard_views.xml',
         'wizard/ksw_fleet_receive_wizard_views.xml',
@@ -47,7 +45,6 @@ history on the vehicle.
         'views/hr_department_views.xml',
         'views/res_users_views.xml',
         'views/overview_views.xml',
-        'views/ksw_vehicle_handover_views.xml',
         'views/menus.xml',
     ],
     'post_init_hook': '_post_init_hook',

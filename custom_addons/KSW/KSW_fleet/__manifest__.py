@@ -1,6 +1,6 @@
 {
     'name': 'KSW Fleet',
-    'version': '19.0.2.5.1',
+    'version': '19.0.2.6.0',
     'summary': 'Vehicle master data shared across KSW modules',
     'description': """
 Vehicle Master Data

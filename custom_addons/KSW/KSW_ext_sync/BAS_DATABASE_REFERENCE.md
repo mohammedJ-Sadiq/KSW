@@ -353,7 +353,8 @@ Also exists as: `VOU50` (71K), `VOU25` (11K), `VOU35` (15K), `VOU61` (1,709)
 | `TCODE` | nvarchar(35) | Credit account (to account) — the account being credited |
 | `AMOUNT` | float | Amount for this journal line |
 | `AMOUNT2` | float | Foreign currency amount |
-| `REMARK` | nvarchar | Narration/description |
+| `REMARK` | nvarchar | Usually **empty** on 018 cash-box lines (verified 2026-11-12) |
+| `REF` | nvarchar | **The real line narration** («تجديد اشتراك … ف/ 6198 م ص 41750»); `VOUREF` = source custody/bank («عهدة احمد ال عيد», «موردين»), `COST_CENTER3` = cost-centre name |
 | `PAYMODE` | nvarchar | Payment mode ('cash', 'cheque', 'transfer', or empty) |
 | `PAYMODENO` | nvarchar | Cheque/transfer reference number |
 | `CHK_NO` | nvarchar | Cheque number |
@@ -663,7 +664,7 @@ consistent with the original documentation.
 
 6. **NUMBER1 is float**, not int. Cast with `INT(NUMBER1)` when building string keys to avoid precision issues (e.g., `1000000.000000001`).
 
-7. **Historical data**: All data in `bas9ss` is for fiscal year 2026 only. Prior years require querying the archived databases listed in `ACCPER`.
+7. **Historical data**: All data in `bas9ss` is for fiscal year 2026 only. Prior years require querying the archived databases listed in `ACCPER`. `odoo_reader` can read `bas9ss_2024` and `bas9ss_2025` (cross-db `[bas9ss_2025].dbo.vou10`); 2018–2023 archives refuse it (error 916).
 
 8. **VOU10 FDATE vs DATE1 in INV10**: VOU10 uses `FDATE` (datetime) while INV10 uses `DATE1` (datetime2) for the document date. Both generally match.
 

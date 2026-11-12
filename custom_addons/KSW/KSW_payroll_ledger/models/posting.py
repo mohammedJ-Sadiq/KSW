@@ -128,6 +128,11 @@ class KswPayrollPostingMap(models.Model):
 
     _group_category_unique = models.Constraint(
         'unique(group_id, category_id)', 'One account per posting group and category.')
+    # unique() lets NULLs repeat: two catch-all rows would leave the wage
+    # account to whichever row the lookup met first.
+    _group_catch_all_unique = models.UniqueIndex(
+        '(group_id) WHERE category_id IS NULL',
+        'One account per posting group for the wage and everything else.')
 
 
 class KswPayrollEmployeePosting(models.Model):
@@ -179,6 +184,9 @@ class KswPayrollEmployeePosting(models.Model):
 
     _employee_category_unique = models.Constraint(
         'unique(employee_id, category_id)', 'One exception per employee and category.')
+    _employee_catch_all_unique = models.UniqueIndex(
+        '(employee_id) WHERE category_id IS NULL',
+        'One whole-salary exception per employee.')
 
 
 class KswPayrollPosting(models.AbstractModel):

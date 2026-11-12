@@ -35,6 +35,7 @@
                                     <div class="ksw_ai_filter">
                                         <i class="fa fa-filter me-1" title="Filter used"/>
                                         <span t-esc="block.model_label"/>: <span t-esc="block.filter_text"/>
+                                        <span t-if="block.own_only" class="ms-1 fst-italic">(only your own records: pay figures of others are confidential)</span>
                                     </div>
                                     <div class="ksw_ai_table_wrap">
                                         <table class="table table-sm table-hover mb-0">

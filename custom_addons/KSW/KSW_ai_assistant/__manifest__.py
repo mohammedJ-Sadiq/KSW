@@ -1,7 +1,7 @@
 {
     'name': 'KSW - AI Assistant',
     'category': 'Productivity',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'author': 'Mohammed Albadr',
     'summary': 'Ask Odoo questions in plain Arabic or English, from Home or '
                'any screen',

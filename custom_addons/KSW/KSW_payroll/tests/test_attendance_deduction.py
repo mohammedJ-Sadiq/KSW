@@ -140,6 +140,16 @@ class TestAttendanceDeduction(TransactionCase):
         # wage 6000 + da 0 + travel 500 + meal 300 + medical 200 + other 0 = 7000
         self.assertEqual(att.x_deductible_base, 7000.0)
 
+    def test_collection_commission_allowance_is_deductible(self):
+        """FAISAL: Other 1,250 split into Mobile 250 + Collection 1,000 keeps his daily rate."""
+        att = self._create_attendance(
+            check_in=dt(2026, 3, 1, 5, 0),
+            check_out=dt(2026, 3, 1, 13, 30),
+        )
+        base = att.x_deductible_base
+        self.employee.current_version_id.write({'collection_commission_allowance': 1000.0})
+        self.assertEqual(att.x_deductible_base, base + 1000.0)
+
     # ==================================================================
     # ABSENCE DEDUCTION
     # ==================================================================

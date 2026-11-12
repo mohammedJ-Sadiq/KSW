@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- A release request: HR's step between the supervisor and the GM. -->
+    <record id="view_ksw_fleet_request_form_custody" model="ir.ui.view">
+        <field name="name">ksw.fleet.request.form.custody</field>
+        <field name="model">ksw.fleet.request</field>
+        <field name="inherit_id" ref="KSW_fleet_allocation.view_ksw_fleet_request_form"/>
+        <field name="arch" type="xml">
+            <button name="action_submit" position="after">
+                <field name="x_is_hr" invisible="1"/>
+                <button name="action_hr_send_to_gm" type="object" string="HR Approve, Send to GM"
+                        class="oe_highlight" invisible="state != 'hr_review' or not x_is_hr"
+                        confirm="Each vehicle's HR-12 is checked (documents, remarks)? The request goes to the GM."/>
+            </button>
+            <field name="state" position="attributes">
+                <attribute name="statusbar_visible">draft,hr_review,submitted,done</attribute>
+            </field>
+            <xpath expr="//field[@name='release_line_ids']/list/field[@name='status']" position="after">
+                <field name="x_custody_request_id" optional="show" readonly="1"/>
+                <field name="x_custody_state" optional="show"/>
+            </xpath>
+            <xpath expr="//sheet/div[hasclass('oe_title')]" position="before">
+                <div class="alert alert-info" role="status" invisible="state != 'hr_review'">
+                    With HR: each vehicle's handover form (HR-12, column on the right) is checked before
+                    the GM decides.
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_ksw_fleet_request_hr_review" model="ir.actions.act_window">
+        <field name="name">Releases to Review</field>
+        <field name="res_model">ksw.fleet.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'hr_review')]</field>
+        <field name="context">{'create': False}</field>
+    </record>
+
+    <!-- Incoming transfers: the new driver's form is one click away. -->
+    <record id="view_ksw_fleet_move_list_custody" model="ir.ui.view">
+        <field name="name">ksw.fleet.move.list.custody</field>
+        <field name="model">ksw.fleet.move</field>
+        <field name="inherit_id" ref="KSW_fleet_allocation.view_ksw_fleet_move_list"/>
+        <field name="arch" type="xml">
+            <button name="action_receive" position="before">
+                <button name="action_open_custody_form" type="object" string="HR-12" icon="fa-file-text-o"
+                        invisible="kind != 'transfer' or state != 'in_transfer'"/>
+            </button>
+        </field>
+    </record>
+
+    <record id="view_ksw_fleet_move_form_custody" model="ir.ui.view">
+        <field name="name">ksw.fleet.move.form.custody</field>
+        <field name="model">ksw.fleet.move</field>
+        <field name="inherit_id" ref="KSW_fleet_allocation.view_ksw_fleet_move_form"/>
+        <field name="arch" type="xml">
+            <field name="note" position="after">
+                <field name="x_custody_request_ids" readonly="1" invisible="not x_custody_request_ids">
+                    <list>
+                        <field name="name"/>
+                        <field name="kind"/>
+                        <field name="new_name"/>
+                        <field name="state" widget="badge"/>
+                    </list>
+                </field>
+            </field>
+        </field>
+    </record>
+
+    <!-- The checkup shows its form, and why it cannot complete yet. -->
+    <record id="view_ksw_workshop_request_form_custody" model="ir.ui.view">
+        <field name="name">ksw.workshop.request.form.custody</field>
+        <field name="model">ksw.workshop.request</field>
+        <field name="inherit_id" ref="KSW_workshop.view_ksw_workshop_request_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/*[1]" position="before">
+                <field name="x_custody_count" invisible="1"/>
+                <field name="x_custody_pending" invisible="1"/>
+                <div class="alert alert-warning" role="alert" invisible="not x_custody_pending">
+                    This checkup comes with a vehicle handover form (HR-12). Inspect the vehicle on it and
+                    press Workshop Done; the request completes once the signed copy is filed.
+                    <button name="action_open_custody_forms" type="object" class="btn btn-link p-0 ms-1"
+                            string="Open the form"/>
+                </div>
+                <div class="d-flex justify-content-end" invisible="not x_custody_count">
+                    <button name="action_open_custody_forms" type="object" class="btn btn-secondary btn-sm mb-2"
+                            icon="fa-file-text-o" string="Handover Form (HR-12)"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- The employee file: every vehicle he answered for. -->
+    <record id="view_employee_form_custody" model="ir.ui.view">
+        <field name="name">hr.employee.form.vehicle.custody</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="ksw_vehicle_custody" string="Vehicle Custody" groups="hr.group_hr_user">
+                    <field name="x_custody_history_ids" readonly="1">
+                        <list>
+                            <field name="vehicle_id"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="source"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

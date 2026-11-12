@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- One company GM, one HR team: the roles of the three apps line up.
+         A <function> write, so it applies on every upgrade (gotcha #2). -->
+    <function model="res.groups" name="write">
+        <value eval="[ref('KSW_fleet_allocation.group_fleet_allocation_gm')]"/>
+        <value eval="{'implied_ids': [(4, ref('KSW_employee_transfer.group_transfer_gm'))]}"/>
+    </function>
+    <function model="res.groups" name="write">
+        <value eval="[ref('KSW_vehicle_custody.group_custody_hr')]"/>
+        <value eval="{'implied_ids': [(4, ref('KSW_employee_transfer.group_transfer_hr'))]}"/>
+    </function>
+    <function model="res.groups" name="write">
+        <value eval="[ref('KSW_fleet_allocation.group_fleet_allocation_user')]"/>
+        <value eval="{'implied_ids': [(4, ref('KSW_employee_transfer.group_transfer_requester'))]}"/>
+    </function>
+</odoo>

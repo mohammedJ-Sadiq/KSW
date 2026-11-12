@@ -58,7 +58,7 @@
         <field name="arch" type="xml">
             <form string="Vehicle Request">
                 <header>
-                    <button name="action_submit" type="object" string="Submit to GM"
+                    <button name="action_submit" type="object" string="Submit"
                             class="oe_highlight" invisible="state != 'draft'"/>
                     <field name="open_line_count" invisible="1"/>
                     <button name="action_decide_release_lines" type="object" string="Decide Vehicles"

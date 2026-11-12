@@ -1,0 +1,1777 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_vehicle_custody
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-12 21:19+0000\n"
+"PO-Revision-Date: 2026-11-12 21:19+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar_001\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%s cannot be refused at this step."
+msgstr "لا يمكن رفض %s في هذه المرحلة."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid ""
+"%s is being moved; a driver change waits until it is back in its department."
+msgstr "%s قيد النقل؛ ينتظر تغيير السائق حتى تعود إلى قسمها."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%s is not a vehicle of your departments."
+msgstr "%s ليست من مركبات أقسامك."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%s is not approved yet; the paper is signed after approval."
+msgstr "لم يُعتمد %s بعد؛ يُوقّع النموذج الورقي بعد الاعتماد."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
+msgid "%s is not waiting for HR."
+msgstr "%s ليس بانتظار الموارد البشرية."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%s is not waiting for the supervisor."
+msgstr "%s ليس بانتظار المشرف."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%s is on a release request; its department is giving it up."
+msgstr "%s مدرجة في طلب استغناء؛ قسمها يستغني عنها."
+
+#. module: KSW_vehicle_custody
+#: model:ir.actions.report,print_report_name:KSW_vehicle_custody.action_report_vehicle_custody
+msgid ""
+"'HR-12 %s %s' % (object.name.replace('/', '-'), object.vehicle_id.name)"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "(Attach driver account statement) / (إرفاق كشف حساب السائق)"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid ""
+"* The car is not handed over without a valid regular license\n"
+"                     /  <span dir=\"rtl\">* لا يتم تسليم السيارة إلا بوجود رخصة نظامية سارية المفعول</span>"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid ""
+"<b>%(n)s approved</b>: %(k)s, %(v)s. %(p)s → %(w)s. For your action if any: "
+"delegation (HR), financial matters (Accounting)."
+msgstr ""
+"<b>اعتُمد %(n)s</b>: %(k)s، %(v)s. %(p)s ← %(w)s. لاتخاذ اللازم إن وجد: "
+"التفويض (الموارد البشرية)، المتعلقات المالية (الحسابات)."
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_header
+msgid "<b>Form No.: HR-12</b><br/>"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "<b>Refused:</b>"
+msgstr "<b>مرفوض:</b>"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_header
+msgid "<b>إدارة الموارد البشرية</b><br/>والتطوير التنظيمي"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "<span class=\"o_stat_text\">Workshop Request</span>"
+msgstr "<span class=\"o_stat_text\">طلب الورشة</span>"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid ""
+"A hand-in or receipt is part of a GM decision: the GM changes it on the "
+"vehicle request, not here."
+msgstr ""
+"التسليم أو الاستلام جزء من قرار المدير العام: يُعدّل من طلب المركبات وليس من"
+" هنا."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "A handover form is cancelled, never deleted."
+msgstr "نموذج التسليم يُلغى ولا يُحذف."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "A signed, refused or cancelled handover form cannot be changed."
+msgstr "لا يمكن تعديل نموذج تسليم موقّع أو مرفوض أو ملغي."
+
+#. module: KSW_vehicle_custody
+#: model:res.groups,name:KSW_vehicle_custody.group_custody_accounting
+msgid "Accounting (Information Copy)"
+msgstr "الحسابات (نسخة للعلم)"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Accounts manager / مدير الحسابات"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__message_needaction
+msgid "Action Needed"
+msgstr "إجراء مطلوب"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_checklist__active
+msgid "Active"
+msgstr "نشط"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__activity_ids
+msgid "Activities"
+msgstr "الأنشطة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "زخرفة استثناء النشاط"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__activity_state
+msgid "Activity State"
+msgstr "حالة النشاط"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "أيقونة نوع النشاط"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Adding New User / إضافة المستخدم الجديد"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__admin_remarks
+msgid "Administrative Remarks"
+msgstr "ملاحظات الشؤون الإدارية"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Administrative use only / خاص بقسم الشؤون الإدارية"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__allowed_department_ids
+msgid "Allowed Department"
+msgstr "الأقسام المسموح بها"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__state__done
+msgid "Approved"
+msgstr "معتمد"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid ""
+"Approved. Print HR-12, have it signed on paper, attach the scan under\n"
+"                        <b>Signed Copy</b> and press <b>Mark as Signed</b>."
+msgstr ""
+"معتمد. اطبع HR-12 ووقّعه ورقياً، ثم أرفق النسخة الممسوحة في <b>النسخة "
+"الموقعة</b> واضغط <b>تأكيد التوقيع</b>."
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_search
+msgid "At the Workshop"
+msgstr "في الورشة"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Attach the signed and scanned form first (Signed Copy)."
+msgstr "أرفق النموذج الموقّع الممسوح ضوئياً أولاً (النسخة الموقعة)."
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__message_attachment_count
+msgid "Attachment Count"
+msgstr "عدد المرفقات"
+
+#. module: KSW_vehicle_custody
+#: model:ksw.vehicle.custody.checklist,name:KSW_vehicle_custody.checklist_batteries
+msgid "Batteries / البطاريات"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__state__cancelled
+msgid "Cancelled"
+msgstr "ملغي"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.actions.act_window,help:KSW_vehicle_custody.action_ksw_vehicle_custody_driver_change
+msgid "Change who answers for a vehicle"
+msgstr "تغيير صاحب عهدة المركبة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_inspection__item_id
+msgid "Checklist Item"
+msgstr "بند الفحص"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Checkup for driver change (%(f)s): %(a)s → %(b)s"
+msgstr "فحص لتغيير السائق (%(f)s): %(a)s ← %(b)s"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Choose the new user of the vehicle."
+msgstr "اختر المستخدم الجديد للمركبة."
+
+#. module: KSW_vehicle_custody
+#: model:ksw.vehicle.custody.checklist,name:KSW_vehicle_custody.checklist_clutch
+msgid "Clutch / الكلتش"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Code # / رقم الكود"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.ui.menu,name:KSW_vehicle_custody.menu_vehicle_custody_config
+msgid "Configuration"
+msgstr "التهيئة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_checklist__create_uid
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_document__create_uid
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_inspection__create_uid
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_refuse_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__create_uid
+msgid "Created by"
+msgstr "أنشئ بواسطة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_checklist__create_date
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_document__create_date
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_inspection__create_date
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_refuse_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__create_date
+msgid "Created on"
+msgstr "أنشئ في"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_fleet_vehicle_custody_search
+msgid "Current"
+msgstr "الحالية"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_fleet_vehicle_custody_search
+msgid "Custodian"
+msgstr "صاحب العهدة"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_fleet_vehicle_custody_list
+msgid "Custody History"
+msgstr "سجل العهدة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__form_date
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Date"
+msgstr "التاريخ"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Date / التاريخ"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Day / اليوم"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Delegation Process"
+msgstr "إجراءات التفويض"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Delegation Process / إجراءات التفويض"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__delegation_remarks
+msgid "Delegation Remarks"
+msgstr "ملاحظات التفويض"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_search
+msgid "Department"
+msgstr "القسم"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_inspection__depreciation
+msgid "Depreciation %"
+msgstr "نسبة الإهلاك %"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Depreciation % / نسبة الإهلاك"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Depreciation is a percentage between 0 and 100."
+msgstr "نسبة الإهلاك يجب أن تكون بين 0 و100."
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_refuse_wizard_form
+msgid "Discard"
+msgstr "تجاهل"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_fleet_move__display_name
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_fleet_release_line__display_name
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_fleet_request__display_name
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_fleet_vehicle__display_name
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_checklist__display_name
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_document__display_name
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_inspection__display_name
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_refuse_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__display_name
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_workshop_request__display_name
+msgid "Display Name"
+msgstr "اسم العرض"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__document_ids
+msgid "Documents"
+msgstr "المستندات"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_document__document_type__driver_card
+msgid "Driver Card"
+msgstr "بطاقة السائق"
+
+#. module: KSW_vehicle_custody
+#: model:ir.actions.act_window,name:KSW_vehicle_custody.action_ksw_vehicle_custody_driver_change
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__kind__driver_change
+#: model:ir.ui.menu,name:KSW_vehicle_custody.menu_vehicle_custody_driver_change
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_search
+msgid "Driver Change"
+msgstr "تغيير السائق"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_fleet_request_form_custody
+msgid ""
+"Each vehicle's HR-12 is checked (documents, remarks)? The request goes to "
+"the GM."
+msgstr ""
+"هل رُوجع نموذج HR-12 لكل مركبة (المستندات والملاحظات)؟ سيُرفع الطلب إلى "
+"المدير العام."
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Emp. No / رقم الموظف"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model,name:KSW_vehicle_custody.model_hr_employee
+msgid "Employee"
+msgstr "الموظف"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Employee Name / اسم الموظف"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,help:KSW_vehicle_custody.field_ksw_vehicle_custody_checklist__vehicle_type
+msgid "Empty: checked on every vehicle type."
+msgstr "فارغ: يُفحص في جميع أنواع المركبات."
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_checklist_list
+msgid "Every type"
+msgstr "جميع الأنواع"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Executive Director / المدير التنفيذي"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__official_remarks
+msgid "Executive Director Remarks"
+msgstr "ملاحظات المدير التنفيذي"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Expiration / صلاحيتها"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "File the signed HR-12: %s"
+msgstr "أرفق HR-12 الموقّع: %s"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
+msgid ""
+"File the signed handover form first (%s): the workshop completes it, it is "
+"printed, signed, scanned and marked as signed."
+msgstr ""
+"أرفق نموذج التسليم الموقّع أولاً (%s): تُتمّه الورشة، ثم يُطبع ويُوقّع "
+"ويُمسح ويُؤكَّد توقيعه."
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__signed_by_id
+msgid "Filed By"
+msgstr "أرفقه"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Fill in when the workshop inspected the vehicle."
+msgstr "أدخل تاريخ ووقت فحص الورشة للمركبة."
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid ""
+"Filled by Accounting after approval; attach the driver's account statement "
+"to the signed copy."
+msgstr "تعبّئه الحسابات بعد الاعتماد؛ أرفق كشف حساب السائق مع النسخة الموقعة."
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__financial_note_1
+msgid "Financial Matter 1"
+msgstr "متعلق مالي 1"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__financial_note_2
+msgid "Financial Matter 2"
+msgstr "متعلق مالي 2"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__financial_note_3
+msgid "Financial Matter 3"
+msgstr "متعلق مالي 3"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Financial Matters"
+msgstr "متعلقات مالية"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Financial Matters / متعلقات مالية"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__message_follower_ids
+msgid "Followers"
+msgstr "المتابعين"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "المتابعين (الشركاء)"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,help:KSW_vehicle_custody.field_ksw_vehicle_custody_request__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr "أيقونة من Font awesome مثال: fa-tasks"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "For the Official Use (Executive Director)"
+msgstr "خاص بالاستخدام الرسمي (المدير التنفيذي)"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "For the official use / خاص بالاستخدام الرسمي"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ksw.vehicle.custody.checklist,name:KSW_vehicle_custody.checklist_front_brake
+msgid "Front brake / البريك الأمامي"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ksw.vehicle.custody.checklist,name:KSW_vehicle_custody.checklist_front_tires
+msgid "Front tires / الكفرات الأمامية"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__state__gm
+msgid "GM Decision"
+msgstr "قرار المدير العام"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Give the reason for the user change."
+msgstr "اذكر سبب تغيير المستخدم."
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__gm_decided
+msgid "Gm Decided"
+msgstr "قرر المدير العام"
+
+#. module: KSW_vehicle_custody
+#: model:res.groups,name:KSW_vehicle_custody.group_custody_hr
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "HR / Administrative Affairs"
+msgstr "الموارد البشرية / الشؤون الإدارية"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "HR Approve"
+msgstr "اعتماد الموارد البشرية"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_fleet_request_form_custody
+msgid "HR Approve, Send to GM"
+msgstr "اعتماد الموارد البشرية ورفعه للمدير العام"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__hr_checked_by_id
+msgid "HR Checked By"
+msgstr "راجعته الموارد البشرية"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__hr_checked_date
+msgid "HR Checked On"
+msgstr "تاريخ مراجعة الموارد البشرية"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_fleet_request__state__hr_review
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__state__hr
+msgid "HR Review"
+msgstr "مراجعة الموارد البشرية"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "HR review: %s"
+msgstr "مراجعة الموارد البشرية: %s"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_fleet_release_line__x_custody_request_id
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_fleet_move_list_custody
+msgid "HR-12"
+msgstr "HR-12"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_fleet_release_line__x_custody_state
+msgid "HR-12 Status"
+msgstr "حالة HR-12"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_search
+msgid "Hand In"
+msgstr "تسليم"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__kind__hand_in
+msgid "Hand In (Release)"
+msgstr "تسليم (استغناء)"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.actions.act_window,help:KSW_vehicle_custody.action_ksw_vehicle_custody
+msgid ""
+"Hand-in and receipt forms open by themselves from vehicle releases and transfers.\n"
+"               A driver change inside a department is raised under Driver Change."
+msgstr ""
+"نماذج التسليم والاستلام تُفتح تلقائياً من طلبات الاستغناء والنقل. أما تغيير "
+"السائق داخل القسم فيُرفع من \"تغيير السائق\"."
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_document__present
+msgid "Handed Over"
+msgstr "تم التسليم"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_workshop_request_form_custody
+msgid "Handover Form (HR-12)"
+msgstr "نموذج التسليم (HR-12)"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_fleet_move__x_custody_request_ids
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_fleet_request__x_custody_request_ids
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_workshop_request__x_custody_request_ids
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_list
+msgid "Handover Forms"
+msgstr "نماذج التسليم"
+
+#. module: KSW_vehicle_custody
+#: model:ir.actions.act_window,name:KSW_vehicle_custody.action_ksw_vehicle_custody
+#: model:ir.ui.menu,name:KSW_vehicle_custody.menu_ksw_workshop_custody
+#: model:ir.ui.menu,name:KSW_vehicle_custody.menu_vehicle_custody_forms
+msgid "Handover Forms (HR-12)"
+msgstr "نماذج التسليم والاستلام (HR-12)"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__has_message
+msgid "Has Message"
+msgstr "يحتوي على رسالة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_hr_employee__id
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_fleet_move__id
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_fleet_release_line__id
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_fleet_request__id
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_fleet_vehicle__id
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_checklist__id
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_document__id
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_inspection__id
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_refuse_wizard__id
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__id
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_workshop_request__id
+msgid "ID"
+msgstr "المُعرف"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "ID # / رقم الإقامة"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__activity_exception_icon
+msgid "Icon"
+msgstr "الأيقونة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,help:KSW_vehicle_custody.field_ksw_vehicle_custody_request__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "الأيقونة للإشارة إلى النشاط المستثنى."
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,help:KSW_vehicle_custody.field_ksw_vehicle_custody_request__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "إذا كان محددًا، فهناك رسائل جديدة عليك رؤيتها."
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,help:KSW_vehicle_custody.field_ksw_vehicle_custody_request__message_has_error
+#: model:ir.model.fields,help:KSW_vehicle_custody.field_ksw_vehicle_custody_request__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "إذا كان محددًا، فقد حدث خطأ في تسليم بعض الرسائل."
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_search
+msgid "In Progress"
+msgstr "قيد التنفيذ"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__inspection_datetime
+msgid "Inspected On"
+msgstr "تاريخ الفحص"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__inspection_line_ids
+msgid "Inspection"
+msgstr "الفحص"
+
+#. module: KSW_vehicle_custody
+#: model:ir.actions.act_window,name:KSW_vehicle_custody.action_ksw_vehicle_custody_checklist
+#: model:ir.ui.menu,name:KSW_vehicle_custody.menu_vehicle_custody_checklist
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_checklist_list
+msgid "Inspection Checklist"
+msgstr "بنود فحص المركبة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_document__document_type__insurance
+msgid "Insurance Letter"
+msgstr "وثيقة التأمين"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__message_is_follower
+msgid "Is Follower"
+msgstr "متابع"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_checklist__vehicle_type__isuzu
+msgid "Isuzu"
+msgstr "إيسوزو"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_inspection__name
+msgid "Item"
+msgstr "البند"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Items / العناصر"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.module.category,name:KSW_vehicle_custody.module_category_ksw_vehicle_custody
+msgid "KSW Vehicle Custody"
+msgstr "عهدة المركبات"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_checklist__write_uid
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_document__write_uid
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_inspection__write_uid
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_refuse_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__write_uid
+msgid "Last Updated by"
+msgstr "آخر تحديث بواسطة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_checklist__write_date
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_document__write_date
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_inspection__write_date
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_refuse_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__write_date
+msgid "Last Updated on"
+msgstr "آخر تحديث في"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__license_expiry
+msgid "License Expiry"
+msgstr "انتهاء الرخصة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__license_type
+msgid "License Type"
+msgstr "نوع الرخصة"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "License Type / نوع الرخصة"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Mark as Signed"
+msgstr "تأكيد التوقيع"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__message_has_error
+msgid "Message Delivery error"
+msgstr "خطأ في تسليم الرسائل"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__message_ids
+msgid "Messages"
+msgstr "الرسائل"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "الموعد النهائي لنشاطاتي"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_checklist__name
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__name
+msgid "Name"
+msgstr "الاسم"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Name / الاسم"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Name / الاسم:"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Name the new driver: %s"
+msgstr "حدد السائق الجديد: %s"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Names for the Signatures"
+msgstr "أسماء الموقّعين"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__new_employee_id
+msgid "New User"
+msgstr "المستخدم الجديد"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__delegation_add_datetime
+msgid "New User Added On"
+msgstr "تاريخ إضافة المستخدم الجديد"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__new_emp_no
+msgid "New User Emp. No"
+msgstr "رقم موظف المستخدم الجديد"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__new_iqama
+msgid "New User ID #"
+msgstr "رقم إقامة المستخدم الجديد"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__new_name
+msgid "New User Name"
+msgstr "اسم المستخدم الجديد"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__new_phone
+msgid "New User Phone"
+msgstr "هاتف المستخدم الجديد"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "New User's License"
+msgstr "رخصة المستخدم الجديد"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "New Vehicle User"
+msgstr "المستخدم الجديد للمركبة"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "New Vehicle User Details / بيانات المستخدم الجديد"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__activity_calendar_event_id
+msgid "Next Activity Calendar Event"
+msgstr "الفعالية التالية في تقويم الأنشطة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "الموعد النهائي للنشاط التالي"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__activity_summary
+msgid "Next Activity Summary"
+msgstr "ملخص النشاط التالي"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__activity_type_id
+msgid "Next Activity Type"
+msgstr "نوع النشاط التالي"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.actions.act_window,help:KSW_vehicle_custody.action_ksw_vehicle_custody
+msgid "No handover form in progress"
+msgstr "لا توجد نماذج تسليم قيد التنفيذ"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__message_needaction_counter
+msgid "Number of Actions"
+msgstr "عدد الإجراءات"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__message_has_error_counter
+msgid "Number of errors"
+msgstr "عدد الأخطاء"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,help:KSW_vehicle_custody.field_ksw_vehicle_custody_request__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "عدد الرسائل التي تتطلب اتخاذ إجراء"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,help:KSW_vehicle_custody.field_ksw_vehicle_custody_request__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "عدد الرسائل الحادث بها خطأ في التسليم"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__delegation_remove_datetime
+msgid "Old User Removed On"
+msgstr "تاريخ إلغاء المستخدم القديم"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.actions.act_window,help:KSW_vehicle_custody.action_ksw_vehicle_custody_driver_change
+msgid ""
+"One vehicle, two drivers, same department (vacation, suspension…). HR checks the new\n"
+"               driver's licence, the workshop checks the vehicle, then the custody changes."
+msgstr ""
+"مركبة واحدة وسائقان في القسم نفسه (إجازة، إيقاف…). تراجع الموارد البشرية "
+"رخصة السائق الجديد، وتفحص الورشة المركبة، ثم تنتقل العهدة."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Only HR approves %s at this step."
+msgstr "الموارد البشرية وحدها تعتمد %s في هذه المرحلة."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
+msgid "Only HR reviews a release."
+msgstr "الموارد البشرية وحدها تراجع طلب الاستغناء."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid ""
+"Only a driver change is raised by hand. Hand-ins and receipts come from "
+"vehicle releases and transfers."
+msgstr ""
+"لا يُرفع يدوياً إلا تغيير السائق. التسليم والاستلام يأتيان من طلبات "
+"الاستغناء والنقل."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Only the workshop completes %s at this step."
+msgstr "الورشة وحدها تُتمّ %s في هذه المرحلة."
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_workshop_request_form_custody
+msgid "Open the form"
+msgstr "فتح النموذج"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_document__document_type__operation_card
+msgid "Operation Card"
+msgstr "كرت التشغيل"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__origin
+msgid "Origin"
+msgstr "المصدر"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_checklist__vehicle_type__other
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_document__document_type__other
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__change_reason__other
+msgid "Other"
+msgstr "أخرى"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_document__document_type__inspection_card
+msgid "Periodic Inspection"
+msgstr "الفحص الدوري"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Phone # / تلفون"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Plate Num / رقم اللوحة"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__plate_number
+msgid "Plate Number"
+msgstr "رقم اللوحة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__new_position
+msgid "Position"
+msgstr "المهنة"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Position / المهنة"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__previous_employee_id
+msgid "Previous User"
+msgstr "المستخدم السابق"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__previous_emp_no
+msgid "Previous User Emp. No"
+msgstr "رقم موظف المستخدم السابق"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__previous_iqama
+msgid "Previous User ID #"
+msgstr "رقم إقامة المستخدم السابق"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__previous_name
+msgid "Previous User Name"
+msgstr "اسم المستخدم السابق"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__previous_phone
+msgid "Previous User Phone"
+msgstr "هاتف المستخدم السابق"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Previous Vehicle User"
+msgstr "المستخدم السابق للمركبة"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Previous Vehicle User Details / بيانات المستخدم القديم"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Print HR-12"
+msgstr "طباعة HR-12"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__rating_ids
+msgid "Ratings"
+msgstr "التقييمات"
+
+#. module: KSW_vehicle_custody
+#: model:ksw.vehicle.custody.checklist,name:KSW_vehicle_custody.checklist_rear_brake
+msgid "Rear brake / البريك الخلفي"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ksw.vehicle.custody.checklist,name:KSW_vehicle_custody.checklist_rear_left_tires
+msgid "Rear left tires / الكفرات الخلفية يسار"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ksw.vehicle.custody.checklist,name:KSW_vehicle_custody.checklist_rear_right_tires
+msgid "Rear right tires / الكفرات الخلفية يمين"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_refuse_wizard__reason
+msgid "Reason"
+msgstr "السبب"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__change_reason_note
+msgid "Reason Details"
+msgstr "تفاصيل السبب"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__change_reason
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Reason for User Change"
+msgstr "سبب تغيير المستخدم"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__workshop_reason
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Reason to Hand Over to the Workshop"
+msgstr "سبب التسليم للورشة"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Reason to handover to the shop / سبب التسليم للورشة"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Reasons for user change / أسباب تغير المستخدم الحالي"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_search
+msgid "Receive"
+msgstr "استلام"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__kind__receive
+msgid "Receive (New Driver)"
+msgstr "استلام (سائق جديد)"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid ""
+"Record the new user's licence type and expiry: the vehicle is not handed "
+"over without a valid licence."
+msgstr ""
+"سجّل نوع رخصة المستخدم الجديد وتاريخ انتهائها: لا تُسلَّم المركبة بدون رخصة "
+"سارية."
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_refuse_wizard_form
+msgid "Refuse"
+msgstr "رفض"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Refuse %s"
+msgstr "رفض %s"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__refuse_reason
+msgid "Refuse Reason"
+msgstr "سبب الرفض"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model,name:KSW_vehicle_custody.model_ksw_vehicle_custody_refuse_wizard
+msgid "Refuse a Driver Change"
+msgstr "رفض تغيير السائق"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__state__refused
+msgid "Refused"
+msgstr "مرفوض"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Refused: %s"
+msgstr "مرفوض: %s"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__fleet_request_id
+msgid "Release Request"
+msgstr "طلب الاستغناء"
+
+#. module: KSW_vehicle_custody
+#: model:ir.actions.act_window,name:KSW_vehicle_custody.action_ksw_fleet_request_hr_review
+#: model:ir.ui.menu,name:KSW_vehicle_custody.menu_vehicle_custody_hr_review
+msgid "Releases to Review"
+msgstr "طلبات استغناء للمراجعة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_document__remark
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_inspection__remark
+msgid "Remark"
+msgstr "ملاحظة"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Remark / ملاحظة"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Remarks"
+msgstr "ملاحظات"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Remarks / ملاحظات"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Remarks / ملاحظة"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Removing Old User / إلغاء المستخدم القديم"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_document__request_id
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_inspection__request_id
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_refuse_wizard__request_id
+msgid "Request"
+msgstr "الطلب"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__kind
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_search
+msgid "Request Type"
+msgstr "نوع الطلب"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Request type / نوع الطلب"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__department_id
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Requesting Department"
+msgstr "القسم الطالب"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Requesting Department / خاص بمقدم الطلب"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__activity_user_id
+msgid "Responsible User"
+msgstr "المستخدم المسؤول"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
+msgid "Reviewed by HR (%s); waiting for the GM."
+msgstr "راجعته الموارد البشرية (%s)؛ بانتظار المدير العام."
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "خطأ في تسليم الرسائل النصية القصيرة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_checklist__sequence
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_document__sequence
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_inspection__sequence
+msgid "Sequence"
+msgstr "تسلسل"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Sign. / التوقيع"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Signature / التوقيع"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__state__signed
+msgid "Signed & Filed"
+msgstr "موقّع ومحفوظ"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__signed_attachment_ids
+msgid "Signed Copy"
+msgstr "النسخة الموقعة"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_search
+msgid "Signed Copy Missing"
+msgstr "النسخة الموقعة ناقصة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__signed_date
+msgid "Signed Date"
+msgstr "تاريخ التوقيع"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Signed copy filed by %s."
+msgstr "أرفق %s النسخة الموقعة."
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_fleet_request__state
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__state
+msgid "State"
+msgstr "الحالة"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_search
+msgid "Status"
+msgstr "الحالة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,help:KSW_vehicle_custody.field_ksw_vehicle_custody_request__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+"الأنشطة المعتمدة على الحالة\n"
+"المتأخرة: تاريخ الاستحقاق مر\n"
+"اليوم: تاريخ النشاط هو اليوم\n"
+"المخطط: الأنشطة المستقبلية."
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Submit to HR"
+msgstr "إرسال إلى الموارد البشرية"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Submit to HR: %s"
+msgstr "أرسله إلى الموارد البشرية: %s"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__supervisor_id
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__state__draft
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Supervisor"
+msgstr "المشرف"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Supervisor Name / اسم المشرف"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__change_reason__suspension
+msgid "Suspension"
+msgstr "إيقاف عن العمل"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_checklist__vehicle_type__tank
+msgid "Tedder (تيدر)"
+msgstr "تيدر"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
+msgid "The GM decided to keep the vehicle."
+msgstr "قرر المدير العام إبقاء المركبة."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
+msgid ""
+"The new driver's handover form (HR-12) must be approved first (named by the "
+"department, checked by HR, handed over by the workshop): %s."
+msgstr ""
+"يجب اعتماد نموذج تسليم السائق الجديد (HR-12) أولاً (يحدده القسم، وتراجعه "
+"الموارد البشرية، وتسلّمه الورشة): %s."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "The new user is the current custodian."
+msgstr "المستخدم الجديد هو صاحب العهدة الحالي."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "The new user's licence expired on %s."
+msgstr "انتهت رخصة المستخدم الجديد في %s."
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,help:KSW_vehicle_custody.field_ksw_vehicle_custody_request__signed_attachment_ids
+msgid "The printed form, signed on paper and scanned back."
+msgstr "النموذج المطبوع بعد توقيعه ورقياً ومسحه ضوئياً."
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,help:KSW_vehicle_custody.field_ksw_vehicle_custody_request__origin
+msgid "The release request or transfer this form belongs to."
+msgstr "طلب الاستغناء أو النقل الذي يتبعه هذا النموذج."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
+msgid "The release request was cancelled."
+msgstr "أُلغي طلب الاستغناء."
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "The signed scan is attached?"
+msgstr "هل أُرفقت النسخة الموقعة الممسوحة؟"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
+msgid "The transfer was cancelled by the GM."
+msgstr "ألغى المدير العام النقل."
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid ""
+"The vehicle is inspected (and handed over on a receipt)? This approves the "
+"form and changes the custodian."
+msgstr ""
+"هل فُحصت المركبة (وسُلّمت في حالة الاستلام)؟ سيُعتمد النموذج ويتغير صاحب "
+"العهدة."
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "The vehicle is not handed over without a valid regular license."
+msgstr "لا يتم تسليم المركبة إلا بوجود رخصة نظامية سارية المفعول."
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_workshop_request_form_custody
+msgid ""
+"This checkup comes with a vehicle handover form (HR-12). Inspect the vehicle on it and\n"
+"                    press Workshop Done; the request completes once the signed copy is filed."
+msgstr ""
+"يرافق هذا الفحص نموذج تسليم مركبة (HR-12). سجّل الفحص عليه واضغط \"إتمام "
+"الورشة\"؛ ويكتمل الطلب بعد إرفاق النسخة الموقعة."
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid ""
+"This form will be kept in the Employee File. / سيتم وضع هذا النموذج في ملف "
+"الموظف."
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
+msgid "This transfer has no handover form."
+msgstr "لا يوجد نموذج تسليم لهذا النقل."
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Time / الوقت"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_list
+msgid "Total"
+msgstr "الإجمالي"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Total / الإجمالي"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__inspection_total
+msgid "Total Value"
+msgstr "إجمالي القيمة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_document__document_type__traffic_license
+msgid "Traffic License"
+msgstr "رخصة السير"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_checklist__vehicle_type__trailer
+msgid "Trailer (تريلا)"
+msgstr "تريلا"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__move_id
+msgid "Transfer"
+msgstr "نقل"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_document__document_type
+msgid "Type"
+msgstr "النوع"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Type / النوع"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,help:KSW_vehicle_custody.field_ksw_vehicle_custody_request__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "نوع النشاط المستثنى في السجل."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Use the buttons to move a handover form on."
+msgstr "استخدم الأزرار لتحريك نموذج التسليم."
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__change_reason__vacation
+msgid "Vacation"
+msgstr "إجازة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_inspection__value
+msgid "Value"
+msgstr "القيمة"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Value / القيمة"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model,name:KSW_vehicle_custody.model_ksw_fleet_vehicle
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__vehicle_id
+msgid "Vehicle"
+msgstr "المركبة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model,name:KSW_vehicle_custody.model_ksw_fleet_request
+msgid "Vehicle Allocation Request"
+msgstr "طلب تخصيص مركبات"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_hr_employee__x_custody_history_ids
+#: model:ir.ui.menu,name:KSW_vehicle_custody.menu_vehicle_custody_root
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_employee_form_custody
+msgid "Vehicle Custody"
+msgstr "عهدة المركبات"
+
+#. module: KSW_vehicle_custody
+#: model:res.groups.privilege,name:KSW_vehicle_custody.privilege_vehicle_custody
+msgid "Vehicle Custody (HR-12)"
+msgstr "عهدة المركبات (HR-12)"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Vehicle Details"
+msgstr "معلومات المركبة"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Vehicle Details / بيانات المركبة"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Vehicle Details / معلومات المركبة"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__deliverer_name
+msgid "Vehicle Handed Over By"
+msgstr "مسلم المركبة"
+
+#. module: KSW_vehicle_custody
+#: model:mail.activity.type,name:KSW_vehicle_custody.mail_activity_custody
+msgid "Vehicle Handover (HR-12)"
+msgstr "تسليم المركبة (HR-12)"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Vehicle Handover / مسلم المركبة"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.actions.report,name:KSW_vehicle_custody.action_report_vehicle_custody
+#: model:ir.model,name:KSW_vehicle_custody.model_ksw_vehicle_custody_request
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Vehicle Handover Form (HR-12)"
+msgstr "نموذج تسليم واستلام المركبة (HR-12)"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model,name:KSW_vehicle_custody.model_ksw_vehicle_custody_document
+msgid "Vehicle Handover Form: Document"
+msgstr "نموذج التسليم: مستند"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model,name:KSW_vehicle_custody.model_ksw_vehicle_custody_inspection
+msgid "Vehicle Handover Form: Inspection Item"
+msgstr "نموذج التسليم: بند فحص"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Vehicle Inspection"
+msgstr "فحص المركبة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model,name:KSW_vehicle_custody.model_ksw_vehicle_custody_checklist
+msgid "Vehicle Inspection Checklist Item"
+msgstr "بند فحص المركبة"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Vehicle Inspection Info / معلومات تشييك المركبة"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model,name:KSW_vehicle_custody.model_ksw_fleet_move
+msgid "Vehicle Movement"
+msgstr "حركة المركبة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__receiver_name
+msgid "Vehicle Receiver"
+msgstr "مستلم المركبة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_checklist__vehicle_type
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__vehicle_type
+msgid "Vehicle Type"
+msgstr "نوع المركبة"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Vehicle Type / نوع المركبة"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ksw.vehicle.custody.checklist,name:KSW_vehicle_custody.checklist_vehicle_plate
+msgid "Vehicle plate / لوحة المركبة"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Vehicle receiver / مستلم المركبة"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model,name:KSW_vehicle_custody.model_ksw_fleet_release_line
+msgid "Vehicle to Release"
+msgstr "مركبة للاستغناء"
+
+#. module: KSW_vehicle_custody
+#: model:ksw.vehicle.custody.checklist,name:KSW_vehicle_custody.checklist_water_motor
+msgid "Water motor / ماتور المياه"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ksw.vehicle.custody.checklist,name:KSW_vehicle_custody.checklist_water_tank
+msgid "Water tank / خزان المياه"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__website_message_ids
+msgid "Website Messages"
+msgstr "رسائل الموقع الإلكتروني"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,help:KSW_vehicle_custody.field_ksw_vehicle_custody_request__website_message_ids
+msgid "Website communication history"
+msgstr "سجل تواصل الموقع الإلكتروني"
+
+#. module: KSW_vehicle_custody
+#: model:ir.actions.act_window,name:KSW_vehicle_custody.action_ksw_fleet_vehicle_custody
+#: model:ir.ui.menu,name:KSW_vehicle_custody.menu_vehicle_custody_history
+msgid "Who Answers for What"
+msgstr "العهد الحالية"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_refuse_wizard_form
+msgid "Why the driver change is refused..."
+msgstr "سبب رفض تغيير السائق..."
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_search
+msgid "With HR"
+msgstr "لدى الموارد البشرية"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_fleet_request_form_custody
+msgid ""
+"With HR: each vehicle's handover form (HR-12, column on the right) is checked before\n"
+"                    the GM decides."
+msgstr ""
+"لدى الموارد البشرية: يُراجَع نموذج HR-12 لكل مركبة (العمود على اليمين) قبل "
+"قرار المدير العام."
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__state__workshop
+msgid "Workshop"
+msgstr "الورشة"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Workshop Done"
+msgstr "إتمام الورشة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__workshop_done_by_id
+msgid "Workshop Done By"
+msgstr "أتمّه في الورشة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__workshop_official_name
+msgid "Workshop Official"
+msgstr "مسؤول الورشة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__workshop_request_id
+msgid "Workshop Request"
+msgstr "طلب الورشة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model,name:KSW_vehicle_custody.model_ksw_workshop_request
+msgid "Workshop Service Request"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "Workshop official / مسؤول الورشة"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Workshop: %s"
+msgstr "الورشة: %s"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__x_can_hr
+msgid "X Can Hr"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__x_can_supervisor
+msgid "X Can Supervisor"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__x_can_workshop
+msgid "X Can Workshop"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_workshop_request__x_custody_count
+msgid "X Custody Count"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_workshop_request__x_custody_pending
+msgid "X Custody Pending"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_fleet_request__x_is_hr
+msgid "X Is Hr"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "أخرى Other"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "إجازة Vacation"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "إيقاف عن العمل Suspension"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "استلام Received"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "التاريخ"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "تسليم Hand over"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "نموذج تسليم واستلام المركبة / Vehicle Handover Form"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
+msgid "نموذج فحص المركبة / Vehicle Inspection Form"
+msgstr ""

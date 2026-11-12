@@ -1,6 +1,6 @@
 {
     'name': 'KSW Payroll & Commissions in the Ledger',
-    'version': '19.0.1.6.0',
+    'version': '19.0.1.7.0',
     'summary': 'Posts the payslip batch and the paid commission month as '
                'Odoo journal entries, booked the way BAS books them.',
     'description': """

@@ -59,11 +59,13 @@ class KswFleetMove(models.Model):
     # obtained outside (purchased / rented) and allocated on arrival.
     source = fields.Selection([('internal', 'Internal'), ('external', 'External')],
                               default='internal')
+    # A checkup decided as the first leg of a transfer: where the vehicle
+    # goes when the checkup completes.
+    reserved_department_id = fields.Many2one('hr.department', string='Then To', readonly=True)
     workshop_request_id = fields.Many2one('ksw.workshop.request', string='Workshop Request',
                                           ondelete='set null')
     workshop_state = fields.Selection(related='workshop_request_id.state', string='Workshop Status')
 
-    handover_ids = fields.One2many('ksw.vehicle.handover', 'move_id', string='Handover Forms')
     x_can_receive = fields.Boolean(compute='_compute_can_receive')
     # "On its way to one of my departments": the Transfers to Receive list.
     x_is_incoming = fields.Boolean(string='Incoming to Me', compute='_compute_is_incoming',
@@ -131,11 +133,13 @@ class KswFleetMove(models.Model):
                              % {'v': ', '.join(group.vehicle_id.mapped('name')), 'd': target.name})
             # Taken from a department that never released it: that department
             # is told, on the request it can now read (security.xml).
-            for source in moves.filtered(
-                    lambda m: m.kind == 'transfer' and not m.release_line_id and m.from_department_id
-            ).from_department_id:
-                taken = moves.filtered(lambda m: m.kind == 'transfer' and not m.release_line_id
-                                       and m.from_department_id == source)
+            # (A vehicle in use first goes to the workshop: a holding move
+            # with the transfer reserved.)
+            def _taken(m):
+                return (m.kind == 'transfer' or m.reserved_department_id) and not m.release_line_id \
+                    and m.from_department_id and m.addition_line_id
+            for source in moves.filtered(_taken).from_department_id:
+                taken = moves.filtered(lambda m: _taken(m) and m.from_department_id == source)
                 parts.append(Markup(_('Taken from <b>%(d)s</b> by the GM\'s decision: <b>%(v)s</b>.'))
                              % {'d': source.name, 'v': ', '.join(taken.vehicle_id.mapped('name'))})
                 partners |= source._ksw_fleet_users().partner_id
@@ -148,13 +152,14 @@ class KswFleetMove(models.Model):
             if parts:
                 request._ksw_fleet_post(Markup('<br/>').join(parts) + note_part, partners=partners)
 
-    def action_open_handover_form(self):
-        self.ensure_one()
-        form = self.handover_ids.filtered(lambda f: f.state != 'cancelled')[:1]
-        if not form:
-            raise UserError(_('This transfer has no handover form.'))
-        return {'type': 'ir.actions.act_window', 'name': form.name, 'res_model': 'ksw.vehicle.handover',
-                'res_id': form.id, 'view_mode': 'form'}
+    def _ksw_fleet_check_receivable(self):
+        """Hook: what must be true before arrival can be confirmed (the
+        custody module requires the new driver's handover form)."""
+        return True
+
+    def _ksw_fleet_on_cancel(self):
+        """Hook: a cancelled transfer takes its paperwork with it."""
+        return True
 
     def _check_can_receive(self):
         for move in self:
@@ -177,15 +182,15 @@ class KswFleetMove(models.Model):
 
     def _ksw_fleet_receive(self, details):
         """Complete these transfers. `details`: {move id: {received_odometer,
-        received_condition, received_note}}. The receiving department names
-        the new driver on HR-12 first; he becomes the vehicle's driver."""
+        received_condition, received_note}}."""
         self._check_can_receive()
-        unnamed = self.sudo().filtered(lambda m: m.handover_ids.filtered(
-            lambda f: f.state != 'cancelled' and not f.new_employee_id))
-        if unnamed:
-            raise UserError(_(
-                'Name the new driver on the handover form (HR-12) first: %s.',
-                ', '.join(unnamed.vehicle_id.mapped('name'))))
+        self._ksw_fleet_check_receivable()
+        return self._ksw_fleet_complete(details)
+
+    def _ksw_fleet_complete(self, details):
+        """The transfer is done: the vehicle belongs to the receiving
+        department. Called after the receiving side confirmed, or directly
+        for a vehicle that moves together with its driver."""
         now = fields.Datetime.now()
         conditions = dict(self._fields['received_condition']._description_selection(self.env))
         gm_partners = self.env.ref('KSW_fleet_allocation.group_fleet_allocation_gm').sudo().all_user_ids.partner_id
@@ -194,9 +199,6 @@ class KswFleetMove(models.Model):
             move.write(dict(vals, state='done', received_by_id=self.env.user.id, received_date=now))
             move.vehicle_id.with_context(ksw_fleet_allocation=True).write({
                 'x_department_id': move.to_department_id.id, 'x_allocation_state': 'assigned'})
-            new_driver = move.handover_ids.filtered(lambda f: f.state != 'cancelled')[:1].new_employee_id
-            if new_driver:
-                move.vehicle_id.driver_id = new_driver
             if move.request_id:
                 condition = move.received_condition or 'good'
                 body = Markup(_('<b>%(v)s</b> received by <b>%(d)s</b> (%(u)s). Condition: <b>%(c)s</b>%(o)s.')) % {
@@ -218,15 +220,18 @@ class KswFleetMove(models.Model):
                 raise UserError(_('Only a transfer still on its way can be cancelled.'))
         for move in self.sudo():
             move.state = 'cancelled'
-            move.handover_ids._ksw_cancel(_('The transfer was cancelled by the GM.'))
+            move._ksw_fleet_on_cancel()
             back = move.from_state if move.from_state in ('assigned', 'holding', 'unassigned') \
                 else ('assigned' if move.from_department_id else 'holding')
             move.vehicle_id.with_context(ksw_fleet_allocation=True).write({'x_allocation_state': back})
-            # The release goes back to the GM's queue undecided.
+            # The release goes back to the GM's queue undecided, unless the
+            # vehicle already left its department for the workshop: then it
+            # simply stays in the pool.
             if move.release_line_id.decision == 'transfer':
-                move.release_line_id.write({
-                    'decision': 'pending', 'target_department_id': False,
-                    'decided_by_id': False, 'decided_date': False})
+                move.release_line_id.write(
+                    {'decision': 'holding', 'target_department_id': False} if back == 'holding' else {
+                        'decision': 'pending', 'target_department_id': False,
+                        'decided_by_id': False, 'decided_date': False})
             requests = move.addition_line_id.request_id | move.release_line_id.request_id
             for request in requests:
                 request._ksw_fleet_post(Markup(_('Transfer of <b>%(v)s</b> to %(d)s cancelled by the GM.'))

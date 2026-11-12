@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_vehicle_custody_root" name="Vehicle Custody"
+              web_icon="KSW_vehicle_custody,static/description/icon.png" sequence="86"
+              action="action_ksw_vehicle_custody"
+              groups="KSW_fleet_allocation.group_fleet_allocation_user,group_custody_hr,group_custody_accounting,KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_reviewer,base.group_system"/>
+    <menuitem id="menu_vehicle_custody_forms" name="Handover Forms (HR-12)"
+              parent="menu_vehicle_custody_root" action="action_ksw_vehicle_custody" sequence="10"/>
+    <menuitem id="menu_vehicle_custody_driver_change" name="Driver Change"
+              parent="menu_vehicle_custody_root" action="action_ksw_vehicle_custody_driver_change" sequence="20"
+              groups="KSW_fleet_allocation.group_fleet_allocation_user,group_custody_hr"/>
+    <menuitem id="menu_vehicle_custody_hr_review" name="Releases to Review"
+              parent="menu_vehicle_custody_root" action="action_ksw_fleet_request_hr_review" sequence="30"
+              groups="group_custody_hr"/>
+    <menuitem id="menu_vehicle_custody_history" name="Who Answers for What"
+              parent="menu_vehicle_custody_root" action="action_ksw_fleet_vehicle_custody" sequence="40"/>
+    <menuitem id="menu_vehicle_custody_config" name="Configuration"
+              parent="menu_vehicle_custody_root" sequence="90"
+              groups="KSW_workshop.group_workshop_manager,base.group_system"/>
+    <menuitem id="menu_vehicle_custody_checklist" name="Inspection Checklist"
+              parent="menu_vehicle_custody_config" action="action_ksw_vehicle_custody_checklist" sequence="10"/>
+
+    <menuitem id="menu_ksw_workshop_custody" name="Handover Forms (HR-12)"
+              parent="KSW_workshop.menu_ksw_workshop_root" action="action_ksw_vehicle_custody" sequence="25"
+              groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_reviewer"/>
+</odoo>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Bank accounts are scoped to their owner (KSW_base_security,
+         bank_account_rules.xml). These roles pay employees by bank and read
+         every employee account: commission bank files, the salary-revision
+         payment step (leave accounting approver) and the loan / revision
+         cashier. -->
+    <record id="rule_res_partner_bank_payers" model="ir.rule">
+        <field name="name">Bank accounts: commission and revision payers read all</field>
+        <field name="model_id" ref="base.model_res_partner_bank"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('KSW_commissions.group_commission_accountant')), (4, ref('KSW_commissions.group_commission_officer')), (4, ref('KSW_annual_leave.group_annual_leave_acc')), (4, ref('KSW_deduction.group_loan_disbursement'))]"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+</odoo>

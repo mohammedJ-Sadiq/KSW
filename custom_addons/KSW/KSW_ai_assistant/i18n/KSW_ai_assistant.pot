@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-12 05:39+0000\n"
-"PO-Revision-Date: 2026-11-12 05:39+0000\n"
+"POT-Creation-Date: 2026-11-12 09:11+0000\n"
+"PO-Revision-Date: 2026-11-12 09:11+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,8 +16,19 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: KSW_ai_assistant
+#. odoo-javascript
+#: code:addons/KSW_ai_assistant/static/src/chat/ai_chat.xml:0
+msgid "(only your own records: pay figures of others are confidential)"
+msgstr ""
+
+#. module: KSW_ai_assistant
 #: model_terms:ir.ui.view,arch_db:KSW_ai_assistant.res_config_settings_view_form_ksw_ai
 msgid "AI Assistant"
+msgstr ""
+
+#. module: KSW_ai_assistant
+#: model:ir.model,name:KSW_ai_assistant.model_ksw_ai_guard
+msgid "AI Assistant Access Guard"
 msgstr ""
 
 #. module: KSW_ai_assistant
@@ -183,6 +194,7 @@ msgstr ""
 
 #. module: KSW_ai_assistant
 #: model:ir.model.fields,field_description:KSW_ai_assistant.field_ksw_ai_conversation__display_name
+#: model:ir.model.fields,field_description:KSW_ai_assistant.field_ksw_ai_guard__display_name
 #: model:ir.model.fields,field_description:KSW_ai_assistant.field_ksw_ai_tools__display_name
 #: model:ir.model.fields,field_description:KSW_ai_assistant.field_ksw_ai_turn__display_name
 #: model:ir.model.fields,field_description:KSW_ai_assistant.field_res_config_settings__display_name
@@ -278,6 +290,7 @@ msgstr ""
 
 #. module: KSW_ai_assistant
 #: model:ir.model.fields,field_description:KSW_ai_assistant.field_ksw_ai_conversation__id
+#: model:ir.model.fields,field_description:KSW_ai_assistant.field_ksw_ai_guard__id
 #: model:ir.model.fields,field_description:KSW_ai_assistant.field_ksw_ai_tools__id
 #: model:ir.model.fields,field_description:KSW_ai_assistant.field_ksw_ai_turn__id
 #: model:ir.model.fields,field_description:KSW_ai_assistant.field_res_config_settings__id
@@ -454,6 +467,12 @@ msgid "Something went wrong."
 msgstr ""
 
 #. module: KSW_ai_assistant
+#. odoo-python
+#: code:addons/KSW_ai_assistant/models/ai_conversation.py:0
+msgid "The AI assistant is for internal users."
+msgstr ""
+
+#. module: KSW_ai_assistant
 #. odoo-javascript
 #: code:addons/KSW_ai_assistant/static/src/chat/ai_chat.xml:0
 msgid "The AI assistant is not set up yet."
@@ -560,6 +579,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_ai_assistant/models/ai_tools.py:0
 msgid "Yes"
+msgstr ""
+
+#. module: KSW_ai_assistant
+#. odoo-python
+#: code:addons/KSW_ai_assistant/models/ai_conversation.py:0
+msgid "You reached today's limit of %(n)s questions. Try again tomorrow."
 msgstr ""
 
 #. module: KSW_ai_assistant

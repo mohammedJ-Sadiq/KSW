@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ksw_fleet_request_form_package" model="ir.ui.view">
+        <field name="name">ksw.fleet.request.form.package</field>
+        <field name="model">ksw.fleet.request</field>
+        <field name="inherit_id" ref="KSW_fleet_allocation.view_ksw_fleet_request_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='release_line_ids']/list/field[@name='note']" position="after">
+                <field name="x_with_driver"/>
+                <field name="x_driver_id" optional="show" readonly="1"/>
+                <field name="x_employee_transfer_id" optional="hide" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

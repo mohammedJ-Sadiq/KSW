@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="module_category_ksw_employee_transfer" model="ir.module.category">
+        <field name="name">KSW Employee Transfer</field>
+        <field name="sequence">214</field>
+    </record>
+
+    <record id="privilege_employee_transfer" model="res.groups.privilege">
+        <field name="name">Employee Transfer</field>
+        <field name="sequence">10</field>
+        <field name="category_id" ref="module_category_ksw_employee_transfer"/>
+    </record>
+    <!-- Department manager: requests moves out of (or into) his departments. -->
+    <record id="group_transfer_requester" model="res.groups">
+        <field name="name">Requester</field>
+        <field name="privilege_id" ref="privilege_employee_transfer"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="sequence">10</field>
+    </record>
+    <!-- HR / Administrative Affairs: reviews every transfer. -->
+    <record id="group_transfer_hr" model="res.groups">
+        <field name="name">HR</field>
+        <field name="privilege_id" ref="privilege_employee_transfer"/>
+        <field name="implied_ids" eval="[(4, ref('group_transfer_requester'))]"/>
+        <field name="sequence">20</field>
+    </record>
+
+    <!-- The GM approves; a separate privilege, he is not HR (gotcha #200). -->
+    <record id="privilege_employee_transfer_gm" model="res.groups.privilege">
+        <field name="name">Employee Transfer Approval</field>
+        <field name="sequence">20</field>
+        <field name="category_id" ref="module_category_ksw_employee_transfer"/>
+    </record>
+    <record id="group_transfer_gm" model="res.groups">
+        <field name="name">General Manager</field>
+        <field name="privilege_id" ref="privilege_employee_transfer_gm"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="rule_employee_transfer_requester" model="ir.rule">
+        <field name="name">Employee transfer: own departments or own requests</field>
+        <field name="model_id" ref="model_ksw_employee_transfer"/>
+        <field name="domain_force">['|', '|', ('requested_by_id', '=', user.id),
+            ('from_department_id', 'in', user._ksw_transfer_department_ids()),
+            ('to_department_id', 'in', user._ksw_transfer_department_ids())]</field>
+        <field name="groups" eval="[(4, ref('group_transfer_requester'))]"/>
+    </record>
+    <record id="rule_employee_transfer_all" model="ir.rule">
+        <field name="name">Employee transfer: HR, GM and administrator see all</field>
+        <field name="model_id" ref="model_ksw_employee_transfer"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_transfer_hr')), (4, ref('group_transfer_gm')), (4, ref('base.group_system'))]"/>
+    </record>
+</odoo>

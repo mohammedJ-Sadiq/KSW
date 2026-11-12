@@ -568,12 +568,13 @@ class KswDeduction(models.Model):
         'employee_id.current_version_id.medical_allowance',
         'employee_id.current_version_id.other_allowance',
         'employee_id.current_version_id.mobile_allowance',
+        'employee_id.current_version_id.collection_commission_allowance',
     )
     def _compute_gross_salary(self):
         _ALLOWANCE_FIELDS = (
             'wage', 'hra', 'travel_allowance', 'da',
             'meal_allowance', 'medical_allowance', 'other_allowance',
-            'mobile_allowance',
+            'mobile_allowance', 'collection_commission_allowance',
         )
         for rec in self:
             if rec.employee_id:

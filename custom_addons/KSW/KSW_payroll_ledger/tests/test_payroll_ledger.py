@@ -8,6 +8,10 @@ never holds up the others, nor HR closing the batch.
 from datetime import date
 from unittest.mock import patch
 
+from psycopg2 import IntegrityError
+
+from odoo.tools import mute_logger
+
 from odoo.addons.KSW_payroll.tests.test_bas_journal_entry import BasJournalPayrollCommon
 
 
@@ -269,7 +273,8 @@ class TestPayrollLedger(BasJournalPayrollCommon):
         self.env['ir.config_parameter'].sudo().set_param('ksw_payroll_ledger.suspense_account_id', str(suspense.id))
         self.batch.action_ksw_ledger_post()
         self.assertEqual(self._lines(slip.x_ledger_move_id), {(suspense, 1000.0), (self.payable, -1000.0)})
-        self.assertIn('suspense', self.batch.x_ledger_error)
+        # The message is in the voucher language (Arabic): the account code reads in both.
+        self.assertIn(suspense.code, self.batch.x_ledger_error)
 
     def test_05_one_employee_never_holds_up_the_others(self):
         self.rule_gosi.sudo().x_bas_posting = 'none'
@@ -414,3 +419,39 @@ class TestPayrollLedger(BasJournalPayrollCommon):
         self.assertEqual(match('Salary  AHMED ALI October'), short)
         self.assertFalse(match('Salary LEDGER TWIN October'))
         self.assertFalse(match('Salary AHMED ALIYU October'))
+
+    def test_14_collection_commission_allowance_on_its_own_account(self):
+        """FAISAL: 2,500 basic, 500 housing, 250 mobile, 1,000 collection commission.
+
+        BAS (July 2026, 26007185): mobile on its own main-office account, the
+        collection commission on 3203020006 whatever the branch."""
+        rule = self.env.ref('KSW_payroll.hr_rule_collection_commission').sudo()
+        self.assertEqual(rule.code, 'COLLECTION_COMM')
+        self.assertEqual(rule.x_bas_posting, 'expense')
+        Account = self.env['account.account'].sudo()
+        mobile_acc = Account.create({'code': '9919010004', 'name': 'Ledger mobile', 'account_type': 'expense'})
+        collection_acc = Account.create(
+            {'code': '9923020006', 'name': 'Ledger collection commission', 'account_type': 'expense'})
+        cat_mobile = self.env['ksw.payroll.posting.category'].sudo().create(
+            {'name': 'Ledger Mobile', 'code': 'LEDGER_MOBILE'})
+        rule_mobile = self._rule('Mobile', 'om_hr_payroll.ALW', 13)
+        rule_mobile.write({'x_bas_posting': 'expense', 'x_posting_category_id': cat_mobile.id,
+                           'x_ledger_account_id': False})
+        self.main_group.write({'map_ids': [(0, 0, {'category_id': cat_mobile.id, 'account_id': mobile_acc.id})]})
+        rule.write({'x_ledger_account_id': collection_acc.id, 'x_posting_category_id': False})
+        self._payslip([(self.rule_basic, 2500.0), (self.rule_hra, 500.0), (rule_mobile, 250.0),
+                       (rule, 1000.0), (self.rule_gross, 4250.0), (self.rule_net, 4250.0)])
+        self.assertEqual(self._lines(self._confirm()), {
+            (self.wage, 2500.0), (self.housing, 500.0), (mobile_acc, 250.0),
+            (collection_acc, 1000.0), (self.payable, -4250.0)})
+
+    def test_15_one_catch_all_row_per_group_and_employee(self):
+        """unique() lets NULLs repeat: a second wage row would make the wage account arbitrary."""
+        with self.assertRaises(IntegrityError), mute_logger('odoo.sql_db'), self.cr.savepoint():
+            self.main_group.write({'map_ids': [(0, 0, {'account_id': self.camp_wage.id})]})
+            self.env.flush_all()
+        man = self.env['hr.employee'].sudo().create(
+            {'name': 'Ledger Two Moves', 'x_posting_exception_ids': [(0, 0, {'account_id': self.camp_wage.id})]})
+        with self.assertRaises(IntegrityError), mute_logger('odoo.sql_db'), self.cr.savepoint():
+            man.write({'x_posting_exception_ids': [(0, 0, {'account_id': self.saudi_wage.id})]})
+            self.env.flush_all()

@@ -230,7 +230,10 @@ class HrPayslip(models.Model):
         # Order inputs by the underlying line's priority (penalties first).
         prio = {}
         for inp in inputs:
-            line = self.env['ksw.deduction.line'].browse(int(inp.code[8:]))
+            # sudo: the Payroll Officer computing the batch is not a
+            # Deduction Officer, and line_rules.xml scopes installments.
+            line = self.env['ksw.deduction.line'].sudo().browse(
+                int(inp.code[8:]))
             prio[inp.id] = (
                 line.payroll_priority, line.period_date or fields.Date.today(),
                 line.sequence)

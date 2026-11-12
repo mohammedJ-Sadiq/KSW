@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Bank accounts: each user reads his own (security audit 2026-11-12).
+
+         Odoo's hr rule for internal users hides only accounts whose OWNER
+         contact is an employee's work contact (partner_id.employee_ids). In
+         KSW 419 of 475 employee accounts belong to a separate contact named
+         like the employee, so they counted as third-party accounts and every
+         internal user could read them (IBANs of the whole company).
+
+         The rule is rewritten to work from the employee-to-bank link itself
+         (res.partner.bank.employee_id searches hr.employee.bank_account_ids):
+         a user reads the accounts of his own employee record and contact,
+         plus the company's own accounts (printed on every invoice). Odoo's
+         other rules still give HR Officers and Invoicing users everything.
+
+         A <function> write, not a <record>: the hr rule lives in a
+         noupdate block, so a record override is ignored on every upgrade
+         after the first (pitfall #2). -->
+    <function model="ir.rule" name="write">
+        <value eval="[ref('hr.ir_rule_res_partner_bank_internal_users')]"/>
+        <value eval="{
+            'name': 'Bank accounts: own and company accounts only (KSW)',
+            'domain_force': &quot;['|', '|', '|', ('employee_id', 'in', user.employee_ids.ids), ('partner_id', '=', user.partner_id.id), ('partner_id', 'in', user.employee_ids.work_contact_id.ids), ('partner_id.ref_company_ids', '!=', False)]&quot;,
+        }"/>
+    </function>
+
+    <data>
+        <!-- Contact managers keep the vendor and customer accounts they
+             maintain: never an account linked to an employee. -->
+        <record id="rule_res_partner_bank_partner_manager" model="ir.rule">
+            <field name="name">Bank accounts: contact managers read third-party accounts</field>
+            <field name="model_id" ref="base.model_res_partner_bank"/>
+            <field name="domain_force">['!', ('employee_id', '!=', False), ('partner_id.employee_ids', '=', False)]</field>
+            <field name="groups" eval="[(4, ref('base.group_partner_manager'))]"/>
+        </record>
+
+        <!-- Payroll builds the bank / WPS files from every employee's account. -->
+        <record id="rule_res_partner_bank_payroll" model="ir.rule">
+            <field name="name">Bank accounts: payroll officers read all</field>
+            <field name="model_id" ref="base.model_res_partner_bank"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('om_hr_payroll.group_hr_payroll_user'))]"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+    </data>
+</odoo>

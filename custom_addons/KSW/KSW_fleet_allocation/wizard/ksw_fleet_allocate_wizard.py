@@ -45,7 +45,8 @@ class KswFleetAllocateWizard(models.TransientModel):
         for wizard in self:
             line = wizard.addition_line_id
             base = [('x_is_own_fleet', '=', True), ('vehicle_type', '=', line.vehicle_type),
-                    ('state', '=', 'confirmed'), ('x_checkup_open', '=', False)]
+                    ('state', '=', 'confirmed'), ('x_checkup_open', '=', False),
+                    ('x_reserved_department_id', '=', False)]
             if wizard.mode == 'external_arrival':
                 # A newly obtained vehicle is registered without a department.
                 pool = [('x_allocation_state', '=', 'unassigned')]

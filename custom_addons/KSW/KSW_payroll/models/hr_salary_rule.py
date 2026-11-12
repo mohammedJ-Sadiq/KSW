@@ -107,7 +107,7 @@ class HrSalaryRule(models.Model):
 
         # Rules to add to most structures (all are in BASE already)
         _NEW = [
-            'DA', 'Travel', 'Meal', 'Medical', 'Mobile',
+            'DA', 'Travel', 'Meal', 'Medical', 'Mobile', 'COLLECTION_COMM',
             'VACATION_BAL', 'FLIGHT_TICKET', 'ADDITIONAL_COMMISSIONS',
             'VACATION_HRA', 'ATTDED', 'SATOT', 'GOSI', 'VACATION_GOSI',
             'PENALTY', 'KSW_DEDUCTIONS', 'REMAINING_LOANS', 'OTHER_DEDUCTIONS',

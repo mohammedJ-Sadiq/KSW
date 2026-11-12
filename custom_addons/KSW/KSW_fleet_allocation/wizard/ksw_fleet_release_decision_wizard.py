@@ -17,7 +17,7 @@ class KswFleetReleaseDecisionWizard(models.TransientModel):
     source_department_ids = fields.Many2many('hr.department', compute='_compute_sources')
     vehicle_types = fields.Char(compute='_compute_sources')
     decision = fields.Selection([
-        ('transfer', 'Transfer to another department'),
+        ('transfer', 'Transfer to another department (after a workshop checkup)'),
         ('holding', 'Send to workshop and hold'),
         ('keep', 'Keep them where they are'),
     ], required=True, default='transfer')

@@ -23,7 +23,8 @@ RULE_ACCOUNTS = {
 }
 # One account for everyone: commissions paid inside a payslip clear the
 # accrual the commission month booked (2107010001), not a second expense.
-FIXED_RULE_ACCOUNTS = {'KSW_COMMISSIONS': '2107010001'}
+# A collection rep's fixed allowance is a commission expense at every branch.
+FIXED_RULE_ACCOUNTS = {'KSW_COMMISSIONS': '2107010001', 'COLLECTION_COMM': '3203020006'}
 CATEGORY_NAMES = {
     'HRA': ('Housing', 'بدل السكن'),
     'Travel': ('Transport', 'بدل الانتقال'),
@@ -38,8 +39,11 @@ DEPARTMENT_ACCOUNTS = {
     'ALHAYAT-IST': '3205010005',
     'Non-K': '3201010010',
     'Equipment Rental Department': '3206010001',
+    # the same departments after the Nov 2026 restructure
+    # (KSW_base_security/scripts/restructure_departments.py)
+    'Affiliated - Non-KSW': '3201010010',
 }
-HAYAT_DEPARTMENTS = ('ALHAYAT',)
+HAYAT_DEPARTMENTS = ('ALHAYAT', 'Al-Hayat Branch')
 HAYAT_BANK_PREFIX = 'Hayat'
 HAYAT_EMPLOYEE_ACCOUNTS = {'50070': '3205010005', '50047': '3205010026'}
 PERSONAL_ACCOUNT_RULES = ('GOSI', 'VACATION_GOSI')

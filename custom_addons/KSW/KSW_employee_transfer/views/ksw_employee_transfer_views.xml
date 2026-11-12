@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ksw_employee_transfer_form" model="ir.ui.view">
+        <field name="name">ksw.employee.transfer.form</field>
+        <field name="model">ksw.employee.transfer</field>
+        <field name="arch" type="xml">
+            <form string="Employee Transfer">
+                <header>
+                    <field name="x_can_hr" invisible="1"/>
+                    <field name="x_can_gm" invisible="1"/>
+                    <button name="action_submit" type="object" string="Submit to HR" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_hr_approve" type="object" string="HR Approve" class="oe_highlight"
+                            invisible="not x_can_hr"/>
+                    <button name="action_gm_approve" type="object" string="GM Approve" class="oe_highlight"
+                            invisible="not x_can_gm"/>
+                    <button name="action_open_refuse" type="object" string="Refuse"
+                            invisible="not x_can_hr and not x_can_gm"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state not in ('draft', 'hr', 'gm', 'approved')"
+                            confirm="Cancel this transfer?"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,hr,gm,approved,applied"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-warning" role="alert" invisible="not warning_text or state in ('applied', 'refused', 'cancelled')">
+                        <field name="warning_text" nolabel="1" class="text-pre-wrap"/>
+                    </div>
+                    <div class="alert alert-danger" role="alert" invisible="state != 'refused'">
+                        <b>Refused:</b> <field name="refuse_reason" nolabel="1" class="d-inline"/>
+                    </div>
+                    <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                    <field name="allowed_department_ids" invisible="1"/>
+                    <group>
+                        <group>
+                            <field name="employee_id" options="{'no_create': True}"
+                                   readonly="state not in ('draft', 'hr')"/>
+                            <field name="from_department_id"/>
+                            <field name="to_department_id" options="{'no_create': True}"
+                                   readonly="state not in ('draft', 'hr')"/>
+                            <field name="effective_date" readonly="state not in ('draft', 'hr')"/>
+                        </group>
+                        <group>
+                            <field name="requested_by_id"/>
+                            <field name="with_vehicles" invisible="not with_vehicles"/>
+                            <field name="origin" invisible="not origin"/>
+                            <field name="version_id" invisible="not version_id" groups="hr.group_hr_user"/>
+                            <field name="applied_date" invisible="not applied_date"/>
+                        </group>
+                    </group>
+                    <field name="reason" readonly="state not in ('draft', 'hr')" placeholder="Why he moves..."/>
+                    <group string="Vehicles in His Custody" invisible="not custody_vehicle_ids">
+                        <field name="custody_vehicle_ids" nolabel="1" colspan="2" widget="many2many_tags"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_employee_transfer_list" model="ir.ui.view">
+        <field name="name">ksw.employee.transfer.list</field>
+        <field name="model">ksw.employee.transfer</field>
+        <field name="arch" type="xml">
+            <list string="Employee Transfers" decoration-muted="state in ('refused', 'cancelled')"
+                  decoration-success="state == 'applied'">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="from_department_id"/>
+                <field name="to_department_id"/>
+                <field name="effective_date"/>
+                <field name="with_vehicles" optional="hide"/>
+                <field name="activity_ids" widget="list_activity" optional="show"/>
+                <field name="state" widget="badge" decoration-info="state in ('hr', 'gm', 'approved')"
+                       decoration-success="state == 'applied'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_employee_transfer_search" model="ir.ui.view">
+        <field name="name">ksw.employee.transfer.search</field>
+        <field name="model">ksw.employee.transfer</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="from_department_id"/>
+                <field name="to_department_id"/>
+                <filter string="In Progress" name="filter_open" domain="[('state', 'in', ('draft', 'hr', 'gm', 'approved'))]"/>
+                <filter string="With HR" name="filter_hr" domain="[('state', '=', 'hr')]"/>
+                <filter string="With the GM" name="filter_gm" domain="[('state', '=', 'gm')]"/>
+                <group>
+                    <filter string="Status" name="groupby_state" context="{'group_by': 'state'}"/>
+                    <filter string="To Department" name="groupby_to" context="{'group_by': 'to_department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_employee_transfer" model="ir.actions.act_window">
+        <field name="name">Employee Transfers</field>
+        <field name="res_model">ksw.employee.transfer</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ksw_employee_transfer_search"/>
+        <field name="context">{'search_default_filter_open': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Move an employee to another department</p>
+            <p>HR checks it, the GM approves it, and it takes effect on its date.</p>
+        </field>
+    </record>
+
+    <record id="view_ksw_employee_transfer_refuse_form" model="ir.ui.view">
+        <field name="name">ksw.employee.transfer.refuse.wizard.form</field>
+        <field name="model">ksw.employee.transfer.refuse.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="transfer_id" invisible="1"/>
+                <field name="reason" placeholder="Why the transfer is refused..."/>
+                <footer>
+                    <button name="action_confirm" type="object" string="Refuse" class="btn-primary"/>
+                    <button string="Discard" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <menuitem id="menu_employee_transfer_root" name="Employee Transfers" sequence="87"
+              web_icon="KSW_employee_transfer,static/description/icon.png"
+              action="action_ksw_employee_transfer"
+              groups="group_transfer_requester,group_transfer_gm,base.group_system"/>
+    <menuitem id="menu_employee_transfer_all" name="Transfers" parent="menu_employee_transfer_root"
+              action="action_ksw_employee_transfer" sequence="10"/>
+</odoo>

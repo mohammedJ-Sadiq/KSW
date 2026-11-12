@@ -21,6 +21,7 @@
                         <field name="hra"/>
                         <field name="travel_allowance" string="Transportation Allowance"/>
                         <field name="mobile_allowance"/>
+                        <field name="collection_commission_allowance"/>
                         <field name="other_allowance" string="Other Allowances"/>
                     </group>
                 </group>

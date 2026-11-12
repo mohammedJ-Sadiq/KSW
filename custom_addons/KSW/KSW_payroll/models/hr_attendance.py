@@ -75,6 +75,7 @@ class HrAttendance(models.Model):
         'employee_id.current_version_id.wage',
         'employee_id.current_version_id.travel_allowance',
         'employee_id.current_version_id.mobile_allowance',
+        'employee_id.current_version_id.collection_commission_allowance',
         'employee_id.current_version_id.other_allowance',
         'x_net_late_minutes',
         'x_net_early_leave_minutes',
@@ -102,6 +103,7 @@ class HrAttendance(models.Model):
                 (version.wage or 0.0)
                 + (version.travel_allowance or 0.0)
                 + (version.mobile_allowance or 0.0)
+                + (version.collection_commission_allowance or 0.0)
                 + (version.other_allowance or 0.0)
             )
             att.x_deductible_base = round(base)

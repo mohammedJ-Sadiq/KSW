@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-14 19:41+0000\n"
-"PO-Revision-Date: 2026-10-14 19:41+0000\n"
+"POT-Creation-Date: 2026-11-12 21:19+0000\n"
+"PO-Revision-Date: 2026-11-12 21:19+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -49,12 +49,37 @@ msgstr ""
 
 #. module: KSW_fleet
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__create_uid
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle_custody__create_uid
 msgid "Created by"
 msgstr ""
 
 #. module: KSW_fleet
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__create_date
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle_custody__create_date
 msgid "Created on"
+msgstr ""
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__x_custodian_id
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle_custody__employee_id
+msgid "Custodian"
+msgstr ""
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__x_custody_ids
+msgid "Custody History"
+msgstr ""
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_custody.py:0
+msgid "Custody history is never deleted."
+msgstr ""
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_custody.py:0
+msgid "Custody history is written by the handover process, not by hand."
 msgstr ""
 
 #. module: KSW_fleet
@@ -69,7 +94,13 @@ msgstr ""
 
 #. module: KSW_fleet
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__display_name
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle_custody__display_name
 msgid "Display Name"
+msgstr ""
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle_custody__source
+msgid "Document"
 msgstr ""
 
 #. module: KSW_fleet
@@ -84,12 +115,23 @@ msgid "Driver Name"
 msgstr ""
 
 #. module: KSW_fleet
+#: model:ir.model.fields,help:KSW_fleet.field_ksw_fleet_vehicle_custody__date_to
+msgid "Empty while the custody is current."
+msgstr ""
+
+#. module: KSW_fleet
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__name
 msgid "Fleet No."
 msgstr ""
 
 #. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle_custody__date_from
+msgid "From"
+msgstr ""
+
+#. module: KSW_fleet
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__id
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle_custody__id
 msgid "ID"
 msgstr ""
 
@@ -99,23 +141,35 @@ msgid "Identification"
 msgstr ""
 
 #. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle_custody__is_current
+msgid "Is Current"
+msgstr ""
+
+#. module: KSW_fleet
 #: model:ir.model.fields.selection,name:KSW_fleet.selection__ksw_fleet_vehicle__vehicle_type__isuzu
 msgid "Isuzu"
 msgstr ""
 
 #. module: KSW_fleet
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__write_uid
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle_custody__write_uid
 msgid "Last Updated by"
 msgstr ""
 
 #. module: KSW_fleet
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__write_date
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle_custody__write_date
 msgid "Last Updated on"
 msgstr ""
 
 #. module: KSW_fleet
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__model
 msgid "Model"
+msgstr ""
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle_custody__note
+msgid "Note"
 msgstr ""
 
 #. module: KSW_fleet
@@ -149,6 +203,12 @@ msgid "Plate Number"
 msgstr ""
 
 #. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_custody.py:0
+msgid "Starting custodian"
+msgstr ""
+
+#. module: KSW_fleet
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__state
 msgid "State"
 msgstr ""
@@ -169,14 +229,45 @@ msgid "Tedder (تيدر)"
 msgstr ""
 
 #. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_custody.py:0
+msgid ""
+"The custodian changes only through an approved vehicle handover form "
+"(HR-12)."
+msgstr ""
+
+#. module: KSW_fleet
+#: model:ir.model.fields,help:KSW_fleet.field_ksw_fleet_vehicle__x_custodian_id
+msgid ""
+"The employee personally responsible for this vehicle (عهدة). Changes only "
+"through an approved handover form."
+msgstr ""
+
+#. module: KSW_fleet
+#: model:ir.model.fields,help:KSW_fleet.field_ksw_fleet_vehicle_custody__source
+msgid "The handover form or transfer behind this custody."
+msgstr ""
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle_custody__date_to
+msgid "To"
+msgstr ""
+
+#. module: KSW_fleet
 #: model:ir.model.fields.selection,name:KSW_fleet.selection__ksw_fleet_vehicle__vehicle_type__trailer
 msgid "Trailer (تريلا)"
 msgstr ""
 
 #. module: KSW_fleet
 #: model:ir.model,name:KSW_fleet.model_ksw_fleet_vehicle
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle_custody__vehicle_id
 #: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_vehicle_form
 msgid "Vehicle"
+msgstr ""
+
+#. module: KSW_fleet
+#: model:ir.model,name:KSW_fleet.model_ksw_fleet_vehicle_custody
+msgid "Vehicle Custody History"
 msgstr ""
 
 #. module: KSW_fleet

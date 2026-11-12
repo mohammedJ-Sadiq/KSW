@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="seq_ksw_employee_transfer" model="ir.sequence">
+            <field name="name">Employee Transfer</field>
+            <field name="code">ksw.employee.transfer</field>
+            <field name="prefix">ET/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

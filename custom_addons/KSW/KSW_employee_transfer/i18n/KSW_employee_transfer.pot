@@ -1,0 +1,618 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_employee_transfer
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-12 21:19+0000\n"
+"PO-Revision-Date: 2026-11-12 21:19+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_employee_transfer
+#. odoo-python
+#: code:addons/KSW_employee_transfer/models/ksw_employee_transfer.py:0
+msgid ""
+"%(e)s still answers for %(v)s. Hand them in first (Vehicle Custody: Driver "
+"Change, or a release), or move him together with them from Vehicle "
+"Allocation."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#. odoo-python
+#: code:addons/KSW_employee_transfer/models/ksw_employee_transfer.py:0
+msgid "%s can no longer be cancelled."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#. odoo-python
+#: code:addons/KSW_employee_transfer/models/ksw_employee_transfer.py:0
+msgid "%s cannot be refused at this step."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#. odoo-python
+#: code:addons/KSW_employee_transfer/models/ksw_employee_transfer.py:0
+msgid "%s is already in that department."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#. odoo-python
+#: code:addons/KSW_employee_transfer/models/ksw_employee_transfer.py:0
+msgid "%s is not in one of your departments."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#. odoo-python
+#: code:addons/KSW_employee_transfer/models/ksw_employee_transfer.py:0
+msgid "%s was already submitted."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#. odoo-python
+#: code:addons/KSW_employee_transfer/models/ksw_employee_transfer.py:0
+msgid ""
+"<b>%(e)s</b> moved from %(f)s to <b>%(t)s</b> from %(d)s. Check his manager "
+"and work schedule in the new department."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model_terms:ir.ui.view,arch_db:KSW_employee_transfer.view_ksw_employee_transfer_form
+msgid "<b>Refused:</b>"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#. odoo-python
+#: code:addons/KSW_employee_transfer/models/ksw_employee_transfer.py:0
+msgid "A transfer is changed only while it is a draft or with HR."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__message_needaction
+msgid "Action Needed"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__activity_ids
+msgid "Activities"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__activity_state
+msgid "Activity State"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__activity_type_icon
+msgid "Activity Type Icon"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__allowed_department_ids
+msgid "Allowed Department"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields.selection,name:KSW_employee_transfer.selection__ksw_employee_transfer__state__applied
+msgid "Applied"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__applied_date
+msgid "Applied Date"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields.selection,name:KSW_employee_transfer.selection__ksw_employee_transfer__state__approved
+msgid "Approved, Waiting for Date"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__message_attachment_count
+msgid "Attachment Count"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__warning_text
+msgid "Before You Approve"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model_terms:ir.ui.view,arch_db:KSW_employee_transfer.view_ksw_employee_transfer_form
+msgid "Cancel"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model_terms:ir.ui.view,arch_db:KSW_employee_transfer.view_ksw_employee_transfer_form
+msgid "Cancel this transfer?"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields.selection,name:KSW_employee_transfer.selection__ksw_employee_transfer__state__cancelled
+msgid "Cancelled"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__version_id
+msgid "Contract Version"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__create_uid
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer_refuse_wizard__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__create_date
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer_refuse_wizard__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model_terms:ir.ui.view,arch_db:KSW_employee_transfer.view_ksw_employee_transfer_refuse_form
+msgid "Discard"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__display_name
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer_refuse_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_res_users__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields.selection,name:KSW_employee_transfer.selection__ksw_employee_transfer__state__draft
+msgid "Draft"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__effective_date
+msgid "Effective Date"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__employee_id
+msgid "Employee"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model,name:KSW_employee_transfer.model_ksw_employee_transfer
+#: model:res.groups.privilege,name:KSW_employee_transfer.privilege_employee_transfer
+#: model_terms:ir.ui.view,arch_db:KSW_employee_transfer.view_ksw_employee_transfer_form
+msgid "Employee Transfer"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:res.groups.privilege,name:KSW_employee_transfer.privilege_employee_transfer_gm
+msgid "Employee Transfer Approval"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.actions.server,name:KSW_employee_transfer.cron_apply_due_transfers_ir_actions_server
+msgid "Employee Transfer: apply transfers that are due"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.actions.act_window,name:KSW_employee_transfer.action_ksw_employee_transfer
+#: model:ir.ui.menu,name:KSW_employee_transfer.menu_employee_transfer_root
+#: model_terms:ir.ui.view,arch_db:KSW_employee_transfer.view_ksw_employee_transfer_list
+msgid "Employee Transfers"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__message_follower_ids
+msgid "Followers"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__message_partner_ids
+msgid "Followers (Partners)"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,help:KSW_employee_transfer.field_ksw_employee_transfer__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__from_department_id
+msgid "From Department"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields.selection,name:KSW_employee_transfer.selection__ksw_employee_transfer__state__gm
+msgid "GM Approval"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model_terms:ir.ui.view,arch_db:KSW_employee_transfer.view_ksw_employee_transfer_form
+msgid "GM Approve"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:res.groups,name:KSW_employee_transfer.group_transfer_gm
+msgid "General Manager"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:res.groups,name:KSW_employee_transfer.group_transfer_hr
+msgid "HR"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model_terms:ir.ui.view,arch_db:KSW_employee_transfer.view_ksw_employee_transfer_form
+msgid "HR Approve"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields.selection,name:KSW_employee_transfer.selection__ksw_employee_transfer__state__hr
+msgid "HR Review"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model_terms:ir.actions.act_window,help:KSW_employee_transfer.action_ksw_employee_transfer
+msgid "HR checks it, the GM approves it, and it takes effect on its date."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__has_message
+msgid "Has Message"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#. odoo-python
+#: code:addons/KSW_employee_transfer/models/ksw_employee_transfer.py:0
+msgid ""
+"He answers for %s: hand them in first (Vehicle Custody: Driver Change or a "
+"release), or move him together with them from Vehicle Allocation."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__id
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer_refuse_wizard__id
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_res_users__id
+msgid "ID"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__activity_exception_icon
+msgid "Icon"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,help:KSW_employee_transfer.field_ksw_employee_transfer__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,help:KSW_employee_transfer.field_ksw_employee_transfer__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,help:KSW_employee_transfer.field_ksw_employee_transfer__message_has_error
+#: model:ir.model.fields,help:KSW_employee_transfer.field_ksw_employee_transfer__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model_terms:ir.ui.view,arch_db:KSW_employee_transfer.view_ksw_employee_transfer_search
+msgid "In Progress"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__message_is_follower
+msgid "Is Follower"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.module.category,name:KSW_employee_transfer.module_category_ksw_employee_transfer
+msgid "KSW Employee Transfer"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__write_uid
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer_refuse_wizard__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__write_date
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer_refuse_wizard__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__message_has_error
+msgid "Message Delivery error"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__message_ids
+msgid "Messages"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model_terms:ir.actions.act_window,help:KSW_employee_transfer.action_ksw_employee_transfer
+msgid "Move an employee to another department"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__name
+msgid "Name"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__activity_calendar_event_id
+msgid "Next Activity Calendar Event"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__activity_summary
+msgid "Next Activity Summary"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__activity_type_id
+msgid "Next Activity Type"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__message_needaction_counter
+msgid "Number of Actions"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__message_has_error_counter
+msgid "Number of errors"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,help:KSW_employee_transfer.field_ksw_employee_transfer__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,help:KSW_employee_transfer.field_ksw_employee_transfer__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#. odoo-python
+#: code:addons/KSW_employee_transfer/models/ksw_employee_transfer.py:0
+msgid "Only HR approves %s at this step."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#. odoo-python
+#: code:addons/KSW_employee_transfer/models/ksw_employee_transfer.py:0
+msgid "Only HR or the GM cancels a submitted transfer."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#. odoo-python
+#: code:addons/KSW_employee_transfer/models/ksw_employee_transfer.py:0
+msgid "Only a draft or cancelled transfer can be deleted."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#. odoo-python
+#: code:addons/KSW_employee_transfer/models/ksw_employee_transfer.py:0
+msgid "Only the GM approves %s at this step."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#. odoo-python
+#: code:addons/KSW_employee_transfer/models/ksw_employee_transfer.py:0
+msgid "Open payslips: %s."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__origin
+msgid "Origin"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__rating_ids
+msgid "Ratings"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__reason
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer_refuse_wizard__reason
+msgid "Reason"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model_terms:ir.ui.view,arch_db:KSW_employee_transfer.view_ksw_employee_transfer_form
+#: model_terms:ir.ui.view,arch_db:KSW_employee_transfer.view_ksw_employee_transfer_refuse_form
+msgid "Refuse"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#. odoo-python
+#: code:addons/KSW_employee_transfer/models/ksw_employee_transfer.py:0
+msgid "Refuse %s"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__refuse_reason
+msgid "Refuse Reason"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model,name:KSW_employee_transfer.model_ksw_employee_transfer_refuse_wizard
+msgid "Refuse an Employee Transfer"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields.selection,name:KSW_employee_transfer.selection__ksw_employee_transfer__state__refused
+msgid "Refused"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#. odoo-python
+#: code:addons/KSW_employee_transfer/models/ksw_employee_transfer.py:0
+msgid "Refused: %s"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__requested_by_id
+msgid "Requested By"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:res.groups,name:KSW_employee_transfer.group_transfer_requester
+msgid "Requester"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__activity_user_id
+msgid "Responsible User"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__state
+msgid "State"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model_terms:ir.ui.view,arch_db:KSW_employee_transfer.view_ksw_employee_transfer_search
+msgid "Status"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,help:KSW_employee_transfer.field_ksw_employee_transfer__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model_terms:ir.ui.view,arch_db:KSW_employee_transfer.view_ksw_employee_transfer_form
+msgid "Submit to HR"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__to_department_id
+#: model_terms:ir.ui.view,arch_db:KSW_employee_transfer.view_ksw_employee_transfer_search
+msgid "To Department"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer_refuse_wizard__transfer_id
+msgid "Transfer"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#. odoo-python
+#: code:addons/KSW_employee_transfer/models/ksw_employee_transfer.py:0
+msgid "Transfer %(e)s to %(d)s"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.ui.menu,name:KSW_employee_transfer.menu_employee_transfer_all
+msgid "Transfers"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,help:KSW_employee_transfer.field_ksw_employee_transfer__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#. odoo-python
+#: code:addons/KSW_employee_transfer/models/ksw_employee_transfer.py:0
+msgid "Unconfirmed attendance sheets: %s."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#. odoo-python
+#: code:addons/KSW_employee_transfer/models/ksw_employee_transfer.py:0
+msgid "Use the buttons to move a transfer on."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model,name:KSW_employee_transfer.model_res_users
+msgid "User"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__custody_vehicle_ids
+#: model_terms:ir.ui.view,arch_db:KSW_employee_transfer.view_ksw_employee_transfer_form
+msgid "Vehicles in His Custody"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__website_message_ids
+msgid "Website Messages"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,help:KSW_employee_transfer.field_ksw_employee_transfer__website_message_ids
+msgid "Website communication history"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model_terms:ir.ui.view,arch_db:KSW_employee_transfer.view_ksw_employee_transfer_form
+msgid "Why he moves..."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model_terms:ir.ui.view,arch_db:KSW_employee_transfer.view_ksw_employee_transfer_refuse_form
+msgid "Why the transfer is refused..."
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model_terms:ir.ui.view,arch_db:KSW_employee_transfer.view_ksw_employee_transfer_search
+msgid "With HR"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__with_vehicles
+msgid "With Vehicles"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model_terms:ir.ui.view,arch_db:KSW_employee_transfer.view_ksw_employee_transfer_search
+msgid "With the GM"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__x_can_gm
+msgid "X Can Gm"
+msgstr ""
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__x_can_hr
+msgid "X Can Hr"
+msgstr ""

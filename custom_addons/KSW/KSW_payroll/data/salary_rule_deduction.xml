@@ -92,6 +92,24 @@ result = max(result, 0.0)
         </record>
 
         <!-- ========================================================= -->
+        <!-- Collection Commission Allowance (after Mobile). BAS books  -->
+        <!-- it on 3203020006 مصروفات عمولات مناديب التحصيل.            -->
+        <!-- ========================================================= -->
+
+        <record id="hr_rule_collection_commission" model="hr.salary.rule">
+            <field name="name">Collection Commission Allowance</field>
+            <field name="sequence" eval="14"/>
+            <field name="code">COLLECTION_COMM</field>
+            <field name="category_id" ref="om_hr_payroll.ALW"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = bool(contract.collection_commission_allowance)</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.collection_commission_allowance</field>
+            <field name="appears_on_payslip" eval="True"/>
+            <field name="x_bas_posting">expense</field>
+        </record>
+
+        <!-- ========================================================= -->
         <!-- Other Allowance salary rule (field exists on contract,     -->
         <!-- but no rule was created in om_hr_payroll)                  -->
         <!-- ========================================================= -->
@@ -124,6 +142,7 @@ result = (contract.other_allowance or 0.0) + sat_ot
                 (4, ref('om_hr_payroll.hr_rule_medical')),
                 (4, ref('hr_rule_other')),
                 (4, ref('hr_rule_mobile')),
+                (4, ref('hr_rule_collection_commission')),
             ]"/>
         </record>
 

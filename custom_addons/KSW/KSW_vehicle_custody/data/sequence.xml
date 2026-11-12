@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="seq_ksw_vehicle_custody_request" model="ir.sequence">
+            <field name="name">Vehicle Handover Form (HR-12)</field>
+            <field name="code">ksw.vehicle.custody.request</field>
+            <field name="prefix">HR12/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

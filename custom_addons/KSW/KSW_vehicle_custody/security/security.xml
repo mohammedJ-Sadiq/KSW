@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="module_category_ksw_vehicle_custody" model="ir.module.category">
+        <field name="name">KSW Vehicle Custody</field>
+        <field name="sequence">213</field>
+    </record>
+
+    <record id="privilege_vehicle_custody" model="res.groups.privilege">
+        <field name="name">Vehicle Custody (HR-12)</field>
+        <field name="sequence">10</field>
+        <field name="category_id" ref="module_category_ksw_vehicle_custody"/>
+    </record>
+
+    <!-- Accounting gets the information copy and reads every form (financial
+         matters, the driver's account statement). -->
+    <record id="group_custody_accounting" model="res.groups">
+        <field name="name">Accounting (Information Copy)</field>
+        <field name="privilege_id" ref="privilege_vehicle_custody"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="sequence">5</field>
+    </record>
+
+    <!-- HR / Administrative Affairs (one team): reviews every release and
+         form, fills the administrative section, checks licences, and gets the
+         information copy for the delegation. -->
+    <record id="group_custody_hr" model="res.groups">
+        <field name="name">HR / Administrative Affairs</field>
+        <field name="privilege_id" ref="privilege_vehicle_custody"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="rule_custody_request_department" model="ir.rule">
+        <field name="name">HR-12: own departments</field>
+        <field name="model_id" ref="model_ksw_vehicle_custody_request"/>
+        <field name="domain_force">[('department_id', 'in', user._ksw_fleet_department_ids())]</field>
+        <field name="groups" eval="[(4, ref('KSW_fleet_allocation.group_fleet_allocation_user'))]"/>
+    </record>
+    <record id="rule_custody_request_all" model="ir.rule">
+        <field name="name">HR-12: HR, accounting, GM, workshop and administrator see all</field>
+        <field name="model_id" ref="model_ksw_vehicle_custody_request"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_custody_hr')), (4, ref('group_custody_accounting')),
+                                    (4, ref('KSW_fleet_allocation.group_fleet_allocation_gm')),
+                                    (4, ref('KSW_workshop.group_workshop_technician')),
+                                    (4, ref('KSW_workshop.group_workshop_reviewer')), (4, ref('base.group_system'))]"/>
+    </record>
+    <record id="rule_custody_document_department" model="ir.rule">
+        <field name="name">HR-12 document: own departments</field>
+        <field name="model_id" ref="model_ksw_vehicle_custody_document"/>
+        <field name="domain_force">[('request_id.department_id', 'in', user._ksw_fleet_department_ids())]</field>
+        <field name="groups" eval="[(4, ref('KSW_fleet_allocation.group_fleet_allocation_user'))]"/>
+    </record>
+    <record id="rule_custody_document_all" model="ir.rule">
+        <field name="name">HR-12 document: see all</field>
+        <field name="model_id" ref="model_ksw_vehicle_custody_document"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_custody_hr')), (4, ref('group_custody_accounting')),
+                                    (4, ref('KSW_fleet_allocation.group_fleet_allocation_gm')),
+                                    (4, ref('KSW_workshop.group_workshop_technician')),
+                                    (4, ref('KSW_workshop.group_workshop_reviewer')), (4, ref('base.group_system'))]"/>
+    </record>
+    <record id="rule_custody_inspection_department" model="ir.rule">
+        <field name="name">HR-12 inspection: own departments</field>
+        <field name="model_id" ref="model_ksw_vehicle_custody_inspection"/>
+        <field name="domain_force">[('request_id.department_id', 'in', user._ksw_fleet_department_ids())]</field>
+        <field name="groups" eval="[(4, ref('KSW_fleet_allocation.group_fleet_allocation_user'))]"/>
+    </record>
+    <record id="rule_custody_inspection_all" model="ir.rule">
+        <field name="name">HR-12 inspection: see all</field>
+        <field name="model_id" ref="model_ksw_vehicle_custody_inspection"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_custody_hr')), (4, ref('group_custody_accounting')),
+                                    (4, ref('KSW_fleet_allocation.group_fleet_allocation_gm')),
+                                    (4, ref('KSW_workshop.group_workshop_technician')),
+                                    (4, ref('KSW_workshop.group_workshop_reviewer')), (4, ref('base.group_system'))]"/>
+    </record>
+
+    <!-- HR reads every vehicle request and its lines and movements, to review
+         releases; read only, the review button writes through sudo. -->
+    <record id="rule_fleet_request_hr" model="ir.rule">
+        <field name="name">Vehicle request: HR reads all</field>
+        <field name="model_id" ref="KSW_fleet_allocation.model_ksw_fleet_request"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_custody_hr'))]"/>
+        <field name="perm_write" eval="False"/><field name="perm_create" eval="False"/><field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="rule_fleet_release_line_hr" model="ir.rule">
+        <field name="name">Vehicle release line: HR reads all</field>
+        <field name="model_id" ref="KSW_fleet_allocation.model_ksw_fleet_release_line"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_custody_hr'))]"/>
+        <field name="perm_write" eval="False"/><field name="perm_create" eval="False"/><field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="rule_fleet_addition_line_hr" model="ir.rule">
+        <field name="name">Vehicle addition line: HR reads all</field>
+        <field name="model_id" ref="KSW_fleet_allocation.model_ksw_fleet_addition_line"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_custody_hr'))]"/>
+        <field name="perm_write" eval="False"/><field name="perm_create" eval="False"/><field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="rule_fleet_move_hr" model="ir.rule">
+        <field name="name">Vehicle movement: HR reads all</field>
+        <field name="model_id" ref="KSW_fleet_allocation.model_ksw_fleet_move"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_custody_hr'))]"/>
+        <field name="perm_write" eval="False"/><field name="perm_create" eval="False"/><field name="perm_unlink" eval="False"/>
+    </record>
+</odoo>

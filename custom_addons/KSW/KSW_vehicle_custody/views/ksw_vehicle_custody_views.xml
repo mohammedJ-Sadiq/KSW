@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ksw_vehicle_custody_form" model="ir.ui.view">
+        <field name="name">ksw.vehicle.custody.request.form</field>
+        <field name="model">ksw.vehicle.custody.request</field>
+        <field name="arch" type="xml">
+            <!-- The paper HR-12, section by section, with its route on top:
+                 one button per step, shown to whoever the form waits for. -->
+            <form string="Vehicle Handover Form (HR-12)">
+                <header>
+                    <field name="x_can_supervisor" invisible="1"/>
+                    <field name="x_can_hr" invisible="1"/>
+                    <field name="x_can_workshop" invisible="1"/>
+                    <button name="action_submit" type="object" string="Submit to HR" class="oe_highlight"
+                            invisible="not x_can_supervisor"/>
+                    <button name="action_hr_approve" type="object" string="HR Approve" class="oe_highlight"
+                            invisible="not x_can_hr"/>
+                    <button name="action_workshop_done" type="object" class="oe_highlight"
+                            string="Workshop Done" invisible="not x_can_workshop"
+                            confirm="The vehicle is inspected (and handed over on a receipt)? This approves the form and changes the custodian."/>
+                    <button name="action_open_refuse" type="object" string="Refuse"
+                            invisible="kind != 'driver_change' or not (x_can_hr or x_can_workshop)"/>
+                    <button name="action_print" type="object" string="Print HR-12" icon="fa-print"
+                            class="oe_highlight" invisible="state != 'done'"/>
+                    <button name="action_mark_signed" type="object" string="Mark as Signed" icon="fa-check"
+                            invisible="state != 'done'" confirm="The signed scan is attached?"/>
+                    <button name="action_print" type="object" string="Print HR-12" icon="fa-print"
+                            invisible="state == 'done'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,hr,gm,workshop,done,signed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_workshop_request" type="object" class="oe_stat_button"
+                                icon="fa-wrench" invisible="not workshop_request_id">
+                            <div class="o_stat_info"><span class="o_stat_text">Workshop Request</span></div>
+                        </button>
+                    </div>
+                    <div class="alert alert-danger" role="alert" invisible="state != 'refused'">
+                        <b>Refused:</b> <field name="refuse_reason" nolabel="1" class="d-inline"/>
+                    </div>
+                    <div class="alert alert-info" role="status" invisible="state != 'done'">
+                        Approved. Print HR-12, have it signed on paper, attach the scan under
+                        <b>Signed Copy</b> and press <b>Mark as Signed</b>.
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                        <h3><field name="kind" readonly="1"/></h3>
+                    </div>
+                    <group>
+                        <group string="Vehicle Details">
+                            <field name="allowed_department_ids" invisible="1"/>
+                            <field name="vehicle_id" options="{'no_create': True}"
+                                   readonly="kind != 'driver_change' or state != 'draft'"/>
+                            <field name="plate_number"/>
+                            <field name="vehicle_type"/>
+                            <field name="department_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="form_date" readonly="state not in ('draft', 'hr', 'workshop', 'done')"/>
+                            <field name="origin" invisible="not origin"/>
+                            <field name="workshop_request_id" invisible="1"/>
+                            <field name="hr_checked_by_id" invisible="not hr_checked_by_id"/>
+                            <field name="signed_attachment_ids" widget="many2many_binary"
+                                   readonly="state != 'done'" invisible="state not in ('done', 'signed')"/>
+                            <field name="signed_date" invisible="not signed_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="users" string="Requesting Department">
+                            <group>
+                                <group string="Previous Vehicle User">
+                                    <field name="previous_employee_id" options="{'no_create': True}"
+                                           readonly="state != 'draft'"/>
+                                    <field name="previous_name" readonly="state not in ('draft', 'hr', 'workshop', 'done')"/>
+                                    <field name="previous_emp_no" readonly="state not in ('draft', 'hr', 'workshop', 'done')"/>
+                                    <field name="previous_iqama" readonly="state not in ('draft', 'hr', 'workshop', 'done')"/>
+                                    <field name="previous_phone" readonly="state not in ('draft', 'hr', 'workshop', 'done')"/>
+                                </group>
+                                <group string="New Vehicle User" invisible="kind == 'hand_in'">
+                                    <field name="new_employee_id" options="{'no_create': True}"
+                                           readonly="state != 'draft'"/>
+                                    <field name="new_name" readonly="state not in ('draft', 'hr', 'workshop', 'done')"/>
+                                    <field name="new_emp_no" readonly="state not in ('draft', 'hr', 'workshop', 'done')"/>
+                                    <field name="new_iqama" readonly="state not in ('draft', 'hr', 'workshop', 'done')"/>
+                                    <field name="new_phone" readonly="state not in ('draft', 'hr', 'workshop', 'done')"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Reason for User Change">
+                                    <field name="change_reason" widget="radio" options="{'horizontal': true}"
+                                           readonly="state != 'draft'" required="kind == 'driver_change'"/>
+                                    <field name="change_reason_note" readonly="state != 'draft'"/>
+                                </group>
+                                <group string="Supervisor">
+                                    <field name="supervisor_id" options="{'no_create': True}"
+                                           readonly="state != 'draft'"/>
+                                </group>
+                            </group>
+                            <group string="Reason to Hand Over to the Workshop">
+                                <field name="workshop_reason" nolabel="1" colspan="2" readonly="state != 'draft'"/>
+                            </group>
+                            <div class="text-muted small">
+                                The vehicle is not handed over without a valid regular license.
+                            </div>
+                        </page>
+                        <page name="admin" string="HR / Administrative Affairs">
+                            <field name="document_ids" readonly="state not in ('hr', 'done')">
+                                <list editable="bottom" create="0" delete="0">
+                                    <field name="sequence" column_invisible="True"/>
+                                    <field name="document_type" readonly="1"/>
+                                    <field name="present"/>
+                                    <field name="remark"/>
+                                </list>
+                            </field>
+                            <group>
+                                <group string="New User's License" invisible="kind == 'hand_in'">
+                                    <field name="new_position" readonly="state != 'hr'"/>
+                                    <field name="license_type" readonly="state != 'hr'"/>
+                                    <field name="license_expiry" readonly="state != 'hr'"/>
+                                </group>
+                                <group string="Delegation Process">
+                                    <field name="delegation_add_datetime" readonly="state not in ('hr', 'done')"/>
+                                    <field name="delegation_remove_datetime" readonly="state not in ('hr', 'done')"/>
+                                    <field name="delegation_remarks" readonly="state not in ('hr', 'done')"/>
+                                </group>
+                            </group>
+                            <group string="Remarks">
+                                <field name="admin_remarks" nolabel="1" colspan="2" readonly="state not in ('hr', 'done')"/>
+                            </group>
+                        </page>
+                        <page name="finance" string="Financial Matters">
+                            <group>
+                                <field name="financial_note_1" readonly="state != 'done'"/>
+                                <field name="financial_note_2" readonly="state != 'done'"/>
+                                <field name="financial_note_3" readonly="state != 'done'"/>
+                            </group>
+                            <div class="text-muted small mb-3">Filled by Accounting after approval; attach the driver's account statement to the signed copy.</div>
+                            <group string="For the Official Use (Executive Director)">
+                                <field name="official_remarks" nolabel="1" colspan="2" readonly="state != 'done'"/>
+                            </group>
+                        </page>
+                        <page name="inspection" string="Vehicle Inspection">
+                            <group>
+                                <group>
+                                    <field name="inspection_datetime" readonly="state != 'workshop'"
+                                           required="state == 'workshop'"/>
+                                </group>
+                                <group>
+                                    <field name="inspection_total"/>
+                                </group>
+                            </group>
+                            <field name="inspection_line_ids" readonly="state != 'workshop'">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="depreciation"/>
+                                    <field name="value" sum="Total"/>
+                                    <field name="remark"/>
+                                </list>
+                            </field>
+                            <group string="Names for the Signatures">
+                                <field name="workshop_official_name" readonly="state not in ('workshop', 'done')"/>
+                                <field name="deliverer_name" readonly="state not in ('workshop', 'done')"/>
+                                <field name="receiver_name" readonly="state not in ('workshop', 'done')"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_vehicle_custody_list" model="ir.ui.view">
+        <field name="name">ksw.vehicle.custody.request.list</field>
+        <field name="model">ksw.vehicle.custody.request</field>
+        <field name="arch" type="xml">
+            <list string="Handover Forms" decoration-muted="state in ('cancelled', 'refused')"
+                  decoration-success="state == 'signed'">
+                <field name="name"/>
+                <field name="kind" widget="badge"/>
+                <field name="vehicle_id"/>
+                <field name="department_id"/>
+                <field name="previous_name" optional="show"/>
+                <field name="new_name" optional="show"/>
+                <field name="form_date"/>
+                <field name="inspection_total" optional="hide" sum="Total"/>
+                <field name="activity_ids" widget="list_activity" optional="show"/>
+                <field name="state" widget="badge" decoration-info="state in ('draft', 'hr', 'gm', 'workshop')"
+                       decoration-warning="state == 'done'" decoration-success="state == 'signed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_vehicle_custody_search" model="ir.ui.view">
+        <field name="name">ksw.vehicle.custody.request.search</field>
+        <field name="model">ksw.vehicle.custody.request</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="vehicle_id"/>
+                <field name="previous_employee_id"/>
+                <field name="new_employee_id"/>
+                <field name="department_id"/>
+                <filter string="In Progress" name="filter_open" domain="[('state', 'in', ('draft', 'hr', 'gm', 'workshop', 'done'))]"/>
+                <filter string="With HR" name="filter_hr" domain="[('state', '=', 'hr')]"/>
+                <filter string="At the Workshop" name="filter_workshop" domain="[('state', '=', 'workshop')]"/>
+                <filter string="Signed Copy Missing" name="filter_unsigned" domain="[('state', '=', 'done')]"/>
+                <separator/>
+                <filter string="Hand In" name="filter_hand_in" domain="[('kind', '=', 'hand_in')]"/>
+                <filter string="Receive" name="filter_receive" domain="[('kind', '=', 'receive')]"/>
+                <filter string="Driver Change" name="filter_driver_change" domain="[('kind', '=', 'driver_change')]"/>
+                <group>
+                    <filter string="Status" name="groupby_state" context="{'group_by': 'state'}"/>
+                    <filter string="Request Type" name="groupby_kind" context="{'group_by': 'kind'}"/>
+                    <filter string="Department" name="groupby_department" context="{'group_by': 'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_vehicle_custody" model="ir.actions.act_window">
+        <field name="name">Handover Forms (HR-12)</field>
+        <field name="res_model">ksw.vehicle.custody.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ksw_vehicle_custody_search"/>
+        <field name="context">{'search_default_filter_open': 1, 'create': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No handover form in progress</p>
+            <p>Hand-in and receipt forms open by themselves from vehicle releases and transfers.
+               A driver change inside a department is raised under Driver Change.</p>
+        </field>
+    </record>
+
+    <record id="action_ksw_vehicle_custody_driver_change" model="ir.actions.act_window">
+        <field name="name">Driver Change</field>
+        <field name="res_model">ksw.vehicle.custody.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('kind', '=', 'driver_change')]</field>
+        <field name="context">{'default_kind': 'driver_change', 'search_default_filter_open': 1}</field>
+        <field name="search_view_id" ref="view_ksw_vehicle_custody_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Change who answers for a vehicle</p>
+            <p>One vehicle, two drivers, same department (vacation, suspension…). HR checks the new
+               driver's licence, the workshop checks the vehicle, then the custody changes.</p>
+        </field>
+    </record>
+
+    <record id="view_ksw_fleet_vehicle_custody_list" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.custody.list</field>
+        <field name="model">ksw.fleet.vehicle.custody</field>
+        <field name="arch" type="xml">
+            <list string="Custody History" create="0" edit="0" delete="0">
+                <field name="vehicle_id"/>
+                <field name="employee_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="source"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_fleet_vehicle_custody_search" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.custody.search</field>
+        <field name="model">ksw.fleet.vehicle.custody</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="vehicle_id"/>
+                <field name="employee_id"/>
+                <filter string="Current" name="filter_current" domain="[('date_to', '=', False)]"/>
+                <group>
+                    <filter string="Custodian" name="groupby_employee" context="{'group_by': 'employee_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_fleet_vehicle_custody" model="ir.actions.act_window">
+        <field name="name">Who Answers for What</field>
+        <field name="res_model">ksw.fleet.vehicle.custody</field>
+        <field name="view_mode">list</field>
+        <field name="context">{'search_default_filter_current': 1}</field>
+    </record>
+
+    <record id="view_ksw_vehicle_custody_checklist_list" model="ir.ui.view">
+        <field name="name">ksw.vehicle.custody.checklist.list</field>
+        <field name="model">ksw.vehicle.custody.checklist</field>
+        <field name="arch" type="xml">
+            <list string="Inspection Checklist" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="vehicle_type" placeholder="Every type"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_ksw_vehicle_custody_checklist" model="ir.actions.act_window">
+        <field name="name">Inspection Checklist</field>
+        <field name="res_model">ksw.vehicle.custody.checklist</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <record id="view_ksw_vehicle_custody_refuse_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.vehicle.custody.refuse.wizard.form</field>
+        <field name="model">ksw.vehicle.custody.refuse.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="request_id" invisible="1"/>
+                <field name="reason" placeholder="Why the driver change is refused..."/>
+                <footer>
+                    <button name="action_confirm" type="object" string="Refuse" class="btn-primary"/>
+                    <button string="Discard" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

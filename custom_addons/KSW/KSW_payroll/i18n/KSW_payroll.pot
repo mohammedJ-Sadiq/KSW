@@ -5511,3 +5511,18 @@ msgstr ""
 #: model:ir.model,name:om_hr_payroll.model_hr_contract_advantage_template
 msgid "Employee's Advantage on Contract"
 msgstr ""
+
+#. module: KSW_payroll
+#: model:hr.salary.rule,name:KSW_payroll.hr_rule_collection_commission
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_employee__collection_commission_allowance
+#: model:ir.model.fields,field_description:KSW_payroll.field_hr_version__collection_commission_allowance
+msgid "Collection Commission Allowance"
+msgstr ""
+
+#. module: KSW_payroll
+#: model:ir.model.fields,help:KSW_payroll.field_hr_employee__collection_commission_allowance
+#: model:ir.model.fields,help:KSW_payroll.field_hr_version__collection_commission_allowance
+msgid ""
+"Fixed monthly allowance of a collection representative, paid on the payslip"
+" with the salary."
+msgstr ""

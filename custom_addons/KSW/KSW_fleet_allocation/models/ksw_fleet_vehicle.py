@@ -30,6 +30,15 @@ class KswFleetVehicle(models.Model):
         ('holding', 'Holding (Workshop)'),
     ], string='Allocation', default='unassigned', required=True, copy=False, index=True)
     x_move_ids = fields.One2many('ksw.fleet.move', 'vehicle_id', string='Movements')
+    # A transfer decided while the vehicle was in use waits for its workshop
+    # checkup; these hold where it goes when the checkup completes.
+    x_reserved_department_id = fields.Many2one('hr.department', string='Reserved For', readonly=True,
+                                               copy=False, index=True)
+    x_reserved_addition_line_id = fields.Many2one('ksw.fleet.addition.line', readonly=True, copy=False)
+    x_reserved_release_line_id = fields.Many2one('ksw.fleet.release.line', readonly=True, copy=False)
+    x_reserved_source = fields.Selection([('internal', 'Internal'), ('external', 'External')],
+                                         readonly=True, copy=False)
+    x_reserved_note = fields.Text(readonly=True, copy=False)
     x_pending_move_id = fields.Many2one(
         'ksw.fleet.move', compute='_compute_pending_move_id', string='Transfer in Progress')
     # Only so x_is_released recomputes when a release is raised or decided.
@@ -233,21 +242,28 @@ class KswFleetVehicle(models.Model):
                           for vid, request in open_checkups.items())))
 
     def _ksw_fleet_current_driver(self):
-        """Who drives it now: the BAS driver when known, else the default one."""
+        """Who answers for it now: its custodian, else its operating driver."""
         self.ensure_one()
-        vehicle = self.sudo()
-        return (vehicle['x_bas_driver_id'] if 'x_bas_driver_id' in vehicle._fields else False) \
-            or vehicle.driver_id
+        return self.sudo().x_custodian_id or self.sudo().driver_id
 
     def _ksw_fleet_start_transfer(self, target, note=False, addition_line=None, source='internal'):
-        """GM decision: move this vehicle to `target`. The vehicle stays with
-        its department, In Transfer, until the receiving side confirms. A
-        pending release of this vehicle is settled by the same decision."""
+        """GM decision: move this vehicle to `target`.
+
+        A vehicle still in use in a department goes through the workshop
+        first: it is sent for a checkup with the transfer reserved, and the
+        transfer starts by itself when the checkup completes (only a vehicle
+        moving together with its driver skips this, ksw_fleet_direct). A
+        vehicle already in the pool is checked, so it moves at once, In
+        Transfer until the receiving side confirms."""
         self.ensure_one()
         self._ksw_fleet_check_movable()
         if self.x_department_id == target:
             raise UserError(_('%(v)s already belongs to %(d)s.', v=self.name, d=target.name))
-        release_line = self._open_release_lines()[:1]
+        if self.x_allocation_state == 'assigned' and not self.env.context.get('ksw_fleet_direct'):
+            return self._ksw_fleet_send_to_holding(
+                _('Checkup before transfer to %s', target.name), note,
+                reserve=target, reserve_addition_line=addition_line, reserve_source=source)
+        release_line = self._open_release_lines()[:1] or self.sudo().x_reserved_release_line_id
         move = self.env['ksw.fleet.move'].sudo().create({
             'vehicle_id': self.id, 'kind': 'transfer', 'state': 'in_transfer',
             'from_department_id': self.x_department_id.id, 'to_department_id': target.id,
@@ -257,42 +273,42 @@ class KswFleetVehicle(models.Model):
             'addition_line_id': addition_line.id if addition_line else False,
             'source': source,
         })
-        # HR-12, Received by New Driver: the receiving department fills it.
-        # A vehicle coming out of holding carries the workshop's inspection.
-        workshop_form = self.env['ksw.vehicle.handover'].sudo().search([
-            ('vehicle_id', '=', self.id), ('handover_type', '=', 'handover'),
-            ('state', '!=', 'cancelled')], limit=1) if self.x_allocation_state == 'holding' else None
-        receive_form = self.env['ksw.vehicle.handover'].sudo().create({
-            'handover_type': 'receive', 'vehicle_id': self.id, 'department_id': target.id,
-            'move_id': move.id, 'previous_employee_id': self._ksw_fleet_current_driver().id,
-            'workshop_official_name': workshop_form.workshop_official_name if workshop_form else False,
-        })
-        if workshop_form:
-            receive_form.inspection_line_ids.unlink()
-            receive_form.inspection_datetime = workshop_form.inspection_datetime
-            receive_form._ksw_load_inspection_items(source=workshop_form)
-        if release_line:
+        if release_line and release_line.decision == 'pending':
             release_line.write({
                 'decision': 'transfer', 'target_department_id': target.id,
                 'decision_note': note, 'decided_by_id': self.env.user.id,
                 'decided_date': fields.Datetime.now(),
             })
-        if release_line and not self.env.context.get('ksw_fleet_batch'):
-            release_line.request_id._ksw_fleet_post(Markup(
-                _('<b>%(v)s</b> will be transferred to <b>%(d)s</b>.%(n)s'))
-                % {'v': self.name, 'd': target.name, 'n': _note(note)})
-        self.sudo().with_context(ksw_fleet_allocation=True).write({'x_allocation_state': 'in_transfer'})
+            if not self.env.context.get('ksw_fleet_batch'):
+                release_line.request_id._ksw_fleet_post(Markup(
+                    _('<b>%(v)s</b> will be transferred to <b>%(d)s</b>.%(n)s'))
+                    % {'v': self.name, 'd': target.name, 'n': _note(note)})
+        self.sudo().with_context(ksw_fleet_allocation=True).write({
+            'x_allocation_state': 'in_transfer', 'x_reserved_department_id': False,
+            'x_reserved_addition_line_id': False, 'x_reserved_release_line_id': False})
         anchor = addition_line.request_id if addition_line else release_line.request_id
         if anchor and not self.env.context.get('ksw_fleet_batch'):
             anchor._ksw_fleet_post(Markup(
                 _('<b>%(v)s</b> is on its way to <b>%(d)s</b>. Confirm on its arrival under '
                 'Vehicle Allocation ▸ Transfers to Receive.%(n)s'))
                 % {'v': self.name, 'd': target.name, 'n': _note(note)})
+        self._ksw_fleet_after_transfer_started(move)
         return move
 
-    def _ksw_fleet_send_to_holding(self, description, note=False):
-        """GM decision: the vehicle leaves its department, goes to the workshop
-        for a checkup, and waits in the Holding pool until reallocated."""
+    def _ksw_fleet_after_transfer_started(self, move):
+        """Hook: the custody module opens the receiving form here."""
+        return True
+
+    def _ksw_fleet_after_holding(self, move, workshop_request, release_line):
+        """Hook: the custody module opens the hand-in form here."""
+        return True
+
+    def _ksw_fleet_send_to_holding(self, description, note=False, reserve=None,
+                                   reserve_addition_line=None, reserve_source='internal'):
+        """GM decision: the vehicle leaves its department and goes to the
+        workshop for a checkup. Without `reserve` it then waits in the Holding
+        pool; with it, the transfer to that department starts by itself when
+        the checkup completes (ksw.workshop.request.action_complete)."""
         self.ensure_one()
         self._ksw_fleet_check_movable()
         employee = self.env.user.employee_id
@@ -301,10 +317,9 @@ class KswFleetVehicle(models.Model):
                               'cannot name who raised it. Ask the administrator to link one.'))
         release_line = self._open_release_lines()[:1]
         department = self.x_department_id
-        # The workshop needs a driver: the truck's own, else the GM's
-        # employee record, who hands it over.
-        driver = (self['x_bas_driver_id'] if 'x_bas_driver_id' in self._fields else False) \
-            or self.driver_id or employee
+        # The workshop needs a driver: who answers for the truck, else the
+        # GM's employee record, who hands it over.
+        driver = self._ksw_fleet_current_driver() or employee
         workshop_request = self.env['ksw.workshop.request'].sudo().create({
             'employee_id': employee.id,
             'client_id': self.client_id.id,
@@ -320,28 +335,30 @@ class KswFleetVehicle(models.Model):
             'decided_by_id': self.env.user.id, 'note': note,
             'received_date': fields.Datetime.now(), 'received_by_id': self.env.user.id,
             'release_line_id': release_line.id, 'workshop_request_id': workshop_request.id,
-        })
-        # HR-12, Handover to Workshop: the workshop receives the vehicle and
-        # fills the inspection; its checkup cannot complete until the signed
-        # copy is filed (ksw.workshop.request.action_complete).
-        current = self._ksw_fleet_current_driver()
-        self.env['ksw.vehicle.handover'].sudo().create({
-            'handover_type': 'handover', 'vehicle_id': self.id, 'department_id': department.id,
-            'workshop_request_id': workshop_request.id,
-            'previous_employee_id': current.id,
-            'supervisor_id': release_line.request_id.user_id.employee_id.id if release_line else False,
-            'workshop_reason': description or _('Checkup before reallocation'),
-            'deliverer_name': current.name or False,
+            # A reserved vehicle already counts against the request it answers.
+            'addition_line_id': reserve_addition_line.id if reserve_addition_line else False,
+            'source': reserve_source,
+            'reserved_department_id': reserve.id if reserve else False,
         })
         if release_line:
             release_line.write({
-                'decision': 'holding', 'decision_note': note,
+                'decision': 'transfer' if reserve else 'holding',
+                'target_department_id': reserve.id if reserve else False,
+                'decision_note': note,
                 'decided_by_id': self.env.user.id, 'decided_date': fields.Datetime.now(),
             })
         if release_line and not self.env.context.get('ksw_fleet_batch'):
             release_line.request_id._ksw_fleet_post(Markup(
                 _('<b>%(v)s</b> was sent to the workshop for a checkup (%(w)s) and is now in '
                 'the Holding pool.%(n)s')) % {'v': self.name, 'w': workshop_request.name, 'n': _note(note)})
+        self._ksw_fleet_after_holding(move, workshop_request, release_line)
+        self.sudo().with_context(ksw_fleet_allocation=True).write({
+            'x_reserved_department_id': reserve.id if reserve else False,
+            'x_reserved_addition_line_id': reserve_addition_line.id if reserve_addition_line else False,
+            'x_reserved_release_line_id': release_line.id if reserve else False,
+            'x_reserved_source': reserve_source if reserve else False,
+            'x_reserved_note': note if reserve else False,
+        })
         self.sudo().with_context(ksw_fleet_allocation=True).write({
             'x_department_id': False, 'x_allocation_state': 'holding'})
         return move

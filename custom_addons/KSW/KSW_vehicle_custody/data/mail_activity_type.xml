@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Whoever an HR-12 waits for: supervisor, HR, workshop, or the one
+         filing the signed paper. Kept in line by _sync_activities. -->
+    <record id="mail_activity_custody" model="mail.activity.type">
+        <field name="name">Vehicle Handover (HR-12)</field>
+        <field name="icon">fa-file-text-o</field>
+        <field name="delay_count">1</field>
+        <field name="sequence">92</field>
+    </record>
+</odoo>

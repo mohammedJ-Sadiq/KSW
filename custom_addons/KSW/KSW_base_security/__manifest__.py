@@ -1,6 +1,6 @@
 {
     'name': 'KSW - Base Security Extensions',
-    'version': '19.0.1.8.1',
+    'version': '19.0.1.8.2',
     'category': 'Human Resources',
     'summary': 'Extended security groups and rules for Employees and Attendances',
     'author': 'KSW',
@@ -8,6 +8,7 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
+        'security/bank_account_rules.xml',
         'views/sale_order_views.xml',
         'views/hr_department_views.xml',
         'views/hr_employee_views.xml',

@@ -15,6 +15,7 @@
                 <field name="model"/>
                 <field name="year"/>
                 <field name="driver_name"/>
+                <field name="x_custodian_id" optional="show"/>
                 <field name="state" widget="badge"/>
             </list>
         </field>
@@ -81,8 +82,21 @@
                             <field name="year"/>
                             <field name="driver_id"/>
                             <field name="driver_name"/>
+                            <field name="x_custodian_id"/>
                         </group>
                     </group>
+                    <!-- Custody (عهدة) is not the operating driver: dispatch
+                         moves drivers day to day, custody changes only
+                         through an approved handover form (HR-12). -->
+                    <field name="x_custody_ids" readonly="1" invisible="not x_custody_ids">
+                        <list>
+                            <field name="employee_id"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="source"/>
+                            <field name="note" optional="hide"/>
+                        </list>
+                    </field>
                     <field name="active" invisible="1"/>
                 </sheet>
             </form>
@@ -97,6 +111,7 @@
                 <field name="name"/>
                 <field name="client_id"/>
                 <field name="plate_number"/>
+                <field name="x_custodian_id"/>
                 <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
                 <filter string="Confirmed" name="filter_confirmed" domain="[('state', '=', 'confirmed')]"/>
                 <group>

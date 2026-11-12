@@ -7,7 +7,9 @@ _logger = logging.getLogger(__name__)
 # administrator ticks it under Configuration ▸ Vehicle Departments.
 HOLDER_DEPARTMENTS = [
     'Supply Chain',
+    'Supply Chain - Dammam',    # renamed Nov 2026 (restructure_departments.py)
     'Tabuk',
+    'Supply Chain - Tabuk',     # renamed Nov 2026 (restructure_departments.py)
     "Disouky's Branch",
     "Tariq's Branch",
     'Equipment Rental Department',

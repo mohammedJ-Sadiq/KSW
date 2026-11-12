@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Installment lines follow their deduction (security audit 2026-11-12).
+
+         ksw.deduction.line had ACL rows but no record rule, so every internal
+         user could read every employee's installments (210 on dev, found
+         through the AI assistant, but open to any RPC call). Each rule below
+         mirrors one READ rule of ksw.deduction with the path taken through
+         deduction_id. Odoo cannot do this by itself: an 'any' sub-domain
+         skips the parent's rules.
+
+         Read only (perm_write/create/unlink False): payroll and payments
+         write lines under sudo or through their own guards, and must not
+         change. The own-and-subordinates scope is also given to
+         base.group_user, so no internal user is ever left without a rule
+         (a user none of whose groups has a rule would read everything).
+
+         Keep in step with security.xml: a new READ rule on ksw.deduction
+         needs its twin here. -->
+    <data>
+        <record id="ksw_deduction_line_rule_user" model="ir.rule">
+            <field name="name">Installment: own + subordinates (read)</field>
+            <field name="model_id" ref="model_ksw_deduction_line"/>
+            <field name="domain_force">['|', ('deduction_id.employee_id.user_id', '=', user.id), ('deduction_id.employee_id.parent_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user')), (4, ref('KSW_deduction.group_deduction_user')), (4, ref('KSW_deduction.group_deduction_supervisor'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="ksw_deduction_line_rule_all" model="ir.rule">
+            <field name="name">Installment: deduction officers and payroll read all</field>
+            <field name="model_id" ref="model_ksw_deduction_line"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <!-- Payroll Officer / Reviewer compute and check every payslip,
+                 whose inputs ARE these installments. -->
+            <field name="groups" eval="[(4, ref('KSW_deduction.group_deduction_officer')), (4, ref('KSW_deduction.group_deduction_manager')), (4, ref('om_hr_payroll.group_hr_payroll_user')), (4, ref('KSW_payroll.group_hr_payroll_reviewer'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="ksw_deduction_line_rule_acc_data_entry" model="ir.rule">
+            <field name="name">Installment: non-loan deductions (data entry, loan approvers)</field>
+            <field name="model_id" ref="model_ksw_deduction_line"/>
+            <field name="domain_force">[('deduction_id.managed_by', '=', 'acc_data_entry')]</field>
+            <field name="groups" eval="[(4, ref('KSW_deduction.group_acc_data_entry')), (4, ref('KSW_deduction.group_loan_hr')), (4, ref('KSW_deduction.group_loan_acc'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="ksw_deduction_line_rule_loan_approvers" model="ir.rule">
+            <field name="name">Installment: loan approvers read loans</field>
+            <field name="model_id" ref="model_ksw_deduction_line"/>
+            <field name="domain_force">[('deduction_id.is_loan', '=', True)]</field>
+            <field name="groups" eval="[(4, ref('KSW_deduction.group_loan_hr')), (4, ref('KSW_deduction.group_loan_acc')), (4, ref('KSW_deduction.group_loan_disbursement'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="ksw_deduction_line_rule_loan_gm" model="ir.rule">
+            <field name="name">Installment: GM reads his departments' loans</field>
+            <field name="model_id" ref="model_ksw_deduction_line"/>
+            <field name="domain_force">[('deduction_id.is_loan', '=', True), '|',
+                ('deduction_id.employee_id.department_id.x_effective_gm_id.user_id', '=', user.id),
+                '&amp;', ('deduction_id.employee_id.department_id', '=', False),
+                ('deduction_id.employee_id.company_id.x_default_gm_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('KSW_deduction.group_loan_gm'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="ksw_deduction_line_rule_manager_assistant" model="ir.rule">
+            <field name="name">Installment: manager assistant reads delegated teams' loans</field>
+            <field name="model_id" ref="model_ksw_deduction_line"/>
+            <field name="domain_force">[('deduction_id.is_loan', '=', True), ('deduction_id.employee_id.parent_id.user_id', 'in', user._ksw_assisted_manager_ids())]</field>
+            <field name="groups" eval="[(4, ref('KSW_base_security.group_manager_assistant'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+    </data>
+</odoo>

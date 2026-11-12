@@ -12,11 +12,13 @@ internals), and it is the same set the user sees in the apps.
 """
 import json
 import logging
-import re
 
 from odoo import api, fields, models, _
 from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.fields import Domain
+
+from .ai_guard import PAY_RE, PAYROLL_MODELS
+from .ai_guard import ToolInputError  # noqa: F401 - re-exported
 
 _logger = logging.getLogger(__name__)
 
@@ -25,16 +27,6 @@ DEFAULT_ROWS = 20
 MAX_GROUPS = 60
 MAX_FIELDS = 60
 MAX_MODELS = 15
-# Never offered, even to an administrator who has the menus: system
-# parameters hold the API keys, and none of these answer a business
-# question. Whatever the model reads is sent to the provider.
-_TECHNICAL_PREFIX = ('ir.', 'base.', 'bus.', 'res.config', 'base_import.',
-                     'mail.', 'auth_', 'iap.', 'fetchmail.', 'ksw.ai.')
-_TECHNICAL_MODELS = {'res.users.apikeys', 'res.users.settings',
-                     'res.groups', 'res.lang', 'res.users.log'}
-# Field names that look like credentials are never read or offered.
-_SECRET_RE = re.compile(r'pass|secret|token|api_?key|signature|totp|pin\b',
-                        re.I)
 READ_FIELDS = 60
 READ_SUBTABLES = 6
 READ_LINES = 25
@@ -190,10 +182,6 @@ TOOLS = [
 ]
 
 
-class ToolInputError(Exception):
-    """Bad tool input: returned to Claude as an error so it can retry."""
-
-
 class KswAiTools(models.AbstractModel):
     _name = 'ksw.ai.tools'
     _description = 'AI Assistant Tools'
@@ -243,8 +231,7 @@ class KswAiTools(models.AbstractModel):
                 continue
             model = action.sudo().res_model
             if not model or model not in self.env \
-                    or model.startswith(_TECHNICAL_PREFIX) \
-                    or model in _TECHNICAL_MODELS:
+                    or self.env['ksw.ai.guard']._model_blocked(model):
                 continue
             Model = self.env[model]
             if Model._transient or Model._abstract \
@@ -294,13 +281,14 @@ class KswAiTools(models.AbstractModel):
         words = [w.lower() for w in keywords or [] if w and w.strip()]
         described = Model.fields_get(attributes=[
             'string', 'type', 'relation', 'selection', 'searchable'])
+        allowed = self.env['ksw.ai.guard']._allowed(model)
         lines, skipped = [], 0
         for name, f in described.items():
+            if name not in allowed:
+                continue
             if f['type'] in _SKIP_TYPES or name.startswith(
                     ('message_', 'activity_', 'website_', 'access_')) \
                     or name in _NOISE_FIELDS:
-                continue
-            if _SECRET_RE.search(name):
                 continue
             text = '%s %s "%s"' % (name, f['type'], f.get('string') or '')
             if words and not any(w in text.lower() for w in words) \
@@ -331,7 +319,18 @@ class KswAiTools(models.AbstractModel):
             raise ToolInputError('No %s record with id %s (or no access).'
                                  % (model, record_id))
         rec.check_access('read')
-        readable = Model.fields_get(attributes=['type', 'string', 'help'])
+        Guard = self.env['ksw.ai.guard']
+        allowed = Guard._allowed(model)
+        hide_pay = not Guard._pay_privileged() \
+            and not Guard._record_is_own(rec)
+        if hide_pay and model in PAYROLL_MODELS:
+            raise ToolInputError(
+                'Payslips of other employees are only available to payroll '
+                'officers and HR managers.')
+        if hide_pay:
+            allowed = {f for f in allowed if not PAY_RE.search(f)}
+        readable = {k: v for k, v in Model.fields_get(
+            attributes=['type', 'string', 'help']).items() if k in allowed}
         values, subtables = {}, {}
         # Amounts first: "why is it 7,114" is the usual question, and the
         # field cap must never cut the figure being asked about.
@@ -340,7 +339,6 @@ class KswAiTools(models.AbstractModel):
         for name, desc in sorted(readable.items(),
                                  key=lambda kv: order.get(kv[1]['type'], 5)):
             if desc['type'] in _SKIP_TYPES or name in _NOISE_FIELDS \
-                    or _SECRET_RE.search(name) \
                     or name.startswith(('message_', 'activity_', 'website_',
                                         'access_')):
                 continue
@@ -351,11 +349,16 @@ class KswAiTools(models.AbstractModel):
                 continue       # hide the rest of the record
             if desc['type'] in ('one2many', 'many2many'):
                 if field.comodel_name.startswith(_SKIP_SUBTABLE_PREFIX) \
-                        or name in _SKIP_SUBTABLES:
+                        or name in _SKIP_SUBTABLES \
+                        or Guard._model_blocked(field.comodel_name) \
+                        or (hide_pay
+                            and field.comodel_name in PAYROLL_MODELS):
                     continue
                 if value and desc['type'] == 'one2many' \
                         and len(subtables) < READ_SUBTABLES:
-                    subtables[name] = self._subtable(desc['string'], value)
+                    subtables[name] = self._subtable(desc['string'], value,
+                                                     via=model,
+                                                     hide_pay=hide_pay)
                 elif value:
                     values[name] = self._format_value(field, value)
                 continue
@@ -379,11 +382,15 @@ class KswAiTools(models.AbstractModel):
                 'fields': values, 'subtables': subtables}, None
 
     @api.model
-    def _subtable(self, label, lines):
+    def _subtable(self, label, lines, via=None, hide_pay=False):
         """A sub-table as ``{'columns': [...], 'rows': [[...]]}``: name /
         code / numbers / dates / states, at most 6 columns."""
         Line = lines.browse()
-        readable = Line.fields_get(attributes=['type'])
+        allowed = self.env['ksw.ai.guard']._allowed(Line._name, via=via)
+        if hide_pay:
+            allowed = {f for f in allowed if not PAY_RE.search(f)}
+        readable = {k: v for k, v in Line.fields_get(
+            attributes=['type']).items() if k in allowed}
         columns = [c for c in _LINE_PREFERRED if c in readable][:6]
         for name, desc in readable.items():
             if len(columns) >= 4:
@@ -414,6 +421,27 @@ class KswAiTools(models.AbstractModel):
         }
 
     @api.model
+    def _domain_paths(self, raw):
+        paths = []
+        for item in raw or []:
+            if isinstance(item, (list, tuple)) and len(item) == 3 \
+                    and isinstance(item[0], str):
+                paths.append(item[0])
+                if isinstance(item[2], list):
+                    sub = self._domain_paths(item[2])
+                    paths += ['%s.%s' % (item[0], p) for p in sub]
+        return paths
+
+    @api.model
+    def _apply_pay_scope(self, model, raw, dom, names):
+        """Limit a pay query to the user's own records (see the guard)."""
+        scope = self.env['ksw.ai.guard']._pay_scope(
+            model, list(names) + self._domain_paths(raw))
+        if not scope:
+            return raw, dom, False
+        return list(raw) + [tuple(x) for x in scope], dom & Domain(scope), True
+
+    @api.model
     def _parse_domain(self, Model, domain):
         try:
             raw = json.loads(domain) if isinstance(domain, str) else domain
@@ -422,6 +450,7 @@ class KswAiTools(models.AbstractModel):
         if not isinstance(raw, list):
             raise ToolInputError('Domain must be a JSON array.')
         raw = [tuple(x) if isinstance(x, list) else x for x in raw]
+        self.env['ksw.ai.guard']._check_domain(Model._name, raw)
         dom = Domain(raw)
         # Validates every field path against the model now, as the user.
         dom.validate(Model)
@@ -432,8 +461,18 @@ class KswAiTools(models.AbstractModel):
         if value is False or value is None:
             return ''
         if field.type == 'many2one':
-            return value.display_name if hasattr(value, 'display_name') \
-                else (value[1] if isinstance(value, (list, tuple)) else value)
+            if not hasattr(value, 'display_name'):
+                return value[1] if isinstance(value, (list, tuple)) else value
+            try:
+                return value.display_name
+            except AccessError:
+                # A non-HR user cannot read hr.employee, but the employee
+                # directory (hr.employee.public) is open to every employee.
+                if value._name == 'hr.employee' and self.env[
+                        'hr.employee.public'].has_access('read'):
+                    return self.env['hr.employee.public'].browse(
+                        value.id).display_name
+                return '…'
         if field.type in ('one2many', 'many2many'):
             names = value.mapped('display_name')
             return ', '.join(names[:5]) + (' …' if len(names) > 5 else '')
@@ -459,8 +498,11 @@ class KswAiTools(models.AbstractModel):
         fields = list(dict.fromkeys(
             f.split('.')[0] if '.' in f and f.split('.')[0] in readable
             else f for f in fields))
-        unknown = [f for f in fields
-                   if f not in readable or _SECRET_RE.search(f)]
+        Guard = self.env['ksw.ai.guard']
+        for f in fields:
+            Guard._check_field(model, f)
+        Guard._check_order(model, order)
+        unknown = [f for f in fields if f not in readable]
         if unknown:
             raise ToolInputError(
                 'Unknown or restricted fields on %s: %s. Use get_fields.'
@@ -468,6 +510,10 @@ class KswAiTools(models.AbstractModel):
         names = [f for f in fields if readable[f]['type'] not in _SKIP_TYPES]
         if 'display_name' not in names:
             names.insert(0, 'display_name')
+        order_fields = [p.strip().split()[0] for p in (order or '').split(',')
+                        if p.strip()]
+        raw, dom, own_only = self._apply_pay_scope(
+            model, raw, dom, names + order_fields)
         limit = max(1, min(int(limit or DEFAULT_ROWS), MAX_ROWS))
         total = Model.search_count(dom)
         records = Model.search(dom, order=order or None, limit=limit)
@@ -495,6 +541,7 @@ class KswAiTools(models.AbstractModel):
             'model_label': self.env['ir.model']._get(model).name,
             'domain': raw,
             'filter_text': self._domain_text(Model, raw),
+            'own_only': own_only,
             'columns': labels,
             'rows': rows,
             'ids': records.ids,
@@ -508,6 +555,10 @@ class KswAiTools(models.AbstractModel):
             'rows': rows,
             'totals_over_all_matching': block['sums'],
         }
+        if own_only:
+            result['note'] = ('Limited to the user\'s own records: pay '
+                              'figures of other employees are not available '
+                              'to this user.')
         return result, block
 
     @api.model
@@ -516,17 +567,23 @@ class KswAiTools(models.AbstractModel):
         Model = self._check_model(model)
         raw, dom = self._parse_domain(Model, domain)
         group_by = list(group_by or [])[:2]
+        Guard = self.env['ksw.ai.guard']
         for g in group_by:
             fname = g.split(':')[0]
             if fname not in Model._fields:
                 raise ToolInputError('Unknown group_by field %s' % fname)
+            Guard._check_field(model, fname)
         aggs = ['__count']
         for m in measures or []:
             fname, _sep, func = m.partition(':')
             if fname not in Model._fields or func not in (
                     'sum', 'avg', 'max', 'min'):
                 raise ToolInputError('Bad measure %s' % m)
+            Guard._check_field(model, fname)
             aggs.append(m)
+        raw, dom, own_only = self._apply_pay_scope(
+            model, raw, dom, [g.split(':')[0] for g in group_by]
+            + [m.split(':')[0] for m in aggs[1:]])
         groups = Model._read_group(dom, group_by, aggs, limit=MAX_GROUPS,
                                    order=None)
         def label(spec):
@@ -561,6 +618,7 @@ class KswAiTools(models.AbstractModel):
             'domain': raw,
             'group_by': group_by,
             'filter_text': self._domain_text(Model, raw),
+            'own_only': own_only,
             'columns': labels,
             'rows': rows,
             'total': sum(r[len(group_by)] for r in rows),
@@ -595,8 +653,11 @@ class KswAiTools(models.AbstractModel):
                     isinstance(value, (list, tuple)) and value
                     and all(isinstance(v, int) for v in value))):
             ids = [value] if isinstance(value, int) else list(value)
-            names = self.env[field.comodel_name].browse(ids).exists() \
-                .mapped('display_name')
+            try:
+                names = self.env[field.comodel_name].browse(ids).exists() \
+                    .mapped('display_name')
+            except AccessError:
+                names = []
             value = names[0] if isinstance(leaf[2], int) and names \
                 else (names or value)
         if field is not None and field.type == 'selection':

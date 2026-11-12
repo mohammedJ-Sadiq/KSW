@@ -43,6 +43,11 @@
                     <field name="mobile_allowance" nolabel="1"/>
                     <span>/ month</span>
                 </div>
+                <label for="collection_commission_allowance"/>
+                <div class="o_row">
+                    <field name="collection_commission_allowance" nolabel="1"/>
+                    <span>/ month</span>
+                </div>
             </xpath>
 
             <!-- Relabel Other → Other Allowances -->
