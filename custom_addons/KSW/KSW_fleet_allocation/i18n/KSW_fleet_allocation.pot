@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 08:05+0000\n"
-"PO-Revision-Date: 2026-11-10 08:05+0000\n"
+"POT-Creation-Date: 2026-11-12 07:51+0000\n"
+"PO-Revision-Date: 2026-11-12 07:51+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -79,6 +79,12 @@ msgstr ""
 
 #. module: KSW_fleet_allocation
 #. odoo-python
+#: code:addons/KSW_fleet_allocation/models/ksw_vehicle_handover.py:0
+msgid "%s is not being filled."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#. odoo-python
 #: code:addons/KSW_fleet_allocation/wizard/ksw_fleet_allocate_wizard.py:0
 msgid "%s is not waiting for a decision."
 msgstr ""
@@ -95,6 +101,24 @@ msgstr ""
 msgid ""
 "%s were not released by their department. Write the reason in the note: that"
 " department is told."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.actions.report,print_report_name:KSW_fleet_allocation.action_report_vehicle_handover
+msgid ""
+"'HR-12 %s %s' % (object.name.replace('/', '-'), object.vehicle_id.name)"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "(Attach driver account statement) / (إرفاق كشف حساب السائق)"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid ""
+"* The car is not handed over without a valid regular license\n"
+"                     /  <span dir=\"rtl\">* لا يتم تسليم السيارة إلا بوجود رخصة نظامية سارية المفعول</span>"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -163,6 +187,16 @@ msgid ""
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_header
+msgid "<b>Form No.: HR-12</b><br/>"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_header
+msgid "<b>إدارة الموارد البشرية</b><br/>والتطوير التنظيمي"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_department_kanban_fleet_overview
 msgid "<i class=\"fa fa-arrow-up me-1\"/>Release Vehicles"
 msgstr ""
@@ -173,9 +207,33 @@ msgid "<i class=\"fa fa-plus me-1\"/>Request Vehicles"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid "<span class=\"o_stat_text\">Workshop Request</span>"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.actions.act_window,help:KSW_fleet_allocation.action_ksw_vehicle_handover
+msgid ""
+"A form is opened automatically when the GM sends a vehicle to the workshop\n"
+"               (Handover to Workshop) or transfers one to a department (Received by New Driver)."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#. odoo-python
+#: code:addons/KSW_fleet_allocation/models/ksw_vehicle_handover.py:0
+msgid "A handover form is cancelled, never deleted."
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #. odoo-python
 #: code:addons/KSW_fleet_allocation/models/ksw_fleet_request.py:0
 msgid "A release request lists vehicles to release only."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#. odoo-python
+#: code:addons/KSW_fleet_allocation/models/ksw_vehicle_handover.py:0
+msgid "A signed or cancelled handover form cannot be changed."
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -214,27 +272,42 @@ msgid ""
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Accounts manager / مدير الحسابات"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__message_needaction
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__message_needaction
 msgid "Action Needed"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_inspection_item__active
+msgid "Active"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__activity_ids
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__activity_ids
 msgid "Activities"
 msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__activity_exception_decoration
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__activity_state
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__activity_state
 msgid "Activity State"
 msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__activity_type_icon
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__activity_type_icon
 msgid "Activity Type Icon"
 msgstr ""
 
@@ -251,6 +324,11 @@ msgid "Add the vehicles you want to release."
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Adding New User / إضافة المستخدم الجديد"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_allocate_wizard__addition_line_id
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_move__addition_line_id
 msgid "Addition Line"
@@ -264,6 +342,21 @@ msgstr ""
 #. module: KSW_fleet_allocation
 #: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_request_search
 msgid "Additions"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid "Administrative Affairs"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__admin_remarks
+msgid "Administrative Remarks"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Administrative use only / خاص بقسم الشؤون الإدارية"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -347,7 +440,19 @@ msgid "Assigned"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid "Attach the driver's account statement to the signed copy."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#. odoo-python
+#: code:addons/KSW_fleet_allocation/models/ksw_vehicle_handover.py:0
+msgid "Attach the signed and scanned form first (Signed Copy)."
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__message_attachment_count
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__message_attachment_count
 msgid "Attachment Count"
 msgstr ""
 
@@ -359,6 +464,17 @@ msgstr ""
 #. module: KSW_fleet_allocation
 #: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_request_form
 msgid "Back to Draft"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ksw.vehicle.inspection.item,name:KSW_fleet_allocation.inspection_item_batteries
+msgid "Batteries / البطاريات"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_vehicle_handover__state__draft
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_search
+msgid "Being Filled"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -394,6 +510,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_fleet_move__state__cancelled
 #: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_fleet_release_line__status__cancelled
 #: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_fleet_request__state__cancelled
+#: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_vehicle_handover__state__cancelled
 msgid "Cancelled"
 msgstr ""
 
@@ -401,6 +518,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_fleet_allocation/models/ksw_fleet_request.py:0
 msgid "Cancelled by %s."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_inspection__item_id
+msgid "Checklist Item"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -433,6 +555,12 @@ msgstr ""
 
 #. module: KSW_fleet_allocation
 #. odoo-python
+#: code:addons/KSW_fleet_allocation/models/ksw_vehicle_handover.py:0
+msgid "Choose the new user of the vehicle."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#. odoo-python
 #: code:addons/KSW_fleet_allocation/wizard/ksw_fleet_allocate_wizard.py:0
 msgid "Choose the vehicles to give."
 msgstr ""
@@ -448,6 +576,21 @@ msgstr ""
 #: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_fleet_request__state__done
 #: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_request_search
 msgid "Closed"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ksw.vehicle.inspection.item,name:KSW_fleet_allocation.inspection_item_clutch
+msgid "Clutch / الكلتش"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__vehicle_code
+msgid "Code #"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Code # / رقم الكود"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -520,6 +663,10 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_release_decision_wizard__create_uid
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_release_line__create_uid
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__create_uid
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__create_uid
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_document__create_uid
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_inspection__create_uid
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_inspection_item__create_uid
 msgid "Created by"
 msgstr ""
 
@@ -532,6 +679,10 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_release_decision_wizard__create_date
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_release_line__create_date
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__create_date
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__create_date
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_document__create_date
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_inspection__create_date
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_inspection_item__create_date
 msgid "Created on"
 msgstr ""
 
@@ -539,6 +690,22 @@ msgstr ""
 #: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_fleet_move__received_condition__damaged
 #: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_fleet_receive_wizard_line__condition__damaged
 msgid "Damaged"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__form_date
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Date"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Date / التاريخ"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Day / اليوم"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -627,6 +794,21 @@ msgid "Decision"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid "Delegation Process"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Delegation Process / إجراءات التفويض"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__delegation_remarks
+msgid "Delegation Remarks"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model,name:KSW_fleet_allocation.model_hr_department
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_addition_line__department_id
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_release_line__department_id
@@ -636,6 +818,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_release_line_search
 #: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_request_search
 #: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_vehicle_search_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_search
 msgid "Department"
 msgstr ""
 
@@ -663,6 +846,22 @@ msgid "Departments asking for these types"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_inspection__depreciation
+msgid "Depreciation %"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Depreciation % / نسبة الإهلاك"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#. odoo-python
+#: code:addons/KSW_fleet_allocation/models/ksw_vehicle_handover.py:0
+msgid "Depreciation is a percentage between 0 and 100."
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #. odoo-python
 #: code:addons/KSW_fleet_allocation/wizard/ksw_fleet_receive_wizard.py:0
 msgid "Describe what is wrong with %s."
@@ -686,8 +885,18 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_release_line__display_name
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__display_name
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_vehicle__display_name
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__display_name
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_document__display_name
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_inspection__display_name
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_inspection_item__display_name
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_workshop_request__display_name
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_res_users__display_name
 msgid "Display Name"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__document_ids
+msgid "Documents"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -713,10 +922,50 @@ msgid "Driver"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_vehicle_handover_document__document_type__driver_card
+msgid "Driver Card"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.fields,help:KSW_fleet_allocation.field_ksw_fleet_release_decision_wizard__match_requests
 msgid ""
 "Each vehicle settles the receiving department's oldest open request for its "
 "type, until those are met. The rest are transferred without a request."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Emp. No / رقم الموظف"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Employee Name / اسم الموظف"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,help:KSW_fleet_allocation.field_ksw_vehicle_inspection_item__vehicle_type
+msgid "Empty: checked on every vehicle type."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_inspection_item_list
+msgid "Every type"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Executive Director / المدير التنفيذي"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__official_remarks
+msgid "Executive Director Remarks"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Expiration / صلاحيتها"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -753,22 +1002,76 @@ msgid "External Waiting"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#. odoo-python
+#: code:addons/KSW_fleet_allocation/models/ksw_workshop_request.py:0
+msgid ""
+"File the signed handover form first (%s): fill it, print it, have it signed,"
+" attach the scan and press Mark as Signed."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__signed_by_id
+msgid "Filed By"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#. odoo-python
+#: code:addons/KSW_fleet_allocation/models/ksw_vehicle_handover.py:0
+msgid "Fill in when the workshop inspected the vehicle."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid ""
+"Fill the form, press <b>Print HR-12</b>, have it signed on paper, attach the scan\n"
+"                        under <b>Signed Copy</b> and press <b>Mark as Signed</b>."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__financial_note_1
+msgid "Financial Matter 1"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__financial_note_2
+msgid "Financial Matter 2"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__financial_note_3
+msgid "Financial Matter 3"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid "Financial Matters"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Financial Matters / متعلقات مالية"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_hr_department__x_fleet_type_summary
 msgid "Fleet"
 msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__message_follower_ids
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__message_follower_ids
 msgid "Followers"
 msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__message_partner_ids
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__message_partner_ids
 msgid "Followers (Partners)"
 msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,help:KSW_fleet_allocation.field_ksw_fleet_request__activity_type_icon
+#: model:ir.model.fields,help:KSW_fleet_allocation.field_ksw_vehicle_handover__activity_type_icon
 msgid "Font awesome icon e.g. fa-tasks"
 msgstr ""
 
@@ -778,8 +1081,18 @@ msgid "For"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid "For the Official Use (Executive Director)"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_release_decision_wizard__workshop_description
 msgid "For the Workshop"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "For the official use / خاص بالاستخدام الرسمي"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -791,6 +1104,16 @@ msgstr ""
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_move__from_state
 msgid "From State"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ksw.vehicle.inspection.item,name:KSW_fleet_allocation.inspection_item_front_brake
+msgid "Front brake / البريك الأمامي"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ksw.vehicle.inspection.item,name:KSW_fleet_allocation.inspection_item_front_tires
+msgid "Front tires / الكفرات الأمامية"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -832,7 +1155,54 @@ msgid "Good"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_move_list
+msgid "HR-12"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_document__present
+msgid "Handed Over"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_document__handover_id
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_inspection__handover_id
+msgid "Handover"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_workshop_request_form_handover
+msgid "Handover Form (HR-12)"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_move__handover_ids
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_workshop_request__x_handover_ids
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_list
+msgid "Handover Forms"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.actions.act_window,name:KSW_fleet_allocation.action_ksw_vehicle_handover
+#: model:ir.ui.menu,name:KSW_fleet_allocation.menu_ksw_fleet_allocation_handover
+#: model:ir.ui.menu,name:KSW_fleet_allocation.menu_ksw_workshop_handover
+msgid "Handover Forms (HR-12)"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:res.groups,name:KSW_fleet_allocation.group_vehicle_handover_officer
+msgid "Handover Forms Officer"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_vehicle_handover__handover_type__handover
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_search
+msgid "Handover to Workshop"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__has_message
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__has_message
 msgid "Has Message"
 msgstr ""
 
@@ -876,28 +1246,43 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_release_line__id
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__id
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_vehicle__id
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__id
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_document__id
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_inspection__id
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_inspection_item__id
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_workshop_request__id
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_res_users__id
 msgid "ID"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "ID # / رقم الإقامة"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__activity_exception_icon
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__activity_exception_icon
 msgid "Icon"
 msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,help:KSW_fleet_allocation.field_ksw_fleet_request__activity_exception_icon
+#: model:ir.model.fields,help:KSW_fleet_allocation.field_ksw_vehicle_handover__activity_exception_icon
 msgid "Icon to indicate an exception activity."
 msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,help:KSW_fleet_allocation.field_ksw_fleet_request__message_needaction
+#: model:ir.model.fields,help:KSW_fleet_allocation.field_ksw_vehicle_handover__message_needaction
 msgid "If checked, new messages require your attention."
 msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,help:KSW_fleet_allocation.field_ksw_fleet_request__message_has_error
 #: model:ir.model.fields,help:KSW_fleet_allocation.field_ksw_fleet_request__message_has_sms_error
+#: model:ir.model.fields,help:KSW_fleet_allocation.field_ksw_vehicle_handover__message_has_error
+#: model:ir.model.fields,help:KSW_fleet_allocation.field_ksw_vehicle_handover__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
 msgstr ""
 
@@ -928,6 +1313,29 @@ msgid "Incoming to Me"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__inspection_datetime
+msgid "Inspected On"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__inspection_line_ids
+msgid "Inspection"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.actions.act_window,name:KSW_fleet_allocation.action_ksw_vehicle_inspection_item
+#: model:ir.ui.menu,name:KSW_fleet_allocation.menu_ksw_fleet_allocation_inspection_items
+#: model:ir.ui.menu,name:KSW_fleet_allocation.menu_ksw_workshop_inspection_items
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_inspection_item_list
+msgid "Inspection Checklist"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_vehicle_handover_document__document_type__insurance
+msgid "Insurance Letter"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_addition_line__internal_quantity
 #: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_fleet_move__source__internal
 msgid "Internal"
@@ -941,12 +1349,24 @@ msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__message_is_follower
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__message_is_follower
 msgid "Is Follower"
 msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_fleet_addition_line__vehicle_type__isuzu
+#: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_vehicle_inspection_item__vehicle_type__isuzu
 msgid "Isuzu"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_inspection__name
+msgid "Item"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Items / العناصر"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -983,6 +1403,10 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_release_decision_wizard__write_uid
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_release_line__write_uid
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__write_uid
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__write_uid
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_document__write_uid
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_inspection__write_uid
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_inspection_item__write_uid
 msgid "Last Updated by"
 msgstr ""
 
@@ -995,16 +1419,42 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_release_decision_wizard__write_date
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_release_line__write_date
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__write_date
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__write_date
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_document__write_date
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_inspection__write_date
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_inspection_item__write_date
 msgid "Last Updated on"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__license_expiry
+msgid "License Expiry"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__license_type
+msgid "License Type"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "License Type / نوع الرخصة"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid "Mark as Signed"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__message_has_error
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__message_has_error
 msgid "Message Delivery error"
 msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__message_ids
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__message_ids
 msgid "Messages"
 msgstr ""
 
@@ -1060,6 +1510,7 @@ msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__my_activity_date_deadline
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__my_activity_date_deadline
 msgid "My Activity Deadline"
 msgstr ""
 
@@ -1070,27 +1521,104 @@ msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__name
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__name
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_inspection_item__name
 msgid "Name"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Name / الاسم"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Name / الاسم:"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#. odoo-python
+#: code:addons/KSW_fleet_allocation/models/ksw_fleet_move.py:0
+msgid "Name the new driver on the handover form (HR-12) first: %s."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid "Names for the Signatures"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__new_employee_id
+msgid "New User"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__delegation_add_datetime
+msgid "New User Added On"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__new_emp_no
+msgid "New User Emp. No"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__new_iqama
+msgid "New User ID #"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__new_name
+msgid "New User Name"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__new_phone
+msgid "New User Phone"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid "New User's License"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid "New Vehicle User"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "New Vehicle User Details / بيانات المستخدم الجديد"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__activity_calendar_event_id
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__activity_calendar_event_id
 msgid "Next Activity Calendar Event"
 msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__activity_date_deadline
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__activity_date_deadline
 msgid "Next Activity Deadline"
 msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__activity_summary
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__activity_summary
 msgid "Next Activity Summary"
 msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__activity_type_id
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__activity_type_id
 msgid "Next Activity Type"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.actions.act_window,help:KSW_fleet_allocation.action_ksw_vehicle_handover
+msgid "No handover form to fill"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -1150,21 +1678,25 @@ msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__message_needaction_counter
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__message_needaction_counter
 msgid "Number of Actions"
 msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__message_has_error_counter
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__message_has_error_counter
 msgid "Number of errors"
 msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,help:KSW_fleet_allocation.field_ksw_fleet_request__message_needaction_counter
+#: model:ir.model.fields,help:KSW_fleet_allocation.field_ksw_vehicle_handover__message_needaction_counter
 msgid "Number of messages requiring action"
 msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,help:KSW_fleet_allocation.field_ksw_fleet_request__message_has_error_counter
+#: model:ir.model.fields,help:KSW_fleet_allocation.field_ksw_vehicle_handover__message_has_error_counter
 msgid "Number of messages with delivery error"
 msgstr ""
 
@@ -1195,6 +1727,11 @@ msgstr ""
 msgid ""
 "Offered: vehicles registered with no department yet. The administrator adds a\n"
 "                        purchased or rented vehicle under Vehicles first."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__delegation_remove_datetime
+msgid "Old User Removed On"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -1259,6 +1796,12 @@ msgstr ""
 
 #. module: KSW_fleet_allocation
 #. odoo-python
+#: code:addons/KSW_fleet_allocation/models/ksw_vehicle_handover.py:0
+msgid "Only the system administrator reopens a signed form."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#. odoo-python
 #: code:addons/KSW_fleet_allocation/models/ksw_fleet_vehicle.py:0
 msgid "Only the system administrator sets a vehicle's department directly."
 msgstr ""
@@ -1282,6 +1825,16 @@ msgid "Open Needs"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_workshop_request_form_handover
+msgid "Open the form"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_vehicle_handover_document__document_type__operation_card
+msgid "Operation Card"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model_terms:ir.actions.act_window,help:KSW_fleet_allocation.action_ksw_fleet_request_release
 msgid ""
 "Or tick them under Vehicles and press Release Selected. The GM decides where"
@@ -1292,6 +1845,9 @@ msgstr ""
 #: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_fleet_addition_line__external_method__other
 #: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_fleet_addition_line__vehicle_type__other
 #: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_fleet_allocate_wizard__external_method__other
+#: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_vehicle_handover__change_reason__other
+#: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_vehicle_handover_document__document_type__other
+#: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_vehicle_inspection_item__vehicle_type__other
 msgid "Other"
 msgstr ""
 
@@ -1308,7 +1864,23 @@ msgid "Own Fleet"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_vehicle_handover_document__document_type__inspection_card
+msgid "Periodic Inspection"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Phone # / تلفون"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Plate Num / رقم اللوحة"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_release_line__plate_number
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__plate_number
 msgid "Plate Number"
 msgstr ""
 
@@ -1316,6 +1888,56 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_fleet_allocation/models/ksw_fleet_move.py:0
 msgid "Pool"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__new_position
+msgid "Position"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Position / المهنة"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__previous_employee_id
+msgid "Previous User"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__previous_emp_no
+msgid "Previous User Emp. No"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__previous_iqama
+msgid "Previous User ID #"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__previous_name
+msgid "Previous User Name"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__previous_phone
+msgid "Previous User Phone"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid "Previous Vehicle User"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Previous Vehicle User Details / بيانات المستخدم القديم"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid "Print HR-12"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -1337,12 +1959,55 @@ msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__rating_ids
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__rating_ids
 msgid "Ratings"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ksw.vehicle.inspection.item,name:KSW_fleet_allocation.inspection_item_rear_brake
+msgid "Rear brake / البريك الخلفي"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ksw.vehicle.inspection.item,name:KSW_fleet_allocation.inspection_item_rear_left_tires
+msgid "Rear left tires / الكفرات الخلفية يسار"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ksw.vehicle.inspection.item,name:KSW_fleet_allocation.inspection_item_rear_right_tires
+msgid "Rear right tires / الكفرات الخلفية يمين"
 msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__reason
 msgid "Reason"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__change_reason_note
+msgid "Reason Details"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__change_reason
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid "Reason for User Change"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__workshop_reason
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid "Reason to Hand Over to the Workshop"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Reason to handover to the shop / سبب التسليم للورشة"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Reasons for user change / أسباب تغير المستخدم الحالي"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -1364,6 +2029,12 @@ msgstr ""
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_move__received_date
 msgid "Received On"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_vehicle_handover__handover_type__receive
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_search
+msgid "Received by New Driver"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -1444,9 +2115,45 @@ msgid "Releases"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_document__remark
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_inspection__remark
+msgid "Remark"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Remark / ملاحظة"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid "Remarks"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Remarks / ملاحظات"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Remarks / ملاحظة"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Removing Old User / إلغاء المستخدم القديم"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_fleet_addition_line__external_method__rent
 #: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_fleet_allocate_wizard__external_method__rent
 msgid "Rent"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid "Reopen"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -1470,6 +2177,12 @@ msgid "Request Status"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__handover_type
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_search
+msgid "Request Type"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #. odoo-python
 #: code:addons/KSW_fleet_allocation/models/hr_department.py:0
 #: model:ir.actions.act_window,name:KSW_fleet_allocation.action_ksw_fleet_request_addition
@@ -1478,8 +2191,24 @@ msgid "Request Vehicles"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Request type / نوع الطلب"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__user_id
 msgid "Requested By"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__department_id
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid "Requesting Department"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Requesting Department / خاص بمقدم الطلب"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -1494,11 +2223,13 @@ msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__activity_user_id
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__activity_user_id
 msgid "Responsible User"
 msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__message_has_sms_error
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr ""
 
@@ -1520,6 +2251,13 @@ msgid "Sent to Workshop (Holding)"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_document__sequence
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_inspection__sequence
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_inspection_item__sequence
+msgid "Sequence"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_fleet_move__kind__manual
 msgid "Set by Administrator"
 msgstr ""
@@ -1529,6 +2267,38 @@ msgstr ""
 msgid ""
 "Show vehicles still in use elsewhere, to take one the GM decides is better "
 "used here."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Sign. / التوقيع"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Signature / التوقيع"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_vehicle_handover__state__signed
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_search
+msgid "Signed"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__signed_attachment_ids
+msgid "Signed Copy"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__signed_date
+msgid "Signed Date"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#. odoo-python
+#: code:addons/KSW_fleet_allocation/models/ksw_vehicle_handover.py:0
+msgid "Signed copy filed by %s."
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -1549,6 +2319,7 @@ msgstr ""
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_move__state
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__state
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__state
 msgid "State"
 msgstr ""
 
@@ -1561,6 +2332,7 @@ msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,help:KSW_fleet_allocation.field_ksw_fleet_request__activity_state
+#: model:ir.model.fields,help:KSW_fleet_allocation.field_ksw_vehicle_handover__activity_state
 msgid ""
 "Status based on activities\n"
 "Overdue: Due date is already passed\n"
@@ -1597,6 +2369,22 @@ msgid "Summary"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__supervisor_id
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid "Supervisor"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Supervisor Name / اسم المشرف"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_vehicle_handover__change_reason__suspension
+msgid "Suspension"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #. odoo-python
 #: code:addons/KSW_fleet_allocation/models/ksw_fleet_move.py:0
 msgid "Taken from <b>%(d)s</b> by the GM's decision: <b>%(v)s</b>."
@@ -1604,6 +2392,7 @@ msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_fleet_addition_line__vehicle_type__tank
+#: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_vehicle_inspection_item__vehicle_type__tank
 msgid "Tedder (تيدر)"
 msgstr ""
 
@@ -1655,13 +2444,41 @@ msgid ""
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model_terms:ir.actions.act_window,help:KSW_fleet_allocation.action_ksw_vehicle_inspection_item
+msgid ""
+"The items the workshop checks on a handover. Leave Vehicle Type empty for an item\n"
+"               checked on every vehicle; set it for items of one type only."
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model_terms:ir.actions.act_window,help:KSW_fleet_allocation.action_ksw_fleet_allocation_holding
 msgid "The pool is empty"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model:ir.model.fields,help:KSW_fleet_allocation.field_ksw_vehicle_handover__signed_attachment_ids
+msgid "The printed form, signed on paper and scanned back."
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.constraint,message:KSW_fleet_allocation.constraint_ksw_fleet_addition_line_quantity_positive
 msgid "The quantity must be at least 1."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid "The signed scan is attached and the form is final?"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#. odoo-python
+#: code:addons/KSW_fleet_allocation/models/ksw_fleet_move.py:0
+msgid "The transfer was cancelled by the GM."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid "The vehicle is not handed over without a valid regular license."
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -1673,8 +2490,28 @@ msgid ""
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_workshop_request_form_handover
+msgid ""
+"This checkup comes with a vehicle handover form (HR-12). Fill it, print it, have it\n"
+"                    signed and file the scan before completing the request."
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.fields,help:KSW_fleet_allocation.field_hr_department__x_fleet_holder
 msgid "This department is given vehicles and may release or request them."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid ""
+"This form will be kept in the Employee File. / سيتم وضع هذا النموذج في ملف "
+"الموظف."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#. odoo-python
+#: code:addons/KSW_fleet_allocation/models/ksw_fleet_move.py:0
+msgid "This transfer has no handover form."
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -1692,6 +2529,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_fleet_allocation/models/ksw_fleet_vehicle.py:0
 msgid "Tick vehicles of one department at a time (these belong to %s)."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Time / الوقت"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -1722,15 +2564,34 @@ msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_addition_line_list
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_list
 msgid "Total"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Total / الإجمالي"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__inspection_total
+msgid "Total Value"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_vehicle_handover_document__document_type__traffic_license
+msgid "Traffic License"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_fleet_addition_line__vehicle_type__trailer
+#: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_vehicle_inspection_item__vehicle_type__trailer
 msgid "Trailer (تريلا)"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__move_id
 #: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_fleet_move__kind__transfer
 #: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_fleet_release_line__decision__transfer
 msgid "Transfer"
@@ -1776,11 +2637,18 @@ msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_move__kind
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_document__document_type
 msgid "Type"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Type / النوع"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.fields,help:KSW_fleet_allocation.field_ksw_fleet_request__activity_exception_decoration
+#: model:ir.model.fields,help:KSW_fleet_allocation.field_ksw_vehicle_handover__activity_exception_decoration
 msgid "Type of the exception activity on record."
 msgstr ""
 
@@ -1815,12 +2683,29 @@ msgid "User"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model:ir.model.fields.selection,name:KSW_fleet_allocation.selection__ksw_vehicle_handover__change_reason__vacation
+msgid "Vacation"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover_inspection__value
+msgid "Value"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Value / القيمة"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model,name:KSW_fleet_allocation.model_ksw_fleet_vehicle
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_move__vehicle_id
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_receive_wizard_line__vehicle_id
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_release_line__vehicle_id
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__vehicle_id
 #: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_move_search
 #: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_request_search
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_search
 msgid "Vehicle"
 msgstr ""
 
@@ -1855,11 +2740,74 @@ msgid "Vehicle Departments"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid "Vehicle Details"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Vehicle Details / بيانات المركبة"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Vehicle Details / معلومات المركبة"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.actions.act_window,name:KSW_fleet_allocation.action_ksw_fleet_vehicle_distribution
 #: model:ir.ui.menu,name:KSW_fleet_allocation.menu_ksw_fleet_allocation_distribution
 #: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_vehicle_graph_allocation
 #: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_vehicle_pivot_allocation
 msgid "Vehicle Distribution"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__deliverer_name
+msgid "Vehicle Handed Over By"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Vehicle Handover / مسلم المركبة"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.actions.report,name:KSW_fleet_allocation.action_report_vehicle_handover
+#: model:ir.model,name:KSW_fleet_allocation.model_ksw_vehicle_handover
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid "Vehicle Handover Form (HR-12)"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model,name:KSW_fleet_allocation.model_ksw_vehicle_handover_document
+msgid "Vehicle Handover Form: Document"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model,name:KSW_fleet_allocation.model_ksw_vehicle_handover_inspection
+msgid "Vehicle Handover Form: Inspection Item"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.ui.menu,name:KSW_fleet_allocation.menu_ksw_handover_officer_root
+#: model:res.groups.privilege,name:KSW_fleet_allocation.privilege_vehicle_handover
+msgid "Vehicle Handover Forms"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_vehicle_handover_form
+msgid "Vehicle Inspection"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model,name:KSW_fleet_allocation.model_ksw_vehicle_inspection_item
+msgid "Vehicle Inspection Checklist Item"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Vehicle Inspection Info / معلومات تشييك المركبة"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -1871,6 +2819,11 @@ msgstr ""
 #. module: KSW_fleet_allocation
 #: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_move_list
 msgid "Vehicle Movements"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__receiver_name
+msgid "Vehicle Receiver"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -1889,14 +2842,31 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_allocate_wizard__vehicle_type
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_move__vehicle_type
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_release_line__vehicle_type
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__vehicle_type
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_inspection_item__vehicle_type
 #: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_addition_line_search
 #: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_release_line_search
 msgid "Vehicle Type"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Vehicle Type / نوع المركبة"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_release_decision_wizard__vehicle_types
 msgid "Vehicle Types"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ksw.vehicle.inspection.item,name:KSW_fleet_allocation.inspection_item_vehicle_plate
+msgid "Vehicle plate / لوحة المركبة"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Vehicle receiver / مستلم المركبة"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -1960,12 +2930,24 @@ msgid "Waiting for GM"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model:ksw.vehicle.inspection.item,name:KSW_fleet_allocation.inspection_item_water_motor
+msgid "Water motor / ماتور المياه"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ksw.vehicle.inspection.item,name:KSW_fleet_allocation.inspection_item_water_tank
+msgid "Water tank / خزان المياه"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__website_message_ids
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__website_message_ids
 msgid "Website Messages"
 msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,help:KSW_fleet_allocation.field_ksw_fleet_request__website_message_ids
+#: model:ir.model.fields,help:KSW_fleet_allocation.field_ksw_vehicle_handover__website_message_ids
 msgid "Website communication history"
 msgstr ""
 
@@ -1997,13 +2979,29 @@ msgid "Wizard"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__workshop_official_name
+msgid "Workshop Official"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_move__workshop_request_id
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_vehicle_handover__workshop_request_id
 msgid "Workshop Request"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model,name:KSW_fleet_allocation.model_ksw_workshop_request
+msgid "Workshop Service Request"
 msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_move__workshop_state
 msgid "Workshop Status"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "Workshop official / مسؤول الورشة"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -2025,6 +3023,16 @@ msgstr ""
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_hr_department__x_fleet_in_my_scope
 msgid "X Fleet In My Scope"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_workshop_request__x_handover_count
+msgid "X Handover Count"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_workshop_request__x_handover_pending
+msgid "X Handover Pending"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -2075,4 +3083,44 @@ msgstr ""
 #. module: KSW_fleet_allocation
 #: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_department_kanban_fleet_overview
 msgid "waiting for GM"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "أخرى Other"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "إجازة Vacation"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "إيقاف عن العمل Suspension"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "استلام Received"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "التاريخ"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "تسليم Hand over"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "نموذج تسليم واستلام المركبة / Vehicle Handover Form"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.report_vehicle_handover_document
+msgid "نموذج فحص المركبة / Vehicle Inspection Form"
 msgstr ""
