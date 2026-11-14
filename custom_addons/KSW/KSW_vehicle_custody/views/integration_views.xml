@@ -1,40 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-    <!-- A release request: HR's step between the supervisor and the GM. -->
+    <!-- A release request shows each vehicle's HR-12 once the GM has decided. -->
     <record id="view_ksw_fleet_request_form_custody" model="ir.ui.view">
         <field name="name">ksw.fleet.request.form.custody</field>
         <field name="model">ksw.fleet.request</field>
         <field name="inherit_id" ref="KSW_fleet_allocation.view_ksw_fleet_request_form"/>
         <field name="arch" type="xml">
-            <button name="action_submit" position="after">
-                <field name="x_is_hr" invisible="1"/>
-                <button name="action_hr_send_to_gm" type="object" string="HR Approve, Send to GM"
-                        class="oe_highlight" invisible="state != 'hr_review' or not x_is_hr"
-                        confirm="Each vehicle's HR-12 is checked (documents, remarks)? The request goes to the GM."/>
-            </button>
-            <field name="state" position="attributes">
-                <attribute name="statusbar_visible">draft,hr_review,submitted,done</attribute>
-            </field>
             <xpath expr="//field[@name='release_line_ids']/list/field[@name='status']" position="after">
                 <field name="x_custody_request_id" optional="show" readonly="1"/>
                 <field name="x_custody_state" optional="show"/>
             </xpath>
-            <xpath expr="//sheet/div[hasclass('oe_title')]" position="before">
-                <div class="alert alert-info" role="status" invisible="state != 'hr_review'">
-                    With HR: each vehicle's handover form (HR-12, column on the right) is checked before
-                    the GM decides.
-                </div>
-            </xpath>
         </field>
-    </record>
-
-    <record id="action_ksw_fleet_request_hr_review" model="ir.actions.act_window">
-        <field name="name">Releases to Review</field>
-        <field name="res_model">ksw.fleet.request</field>
-        <field name="view_mode">list,form</field>
-        <field name="domain">[('state', '=', 'hr_review')]</field>
-        <field name="context">{'create': False}</field>
     </record>
 
     <!-- Incoming transfers: the new driver's form is one click away. -->

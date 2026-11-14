@@ -104,6 +104,7 @@
                                     <field name="plate_number" optional="show"/>
                                     <field name="driver_name" optional="show"/>
                                     <field name="note"/>
+                                    <field name="x_with_driver"/>
                                     <field name="status" widget="badge" readonly="1"/>
                                     <field name="target_department_id" readonly="1" optional="show"/>
                                     <field name="decision_note" readonly="1" optional="hide"/>
@@ -122,6 +123,7 @@
                                       decoration-success="status == 'done'"
                                       decoration-info="status in ('in_transfer', 'waiting_external')">
                                     <field name="vehicle_type"/>
+                                    <field name="need"/>
                                     <field name="quantity"/>
                                     <field name="note"/>
                                     <field name="internal_quantity" readonly="1" optional="show"/>
@@ -169,7 +171,9 @@
                 <field name="name"/>
                 <field name="department_id"/>
                 <field name="release_line_ids" string="Vehicle" filter_domain="[('release_line_ids.vehicle_id.name', 'ilike', self)]"/>
-                <filter string="Open" name="filter_open" domain="[('state', 'in', ('draft', 'submitted'))]"/>
+                <filter string="Waiting for Me" name="filter_mine" domain="[('x_is_pending_my_action', '=', True)]"/>
+                <separator/>
+                <filter string="Open" name="filter_open" domain="[('state', 'not in', ('done', 'cancelled'))]"/>
                 <filter string="Waiting for GM" name="filter_submitted" domain="[('state', '=', 'submitted')]"/>
                 <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
                 <filter string="Closed" name="filter_done" domain="[('state', '=', 'done')]"/>
@@ -242,6 +246,7 @@
                 <field name="request_id"/>
                 <field name="department_id"/>
                 <field name="vehicle_type"/>
+                <field name="need"/>
                 <field name="quantity" sum="Total"/>
                 <field name="open_quantity" sum="Total"/>
                 <field name="external_quantity" optional="show"/>

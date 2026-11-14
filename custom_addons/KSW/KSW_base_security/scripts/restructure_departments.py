@@ -17,8 +17,8 @@ analytic accounts), and the legal entity stays ONE company (re-confirmed
     |   `-- Office Services
     |-- Kawther Sweet Water
     |   |-- Sales
-    |   |-- Supply Chain / Heavy Vehicles / Supply Chain - Dammam, Supply Chain - Tabuk
-    |   |                / Light Vehicles / Tariq's Branch, Disouky's Branch, VO
+    |   |-- Distribution / Bulk Distribution / Distribution - Dammam, Distribution - Tabuk
+    |   |                / Route Sales / Tariq's Branch, Disouky's Branch, VO
     |   |-- Maintenance, Workshop, Salwa
     |   `-- Al-Hayat Branch
     |-- Compound
@@ -64,8 +64,8 @@ EXISTING = {
     291: ('ALHAYAT-IST', 'ALHAYAT-IST', 'ALHAYAT-IST', 278),
     279: ('Workshop', 'Workshop', 'الورشة', 'ksw'),
     280: ('Maintenance', 'Maintenance', 'الصيانة', 'ksw'),
-    283: ('Supply Chain', 'Supply Chain - Dammam', 'سلاسل الإمداد - الدمام', 'heavy'),
-    284: ('Tabuk', 'Supply Chain - Tabuk', 'سلاسل الإمداد - تبوك', 'heavy'),
+    283: ('Supply Chain', 'Distribution - Dammam', 'التوزيع - الدمام', 'heavy'),
+    284: ('Tabuk', 'Distribution - Tabuk', 'التوزيع - تبوك', 'heavy'),
     289: ('Salwa', 'Salwa', 'سلوى', 'ksw'),
     287: ('ALHAYAT', 'Al-Hayat Branch', 'فرع الحياة', 'ksw'),
     296: ("Tariq's Branch", "Tariq's Branch", 'فرع طارق', 'light'),
@@ -76,7 +76,9 @@ EXISTING = {
     288: ('Non-K', 'Affiliated - Non-KSW', 'جهات تابعة خارج الكوثر', 'root'),
 }
 # Names an earlier version of this script gave (applied on dev 2026-11-13)
-PREVIOUS = {294: ('Saudi Staff (Remote) - Kawther',), 291: ('Saudi Staff (Remote) - Al-Hayat',)}
+PREVIOUS = {294: ('Saudi Staff (Remote) - Kawther',), 291: ('Saudi Staff (Remote) - Al-Hayat',),
+            283: ('Supply Chain - Dammam',), 284: ('Supply Chain - Tabuk',)}
+NEW_PREVIOUS = {'sc': ('Supply Chain',), 'heavy': ('Heavy Vehicles',), 'light': ('Light Vehicles',)}
 # New departments: key -> (en, ar, parent key, manager employee id)
 NEW = [
     ('root', 'Al-Kawther Group', 'مجموعة الكوثر', None, 9753),          # Hussain, CEO
@@ -86,9 +88,11 @@ NEW = [
     ('office', 'Office Services', 'الخدمات المكتبية', 'shared', None),
     ('ksw', 'Kawther Sweet Water', 'الكوثر للمياه', 'root', 9943),     # Mohammed Amin, GM
     # headings only: Mishal and Azouni each run their own branch
-    ('sc', 'Supply Chain', 'سلاسل الإمداد', 'ksw', None),
-    ('heavy', 'Heavy Vehicles', 'المركبات الثقيلة', 'sc', None),
-    ('light', 'Light Vehicles', 'المركبات الخفيفة', 'sc', None),
+    # Distribution, not Supply Chain: they only deliver to the customer; supply chain
+    # (purchasing, stock) is a wider job that belongs to a future procurement team.
+    ('sc', 'Distribution', 'التوزيع', 'ksw', None),
+    ('heavy', 'Bulk Distribution', 'التوزيع بالجملة (المركبات الثقيلة)', 'sc', None),
+    ('light', 'Route Sales', 'البيع المتنقل (المركبات الخفيفة)', 'sc', None),
     ('schools', 'Jubail Schools', 'مدارس الجبيل', 288, 9859),
     ('external', 'External Management', 'إدارات خارجية', 288, 9859),
 ]
@@ -231,7 +235,8 @@ def run(env):
     new_ids = {}
     for key, en, ar, parent, manager in NEW:
         parent_rec = find_dept(env, parent, new_ids) if parent else Dept
-        d = Dept.search([('name', '=', en), ('parent_id', '=', parent_rec.id or False),
+        d = Dept.search([('name', 'in', [en, *NEW_PREVIOUS.get(key, ())]),
+                         ('parent_id', '=', parent_rec.id or False),
                          ('id', 'not in', list(EXISTING))], limit=1)
         vals = {'name': en, 'parent_id': parent_rec.id or False,
                 'manager_id': Emp.browse(manager).exists().id or False if manager else False}

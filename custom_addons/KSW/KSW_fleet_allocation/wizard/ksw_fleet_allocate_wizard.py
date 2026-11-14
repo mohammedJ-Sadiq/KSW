@@ -23,9 +23,6 @@ class KswFleetAllocateWizard(models.TransientModel):
         ('external_arrival', 'Allocate an obtained vehicle that arrived'),
         ('refuse', 'Refuse'),
     ], required=True, default='internal')
-    include_assigned = fields.Boolean(
-        string='Also take from departments that did not release',
-        help='Show vehicles still in use elsewhere, to take one the GM decides is better used here.')
     available_vehicle_ids = fields.Many2many('ksw.fleet.vehicle', compute='_compute_available_vehicle_ids')
     vehicle_ids = fields.Many2many('ksw.fleet.vehicle', string='Vehicles',
                                    domain="[('id', 'in', available_vehicle_ids)]")
@@ -39,25 +36,33 @@ class KswFleetAllocateWizard(models.TransientModel):
         for wizard in self:
             wizard.external_waiting = wizard.external_quantity - wizard.external_received_quantity
 
-    @api.depends('addition_line_id', 'mode', 'include_assigned')
+    @api.depends('addition_line_id', 'mode')
     def _compute_available_vehicle_ids(self):
+        """Vehicles only come from a release or the pool (never from a
+        department that did not release them), and must fit the need: a pool
+        vehicle has no driver, a released one comes with or without its own."""
         Vehicle = self.env['ksw.fleet.vehicle']
+        Release = self.env['ksw.fleet.release.line'].sudo()
         for wizard in self:
             line = wizard.addition_line_id
+            if not line:
+                wizard.available_vehicle_ids = Vehicle
+                continue
             base = [('x_is_own_fleet', '=', True), ('vehicle_type', '=', line.vehicle_type),
                     ('state', '=', 'confirmed'), ('x_checkup_open', '=', False),
                     ('x_reserved_department_id', '=', False)]
             if wizard.mode == 'external_arrival':
                 # A newly obtained vehicle is registered without a department.
-                pool = [('x_allocation_state', '=', 'unassigned')]
-            elif wizard.include_assigned:
-                pool = ['|', ('x_allocation_state', 'in', ('holding', 'unassigned')),
-                        '&', ('x_allocation_state', '=', 'assigned'),
-                        ('x_department_id', '!=', line.department_id.id)]
-            else:
-                pool = ['|', ('x_allocation_state', 'in', ('holding', 'unassigned')),
-                        '&', ('x_allocation_state', '=', 'assigned'), ('x_is_released', '=', True)]
-            wizard.available_vehicle_ids = Vehicle.search(base + pool) if line else Vehicle
+                wizard.available_vehicle_ids = Vehicle.search(base + [('x_allocation_state', '=', 'unassigned')])
+                continue
+            found = Vehicle
+            if line._ksw_accepts(False):
+                found |= Vehicle.search(base + [('x_allocation_state', 'in', ('holding', 'unassigned'))])
+            released = Release.search([('decision', '=', 'pending'), ('request_id.state', '=', 'submitted'),
+                                       ('vehicle_type', '=', line.vehicle_type),
+                                       ('department_id', '!=', line.department_id.id)])
+            found |= released.filtered(lambda r: line._ksw_accepts(r.x_with_driver)).vehicle_id
+            wizard.available_vehicle_ids = found
 
     def action_confirm(self):
         self.ensure_one()
@@ -78,16 +83,12 @@ class KswFleetAllocateWizard(models.TransientModel):
             outside = self.vehicle_ids - self.available_vehicle_ids
             if outside:
                 raise UserError(_('Not available: %s.', ', '.join(outside.mapped('name'))))
-            # Taking a vehicle its department never offered: say why, and that
-            # department is told (_ksw_fleet_post_summary).
-            taken = self.vehicle_ids.sudo().filtered(
-                lambda v: v.x_allocation_state == 'assigned' and not v.x_is_released)
-            if taken and not self.note:
-                raise UserError(_(
-                    '%s were not released by their department. Write the reason in the note: '
-                    'that department is told.', ', '.join(taken.mapped('name'))))
             source = 'internal' if self.mode == 'internal' else 'external'
-            for vehicle in self.vehicle_ids.sudo().with_context(ksw_fleet_batch=True):
+            vehicles = self.vehicle_ids.sudo().with_context(ksw_fleet_batch=True)
+            releases = vehicles._open_release_lines()
+            if releases:
+                moves |= releases.with_context(ksw_fleet_batch=True)._ksw_execute_transfer(line, self.note)
+            for vehicle in vehicles - releases.vehicle_id:
                 moves |= vehicle._ksw_fleet_start_transfer(line.department_id, self.note,
                                                            addition_line=line, source=source)
             moves._ksw_fleet_post_summary(self.note)

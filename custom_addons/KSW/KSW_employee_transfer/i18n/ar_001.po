@@ -6,15 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-12 21:19+0000\n"
-"PO-Revision-Date: 2026-11-12 21:19+0000\n"
+"POT-Creation-Date: 2026-11-14 08:56+0000\n"
+"PO-Revision-Date: 2026-11-14 08:56+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar_001\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
+"Plural-Forms: \n"
 
 #. module: KSW_employee_transfer
 #. odoo-python
@@ -582,6 +582,12 @@ msgstr "المستخدم"
 #: model_terms:ir.ui.view,arch_db:KSW_employee_transfer.view_ksw_employee_transfer_form
 msgid "Vehicles in His Custody"
 msgstr "المركبات في عهدته"
+
+#. module: KSW_employee_transfer
+#: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__x_is_pending_my_action
+#: model_terms:ir.ui.view,arch_db:KSW_employee_transfer.view_ksw_employee_transfer_search
+msgid "Waiting for Me"
+msgstr "بانتظاري"
 
 #. module: KSW_employee_transfer
 #: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__website_message_ids

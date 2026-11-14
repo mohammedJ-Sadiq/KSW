@@ -1,6 +1,6 @@
 {
     'name': 'KSW Vehicle Allocation',
-    'version': '19.0.1.6.1',
+    'version': '19.0.1.8.0',
     'summary': 'Move vehicles between departments: release and addition requests decided by the GM',
     'description': """
 Vehicle Allocation

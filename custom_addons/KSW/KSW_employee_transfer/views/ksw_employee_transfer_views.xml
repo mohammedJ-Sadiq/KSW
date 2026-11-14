@@ -84,6 +84,8 @@
                 <field name="employee_id"/>
                 <field name="from_department_id"/>
                 <field name="to_department_id"/>
+                <filter string="Waiting for Me" name="filter_mine" domain="[('x_is_pending_my_action', '=', True)]"/>
+                <separator/>
                 <filter string="In Progress" name="filter_open" domain="[('state', 'in', ('draft', 'hr', 'gm', 'approved'))]"/>
                 <filter string="With HR" name="filter_hr" domain="[('state', '=', 'hr')]"/>
                 <filter string="With the GM" name="filter_gm" domain="[('state', '=', 'gm')]"/>

@@ -44,4 +44,35 @@
         <field name="domain">[('user_id', '=', uid), ('stage_id.fold', '=', False)]</field>
         <field name="icon">fa-life-ring</field>
     </record>
+    <!-- Vehicles and drivers (Nov 2026): every step a person takes in Vehicle
+         Allocation, Vehicle Custody and Employee Transfer, each model's own
+         x_is_pending_my_action deciding what is whose. -->
+    <record id="inbox_vehicle_requests" model="ksw.home.inbox.source">
+        <field name="name">Vehicle requests awaiting my review or decision</field>
+        <field name="sequence">70</field>
+        <field name="model_name">ksw.fleet.request</field>
+        <field name="domain">[('x_is_pending_my_action', '=', True)]</field>
+        <field name="icon">fa-exchange</field>
+    </record>
+    <record id="inbox_vehicles_to_receive" model="ksw.home.inbox.source">
+        <field name="name">Vehicles on their way to my department</field>
+        <field name="sequence">71</field>
+        <field name="model_name">ksw.fleet.move</field>
+        <field name="domain">[('x_is_pending_my_action', '=', True)]</field>
+        <field name="icon">fa-truck</field>
+    </record>
+    <record id="inbox_vehicle_handover_forms" model="ksw.home.inbox.source">
+        <field name="name">Vehicle handover forms (HR-12) awaiting me</field>
+        <field name="sequence">72</field>
+        <field name="model_name">ksw.vehicle.custody.request</field>
+        <field name="domain">[('x_is_pending_my_action', '=', True)]</field>
+        <field name="icon">fa-file-text-o</field>
+    </record>
+    <record id="inbox_employee_transfers" model="ksw.home.inbox.source">
+        <field name="name">Employee transfers awaiting me</field>
+        <field name="sequence">73</field>
+        <field name="model_name">ksw.employee.transfer</field>
+        <field name="domain">[('x_is_pending_my_action', '=', True)]</field>
+        <field name="icon">fa-users</field>
+    </record>
 </odoo>

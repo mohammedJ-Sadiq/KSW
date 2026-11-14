@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-12 21:19+0000\n"
-"PO-Revision-Date: 2026-11-12 21:19+0000\n"
+"POT-Creation-Date: 2026-11-14 10:59+0000\n"
+"PO-Revision-Date: 2026-11-14 10:59+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -38,12 +38,6 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "%s is not approved yet; the paper is signed after approval."
-msgstr ""
-
-#. module: KSW_vehicle_custody
-#. odoo-python
-#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
-msgid "%s is not waiting for HR."
 msgstr ""
 
 #. module: KSW_vehicle_custody
@@ -80,8 +74,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid ""
-"<b>%(n)s approved</b>: %(k)s, %(v)s. %(p)s → %(w)s. For your action if any: "
-"delegation (HR), financial matters (Accounting)."
+"<b>%(n)s done</b>: %(k)s, %(v)s. %(p)s → %(w)s. Depreciation value: %(t)s."
 msgstr ""
 
 #. module: KSW_vehicle_custody
@@ -370,6 +363,12 @@ msgid "Documents"
 msgstr ""
 
 #. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__hr_done
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Documents Checked"
+msgstr ""
+
+#. module: KSW_vehicle_custody
 #: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_document__document_type__driver_card
 msgid "Driver Card"
 msgstr ""
@@ -380,13 +379,6 @@ msgstr ""
 #: model:ir.ui.menu,name:KSW_vehicle_custody.menu_vehicle_custody_driver_change
 #: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_search
 msgid "Driver Change"
-msgstr ""
-
-#. module: KSW_vehicle_custody
-#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_fleet_request_form_custody
-msgid ""
-"Each vehicle's HR-12 is checked (documents, remarks)? The request goes to "
-"the GM."
 msgstr ""
 
 #. module: KSW_vehicle_custody
@@ -439,8 +431,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
 msgid ""
-"File the signed handover form first (%s): the workshop completes it, it is "
-"printed, signed, scanned and marked as signed."
+"File the signed handover form first (%s): the workshop and HR complete it, "
+"it is printed, signed, scanned and marked as signed."
 msgstr ""
 
 #. module: KSW_vehicle_custody
@@ -522,35 +514,15 @@ msgid "Front tires / الكفرات الأمامية"
 msgstr ""
 
 #. module: KSW_vehicle_custody
-#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__state__gm
-msgid "GM Decision"
-msgstr ""
-
-#. module: KSW_vehicle_custody
 #. odoo-python
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "Give the reason for the user change."
 msgstr ""
 
 #. module: KSW_vehicle_custody
-#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__gm_decided
-msgid "Gm Decided"
-msgstr ""
-
-#. module: KSW_vehicle_custody
 #: model:res.groups,name:KSW_vehicle_custody.group_custody_hr
 #: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
 msgid "HR / Administrative Affairs"
-msgstr ""
-
-#. module: KSW_vehicle_custody
-#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
-msgid "HR Approve"
-msgstr ""
-
-#. module: KSW_vehicle_custody
-#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_fleet_request_form_custody
-msgid "HR Approve, Send to GM"
 msgstr ""
 
 #. module: KSW_vehicle_custody
@@ -564,16 +536,14 @@ msgid "HR Checked On"
 msgstr ""
 
 #. module: KSW_vehicle_custody
-#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_fleet_request__state__hr_review
 #: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__state__hr
-msgid "HR Review"
+msgid "HR Documents"
 msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
-#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
-msgid "HR review: %s"
+msgid "HR documents: %s"
 msgstr ""
 
 #. module: KSW_vehicle_custody
@@ -585,6 +555,11 @@ msgstr ""
 #. module: KSW_vehicle_custody
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_fleet_release_line__x_custody_state
 msgid "HR-12 Status"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "HR: documents checked"
 msgstr ""
 
 #. module: KSW_vehicle_custody
@@ -912,13 +887,7 @@ msgstr ""
 #. module: KSW_vehicle_custody
 #. odoo-python
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
-msgid "Only HR approves %s at this step."
-msgstr ""
-
-#. module: KSW_vehicle_custody
-#. odoo-python
-#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
-msgid "Only HR reviews a release."
+msgid "Only HR completes the documents of %s at this step."
 msgstr ""
 
 #. module: KSW_vehicle_custody
@@ -1136,12 +1105,6 @@ msgid "Release Request"
 msgstr ""
 
 #. module: KSW_vehicle_custody
-#: model:ir.actions.act_window,name:KSW_vehicle_custody.action_ksw_fleet_request_hr_review
-#: model:ir.ui.menu,name:KSW_vehicle_custody.menu_vehicle_custody_hr_review
-msgid "Releases to Review"
-msgstr ""
-
-#. module: KSW_vehicle_custody
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_document__remark
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_inspection__remark
 msgid "Remark"
@@ -1207,12 +1170,6 @@ msgid "Responsible User"
 msgstr ""
 
 #. module: KSW_vehicle_custody
-#. odoo-python
-#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
-msgid "Reviewed by HR (%s); waiting for the GM."
-msgstr ""
-
-#. module: KSW_vehicle_custody
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr ""
@@ -1261,7 +1218,6 @@ msgid "Signed copy filed by %s."
 msgstr ""
 
 #. module: KSW_vehicle_custody
-#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_fleet_request__state
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__state
 msgid "State"
 msgstr ""
@@ -1315,20 +1271,6 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
-#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
-msgid "The GM decided to keep the vehicle."
-msgstr ""
-
-#. module: KSW_vehicle_custody
-#. odoo-python
-#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
-msgid ""
-"The new driver's handover form (HR-12) must be approved first (named by the "
-"department, checked by HR, handed over by the workshop): %s."
-msgstr ""
-
-#. module: KSW_vehicle_custody
-#. odoo-python
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "The new user is the current custodian."
 msgstr ""
@@ -1369,8 +1311,7 @@ msgstr ""
 #. module: KSW_vehicle_custody
 #: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
 msgid ""
-"The vehicle is inspected (and handed over on a receipt)? This approves the "
-"form and changes the custodian."
+"The vehicle is inspected (and, on a receipt, handed over to the new driver)?"
 msgstr ""
 
 #. module: KSW_vehicle_custody
@@ -1592,6 +1533,12 @@ msgid "Vehicle to Release"
 msgstr ""
 
 #. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__x_is_pending_my_action
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_search
+msgid "Waiting for Me"
+msgstr ""
+
+#. module: KSW_vehicle_custody
 #: model:ksw.vehicle.custody.checklist,name:KSW_vehicle_custody.checklist_water_motor
 msgid "Water motor / ماتور المياه"
 msgstr ""
@@ -1628,18 +1575,7 @@ msgid "With HR"
 msgstr ""
 
 #. module: KSW_vehicle_custody
-#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_fleet_request_form_custody
-msgid ""
-"With HR: each vehicle's handover form (HR-12, column on the right) is checked before\n"
-"                    the GM decides."
-msgstr ""
-
-#. module: KSW_vehicle_custody
-#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__state__workshop
-msgid "Workshop"
-msgstr ""
-
-#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__workshop_done
 #: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
 msgid "Workshop Done"
 msgstr ""
@@ -1665,6 +1601,11 @@ msgid "Workshop Service Request"
 msgstr ""
 
 #. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__state__workshop
+msgid "Workshop and HR"
+msgstr ""
+
+#. module: KSW_vehicle_custody
 #: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
 msgid "Workshop official / مسؤول الورشة"
 msgstr ""
@@ -1673,6 +1614,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "Workshop: %s"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Workshop: vehicle inspected"
 msgstr ""
 
 #. module: KSW_vehicle_custody
@@ -1698,11 +1644,6 @@ msgstr ""
 #. module: KSW_vehicle_custody
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_workshop_request__x_custody_pending
 msgid "X Custody Pending"
-msgstr ""
-
-#. module: KSW_vehicle_custody
-#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_fleet_request__x_is_hr
-msgid "X Is Hr"
 msgstr ""
 
 #. module: KSW_vehicle_custody

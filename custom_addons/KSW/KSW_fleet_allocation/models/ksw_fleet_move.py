@@ -1,6 +1,7 @@
 from markupsafe import Markup
 
 from odoo import _, api, fields, models
+from odoo.fields import Domain
 from odoo.exceptions import UserError
 
 
@@ -68,6 +69,9 @@ class KswFleetMove(models.Model):
 
     x_can_receive = fields.Boolean(compute='_compute_can_receive')
     # "On its way to one of my departments": the Transfers to Receive list.
+    # Home ▸ Waiting for you: a vehicle on its way to one of my departments.
+    x_is_pending_my_action = fields.Boolean(compute='_compute_is_pending_my_action',
+                                            search='_search_is_pending_my_action', string='Waiting for Me')
     x_is_incoming = fields.Boolean(string='Incoming to Me', compute='_compute_is_incoming',
                                    search='_search_is_incoming')
     x_can_cancel = fields.Boolean(compute='_compute_can_receive')
@@ -89,6 +93,35 @@ class KswFleetMove(models.Model):
         scope = set(self.env.user._ksw_fleet_department_ids())
         for move in self:
             move.x_is_incoming = move.to_department_id.id in scope
+
+    @api.model
+    def _ksw_receipt_by_department(self):
+        """Does the receiving department confirm arrival here? Yes on its
+        own; Vehicle Custody says no: the workshop handing the vehicle to the
+        new driver (his HR-12) is the arrival, one confirmation per event."""
+        return True
+
+    @api.depends_context('uid')
+    @api.depends('state', 'to_department_id')
+    def _compute_is_pending_my_action(self):
+        scope = set(self.env.user._ksw_fleet_department_ids())
+        by_department = self._ksw_receipt_by_department()
+        for move in self:
+            move.x_is_pending_my_action = by_department and move.state == 'in_transfer' \
+                and move.to_department_id.id in scope
+
+    def _search_is_pending_my_action(self, operator, value):
+        if operator in ('in', 'not in'):
+            wanted = (operator == 'in') == any(value)
+        elif operator in ('=', '!='):
+            wanted = (operator == '=') == bool(value)
+        else:
+            return NotImplemented
+        if not self._ksw_receipt_by_department():
+            return [('id', '=', False)] if wanted else []
+        domain = Domain([('state', '=', 'in_transfer'),
+                         ('to_department_id', 'in', self.env.user._ksw_fleet_department_ids())])
+        return domain if wanted else ~domain
 
     def _search_is_incoming(self, operator, value):
         # Odoo 19 hands a boolean condition over as in/not in (gotcha #24).
@@ -113,7 +146,8 @@ class KswFleetMove(models.Model):
             # Only the receiving department confirms the vehicle reached it:
             # nobody else, the GM included, can see it arrive. A GM who is
             # also named on that department receives as its user.
-            move.x_can_receive = pending and move.to_department_id.id in scope
+            move.x_can_receive = pending and move.to_department_id.id in scope \
+                and self._ksw_receipt_by_department()
             move.x_can_cancel = pending and is_gm
 
     def _ksw_fleet_post_summary(self, note=False):

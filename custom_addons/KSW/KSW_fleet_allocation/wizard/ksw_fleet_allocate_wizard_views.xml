@@ -25,14 +25,10 @@
                     <field name="mode" widget="radio"/>
                 </group>
                 <group invisible="mode not in ('internal', 'external_arrival')">
-                    <field name="include_assigned" invisible="mode != 'internal'"/>
                     <div colspan="2" class="text-muted" invisible="mode != 'internal'">
-                        Offered: the holding pool (checkup completed), vehicles with no department,
-                        and vehicles other departments released and the GM has not decided yet.
-                    </div>
-                    <div colspan="2" class="alert alert-warning mb-0" role="alert" invisible="not include_assigned">
-                        A vehicle its department did not release needs a reason in the note, and
-                        that department is told.
+                        Offered: vehicles other departments released that fit this need, and, for a
+                        need without a driver, the holding pool (checkup completed) and vehicles with
+                        no department.
                     </div>
                     <div colspan="2" class="text-muted" invisible="mode != 'external_arrival'">
                         Offered: vehicles registered with no department yet. The administrator adds a
@@ -56,7 +52,7 @@
                     <field name="decide_quantity"/>
                     <field name="external_method" invisible="mode != 'external'" required="mode == 'external'"/>
                 </group>
-                <field name="note" placeholder="Note (required when refusing, or when taking a vehicle its department did not release)..."/>
+                <field name="note" placeholder="Note (required when refusing)..."/>
                 <footer>
                     <button name="action_confirm" type="object" string="Confirm Decision" class="btn-primary"/>
                     <button string="Discard" special="cancel" class="btn-secondary"/>

@@ -1,6 +1,6 @@
 {
     'name': 'KSW Vehicle Custody (HR-12)',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.2.0',
     'summary': 'Vehicle handover form HR-12: who answers for each vehicle, handed in, received and changed with HR, GM and workshop',
     'description': """
 Vehicle Custody

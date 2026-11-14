@@ -20,6 +20,31 @@ The project has an Obsidian knowledge base at **`~/KSW-Brain/`**. This is the au
 
 ---
 
+## How to plan with the user — MANDATORY
+Do not just agree with or implement a proposed workflow, design or fix (the user's, an agreed
+spec, or an earlier design of mine). First go to the root: what is *decided* and by whom, what
+is *executed* and what each step really checks and depends on. If the proposal, or what is
+already built, is not the optimal solution, say so plainly with the reasoning and the better
+option before building. Flag redundant steps, duplicated confirmations, asymmetric rules and
+paperwork driving the process instead of the decision. Recommend; don't list options neutrally.
+Brain: [[Design Principles]].
+
+## Home "Waiting for you" — MANDATORY for every workflow step
+Every app or feature where a **specific person must act** (approve, review, decide, receive,
+sign, fill a section) must surface that step on the Home page's "Waiting for you" list, in the
+same change, never as a follow-up:
+1. On the model, a `x_is_pending_my_action` Boolean: `compute=` + `search=` (operator-safe,
+   gotcha #24) + `@api.depends_context('uid')`, built from ONE `_pending_domain()` per role.
+2. A `ksw.home.inbox.source` record in `KSW_backend_theme/data/home_inbox_sources.xml`
+   (`[('x_is_pending_my_action', '=', True)]`), and bump that test's seeded count.
+3. A "Waiting for Me" filter in the model's search view.
+4. **One home per decision**: a step is actionable in exactly one place; anywhere else the
+   record shows where it waits, with a button to that place (never a second approve button).
+5. Test each role sees its step, and stops seeing it once done.
+Brain: [[Waiting For You on Home]] lists every source. Why: Nov 2026, HR approved release
+forms in Vehicle Custody while the request waited in Vehicle Allocation; the GM had nothing to
+open (VA/2026/0512).
+
 ## Project Identity
 - **Product**: Odoo 19 Community Edition, customised for Al-Kawthar Software (KSW)
 - **Active branch**: `KSWDev` → merges into `19.0`

@@ -6,27 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-12 21:19+0000\n"
-"PO-Revision-Date: 2026-11-12 21:19+0000\n"
+"POT-Creation-Date: 2026-11-14 10:59+0000\n"
+"PO-Revision-Date: 2026-11-14 10:59+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar_001\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
-
-#. module: KSW_fleet_package
-#. odoo-python
-#: code:addons/KSW_fleet_package/models/fleet_package.py:0
-msgid "%s already belongs to that department."
-msgstr "%s تابعة أصلاً لذلك القسم."
-
-#. module: KSW_fleet_package
-#. odoo-python
-#: code:addons/KSW_fleet_package/models/fleet_package.py:0
-msgid "%s has already been decided."
-msgstr "تم البت في %s مسبقاً."
+"Plural-Forms: \n"
 
 #. module: KSW_fleet_package
 #. odoo-python
@@ -43,35 +31,14 @@ msgstr ""
 #: code:addons/KSW_fleet_package/models/fleet_package.py:0
 msgid ""
 "<b>%(v)s</b> moved to <b>%(d)s</b> together with their drivers (%(e)s), "
-"effective today. For your action if any: delegation (HR), financial matters "
-"(Accounting)."
+"effective today. For your action if any: delegation and documents (HR), "
+"financial matters (Accounting)."
 msgstr ""
 "نُقلت <b>%(v)s</b> إلى <b>%(d)s</b> مع سائقيها (%(e)s) اعتباراً من اليوم. "
-"لاتخاذ اللازم إن وجد: التفويض (الموارد البشرية)، المتعلقات المالية "
-"(الحسابات)."
+"لاتخاذ اللازم إن وجد: التفويض والمستندات (الموارد البشرية)، المتعلقات "
+"المالية (الحسابات)."
 
 #. module: KSW_fleet_package
-#. odoo-python
-#: code:addons/KSW_fleet_package/models/fleet_package.py:0
-msgid ""
-"A vehicle released with its driver is transferred with him or kept, not sent"
-" to the workshop: %s."
-msgstr ""
-"المركبة المستغنى عنها مع سائقها تُنقل معه أو تبقى، ولا تُرسل إلى الورشة: %s."
-
-#. module: KSW_fleet_package
-#. odoo-python
-#: code:addons/KSW_fleet_package/models/fleet_package.py:0
-msgid "Choose the department that receives them."
-msgstr "اختر القسم المستلم."
-
-#. module: KSW_fleet_package
-#: model:ir.model,name:KSW_fleet_package.model_ksw_fleet_release_decision_wizard
-msgid "Decide Released Vehicles"
-msgstr "البت في المركبات المستغنى عنها"
-
-#. module: KSW_fleet_package
-#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_fleet_release_decision_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_fleet_release_line__display_name
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_fleet_request__display_name
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_res_users__display_name
@@ -89,14 +56,6 @@ msgid "Employee Transfer"
 msgstr "نقل موظف"
 
 #. module: KSW_fleet_package
-#. odoo-python
-#: code:addons/KSW_fleet_package/models/fleet_package.py:0
-msgid ""
-"HR checked the documents of the drivers moving with their vehicles: %s."
-msgstr "راجعت الموارد البشرية مستندات السائقين المنتقلين مع مركباتهم: %s."
-
-#. module: KSW_fleet_package
-#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_fleet_release_decision_wizard__id
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_fleet_release_line__id
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_fleet_request__id
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_res_users__id
@@ -108,20 +67,6 @@ msgstr "المُعرف"
 #: code:addons/KSW_fleet_package/models/fleet_package.py:0
 msgid "Moves with %(v)s (%(r)s)."
 msgstr "ينتقل مع %(v)s (%(r)s)."
-
-#. module: KSW_fleet_package
-#. odoo-python
-#: code:addons/KSW_fleet_package/models/fleet_package.py:0
-msgid "Only the GM decides a release."
-msgstr "المدير العام وحده يبت في الاستغناء."
-
-#. module: KSW_fleet_package
-#: model:ir.model.fields,help:KSW_fleet_package.field_ksw_fleet_release_line__x_with_driver
-msgid ""
-"The vehicle moves together with the employee who answers for it: no "
-"workshop, no handover form, and he is transferred too."
-msgstr ""
-"تنتقل المركبة مع صاحب عهدتها: بلا ورشة ولا نموذج تسليم، ويُنقل هو أيضاً."
 
 #. module: KSW_fleet_package
 #: model:ir.model,name:KSW_fleet_package.model_res_users
@@ -137,8 +82,3 @@ msgstr "طلب تخصيص مركبات"
 #: model:ir.model,name:KSW_fleet_package.model_ksw_fleet_release_line
 msgid "Vehicle to Release"
 msgstr "مركبة للاستغناء"
-
-#. module: KSW_fleet_package
-#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_fleet_release_line__x_with_driver
-msgid "With Driver"
-msgstr "مع السائق"

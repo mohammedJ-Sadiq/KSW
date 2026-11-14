@@ -1,95 +1,20 @@
-from markupsafe import Markup
-
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
-HR_GROUP = 'KSW_vehicle_custody.group_custody_hr'
-
 
 class KswFleetRequest(models.Model):
-    """A release now goes Supervisor → HR → GM (one request, one GM
-    decision): HR checks each vehicle's HR-12 before the GM sees it."""
+    """A request is an intent (release these / we need these) and only the
+    GM decides it. HR-12 belongs to executing his decision, so the forms are
+    opened when he decides, never before."""
     _inherit = 'ksw.fleet.request'
 
-    state = fields.Selection(selection_add=[('hr_review', 'HR Review'), ('submitted',)],
-                             ondelete={'hr_review': 'set default'})
     x_custody_request_ids = fields.One2many('ksw.vehicle.custody.request', 'fleet_request_id',
                                             string='Handover Forms')
-    x_is_hr = fields.Boolean(compute='_compute_is_hr')
-
-    @api.depends_context('uid')
-    def _compute_is_hr(self):
-        is_hr = self.env['ksw.vehicle.custody.request']._is_hr()
-        for request in self:
-            request.x_is_hr = is_hr
-
-    def _ksw_custody_lines(self):
-        """The release lines that hand a vehicle in (HR-12). The package
-        bridge leaves out vehicles moving together with their driver."""
-        return self.release_line_ids
-
-    def action_submit(self):
-        res = super().action_submit()
-        releases = self.sudo().filtered(lambda r: r.request_type == 'release')
-        if releases:
-            releases.write({'state': 'hr_review'})
-            Custody = self.env['ksw.vehicle.custody.request'].sudo()
-            for request in releases:
-                for line in request._ksw_custody_lines():
-                    vehicle = line.vehicle_id
-                    current = vehicle._ksw_fleet_current_driver()
-                    line.x_custody_request_id = Custody.create({
-                        'kind': 'hand_in', 'state': 'hr', 'vehicle_id': vehicle.id,
-                        'department_id': request.department_id.id,
-                        'fleet_request_id': request.id, 'origin': request.name,
-                        'previous_employee_id': current.id,
-                        'supervisor_id': request.user_id.employee_id.id,
-                        'workshop_reason': line.note or request.reason,
-                        'deliverer_name': current.name or False,
-                    })
-            releases._ksw_fleet_sync_activities()
-        return res
-
-    def action_hr_send_to_gm(self):
-        """HR approves the request's handover forms and passes it to the GM."""
-        if not self.env['ksw.vehicle.custody.request']._is_hr():
-            raise UserError(_('Only HR reviews a release.'))
-        for request in self:
-            if request.state != 'hr_review':
-                raise UserError(_('%s is not waiting for HR.', request.name))
-            request._ksw_check_hr_review()
-        for request in self.sudo():
-            forms = request.x_custody_request_ids.filtered(lambda f: f.state == 'hr')
-            # As the reviewer himself: the forms check HR's rights and stamp his name.
-            forms.with_env(self.env).action_hr_approve()
-            request.state = 'submitted'
-            request._ksw_fleet_post(Markup(_('Reviewed by HR (%s); waiting for the GM.')) % self.env.user.name)
-        self._ksw_fleet_sync_activities()
-        return True
-
-    def _ksw_check_hr_review(self):
-        """Hook: what HR must have done before the GM sees the request."""
-        return True
 
     def action_cancel(self):
         res = super().action_cancel()
         self.sudo().x_custody_request_ids._ksw_cancel(_('The release request was cancelled.'))
         return res
-
-    def _ksw_fleet_sync_activities(self):
-        super()._ksw_fleet_sync_activities()
-        todo = self.env.ref('KSW_vehicle_custody.mail_activity_custody')
-        hr_users = self.env.ref(HR_GROUP).sudo().all_user_ids.filtered(lambda u: u.active and not u.share)
-        for request in self.sudo().exists():
-            wanted = {u.id: _('HR review: %s', request.name) for u in hr_users} \
-                if request.state == 'hr_review' else {}
-            for activity in request.activity_ids.filtered(lambda a: a.activity_type_id == todo):
-                if wanted.get(activity.user_id.id) == activity.summary:
-                    wanted.pop(activity.user_id.id)
-                else:
-                    activity.unlink()
-            for user_id, summary in wanted.items():
-                request.activity_schedule(activity_type_id=todo.id, user_id=user_id, summary=summary)
 
 
 class KswFleetReleaseLine(models.Model):
@@ -99,41 +24,39 @@ class KswFleetReleaseLine(models.Model):
                                            copy=False)
     x_custody_state = fields.Selection(related='x_custody_request_id.state', string='HR-12 Status')
 
-    def write(self, vals):
-        res = super().write(vals)
-        if vals.get('decision') == 'keep':
-            # The GM kept it: the hand-in it was prepared for does not happen.
-            self.sudo().x_custody_request_id._ksw_cancel(_('The GM decided to keep the vehicle.'))
-        return res
-
 
 class KswFleetVehicle(models.Model):
     _inherit = 'ksw.fleet.vehicle'
 
     def _ksw_fleet_after_holding(self, move, workshop_request, release_line):
-        """The vehicle goes to the workshop: its hand-in form follows the GM
-        decision there. One taken by the GM without a release gets its own,
-        HR still checks it, then the workshop."""
+        """The GM sent the vehicle to the workshop (to hold, or on its way to
+        a department that asked): its custodian hands it in. The workshop
+        inspects it while HR collects its documents, in parallel."""
         res = super()._ksw_fleet_after_holding(move, workshop_request, release_line)
         Custody = self.env['ksw.vehicle.custody.request'].sudo()
         for vehicle in self:
-            form = release_line.sudo().x_custody_request_id if release_line else Custody
-            if not form or form.state in ('cancelled', 'refused'):
-                current = vehicle._ksw_fleet_current_driver()
-                form = Custody.create({
-                    'kind': 'hand_in', 'state': 'hr', 'vehicle_id': vehicle.id,
-                    'department_id': vehicle.x_department_id.id, 'origin': move.display_name,
-                    'previous_employee_id': current.id, 'deliverer_name': current.name or False,
-                    'workshop_reason': workshop_request.description,
-                })
-                if release_line:
-                    release_line.sudo().x_custody_request_id = form
-            form._gm_decided_to_workshop(workshop_request)
+            current = vehicle._ksw_fleet_current_driver()
+            request = release_line.request_id if release_line else move.addition_line_id.request_id
+            form = Custody.create({
+                'kind': 'hand_in', 'state': 'workshop', 'vehicle_id': vehicle.id,
+                'department_id': vehicle.x_department_id.id,
+                'fleet_request_id': release_line.request_id.id if release_line else False,
+                'workshop_request_id': workshop_request.id,
+                'origin': request.name or move.display_name,
+                'previous_employee_id': current.id, 'deliverer_name': current.name or False,
+                'supervisor_id': release_line.request_id.user_id.employee_id.id if release_line else False,
+                'workshop_reason': (release_line.note if release_line else False) or workshop_request.description,
+            })
+            if release_line:
+                release_line.sudo().x_custody_request_id = form
+            form._sync_activities()
         return res
 
     def _ksw_fleet_after_transfer_started(self, move):
-        """The receiving department names the new driver on its own form; a
-        vehicle out of the workshop carries the workshop's inspection."""
+        """The vehicle is on its way to a department that asked for it: that
+        department names the new driver, HR checks him (licence before
+        handover), then the workshop hands it over. That handover is the
+        arrival. A vehicle out of the workshop carries its inspection."""
         res = super()._ksw_fleet_after_transfer_started(move)
         if self.env.context.get('ksw_fleet_with_driver'):
             # The vehicle moves together with its custodian: nobody new to name.
@@ -145,7 +68,7 @@ class KswFleetVehicle(models.Model):
             form = Custody.create({
                 'kind': 'receive', 'state': 'draft', 'vehicle_id': vehicle.id,
                 'department_id': move.to_department_id.id, 'move_id': move.id,
-                'origin': move.display_name,
+                'origin': move.addition_line_id.request_id.name or move.display_name,
                 'previous_employee_id': hand_in.previous_employee_id.id,
                 'deliverer_name': hand_in.workshop_official_name or False,
                 'workshop_official_name': hand_in.workshop_official_name or False,
@@ -162,16 +85,10 @@ class KswFleetMove(models.Model):
 
     x_custody_request_ids = fields.One2many('ksw.vehicle.custody.request', 'move_id', string='Handover Forms')
 
-    def _ksw_fleet_check_receivable(self):
-        res = super()._ksw_fleet_check_receivable()
-        waiting = self.sudo().filtered(lambda m: m.x_custody_request_ids.filtered(
-            lambda f: f.state not in ('done', 'signed', 'cancelled')))
-        if waiting:
-            raise UserError(_(
-                'The new driver\'s handover form (HR-12) must be approved first (named by the '
-                'department, checked by HR, handed over by the workshop): %s.',
-                ', '.join(waiting.vehicle_id.mapped('name'))))
-        return res
+    @api.model
+    def _ksw_receipt_by_department(self):
+        # The workshop's handover to the new driver (HR-12) is the arrival.
+        return False
 
     def _ksw_fleet_on_cancel(self):
         res = super()._ksw_fleet_on_cancel()
@@ -211,7 +128,7 @@ class KswWorkshopRequest(models.Model):
             lambda f: f.state not in ('signed', 'cancelled', 'refused'))
         if pending:
             raise UserError(_(
-                'File the signed handover form first (%s): the workshop completes it, it is '
+                'File the signed handover form first (%s): the workshop and HR complete it, it is '
                 'printed, signed, scanned and marked as signed.', ', '.join(pending.mapped('name'))))
         return super().action_complete()
 

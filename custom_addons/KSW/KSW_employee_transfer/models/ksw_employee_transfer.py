@@ -1,6 +1,7 @@
 from markupsafe import Markup
 
 from odoo import _, api, fields, models
+from odoo.fields import Domain
 from odoo.exceptions import UserError
 
 HR_GROUP = 'KSW_employee_transfer.group_transfer_hr'
@@ -46,6 +47,9 @@ class KswEmployeeTransfer(models.Model):
     custody_vehicle_ids = fields.Many2many('ksw.fleet.vehicle', compute='_compute_checks',
                                            string='Vehicles in His Custody')
     warning_text = fields.Text(compute='_compute_checks', string='Before You Approve')
+    # Home ▸ Waiting for you, and the "Waiting for Me" filter.
+    x_is_pending_my_action = fields.Boolean(compute='_compute_is_pending_my_action',
+                                            search='_search_is_pending_my_action', string='Waiting for Me')
     x_can_hr = fields.Boolean(compute='_compute_permissions')
     x_can_gm = fields.Boolean(compute='_compute_permissions')
 
@@ -100,6 +104,32 @@ class KswEmployeeTransfer(models.Model):
                               'or a release), or move him together with them from Vehicle Allocation.',
                               ', '.join(self.custody_vehicle_ids.mapped('name'))))
         return warnings
+
+    @api.model
+    def _pending_domain(self):
+        user = self.env.user
+        mine = [['&', ('state', '=', 'draft'), ('requested_by_id', '=', user.id)]]
+        if self.env.su or user.has_group(HR_GROUP):
+            mine.append([('state', '=', 'hr')])
+        if self.env.su or user.has_group(GM_GROUP):
+            mine.append([('state', '=', 'gm')])
+        return Domain.OR(mine)
+
+    @api.depends_context('uid')
+    def _compute_is_pending_my_action(self):
+        mine = set(self.search(self._pending_domain()).ids)
+        for transfer in self:
+            transfer.x_is_pending_my_action = transfer.id in mine
+
+    def _search_is_pending_my_action(self, operator, value):
+        if operator in ('in', 'not in'):
+            wanted = (operator == 'in') == any(value)
+        elif operator in ('=', '!='):
+            wanted = (operator == '=') == bool(value)
+        else:
+            return NotImplemented
+        domain = self._pending_domain()
+        return domain if wanted else ~domain
 
     @api.model
     def _is_hr_or_gm(self):

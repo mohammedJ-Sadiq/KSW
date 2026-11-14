@@ -423,12 +423,16 @@ msgstr "اتركه فارغاً ليُحتسب للجميع (مع بقاء صل�
 
 #. module: KSW_backend_theme
 #: model:ir.model.fields,help:KSW_backend_theme.field_ksw_home_inbox_source__domain
-msgid "Records waiting for the current user. Evaluated with uid, user and today."
-msgstr "السجلات المنتظرة للمستخدم الحالي. يُقيَّم باستخدام uid و user و today."
+msgid ""
+"Records waiting for the current user. Evaluated with uid, user and today."
+msgstr ""
+"السجلات المنتظرة للمستخدم الحالي. يُقيَّم باستخدام uid و user و today."
 
 #. module: KSW_backend_theme
 #: model:ir.model.fields,help:KSW_backend_theme.field_ksw_home_inbox_source__model_name
-msgid "Technical model name, e.g. hr.leave. Ignored while that module is not installed."
+msgid ""
+"Technical model name, e.g. hr.leave. Ignored while that module is not "
+"installed."
 msgstr "الاسم التقني للنموذج، مثل hr.leave. يُتجاهل ما دامت الوحدة غير مثبتة."
 
 #. module: KSW_backend_theme
@@ -438,8 +442,13 @@ msgstr "أضف عدّاداً إلى الصفحة الرئيسية"
 
 #. module: KSW_backend_theme
 #: model_terms:ir.actions.act_window,help:KSW_backend_theme.action_ksw_home_inbox_source
-msgid "A model and a domain of records waiting for the current user (uid). Each user only counts what their access rights let them read, and a counter at zero is hidden."
-msgstr "نموذج ونطاق للسجلات المنتظرة للمستخدم الحالي (uid). يحتسب كل مستخدم ما تسمح له صلاحياته بقراءته فقط، ويُخفى العدّاد عندما يكون صفراً."
+msgid ""
+"A model and a domain of records waiting for the current user (uid). Each "
+"user only counts what their access rights let them read, and a counter at "
+"zero is hidden."
+msgstr ""
+"نموذج ونطاق للسجلات المنتظرة للمستخدم الحالي (uid). يحتسب كل مستخدم ما تسمح "
+"له صلاحياته بقراءته فقط، ويُخفى العدّاد عندما يكون صفراً."
 
 #. module: KSW_backend_theme
 #. odoo-javascript
@@ -486,19 +495,29 @@ msgstr "الاختصارات"
 #. module: KSW_backend_theme
 #. odoo-javascript
 #: code:addons/KSW_backend_theme/static/src/tour/quick_tour.js:0
-msgid "Open this menu and press Home to return to the Home page at any time: what is waiting for you, all your apps, and what you opened recently."
-msgstr "افتح هذه القائمة واضغط «الرئيسية» للعودة إلى الصفحة الرئيسية في أي وقت: ما ينتظرك، وجميع تطبيقاتك، وما فتحته مؤخراً."
+msgid ""
+"Open this menu and press Home to return to the Home page at any time: what "
+"is waiting for you, all your apps, and what you opened recently."
+msgstr ""
+"افتح هذه القائمة واضغط «الرئيسية» للعودة إلى الصفحة الرئيسية في أي وقت: ما "
+"ينتظرك، وجميع تطبيقاتك، وما فتحته مؤخراً."
 
 #. module: KSW_backend_theme
 #. odoo-javascript
 #: code:addons/KSW_backend_theme/static/src/tour/quick_tour.js:0
-msgid "Press this button at any time to return to Home: what is waiting for you, all your apps, and what you opened recently. Shortcut: Alt+H."
-msgstr "اضغط هذا الزر في أي وقت للعودة إلى الصفحة الرئيسية: ما ينتظرك، وجميع تطبيقاتك، وما فتحته مؤخراً. الاختصار: Alt+H."
+msgid ""
+"Press this button at any time to return to Home: what is waiting for you, "
+"all your apps, and what you opened recently. Shortcut: Alt+H."
+msgstr ""
+"اضغط هذا الزر في أي وقت للعودة إلى الصفحة الرئيسية: ما ينتظرك، وجميع "
+"تطبيقاتك، وما فتحته مؤخراً. الاختصار: Alt+H."
 
 #. module: KSW_backend_theme
 #. odoo-javascript
 #: code:addons/KSW_backend_theme/static/src/tour/quick_tour.js:0
-msgid "Find any screen by its name instead of going through the menus. Shortcut: Ctrl+K."
+msgid ""
+"Find any screen by its name instead of going through the menus. Shortcut: "
+"Ctrl+K."
 msgstr "ابحث عن أي شاشة باسمها بدلاً من التنقل في القوائم. الاختصار: Ctrl+K."
 
 #. module: KSW_backend_theme
@@ -510,8 +529,12 @@ msgstr "المظهر"
 #. module: KSW_backend_theme
 #. odoo-javascript
 #: code:addons/KSW_backend_theme/static/src/tour/quick_tour.js:0
-msgid "Open your profile menu and choose Light (the original look), Dark, or Automatic to follow this device."
-msgstr "افتح قائمتك الشخصية واختر «فاتح» (المظهر الأصلي) أو «داكن» أو «تلقائي» ليتبع إعداد جهازك."
+msgid ""
+"Open your profile menu and choose Light (the original look), Dark, or "
+"Automatic to follow this device."
+msgstr ""
+"افتح قائمتك الشخصية واختر «فاتح» (المظهر الأصلي) أو «داكن» أو «تلقائي» ليتبع"
+" إعداد جهازك."
 
 #. module: KSW_backend_theme
 #. odoo-javascript
@@ -522,8 +545,11 @@ msgstr "حجم الخط"
 #. module: KSW_backend_theme
 #. odoo-javascript
 #: code:addons/KSW_backend_theme/static/src/tour/quick_tour.js:0
-msgid "In the same menu, open My Preferences and choose a text size: Automatic, Standard or Large."
-msgstr "من القائمة نفسها افتح «تفضيلاتي» واختر حجم الخط: تلقائي أو عادي أو كبير."
+msgid ""
+"In the same menu, open My Preferences and choose a text size: Automatic, "
+"Standard or Large."
+msgstr ""
+"من القائمة نفسها افتح «تفضيلاتي» واختر حجم الخط: تلقائي أو عادي أو كبير."
 
 #. module: KSW_backend_theme
 #. odoo-javascript
@@ -589,14 +615,23 @@ msgstr "تلقائي: كبير للعربية، وعادي للإنجليزية.
 #. module: KSW_backend_theme
 #. odoo-javascript
 #: code:addons/KSW_backend_theme/static/src/tour/quick_tour.js:0
-msgid "Type the name of any app or screen and press Enter to open it. From any other page, use the search button at the top or Ctrl+K."
-msgstr "اكتب اسم أي تطبيق أو شاشة واضغط Enter لفتحها. ومن أي صفحة أخرى استخدم زر البحث في الأعلى أو Ctrl+K."
+msgid ""
+"Type the name of any app or screen and press Enter to open it. From any "
+"other page, use the search button at the top or Ctrl+K."
+msgstr ""
+"اكتب اسم أي تطبيق أو شاشة واضغط Enter لفتحها. ومن أي صفحة أخرى استخدم زر "
+"البحث في الأعلى أو Ctrl+K."
 
 #. module: KSW_backend_theme
 #. odoo-javascript
 #: code:addons/KSW_backend_theme/static/src/tour/quick_tour.js:0
-msgid "Approvals and activities that need you appear here as cards with a count. Press a card to open exactly those records. When nothing is waiting, it tells you so."
-msgstr "تظهر هنا الموافقات والأنشطة التي تحتاج إليك على شكل بطاقات مع عددها. اضغط البطاقة لفتح تلك السجلات بالضبط. وإن لم يكن شيء بانتظارك فستخبرك بذلك."
+msgid ""
+"Approvals and activities that need you appear here as cards with a count. "
+"Press a card to open exactly those records. When nothing is waiting, it "
+"tells you so."
+msgstr ""
+"تظهر هنا الموافقات والأنشطة التي تحتاج إليك على شكل بطاقات مع عددها. اضغط "
+"البطاقة لفتح تلك السجلات بالضبط. وإن لم يكن شيء بانتظارك فستخبرك بذلك."
 
 #. module: KSW_backend_theme
 #. odoo-javascript
@@ -607,11 +642,41 @@ msgstr "أخفِ التطبيقات التي لا تستخدمها"
 #. module: KSW_backend_theme
 #. odoo-javascript
 #: code:addons/KSW_backend_theme/static/src/tour/quick_tour.js:0
-msgid "Press Customise, then the eye on an app to hide it, or drag the apps into your own order, and press Save. Hidden apps stay one click away under Show hidden apps."
-msgstr "اضغط «تخصيص» ثم أيقونة العين على التطبيق لإخفائه، أو اسحب التطبيقات لترتيبها كما تريد، ثم اضغط «حفظ». تبقى التطبيقات المخفية على بُعد نقرة واحدة تحت «عرض التطبيقات المخفية»."
+msgid ""
+"Press Customise, then the eye on an app to hide it, or drag the apps into "
+"your own order, and press Save. Hidden apps stay one click away under Show "
+"hidden apps."
+msgstr ""
+"اضغط «تخصيص» ثم أيقونة العين على التطبيق لإخفائه، أو اسحب التطبيقات لترتيبها"
+" كما تريد، ثم اضغط «حفظ». تبقى التطبيقات المخفية على بُعد نقرة واحدة تحت "
+"«عرض التطبيقات المخفية»."
 
 #. module: KSW_backend_theme
 #. odoo-javascript
 #: code:addons/KSW_backend_theme/static/src/tour/quick_tour.js:0
-msgid "In the same menu, open My Preferences and choose a text size: Automatic, Standard or Large. You can replay this tour from that menu too: Quick tour."
-msgstr "من القائمة نفسها افتح «تفضيلاتي» واختر حجم الخط: تلقائي أو عادي أو كبير. ويمكنك إعادة هذه الجولة من القائمة نفسها: «الجولة السريعة»."
+msgid ""
+"In the same menu, open My Preferences and choose a text size: Automatic, "
+"Standard or Large. You can replay this tour from that menu too: Quick tour."
+msgstr ""
+"من القائمة نفسها افتح «تفضيلاتي» واختر حجم الخط: تلقائي أو عادي أو كبير. "
+"ويمكنك إعادة هذه الجولة من القائمة نفسها: «الجولة السريعة»."
+
+#. module: KSW_backend_theme
+#: model:ksw.home.inbox.source,name:KSW_backend_theme.inbox_employee_transfers
+msgid "Employee transfers awaiting me"
+msgstr "طلبات نقل موظفين بانتظاري"
+
+#. module: KSW_backend_theme
+#: model:ksw.home.inbox.source,name:KSW_backend_theme.inbox_vehicle_handover_forms
+msgid "Vehicle handover forms (HR-12) awaiting me"
+msgstr "نماذج تسليم المركبات (HR-12) بانتظاري"
+
+#. module: KSW_backend_theme
+#: model:ksw.home.inbox.source,name:KSW_backend_theme.inbox_vehicle_requests
+msgid "Vehicle requests awaiting my review or decision"
+msgstr "طلبات مركبات بانتظار مراجعتي أو قراري"
+
+#. module: KSW_backend_theme
+#: model:ksw.home.inbox.source,name:KSW_backend_theme.inbox_vehicles_to_receive
+msgid "Vehicles on their way to my department"
+msgstr "مركبات في الطريق إلى قسمي"

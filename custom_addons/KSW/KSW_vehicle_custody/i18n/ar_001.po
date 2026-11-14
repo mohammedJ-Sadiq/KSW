@@ -6,15 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-12 21:19+0000\n"
-"PO-Revision-Date: 2026-11-12 21:19+0000\n"
+"POT-Creation-Date: 2026-11-14 10:59+0000\n"
+"PO-Revision-Date: 2026-11-14 10:59+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar_001\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
+"Plural-Forms: \n"
 
 #. module: KSW_vehicle_custody
 #. odoo-python
@@ -40,12 +40,6 @@ msgstr "%s ليست من مركبات أقسامك."
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "%s is not approved yet; the paper is signed after approval."
 msgstr "لم يُعتمد %s بعد؛ يُوقّع النموذج الورقي بعد الاعتماد."
-
-#. module: KSW_vehicle_custody
-#. odoo-python
-#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
-msgid "%s is not waiting for HR."
-msgstr "%s ليس بانتظار الموارد البشرية."
 
 #. module: KSW_vehicle_custody
 #. odoo-python
@@ -81,11 +75,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid ""
-"<b>%(n)s approved</b>: %(k)s, %(v)s. %(p)s → %(w)s. For your action if any: "
-"delegation (HR), financial matters (Accounting)."
-msgstr ""
-"<b>اعتُمد %(n)s</b>: %(k)s، %(v)s. %(p)s ← %(w)s. لاتخاذ اللازم إن وجد: "
-"التفويض (الموارد البشرية)، المتعلقات المالية (الحسابات)."
+"<b>%(n)s done</b>: %(k)s, %(v)s. %(p)s → %(w)s. Depreciation value: %(t)s."
+msgstr "<b>اكتمل %(n)s</b>: %(k)s، %(v)s. %(p)s ← %(w)s. قيمة الإهلاك: %(t)s."
 
 #. module: KSW_vehicle_custody
 #: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_header
@@ -377,6 +368,12 @@ msgid "Documents"
 msgstr "المستندات"
 
 #. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__hr_done
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Documents Checked"
+msgstr "تمت مراجعة المستندات"
+
+#. module: KSW_vehicle_custody
 #: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_document__document_type__driver_card
 msgid "Driver Card"
 msgstr "بطاقة السائق"
@@ -388,15 +385,6 @@ msgstr "بطاقة السائق"
 #: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_search
 msgid "Driver Change"
 msgstr "تغيير السائق"
-
-#. module: KSW_vehicle_custody
-#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_fleet_request_form_custody
-msgid ""
-"Each vehicle's HR-12 is checked (documents, remarks)? The request goes to "
-"the GM."
-msgstr ""
-"هل رُوجع نموذج HR-12 لكل مركبة (المستندات والملاحظات)؟ سيُرفع الطلب إلى "
-"المدير العام."
 
 #. module: KSW_vehicle_custody
 #: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
@@ -448,11 +436,11 @@ msgstr "أرفق HR-12 الموقّع: %s"
 #. odoo-python
 #: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
 msgid ""
-"File the signed handover form first (%s): the workshop completes it, it is "
-"printed, signed, scanned and marked as signed."
+"File the signed handover form first (%s): the workshop and HR complete it, "
+"it is printed, signed, scanned and marked as signed."
 msgstr ""
-"أرفق نموذج التسليم الموقّع أولاً (%s): تُتمّه الورشة، ثم يُطبع ويُوقّع "
-"ويُمسح ويُؤكَّد توقيعه."
+"أرفق نموذج التسليم الموقّع أولاً (%s): تُتمّه الورشة والموارد البشرية، ثم "
+"يُطبع ويُوقّع ويُمسح ويُؤكَّد توقيعه."
 
 #. module: KSW_vehicle_custody
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__signed_by_id
@@ -533,36 +521,16 @@ msgid "Front tires / الكفرات الأمامية"
 msgstr ""
 
 #. module: KSW_vehicle_custody
-#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__state__gm
-msgid "GM Decision"
-msgstr "قرار المدير العام"
-
-#. module: KSW_vehicle_custody
 #. odoo-python
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "Give the reason for the user change."
 msgstr "اذكر سبب تغيير المستخدم."
 
 #. module: KSW_vehicle_custody
-#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__gm_decided
-msgid "Gm Decided"
-msgstr "قرر المدير العام"
-
-#. module: KSW_vehicle_custody
 #: model:res.groups,name:KSW_vehicle_custody.group_custody_hr
 #: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
 msgid "HR / Administrative Affairs"
 msgstr "الموارد البشرية / الشؤون الإدارية"
-
-#. module: KSW_vehicle_custody
-#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
-msgid "HR Approve"
-msgstr "اعتماد الموارد البشرية"
-
-#. module: KSW_vehicle_custody
-#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_fleet_request_form_custody
-msgid "HR Approve, Send to GM"
-msgstr "اعتماد الموارد البشرية ورفعه للمدير العام"
 
 #. module: KSW_vehicle_custody
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__hr_checked_by_id
@@ -575,17 +543,15 @@ msgid "HR Checked On"
 msgstr "تاريخ مراجعة الموارد البشرية"
 
 #. module: KSW_vehicle_custody
-#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_fleet_request__state__hr_review
 #: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__state__hr
-msgid "HR Review"
-msgstr "مراجعة الموارد البشرية"
+msgid "HR Documents"
+msgstr "مستندات الموارد البشرية"
 
 #. module: KSW_vehicle_custody
 #. odoo-python
-#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
-msgid "HR review: %s"
-msgstr "مراجعة الموارد البشرية: %s"
+msgid "HR documents: %s"
+msgstr "مستندات الموارد البشرية: %s"
 
 #. module: KSW_vehicle_custody
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_fleet_release_line__x_custody_request_id
@@ -597,6 +563,11 @@ msgstr "HR-12"
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_fleet_release_line__x_custody_state
 msgid "HR-12 Status"
 msgstr "حالة HR-12"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "HR: documents checked"
+msgstr "الموارد البشرية: تمت مراجعة المستندات"
 
 #. module: KSW_vehicle_custody
 #: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_search
@@ -927,14 +898,8 @@ msgstr ""
 #. module: KSW_vehicle_custody
 #. odoo-python
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
-msgid "Only HR approves %s at this step."
-msgstr "الموارد البشرية وحدها تعتمد %s في هذه المرحلة."
-
-#. module: KSW_vehicle_custody
-#. odoo-python
-#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
-msgid "Only HR reviews a release."
-msgstr "الموارد البشرية وحدها تراجع طلب الاستغناء."
+msgid "Only HR completes the documents of %s at this step."
+msgstr "الموارد البشرية وحدها تُتمّ مستندات %s في هذه المرحلة."
 
 #. module: KSW_vehicle_custody
 #. odoo-python
@@ -1155,12 +1120,6 @@ msgid "Release Request"
 msgstr "طلب الاستغناء"
 
 #. module: KSW_vehicle_custody
-#: model:ir.actions.act_window,name:KSW_vehicle_custody.action_ksw_fleet_request_hr_review
-#: model:ir.ui.menu,name:KSW_vehicle_custody.menu_vehicle_custody_hr_review
-msgid "Releases to Review"
-msgstr "طلبات استغناء للمراجعة"
-
-#. module: KSW_vehicle_custody
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_document__remark
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_inspection__remark
 msgid "Remark"
@@ -1226,12 +1185,6 @@ msgid "Responsible User"
 msgstr "المستخدم المسؤول"
 
 #. module: KSW_vehicle_custody
-#. odoo-python
-#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
-msgid "Reviewed by HR (%s); waiting for the GM."
-msgstr "راجعته الموارد البشرية (%s)؛ بانتظار المدير العام."
-
-#. module: KSW_vehicle_custody
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr "خطأ في تسليم الرسائل النصية القصيرة"
@@ -1280,7 +1233,6 @@ msgid "Signed copy filed by %s."
 msgstr "أرفق %s النسخة الموقعة."
 
 #. module: KSW_vehicle_custody
-#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_fleet_request__state
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__state
 msgid "State"
 msgstr "الحالة"
@@ -1338,22 +1290,6 @@ msgstr "تيدر"
 
 #. module: KSW_vehicle_custody
 #. odoo-python
-#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
-msgid "The GM decided to keep the vehicle."
-msgstr "قرر المدير العام إبقاء المركبة."
-
-#. module: KSW_vehicle_custody
-#. odoo-python
-#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
-msgid ""
-"The new driver's handover form (HR-12) must be approved first (named by the "
-"department, checked by HR, handed over by the workshop): %s."
-msgstr ""
-"يجب اعتماد نموذج تسليم السائق الجديد (HR-12) أولاً (يحدده القسم، وتراجعه "
-"الموارد البشرية، وتسلّمه الورشة): %s."
-
-#. module: KSW_vehicle_custody
-#. odoo-python
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "The new user is the current custodian."
 msgstr "المستخدم الجديد هو صاحب العهدة الحالي."
@@ -1394,11 +1330,8 @@ msgstr "ألغى المدير العام النقل."
 #. module: KSW_vehicle_custody
 #: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
 msgid ""
-"The vehicle is inspected (and handed over on a receipt)? This approves the "
-"form and changes the custodian."
-msgstr ""
-"هل فُحصت المركبة (وسُلّمت في حالة الاستلام)؟ سيُعتمد النموذج ويتغير صاحب "
-"العهدة."
+"The vehicle is inspected (and, on a receipt, handed over to the new driver)?"
+msgstr "هل فُحصت المركبة (وسُلّمت للسائق الجديد في حالة الاستلام)؟"
 
 #. module: KSW_vehicle_custody
 #: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
@@ -1621,6 +1554,12 @@ msgid "Vehicle to Release"
 msgstr "مركبة للاستغناء"
 
 #. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__x_is_pending_my_action
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_search
+msgid "Waiting for Me"
+msgstr "بانتظاري"
+
+#. module: KSW_vehicle_custody
 #: model:ksw.vehicle.custody.checklist,name:KSW_vehicle_custody.checklist_water_motor
 msgid "Water motor / ماتور المياه"
 msgstr ""
@@ -1657,20 +1596,7 @@ msgid "With HR"
 msgstr "لدى الموارد البشرية"
 
 #. module: KSW_vehicle_custody
-#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_fleet_request_form_custody
-msgid ""
-"With HR: each vehicle's handover form (HR-12, column on the right) is checked before\n"
-"                    the GM decides."
-msgstr ""
-"لدى الموارد البشرية: يُراجَع نموذج HR-12 لكل مركبة (العمود على اليمين) قبل "
-"قرار المدير العام."
-
-#. module: KSW_vehicle_custody
-#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__state__workshop
-msgid "Workshop"
-msgstr "الورشة"
-
-#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__workshop_done
 #: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
 msgid "Workshop Done"
 msgstr "إتمام الورشة"
@@ -1696,6 +1622,11 @@ msgid "Workshop Service Request"
 msgstr ""
 
 #. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__state__workshop
+msgid "Workshop and HR"
+msgstr "الورشة والموارد البشرية"
+
+#. module: KSW_vehicle_custody
 #: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
 msgid "Workshop official / مسؤول الورشة"
 msgstr ""
@@ -1705,6 +1636,11 @@ msgstr ""
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "Workshop: %s"
 msgstr "الورشة: %s"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Workshop: vehicle inspected"
+msgstr "الورشة: فُحصت المركبة"
 
 #. module: KSW_vehicle_custody
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__x_can_hr
@@ -1729,11 +1665,6 @@ msgstr ""
 #. module: KSW_vehicle_custody
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_workshop_request__x_custody_pending
 msgid "X Custody Pending"
-msgstr ""
-
-#. module: KSW_vehicle_custody
-#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_fleet_request__x_is_hr
-msgid "X Is Hr"
 msgstr ""
 
 #. module: KSW_vehicle_custody

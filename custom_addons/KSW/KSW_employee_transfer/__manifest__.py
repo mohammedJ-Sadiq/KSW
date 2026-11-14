@@ -1,6 +1,6 @@
 {
     'name': 'KSW Employee Transfer',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'summary': 'Move an employee to another department: requested, checked by HR, approved by the GM, applied on its date',
     'description': """
 Employee Transfer

@@ -97,6 +97,8 @@
                 <field name="vehicle_id"/>
                 <field name="from_department_id"/>
                 <field name="to_department_id"/>
+                <filter string="Waiting for Me" name="filter_mine" domain="[('x_is_pending_my_action', '=', True)]"/>
+                <separator/>
                 <filter string="In Transfer" name="filter_in_transfer" domain="[('state', '=', 'in_transfer')]"/>
                 <filter string="Transfers" name="filter_transfer" domain="[('kind', '=', 'transfer')]"/>
                 <filter string="To Workshop" name="filter_holding" domain="[('kind', '=', 'holding')]"/>

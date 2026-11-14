@@ -9,9 +9,6 @@
     <menuitem id="menu_vehicle_custody_driver_change" name="Driver Change"
               parent="menu_vehicle_custody_root" action="action_ksw_vehicle_custody_driver_change" sequence="20"
               groups="KSW_fleet_allocation.group_fleet_allocation_user,group_custody_hr"/>
-    <menuitem id="menu_vehicle_custody_hr_review" name="Releases to Review"
-              parent="menu_vehicle_custody_root" action="action_ksw_fleet_request_hr_review" sequence="30"
-              groups="group_custody_hr"/>
     <menuitem id="menu_vehicle_custody_history" name="Who Answers for What"
               parent="menu_vehicle_custody_root" action="action_ksw_fleet_vehicle_custody" sequence="40"/>
     <menuitem id="menu_vehicle_custody_config" name="Configuration"
@@ -23,4 +20,12 @@
     <menuitem id="menu_ksw_workshop_custody" name="Handover Forms (HR-12)"
               parent="KSW_workshop.menu_ksw_workshop_root" action="action_ksw_vehicle_custody" sequence="25"
               groups="KSW_workshop.group_workshop_technician,KSW_workshop.group_workshop_reviewer"/>
+
+    <!-- The workshop's handover to the new driver (his HR-12) is the arrival:
+         the receiving department has nothing more to confirm in Vehicle
+         Allocation. A <function> so it holds on every upgrade (gotcha #2). -->
+    <function model="ir.ui.menu" name="write">
+        <value eval="[ref('KSW_fleet_allocation.menu_ksw_fleet_allocation_receive')]"/>
+        <value eval="{'active': False}"/>
+    </function>
 </odoo>

@@ -23,6 +23,7 @@ class TestFleetPackage(TransactionCase):
             return user
 
         cls.user_a = _user('pk_user_a', 'KSW_fleet_allocation.group_fleet_allocation_user', [cls.dept_a])
+        cls.user_b = _user('pk_user_b', 'KSW_fleet_allocation.group_fleet_allocation_user', [cls.dept_b])
         cls.gm = _user('pk_gm', 'KSW_fleet_allocation.group_fleet_allocation_gm')
         cls.hr = _user('pk_hr', 'KSW_vehicle_custody.group_custody_hr')
         cls.accounting = _user('pk_acc', 'KSW_vehicle_custody.group_custody_accounting')
@@ -40,8 +41,14 @@ class TestFleetPackage(TransactionCase):
             'request_type': 'release', 'department_id': self.dept_a.id, 'reason': 'Contract moves to Bravo',
             'release_line_ids': [(0, 0, vals) for vals in lines]})
         request.action_submit()
-        request.with_user(self.hr).action_hr_send_to_gm()
         return request
+
+    def _need(self, quantity, need):
+        request = self.env['ksw.fleet.request'].with_user(self.user_b).create({
+            'request_type': 'addition', 'department_id': self.dept_b.id, 'reason': 'New contract',
+            'addition_line_ids': [(0, 0, {'vehicle_type': 'isuzu', 'quantity': quantity, 'need': need})]})
+        request.action_submit()
+        return request.addition_line_ids
 
     def _decide(self, lines, **vals):
         self.env['ksw.fleet.release.decision.wizard'].with_user(self.gm).create(
@@ -50,9 +57,10 @@ class TestFleetPackage(TransactionCase):
     def test_vehicles_move_with_their_drivers(self):
         request = self._release([{'vehicle_id': self.truck_1.id, 'x_with_driver': True},
                                  {'vehicle_id': self.truck_2.id, 'x_with_driver': True}])
-        self.assertFalse(request.sudo().x_custody_request_ids)  # no HR-12 for a package
         self.assertEqual(request.release_line_ids.x_driver_id, self.driver_1 | self.driver_2)
-        self._decide(request.release_line_ids, decision='transfer', target_department_id=self.dept_b.id)
+        need = self._need(2, 'with_driver')
+        self._decide(request.release_line_ids, decision='transfer', addition_line_id=need.id)
+        self.assertFalse(request.sudo().x_custody_request_ids)  # no HR-12 for a package
         for truck, driver in ((self.truck_1, self.driver_1), (self.truck_2, self.driver_2)):
             self.assertEqual((truck.x_department_id, truck.x_allocation_state), (self.dept_b, 'assigned'))
             self.assertEqual(truck.x_custodian_id, driver)  # custody unchanged
@@ -62,20 +70,26 @@ class TestFleetPackage(TransactionCase):
         self.assertEqual(transfers.mapped('state'), ['applied', 'applied'])
         self.assertTrue(all(transfers.mapped('with_vehicles')))
         self.assertEqual(request.state, 'done')
+        self.assertEqual(need.request_id.state, 'done')
         copy = request.message_ids.filtered(lambda m: self.accounting.partner_id in m.partner_ids)
         self.assertTrue(copy)
 
-    def test_mixed_request(self):
-        """One vehicle with its driver, one without: the first moves at once,
-        the second goes through the workshop with its HR-12."""
+    def test_needs_decide_what_fills_them(self):
         request = self._release([{'vehicle_id': self.truck_1.id, 'x_with_driver': True},
                                  {'vehicle_id': self.truck_2.id}])
-        self.assertEqual(request.sudo().x_custody_request_ids.vehicle_id, self.truck_2)
-        self._decide(request.release_line_ids, decision='transfer', target_department_id=self.dept_b.id)
-        self.assertEqual(self.truck_1.x_department_id, self.dept_b)
+        package, alone = request.release_line_ids.sorted(lambda l: not l.x_with_driver)
+        vehicle_only = self._need(1, 'vehicle')
+        with self.assertRaises(UserError):  # comes with a driver, the need has its own
+            self._decide(package, decision='transfer', addition_line_id=vehicle_only.id)
+        with self.assertRaises(UserError):  # with and without drivers in one decision
+            self._decide(request.release_line_ids, decision='transfer', addition_line_id=vehicle_only.id)
+        self._decide(alone, decision='transfer', addition_line_id=vehicle_only.id)
         self.assertEqual((self.truck_2.x_allocation_state, self.truck_2.x_reserved_department_id),
-                         ('holding', self.dept_b))
+                         ('holding', self.dept_b))  # through the workshop
         self.assertEqual(self.driver_2.department_id, self.dept_a)  # his driver stays
+        either = self._need(1, 'either')
+        self._decide(package, decision='transfer', addition_line_id=either.id)
+        self.assertEqual(self.truck_1.x_department_id, self.dept_b)  # at once
 
     def test_package_cannot_go_to_the_workshop(self):
         request = self._release([{'vehicle_id': self.truck_1.id, 'x_with_driver': True}])
@@ -98,7 +112,6 @@ class TestFleetPackage(TransactionCase):
         self.assertTrue(self.gm.has_group('KSW_employee_transfer.group_transfer_gm'))
         self.assertTrue(self.hr.has_group('KSW_employee_transfer.group_transfer_hr'))
         self.assertTrue(self.user_a.has_group('KSW_employee_transfer.group_transfer_requester'))
-        # A department's vehicle user may ask to move its people.
         transfer = self.env['ksw.employee.transfer'].with_user(self.user_a).create({
             'employee_id': self.env['hr.employee'].create({'name': 'PK Clerk', 'department_id': self.dept_a.id}).id,
             'to_department_id': self.dept_b.id, 'reason': 'Needed there'})

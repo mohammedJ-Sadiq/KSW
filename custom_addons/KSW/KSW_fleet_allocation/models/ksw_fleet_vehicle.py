@@ -257,6 +257,8 @@ class KswFleetVehicle(models.Model):
         Transfer until the receiving side confirms."""
         self.ensure_one()
         self._ksw_fleet_check_movable()
+        if not addition_line:
+            raise UserError(_('A vehicle goes only to a department that asked for one: choose its request.'))
         if self.x_department_id == target:
             raise UserError(_('%(v)s already belongs to %(d)s.', v=self.name, d=target.name))
         if self.x_allocation_state == 'assigned' and not self.env.context.get('ksw_fleet_direct'):

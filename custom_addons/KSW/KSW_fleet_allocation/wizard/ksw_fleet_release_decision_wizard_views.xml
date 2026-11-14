@@ -15,9 +15,12 @@
                     </group>
                 </group>
                 <group invisible="decision != 'transfer'">
-                    <field name="target_department_id" options="{'no_create': True, 'no_open': True}"
+                    <field name="addition_line_id" options="{'no_create': True, 'no_open': True}"
                            required="decision == 'transfer'"/>
-                    <field name="match_requests"/>
+                    <div colspan="2" class="text-muted small">
+                        A vehicle goes only to a department that asked for one, up to the number it
+                        asked for, and only to a need it fits (with or without its driver).
+                    </div>
                 </group>
                 <group invisible="decision != 'holding'">
                     <field name="workshop_description"/>
@@ -36,13 +39,14 @@
                 </field>
                 <field name="note" required="decision == 'keep'"
                        placeholder="Note for the departments (required when keeping them: they asked to give them up)..."/>
-                <separator string="Departments asking for these types"
+                <separator string="Requests these vehicles can fill"
                            invisible="not demand_line_ids or decision != 'transfer'"/>
                 <field name="demand_line_ids" readonly="1" invisible="not demand_line_ids or decision != 'transfer'">
                     <list>
                         <field name="request_id"/>
                         <field name="department_id"/>
                         <field name="vehicle_type"/>
+                        <field name="need"/>
                         <field name="open_quantity" string="Still Needed"/>
                         <field name="note"/>
                     </list>
