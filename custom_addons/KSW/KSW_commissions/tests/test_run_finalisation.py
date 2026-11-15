@@ -57,6 +57,7 @@ class TestRunFinalisation(SubmissionCommon):
     def _submit(self, supervisor, department, employee):
         batch = self._filled_batch(supervisor, department, employee)
         batch.submission_id.sudo().action_submit()
+        self._acc_check(batch.submission_id)
         return batch.submission_id
 
     def _stuck_run(self):
@@ -67,6 +68,7 @@ class TestRunFinalisation(SubmissionCommon):
         """
         sub_a = self._submit(self.sup_a, self.dept_a, self.emp_a)
         sub_b = self._submit(self.sup_b, self.dept_b, self.emp_b)
+        self._acc_check(sub_a)
         sub_a.with_user(self.gm_a).sudo().action_approve()
         return sub_a, sub_b, sub_a.run_id
 
@@ -83,6 +85,7 @@ class TestRunFinalisation(SubmissionCommon):
         run = sub_b.run_id   # B's GM has his own run (Oct 2026)
         existing = run.sudo().message_ids.ids
 
+        self._acc_check(sub_b)
         sub_b.with_user(self.user_gm_b).action_approve()
 
         self.assertNotIn(run.state, ('approved', 'paid'))
@@ -103,6 +106,7 @@ class TestRunFinalisation(SubmissionCommon):
         """The KSWCO incident: A recorded and was approved while B had not
         recorded anything yet. B must still be able to hand over."""
         sub_a = self._submit(self.sup_a, self.dept_a, self.emp_a)
+        self._acc_check(sub_a)
         sub_a.with_user(self.gm_a).sudo().action_approve()
         run = sub_a.run_id
         self.assertNotIn(run.state, ('approved', 'paid'))
@@ -113,6 +117,7 @@ class TestRunFinalisation(SubmissionCommon):
 
     def test_the_register_is_settled_not_a_preview(self):
         sub_a, sub_b, run = self._stuck_run()
+        self._acc_check(sub_b)
         sub_b.with_user(self.user_gm_b).sudo().action_approve()
         self._close(run)
         self.assertFalse(run.sudo().line_ids.filtered('x_preview_generated'),
@@ -126,6 +131,7 @@ class TestRunFinalisation(SubmissionCommon):
 
     def test_finalising_twice_is_refused_not_repeated(self):
         sub_a, sub_b, run = self._stuck_run()
+        self._acc_check(sub_b)
         sub_b.with_user(self.user_gm_b).sudo().action_approve()
         self._close(run)
         with self.assertRaises(UserError):
@@ -228,6 +234,7 @@ class TestRunFinalisation(SubmissionCommon):
             ])],
         })
         sub_a, sub_b, run = self._stuck_run()
+        self._acc_check(sub_b)
         sub_b.with_user(self.user_gm_b).sudo().action_approve()
         existing = run.sudo().message_ids.ids
         self._close(run)
@@ -239,6 +246,7 @@ class TestRunFinalisation(SubmissionCommon):
 
     def test_the_accountant_can_export_once_it_is_finalised(self):
         sub_a, sub_b, run = self._stuck_run()
+        self._acc_check(sub_b)
         sub_b.with_user(self.user_gm_b).sudo().action_approve()
         self._close(run)
         accountant = self.env['res.users'].sudo().create({

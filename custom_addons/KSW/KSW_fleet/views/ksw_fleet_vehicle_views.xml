@@ -75,11 +75,13 @@
                             <field name="vehicle_type"/>
                             <field name="tank_number"/>
                             <field name="plate_number"/>
+                            <field name="x_vin"/>
                         </group>
                         <group string="Details">
                             <field name="brand"/>
                             <field name="model"/>
                             <field name="year"/>
+                            <field name="x_color"/>
                             <field name="driver_id"/>
                             <field name="driver_name"/>
                             <field name="x_custodian_id"/>

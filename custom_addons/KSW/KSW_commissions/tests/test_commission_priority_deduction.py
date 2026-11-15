@@ -55,7 +55,9 @@ class CommissionPriorityCommon(SubmissionCommon):
         env.su.
         """
         batch.submission_id.sudo().action_submit()
+        self._acc_check(batch.submission_id)
         run = batch.submission_id.run_id
+        self._acc_check(run)
         run.with_user(self.gm).action_approve()
         run.sudo().action_close_month()
         return run
@@ -232,6 +234,7 @@ class TestOpenRunLoanEstimate(CommissionPriorityCommon):
     def test_open_run_estimates_priority_installment(self):
         entry = self._commission_entry(self.emp_a, 700.0)
         entry.batch_id.submission_id.sudo().action_submit()
+        self._acc_check(entry.batch_id.submission_id)
         run = entry.batch_id.submission_id.run_id
         self.assertNotIn(run.state, ('approved', 'paid'))
         self._make_pending_installment(self.emp_a, 1500.0)

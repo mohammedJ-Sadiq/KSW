@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_documents_root" name="Documents" sequence="88"
+              web_icon="KSW_documents,static/description/icon.png"
+              action="action_ksw_document_to_confirm" groups="group_document_officer,base.group_system"/>
+    <menuitem id="menu_documents_bulk" name="Bulk Upload" parent="menu_documents_root"
+              action="action_ksw_document_batch" sequence="5"/>
+    <menuitem id="menu_documents_to_confirm" name="To Confirm" parent="menu_documents_root"
+              action="action_ksw_document_to_confirm" sequence="10"/>
+    <menuitem id="menu_documents_expiring" name="Expiring or Expired" parent="menu_documents_root"
+              action="action_ksw_document_expiring" sequence="20"/>
+    <menuitem id="menu_documents_missing" name="Missing" parent="menu_documents_root" sequence="30"/>
+    <menuitem id="menu_documents_missing_vehicles" name="Vehicles" parent="menu_documents_missing"
+              action="action_ksw_vehicle_documents_missing" sequence="10"/>
+    <menuitem id="menu_documents_missing_employees" name="Employees" parent="menu_documents_missing"
+              action="action_ksw_employee_documents_missing" sequence="20"/>
+    <menuitem id="menu_documents_all" name="All Documents" parent="menu_documents_root"
+              action="action_ksw_document" sequence="40"/>
+    <menuitem id="menu_documents_config" name="Configuration" parent="menu_documents_root" sequence="90"/>
+    <menuitem id="menu_documents_types" name="Document Types" parent="menu_documents_config"
+              action="action_ksw_document_type" sequence="10"/>
+    <menuitem id="menu_documents_registrations" name="Commercial Registrations" parent="menu_documents_config"
+              action="action_ksw_company_registration" sequence="20"/>
+</odoo>

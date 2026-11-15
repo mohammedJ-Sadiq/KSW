@@ -1,6 +1,6 @@
 {
     'name': 'KSW Vehicle Custody (HR-12)',
-    'version': '19.0.1.2.0',
+    'version': '19.0.1.4.0',
     'summary': 'Vehicle handover form HR-12: who answers for each vehicle, handed in, received and changed with HR, GM and workshop',
     'description': """
 Vehicle Custody
@@ -23,7 +23,7 @@ complete without it.
     """,
     'author': 'KSW',
     'category': 'Human Resources',
-    'depends': ['hr', 'mail', 'KSW_fleet', 'KSW_workshop', 'KSW_fleet_allocation'],
+    'depends': ['hr', 'mail', 'KSW_fleet', 'KSW_workshop', 'KSW_fleet_allocation', 'KSW_documents'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',

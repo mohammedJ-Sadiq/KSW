@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ksw_document_upload_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.document.upload.wizard.form</field>
+        <field name="model">ksw.document.upload.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Upload Documents">
+                <field name="applies_to" invisible="1"/>
+                <field name="ai_available" invisible="1"/>
+                <group>
+                    <field name="vehicle_id" invisible="not vehicle_id"/>
+                    <field name="employee_id" invisible="not employee_id"/>
+                    <field name="attachment_ids" widget="many2many_binary"/>
+                    <field name="use_ai" invisible="not ai_available"/>
+                    <field name="type_id" options="{'no_create': True}" required="not use_ai"/>
+                </group>
+                <div class="text-muted small" invisible="not use_ai">
+                    Claude reads each scan (type, number, dates; Hijri converted to Gregorian) into a
+                    draft. Nothing is saved as current until HR checks and confirms it.
+                </div>
+                <div class="text-muted small" invisible="ai_available">
+                    Reading scans automatically needs Claude: Settings ▸ AI Provider ▸ Anthropic Claude.
+                    Until then, choose the type and fill the draft by hand.
+                </div>
+                <footer>
+                    <button name="action_upload" type="object" string="Upload" class="btn-primary"/>
+                    <button string="Discard" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -724,6 +724,7 @@ class TestGmAddsToAnApprovedMonth(SettlementCommon):
             'batch_id': batch.id, 'employee_id': self.emp_a.id,
             'quantity': 1.0, 'amount': 500.0, 'reason': 'بأمر المدير العام'})
         batch.with_user(self.gm).action_submit()
+        self._acc_check(batch)
         batch.submission_id.with_user(self.gm).action_approve()
 
         self.assertEqual(run.state, 'approved')

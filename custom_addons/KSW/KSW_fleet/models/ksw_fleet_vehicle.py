@@ -31,6 +31,10 @@ class KswFleetVehicle(models.Model):
 
     tank_number = fields.Char(string='Tank Number')
     plate_number = fields.Char(string='Plate Number')
+    # The chassis number (VIN) on the istimara: the one identifier that never
+    # changes, so documents can find their vehicle by it.
+    x_vin = fields.Char(string='Chassis No. (VIN)', index=True)
+    x_color = fields.Char(string='Colour')
 
     driver_id = fields.Many2one('hr.employee', string='Default Driver')
     driver_name = fields.Char(

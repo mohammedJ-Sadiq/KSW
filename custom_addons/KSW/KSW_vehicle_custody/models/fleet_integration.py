@@ -41,7 +41,7 @@ class KswFleetVehicle(models.Model):
                 'kind': 'hand_in', 'state': 'workshop', 'vehicle_id': vehicle.id,
                 'department_id': vehicle.x_department_id.id,
                 'fleet_request_id': release_line.request_id.id if release_line else False,
-                'workshop_request_id': workshop_request.id,
+                'workshop_request_id': workshop_request.id, 'workshop_id': workshop_request.workshop_id.id,
                 'origin': request.name or move.display_name,
                 'previous_employee_id': current.id, 'deliverer_name': current.name or False,
                 'supervisor_id': release_line.request_id.user_id.employee_id.id if release_line else False,
@@ -68,6 +68,10 @@ class KswFleetVehicle(models.Model):
             form = Custody.create({
                 'kind': 'receive', 'state': 'draft', 'vehicle_id': vehicle.id,
                 'department_id': move.to_department_id.id, 'move_id': move.id,
+                # The workshop that held it hands it over; a vehicle straight
+                # from the pool goes to the receiving department's workshop.
+                'workshop_id': (hand_in.workshop_id
+                                or self.env['ksw.workshop']._for_department(move.to_department_id)).id,
                 'origin': move.addition_line_id.request_id.name or move.display_name,
                 'previous_employee_id': hand_in.previous_employee_id.id,
                 'deliverer_name': hand_in.workshop_official_name or False,

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-14 10:59+0000\n"
-"PO-Revision-Date: 2026-11-14 10:59+0000\n"
+"POT-Creation-Date: 2026-11-14 20:54+0000\n"
+"PO-Revision-Date: 2026-11-14 20:54+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -422,6 +422,21 @@ msgid "Expiration / صلاحيتها"
 msgstr ""
 
 #. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_document__register_status__expired
+msgid "Expired"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_document__register_expiry
+msgid "Expires"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_document__register_status__expiring
+msgid "Expiring Soon"
+msgstr ""
+
+#. module: KSW_vehicle_custody
 #. odoo-python
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "File the signed HR-12: %s"
@@ -656,6 +671,11 @@ msgid "In Progress"
 msgstr ""
 
 #. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_document__register_status
+msgid "In the Register"
+msgstr ""
+
+#. module: KSW_vehicle_custody
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__inspection_datetime
 msgid "Inspected On"
 msgstr ""
@@ -850,6 +870,11 @@ msgstr ""
 #. module: KSW_vehicle_custody
 #: model_terms:ir.actions.act_window,help:KSW_vehicle_custody.action_ksw_vehicle_custody
 msgid "No handover form in progress"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_document__register_status__missing
+msgid "Not in the Register"
 msgstr ""
 
 #. module: KSW_vehicle_custody
@@ -1402,6 +1427,11 @@ msgid "Vacation"
 msgstr ""
 
 #. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_document__register_status__valid
+msgid "Valid"
+msgstr ""
+
+#. module: KSW_vehicle_custody
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_inspection__value
 msgid "Value"
 msgstr ""
@@ -1572,6 +1602,11 @@ msgstr ""
 #. module: KSW_vehicle_custody
 #: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_search
 msgid "With HR"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__workshop_id
+msgid "Workshop"
 msgstr ""
 
 #. module: KSW_vehicle_custody

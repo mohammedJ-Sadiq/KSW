@@ -70,6 +70,9 @@ class TestPeriodLock(TransactionCase):
         batch = self._batch()
         self._entry(batch)
         batch.submission_id.sudo().action_submit()
+        # Accounting's check before the GM (Nov 2026); sudo() stands in
+        # for the department's accountant.
+        batch.submission_id.sudo().action_acc_check()
         run = batch.submission_id.run_id
         # Approve as the department's GM: approval is per department now, so
         # the acting user has to be one.

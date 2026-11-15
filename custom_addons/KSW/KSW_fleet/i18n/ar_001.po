@@ -245,6 +245,8 @@ msgid ""
 "The employee personally responsible for this vehicle (عهدة). Changes only "
 "through an approved handover form."
 msgstr ""
+"الموظف المسؤول شخصياً عن هذه المركبة (العهدة). لا يتغير إلا عبر نموذج تسليم "
+"واستلام معتمد."
 
 #. module: KSW_fleet
 #: model:ir.model.fields,help:KSW_fleet.field_ksw_fleet_vehicle_custody__source
@@ -290,3 +292,13 @@ msgstr "المركبات"
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__year
 msgid "Year"
 msgstr "السنة"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__x_vin
+msgid "Chassis No. (VIN)"
+msgstr "رقم الهيكل (VIN)"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__x_color
+msgid "Colour"
+msgstr "اللون"

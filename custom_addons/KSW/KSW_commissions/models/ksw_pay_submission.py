@@ -32,10 +32,11 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 from .ksw_commission_lock import (
-    LOCKING_STATES, check_period_unlocked, gm_for_department)
+    HANDED_STATES, LOCKING_STATES, check_period_unlocked, gm_for_department)
 
 SUBMISSION_STATES = [
     ('draft', 'Being Prepared'),
+    ('checking', 'With Accounting'),
     ('submitted', 'Submitted to GM'),
     ('returned', 'Returned for Correction'),
     ('approved', 'Approved'),
@@ -118,6 +119,20 @@ class KswPaySubmission(models.Model):
     pending_amount = fields.Monetary(compute='_compute_pending')
     approved_entry_count = fields.Integer(compute='_compute_pending')
     sub_batch_count = fields.Integer(compute='_compute_pending')
+    # Accounting's check, before the GM (Nov 2026): handed-over rows the
+    # department's accountants have not checked yet. The pending_* fields
+    # above are the GM's — rows they have.
+    acc_entry_ids = fields.Many2many(
+        'ksw.pay.entry', compute='_compute_pending',
+        string='With Accounting')
+    acc_entry_count = fields.Integer(
+        compute='_compute_pending', string='Entries with Accounting')
+    acc_amount = fields.Monetary(
+        compute='_compute_pending', string='Amount with Accounting')
+    x_can_acc_check = fields.Boolean(compute='_compute_permissions')
+    x_is_pending_my_action = fields.Boolean(
+        compute='_compute_permissions', search='_search_is_pending_my_action',
+        string='Waiting for Me')
 
     x_can_submit = fields.Boolean(compute='_compute_permissions')
     x_can_return = fields.Boolean(compute='_compute_permissions')
@@ -187,11 +202,16 @@ class KswPaySubmission(models.Model):
 
     @api.depends('state', 'batch_ids.entry_ids.state',
                  'batch_ids.entry_ids.amount',
+                 'batch_ids.entry_ids.x_acc_checked_by',
                  'batch_ids.entry_ids.x_sub_batch_id', 'sub_batch_ids.state')
     def _compute_pending(self):
         for rec in self:
             entries = rec.sudo().batch_ids.entry_ids
-            pending = entries._handed_over()
+            checking = entries._awaiting_accounting()
+            rec.acc_entry_ids = checking
+            rec.acc_entry_count = len(checking)
+            rec.acc_amount = sum(checking.mapped('amount'))
+            pending = entries._awaiting_gm()
             rec.pending_entry_ids = pending
             rec.pending_entry_count = len(pending)
             rec.pending_employee_count = len(pending.employee_id)
@@ -202,7 +222,8 @@ class KswPaySubmission(models.Model):
 
     @api.depends_context('uid')
     @api.depends('state', 'run_id.state', 'gm_id', 'pending_entry_count',
-                 'approved_entry_count')
+                 'approved_entry_count', 'acc_entry_count',
+                 'department_id.x_effective_accountant_ids')
     def _compute_permissions(self):
         user = self.env.user
         is_supervisor = user.has_group(
@@ -224,6 +245,71 @@ class KswPaySubmission(models.Model):
                 and bool(rec.approved_entry_count)
             rec.x_can_split = is_supervisor and not locked \
                 and rec.state in ('draft', 'returned') and bool(rec.batch_ids)
+            rec.x_can_acc_check = rec._is_accounting_pending_for(user)
+            rec.x_is_pending_my_action = rec._is_pending_for(user)
+
+    # ------------------------------------------------------------------
+    # Accounting — who checks a department's commissions (Nov 2026)
+    # ------------------------------------------------------------------
+    def _accountant_users(self):
+        """The department's Accounting Approvers, the same people who clear
+        the accounting step of its time off (KSW_base_security). A handover
+        with no department — a work site — falls to the company team.
+        Identity reads, so sudo()."""
+        accountants = self.env['hr.employee']
+        for rec in self.sudo():
+            accountants |= (rec.department_id.x_effective_accountant_ids
+                            if rec.department_id else
+                            self.env.company.sudo().x_default_accountant_ids)
+        return accountants.sudo().user_id
+
+    def _check_is_accountant(self):
+        """Refuse unless the caller is one of this scope's accountants."""
+        if self.env.su:
+            return
+        for rec in self:
+            users = rec._accountant_users()
+            if self.env.user in users:
+                continue
+            if not users:
+                raise UserError(_(
+                    "No Accounting Approver is set for %(scope)s. Ask HR to "
+                    "set the department's Accounting Approvers.",
+                    scope=rec.display_name))
+            raise UserError(_(
+                "Only the Accounting Approvers of %(scope)s can check its "
+                "commissions: %(names)s.", scope=rec.display_name,
+                names=', '.join(sorted(users.mapped('name')))))
+
+    def _is_accounting_pending_for(self, user):
+        self.ensure_one()
+        return bool(self.sudo().acc_entry_count) \
+            and user in self._accountant_users()
+
+    def _is_pending_for(self, user):
+        """A step here waits on ``user``: his check as one of the
+        department's accountants, or his decision as its General Manager."""
+        self.ensure_one()
+        rec = self.sudo()
+        gm_step = rec.run_id.state not in LOCKING_STATES \
+            and bool(rec.pending_entry_count) and rec.gm_id == user
+        return gm_step or rec._is_accounting_pending_for(user)
+
+    def _search_is_pending_my_action(self, operator, value):
+        # Odoo 19 hands '=' / '!=' over as 'in' / 'not in' (gotcha #24).
+        if operator in ('in', 'not in'):
+            positive = (operator == 'in') == any(value)
+        elif operator in ('=', '!='):
+            positive = (operator == '=') == bool(value)
+        else:
+            return NotImplemented
+        user = self.env.user
+        # Whatever has a row waiting on somebody — including a department
+        # still being prepared with a sub-batch in it.
+        candidates = self.env['ksw.pay.entry'].sudo().search([
+            ('state', '=', 'submitted')]).batch_id.submission_id
+        ids = candidates.filtered(lambda r: r._is_pending_for(user)).ids
+        return [('id', 'in' if positive else 'not in', ids)]
 
     @api.depends('department_id', 'site_id', 'period')
     def _compute_display_name(self):
@@ -359,7 +445,8 @@ class KswPaySubmission(models.Model):
     # Workflow
     # ------------------------------------------------------------------
     def action_submit(self):
-        """Hand this department's month over to the General Manager.
+        """Hand this department's month over: to its accountants for their
+        check first, then (action_acc_check) to the General Manager.
 
         Submits every batch still in draft on the way through, so the
         supervisor has one button to press rather than one per batch — and
@@ -374,9 +461,15 @@ class KswPaySubmission(models.Model):
                 raise UserError(_(
                     "%(name)s has already been approved.",
                     name=rec.display_name))
-            if rec.state == 'submitted':
+            if rec.state in HANDED_STATES:
                 raise UserError(_(
                     "%(name)s has already been submitted.",
+                    name=rec.display_name))
+            if not rec._accountant_users():
+                raise UserError(_(
+                    "No Accounting Approver is set for %(name)s, so nobody "
+                    "could check it before the General Manager. Ask HR to "
+                    "set the department's Accounting Approvers.",
                     name=rec.display_name))
             if not rec.batch_ids:
                 raise UserError(_(
@@ -408,7 +501,7 @@ class KswPaySubmission(models.Model):
                 drafts.action_submit()
 
             rec.write({
-                'state': 'submitted',
+                'state': 'checking',
                 'submitted_by': self.env.uid,
                 'submitted_date': fields.Datetime.now(),
                 'return_reason': False,
@@ -417,13 +510,19 @@ class KswPaySubmission(models.Model):
             # sub-batches has nothing left waiting — it reads approved.
             rec._sync_state_from_entries()
             rec.sudo().sub_batch_ids._sync_state_from_entries()
-            rec._notify_gm(resubmission=resubmission)
+            # Accounting acts on it. A resubmission also tells the GM what
+            # changed since he returned it — he will be asked to approve it.
+            partners = rec._accountant_users().partner_id
+            if resubmission:
+                partners |= rec._gm_partners()
+            rec._notify_handover(partners, resubmission=resubmission)
         self.mapped('run_id')._sync_state()
         self.mapped('run_id')._refresh_register()
         return True
 
     def action_approve(self):
-        """The GM signs off his own department, on its own.
+        """The GM signs off his own department, on its own — the rows its
+        accountants have checked.
 
         Approval used to be one atomic act on the month: every submitted
         department at once, then build the register and lock. With a GM per
@@ -447,6 +546,11 @@ class KswPaySubmission(models.Model):
                     "%(name)s has already been approved.",
                     name=rec.display_name))
             if not pending:
+                if rec._acc_entries():
+                    raise UserError(_(
+                        "%(name)s is still with Accounting for checking. It "
+                        "reaches you once they have checked it.",
+                        name=rec.display_name))
                 raise UserError(_(
                     "%(name)s has not been submitted yet, so there is "
                     "nothing to approve.", name=rec.display_name))
@@ -547,12 +651,19 @@ class KswPaySubmission(models.Model):
     # Partial approval
     # ------------------------------------------------------------------
     def _pending_entries(self):
-        """The rows in front of the General Manager for this department."""
-        return self.sudo().batch_ids.entry_ids._handed_over()
+        """The rows in front of the General Manager for this department:
+        handed over and checked by Accounting."""
+        return self.sudo().batch_ids.entry_ids._awaiting_gm()
+
+    def _acc_entries(self):
+        """The rows in front of the department's accountants."""
+        return self.sudo().batch_ids.entry_ids._awaiting_accounting()
 
     def _review_entries(self, mode):
-        """What the GM's review wizard lists: waiting rows to return, or
-        approved rows to reopen."""
+        """What the review screen lists: rows to check (Accounting), rows
+        to approve or return (the GM), or approved rows to reopen."""
+        if mode == 'check':
+            return self._acc_entries()
         if mode == 'review':
             return self._pending_entries()
         return self.sudo().batch_ids.entry_ids.filtered(
@@ -586,6 +697,10 @@ class KswPaySubmission(models.Model):
                 continue
             if 'draft' in states:
                 target = 'returned'
+            elif rec.batch_ids.entry_ids.filtered(
+                    lambda e: e.state == 'submitted'
+                    and not e.x_acc_checked_by):
+                target = 'checking'
             elif 'submitted' in states:
                 target = 'submitted'
             else:
@@ -616,6 +731,35 @@ class KswPaySubmission(models.Model):
                        names=names),
                 subtype_xmlid='mail.mt_note')
         return True
+
+    # ------------------------------------------------------------------
+    # Accounting's check (Nov 2026)
+    # ------------------------------------------------------------------
+    def action_acc_check(self):
+        """Accounting: everything this department has with us is checked —
+        on to the General Manager."""
+        self._check_is_accountant()
+        # Not refused in a finalised month: the GM may still add to it (the
+        # lock exempts him), and a check moves no money — it only puts the
+        # rows in front of him.
+        for rec in self:
+            rows = rec._acc_entries()
+            if not rows:
+                raise UserError(_(
+                    "%(name)s has nothing waiting for Accounting's check.",
+                    name=rec.display_name))
+            rows._wf_acc_check()
+            rows._sync_containers()
+            rec._notify_checked(rows)
+        return True
+
+    def action_open_acc_review(self):
+        """Accounting: the review screen, employee by employee — send some
+        on to the GM, return others to the supervisor with a reason."""
+        self.ensure_one()
+        self._check_is_accountant()
+        return self.env['ksw.pay.gm.review.wizard']._open_for(
+            self, mode='check')
 
     def action_open_review(self):
         """GM: the review screen — component by component, approve or return
@@ -659,17 +803,51 @@ class KswPaySubmission(models.Model):
             | self.batch_ids.mapped('create_uid')
         return users.partner_id
 
-    def _notify_gm(self, resubmission=None):
-        """Tell the GM this department is in — in his inbox and by email.
+    def _notify_checked(self, rows):
+        """Accounting has checked: the GM is told, in his inbox and by
+        email, that the department is now his to approve."""
+        self.ensure_one()
+        partners = self._gm_partners()
+        self.sudo().message_post(
+            body=Markup(
+                '<strong>%(title)s</strong><br/>'
+                '<b>%(l_dept)s</b> %(scope)s<br/>'
+                '<b>%(l_by)s</b> %(user)s<br/>'
+                '<b>%(l_emp)s</b> %(emp)s · <b>%(l_total)s</b> %(total).2f'
+                '<br/><i>%(note)s</i>'
+            ) % {'title': _('🧾 Checked by Accounting'),
+                 'l_dept': _('Department:'), 'scope': self.display_name,
+                 'l_by': _('By:'), 'user': self.env.user.name,
+                 'l_emp': _('Employees:'), 'emp': len(rows.employee_id),
+                 'l_total': _('Total:'), 'total': sum(rows.mapped('amount')),
+                 'note': _('Now waiting for the General Manager\'s '
+                           'approval.')},
+            partner_ids=partners.ids,
+            subtype_xmlid='mail.mt_comment',
+        )
+        self._email_gm(partners)
 
-        Both on purpose: the inbox message is the audit trail on the record,
-        the email is what reaches him when he is not in Odoo.
+    def _email_gm(self, partners):
+        if not partners:
+            return
+        template = self.env.ref(
+            'KSW_commissions.mail_template_submission_to_gm',
+            raise_if_not_found=False)
+        if not template:
+            return
+        template.sudo().send_mail(
+            self.id, force_send=False,
+            email_values={'recipient_ids': [(6, 0, partners.ids)]},
+        )
+
+    def _notify_handover(self, partners, resubmission=None):
+        """Tell whoever acts next that this department is in — the
+        accountants at the handover (Nov 2026), in their inbox.
 
         ``resubmission`` (from action_submit) turns it into a "resubmitted
         after changes" message naming what was reopened, by whom and why.
         """
         self.ensure_one()
-        partners = self._gm_partners()
         if resubmission:
             body = Markup(
                 '<strong>🔁 Resubmitted after changes</strong><br/>'
@@ -699,23 +877,14 @@ class KswPaySubmission(models.Model):
                 '<b>By:</b> %(user)s<br/>'
                 '<b>Batches:</b> %(batches)s · '
                 '<b>Employees:</b> %(emp)s<br/>'
-                '<b>Total:</b> %(total).2f'
+                '<b>Total:</b> %(total).2f<br/>'
+                '<i>With Accounting for checking; it goes on to the General '
+                'Manager once checked.</i>'
             ) % {'scope': self.display_name, 'user': self.env.user.name,
                  'batches': self.batch_count, 'emp': self.employee_count,
                  'total': self.total_amount or 0.0},
             partner_ids=partners.ids,
             subtype_xmlid='mail.mt_comment',
-        )
-        if not partners:
-            return
-        template = self.env.ref(
-            'KSW_commissions.mail_template_submission_to_gm',
-            raise_if_not_found=False)
-        if not template:
-            return
-        template.sudo().send_mail(
-            self.id, force_send=False,
-            email_values={'recipient_ids': [(6, 0, partners.ids)]},
         )
 
     # ------------------------------------------------------------------

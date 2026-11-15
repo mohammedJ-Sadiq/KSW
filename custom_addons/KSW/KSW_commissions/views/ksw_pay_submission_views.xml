@@ -14,20 +14,33 @@
                 <field name="x_can_approve" invisible="1"/>
                 <field name="x_can_reopen_rows" invisible="1"/>
                 <field name="x_can_split" invisible="1"/>
+                <field name="x_can_acc_check" invisible="1"/>
                 <field name="state" invisible="1"/>
 
                 <header>
                     <!-- Asks what goes: every component, or only the ones he
                          ticks (and any open sub-batch). -->
-                    <button name="action_submit_prompt" string="Submit to GM"
+                    <button name="action_submit_prompt" string="Submit"
                             type="object" class="btn-primary"
                             invisible="not x_can_submit"/>
                     <button name="action_reset_to_draft"
                             string="Take Back" type="object"
                             class="btn-secondary"
-                            invisible="state != 'submitted'"
+                            invisible="state not in ('checking', 'submitted')"
                             groups="KSW_commissions.group_commission_supervisor"
-                            confirm="Take the submission back so you can keep editing? The General Manager will no longer see it as handed over."/>
+                            confirm="Take the submission back so you can keep editing? Accounting and the General Manager will no longer see it as handed over."/>
+                    <!-- Accounting's check, before the GM (Nov 2026). No
+                         groups=: x_can_acc_check already answers "am I one
+                         of this department's accountants". -->
+                    <button name="action_acc_check"
+                            string="Checked: Send to GM" type="object"
+                            class="btn-primary"
+                            invisible="not x_can_acc_check"
+                            confirm="Send everything this department has with Accounting on to the General Manager as checked?"/>
+                    <button name="action_open_acc_review"
+                            string="Check by Employee…" type="object"
+                            class="btn-secondary"
+                            invisible="not x_can_acc_check"/>
                     <!-- No groups= on either button: x_can_approve /
                          x_can_return already answer "is this department
                          mine", and a groups= filter that is narrower than
@@ -53,7 +66,7 @@
                             type="object" class="btn-secondary"
                             invisible="not x_can_reopen_rows"/>
                     <statusbar statusfield="state"
-                               statusbar_visible="draft,submitted,approved"/>
+                               statusbar_visible="draft,checking,submitted,approved"/>
                 </header>
 
                 <sheet>
@@ -83,8 +96,15 @@
 
                     <div class="alert alert-warning" role="alert"
                          invisible="state != 'returned'">
-                        <strong>Returned by the General Manager:</strong>
+                        <strong>Returned for correction:</strong>
                         <field name="return_reason" readonly="1" nolabel="1"/>
+                    </div>
+                    <div class="alert alert-info" role="status"
+                         invisible="not acc_entry_count or x_can_acc_check">
+                        <field name="acc_entry_count" readonly="1"
+                               class="oe_inline"/>
+                        entr(ies) are with Accounting for checking. They
+                        reach the General Manager once checked.
                     </div>
 
                     <group>
@@ -107,6 +127,12 @@
                                    invisible="not submitted_date"/>
                             <field name="entry_count" readonly="1"/>
                             <field name="total_amount" readonly="1"/>
+                            <field name="acc_entry_count" readonly="1"
+                                   string="With Accounting"
+                                   invisible="not acc_entry_count"/>
+                            <field name="acc_amount" readonly="1"
+                                   string="Amount with Accounting"
+                                   invisible="not acc_entry_count"/>
                             <field name="pending_entry_count" readonly="1"
                                    string="Waiting on the GM"
                                    invisible="not pending_entry_count"/>
@@ -127,6 +153,35 @@
                     </group>
 
                     <notebook>
+                        <!-- What Accounting is checking (Nov 2026). -->
+                        <page string="With Accounting" name="accounting"
+                              invisible="not acc_entry_count">
+                            <field name="acc_entry_ids" nolabel="1"
+                                   readonly="1">
+                                <list default_group_by="employee_id"
+                                      create="false" delete="false"
+                                      decoration-warning="x_overlap_note">
+                                    <field name="employee_id"/>
+                                    <field name="component_id"/>
+                                    <field name="option_id" optional="show"/>
+                                    <field name="date" optional="show"/>
+                                    <field name="x_window_from" optional="show"/>
+                                    <field name="x_window_to" optional="show"/>
+                                    <field name="quantity" sum="Total"/>
+                                    <field name="reason" optional="show"/>
+                                    <field name="x_sub_batch_id"
+                                           optional="show"/>
+                                    <field name="x_overlap_note"
+                                           decoration-warning="x_overlap_note"
+                                           optional="show"/>
+                                    <field name="x_vacation_hold"
+                                           optional="show"/>
+                                    <field name="amount" sum="Total Amount"/>
+                                    <field name="currency_id"
+                                           column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
                         <!-- Exactly what the GM is deciding: rows handed
                              over as a department or in a sub-batch. Rows
                              the supervisor is still typing are not shown. -->
@@ -177,6 +232,7 @@
         <field name="model">ksw.pay.submission</field>
         <field name="arch" type="xml">
             <list decoration-success="state in ['submitted', 'approved']"
+                  decoration-info="state == 'checking'"
                   decoration-warning="state == 'returned'"
                   decoration-muted="state == 'draft' and not batch_count">
                 <field name="display_name" string="Department"/>
@@ -190,9 +246,12 @@
                 <field name="entry_count" string="Records"/>
                 <field name="employee_count"/>
                 <field name="total_amount" sum="Total"/>
+                <field name="acc_entry_count" string="With Accounting"
+                       optional="show"/>
                 <field name="pending_entry_count" string="Waiting on GM"
                        optional="show"/>
                 <field name="state" widget="badge"
+                       decoration-info="state == 'checking'"
                        decoration-success="state in ['submitted', 'approved']"
                        decoration-warning="state == 'returned'"/>
                 <field name="currency_id" column_invisible="1"/>
@@ -209,7 +268,11 @@
                 <field name="site_id"/>
                 <field name="period" options="{'min_precision': 'months'}"/>
                 <field name="submitted_by"/>
-                <filter name="submitted" string="Submitted"
+                <filter name="awaiting_me" string="Waiting for Me"
+                        domain="[('x_is_pending_my_action', '=', True)]"/>
+                <filter name="checking" string="With Accounting"
+                        domain="[('state','=','checking')]"/>
+                <filter name="submitted" string="Submitted to GM"
                         domain="[('state','=','submitted')]"/>
                 <filter name="pending" string="Not Submitted Yet"
                         domain="[('state','in',['draft','returned']),('batch_count','&gt;',0)]"/>

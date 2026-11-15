@@ -15,15 +15,20 @@ class TestResubmissionNotice(SubmissionCommon):
         batch = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)
         submission = batch.submission_id
         submission.with_user(self.sup_a).action_submit()
+        self._acc_check(submission)
         first = self._gm_messages(submission)
-        self.assertIn('Submitted for approval', first[:1].body)
+        # Since Nov 2026 the handover itself goes to Accounting; the GM is
+        # told once it is checked.
+        self.assertIn('Checked by Accounting', first[:1].body)
 
         submission.with_user(self.gm).write({'return_reason': 'Fix the hours'})
         submission.with_user(self.gm).action_return()
         batch.entry_ids.with_user(self.sup_a).write({'quantity': 2.0})
         submission.with_user(self.sup_a).action_submit()
+        self._acc_check(submission)
 
-        latest = (self._gm_messages(submission) - first)[:1]
+        latest = (self._gm_messages(submission) - first).filtered(
+            lambda m: 'Resubmitted' in m.body)[:1]
         self.assertIn('Resubmitted after changes', latest.body)
         self.assertIn('Fix the hours', latest.body)
         self.assertIn(batch.name, latest.body)
@@ -31,5 +36,6 @@ class TestResubmissionNotice(SubmissionCommon):
     def test_first_submission_is_not_a_resubmission(self):
         batch = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)
         batch.submission_id.with_user(self.sup_a).action_submit()
+        self._acc_check(batch.submission_id)
         body = self._gm_messages(batch.submission_id)[:1].body
         self.assertNotIn('Resubmitted', body)

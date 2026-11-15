@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ksw_document_form" model="ir.ui.view">
+        <field name="name">ksw.document.form</field>
+        <field name="model">ksw.document</field>
+        <field name="arch" type="xml">
+            <form string="Document">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_open_scan" type="object" string="Open Scan" icon="fa-file-image-o"
+                            invisible="not attachment_ids"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-warning" role="alert" invisible="not ai_notes or state != 'draft'">
+                        <b>Read by AI: check before confirming</b>
+                        <field name="ai_notes" nolabel="1" class="text-pre-wrap d-block"/>
+                    </div>
+                    <div class="alert alert-info" role="status" invisible="not ai_read or ai_notes or state != 'draft'">
+                        Read by AI. Compare every field with the scan, then confirm.
+                    </div>
+                    <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="applies_to" invisible="1"/>
+                            <field name="type_id" options="{'no_create': True}" readonly="state != 'draft'"/>
+                            <field name="vehicle_id" invisible="applies_to != 'vehicle'" readonly="state != 'draft'"
+                                   required="applies_to == 'vehicle'" options="{'no_create': True}"/>
+                            <field name="employee_id" invisible="applies_to != 'employee'" readonly="state != 'draft'"
+                                   required="applies_to == 'employee'" options="{'no_create': True}"/>
+                            <field name="company_id" invisible="applies_to != 'company'" readonly="state != 'draft'"
+                                   required="applies_to == 'company'" options="{'no_create': True}"/>
+                            <field name="registration_id" invisible="applies_to != 'company'"
+                                   readonly="state != 'draft'" options="{'no_create': True}"/>
+                            <field name="number" readonly="state != 'draft'"/>
+                            <field name="license_class" invisible="not has_class" readonly="state != 'draft'"/>
+                            <field name="has_class" invisible="1"/>
+                            <field name="has_expiry" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="issue_date" readonly="state != 'draft'"/>
+                            <field name="expiry_date" invisible="not has_expiry" readonly="state != 'draft'"/>
+                            <field name="expiry_status" widget="badge" invisible="not has_expiry"
+                                   decoration-success="expiry_status == 'valid'"
+                                   decoration-warning="expiry_status == 'expiring'"
+                                   decoration-danger="expiry_status == 'expired'"/>
+                            <field name="days_left" invisible="not has_expiry or state != 'confirmed'"/>
+                            <field name="attachment_ids" widget="many2many_binary" readonly="state != 'draft'"/>
+                            <field name="confirmed_by_id" invisible="not confirmed_by_id"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_document_list" model="ir.ui.view">
+        <field name="name">ksw.document.list</field>
+        <field name="model">ksw.document</field>
+        <field name="arch" type="xml">
+            <list string="Documents" decoration-muted="state == 'replaced'" decoration-info="state == 'draft'">
+                <field name="type_id"/>
+                <field name="vehicle_id" optional="show"/>
+                <field name="employee_id" optional="show"/>
+                <field name="registration_id" optional="show"/>
+                <field name="number"/>
+                <field name="license_class" optional="hide"/>
+                <field name="expiry_date"/>
+                <field name="expiry_status" widget="badge" decoration-success="expiry_status == 'valid'"
+                       decoration-warning="expiry_status == 'expiring'" decoration-danger="expiry_status == 'expired'"/>
+                <field name="ai_read" optional="hide"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'"
+                       decoration-success="state == 'confirmed'"/>
+                <button name="action_open_scan" type="object" icon="fa-file-image-o" title="Open Scan"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_document_search" model="ir.ui.view">
+        <field name="name">ksw.document.search</field>
+        <field name="model">ksw.document</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="number"/>
+                <field name="vehicle_id"/>
+                <field name="employee_id"/>
+                <field name="type_id"/>
+                <filter string="Waiting for Me" name="filter_mine" domain="[('x_is_pending_my_action', '=', True)]"/>
+                <separator/>
+                <filter string="To Confirm" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Current" name="filter_current" domain="[('state', '=', 'confirmed')]"/>
+                <separator/>
+                <filter string="Expiring Soon" name="filter_expiring" domain="[('expiry_status', '=', 'expiring')]"/>
+                <filter string="Expired" name="filter_expired" domain="[('expiry_status', '=', 'expired')]"/>
+                <separator/>
+                <filter string="Vehicles" name="filter_vehicle" domain="[('applies_to', '=', 'vehicle')]"/>
+                <filter string="Employees" name="filter_employee" domain="[('applies_to', '=', 'employee')]"/>
+                <group>
+                    <filter string="Document" name="groupby_type" context="{'group_by': 'type_id'}"/>
+                    <filter string="Expiry Month" name="groupby_expiry" context="{'group_by': 'expiry_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_document" model="ir.actions.act_window">
+        <field name="name">Documents</field>
+        <field name="res_model">ksw.document</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ksw_document_search"/>
+        <field name="context">{'search_default_filter_current': 1}</field>
+    </record>
+    <record id="action_ksw_document_to_confirm" model="ir.actions.act_window">
+        <field name="name">To Confirm</field>
+        <field name="res_model">ksw.document</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ksw_document_search"/>
+        <field name="domain">[('state', '=', 'draft')]</field>
+        <field name="help" type="html"><p>Nothing to confirm. Uploaded scans wait here until HR checks them.</p></field>
+    </record>
+    <record id="action_ksw_document_expiring" model="ir.actions.act_window">
+        <field name="name">Expiring or Expired</field>
+        <field name="res_model">ksw.document</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ksw_document_search"/>
+        <field name="domain">[('state', '=', 'confirmed'), ('expiry_status', 'in', ['expiring', 'expired'])]</field>
+    </record>
+
+    <record id="view_ksw_document_type_list" model="ir.ui.view">
+        <field name="name">ksw.document.type.list</field>
+        <field name="model">ksw.document.type</field>
+        <field name="arch" type="xml">
+            <list string="Document Types" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="applies_to"/>
+                <field name="required_for"/>
+                <field name="has_expiry"/>
+                <field name="has_class"/>
+                <field name="alert_days"/>
+                <field name="ai_hint" optional="hide"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_ksw_document_type" model="ir.actions.act_window">
+        <field name="name">Document Types</field>
+        <field name="res_model">ksw.document.type</field>
+        <field name="view_mode">list</field>
+    </record>
+</odoo>

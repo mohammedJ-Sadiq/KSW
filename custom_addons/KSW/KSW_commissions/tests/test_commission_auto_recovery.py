@@ -105,6 +105,7 @@ class TestTakenAtActivation(AutoRecoveryCommon):
     def test_05_an_open_month_is_not_used(self):
         entry = self._commission_entry(self.emp_a, 2456.0)
         entry.batch_id.submission_id.sudo().action_submit()
+        self._acc_check(entry.batch_id.submission_id)
         ded = self._penalty(self.emp_a, 1000.0)
         self.assertEqual(ded.line_ids.state, 'pending')
         self.assertFalse(ded.line_ids.x_recover_from_run_id)

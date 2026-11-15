@@ -433,6 +433,7 @@ class TestOneOrder(BasJournalCommon):
         self._entry(batch_b, self.emp_b, user=self.sup_b, quantity=1.0,
                     amount_override=100.0)
         batch_b.submission_id.sudo().action_submit()
+        self._acc_check(batch_b.submission_id)
         run = self._approve(batch_a)
 
         order = [l.employee_id for l in run.line_ids._export_sorted()]

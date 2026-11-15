@@ -109,7 +109,9 @@ class TestRunReviewUI(HttpCase, SubmissionCommon):
         self._entry(meals, self.emp_a, user=self.sup_a, quantity=5.0)
         b = self._filled_batch(self.sup_b, self.dept_b, self.emp_b)
         a.submission_id.with_user(self.sup_a).action_submit()
+        self._acc_check(a.submission_id)
         b.submission_id.with_user(self.sup_b).action_submit()
+        self._acc_check(b.submission_id)
         run = a.submission_id.run_id
         self.gm.sudo().password = 'sub_gm'
         self.browser_js(

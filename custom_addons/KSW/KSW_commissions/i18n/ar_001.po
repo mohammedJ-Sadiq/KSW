@@ -12977,3 +12977,297 @@ msgstr "مثال: 120301309"
 #: code:addons/KSW_commissions/models/ksw_sales_commission_sheet.py:0
 msgid "rep on each document"
 msgstr "المندوب على كل مستند"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
+msgid ""
+"%(name)s has been handed over (%(state)s). %(what)s is not possible until it"
+" is returned."
+msgstr "تم تسليم %(name)s (%(state)s). لا يمكن %(what)s حتى تتم إعادتها."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid "%(name)s has nothing waiting for Accounting's check."
+msgstr "لا يوجد في %(name)s ما ينتظر تدقيق المحاسبة."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid ""
+"%(name)s is still with Accounting for checking. It reaches you once they "
+"have checked it."
+msgstr "لا تزال %(name)s لدى المحاسبة للتدقيق، وستصلك بعد أن يدققوها."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid ""
+"%(what)s would pay these employees twice — the same days are already imported in another handover:\n"
+"%(rows)s\n"
+"\n"
+"Press Import Again on the batch: it replaces its row with only the days no handover has taken yet."
+msgstr ""
+"%(what)s سيصرف لهؤلاء الموظفين مرتين — الأيام نفسها مستوردة مسبقاً في تسليم آخر:\n"
+"%(rows)s\n"
+"\n"
+"اضغط «استيراد مجدداً» على الدفعة: سيستبدل سطرها بالأيام التي لم يأخذها أي تسليم بعد."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_form
+msgid "<strong>Returned for correction:</strong>"
+msgstr "<strong>مُعاد للتصحيح:</strong>"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_gm_review_line_list_check
+msgid "Accounting Check"
+msgstr "تدقيق المحاسبة"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_handover_wizards.py:0
+msgid "Accounting Check — %(name)s"
+msgstr "تدقيق المحاسبة — %(name)s"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__acc_amount
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_form
+msgid "Amount with Accounting"
+msgstr "المبلغ لدى المحاسبة"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "Approving"
+msgstr "الاعتماد"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
+msgid ""
+"Being prepared: press <b>Add Employees…</b> to add\n"
+"                        more people for these days, or <b>Submit</b>\n"
+"                        when it is complete: Accounting checks it, then the\n"
+"                        General Manager approves. Once submitted, nobody more can\n"
+"                        be added: the next early handover is a new sub-batch."
+msgstr ""
+"قيد الإعداد: اضغط <b>إضافة موظفين…</b> لإضافة موظفين آخرين لهذه الأيام، أو "
+"<b>تقديم</b> عند اكتمالها: تدققها المحاسبة ثم يعتمدها المدير العام. وبعد "
+"التقديم لا يمكن إضافة أحد إليها: يكون التسليم المبكر التالي دفعة فرعية "
+"جديدة."
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_gm_review_wizard__mode__check
+msgid "Check before the General Manager"
+msgstr "التدقيق قبل المدير العام"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_form
+msgid "Check by Employee…"
+msgstr "تدقيق حسب الموظف…"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_entry__x_acc_checked_by
+msgid "Checked by Accounting"
+msgstr "دققته المحاسبة"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_gm_review_line_list_check
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_form
+msgid "Checked: Send to GM"
+msgstr "تم التدقيق: إرسال إلى المدير العام"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid "Checking"
+msgstr "التدقيق"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
+msgid "Checking it"
+msgstr "تدقيقها"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
+msgid ""
+"Correct the returned rows in the component's batch\n"
+"                        (or press <b>Import Again</b> for Driver Trips), then\n"
+"                        <b>Submit</b>."
+msgstr ""
+"صحّح السطور المُعادة في دفعة المكوّن (أو اضغط <b>استيراد مجدداً</b> لردود "
+"السائقين)، ثم <b>تقديم</b>."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_sub_batch__acc_pending_count
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__acc_entry_count
+msgid "Entries with Accounting"
+msgstr "قيود لدى المحاسبة"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
+msgid ""
+"Hand these employees' entries over? Accounting checks them first, then the "
+"General Manager approves. Only their rows are locked and your batches stay "
+"open, but nobody more can be added to this sub-batch."
+msgstr ""
+"تسليم قيود هؤلاء الموظفين؟ تدققها المحاسبة أولًا ثم يعتمدها المدير العام. "
+"تُقفل قيودهم فقط وتبقى دفعاتك مفتوحة، لكن لا يمكن إضافة أي موظف آخر إلى هذه "
+"الدفعة الفرعية."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid ""
+"No Accounting Approver is set for %(name)s, so nobody could check it before "
+"the General Manager. Ask HR to set the department's Accounting Approvers."
+msgstr ""
+"لم يُحدَّد معتمد محاسبة لـ %(name)s، فلا يوجد من يدققها قبل المدير العام. "
+"اطلب من الموارد البشرية تحديد معتمدي المحاسبة للإدارة."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
+msgid ""
+"No Accounting Approver is set for %(scope)s, so nobody could check %(name)s "
+"before the General Manager. Ask HR to set the department's Accounting "
+"Approvers."
+msgstr ""
+"لم يُحدَّد معتمد محاسبة لـ %(scope)s، فلا يوجد من يدقق %(name)s قبل المدير "
+"العام. اطلب من الموارد البشرية تحديد معتمدي المحاسبة للإدارة."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid ""
+"No Accounting Approver is set for %(scope)s. Ask HR to set the department's "
+"Accounting Approvers."
+msgstr ""
+"لم يُحدَّد معتمد محاسبة لـ %(scope)s. اطلب من الموارد البشرية تحديد معتمدي "
+"المحاسبة للإدارة."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid "Now waiting for the General Manager's approval."
+msgstr "بانتظار اعتماد المدير العام الآن."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid ""
+"Only the Accounting Approvers of %(scope)s can check its commissions: "
+"%(names)s."
+msgstr "لا يدقق عمولات %(scope)s إلا معتمدو المحاسبة لها: %(names)s."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_form
+msgid ""
+"Send everything this department has with Accounting on to the General "
+"Manager as checked?"
+msgstr "إرسال كل ما لدى المحاسبة لهذه الإدارة إلى المدير العام بعد تدقيقه؟"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
+msgid "Send everything waiting here on to the General Manager as checked?"
+msgstr "إرسال كل ما ينتظر هنا إلى المدير العام بعد تدقيقه؟"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_form
+msgid ""
+"Take the submission back so you can keep editing? Accounting and the General"
+" Manager will no longer see it as handed over."
+msgstr ""
+"سحب التسليم لمواصلة التعديل؟ لن تراه المحاسبة ولا المدير العام مُسلَّمًا بعد"
+" ذلك."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_handover_wizards.py:0
+msgid "That is not a step of this screen."
+msgstr "هذه الخطوة ليست من هذه الشاشة."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_handover_wizards.py:0
+msgid "There is nothing waiting for Accounting's check here."
+msgstr "لا يوجد هنا ما ينتظر تدقيق المحاسبة."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_sub_batch__x_is_pending_my_action
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__x_is_pending_my_action
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_search
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_search
+msgid "Waiting for Me"
+msgstr "بانتظاري"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__acc_entry_ids
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_sub_batch__state__checking
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_submission__state__checking
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_list
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_search
+msgid "With Accounting"
+msgstr "لدى المحاسبة"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
+msgid ""
+"With Accounting for checking; it goes on to the General Manager once "
+"checked."
+msgstr "لدى المحاسبة للتدقيق، ثم تنتقل إلى المدير العام بعد تدقيقها."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_batch.py:0
+msgid ""
+"With Accounting for checking; they go on to the General Manager once "
+"checked."
+msgstr "لدى المحاسبة للتدقيق، ثم تنتقل إلى المدير العام بعد تدقيقها."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+msgid ""
+"Your departments for %(period)s are still with Accounting for checking: "
+"%(names)s. They reach you once checked."
+msgstr ""
+"لا تزال إداراتك لشهر %(period)s لدى المحاسبة للتدقيق: %(names)s. ستصلك بعد "
+"تدقيقها."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_form
+msgid ""
+"entr(ies) are with Accounting for checking. They\n"
+"                        reach the General Manager once checked."
+msgstr "قيد/قيود لدى المحاسبة للتدقيق، وتصل إلى المدير العام بعد تدقيقها."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
+msgid ""
+"entr(ies) here are for an employee who already has\n"
+"                        the same thing in another sub-batch or in the batch\n"
+"                        itself (see <b>Also In</b>). Imported trips for the same\n"
+"                        days cannot be submitted twice; anything else can, so\n"
+"                        check that nobody is paid twice."
+msgstr ""
+"قيد/قيود هنا لموظف لديه البند نفسه في دفعة فرعية أخرى أو في الدفعة نفسها "
+"(انظر <b>موجود أيضاً في</b>). لا يمكن تقديم الردود المستوردة للأيام نفسها "
+"مرتين؛ أما غيرها فيمكن، فتأكّد من عدم الصرف مرتين."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
+msgid "🧾 Checked by Accounting"
+msgstr "🧾 دققته المحاسبة"

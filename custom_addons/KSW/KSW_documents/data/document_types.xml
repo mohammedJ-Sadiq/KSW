@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- noupdate: HR tunes alert days, what is required, etc. -->
+    <data noupdate="1">
+        <record id="type_istimara" model="ksw.document.type">
+            <field name="name">Vehicle Registration (Istimara)</field>
+            <field name="code">istimara</field><field name="sequence">1</field>
+            <field name="applies_to">vehicle</field><field name="required_for">own_fleet</field>
+            <field name="ai_hint">رخصة سير / استمارة، Vehicles Registration (no expiry printed)</field>
+            <field name="expiry_on_document" eval="False"/>
+        </record>
+        <record id="type_insurance" model="ksw.document.type">
+            <field name="name">Insurance</field>
+            <field name="code">insurance</field><field name="sequence">2</field>
+            <field name="applies_to">vehicle</field><field name="required_for">own_fleet</field>
+            <field name="ai_hint">وثيقة تأمين مركبة، policy number</field>
+        </record>
+        <record id="type_mvpi" model="ksw.document.type">
+            <field name="name">Periodic Inspection</field>
+            <field name="code">mvpi</field><field name="sequence">3</field>
+            <field name="applies_to">vehicle</field><field name="required_for">own_fleet</field>
+            <field name="ai_hint">الفحص الفني الدوري، MVPI certificate</field>
+        </record>
+        <record id="type_operation_card" model="ksw.document.type">
+            <field name="name">Operation Card</field>
+            <field name="code">operation_card</field><field name="sequence">4</field>
+            <field name="applies_to">vehicle</field><field name="required_for">own_fleet</field>
+            <field name="ai_hint">كرت التشغيل، هيئة النقل، operating card</field>
+        </record>
+        <record id="type_driving_licence" model="ksw.document.type">
+            <field name="name">Driving Licence</field>
+            <field name="code">driving_licence</field><field name="sequence">10</field>
+            <field name="applies_to">employee</field><field name="required_for">custodians</field>
+            <field name="has_class" eval="True"/>
+            <field name="ai_hint">رخصة قيادة، نوع الرخصة: خاصة / عمومي / نقل ثقيل</field>
+        </record>
+        <record id="type_driver_card" model="ksw.document.type">
+            <field name="name">Driver Card</field>
+            <field name="code">driver_card</field><field name="sequence">11</field>
+            <field name="applies_to">employee</field><field name="required_for">custodians</field>
+            <field name="ai_hint">بطاقة سائق، هيئة النقل العام</field>
+        </record>
+        <record id="type_iqama" model="ksw.document.type">
+            <field name="name">Iqama</field>
+            <field name="code">iqama</field><field name="sequence">12</field>
+            <field name="applies_to">employee</field><field name="required_for">non_saudi</field>
+            <field name="sync_number_field">identification_id</field>
+            <field name="ai_hint">هوية مقيم / إقامة، رقم الإقامة 10 أرقام</field>
+        </record>
+        <record id="type_passport" model="ksw.document.type">
+            <field name="name">Passport</field>
+            <field name="code">passport</field><field name="sequence">13</field>
+            <field name="applies_to">employee</field><field name="required_for">non_saudi</field>
+            <field name="sync_number_field">passport_id</field>
+            <field name="sync_expiry_field">passport_expiration_date</field>
+            <field name="ai_hint">Passport, any country</field>
+        </record>
+        <record id="type_visa" model="ksw.document.type">
+            <field name="name">Visa</field>
+            <field name="code">visa</field><field name="sequence">14</field>
+            <field name="applies_to">employee</field><field name="required_for">none</field>
+            <field name="sync_number_field">visa_no</field>
+            <field name="sync_expiry_field">visa_expire</field>
+            <field name="ai_hint">تأشيرة، خروج وعودة، visa</field>
+        </record>
+        <record id="type_company_transport_licence" model="ksw.document.type">
+            <field name="name">Company Transport Licence</field>
+            <field name="code">company_transport_licence</field><field name="sequence">20</field>
+            <field name="applies_to">company</field><field name="required_for">none</field>
+            <field name="ai_hint">ترخيص النقل، License Info on a Naql operation card</field>
+        </record>
+        <record id="type_commercial_registration" model="ksw.document.type">
+            <field name="name">Commercial Registration</field>
+            <field name="code">commercial_registration</field><field name="sequence">19</field>
+            <field name="applies_to">company</field><field name="required_for">none</field>
+            <field name="has_expiry" eval="False"/>
+            <field name="ai_hint">شهادة السجل التجاري / شهادة تسجيل فرع الشركة</field>
+        </record>
+    </data>
+    <!-- The istimara prints no expiry (it is renewed with the periodic
+         inspection): noupdate above, so existing databases get it here. -->
+    <function model="ksw.document.type" name="write">
+        <value eval="[ref('type_istimara')]"/>
+        <value eval="{'expiry_on_document': False}"/>
+    </function>
+    <record id="mail_activity_document" model="mail.activity.type">
+        <field name="name">Document Expiry</field>
+        <field name="icon">fa-id-card-o</field>
+        <field name="res_model">ksw.document</field>
+        <field name="sequence">95</field>
+    </record>
+</odoo>

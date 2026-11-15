@@ -116,6 +116,11 @@
                                 <list editable="bottom" create="0" delete="0">
                                     <field name="sequence" column_invisible="True"/>
                                     <field name="document_type" readonly="1"/>
+                                    <field name="register_status" widget="badge"
+                                           decoration-success="register_status == 'valid'"
+                                           decoration-warning="register_status == 'expiring'"
+                                           decoration-danger="register_status in ('expired', 'missing')"/>
+                                    <field name="register_expiry"/>
                                     <field name="present"/>
                                     <field name="remark"/>
                                 </list>

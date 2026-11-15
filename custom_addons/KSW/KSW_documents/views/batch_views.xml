@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ksw_document_batch_form" model="ir.ui.view">
+        <field name="name">ksw.document.batch.form</field>
+        <field name="model">ksw.document.batch</field>
+        <field name="arch" type="xml">
+            <!-- 1. drop the files  2. Read All  3. choose whose the unmatched
+                 ones are (the rest of their vehicle / person follows)
+                 4. Confirm All. -->
+            <form string="Bulk Upload">
+                <header>
+                    <button name="action_read" type="object" string="Read All" class="oe_highlight"
+                            icon="fa-magic" invisible="not unread_count"/>
+                    <button name="action_confirm_all" type="object" string="Confirm All" class="oe_highlight"
+                            icon="fa-check" invisible="not draft_count or unread_count"
+                            confirm="Confirm every document that says whose it is? Check the highlighted ones first."/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <div class="alert alert-info" role="status" invisible="found_count">
+                        Drop every scan, photo or Absher screenshot here (any mix of vehicles and people,
+                        several documents per image are fine), save, then press <b>Read All</b>.
+                    </div>
+                    <div class="alert alert-warning" role="alert" invisible="not unmatched_count">
+                        <field name="unmatched_count" class="d-inline"/> documents do not say whose they are yet:
+                        choose the vehicle or employee in the list. The other documents of the same
+                        vehicle or person follow.
+                    </div>
+                    <div class="alert alert-danger text-pre-wrap" role="alert" invisible="not errors">
+                        <field name="errors" nolabel="1"/>
+                    </div>
+                    <div class="alert alert-info text-pre-wrap" role="status" invisible="not info">
+                        <field name="info" nolabel="1"/>
+                    </div>
+                    <group>
+                        <field name="attachment_ids" widget="many2many_binary"/>
+                        <field name="unread_count" invisible="1"/>
+                        <field name="draft_count" invisible="1"/>
+                        <field name="found_count" invisible="1"/>
+                    </group>
+                    <field name="document_ids">
+                        <list editable="bottom" create="0" decoration-warning="state == 'draft' and not (vehicle_id or employee_id or company_id)"
+                              decoration-muted="state != 'draft'">
+                            <field name="state" column_invisible="True"/>
+                            <field name="applies_to" column_invisible="True"/>
+                            <field name="type_id" options="{'no_create': True}" readonly="state != 'draft'"/>
+                            <field name="vehicle_id" options="{'no_create': True}" readonly="state != 'draft'"
+                                   invisible="applies_to != 'vehicle'"/>
+                            <field name="employee_id" options="{'no_create': True}" readonly="state != 'draft'"
+                                   invisible="applies_to != 'employee'"/>
+                            <field name="company_id" options="{'no_create': True}" readonly="state != 'draft'"
+                                   invisible="applies_to != 'company'"/>
+                            <field name="registration_id" options="{'no_create': True}" readonly="state != 'draft'"
+                                   invisible="applies_to != 'company'" optional="show"/>
+                            <field name="match_note" optional="show"/>
+                            <field name="number" readonly="state != 'draft'"/>
+                            <field name="expiry_date" readonly="state != 'draft'"/>
+                            <field name="license_class" optional="hide" readonly="state != 'draft'"/>
+                            <field name="detected_plate" optional="show"/>
+                            <field name="detected_vin" optional="show"/>
+                            <field name="detected_id_number" optional="show"/>
+                            <field name="detected_name" optional="show"/>
+                            <field name="ai_notes" optional="show"/>
+                            <button name="action_open_scan" type="object" icon="fa-file-image-o" title="Open Scan"/>
+                        </list>
+                    </field>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_document_batch_list" model="ir.ui.view">
+        <field name="name">ksw.document.batch.list</field>
+        <field name="model">ksw.document.batch</field>
+        <field name="arch" type="xml">
+            <list string="Bulk Uploads">
+                <field name="name"/>
+                <field name="create_uid"/>
+                <field name="create_date"/>
+                <field name="found_count" string="Documents"/>
+                <field name="draft_count" string="To Confirm"/>
+                <field name="unmatched_count" string="Owner Missing"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_ksw_document_batch" model="ir.actions.act_window">
+        <field name="name">Bulk Upload</field>
+        <field name="res_model">ksw.document.batch</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Upload many documents at once</p>
+            <p>Claude reads every scan and Odoo finds whose each document is. You confirm.</p>
+        </field>
+    </record>
+</odoo>

@@ -433,6 +433,7 @@ class TestVacationHoldOnTheRegister(VacationHoldCommon):
         batch = self._batch(AUG)
         self._entry(batch, day=date(2026, 8, 4))
         batch.submission_id.sudo().action_submit()
+        batch.submission_id.sudo().action_acc_check()
         batch.submission_id.with_user(self.gm_user).sudo().action_approve()
 
         self._leave(date(2026, 8, 11), date(2026, 9, 16),

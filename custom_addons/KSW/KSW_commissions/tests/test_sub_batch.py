@@ -118,6 +118,7 @@ class TestSubBatchLock(SubBatchCommon):
     def test_10_submitting_locks_only_its_rows(self):
         sub = self._sub_batch(self.emp_a)
         sub.with_user(self.sup_a).action_submit()
+        self._acc_check(sub)
         self.assertEqual(sub.state, 'submitted')
         self.assertEqual(self.ot_a.state, 'submitted')
         # One component: his meal row is not part of an Overtime sub-batch.
@@ -137,6 +138,7 @@ class TestSubBatchLock(SubBatchCommon):
     def test_11_the_gm_sees_only_what_was_handed_over(self):
         sub = self._sub_batch(self.emp_a)
         sub.with_user(self.sup_a).action_submit()
+        self._acc_check(sub)
         self.submission.invalidate_recordset()
         self.assertEqual(self.submission.pending_entry_ids, self.ot_a)
         self.run.invalidate_recordset()
@@ -146,6 +148,7 @@ class TestSubBatchLock(SubBatchCommon):
     def test_12_approval_locks_them_and_leaves_the_month_open(self):
         sub = self._sub_batch(self.emp_a)
         sub.with_user(self.sup_a).action_submit()
+        self._acc_check(sub)
         sub.with_user(self.gm).action_approve()
         self.assertEqual(sub.state, 'approved')
         self.assertEqual(self.ot_a.state, 'approved')
@@ -163,6 +166,7 @@ class TestSubBatchLock(SubBatchCommon):
         was refused. The rest of the department must go in as usual."""
         meals_sub = self._sub_batch(self.emp_a, batch=self.meals_batch)
         meals_sub.with_user(self.sup_a).action_submit()
+        self._acc_check(meals_sub)
         meals_sub.with_user(self.gm).action_approve()
         self.assertEqual(self.meal_a.state, 'approved')
         # Add a line, as the form does it: nothing carried from his row.
@@ -186,8 +190,10 @@ class TestSubBatchLock(SubBatchCommon):
         decided nothing on it, so the supervisor takes it back himself."""
         meals_sub = self._sub_batch(self.emp_a, batch=self.meals_batch)
         meals_sub.with_user(self.sup_a).action_submit()
+        self._acc_check(meals_sub)
         meals_sub.with_user(self.gm).action_approve()
         self.meals_batch.with_user(self.sup_a).action_submit()
+        self._acc_check(self.meals_batch)
         self.assertEqual(self.meals_batch.state, 'approved')
         self.assertTrue(self.meals_batch.with_user(self.sup_a).x_can_reopen)
         self.meals_batch.with_user(self.sup_a).action_reset_to_draft()
@@ -198,6 +204,7 @@ class TestSubBatchLock(SubBatchCommon):
 
     def test_12d_a_batch_the_gm_approved_stays_his_to_reopen(self):
         self.meals_batch.with_user(self.sup_a).action_submit()
+        self._acc_check(self.meals_batch)
         self.meals_batch.entry_ids.sudo().write({'state': 'approved'})
         self.meals_batch.sudo()._sync_state_from_entries()
         self.assertEqual(self.meals_batch.state, 'approved')
@@ -208,6 +215,7 @@ class TestSubBatchLock(SubBatchCommon):
     def test_13_a_batch_with_approved_rows_cannot_be_deleted_by_anyone(self):
         sub = self._sub_batch(self.emp_a)
         sub.with_user(self.sup_a).action_submit()
+        self._acc_check(sub)
         sub.with_user(self.gm).action_approve()
         with self.assertRaises(UserError):
             self.ot.with_user(self.sup_a).unlink()
@@ -222,15 +230,20 @@ class TestSubBatchLock(SubBatchCommon):
         other = self._user('sub_other_gm', 'KSW_commissions.group_commission_gm')
         sub = self._sub_batch(self.emp_a)
         sub.with_user(self.sup_a).action_submit()
+        self._acc_check(sub)
+        self._acc_check(sub)
         with self.assertRaises(UserError):
             sub.with_user(other).action_approve()
+        self._acc_check(sub)
         with self.assertRaises(UserError):
             sub.with_user(self.sup_a).action_approve()
 
     def test_15_reopening_the_batch_leaves_sub_batch_rows_alone(self):
         sub = self._sub_batch(self.emp_a)
         sub.with_user(self.sup_a).action_submit()
+        self._acc_check(sub)
         self.ot.with_user(self.sup_a).action_submit()
+        self._acc_check(self.ot)
         self.assertEqual(self.ot_a2.state, 'submitted')
         self.ot.with_user(self.sup_a).action_reset_to_draft()
         self.assertEqual(self.ot_a2.state, 'draft')
@@ -253,8 +266,11 @@ class TestSubmitPrompt(SubBatchCommon):
         wizard.write(dict(
             {'employee_ids': [(6, 0, employees.ids)], 'note': note}, **vals))
         action = wizard.action_confirm() if send else wizard.action_add()
-        return self.env['ksw.pay.sub.batch'].browse(
+        sub = self.env['ksw.pay.sub.batch'].browse(
             action['params']['next']['res_id'])
+        if send:
+            self._acc_check(sub)
+        return sub
 
     def test_20_one_sub_batch_across_components_month_stays_open(self):
         wizard = self._wizard()
@@ -276,6 +292,7 @@ class TestSubmitPrompt(SubBatchCommon):
     def test_21_the_gm_approving_the_early_ones_closes_nothing(self):
         """The KSWCO incident, the way it should have gone."""
         sub = self._early(self.emp_a)
+        self._acc_check(sub)
         sub.with_user(self.gm).action_approve()
         self.assertEqual(self.ot_a.state, 'approved')
         self.assertEqual(self.submission.state, 'draft')
@@ -333,6 +350,7 @@ class TestSubmitPrompt(SubBatchCommon):
         late = self._entry(self.meals_batch, self.emp_a, user=self.sup_a)
         self.assertEqual(late.x_sub_batch_id, sub)
         sub.with_user(self.sup_a).action_submit()
+        self._acc_check(sub)
         self.assertEqual(late.state, 'submitted')
 
     def test_27_add_employees_from_the_sub_batch(self):
@@ -348,6 +366,7 @@ class TestSubmitPrompt(SubBatchCommon):
         wizard = self._wizard()
         wizard.mode = 'month'
         wizard.action_confirm()
+        self._acc_check(self.submission)
         self.assertEqual(self.submission.state, 'submitted')
         self.assertEqual(sub.state, 'submitted')
         self.assertEqual(
@@ -369,6 +388,7 @@ class TestSubmitPrompt(SubBatchCommon):
         wizard = self._wizard(self.run)
         wizard.mode = 'month'
         wizard.action_confirm()
+        self._acc_check(self.submission)
         self.assertEqual(self.submission.state, 'submitted')
         self.assertFalse(empty.exists())
 
@@ -378,6 +398,7 @@ class TestGmPartialReturn(SubBatchCommon):
     def test_30_refuse_one_employee_approve_the_rest(self):
         """On a normal, whole-department handover."""
         self.submission.with_user(self.sup_a).action_submit()
+        self._acc_check(self.submission)
         self._review(self.submission, 'return', self.emp_a,
                      approve_rest=True)
         # emp_a's overtime and meals come back, with the reason…
@@ -394,11 +415,13 @@ class TestGmPartialReturn(SubBatchCommon):
             self.ot_a2.with_user(self.sup_a).write({'quantity': 2.0})
         # Resubmit, approve, done.
         self.submission.with_user(self.sup_a).action_submit()
+        self._acc_check(self.submission)
         self.submission.with_user(self.gm).action_approve()
         self.assertEqual(self.submission.state, 'approved')
 
     def test_31_refuse_one_pay_type_of_one_employee(self):
         self.submission.with_user(self.sup_a).action_submit()
+        self._acc_check(self.submission)
         lines = self._lines(self.submission)
         # One line per component per employee: 3 here.
         self.assertEqual(len(lines), 3)
@@ -412,6 +435,7 @@ class TestGmPartialReturn(SubBatchCommon):
     def test_32_a_sub_batch_can_be_partly_refused(self):
         sub = self._sub_batch(self.emp_a | self.emp_a2)
         sub.with_user(self.sup_a).action_submit()
+        self._acc_check(sub)
         self._review(sub, 'return', self.emp_a2, approve_rest=True)
         self.assertEqual(self.ot_a2.state, 'draft')
         self.assertEqual(self.ot_a.state, 'approved')
@@ -430,6 +454,7 @@ class TestGmReviewByComponent(SubBatchCommon):
 
     def test_60_one_line_per_component_per_employee(self):
         self.submission.with_user(self.sup_a).action_submit()
+        self._acc_check(self.submission)
         lines = self._lines(self.submission)
         overtime = lines.filtered(lambda l: l.component_id == self.component)
         self.assertEqual(len(overtime), 2)
@@ -437,6 +462,7 @@ class TestGmReviewByComponent(SubBatchCommon):
 
     def test_61_approve_one_employee_of_a_component(self):
         self.submission.with_user(self.sup_a).action_submit()
+        self._acc_check(self.submission)
         lines = self._lines(self.submission)
         self._pick(lines, self.component, self.emp_a).action_approve()
         self.assertEqual(self.ot_a.state, 'approved')
@@ -456,6 +482,7 @@ class TestGmReviewByComponent(SubBatchCommon):
         """Approve A's overtime, return A2's overtime, approve A's meals —
         in one sitting, component by component."""
         self.submission.with_user(self.sup_a).action_submit()
+        self._acc_check(self.submission)
         lines = self._lines(self.submission)
         self._pick(lines, self.component, self.emp_a).action_approve()
         self._send_back(self._pick(lines, self.component, self.emp_a2),
@@ -471,12 +498,14 @@ class TestGmReviewByComponent(SubBatchCommon):
         # The supervisor fixes only the returned row, and resubmits.
         self.ot_a2.with_user(self.sup_a).write({'quantity': 2.0})
         self.submission.with_user(self.sup_a).action_submit()
+        self._acc_check(self.submission)
         self.submission.with_user(self.gm).action_approve()
         self.assertEqual(self.submission.state, 'approved')
 
     def test_63_works_on_a_sub_batch(self):
         sub = self._sub_batch(self.emp_a | self.emp_a2)
         sub.with_user(self.sup_a).action_submit()
+        self._acc_check(sub)
         lines = self._lines(sub)
         self._pick(lines, self.component, self.emp_a).action_approve()
         self.assertEqual(self.ot_a.state, 'approved')
@@ -485,12 +514,14 @@ class TestGmReviewByComponent(SubBatchCommon):
 
     def test_64_a_return_needs_a_reason(self):
         self.submission.with_user(self.sup_a).action_submit()
+        self._acc_check(self.submission)
         lines = self._lines(self.submission)
         with self.assertRaises(UserError):
             self._send_back(lines[:1], '  ')
 
     def test_65_only_the_departments_gm(self):
         self.submission.with_user(self.sup_a).action_submit()
+        self._acc_check(self.submission)
         with self.assertRaises(UserError):
             self.submission.with_user(self.sup_a).action_open_review()
 
@@ -504,6 +535,7 @@ class TestNothingAfterApproval(SubBatchCommon):
         other = self._batch(self.sup_b, self.dept_b)
         self._entry(other, self.emp_b, user=self.sup_b)
         self.submission.with_user(self.sup_a).action_submit()
+        self._acc_check(self.submission)
         self.submission.with_user(self.gm).action_approve()
         self.assertEqual(self.submission.state, 'approved')
         self.assertNotIn(self.run.state, ('approved', 'paid'))
@@ -519,6 +551,7 @@ class TestNothingAfterApproval(SubBatchCommon):
 
     def test_71_a_returned_department_is_open_again(self):
         self.submission.with_user(self.sup_a).action_submit()
+        self._acc_check(self.submission)
         self.submission.sudo().return_reason = 'Add the Friday allowance'
         self.submission.with_user(self.gm).action_return()
         self._batch(self.sup_a, self.dept_a, component=self.env.ref(
@@ -527,6 +560,7 @@ class TestNothingAfterApproval(SubBatchCommon):
     def test_72_a_finalised_month_takes_nothing_from_anyone(self):
         other = self._approved_normally()
         other.submission_id.with_user(self.sup_b).action_submit()
+        self._acc_check(other.submission_id)
         other.submission_id.with_user(self.gm).action_approve()
         self.run.sudo().action_close_month()
         self.assertEqual(self.run.state, 'approved')
@@ -553,6 +587,7 @@ class TestPaidIsFinal(SubBatchCommon):
     def _approved_early(self):
         sub = self._sub_batch(self.emp_a)
         sub.with_user(self.sup_a).action_submit()
+        self._acc_check(sub)
         sub.with_user(self.gm).action_approve()
         return sub
 
@@ -591,6 +626,7 @@ class TestPaidIsFinal(SubBatchCommon):
     def test_43_reopening_the_month_keeps_early_approvals(self):
         self._approved_early()
         self.submission.with_user(self.sup_a).action_submit()
+        self._acc_check(self.submission)
         self.submission.with_user(self.gm).action_approve()
         self.run.sudo().action_close_month()
         self.assertEqual(self.run.state, 'approved')
@@ -608,6 +644,7 @@ class TestSubBatchComponentScope(TestSubmitPrompt):
 
     def test_80_a_batch_taken_back_joins_the_open_sub_batch(self):
         self.meals_batch.with_user(self.sup_a).action_submit()
+        self._acc_check(self.meals_batch)
         self.assertEqual(self.meal_a.state, 'submitted')
         sub = self._early(self.emp_a, send=False)
         self.assertNotIn(self.meal_a, sub.entry_ids)
@@ -642,6 +679,7 @@ class TestSubBatchComponentScope(TestSubmitPrompt):
         late = self._entry(self.meals_batch, self.emp_a, user=self.sup_a)
         self.assertFalse(late.x_sub_batch_id)
         sub.with_user(self.sup_a).action_submit()
+        self._acc_check(sub)
         self.assertEqual((self.meal_a | late).mapped('state'),
                          ['draft', 'draft'])
         self.assertEqual(self.ot_a.state, 'submitted')

@@ -18,7 +18,9 @@ class TestRunTotalsVisibility(SubmissionCommon):
     def _approved_run(self):
         batch = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)
         batch.submission_id.sudo().action_submit()
+        self._acc_check(batch.submission_id)
         run = batch.submission_id.run_id
+        self._acc_check(run)
         run.with_user(self.gm).action_approve()
         return run
 

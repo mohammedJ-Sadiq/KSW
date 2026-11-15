@@ -205,3 +205,38 @@ class TestVehicleCustody(TransactionCase):
         Requests = self.env['ksw.fleet.request']
         self.assertIn(request, Requests.with_user(self.gm).search(pending))
         self.assertNotIn(request, Requests.with_user(self.hr).search(pending))
+
+    def test_todos_skip_admin(self):
+        """admin holds the workshop role for system access: no to-do for him."""
+        admin = self.env.ref('base.user_admin')
+        admin.sudo().group_ids = [(4, self.env.ref('KSW_workshop.group_workshop_manager').id),
+                                  (4, self.env.ref('KSW_vehicle_custody.group_custody_hr').id)]
+        request, form = self._release('holding')
+        users = form.activity_ids.user_id
+        self.assertIn(self.workshop, users)
+        self.assertIn(self.hr, users)
+        self.assertNotIn(admin, users)
+
+    def test_workshop_staff_see_their_own_workshop_only(self):
+        """The Tabuk manager handles Tabuk's forms; the Nabiya manager does not
+        see, get, or complete them (as with workshop requests)."""
+        Workshop = self.env['ksw.workshop']
+        nabiya, other = Workshop._main(), Workshop.create({'name': 'VC Other Workshop'})
+        self.dept_a.x_workshop_id = other
+        other_mgr = self.env['res.users'].with_context(no_reset_password=True).create({
+            'name': 'vc_other_ws', 'login': 'vc_other_ws',
+            'group_ids': [(6, 0, [self.env.ref('KSW_workshop.group_workshop_manager').id])],
+            'x_workshop_ids': [(6, 0, other.ids)]})
+        self.workshop.sudo().x_workshop_ids = [(6, 0, nabiya.ids)]
+        request, form = self._release('holding')
+        self.assertEqual(form.workshop_id, other)
+        Form = self.env['ksw.vehicle.custody.request']
+        pending = [('x_is_pending_my_action', '=', True)]
+        self.assertIn(form, Form.with_user(other_mgr).search(pending))
+        self.assertNotIn(form, Form.with_user(self.workshop).search(pending))
+        self.assertFalse(Form.with_user(self.workshop).search([('id', '=', form.id)]))
+        self.assertEqual(form.activity_ids.filtered(lambda a: a.user_id.has_group(
+            'KSW_workshop.group_workshop_manager')).user_id, other_mgr)
+        form.sudo().inspection_datetime = '2026-11-12 08:00:00'
+        form.with_user(other_mgr).action_workshop_done()
+        self.assertTrue(form.workshop_done)

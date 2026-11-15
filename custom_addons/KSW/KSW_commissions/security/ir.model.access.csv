@@ -75,6 +75,9 @@ access_ksw_pay_submit_wizard_supervisor,ksw.pay.submit.wizard supervisor,model_k
 access_ksw_pay_gm_review_wizard_gm,ksw.pay.gm.review.wizard gm,model_ksw_pay_gm_review_wizard,group_commission_gm,1,1,1,1
 access_ksw_pay_gm_review_line_gm,ksw.pay.gm.review.line gm,model_ksw_pay_gm_review_line,group_commission_gm,1,1,1,1
 access_ksw_pay_gm_review_reason_gm,ksw.pay.gm.review.reason gm,model_ksw_pay_gm_review_reason,group_commission_gm,1,1,1,1
+access_ksw_pay_gm_review_wizard_accountant,ksw.pay.gm.review.wizard accountant,model_ksw_pay_gm_review_wizard,group_commission_accountant,1,1,1,1
+access_ksw_pay_gm_review_line_accountant,ksw.pay.gm.review.line accountant,model_ksw_pay_gm_review_line,group_commission_accountant,1,1,1,1
+access_ksw_pay_gm_review_reason_accountant,ksw.pay.gm.review.reason accountant,model_ksw_pay_gm_review_reason,group_commission_accountant,1,1,1,1
 access_ksw_pay_employee_review_supervisor,ksw.pay.employee.review supervisor,model_ksw_pay_employee_review,group_commission_supervisor,1,0,0,0
 access_ksw_pay_employee_review_gm,ksw.pay.employee.review gm,model_ksw_pay_employee_review,group_commission_gm,1,0,0,0
 access_ksw_pay_employee_review_accountant,ksw.pay.employee.review accountant,model_ksw_pay_employee_review,group_commission_accountant,1,0,0,0

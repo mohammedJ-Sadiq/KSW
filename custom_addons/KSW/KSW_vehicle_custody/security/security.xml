@@ -27,7 +27,8 @@
     <record id="group_custody_hr" model="res.groups">
         <field name="name">HR / Administrative Affairs</field>
         <field name="privilege_id" ref="privilege_vehicle_custody"/>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <!-- HR keeps the documents register its HR-12 section reads. -->
+        <field name="implied_ids" eval="[(4, ref('base.group_user')), (4, ref('KSW_documents.group_document_officer'))]"/>
         <field name="sequence">10</field>
     </record>
 
@@ -38,13 +39,13 @@
         <field name="groups" eval="[(4, ref('KSW_fleet_allocation.group_fleet_allocation_user'))]"/>
     </record>
     <record id="rule_custody_request_all" model="ir.rule">
-        <field name="name">HR-12: HR, accounting, GM, workshop and administrator see all</field>
+        <field name="name">HR-12: HR, accounting, GM and administrator see all</field>
         <field name="model_id" ref="model_ksw_vehicle_custody_request"/>
         <field name="domain_force">[(1, '=', 1)]</field>
-        <field name="groups" eval="[(4, ref('group_custody_hr')), (4, ref('group_custody_accounting')),
-                                    (4, ref('KSW_fleet_allocation.group_fleet_allocation_gm')),
-                                    (4, ref('KSW_workshop.group_workshop_technician')),
-                                    (4, ref('KSW_workshop.group_workshop_reviewer')), (4, ref('base.group_system'))]"/>
+        <!-- (6, ...): sets the list exactly. (4, ...) only adds, so workshop
+             roles removed here would stay in the database (gotcha #3). -->
+        <field name="groups" eval="[(6, 0, [ref('group_custody_hr'), ref('group_custody_accounting'),
+                                            ref('KSW_fleet_allocation.group_fleet_allocation_gm'), ref('base.group_system')])]"/>
     </record>
     <record id="rule_custody_document_department" model="ir.rule">
         <field name="name">HR-12 document: own departments</field>
@@ -56,10 +57,10 @@
         <field name="name">HR-12 document: see all</field>
         <field name="model_id" ref="model_ksw_vehicle_custody_document"/>
         <field name="domain_force">[(1, '=', 1)]</field>
-        <field name="groups" eval="[(4, ref('group_custody_hr')), (4, ref('group_custody_accounting')),
-                                    (4, ref('KSW_fleet_allocation.group_fleet_allocation_gm')),
-                                    (4, ref('KSW_workshop.group_workshop_technician')),
-                                    (4, ref('KSW_workshop.group_workshop_reviewer')), (4, ref('base.group_system'))]"/>
+        <!-- (6, ...): sets the list exactly. (4, ...) only adds, so workshop
+             roles removed here would stay in the database (gotcha #3). -->
+        <field name="groups" eval="[(6, 0, [ref('group_custody_hr'), ref('group_custody_accounting'),
+                                            ref('KSW_fleet_allocation.group_fleet_allocation_gm'), ref('base.group_system')])]"/>
     </record>
     <record id="rule_custody_inspection_department" model="ir.rule">
         <field name="name">HR-12 inspection: own departments</field>
@@ -71,10 +72,53 @@
         <field name="name">HR-12 inspection: see all</field>
         <field name="model_id" ref="model_ksw_vehicle_custody_inspection"/>
         <field name="domain_force">[(1, '=', 1)]</field>
-        <field name="groups" eval="[(4, ref('group_custody_hr')), (4, ref('group_custody_accounting')),
-                                    (4, ref('KSW_fleet_allocation.group_fleet_allocation_gm')),
-                                    (4, ref('KSW_workshop.group_workshop_technician')),
-                                    (4, ref('KSW_workshop.group_workshop_reviewer')), (4, ref('base.group_system'))]"/>
+        <!-- (6, ...): sets the list exactly. (4, ...) only adds, so workshop
+             roles removed here would stay in the database (gotcha #3). -->
+        <field name="groups" eval="[(6, 0, [ref('group_custody_hr'), ref('group_custody_accounting'),
+                                            ref('KSW_fleet_allocation.group_fleet_allocation_gm'), ref('base.group_system')])]"/>
+    </record>
+
+    <!-- Workshop staff: their own workshop's forms, as with workshop
+         requests (manager/technician scope; the Reviewer role a Manager
+         implies is scoped the same way, gotcha #256). -->
+    <record id="rule_custody_request_workshop" model="ir.rule">
+        <field name="name">HR-12: workshop staff, own workshops</field>
+        <field name="model_id" ref="model_ksw_vehicle_custody_request"/>
+        <field name="domain_force">[('workshop_id', 'in', user._ksw_workshop_scope_ids())]</field>
+        <field name="groups" eval="[(4, ref('KSW_workshop.group_workshop_technician'))]"/>
+    </record>
+    <record id="rule_custody_request_reviewer" model="ir.rule">
+        <field name="name">HR-12: workshop reviewer, his workshops (all for a pure reviewer)</field>
+        <field name="model_id" ref="model_ksw_vehicle_custody_request"/>
+        <field name="domain_force">[('workshop_id', 'in', user._ksw_workshop_review_ids())]</field>
+        <field name="groups" eval="[(4, ref('KSW_workshop.group_workshop_reviewer'))]"/>
+        <field name="perm_write" eval="False"/><field name="perm_create" eval="False"/><field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="rule_custody_document_workshop" model="ir.rule">
+        <field name="name">HR-12 document: workshop staff, own workshops</field>
+        <field name="model_id" ref="model_ksw_vehicle_custody_document"/>
+        <field name="domain_force">[('request_id.workshop_id', 'in', user._ksw_workshop_scope_ids())]</field>
+        <field name="groups" eval="[(4, ref('KSW_workshop.group_workshop_technician'))]"/>
+    </record>
+    <record id="rule_custody_document_reviewer" model="ir.rule">
+        <field name="name">HR-12 document: workshop reviewer, his workshops</field>
+        <field name="model_id" ref="model_ksw_vehicle_custody_document"/>
+        <field name="domain_force">[('request_id.workshop_id', 'in', user._ksw_workshop_review_ids())]</field>
+        <field name="groups" eval="[(4, ref('KSW_workshop.group_workshop_reviewer'))]"/>
+        <field name="perm_write" eval="False"/><field name="perm_create" eval="False"/><field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="rule_custody_inspection_workshop" model="ir.rule">
+        <field name="name">HR-12 inspection: workshop staff, own workshops</field>
+        <field name="model_id" ref="model_ksw_vehicle_custody_inspection"/>
+        <field name="domain_force">[('request_id.workshop_id', 'in', user._ksw_workshop_scope_ids())]</field>
+        <field name="groups" eval="[(4, ref('KSW_workshop.group_workshop_technician'))]"/>
+    </record>
+    <record id="rule_custody_inspection_reviewer" model="ir.rule">
+        <field name="name">HR-12 inspection: workshop reviewer, his workshops</field>
+        <field name="model_id" ref="model_ksw_vehicle_custody_inspection"/>
+        <field name="domain_force">[('request_id.workshop_id', 'in', user._ksw_workshop_review_ids())]</field>
+        <field name="groups" eval="[(4, ref('KSW_workshop.group_workshop_reviewer'))]"/>
+        <field name="perm_write" eval="False"/><field name="perm_create" eval="False"/><field name="perm_unlink" eval="False"/>
     </record>
 
     <!-- HR reads every vehicle request and its lines and movements, to review

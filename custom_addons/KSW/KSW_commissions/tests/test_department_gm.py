@@ -50,6 +50,7 @@ class TestCommissionDepartmentGm(SubmissionCommon):
         batch = self._batch(supervisor, department)
         self._entry(batch, employee, user=supervisor)
         batch.submission_id.sudo().action_submit()
+        self._acc_check(batch.submission_id)
         return batch.submission_id
 
     # ------------------------------------------------------------------
@@ -74,6 +75,7 @@ class TestCommissionDepartmentGm(SubmissionCommon):
     # ------------------------------------------------------------------
     def test_a_gm_cannot_approve_another_departments_handover(self):
         sub = self._submit(self.sup_a, self.dept_a, self.emp_a)
+        self._acc_check(sub)
         with self.assertRaises(UserError) as caught:
             sub.with_user(self.user_gm_b).action_approve()
         self.assertIn(self.gm_a.name, str(caught.exception))
@@ -88,6 +90,7 @@ class TestCommissionDepartmentGm(SubmissionCommon):
 
     def test_a_gm_approves_his_own_departments_handover(self):
         sub = self._submit(self.sup_a, self.dept_a, self.emp_a)
+        self._acc_check(sub)
         sub.with_user(self.gm_a).sudo().action_approve()
         self.assertEqual(sub.state, 'approved')
 
@@ -117,6 +120,7 @@ class TestCommissionDepartmentGm(SubmissionCommon):
         sub_a = self._submit(self.sup_a, self.dept_a, self.emp_a)
         self._submit(self.sup_b, self.dept_b, self.emp_b)
         run = sub_a.run_id
+        self._acc_check(run)
         run.with_user(self.gm_a).sudo().action_approve()
         self.assertEqual(sub_a.state, 'approved')
         self.assertNotEqual(
@@ -126,7 +130,9 @@ class TestCommissionDepartmentGm(SubmissionCommon):
     def test_the_month_stays_open_once_no_department_is_left_waiting(self):
         sub_a = self._submit(self.sup_a, self.dept_a, self.emp_a)
         sub_b = self._submit(self.sup_b, self.dept_b, self.emp_b)
+        self._acc_check(sub_a.run_id)
         sub_a.run_id.with_user(self.gm_a).action_approve()
+        self._acc_check(sub_b.run_id)
         sub_b.run_id.with_user(self.user_gm_b).action_approve()
         self.assertEqual(sub_b.state, 'approved')
         self.assertNotIn(sub_a.run_id.state, ('approved', 'paid'))
@@ -137,7 +143,9 @@ class TestCommissionDepartmentGm(SubmissionCommon):
         # are approved there is nothing else on it to name.
         sub_a = self._submit(self.sup_a, self.dept_a, self.emp_a)
         run = sub_a.run_id
+        self._acc_check(run)
         run.with_user(self.gm_a).action_approve()
+        self._acc_check(run)
         with self.assertRaises(UserError):
             run.with_user(self.gm_a).action_approve()
 
@@ -147,6 +155,7 @@ class TestCommissionDepartmentGm(SubmissionCommon):
     def test_a_gm_cannot_close_another_gms_month(self):
         self._submit(self.sup_a, self.dept_a, self.emp_a)
         sub_b = self._submit(self.sup_b, self.dept_b, self.emp_b)
+        self._acc_check(sub_b.run_id)
         sub_b.run_id.with_user(self.user_gm_b).action_approve()
         # No sudo() on the call under test: _is_month_closer() exempts
         # env.su, so a sudo'd call would pass whatever the guard said.
@@ -157,6 +166,7 @@ class TestCommissionDepartmentGm(SubmissionCommon):
         sub_a = self._submit(self.sup_a, self.dept_a, self.emp_a)
         self._submit(self.sup_b, self.dept_b, self.emp_b)
         run = sub_a.run_id
+        self._acc_check(run)
         run.with_user(self.gm_a).action_approve()
         run.with_user(self.gm_a).action_close_month()
         self.assertEqual(run.state, 'approved')
@@ -171,6 +181,7 @@ class TestCommissionDepartmentGm(SubmissionCommon):
         sub_a = self._submit(self.sup_a, self.dept_a, self.emp_a)
         sub_b = self._submit(self.sup_b, self.dept_b, self.emp_b)
         run = sub_a.run_id
+        self._acc_check(run)
         run.with_user(self.gm_a).sudo().action_approve()
         run.with_user(self.user_company_gm).sudo().action_close_month()
 

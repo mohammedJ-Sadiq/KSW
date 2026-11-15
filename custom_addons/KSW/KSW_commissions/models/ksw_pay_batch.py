@@ -30,9 +30,11 @@ from markupsafe import Markup, escape
 
 from odoo import _, SUPERUSER_ID, api, fields, models
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools.misc import format_date
 
 from .ksw_commission_lock import (
-    check_period_unlocked, gm_for_department, period_is_locked)
+    HANDED_STATES, check_period_unlocked, gm_for_department,
+    period_is_locked)
 from .ksw_pay_component import HOLIDAY_OCCASIONS
 from .ksw_vacation_hold import (
     check_not_held, entry_blocked, hold_reason, month_bounds,
@@ -265,14 +267,15 @@ class KswPayBatch(models.Model):
             if rec._approved_only_by_sub_batches():
                 # The GM never decided this batch: its rows were approved
                 # in sub-batches, so it is still the supervisor's to type in.
-                rec.x_can_reopen = rec.submission_id.state != 'submitted'
+                rec.x_can_reopen = rec.submission_id.state not in HANDED_STATES
                 continue
             if rec.state == 'approved':
                 # Money that has left is history, for the GM too.
                 rec.x_can_reopen = is_gm and not rec.sudo().entry_ids.filtered(
                     lambda e: e.state == 'approved')._paid_entries()
                 continue
-            rec.x_can_reopen = is_gm or rec.submission_id.state != 'submitted'
+            rec.x_can_reopen = is_gm or \
+                rec.submission_id.state not in HANDED_STATES
 
     @api.depends_context('uid')
     @api.depends('component_id', 'component_id.entries_import_only')
@@ -649,7 +652,7 @@ class KswPayBatch(models.Model):
         if self.env.su:
             return
         for rec in self:
-            if rec.submission_id.state in ('submitted', 'approved'):
+            if rec.submission_id.state in HANDED_STATES + ('approved',):
                 raise UserError(_(
                     "%(scope)s has been handed to the General Manager as a "
                     "whole. %(what)s is not possible until he returns it.",
@@ -910,7 +913,7 @@ class KswPayBatch(models.Model):
             )
             # A department cannot stay handed over while one of its batches
             # is back on the supervisor's desk.
-            if rec.submission_id.state == 'submitted':
+            if rec.submission_id.state in HANDED_STATES:
                 rec.submission_id.sudo().write({
                     'state': 'returned', 'returned_by': self.env.uid,
                     'return_reason': reason or rec.submission_id.return_reason,
@@ -953,7 +956,7 @@ class KswPayBatch(models.Model):
                     approved._check_reopenable()
                 rows.filtered(
                     lambda e: e.state != 'draft' and not e.x_vacation_payslip_id
-                ).sudo().write({'state': 'draft'})
+                ).sudo().write(dict(rec.entry_ids._UNCHECKED, state='draft'))
                 rec.with_context(ksw_entry_sync=True).write({
                     'state': 'draft', 'submitted_by': False,
                     'submitted_date': False, 'handed_over_date': False})
@@ -965,7 +968,7 @@ class KswPayBatch(models.Model):
                 raise UserError(_(
                     "%(name)s has been approved. Only the General Manager "
                     "can reopen it.", name=rec.name))
-            if rec.submission_id.state == 'submitted':
+            if rec.submission_id.state in HANDED_STATES:
                 raise UserError(_(
                     "%(scope)s has already been submitted to the General "
                     "Manager, so its batches are frozen. Ask him to return "
@@ -1039,8 +1042,14 @@ class KswPayBatch(models.Model):
                     'name': b.component_id.name,
                     'total': b.total_amount or 0.0}
             body += Markup('</ul>')
+            # Accounting checks them first (Nov 2026); the GM is told when
+            # they have (ksw.pay.submission._notify_checked).
+            body += Markup('<i>%s</i>') % _(
+                'With Accounting for checking; they go on to the General '
+                'Manager once checked.')
             submission.sudo().message_post(
-                body=body, partner_ids=submission._gm_partners().ids,
+                body=body,
+                partner_ids=submission._accountant_users().partner_id.ids,
                 subtype_xmlid='mail.mt_comment')
         runs = batches.mapped('submission_id.run_id')
         runs._sync_state()
@@ -1171,6 +1180,16 @@ class KswPayEntry(models.Model):
              'paid with the rest of the month.')
     x_return_reason = fields.Text(
         string='Returned Because', readonly=True, copy=False)
+    # Accounting's check (Nov 2026): a handed-over row reaches the
+    # department's accountants first, and only a row they have checked is
+    # in front of the General Manager. On the row, not the handover, for
+    # the reason the state is: the GM decides per employee, and a row he
+    # returns comes back unchecked (_wf_return clears it).
+    x_acc_checked_by = fields.Many2one(
+        'res.users', string='Checked by Accounting', readonly=True,
+        copy=False, index=True)
+    x_acc_checked_date = fields.Datetime(
+        string='Checked On', readonly=True, copy=False)
     currency_id = fields.Many2one(
         related='batch_id.currency_id', readonly=True,
     )
@@ -1275,9 +1294,10 @@ class KswPayEntry(models.Model):
         string='Days To', readonly=True, copy=False,
         help='Last day the imported figure covers.')
     # The same employee paid for the same thing twice: once in a sub-batch
-    # and again in the batch, or in another sub-batch. A warning, never a
-    # block — the supervisor may mean it (two separate overtime sessions on
-    # one day), and he is the one who knows. Not stored: it is an answer
+    # and again in the batch, or in another sub-batch. A warning for typed
+    # rows — the supervisor may mean it (two separate overtime sessions on
+    # one day), and Accounting checks it before the GM; a refusal for
+    # imported days, which are never meant (_check_no_duplicate). Not stored: it is an answer
     # about the other rows, which change without touching this one.
     x_overlap_note = fields.Char(
         compute='_compute_overlap_note', compute_sudo=True,
@@ -1802,15 +1822,34 @@ class KswPayEntry(models.Model):
     @api.depends('employee_id', 'option_id', 'date', 'x_window_from',
                  'x_window_to', 'x_sub_batch_id', 'batch_id.entry_ids')
     def _compute_overlap_note(self):
-        """Name the other places this employee is paid for the same thing.
+        """Name the other places this employee is paid for the same thing."""
+        overlaps = self._overlap_map()
+        for rec in self:
+            where = []
+            for other, _certain in overlaps.get(rec.id, []):
+                label = other.x_sub_batch_id.name or _('the batch itself')
+                if label not in where:
+                    where.append(label)
+            rec.x_overlap_note = _(
+                'Also in %(where)s', where=', '.join(where)) if where else False
+
+    def _overlap_map(self):
+        """``{row id: [(other row, certain), ...]}`` for the rows of
+        ``self``'s batches.
 
         One batch per component, department and month, so "the same thing"
         is always a sibling row in the same batch. Only rows that sit in a
         *different* sub-batch (or one in a sub-batch, one not) are compared
         — two rows typed side by side in the batch is ordinary data entry,
-        not the double payment this exists to catch."""
-        notes = {}
-        for batch in self.batch_id:
+        not the double payment this exists to catch.
+
+        ``certain`` for an imported component: its rows are the same BAS
+        loads fetched again, which is never meant (KSWCO SUB00013, Nov
+        2026). A typed row can be — two overtime sessions on one day, or a
+        month's meals sent before a vacation and the rest after the return —
+        so those stay a warning, for Accounting to check before the GM."""
+        found = defaultdict(list)
+        for batch in self.sudo().batch_id:
             groups = defaultdict(list)
             for row in batch.entry_ids:
                 if row.employee_id:
@@ -1819,22 +1858,48 @@ class KswPayEntry(models.Model):
                 if len(rows) < 2:
                     continue
                 for row in rows:
-                    where = []
                     for other in rows:
                         if other == row or \
                                 other.x_sub_batch_id == row.x_sub_batch_id:
                             continue
-                        if not row._overlaps(other):
-                            continue
-                        label = other.x_sub_batch_id.name or _(
-                            'the batch itself')
-                        if label not in where:
-                            where.append(label)
-                    if where:
-                        notes[row.id] = _(
-                            'Also in %(where)s', where=', '.join(where))
+                        if row._overlaps(other):
+                            found[row.id].append(
+                                (other, bool(row.component_id.importer)))
+        return found
+
+    def _check_no_duplicate(self, what):
+        """Refuse to move a row that pays what another row already pays.
+
+        The hard half of ``x_overlap_note``: the same imported days in two
+        handovers. Not exempting env.su — no route has a reason to import
+        the same loads twice. Typed rows stay a warning (_overlap_map)."""
+        overlaps = self._overlap_map()
+        lines = []
         for rec in self:
-            rec.x_overlap_note = notes.get(rec.id, False)
+            # Against a row that is already somebody's handover. A draft
+            # batch row is not paid yet: the batch's next import trims it,
+            # and if it is ever submitted this check stops it then.
+            others = [o for o, certain in overlaps.get(rec.id, [])
+                      if certain and (o.state != 'draft' or o.x_sub_batch_id)]
+            if not others:
+                continue
+            row = rec.sudo()
+            span = row._span()
+            days = ('%s – %s' % (format_date(self.env, span[0]),
+                                 format_date(self.env, span[1]))
+                    if span else row.period.strftime('%B %Y'))
+            lines.append('• %s — %s, %s: %s' % (
+                row.employee_id.name, row.component_id.name, days,
+                ', '.join(sorted(set(
+                    o.x_sub_batch_id.name or _('the batch itself')
+                    for o in others)))))
+        if lines:
+            raise UserError(_(
+                "%(what)s would pay these employees twice — the same days "
+                "are already imported in another handover:\n%(rows)s\n\n"
+                "Press Import Again on the batch: it replaces its row with "
+                "only the days no handover has taken yet.",
+                what=what, rows='\n'.join(lines)))
 
     def _overlaps(self, other):
         mine, theirs = self._span(), other._span()
@@ -2249,29 +2314,56 @@ class KswPayEntry(models.Model):
             }
         return body
 
+    _UNCHECKED = {'x_acc_checked_by': False, 'x_acc_checked_date': False}
+
+    def _awaiting_accounting(self):
+        """Handed-over rows the department's accountants have not checked."""
+        return self._handed_over().filtered(lambda e: not e.x_acc_checked_by)
+
+    def _awaiting_gm(self):
+        """Handed-over rows Accounting has checked: the GM's to decide."""
+        return self._handed_over().filtered('x_acc_checked_by')
+
     def _wf_submit(self):
         todo = self.filtered(lambda e: e.state == 'draft')
-        todo.sudo().write({'state': 'submitted', 'x_return_reason': False})
+        todo._check_no_duplicate(_("Submitting"))
+        todo.sudo().write(dict(self._UNCHECKED, state='submitted',
+                               x_return_reason=False))
+        return todo
+
+    def _wf_acc_check(self):
+        """Accounting has looked: the row goes on to the General Manager."""
+        todo = self.filtered(
+            lambda e: e.state == 'submitted' and not e.x_acc_checked_by)
+        todo._check_no_duplicate(_("Checking"))
+        todo.sudo().write({'x_acc_checked_by': self.env.uid,
+                           'x_acc_checked_date': fields.Datetime.now()})
         return todo
 
     def _wf_approve(self):
-        todo = self.filtered(lambda e: e.state == 'submitted')
+        """Only a row Accounting has checked: every approval route (the
+        department, a sub-batch, the review screen, the month) ends here."""
+        todo = self.filtered(
+            lambda e: e.state == 'submitted' and e.x_acc_checked_by)
+        todo._check_no_duplicate(_("Approving"))
         todo.sudo().write({'state': 'approved', 'x_return_reason': False})
         return todo
 
     def _wf_return(self, reason=None):
-        """submitted → draft. With a reason when the GM refused it; without
-        one when the supervisor took it back before anyone looked."""
+        """submitted → draft. With a reason when Accounting or the GM
+        refused it; without one when the supervisor took it back before
+        anyone looked. It comes back unchecked."""
         todo = self.filtered(lambda e: e.state == 'submitted')
-        todo.sudo().write({'state': 'draft',
-                           'x_return_reason': reason or False})
+        todo.sudo().write(dict(self._UNCHECKED, state='draft',
+                               x_return_reason=reason or False))
         return todo
 
     def _wf_reopen(self, reason):
         """approved → draft, by the General Manager, while nothing is paid."""
         todo = self.filtered(lambda e: e.state == 'approved')
         todo._check_reopenable()
-        todo.sudo().write({'state': 'draft', 'x_return_reason': reason})
+        todo.sudo().write(dict(self._UNCHECKED, state='draft',
+                               x_return_reason=reason))
         return todo
 
     def _sync_containers(self):

@@ -74,13 +74,19 @@ class SendEarlyCommon(SubBatchCommon):
             wizard.date_to = date_to
         return wizard
 
-    def _send(self, batch, employees, date_from=None, date_to=None):
+    def _send(self, batch, employees, date_from=None, date_to=None,
+              check=True):
+        """Send Early… and, unless ``check`` is False, Accounting's check
+        straight after — so the sub-batch is the GM's, as these tests
+        assumed before Accounting had a step (Nov 2026)."""
         wizard = self._dialog(batch, date_from, date_to)
         wizard.employee_ids = [(6, 0, employees.ids)]
         with self._patched():
             action = wizard.action_confirm()
         sub = self.env['ksw.pay.sub.batch'].browse(
             action['params']['next']['res_id'])
+        if check:
+            self._acc_check(sub)
         return sub
 
     def _import_batch(self, batch=None):
@@ -145,6 +151,7 @@ class TestSendEarly(SendEarlyCommon):
 
     def test_06_again_in_the_same_month_after_approval(self):
         first = self._send(self.ot, self.emp_a, '2029-03-01', '2029-03-03')
+        self._acc_check(first)
         first.with_user(self.gm).action_approve()
         self._entry(self.ot, self.emp_a, user=self.sup_a, date='2029-03-06')
         second = self._send(self.ot, self.emp_a, '2029-03-04', '2029-03-07')
@@ -183,6 +190,7 @@ class TestOverlapWarning(SendEarlyCommon):
 
     def test_12_a_warning_never_blocks(self):
         sub = self._send(self.meals_batch, self.emp_a)
+        self._acc_check(sub)
         sub.with_user(self.gm).action_approve()
         self._entry(self.meals_batch, self.emp_a, user=self.sup_a)
         second = self._send(self.meals_batch, self.emp_a)
@@ -299,6 +307,7 @@ class TestSendEarlyTrips(SendEarlyCommon):
             sub.with_user(self.sup_a).action_reimport()
         self.assertEqual(len(self._rows(self.driver_1)), 1)
         sub.with_user(self.sup_a).action_submit()
+        self._acc_check(sub)
         self.assertEqual(sub.state, 'submitted')
 
 

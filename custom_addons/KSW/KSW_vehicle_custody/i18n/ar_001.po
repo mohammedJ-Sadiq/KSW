@@ -6,15 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-14 10:59+0000\n"
-"PO-Revision-Date: 2026-11-14 10:59+0000\n"
+"POT-Creation-Date: 2026-11-14 20:54+0000\n"
+"PO-Revision-Date: 2026-11-14 20:54+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar_001\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: \n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
 
 #. module: KSW_vehicle_custody
 #. odoo-python
@@ -427,6 +427,21 @@ msgid "Expiration / صلاحيتها"
 msgstr ""
 
 #. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_document__register_status__expired
+msgid "Expired"
+msgstr "منتهي الصلاحية"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_document__register_expiry
+msgid "Expires"
+msgstr "تنتهي في"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_document__register_status__expiring
+msgid "Expiring Soon"
+msgstr "قريبة الانتهاء"
+
+#. module: KSW_vehicle_custody
 #. odoo-python
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "File the signed HR-12: %s"
@@ -665,6 +680,11 @@ msgid "In Progress"
 msgstr "قيد التنفيذ"
 
 #. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_document__register_status
+msgid "In the Register"
+msgstr "في السجل"
+
+#. module: KSW_vehicle_custody
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__inspection_datetime
 msgid "Inspected On"
 msgstr "تاريخ الفحص"
@@ -860,6 +880,11 @@ msgstr "نوع النشاط التالي"
 #: model_terms:ir.actions.act_window,help:KSW_vehicle_custody.action_ksw_vehicle_custody
 msgid "No handover form in progress"
 msgstr "لا توجد نماذج تسليم قيد التنفيذ"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_document__register_status__missing
+msgid "Not in the Register"
+msgstr "غير موجودة في السجل"
 
 #. module: KSW_vehicle_custody
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__message_needaction_counter
@@ -1423,6 +1448,11 @@ msgid "Vacation"
 msgstr "إجازة"
 
 #. module: KSW_vehicle_custody
+#: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_document__register_status__valid
+msgid "Valid"
+msgstr "صالح"
+
+#. module: KSW_vehicle_custody
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_inspection__value
 msgid "Value"
 msgstr "القيمة"
@@ -1594,6 +1624,11 @@ msgstr "سبب رفض تغيير السائق..."
 #: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_search
 msgid "With HR"
 msgstr "لدى الموارد البشرية"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__workshop_id
+msgid "Workshop"
+msgstr "الورشة"
 
 #. module: KSW_vehicle_custody
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__workshop_done

@@ -46,6 +46,18 @@ class SubmissionCommon(TransactionCase):
         cls.emp_a = cls._employee('Sub Emp A', cls.dept_a, 7200.0)
         cls.emp_b = cls._employee('Sub Emp B', cls.dept_b, 4800.0)
 
+        # Accounting checks a handover before the GM sees it (Nov 2026):
+        # the departments' Accounting Approvers, as in KSW_base_security.
+        cls.accountant = cls._user(
+            'sub_acc', 'KSW_commissions.group_commission_accountant')
+        cls.acc_employee = cls.env['hr.employee'].sudo().create({
+            'name': 'Sub Acc Emp', 'user_id': cls.accountant.id})
+        (cls.dept_a | cls.dept_b).sudo().write(
+            {'x_accountant_ids': [(6, 0, cls.acc_employee.ids)]})
+        # And the company team, for the departments subclasses make.
+        cls.env.company.sudo().x_default_accountant_ids = [
+            (4, cls.acc_employee.id)]
+
     # -- fixtures -------------------------------------------------------
     @classmethod
     def _user(cls, login, group_xmlid):
@@ -97,6 +109,23 @@ class SubmissionCommon(TransactionCase):
         model = self.env['ksw.pay.entry']
         return (model.with_user(user) if user else model.sudo()).create(vals)
 
+    def _acc_check(self, *records):
+        """Accounting's Checked: Send to GM, on whatever a department, sub-
+        batch, batch or month has waiting for it (nothing, if nothing has
+        been handed over yet)."""
+        for record in records:
+            if record._name == 'ksw.pay.batch':
+                record = record.sudo().submission_id
+            elif record._name == 'ksw.pay.run':
+                record = record.sudo().submission_ids
+            if record._name not in ('ksw.pay.submission',
+                                    'ksw.pay.sub.batch'):
+                continue
+            for one in record:
+                one.invalidate_recordset()
+                if one.sudo()._review_entries('check'):
+                    one.with_user(self.accountant).action_acc_check()
+
     def _filled_batch(self, user, department, employee, **kwargs):
         batch = self._batch(user, department, **kwargs)
         self._entry(batch, employee, user=user)
@@ -109,6 +138,7 @@ class TestBatchReopen(SubmissionCommon):
     def test_01_supervisor_reopens_his_own_submitted_batch(self):
         batch = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)
         batch.with_user(self.sup_a).action_submit()
+        self._acc_check(batch)
         self.assertEqual(batch.state, 'submitted')
         self.assertTrue(batch.with_user(self.sup_a).x_can_reopen)
 
@@ -118,6 +148,7 @@ class TestBatchReopen(SubmissionCommon):
     def test_02_and_can_edit_its_entries_again(self):
         batch = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)
         batch.with_user(self.sup_a).action_submit()
+        self._acc_check(batch)
         batch.with_user(self.sup_a).action_reset_to_draft()
         batch.entry_ids.with_user(self.sup_a).write({'quantity': 6.0})
         self.assertEqual(batch.entry_ids[0].quantity, 6.0)
@@ -125,6 +156,7 @@ class TestBatchReopen(SubmissionCommon):
     def test_03_frozen_once_the_department_is_handed_over(self):
         batch = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)
         batch.submission_id.with_user(self.sup_a).action_submit()
+        self._acc_check(batch.submission_id)
         self.assertFalse(batch.with_user(self.sup_a).x_can_reopen)
         with self.assertRaises(UserError):
             batch.with_user(self.sup_a).action_reset_to_draft()
@@ -134,6 +166,7 @@ class TestBatchReopen(SubmissionCommon):
         batch = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)
         submission = batch.submission_id
         submission.with_user(self.sup_a).action_submit()
+        self._acc_check(submission)
         submission.with_user(self.sup_a).action_reset_to_draft()
         self.assertEqual(submission.state, 'draft')
         batch.with_user(self.sup_a).action_reset_to_draft()
@@ -142,6 +175,7 @@ class TestBatchReopen(SubmissionCommon):
     def test_05_the_gm_can_always_reopen(self):
         batch = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)
         batch.submission_id.with_user(self.sup_a).action_submit()
+        self._acc_check(batch.submission_id)
         batch.with_user(self.gm).action_reset_to_draft()
         self.assertEqual(batch.state, 'draft')
 
@@ -174,6 +208,8 @@ class TestDepartmentScope(SubmissionCommon):
             self.sup_a).browse(action['res_id'])
         wizard.mode = 'month'
         wizard.action_confirm()
+        self.assertEqual(mine.submission_id.state, 'checking')
+        self._acc_check(mine)
 
         self.assertEqual(mine.submission_id.state, 'submitted')
         self.assertEqual(mine.state, 'submitted')
@@ -199,11 +235,13 @@ class TestDepartmentScope(SubmissionCommon):
         run = mine.submission_id.run_id
 
         mine.submission_id.with_user(self.sup_a).action_submit()
+        self._acc_check(mine.submission_id)
         self.assertEqual(run.state, 'open')
         self.assertEqual(run.submitted_department_count, 1)
         self.assertEqual(run.pending_department_count, 1)
 
         yours.submission_id.with_user(self.sup_b).action_submit()
+        self._acc_check(yours.submission_id)
         self.assertEqual(run.state, 'submitted')
         self.assertEqual(run.pending_department_count, 0)
 
@@ -211,6 +249,7 @@ class TestDepartmentScope(SubmissionCommon):
         batch = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)
         submission = batch.submission_id
         submission.with_user(self.sup_a).action_submit()
+        self._acc_check(submission)
 
         # A return with no reason tells the supervisor nothing.
         with self.assertRaises(UserError):
@@ -227,6 +266,7 @@ class TestDepartmentScope(SubmissionCommon):
     def test_17_only_the_gm_returns(self):
         batch = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)
         batch.submission_id.with_user(self.sup_a).action_submit()
+        self._acc_check(batch.submission_id)
         batch.submission_id.sudo().write({'return_reason': 'no'})
         with self.assertRaises(UserError):
             batch.submission_id.with_user(self.sup_b).action_return()
@@ -241,6 +281,7 @@ class TestRegisterPreview(SubmissionCommon):
         self.assertFalse(run.line_ids)
 
         batch.submission_id.with_user(self.sup_a).action_submit()
+        self._acc_check(batch.submission_id)
         line = run.line_ids.filtered(lambda l: l.employee_id == self.emp_a)
         self.assertTrue(line, "the register must be built at handover")
         self.assertAlmostEqual(line.earnings, 180.0, places=2)
@@ -250,6 +291,7 @@ class TestRegisterPreview(SubmissionCommon):
         self._filled_batch(self.sup_b, self.dept_b, self.emp_b)
         batch = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)
         batch.submission_id.with_user(self.sup_a).action_submit()
+        self._acc_check(batch.submission_id)
         run = batch.submission_id.run_id
         self.assertNotIn(self.emp_b, run.line_ids.mapped('employee_id'))
 
@@ -257,7 +299,9 @@ class TestRegisterPreview(SubmissionCommon):
         a = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)
         b = self._filled_batch(self.sup_b, self.dept_b, self.emp_b)
         a.submission_id.with_user(self.sup_a).action_submit()
+        self._acc_check(a.submission_id)
         b.submission_id.with_user(self.sup_b).action_submit()
+        self._acc_check(b.submission_id)
         run = a.submission_id.run_id
 
         self.assertEqual(len(run.line_ids), 2)
@@ -268,7 +312,9 @@ class TestRegisterPreview(SubmissionCommon):
         a = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)
         b = self._filled_batch(self.sup_b, self.dept_b, self.emp_b)
         a.submission_id.with_user(self.sup_a).action_submit()
+        self._acc_check(a.submission_id)
         b.submission_id.with_user(self.sup_b).action_submit()
+        self._acc_check(b.submission_id)
         run = a.submission_id.run_id
 
         seen = run.with_user(self.gm).x_visible_line_ids
@@ -284,6 +330,7 @@ class TestRegisterPreview(SubmissionCommon):
         submission = batch.submission_id
         run = submission.run_id
         submission.with_user(self.sup_a).action_submit()
+        self._acc_check(submission)
         self.assertAlmostEqual(run.line_ids.earnings, 180.0, places=2)
 
         submission.with_user(self.sup_a).action_reset_to_draft()
@@ -307,6 +354,7 @@ class TestRegisterPreview(SubmissionCommon):
         self.assertFalse(settled.x_preview_generated)
 
         batch.submission_id.with_user(self.sup_a).action_submit()
+        self._acc_check(batch.submission_id)
 
         self.assertTrue(settled.exists(), "a settled line must survive")
         self.assertAlmostEqual(settled.earnings, 999.0, places=2)
@@ -457,6 +505,7 @@ class TestApproval(SubmissionCommon):
     def _submit(self, *batches):
         for batch in batches:
             batch.submission_id.sudo().action_submit()
+            self._acc_check(batch.submission_id)
         return batches[0].submission_id.run_id
 
     def test_30_approval_pays_only_what_was_handed_over(self):
@@ -464,6 +513,7 @@ class TestApproval(SubmissionCommon):
         yours = self._filled_batch(self.sup_b, self.dept_b, self.emp_b)
         run = self._submit(mine)
 
+        self._acc_check(run)
         run.with_user(self.gm).action_approve()
 
         # B is still typing, so the month does not lock itself (Sep 2026:
@@ -485,6 +535,7 @@ class TestApproval(SubmissionCommon):
         yours = self._filled_batch(self.sup_b, self.dept_b, self.emp_b)
         run = self._submit(mine)
         yours.submission_id.with_user(self.sup_b).action_submit()
+        self._acc_check(yours.submission_id)
         run.with_user(self.gm).action_approve()
         self.assertNotIn(run.state, ('approved', 'paid'))
         run.sudo().action_close_month()
@@ -493,18 +544,21 @@ class TestApproval(SubmissionCommon):
     def test_31_nothing_handed_over_means_nothing_to_approve(self):
         batch = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)
         run = batch.submission_id.run_id
+        self._acc_check(run)
         with self.assertRaises(UserError):
             run.with_user(self.gm).action_approve()
 
     def test_32_only_the_gm_approves(self):
         batch = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)
         run = self._submit(batch)
+        self._acc_check(run)
         with self.assertRaises(UserError):
             run.with_user(self.sup_a).action_approve()
 
     def test_33_reopening_puts_the_departments_back(self):
         batch = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)
         run = self._submit(batch)
+        self._acc_check(run)
         run.with_user(self.gm).action_approve()
         run.sudo().action_close_month()
 
@@ -521,6 +575,7 @@ class TestApproval(SubmissionCommon):
         when only one empty batch needed deleting)."""
         batch = self._filled_batch(self.sup_a, self.dept_a, self.emp_a)
         run = self._submit(batch)
+        self._acc_check(run)
         run.with_user(self.gm).action_approve()
         run.sudo().action_close_month()
         self.assertEqual(run.state, 'approved')

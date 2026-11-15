@@ -680,3 +680,28 @@ msgstr "طلبات مركبات بانتظار مراجعتي أو قراري"
 #: model:ksw.home.inbox.source,name:KSW_backend_theme.inbox_vehicles_to_receive
 msgid "Vehicles on their way to my department"
 msgstr "مركبات في الطريق إلى قسمي"
+
+#. module: KSW_backend_theme
+#: model:ksw.home.inbox.source,name:KSW_backend_theme.inbox_documents
+msgid "Documents to confirm, expiring or expired"
+msgstr "مستندات بانتظار الاعتماد أو قريبة الانتهاء أو منتهية"
+
+#. module: KSW_backend_theme
+#: model:ksw.home.inbox.source,name:KSW_backend_theme.inbox_employee_documents_missing
+msgid "Employees missing documents"
+msgstr "موظفون ينقصهم مستندات"
+
+#. module: KSW_backend_theme
+#: model:ksw.home.inbox.source,name:KSW_backend_theme.inbox_vehicle_documents_missing
+msgid "Vehicles missing documents"
+msgstr "مركبات ينقصها مستندات"
+
+#. module: KSW_backend_theme
+#: model:ksw.home.inbox.source,name:KSW_backend_theme.inbox_commission_sub_batches
+msgid "Commission sub-batches to check or approve"
+msgstr "دفعات عمولات فرعية بانتظار تدقيقي أو اعتمادي"
+
+#. module: KSW_backend_theme
+#: model:ksw.home.inbox.source,name:KSW_backend_theme.inbox_commission_submissions
+msgid "Commission submissions to check or approve"
+msgstr "عمولات أقسام بانتظار تدقيقي أو اعتمادي"

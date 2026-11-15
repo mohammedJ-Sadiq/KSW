@@ -14,16 +14,30 @@
                 <field name="x_can_review" invisible="1"/>
                 <field name="x_can_reopen" invisible="1"/>
                 <field name="pending_count" invisible="1"/>
+                <field name="acc_pending_count" invisible="1"/>
+                <field name="x_can_acc_check" invisible="1"/>
                 <field name="x_can_reimport" invisible="1"/>
                 <header>
                     <button name="action_add_employees"
                             string="Add Employees…" type="object"
                             class="btn-secondary" icon="fa-user-plus"
                             invisible="state != 'draft' or not x_can_edit"/>
-                    <button name="action_submit" string="Submit to GM"
+                    <button name="action_submit" string="Submit"
                             type="object" class="btn-primary"
                             invisible="not x_can_submit or not id"
-                            confirm="Hand these employees' entries to the General Manager? Only their rows are locked and your batches stay open, but nobody more can be added to this sub-batch."/>
+                            confirm="Hand these employees' entries over? Accounting checks them first, then the General Manager approves. Only their rows are locked and your batches stay open, but nobody more can be added to this sub-batch."/>
+                    <!-- Accounting's check, before the GM (Nov 2026). No
+                         groups=: x_can_acc_check already answers "am I one
+                         of this department's accountants". -->
+                    <button name="action_acc_check"
+                            string="Checked: Send to GM" type="object"
+                            class="btn-primary"
+                            invisible="not x_can_acc_check"
+                            confirm="Send everything waiting here on to the General Manager as checked?"/>
+                    <button name="action_open_acc_review"
+                            string="Check by Employee…" type="object"
+                            class="btn-secondary"
+                            invisible="not x_can_acc_check"/>
                     <!-- No groups= on the GM buttons: x_can_review /
                          x_can_reopen already answer "is this department
                          mine" (see the department submission form). -->
@@ -47,7 +61,7 @@
                             class="btn-secondary"
                             invisible="not x_can_reopen"/>
                     <field name="state" widget="statusbar"
-                           statusbar_visible="draft,submitted,approved"/>
+                           statusbar_visible="draft,checking,submitted,approved"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -62,22 +76,30 @@
                         <h1><field name="name" readonly="1"/></h1>
                     </div>
 
+                    <div class="alert alert-info" role="status"
+                         invisible="not acc_pending_count or x_can_acc_check">
+                        <field name="acc_pending_count" readonly="1"
+                               class="oe_inline"/>
+                        entr(ies) are with Accounting for checking. They
+                        reach the General Manager once checked.
+                    </div>
                     <div class="alert alert-warning" role="alert"
                          invisible="state != 'returned'">
-                        <strong>Returned by the General Manager:</strong>
+                        <strong>Returned for correction:</strong>
                         <field name="return_reason" readonly="1" nolabel="1"/>
                     </div>
                     <div class="alert alert-info" role="status"
                          invisible="state != 'returned'">
                         Correct the returned rows in the component's batch
                         (or press <b>Import Again</b> for Driver Trips), then
-                        <b>Submit to GM</b>.
+                        <b>Submit</b>.
                     </div>
                     <div class="alert alert-info" role="status"
                          invisible="state != 'draft'">
                         Being prepared: press <b>Add Employees…</b> to add
-                        more people for these days, or <b>Submit to GM</b>
-                        when it is complete. Once submitted, nobody more can
+                        more people for these days, or <b>Submit</b>
+                        when it is complete: Accounting checks it, then the
+                        General Manager approves. Once submitted, nobody more can
                         be added: the next early handover is a new sub-batch.
                     </div>
                     <field name="x_overlap_count" invisible="1"/>
@@ -87,8 +109,9 @@
                                class="oe_inline"/>
                         entr(ies) here are for an employee who already has
                         the same thing in another sub-batch or in the batch
-                        itself (see <b>Also In</b>). Check that nobody is
-                        paid twice before you submit.
+                        itself (see <b>Also In</b>). Imported trips for the same
+                        days cannot be submitted twice; anything else can, so
+                        check that nobody is paid twice.
                     </div>
 
                     <group>
@@ -161,6 +184,8 @@
                                     <field name="state" widget="badge"
                                            decoration-info="state == 'submitted'"
                                            decoration-success="state == 'approved'"/>
+                                    <field name="x_acc_checked_by"
+                                           optional="show"/>
                                     <field name="x_return_reason"
                                            optional="show"/>
                                     <field name="x_overlap_note"
@@ -194,7 +219,7 @@
         <field name="model">ksw.pay.sub.batch</field>
         <field name="arch" type="xml">
             <list create="false"
-                  decoration-info="state == 'submitted'"
+                  decoration-info="state in ('checking', 'submitted')"
                   decoration-warning="state == 'returned'"
                   decoration-muted="state == 'approved'">
                 <field name="name"/>
@@ -208,7 +233,7 @@
                 <field name="entry_count" string="Entries"/>
                 <field name="total_amount" sum="Total"/>
                 <field name="state" widget="badge"
-                       decoration-info="state == 'submitted'"
+                       decoration-info="state in ('checking', 'submitted')"
                        decoration-warning="state == 'returned'"
                        decoration-success="state == 'approved'"/>
                 <field name="currency_id" column_invisible="1"/>
@@ -225,8 +250,8 @@
                 <field name="department_id"/>
                 <field name="employee_ids"/>
                 <field name="period" options="{'min_precision': 'months'}"/>
-                <filter name="awaiting_me" string="Waiting on Me"
-                        domain="[('state', '=', 'submitted'), ('gm_id', '=', uid)]"/>
+                <filter name="awaiting_me" string="Waiting for Me"
+                        domain="[('x_is_pending_my_action', '=', True)]"/>
                 <filter name="open" string="Not Submitted Yet"
                         domain="[('state', 'in', ['draft', 'returned'])]"/>
                 <group>
@@ -387,6 +412,32 @@
                 <header>
                     <button name="action_approve" type="object"
                             string="Approve" class="btn-primary"/>
+                    <button name="action_return" type="object"
+                            string="Return…" class="btn-secondary"/>
+                </header>
+                <field name="component_id"/>
+                <field name="employee_name"/>
+                <field name="entry_count"/>
+                <field name="amount" sum="Total"/>
+                <field name="sub_batch_name" optional="show"/>
+                <field name="batch_name" optional="hide"/>
+                <button name="action_open_entries" type="object"
+                        icon="fa-list" title="See the entries"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Accounting's check (Nov 2026): send on to the GM or return. -->
+    <record id="view_ksw_pay_gm_review_line_list_check" model="ir.ui.view">
+        <field name="name">ksw.pay.gm.review.line.list.check</field>
+        <field name="model">ksw.pay.gm.review.line</field>
+        <field name="priority">30</field>
+        <field name="arch" type="xml">
+            <list create="false" delete="false" edit="false"
+                  string="Accounting Check">
+                <header>
+                    <button name="action_acc_check" type="object"
+                            string="Checked: Send to GM" class="btn-primary"/>
                     <button name="action_return" type="object"
                             string="Return…" class="btn-secondary"/>
                 </header>

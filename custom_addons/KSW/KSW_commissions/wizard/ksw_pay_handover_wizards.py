@@ -308,6 +308,7 @@ class KswPayGmReviewWizard(models.TransientModel):
     _description = 'GM review of a handover, component by component'
 
     mode = fields.Selection([
+        ('check', 'Check before the General Manager'),
         ('review', 'Approve or return'),
         ('reopen', 'Reopen approved entries'),
     ], required=True, readonly=True)
@@ -325,10 +326,12 @@ class KswPayGmReviewWizard(models.TransientModel):
                 "first.", month=container.run_id.display_name))
         entries = container._review_entries(mode)
         if not entries:
-            raise UserError(
-                _("There are no approved entries here to reopen.")
-                if mode == 'reopen' else
-                _("There is nothing waiting for your approval here."))
+            raise UserError({
+                'reopen': _("There are no approved entries here to reopen."),
+                'check': _("There is nothing waiting for Accounting's check "
+                           "here."),
+            }.get(mode) or _("There is nothing waiting for your approval "
+                             "here."))
         groups = OrderedDict()
         for entry in entries.sorted(
                 lambda e: (e.component_id.sequence, e.component_id.id,
@@ -355,13 +358,20 @@ class KswPayGmReviewWizard(models.TransientModel):
         else:
             vals['submission_id'] = container.id
         wizard = self.create(vals)
-        view = 'view_ksw_pay_gm_review_line_list' if mode == 'review' \
-            else 'view_ksw_pay_gm_review_line_list_reopen'
+        view = {
+            'check': 'view_ksw_pay_gm_review_line_list_check',
+            'review': 'view_ksw_pay_gm_review_line_list',
+            'reopen': 'view_ksw_pay_gm_review_line_list_reopen',
+        }[mode]
+        title = {
+            'check': _('Accounting Check — %(name)s',
+                       name=container.display_name),
+            'review': _('Review — %(name)s', name=container.display_name),
+            'reopen': _('Reopen — %(name)s', name=container.display_name),
+        }[mode]
         return {
             'type': 'ir.actions.act_window',
-            'name': (_('Review — %(name)s', name=container.display_name)
-                     if mode == 'review' else
-                     _('Reopen — %(name)s', name=container.display_name)),
+            'name': title,
             'res_model': 'ksw.pay.gm.review.line',
             'view_mode': 'list',
             'views': [(self.env.ref('KSW_commissions.' + view).id, 'list')],
@@ -371,11 +381,22 @@ class KswPayGmReviewWizard(models.TransientModel):
             'target': 'current',
         }
 
+    _MODE_ACTIONS = {
+        'check': ('check', 'return'),
+        'review': ('approve', 'return'),
+        'reopen': ('reopen',),
+    }
+
     def _container(self):
         return self.sub_batch_id or self.submission_id
 
-    def _check_gm(self):
-        if self.sub_batch_id:
+    def _check_actor(self):
+        """Accounting checks; the General Manager approves and reopens."""
+        if self.mode == 'check':
+            # A sub-batch's accountants are its department's.
+            (self.sub_batch_id.submission_id
+             or self.submission_id)._check_is_accountant()
+        elif self.sub_batch_id:
             self.sub_batch_id._check_gm()
         else:
             self.submission_id._check_is_my_department()
@@ -387,7 +408,10 @@ class KswPayGmReviewWizard(models.TransientModel):
         removed afterwards so the screen shows only what is still undecided.
         """
         self.ensure_one()
-        self._check_gm()
+        self._check_actor()
+        # Accounting checks or returns; only the GM approves or reopens.
+        if action not in self._MODE_ACTIONS[self.mode]:
+            raise UserError(_("That is not a step of this screen."))
         container = self._container()
         if container.run_id.state in LOCKING_STATES:
             raise UserError(_(
@@ -395,13 +419,15 @@ class KswPayGmReviewWizard(models.TransientModel):
                 "first.", month=container.run_id.display_name))
         if not lines:
             raise UserError(_("Tick the employees first."))
-        if action != 'approve':
+        if action not in ('approve', 'check'):
             reason = (reason or '').strip()
             if not reason:
                 raise UserError(_(
                     "Say why — the supervisor needs to know what to fix."))
         rows = lines.entry_ids.sudo()
-        if action == 'approve':
+        if action == 'check':
+            moved = rows._wf_acc_check()
+        elif action == 'approve':
             moved = rows._wf_approve()
         elif action == 'return':
             moved = rows._wf_return(reason)
@@ -410,7 +436,7 @@ class KswPayGmReviewWizard(models.TransientModel):
         if not moved:
             raise UserError(_(
                 "Those entries have already moved on — reload the page."))
-        if action != 'approve':
+        if action not in ('approve', 'check'):
             for batch in moved.batch_id:
                 batch.with_context(ksw_entry_sync=True).write(
                     {'return_reason': reason})
@@ -420,12 +446,15 @@ class KswPayGmReviewWizard(models.TransientModel):
             container.sudo().write({
                 'approved_by': self.env.uid,
                 'approved_date': fields.Datetime.now()})
-        if action != 'approve':
+        if action not in ('approve', 'check'):
             moved.batch_id.submission_id.filtered(
                 lambda s: s.state == 'returned'
             ).sudo().write({'returned_by': self.env.uid,
                             'return_reason': reason})
-        self._announce(container, lines, action, reason)
+        if action == 'check':
+            container._notify_checked(moved)
+        else:
+            self._announce(container, lines, action, reason)
         lines.unlink()
         runs = moved.batch_id.submission_id.run_id
         runs._sync_state()
@@ -498,6 +527,11 @@ class KswPayGmReviewLine(models.TransientModel):
     def action_approve(self):
         """Approve the ticked employees; the rest stay waiting."""
         self._wizard()._act(self, 'approve')
+        return {'type': 'ir.actions.client', 'tag': 'soft_reload'}
+
+    def action_acc_check(self):
+        """Accounting: the ticked employees are checked — on to the GM."""
+        self._wizard()._act(self, 'check')
         return {'type': 'ir.actions.client', 'tag': 'soft_reload'}
 
     def action_return(self):

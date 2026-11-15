@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ksw_company_registration_list" model="ir.ui.view">
+        <field name="name">ksw.company.registration.list</field>
+        <field name="model">ksw.company.registration</field>
+        <field name="arch" type="xml">
+            <list string="Commercial Registrations" editable="bottom">
+                <field name="company_id" optional="hide"/>
+                <field name="kind"/>
+                <field name="name"/>
+                <field name="unified_number"/>
+                <field name="cr_number"/>
+                <field name="parent_id" options="{'no_create': True}" invisible="kind != 'branch'"/>
+                <field name="city"/>
+                <field name="issue_date" optional="hide"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_company_registration_search" model="ir.ui.view">
+        <field name="name">ksw.company.registration.search</field>
+        <field name="model">ksw.company.registration</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="unified_number"/>
+                <field name="cr_number"/>
+                <filter string="Archived" name="archived" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter string="Kind" name="group_kind" context="{'group_by': 'kind'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_company_registration" model="ir.actions.act_window">
+        <field name="name">Commercial Registrations</field>
+        <field name="res_model">ksw.company.registration</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add the company's main CR and its branches</p>
+            <p>Or upload the CR certificates in Bulk Upload: confirming one records it here. Company
+               documents (transport licence, operation cards…) are tied to their registration by its number.</p>
+        </field>
+    </record>
+
+    <record id="view_company_form_registrations" model="ir.ui.view">
+        <field name="name">res.company.form.ksw.registrations</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Commercial Registrations" name="ksw_registrations"
+                      groups="KSW_documents.group_document_officer">
+                    <field name="x_registration_ids" context="{'default_company_id': id}">
+                        <list editable="bottom">
+                            <field name="kind"/>
+                            <field name="name"/>
+                            <field name="unified_number"/>
+                            <field name="cr_number"/>
+                            <field name="city"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

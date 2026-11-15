@@ -33,6 +33,11 @@ from odoo.exceptions import UserError
 # A run in one of these states freezes its whole period.
 LOCKING_STATES = ('approved', 'paid')
 
+# A department handover or a sub-batch in one of these has been handed over
+# and nobody has decided all of it yet: with Accounting for its check
+# (Nov 2026), then with the General Manager.
+HANDED_STATES = ('checking', 'submitted')
+
 
 def normalise_period(period):
     """Return ``period`` as the first day of its month, or ``False``."""

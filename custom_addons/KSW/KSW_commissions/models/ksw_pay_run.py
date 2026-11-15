@@ -27,7 +27,7 @@ from odoo.exceptions import UserError
 from odoo.tools import float_compare, float_round
 from odoo.tools.misc import format_datetime
 
-from .ksw_commission_lock import LOCKING_STATES
+from .ksw_commission_lock import HANDED_STATES, LOCKING_STATES
 from .ksw_vacation_hold import (
     entry_blocked, hold_reason, vacation_holds,
 )
@@ -217,8 +217,8 @@ class KswPayRun(models.Model):
     def _compute_submission_stats(self):
         for rec in self:
             active = rec.submission_ids.filtered('batch_count')
-            done = active.filtered(lambda s: s.state in ('submitted',
-                                                         'approved'))
+            done = active.filtered(
+                lambda s: s.state in HANDED_STATES + ('approved',))
             pending = active - done
             rec.submitted_department_count = len(done)
             rec.pending_department_count = len(pending)
@@ -450,7 +450,7 @@ class KswPayRun(models.Model):
         return self._all_batches().filtered(
             lambda b: b.state == 'approved' or (
                 b.state == 'submitted'
-                and b.submission_id.state in ('submitted', 'approved')))
+                and b.submission_id.state in HANDED_STATES + ('approved',)))
 
     def _sync_state(self):
         """Keep the month's status in step with its departments.
@@ -464,7 +464,7 @@ class KswPayRun(models.Model):
                 continue
             active = rec.submission_ids.filtered('batch_count')
             done = active.filtered(
-                lambda s: s.state in ('submitted', 'approved'))
+                lambda s: s.state in HANDED_STATES + ('approved',))
             target = 'submitted' if (active and done == active) else 'open'
             if rec.state != target:
                 rec.sudo().write({'state': target})
@@ -579,12 +579,21 @@ class KswPayRun(models.Model):
             mine = rec.x_gm_submission_ids
             if not mine:
                 waiting = rec.submission_ids.filtered(
-                    lambda s: s.state == 'submitted')
+                    lambda s: s.state in HANDED_STATES)
                 if not waiting:
                     raise UserError(_(
                         "No department has submitted its commissions for "
                         "%(period)s, so there is nothing to approve.",
                         period=rec.display_name))
+                with_accounting = waiting.filtered(
+                    lambda s: s.gm_id == self.env.user and s.acc_entry_count)
+                if with_accounting:
+                    raise UserError(_(
+                        "Your departments for %(period)s are still with "
+                        "Accounting for checking: %(names)s. They reach you "
+                        "once checked.", period=rec.display_name,
+                        names=', '.join(
+                            with_accounting.mapped('display_name'))))
                 raise UserError(_(
                     "None of the departments waiting on %(period)s are "
                     "yours to approve. Still waiting on their own General "

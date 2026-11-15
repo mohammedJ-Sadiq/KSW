@@ -106,7 +106,7 @@
               parent="menu_ksw_pay_month_section"
               action="action_ksw_pay_submission"
               sequence="10"
-              groups="KSW_commissions.group_commission_supervisor,KSW_commissions.group_commission_gm"/>
+              groups="KSW_commissions.group_commission_supervisor,KSW_commissions.group_commission_gm,KSW_commissions.group_commission_accountant"/>
 
     <!-- Some employees' month handed over ahead of the rest. Beside the
          department handovers, and gated the same way, so a GM reaches the
@@ -116,7 +116,7 @@
               parent="menu_ksw_pay_month_section"
               action="action_ksw_pay_sub_batch"
               sequence="20"
-              groups="KSW_commissions.group_commission_supervisor,KSW_commissions.group_commission_gm"/>
+              groups="KSW_commissions.group_commission_supervisor,KSW_commissions.group_commission_gm,KSW_commissions.group_commission_accountant"/>
 
     <!--
         Under the month, not under Configuration: a menu's effective

@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ksw_document_officer,ksw.document.officer,model_ksw_document,group_document_officer,1,1,1,0
+access_ksw_document_system,ksw.document.system,model_ksw_document,base.group_system,1,1,1,1
+access_ksw_document_type_user,ksw.document.type.user,model_ksw_document_type,base.group_user,1,0,0,0
+access_ksw_document_type_officer,ksw.document.type.officer,model_ksw_document_type,group_document_officer,1,1,1,0
+access_ksw_document_type_system,ksw.document.type.system,model_ksw_document_type,base.group_system,1,1,1,1
+access_ksw_document_upload_officer,ksw.document.upload.officer,model_ksw_document_upload_wizard,group_document_officer,1,1,1,1
+access_ksw_document_batch_officer,ksw.document.batch.officer,model_ksw_document_batch,group_document_officer,1,1,1,1
+access_ksw_document_batch_system,ksw.document.batch.system,model_ksw_document_batch,base.group_system,1,1,1,1
+access_ksw_company_registration_user,ksw.company.registration.user,model_ksw_company_registration,base.group_user,1,0,0,0
+access_ksw_company_registration_officer,ksw.company.registration.officer,model_ksw_company_registration,group_document_officer,1,1,1,0
+access_ksw_company_registration_system,ksw.company.registration.system,model_ksw_company_registration,base.group_system,1,1,1,1

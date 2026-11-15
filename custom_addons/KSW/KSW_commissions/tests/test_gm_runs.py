@@ -28,9 +28,11 @@ class TestGmRuns(SubmissionCommon):
     def _submit(self, supervisor, department, employee):
         batch = self._filled_batch(supervisor, department, employee)
         batch.submission_id.sudo().action_submit()
+        self._acc_check(batch.submission_id)
         return batch.submission_id
 
     def _approve(self, sub, gm):
+        self._acc_check(sub)
         sub.with_user(gm).action_approve()
 
     # ------------------------------------------------------------------
@@ -79,6 +81,7 @@ class TestGmRuns(SubmissionCommon):
         # B's supervisor can still record and submit in the same month.
         batch_b = self._filled_batch(self.sup_b, self.dept_b, self.emp_b)
         batch_b.submission_id.with_user(self.sup_b).action_submit()
+        self._acc_check(batch_b.submission_id)
         self.assertEqual(batch_b.submission_id.state, 'submitted')
 
     def test_changing_a_departments_gm_moves_its_open_submission(self):

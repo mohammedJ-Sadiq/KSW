@@ -46,11 +46,13 @@ class TestSupervisorGmRole(SubmissionCommon):
         batch = self._filled_batch(self.sup_c, self.dept_c, self.emp_c)
         sub = batch.submission_id
         sub.with_user(self.sup_c).action_submit()
+        self._acc_check(sub)
         self.assertEqual(sub.gm_id, self.sup_c)
         self.assertNotEqual(sub.gm_id, self.gm,
                             'must not fall back to the other GM')
         self.assertTrue(sub.with_user(self.sup_c).x_can_approve)
         # No sudo(): the guard exempts env.su (CLAUDE.md gotcha #16).
+        self._acc_check(sub)
         sub.with_user(self.sup_c).action_approve()
         self.assertEqual(sub.state, 'approved')
 
@@ -58,5 +60,6 @@ class TestSupervisorGmRole(SubmissionCommon):
         batch = self._filled_batch(self.sup_c, self.dept_c, self.emp_c)
         sub = batch.submission_id
         sub.with_user(self.sup_c).action_submit()
+        self._acc_check(sub)
         self.assertFalse(self.env['ksw.pay.submission'].with_user(
             self.gm).search([('id', '=', sub.id)]))

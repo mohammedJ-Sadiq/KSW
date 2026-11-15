@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Missing documents: what HR fills in, one row per vehicle / employee. -->
+    <record id="view_ksw_fleet_vehicle_list_documents" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.list.documents</field>
+        <field name="model">ksw.fleet.vehicle</field>
+        <field name="priority">95</field>
+        <field name="arch" type="xml">
+            <list string="Vehicles: Missing Documents" create="0">
+                <field name="name"/>
+                <field name="vehicle_type"/>
+                <field name="plate_number"/>
+                <field name="x_documents_missing" string="Missing or Expired"/>
+                <button name="action_upload_documents" type="object" string="Upload" icon="fa-upload"
+                        class="btn-primary"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_ksw_vehicle_documents_missing" model="ir.actions.act_window">
+        <field name="name">Vehicles: Missing Documents</field>
+        <field name="res_model">ksw.fleet.vehicle</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('x_document_issue', '=', True)]</field>
+        <field name="view_ids" eval="[(5, 0, 0), (0, 0, {'view_mode': 'list', 'view_id': ref('view_ksw_fleet_vehicle_list_documents')})]"/>
+        <field name="help" type="html"><p class="o_view_nocontent_smiling_face">Every company vehicle has its documents</p></field>
+    </record>
+
+    <record id="view_employee_list_documents" model="ir.ui.view">
+        <field name="name">hr.employee.list.documents</field>
+        <field name="model">hr.employee</field>
+        <field name="priority">95</field>
+        <field name="arch" type="xml">
+            <list string="Employees: Missing Documents" create="0">
+                <field name="name"/>
+                <field name="department_id"/>
+                <field name="x_documents_missing" string="Missing or Expired"/>
+                <button name="action_upload_documents" type="object" string="Upload" icon="fa-upload"
+                        class="btn-primary"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_ksw_employee_documents_missing" model="ir.actions.act_window">
+        <field name="name">Employees: Missing Documents</field>
+        <field name="res_model">hr.employee</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('x_document_issue', '=', True)]</field>
+        <field name="view_ids" eval="[(5, 0, 0), (0, 0, {'view_mode': 'list', 'view_id': ref('view_employee_list_documents')})]"/>
+        <field name="help" type="html"><p class="o_view_nocontent_smiling_face">Every employee has his documents</p></field>
+    </record>
+
+    <!-- The documents on the vehicle and the employee forms (HR only). -->
+    <record id="view_ksw_fleet_vehicle_form_documents" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.form.documents</field>
+        <field name="model">ksw.fleet.vehicle</field>
+        <field name="inherit_id" ref="KSW_fleet.view_ksw_fleet_vehicle_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <div groups="KSW_documents.group_document_officer">
+                    <separator string="Documents"/>
+                    <div class="alert alert-warning" role="alert" invisible="not x_documents_missing">
+                        Missing or expired: <field name="x_documents_missing" nolabel="1" class="d-inline"/>
+                    </div>
+                    <button name="action_upload_documents" type="object" string="Upload Documents"
+                            icon="fa-upload" class="btn-secondary mb-2"/>
+                    <field name="x_document_ids" readonly="1">
+                        <list>
+                            <field name="type_id"/>
+                            <field name="number"/>
+                            <field name="expiry_date"/>
+                            <field name="expiry_status" widget="badge" decoration-success="expiry_status == 'valid'"
+                                   decoration-warning="expiry_status == 'expiring'"
+                                   decoration-danger="expiry_status == 'expired'"/>
+                            <field name="state" widget="badge"/>
+                        </list>
+                    </field>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_employee_form_documents" model="ir.ui.view">
+        <field name="name">hr.employee.form.documents</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="ksw_documents" string="Documents" groups="KSW_documents.group_document_officer">
+                    <div class="alert alert-warning" role="alert" invisible="not x_documents_missing">
+                        Missing or expired: <field name="x_documents_missing" nolabel="1" class="d-inline"/>
+                    </div>
+                    <button name="action_upload_documents" type="object" string="Upload Documents"
+                            icon="fa-upload" class="btn-secondary mb-2"/>
+                    <field name="x_document_ids" readonly="1">
+                        <list>
+                            <field name="type_id"/>
+                            <field name="number"/>
+                            <field name="license_class" optional="show"/>
+                            <field name="expiry_date"/>
+                            <field name="expiry_status" widget="badge" decoration-success="expiry_status == 'valid'"
+                                   decoration-warning="expiry_status == 'expiring'"
+                                   decoration-danger="expiry_status == 'expired'"/>
+                            <field name="state" widget="badge"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

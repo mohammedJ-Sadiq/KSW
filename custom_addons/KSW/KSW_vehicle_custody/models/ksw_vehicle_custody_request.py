@@ -79,6 +79,11 @@ class KswVehicleCustodyRequest(models.Model):
     department_id = fields.Many2one('hr.department', string='Requesting Department', index=True,
                                     domain="[('id', 'in', allowed_department_ids)]")
     allowed_department_ids = fields.Many2many('hr.department', compute='_compute_allowed_department_ids')
+    # The workshop that handles this form: workshop staff see and act on
+    # their own workshop's forms only, as with workshop requests. Set when the
+    # form is opened (its checkup's workshop, or the receiving department's
+    # home workshop); a plain field, so it does not move afterwards.
+    workshop_id = fields.Many2one('ksw.workshop', string='Workshop', index=True, readonly=True)
     workshop_request_id = fields.Many2one('ksw.workshop.request', string='Workshop Request',
                                           readonly=True, index=True, ondelete='set null', copy=False)
     origin = fields.Char(readonly=True, help='The release request or transfer this form belongs to.')
@@ -176,11 +181,13 @@ class KswVehicleCustodyRequest(models.Model):
     def _compute_permissions(self):
         is_hr = self._is_hr()
         is_workshop = self.env.su or self.env.user.has_group(WORKSHOP_GROUP)
+        workshops = set(self.env.user._ksw_workshop_scope_ids()) if not self.env.su else None
         scope = set(self.env.user._ksw_fleet_department_ids())
         for form in self:
             form.x_can_supervisor = form.state == 'draft' and (form.department_id.id in scope or is_hr)
             form.x_can_hr = is_hr and form._waits_for_hr()
-            form.x_can_workshop = is_workshop and form.state == 'workshop' and not form.workshop_done
+            form.x_can_workshop = is_workshop and form.state == 'workshop' and not form.workshop_done \
+                and (workshops is None or form.workshop_id.id in workshops)
 
     @api.model
     def _pending_domain(self):
@@ -196,7 +203,8 @@ class KswVehicleCustodyRequest(models.Model):
             mine.append(['|', ('state', '=', 'hr'),
                          '&', '&', ('state', '=', 'workshop'), ('kind', '!=', 'receive'), ('hr_done', '=', False)])
         if user.has_group(WORKSHOP_GROUP):
-            mine.append(['&', ('state', '=', 'workshop'), ('workshop_done', '=', False)])
+            mine.append(['&', '&', ('state', '=', 'workshop'), ('workshop_done', '=', False),
+                         ('workshop_id', 'in', user._ksw_workshop_scope_ids())])
         return Domain.OR(mine)
 
     @api.depends_context('uid')
@@ -279,7 +287,7 @@ class KswVehicleCustodyRequest(models.Model):
                 if vals.get('kind') != 'driver_change':
                     raise UserError(_('Only a driver change is raised by hand. Hand-ins and '
                                       'receipts come from vehicle releases and transfers.'))
-                for key in ('state', 'hr_done', 'workshop_done', 'workshop_request_id'):
+                for key in ('state', 'hr_done', 'workshop_done', 'workshop_request_id', 'workshop_id'):
                     vals.pop(key, None)
             vehicle = self.env['ksw.fleet.vehicle'].sudo().browse(vals.get('vehicle_id'))
             if vals.get('kind') == 'driver_change' and vehicle:
@@ -300,7 +308,8 @@ class KswVehicleCustodyRequest(models.Model):
         if not self.env.su and self.filtered(lambda f: f.state in ('signed', 'refused', 'cancelled')) \
                 and set(vals) - {'message_main_attachment_id'}:
             raise UserError(_('A signed, refused or cancelled handover form cannot be changed.'))
-        if not self.env.su and {'state', 'hr_done', 'workshop_done', 'kind', 'workshop_request_id'} & set(vals):
+        if not self.env.su and {'state', 'hr_done', 'workshop_done', 'kind', 'workshop_request_id',
+                                'workshop_id'} & set(vals):
             raise UserError(_('Use the buttons to move a handover form on.'))
         res = super().write(self._fill_snapshots(dict(vals)))
         if 'department_id' in vals or 'vehicle_id' in vals:
@@ -375,7 +384,19 @@ class KswVehicleCustodyRequest(models.Model):
                 form._advance('hr')
         return True
 
+    def _fill_licence_from_register(self):
+        """The new user's licence as the register holds it, where the form
+        has none yet: HR checks it, it does not type it again."""
+        for form in self.sudo().filtered(lambda f: f.new_employee_id and not f.license_expiry):
+            doc = self.env['ksw.document'].sudo().search([
+                ('employee_id', '=', form.new_employee_id.id), ('type_id.code', '=', 'driving_licence'),
+                ('state', '=', 'confirmed')], limit=1)
+            if doc:
+                form.write({'license_type': doc.license_class or form.license_type,
+                            'license_expiry': doc.expiry_date})
+
     def _check_new_user_licence(self):
+        self._fill_licence_from_register()
         for form in self.filtered('new_employee_id'):
             if not (form.license_type and form.license_expiry):
                 raise UserError(_('Record the new user\'s licence type and expiry: the vehicle is '
@@ -467,7 +488,7 @@ class KswVehicleCustodyRequest(models.Model):
                 'description': _('Checkup for driver change (%(f)s): %(a)s → %(b)s',
                                  f=form.name, a=form.previous_name or '-', b=form.new_name or '-'),
             })
-            form.write({'workshop_request_id': workshop_request.id})
+            form.write({'workshop_request_id': workshop_request.id, 'workshop_id': workshop_request.workshop_id.id})
 
     def _apply_custody(self):
         """What a done form changes. A hand-in leaves the vehicle in nobody's
@@ -537,7 +558,11 @@ class KswVehicleCustodyRequest(models.Model):
     # ------------------------------------------------------------------
     def _sync_activities(self):
         todo = self.env.ref('KSW_vehicle_custody.mail_activity_custody')
-        hr_users = self.env.ref(HR_GROUP).sudo().all_user_ids.filtered(lambda u: u.active and not u.share)
+        # admin and OdooBot hold these roles for system access, not as people
+        # who do the work (same rule as KSW_workshop's notifications).
+        technical = self.env.ref('base.user_admin') | self.env.ref('base.user_root')
+        hr_users = self.env.ref(HR_GROUP).sudo().all_user_ids.filtered(
+            lambda u: u.active and not u.share) - technical
         for form in self.sudo().exists():
             wanted = {}
             if form.state == 'draft':
@@ -550,8 +575,8 @@ class KswVehicleCustodyRequest(models.Model):
                     wanted[user.id] = _('HR documents: %s', form.vehicle_id.name)
             if form.state == 'workshop' and not form.workshop_done:
                 managers = self.env.ref('KSW_workshop.group_workshop_manager').sudo().all_user_ids
-                workshop = form.workshop_request_id.workshop_id
-                for user in managers.filtered(lambda u: u.active and not u.share and (
+                workshop = form.workshop_id
+                for user in (managers - technical).filtered(lambda u: u.active and not u.share and (
                         not workshop or workshop.id in u._ksw_workshop_scope_ids())):
                     wanted[user.id] = _('Workshop: %s', form.vehicle_id.name)
             elif form.state == 'done':
@@ -567,6 +592,15 @@ class KswVehicleCustodyRequest(models.Model):
                 form.activity_schedule(activity_type_id=todo.id, user_id=user_id, summary=summary)
 
 
+# HR-12's document lines and the register's types: the line shows what the
+# register holds instead of HR re-checking it at every handover. The driver
+# card belongs to the user who keeps (or receives) the vehicle.
+_REGISTER_CODES = {
+    'traffic_license': 'istimara', 'insurance': 'insurance', 'inspection_card': 'mvpi',
+    'operation_card': 'operation_card', 'driver_card': 'driver_card',
+}
+
+
 class KswVehicleCustodyDocument(models.Model):
     _name = 'ksw.vehicle.custody.document'
     _description = 'Vehicle Handover Form: Document'
@@ -577,6 +611,32 @@ class KswVehicleCustodyDocument(models.Model):
     document_type = fields.Selection(DOCUMENT_TYPES, string='Type', required=True)
     present = fields.Boolean(string='Handed Over')
     remark = fields.Char()
+    register_status = fields.Selection([
+        ('valid', 'Valid'), ('expiring', 'Expiring Soon'), ('expired', 'Expired'),
+        ('missing', 'Not in the Register'), ('none', ''),
+    ], string='In the Register', compute='_compute_register', compute_sudo=True)
+    register_expiry = fields.Date(string='Expires', compute='_compute_register', compute_sudo=True)
+
+    @api.depends('document_type', 'request_id.vehicle_id', 'request_id.new_employee_id',
+                 'request_id.previous_employee_id')
+    def _compute_register(self):
+        Document = self.env['ksw.document']
+        for line in self:
+            code = _REGISTER_CODES.get(line.document_type)
+            form = line.request_id
+            if not code:
+                line.register_status, line.register_expiry = 'none', False
+                continue
+            if code == 'driver_card':
+                domain = [('employee_id', '=', (form.new_employee_id or form.previous_employee_id).id)]
+            else:
+                domain = [('vehicle_id', '=', form.vehicle_id.id)]
+            doc = Document.search(domain + [('type_id.code', '=', code), ('state', '=', 'confirmed')], limit=1)
+            if not doc:
+                line.register_status, line.register_expiry = 'missing', False
+            else:
+                line.register_status = 'valid' if doc.expiry_status == 'none' else doc.expiry_status
+                line.register_expiry = doc.expiry_date
 
     @api.model_create_multi
     def create(self, vals_list):

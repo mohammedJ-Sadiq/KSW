@@ -1,0 +1,1426 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_documents
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-14 20:54+0000\n"
+"PO-Revision-Date: 2026-11-14 20:54+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar_001\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ai_reader.py:0
+msgid "%(f)s could not be read as a date: %(v)s"
+msgstr "تعذرت قراءة %(f)s كتاريخ: %(v)s"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/owners.py:0
+msgid "%s (expired)"
+msgstr "%s (منتهية)"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document.py:0
+msgid "%s is already confirmed."
+msgstr "تم اعتماد %s مسبقاً."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document.py:0
+msgid "%s is not a document of this kind of owner."
+msgstr "%s ليست من مستندات هذا النوع من المالكين."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ai_reader.py:0
+msgid "%s is not a photo or a PDF."
+msgstr "%s ليس صورة أو ملف PDF."
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_form
+msgid "<b>Read by AI: check before confirming</b>"
+msgstr "<b>قرأه الذكاء الاصطناعي: راجع قبل الاعتماد</b>"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document.py:0
+msgid ""
+"A confirmed document is not edited: upload the renewed one, which replaces "
+"it when confirmed."
+msgstr ""
+"المستند المعتمد لا يُعدّل: ارفع المستند المجدد، وسيحل محله عند اعتماده."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_needaction
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_needaction
+msgid "Action Needed"
+msgstr "إجراء مطلوب"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__active
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__active
+msgid "Active"
+msgstr "نشط"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__activity_ids
+msgid "Activities"
+msgstr "الأنشطة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "زخرفة استثناء النشاط"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__activity_state
+msgid "Activity State"
+msgstr "حالة النشاط"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "أيقونة نوع النشاط"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/wizard/upload_wizard.py:0
+msgid "Add at least one scan or photo."
+msgstr "أضف نسخة ممسوحة أو صورة واحدة على الأقل."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__ai_available
+msgid "Ai Available"
+msgstr "الذكاء الاصطناعي متاح"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__alert_days
+msgid "Alert Days Before Expiry"
+msgstr "أيام التنبيه قبل الانتهاء"
+
+#. module: KSW_documents
+#: model:ir.ui.menu,name:KSW_documents.menu_documents_all
+msgid "All Documents"
+msgstr "جميع المستندات"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__applies_to
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__applies_to
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__applies_to
+msgid "Applies To"
+msgstr "يخص"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document.py:0
+msgid "Attach the scan of %s."
+msgstr "أرفق النسخة الممسوحة لـ %s."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_attachment_count
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_attachment_count
+msgid "Attachment Count"
+msgstr "عدد المرفقات"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__ai_notes
+msgid "Check Before Confirming"
+msgstr "راجع قبل الاعتماد"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/wizard/upload_wizard.py:0
+msgid "Choose the document type (or read it with AI)."
+msgstr "اختر نوع المستند (أو اقرأه بالذكاء الاصطناعي)."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__license_class
+msgid "Class"
+msgstr "الفئة"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_upload_wizard_form
+msgid ""
+"Claude reads each scan (type, number, dates; Hijri converted to Gregorian) into a\n"
+"                    draft. Nothing is saved as current until HR checks and confirms it."
+msgstr ""
+"يقرأ Claude كل نسخة (النوع والرقم والتواريخ، مع تحويل الهجري إلى ميلادي) في "
+"مسودة. لا يُعتمد شيء حتى تراجعه الموارد البشرية وتعتمده."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__code
+msgid "Code"
+msgstr "رمز"
+
+#. module: KSW_documents
+#: model:ir.ui.menu,name:KSW_documents.menu_documents_config
+msgid "Configuration"
+msgstr "التهيئة"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_form
+msgid "Confirm"
+msgstr "تأكيد"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__confirmed_by_id
+msgid "Confirmed By"
+msgstr "اعتمده"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__confirmed_date
+msgid "Confirmed Date"
+msgstr "تاريخ الاعتماد"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__create_uid
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__create_uid
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__create_uid
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__create_uid
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__create_uid
+msgid "Created by"
+msgstr "أنشئ بواسطة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__create_date
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__create_date
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__create_date
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__create_date
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__create_date
+msgid "Created on"
+msgstr "أنشئ في"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__state__confirmed
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_search
+msgid "Current"
+msgstr "الحالية"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__days_left
+msgid "Days Left"
+msgstr "الأيام المتبقية"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_upload_wizard_form
+msgid "Discard"
+msgstr "تجاهل"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__display_name
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__display_name
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_ai_reader__display_name
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__display_name
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_owner_mixin__display_name
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__display_name
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_fleet_vehicle__display_name
+#: model:ir.model.fields,field_description:KSW_documents.field_res_company__display_name
+msgid "Display Name"
+msgstr "اسم العرض"
+
+#. module: KSW_documents
+#: model:ir.model,name:KSW_documents.model_ksw_document
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__type_id
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__type_id
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_form
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_search
+msgid "Document"
+msgstr "المستند"
+
+#. module: KSW_documents
+#: model:ir.model,name:KSW_documents.model_ksw_document_ai_reader
+msgid "Document AI Reader"
+msgstr "قارئ المستندات بالذكاء الاصطناعي"
+
+#. module: KSW_documents
+#: model:mail.activity.type,name:KSW_documents.mail_activity_document
+msgid "Document Expiry"
+msgstr "انتهاء مستند"
+
+#. module: KSW_documents
+#: model:ir.model,name:KSW_documents.model_ksw_document_owner_mixin
+msgid "Document Owner"
+msgstr "مالك المستند"
+
+#. module: KSW_documents
+#: model:ir.model,name:KSW_documents.model_ksw_document_type
+msgid "Document Type"
+msgstr "نوع المستند"
+
+#. module: KSW_documents
+#: model:ir.actions.act_window,name:KSW_documents.action_ksw_document_type
+#: model:ir.ui.menu,name:KSW_documents.menu_documents_types
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_type_list
+msgid "Document Types"
+msgstr "أنواع المستندات"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ai_reader.py:0
+msgid "Document type not recognised: choose it."
+msgstr "لم يُتعرّف على نوع المستند: اختره."
+
+#. module: KSW_documents
+#: model:ir.actions.act_window,name:KSW_documents.action_ksw_document
+#: model:ir.model.fields,field_description:KSW_documents.field_hr_employee__x_document_ids
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__document_ids
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_fleet_vehicle__x_document_ids
+#: model:ir.ui.menu,name:KSW_documents.menu_documents_root
+#: model:res.groups.privilege,name:KSW_documents.privilege_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_employee_form_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_batch_list
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_list
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_fleet_vehicle_form_documents
+msgid "Documents"
+msgstr "المستندات"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_hr_employee__x_document_issue
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_owner_mixin__x_document_issue
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_fleet_vehicle__x_document_issue
+msgid "Documents Missing or Expired"
+msgstr "مستندات ناقصة أو منتهية"
+
+#. module: KSW_documents
+#: model:res.groups,name:KSW_documents.group_document_officer
+msgid "Documents Officer"
+msgstr "مسؤول المستندات"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_hr_employee__x_document_pending_my_action
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_owner_mixin__x_document_pending_my_action
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_fleet_vehicle__x_document_pending_my_action
+msgid "Documents Waiting for Me"
+msgstr "مستندات بانتظاري"
+
+#. module: KSW_documents
+#: model:ir.actions.server,name:KSW_documents.cron_document_alerts_ir_actions_server
+msgid "Documents: to-dos for documents expiring or expired"
+msgstr "المستندات: مهام للمستندات القريبة الانتهاء أو المنتهية"
+
+#. module: KSW_documents
+#: model:ksw.document.type,name:KSW_documents.type_driver_card
+msgid "Driver Card"
+msgstr "بطاقة السائق"
+
+#. module: KSW_documents
+#: model:ksw.document.type,name:KSW_documents.type_driving_licence
+msgid "Driving Licence"
+msgstr "رخصة القيادة"
+
+#. module: KSW_documents
+#: model:ir.model,name:KSW_documents.model_hr_employee
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__employee_id
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__employee_id
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__applies_to__employee
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_type__applies_to__employee
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_upload_wizard__applies_to__employee
+msgid "Employee"
+msgstr "الموظف"
+
+#. module: KSW_documents
+#: model:ir.ui.menu,name:KSW_documents.menu_documents_missing_employees
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_search
+msgid "Employees"
+msgstr "الموظفون"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_type__required_for__custodians
+msgid "Employees who hold a vehicle"
+msgstr "الموظفون أصحاب عهد المركبات"
+
+#. module: KSW_documents
+#: model:ir.actions.act_window,name:KSW_documents.action_ksw_employee_documents_missing
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_employee_list_documents
+msgid "Employees: Missing Documents"
+msgstr "الموظفون: مستندات ناقصة"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_type__required_for__own_fleet
+msgid "Every company vehicle"
+msgstr "كل مركبات الشركة"
+
+#. module: KSW_documents
+#: model_terms:ir.actions.act_window,help:KSW_documents.action_ksw_vehicle_documents_missing
+msgid "Every company vehicle has its documents"
+msgstr "جميع مركبات الشركة مستوفية لمستنداتها"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_type__required_for__all
+msgid "Every employee"
+msgstr "كل الموظفين"
+
+#. module: KSW_documents
+#: model_terms:ir.actions.act_window,help:KSW_documents.action_ksw_employee_documents_missing
+msgid "Every employee has his documents"
+msgstr "جميع الموظفين مستوفون لمستنداتهم"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__expiry_status__expired
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_search
+msgid "Expired"
+msgstr "منتهي الصلاحية"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document.py:0
+msgid "Expired %(d)s: %(n)s"
+msgstr "انتهت في %(d)s: %(n)s"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document.py:0
+msgid "Expires %(d)s: %(n)s"
+msgstr "تنتهي في %(d)s: %(n)s"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__expiry_status__expiring
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_search
+msgid "Expiring Soon"
+msgstr "قريبة الانتهاء"
+
+#. module: KSW_documents
+#: model:ir.actions.act_window,name:KSW_documents.action_ksw_document_expiring
+#: model:ir.ui.menu,name:KSW_documents.menu_documents_expiring
+msgid "Expiring or Expired"
+msgstr "قريبة الانتهاء أو منتهية"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__expiry_date
+msgid "Expiry Date"
+msgstr "تاريخ الانتهاء"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_search
+msgid "Expiry Month"
+msgstr "شهر الانتهاء"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ai_reader.py:0
+msgid "Expiry as printed: %s (converted to Gregorian; check it)."
+msgstr "تاريخ الانتهاء كما هو مطبوع: %s (حُوّل إلى الميلادي؛ راجعه)."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document.py:0
+msgid "Fill in the document number of %s."
+msgstr "أدخل رقم مستند %s."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document.py:0
+msgid "Fill in the expiry date of %s."
+msgstr "أدخل تاريخ انتهاء %s."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_follower_ids
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_follower_ids
+msgid "Followers"
+msgstr "المتابعين"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_partner_ids
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "المتابعين (الشركاء)"
+
+#. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr "أيقونة من Font awesome مثال: fa-tasks"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__has_expiry
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__has_expiry
+msgid "Has Expiry"
+msgstr "له تاريخ انتهاء"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__has_message
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__has_message
+msgid "Has Message"
+msgstr "يحتوي على رسالة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__has_class
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__has_class
+msgid "Has a Class"
+msgstr "له فئة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__ai_hint
+msgid "How It Looks"
+msgstr "كيف يبدو"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_hr_employee__id
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__id
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__id
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_ai_reader__id
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__id
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_owner_mixin__id
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__id
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__id
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_fleet_vehicle__id
+#: model:ir.model.fields,field_description:KSW_documents.field_res_company__id
+msgid "ID"
+msgstr "المُعرف"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__activity_exception_icon
+msgid "Icon"
+msgstr "الأيقونة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "الأيقونة للإشارة إلى النشاط المستثنى."
+
+#. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document__message_needaction
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_batch__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "إذا كان محددًا، فهناك رسائل جديدة عليك رؤيتها."
+
+#. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document__message_has_error
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document__message_has_sms_error
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_batch__message_has_error
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_batch__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "إذا كان محددًا، فقد حدث خطأ في تسليم بعض الرسائل."
+
+#. module: KSW_documents
+#: model:ksw.document.type,name:KSW_documents.type_insurance
+msgid "Insurance"
+msgstr "التأمين"
+
+#. module: KSW_documents
+#: model:ksw.document.type,name:KSW_documents.type_iqama
+msgid "Iqama"
+msgstr "الإقامة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_is_follower
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_is_follower
+msgid "Is Follower"
+msgstr "متابع"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__issue_date
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__issue_date
+msgid "Issue Date"
+msgstr "تاريخ الإصدار"
+
+#. module: KSW_documents
+#: model:ir.module.category,name:KSW_documents.module_category_ksw_documents
+msgid "KSW Documents"
+msgstr "المستندات"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__write_uid
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__write_uid
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__write_uid
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__write_uid
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__write_uid
+msgid "Last Updated by"
+msgstr "آخر تحديث بواسطة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__write_date
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__write_date
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__write_date
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__write_date
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__write_date
+msgid "Last Updated on"
+msgstr "آخر تحديث في"
+
+#. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_upload_wizard__type_id
+msgid "Leave empty for the AI reader to tell; required without it."
+msgstr "اتركه فارغاً ليحدده قارئ الذكاء الاصطناعي؛ إلزامي بدونه."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_has_error
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_has_error
+msgid "Message Delivery error"
+msgstr "خطأ في تسليم الرسائل"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_ids
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_ids
+msgid "Messages"
+msgstr "الرسائل"
+
+#. module: KSW_documents
+#: model:ir.ui.menu,name:KSW_documents.menu_documents_missing
+msgid "Missing"
+msgstr "الناقصة"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_employee_list_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_fleet_vehicle_list_documents
+msgid "Missing or Expired"
+msgstr "ناقصة أو منتهية"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_hr_employee__x_documents_missing
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_owner_mixin__x_documents_missing
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_fleet_vehicle__x_documents_missing
+msgid "Missing or Expired Documents"
+msgstr "المستندات الناقصة أو المنتهية"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_employee_form_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_fleet_vehicle_form_documents
+msgid "Missing or expired:"
+msgstr "ناقصة أو منتهية:"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "الموعد النهائي لنشاطاتي"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_batch.py:0
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__name
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__name
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__name
+msgid "Name"
+msgstr "الاسم"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/wizard/upload_wizard.py:0
+msgid "Name on the document (%(d)s) does not look like %(e)s."
+msgstr "الاسم في المستند (%(d)s) لا يطابق %(e)s."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/owners.py:0
+msgid "Nationality not recorded"
+msgstr "الجنسية غير مسجلة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__activity_calendar_event_id
+msgid "Next Activity Calendar Event"
+msgstr "الفعالية التالية في تقويم الأنشطة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "الموعد النهائي للنشاط التالي"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__activity_summary
+msgid "Next Activity Summary"
+msgstr "ملخص النشاط التالي"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__activity_type_id
+msgid "Next Activity Type"
+msgstr "نوع النشاط التالي"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__expiry_status__none
+msgid "No Expiry"
+msgstr "بلا تاريخ انتهاء"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document.py:0
+msgid "No scan attached."
+msgstr "لا توجد نسخة مرفقة."
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_type__required_for__none
+msgid "Nobody (optional)"
+msgstr "لا أحد (اختياري)"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_type__required_for__non_saudi
+msgid "Non-Saudi employees"
+msgstr "الموظفون غير السعوديين"
+
+#. module: KSW_documents
+#: model_terms:ir.actions.act_window,help:KSW_documents.action_ksw_document_to_confirm
+msgid "Nothing to confirm. Uploaded scans wait here until HR checks them."
+msgstr ""
+"لا يوجد ما يُعتمد. تنتظر النسخ المرفوعة هنا حتى تراجعها الموارد البشرية."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__number
+msgid "Number"
+msgstr "الرقم"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_needaction_counter
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_needaction_counter
+msgid "Number of Actions"
+msgstr "عدد الإجراءات"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_has_error_counter
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_has_error_counter
+msgid "Number of errors"
+msgstr "عدد الأخطاء"
+
+#. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document__message_needaction_counter
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_batch__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "عدد الرسائل التي تتطلب اتخاذ إجراء"
+
+#. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document__message_has_error_counter
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_batch__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "عدد الرسائل الحادث بها خطأ في التسليم"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document.py:0
+msgid "Only HR confirms a document."
+msgstr "الموارد البشرية وحدها تعتمد المستند."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_batch.py:0
+#: code:addons/KSW_documents/wizard/upload_wizard.py:0
+msgid "Only HR uploads documents."
+msgstr "الموارد البشرية وحدها ترفع المستندات."
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_batch_form
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_form
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_list
+msgid "Open Scan"
+msgstr "فتح النسخة"
+
+#. module: KSW_documents
+#: model:ksw.document.type,name:KSW_documents.type_operation_card
+msgid "Operation Card"
+msgstr "كرت التشغيل"
+
+#. module: KSW_documents
+#: model:ksw.document.type,name:KSW_documents.type_passport
+msgid "Passport"
+msgstr "جواز السفر"
+
+#. module: KSW_documents
+#: model:ksw.document.type,name:KSW_documents.type_mvpi
+msgid "Periodic Inspection"
+msgstr "الفحص الدوري"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/wizard/upload_wizard.py:0
+msgid "Plate on the document (%(d)s) differs from the vehicle's (%(v)s)."
+msgstr "اللوحة في المستند (%(d)s) تختلف عن لوحة المركبة (%(v)s)."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__rating_ids
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__rating_ids
+msgid "Ratings"
+msgstr "التقييمات"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__ai_read
+msgid "Read by AI"
+msgstr "قرأه الذكاء الاصطناعي"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_form
+msgid "Read by AI. Compare every field with the scan, then confirm."
+msgstr "قرأه الذكاء الاصطناعي. قارن كل حقل بالنسخة ثم اعتمده."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__use_ai
+msgid "Read with AI"
+msgstr "القراءة بالذكاء الاصطناعي"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ai_reader.py:0
+#: code:addons/KSW_documents/models/ksw_document_batch.py:0
+msgid ""
+"Reading documents needs Claude: set Settings ▸ AI Provider to Anthropic "
+"Claude and add its API key."
+msgstr ""
+"قراءة المستندات تتطلب Claude: اختر الإعدادات ▸ مزود الذكاء الاصطناعي ▸ "
+"Anthropic Claude وأضف مفتاحه."
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_upload_wizard_form
+msgid ""
+"Reading scans automatically needs Claude: Settings ▸ AI Provider ▸ Anthropic Claude.\n"
+"                    Until then, choose the type and fill the draft by hand."
+msgstr ""
+"القراءة التلقائية تتطلب Claude: الإعدادات ▸ مزود الذكاء الاصطناعي ▸ "
+"Anthropic Claude. حتى ذلك الحين اختر النوع وعبّئ المسودة يدوياً."
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__state__replaced
+msgid "Replaced"
+msgstr "مستبدل"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__required_for
+msgid "Required For"
+msgstr "مطلوب من"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__activity_user_id
+msgid "Responsible User"
+msgstr "المستخدم المسؤول"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_has_sms_error
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "خطأ في تسليم الرسائل النصية القصيرة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__attachment_ids
+msgid "Scan"
+msgstr "النسخة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__attachment_ids
+msgid "Scans or Photos"
+msgstr "النسخ أو الصور"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__sequence
+msgid "Sequence"
+msgstr "تسلسل"
+
+#. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_type__code
+msgid "Stable key used by the code and the AI reader."
+msgstr "مفتاح ثابت يستخدمه النظام وقارئ الذكاء الاصطناعي."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__state
+msgid "State"
+msgstr "الحالة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+"الأنشطة المعتمدة على الحالة\n"
+"المتأخرة: تاريخ الاستحقاق مر\n"
+"اليوم: تاريخ النشاط هو اليوم\n"
+"المخطط: الأنشطة المستقبلية."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__sync_expiry_field
+msgid "Sync Expiry Field"
+msgstr "حقل تاريخ الانتهاء المرتبط"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__sync_number_field
+msgid "Sync Number Field"
+msgstr "حقل الرقم المرتبط"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ai_reader.py:0
+msgid "The AI reader could not be reached (%s). Fill the document by hand."
+msgstr "تعذر الوصول إلى قارئ الذكاء الاصطناعي (%s). عبّئ المستند يدوياً."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ai_reader.py:0
+msgid "The AI reader gave no usable answer: fill the document by hand."
+msgstr "لم يُعطِ قارئ الذكاء الاصطناعي إجابة صالحة: عبّئ المستند يدوياً."
+
+#. module: KSW_documents
+#: model:ir.model.constraint,message:KSW_documents.constraint_ksw_document_type_code_uniq
+msgid "The code must be unique."
+msgstr "يجب أن يكون الرمز فريداً."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ai_reader.py:0
+msgid "The reader was only %s confident: check every field."
+msgstr "كانت ثقة القارئ %s فقط: راجع كل حقل."
+
+#. module: KSW_documents
+#: model:ir.actions.act_window,name:KSW_documents.action_ksw_document_to_confirm
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__state__draft
+#: model:ir.ui.menu,name:KSW_documents.menu_documents_to_confirm
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_batch_list
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_search
+msgid "To Confirm"
+msgstr "بانتظار الاعتماد"
+
+#. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_type__ai_hint
+msgid "Told to the AI reader, e.g. its Arabic title."
+msgstr "يُبلَّغ لقارئ الذكاء الاصطناعي، مثل عنوانه بالعربية."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/wizard/upload_wizard.py:0
+msgid "Type guessed as the first possible one: check it."
+msgstr "خُمّن النوع كأول نوع ممكن: راجعه."
+
+#. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "نوع النشاط المستثنى في السجل."
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_employee_list_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_upload_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_fleet_vehicle_list_documents
+msgid "Upload"
+msgstr "رفع"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/wizard/upload_wizard.py:0
+#: model:ir.model,name:KSW_documents.model_ksw_document_upload_wizard
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_employee_form_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_upload_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_fleet_vehicle_form_documents
+msgid "Upload Documents"
+msgstr "رفع المستندات"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__expiry_status__valid
+msgid "Valid"
+msgstr "صالح"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__expiry_status
+msgid "Validity"
+msgstr "الصلاحية"
+
+#. module: KSW_documents
+#: model:ir.model,name:KSW_documents.model_ksw_fleet_vehicle
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__vehicle_id
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__vehicle_id
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__applies_to__vehicle
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_type__applies_to__vehicle
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_upload_wizard__applies_to__vehicle
+msgid "Vehicle"
+msgstr "المركبة"
+
+#. module: KSW_documents
+#: model:ksw.document.type,name:KSW_documents.type_istimara
+msgid "Vehicle Registration (Istimara)"
+msgstr "استمارة المركبة"
+
+#. module: KSW_documents
+#: model:ir.ui.menu,name:KSW_documents.menu_documents_missing_vehicles
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_search
+msgid "Vehicles"
+msgstr "المركبات"
+
+#. module: KSW_documents
+#: model:ir.actions.act_window,name:KSW_documents.action_ksw_vehicle_documents_missing
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_fleet_vehicle_list_documents
+msgid "Vehicles: Missing Documents"
+msgstr "المركبات: مستندات ناقصة"
+
+#. module: KSW_documents
+#: model:ksw.document.type,name:KSW_documents.type_visa
+msgid "Visa"
+msgstr "التأشيرة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__x_is_pending_my_action
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_search
+msgid "Waiting for Me"
+msgstr "بانتظاري"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__website_message_ids
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__website_message_ids
+msgid "Website Messages"
+msgstr "رسائل الموقع الإلكتروني"
+
+#. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document__website_message_ids
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_batch__website_message_ids
+msgid "Website communication history"
+msgstr "سجل تواصل الموقع الإلكتروني"
+
+#. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document__ai_notes
+msgid "What the AI reader was unsure of, or what does not match the owner."
+msgstr "ما لم يتأكد منه قارئ الذكاء الاصطناعي، أو ما لا يطابق المالك."
+
+#. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document__has_class
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_type__has_class
+msgid "e.g. a driving licence: private, heavy, public."
+msgstr "مثل رخصة القيادة: خاصة، نقل ثقيل، عمومي."
+
+#. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_type__sync_expiry_field
+msgid "hr.employee field that receives the expiry date."
+msgstr "حقل الموظف الذي يستقبل تاريخ الانتهاء."
+
+#. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_type__sync_number_field
+msgid "hr.employee field that receives the number."
+msgstr "حقل الموظف الذي يستقبل الرقم."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/owners.py:0
+msgid "%s (expiry not entered)"
+msgstr "%s (تاريخ الانتهاء غير مدخل)"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document.py:0
+msgid "A document belongs to one owner."
+msgstr "المستند يخص صاحباً واحداً فقط."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__read_attachment_ids
+msgid "Already Read"
+msgstr "تمت قراءتها"
+
+#. module: KSW_documents
+#: model:ir.model,name:KSW_documents.model_ksw_document_batch
+msgid "Bulk Document Upload"
+msgstr "رفع مستندات جماعي"
+
+#. module: KSW_documents
+#: model:ir.actions.act_window,name:KSW_documents.action_ksw_document_batch
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__batch_id
+#: model:ir.ui.menu,name:KSW_documents.menu_documents_bulk
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_batch_form
+msgid "Bulk Upload"
+msgstr "رفع جماعي"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_batch_list
+msgid "Bulk Uploads"
+msgstr "الرفع الجماعي"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_batch.py:0
+msgid "Bulk upload %s"
+msgstr "رفع جماعي %s"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__detected_vin
+msgid "Chassis No. (as read)"
+msgstr "رقم الهيكل (كما قُرئ)"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_batch.py:0
+msgid "Chassis number"
+msgstr "رقم الهيكل"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document.py:0
+msgid "Choose whose document %s is."
+msgstr "حدد صاحب المستند %s."
+
+#. module: KSW_documents
+#: model_terms:ir.actions.act_window,help:KSW_documents.action_ksw_document_batch
+msgid ""
+"Claude reads every scan and Odoo finds whose each document is. You confirm."
+msgstr ""
+"يقرأ Claude كل مستند ممسوح، ويحدد النظام صاحب كل مستند، ثم تقوم أنت "
+"بالاعتماد."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__detected_color
+msgid "Colour (as read)"
+msgstr "اللون (كما قُرئ)"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__company_id
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__company_id
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__applies_to__company
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_type__applies_to__company
+msgid "Company"
+msgstr "الشركة"
+
+#. module: KSW_documents
+#: model:ksw.document.type,name:KSW_documents.type_company_transport_licence
+msgid "Company Transport Licence"
+msgstr "ترخيص النقل للشركة"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_batch_form
+msgid "Confirm All"
+msgstr "اعتماد الكل"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_batch_form
+msgid ""
+"Confirm every document that says whose it is? Check the highlighted ones "
+"first."
+msgstr "اعتماد كل مستند محدد صاحبه؟ راجع المستندات المميزة أولاً."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document.py:0
+msgid "Differs from %(o)s (not changed): %(d)s"
+msgstr "يختلف عن %(o)s (لم يتم التعديل): %(d)s"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__document_ids
+msgid "Documents Found"
+msgstr "المستندات المستخرجة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__draft_count
+msgid "Draft Count"
+msgstr "عدد المسودات"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_batch_form
+msgid ""
+"Drop every scan, photo or Absher screenshot here (any mix of vehicles and people,\n"
+"                        several documents per image are fine), save, then press <b>Read All</b>."
+msgstr ""
+"أرفق هنا جميع المستندات الممسوحة أو الصور أو لقطات أبشر (مركبات وأشخاص معاً،"
+" ويمكن أن تحتوي الصورة الواحدة على أكثر من مستند)، ثم احفظ واضغط <b>قراءة "
+"الكل</b>."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__errors
+msgid "Errors"
+msgstr "الأخطاء"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__expiry_status__unknown
+msgid "Expiry Not Entered"
+msgstr "تاريخ الانتهاء غير مدخل"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__expiry_on_document
+msgid "Expiry Printed on It"
+msgstr "تاريخ الانتهاء مطبوع عليه"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document.py:0
+msgid "Filled on %(o)s: %(f)s"
+msgstr "تم استكمال بيانات %(o)s: %(f)s"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__match_note
+msgid "Found By"
+msgstr "طريقة التعرف"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__found_count
+msgid "Found Count"
+msgstr "عدد المستندات"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__detected_id_number
+msgid "ID / Iqama No. (as read)"
+msgstr "رقم الهوية / الإقامة (كما قُرئ)"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_batch.py:0
+msgid "Iqama / ID number"
+msgstr "رقم الإقامة / الهوية"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__detected_make
+msgid "Make (as read)"
+msgstr "الماركة (كما قُرئت)"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__detected_model
+msgid "Model (as read)"
+msgstr "الطراز (كما قُرئ)"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__detected_name
+msgid "Name (as read)"
+msgstr "الاسم (كما قُرئ)"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__detected_nationality
+msgid "Nationality (as read)"
+msgstr "الجنسية (كما قُرئت)"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_batch_list
+msgid "Owner Missing"
+msgstr "بدون صاحب"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_batch.py:0
+msgid "Plate"
+msgstr "اللوحة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__detected_plate
+msgid "Plate (as read)"
+msgstr "اللوحة (كما قُرئت)"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_batch_form
+msgid "Read All"
+msgstr "قراءة الكل"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_batch.py:0
+msgid "Same person as another document"
+msgstr "نفس صاحب مستند آخر"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_batch.py:0
+msgid "Same vehicle as another document"
+msgstr "نفس مركبة مستند آخر"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__attachment_ids
+msgid "Scans, Photos, Screenshots"
+msgstr "المستندات الممسوحة والصور ولقطات الشاشة"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ai_reader.py:0
+msgid "The AI reader found no document: fill it by hand."
+msgstr "لم يعثر القارئ الآلي على أي مستند: أدخل البيانات يدوياً."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__unmatched_count
+msgid "Unmatched Count"
+msgstr "عدد غير المطابقة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__unread_count
+msgid "Unread Count"
+msgstr "عدد غير المقروءة"
+
+#. module: KSW_documents
+#: model_terms:ir.actions.act_window,help:KSW_documents.action_ksw_document_batch
+msgid "Upload many documents at once"
+msgstr "رفع عدة مستندات دفعة واحدة"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_batch.py:0
+msgid "Whose document this is was not found: choose it."
+msgstr "لم يتم التعرف على صاحب هذا المستند: حدده."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__detected_year
+msgid "Year (as read)"
+msgstr "سنة الصنع (كما قُرئت)"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_batch_form
+msgid ""
+"documents do not say whose they are yet:\n"
+"                        choose the vehicle or employee in the list. The other documents of the same\n"
+"                        vehicle or person follow."
+msgstr ""
+"مستندات لم يُحدد صاحبها بعد: اختر المركبة أو الموظف في القائمة، وستتبعها "
+"بقية مستندات نفس المركبة أو الشخص تلقائياً."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_batch.py:0
+msgid "%(f)s: %(t)s %(n)s is already listed (%(d)s), not added again."
+msgstr "%(f)s: %(t)s رقم %(n)s مدرج مسبقاً (%(d)s)، ولم تتم إضافته مرة أخرى."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__info
+msgid "Not Added Again"
+msgstr "لم تتم إضافتها مرة أخرى"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_batch.py:0
+msgid "in the register"
+msgstr "في السجل"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_batch.py:0
+msgid "this upload"
+msgstr "في هذا الرفع"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_company_registration.py:0
+msgid "A unified number has 10 digits and starts with 7 (%s)."
+msgstr "الرقم الموحد مكون من 10 أرقام ويبدأ بالرقم 7 (%s)."
+
+#. module: KSW_documents
+#: model_terms:ir.actions.act_window,help:KSW_documents.action_ksw_company_registration
+msgid "Add the company's main CR and its branches"
+msgstr "أضف السجل التجاري الرئيسي للشركة وفروعها"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_company_registration_search
+msgid "Archived"
+msgstr "مؤرشف"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_company_registration__kind__branch
+msgid "Branch (Sub-CR)"
+msgstr "فرع (سجل فرعي)"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__cr_number
+msgid "CR No."
+msgstr "رقم السجل التجاري"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document.py:0
+msgid "Choose which registration (main CR or branch) %s is for."
+msgstr "حدد السجل التجاري (الرئيسي أو الفرع) الذي يخصه المستند %s."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__city
+msgid "City"
+msgstr "المدينة"
+
+#. module: KSW_documents
+#: model:ir.model,name:KSW_documents.model_ksw_company_registration
+#: model:ksw.document.type,name:KSW_documents.type_commercial_registration
+msgid "Commercial Registration"
+msgstr "السجل التجاري"
+
+#. module: KSW_documents
+#: model:ir.actions.act_window,name:KSW_documents.action_ksw_company_registration
+#: model:ir.model.fields,field_description:KSW_documents.field_res_company__x_registration_ids
+#: model:ir.ui.menu,name:KSW_documents.menu_documents_registrations
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_company_form_registrations
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_company_registration_list
+msgid "Commercial Registrations"
+msgstr "السجلات التجارية"
+
+#. module: KSW_documents
+#: model:ir.model,name:KSW_documents.model_res_company
+msgid "Companies"
+msgstr "الشركات"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_company_registration__kind__group
+msgid "Group Company (separate legal entity)"
+msgstr "شركة تابعة للمجموعة (كيان قانوني مستقل)"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_batch.py:0
+msgid ""
+"Issued to %(n)s (%(r)s): no registration in Odoo has this number. Add it "
+"under Documents ▸ Configuration ▸ Commercial Registrations (or upload its CR"
+" certificate), or choose the company and registration."
+msgstr ""
+"صادر باسم %(n)s (%(r)s): لا يوجد سجل تجاري في النظام بهذا الرقم. أضفه من "
+"المستندات ▸ الإعدادات ▸ السجلات التجارية (أو ارفع شهادة السجل)، أو اختر "
+"الشركة والسجل."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__kind
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_company_registration_search
+msgid "Kind"
+msgstr "النوع"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__parent_id
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_company_registration__kind__main
+msgid "Main CR"
+msgstr "السجل الرئيسي"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_batch.py:0
+msgid "Main CR %s"
+msgstr "السجل الرئيسي %s"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__detected_parent_number
+msgid "Main CR No. (as read)"
+msgstr "رقم السجل الرئيسي (كما قُرئ)"
+
+#. module: KSW_documents
+#: model_terms:ir.actions.act_window,help:KSW_documents.action_ksw_company_registration
+msgid ""
+"Or upload the CR certificates in Bulk Upload: confirming one records it here. Company\n"
+"               documents (transport licence, operation cards…) are tied to their registration by its number."
+msgstr ""
+"أو ارفع شهادات السجل التجاري من الرفع الجماعي: اعتماد الشهادة يسجلها هنا. "
+"ترتبط مستندات الشركة (ترخيص النقل، بطاقات التشغيل…) بسجلها التجاري عبر رقمه."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_batch.py:0
+msgid "Registration %s"
+msgstr "السجل %s"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__registration_id
+msgid "Registration (CR)"
+msgstr "السجل التجاري"
+
+#. module: KSW_documents
+#: model:ir.model.constraint,message:KSW_documents.constraint_ksw_company_registration_unified_unique
+msgid "This unified number is already registered."
+msgstr "هذا الرقم الموحد مسجل مسبقاً."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__name
+msgid "Trade Name"
+msgstr "الاسم التجاري"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__unified_number
+msgid "Unified No. (700)"
+msgstr "الرقم الوطني الموحد (700)"
+
+#. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document__registration_id
+msgid ""
+"Which of the company's registrations (main CR, branch, group company) this "
+"document is for."
+msgstr ""
+"السجل التجاري الذي يخصه هذا المستند (الرئيسي أو الفرع أو شركة المجموعة)."
+
+#. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_company_registration__unified_number
+msgid "الرقم الوطني الموحد"
+msgstr "الرقم الوطني الموحد"
+
+#. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_company_registration__cr_number
+msgid "رقم السجل التجاري"
+msgstr "رقم السجل التجاري"

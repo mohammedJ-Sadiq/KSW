@@ -225,12 +225,23 @@ class KswPayBatchBasImport(models.Model):
                 # is about to collect (_collect_entries): refreshed here, not
                 # imported a second time beside it (KSWCO SUB00008: four
                 # drivers' October trips paid twice).
-                segments = [window or (month_start, month_end)]
+                days = window or (month_start, month_end)
                 mine = rows.filtered(
                     lambda e: e.x_sub_batch_id == sub_batch or (
                         not e.x_sub_batch_id and e.state == 'draft'
                         and not e.x_sub_batch_left_out
-                        and e._within(*segments[0])))
+                        and e._within(*days)))
+                # Days another handover already holds are not this one's
+                # to import: the same check the batch's own import makes
+                # (_uncovered_days below). Without it a second sub-batch
+                # over the same days imported the trips again beside the
+                # rows the first had approved (KSWCO SUB00013, Nov 2026).
+                # A draft batch row is not a handover — the batch's own
+                # import replaces it — so it takes no days here.
+                taken = [r._span() or (month_start, month_end)
+                         for r in rows - mine
+                         if r.x_sub_batch_id or r.state != 'draft']
+                segments = self._uncovered_days(days[0], days[1], taken)
             else:
                 mine = rows.filtered(lambda e: not e.x_sub_batch_id)
                 taken = [r._span() for r in rows - mine]
