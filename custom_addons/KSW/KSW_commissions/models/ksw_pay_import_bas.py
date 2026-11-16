@@ -329,6 +329,21 @@ class KswPayBatchBasImport(models.Model):
                 if stale:
                     commands += [(2, r.id) for r in stale]
                     mine -= stale
+            else:
+                # The batch's own draft row reaching past these days (a
+                # whole-month import made before the sub-batch) counts the
+                # same loads again with a full month's allowance: KSWCO
+                # PB000157 row 2666, 1–30 Nov beside SUB00010's 1–9 Nov
+                # (22.80 next to 572.00). It goes; the batch's next import
+                # rebuilds only the days no handover holds.
+                wider = rows.filtered(
+                    lambda e: not e.x_sub_batch_id and e.state == 'draft'
+                    and not e.x_sub_batch_left_out
+                    and not e.x_vacation_payslip_id and e._span()
+                    and e._span()[0] <= days[1] and days[0] <= e._span()[1]
+                    and not e._within(*days))
+                if wider:
+                    commands += [(2, r.id) for r in wider]
 
             if not segments and hold:
                 # Back only after these days: nothing here is his, and the

@@ -245,11 +245,16 @@ class TestSendEarlyTrips(SendEarlyCommon):
         self.assertIn((date(2029, 3, 1), date(2029, 3, 16)), self.bas_calls)
 
     def test_23_an_earlier_whole_month_row_is_trimmed_not_doubled(self):
+        """KSWCO PB000157 (Nov 2026): the whole-month row stayed beside
+        SUB00010's, the same loads with a full month's allowance (22.80
+        next to 572.00). The sub-batch import removes it now; the batch's
+        next import rebuilds only the days nobody has handed over."""
         self._import_batch()
         whole = self._rows(self.driver_1)
-        self._send(self.trips_batch, self.driver_1,
-                   '2029-03-16', '2029-03-31')
-        self.assertTrue(whole.x_overlap_note)
+        sub = self._send(self.trips_batch, self.driver_1,
+                         '2029-03-16', '2029-03-31')
+        self.assertFalse(whole.exists())
+        self.assertEqual(self._rows(self.driver_1).x_sub_batch_id, sub)
         self._import_batch()
         mine = self._rows(self.driver_1)
         self.assertEqual(len(mine), 2)

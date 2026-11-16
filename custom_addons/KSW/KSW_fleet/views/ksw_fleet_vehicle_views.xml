@@ -14,6 +14,8 @@
                 <field name="brand"/>
                 <field name="model"/>
                 <field name="year"/>
+                <field name="x_vin" optional="hide"/>
+                <field name="x_color" optional="hide"/>
                 <field name="driver_name"/>
                 <field name="x_custodian_id" optional="show"/>
                 <field name="state" widget="badge"/>
@@ -113,6 +115,7 @@
                 <field name="name"/>
                 <field name="client_id"/>
                 <field name="plate_number"/>
+                <field name="x_vin"/>
                 <field name="x_custodian_id"/>
                 <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
                 <filter string="Confirmed" name="filter_confirmed" domain="[('state', '=', 'confirmed')]"/>
