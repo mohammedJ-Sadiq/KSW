@@ -705,3 +705,8 @@ msgstr "دفعات عمولات فرعية بانتظار تدقيقي أو اع
 #: model:ksw.home.inbox.source,name:KSW_backend_theme.inbox_commission_submissions
 msgid "Commission submissions to check or approve"
 msgstr "عمولات أقسام بانتظار تدقيقي أو اعتمادي"
+
+#. module: KSW_backend_theme
+#: model:ksw.home.inbox.source,name:KSW_backend_theme.inbox_document_imports
+msgid "Government exports to import"
+msgstr "ملفات بوابات حكومية بانتظار الاستيراد"

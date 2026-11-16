@@ -44,7 +44,7 @@
             <field name="name">Iqama</field>
             <field name="code">iqama</field><field name="sequence">12</field>
             <field name="applies_to">employee</field><field name="required_for">non_saudi</field>
-            <field name="sync_number_field">identification_id</field>
+            <field name="sync_number_field">ssnid</field>
             <field name="ai_hint">هوية مقيم / إقامة، رقم الإقامة 10 أرقام</field>
         </record>
         <record id="type_passport" model="ksw.document.type">
@@ -79,6 +79,12 @@
     </data>
     <!-- The istimara prints no expiry (it is renewed with the periodic
          inspection): noupdate above, so existing databases get it here. -->
+    <!-- The iqama number lives in SSN No., the field payroll's WPS file reads
+         (noupdate above, so existing databases get it here). -->
+    <function model="ksw.document.type" name="write">
+        <value eval="[ref('type_iqama')]"/>
+        <value eval="{'sync_number_field': 'ssnid'}"/>
+    </function>
     <function model="ksw.document.type" name="write">
         <value eval="[ref('type_istimara')]"/>
         <value eval="{'expiry_on_document': False}"/>

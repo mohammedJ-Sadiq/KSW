@@ -5,3 +5,5 @@ from . import owners
 from . import ai_reader
 from . import plates
 from . import ksw_document_batch
+from . import hijri
+from . import ksw_document_import

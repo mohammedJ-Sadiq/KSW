@@ -11,6 +11,8 @@
                 <header>
                     <button name="action_read" type="object" string="Read All" class="oe_highlight"
                             icon="fa-magic" invisible="not unread_count"/>
+                    <button name="action_match_again" type="object" string="Match Again" icon="fa-refresh"
+                            invisible="not unmatched_count"/>
                     <button name="action_confirm_all" type="object" string="Confirm All" class="oe_highlight"
                             icon="fa-check" invisible="not draft_count or unread_count"
                             confirm="Confirm every document that says whose it is? Check the highlighted ones first."/>

@@ -9,6 +9,8 @@ from odoo.fields import Domain
 from .plates import plate_key, vin_key
 
 OFFICER_GROUP = 'KSW_documents.group_document_officer'
+# A status-only confirmation from a monthly export stays good this long.
+VERIFIED_DAYS = 45
 
 
 # A plate is the same plate in Arabic or Latin letters, any order or spacing.
@@ -66,6 +68,13 @@ class KswDocument(models.Model):
                                       help='Which of the company\'s registrations (main CR, branch, group company) '
                                            'this document is for.')
     detected_parent_number = fields.Char(string='Main CR No. (as read)')
+    source = fields.Selection([('upload', 'Scan'), ('absher', 'Absher Business'), ('muqeem', 'Muqeem'),
+                               ('naql', 'Naql')], default='upload', required=True, readonly=True,
+                              string='Source')
+    verified_date = fields.Date(readonly=True, help='The day a government export last showed this document as '
+                                                    'valid. Used when the export gives a status but no date.')
+    import_id = fields.Many2one('ksw.document.import', string='Import', readonly=True, ondelete='set null',
+                                index=True)
     batch_id = fields.Many2one('ksw.document.batch', string='Bulk Upload', index=True, ondelete='set null')
     detected_plate = fields.Char(string='Plate (as read)')
     detected_vin = fields.Char(string='Chassis No. (as read)')
@@ -94,7 +103,9 @@ class KswDocument(models.Model):
                 doc.expiry_status, doc.days_left = 'none', 0
                 continue
             if not doc.expiry_date:
-                doc.expiry_status, doc.days_left = 'unknown', 0
+                # A portal said "valid" without a date: valid while that is recent.
+                fresh = doc.verified_date and (today - doc.verified_date).days <= VERIFIED_DAYS
+                doc.expiry_status, doc.days_left = ('valid' if fresh else 'unknown'), 0
                 continue
             doc.days_left = (doc.expiry_date - today).days
             doc.expiry_status = 'expired' if doc.days_left < 0 else (
@@ -116,13 +127,17 @@ class KswDocument(models.Model):
                                   ('expiry_date', '>=', today),
                                   ('expiry_date', '<=', today + timedelta(days=days))])
             elif status == 'valid':
+                parts.append([('type_id.has_expiry', '=', True), ('expiry_date', '=', False),
+                              ('verified_date', '>=', today - timedelta(days=VERIFIED_DAYS))])
                 for days in set(self.env['ksw.document.type'].search([]).mapped('alert_days')):
                     parts.append([('type_id.alert_days', '=', days), ('type_id.has_expiry', '=', True),
                                   ('expiry_date', '>', today + timedelta(days=days))])
             elif status == 'none':
                 parts.append([('type_id.has_expiry', '=', False)])
             elif status == 'unknown':
-                parts.append([('type_id.has_expiry', '=', True), ('expiry_date', '=', False)])
+                parts.append(Domain([('type_id.has_expiry', '=', True), ('expiry_date', '=', False)]) & Domain.OR([
+                    [('verified_date', '=', False)],
+                    [('verified_date', '<', today - timedelta(days=VERIFIED_DAYS))]]))
         return Domain.OR(parts) if parts else [('id', '=', False)]
 
     @api.model
@@ -201,9 +216,18 @@ class KswDocument(models.Model):
             if not doc.attachment_ids:
                 raise UserError(_('Attach the scan of %s.', doc.name))
         for doc in self.sudo():
-            doc._owner_documents().filtered(
-                lambda d: d.state == 'confirmed' and d.type_id == doc.type_id and d != doc
-            ).write({'state': 'replaced'})
+            current = doc._owner_documents().filtered(
+                lambda d: d.state == 'confirmed' and d.type_id == doc.type_id and d != doc)
+            newer = current.filtered(lambda d: d.expiry_date and doc.expiry_date and d.expiry_date > doc.expiry_date)
+            if newer:
+                # An old paper uploaded late is history: it never replaces the valid one.
+                doc.write({'state': 'replaced', 'confirmed_by_id': self.env.user.id,
+                           'confirmed_date': fields.Datetime.now()})
+                doc.message_post(body=_('Filed as history: %(d)s (valid to %(e)s) is newer.', d=newer[0].name,
+                                        e=newer[0].expiry_date), subtype_xmlid='mail.mt_note')
+                doc.attachment_ids.write({'res_model': doc._name, 'res_id': doc.id})
+                continue
+            current.write({'state': 'replaced'})
             doc.write({'state': 'confirmed', 'confirmed_by_id': self.env.user.id,
                        'confirmed_date': fields.Datetime.now()})
             doc.attachment_ids.write({'res_model': doc._name, 'res_id': doc.id})
@@ -237,6 +261,38 @@ class KswDocument(models.Model):
                                          'parent_id': parent.id}.items() if v and not reg[k]})
         if self.registration_id != reg:
             self.registration_id = reg
+
+    @api.model
+    def _record_from_source(self, doc_type, owner, source, import_rec=False, number=False, expiry=False,
+                            verified=False, note=False):
+        """What a government export says about one document of one owner.
+        Returns 'new', 'renewed', 'same' or 'older'. The export is the
+        authority, so no scan and no HR confirmation are needed; it never
+        moves a document backwards."""
+        field = {'ksw.fleet.vehicle': 'vehicle_id', 'hr.employee': 'employee_id'}[owner._name]
+        Document = self.sudo()
+        current = Document.search([('type_id', '=', doc_type.id), (field, '=', owner.id),
+                                   ('state', '=', 'confirmed')], order='expiry_date desc nulls last, id desc')
+        top = current[:1]
+        today = fields.Date.context_today(self)
+        if top and (top.number or False) == (number or False) and top.expiry_date == (expiry or False):
+            if verified:
+                top.verified_date = today
+            return 'same'
+        if top and top.expiry_date and expiry and top.expiry_date > expiry:
+            return 'older'
+        doc = Document.create({
+            'type_id': doc_type.id, 'applies_to': doc_type.applies_to, field: owner.id, 'number': number,
+            'expiry_date': expiry, 'source': source, 'import_id': import_rec and import_rec.id,
+            'verified_date': today if verified else False, 'ai_notes': note,
+        })
+        current.write({'state': 'replaced'})
+        doc.write({'state': 'confirmed', 'confirmed_by_id': self.env.user.id,
+                   'confirmed_date': fields.Datetime.now()})
+        doc._sync_employee_fields()
+        doc._sync_activities()
+        current._sync_activities()
+        return 'renewed' if top else 'new'
 
     def _owner_documents(self):
         self.ensure_one()
@@ -296,11 +352,23 @@ class KswDocument(models.Model):
                 return country
         return Country.with_context(lang='en_US').search([('name', 'ilike', name.strip())], limit=1)
 
+    # Numbers that never change over a renewal (an iqama keeps its number;
+    # payroll's WPS file reads it): a different one is a wrong match, not news.
+    _STABLE_NUMBER_FIELDS = ('ssnid', 'identification_id')
+
     def _sync_employee_fields(self):
         for doc in self.filtered(lambda d: d.employee_id and d.state == 'confirmed'):
             vals = {}
-            if doc.type_id.sync_number_field and doc.number:
-                vals[doc.type_id.sync_number_field] = doc.number
+            field = doc.type_id.sync_number_field
+            if field and doc.number:
+                current = doc.employee_id.sudo()[field]
+                if field in self._STABLE_NUMBER_FIELDS and current and current != doc.number:
+                    doc.message_post(body=_('%(e)s already has %(f)s %(c)s; this document says %(n)s. Not '
+                                            'changed: check that the document is his.',
+                                            e=doc.employee_id.name, f=doc.employee_id._fields[field].string,
+                                            c=current, n=doc.number), subtype_xmlid='mail.mt_note')
+                else:
+                    vals[field] = doc.number
             if doc.type_id.sync_expiry_field and doc.expiry_date:
                 vals[doc.type_id.sync_expiry_field] = doc.expiry_date
             if vals:

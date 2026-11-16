@@ -8,4 +8,12 @@
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
     </record>
+    <record id="cron_monthly_imports" model="ir.cron">
+        <field name="name">Documents: this month's government exports to import</field>
+        <field name="model_id" ref="model_ksw_document_import"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_monthly_imports()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+    </record>
 </odoo>

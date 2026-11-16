@@ -63,6 +63,7 @@ msgstr ""
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_needaction
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_needaction
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__message_needaction
 msgid "Action Needed"
 msgstr "إجراء مطلوب"
 
@@ -129,6 +130,7 @@ msgstr "أرفق النسخة الممسوحة لـ %s."
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_attachment_count
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_attachment_count
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__message_attachment_count
 msgid "Attachment Count"
 msgstr "عدد المرفقات"
 
@@ -186,6 +188,8 @@ msgstr "تاريخ الاعتماد"
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__create_uid
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__create_uid
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__create_uid
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__create_uid
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__create_uid
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__create_uid
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__create_uid
 msgid "Created by"
@@ -195,6 +199,8 @@ msgstr "أنشئ بواسطة"
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__create_date
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__create_date
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__create_date
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__create_date
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__create_date
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__create_date
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__create_date
 msgid "Created on"
@@ -222,6 +228,8 @@ msgstr "تجاهل"
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__display_name
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_ai_reader__display_name
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__display_name
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__display_name
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__display_name
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_owner_mixin__display_name
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__display_name
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__display_name
@@ -428,12 +436,14 @@ msgstr "أدخل تاريخ انتهاء %s."
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_follower_ids
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_follower_ids
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__message_follower_ids
 msgid "Followers"
 msgstr "المتابعين"
 
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_partner_ids
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_partner_ids
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "المتابعين (الشركاء)"
 
@@ -451,6 +461,7 @@ msgstr "له تاريخ انتهاء"
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__has_message
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__has_message
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__has_message
 msgid "Has Message"
 msgstr "يحتوي على رسالة"
 
@@ -471,6 +482,8 @@ msgstr "كيف يبدو"
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__id
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_ai_reader__id
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__id
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__id
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__id
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_owner_mixin__id
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__id
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__id
@@ -492,6 +505,7 @@ msgstr "الأيقونة للإشارة إلى النشاط المستثنى."
 #. module: KSW_documents
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document__message_needaction
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document_batch__message_needaction
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_import__message_needaction
 msgid "If checked, new messages require your attention."
 msgstr "إذا كان محددًا، فهناك رسائل جديدة عليك رؤيتها."
 
@@ -500,10 +514,13 @@ msgstr "إذا كان محددًا، فهناك رسائل جديدة عليك �
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document__message_has_sms_error
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document_batch__message_has_error
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document_batch__message_has_sms_error
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_import__message_has_error
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_import__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
 msgstr "إذا كان محددًا، فقد حدث خطأ في تسليم بعض الرسائل."
 
 #. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__insurance_status
 #: model:ksw.document.type,name:KSW_documents.type_insurance
 msgid "Insurance"
 msgstr "التأمين"
@@ -516,6 +533,7 @@ msgstr "الإقامة"
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_is_follower
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_is_follower
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__message_is_follower
 msgid "Is Follower"
 msgstr "متابع"
 
@@ -534,6 +552,8 @@ msgstr "المستندات"
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__write_uid
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__write_uid
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__write_uid
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__write_uid
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__write_uid
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__write_uid
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__write_uid
 msgid "Last Updated by"
@@ -543,6 +563,8 @@ msgstr "آخر تحديث بواسطة"
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__write_date
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__write_date
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__write_date
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__write_date
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__write_date
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__write_date
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__write_date
 msgid "Last Updated on"
@@ -556,12 +578,14 @@ msgstr "اتركه فارغاً ليحدده قارئ الذكاء الاصطن�
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_has_error
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_has_error
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__message_has_error
 msgid "Message Delivery error"
 msgstr "خطأ في تسليم الرسائل"
 
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_ids
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_ids
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__message_ids
 msgid "Messages"
 msgstr "الرسائل"
 
@@ -599,6 +623,7 @@ msgstr "الموعد النهائي لنشاطاتي"
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__name
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__name
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__name
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__name
 msgid "Name"
 msgstr "الاسم"
@@ -670,24 +695,28 @@ msgstr "الرقم"
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_needaction_counter
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_needaction_counter
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__message_needaction_counter
 msgid "Number of Actions"
 msgstr "عدد الإجراءات"
 
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_has_error_counter
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_has_error_counter
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__message_has_error_counter
 msgid "Number of errors"
 msgstr "عدد الأخطاء"
 
 #. module: KSW_documents
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document__message_needaction_counter
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document_batch__message_needaction_counter
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_import__message_needaction_counter
 msgid "Number of messages requiring action"
 msgstr "عدد الرسائل التي تتطلب اتخاذ إجراء"
 
 #. module: KSW_documents
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document__message_has_error_counter
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document_batch__message_has_error_counter
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_import__message_has_error_counter
 msgid "Number of messages with delivery error"
 msgstr "عدد الرسائل الحادث بها خطأ في التسليم"
 
@@ -735,6 +764,7 @@ msgstr "اللوحة في المستند (%(d)s) تختلف عن لوحة الم
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__rating_ids
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__rating_ids
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__rating_ids
 msgid "Ratings"
 msgstr "التقييمات"
 
@@ -791,11 +821,13 @@ msgstr "المستخدم المسؤول"
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_has_sms_error
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_has_sms_error
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr "خطأ في تسليم الرسائل النصية القصيرة"
 
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__attachment_ids
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__source__upload
 msgid "Scan"
 msgstr "النسخة"
 
@@ -816,6 +848,7 @@ msgstr "مفتاح ثابت يستخدمه النظام وقارئ الذكاء 
 
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__state
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__state
 msgid "State"
 msgstr "الحالة"
 
@@ -951,6 +984,8 @@ msgstr "التأشيرة"
 
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__x_is_pending_my_action
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__x_is_pending_my_action
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_search
 #: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_search
 msgid "Waiting for Me"
 msgstr "بانتظاري"
@@ -958,12 +993,14 @@ msgstr "بانتظاري"
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__website_message_ids
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__website_message_ids
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__website_message_ids
 msgid "Website Messages"
 msgstr "رسائل الموقع الإلكتروني"
 
 #. module: KSW_documents
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document__website_message_ids
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document_batch__website_message_ids
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_import__website_message_ids
 msgid "Website communication history"
 msgstr "سجل تواصل الموقع الإلكتروني"
 
@@ -1133,6 +1170,7 @@ msgstr "تم استكمال بيانات %(o)s: %(f)s"
 
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__match_note
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__match_note
 msgid "Found By"
 msgstr "طريقة التعرف"
 
@@ -1180,6 +1218,8 @@ msgstr "بدون صاحب"
 #. module: KSW_documents
 #. odoo-python
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__plate
 msgid "Plate"
 msgstr "اللوحة"
 
@@ -1351,6 +1391,7 @@ msgstr ""
 
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__kind
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__kind
 #: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_company_registration_search
 msgid "Kind"
 msgstr "النوع"
@@ -1424,3 +1465,543 @@ msgstr "الرقم الوطني الموحد"
 #: model:ir.model.fields,help:KSW_documents.field_ksw_company_registration__cr_number
 msgid "رقم السجل التجاري"
 msgstr "رقم السجل التجاري"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document.py:0
+msgid ""
+"%(e)s already has %(f)s %(c)s; this document says %(n)s. Not changed: check "
+"that the document is his."
+msgstr ""
+"لدى %(e)s %(f)s %(c)s مسجل مسبقاً، بينما يذكر هذا المستند %(n)s. لم يتم "
+"التعديل: تحقق من أن المستند يخصه."
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_batch_form
+msgid "Match Again"
+msgstr "إعادة المطابقة"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "%(l)s not a date: %(t)s"
+msgstr "%(l)s ليس تاريخاً صحيحاً: %(t)s"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__source__absher
+msgid "Absher Business"
+msgstr "أبشر أعمال"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import__source__absher_vehicles
+msgid "Absher Business: Vehicles"
+msgstr "أبشر أعمال: المركبات"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid ""
+"Absher actual user %(a)s, custodian in Odoo %(o)s: update Absher after the "
+"handover (HR-12), or check the custody."
+msgstr ""
+"المستخدم الفعلي في أبشر %(a)s، والمسؤول عن العهدة في النظام %(o)s: حدّث أبشر"
+" بعد التسليم (HR-12)، أو راجع العهدة."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Absher hold: %s"
+msgstr "تحفظ في أبشر: %s"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Absher vehicles %s"
+msgstr "مركبات أبشر %s"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__action
+msgid "Action"
+msgstr "الإجراء"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__user_name
+msgid "Actual User"
+msgstr "المستخدم الفعلي"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__user_id_number
+msgid "Actual User ID"
+msgstr "هوية المستخدم الفعلي"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__user_employee_id
+msgid "Actual User in Odoo"
+msgstr "المستخدم الفعلي في النظام"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Actual user %s is not an employee in Odoo."
+msgstr "المستخدم الفعلي %s ليس موظفاً في النظام."
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import__state__done
+msgid "Applied"
+msgstr "تم التطبيق"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__applied_by_id
+msgid "Applied By"
+msgstr "طُبّق بواسطة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__applied_date
+msgid "Applied Date"
+msgstr "تاريخ التطبيق"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid "Apply"
+msgstr "تطبيق"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid ""
+"Apply this export? New vehicles are created, empty details filled and the "
+"documents recorded as verified from Absher."
+msgstr ""
+"تطبيق هذا الملف؟ سيتم إنشاء المركبات الجديدة واستكمال البيانات الناقصة "
+"وتسجيل المستندات على أنها موثقة من أبشر."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Attach the export file first."
+msgstr "أرفق ملف التصدير أولاً."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__body_type
+msgid "Body Type"
+msgstr "نوع الهيكل"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__vin
+msgid "Chassis No."
+msgstr "رقم الهيكل"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Chassis in Odoo %(o)s ≠ Absher %(a)s"
+msgstr "رقم الهيكل في النظام %(o)s ≠ أبشر %(a)s"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__code
+msgid "Code (Absher)"
+msgstr "الكود (أبشر)"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__color
+msgid "Color"
+msgstr "اللون"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__create_count
+msgid "Create Count"
+msgstr "عدد الإنشاء"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import_line__action__create
+msgid "Create Vehicle"
+msgstr "إنشاء مركبة"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_list
+msgid "Created"
+msgstr "تم الإنشاء"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__absher_department
+msgid "Department (Absher)"
+msgstr "القسم (أبشر)"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Documents recorded"
+msgstr "مستندات مسجلة"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Documents renewed"
+msgstr "مستندات مجددة"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Documents unchanged"
+msgstr "مستندات دون تغيير"
+
+#. module: KSW_documents
+#: model:ir.actions.server,name:KSW_documents.cron_monthly_imports_ir_actions_server
+msgid "Documents: this month's government exports to import"
+msgstr "المستندات: ملفات البوابات الحكومية المطلوب استيرادها هذا الشهر"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__file
+msgid "Export File"
+msgstr "ملف التصدير"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__file_name
+msgid "File Name"
+msgstr "اسم الملف"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document.py:0
+msgid "Filed as history: %(d)s (valid to %(e)s) is newer."
+msgstr "حُفظ كسجل سابق: المستند %(d)s (ساري حتى %(e)s) أحدث منه."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Fleet No."
+msgstr "رقم الأسطول"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid "Found in Odoo"
+msgstr "موجودة في النظام"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid "Government Export"
+msgstr "ملف بوابة حكومية"
+
+#. module: KSW_documents
+#: model:ir.model,name:KSW_documents.model_ksw_document_import
+msgid "Government Export Import"
+msgstr "استيراد ملف بوابة حكومية"
+
+#. module: KSW_documents
+#: model:ir.model,name:KSW_documents.model_ksw_document_import_line
+msgid "Government Export Row"
+msgstr "سطر ملف بوابة حكومية"
+
+#. module: KSW_documents
+#: model:ir.actions.act_window,name:KSW_documents.action_ksw_document_import
+#: model:ir.ui.menu,name:KSW_documents.menu_documents_imports
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_list
+msgid "Government Exports"
+msgstr "ملفات البوابات الحكومية"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__hold_status
+msgid "Hold"
+msgstr "التحفظ"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__import_id
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__import_id
+msgid "Import"
+msgstr "الاستيراد"
+
+#. module: KSW_documents
+#: model_terms:ir.actions.act_window,help:KSW_documents.action_ksw_document_import
+msgid "Import this month's Absher vehicles export"
+msgstr "استورد ملف مركبات أبشر لهذا الشهر"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid ""
+"In <b>Absher Business ▸ Vehicles</b>, export the vehicles list (all columns) and\n"
+"                        attach the file here as it is (.xlsx or .csv), then press <b>Preview</b>. Nothing is\n"
+"                        written until you press <b>Apply</b>."
+msgstr ""
+"من <b>أبشر أعمال ▸ المركبات</b> صدّر قائمة المركبات (جميع الأعمدة) وأرفق "
+"الملف هنا كما هو (.xlsx أو .csv)، ثم اضغط <b>معاينة</b>. لن يتم حفظ أي شيء "
+"حتى تضغط <b>تطبيق</b>."
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import_line__kind__row
+msgid "In the Export"
+msgstr "في الملف"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__mvpi_status
+msgid "Inspection"
+msgstr "الفحص"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__mvpi_expiry_text
+msgid "Inspection Expiry (Hijri)"
+msgstr "انتهاء الفحص (هجري)"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Inspection expiry"
+msgstr "انتهاء الفحص"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__istimara_expiry
+msgid "Istimara Expiry"
+msgstr "انتهاء الاستمارة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__istimara_expiry_text
+msgid "Istimara Expiry (Hijri)"
+msgstr "انتهاء الاستمارة (هجري)"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__serial
+msgid "Istimara Serial"
+msgstr "الرقم التسلسلي للاستمارة"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Istimara expiry"
+msgstr "انتهاء الاستمارة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__make
+msgid "Make"
+msgstr "الماركة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__matched_count
+msgid "Matched Count"
+msgstr "عدد المطابق"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__missing_count
+msgid "Missing Count"
+msgstr "عدد غير الموجود"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__model
+msgid "Model"
+msgstr "الطراز"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__source__muqeem
+msgid "Muqeem"
+msgstr "مقيم"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__mvpi_expiry
+msgid "Mvpi Expiry"
+msgstr "انتهاء الفحص"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__source__naql
+msgid "Naql"
+msgstr "نقل"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid ""
+"No longer in the Absher export: sold, scrapped or transferred? Archive it in"
+" Fleet if so."
+msgstr ""
+"لم تعد في ملف أبشر: هل بيعت أو أُسقطت أو نُقلت؟ إن كان كذلك فأرشفها من "
+"الأسطول."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "No valid insurance on Absher."
+msgstr "لا يوجد تأمين ساري في أبشر."
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import_line__kind__missing
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid "Not in the Export"
+msgstr "غير موجودة في الملف"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Not required yet (new vehicle), per Absher."
+msgstr "غير مطلوب بعد (مركبة جديدة) حسب أبشر."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Older than the register (ignored)"
+msgstr "أقدم مما في السجل (تم تجاهله)"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Only HR imports government exports."
+msgstr "استيراد ملفات البوابات الحكومية من صلاحية الموارد البشرية فقط."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Plate in Odoo %(o)s ≠ Absher %(a)s"
+msgstr "اللوحة في النظام %(o)s ≠ أبشر %(a)s"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid "Preview"
+msgstr "معاينة"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid "Preview Again"
+msgstr "معاينة مرة أخرى"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Preview the export first."
+msgstr "اعرض المعاينة أولاً."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__registration_type
+msgid "Registration Type"
+msgstr "نوع التسجيل"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__result
+msgid "Result"
+msgstr "النتيجة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__row_count
+msgid "Row Count"
+msgstr "عدد الأسطر"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__line_ids
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_list
+msgid "Rows"
+msgstr "الأسطر"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import_line__action__skip
+msgid "Skip"
+msgstr "تجاوز"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__source
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__source
+msgid "Source"
+msgstr "المصدر"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__summary
+msgid "Summary"
+msgstr "الملخص"
+
+#. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document__verified_date
+msgid ""
+"The day a government export last showed this document as valid. Used when "
+"the export gives a status but no date."
+msgstr ""
+"آخر يوم أظهر فيه ملف بوابة حكومية هذا المستند سارياً. يُستخدم عندما يذكر "
+"الملف الحالة دون تاريخ."
+
+#. module: KSW_documents
+#: model_terms:ir.actions.act_window,help:KSW_documents.action_ksw_document_import
+msgid ""
+"The export is the authority: new vehicles are added, renewals recorded, and anything that\n"
+"               disappeared from it is shown to you. No scans needed."
+msgstr ""
+"الملف هو المرجع: تُضاف المركبات الجديدة وتُسجل التجديدات، ويُعرض عليك كل ما "
+"اختفى منه. لا حاجة لمسح المستندات."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid ""
+"This is not the Absher vehicles export: no «رقم الهيكل» (chassis) column "
+"found."
+msgstr "هذا ليس ملف مركبات أبشر: لا يوجد عمود «رقم الهيكل»."
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import__state__preview
+msgid "To Apply"
+msgstr "بانتظار التطبيق"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid "To Create"
+msgstr "سيتم إنشاؤها"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import__state__draft
+msgid "To Import"
+msgstr "بانتظار الاستيراد"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_list
+msgid "To Look At"
+msgstr "للمراجعة"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import_line__action__update
+msgid "Update"
+msgstr "تحديث"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__vehicle_status
+msgid "Vehicle Status"
+msgstr "وضع المركبة"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Vehicle details filled"
+msgstr "تم استكمال بيانات المركبة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__vehicle_id
+msgid "Vehicle in Odoo"
+msgstr "المركبة في النظام"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Vehicles created"
+msgstr "مركبات تم إنشاؤها"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__verified_date
+msgid "Verified Date"
+msgstr "تاريخ التحقق"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__warning_count
+msgid "Warning Count"
+msgstr "عدد التنبيهات"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__warnings
+msgid "Warnings"
+msgstr "التنبيهات"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__year
+msgid "Year"
+msgstr "سنة الصنع"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid ""
+"rows need a look (plate or actual user\n"
+"                        different, no insurance, not in the export…). Nothing in Odoo is overwritten by them."
+msgstr ""
+"سطراً تحتاج مراجعة (اختلاف اللوحة أو المستخدم الفعلي، عدم وجود تأمين، غير "
+"موجودة في الملف…). لا يتم استبدال أي بيانات في النظام بسببها."

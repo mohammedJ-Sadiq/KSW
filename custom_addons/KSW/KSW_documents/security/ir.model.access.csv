@@ -10,3 +10,7 @@ access_ksw_document_batch_system,ksw.document.batch.system,model_ksw_document_ba
 access_ksw_company_registration_user,ksw.company.registration.user,model_ksw_company_registration,base.group_user,1,0,0,0
 access_ksw_company_registration_officer,ksw.company.registration.officer,model_ksw_company_registration,group_document_officer,1,1,1,0
 access_ksw_company_registration_system,ksw.company.registration.system,model_ksw_company_registration,base.group_system,1,1,1,1
+access_ksw_document_import_officer,ksw.document.import.officer,model_ksw_document_import,group_document_officer,1,1,1,1
+access_ksw_document_import_system,ksw.document.import.system,model_ksw_document_import,base.group_system,1,1,1,1
+access_ksw_document_import_line_officer,ksw.document.import.line.officer,model_ksw_document_import_line,group_document_officer,1,1,1,1
+access_ksw_document_import_line_system,ksw.document.import.line.system,model_ksw_document_import_line,base.group_system,1,1,1,1

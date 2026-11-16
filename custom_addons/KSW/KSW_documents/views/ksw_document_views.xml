@@ -34,6 +34,8 @@
                             <field name="registration_id" invisible="applies_to != 'company'"
                                    readonly="state != 'draft'" options="{'no_create': True}"/>
                             <field name="number" readonly="state != 'draft'"/>
+                            <field name="source" invisible="source == 'upload'"/>
+                            <field name="verified_date" invisible="not verified_date"/>
                             <field name="license_class" invisible="not has_class" readonly="state != 'draft'"/>
                             <field name="has_class" invisible="1"/>
                             <field name="has_expiry" invisible="1"/>
@@ -66,6 +68,7 @@
                 <field name="employee_id" optional="show"/>
                 <field name="registration_id" optional="show"/>
                 <field name="number"/>
+                <field name="source" optional="show"/>
                 <field name="license_class" optional="hide"/>
                 <field name="expiry_date"/>
                 <field name="expiry_status" widget="badge" decoration-success="expiry_status == 'valid'"

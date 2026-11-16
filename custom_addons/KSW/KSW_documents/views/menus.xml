@@ -3,6 +3,8 @@
     <menuitem id="menu_documents_root" name="Documents" sequence="88"
               web_icon="KSW_documents,static/description/icon.png"
               action="action_ksw_document_to_confirm" groups="group_document_officer,base.group_system"/>
+    <menuitem id="menu_documents_imports" name="Government Exports" parent="menu_documents_root"
+              action="action_ksw_document_import" sequence="4"/>
     <menuitem id="menu_documents_bulk" name="Bulk Upload" parent="menu_documents_root"
               action="action_ksw_document_batch" sequence="5"/>
     <menuitem id="menu_documents_to_confirm" name="To Confirm" parent="menu_documents_root"

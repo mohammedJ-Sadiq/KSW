@@ -173,7 +173,8 @@ class KswDocumentBatch(models.Model):
         Employee = self.env['hr.employee'].sudo()
         number = (who.get('detected_id_number') or '').translate(_DIGITS).strip()
         if number:
-            found = Employee.search([('identification_id', '=', number)])
+            # SSN No. is where payroll keeps the iqama / Saudi ID (WPS file).
+            found = Employee.search(['|', ('ssnid', '=', number), ('identification_id', '=', number)])
             if len(found) == 1:
                 return found, _('Iqama / ID number')
         name = (who.get('detected_name') or '').strip()
@@ -222,6 +223,28 @@ class KswDocumentBatch(models.Model):
                     else:
                         field, note = 'employee_id', _('Same person as another document')
                     doc.with_context(ksw_document_grouping=True).write({field: owner.id, 'match_note': note})
+
+    def action_match_again(self):
+        """Look again for the owner of documents still without one: the master
+        data may have gained the number since they were read."""
+        self._check_officer()
+        Registration = self.env['ksw.company.registration']
+        for batch in self:
+            for doc in batch.document_ids.filtered(
+                    lambda d: d.state == 'draft' and not (d.vehicle_id or d.employee_id or d.company_id)):
+                who = {f: doc[f] for f in ('detected_plate', 'detected_vin', 'detected_id_number', 'detected_name',
+                                           'detected_parent_number') if doc[f]}
+                owner, how = batch._match_owner(doc.applies_to, dict(who, _number=doc.number))
+                if not owner:
+                    continue
+                field = {'vehicle': 'vehicle_id', 'employee': 'employee_id', 'company': 'company_id'}[doc.applies_to]
+                vals = {field: owner.id, 'match_note': how}
+                if doc.applies_to == 'company':
+                    vals['registration_id'] = (Registration._find(doc.detected_id_number)
+                                               or Registration._find(doc.number)).id
+                doc.with_context(ksw_document_grouping=True).write(vals)
+            batch._group_owners()
+        return True
 
     def action_confirm_all(self):
         """Confirm every draft that says whose it is. Those still missing

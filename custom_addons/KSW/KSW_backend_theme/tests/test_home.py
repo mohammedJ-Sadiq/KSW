@@ -71,7 +71,7 @@ class TestHomeCounters(TransactionCase):
         seeded = self.Source.with_context(active_test=False).browse(res_ids)
         # 6 original + 4 vehicles and drivers + 3 documents + 1 commission
         # sub-batches (Nov 2026).
-        self.assertEqual(len(seeded), 14)
+        self.assertEqual(len(seeded), 15)
         admin = self.env.ref('base.user_admin')
         for source in seeded:
             Model = self.env.get(source.model_name)

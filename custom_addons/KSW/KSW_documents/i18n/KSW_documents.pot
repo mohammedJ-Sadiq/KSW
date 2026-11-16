@@ -6,14 +6,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-15 12:38+0000\n"
-"PO-Revision-Date: 2026-11-15 12:38+0000\n"
+"POT-Creation-Date: 2026-11-16 05:57+0000\n"
+"PO-Revision-Date: 2026-11-16 05:57+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document.py:0
+msgid ""
+"%(e)s already has %(f)s %(c)s; this document says %(n)s. Not changed: check "
+"that the document is his."
+msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
@@ -25,6 +33,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
 msgid "%(f)s: %(t)s %(n)s is already listed (%(d)s), not added again."
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "%(l)s not a date: %(t)s"
 msgstr ""
 
 #. module: KSW_documents
@@ -83,8 +97,44 @@ msgid "A unified number has 10 digits and starts with 7 (%s)."
 msgstr ""
 
 #. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__source__absher
+msgid "Absher Business"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import__source__absher_vehicles
+msgid "Absher Business: Vehicles"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid ""
+"Absher actual user %(a)s, custodian in Odoo %(o)s: update Absher after the "
+"handover (HR-12), or check the custody."
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Absher hold: %s"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Absher vehicles %s"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__action
+msgid "Action"
+msgstr ""
+
+#. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_needaction
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_needaction
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__message_needaction
 msgid "Action Needed"
 msgstr ""
 
@@ -112,6 +162,27 @@ msgstr ""
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__activity_type_icon
 msgid "Activity Type Icon"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__user_name
+msgid "Actual User"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__user_id_number
+msgid "Actual User ID"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__user_employee_id
+msgid "Actual User in Odoo"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Actual user %s is not an employee in Odoo."
 msgstr ""
 
 #. module: KSW_documents
@@ -146,6 +217,21 @@ msgid "Already Read"
 msgstr ""
 
 #. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import__state__done
+msgid "Applied"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__applied_by_id
+msgid "Applied By"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__applied_date
+msgid "Applied Date"
+msgstr ""
+
+#. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__applies_to
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__applies_to
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__applies_to
@@ -153,8 +239,26 @@ msgid "Applies To"
 msgstr ""
 
 #. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid "Apply"
+msgstr ""
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid ""
+"Apply this export? New vehicles are created, empty details filled and the "
+"documents recorded as verified from Absher."
+msgstr ""
+
+#. module: KSW_documents
 #: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_company_registration_search
 msgid "Archived"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Attach the export file first."
 msgstr ""
 
 #. module: KSW_documents
@@ -166,7 +270,13 @@ msgstr ""
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_attachment_count
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_attachment_count
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__message_attachment_count
 msgid "Attachment Count"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__body_type
+msgid "Body Type"
 msgstr ""
 
 #. module: KSW_documents
@@ -204,8 +314,21 @@ msgid "CR No."
 msgstr ""
 
 #. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__vin
+msgid "Chassis No."
+msgstr ""
+
+#. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__detected_vin
 msgid "Chassis No. (as read)"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Chassis in Odoo %(o)s ≠ Absher %(a)s"
 msgstr ""
 
 #. module: KSW_documents
@@ -263,6 +386,16 @@ msgstr ""
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__code
 msgid "Code"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__code
+msgid "Code (Absher)"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__color
+msgid "Color"
 msgstr ""
 
 #. module: KSW_documents
@@ -336,9 +469,26 @@ msgid "Confirmed Date"
 msgstr ""
 
 #. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__create_count
+msgid "Create Count"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import_line__action__create
+msgid "Create Vehicle"
+msgstr ""
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_list
+msgid "Created"
+msgstr ""
+
+#. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__create_uid
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__create_uid
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__create_uid
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__create_uid
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__create_uid
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__create_uid
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__create_uid
 msgid "Created by"
@@ -348,6 +498,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__create_date
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__create_date
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__create_date
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__create_date
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__create_date
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__create_date
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__create_date
 msgid "Created on"
@@ -362,6 +514,11 @@ msgstr ""
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__days_left
 msgid "Days Left"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__absher_department
+msgid "Department (Absher)"
 msgstr ""
 
 #. module: KSW_documents
@@ -381,6 +538,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__display_name
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_ai_reader__display_name
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__display_name
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__display_name
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__display_name
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_owner_mixin__display_name
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__display_name
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__display_name
@@ -467,6 +626,29 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_owner_mixin__x_document_pending_my_action
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_fleet_vehicle__x_document_pending_my_action
 msgid "Documents Waiting for Me"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Documents recorded"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Documents renewed"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Documents unchanged"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.actions.server,name:KSW_documents.cron_monthly_imports_ir_actions_server
+msgid "Documents: this month's government exports to import"
 msgstr ""
 
 #. module: KSW_documents
@@ -605,6 +787,22 @@ msgid "Expiry as printed: %s (converted to Gregorian; check it)."
 msgstr ""
 
 #. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__file
+msgid "Export File"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__file_name
+msgid "File Name"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document.py:0
+msgid "Filed as history: %(d)s (valid to %(e)s) is newer."
+msgstr ""
+
+#. module: KSW_documents
 #. odoo-python
 #: code:addons/KSW_documents/models/ksw_document.py:0
 msgid "Fill in the document number of %s."
@@ -623,14 +821,22 @@ msgid "Filled on %(o)s: %(f)s"
 msgstr ""
 
 #. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Fleet No."
+msgstr ""
+
+#. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_follower_ids
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_follower_ids
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__message_follower_ids
 msgid "Followers"
 msgstr ""
 
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_partner_ids
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_partner_ids
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__message_partner_ids
 msgid "Followers (Partners)"
 msgstr ""
 
@@ -641,12 +847,40 @@ msgstr ""
 
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__match_note
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__match_note
 msgid "Found By"
 msgstr ""
 
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__found_count
 msgid "Found Count"
+msgstr ""
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid "Found in Odoo"
+msgstr ""
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid "Government Export"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model,name:KSW_documents.model_ksw_document_import
+msgid "Government Export Import"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model,name:KSW_documents.model_ksw_document_import_line
+msgid "Government Export Row"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.actions.act_window,name:KSW_documents.action_ksw_document_import
+#: model:ir.ui.menu,name:KSW_documents.menu_documents_imports
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_list
+msgid "Government Exports"
 msgstr ""
 
 #. module: KSW_documents
@@ -663,6 +897,7 @@ msgstr ""
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__has_message
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__has_message
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__has_message
 msgid "Has Message"
 msgstr ""
 
@@ -670,6 +905,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__has_class
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__has_class
 msgid "Has a Class"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__hold_status
+msgid "Hold"
 msgstr ""
 
 #. module: KSW_documents
@@ -683,6 +923,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__id
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_ai_reader__id
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__id
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__id
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__id
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_owner_mixin__id
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__id
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__id
@@ -709,6 +951,7 @@ msgstr ""
 #. module: KSW_documents
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document__message_needaction
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document_batch__message_needaction
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_import__message_needaction
 msgid "If checked, new messages require your attention."
 msgstr ""
 
@@ -717,10 +960,53 @@ msgstr ""
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document__message_has_sms_error
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document_batch__message_has_error
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document_batch__message_has_sms_error
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_import__message_has_error
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_import__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
 msgstr ""
 
 #. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__import_id
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__import_id
+msgid "Import"
+msgstr ""
+
+#. module: KSW_documents
+#: model_terms:ir.actions.act_window,help:KSW_documents.action_ksw_document_import
+msgid "Import this month's Absher vehicles export"
+msgstr ""
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid ""
+"In <b>Absher Business ▸ Vehicles</b>, export the vehicles list (all columns) and\n"
+"                        attach the file here as it is (.xlsx or .csv), then press <b>Preview</b>. Nothing is\n"
+"                        written until you press <b>Apply</b>."
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import_line__kind__row
+msgid "In the Export"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__mvpi_status
+msgid "Inspection"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__mvpi_expiry_text
+msgid "Inspection Expiry (Hijri)"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Inspection expiry"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__insurance_status
 #: model:ksw.document.type,name:KSW_documents.type_insurance
 msgid "Insurance"
 msgstr ""
@@ -739,6 +1025,7 @@ msgstr ""
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_is_follower
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_is_follower
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__message_is_follower
 msgid "Is Follower"
 msgstr ""
 
@@ -758,12 +1045,34 @@ msgid ""
 msgstr ""
 
 #. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__istimara_expiry
+msgid "Istimara Expiry"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__istimara_expiry_text
+msgid "Istimara Expiry (Hijri)"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__serial
+msgid "Istimara Serial"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Istimara expiry"
+msgstr ""
+
+#. module: KSW_documents
 #: model:ir.module.category,name:KSW_documents.module_category_ksw_documents
 msgid "KSW Documents"
 msgstr ""
 
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__kind
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__kind
 #: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_company_registration_search
 msgid "Kind"
 msgstr ""
@@ -772,6 +1081,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__write_uid
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__write_uid
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__write_uid
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__write_uid
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__write_uid
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__write_uid
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__write_uid
 msgid "Last Updated by"
@@ -781,6 +1092,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__write_date
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__write_date
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__write_date
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__write_date
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__write_date
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__write_date
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_upload_wizard__write_date
 msgid "Last Updated on"
@@ -809,25 +1122,47 @@ msgid "Main CR No. (as read)"
 msgstr ""
 
 #. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__make
+msgid "Make"
+msgstr ""
+
+#. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__detected_make
 msgid "Make (as read)"
 msgstr ""
 
 #. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_batch_form
+msgid "Match Again"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__matched_count
+msgid "Matched Count"
+msgstr ""
+
+#. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_has_error
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_has_error
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__message_has_error
 msgid "Message Delivery error"
 msgstr ""
 
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_ids
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_ids
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__message_ids
 msgid "Messages"
 msgstr ""
 
 #. module: KSW_documents
 #: model:ir.ui.menu,name:KSW_documents.menu_documents_missing
 msgid "Missing"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__missing_count
+msgid "Missing Count"
 msgstr ""
 
 #. module: KSW_documents
@@ -850,8 +1185,23 @@ msgid "Missing or expired:"
 msgstr ""
 
 #. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__model
+msgid "Model"
+msgstr ""
+
+#. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__detected_model
 msgid "Model (as read)"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__source__muqeem
+msgid "Muqeem"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__mvpi_expiry
+msgid "Mvpi Expiry"
 msgstr ""
 
 #. module: KSW_documents
@@ -864,6 +1214,7 @@ msgstr ""
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__name
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__name
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__name
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__name
 msgid "Name"
 msgstr ""
@@ -877,6 +1228,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_documents/wizard/upload_wizard.py:0
 msgid "Name on the document (%(d)s) does not look like %(e)s."
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__source__naql
+msgid "Naql"
 msgstr ""
 
 #. module: KSW_documents
@@ -917,8 +1273,22 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid ""
+"No longer in the Absher export: sold, scrapped or transferred? Archive it in"
+" Fleet if so."
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
 #: code:addons/KSW_documents/models/ksw_document.py:0
 msgid "No scan attached."
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "No valid insurance on Absher."
 msgstr ""
 
 #. module: KSW_documents
@@ -937,6 +1307,18 @@ msgid "Not Added Again"
 msgstr ""
 
 #. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import_line__kind__missing
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid "Not in the Export"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Not required yet (new vehicle), per Absher."
+msgstr ""
+
+#. module: KSW_documents
 #: model_terms:ir.actions.act_window,help:KSW_documents.action_ksw_document_to_confirm
 msgid "Nothing to confirm. Uploaded scans wait here until HR checks them."
 msgstr ""
@@ -949,31 +1331,47 @@ msgstr ""
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_needaction_counter
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_needaction_counter
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__message_needaction_counter
 msgid "Number of Actions"
 msgstr ""
 
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_has_error_counter
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_has_error_counter
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__message_has_error_counter
 msgid "Number of errors"
 msgstr ""
 
 #. module: KSW_documents
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document__message_needaction_counter
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document_batch__message_needaction_counter
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_import__message_needaction_counter
 msgid "Number of messages requiring action"
 msgstr ""
 
 #. module: KSW_documents
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document__message_has_error_counter
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document_batch__message_has_error_counter
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_import__message_has_error_counter
 msgid "Number of messages with delivery error"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Older than the register (ignored)"
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
 #: code:addons/KSW_documents/models/ksw_document.py:0
 msgid "Only HR confirms a document."
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Only HR imports government exports."
 msgstr ""
 
 #. module: KSW_documents
@@ -1020,6 +1418,8 @@ msgstr ""
 #. module: KSW_documents
 #. odoo-python
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__plate
 msgid "Plate"
 msgstr ""
 
@@ -1030,13 +1430,36 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Plate in Odoo %(o)s ≠ Absher %(a)s"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
 #: code:addons/KSW_documents/wizard/upload_wizard.py:0
 msgid "Plate on the document (%(d)s) differs from the vehicle's (%(v)s)."
 msgstr ""
 
 #. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid "Preview"
+msgstr ""
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid "Preview Again"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Preview the export first."
+msgstr ""
+
+#. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__rating_ids
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__rating_ids
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__rating_ids
 msgid "Ratings"
 msgstr ""
 
@@ -1088,6 +1511,11 @@ msgid "Registration (CR)"
 msgstr ""
 
 #. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__registration_type
+msgid "Registration Type"
+msgstr ""
+
+#. module: KSW_documents
 #: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__state__replaced
 msgid "Replaced"
 msgstr ""
@@ -1103,8 +1531,26 @@ msgid "Responsible User"
 msgstr ""
 
 #. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__result
+msgid "Result"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__row_count
+msgid "Row Count"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__line_ids
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_list
+msgid "Rows"
+msgstr ""
+
+#. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_has_sms_error
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_has_sms_error
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr ""
 
@@ -1122,6 +1568,7 @@ msgstr ""
 
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__attachment_ids
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__source__upload
 msgid "Scan"
 msgstr ""
 
@@ -1141,12 +1588,24 @@ msgid "Sequence"
 msgstr ""
 
 #. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import_line__action__skip
+msgid "Skip"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__source
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__source
+msgid "Source"
+msgstr ""
+
+#. module: KSW_documents
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document_type__code
 msgid "Stable key used by the code and the AI reader."
 msgstr ""
 
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__state
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__state
 msgid "State"
 msgstr ""
 
@@ -1157,6 +1616,11 @@ msgid ""
 "Overdue: Due date is already passed\n"
 "Today: Activity date is today\n"
 "Planned: Future activities."
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__summary
+msgid "Summary"
 msgstr ""
 
 #. module: KSW_documents
@@ -1193,14 +1657,41 @@ msgid "The code must be unique."
 msgstr ""
 
 #. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document__verified_date
+msgid ""
+"The day a government export last showed this document as valid. Used when "
+"the export gives a status but no date."
+msgstr ""
+
+#. module: KSW_documents
+#: model_terms:ir.actions.act_window,help:KSW_documents.action_ksw_document_import
+msgid ""
+"The export is the authority: new vehicles are added, renewals recorded, and anything that\n"
+"               disappeared from it is shown to you. No scans needed."
+msgstr ""
+
+#. module: KSW_documents
 #. odoo-python
 #: code:addons/KSW_documents/models/ai_reader.py:0
 msgid "The reader was only %s confident: check every field."
 msgstr ""
 
 #. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid ""
+"This is not the Absher vehicles export: no «رقم الهيكل» (chassis) column "
+"found."
+msgstr ""
+
+#. module: KSW_documents
 #: model:ir.model.constraint,message:KSW_documents.constraint_ksw_company_registration_unified_unique
 msgid "This unified number is already registered."
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import__state__preview
+msgid "To Apply"
 msgstr ""
 
 #. module: KSW_documents
@@ -1210,6 +1701,21 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_batch_list
 #: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_search
 msgid "To Confirm"
+msgstr ""
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid "To Create"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import__state__draft
+msgid "To Import"
+msgstr ""
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_list
+msgid "To Look At"
 msgstr ""
 
 #. module: KSW_documents
@@ -1246,6 +1752,11 @@ msgstr ""
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__unread_count
 msgid "Unread Count"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import_line__action__update
+msgid "Update"
 msgstr ""
 
 #. module: KSW_documents
@@ -1296,9 +1807,31 @@ msgid "Vehicle Registration (Istimara)"
 msgstr ""
 
 #. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__vehicle_status
+msgid "Vehicle Status"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Vehicle details filled"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__vehicle_id
+msgid "Vehicle in Odoo"
+msgstr ""
+
+#. module: KSW_documents
 #: model:ir.ui.menu,name:KSW_documents.menu_documents_missing_vehicles
 #: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_search
 msgid "Vehicles"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Vehicles created"
 msgstr ""
 
 #. module: KSW_documents
@@ -1308,25 +1841,44 @@ msgid "Vehicles: Missing Documents"
 msgstr ""
 
 #. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__verified_date
+msgid "Verified Date"
+msgstr ""
+
+#. module: KSW_documents
 #: model:ksw.document.type,name:KSW_documents.type_visa
 msgid "Visa"
 msgstr ""
 
 #. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__x_is_pending_my_action
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__x_is_pending_my_action
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_search
 #: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_search
 msgid "Waiting for Me"
 msgstr ""
 
 #. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__warning_count
+msgid "Warning Count"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__warnings
+msgid "Warnings"
+msgstr ""
+
+#. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__website_message_ids
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__website_message_ids
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__website_message_ids
 msgid "Website Messages"
 msgstr ""
 
 #. module: KSW_documents
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document__website_message_ids
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document_batch__website_message_ids
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_import__website_message_ids
 msgid "Website communication history"
 msgstr ""
 
@@ -1346,6 +1898,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
 msgid "Whose document this is was not found: choose it."
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__year
+msgid "Year"
 msgstr ""
 
 #. module: KSW_documents
@@ -1381,6 +1938,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
 msgid "in the register"
+msgstr ""
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid ""
+"rows need a look (plate or actual user\n"
+"                        different, no insurance, not in the export…). Nothing in Odoo is overwritten by them."
 msgstr ""
 
 #. module: KSW_documents

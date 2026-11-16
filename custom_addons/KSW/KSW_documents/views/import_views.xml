@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ksw_document_import_form" model="ir.ui.view">
+        <field name="name">ksw.document.import.form</field>
+        <field name="model">ksw.document.import</field>
+        <field name="arch" type="xml">
+            <!-- 1. download the export from the portal  2. attach it, Preview
+                 3. check the highlighted rows  4. Apply. -->
+            <form string="Government Export">
+                <header>
+                    <button name="action_preview" type="object" string="Preview" class="oe_highlight"
+                            icon="fa-eye" invisible="state != 'draft' or not file"/>
+                    <button name="action_preview" type="object" string="Preview Again" icon="fa-refresh"
+                            invisible="state != 'preview'"/>
+                    <button name="action_apply" type="object" string="Apply" class="oe_highlight" icon="fa-check"
+                            invisible="state != 'preview'"
+                            confirm="Apply this export? New vehicles are created, empty details filled and the documents recorded as verified from Absher."/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" readonly="state == 'done'"/></h1></div>
+                    <div class="alert alert-info" role="status" invisible="state != 'draft'">
+                        In <b>Absher Business ▸ Vehicles</b>, export the vehicles list (all columns) and
+                        attach the file here as it is (.xlsx or .csv), then press <b>Preview</b>. Nothing is
+                        written until you press <b>Apply</b>.
+                    </div>
+                    <div class="alert alert-warning" role="alert" invisible="not warning_count or state == 'done'">
+                        <field name="warning_count" class="d-inline"/> rows need a look (plate or actual user
+                        different, no insurance, not in the export…). Nothing in Odoo is overwritten by them.
+                    </div>
+                    <div invisible="state != 'done'"><field name="summary"/></div>
+                    <group>
+                        <group>
+                            <field name="source" readonly="state != 'draft'"/>
+                            <field name="file" filename="file_name" readonly="state == 'done'"/>
+                            <field name="file_name" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="row_count" string="Rows"/>
+                            <field name="matched_count" string="Found in Odoo"/>
+                            <field name="create_count" string="To Create"/>
+                            <field name="missing_count" string="Not in the Export"/>
+                            <field name="applied_by_id" invisible="state != 'done'"/>
+                            <field name="applied_date" invisible="state != 'done'"/>
+                        </group>
+                    </group>
+                    <field name="line_ids" readonly="state == 'done'">
+                        <list editable="bottom" create="0" delete="0"
+                              decoration-warning="warnings" decoration-info="action == 'create'"
+                              decoration-muted="action == 'skip'">
+                            <field name="kind" column_invisible="True"/>
+                            <field name="row_no"/>
+                            <field name="code"/>
+                            <field name="plate"/>
+                            <field name="vehicle_id" options="{'no_create': True}" readonly="kind == 'missing'"/>
+                            <field name="action" readonly="kind == 'missing'"/>
+                            <field name="match_note" optional="show"/>
+                            <field name="make" optional="show"/>
+                            <field name="model" optional="show"/>
+                            <field name="year" optional="hide"/>
+                            <field name="vin" optional="hide"/>
+                            <field name="serial" optional="hide"/>
+                            <field name="istimara_expiry" optional="show"/>
+                            <field name="mvpi_expiry" optional="show"/>
+                            <field name="insurance_status" optional="show"/>
+                            <field name="absher_department" optional="hide"/>
+                            <field name="user_name" optional="hide"/>
+                            <field name="user_employee_id" optional="hide"/>
+                            <field name="warnings" optional="show"/>
+                            <field name="result" optional="show"/>
+                        </list>
+                    </field>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_document_import_list" model="ir.ui.view">
+        <field name="name">ksw.document.import.list</field>
+        <field name="model">ksw.document.import</field>
+        <field name="arch" type="xml">
+            <list string="Government Exports" decoration-info="state != 'done'">
+                <field name="name"/>
+                <field name="source"/>
+                <field name="row_count" string="Rows"/>
+                <field name="create_count" string="Created"/>
+                <field name="warning_count" string="To Look At"/>
+                <field name="applied_date"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_document_import_search" model="ir.ui.view">
+        <field name="name">ksw.document.import.search</field>
+        <field name="model">ksw.document.import</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <filter string="Waiting for Me" name="waiting_for_me" domain="[('x_is_pending_my_action', '=', True)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_document_import" model="ir.actions.act_window">
+        <field name="name">Government Exports</field>
+        <field name="res_model">ksw.document.import</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Import this month's Absher vehicles export</p>
+            <p>The export is the authority: new vehicles are added, renewals recorded, and anything that
+               disappeared from it is shown to you. No scans needed.</p>
+        </field>
+    </record>
+</odoo>
