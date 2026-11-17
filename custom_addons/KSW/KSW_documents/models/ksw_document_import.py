@@ -26,8 +26,28 @@ ABSHER_VEHICLE_COLUMNS = {
     'اسم المستخدم الفعلي': 'user_name', 'حالة الفحص': 'mvpi_status', 'حالة التأمين': 'insurance_status',
     'حالة التحفظ': 'hold_status', 'وضع المركبة': 'vehicle_status', 'نوع الهيكل': 'body_type',
 }
+# Muqeem ▸ Reports ▸ Active residents.
+MUQEEM_COLUMNS = {
+    'رقم الاقامة': 'id_number', 'الاسم': 'person_name', 'الجنسية': 'nationality', 'المهنة': 'occupation',
+    'رقم الجواز': 'passport_no', 'تاريخ انتهاء الجواز': 'passport_expiry_text',
+    'تاريخ انتهاء الاقامة': 'iqama_expiry_text', 'تاريخ الميلاد': 'birth_date_text',
+    'خارج المملكه': 'outside_kingdom', 'رقم صاحب العمل': 'employer_number',
+}
+# GOSI ▸ Active subscribers of one establishment. The wage columns are never
+# read: pay belongs to payroll.
+GOSI_COLUMNS = {'رقم الهوية': 'id_number', 'اسم المشترك': 'person_name', 'الجنسية': 'nationality',
+                'المهنة': 'occupation'}
+# The column that identifies each export's header row.
+HEADER_MARK = {'absher_vehicles': 'رقم الهيكل', 'muqeem_residents': 'رقم الاقامة', 'gosi_subscribers': 'رقم الهوية'}
+# Imported every month (a reminder on Home); GOSI only when HR wants to check.
+MONTHLY_SOURCES = ('absher_vehicles', 'muqeem_residents')
 VALID = 'ساري المفعول'
 NONE_VALUES = ('', '-', 'لا يوجد')
+
+
+def _arabic_name_key(text):
+    """A company name compared loosely: no «شركة», no spaces, ة = ه."""
+    return re.sub(r'\s+', '', (text or '').replace('شركة', '').replace('ة', 'ه'))
 
 
 def fleet_key(text):
@@ -52,10 +72,14 @@ class KswDocumentImport(models.Model):
     _inherit = ['mail.thread']
     _order = 'id desc'
 
-    name = fields.Char(required=True, default=lambda self: _('Absher vehicles %s',
-                                                             fields.Date.context_today(self).strftime('%Y-%m')))
-    source = fields.Selection([('absher_vehicles', 'Absher Business: Vehicles')], required=True,
+    name = fields.Char(compute='_compute_name', store=True, readonly=False, precompute=True, required=True)
+    source = fields.Selection([('absher_vehicles', 'Absher Business: Vehicles'),
+                               ('muqeem_residents', 'Muqeem: Active Residents'),
+                               ('gosi_subscribers', 'GOSI: Active Subscribers')], required=True,
                               default='absher_vehicles')
+    registration_id = fields.Many2one('ksw.company.registration', string='Establishment (CR)',
+                                      help='GOSI lists one establishment per file: the registration its '
+                                           'subscribers are under. Found from the file header.')
     file = fields.Binary(string='Export File', attachment=True)
     file_name = fields.Char()
     state = fields.Selection([('draft', 'To Import'), ('preview', 'To Apply'), ('done', 'Applied')],
@@ -72,12 +96,21 @@ class KswDocumentImport(models.Model):
     x_is_pending_my_action = fields.Boolean(compute='_compute_is_pending_my_action',
                                             search='_search_is_pending_my_action', string='Waiting for Me')
 
-    @api.depends('line_ids.action', 'line_ids.vehicle_id', 'line_ids.warnings', 'line_ids.kind')
+    @api.depends('source')
+    def _compute_name(self):
+        month = fields.Date.context_today(self).strftime('%Y-%m')
+        labels = dict(self._fields['source']._description_selection(self.env))
+        for rec in self:
+            if not rec.name or rec.name.startswith(tuple(labels.values())):
+                rec.name = '%s %s' % (labels.get(rec.source, ''), month)
+
+    @api.depends('line_ids.action', 'line_ids.vehicle_id', 'line_ids.employee_id', 'line_ids.warnings',
+                 'line_ids.kind')
     def _compute_counts(self):
         for rec in self:
             rows = rec.line_ids.filtered(lambda l: l.kind == 'row')
             rec.row_count = len(rows)
-            rec.matched_count = len(rows.filtered('vehicle_id'))
+            rec.matched_count = len(rows.filtered(lambda l: l.vehicle_id or l.employee_id))
             rec.create_count = len(rows.filtered(lambda l: l.action == 'create'))
             rec.warning_count = len(rec.line_ids.filtered('warnings'))
             rec.missing_count = len(rec.line_ids.filtered(lambda l: l.kind == 'missing'))
@@ -109,10 +142,11 @@ class KswDocumentImport(models.Model):
     def _cron_monthly_imports(self):
         """On the 1st: this month's import waits on Home until it is done."""
         month = fields.Date.context_today(self).strftime('%Y-%m')
-        for source, label in self._fields['source'].selection:
-            if not self.search([('source', '=', source), ('state', '!=', 'done'),
-                                ('create_date', '>=', fields.Date.context_today(self).replace(day=1))]):
-                self.create({'source': source, 'name': '%s %s' % (label, month)})
+        first = fields.Date.context_today(self).replace(day=1)
+        labels = dict(self._fields['source'].selection)
+        for source in MONTHLY_SOURCES:
+            if not self.search_count([('source', '=', source), ('create_date', '>=', first)]):
+                self.create({'source': source, 'name': '%s %s' % (labels[source], month)})
 
     def _check_officer(self):
         if not (self.env.su or self.env.user.has_group(OFFICER_GROUP)):
@@ -132,15 +166,23 @@ class KswDocumentImport(models.Model):
             table = [[('' if c is None else c) for c in row] for row in sheet.iter_rows(values_only=True)]
         else:
             text = raw.decode('utf-8-sig', errors='replace')
-            dialect = csv.Sniffer().sniff(text[:4096], delimiters=',;\t') if text else csv.excel
-            table = list(csv.reader(io.StringIO(text), dialect))
+            try:
+                delimiter = csv.Sniffer().sniff(text[:4096], delimiters=',;\t').delimiter
+            except csv.Error:
+                # Short or ragged files defeat the sniffer: the commonest separator wins.
+                delimiter = max('\t;,', key=text[:4096].count)
+            table = list(csv.reader(io.StringIO(text), delimiter=delimiter))
+        mark = HEADER_MARK[self.source]
         for i, row in enumerate(table):
             cells = [str(c).strip() for c in row]
-            if 'رقم الهيكل' in cells:
+            if mark in cells:
                 headers = cells
                 break
         else:
-            raise UserError(_('This is not the Absher vehicles export: no «رقم الهيكل» (chassis) column found.'))
+            raise UserError(_('This is not the %(s)s export: no «%(c)s» column found.',
+                              s=dict(self._fields['source']._description_selection(self.env))[self.source], c=mark))
+        # What a GOSI list prints above its table: the establishment.
+        preamble = [str(c).strip() for row in table[:i] for c in row if str(c).strip()]
         rows = []
         for row in table[i + 1:]:
             values = {}
@@ -149,56 +191,119 @@ class KswDocumentImport(models.Model):
                     values[header] = cell.strip() if isinstance(cell, str) else cell
             if any(v not in NONE_VALUES for v in values.values() if isinstance(v, str)):
                 rows.append(values)
-        return rows
+        return rows, preamble
 
     # -- preview -------------------------------------------------------------
     def action_preview(self):
         self._check_officer()
-        Line = self.env['ksw.document.import.line']
-        Vehicle = self.env['ksw.fleet.vehicle'].sudo()
         for rec in self:
             rec.line_ids.unlink()
-            rows = rec._read_rows()
-            vehicles = Vehicle.search([])
-            by_vin = {vin_key(v.x_vin): v for v in vehicles if v.x_vin}
-            by_plate = {}
-            by_code = {}
-            for v in vehicles:
-                if plate_key(v.plate_number):
-                    by_plate.setdefault(plate_key(v.plate_number), v)
-                if fleet_key(v.name):
-                    by_code.setdefault(fleet_key(v.name), Vehicle.browse())
-                    by_code[fleet_key(v.name)] |= v
-            codes = [fleet_key(r.get('الكود')) for r in rows]
-            vals_list = []
-            for n, row in enumerate(rows, 1):
-                vals = {'import_id': rec.id, 'row_no': n, 'kind': 'row'}
-                for header, field in ABSHER_VEHICLE_COLUMNS.items():
-                    value = row.get(header, '')
-                    vals[field] = '' if value is None else str(value).strip()
-                key = codes[n - 1]
-                vehicle, how = Vehicle.browse(), False
-                if vin_key(vals['vin']) in by_vin:
-                    vehicle, how = by_vin[vin_key(vals['vin'])], _('Chassis No.')
-                elif plate_key(vals['plate']) in by_plate:
-                    vehicle, how = by_plate[plate_key(vals['plate'])], _('Plate')
-                elif key and codes.count(key) == 1 and len(by_code.get(key, [])) == 1:
-                    vehicle, how = by_code[key], _('Fleet No.')
-                vals.update(vehicle_id=vehicle.id, match_note=how,
-                            action='update' if vehicle else 'create')
-                vals_list.append(vals)
-            lines = Line.create(vals_list)
-            lines._compute_warnings()
-            # Vehicles once confirmed by Absher (they carry a chassis no.) that
-            # are no longer in it: sold, scrapped, transferred, or a mistake.
-            seen = lines.vehicle_id
-            gone = vehicles.filtered(lambda v: v.x_vin and v not in seen)
-            Line.create([{'import_id': rec.id, 'kind': 'missing', 'vehicle_id': v.id, 'action': 'skip',
-                          'plate': v.plate_number, 'vin': v.x_vin, 'code': v.name,
-                          'warnings': _('No longer in the Absher export: sold, scrapped or transferred? '
-                                        'Archive it in Fleet if so.')} for v in gone])
+            rows, preamble = rec._read_rows()
+            getattr(rec, '_preview_' + rec.source)(rows, preamble)
             rec.state = 'preview'
         return True
+
+    def _preview_absher_vehicles(self, rows, preamble):
+        rec = self
+        Line = self.env['ksw.document.import.line']
+        Vehicle = self.env['ksw.fleet.vehicle'].sudo()
+        vehicles = Vehicle.search([])
+        by_vin = {vin_key(v.x_vin): v for v in vehicles if v.x_vin}
+        by_plate = {}
+        by_code = {}
+        by_digits = {}
+        for v in vehicles:
+            if plate_key(v.plate_number):
+                by_plate.setdefault(plate_key(v.plate_number), v)
+            # A plate kept as digits only ("3463"): matched on its digits, or
+            # the import would add the same vehicle a second time.
+            if (v.plate_number or '').strip().isdigit():
+                by_digits.setdefault(v.plate_number.strip(), Vehicle.browse())
+                by_digits[v.plate_number.strip()] |= v
+            if fleet_key(v.name):
+                by_code.setdefault(fleet_key(v.name), Vehicle.browse())
+                by_code[fleet_key(v.name)] |= v
+        codes = [fleet_key(r.get('الكود')) for r in rows]
+        file_digits = [re.sub(r'\D', '', str(r.get('رقم اللوحة') or '')) for r in rows]
+        vals_list = []
+        for n, row in enumerate(rows, 1):
+            vals = {'import_id': rec.id, 'row_no': n, 'kind': 'row'}
+            for header, field in ABSHER_VEHICLE_COLUMNS.items():
+                value = row.get(header, '')
+                vals[field] = '' if value is None else str(value).strip()
+            key = codes[n - 1]
+            vehicle, how = Vehicle.browse(), False
+            if vin_key(vals['vin']) in by_vin:
+                vehicle, how = by_vin[vin_key(vals['vin'])], _('Chassis No.')
+            elif plate_key(vals['plate']) in by_plate:
+                vehicle, how = by_plate[plate_key(vals['plate'])], _('Plate')
+            elif len(by_digits.get(re.sub(r'\D', '', vals['plate']), [])) == 1 \
+                    and file_digits.count(re.sub(r'\D', '', vals['plate'])) == 1:
+                vehicle, how = by_digits[re.sub(r'\D', '', vals['plate'])], _('Plate digits')
+            elif key and codes.count(key) == 1 and len(by_code.get(key, [])) == 1:
+                vehicle, how = by_code[key], _('Fleet No.')
+            vals.update(vehicle_id=vehicle.id, match_note=how,
+                        action='update' if vehicle else 'create')
+            vals_list.append(vals)
+        lines = Line.create(vals_list)
+        lines._compute_warnings()
+        # Vehicles once confirmed by Absher (they carry a chassis no.) that
+        # are no longer in it: sold, scrapped, transferred, or a mistake.
+        seen = lines.vehicle_id
+        gone = vehicles.filtered(lambda v: v.x_vin and v not in seen)
+        Line.create([{'import_id': rec.id, 'kind': 'missing', 'vehicle_id': v.id, 'action': 'skip',
+                      'plate': v.plate_number, 'vin': v.x_vin, 'code': v.name,
+                      'warnings': _('No longer in the Absher export: sold, scrapped or transferred? '
+                                    'Archive it in Fleet if so.')} for v in gone])
+
+    def _employees_by_id_number(self):
+        """Employees by iqama / Saudi ID: SSN No. is where payroll keeps it."""
+        found = {}
+        for emp in self.env['hr.employee'].sudo().with_context(active_test=False).search(
+                ['|', ('ssnid', '!=', False), ('identification_id', '!=', False)]):
+            for number in {(emp.ssnid or '').strip(), (emp.identification_id or '').strip()} - {''}:
+                found.setdefault(number, emp)
+        return found
+
+    def _people_lines(self, rows, columns):
+        employees = self._employees_by_id_number()
+        vals_list = []
+        for n, row in enumerate(rows, 1):
+            vals = {'import_id': self.id, 'row_no': n, 'kind': 'row'}
+            for header, field in columns.items():
+                value = row.get(header, '')
+                vals[field] = '' if value is None else str(value).strip()
+            if not vals['id_number']:
+                continue
+            emp = employees.get(vals['id_number'])
+            vals.update(employee_id=emp and emp.id, match_note=emp and _('Iqama / ID number'),
+                        action='update' if emp else 'skip')
+            vals_list.append(vals)
+        lines = self.env['ksw.document.import.line'].create(vals_list)
+        lines._compute_warnings()
+        return lines
+
+    def _preview_muqeem_residents(self, rows, preamble):
+        lines = self._people_lines(rows, MUQEEM_COLUMNS)
+        # Active employees on an iqama that Muqeem no longer lists.
+        listed = set(lines.mapped('id_number'))
+        gone = self.env['hr.employee'].sudo().search([('ssnid', '=like', '2%')]).filtered(
+            lambda e: e.ssnid.strip() not in listed)
+        self.env['ksw.document.import.line'].create([{
+            'import_id': self.id, 'kind': 'missing', 'employee_id': e.id, 'action': 'skip',
+            'id_number': e.ssnid, 'person_name': e.name,
+            'warnings': _('Active in Odoo but not in Muqeem: final exit, transferred, or a wrong iqama no. '
+                          'in Odoo?')} for e in gone])
+
+    def _preview_gosi_subscribers(self, rows, preamble):
+        if not self.registration_id:
+            names = [_arabic_name_key(t) for t in preamble if 'المنشأة' not in t]
+            for reg in self.env['ksw.company.registration'].sudo().search([]):
+                key = _arabic_name_key(reg.name.split('(')[0])
+                if any(n and (n in key or key in n) for n in names):
+                    self.registration_id = reg
+                    break
+        self._people_lines(rows, GOSI_COLUMNS)
 
     # -- apply ---------------------------------------------------------------
     def action_apply(self):
@@ -255,11 +360,31 @@ class KswDocumentImportLine(models.Model):
     user_id_number = fields.Char(string='Actual User ID')
     user_name = fields.Char(string='Actual User')
     user_employee_id = fields.Many2one('hr.employee', compute='_compute_user_employee', string='Actual User in Odoo')
+    # People (Muqeem, GOSI)
+    employee_id = fields.Many2one('hr.employee', string='Employee in Odoo')
+    id_number = fields.Char(string='Iqama / ID No.')
+    person_name = fields.Char(string='Name')
+    nationality = fields.Char()
+    occupation = fields.Char()
+    passport_no = fields.Char(string='Passport No.')
+    passport_expiry_text = fields.Char(string='Passport Expiry (as exported)')
+    iqama_expiry_text = fields.Char(string='Iqama Expiry (as exported)')
+    birth_date_text = fields.Char(string='Birth Date (as exported)')
+    outside_kingdom = fields.Char(string='Outside the Kingdom')
+    employer_number = fields.Char(string='Employer No.')
+    passport_expiry = fields.Date(compute='_compute_dates')
+    iqama_expiry = fields.Date(compute='_compute_dates')
+    birth_date = fields.Date(compute='_compute_dates')
+    line_registration_id = fields.Many2one('ksw.company.registration', compute='_compute_line_registration',
+                                           string='Registered Under')
 
-    @api.depends('istimara_expiry_text', 'mvpi_expiry_text')
+    @api.depends('istimara_expiry_text', 'mvpi_expiry_text', 'passport_expiry_text', 'iqama_expiry_text',
+                 'birth_date_text')
     def _compute_dates(self):
         for line in self:
-            for src, dst in (('istimara_expiry_text', 'istimara_expiry'), ('mvpi_expiry_text', 'mvpi_expiry')):
+            for src, dst in (('istimara_expiry_text', 'istimara_expiry'), ('mvpi_expiry_text', 'mvpi_expiry'),
+                             ('passport_expiry_text', 'passport_expiry'), ('iqama_expiry_text', 'iqama_expiry'),
+                             ('birth_date_text', 'birth_date')):
                 try:
                     line[dst] = parse_date(line[src])
                 except ValueError:
@@ -273,12 +398,23 @@ class KswDocumentImportLine(models.Model):
             line.user_employee_id = number not in NONE_VALUES and Employee.search(
                 ['|', ('ssnid', '=', number), ('identification_id', '=', number)], limit=1)
 
+    @api.depends('employer_number', 'import_id.registration_id')
+    def _compute_line_registration(self):
+        Registration = self.env['ksw.company.registration']
+        for line in self:
+            line.line_registration_id = (Registration._find(line.employer_number) if line.employer_number
+                                         else line.import_id.registration_id)
+
     def _compute_warnings(self):
         """What HR should look at; none of it is written over Odoo's data."""
-        for line in self.filtered(lambda l: l.kind == 'row'):
+        people = self.filtered(lambda l: l.import_id.source != 'absher_vehicles')
+        people._compute_people_warnings()
+        for line in (self - people).filtered(lambda l: l.kind == 'row'):
             notes = []
             v = line.vehicle_id.sudo()
-            if v.plate_number and plate_key(v.plate_number) != plate_key(line.plate):
+            digits_only = (v.plate_number or '').strip().isdigit() \
+                and v.plate_number.strip() == re.sub(r'\D', '', line.plate or '')
+            if v.plate_number and not digits_only and plate_key(v.plate_number) != plate_key(line.plate):
                 notes.append(_('Plate in Odoo %(o)s ≠ Absher %(a)s', o=v.plate_number, a=line.plate))
             if v.x_vin and vin_key(v.x_vin) != vin_key(line.vin):
                 notes.append(_('Chassis in Odoo %(o)s ≠ Absher %(a)s', o=v.x_vin, a=line.vin))
@@ -290,12 +426,32 @@ class KswDocumentImportLine(models.Model):
                 notes.append(_('Actual user %s is not an employee in Odoo.', line.user_name))
             for label, text, value in ((_('Istimara expiry'), line.istimara_expiry_text, line.istimara_expiry),
                                        (_('Inspection expiry'), line.mvpi_expiry_text, line.mvpi_expiry)):
-                if text not in NONE_VALUES and not value:
+                if text and text not in NONE_VALUES and not value:
                     notes.append(_('%(l)s not a date: %(t)s', l=label, t=text))
             if line.insurance_status != VALID:
                 notes.append(_('No valid insurance on Absher.'))
             if line.hold_status and line.hold_status not in ('غير متحفظ',) + NONE_VALUES:
                 notes.append(_('Absher hold: %s', line.hold_status))
+            line.warnings = '\n'.join(notes) or False
+
+    def _compute_people_warnings(self):
+        for line in self.filtered(lambda l: l.kind == 'row'):
+            notes = []
+            emp = line.employee_id.sudo()
+            if not emp:
+                notes.append(_('Not an employee in Odoo: add the employee, then preview again.'))
+            if line.outside_kingdom == 'نعم':
+                notes.append(_('Outside the Kingdom now (Muqeem).'))
+            if emp and emp.x_registration_id and line.line_registration_id \
+                    and emp.x_registration_id != line.line_registration_id:
+                notes.append(_('Registered under %(o)s in Odoo, %(g)s here: check which is right.',
+                               o=emp.x_registration_id.name, g=line.line_registration_id.name))
+            if line.employer_number and not line.line_registration_id:
+                notes.append(_('Employer no. %s is not one of the registrations.', line.employer_number))
+            for label, text, value in ((_('Iqama expiry'), line.iqama_expiry_text, line.iqama_expiry),
+                                       (_('Passport expiry'), line.passport_expiry_text, line.passport_expiry)):
+                if text and text not in NONE_VALUES and not value:
+                    notes.append(_('%(l)s not a date: %(t)s', l=label, t=text))
             line.warnings = '\n'.join(notes) or False
 
     def _vehicle_type(self):
@@ -309,6 +465,46 @@ class KswDocumentImportLine(models.Model):
     def _apply(self):
         """Write one row. Returns what happened, for the summary."""
         self.ensure_one()
+        if self.import_id.source == 'absher_vehicles':
+            return self._apply_vehicle()
+        return self._apply_person()
+
+    def _apply_person(self):
+        """Muqeem / GOSI: the registration the employee is under, and (Muqeem)
+        the iqama and passport, verified. Fills what is empty, never overwrites."""
+        emp = self.employee_id.sudo()
+        if not emp:
+            return []
+        done = []
+        fill = {}
+        if self.line_registration_id and not emp.x_registration_id:
+            fill['x_registration_id'] = self.line_registration_id.id
+        if self.nationality and not emp.country_id:
+            country = self.env['ksw.document']._find_country(self.nationality)
+            if country:
+                fill['country_id'] = country.id
+        if self.birth_date and not emp.birthday:
+            fill['birthday'] = self.birth_date
+        if fill:
+            emp.write(fill)
+            done.append(_('Employee details filled'))
+        if self.import_id.source == 'muqeem_residents':
+            types = {t.code: t for t in self.env['ksw.document.type'].search([])}
+            Document = self.env['ksw.document']
+            labels = {'new': _('Documents recorded'), 'renewed': _('Documents renewed'),
+                      'same': _('Documents unchanged'), 'older': _('Older than the register (ignored)')}
+            if 'iqama' in types:
+                done.append(labels[Document._record_from_source(
+                    types['iqama'], emp, 'muqeem', self.import_id, number=self.id_number,
+                    expiry=self.iqama_expiry or False)])
+            if 'passport' in types and self.passport_no:
+                done.append(labels[Document._record_from_source(
+                    types['passport'], emp, 'muqeem', self.import_id, number=self.passport_no,
+                    expiry=self.passport_expiry or False)])
+        self.result = ', '.join(sorted(set(done)))
+        return done
+
+    def _apply_vehicle(self):
         done = []
         Vehicle = self.env['ksw.fleet.vehicle'].sudo()
         vehicle = self.vehicle_id.sudo()
@@ -324,6 +520,10 @@ class KswDocumentImportLine(models.Model):
         if self.year and self.year.isdigit():
             master['year'] = int(self.year)
         fill = {f: v for f, v in master.items() if v not in NONE_VALUES and f in vehicle._fields and not vehicle[f]}
+        # "3463" typed for «أ ع ط 3463» is completed, not overwritten.
+        if (vehicle.plate_number or '').strip().isdigit() \
+                and vehicle.plate_number.strip() == re.sub(r'\D', '', self.plate or ''):
+            fill['plate_number'] = self.plate
         if fill:
             vehicle.write(fill)
             done.append(_('Vehicle details filled'))

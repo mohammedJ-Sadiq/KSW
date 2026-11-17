@@ -20,9 +20,10 @@
                 <sheet>
                     <div class="oe_title"><h1><field name="name" readonly="state == 'done'"/></h1></div>
                     <div class="alert alert-info" role="status" invisible="state != 'draft'">
-                        In <b>Absher Business ▸ Vehicles</b>, export the vehicles list (all columns) and
-                        attach the file here as it is (.xlsx or .csv), then press <b>Preview</b>. Nothing is
-                        written until you press <b>Apply</b>.
+                        Download the export from the portal (<b>Absher Business ▸ Vehicles</b>,
+                        <b>Muqeem ▸ Active residents</b>, or a <b>GOSI</b> establishment's active subscribers)
+                        and attach the file here as it is (.xlsx or .csv), then press <b>Preview</b>. Nothing is
+                        written until you press <b>Apply</b>. GOSI wage columns are never read.
                     </div>
                     <div class="alert alert-warning" role="alert" invisible="not warning_count or state == 'done'">
                         <field name="warning_count" class="d-inline"/> rows need a look (plate or actual user
@@ -32,6 +33,8 @@
                     <group>
                         <group>
                             <field name="source" readonly="state != 'draft'"/>
+                            <field name="registration_id" invisible="source != 'gosi_subscribers'"
+                                   readonly="state == 'done'" options="{'no_create': True}"/>
                             <field name="file" filename="file_name" readonly="state == 'done'"/>
                             <field name="file_name" invisible="1"/>
                         </group>
@@ -50,22 +53,33 @@
                               decoration-muted="action == 'skip'">
                             <field name="kind" column_invisible="True"/>
                             <field name="row_no"/>
-                            <field name="code"/>
-                            <field name="plate"/>
-                            <field name="vehicle_id" options="{'no_create': True}" readonly="kind == 'missing'"/>
+                            <field name="code" column_invisible="parent.source != 'absher_vehicles'"/>
+                            <field name="plate" column_invisible="parent.source != 'absher_vehicles'"/>
+                            <field name="vehicle_id" options="{'no_create': True}" readonly="kind == 'missing'"
+                                   column_invisible="parent.source != 'absher_vehicles'"/>
+                            <field name="id_number" column_invisible="parent.source == 'absher_vehicles'"/>
+                            <field name="person_name" column_invisible="parent.source == 'absher_vehicles'"/>
+                            <field name="employee_id" options="{'no_create': True}" readonly="kind == 'missing'"
+                                   column_invisible="parent.source == 'absher_vehicles'"/>
+                            <field name="nationality" optional="hide" column_invisible="parent.source == 'absher_vehicles'"/>
+                            <field name="iqama_expiry" column_invisible="parent.source != 'muqeem_residents'"/>
+                            <field name="passport_no" optional="hide" column_invisible="parent.source != 'muqeem_residents'"/>
+                            <field name="passport_expiry" column_invisible="parent.source != 'muqeem_residents'"/>
+                            <field name="outside_kingdom" optional="show" column_invisible="parent.source != 'muqeem_residents'"/>
+                            <field name="line_registration_id" optional="show" column_invisible="parent.source == 'absher_vehicles'"/>
                             <field name="action" readonly="kind == 'missing'"/>
                             <field name="match_note" optional="show"/>
-                            <field name="make" optional="show"/>
-                            <field name="model" optional="show"/>
-                            <field name="year" optional="hide"/>
-                            <field name="vin" optional="hide"/>
-                            <field name="serial" optional="hide"/>
-                            <field name="istimara_expiry" optional="show"/>
-                            <field name="mvpi_expiry" optional="show"/>
-                            <field name="insurance_status" optional="show"/>
-                            <field name="absher_department" optional="hide"/>
-                            <field name="user_name" optional="hide"/>
-                            <field name="user_employee_id" optional="hide"/>
+                            <field name="make" optional="show" column_invisible="parent.source != 'absher_vehicles'"/>
+                            <field name="model" optional="show" column_invisible="parent.source != 'absher_vehicles'"/>
+                            <field name="year" optional="hide" column_invisible="parent.source != 'absher_vehicles'"/>
+                            <field name="vin" optional="hide" column_invisible="parent.source != 'absher_vehicles'"/>
+                            <field name="serial" optional="hide" column_invisible="parent.source != 'absher_vehicles'"/>
+                            <field name="istimara_expiry" optional="show" column_invisible="parent.source != 'absher_vehicles'"/>
+                            <field name="mvpi_expiry" optional="show" column_invisible="parent.source != 'absher_vehicles'"/>
+                            <field name="insurance_status" optional="show" column_invisible="parent.source != 'absher_vehicles'"/>
+                            <field name="absher_department" optional="hide" column_invisible="parent.source != 'absher_vehicles'"/>
+                            <field name="user_name" optional="hide" column_invisible="parent.source != 'absher_vehicles'"/>
+                            <field name="user_employee_id" optional="hide" column_invisible="parent.source != 'absher_vehicles'"/>
                             <field name="warnings" optional="show"/>
                             <field name="result" optional="show"/>
                         </list>

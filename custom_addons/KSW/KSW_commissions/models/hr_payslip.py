@@ -30,6 +30,17 @@ COMMISSION_INPUT_PREFIX = 'KSW_COM_'
 class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
 
+    def _ksw_pending_lines_domain(self, employee_ids, date_to, full=False):
+        """A deduction the GM put on commission only is not an ordinary
+        payslip's to take. A vacation / EOS settlement (``full``) still
+        collects it: it carries the employee's commission, and it is the
+        last payslip before he goes."""
+        domain = super()._ksw_pending_lines_domain(
+            employee_ids, date_to, full=full)
+        if not full:
+            domain = domain + [('deduction_id.x_commission_only', '=', False)]
+        return domain
+
     @api.model
     def get_inputs(self, versions, date_from, date_to):
         res = super().get_inputs(versions, date_from, date_to)
@@ -74,10 +85,13 @@ class HrPayslip(models.Model):
         if not ksw_inputs:
             return
         line_ids = [int(i.code[8:]) for i in ksw_inputs]
-        parked_ids = set(self.env['ksw.deduction.line'].sudo().search([
-            ('id', 'in', line_ids),
-            ('x_awaiting_commission', '=', True),
-        ]).ids)
+        parked = [('id', 'in', line_ids), ('x_awaiting_commission', '=', True)]
+        if payslip._ksw_shows_full_deductions():
+            # The settlement collects a commission-only deduction even when
+            # a reopened month left its row parked.
+            parked.append(('deduction_id.x_commission_only', '=', False))
+        parked_ids = set(self.env['ksw.deduction.line'].sudo().search(
+            parked).ids)
         if not parked_ids:
             return
         to_drop = ksw_inputs.filtered(

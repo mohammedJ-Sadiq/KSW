@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Commission-only requests (Nov 2026). Read: who asked, the GM who
+         decides, and accounting. Write: only the deciding GM, only while it
+         waits, and the model lets him write nothing but the note. Every
+         other change goes through the buttons under sudo. -->
+    <record id="rule_ksw_ded_commission_only_mine" model="ir.rule">
+        <field name="name">Commission-only request: mine to ask or decide</field>
+        <field name="model_id" ref="model_ksw_deduction_commission_only"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="domain_force">['|', ('requested_by', '=', user.id), ('gm_user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="rule_ksw_ded_commission_only_gm_note" model="ir.rule">
+        <field name="name">Commission-only request: the GM writes his note</field>
+        <field name="model_id" ref="model_ksw_deduction_commission_only"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="domain_force">[('gm_user_id', '=', user.id), ('state', '=', 'pending_gm')]</field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="rule_ksw_ded_commission_only_accounting" model="ir.rule">
+        <field name="name">Commission-only request: accounting reads all</field>
+        <field name="model_id" ref="model_ksw_deduction_commission_only"/>
+        <field name="groups" eval="[(4, ref('KSW_deduction.group_installment_edit')), (4, ref('KSW_deduction.group_deduction_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="rule_ksw_ded_commission_only_data_entry" model="ir.rule">
+        <field name="name">Commission-only request: data entry reads non-loan</field>
+        <field name="model_id" ref="model_ksw_deduction_commission_only"/>
+        <field name="groups" eval="[(4, ref('KSW_deduction.group_acc_data_entry'))]"/>
+        <field name="domain_force">[('managed_by', '=', 'acc_data_entry')]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+</odoo>

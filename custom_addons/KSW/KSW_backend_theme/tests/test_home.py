@@ -70,8 +70,8 @@ class TestHomeCounters(TransactionCase):
             [('module', '=', 'KSW_backend_theme'), ('model', '=', 'ksw.home.inbox.source')]).mapped('res_id')
         seeded = self.Source.with_context(active_test=False).browse(res_ids)
         # 6 original + 4 vehicles and drivers + 3 documents + 1 commission
-        # sub-batches (Nov 2026).
-        self.assertEqual(len(seeded), 15)
+        # sub-batches + 1 commission-only settlement (Nov 2026).
+        self.assertEqual(len(seeded), 16)
         admin = self.env.ref('base.user_admin')
         for source in seeded:
             Model = self.env.get(source.model_name)

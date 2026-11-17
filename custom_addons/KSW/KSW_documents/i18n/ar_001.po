@@ -624,6 +624,7 @@ msgstr "الموعد النهائي لنشاطاتي"
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__name
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__name
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__name
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__person_name
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__name
 msgid "Name"
 msgstr "الاسم"
@@ -1187,6 +1188,7 @@ msgstr "رقم الهوية / الإقامة (كما قُرئ)"
 #. module: KSW_documents
 #. odoo-python
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Iqama / ID number"
 msgstr "رقم الإقامة / الهوية"
 
@@ -1514,12 +1516,6 @@ msgid "Absher hold: %s"
 msgstr "تحفظ في أبشر: %s"
 
 #. module: KSW_documents
-#. odoo-python
-#: code:addons/KSW_documents/models/ksw_document_import.py:0
-msgid "Absher vehicles %s"
-msgstr "مركبات أبشر %s"
-
-#. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__action
 msgid "Action"
 msgstr "الإجراء"
@@ -1717,17 +1713,6 @@ msgid "Import this month's Absher vehicles export"
 msgstr "استورد ملف مركبات أبشر لهذا الشهر"
 
 #. module: KSW_documents
-#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
-msgid ""
-"In <b>Absher Business ▸ Vehicles</b>, export the vehicles list (all columns) and\n"
-"                        attach the file here as it is (.xlsx or .csv), then press <b>Preview</b>. Nothing is\n"
-"                        written until you press <b>Apply</b>."
-msgstr ""
-"من <b>أبشر أعمال ▸ المركبات</b> صدّر قائمة المركبات (جميع الأعمدة) وأرفق "
-"الملف هنا كما هو (.xlsx أو .csv)، ثم اضغط <b>معاينة</b>. لن يتم حفظ أي شيء "
-"حتى تضغط <b>تطبيق</b>."
-
-#. module: KSW_documents
 #: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import_line__kind__row
 msgid "In the Export"
 msgstr "في الملف"
@@ -1923,14 +1908,6 @@ msgstr ""
 "اختفى منه. لا حاجة لمسح المستندات."
 
 #. module: KSW_documents
-#. odoo-python
-#: code:addons/KSW_documents/models/ksw_document_import.py:0
-msgid ""
-"This is not the Absher vehicles export: no «رقم الهيكل» (chassis) column "
-"found."
-msgstr "هذا ليس ملف مركبات أبشر: لا يوجد عمود «رقم الهيكل»."
-
-#. module: KSW_documents
 #: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import__state__preview
 msgid "To Apply"
 msgstr "بانتظار التطبيق"
@@ -2005,3 +1982,179 @@ msgid ""
 msgstr ""
 "سطراً تحتاج مراجعة (اختلاف اللوحة أو المستخدم الفعلي، عدم وجود تأمين، غير "
 "موجودة في الملف…). لا يتم استبدال أي بيانات في النظام بسببها."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid ""
+"Active in Odoo but not in Muqeem: final exit, transferred, or a wrong iqama "
+"no. in Odoo?"
+msgstr ""
+"نشط في النظام لكنه غير موجود في مقيم: خروج نهائي، أو نقل خدمات، أو رقم إقامة"
+" خاطئ في النظام؟"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__birth_date
+msgid "Birth Date"
+msgstr "تاريخ الميلاد"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__birth_date_text
+msgid "Birth Date (as exported)"
+msgstr "تاريخ الميلاد (كما في الملف)"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid ""
+"Download the export from the portal (<b>Absher Business ▸ Vehicles</b>,\n"
+"                        <b>Muqeem ▸ Active residents</b>, or a <b>GOSI</b> establishment's active subscribers)\n"
+"                        and attach the file here as it is (.xlsx or .csv), then press <b>Preview</b>. Nothing is\n"
+"                        written until you press <b>Apply</b>. GOSI wage columns are never read."
+msgstr ""
+"نزّل الملف من البوابة (<b>أبشر أعمال ▸ المركبات</b>، أو <b>مقيم ▸ المقيمون "
+"النشطون</b>، أو قائمة المشتركين النشطين لمنشأة في <b>التأمينات</b>) وأرفقه "
+"هنا كما هو (.xlsx أو .csv)، ثم اضغط <b>معاينة</b>. لن يتم حفظ أي شيء حتى "
+"تضغط <b>تطبيق</b>. أعمدة الأجور في ملف التأمينات لا تُقرأ إطلاقاً."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Employee details filled"
+msgstr "تم استكمال بيانات الموظف"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__employee_id
+msgid "Employee in Odoo"
+msgstr "الموظف في النظام"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__employer_number
+msgid "Employer No."
+msgstr "رقم صاحب العمل"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Employer no. %s is not one of the registrations."
+msgstr "رقم صاحب العمل %s ليس من السجلات التجارية المسجلة."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__registration_id
+msgid "Establishment (CR)"
+msgstr "المنشأة (السجل التجاري)"
+
+#. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_import__registration_id
+msgid ""
+"GOSI lists one establishment per file: the registration its subscribers are "
+"under. Found from the file header."
+msgstr ""
+"ملف التأمينات يخص منشأة واحدة: السجل الذي يتبعه المشتركون. يُحدد تلقائياً من"
+" رأس الملف."
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import__source__gosi_subscribers
+msgid "GOSI: Active Subscribers"
+msgstr "التأمينات: المشتركون النشطون"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__id_number
+msgid "Iqama / ID No."
+msgstr "رقم الإقامة / الهوية"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__iqama_expiry
+msgid "Iqama Expiry"
+msgstr "انتهاء الإقامة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__iqama_expiry_text
+msgid "Iqama Expiry (as exported)"
+msgstr "انتهاء الإقامة (كما في الملف)"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Iqama expiry"
+msgstr "انتهاء الإقامة"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import__source__muqeem_residents
+msgid "Muqeem: Active Residents"
+msgstr "مقيم: المقيمون النشطون"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__nationality
+msgid "Nationality"
+msgstr "الجنسية"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Not an employee in Odoo: add the employee, then preview again."
+msgstr "ليس موظفاً في النظام: أضف الموظف ثم أعد المعاينة."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__occupation
+msgid "Occupation"
+msgstr "المهنة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__outside_kingdom
+msgid "Outside the Kingdom"
+msgstr "خارج المملكة"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Outside the Kingdom now (Muqeem)."
+msgstr "خارج المملكة حالياً (مقيم)."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__passport_expiry
+msgid "Passport Expiry"
+msgstr "انتهاء الجواز"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__passport_expiry_text
+msgid "Passport Expiry (as exported)"
+msgstr "انتهاء الجواز (كما في الملف)"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__passport_no
+msgid "Passport No."
+msgstr "رقم الجواز"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Passport expiry"
+msgstr "انتهاء الجواز"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__line_registration_id
+msgid "Registered Under"
+msgstr "مسجل على"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_hr_employee__x_registration_id
+msgid "Registered Under (CR)"
+msgstr "مسجل على (السجل التجاري)"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Registered under %(o)s in Odoo, %(g)s here: check which is right."
+msgstr "مسجل على %(o)s في النظام و%(g)s في الملف: تحقق من الصحيح."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "This is not the %(s)s export: no «%(c)s» column found."
+msgstr "هذا ليس ملف %(s)s: لا يوجد عمود «%(c)s»."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Plate digits"
+msgstr "أرقام اللوحة"

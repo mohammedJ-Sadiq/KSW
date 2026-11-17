@@ -431,6 +431,25 @@
         <field name="domain_force">[('managed_by', '=', 'acc_data_entry')]</field>
     </record>
 
+    <!-- Loan Modification = Full edits the installments of ANY deduction
+         type (x_can_edit_installments, the payment wizard, closing a
+         penalty or advance). That authority lived only in Python: the
+         group had no rule of its own, so its write scope was whatever the
+         holder's other groups gave. An Accounting Approver with Full could
+         write loans but not a non-loan deduction, and the form refused the
+         edit on onchange (KSWCO deduction 1821, Nov 2026). Read + write,
+         no create/unlink: creating and deleting stay with their own roles. -->
+    <record id="ksw_deduction_rule_installment_edit" model="ir.rule">
+        <field name="name">Deduction: Loan Modification Full edits every deduction</field>
+        <field name="model_id" ref="model_ksw_deduction"/>
+        <field name="groups" eval="[(4, ref('group_installment_edit'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
     <!-- Loan approvers keep VISIBILITY of non-loan deductions (they still need
          the employee's full deduction picture when approving a loan) but may
          no longer touch them — read-only since August 2026. Odoo ORs rules per

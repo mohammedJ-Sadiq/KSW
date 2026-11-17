@@ -16,6 +16,16 @@
         <field name="domain">[('x_is_pending_my_action', '=', True)]</field>
         <field name="icon">fa-money</field>
     </record>
+    <!-- Commission-only settlement (Nov 2026): the department GM decides.
+         Existing databases get it from KSW_commissions' 19.0.4.61.0
+         end-migrate (same xml id). -->
+    <record id="inbox_deduction_commission_only" model="ksw.home.inbox.source">
+        <field name="name">Commission-only settlements awaiting my decision</field>
+        <field name="sequence">21</field>
+        <field name="model_name">ksw.deduction.commission.only</field>
+        <field name="domain">[('x_is_pending_my_action', '=', True)]</field>
+        <field name="icon">fa-exchange</field>
+    </record>
     <record id="inbox_revisions" model="ksw.home.inbox.source">
         <field name="name">Salary revisions awaiting my action</field>
         <field name="sequence">30</field>

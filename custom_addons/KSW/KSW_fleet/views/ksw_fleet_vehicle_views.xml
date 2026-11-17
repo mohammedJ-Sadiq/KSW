@@ -11,6 +11,7 @@
                 <field name="vehicle_type"/>
                 <field name="tank_number"/>
                 <field name="plate_number"/>
+                <field name="x_plate_en"/>
                 <field name="brand"/>
                 <field name="model"/>
                 <field name="year"/>
@@ -77,6 +78,7 @@
                             <field name="vehicle_type"/>
                             <field name="tank_number"/>
                             <field name="plate_number"/>
+                            <field name="x_plate_en"/>
                             <field name="x_vin"/>
                         </group>
                         <group string="Details">
@@ -114,7 +116,7 @@
             <search string="Vehicles">
                 <field name="name"/>
                 <field name="client_id"/>
-                <field name="plate_number"/>
+                <field name="plate_number" filter_domain="['|', ('plate_number', 'ilike', self), ('x_plate_en', 'ilike', self)]"/>
                 <field name="x_vin"/>
                 <field name="x_custodian_id"/>
                 <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>

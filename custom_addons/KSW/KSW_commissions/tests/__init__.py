@@ -39,3 +39,4 @@ from . import test_vacation_takes_recovered_deduction
 from . import test_salesperson_is_sales_rep
 from . import test_bas_compare
 from . import test_accounting_check
+from . import test_commission_only

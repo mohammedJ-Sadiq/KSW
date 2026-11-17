@@ -194,11 +194,25 @@ class KswDeduction(models.Model):
             '&', ('x_recover_from_run_id', '=', False),
             '&', ('year', '=', year), ('month', '=', month),
             ('x_recover_from_run_id.period', '=', period),
-        ]).sorted(key=lambda l: (
+        ])
+        # Settled from commission only: payroll never takes it, so every
+        # month collects what is due by then — an installment one month
+        # could not cover is simply still due in the next.
+        lines |= Line.search([
+            ('employee_id', '=', employee.id),
+            ('state', '=', 'pending'),
+            ('deduction_id.state', '=', 'active'),
+            ('deduction_id.x_commission_only', '=', True),
+            ('x_recover_from_run_id', '=', False),
+            ('period_date', '<=', period),
+        ])
+        lines = lines.sorted(key=lambda l: (
             # Reservations last: they were decided after the month's own
             # installments, and must never push one of those to payroll.
             bool(l.x_recover_from_run_id),
             l.x_recovery_date or fields.Date.to_date('1900-01-01'),
+            # Oldest due first; equal for the month's own parked rows.
+            l.period_date or period,
             l.deduction_id.create_date or fields.Datetime.now(),
             l.sequence, l.id,
         ))

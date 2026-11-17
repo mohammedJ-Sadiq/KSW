@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data noupdate="1">
+        <record id="seq_ksw_deduction_commission_only" model="ir.sequence">
+            <field name="name">KSW Commission-Only Request</field>
+            <field name="code">ksw.deduction.commission.only</field>
+            <field name="prefix">CO</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
         <record id="seq_ksw_commission_sheet" model="ir.sequence">
             <field name="name">KSW Commission Sheet Reference</field>
             <field name="code">ksw.commission.sheet</field>

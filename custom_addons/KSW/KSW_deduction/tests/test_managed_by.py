@@ -130,6 +130,30 @@ class TestManagedBy(DeductionCommon):
         ded = self._active_loan()
         self.assertTrue(ded.with_user(self.user_acc).x_can_edit_installments)
 
+    def test_full_loan_mod_can_save_installments_on_non_loan(self):
+        """The flag above is not the permission: the form saves through
+        ksw.deduction.write, which the record rules gate. A Full holder whose
+        other group (Accounting Approver) reads non-loan deductions only
+        must still be able to save them (KSWCO deduction 1821)."""
+        ded = self._active_penalty(amount=300.0, installments=2)
+        l1, l2 = ded.line_ids.sorted('id')
+        ded.with_user(self.user_acc).write({'line_ids': [
+            (1, l1.id, {'amount': 100.0}),
+            (1, l2.id, {'amount': 200.0}),
+        ]})
+        self.assertEqual(l1.amount, 100.0)
+        self.assertEqual(l2.amount, 200.0)
+
+    def test_accounting_approver_without_full_cannot_write_non_loan(self):
+        approver = self.env['res.users'].create({
+            'name': 'kswmb_acc_only', 'login': 'kswmb_acc_only',
+            'group_ids': [(6, 0, [
+                self.env.ref('KSW_deduction.group_loan_acc').id])],
+        })
+        ded = self._active_penalty()
+        with self.assertRaises(AccessError):
+            ded.with_user(approver).check_access('write')
+
     def test_x_can_edit_installments_false_when_not_active(self):
         ded = self._make_deduction(self.type_gov_pen)   # draft
         self.assertFalse(

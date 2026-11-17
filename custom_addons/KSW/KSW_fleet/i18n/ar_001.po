@@ -201,11 +201,6 @@ msgid "Other"
 msgstr "أخرى"
 
 #. module: KSW_fleet
-#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__plate_number
-msgid "Plate Number"
-msgstr "رقم اللوحة"
-
-#. module: KSW_fleet
 #. odoo-python
 #: code:addons/KSW_fleet/models/ksw_fleet_custody.py:0
 msgid "Starting custodian"
@@ -302,3 +297,13 @@ msgstr "رقم الهيكل (VIN)"
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__x_color
 msgid "Colour"
 msgstr "اللون"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__plate_number
+msgid "Plate (Arabic)"
+msgstr "رقم اللوحة (عربي)"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__x_plate_en
+msgid "Plate (English)"
+msgstr "رقم اللوحة (إنجليزي)"

@@ -88,6 +88,9 @@
                     <div class="alert alert-warning" role="alert" invisible="not x_documents_missing">
                         Missing or expired: <field name="x_documents_missing" nolabel="1" class="d-inline"/>
                     </div>
+                    <group>
+                        <field name="x_registration_id" options="{'no_create': True}"/>
+                    </group>
                     <button name="action_upload_documents" type="object" string="Upload Documents"
                             icon="fa-upload" class="btn-secondary mb-2"/>
                     <field name="x_document_ids" readonly="1">

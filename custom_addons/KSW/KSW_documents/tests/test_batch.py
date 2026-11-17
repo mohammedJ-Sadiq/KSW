@@ -3,11 +3,11 @@ from unittest.mock import patch
 from odoo.tests import TransactionCase, tagged
 
 # What Claude answered for the sample scans (Nov 2026), as _parse_all returns it.
-ISTIMARA_1 = {'type_code': 'istimara', 'number': '596812347', 'plate': 'أ ص ر ٨٩٣٥',
-              'vin': 'WDB9634031C013456', 'make': 'Mercedes', 'model': 'Actros', 'year': 2020,
+ISTIMARA_1 = {'type_code': 'istimara', 'number': '596812347', 'plate': 'ق ك ل ٩٩٠١',
+              'vin': 'TSTB634031C0TEST1', 'make': 'Mercedes', 'model': 'Actros', 'year': 2020,
               'color': 'White'}
 CARD_1 = {'type_code': 'operation_card', 'number': '11-00452625', 'expiry_date': '2027-01-05',
-          'plate': '8935 R X A'}
+          'plate': '9901 L K G'}
 ABSHER = [{'type_code': 'iqama', 'number': '2999999992', 'expiry_date': '2027-01-08',
            'holder_name': 'ANAS KHAN', 'id_number': '2999999992', 'nationality': 'Pakistan'},
           {'type_code': 'driving_licence', 'number': '2999999992', 'license_class': 'Heavy Transport',
@@ -29,7 +29,7 @@ class TestDocumentBatch(TransactionCase):
         # The master data is as thin as on the real database: the plate in
         # Latin letters, no chassis number, no make.
         cls.head = cls.env['ksw.fleet.vehicle'].create({'name': 'T-BATCH', 'vehicle_type': 'trailer',
-                                                        'plate_number': 'RXA 8935'})
+                                                        'plate_number': 'LKG 9901'})
         cls.anas = cls.env['hr.employee'].create({'name': 'Anas Khan'})
         cls.types = cls.env['ksw.document.type'].search([])
 
@@ -71,13 +71,14 @@ class TestDocumentBatch(TransactionCase):
         self.assertFalse(istimara.expiry_date)
         self.assertEqual(istimara.expiry_status, 'unknown')
         # It filled what the vehicle lacked; the plate (same, other script) is untouched.
-        self.assertEqual(self.head.x_vin, 'WDB9634031C013456')
+        self.assertEqual(self.head.x_vin, 'TSTB634031C0TEST1')
         self.assertEqual((self.head.brand, self.head.year), ('Mercedes', 2020))
-        self.assertEqual(self.head.plate_number, 'RXA 8935')
+        # Kept, and stored in both scripts.
+        self.assertEqual((self.head.plate_number, self.head.x_plate_en), ('ق ك ل 9901', 'LKG 9901'))
         self.assertFalse(istimara.message_ids.filtered(lambda m: 'Differs' in (m.body or '')))
 
     def test_chassis_wins_and_ties_the_plate_group(self):
-        self.head.x_vin = 'WDB 9634031C013456'
+        self.head.x_vin = 'TSTB 634031C0TEST1'
         self.head.plate_number = False
         batch = self._batch([ISTIMARA_1, CARD_1])
         self.assertEqual(self._of(batch, 'istimara').match_note, 'Chassis number')
@@ -135,7 +136,7 @@ class TestDocumentBatch(TransactionCase):
         self.assertEqual(len(self._of(batch, 'operation_card')), 2)
 
     def test_plate_written_in_both_scripts(self):
-        batch = self._batch([dict(ISTIMARA_1, plate='8935 RXA / أ ص ر ٨٩٣٥', vin=False), CARD_1])
+        batch = self._batch([dict(ISTIMARA_1, plate='9901 LKG / ق ك ل ٩٩٠١', vin=False), CARD_1])
         self.assertEqual(self._of(batch, 'istimara').vehicle_id, self.head)
         self.assertEqual(self._of(batch, 'operation_card').vehicle_id, self.head)
 

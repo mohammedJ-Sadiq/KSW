@@ -1531,6 +1531,8 @@ class KswPayRunLine(models.Model):
                 ('year', '=', year), ('month', '=', month),
                 ('x_awaiting_commission', '=', False),
                 ('deduction_id.state', '=', 'active'),
+                # already in _pending_loan_total
+                ('deduction_id.x_commission_only', '=', False),
             ]).mapped('amount'))
         return total
 

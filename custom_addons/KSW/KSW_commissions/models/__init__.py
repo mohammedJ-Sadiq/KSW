@@ -39,6 +39,7 @@ from . import ksw_bas_sales_rep           # BAS rep code -> employee, picked onc
 from . import ksw_bas_customer            # BAS-native rep resolution + AR aging target
 from . import ksw_deduction               # adds awaiting-commission helpers
 from . import ksw_deduction_line          # parked installments + pay-run settlement link
+from . import ksw_deduction_commission_only  # GM-approved: settle from commission only
 from . import hr_payslip                  # filters parked KSW_DED_* inputs out of payslips
 from . import hr_salary_rule              # attaches KSW_COMMISSIONS to the structures
 from . import ksw_leave_commission_entry  # what a vacation request latched

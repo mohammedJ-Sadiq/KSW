@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- The request: the GM decides here and nowhere else.            -->
+    <!-- ============================================================ -->
+    <record id="view_ksw_deduction_commission_only_form" model="ir.ui.view">
+        <field name="name">ksw.deduction.commission.only.form</field>
+        <field name="model">ksw.deduction.commission.only</field>
+        <field name="arch" type="xml">
+            <form string="Commission-Only Request" create="0" delete="0">
+                <header>
+                    <button name="action_gm_approve" type="object"
+                            string="Approve" class="btn-primary"
+                            invisible="not x_is_pending_my_action"
+                            confirm="From now on, ordinary payslips will not deduct this. Only approved commission months (and a vacation or end-of-service settlement) will collect it. Approve?"/>
+                    <button name="action_gm_refuse" type="object"
+                            string="Refuse" class="btn-secondary"
+                            invisible="not x_is_pending_my_action"/>
+                    <button name="action_withdraw" type="object"
+                            string="Withdraw" class="btn-secondary"
+                            invisible="not x_can_withdraw"/>
+                    <button name="action_open_deduction" type="object"
+                            string="Open Deduction" class="btn-secondary"
+                            groups="KSW_deduction.group_installment_edit,KSW_deduction.group_acc_data_entry,KSW_deduction.group_deduction_manager"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="pending_gm,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                        <h3><field name="action"/></h3>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="deduction_id" options="{'no_open': True}"/>
+                            <field name="employee_id" options="{'no_open': True}"/>
+                            <field name="type_id" options="{'no_open': True}"/>
+                            <field name="deduction_state"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="outstanding_at_request"/>
+                        </group>
+                        <group>
+                            <field name="requested_by" options="{'no_open': True}"/>
+                            <field name="requested_on"/>
+                            <field name="gm_user_id" options="{'no_open': True}"/>
+                            <field name="decided_by" options="{'no_open': True}"
+                                   invisible="not decided_by"/>
+                            <field name="decided_on" invisible="not decided_on"/>
+                            <field name="x_is_pending_my_action" invisible="1"/>
+                            <field name="x_can_withdraw" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Reason">
+                        <field name="reason" nolabel="1" colspan="2"/>
+                    </group>
+                    <group string="Recent commission (when asked)"
+                           invisible="action != 'enable'">
+                        <field name="commission_history" nolabel="1" colspan="2"/>
+                    </group>
+                    <group string="Decision Note">
+                        <field name="decision_note" nolabel="1" colspan="2"
+                               readonly="not x_is_pending_my_action"
+                               placeholder="Required to refuse."/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_deduction_commission_only_list" model="ir.ui.view">
+        <field name="name">ksw.deduction.commission.only.list</field>
+        <field name="model">ksw.deduction.commission.only</field>
+        <field name="arch" type="xml">
+            <list string="Commission-Only Requests" create="0" delete="0"
+                  decoration-info="state == 'pending_gm'"
+                  decoration-muted="state in ('refused', 'withdrawn')">
+                <field name="name"/>
+                <field name="requested_on"/>
+                <field name="deduction_id"/>
+                <field name="employee_id"/>
+                <field name="type_id" optional="show"/>
+                <field name="action"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="outstanding_at_request" sum="Total"/>
+                <field name="requested_by"/>
+                <field name="gm_user_id"/>
+                <field name="decided_on" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'pending_gm'"
+                       decoration-success="state in ('approved', 'done')"
+                       decoration-danger="state == 'refused'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_deduction_commission_only_search" model="ir.ui.view">
+        <field name="name">ksw.deduction.commission.only.search</field>
+        <field name="model">ksw.deduction.commission.only</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="deduction_id"/>
+                <field name="employee_id"/>
+                <field name="requested_by"/>
+                <filter name="waiting_for_me" string="Waiting for Me"
+                        domain="[('x_is_pending_my_action', '=', True)]"/>
+                <filter name="pending" string="Waiting for GM"
+                        domain="[('state', '=', 'pending_gm')]"/>
+                <separator/>
+                <filter name="enable" string="Commission only"
+                        domain="[('action', '=', 'enable')]"/>
+                <filter name="disable" string="Back to payroll"
+                        domain="[('action', '=', 'disable')]"/>
+                <group>
+                    <filter name="group_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_gm" string="General Manager"
+                            context="{'group_by': 'gm_user_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_deduction_commission_only" model="ir.actions.act_window">
+        <field name="name">Commission-Only Requests</field>
+        <field name="res_model">ksw.deduction.commission.only</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'create': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No commission-only requests yet</p>
+            <p>Ask from a deduction with <b>Settle from Commission Only</b>.
+               The department's General Manager decides each request here.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_ksw_deduction_commission_only"
+              name="Commission-Only Requests"
+              parent="KSW_deduction.menu_ksw_deduction_operations"
+              action="action_ksw_deduction_commission_only"
+              sequence="40"
+              groups="KSW_deduction.group_installment_edit,KSW_deduction.group_acc_data_entry,KSW_deduction.group_deduction_manager,KSW_deduction.group_loan_gm"/>
+
+    <!-- ============================================================ -->
+    <!-- The wizard: the reason, and what the GM will be shown.        -->
+    <!-- ============================================================ -->
+    <record id="view_ksw_deduction_commission_only_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.deduction.commission.only.wizard.form</field>
+        <field name="model">ksw.deduction.commission.only.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="deduction_id" invisible="1"/>
+                <field name="action" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+                <div class="alert alert-info" role="status" invisible="action != 'enable'">
+                    Ordinary payslips keep deducting this until
+                    <b><field name="gm_name" readonly="1" class="d-inline"/></b>
+                    approves. After that only approved commission months collect
+                    it, oldest installment first; what a month cannot cover stays
+                    due for the next. A vacation or end-of-service settlement still
+                    collects it.
+                </div>
+                <div class="alert alert-warning" role="status" invisible="action != 'disable'">
+                    From now on the payslip deducts this again, as any deduction.
+                    The General Manager is told; no approval is needed.
+                </div>
+                <group>
+                    <field name="outstanding"/>
+                    <field name="commission_history" invisible="action != 'enable'"/>
+                    <field name="reason" placeholder="Why should this be settled this way?"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" type="object"
+                            string="Send to the GM" class="btn-primary"
+                            invisible="action != 'enable'"/>
+                    <button name="action_confirm" type="object"
+                            string="Back to Payroll Deduction" class="btn-primary"
+                            invisible="action != 'disable'"/>
+                    <button special="cancel" string="Cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- The deduction: where it waits, never a second approve button. -->
+    <!-- ============================================================ -->
+    <record id="view_ksw_deduction_form_inherit_commission_only" model="ir.ui.view">
+        <field name="name">ksw.deduction.form.inherit.commission.only</field>
+        <field name="model">ksw.deduction</field>
+        <field name="inherit_id" ref="KSW_deduction.ksw_deduction_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[@name='action_reschedule_installments']" position="after">
+                <field name="x_can_request_commission_only" invisible="1"/>
+                <field name="x_can_end_commission_only" invisible="1"/>
+                <button name="action_open_commission_only_wizard" type="object"
+                        string="Settle from Commission Only" class="btn-secondary"
+                        groups="KSW_deduction.group_installment_edit,KSW_deduction.group_acc_data_entry,KSW_deduction.group_deduction_manager"
+                        invisible="not x_can_request_commission_only"/>
+                <button name="action_open_commission_only_wizard" type="object"
+                        string="Back to Payroll Deduction" class="btn-secondary"
+                        groups="KSW_deduction.group_installment_edit,KSW_deduction.group_acc_data_entry,KSW_deduction.group_deduction_manager"
+                        invisible="not x_can_end_commission_only"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" type="object"
+                        name="action_view_commission_only_log" icon="fa-history"
+                        groups="KSW_deduction.group_installment_edit,KSW_deduction.group_acc_data_entry,KSW_deduction.group_deduction_manager"
+                        invisible="not x_commission_only_log_count">
+                    <field name="x_commission_only_log_count" widget="statinfo"
+                           string="Commission-Only Log"/>
+                </button>
+            </xpath>
+            <xpath expr="//div[hasclass('oe_title')]" position="before">
+                <field name="x_commission_only" invisible="1"/>
+                <field name="x_commission_only_pending_id" invisible="1"/>
+                <div class="alert alert-success" role="status"
+                     invisible="not x_commission_only">
+                    <i class="fa fa-check-circle" title="Commission only" role="img" aria-label="Commission only"/>
+                    <b class="ms-1">Settled from commission only</b>, approved by the
+                    General Manager (<field name="x_commission_only_request_id" readonly="1"
+                        class="d-inline" options="{'no_open': True}"/>). Ordinary payslips do
+                    not deduct it; approved commission months do, and so does a vacation or
+                    end-of-service settlement.
+                </div>
+                <div class="alert alert-warning d-flex align-items-center gap-2" role="status"
+                     invisible="not x_commission_only_pending_id">
+                    <span>
+                        <i class="fa fa-hourglass-half" title="Waiting" role="img" aria-label="Waiting"/>
+                        <b class="ms-1">Commission only: waiting for</b>
+                        <field name="x_commission_only_pending_gm" readonly="1" class="d-inline"/>.
+                        Payroll keeps deducting it until then.
+                    </span>
+                    <button name="action_open_commission_only_pending" type="object"
+                            string="Open Request" class="btn-link"
+                            groups="KSW_deduction.group_installment_edit,KSW_deduction.group_acc_data_entry,KSW_deduction.group_deduction_manager"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

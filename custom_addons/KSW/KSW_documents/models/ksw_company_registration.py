@@ -76,3 +76,12 @@ class ResCompany(models.Model):
 
     x_registration_ids = fields.One2many('ksw.company.registration', 'company_id',
                                          string='Commercial Registrations')
+
+
+class HrEmployee(models.Model):
+    _inherit = 'hr.employee'
+
+    # Which registration (main CR or branch) the employee is under at Muqeem /
+    # GOSI. HR-only like every KSW employee field (gotcha #32).
+    x_registration_id = fields.Many2one('ksw.company.registration', string='Registered Under (CR)',
+                                        groups='hr.group_hr_user', tracking=True)

@@ -1,6 +1,8 @@
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
+from .plates import plate_arabic, plate_english
+
 
 class KswFleetVehicle(models.Model):
     _name = 'ksw.fleet.vehicle'
@@ -30,7 +32,11 @@ class KswFleetVehicle(models.Model):
     ], string='Vehicle Type')
 
     tank_number = fields.Char(string='Tank Number')
-    plate_number = fields.Char(string='Plate Number')
+    # The plate in both scripts: Absher, Muqeem and the istimara write it in
+    # Arabic, the workshop and BAS often in English. Typing either fills the
+    # other (_sync_plate); a value that is not a real plate stays as typed.
+    plate_number = fields.Char(string='Plate (Arabic)')
+    x_plate_en = fields.Char(string='Plate (English)', index=True)
     # The chassis number (VIN) on the istimara: the one identifier that never
     # changes, so documents can find their vehicle by it.
     x_vin = fields.Char(string='Chassis No. (VIN)', index=True)
@@ -83,7 +89,25 @@ class KswFleetVehicle(models.Model):
         for vals in vals_list:
             if not vals.get('state'):
                 vals['state'] = 'confirmed'
+            self._sync_plate(vals)
         return super().create(vals_list)
+
+    def write(self, vals):
+        self._sync_plate(vals)
+        return super().write(vals)
+
+    @api.model
+    def _sync_plate(self, vals):
+        """Whichever script was typed, store both."""
+        if 'plate_number' in vals:
+            typed = vals['plate_number'] or ''
+            arabic = plate_arabic(typed)
+            vals['plate_number'] = arabic or typed or False
+            vals['x_plate_en'] = plate_english(typed) or False
+        elif vals.get('x_plate_en'):
+            typed = vals['x_plate_en']
+            vals['plate_number'] = plate_arabic(typed) or False
+            vals['x_plate_en'] = plate_english(typed) or typed
 
     def action_confirm(self):
         if not self.env.su and not self.env.user.has_group('hr.group_hr_user'):
