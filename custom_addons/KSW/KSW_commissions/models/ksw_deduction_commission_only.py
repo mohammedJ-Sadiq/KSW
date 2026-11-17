@@ -105,7 +105,8 @@ class KswDeductionCommissionOnly(models.Model):
         compute='_compute_is_pending_my_action',
         search='_search_is_pending_my_action',
         string='Waiting for Me')
-    x_can_withdraw = fields.Boolean(compute='_compute_is_pending_my_action')
+    x_can_withdraw = fields.Boolean(
+        string='Can Withdraw', compute='_compute_is_pending_my_action')
 
     @api.model
     def _pending_domain(self):
@@ -286,18 +287,21 @@ class KswDeduction(models.Model):
     # supervisors) cannot read the requests, and an o2m they cannot read
     # fails the whole form. The sudo computes below are what views show.
     x_commission_only_request_ids = fields.One2many(
-        'ksw.deduction.commission.only', 'deduction_id', readonly=True)
+        'ksw.deduction.commission.only', 'deduction_id',
+        string='Commission-Only Requests', readonly=True)
     x_commission_only_pending_id = fields.Many2one(
         'ksw.deduction.commission.only', string='Waiting Request',
         compute='_compute_commission_only_info', compute_sudo=True)
     x_commission_only_pending_gm = fields.Char(
+        string='Waiting for General Manager',
         compute='_compute_commission_only_info', compute_sudo=True)
     x_commission_only_log_count = fields.Integer(
+        string='Commission-Only Log Count',
         compute='_compute_commission_only_info', compute_sudo=True)
     x_can_request_commission_only = fields.Boolean(
-        compute='_compute_can_commission_only')
+        string='Can Ask for Commission Only', compute='_compute_can_commission_only')
     x_can_end_commission_only = fields.Boolean(
-        compute='_compute_can_commission_only')
+        string='Can Switch Back to Payroll', compute='_compute_can_commission_only')
 
     @api.depends('x_commission_only_request_ids.state',
                  'x_commission_only_request_ids.gm_user_id')

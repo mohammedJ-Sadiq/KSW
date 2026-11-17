@@ -1607,6 +1607,8 @@ msgstr "يجب أن تكون المبالغ المحقَّقة والمستهد�
 
 #. module: KSW_commissions
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_gm_review_reason__action
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__action
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only_wizard__action
 msgid "Action"
 msgstr "الإجراء"
 
@@ -1618,6 +1620,7 @@ msgstr "الإجراء"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_needaction
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_needaction
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__message_needaction
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__message_needaction
 msgid "Action Needed"
 msgstr "إجراء مطلوب"
 
@@ -1968,6 +1971,7 @@ msgstr "الموافقة"
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_gm_review_line_list
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_form
 msgid "Approve"
 msgstr "اعتماد"
 
@@ -2013,6 +2017,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_sub_batch__state__approved
 #: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_submission__state__approved
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_search
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_deduction_commission_only__state__approved
 msgid "Approved"
 msgstr "معتمد"
 
@@ -2110,6 +2115,7 @@ msgstr "طلب السبب"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_attachment_count
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_attachment_count
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__message_attachment_count
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__message_attachment_count
 msgid "Attachment Count"
 msgstr "عدد المرفقات"
 
@@ -2457,6 +2463,8 @@ msgstr "حسب الموظف"
 #: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
 #: code:addons/KSW_commissions/wizard/ksw_pay_handover_wizards.py:0
 #: code:addons/KSW_commissions/models/ksw_pay_settlement.py:0
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+#: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
 msgid "By:"
 msgstr "بواسطة:"
 
@@ -2477,6 +2485,7 @@ msgstr "طريقة الاحتساب"
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_new_wizard_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_bas_baseline_wizard_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_bas_compare_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_wizard_form
 msgid "Cancel"
 msgstr "إلغاء"
 
@@ -3173,6 +3182,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_bas_sales_rep__create_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_bas_line__create_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_type_rule__create_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__create_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only_wizard__create_uid
 msgid "Created by"
 msgstr "أنشئ بواسطة"
 
@@ -3224,6 +3235,8 @@ msgstr "أنشئ بواسطة"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_bas_sales_rep__create_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_bas_line__create_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_type_rule__create_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__create_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only_wizard__create_date
 msgid "Created on"
 msgstr "أنشئ في"
 
@@ -3260,6 +3273,8 @@ msgstr "إنشاء دفعة فرعية"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_new_wizard__currency_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_bas_compare_account__currency_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_bas_compare_line__currency_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__currency_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only_wizard__currency_id
 msgid "Currency"
 msgstr "العملة"
 
@@ -3349,6 +3364,8 @@ msgstr "خصم من عمولات"
 #: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_component__kind__deduction
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement_item__deduction_id
 #: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_pay_settlement_item__kind__deduction
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__deduction_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only_wizard__deduction_id
 msgid "Deduction"
 msgstr "خصم"
 
@@ -3366,6 +3383,7 @@ msgstr "الخصم المسترد من هذه العمولة"
 #. module: KSW_commissions
 #. odoo-python
 #: code:addons/KSW_commissions/models/ksw_pay_run.py:0
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
 msgid "Deduction:"
 msgstr "الخصم:"
 
@@ -3596,6 +3614,8 @@ msgstr "إهمال"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_bas_line__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_type_rule__display_name
 #: model:ir.model.fields,field_description:KSW_commissions.field_res_partner_bank__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__display_name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only_wizard__display_name
 msgid "Display Name"
 msgstr "اسم العرض"
 
@@ -3811,6 +3831,7 @@ msgstr "عيد الفطر"
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_employee_review_search
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_run_bas_compare_line__employee_id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_bas_sales_rep__employee_id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__employee_id
 msgid "Employee"
 msgstr "الموظف"
 
@@ -4275,6 +4296,7 @@ msgstr "مبلغ ثابت"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_follower_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_follower_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__message_follower_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__message_follower_ids
 msgid "Followers"
 msgstr "المتابعين"
 
@@ -4286,6 +4308,7 @@ msgstr "المتابعين"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_partner_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_partner_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__message_partner_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "المتابعين (الشركاء)"
 
@@ -4410,6 +4433,8 @@ msgstr "عام (الافتراضي)"
 #: model:res.groups,name:KSW_commissions.group_commission_gm
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_run_search
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_list
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__gm_user_id
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_search
 msgid "General Manager"
 msgstr "المدير العام"
 
@@ -4459,6 +4484,7 @@ msgstr "التسليم"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__has_message
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__has_message
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__has_message
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__has_message
 msgid "Has Message"
 msgstr "يحتوي على رسالة"
 
@@ -4626,6 +4652,8 @@ msgstr "كيف احتُسِب هذا؟"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_bas_line__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_type_rule__id
 #: model:ir.model.fields,field_description:KSW_commissions.field_res_partner_bank__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__id
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only_wizard__id
 msgid "ID"
 msgstr "المعرف"
 
@@ -4662,6 +4690,7 @@ msgstr "الهوية"
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_sheet__message_needaction
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__message_needaction
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement__message_needaction
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_deduction_commission_only__message_needaction
 msgid "If checked, new messages require your attention."
 msgstr "إذا كان محددا، فهناك رسائل جديدة عليك رؤيتها."
 
@@ -4680,6 +4709,8 @@ msgstr "إذا كان محددا، فهناك رسائل جديدة عليك ر�
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__message_has_sms_error
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement__message_has_error
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement__message_has_sms_error
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_deduction_commission_only__message_has_error
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_deduction_commission_only__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
 msgstr "إذا كان محددا، فقد حدث خطأ في تسليم بعض الرسائل."
 
@@ -4794,6 +4825,7 @@ msgstr "ملاحظات داخلية…"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_is_follower
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_is_follower
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__message_is_follower
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__message_is_follower
 msgid "Is Follower"
 msgstr "متابع"
 
@@ -5074,6 +5106,8 @@ msgstr "التسمية"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_bas_sales_rep__write_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_bas_line__write_uid
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_type_rule__write_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__write_uid
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only_wizard__write_uid
 msgid "Last Updated by"
 msgstr "آخر تحديث بواسطة"
 
@@ -5125,6 +5159,8 @@ msgstr "آخر تحديث بواسطة"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_bas_sales_rep__write_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_bas_line__write_date
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_type_rule__write_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__write_date
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only_wizard__write_date
 msgid "Last Updated on"
 msgstr "آخر تحديث في"
 
@@ -5367,6 +5403,7 @@ msgstr "مدمج: مصنف واحد يضم الملخص لجميع الموظف�
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_has_error
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_has_error
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__message_has_error
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__message_has_error
 msgid "Message Delivery error"
 msgstr "خطأ في تسليم الرسائل"
 
@@ -5378,6 +5415,7 @@ msgstr "خطأ في تسليم الرسائل"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__message_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__message_ids
 msgid "Messages"
 msgstr "الرسائل"
 
@@ -5533,6 +5571,7 @@ msgstr "لم يحدث — خارج نطاق هذه الدفعة"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_rule__name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__name
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_site__name
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__name
 msgid "Name"
 msgstr "الاسم"
 
@@ -5909,6 +5948,7 @@ msgstr "نوفمبر"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_needaction_counter
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_needaction_counter
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__message_needaction_counter
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__message_needaction_counter
 msgid "Number of Actions"
 msgstr "عدد الإجراءات"
 
@@ -5920,6 +5960,7 @@ msgstr "عدد الإجراءات"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_has_error_counter
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_has_error_counter
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__message_has_error_counter
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__message_has_error_counter
 msgid "Number of errors"
 msgstr "عدد الأخطاء"
 
@@ -5931,6 +5972,7 @@ msgstr "عدد الأخطاء"
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_sheet__message_needaction_counter
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__message_needaction_counter
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement__message_needaction_counter
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_deduction_commission_only__message_needaction_counter
 msgid "Number of messages requiring action"
 msgstr "عدد الرسائل التي تتطلب اتخاذ إجراء"
 
@@ -5942,6 +5984,7 @@ msgstr "عدد الرسائل التي تتطلب اتخاذ إجراء"
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_sheet__message_has_error_counter
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__message_has_error_counter
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement__message_has_error_counter
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_deduction_commission_only__message_has_error_counter
 msgid "Number of messages with delivery error"
 msgstr "عدد الرسائل الحادث بها خطأ في التسليم"
 
@@ -6871,6 +6914,7 @@ msgstr "شرائح السعر"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__rating_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__rating_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__rating_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__rating_ids
 msgid "Ratings"
 msgstr "التقييمات"
 
@@ -6890,12 +6934,16 @@ msgstr "يقرأ ك"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_vacation_release__reason
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_override_wizard__reason
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.employee_review_sections
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__reason
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only_wizard__reason
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_form
 msgid "Reason"
 msgstr "السبب"
 
 #. module: KSW_commissions
 #. odoo-python
 #: code:addons/KSW_commissions/wizard/ksw_pay_handover_wizards.py:0
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
 msgid "Reason:"
 msgstr "السبب:"
 
@@ -7389,6 +7437,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__message_has_sms_error
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__message_has_sms_error
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__message_has_sms_error
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr "خطأ في تسليم الرسائل النصية القصيرة"
 
@@ -7870,6 +7919,7 @@ msgstr "بدء دفعة فرعية جديدة (أيام أخرى أو سبب آ�
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__state
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_sheet_search
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_bas_sales_rep__state
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__state
 msgid "State"
 msgstr "الحالة"
 
@@ -7887,6 +7937,7 @@ msgstr "الحالة"
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_search
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_bas_line__status
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_bas_line_search
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_search
 msgid "Status"
 msgstr "الحالة"
 
@@ -8971,6 +9022,8 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_item_list
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_settlement_form
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_bas_line_list
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_list
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_gm_review_line_list_check
 msgid "Total"
 msgstr "الإجمالي"
 
@@ -9073,6 +9126,7 @@ msgstr "لا يمكن أن يتشارك خياران من المكوّن نفس�
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_line__x_commission_type
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile_type_rule__commission_type
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_sales_commission_bas_line_search
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__type_id
 msgid "Type"
 msgstr "النوع"
 
@@ -9224,6 +9278,7 @@ msgstr "كان محجوزا بسبب"
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_sales_commission_sheet__website_message_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_salesperson_profile__website_message_ids
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_settlement__website_message_ids
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__website_message_ids
 msgid "Website Messages"
 msgstr "رسائل الموقع الإلكتروني"
 
@@ -9235,6 +9290,7 @@ msgstr "رسائل الموقع الإلكتروني"
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_sales_commission_sheet__website_message_ids
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_salesperson_profile__website_message_ids
 #: model:ir.model.fields,help:KSW_commissions.field_ksw_pay_settlement__website_message_ids
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_deduction_commission_only__website_message_ids
 msgid "Website communication history"
 msgstr "سجل تواصل الموقع الإلكتروني"
 
@@ -13205,6 +13261,8 @@ msgstr "لا يوجد هنا ما ينتظر تدقيق المحاسبة."
 #: model:ir.model.fields,field_description:KSW_commissions.field_ksw_pay_submission__x_is_pending_my_action
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_sub_batch_search
 #: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_pay_submission_search
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__x_is_pending_my_action
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_search
 msgid "Waiting for Me"
 msgstr "بانتظاري"
 
@@ -13271,3 +13329,541 @@ msgstr ""
 #: code:addons/KSW_commissions/models/ksw_pay_submission.py:0
 msgid "🧾 Checked by Accounting"
 msgstr "🧾 دققته المحاسبة"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "%(ded)s already has a request waiting for the General Manager."
+msgstr "يوجد للخصم %(ded)s طلب بانتظار اعتماد المدير العام."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "%(ded)s is %(state)s, so there is nothing left to decide."
+msgstr "حالة الخصم %(ded)s هي %(state)s، فلم يعد هناك ما يُقرَّر."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "%(ded)s is already settled from commission only."
+msgstr "الخصم %(ded)s يُسوّى من العمولة فقط بالفعل."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "%(ded)s is closed."
+msgstr "الخصم %(ded)s مُقفل."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "%(ded)s is not settled from commission only."
+msgstr "الخصم %(ded)s لا يُسوّى من العمولة فقط."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "%(name)s is no longer waiting for a decision."
+msgstr "الطلب %(name)s لم يعد بانتظار قرار."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "%(name)s is no longer waiting."
+msgstr "الطلب %(name)s لم يعد قيد الانتظار."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "%s is deducted from the payslip again"
+msgstr "عاد خصم %s من كشف الراتب"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "%s is now settled from commission only"
+msgstr "أصبح %s يُسوّى من العمولة فقط"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_form_inherit_commission_only
+msgid ""
+"). Ordinary payslips do\n"
+"                    not deduct it; approved commission months do, and so does a vacation or\n"
+"                    end-of-service settlement."
+msgstr ""
+"). لا تخصمه كشوف الرواتب العادية؛ تخصمه أشهر العمولات المعتمدة،\n"
+"                    وكذلك تسوية الإجازة أو نهاية الخدمة."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_form_inherit_commission_only
+msgid ""
+".\n"
+"                        Payroll keeps deducting it until then."
+msgstr ""
+".\n"
+"                        يستمر خصمه من الراتب حتى ذلك الحين."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_form_inherit_commission_only
+msgid ""
+"<i class=\"fa fa-check-circle\" title=\"Commission only\" role=\"img\" aria-label=\"Commission only\"/>\n"
+"                    <b class=\"ms-1\">Settled from commission only</b>, approved by the\n"
+"                    General Manager ("
+msgstr ""
+"<i class=\"fa fa-check-circle\" title=\"من العمولة فقط\" role=\"img\" aria-label=\"من العمولة فقط\"/>\n"
+"                    <b class=\"ms-1\">يُسوّى من العمولة فقط</b>، باعتماد\n"
+"                    المدير العام ("
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_form_inherit_commission_only
+msgid ""
+"<i class=\"fa fa-hourglass-half\" title=\"Waiting\" role=\"img\" aria-label=\"Waiting\"/>\n"
+"                        <b class=\"ms-1\">Commission only: waiting for</b>"
+msgstr ""
+"<i class=\"fa fa-hourglass-half\" title=\"بانتظار\" role=\"img\" aria-label=\"بانتظار\"/>\n"
+"                        <b class=\"ms-1\">التسوية من العمولة فقط: بانتظار</b>"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "A commission-only request is changed only through its buttons."
+msgstr "لا يُعدَّل طلب التسوية من العمولة إلا من خلال أزراره."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "Approved by the General Manager"
+msgstr "اعتمده المدير العام"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_deduction__x_commission_only
+msgid "Approved by the General Manager: ordinary payslips never deduct this. Each approved commission month takes the due and overdue installments; a vacation or end-of-service settlement still collects it."
+msgstr "باعتماد المدير العام: لا تخصمه كشوف الرواتب العادية أبداً. يأخذ كل شهر عمولات معتمد الأقساط المستحقة والمتأخرة؛ وتبقى تسوية الإجازة أو نهاية الخدمة تحصّله."
+
+#. module: KSW_commissions
+#: model_terms:ir.actions.act_window,help:KSW_commissions.action_ksw_deduction_commission_only
+msgid ""
+"Ask from a deduction with <b>Settle from Commission Only</b>.\n"
+"               The department's General Manager decides each request here."
+msgstr ""
+"قدّم الطلب من الخصم بزر <b>التسوية من العمولة فقط</b>.\n"
+"               ويقرر المدير العام للقسم كل طلب هنا."
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_deduction_commission_only_wizard
+msgid "Ask to Settle a Deduction from Commission Only"
+msgstr "طلب تسوية خصم من العمولة فقط"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "Asked to settle from commission only (%s)"
+msgstr "طُلبت التسوية من العمولة فقط (%s)"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_wizard_form
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_form_inherit_commission_only
+msgid "Back to Payroll Deduction"
+msgstr "إعادة الخصم من الراتب"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_search
+msgid "Back to payroll"
+msgstr "إعادة إلى الراتب"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_deduction_commission_only__action__disable
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_deduction_commission_only_wizard__action__disable
+msgid "Back to payroll deduction"
+msgstr "إعادة الخصم من الراتب"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction__x_can_request_commission_only
+msgid "Can Ask for Commission Only"
+msgstr "يمكنه طلب التسوية من العمولة"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction__x_can_end_commission_only
+msgid "Can Switch Back to Payroll"
+msgstr "يمكنه الإعادة إلى الراتب"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__x_can_withdraw
+msgid "Can Withdraw"
+msgstr "يمكنه السحب"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only_wizard__commission_history
+msgid "Commission History"
+msgstr "سجل العمولات"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_search
+msgid "Commission only"
+msgstr "من العمولة فقط"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction__x_commission_only_request_id
+msgid "Commission-Only Decision"
+msgstr "قرار التسوية من العمولة"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_form_inherit_commission_only
+msgid "Commission-Only Log"
+msgstr "سجل التسوية من العمولة"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction__x_commission_only_log_count
+msgid "Commission-Only Log Count"
+msgstr "عدد سجلات التسوية من العمولة"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_form
+msgid "Commission-Only Request"
+msgstr "طلب تسوية من العمولة"
+
+#. module: KSW_commissions
+#: model:ir.actions.act_window,name:KSW_commissions.action_ksw_deduction_commission_only
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction__x_commission_only_request_ids
+#: model:ir.ui.menu,name:KSW_commissions.menu_ksw_deduction_commission_only
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_list
+msgid "Commission-Only Requests"
+msgstr "طلبات التسوية من العمولة"
+
+#. module: KSW_commissions
+#: model:ir.model,name:KSW_commissions.model_ksw_deduction_commission_only
+msgid "Commission-Only Settlement Request"
+msgstr "طلب تسوية من العمولة فقط"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "Commission-only requests are a permanent record and cannot be deleted."
+msgstr "طلبات التسوية من العمولة سجل دائم ولا يمكن حذفها."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__decided_by
+msgid "Decided By"
+msgstr "صاحب القرار"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__decided_on
+msgid "Decided On"
+msgstr "تاريخ القرار"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only_wizard__gm_name
+msgid "Decided by"
+msgstr "يقرره"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__decision_note
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_form
+msgid "Decision Note"
+msgstr "ملاحظة القرار"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__deduction_state
+msgid "Deduction Status"
+msgstr "حالة الخصم"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_wizard_form
+msgid ""
+"From now on the payslip deducts this again, as any deduction.\n"
+"                    The General Manager is told; no approval is needed."
+msgstr ""
+"من الآن يعود كشف الراتب لخصمه كأي خصم آخر.\n"
+"                    يُبلَّغ المدير العام؛ ولا يلزم اعتماد."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_form
+msgid "From now on, ordinary payslips will not deduct this. Only approved commission months (and a vacation or end-of-service settlement) will collect it. Approve?"
+msgstr "من الآن لن تخصمه كشوف الرواتب العادية. ستحصّله أشهر العمولات المعتمدة فقط (وتسوية الإجازة أو نهاية الخدمة). هل تعتمد؟"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "Give the reason."
+msgstr "اذكر السبب."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__managed_by
+msgid "Managed By"
+msgstr "الجهة المسؤولة"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "No General Manager is set for %(dept)s, so nobody can decide this. Ask HR to set the department's General Manager."
+msgstr "لم يُحدَّد مدير عام لـ %(dept)s، فلا أحد يستطيع البت في الطلب. اطلب من الموارد البشرية تحديد المدير العام للقسم."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "No approved commission in any month: nothing would collect this."
+msgstr "لا توجد عمولة معتمدة في أي شهر: لن يحصّل هذا الخصم شيء."
+
+#. module: KSW_commissions
+#: model_terms:ir.actions.act_window,help:KSW_commissions.action_ksw_deduction_commission_only
+msgid "No commission-only requests yet"
+msgstr "لا توجد طلبات تسوية من العمولة بعد"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "Note:"
+msgstr "ملاحظة:"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "Only %(gm)s can write the decision note, and only while the request is waiting."
+msgstr "لا يكتب ملاحظة القرار إلا %(gm)s، وفقط ما دام الطلب قيد الانتظار."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "Only %(gm)s, the General Manager of this employee's department, can decide this request."
+msgstr "لا يبت في هذا الطلب إلا %(gm)s، المدير العام لقسم الموظف."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "Only %(user)s, who asked, can withdraw it."
+msgstr "لا يسحب الطلب إلا مقدّمه %(user)s."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "Only accounting with Loan Modification = Full, or the Accounting Data Entry user who created %(ded)s, can change how it is settled."
+msgstr "لا يغيّر طريقة تسوية %(ded)s إلا المحاسبة بصلاحية تعديل السلف = كاملة، أو مُدخل البيانات المحاسبية الذي أنشأه."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_form
+msgid "Open Deduction"
+msgstr "فتح الخصم"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_form_inherit_commission_only
+msgid "Open Request"
+msgstr "فتح الطلب"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_wizard_form
+msgid "Ordinary payslips keep deducting this until"
+msgstr "تستمر كشوف الرواتب العادية في خصمه حتى يعتمد"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only_wizard__outstanding
+msgid "Outstanding"
+msgstr "المتبقي"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__outstanding_at_request
+msgid "Outstanding at Request"
+msgstr "المتبقي عند الطلب"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "Outstanding:"
+msgstr "المتبقي:"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "Payroll keeps deducting it until the General Manager approves."
+msgstr "يستمر خصمه من الراتب حتى يعتمد المدير العام."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "Re-export the bank file if it was already generated for this batch."
+msgstr "أعد تصدير ملف البنك إن كان قد صُدِّر لهذه الدفعة."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__commission_history
+msgid "Recent Commission"
+msgstr "العمولات الأخيرة"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_form
+msgid "Recent commission (when asked)"
+msgstr "العمولات الأخيرة (عند الطلب)"
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_deduction_commission_only__state__done
+msgid "Recorded"
+msgstr "مُسجَّل"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_form
+msgid "Refuse"
+msgstr "رفض"
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_deduction_commission_only__state__refused
+msgid "Refused"
+msgstr "مرفوض"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "Refused by the General Manager"
+msgstr "رفضه المدير العام"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "Request:"
+msgstr "الطلب:"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__requested_by
+msgid "Requested By"
+msgstr "مقدّم الطلب"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction_commission_only__requested_on
+msgid "Requested On"
+msgstr "تاريخ الطلب"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_form
+msgid "Required to refuse."
+msgstr "مطلوبة عند الرفض."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_deduction_commission_only__decision_note
+msgid "Required to refuse. Written by the General Manager."
+msgstr "مطلوبة عند الرفض. يكتبها المدير العام."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_wizard_form
+msgid "Send to the GM"
+msgstr "إرسال إلى المدير العام"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction__x_commission_only
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_form_inherit_commission_only
+msgid "Settle from Commission Only"
+msgstr "التسوية من العمولة فقط"
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_deduction_commission_only__action__enable
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_deduction_commission_only_wizard__action__enable
+msgid "Settle from commission only"
+msgstr "التسوية من العمولة فقط"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "Settle from commission only: your decision"
+msgstr "التسوية من العمولة فقط: بانتظار قرارك"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "Settling from commission only is set by a General Manager's decision, not edited directly."
+msgstr "التسوية من العمولة فقط تُحدَّد بقرار المدير العام، ولا تُعدَّل مباشرة."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_deduction_commission_only__gm_user_id
+msgid "The department General Manager who decides this request, fixed when it was made."
+msgstr "المدير العام للقسم الذي يبت في الطلب، ويُثبَّت عند تقديمه."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_deduction__x_commission_only_request_id
+msgid "The request whose decision set the current status."
+msgstr "الطلب الذي حدّد قراره الحالة الحالية."
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction__x_commission_only_pending_id
+msgid "Waiting Request"
+msgstr "طلب قيد الانتظار"
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_deduction_commission_only__state__pending_gm
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_search
+msgid "Waiting for GM"
+msgstr "بانتظار المدير العام"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,field_description:KSW_commissions.field_ksw_deduction__x_commission_only_pending_gm
+msgid "Waiting for General Manager"
+msgstr "بانتظار المدير العام"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "Waiting for:"
+msgstr "بانتظار:"
+
+#. module: KSW_commissions
+#: model:ir.model.fields,help:KSW_commissions.field_ksw_deduction_commission_only__managed_by
+msgid "Who can create and manually close (mark as paid) deductions of this type outside payroll. Accounting Data Entry: gov. penalties, internal penalties, salary advances. Accounting (Loans): loans, which additionally require the \"Loan Modification: Full\" privilege."
+msgstr "من يستطيع إنشاء خصومات هذا النوع وإقفالها يدوياً (تسجيلها مدفوعة) خارج الرواتب. مُدخل البيانات المحاسبية: المخالفات الحكومية والجزاءات الداخلية والسلف على الراتب. المحاسبة (السلف): القروض، وتتطلب أيضاً صلاحية \"تعديل السلف: كاملة\"."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_wizard_form
+msgid "Why should this be settled this way?"
+msgstr "لماذا تُسوّى بهذه الطريقة؟"
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_form
+msgid "Withdraw"
+msgstr "سحب الطلب"
+
+#. module: KSW_commissions
+#: model:ir.model.fields.selection,name:KSW_commissions.selection__ksw_deduction_commission_only__state__withdrawn
+msgid "Withdrawn"
+msgstr "مسحوب"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "Withdrawn by the requester"
+msgstr "سحبه مقدّم الطلب"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "Write the reason for refusing in the Decision Note first."
+msgstr "اكتب سبب الرفض في ملاحظة القرار أولاً."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "You asked for this yourself, so you cannot also approve it."
+msgstr "أنت من قدّم هذا الطلب، فلا يمكنك اعتماده أيضاً."
+
+#. module: KSW_commissions
+#: model_terms:ir.ui.view,arch_db:KSW_commissions.view_ksw_deduction_commission_only_wizard_form
+msgid ""
+"approves. After that only approved commission months collect\n"
+"                    it, oldest installment first; what a month cannot cover stays\n"
+"                    due for the next. A vacation or end-of-service settlement still\n"
+"                    collects it."
+msgstr ""
+". بعدها تحصّله أشهر العمولات المعتمدة فقط، الأقدم أولاً؛\n"
+"                    وما لا يغطيه شهر يبقى مستحقاً للشهر التالي. وتبقى تسوية الإجازة\n"
+"                    أو نهاية الخدمة تحصّله."
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "the General Manager"
+msgstr "المدير العام"
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
+msgid "this employee's department"
+msgstr "قسم هذا الموظف"
