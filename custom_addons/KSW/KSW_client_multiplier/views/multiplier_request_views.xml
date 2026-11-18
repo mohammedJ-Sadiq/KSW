@@ -92,7 +92,7 @@
                 <field name="name"/>
                 <field name="requested_by_id"/>
                 <filter name="to_decide" string="Waiting for Me"
-                        domain="[('state', '=', 'pending'), ('gm_user_id', '=', uid)]"/>
+                        domain="[('x_is_pending_my_action', '=', True)]"/>
                 <filter name="pending" string="Waiting for GM" domain="[('state', '=', 'pending')]"/>
                 <filter name="approved" string="Approved" domain="[('state', '=', 'approved')]"/>
                 <group>

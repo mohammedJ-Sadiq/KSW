@@ -267,17 +267,17 @@ class TestImportSkipsHeldDrivers(BasTripsImportCommon):
                     return_date=date(2028, 7, 17))
         batch = self._batch()
         calls = []
-        real = type(batch)._bas_fetch_orood
 
         def spy(self_, date_from, date_to):
             calls.append(date_from)
             return self.bas_rows
 
-        type(batch)._bas_fetch_orood = spy
-        try:
+        # patch.object, not a hand-made swap: reading the method off the
+        # class and assigning it back pinned it in the class's own dict,
+        # so every later test bypassed patches on the classes below it
+        # (KSW_commissions_multiplier's tests then queried the real BAS).
+        with patch.object(type(batch), '_bas_fetch_orood', spy):
             message = self._message(batch._import_bas_trips())
-        finally:
-            type(batch)._bas_fetch_orood = real
         self.assertIn(date(2028, 7, 17), calls,
                       'BAS must be re-queried from the return date.')
         self.assertIn(self.driver_ok, batch.entry_ids.employee_id)

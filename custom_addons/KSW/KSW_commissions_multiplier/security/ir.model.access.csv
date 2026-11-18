@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_trip_detail_supervisor,trip detail supervisor,model_ksw_pay_trip_detail,KSW_commissions.group_commission_supervisor,1,1,1,1
+access_trip_detail_line_supervisor,trip detail line supervisor,model_ksw_pay_trip_detail_line,KSW_commissions.group_commission_supervisor,1,1,1,1
+access_trip_detail_officer,trip detail officer,model_ksw_pay_trip_detail,KSW_commissions.group_commission_officer,1,1,1,1
+access_trip_detail_line_officer,trip detail line officer,model_ksw_pay_trip_detail_line,KSW_commissions.group_commission_officer,1,1,1,1
+access_trip_detail_gm,trip detail gm,model_ksw_pay_trip_detail,KSW_commissions.group_commission_gm,1,1,1,1
+access_trip_detail_line_gm,trip detail line gm,model_ksw_pay_trip_detail_line,KSW_commissions.group_commission_gm,1,1,1,1
+access_trip_detail_accountant,trip detail accountant,model_ksw_pay_trip_detail,KSW_commissions.group_commission_accountant,1,1,1,1
+access_trip_detail_line_accountant,trip detail line accountant,model_ksw_pay_trip_detail_line,KSW_commissions.group_commission_accountant,1,1,1,1
+access_trip_detail_supervisor_gm,trip detail supervisor gm,model_ksw_pay_trip_detail,KSW_commissions.group_commission_supervisor_gm,1,1,1,1
+access_trip_detail_line_supervisor_gm,trip detail line supervisor gm,model_ksw_pay_trip_detail_line,KSW_commissions.group_commission_supervisor_gm,1,1,1,1

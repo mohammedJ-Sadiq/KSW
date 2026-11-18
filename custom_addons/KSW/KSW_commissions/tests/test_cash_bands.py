@@ -82,8 +82,19 @@ class TestCashBands(TransactionCase):
         self.Band.search([]).unlink()
         self.assertIsNone(self.Band._sql_case('s.AMOUNT'))
 
-    def test_the_cash_accounts_are_configurable(self):
-        self.assertIn('1201020006', self.Band._cash_accounts())
+    def test_every_till_under_1201_is_cash_by_default(self):
+        """Nov 2026: all tills, not a list of six (Tabuk 2 / North Manifa
+        were missing and weighted at a flat 1.0)."""
+        sql, params = self.Band._cash_condition('s.FCODE')
+        self.assertEqual(sql, '(RTRIM(s.FCODE) LIKE %s)')
+        self.assertEqual(params, ['1201%'])
+        ICP = self.env['ir.config_parameter'].sudo()
+        ICP.set_param('ksw_commissions.bas_cash_prefixes', '1201, 1299')
+        self.assertEqual(self.Band._cash_condition('s.FCODE')[1], ['1201%', '1299%'])
+
+    def test_an_explicit_account_list_still_wins(self):
         self.env['ir.config_parameter'].sudo().set_param(
             'ksw_commissions.bas_cash_accounts', ' 999 , 888 ')
         self.assertEqual(self.Band._cash_accounts(), ('999', '888'))
+        self.assertEqual(self.Band._cash_condition('s.FCODE'),
+                         ('s.FCODE IN (%s,%s)', ['999', '888']))

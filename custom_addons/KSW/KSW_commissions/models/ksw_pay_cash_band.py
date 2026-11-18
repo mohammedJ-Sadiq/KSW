@@ -16,15 +16,22 @@ commercial decision and not a fact about the software.
 The bands are **sharp at the edges by design**: a load at 450.00 is worth
 1.0 and at 451.00 is worth 1.5. A discount that moves an invoice across a
 boundary moves the driver's weighting with it. That is the rule as given.
+
+**Which accounts are a till** (Nov 2026, user: "all tills for all
+vehicles"): every BAS account under ``1201`` «حسابات النقدية» — the main
+till, every branch till and the cash customers. It used to be a list of six
+branch tills, and two tills missing from it (Tabuk 2, North Manifa) were
+weighted at a flat 1.0 instead. A prefix covers a till opened tomorrow.
+``ksw_commissions.bas_cash_prefixes`` overrides the prefixes; an explicit
+``ksw_commissions.bas_cash_accounts`` list, if set, still wins.
 """
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
-#: BAS accounts that are a till, not a customer. A line sitting on one of
-#: these is a cash sale and its factor comes from the amount band.
-#: Overridable via `ir.config_parameter` `ksw_commissions.bas_cash_accounts`.
-CASH_ACCOUNTS_DEFAULT = ('1201020001,1201020003,1201020004,'
-                         '1201020006,1201020007,1201020010')
+#: BAS account prefixes that are a till, not a customer: «حسابات النقدية».
+#: A line on one of these is a cash sale and its factor comes from the
+#: amount band. Overridable via `ksw_commissions.bas_cash_prefixes`.
+CASH_PREFIXES_DEFAULT = '1201'
 
 
 class KswPayCashBand(models.Model):
@@ -82,10 +89,33 @@ class KswPayCashBand(models.Model):
     # ------------------------------------------------------------------
     @api.model
     def _cash_accounts(self):
-        """The BAS accounts that are a till rather than a customer."""
+        """An explicit list of till accounts, if one is configured; else ()."""
         raw = self.env['ir.config_parameter'].sudo().get_param(
-            'ksw_commissions.bas_cash_accounts', CASH_ACCOUNTS_DEFAULT)
+            'ksw_commissions.bas_cash_accounts', '')
         return tuple(a.strip() for a in (raw or '').split(',') if a.strip())
+
+    @api.model
+    def _cash_prefixes(self):
+        raw = self.env['ir.config_parameter'].sudo().get_param(
+            'ksw_commissions.bas_cash_prefixes', CASH_PREFIXES_DEFAULT)
+        return tuple(a.strip() for a in (raw or '').split(',') if a.strip())
+
+    @api.model
+    def _cash_condition(self, column):
+        """``(sql, params)`` true for a line on a till, or ``(None, [])``.
+
+        The explicit account list wins when set; otherwise every account
+        starting with a till prefix. ``column`` is our own SQL expression,
+        never user text."""
+        accounts = self._cash_accounts()
+        if accounts:
+            return ('%s IN (%s)' % (column, ','.join(['%s'] * len(accounts))),
+                    list(accounts))
+        prefixes = self._cash_prefixes()
+        if not prefixes:
+            return None, []
+        return ('(' + ' OR '.join(['RTRIM(%s) LIKE %%s' % column] * len(prefixes)) + ')',
+                [p + '%' for p in prefixes])
 
     @api.model
     def _sql_case(self, amount_expr):

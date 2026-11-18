@@ -857,14 +857,11 @@ class KswPayBatchBasImport(models.Model):
             # what both columns are for.
             col = INVOICE_FACTOR_COLUMN
             Band = self.env['ksw.pay.cash.band'].sudo()
-            cash_accounts = Band._cash_accounts()
-            band_case = Band._sql_case('s.AMOUNT') if cash_accounts else None
-            if band_case:
-                cash_ph = ','.join(['%s'] * len(cash_accounts))
-                is_cash = 's.FCODE IN (' + cash_ph + ')'
-            else:
+            is_cash, cash = Band._cash_condition('s.FCODE')
+            band_case = Band._sql_case('s.AMOUNT') if is_cash else None
+            if not band_case:
                 # No bands configured: leave every line exactly as it was.
-                cash_accounts, is_cash = (), '1 = 0'
+                cash, is_cash = [], '1 = 0'
                 band_case = '0'
             # «رد الفاتورة» applies only inside [from, until); before and
             # after it, «الرد المضاعف».
@@ -914,7 +911,6 @@ class KswPayBatchBasImport(models.Model):
             )
             window = [fields.Date.to_string(self._invoice_factor_cutover()),
                       fields.Date.to_string(self._invoice_factor_until())]
-            cash = list(cash_accounts)
             params = tuple(
                 # order matters: every %s in the SELECT, left to right
                 cash + window                    # mult

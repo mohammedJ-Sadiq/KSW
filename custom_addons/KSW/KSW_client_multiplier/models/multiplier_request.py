@@ -11,17 +11,29 @@ Draft → Waiting for GM → Approved / Refused (or Cancelled by the requester).
   say *for whom* (KSW, Aug 2026). Resolved at submission and stored, because
   the record rule that lets the GM see the request needs a column.
 * **What approval does**: adds one dated line to the client's history. Loads
-  before the effective date keep the old value; nothing is rewritten.
+  before the effective date keep the old value.
+* **Back-dated changes** (Nov 2026): the effective date may lie in the past,
+  but never before ``BACKDATE_FLOOR_DEFAULT`` (1 Oct 2026, when driver trips
+  went back to being weighted on «الرد المضاعف»; overridable with
+  ``ksw_client_multiplier.backdate_floor``). Loads already delivered from
+  that day on are re-weighted by whoever consumes the history (driver
+  commissions: KSW_commissions_multiplier).
 
 After submission nothing on the request is editable; every state change goes
 through an action that checks the caller first and then writes as sudo.
 """
+from dateutil.relativedelta import relativedelta
 from markupsafe import Markup
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 SUPERVISOR = 'KSW_water_delivery.group_water_dispatcher'
+
+#: The earliest effective date a request may carry. Before it, driver trips
+#: were weighted on «رد الفاتورة» (the invoice's own value), so a client
+#: multiplier has nothing to change there.
+BACKDATE_FLOOR_DEFAULT = '2026-10-01'
 
 
 class KswClientMultiplierRequest(models.Model):
@@ -71,6 +83,9 @@ class KswClientMultiplierRequest(models.Model):
 
     can_approve = fields.Boolean(compute='_compute_permissions')
     can_cancel = fields.Boolean(compute='_compute_permissions')
+    x_is_pending_my_action = fields.Boolean(
+        string='Waiting for Me', compute='_compute_is_pending_my_action',
+        search='_search_is_pending_my_action')
 
     # ------------------------------------------------------------------
     @api.depends('department_id.x_effective_gm_id.user_id',
@@ -95,6 +110,35 @@ class KswClientMultiplierRequest(models.Model):
             rec.can_approve = rec.state == 'pending' and rec.gm_user_id == user
             rec.can_cancel = rec.state in ('draft', 'pending') and (
                 rec.requested_by_id == user or user.has_group('base.group_system'))
+
+    @api.model
+    def _pending_domain(self):
+        """The one step a person takes on a request: the GM's decision."""
+        return [('state', '=', 'pending'), ('gm_user_id', '=', self.env.uid)]
+
+    @api.depends_context('uid')
+    @api.depends('state', 'gm_user_id')
+    def _compute_is_pending_my_action(self):
+        mine = self.sudo().search(self._pending_domain() + [('id', 'in', self.ids)])
+        for rec in self:
+            rec.x_is_pending_my_action = rec in mine
+
+    def _search_is_pending_my_action(self, operator, value):
+        # Odoo 19 hands '=' as 'in' with an OrderedSet (gotcha #24).
+        if operator in ('in', 'not in'):
+            positive = (operator == 'in') == any(value)
+        elif operator in ('=', '!='):
+            positive = (operator == '=') == bool(value)
+        else:
+            return NotImplemented
+        ids = self.sudo().search(self._pending_domain()).ids
+        return [('id', 'in' if positive else 'not in', ids)]
+
+    @api.model
+    def _backdate_floor(self):
+        value = self.env['ir.config_parameter'].sudo().get_param(
+            'ksw_client_multiplier.backdate_floor', BACKDATE_FLOOR_DEFAULT)
+        return fields.Date.to_date(value or BACKDATE_FLOOR_DEFAULT)
 
     @api.constrains('new_multiplier')
     def _check_multiplier(self):
@@ -133,11 +177,12 @@ class KswClientMultiplierRequest(models.Model):
         for rec in self:
             if rec.state != 'draft':
                 raise UserError(_('%(ref)s has already been sent.', ref=rec.name))
-            if rec.effective_date < rec.request_date:
+            floor = self._backdate_floor()
+            if rec.effective_date < floor:
                 raise UserError(_(
-                    'The effective date cannot be before the day the change was '
-                    'requested (%(day)s): a change applies from now on, never to '
-                    'loads already delivered.', day=rec.request_date))
+                    'The effective date cannot be before %(day)s: before that day '
+                    'driver trips were weighted on «رد الفاتورة», not on the '
+                    'client\'s multiplier.', day=floor))
             other = self.sudo().search([('client_id', '=', rec.client_id.id),
                                         ('state', '=', 'pending'), ('id', '!=', rec.id)], limit=1)
             if other:
@@ -216,7 +261,22 @@ class KswClientMultiplierRequest(models.Model):
                     'old': rec.old_multiplier, 'new': rec.new_multiplier,
                     'day': rec.effective_date, 'ref': rec.name, 'gm': self.env.user.name},
                 subtype_xmlid='mail.mt_note')
+            rec.sudo()._after_approve()
         return True
+
+    def _after_approve(self):
+        """Hook: the value is in the history. Consumers that already used the
+        old value for days from the effective date re-weight them here."""
+        return True
+
+    def _rate_until(self):
+        """The last day this request's value applies: the day before the
+        client's next dated change, or ``None`` when it is the latest."""
+        self.ensure_one()
+        later = self.env['ksw.client.multiplier.rate'].sudo().search([
+            ('client_id', '=', self.client_id.id),
+            ('date_from', '>', self.effective_date)], order='date_from', limit=1)
+        return later.date_from - relativedelta(days=1) if later else None
 
     def _apply(self):
         """Add the approved value to the client's history, from its effective date."""

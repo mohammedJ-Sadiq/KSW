@@ -51,6 +51,16 @@
         <field name="domain">[('x_is_pending_my_action', '=', True)]</field>
         <field name="icon">fa-scissors</field>
     </record>
+    <!-- «الرد المضاعف» change requests (Nov 2026): the department GM decides.
+         Existing databases get it from KSW_client_multiplier's 19.0.1.4.0
+         end-migrate (same xml id). -->
+    <record id="inbox_client_multiplier_requests" model="ksw.home.inbox.source">
+        <field name="name">Client multiplier changes awaiting my approval</field>
+        <field name="sequence">45</field>
+        <field name="model_name">ksw.client.multiplier.request</field>
+        <field name="domain">[('x_is_pending_my_action', '=', True)]</field>
+        <field name="icon">fa-truck</field>
+    </record>
     <record id="inbox_purchase_requests" model="ksw.home.inbox.source">
         <field name="name">Purchase requests to approve</field>
         <field name="sequence">50</field>

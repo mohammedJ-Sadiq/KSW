@@ -1,6 +1,6 @@
 {
     'name': 'KSW Client Multiplier',
-    'version': '19.0.1.3.0',
+    'version': '19.0.1.4.0',
     'author': 'Mohammed Albadr',
     'category': 'Inventory/Delivery',
     'summary': '«الرد المضاعف» per client: dated history, changed only by a '

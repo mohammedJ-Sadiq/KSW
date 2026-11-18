@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Trip Details button next to the tier explanation, on driver-trip
+         rows only (the batch's importer says which). -->
+    <record id="view_ksw_pay_batch_form_trip_details" model="ir.ui.view">
+        <field name="name">ksw.pay.batch.form.trip.details</field>
+        <field name="model">ksw.pay.batch</field>
+        <field name="inherit_id" ref="KSW_commissions.view_ksw_pay_batch_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='entry_ids']/list/button[@name='action_explain']" position="after">
+                <button name="action_trip_details" type="object" icon="fa-list-ol"
+                        title="Trip Details: every load and its multiplier"
+                        column_invisible="parent.importer != 'bas_trips'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_entry_explain_form_trip_details" model="ir.ui.view">
+        <field name="name">ksw.pay.entry.explain.trip.details</field>
+        <field name="model">ksw.pay.entry</field>
+        <field name="inherit_id" ref="KSW_commissions.view_ksw_pay_entry_explain_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//footer/button" position="before">
+                <field name="x_component_importer" invisible="1"/>
+                <button name="action_trip_details" type="object" string="Trip Details"
+                        icon="fa-list-ol" class="btn-secondary"
+                        invisible="x_component_importer != 'bas_trips'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_trip_detail_form" model="ir.ui.view">
+        <field name="name">ksw.pay.trip.detail.form</field>
+        <field name="model">ksw.pay.trip.detail</field>
+        <field name="arch" type="xml">
+            <form string="Trip Details" create="false" edit="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id" readonly="1"/>
+                            <field name="period" readonly="1"/>
+                            <field name="date_from" readonly="1"/>
+                            <field name="date_to" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="loads"/>
+                            <field name="weighted"/>
+                            <field name="stored_quantity"/>
+                            <field name="difference" invisible="not difference"
+                                   decoration-danger="difference"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-warning" role="alert" invisible="not difference">
+                        BAS no longer gives the figure on the line: a load was added, edited or
+                        removed in BAS after the import. Re-import the batch to bring the line
+                        in step (only while it is in Draft).
+                    </div>
+                    <field name="summary" nolabel="1"/>
+                    <field name="line_ids" nolabel="1">
+                        <list>
+                            <field name="day"/>
+                            <field name="document"/>
+                            <field name="truck" optional="show"/>
+                            <field name="customer_code" optional="show"/>
+                            <field name="customer"/>
+                            <field name="amount" optional="hide"/>
+                            <field name="basis"/>
+                            <field name="source" optional="show"/>
+                            <field name="weight" sum="Multiplied trips"/>
+                        </list>
+                    </field>
+                </sheet>
+                <footer>
+                    <button name="action_open_list" type="object" string="Group / Export"
+                            icon="fa-table" class="btn-secondary"/>
+                    <button string="Close" class="btn-primary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_trip_detail_line_list" model="ir.ui.view">
+        <field name="name">ksw.pay.trip.detail.line.list</field>
+        <field name="model">ksw.pay.trip.detail.line</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false" delete="false">
+                <field name="day"/>
+                <field name="document"/>
+                <field name="truck"/>
+                <field name="customer_code"/>
+                <field name="customer"/>
+                <field name="amount" optional="hide"/>
+                <field name="basis"/>
+                <field name="source"/>
+                <field name="weight" sum="Multiplied trips"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_pay_trip_detail_line_search" model="ir.ui.view">
+        <field name="name">ksw.pay.trip.detail.line.search</field>
+        <field name="model">ksw.pay.trip.detail.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="customer"/>
+                <field name="customer_code"/>
+                <field name="document"/>
+                <filter name="no_multiplier" string="No Multiplier" domain="[('basis', '=', 'none')]"/>
+                <group>
+                    <filter name="g_customer" string="Customer" context="{'group_by': 'customer'}"/>
+                    <filter name="g_day" string="Day" context="{'group_by': 'day'}"/>
+                    <filter name="g_basis" string="Weighted On" context="{'group_by': 'basis'}"/>
+                    <filter name="g_weight" string="Multiplier" context="{'group_by': 'weight'}"/>
+                    <filter name="g_truck" string="Truck" context="{'group_by': 'truck'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

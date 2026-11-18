@@ -111,10 +111,45 @@ class TestClientMultiplier(TransactionCase):
             self.env['ksw.client.multiplier.rate'].with_user(self.accountant).create({
                 'client_id': self.client.id, 'multiplier': 9.0, 'date_from': self.today})
 
-    def test_effective_date_cannot_reach_back(self):
-        req = self._request(days=-1)
+    def test_effective_date_may_reach_back_to_the_floor_only(self):
+        """Nov 2026: back-dated changes are allowed, never before the floor
+        (1 Oct 2026, when trips went back to «الرد المضاعف»)."""
+        floor = self.env['ksw.client.multiplier.request']._backdate_floor()
+        req = self._request(days=(floor - self.today).days - 1)
         with self.assertRaises(UserError):
             req.with_user(self.supervisor).action_submit()
+        req = self._request(days=(floor - self.today).days)
+        req.with_user(self.supervisor).action_submit()
+        self.assertEqual(req.state, 'pending')
+
+    def test_back_dated_change_applies_from_its_day_until_the_next_change(self):
+        self.env['ksw.client.multiplier.rate'].create({
+            'client_id': self.client.id, 'multiplier': 3.0,
+            'date_from': self.today - timedelta(days=3)})
+        req = self._request(new=1.25, days=-10)
+        req.with_user(self.supervisor).action_submit()
+        req.with_user(self.gm).action_approve()
+        resolve = self.env['ksw.client.multiplier']._multiplier_on
+        self.assertEqual(resolve(['1203ZZ001'], self.today - timedelta(days=11)), {'1203ZZ001': 2.0})
+        self.assertEqual(resolve(['1203ZZ001'], self.today - timedelta(days=10)), {'1203ZZ001': 1.25})
+        self.assertEqual(resolve(['1203ZZ001'], self.today - timedelta(days=4)), {'1203ZZ001': 1.25})
+        self.assertEqual(resolve(['1203ZZ001'], self.today), {'1203ZZ001': 3.0})
+        self.assertEqual(req._rate_until(), self.today - timedelta(days=4))
+
+    def test_waiting_for_the_gm_on_home_until_decided(self):
+        Request = self.env['ksw.client.multiplier.request']
+        req = self._request()
+        req.with_user(self.supervisor).action_submit()
+        mine = [('x_is_pending_my_action', '=', True)]
+        self.assertIn(req, Request.with_user(self.gm).search(mine))
+        self.assertNotIn(req, Request.sudo().with_user(self.other_gm).search(mine))
+        self.assertNotIn(req, Request.with_user(self.supervisor).search(mine))
+        self.assertTrue(req.with_user(self.gm).x_is_pending_my_action)
+        req.with_user(self.gm).action_approve()
+        self.assertNotIn(req, Request.with_user(self.gm).search(mine))
+        self.assertFalse(req.with_user(self.gm).x_is_pending_my_action)
+        self.assertIn(req, Request.with_user(self.gm).search(
+            [('x_is_pending_my_action', '!=', True)]))
 
     def test_one_pending_request_per_client(self):
         self._request().with_user(self.supervisor).action_submit()
