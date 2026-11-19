@@ -37,8 +37,18 @@ MUQEEM_COLUMNS = {
 # read: pay belongs to payroll.
 GOSI_COLUMNS = {'رقم الهوية': 'id_number', 'اسم المشترك': 'person_name', 'الجنسية': 'nationality',
                 'المهنة': 'occupation'}
+# Qiwa ▸ Active contracts (with each employee's establishment). The wage
+# columns are never read.
+QIWA_COLUMNS = {
+    'رقم الهوية / الإقامة': 'id_number', 'الرقم الوظيفي': 'employee_number', 'اسم المشترك': 'person_name',
+    'اسم المنشأة': 'establishment', 'رقم اشتراك المنشأة': 'gosi_number', 'رقم الكفيل': 'employer_number',
+    'رقم العقد': 'contract_number', 'تاريخ إنشاء العقد': 'contract_date_text', 'حالة العقد': 'contract_status',
+    'الجنسية': 'nationality', 'الجنس': 'gender', 'تاريخ الميلاد': 'birth_date_text', 'المهنة': 'occupation',
+    'تاريخ الالتحاق (البسيط)': 'join_date_text',
+}
 # The column that identifies each export's header row.
-HEADER_MARK = {'absher_vehicles': 'رقم الهيكل', 'muqeem_residents': 'رقم الاقامة', 'gosi_subscribers': 'رقم الهوية'}
+HEADER_MARK = {'absher_vehicles': 'رقم الهيكل', 'muqeem_residents': 'رقم الاقامة', 'gosi_subscribers': 'رقم الهوية',
+               'qiwa_contracts': 'رقم العقد'}
 # Imported every month (a reminder on Home); GOSI only when HR wants to check.
 MONTHLY_SOURCES = ('absher_vehicles', 'muqeem_residents')
 VALID = 'ساري المفعول'
@@ -75,7 +85,8 @@ class KswDocumentImport(models.Model):
     name = fields.Char(compute='_compute_name', store=True, readonly=False, precompute=True, required=True)
     source = fields.Selection([('absher_vehicles', 'Absher Business: Vehicles'),
                                ('muqeem_residents', 'Muqeem: Active Residents'),
-                               ('gosi_subscribers', 'GOSI: Active Subscribers')], required=True,
+                               ('gosi_subscribers', 'GOSI: Active Subscribers'),
+                               ('qiwa_contracts', 'Qiwa: Active Contracts')], required=True,
                               default='absher_vehicles')
     registration_id = fields.Many2one('ksw.company.registration', string='Establishment (CR)',
                                       help='GOSI lists one establishment per file: the registration its '
@@ -267,6 +278,11 @@ class KswDocumentImport(models.Model):
 
     def _people_lines(self, rows, columns):
         employees = self._employees_by_id_number()
+        by_number = {}
+        if 'x_employee_no' in self.env['hr.employee']._fields:
+            for emp in self.env['hr.employee'].sudo().with_context(active_test=False).search(
+                    [('x_employee_no', '!=', False)]):
+                by_number.setdefault(str(emp.x_employee_no).strip(), emp)
         vals_list = []
         for n, row in enumerate(rows, 1):
             vals = {'import_id': self.id, 'row_no': n, 'kind': 'row'}
@@ -275,9 +291,10 @@ class KswDocumentImport(models.Model):
                 vals[field] = '' if value is None else str(value).strip()
             if not vals['id_number']:
                 continue
-            emp = employees.get(vals['id_number'])
-            vals.update(employee_id=emp and emp.id, match_note=emp and _('Iqama / ID number'),
-                        action='update' if emp else 'skip')
+            emp, how = employees.get(vals['id_number']), _('Iqama / ID number')
+            if not emp and vals.get('employee_number') in by_number:
+                emp, how = by_number[vals['employee_number']], _('Employee No.')
+            vals.update(employee_id=emp and emp.id, match_note=emp and how, action='update' if emp else 'skip')
             vals_list.append(vals)
         lines = self.env['ksw.document.import.line'].create(vals_list)
         lines._compute_warnings()
@@ -295,6 +312,27 @@ class KswDocumentImport(models.Model):
             'warnings': _('Active in Odoo but not in Muqeem: final exit, transferred, or a wrong iqama no. '
                           'in Odoo?')} for e in gone])
 
+    def _preview_qiwa_contracts(self, rows, preamble):
+        # GOSI subscription no. → registration, learnt from the rows that also
+        # carry the sponsor's unified no. (Saudis' rows have none).
+        Registration = self.env['ksw.company.registration'].sudo()
+        for row in rows:
+            reg = Registration._find(str(row.get('رقم الكفيل') or ''))
+            gosi = str(row.get('رقم اشتراك المنشأة') or '').strip()
+            if reg and gosi and not reg.gosi_number:
+                reg.gosi_number = gosi
+        lines = self._people_lines(rows, QIWA_COLUMNS)
+        # Active employees of the establishments in this file who have no
+        # active contract in it.
+        regs = lines.line_registration_id
+        listed = lines.employee_id
+        gone = self.env['hr.employee'].sudo().search([('x_registration_id', 'in', regs.ids)]) - listed
+        self.env['ksw.document.import.line'].create([{
+            'import_id': self.id, 'kind': 'missing', 'employee_id': e.id, 'action': 'skip',
+            'id_number': e.ssnid, 'person_name': e.name,
+            'warnings': _('Active in Odoo but no active contract in Qiwa: left, or contract not yet '
+                          'registered?')} for e in gone])
+
     def _preview_gosi_subscribers(self, rows, preamble):
         if not self.registration_id:
             names = [_arabic_name_key(t) for t in preamble if 'المنشأة' not in t]
@@ -303,6 +341,10 @@ class KswDocumentImport(models.Model):
                 if any(n and (n in key or key in n) for n in names):
                     self.registration_id = reg
                     break
+        # «رقم إشتراك المنشأة» printed above the table.
+        gosi = next((t for t in preamble if t.isdigit() and len(t) >= 9), False)
+        if self.registration_id and gosi and not self.registration_id.gosi_number:
+            self.registration_id.sudo().gosi_number = gosi
         self._people_lines(rows, GOSI_COLUMNS)
 
     # -- apply ---------------------------------------------------------------
@@ -377,14 +419,26 @@ class KswDocumentImportLine(models.Model):
     birth_date = fields.Date(compute='_compute_dates')
     line_registration_id = fields.Many2one('ksw.company.registration', compute='_compute_line_registration',
                                            string='Registered Under')
+    # Qiwa
+    employee_number = fields.Char(string='Employee No. (Qiwa)')
+    establishment = fields.Char()
+    gosi_number = fields.Char(string='GOSI Subscription No.')
+    contract_number = fields.Char(string='Qiwa Contract No.')
+    contract_date_text = fields.Char(string='Contract Date (as exported)')
+    contract_date = fields.Date(compute='_compute_dates')
+    contract_status = fields.Char(string='Contract Status')
+    gender = fields.Char()
+    join_date_text = fields.Char(string='Joining Date (as exported)')
+    join_date = fields.Date(compute='_compute_dates', string='Joining Date (Qiwa)')
 
     @api.depends('istimara_expiry_text', 'mvpi_expiry_text', 'passport_expiry_text', 'iqama_expiry_text',
-                 'birth_date_text')
+                 'birth_date_text', 'contract_date_text', 'join_date_text')
     def _compute_dates(self):
         for line in self:
             for src, dst in (('istimara_expiry_text', 'istimara_expiry'), ('mvpi_expiry_text', 'mvpi_expiry'),
                              ('passport_expiry_text', 'passport_expiry'), ('iqama_expiry_text', 'iqama_expiry'),
-                             ('birth_date_text', 'birth_date')):
+                             ('birth_date_text', 'birth_date'), ('contract_date_text', 'contract_date'),
+                             ('join_date_text', 'join_date')):
                 try:
                     line[dst] = parse_date(line[src])
                 except ValueError:
@@ -398,12 +452,13 @@ class KswDocumentImportLine(models.Model):
             line.user_employee_id = number not in NONE_VALUES and Employee.search(
                 ['|', ('ssnid', '=', number), ('identification_id', '=', number)], limit=1)
 
-    @api.depends('employer_number', 'import_id.registration_id')
+    @api.depends('employer_number', 'gosi_number', 'import_id.registration_id')
     def _compute_line_registration(self):
         Registration = self.env['ksw.company.registration']
         for line in self:
-            line.line_registration_id = (Registration._find(line.employer_number) if line.employer_number
-                                         else line.import_id.registration_id)
+            line.line_registration_id = (Registration._find(line.employer_number)
+                                         or Registration._find(line.gosi_number)
+                                         or line.import_id.registration_id)
 
     def _compute_warnings(self):
         """What HR should look at; none of it is written over Odoo's data."""
@@ -442,6 +497,24 @@ class KswDocumentImportLine(models.Model):
                 notes.append(_('Not an employee in Odoo: add the employee, then preview again.'))
             if line.outside_kingdom == 'نعم':
                 notes.append(_('Outside the Kingdom now (Muqeem).'))
+            if emp and not emp.active:
+                notes.append(_('Archived in Odoo, but still in this export.'))
+            if line.contract_status and line.contract_status != 'ساري':
+                notes.append(_('Qiwa contract: %s', line.contract_status))
+            if emp and line.employee_number and 'x_employee_no' in emp._fields:
+                current = str(emp.x_employee_no or '').strip()
+                if current and current != line.employee_number:
+                    notes.append(_('Employee No. in Odoo %(o)s, in Qiwa %(q)s.', o=current, q=line.employee_number))
+                others = emp.search([('x_employee_no', '=', line.employee_number), ('id', '!=', emp.id)])
+                if others:
+                    notes.append(_('Employee No. %(n)s is also on %(e)s in Odoo.', n=line.employee_number,
+                                   e=', '.join(others.mapped('name'))))
+            if emp and line.join_date:
+                versions = emp.version_ids if 'version_ids' in emp._fields else emp.browse()
+                starts = [d for d in versions.mapped('contract_date_start') if d]
+                if starts and min(starts) != line.join_date:
+                    notes.append(_('Joining date in Odoo %(o)s, in Qiwa %(q)s: annual leave and end of service '
+                                   'use the Odoo one. Not changed.', o=min(starts), q=line.join_date))
             if emp and emp.x_registration_id and line.line_registration_id \
                     and emp.x_registration_id != line.line_registration_id:
                 notes.append(_('Registered under %(o)s in Odoo, %(g)s here: check which is right.',
@@ -485,9 +558,27 @@ class KswDocumentImportLine(models.Model):
                 fill['country_id'] = country.id
         if self.birth_date and not emp.birthday:
             fill['birthday'] = self.birth_date
+        if self.occupation and not emp.x_official_occupation:
+            fill['x_official_occupation'] = self.occupation
+        if self.gender and not emp.sex:
+            fill['sex'] = {'ذكر': 'male', 'انثى': 'female', 'أنثى': 'female'}.get(self.gender)
+            if not fill['sex']:
+                fill.pop('sex')
+        if self.employee_number and 'x_employee_no' in emp._fields and not emp.x_employee_no \
+                and not emp.search_count([('x_employee_no', '=', self.employee_number)]):
+            fill['x_employee_no'] = self.employee_number
         if fill:
             emp.write(fill)
             done.append(_('Employee details filled'))
+        if self.import_id.source == 'qiwa_contracts' and self.contract_number:
+            contract_type = self.env.ref('KSW_documents.type_employment_contract', raise_if_not_found=False)
+            if contract_type:
+                outcome = self.env['ksw.document']._record_from_source(
+                    contract_type, emp, 'qiwa', self.import_id, number=self.contract_number,
+                    issue_date=self.contract_date or False, verified=self.contract_status == 'ساري',
+                    note=self.contract_status != 'ساري' and _('Qiwa: %s', self.contract_status) or False)
+                done.append({'new': _('Documents recorded'), 'renewed': _('Documents renewed'),
+                             'same': _('Documents unchanged'), 'older': _('Older than the register (ignored)')}[outcome])
         if self.import_id.source == 'muqeem_residents':
             types = {t.code: t for t in self.env['ksw.document.type'].search([])}
             Document = self.env['ksw.document']

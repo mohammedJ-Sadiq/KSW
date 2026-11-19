@@ -1,0 +1,104 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* KSW_employee_transfer_eos
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-19 05:41+0000\n"
+"PO-Revision-Date: 2026-11-19 05:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar_001\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: KSW_employee_transfer_eos
+#: model:ir.model.fields,field_description:KSW_employee_transfer_eos.field_hr_leave__display_name
+#: model:ir.model.fields,field_description:KSW_employee_transfer_eos.field_ksw_employee_release_line__display_name
+msgid "Display Name"
+msgstr "اسم العرض"
+
+#. module: KSW_employee_transfer_eos
+#: model:ir.model.fields,field_description:KSW_employee_transfer_eos.field_ksw_employee_release_line__x_eos_leave_ids
+#: model:ir.model.fields,field_description:KSW_employee_transfer_eos.field_ksw_employee_release_line__x_eos_progress
+msgid "End of Service"
+msgstr "نهاية الخدمة"
+
+#. module: KSW_employee_transfer_eos
+#: model:ir.model.fields.selection,name:KSW_employee_transfer_eos.selection__ksw_employee_release_line__status__eos
+msgid "End of Service in Time Off"
+msgstr "نهاية الخدمة في الإجازات"
+
+#. module: KSW_employee_transfer_eos
+#. odoo-python
+#: code:addons/KSW_employee_transfer_eos/models/eos.py:0
+msgid ""
+"End of Service request for <b>%(e)s</b> opened in Time Off (termination date"
+" %(d)s): it continues there."
+msgstr ""
+"فُتح طلب نهاية الخدمة لـ <b>%(e)s</b> في الإجازات (تاريخ انتهاء الخدمة "
+"%(d)s): يُستكمل هناك."
+
+#. module: KSW_employee_transfer_eos
+#. odoo-python
+#: code:addons/KSW_employee_transfer_eos/models/eos.py:0
+msgid "End of service: GM decision on %s"
+msgstr "نهاية الخدمة: قرار المدير العام في %s"
+
+#. module: KSW_employee_transfer_eos
+#: model:ir.model.fields,field_description:KSW_employee_transfer_eos.field_hr_leave__id
+#: model:ir.model.fields,field_description:KSW_employee_transfer_eos.field_ksw_employee_release_line__id
+msgid "ID"
+msgstr "المعرف"
+
+#. module: KSW_employee_transfer_eos
+#. odoo-python
+#: code:addons/KSW_employee_transfer_eos/models/eos.py:0
+msgid "No End of Service time off type is configured."
+msgstr "لا يوجد نوع إجازة لنهاية الخدمة."
+
+#. module: KSW_employee_transfer_eos
+#. odoo-python
+#: code:addons/KSW_employee_transfer_eos/models/eos.py:0
+msgid "Only HR carries out an end of service."
+msgstr "لا ينفذ نهاية الخدمة إلا الموارد البشرية."
+
+#. module: KSW_employee_transfer_eos
+#. odoo-python
+#: code:addons/KSW_employee_transfer_eos/models/eos.py:0
+msgid "Opened by the GM's end-of-service decision on %s."
+msgstr "فُتح بقرار المدير العام بإنهاء الخدمة في %s."
+
+#. module: KSW_employee_transfer_eos
+#: model:ir.model.fields,field_description:KSW_employee_transfer_eos.field_hr_leave__x_employee_release_line_id
+msgid "Released By"
+msgstr "طلب الاستغناء"
+
+#. module: KSW_employee_transfer_eos
+#: model:ir.model,name:KSW_employee_transfer_eos.model_ksw_employee_release_line
+msgid "Released Employee"
+msgstr "موظف مستغنى عنه"
+
+#. module: KSW_employee_transfer_eos
+#: model:ir.model.fields,field_description:KSW_employee_transfer_eos.field_ksw_employee_release_line__status
+msgid "Status"
+msgstr "الحالة"
+
+#. module: KSW_employee_transfer_eos
+#. odoo-python
+#: code:addons/KSW_employee_transfer_eos/models/eos.py:0
+msgid ""
+"The End of Service request for <b>%s</b> was refused or cancelled in Time "
+"Off: he is back with the GM."
+msgstr ""
+"رُفض طلب نهاية الخدمة لـ <b>%s</b> أو أُلغي في الإجازات: عاد إلى المدير "
+"العام."
+
+#. module: KSW_employee_transfer_eos
+#: model:ir.model,name:KSW_employee_transfer_eos.model_hr_leave
+msgid "Time Off"
+msgstr "الإجازات"

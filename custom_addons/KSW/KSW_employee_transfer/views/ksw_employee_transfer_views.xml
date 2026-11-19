@@ -4,50 +4,82 @@
         <field name="name">ksw.employee.transfer.form</field>
         <field name="model">ksw.employee.transfer</field>
         <field name="arch" type="xml">
-            <form string="Employee Transfer">
+            <form string="Employee Transfer" create="0" delete="0">
                 <header>
                     <field name="x_can_hr" invisible="1"/>
                     <field name="x_can_gm" invisible="1"/>
-                    <button name="action_submit" type="object" string="Submit to HR" class="oe_highlight"
-                            invisible="state != 'draft'"/>
-                    <button name="action_hr_approve" type="object" string="HR Approve" class="oe_highlight"
+                    <button name="action_hr_approve" type="object" string="Confirm" class="oe_highlight"
                             invisible="not x_can_hr"/>
-                    <button name="action_gm_approve" type="object" string="GM Approve" class="oe_highlight"
-                            invisible="not x_can_gm"/>
-                    <button name="action_open_refuse" type="object" string="Refuse"
-                            invisible="not x_can_hr and not x_can_gm"/>
-                    <button name="action_cancel" type="object" string="Cancel"
-                            invisible="state not in ('draft', 'hr', 'gm', 'approved')"
-                            confirm="Cancel this transfer?"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,hr,gm,approved,applied"/>
+                    <button name="action_open_refuse" type="object" string="Return to the GM"
+                            invisible="not x_can_hr"/>
+                    <button name="action_cancel" type="object" string="Cancel Decision"
+                            invisible="not x_can_gm" confirm="Take the transfer decision back? The employee returns to your list."/>
+                    <field name="state" widget="statusbar" statusbar_visible="hr,approved,applied"/>
                 </header>
                 <sheet>
                     <div class="alert alert-warning" role="alert" invisible="not warning_text or state in ('applied', 'refused', 'cancelled')">
                         <field name="warning_text" nolabel="1" class="text-pre-wrap"/>
                     </div>
                     <div class="alert alert-danger" role="alert" invisible="state != 'refused'">
-                        <b>Refused:</b> <field name="refuse_reason" nolabel="1" class="d-inline"/>
+                        <b>Returned to the GM:</b> <field name="refuse_reason" nolabel="1" class="d-inline"/>
                     </div>
                     <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
-                    <field name="allowed_department_ids" invisible="1"/>
                     <group>
                         <group>
-                            <field name="employee_id" options="{'no_create': True}"
-                                   readonly="state not in ('draft', 'hr')"/>
+                            <field name="employee_id"/>
                             <field name="from_department_id"/>
-                            <field name="to_department_id" options="{'no_create': True}"
-                                   readonly="state not in ('draft', 'hr')"/>
-                            <field name="effective_date" readonly="state not in ('draft', 'hr')"/>
+                            <field name="to_department_id"/>
+                            <field name="effective_date" readonly="not x_can_hr"/>
                         </group>
                         <group>
-                            <field name="requested_by_id"/>
                             <field name="with_vehicles" invisible="not with_vehicles"/>
+                            <field name="release_line_id" invisible="not release_line_id"/>
+                            <field name="addition_line_id" invisible="not addition_line_id"/>
                             <field name="origin" invisible="not origin"/>
                             <field name="version_id" invisible="not version_id" groups="hr.group_hr_user"/>
-                            <field name="applied_date" invisible="not applied_date"/>
                         </group>
                     </group>
-                    <field name="reason" readonly="state not in ('draft', 'hr')" placeholder="Why he moves..."/>
+                    <group string="After the Move">
+                        <group>
+                            <field name="to_manager_id" options="{'no_create': True}"
+                                   readonly="not x_can_hr"/>
+                            <field name="to_hr_responsible_id" options="{'no_create': True}"
+                                   readonly="not x_can_hr"/>
+                        </group>
+                        <group>
+                            <field name="to_leave_manager_id" options="{'no_create': True}"
+                                   readonly="not x_can_hr"/>
+                            <field name="to_attendance_manager_id" options="{'no_create': True}"
+                                   readonly="not x_can_hr"/>
+                        </group>
+                    </group>
+                    <group string="Before the Move" invisible="state != 'applied'">
+                        <group>
+                            <field name="from_manager_id"/>
+                            <field name="from_hr_responsible_id"/>
+                        </group>
+                        <group>
+                            <field name="from_leave_manager_id"/>
+                            <field name="from_attendance_manager_id"/>
+                        </group>
+                    </group>
+                    <field name="reason" readonly="not x_can_hr" placeholder="Why he moves..."/>
+                    <group string="Steps">
+                        <group>
+                            <field name="requested_by_id" string="Requested By"/>
+                            <field name="create_date" string="Requested On"/>
+                            <field name="submitted_date" invisible="not submitted_date"/>
+                            <field name="gm_user_id" invisible="not gm_user_id"/>
+                            <field name="gm_date" invisible="not gm_date"/>
+                        </group>
+                        <group>
+                            <field name="hr_user_id" invisible="not hr_user_id"/>
+                            <field name="hr_date" invisible="not hr_date"/>
+                            <field name="applied_date" string="Applied On" invisible="not applied_date"/>
+                            <field name="closed_by_id" invisible="not closed_by_id"/>
+                            <field name="closed_date" invisible="not closed_date"/>
+                        </group>
+                    </group>
                     <group string="Vehicles in His Custody" invisible="not custody_vehicle_ids">
                         <field name="custody_vehicle_ids" nolabel="1" colspan="2" widget="many2many_tags"/>
                     </group>
@@ -61,16 +93,20 @@
         <field name="name">ksw.employee.transfer.list</field>
         <field name="model">ksw.employee.transfer</field>
         <field name="arch" type="xml">
-            <list string="Employee Transfers" decoration-muted="state in ('refused', 'cancelled')"
+            <list string="Employee Transfers" create="0" decoration-muted="state in ('refused', 'cancelled')"
                   decoration-success="state == 'applied'">
                 <field name="name"/>
                 <field name="employee_id"/>
                 <field name="from_department_id"/>
                 <field name="to_department_id"/>
                 <field name="effective_date"/>
+                <field name="to_manager_id" optional="hide"/>
+                <field name="hr_user_id" optional="hide"/>
+                <field name="gm_user_id" optional="hide"/>
+                <field name="applied_date" optional="hide"/>
                 <field name="with_vehicles" optional="hide"/>
                 <field name="activity_ids" widget="list_activity" optional="show"/>
-                <field name="state" widget="badge" decoration-info="state in ('hr', 'gm', 'approved')"
+                <field name="state" widget="badge" decoration-info="state in ('hr', 'approved')"
                        decoration-success="state == 'applied'"/>
             </list>
         </field>
@@ -86,11 +122,13 @@
                 <field name="to_department_id"/>
                 <filter string="Waiting for Me" name="filter_mine" domain="[('x_is_pending_my_action', '=', True)]"/>
                 <separator/>
-                <filter string="In Progress" name="filter_open" domain="[('state', 'in', ('draft', 'hr', 'gm', 'approved'))]"/>
+                <filter string="In Progress" name="filter_open" domain="[('state', 'in', ('hr', 'approved'))]"/>
                 <filter string="With HR" name="filter_hr" domain="[('state', '=', 'hr')]"/>
-                <filter string="With the GM" name="filter_gm" domain="[('state', '=', 'gm')]"/>
+                <filter string="Waiting for Date or Vehicles" name="filter_approved" domain="[('state', '=', 'approved')]"/>
+                <filter string="Applied" name="filter_applied" domain="[('state', '=', 'applied')]"/>
                 <group>
                     <filter string="Status" name="groupby_state" context="{'group_by': 'state'}"/>
+                    <filter string="Employee" name="groupby_employee" context="{'group_by': 'employee_id'}"/>
                     <filter string="To Department" name="groupby_to" context="{'group_by': 'to_department_id'}"/>
                 </group>
             </search>
@@ -102,10 +140,10 @@
         <field name="res_model">ksw.employee.transfer</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_ksw_employee_transfer_search"/>
-        <field name="context">{'search_default_filter_open': 1}</field>
+        <field name="context">{'search_default_filter_open': 1, 'create': False}</field>
         <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">Move an employee to another department</p>
-            <p>HR checks it, the GM approves it, and it takes effect on its date.</p>
+            <p class="o_view_nocontent_smiling_face">No transfers yet</p>
+            <p>A transfer starts when the GM gives a released employee to another department's request. HR completes it and it takes effect on its date.</p>
         </field>
     </record>
 
@@ -115,19 +153,13 @@
         <field name="arch" type="xml">
             <form>
                 <field name="transfer_id" invisible="1"/>
-                <field name="reason" placeholder="Why the transfer is refused..."/>
+                <field name="reason" placeholder="Why HR cannot carry it out..."/>
                 <footer>
-                    <button name="action_confirm" type="object" string="Refuse" class="btn-primary"/>
+                    <button name="action_confirm" type="object" string="Return to the GM" class="btn-primary"/>
                     <button string="Discard" special="cancel" class="btn-secondary"/>
                 </footer>
             </form>
         </field>
     </record>
 
-    <menuitem id="menu_employee_transfer_root" name="Employee Transfers" sequence="87"
-              web_icon="KSW_employee_transfer,static/description/icon.png"
-              action="action_ksw_employee_transfer"
-              groups="group_transfer_requester,group_transfer_gm,base.group_system"/>
-    <menuitem id="menu_employee_transfer_all" name="Transfers" parent="menu_employee_transfer_root"
-              action="action_ksw_employee_transfer" sequence="10"/>
 </odoo>

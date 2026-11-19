@@ -11,4 +11,32 @@
             </xpath>
         </field>
     </record>
+
+    <!-- The release says what happens to each vehicle of a leaving driver. -->
+    <record id="view_ksw_employee_request_form_vehicles" model="ir.ui.view">
+        <field name="name">ksw.employee.request.form.vehicles</field>
+        <field name="model">ksw.employee.request</field>
+        <field name="inherit_id" ref="KSW_employee_transfer.view_ksw_employee_request_form"/>
+        <field name="arch" type="xml">
+            <page name="release" position="after">
+                <page string="Vehicles in Their Custody" name="vehicles"
+                      invisible="request_type != 'release' or not x_vehicle_ids">
+                    <field name="x_vehicle_ids" readonly="state != 'draft'">
+                        <list editable="bottom" create="0" delete="0">
+                            <field name="employee_id" readonly="1"/>
+                            <field name="vehicle_id" readonly="1"/>
+                            <field name="vehicle_department_id" column_invisible="True"/>
+                            <field name="disposition" required="1"/>
+                            <field name="new_driver_id" options="{'no_create': True}"
+                                   domain="[('department_id', 'child_of', vehicle_department_id)]"
+                                   invisible="disposition != 'driver_change'"
+                                   required="disposition == 'driver_change'"/>
+                            <field name="custody_request_id" readonly="1" optional="show"/>
+                            <field name="fleet_request_id" readonly="1" optional="show"/>
+                        </list>
+                    </field>
+                </page>
+            </page>
+        </field>
+    </record>
 </odoo>

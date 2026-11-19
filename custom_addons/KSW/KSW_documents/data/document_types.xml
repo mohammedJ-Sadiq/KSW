@@ -69,6 +69,13 @@
             <field name="applies_to">company</field><field name="required_for">none</field>
             <field name="ai_hint">ترخيص النقل، License Info on a Naql operation card</field>
         </record>
+        <record id="type_employment_contract" model="ksw.document.type">
+            <field name="name">Employment Contract (Qiwa)</field>
+            <field name="code">employment_contract</field><field name="sequence">18</field>
+            <field name="applies_to">employee</field><field name="required_for">none</field>
+            <field name="has_expiry" eval="False"/>
+            <field name="ai_hint">عقد عمل موثق في منصة قوى</field>
+        </record>
         <record id="type_commercial_registration" model="ksw.document.type">
             <field name="name">Commercial Registration</field>
             <field name="code">commercial_registration</field><field name="sequence">19</field>

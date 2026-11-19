@@ -46,6 +46,7 @@ class TestAbsherImport(TransactionCase):
     def test_hijri_and_fleet_keys(self):
         self.assertEqual(parse_date('1448-06-06'), date(2026, 11, 16))
         self.assertIsNone(parse_date('-'))
+        self.assertEqual(parse_date('2023-01-01 00:00:00'), date(2023, 1, 1))  # Excel date-time
         self.assertEqual(fleet_key('T099'), fleet_key('T99'))
         self.assertEqual(fleet_key('س 43'), fleet_key('43 س'))
         self.assertIsNone(fleet_key('محمد سهيل'))
@@ -212,3 +213,61 @@ class TestMuqeemGosiImport(TransactionCase):
         imp.action_apply()
         self.assertEqual(self.saudi.x_registration_id, self.hayah)
         self.assertNotIn('4000', str(imp.line_ids.read()))
+
+
+QIWA_HEADER = ('م\tالرقم الوظيفي\tاسم المنشأة\tرقم اشتراك المنشأة\tرقم الكفيل\tاسم المشترك\t'
+               'رقم الهوية / الإقامة\tرقم العقد\tتاريخ إنشاء العقد\tمدة العقد\tحالة العقد\tالجنسية\tالجنس\t'
+               'تاريخ الميلاد\tصلاحية الإقامة\tصلاحية الجواز\tالمهنة\tتاريخ الالتحاق (البسيط)\t'
+               'تاريخ الالتحاق (التأمينات)\tالأجر الأساسي\tالسكن\tالعمولات\tالبدلات الأخرى\tإجمالي الأجر\t'
+               'الأجر الخاضع للاشتراك')
+
+
+@tagged('post_install', '-at_install')
+class TestQiwaImport(TransactionCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.officer = cls.env['res.users'].with_context(no_reset_password=True).create({
+            'name': 'QW Officer', 'login': 'qw_officer', 'group_ids': [(6, 0, [
+                cls.env.ref('KSW_documents.group_document_officer').id, cls.env.ref('hr.group_hr_user').id])]})
+        cls.main = cls.env['ksw.company.registration'].create(
+            {'name': 'QW Main', 'kind': 'main', 'unified_number': '7999997700'})
+        Employee = cls.env['hr.employee']
+        cls.driver = Employee.create({'name': 'QW Driver', 'ssnid': '2999997701'})
+        cls.saudi = Employee.create({'name': 'QW Saudi', 'ssnid': '1999997702'})
+
+    def _import(self, *rows):
+        imp = self.env['ksw.document.import'].with_user(self.officer).create({
+            'source': 'qiwa_contracts', 'file_name': 'qiwa.csv',
+            'file': base64.b64encode('\n'.join((QIWA_HEADER,) + rows).encode())})
+        imp.action_preview()
+        return imp
+
+    def test_contract_registration_and_employee_no(self):
+        has_no = 'x_employee_no' in self.driver._fields
+        imp = self._import(
+            '1\t99771\tQW Main\t599997700\t7999997700\tQW DRIVER\t2999997701\t99997701\t2025-08-21\t\t'
+            'ساري\tباكستان\tذكر\t1990-01-01\t2027-01-01\t2030-01-01\tسائق شاحنة ثقيلة\t2023-01-01\t'
+            '2023-02-01\t1500\t0\t0\t0\t1500\t1500',
+            # A Saudi: no sponsor no.; the establishment is found by its GOSI no.
+            '2\t99772\tQW Main\t599997700\t\tQW SAUDI\t1999997702\t99997702\t2025-08-21\t\t'
+            'ساري (غير موثق)\tالسعودية\tانثى\t1995-05-05\t\t\tكاتب\t2024-01-01\t2024-01-01\t4000\t0\t0\t0\t'
+            '4000\t4000')
+        self.assertEqual(self.main.gosi_number, '599997700')  # learnt from the first row
+        rows = imp.line_ids.filtered(lambda l: l.kind == 'row')
+        saudi = rows.filtered(lambda l: l.id_number == '1999997702')
+        self.assertEqual(saudi.line_registration_id, self.main)
+        self.assertIn('غير موثق', saudi.warnings)
+        imp.action_apply()
+        self.assertEqual((self.driver.x_registration_id, self.saudi.x_registration_id), (self.main, self.main))
+        self.assertEqual(self.driver.x_official_occupation, 'سائق شاحنة ثقيلة')
+        self.assertEqual(self.saudi.sex, 'female')
+        if has_no:
+            self.assertEqual(self.driver.x_employee_no, '99771')
+        contract = self.env['ksw.document'].search([('employee_id', '=', self.driver.id),
+                                                    ('type_id.code', '=', 'employment_contract')])
+        self.assertEqual((contract.number, str(contract.issue_date), contract.source),
+                         ('99997701', '2025-08-21', 'qiwa'))
+        # Wages are never read or stored.
+        self.assertNotIn('1500', str(imp.line_ids.read()))

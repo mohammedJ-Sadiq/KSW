@@ -112,7 +112,86 @@ class TestFleetPackage(TransactionCase):
         self.assertTrue(self.gm.has_group('KSW_employee_transfer.group_transfer_gm'))
         self.assertTrue(self.hr.has_group('KSW_employee_transfer.group_transfer_hr'))
         self.assertTrue(self.user_a.has_group('KSW_employee_transfer.group_transfer_requester'))
-        transfer = self.env['ksw.employee.transfer'].with_user(self.user_a).create({
-            'employee_id': self.env['hr.employee'].create({'name': 'PK Clerk', 'department_id': self.dept_a.id}).id,
-            'to_department_id': self.dept_b.id, 'reason': 'Needed there'})
-        self.assertEqual(transfer.from_department_id, self.dept_a)
+        # A fleet user releases his department's people (no direct transfer).
+        clerk = self.env['hr.employee'].create({'name': 'PK Clerk', 'department_id': self.dept_a.id})
+        request = self.env['ksw.employee.request'].with_user(self.user_a).create({
+            'request_type': 'release', 'department_id': self.dept_a.id, 'reason': 'Needed elsewhere',
+            'release_line_ids': [(0, 0, {'employee_id': clerk.id})]})
+        request.action_submit()
+        self.assertEqual(request.state, 'submitted')
+
+    # ------------------------------------------------------------------
+    # An employee released while he answers for vehicles: his department
+    # says what happens to each, and it happens only when he actually leaves.
+
+    def _release_employee(self, disposition=None, new_driver=None, submit=True):
+        request = self.env['ksw.employee.request'].with_user(self.user_a).create({
+            'request_type': 'release', 'department_id': self.dept_a.id, 'reason': 'Route closed',
+            'release_line_ids': [(0, 0, {'employee_id': self.driver_1.id})]})
+        row = request.x_vehicle_ids
+        if disposition:
+            row.with_user(self.user_a).write({'disposition': disposition,
+                                              'new_driver_id': new_driver and new_driver.id})
+        if submit:
+            request.action_submit()
+        return request
+
+    def _ask_employee(self):
+        request = self.env['ksw.employee.request'].with_user(self.user_b).create({
+            'request_type': 'addition', 'department_id': self.dept_b.id, 'reason': 'New route',
+            'addition_line_ids': [(0, 0, {'job_id': self.env['hr.job'].create({'name': 'PK Job'}).id})]})
+        request.action_submit()
+        return request.addition_line_ids
+
+    def _gm(self, request, decision, **vals):
+        self.env['ksw.employee.release.decision.wizard'].with_user(self.gm).create(dict({
+            'release_line_ids': [(6, 0, request.release_line_ids.ids)], 'decision': decision,
+            'note': 'GM'}, **vals)).action_confirm()
+
+    def test_each_vehicle_needs_a_plan(self):
+        request = self._release_employee(submit=False)
+        self.assertEqual(request.x_vehicle_ids.vehicle_id, self.truck_1)
+        with self.assertRaises(UserError):
+            request.action_submit()
+        request.x_vehicle_ids.with_user(self.user_a).disposition = 'driver_change'
+        with self.assertRaises(UserError):
+            request.action_submit()  # no new driver
+        outsider = self.env['hr.employee'].create({'name': 'PK Bravo Man', 'department_id': self.dept_b.id})
+        request.x_vehicle_ids.with_user(self.user_a).new_driver_id = outsider
+        with self.assertRaises(UserError):
+            request.action_submit()  # driver change stays in the vehicle's department
+        request.x_vehicle_ids.with_user(self.user_a).new_driver_id = self.driver_2
+        request.action_submit()
+        self.assertEqual(request.state, 'submitted')
+
+    def test_driver_change_when_he_leaves_and_move_waits_for_it(self):
+        request = self._release_employee('driver_change', self.driver_2)
+        self.assertFalse(request.x_vehicle_ids.custody_request_id)  # nothing before the GM
+        self._gm(request, 'transfer', addition_line_id=self._ask_employee().id)
+        form = request.x_vehicle_ids.custody_request_id
+        self.assertEqual((form.kind, form.state, form.new_employee_id), ('driver_change', 'workshop', self.driver_2))
+        transfer = request.release_line_ids.sudo().transfer_id
+        transfer.with_user(self.hr).write({'to_manager_id': self.user_b.employee_id.id,
+                                           'to_leave_manager_id': self.user_b.id,
+                                           'to_hr_responsible_id': self.hr.id})
+        transfer.with_user(self.hr).action_hr_approve()
+        self.assertEqual(transfer.state, 'approved')  # still answers for PK-1
+        self.assertEqual(self.driver_1.department_id, self.dept_a)
+        # The driver change completes: the move goes through at once.
+        self.truck_1._ksw_set_custodian(self.driver_2)
+        self.assertEqual(transfer.state, 'applied')
+        self.assertEqual(self.driver_1.department_id, self.dept_b)
+
+    def test_release_to_workshop_on_end_of_service(self):
+        request = self._release_employee('holding')
+        self._gm(request, 'terminate')
+        fleet_request = request.x_vehicle_ids.fleet_request_id
+        self.assertEqual((fleet_request.request_type, fleet_request.state), ('release', 'submitted'))
+        self.assertEqual(fleet_request.release_line_ids.vehicle_id, self.truck_1)
+        self.assertEqual(fleet_request.department_id, self.dept_a)
+
+    def test_kept_employee_keeps_his_vehicle(self):
+        request = self._release_employee('holding')
+        self._gm(request, 'keep')
+        self.assertFalse(request.x_vehicle_ids.fleet_request_id)
+        self.assertEqual(self.truck_1.x_custodian_id, self.driver_1)

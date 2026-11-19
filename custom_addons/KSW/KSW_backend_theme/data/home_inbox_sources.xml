@@ -106,6 +106,13 @@
         <field name="domain">[('x_is_pending_my_action', '=', True)]</field>
         <field name="icon">fa-users</field>
     </record>
+    <record id="inbox_employee_requests" model="ksw.home.inbox.source">
+        <field name="name">Employee releases and requests awaiting me</field>
+        <field name="sequence">72</field>
+        <field name="model_name">ksw.employee.request</field>
+        <field name="domain">[('x_is_pending_my_action', '=', True)]</field>
+        <field name="icon">fa-exchange</field>
+    </record>
     <!-- Documents register (Nov 2026): HR's documents to confirm or renew,
          and the vehicles and employees still missing some. -->
     <record id="inbox_documents" model="ksw.home.inbox.source">

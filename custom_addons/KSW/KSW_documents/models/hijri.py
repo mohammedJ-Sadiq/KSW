@@ -5,7 +5,7 @@ Gregorian first day of every Hijri month 1400-1482 AH, generated once from
 ICU's Umm al-Qura data (Node.js Intl, calendar islamic-umalqura); no
 library is needed at runtime."""
 import re
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 _MONTH_START = {
     (1400,1):"1979-11-21",
@@ -1017,11 +1017,16 @@ def parse_date(text):
     """A date as an export prints it: Hijri ("1450-01-01", "1450/1/1") or
     Gregorian (year 1900+); "-", empty or "لا يوجد" means none."""
     text = (text or '').strip().translate(str.maketrans('٠١٢٣٤٥٦٧٨٩', '0123456789')) if isinstance(text, str) else text
+    if isinstance(text, datetime):
+        return text.date()
     if isinstance(text, date):
         return text
     if not text or text in ('-', 'لا يوجد'):
         return None
     parts = re.findall(r'\d+', text)
+    # Excel date-times come as "2023-01-01 00:00:00": the time is dropped.
+    if len(parts) > 3 and len(parts[0]) == 4:
+        parts = parts[:3]
     if len(parts) != 3:
         raise ValueError('Not a date: %s' % text)
     if len(parts[0]) != 4:  # DD/MM/YYYY

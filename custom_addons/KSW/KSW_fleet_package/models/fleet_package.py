@@ -72,3 +72,8 @@ class ResUsers(models.Model):
         """A department's vehicle users may also ask to move its people."""
         ids = set(super()._ksw_transfer_department_ids())
         return list(ids | set(self._ksw_fleet_department_ids()))
+
+    def _ksw_transfer_home_department_ids(self):
+        """The departments named on him in Vehicle Allocation count too."""
+        ids = set(super()._ksw_transfer_home_department_ids())
+        return list(ids | set(self.sudo().x_fleet_department_ids.ids))

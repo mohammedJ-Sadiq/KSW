@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_employee_form_transfers" model="ir.ui.view">
+        <field name="name">hr.employee.form.ksw.transfers</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button" type="object" name="action_view_transfers"
+                        icon="fa-exchange" groups="KSW_employee_transfer.group_transfer_hr">
+                    <field name="x_transfer_count" widget="statinfo" string="Transfers"/>
+                </button>
+            </div>
+        </field>
+    </record>
+</odoo>

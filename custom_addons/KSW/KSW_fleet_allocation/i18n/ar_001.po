@@ -1391,11 +1391,6 @@ msgid "Own Fleet"
 msgstr "أسطول الشركة"
 
 #. module: KSW_fleet_allocation
-#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_release_line__plate_number
-msgid "Plate Number"
-msgstr "رقم اللوحة"
-
-#. module: KSW_fleet_allocation
 #. odoo-python
 #: code:addons/KSW_fleet_allocation/models/ksw_fleet_move.py:0
 msgid "Pool"
@@ -2256,3 +2251,53 @@ msgstr "مع سائقها"
 #: code:addons/KSW_fleet_allocation/models/ksw_fleet_request.py:0
 msgid "without a driver"
 msgstr "بدون سائق"
+
+#. module: KSW_fleet_allocation
+#. odoo-python
+#: code:addons/KSW_fleet_allocation/models/ksw_fleet_vehicle.py:0
+msgid "%s is not in one of your departments."
+msgstr "%s ليست ضمن أقسامك."
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_vehicle_form_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_vehicle_list_allocation
+msgid "Back in Service"
+msgstr "إعادة للعمل"
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_vehicle_form_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_vehicle_list_allocation
+msgid "Mark Stopped"
+msgstr "تسجيل كمتوقفة"
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_vehicle_form_allocation
+msgid ""
+"Mark this vehicle as stopped (not working)? It stays in its department."
+msgstr "تسجيل هذه المركبة كمتوقفة (لا تعمل)؟ تبقى تابعة لقسمها."
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_release_line__plate_number
+msgid "Plate (Arabic)"
+msgstr "رقم اللوحة (عربي)"
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_vehicle__x_is_stopped
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_vehicle_search_allocation
+msgid "Stopped"
+msgstr "متوقفة"
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_vehicle__x_stopped_since
+msgid "Stopped Since"
+msgstr "متوقفة منذ"
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_vehicle__x_stopped_reason
+msgid "Why Stopped"
+msgstr "سبب التوقف"
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_vehicle_search_allocation
+msgid "Working"
+msgstr "تعمل"

@@ -69,7 +69,7 @@ class KswDocument(models.Model):
                                            'this document is for.')
     detected_parent_number = fields.Char(string='Main CR No. (as read)')
     source = fields.Selection([('upload', 'Scan'), ('absher', 'Absher Business'), ('muqeem', 'Muqeem'),
-                               ('naql', 'Naql')], default='upload', required=True, readonly=True,
+                               ('naql', 'Naql'), ('qiwa', 'Qiwa')], default='upload', required=True, readonly=True,
                               string='Source')
     verified_date = fields.Date(readonly=True, help='The day a government export last showed this document as '
                                                     'valid. Used when the export gives a status but no date.')
@@ -264,7 +264,7 @@ class KswDocument(models.Model):
 
     @api.model
     def _record_from_source(self, doc_type, owner, source, import_rec=False, number=False, expiry=False,
-                            verified=False, note=False):
+                            verified=False, note=False, issue_date=False):
         """What a government export says about one document of one owner.
         Returns 'new', 'renewed', 'same' or 'older'. The export is the
         authority, so no scan and no HR confirmation are needed; it never
@@ -284,7 +284,7 @@ class KswDocument(models.Model):
         doc = Document.create({
             'type_id': doc_type.id, 'applies_to': doc_type.applies_to, field: owner.id, 'number': number,
             'expiry_date': expiry, 'source': source, 'import_id': import_rec and import_rec.id,
-            'verified_date': today if verified else False, 'ai_notes': note,
+            'verified_date': today if verified else False, 'ai_notes': note, 'issue_date': issue_date,
         })
         current.write({'state': 'replaced'})
         doc.write({'state': 'confirmed', 'confirmed_by_id': self.env.user.id,

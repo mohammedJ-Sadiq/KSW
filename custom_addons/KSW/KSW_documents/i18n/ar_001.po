@@ -2004,19 +2004,6 @@ msgid "Birth Date (as exported)"
 msgstr "تاريخ الميلاد (كما في الملف)"
 
 #. module: KSW_documents
-#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
-msgid ""
-"Download the export from the portal (<b>Absher Business ▸ Vehicles</b>,\n"
-"                        <b>Muqeem ▸ Active residents</b>, or a <b>GOSI</b> establishment's active subscribers)\n"
-"                        and attach the file here as it is (.xlsx or .csv), then press <b>Preview</b>. Nothing is\n"
-"                        written until you press <b>Apply</b>. GOSI wage columns are never read."
-msgstr ""
-"نزّل الملف من البوابة (<b>أبشر أعمال ▸ المركبات</b>، أو <b>مقيم ▸ المقيمون "
-"النشطون</b>، أو قائمة المشتركين النشطين لمنشأة في <b>التأمينات</b>) وأرفقه "
-"هنا كما هو (.xlsx أو .csv)، ثم اضغط <b>معاينة</b>. لن يتم حفظ أي شيء حتى "
-"تضغط <b>تطبيق</b>. أعمدة الأجور في ملف التأمينات لا تُقرأ إطلاقاً."
-
-#. module: KSW_documents
 #. odoo-python
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Employee details filled"
@@ -2158,3 +2145,149 @@ msgstr "هذا ليس ملف %(s)s: لا يوجد عمود «%(c)s»."
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Plate digits"
 msgstr "أرقام اللوحة"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid ""
+"Active in Odoo but no active contract in Qiwa: left, or contract not yet "
+"registered?"
+msgstr ""
+"نشط في النظام دون عقد ساري في قوى: هل ترك العمل، أم لم يُسجل عقده بعد؟"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Archived in Odoo, but still in this export."
+msgstr "مؤرشف في النظام، لكنه ما زال في هذا الملف."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__contract_date
+msgid "Contract Date"
+msgstr "تاريخ العقد"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__contract_date_text
+msgid "Contract Date (as exported)"
+msgstr "تاريخ العقد (كما في الملف)"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__contract_status
+msgid "Contract Status"
+msgstr "حالة العقد"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid ""
+"Download the export from the portal (<b>Absher Business ▸ Vehicles</b>,\n"
+"                        <b>Muqeem ▸ Active residents</b>, <b>Qiwa ▸ Active contracts</b>, or a <b>GOSI</b>\n"
+"                        establishment's active subscribers)\n"
+"                        and attach the file here as it is (.xlsx or .csv), then press <b>Preview</b>. Nothing is\n"
+"                        written until you press <b>Apply</b>. Wage columns are never read."
+msgstr ""
+"نزّل الملف من البوابة (<b>أبشر أعمال ▸ المركبات</b>، أو <b>مقيم ▸ المقيمون "
+"النشطون</b>، أو <b>قوى ▸ العقود السارية</b>، أو قائمة المشتركين النشطين "
+"لمنشأة في <b>التأمينات</b>) وأرفقه هنا كما هو (.xlsx أو .csv)، ثم اضغط "
+"<b>معاينة</b>. لن يتم حفظ أي شيء حتى تضغط <b>تطبيق</b>. أعمدة الأجور لا "
+"تُقرأ إطلاقاً."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Employee No."
+msgstr "الرقم الوظيفي"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Employee No. %(n)s is also on %(e)s in Odoo."
+msgstr "الرقم الوظيفي %(n)s مسجل أيضاً على %(e)s في النظام."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__employee_number
+msgid "Employee No. (Qiwa)"
+msgstr "الرقم الوظيفي (قوى)"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Employee No. in Odoo %(o)s, in Qiwa %(q)s."
+msgstr "الرقم الوظيفي في النظام %(o)s وفي قوى %(q)s."
+
+#. module: KSW_documents
+#: model:ksw.document.type,name:KSW_documents.type_employment_contract
+msgid "Employment Contract (Qiwa)"
+msgstr "عقد العمل (قوى)"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__establishment
+msgid "Establishment"
+msgstr "المنشأة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_company_registration__gosi_number
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__gosi_number
+msgid "GOSI Subscription No."
+msgstr "رقم اشتراك المنشأة في التأمينات"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__gender
+msgid "Gender"
+msgstr "الجنس"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__join_date
+msgid "Joining Date (Qiwa)"
+msgstr "تاريخ الالتحاق (قوى)"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__join_date_text
+msgid "Joining Date (as exported)"
+msgstr "تاريخ الالتحاق (كما في الملف)"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid ""
+"Joining date in Odoo %(o)s, in Qiwa %(q)s: annual leave and end of service "
+"use the Odoo one. Not changed."
+msgstr ""
+"تاريخ الالتحاق في النظام %(o)s وفي قوى %(q)s: الإجازة السنوية ومكافأة نهاية "
+"الخدمة تُحسب من تاريخ النظام. لم يتم التعديل."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_hr_employee__x_official_occupation
+msgid "Official Occupation (Iqama / Qiwa)"
+msgstr "المهنة الرسمية (الإقامة / قوى)"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__source__qiwa
+msgid "Qiwa"
+msgstr "قوى"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__contract_number
+msgid "Qiwa Contract No."
+msgstr "رقم العقد في قوى"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Qiwa contract: %s"
+msgstr "عقد قوى: %s"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Qiwa: %s"
+msgstr "قوى: %s"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import__source__qiwa_contracts
+msgid "Qiwa: Active Contracts"
+msgstr "قوى: العقود السارية"
+
+#. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_company_registration__gosi_number
+msgid "رقم اشتراك المنشأة: how GOSI and Qiwa name the establishment."
+msgstr "رقم اشتراك المنشأة: الرقم الذي تُعرّف به التأمينات وقوى المنشأة."

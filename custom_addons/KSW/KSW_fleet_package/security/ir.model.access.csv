@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ksw_employee_release_vehicle_requester,ksw.employee.release.vehicle.requester,model_ksw_employee_release_vehicle,KSW_employee_transfer.group_transfer_requester,1,1,0,0
+access_ksw_employee_release_vehicle_gm,ksw.employee.release.vehicle.gm,model_ksw_employee_release_vehicle,KSW_employee_transfer.group_transfer_gm,1,0,0,0
+access_ksw_employee_release_vehicle_system,ksw.employee.release.vehicle.system,model_ksw_employee_release_vehicle,base.group_system,1,1,1,1

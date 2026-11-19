@@ -33,6 +33,8 @@ class KswCompanyRegistration(models.Model):
     cr_number = fields.Char(string='CR No.', index=True, help='رقم السجل التجاري')
     parent_id = fields.Many2one('ksw.company.registration', string='Main CR', index=True,
                                 domain="[('company_id', '=', company_id), ('kind', '=', 'main')]")
+    gosi_number = fields.Char(string='GOSI Subscription No.', index=True,
+                              help='رقم اشتراك المنشأة: how GOSI and Qiwa name the establishment.')
     city = fields.Char()
     issue_date = fields.Date()
     active = fields.Boolean(default=True)
@@ -67,7 +69,7 @@ class KswCompanyRegistration(models.Model):
         if not keys:
             return self.browse()
         found = self.sudo().with_context(active_test=False).search(
-            ['|', ('unified_number', 'in', keys), ('cr_number', 'in', keys)])
+            ['|', '|', ('unified_number', 'in', keys), ('cr_number', 'in', keys), ('gosi_number', 'in', keys)])
         return found if len(found) == 1 else self.browse()
 
 
@@ -85,3 +87,6 @@ class HrEmployee(models.Model):
     # GOSI. HR-only like every KSW employee field (gotcha #32).
     x_registration_id = fields.Many2one('ksw.company.registration', string='Registered Under (CR)',
                                         groups='hr.group_hr_user', tracking=True)
+    # The profession on the iqama / in Qiwa (not the job title): what the
+    # employee may legally do, e.g. «سائق شاحنة ثقيلة».
+    x_official_occupation = fields.Char(string='Official Occupation (Iqama / Qiwa)', groups='hr.group_hr_user')

@@ -1,6 +1,6 @@
 {
     'name': 'KSW Documents',
-    'version': '19.0.1.4.0',
+    'version': '19.0.1.5.0',
     'summary': 'Vehicle and employee documents with expiry: istimara, insurance, inspection, licences, iqama; read from an upload by AI',
     'description': """
 Documents Register

@@ -90,6 +90,7 @@
                     </div>
                     <group>
                         <field name="x_registration_id" options="{'no_create': True}"/>
+                        <field name="x_official_occupation"/>
                     </group>
                     <button name="action_upload_documents" type="object" string="Upload Documents"
                             icon="fa-upload" class="btn-secondary mb-2"/>

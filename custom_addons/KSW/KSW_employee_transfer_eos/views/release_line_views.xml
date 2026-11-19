@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ksw_employee_request_form_eos" model="ir.ui.view">
+        <field name="name">ksw.employee.request.form.eos</field>
+        <field name="model">ksw.employee.request</field>
+        <field name="inherit_id" ref="KSW_employee_transfer.view_ksw_employee_request_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='release_line_ids']/list/field[@name='transfer_id']" position="after">
+                <field name="x_eos_progress" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

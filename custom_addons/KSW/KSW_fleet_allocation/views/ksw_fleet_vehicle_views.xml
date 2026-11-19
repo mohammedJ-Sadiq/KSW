@@ -20,6 +20,16 @@
                                readonly="x_allocation_state == 'in_transfer'"
                                groups="base.group_system"/>
                         <field name="x_department_id" readonly="1" groups="!base.group_system"/>
+                        <field name="x_is_stopped" widget="boolean_toggle" readonly="1"/>
+                        <field name="x_stopped_since" invisible="not x_is_stopped"/>
+                        <field name="x_stopped_reason" invisible="not x_is_stopped"/>
+                        <div colspan="2">
+                            <button name="action_mark_stopped" type="object" string="Mark Stopped" icon="fa-pause"
+                                    class="btn-secondary" invisible="x_is_stopped or not x_department_id"
+                                    confirm="Mark this vehicle as stopped (not working)? It stays in its department."/>
+                            <button name="action_back_in_service" type="object" string="Back in Service"
+                                    icon="fa-play" class="btn-secondary" invisible="not x_is_stopped"/>
+                        </div>
                         <field name="x_allocation_state" widget="badge"
                                decoration-info="x_allocation_state == 'in_transfer'"
                                decoration-warning="x_allocation_state == 'holding'"
@@ -61,6 +71,8 @@
                 <header>
                     <button name="action_ksw_fleet_release_selected" type="object" string="Release Selected"
                             class="btn-primary"/>
+                    <button name="action_mark_stopped" type="object" string="Mark Stopped"/>
+                    <button name="action_back_in_service" type="object" string="Back in Service"/>
                 </header>
                 <field name="name"/>
                 <field name="vehicle_type"/>
@@ -74,6 +86,8 @@
                        decoration-info="x_allocation_state == 'in_transfer'"
                        decoration-warning="x_allocation_state == 'holding'"
                        decoration-success="x_allocation_state == 'assigned'"/>
+                <field name="x_is_stopped" optional="show" widget="boolean_toggle" readonly="1"/>
+                <field name="x_stopped_since" optional="hide"/>
                 <field name="x_release_request_id" optional="show"/>
                 <field name="x_checkup_label" optional="show"/>
                 <field name="x_checkup_open" column_invisible="True"/>
@@ -95,6 +109,9 @@
                 <filter string="Unassigned" name="filter_unassigned" domain="[('x_allocation_state', '=', 'unassigned')]"/>
                 <filter string="In Transfer" name="filter_in_transfer" domain="[('x_allocation_state', '=', 'in_transfer')]"/>
                 <filter string="Holding" name="filter_holding" domain="[('x_allocation_state', '=', 'holding')]"/>
+                <filter string="Stopped" name="filter_stopped" domain="[('x_is_stopped', '=', True)]"/>
+                <filter string="Working" name="filter_working"
+                        domain="[('x_is_stopped', '=', False), ('x_allocation_state', '=', 'assigned')]"/>
                 <filter string="Released, Waiting for GM" name="filter_released" domain="[('x_is_released', '=', True)]"/>
             </filter>
             <filter name="groupby_client" position="before">

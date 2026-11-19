@@ -14,4 +14,18 @@
         <value eval="[ref('KSW_fleet_allocation.group_fleet_allocation_user')]"/>
         <value eval="{'implied_ids': [(4, ref('KSW_employee_transfer.group_transfer_requester'))]}"/>
     </function>
+
+    <record id="rule_employee_release_vehicle_requester" model="ir.rule">
+        <field name="name">Vehicle of a released employee: own departments</field>
+        <field name="model_id" ref="model_ksw_employee_release_vehicle"/>
+        <field name="domain_force">['|', ('request_id.requested_by_id', '=', user.id),
+            ('request_id.department_id', 'in', user._ksw_transfer_department_ids())]</field>
+        <field name="groups" eval="[(4, ref('KSW_employee_transfer.group_transfer_requester'))]"/>
+    </record>
+    <record id="rule_employee_release_vehicle_all" model="ir.rule">
+        <field name="name">Vehicle of a released employee: HR, GM and administrator see all</field>
+        <field name="model_id" ref="model_ksw_employee_release_vehicle"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('KSW_employee_transfer.group_transfer_hr')), (4, ref('KSW_employee_transfer.group_transfer_gm')), (4, ref('base.group_system'))]"/>
+    </record>
 </odoo>

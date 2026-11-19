@@ -36,6 +36,16 @@ class TestFleetAllocation(TransactionCase):
         cls.trailer_b = Vehicle.create({'name': 'FA-T1', 'vehicle_type': 'trailer', 'x_department_id': cls.dept_b.id})
 
     # helpers ----------------------------------------------------------
+    def test_stopped_stays_in_its_department(self):
+        # «متوقفة»: parked, still its department's; not the GM's holding pool.
+        self.isuzu_a1.with_user(self.user_a).action_mark_stopped()
+        self.assertTrue(self.isuzu_a1.x_is_stopped)
+        self.assertEqual((self.isuzu_a1.x_department_id, self.isuzu_a1.x_allocation_state), (self.dept_a, 'assigned'))
+        with self.assertRaises(UserError):
+            self.isuzu_a2.with_user(self.user_b).action_mark_stopped()   # not B's vehicle
+        self.isuzu_a1.with_user(self.gm).action_back_in_service()
+        self.assertFalse(self.isuzu_a1.x_is_stopped)
+
     def _release(self, user, department, vehicles):
         request = self.env['ksw.fleet.request'].with_user(user).create({
             'request_type': 'release', 'department_id': department.id, 'reason': 'Not needed',

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-14 10:59+0000\n"
-"PO-Revision-Date: 2026-11-14 10:59+0000\n"
+"POT-Creation-Date: 2026-11-19 05:41+0000\n"
+"PO-Revision-Date: 2026-11-19 05:41+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar_001\n"
@@ -18,6 +18,37 @@ msgstr ""
 
 #. module: KSW_fleet_package
 #. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid ""
+"%(d)s is not in %(dep)s: a driver change stays in the vehicle's department."
+msgstr "الموظف %(d)s ليس في %(dep)s: تغيير السائق يبقى داخل قسم المركبة."
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "%(e)s answers for %(v)s: say what happens to it if he leaves."
+msgstr "%(e)s صاحب عهدة %(v)s: حدّد ما يحدث لها إذا غادر."
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "%(e)s released (%(r)s)"
+msgstr "تم الاستغناء عن %(e)s (%(r)s)"
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "%(v)s: driver change to %(d)s (%(f)s)"
+msgstr "%(v)s: تغيير السائق إلى %(d)s (%(f)s)"
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "%(v)s: released to the workshop (%(f)s)"
+msgstr "%(v)s: استغناء إلى الورشة (%(f)s)"
+
+#. module: KSW_fleet_package
+#. odoo-python
 #: code:addons/KSW_fleet_package/models/fleet_package.py:0
 msgid ""
 "%s has no custodian to move with it. Release it without its driver, or have "
@@ -25,6 +56,12 @@ msgid ""
 msgstr ""
 "لا يوجد صاحب عهدة لـ %s لينتقل معها. استغنِ عنها بدون سائقها، أو اطلب من "
 "الموارد البشرية تسجيل صاحب عهدتها أولاً."
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "%s released"
+msgstr "تم الاستغناء عن %s"
 
 #. module: KSW_fleet_package
 #. odoo-python
@@ -39,6 +76,30 @@ msgstr ""
 "المالية (الحسابات)."
 
 #. module: KSW_fleet_package
+#: model:ir.model.fields.selection,name:KSW_fleet_package.selection__ksw_employee_release_vehicle__disposition__driver_change
+msgid "Another Driver in Our Department"
+msgstr "سائق آخر في قسمنا"
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "Choose the new driver of %s."
+msgstr "اختر السائق الجديد لـ %s."
+
+#. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__create_uid
+msgid "Created by"
+msgstr "أنشئ بواسطة"
+
+#. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__create_date
+msgid "Created on"
+msgstr "أنشئ في"
+
+#. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_line__display_name
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__display_name
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_request__display_name
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_fleet_release_line__display_name
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_fleet_request__display_name
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_res_users__display_name
@@ -46,9 +107,24 @@ msgid "Display Name"
 msgstr "اسم العرض"
 
 #. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__custody_request_id
+msgid "Driver Change"
+msgstr "تغيير السائق"
+
+#. module: KSW_fleet_package
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_fleet_release_line__x_driver_id
 msgid "Driver Going With It"
 msgstr "السائق المنتقل معها"
+
+#. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__employee_id
+msgid "Employee"
+msgstr "الموظف"
+
+#. module: KSW_fleet_package
+#: model:ir.model,name:KSW_fleet_package.model_ksw_employee_request
+msgid "Employee Release / Request"
+msgstr "استغناء عن موظفين / طلب موظفين"
 
 #. module: KSW_fleet_package
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_fleet_release_line__x_employee_transfer_id
@@ -56,11 +132,29 @@ msgid "Employee Transfer"
 msgstr "نقل موظف"
 
 #. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_line__id
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__id
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_request__id
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_fleet_release_line__id
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_fleet_request__id
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_res_users__id
 msgid "ID"
 msgstr "المُعرف"
+
+#. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__disposition
+msgid "If He Leaves"
+msgstr "إذا غادر"
+
+#. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__write_uid
+msgid "Last Updated by"
+msgstr "آخر تحديث بواسطة"
+
+#. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__write_date
+msgid "Last Updated on"
+msgstr "آخر تحديث في"
 
 #. module: KSW_fleet_package
 #. odoo-python
@@ -69,9 +163,57 @@ msgid "Moves with %(v)s (%(r)s)."
 msgstr "ينتقل مع %(v)s (%(r)s)."
 
 #. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__new_driver_id
+msgid "New Driver"
+msgstr "السائق الجديد"
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "Only what happens to the vehicle is chosen here."
+msgstr "يُختار هنا فقط ما يحدث للمركبة."
+
+#. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__release_line_id
+msgid "Release Line"
+msgstr "بند الاستغناء"
+
+#. module: KSW_fleet_package
+#: model:ir.model.fields.selection,name:KSW_fleet_package.selection__ksw_employee_release_vehicle__disposition__holding
+msgid "Release to the Workshop"
+msgstr "استغناء إلى الورشة"
+
+#. module: KSW_fleet_package
+#: model:ir.model,name:KSW_fleet_package.model_ksw_employee_release_line
+msgid "Released Employee"
+msgstr "موظف مستغنى عنه"
+
+#. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__request_id
+msgid "Request"
+msgstr "الطلب"
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "The new driver of %s is the employee being released."
+msgstr "السائق الجديد لـ %s هو الموظف المستغنى عنه."
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "Their driver leaves the department (%s)."
+msgstr "سائقها يغادر القسم (%s)."
+
+#. module: KSW_fleet_package
 #: model:ir.model,name:KSW_fleet_package.model_res_users
 msgid "User"
 msgstr "المستخدم"
+
+#. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__vehicle_id
+msgid "Vehicle"
+msgstr "المركبة"
 
 #. module: KSW_fleet_package
 #: model:ir.model,name:KSW_fleet_package.model_ksw_fleet_request
@@ -79,6 +221,38 @@ msgid "Vehicle Allocation Request"
 msgstr "طلب تخصيص مركبات"
 
 #. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__vehicle_department_id
+msgid "Vehicle Department"
+msgstr "قسم المركبة"
+
+#. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__fleet_request_id
+msgid "Vehicle Release"
+msgstr "استغناء المركبة"
+
+#. module: KSW_fleet_package
+#: model:ir.model,name:KSW_fleet_package.model_ksw_employee_release_vehicle
+msgid "Vehicle of a Released Employee"
+msgstr "مركبة موظف مستغنى عنه"
+
+#. module: KSW_fleet_package
 #: model:ir.model,name:KSW_fleet_package.model_ksw_fleet_release_line
 msgid "Vehicle to Release"
 msgstr "مركبة للاستغناء"
+
+#. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_line__x_vehicle_ids
+msgid "Vehicles in His Custody"
+msgstr "المركبات في عهدته"
+
+#. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_request__x_vehicle_ids
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_package.view_ksw_employee_request_form_vehicles
+msgid "Vehicles in Their Custody"
+msgstr "المركبات في عهدتهم"
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "Vehicles of the leaving employees: %s"
+msgstr "مركبات الموظفين المغادرين: %s"

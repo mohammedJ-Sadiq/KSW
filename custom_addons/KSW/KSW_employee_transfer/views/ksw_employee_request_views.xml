@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Release / request form: the department's intent, decided by the GM,
+         carried out by HR. -->
+    <record id="view_ksw_employee_request_form" model="ir.ui.view">
+        <field name="name">ksw.employee.request.form</field>
+        <field name="model">ksw.employee.request</field>
+        <field name="arch" type="xml">
+            <form string="Employee Release / Request">
+                <header>
+                    <field name="x_is_gm" invisible="1"/>
+                    <field name="x_is_hr" invisible="1"/>
+                    <field name="x_waiting_gm" invisible="1"/>
+                    <field name="x_waiting_hr" invisible="1"/>
+                    <button name="action_submit" type="object" string="Submit to the GM" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_open_decide" type="object" string="Decide" class="oe_highlight"
+                            invisible="not x_is_gm or not x_waiting_gm"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state not in ('draft', 'submitted')" confirm="Cancel this request?"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,done"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-info" role="alert" invisible="state != 'draft' or request_type != 'release'">
+                        For each employee who answers for vehicles, say what happens to them when he leaves:
+                        another driver in your department, or released to the workshop (Vehicle Allocation).
+                    </div>
+                    <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                    <field name="allowed_department_ids" invisible="1"/>
+                    <group>
+                        <group>
+                            <field name="request_type" widget="radio" readonly="state != 'draft'"/>
+                            <field name="x_department_locked" invisible="1"/>
+                            <field name="department_id" options="{'no_create': True}"
+                                   readonly="state != 'draft' or x_department_locked" force_save="1"/>
+                        </group>
+                        <group>
+                            <field name="requested_by_id"/>
+                            <field name="submitted_date" invisible="not submitted_date"/>
+                        </group>
+                    </group>
+                    <field name="reason" readonly="state != 'draft'" placeholder="Why..."/>
+                    <notebook>
+                        <page string="Employees to Release" name="release" invisible="request_type != 'release'">
+                            <field name="release_line_ids" readonly="state != 'draft'"
+                                   context="{'default_request_id': id}">
+                                <list editable="bottom">
+                                    <field name="employee_id" options="{'no_create': True}"
+                                           domain="[('department_id', 'child_of', parent.department_id)]"/>
+                                    <field name="job_id"/>
+                                    <field name="note"/>
+                                    <field name="status" widget="badge"
+                                           decoration-info="status in ('gm', 'transferring', 'terminating')"
+                                           decoration-warning="status == 'hold'"
+                                           decoration-success="status in ('transferred', 'terminated')"
+                                           decoration-muted="status in ('kept', 'cancelled')"/>
+                                    <field name="addition_line_id" optional="show"/>
+                                    <field name="transfer_id" optional="show"/>
+                                    <field name="decision_note" optional="hide"/>
+                                    <field name="decided_by_id" optional="hide"/>
+                                    <field name="decided_date" optional="hide"/>
+                                    <button name="action_open_decide" type="object" string="Decide" icon="fa-gavel"
+                                            invisible="status not in ('gm', 'hold')"
+                                            groups="KSW_employee_transfer.group_transfer_gm"/>
+                                    <button name="action_hr_terminate" type="object" string="End of Service"
+                                            icon="fa-sign-out" invisible="status != 'terminating'"
+                                            groups="KSW_employee_transfer.group_transfer_hr"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Employees Needed" name="addition" invisible="request_type != 'addition'">
+                            <field name="addition_line_ids" readonly="state != 'draft'"
+                                   context="{'default_request_id': id}">
+                                <list editable="bottom">
+                                    <field name="job_id" options="{'no_create': True}"/>
+                                    <field name="quantity"/>
+                                    <field name="note"/>
+                                    <field name="given_count" optional="show"/>
+                                    <field name="external_quantity" optional="show"/>
+                                    <field name="hired_employee_ids" widget="many2many_tags" optional="show"/>
+                                    <field name="refused_quantity" optional="hide"/>
+                                    <field name="open_quantity"/>
+                                    <field name="hire_open" column_invisible="True"/>
+                                    <field name="status" widget="badge"
+                                           decoration-info="status in ('gm', 'hiring')"
+                                           decoration-warning="status == 'hold'"
+                                           decoration-success="status == 'done'"
+                                           decoration-muted="status == 'cancelled'"/>
+                                    <field name="decision_note" optional="hide"/>
+                                    <button name="action_open_decide" type="object" string="Decide" icon="fa-gavel"
+                                            invisible="status not in ('gm', 'hold')"
+                                            groups="KSW_employee_transfer.group_transfer_gm"/>
+                                    <button name="action_open_hire" type="object" string="Name New Hires"
+                                            icon="fa-user-plus" invisible="status != 'hiring'"
+                                            groups="KSW_employee_transfer.group_transfer_hr"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_employee_request_list" model="ir.ui.view">
+        <field name="name">ksw.employee.request.list</field>
+        <field name="model">ksw.employee.request</field>
+        <field name="arch" type="xml">
+            <list string="Employee Releases and Requests" decoration-muted="state == 'cancelled'"
+                  decoration-success="state == 'done'">
+                <field name="name"/>
+                <field name="request_type"/>
+                <field name="department_id"/>
+                <field name="line_summary"/>
+                <field name="requested_by_id" optional="show"/>
+                <field name="submitted_date" optional="show"/>
+                <field name="activity_ids" widget="list_activity" optional="show"/>
+                <field name="state" widget="badge" decoration-info="state == 'submitted'"
+                       decoration-success="state == 'done'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_employee_request_search" model="ir.ui.view">
+        <field name="name">ksw.employee.request.search</field>
+        <field name="model">ksw.employee.request</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="department_id"/>
+                <field name="release_line_ids" string="Employee" filter_domain="[('release_line_ids.employee_id', 'ilike', self)]"/>
+                <filter string="Waiting for Me" name="filter_mine" domain="[('x_is_pending_my_action', '=', True)]"/>
+                <separator/>
+                <filter string="Releases" name="filter_release" domain="[('request_type', '=', 'release')]"/>
+                <filter string="Requests for Employees" name="filter_addition" domain="[('request_type', '=', 'addition')]"/>
+                <separator/>
+                <filter string="In Progress" name="filter_open" domain="[('state', 'in', ('draft', 'submitted'))]"/>
+                <filter string="Waiting for the GM" name="filter_gm" domain="[('x_waiting_gm', '=', True)]"/>
+                <filter string="Waiting for HR" name="filter_hr" domain="[('x_waiting_hr', '=', True)]"/>
+                <group>
+                    <filter string="Type" name="groupby_type" context="{'group_by': 'request_type'}"/>
+                    <filter string="Department" name="groupby_department" context="{'group_by': 'department_id'}"/>
+                    <filter string="Status" name="groupby_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ksw_employee_release" model="ir.actions.act_window">
+        <field name="name">Release Employees</field>
+        <field name="res_model">ksw.employee.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('request_type', '=', 'release')]</field>
+        <field name="context">{'default_request_type': 'release', 'search_default_filter_open': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Release employees your department no longer needs</p>
+            <p>The GM gives them to a department that asked, keeps them on hold, ends their service, or refuses.</p>
+        </field>
+    </record>
+    <record id="action_ksw_employee_addition" model="ir.actions.act_window">
+        <field name="name">Request Employees</field>
+        <field name="res_model">ksw.employee.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('request_type', '=', 'addition')]</field>
+        <field name="context">{'default_request_type': 'addition', 'search_default_filter_open': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Ask for the employees your department needs</p>
+            <p>The GM fills it from released employees or approves hiring from outside.</p>
+        </field>
+    </record>
+    <record id="action_ksw_employee_request" model="ir.actions.act_window">
+        <field name="name">All Requests</field>
+        <field name="res_model">ksw.employee.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_filter_open': 1}</field>
+    </record>
+
+    <!-- GM: released employees across requests (the pool). -->
+    <record id="view_ksw_employee_release_line_list" model="ir.ui.view">
+        <field name="name">ksw.employee.release.line.list</field>
+        <field name="model">ksw.employee.release.line</field>
+        <field name="arch" type="xml">
+            <list string="Released Employees" create="0" delete="0">
+                <header>
+                    <button name="action_open_decide" type="object" string="Decide Selected" class="btn-primary"/>
+                </header>
+                <field name="request_id"/>
+                <field name="department_id"/>
+                <field name="employee_id"/>
+                <field name="job_id"/>
+                <field name="note"/>
+                <field name="decision_note" optional="show"/>
+                <field name="status" widget="badge" decoration-info="status == 'gm'" decoration-warning="status == 'hold'"/>
+                <button name="action_open_decide" type="object" string="Decide" icon="fa-gavel"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_ksw_employee_release_line_search" model="ir.ui.view">
+        <field name="name">ksw.employee.release.line.search</field>
+        <field name="model">ksw.employee.release.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <field name="job_id"/>
+                <filter string="Not Decided" name="filter_gm" domain="[('status', '=', 'gm')]"/>
+                <filter string="On Hold" name="filter_hold" domain="[('status', '=', 'hold')]"/>
+                <group>
+                    <filter string="Department" name="groupby_department" context="{'group_by': 'department_id'}"/>
+                    <filter string="Job Position" name="groupby_job" context="{'group_by': 'job_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="action_ksw_employee_release_pool" model="ir.actions.act_window">
+        <field name="name">Released Employees</field>
+        <field name="res_model">ksw.employee.release.line</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_ksw_employee_release_line_list"/>
+        <field name="domain">[('status', 'in', ('gm', 'hold'))]</field>
+    </record>
+
+    <!-- GM: what departments asked for and is still open. -->
+    <record id="view_ksw_employee_addition_line_list" model="ir.ui.view">
+        <field name="name">ksw.employee.addition.line.list</field>
+        <field name="model">ksw.employee.addition.line</field>
+        <field name="arch" type="xml">
+            <list string="Employees Requested" create="0" delete="0">
+                <field name="request_id"/>
+                <field name="department_id"/>
+                <field name="job_id"/>
+                <field name="quantity"/>
+                <field name="open_quantity"/>
+                <field name="note"/>
+                <field name="decision_note" optional="show"/>
+                <field name="status" widget="badge" decoration-info="status == 'gm'" decoration-warning="status == 'hold'"/>
+                <button name="action_open_decide" type="object" string="Decide" icon="fa-gavel"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_ksw_employee_addition_open" model="ir.actions.act_window">
+        <field name="name">Employees Requested</field>
+        <field name="res_model">ksw.employee.addition.line</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_ksw_employee_addition_line_list"/>
+        <field name="domain">[('status', 'in', ('gm', 'hold'))]</field>
+    </record>
+
+    <!-- Wizards -->
+    <record id="view_ksw_employee_release_decision_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.employee.release.decision.wizard.form</field>
+        <field name="model">ksw.employee.release.decision.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="demand_line_ids" invisible="1"/>
+                <field name="release_line_ids" readonly="1">
+                    <list>
+                        <field name="employee_id"/>
+                        <field name="department_id"/>
+                        <field name="job_id"/>
+                        <field name="note"/>
+                    </list>
+                </field>
+                <group>
+                    <field name="decision" widget="radio"/>
+                    <field name="addition_line_id" options="{'no_create': True, 'no_open': True}"
+                           invisible="decision != 'transfer'" required="decision == 'transfer'"/>
+                    <field name="effective_date" invisible="decision not in ('transfer', 'terminate')"
+                           required="decision in ('transfer', 'terminate')"/>
+                    <field name="note" placeholder="Optional"/>
+                </group>
+                <div class="alert alert-warning" role="alert" invisible="not job_warning">
+                    <field name="job_warning" nolabel="1"/>
+                </div>
+                <div class="alert alert-info" role="alert"
+                     invisible="decision != 'transfer' or demand_line_ids">
+                    No department has an open request for employees. A transfer needs one: hold them until it comes.
+                </div>
+                <footer>
+                    <button name="action_confirm" type="object" string="Confirm" class="btn-primary"/>
+                    <button string="Discard" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_employee_addition_decision_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.employee.addition.decision.wizard.form</field>
+        <field name="model">ksw.employee.addition.decision.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="addition_line_id"/>
+                <field name="candidate_ids" invisible="1"/>
+                <group>
+                    <field name="open_quantity"/>
+                    <field name="decision" widget="radio"/>
+                    <field name="release_line_ids" widget="many2many_tags" options="{'no_create': True}"
+                           invisible="decision != 'fill'"/>
+                    <field name="effective_date" invisible="decision != 'fill'" required="decision == 'fill'"/>
+                    <field name="quantity" invisible="decision not in ('external', 'refuse')"/>
+                    <field name="note" placeholder="Optional"/>
+                </group>
+                <div class="alert alert-warning" role="alert" invisible="not job_warning">
+                    <field name="job_warning" nolabel="1"/>
+                </div>
+                <div class="alert alert-info" role="alert" invisible="decision != 'fill' or candidate_ids">
+                    No employee is released by another department right now.
+                </div>
+                <footer>
+                    <button name="action_confirm" type="object" string="Confirm" class="btn-primary"/>
+                    <button string="Discard" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_employee_hire_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.employee.hire.wizard.form</field>
+        <field name="model">ksw.employee.hire.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="addition_line_id"/>
+                <field name="department_id" invisible="1"/>
+                <group>
+                    <field name="hire_open"/>
+                    <field name="employee_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" type="object" string="Confirm" class="btn-primary"/>
+                    <button string="Discard" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Menus: one entry per intent, the GM's decisions, HR's transfers. -->
+    <menuitem id="menu_employee_transfer_root" name="Employee Transfers" sequence="87"
+              web_icon="KSW_employee_transfer,static/description/icon.png"
+              action="action_ksw_employee_release"
+              groups="group_transfer_requester,group_transfer_gm,base.group_system"/>
+    <menuitem id="menu_employee_requests" name="Requests" parent="menu_employee_transfer_root" sequence="10"/>
+    <menuitem id="menu_employee_release" name="Release Employees" parent="menu_employee_requests"
+              action="action_ksw_employee_release" sequence="10"/>
+    <menuitem id="menu_employee_addition" name="Request Employees" parent="menu_employee_requests"
+              action="action_ksw_employee_addition" sequence="20"/>
+    <menuitem id="menu_employee_request_all" name="All Requests" parent="menu_employee_requests"
+              action="action_ksw_employee_request" sequence="30"/>
+    <menuitem id="menu_employee_gm" name="GM Decisions" parent="menu_employee_transfer_root" sequence="20"
+              groups="group_transfer_gm,base.group_system"/>
+    <menuitem id="menu_employee_release_pool" name="Released Employees" parent="menu_employee_gm"
+              action="action_ksw_employee_release_pool" sequence="10"/>
+    <menuitem id="menu_employee_addition_open" name="Employees Requested" parent="menu_employee_gm"
+              action="action_ksw_employee_addition_open" sequence="20"/>
+    <menuitem id="menu_employee_transfer_all" name="Transfers" parent="menu_employee_transfer_root"
+              action="action_ksw_employee_transfer" sequence="30"/>
+</odoo>

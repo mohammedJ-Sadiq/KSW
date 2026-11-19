@@ -21,9 +21,10 @@
                     <div class="oe_title"><h1><field name="name" readonly="state == 'done'"/></h1></div>
                     <div class="alert alert-info" role="status" invisible="state != 'draft'">
                         Download the export from the portal (<b>Absher Business ▸ Vehicles</b>,
-                        <b>Muqeem ▸ Active residents</b>, or a <b>GOSI</b> establishment's active subscribers)
+                        <b>Muqeem ▸ Active residents</b>, <b>Qiwa ▸ Active contracts</b>, or a <b>GOSI</b>
+                        establishment's active subscribers)
                         and attach the file here as it is (.xlsx or .csv), then press <b>Preview</b>. Nothing is
-                        written until you press <b>Apply</b>. GOSI wage columns are never read.
+                        written until you press <b>Apply</b>. Wage columns are never read.
                     </div>
                     <div class="alert alert-warning" role="alert" invisible="not warning_count or state == 'done'">
                         <field name="warning_count" class="d-inline"/> rows need a look (plate or actual user
@@ -67,6 +68,11 @@
                             <field name="passport_expiry" column_invisible="parent.source != 'muqeem_residents'"/>
                             <field name="outside_kingdom" optional="show" column_invisible="parent.source != 'muqeem_residents'"/>
                             <field name="line_registration_id" optional="show" column_invisible="parent.source == 'absher_vehicles'"/>
+                            <field name="employee_number" optional="show" column_invisible="parent.source != 'qiwa_contracts'"/>
+                            <field name="contract_number" optional="show" column_invisible="parent.source != 'qiwa_contracts'"/>
+                            <field name="contract_status" optional="show" column_invisible="parent.source != 'qiwa_contracts'"/>
+                            <field name="join_date" optional="hide" column_invisible="parent.source != 'qiwa_contracts'"/>
+                            <field name="occupation" optional="hide" column_invisible="parent.source == 'absher_vehicles'"/>
                             <field name="action" readonly="kind == 'missing'"/>
                             <field name="match_note" optional="show"/>
                             <field name="make" optional="show" column_invisible="parent.source != 'absher_vehicles'"/>

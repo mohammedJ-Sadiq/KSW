@@ -10,14 +10,14 @@
         <field name="sequence">10</field>
         <field name="category_id" ref="module_category_ksw_employee_transfer"/>
     </record>
-    <!-- Department manager: requests moves out of (or into) his departments. -->
+    <!-- Department manager: releases his people or asks for people. -->
     <record id="group_transfer_requester" model="res.groups">
         <field name="name">Requester</field>
         <field name="privilege_id" ref="privilege_employee_transfer"/>
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
         <field name="sequence">10</field>
     </record>
-    <!-- HR / Administrative Affairs: reviews every transfer. -->
+    <!-- HR / Administrative Affairs: carries out what the GM decided. -->
     <record id="group_transfer_hr" model="res.groups">
         <field name="name">HR</field>
         <field name="privilege_id" ref="privilege_employee_transfer"/>
@@ -25,7 +25,7 @@
         <field name="sequence">20</field>
     </record>
 
-    <!-- The GM approves; a separate privilege, he is not HR (gotcha #200). -->
+    <!-- The GM decides; a separate privilege, he is not HR (gotcha #200). -->
     <record id="privilege_employee_transfer_gm" model="res.groups.privilege">
         <field name="name">Employee Transfer Approval</field>
         <field name="sequence">20</field>
@@ -49,6 +49,49 @@
     <record id="rule_employee_transfer_all" model="ir.rule">
         <field name="name">Employee transfer: HR, GM and administrator see all</field>
         <field name="model_id" ref="model_ksw_employee_transfer"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_transfer_hr')), (4, ref('group_transfer_gm')), (4, ref('base.group_system'))]"/>
+    </record>
+
+    <!-- Requests: the department's own, and its lines; a department that
+         asked also reads the employees given to it. -->
+    <record id="rule_employee_request_requester" model="ir.rule">
+        <field name="name">Employee request: own departments or own requests</field>
+        <field name="model_id" ref="model_ksw_employee_request"/>
+        <field name="domain_force">['|', ('requested_by_id', '=', user.id),
+            ('department_id', 'in', user._ksw_transfer_department_ids())]</field>
+        <field name="groups" eval="[(4, ref('group_transfer_requester'))]"/>
+    </record>
+    <record id="rule_employee_request_all" model="ir.rule">
+        <field name="name">Employee request: HR, GM and administrator see all</field>
+        <field name="model_id" ref="model_ksw_employee_request"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_transfer_hr')), (4, ref('group_transfer_gm')), (4, ref('base.group_system'))]"/>
+    </record>
+    <record id="rule_employee_release_line_requester" model="ir.rule">
+        <field name="name">Released employee: own departments, or given to them</field>
+        <field name="model_id" ref="model_ksw_employee_release_line"/>
+        <field name="domain_force">['|', '|', ('request_id.requested_by_id', '=', user.id),
+            ('department_id', 'in', user._ksw_transfer_department_ids()),
+            ('addition_line_id.department_id', 'in', user._ksw_transfer_department_ids())]</field>
+        <field name="groups" eval="[(4, ref('group_transfer_requester'))]"/>
+    </record>
+    <record id="rule_employee_release_line_all" model="ir.rule">
+        <field name="name">Released employee: HR, GM and administrator see all</field>
+        <field name="model_id" ref="model_ksw_employee_release_line"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_transfer_hr')), (4, ref('group_transfer_gm')), (4, ref('base.group_system'))]"/>
+    </record>
+    <record id="rule_employee_addition_line_requester" model="ir.rule">
+        <field name="name">Employees needed: own departments or own requests</field>
+        <field name="model_id" ref="model_ksw_employee_addition_line"/>
+        <field name="domain_force">['|', ('request_id.requested_by_id', '=', user.id),
+            ('department_id', 'in', user._ksw_transfer_department_ids())]</field>
+        <field name="groups" eval="[(4, ref('group_transfer_requester'))]"/>
+    </record>
+    <record id="rule_employee_addition_line_all" model="ir.rule">
+        <field name="name">Employees needed: HR, GM and administrator see all</field>
+        <field name="model_id" ref="model_ksw_employee_addition_line"/>
         <field name="domain_force">[(1, '=', 1)]</field>
         <field name="groups" eval="[(4, ref('group_transfer_hr')), (4, ref('group_transfer_gm')), (4, ref('base.group_system'))]"/>
     </record>

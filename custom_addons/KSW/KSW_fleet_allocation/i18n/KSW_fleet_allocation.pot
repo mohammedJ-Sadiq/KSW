@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-14 10:59+0000\n"
-"PO-Revision-Date: 2026-11-14 10:59+0000\n"
+"POT-Creation-Date: 2026-11-19 05:25+0000\n"
+"PO-Revision-Date: 2026-11-19 05:25+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -93,6 +93,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_fleet_allocation/models/ksw_fleet_request.py:0
 msgid "%s is already closed."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#. odoo-python
+#: code:addons/KSW_fleet_allocation/models/ksw_fleet_vehicle.py:0
+msgid "%s is not in one of your departments."
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -379,6 +385,12 @@ msgstr ""
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_allocate_wizard__available_vehicle_ids
 msgid "Available Vehicle"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_vehicle_form_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_vehicle_list_allocation
+msgid "Back in Service"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -1047,6 +1059,18 @@ msgid "Last Updated on"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_vehicle_form_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_vehicle_list_allocation
+msgid "Mark Stopped"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_vehicle_form_allocation
+msgid ""
+"Mark this vehicle as stopped (not working)? It stays in its department."
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_request__message_has_error
 msgid "Message Delivery error"
 msgstr ""
@@ -1361,7 +1385,7 @@ msgstr ""
 
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_release_line__plate_number
-msgid "Plate Number"
+msgid "Plate (Arabic)"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -1634,6 +1658,17 @@ msgstr ""
 msgid ""
 "Still at the workshop: %s. A held vehicle is given out once its checkup is "
 "completed."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_vehicle__x_is_stopped
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_vehicle_search_allocation
+msgid "Stopped"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_vehicle__x_stopped_since
+msgid "Stopped Since"
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -2075,6 +2110,11 @@ msgid "Why"
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_vehicle__x_stopped_reason
+msgid "Why Stopped"
+msgstr ""
+
+#. module: KSW_fleet_allocation
 #: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_request_form
 msgid "Why these vehicles are not needed / what the extra vehicles are for..."
 msgstr ""
@@ -2088,6 +2128,11 @@ msgstr ""
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_receive_wizard_line__wizard_id
 msgid "Wizard"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_vehicle_search_allocation
+msgid "Working"
 msgstr ""
 
 #. module: KSW_fleet_allocation

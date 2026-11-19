@@ -30,6 +30,12 @@ class KswFleetVehicle(models.Model):
         ('holding', 'Holding (Workshop)'),
     ], string='Allocation', default='unassigned', required=True, copy=False, index=True)
     x_move_ids = fields.One2many('ksw.fleet.move', 'vehicle_id', string='Movements')
+    # Parked and not working, but still its department's («متوقفة»). Not the
+    # holding pool: that one takes the vehicle away from the department and
+    # only a GM decision on a release puts it there.
+    x_is_stopped = fields.Boolean(string='Stopped', index=True, copy=False, readonly=True)
+    x_stopped_since = fields.Date(string='Stopped Since', copy=False, readonly=True)
+    x_stopped_reason = fields.Char(string='Why Stopped', copy=False)
     # A transfer decided while the vehicle was in use waits for its workshop
     # checkup; these hold where it goes when the checkup completes.
     x_reserved_department_id = fields.Many2one('hr.department', string='Reserved For', readonly=True,
@@ -216,6 +222,27 @@ class KswFleetVehicle(models.Model):
             vehicle._ksw_fleet_log_manual(old[vehicle.id], new_department,
                                           'manual' if old[vehicle.id] else 'initial')
         return res
+
+    def _ksw_fleet_check_can_stop(self):
+        """Its own department, the GM or the administrator."""
+        if self.env.su or self.env.user.has_group('base.group_system') \
+                or self.env.user.has_group('KSW_fleet_allocation.group_fleet_allocation_gm'):
+            return
+        mine = set(self.env.user._ksw_fleet_department_ids())
+        others = self.filtered(lambda v: v.x_department_id.id not in mine)
+        if others:
+            raise UserError(_('%s is not in one of your departments.', ', '.join(others.mapped('name'))))
+
+    def action_mark_stopped(self):
+        self._ksw_fleet_check_can_stop()
+        self.filtered(lambda v: not v.x_is_stopped).sudo().write(
+            {'x_is_stopped': True, 'x_stopped_since': fields.Date.context_today(self)})
+        return True
+
+    def action_back_in_service(self):
+        self._ksw_fleet_check_can_stop()
+        self.sudo().write({'x_is_stopped': False, 'x_stopped_since': False, 'x_stopped_reason': False})
+        return True
 
     def _ksw_fleet_log_manual(self, from_department, to_department, kind):
         self.env['ksw.fleet.move'].sudo().create({

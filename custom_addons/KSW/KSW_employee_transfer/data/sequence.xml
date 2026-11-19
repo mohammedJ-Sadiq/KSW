@@ -8,5 +8,12 @@
             <field name="padding">4</field>
             <field name="company_id" eval="False"/>
         </record>
+        <record id="seq_ksw_employee_request" model="ir.sequence">
+            <field name="name">Employee Release / Request</field>
+            <field name="code">ksw.employee.request</field>
+            <field name="prefix">ER/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
     </data>
 </odoo>
