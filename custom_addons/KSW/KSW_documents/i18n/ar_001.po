@@ -122,12 +122,6 @@ msgid "Applies To"
 msgstr "يخص"
 
 #. module: KSW_documents
-#. odoo-python
-#: code:addons/KSW_documents/models/ksw_document.py:0
-msgid "Attach the scan of %s."
-msgstr "أرفق النسخة الممسوحة لـ %s."
-
-#. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__message_attachment_count
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__message_attachment_count
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__message_attachment_count
@@ -2291,3 +2285,126 @@ msgstr "قوى: العقود السارية"
 #: model:ir.model.fields,help:KSW_documents.field_ksw_company_registration__gosi_number
 msgid "رقم اشتراك المنشأة: how GOSI and Qiwa name the establishment."
 msgstr "رقم اشتراك المنشأة: الرقم الذي تُعرّف به التأمينات وقوى المنشأة."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__card_expiry
+msgid "Operation Card Expiry"
+msgstr "انتهاء بطاقة التشغيل"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__card_expiry_text
+msgid "Operation Card Expiry (as exported)"
+msgstr "انتهاء بطاقة التشغيل (كما في الملف)"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__card_number
+msgid "Operation Card No."
+msgstr "رقم بطاقة التشغيل"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_type__required_for__public_transport
+msgid "Public-transport company vehicles (نقل عام)"
+msgstr "مركبات الشركة ذات التسجيل نقل عام"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Archived in Odoo."
+msgstr "مؤرشفة في النظام."
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__source__fahes
+msgid "Fahes (tank inspection)"
+msgstr "فاحص (فحص الصهاريج)"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Failed the tank inspection: %s"
+msgstr "لم تجتز فحص الصهريج: %s"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__inspection_note
+msgid "Inspection Note"
+msgstr "ملاحظة الفحص"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__request_number
+msgid "Inspection Request"
+msgstr "رقم طلب الفحص"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__inspection_status
+msgid "Inspection Result"
+msgstr "نتيجة الفحص"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Inspection request %s"
+msgstr "طلب الفحص %s"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Licence expiry not a date: %s"
+msgstr "تاريخ انتهاء الرخصة غير صحيح: %s"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "No tank licence yet: %s"
+msgstr "لا توجد رخصة صهريج بعد: %s"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "No vehicle in Odoo with this chassis no."
+msgstr "لا توجد مركبة في النظام بهذا الرقم الهيكل."
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import__source__tank_inspection
+msgid "Tank Inspection Report (Fahes)"
+msgstr "تقرير فحص الصهاريج (فاحص)"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__licence_expiry
+msgid "Tank Licence Expiry"
+msgstr "انتهاء رخصة الصهريج"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__licence_expiry_text
+msgid "Tank Licence Expiry (as exported)"
+msgstr "انتهاء رخصة الصهريج (كما في الملف)"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__licence_number
+msgid "Tank Licence No."
+msgstr "رقم رخصة الصهريج"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Total loss (accident) per the report."
+msgstr "تلف كلي (حادث) حسب التقرير."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__water_note
+msgid "Water Authority Note"
+msgstr "ملاحظة هيئة المياه"
+
+#. module: KSW_documents
+#: model:ksw.document.type,name:KSW_documents.type_water_tank_licence
+msgid "Water Tank Licence"
+msgstr "رخصة صهريج المياه"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_type__required_for__water_tankers
+msgid "Water tankers (trailer heads and Isuzu tankers)"
+msgstr "صهاريج المياه (رؤوس التريلات وصهاريج الإيسوزو)"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "not inspected"
+msgstr "لم يتم الفحص"

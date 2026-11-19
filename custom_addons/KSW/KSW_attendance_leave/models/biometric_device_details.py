@@ -5,6 +5,7 @@ from datetime import timedelta
 from markupsafe import Markup
 
 from odoo import api, fields, models, _
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -12,6 +13,9 @@ _logger = logging.getLogger(__name__)
 # (90 minutes) tolerates one transient blip without alerting, while still
 # catching a device that's actually down well before a multi-hour gap.
 _STALE_THRESHOLD_MINUTES = 90
+
+# Written by the sync itself, never typed by a person.
+_SYSTEM_MAINTAINED_FIELDS = {'last_download_time', 'x_stale_alert_sent'}
 
 
 class BiometricDeviceDetailsKSW(models.Model):
@@ -22,6 +26,60 @@ class BiometricDeviceDetailsKSW(models.Model):
         help='Set when a stale-sync alert email has been sent for the '
              'current outage; cleared once the device syncs successfully '
              'again so the next outage can re-alert.')
+
+    # -- Configuration is the Settings administrator's ------------------------
+    # hr_biometric_attendance grants HR Officers write and HR Managers full
+    # CRUD on this model, and its buttons carry no group check. HR re-reads
+    # a period through ksw.attendance.download.wizard (Attendances menu);
+    # the device itself, and the whole-device actions, stay with the
+    # administrator. The ACL rows are the third-party module's, so the lock
+    # lives here rather than in a CSV the next cybrosys upgrade restores.
+
+    def _check_device_admin(self):
+        if not self.env.su and not self.env.user.has_group('base.group_system'):
+            raise UserError(_(
+                'Only the Settings administrator can change or operate the '
+                'biometric devices. To re-read a period from a device, use '
+                'Attendances ▸ Re-read from Device.'))
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        self._check_device_admin()
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if set(vals) - _SYSTEM_MAINTAINED_FIELDS:
+            self._check_device_admin()
+        return super().write(vals)
+
+    def unlink(self):
+        self._check_device_admin()
+        return super().unlink()
+
+    def action_map_biometric_ids(self):
+        self._check_device_admin()
+        return super().action_map_biometric_ids()
+
+    def action_download_all_attendance(self):
+        self._check_device_admin()
+        return super().action_download_all_attendance()
+
+    def action_download_incremental_attendance(self):
+        self._check_device_admin()
+        return super().action_download_incremental_attendance()
+
+    def action_download_attendance(self, incremental=True, force=False):
+        self._check_device_admin()
+        return super().action_download_attendance(
+            incremental=incremental, force=force)
+
+    def action_clear_attendance(self):
+        self._check_device_admin()
+        return super().action_clear_attendance()
+
+    def action_restart_device(self):
+        self._check_device_admin()
+        return super().action_restart_device()
 
     @api.model
     def cron_check_stale_devices(self):
@@ -56,6 +114,7 @@ class BiometricDeviceDetailsKSW(models.Model):
         device's employees.
         """
         self.ensure_one()
+        self._check_device_admin()
         self.env['ir.config_parameter'].sudo().set_param(
             'ksw_attendance_leave.generate_absences_device_id', str(self.id)
         )

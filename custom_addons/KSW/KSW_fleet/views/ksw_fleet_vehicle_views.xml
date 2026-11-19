@@ -17,6 +17,7 @@
                 <field name="year"/>
                 <field name="x_vin" optional="hide"/>
                 <field name="x_color" optional="hide"/>
+                <field name="x_registration_type" optional="hide"/>
                 <field name="driver_name"/>
                 <field name="x_custodian_id" optional="show"/>
                 <field name="state" widget="badge"/>
@@ -79,6 +80,7 @@
                             <field name="tank_number"/>
                             <field name="plate_number"/>
                             <field name="x_plate_en"/>
+                            <field name="x_registration_type"/>
                             <field name="x_vin"/>
                         </group>
                         <group string="Details">

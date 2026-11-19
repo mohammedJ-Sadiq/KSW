@@ -47,4 +47,20 @@
         <field name="view_mode">form</field>
         <field name="target">new</field>
     </record>
+
+    <!-- HR's door to the same wizard, without the device form: the
+         configuration and the whole-device buttons stay administrator-only. -->
+    <record id="ksw_attendance_reread_action" model="ir.actions.act_window">
+        <field name="name">Re-read from Device</field>
+        <field name="res_model">ksw.attendance.download.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="ksw_attendance_reread_menu"
+              name="Re-read from Device"
+              parent="hr_attendance.menu_hr_attendance_root"
+              action="ksw_attendance_reread_action"
+              sequence="20"
+              groups="hr.group_hr_user"/>
 </odoo>

@@ -37,6 +37,13 @@ class KswFleetVehicle(models.Model):
     # other (_sync_plate); a value that is not a real plate stays as typed.
     plate_number = fields.Char(string='Plate (Arabic)')
     x_plate_en = fields.Char(string='Plate (English)', index=True)
+    # «نوع التسجيل» on the istimara / in Absher: a public-transport vehicle
+    # needs a Naql operation card, a private one does not.
+    x_registration_type = fields.Selection([
+        ('public', 'Public Transport (نقل عام)'),
+        ('private_transport', 'Private Transport (نقل خاص)'),
+        ('private', 'Private (خاص)'),
+    ], string='Registration Type', index=True)
     # The chassis number (VIN) on the istimara: the one identifier that never
     # changes, so documents can find their vehicle by it.
     x_vin = fields.Char(string='Chassis No. (VIN)', index=True)

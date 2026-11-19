@@ -1033,3 +1033,21 @@ msgstr "✅ إرسال"
 #: model_terms:ir.ui.view,arch_db:KSW_attendance_leave.hr_leave_view_form_inherit_attendance_issue
 msgid "✔ Accepted"
 msgstr "✔ مقبول"
+
+#. module: KSW_attendance_leave
+#: model:ir.actions.act_window,name:KSW_attendance_leave.ksw_attendance_reread_action
+#: model:ir.ui.menu,name:KSW_attendance_leave.ksw_attendance_reread_menu
+msgid "Re-read from Device"
+msgstr "إعادة القراءة من جهاز البصمة"
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/wizard/ksw_attendance_download_wizard.py:0
+msgid "Only HR can re-read attendance from a device."
+msgstr "إعادة قراءة الحضور من جهاز البصمة متاحة للموارد البشرية فقط."
+
+#. module: KSW_attendance_leave
+#. odoo-python
+#: code:addons/KSW_attendance_leave/models/biometric_device_details.py:0
+msgid "Only the Settings administrator can change or operate the biometric devices. To re-read a period from a device, use Attendances ▸ Re-read from Device."
+msgstr "تعديل أجهزة البصمة وتشغيلها من صلاحية مسؤول الإعدادات فقط. لإعادة قراءة فترة من الجهاز استخدم: الحضور ▸ إعادة القراءة من جهاز البصمة."

@@ -5,3 +5,4 @@ access_ksw_weekend_grant_wizard_hr_manager,ksw.weekend.grant.wizard.hr.manager,m
 access_ksw_weekend_grant_wizard_system,ksw.weekend.grant.wizard.system,model_ksw_weekend_grant_wizard,base.group_system,1,1,1,1
 access_ksw_attendance_download_wizard_hr_manager,ksw.attendance.download.wizard.hr.manager,model_ksw_attendance_download_wizard,hr.group_hr_manager,1,1,1,1
 access_ksw_attendance_download_wizard_system,ksw.attendance.download.wizard.system,model_ksw_attendance_download_wizard,base.group_system,1,1,1,1
+access_ksw_attendance_download_wizard_hr_user,ksw.attendance.download.wizard.hr.user,model_ksw_attendance_download_wizard,hr.group_hr_user,1,1,1,0

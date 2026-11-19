@@ -19,13 +19,14 @@ class TestDocuments(TransactionCase):
         cls.plain = Users.create({'name': 'DOC Plain', 'login': 'doc_plain',
                                   'group_ids': [(6, 0, [cls.env.ref('base.group_user').id])]})
         cls.truck = cls.env['ksw.fleet.vehicle'].create({'name': 'DOC-1', 'vehicle_type': 'isuzu',
-                                                         'plate_number': 'ABC 1234'})
+                                                         'plate_number': 'ABC 1234',
+                                                         'x_registration_type': 'public'})
         cls.saudi = cls.env.ref('base.sa')
         cls.driver = cls.env['hr.employee'].create({'name': 'DOC Driver Ahmed', 'country_id': cls.env.ref('base.in').id})
         cls.truck._ksw_set_custodian(cls.driver)
         cls.T = {code: cls.env['ksw.document.type'].search([('code', '=', code)]) for code in
                  ('istimara', 'insurance', 'mvpi', 'operation_card', 'driving_licence', 'driver_card',
-                  'iqama', 'passport', 'visa')}
+                  'iqama', 'passport', 'visa', 'water_tank_licence')}
 
     def _scan(self, name='scan.png', mimetype='image/png'):
         # As the officer: in the screen he uploads it himself.
@@ -49,7 +50,7 @@ class TestDocuments(TransactionCase):
         for name in ('Istimara', 'Insurance', 'Periodic Inspection', 'Operation Card'):
             self.assertIn(name, self.truck.x_documents_missing)
         far = fields.Date.today() + timedelta(days=200)
-        for code in ('istimara', 'insurance', 'mvpi', 'operation_card'):
+        for code in ('istimara', 'insurance', 'mvpi', 'operation_card', 'water_tank_licence'):
             self._doc(code, self.truck, far)
         self.truck.invalidate_recordset()
         self.assertFalse(self.truck.x_document_issue)
@@ -90,9 +91,9 @@ class TestDocuments(TransactionCase):
         self.assertEqual(self.driver.passport_expiration_date, draft.expiry_date)
         with self.assertRaises(UserError):
             draft.with_user(self.officer).write({'number': 'X'})
-        with self.assertRaises(UserError):  # a document needs its scan and dates
+        with self.assertRaises(UserError):  # a document needs its dates (a scan is optional)
             self.env['ksw.document'].with_user(self.officer).create({
-                'applies_to': 'vehicle', 'vehicle_id': self.truck.id, 'type_id': self.T['istimara'].id,
+                'applies_to': 'vehicle', 'vehicle_id': self.truck.id, 'type_id': self.T['insurance'].id,
                 'number': '9'}).action_confirm()
 
     def test_ai_reader_parses_and_flags(self):

@@ -69,6 +69,13 @@
             <field name="applies_to">company</field><field name="required_for">none</field>
             <field name="ai_hint">ترخيص النقل، License Info on a Naql operation card</field>
         </record>
+        <record id="type_water_tank_licence" model="ksw.document.type">
+            <field name="name">Water Tank Licence</field>
+            <field name="code">water_tank_licence</field><field name="sequence">5</field>
+            <field name="applies_to">vehicle</field><field name="required_for">water_tankers</field>
+            <field name="alert_days">60</field>
+            <field name="ai_hint">رخصة صهريج نقل المياه بعد الفحص في منصة فاحص / هيئة المياه</field>
+        </record>
         <record id="type_employment_contract" model="ksw.document.type">
             <field name="name">Employment Contract (Qiwa)</field>
             <field name="code">employment_contract</field><field name="sequence">18</field>
@@ -91,6 +98,12 @@
     <function model="ksw.document.type" name="write">
         <value eval="[ref('type_iqama')]"/>
         <value eval="{'sync_number_field': 'ssnid'}"/>
+    </function>
+    <!-- The operation card is a Naql licence for public transport only
+         (noupdate above, so existing databases get it here). -->
+    <function model="ksw.document.type" name="write">
+        <value eval="[ref('type_operation_card')]"/>
+        <value eval="{'required_for': 'public_transport'}"/>
     </function>
     <function model="ksw.document.type" name="write">
         <value eval="[ref('type_istimara')]"/>

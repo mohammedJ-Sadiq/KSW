@@ -54,25 +54,29 @@
                               decoration-muted="action == 'skip'">
                             <field name="kind" column_invisible="True"/>
                             <field name="row_no"/>
-                            <field name="code" column_invisible="parent.source != 'absher_vehicles'"/>
-                            <field name="plate" column_invisible="parent.source != 'absher_vehicles'"/>
+                            <field name="code" column_invisible="parent.source not in ('absher_vehicles', 'tank_inspection')"/>
+                            <field name="plate" column_invisible="parent.source not in ('absher_vehicles', 'tank_inspection')"/>
                             <field name="vehicle_id" options="{'no_create': True}" readonly="kind == 'missing'"
-                                   column_invisible="parent.source != 'absher_vehicles'"/>
-                            <field name="id_number" column_invisible="parent.source == 'absher_vehicles'"/>
-                            <field name="person_name" column_invisible="parent.source == 'absher_vehicles'"/>
+                                   column_invisible="parent.source not in ('absher_vehicles', 'tank_inspection')"/>
+                            <field name="inspection_status" column_invisible="parent.source != 'tank_inspection'"/>
+                            <field name="licence_number" column_invisible="parent.source != 'tank_inspection'"/>
+                            <field name="licence_expiry" column_invisible="parent.source != 'tank_inspection'"/>
+                            <field name="inspection_note" optional="show" column_invisible="parent.source != 'tank_inspection'"/>
+                            <field name="id_number" column_invisible="parent.source in ('absher_vehicles', 'tank_inspection')"/>
+                            <field name="person_name" column_invisible="parent.source in ('absher_vehicles', 'tank_inspection')"/>
                             <field name="employee_id" options="{'no_create': True}" readonly="kind == 'missing'"
-                                   column_invisible="parent.source == 'absher_vehicles'"/>
-                            <field name="nationality" optional="hide" column_invisible="parent.source == 'absher_vehicles'"/>
+                                   column_invisible="parent.source in ('absher_vehicles', 'tank_inspection')"/>
+                            <field name="nationality" optional="hide" column_invisible="parent.source in ('absher_vehicles', 'tank_inspection')"/>
                             <field name="iqama_expiry" column_invisible="parent.source != 'muqeem_residents'"/>
                             <field name="passport_no" optional="hide" column_invisible="parent.source != 'muqeem_residents'"/>
                             <field name="passport_expiry" column_invisible="parent.source != 'muqeem_residents'"/>
                             <field name="outside_kingdom" optional="show" column_invisible="parent.source != 'muqeem_residents'"/>
-                            <field name="line_registration_id" optional="show" column_invisible="parent.source == 'absher_vehicles'"/>
+                            <field name="line_registration_id" optional="show" column_invisible="parent.source in ('absher_vehicles', 'tank_inspection')"/>
                             <field name="employee_number" optional="show" column_invisible="parent.source != 'qiwa_contracts'"/>
                             <field name="contract_number" optional="show" column_invisible="parent.source != 'qiwa_contracts'"/>
                             <field name="contract_status" optional="show" column_invisible="parent.source != 'qiwa_contracts'"/>
                             <field name="join_date" optional="hide" column_invisible="parent.source != 'qiwa_contracts'"/>
-                            <field name="occupation" optional="hide" column_invisible="parent.source == 'absher_vehicles'"/>
+                            <field name="occupation" optional="hide" column_invisible="parent.source in ('absher_vehicles', 'tank_inspection')"/>
                             <field name="action" readonly="kind == 'missing'"/>
                             <field name="match_note" optional="show"/>
                             <field name="make" optional="show" column_invisible="parent.source != 'absher_vehicles'"/>

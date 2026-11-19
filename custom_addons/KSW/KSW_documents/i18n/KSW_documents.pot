@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-18 12:49+0000\n"
-"PO-Revision-Date: 2026-11-18 12:49+0000\n"
+"POT-Creation-Date: 2026-11-19 08:51+0000\n"
+"PO-Revision-Date: 2026-11-19 08:51+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -274,13 +274,13 @@ msgstr ""
 #. module: KSW_documents
 #. odoo-python
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
-msgid "Attach the export file first."
+msgid "Archived in Odoo."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW_documents/models/ksw_document.py:0
-msgid "Attach the scan of %s."
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Attach the export file first."
 msgstr ""
 
 #. module: KSW_documents
@@ -903,6 +903,17 @@ msgid "Export File"
 msgstr ""
 
 #. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__source__fahes
+msgid "Fahes (tank inspection)"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Failed the tank inspection: %s"
+msgstr ""
+
+#. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__file_name
 msgid "File Name"
 msgstr ""
@@ -1126,9 +1137,30 @@ msgid "Inspection Expiry (Hijri)"
 msgstr ""
 
 #. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__inspection_note
+msgid "Inspection Note"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__request_number
+msgid "Inspection Request"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__inspection_status
+msgid "Inspection Result"
+msgstr ""
+
+#. module: KSW_documents
 #. odoo-python
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Inspection expiry"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Inspection request %s"
 msgstr ""
 
 #. module: KSW_documents
@@ -1268,6 +1300,12 @@ msgstr ""
 #. module: KSW_documents
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document_upload_wizard__type_id
 msgid "Leave empty for the AI reader to tell; required without it."
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Licence expiry not a date: %s"
 msgstr ""
 
 #. module: KSW_documents
@@ -1465,7 +1503,19 @@ msgstr ""
 #. module: KSW_documents
 #. odoo-python
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "No tank licence yet: %s"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "No valid insurance on Absher."
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "No vehicle in Odoo with this chassis no."
 msgstr ""
 
 #. module: KSW_documents
@@ -1587,6 +1637,21 @@ msgid "Operation Card"
 msgstr ""
 
 #. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__card_expiry
+msgid "Operation Card Expiry"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__card_expiry_text
+msgid "Operation Card Expiry (as exported)"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__card_number
+msgid "Operation Card No."
+msgstr ""
+
+#. module: KSW_documents
 #: model_terms:ir.actions.act_window,help:KSW_documents.action_ksw_company_registration
 msgid ""
 "Or upload the CR certificates in Bulk Upload: confirming one records it here. Company\n"
@@ -1685,6 +1750,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Preview the export first."
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_type__required_for__public_transport
+msgid "Public-transport company vehicles (نقل عام)"
 msgstr ""
 
 #. module: KSW_documents
@@ -1908,6 +1978,26 @@ msgid "Sync Number Field"
 msgstr ""
 
 #. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import__source__tank_inspection
+msgid "Tank Inspection Report (Fahes)"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__licence_expiry
+msgid "Tank Licence Expiry"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__licence_expiry_text
+msgid "Tank Licence Expiry (as exported)"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__licence_number
+msgid "Tank Licence No."
+msgstr ""
+
+#. module: KSW_documents
 #. odoo-python
 #: code:addons/KSW_documents/models/ai_reader.py:0
 msgid "The AI reader could not be reached (%s). Fill the document by hand."
@@ -1993,6 +2083,12 @@ msgstr ""
 #. module: KSW_documents
 #: model:ir.model.fields,help:KSW_documents.field_ksw_document_type__ai_hint
 msgid "Told to the AI reader, e.g. its Arabic title."
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Total loss (accident) per the report."
 msgstr ""
 
 #. module: KSW_documents
@@ -2141,6 +2237,21 @@ msgid "Warnings"
 msgstr ""
 
 #. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__water_note
+msgid "Water Authority Note"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ksw.document.type,name:KSW_documents.type_water_tank_licence
+msgid "Water Tank Licence"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_type__required_for__water_tankers
+msgid "Water tankers (trailer heads and Isuzu tankers)"
+msgstr ""
+
+#. module: KSW_documents
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__website_message_ids
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__website_message_ids
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import__website_message_ids
@@ -2210,6 +2321,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
 msgid "in the register"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "not inspected"
 msgstr ""
 
 #. module: KSW_documents

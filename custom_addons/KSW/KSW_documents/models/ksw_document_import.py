@@ -25,7 +25,10 @@ ABSHER_VEHICLE_COLUMNS = {
     'تاريخ انتهاء الفحص': 'mvpi_expiry_text', 'رقم هوية المستخدم الفعلي': 'user_id_number',
     'اسم المستخدم الفعلي': 'user_name', 'حالة الفحص': 'mvpi_status', 'حالة التأمين': 'insurance_status',
     'حالة التحفظ': 'hold_status', 'وضع المركبة': 'vehicle_status', 'نوع الهيكل': 'body_type',
+    # Not in Absher itself; read when a compiled vehicles list carries them.
+    'رقم بطاقة التشغيل': 'card_number', 'تاريخ انتهاء بطاقة التشغيل': 'card_expiry_text',
 }
+REGISTRATION_TYPES = {'نقل عام': 'public', 'نقل خاص': 'private_transport', 'خاص': 'private'}
 # Muqeem ▸ Reports ▸ Active residents.
 MUQEEM_COLUMNS = {
     'رقم الاقامة': 'id_number', 'الاسم': 'person_name', 'الجنسية': 'nationality', 'المهنة': 'occupation',
@@ -46,9 +49,18 @@ QIWA_COLUMNS = {
     'الجنسية': 'nationality', 'الجنس': 'gender', 'تاريخ الميلاد': 'birth_date_text', 'المهنة': 'occupation',
     'تاريخ الالتحاق (البسيط)': 'join_date_text',
 }
+# The tank-inspection report (Fahes / Water Authority): several sheets, each
+# in sections with their own header row. Headers are compared without the
+# tatweel «ـ» the sheets decorate them with.
+TANK_COLUMNS = {
+    'رقم اللوحة': 'plate', 'الكود': 'code', 'رقم الهيكل': 'vin', 'رقم الطلب': 'request_number',
+    'رقم الطلب في منصة فاحص': 'request_number', 'حالة الطلب': 'inspection_status', 'ملاحظة': 'inspection_note',
+    'رقم الرخصة': 'licence_number', 'صلاحية الرخصة': 'licence_expiry_text', 'صلاحية': 'licence_expiry_text',
+    'رقم طلب في هيئة المياه': 'water_note',
+}
 # The column that identifies each export's header row.
 HEADER_MARK = {'absher_vehicles': 'رقم الهيكل', 'muqeem_residents': 'رقم الاقامة', 'gosi_subscribers': 'رقم الهوية',
-               'qiwa_contracts': 'رقم العقد'}
+               'qiwa_contracts': 'رقم العقد', 'tank_inspection': 'رقم الهيكل'}
 # Imported every month (a reminder on Home); GOSI only when HR wants to check.
 MONTHLY_SOURCES = ('absher_vehicles', 'muqeem_residents')
 VALID = 'ساري المفعول'
@@ -86,7 +98,8 @@ class KswDocumentImport(models.Model):
     source = fields.Selection([('absher_vehicles', 'Absher Business: Vehicles'),
                                ('muqeem_residents', 'Muqeem: Active Residents'),
                                ('gosi_subscribers', 'GOSI: Active Subscribers'),
-                               ('qiwa_contracts', 'Qiwa: Active Contracts')], required=True,
+                               ('qiwa_contracts', 'Qiwa: Active Contracts'),
+                               ('tank_inspection', 'Tank Inspection Report (Fahes)')], required=True,
                               default='absher_vehicles')
     registration_id = fields.Many2one('ksw.company.registration', string='Establishment (CR)',
                                       help='GOSI lists one establishment per file: the registration its '
@@ -173,8 +186,14 @@ class KswDocumentImport(models.Model):
         name = (self.file_name or '').lower()
         if name.endswith(('.xlsx', '.xlsm')) or raw[:2] == b'PK':
             import openpyxl
-            sheet = openpyxl.load_workbook(io.BytesIO(raw), read_only=True, data_only=True).active
-            table = [[('' if c is None else c) for c in row] for row in sheet.iter_rows(values_only=True)]
+            book = openpyxl.load_workbook(io.BytesIO(raw), read_only=True, data_only=True)
+            mark = HEADER_MARK[self.source]
+            table = []
+            # The sheet that has the data, whichever tab it is on.
+            for sheet in [book.active] + [s for s in book.worksheets if s != book.active]:
+                table = [[('' if c is None else c) for c in row] for row in sheet.iter_rows(values_only=True)]
+                if any(mark in [str(c).strip() for c in row] for row in table[:50]):
+                    break
         else:
             text = raw.decode('utf-8-sig', errors='replace')
             try:
@@ -234,6 +253,9 @@ class KswDocumentImport(models.Model):
             if fleet_key(v.name):
                 by_code.setdefault(fleet_key(v.name), Vehicle.browse())
                 by_code[fleet_key(v.name)] |= v
+        # A section title («قائمة مركبات …») or a repeated header row is not a vehicle.
+        rows = [r for r in rows if str(r.get('رقم الهيكل') or '').strip() not in ('', 'رقم الهيكل')
+                or plate_key(str(r.get('رقم اللوحة') or ''))]
         codes = [fleet_key(r.get('الكود')) for r in rows]
         file_digits = [re.sub(r'\D', '', str(r.get('رقم اللوحة') or '')) for r in rows]
         vals_list = []
@@ -242,6 +264,9 @@ class KswDocumentImport(models.Model):
             for header, field in ABSHER_VEHICLE_COLUMNS.items():
                 value = row.get(header, '')
                 vals[field] = '' if value is None else str(value).strip()
+            # A section title or a repeated header row is not a vehicle.
+            if vals['vin'] in ('', 'رقم الهيكل') and not plate_key(vals['plate']):
+                continue
             key = codes[n - 1]
             vehicle, how = Vehicle.browse(), False
             if vin_key(vals['vin']) in by_vin:
@@ -266,6 +291,66 @@ class KswDocumentImport(models.Model):
                       'plate': v.plate_number, 'vin': v.x_vin, 'code': v.name,
                       'warnings': _('No longer in the Absher export: sold, scrapped or transferred? '
                                     'Archive it in Fleet if so.')} for v in gone])
+
+    def _read_all_sections(self):
+        """Every sheet, every section: a header row (with «رقم الهيكل») starts
+        a section; the rows under it are read with that header."""
+        self.ensure_one()
+        import openpyxl
+        book = openpyxl.load_workbook(io.BytesIO(base64.b64decode(self.file)), read_only=True, data_only=True)
+        rows = []
+        for sheet in book.worksheets:
+            headers = None
+            for raw in sheet.iter_rows(values_only=True):
+                cells = [('' if c is None else c) for c in raw]
+                texts = [re.sub(r'\s+', ' ', str(c).replace('ـ', '')).strip() for c in cells]
+                if 'رقم الهيكل' in texts:
+                    headers = texts
+                    continue
+                if headers:
+                    row = {}
+                    for h, c in zip(headers, cells):
+                        if h and h not in row:
+                            row[h] = c.strip() if isinstance(c, str) else c
+                    row['_sheet'] = sheet.title
+                    rows.append(row)
+        return rows
+
+    def _preview_tank_inspection(self, rows, preamble):
+        rows = self._read_all_sections()
+        Vehicle = self.env['ksw.fleet.vehicle'].sudo().with_context(active_test=False)
+        by_vin = {vin_key(v.x_vin): v for v in Vehicle.search([('x_vin', '!=', False)])}
+        vals_list = []
+        for n, row in enumerate(rows, 1):
+            vals = {'import_id': self.id, 'row_no': n, 'kind': 'row', 'absher_department': row.get('_sheet')}
+            for header, field in TANK_COLUMNS.items():
+                value = row.get(header)
+                if value not in (None, '') and not vals.get(field):
+                    vals[field] = str(value).strip()
+            if not vin_key(vals.get('vin')):
+                continue
+            vehicle = by_vin.get(vin_key(vals['vin']))
+            vals.update(vehicle_id=vehicle and vehicle.id, match_note=vehicle and _('Chassis No.'),
+                        action='update' if vehicle else 'skip')
+            vals_list.append(vals)
+        lines = self.env['ksw.document.import.line'].create(vals_list)
+        for line in lines:
+            notes = []
+            if not line.vehicle_id:
+                notes.append(_('No vehicle in Odoo with this chassis no.'))
+            elif not line.vehicle_id.active:
+                notes.append(_('Archived in Odoo.'))
+            status = (line.inspection_status or '').strip()
+            if status.startswith('راسب') or status == 'رسبت':
+                notes.append(_('Failed the tank inspection: %s', line.inspection_note or '-'))
+            text = ' '.join(filter(None, [line.inspection_note, line.water_note]))
+            if 'تلف كلي' in text:
+                notes.append(_('Total loss (accident) per the report.'))
+            if line.licence_expiry_text and not line.licence_expiry:
+                notes.append(_('Licence expiry not a date: %s', line.licence_expiry_text))
+            if not line.licence_number and not notes:
+                notes.append(_('No tank licence yet: %s', line.inspection_note or _('not inspected')))
+            line.warnings = '\n'.join(notes) or False
 
     def _employees_by_id_number(self):
         """Employees by iqama / Saudi ID: SSN No. is where payroll keeps it."""
@@ -402,6 +487,16 @@ class KswDocumentImportLine(models.Model):
     user_id_number = fields.Char(string='Actual User ID')
     user_name = fields.Char(string='Actual User')
     user_employee_id = fields.Many2one('hr.employee', compute='_compute_user_employee', string='Actual User in Odoo')
+    card_number = fields.Char(string='Operation Card No.')
+    request_number = fields.Char(string='Inspection Request')
+    inspection_status = fields.Char(string='Inspection Result')
+    inspection_note = fields.Char(string='Inspection Note')
+    water_note = fields.Char(string='Water Authority Note')
+    licence_number = fields.Char(string='Tank Licence No.')
+    licence_expiry_text = fields.Char(string='Tank Licence Expiry (as exported)')
+    licence_expiry = fields.Date(compute='_compute_dates', string='Tank Licence Expiry')
+    card_expiry_text = fields.Char(string='Operation Card Expiry (as exported)')
+    card_expiry = fields.Date(compute='_compute_dates', string='Operation Card Expiry')
     # People (Muqeem, GOSI)
     employee_id = fields.Many2one('hr.employee', string='Employee in Odoo')
     id_number = fields.Char(string='Iqama / ID No.')
@@ -432,13 +527,15 @@ class KswDocumentImportLine(models.Model):
     join_date = fields.Date(compute='_compute_dates', string='Joining Date (Qiwa)')
 
     @api.depends('istimara_expiry_text', 'mvpi_expiry_text', 'passport_expiry_text', 'iqama_expiry_text',
-                 'birth_date_text', 'contract_date_text', 'join_date_text')
+                 'birth_date_text', 'contract_date_text', 'join_date_text', 'card_expiry_text',
+                 'licence_expiry_text')
     def _compute_dates(self):
         for line in self:
             for src, dst in (('istimara_expiry_text', 'istimara_expiry'), ('mvpi_expiry_text', 'mvpi_expiry'),
                              ('passport_expiry_text', 'passport_expiry'), ('iqama_expiry_text', 'iqama_expiry'),
                              ('birth_date_text', 'birth_date'), ('contract_date_text', 'contract_date'),
-                             ('join_date_text', 'join_date')):
+                             ('join_date_text', 'join_date'), ('card_expiry_text', 'card_expiry'),
+                             ('licence_expiry_text', 'licence_expiry')):
                 try:
                     line[dst] = parse_date(line[src])
                 except ValueError:
@@ -462,6 +559,7 @@ class KswDocumentImportLine(models.Model):
 
     def _compute_warnings(self):
         """What HR should look at; none of it is written over Odoo's data."""
+        self = self.filtered(lambda l: l.import_id.source != 'tank_inspection')
         people = self.filtered(lambda l: l.import_id.source != 'absher_vehicles')
         people._compute_people_warnings()
         for line in (self - people).filtered(lambda l: l.kind == 'row'):
@@ -540,7 +638,23 @@ class KswDocumentImportLine(models.Model):
         self.ensure_one()
         if self.import_id.source == 'absher_vehicles':
             return self._apply_vehicle()
+        if self.import_id.source == 'tank_inspection':
+            return self._apply_tank()
         return self._apply_person()
+
+    def _apply_tank(self):
+        """The water-tank licence, on the vehicle that carries the tank."""
+        vehicle = self.vehicle_id.sudo()
+        tank_type = self.env.ref('KSW_documents.type_water_tank_licence', raise_if_not_found=False)
+        if not (vehicle and tank_type and self.licence_number and self.licence_expiry):
+            return []
+        outcome = self.env['ksw.document']._record_from_source(
+            tank_type, vehicle, 'fahes', self.import_id, number=self.licence_number, expiry=self.licence_expiry,
+            note=self.request_number and _('Inspection request %s', self.request_number) or False)
+        done = [{'new': _('Documents recorded'), 'renewed': _('Documents renewed'), 'same': _('Documents unchanged'),
+                 'older': _('Older than the register (ignored)')}[outcome]]
+        self.result = done[0]
+        return done
 
     def _apply_person(self):
         """Muqeem / GOSI: the registration the employee is under, and (Muqeem)
@@ -610,6 +724,8 @@ class KswDocumentImportLine(models.Model):
                   'x_color': self.color}
         if self.year and self.year.isdigit():
             master['year'] = int(self.year)
+        if REGISTRATION_TYPES.get(self.registration_type) and 'x_registration_type' in vehicle._fields:
+            master['x_registration_type'] = REGISTRATION_TYPES[self.registration_type]
         fill = {f: v for f, v in master.items() if v not in NONE_VALUES and f in vehicle._fields and not vehicle[f]}
         # "3463" typed for «أ ع ط 3463» is completed, not overwritten.
         if (vehicle.plate_number or '').strip().isdigit() \
@@ -635,6 +751,10 @@ class KswDocumentImportLine(models.Model):
                 outcomes.append(Document._record_from_source(
                     types['mvpi'], vehicle, 'absher', imp, verified=True,
                     note=_('Not required yet (new vehicle), per Absher.')))
+        if 'operation_card' in types and self.card_number not in NONE_VALUES:
+            outcomes.append(Document._record_from_source(
+                types['operation_card'], vehicle, 'naql', imp, number=self.card_number,
+                expiry=self.card_expiry or False))
         if 'insurance' in types and self.insurance_status == VALID:
             outcomes.append(Document._record_from_source(types['insurance'], vehicle, 'absher', imp,
                                                          verified=True))

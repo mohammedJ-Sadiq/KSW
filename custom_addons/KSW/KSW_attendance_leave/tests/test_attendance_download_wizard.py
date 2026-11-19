@@ -16,8 +16,9 @@ is the real code path.
 from datetime import datetime as dt, date, timedelta
 from unittest.mock import patch
 
-from odoo.exceptions import UserError
-from odoo.tests.common import TransactionCase
+from odoo.exceptions import AccessError, UserError
+from odoo.tests import tagged
+from odoo.tests.common import TransactionCase, new_test_user
 
 
 class FakeLog:
@@ -40,6 +41,9 @@ class FakeConnection:
         self.disconnected = True
 
 
+# post_install: the test users need every module's res.users columns
+# (KSW_backend_theme adds NOT NULL ones and loads after this module).
+@tagged('post_install', '-at_install')
 class TestAttendanceDownloadWizard(TransactionCase):
 
     @classmethod
@@ -100,6 +104,17 @@ class TestAttendanceDownloadWizard(TransactionCase):
             'device_id': cls.device.id,
         })
 
+        # HR re-reads a period but owns no device configuration. No
+        # attendance group either: the wizard must not need hr.attendance write.
+        cls.hr_officer = new_test_user(
+            cls.env, login='reread_hr_officer',
+            groups='base.group_user,hr.group_hr_user')
+        cls.hr_manager = new_test_user(
+            cls.env, login='reread_hr_manager',
+            groups='base.group_user,hr.group_hr_manager')
+        cls.plain_user = new_test_user(
+            cls.env, login='reread_plain_user', groups='base.group_user')
+
         # Sat 2026-07-04 → Thu 2026-07-09, plus Fri 2026-07-10 off.
         cls.date_from = date(2026, 7, 4)
         cls.date_to = date(2026, 7, 9)
@@ -115,7 +130,7 @@ class TestAttendanceDownloadWizard(TransactionCase):
             logs.append(FakeLog(bio_id, dt.combine(day, dt.min.time()) + timedelta(hours=16, minutes=30)))
         return logs
 
-    def _run(self, logs, **overrides):
+    def _run(self, logs, user=None, **overrides):
         vals = {
             'device_id': self.device.id,
             'date_from': self.date_from,
@@ -124,7 +139,10 @@ class TestAttendanceDownloadWizard(TransactionCase):
             'generate_weekend_grants': False,
         }
         vals.update(overrides)
-        wizard = self.env['ksw.attendance.download.wizard'].create(vals)
+        Wizard = self.env['ksw.attendance.download.wizard']
+        if user:
+            Wizard = Wizard.with_user(user)
+        wizard = Wizard.create(vals)
         conn = FakeConnection(logs)
         with patch.object(
             type(self.device), '_connect_device', return_value=conn,
@@ -237,3 +255,73 @@ class TestAttendanceDownloadWizard(TransactionCase):
         with self.assertRaises(UserError) as ctx:
             wizard.action_download()
         self.assertIn('too large', str(ctx.exception))
+
+    # ------------------------------------------------------------------
+    # HR re-reads, the administrator configures
+    # ------------------------------------------------------------------
+    def test_hr_officer_rereads_and_rebuilds(self):
+        """HR runs the whole repair without any attendance-write right."""
+        attended = [d for d in (self.date_from + timedelta(days=i) for i in range(6))
+                    if d != date(2026, 7, 6)]
+        wizard, _conn = self._run(
+            self._logs_for('8001', attended), user=self.hr_officer,
+            employee_ids=[(6, 0, self.employee.ids)],
+            date_to=date(2026, 7, 10),
+            generate_absences=True, generate_weekend_grants=True)
+
+        self.assertIn('5 day(s) created', wizard.result_message)
+        self.assertIn('Absence records created: 1', wizard.result_message)
+        self.assertIn('1 granted', wizard.result_message)
+
+    def test_non_hr_user_cannot_reread(self):
+        with self.assertRaises(AccessError):
+            self._run([], user=self.plain_user,
+                      employee_ids=[(6, 0, self.employee.ids)])
+
+    def test_hr_cannot_change_device_configuration(self):
+        """The cybrosys ACL lets HR write devices; the KSW guard does not."""
+        for user in (self.hr_officer, self.hr_manager):
+            device = self.device.with_user(user)
+            with self.assertRaises(UserError):
+                device.write({'device_ip': '192.0.2.99'})
+            with self.assertRaises(UserError):
+                device.unlink()
+            with self.assertRaises(UserError):
+                self.env['biometric.device.details'].with_user(user).create(
+                    {'name': 'Rogue', 'device_ip': '192.0.2.50'})
+        self.assertEqual(self.device.device_ip, '192.0.2.20')
+
+    def test_hr_cannot_run_whole_device_actions(self):
+        """Clear, restart, full download and mapping stay administrator-only,
+        refused before any connection is opened."""
+        device = self.device.with_user(self.hr_manager)
+        with patch.object(type(self.device), '_connect_device') as connect:
+            for action in ('action_clear_attendance', 'action_restart_device',
+                           'action_download_all_attendance',
+                           'action_download_incremental_attendance',
+                           'action_map_biometric_ids',
+                           'action_generate_all_absences'):
+                with self.assertRaises(UserError, msg=action):
+                    getattr(device, action)()
+            connect.assert_not_called()
+
+    def test_sync_bookkeeping_still_writable(self):
+        """The sync and the stale-device cron stamp these as whoever runs."""
+        stamp = dt(2026, 7, 1, 6, 0, 0)
+        self.device.with_user(self.hr_officer).write(
+            {'last_download_time': stamp, 'x_stale_alert_sent': True})
+        self.assertEqual(self.device.last_download_time, stamp)
+
+    def test_reread_menu_reaches_hr(self):
+        """Effective menu visibility is the intersection with every ancestor
+        (gotcha #41), so check the menu is actually reachable."""
+        menu = self.env.ref('KSW_attendance_leave.ksw_attendance_reread_menu')
+        officer = new_test_user(
+            self.env, login='reread_menu_officer',
+            groups='base.group_user,hr.group_hr_user,'
+                   'hr_attendance.group_hr_attendance_officer')
+        visible = self.env['ir.ui.menu'].with_user(officer)._visible_menu_ids()
+        self.assertIn(menu.id, visible)
+        visible = self.env['ir.ui.menu'].with_user(
+            self.plain_user)._visible_menu_ids()
+        self.assertNotIn(menu.id, visible)

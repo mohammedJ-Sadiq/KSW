@@ -17,6 +17,8 @@ class KswDocumentType(models.Model):
     required_for = fields.Selection([
         ('none', 'Nobody (optional)'),
         ('own_fleet', 'Every company vehicle'),
+        ('public_transport', 'Public-transport company vehicles (نقل عام)'),
+        ('water_tankers', 'Water tankers (trailer heads and Isuzu tankers)'),
         ('custodians', 'Employees who hold a vehicle'),
         ('non_saudi', 'Non-Saudi employees'),
         ('all', 'Every employee'),

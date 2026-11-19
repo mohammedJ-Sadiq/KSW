@@ -307,3 +307,23 @@ msgstr "رقم اللوحة (عربي)"
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__x_plate_en
 msgid "Plate (English)"
 msgstr "رقم اللوحة (إنجليزي)"
+
+#. module: KSW_fleet
+#: model:ir.model.fields.selection,name:KSW_fleet.selection__ksw_fleet_vehicle__x_registration_type__private
+msgid "Private (خاص)"
+msgstr "خاص"
+
+#. module: KSW_fleet
+#: model:ir.model.fields.selection,name:KSW_fleet.selection__ksw_fleet_vehicle__x_registration_type__private_transport
+msgid "Private Transport (نقل خاص)"
+msgstr "نقل خاص"
+
+#. module: KSW_fleet
+#: model:ir.model.fields.selection,name:KSW_fleet.selection__ksw_fleet_vehicle__x_registration_type__public
+msgid "Public Transport (نقل عام)"
+msgstr "نقل عام"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__x_registration_type
+msgid "Registration Type"
+msgstr "نوع التسجيل"

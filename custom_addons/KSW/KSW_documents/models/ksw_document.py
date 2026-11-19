@@ -69,7 +69,7 @@ class KswDocument(models.Model):
                                            'this document is for.')
     detected_parent_number = fields.Char(string='Main CR No. (as read)')
     source = fields.Selection([('upload', 'Scan'), ('absher', 'Absher Business'), ('muqeem', 'Muqeem'),
-                               ('naql', 'Naql'), ('qiwa', 'Qiwa')], default='upload', required=True, readonly=True,
+                               ('naql', 'Naql'), ('qiwa', 'Qiwa'), ('fahes', 'Fahes (tank inspection)')], default='upload', required=True, readonly=True,
                               string='Source')
     verified_date = fields.Date(readonly=True, help='The day a government export last showed this document as '
                                                     'valid. Used when the export gives a status but no date.')
@@ -213,8 +213,8 @@ class KswDocument(models.Model):
                 raise UserError(_('Choose which registration (main CR or branch) %s is for.', doc.name))
             if doc.type_id.has_expiry and doc.type_id.expiry_on_document and not doc.expiry_date:
                 raise UserError(_('Fill in the expiry date of %s.', doc.name))
-            if not doc.attachment_ids:
-                raise UserError(_('Attach the scan of %s.', doc.name))
+            # No scan needed (user decision 2026-11-19): the number and the
+            # dates are what the register is for; a copy is optional.
         for doc in self.sudo():
             current = doc._owner_documents().filtered(
                 lambda d: d.state == 'confirmed' and d.type_id == doc.type_id and d != doc)

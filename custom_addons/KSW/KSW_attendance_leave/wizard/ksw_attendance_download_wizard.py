@@ -12,6 +12,12 @@ _logger = logging.getLogger(__name__)
 # halfway through.
 _MAX_SCOPE = 15000
 
+# Re-reading a period only re-applies what the device holds and rebuilds that
+# period's absences and weekend grants, so it is safe to hand to HR. The
+# device configuration and the whole-device actions stay with the Settings
+# administrator (biometric_device_details.py::_check_device_admin).
+_REREAD_GROUP = 'hr.group_hr_user'
+
 
 class KswAttendanceDownloadWizard(models.TransientModel):
     _name = 'ksw.attendance.download.wizard'
@@ -32,6 +38,8 @@ class KswAttendanceDownloadWizard(models.TransientModel):
     def action_download(self):
         """Pull this device's punches for the chosen period and employees."""
         self.ensure_one()
+        if not self.env.su and not self.env.user.has_group(_REREAD_GROUP):
+            raise UserError(_('Only HR can re-read attendance from a device.'))
         employees = self._scoped_employees()
 
         span = self._day_span()
@@ -42,9 +50,12 @@ class KswAttendanceDownloadWizard(models.TransientModel):
                 'period or pick specific employees.'
             ) % {'emp': len(employees), 'days': span})
 
-        Sync = self.env['biometric.attendance.sync']
+        # Authority checked above. HR Officers cannot write hr.attendance
+        # and need not: the sync writes the punches, absences and grants.
+        Sync = self.env['biometric.attendance.sync'].sudo()
+        employees = employees.sudo()
         downloaded = Sync.download_attendance_range(
-            self.device_id, self.date_from, self.date_to, employees)
+            self.device_id.sudo(), self.date_from, self.date_to, employees)
 
         lines = [
             _('Device: %(device)s\n'
@@ -82,8 +93,9 @@ class KswAttendanceDownloadWizard(models.TransientModel):
 
         self.result_message = '\n'.join(lines)
         _logger.info(
-            "Specific attendance download: device %s, %s to %s, %d employees "
-            "— %d created, %d updated",
-            self.device_id.name, self.date_from, self.date_to, len(employees),
+            "Specific attendance download by %s: device %s, %s to %s, "
+            "%d employees — %d created, %d updated",
+            self.env.user.login, self.device_id.name,
+            self.date_from, self.date_to, len(employees),
             downloaded['created'], downloaded['updated'])
         return self._reopen()

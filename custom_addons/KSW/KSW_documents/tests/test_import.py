@@ -1,5 +1,5 @@
 import base64
-from datetime import date
+from datetime import date, datetime
 
 from odoo.tests import TransactionCase, tagged
 
@@ -110,6 +110,66 @@ class TestAbsherImport(TransactionCase):
         self.assertEqual((row.vehicle_id, row.action, row.match_note), (pickup, 'update', 'Plate digits'))
         imp.action_apply()
         self.assertEqual((pickup.plate_number, pickup.x_plate_en), ('ق ك ب 9904', 'BKG 9904'))
+
+    def test_compiled_list_with_operation_cards(self):
+        # The company's own vehicles report: a title row, the header repeated
+        # per section, and Naql operation-card columns after Absher's.
+        header = HEADER + '\tرقم بطاقة التشغيل\tتاريخ انتهاء بطاقة التشغيل'
+        text = '\n'.join(['قائمة مركبات\t\t', header, 'قائمة مركبات العبوات\t\t', T196 + '\t11-99990001\t2027-01-05 00:00:00',
+                           header, BOX + '\t-\t-'])
+        imp = self.env['ksw.document.import'].with_user(self.officer).create({
+            'file': base64.b64encode(text.encode()), 'file_name': 'report.csv'})
+        imp.action_preview()
+        rows = imp.line_ids.filtered(lambda l: l.kind == 'row')
+        self.assertEqual(len(rows), 2)
+        imp.action_apply()
+        card = self.env['ksw.document'].search([('vehicle_id', '=', self.head.id),
+                                                ('type_id.code', '=', 'operation_card'), ('state', '=', 'confirmed')])
+        self.assertEqual((card.number, str(card.expiry_date), card.source), ('11-99990001', '2027-01-05', 'naql'))
+        self.assertEqual(self.head.x_registration_type, 'public')
+
+    def test_tank_inspection_report(self):
+        import io
+        import openpyxl
+        self._import(T196, IS386).action_apply()   # both known by their chassis no.
+        book = openpyxl.Workbook()
+        sheet = book.active
+        sheet.title = 'الـخـدمـة'
+        sheet.append(['قائمة مركبات التريلات'])
+        sheet.append(['#', 'رقم اللوحة', 'الـكود', 'رقم الهيكل', 'رقم الطلب', 'حالة الطلب ', 'ملاحظة',
+                      'رقم الرخصة ', 'صلاحية الرخصة'])
+        sheet.append([1, 'ق ك ل 9902', 'T9196', 'TSTB9634031C013456', 'R-1', 'ناجح', None, 26999999,
+                      datetime(2027, 5, 24)])
+        sheet.append(['مركبات رسبة'])
+        sheet.append(['#', 'رقم اللوحة', 'الـكود', 'رقم الهيكل', 'رقم الطلب', 'حالة الطلب ', 'ملاحظة'])
+        sheet.append([1, 'ق ك د 9903', 'IS9386', 'TSTKP34T1S7P29672', 'R-2', 'راسب ', 'مطابقة المقطورة'])
+        data = io.BytesIO()
+        book.save(data)
+        imp = self.env['ksw.document.import'].with_user(self.officer).create({
+            'source': 'tank_inspection', 'file_name': 'tanks.xlsx', 'file': base64.b64encode(data.getvalue())})
+        imp.action_preview()
+        rows = imp.line_ids
+        self.assertEqual(len(rows), 2)
+        failed = rows.filtered(lambda l: l.vehicle_id == self.isuzu)
+        self.assertIn('Failed the tank inspection', failed.warnings)
+        imp.action_apply()
+        licence = self.env['ksw.document'].search([('vehicle_id', '=', self.head.id),
+                                                   ('type_id.code', '=', 'water_tank_licence')])
+        self.assertEqual((licence.number, str(licence.expiry_date), licence.source), ('26999999', '2027-05-24', 'fahes'))
+        self.assertIn('Water Tank Licence', self.isuzu.x_documents_missing or '')
+
+    def test_operation_card_only_for_public_transport(self):
+        car = self.env['ksw.fleet.vehicle'].create({'name': 'IMP-CAR', 'x_registration_type': 'private'})
+        truck = self.env['ksw.fleet.vehicle'].create({'name': 'IMP-TRK', 'x_registration_type': 'public'})
+        self.assertNotIn('Operation Card', car.x_documents_missing or '')
+        self.assertIn('Operation Card', truck.x_documents_missing or '')
+
+    def test_document_confirms_without_a_scan(self):
+        doc = self.env['ksw.document'].with_user(self.officer).create({
+            'type_id': self.env.ref('KSW_documents.type_insurance').id, 'applies_to': 'vehicle',
+            'vehicle_id': self.head.id, 'number': 'POL-1', 'expiry_date': '2030-01-01'})
+        doc.action_confirm()
+        self.assertEqual(doc.state, 'confirmed')
 
     def test_absher_never_overwrites_odoo(self):
         self.head.plate_number = 'ABC 1'

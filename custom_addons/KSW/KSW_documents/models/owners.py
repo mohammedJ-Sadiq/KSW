@@ -106,10 +106,20 @@ class KswFleetVehicle(models.Model):
 
     def _ksw_required_types(self):
         types = self.env['ksw.document.type'].sudo().search(
-            [('applies_to', '=', 'vehicle'), ('required_for', '=', 'own_fleet')])
+            [('applies_to', '=', 'vehicle'), ('required_for', 'in', ('own_fleet', 'public_transport',
+                                                                     'water_tankers'))])
         own = set(self.env['res.company'].sudo().search([]).partner_id.ids)
-        return {v.id: types if (v.sudo().client_id.id in own and v.sudo().state == 'confirmed') else types.browse()
-                for v in self}
+        result = {}
+        for v in self.sudo():
+            if v.client_id.id not in own or v.state != 'confirmed':
+                result[v.id] = types.browse()
+                continue
+            # The operation card is for public transport only (Naql).
+            result[v.id] = types.filtered(lambda t: t.required_for == 'own_fleet' or (
+                t.required_for == 'public_transport' and v.x_registration_type == 'public') or (
+                # The tank licence is issued on the vehicle that carries the tank.
+                t.required_for == 'water_tankers' and v.vehicle_type in ('trailer', 'isuzu')))
+        return result
 
     def action_upload_documents(self):
         self.ensure_one()
