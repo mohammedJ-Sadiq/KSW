@@ -1,6 +1,6 @@
 {
     'name': 'KSW Fleet',
-    'version': '19.0.2.9.0',
+    'version': '19.0.2.10.0',
     'summary': 'Vehicle master data shared across KSW modules',
     'description': """
 Vehicle Master Data
@@ -21,8 +21,10 @@ each keeping its own free-text field.
         'account',
     ],
     'data': [
+        'security/security.xml',
         'security/ir.model.access.csv',
         'views/ksw_fleet_vehicle_views.xml',
+        'views/coupling_views.xml',
         'data/ksw_fleet_vehicle_data.xml',
     ],
     'post_init_hook': '_post_init_hook',

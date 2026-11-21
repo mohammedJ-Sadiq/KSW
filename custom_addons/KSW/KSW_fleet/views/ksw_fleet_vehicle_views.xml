@@ -68,28 +68,29 @@
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
+                    <field name="x_can_edit_vehicle" invisible="1"/>
                     <group>
                         <group string="Identification">
-                            <field name="name"/>
+                            <field name="name" readonly="not x_can_edit_vehicle"/>
                             <!-- res_partner_search_mode orders the picker by
                                  customer rank AND stamps customer_rank=1 on
                                  anything quick-created from it, so "client not
                                  in the list" needs no wizard. -->
-                            <field name="client_id" context="{'res_partner_search_mode': 'customer'}"/>
-                            <field name="vehicle_type"/>
-                            <field name="tank_number"/>
-                            <field name="plate_number"/>
-                            <field name="x_plate_en"/>
-                            <field name="x_registration_type"/>
-                            <field name="x_vin"/>
+                            <field name="client_id" readonly="not x_can_edit_vehicle" context="{'res_partner_search_mode': 'customer'}"/>
+                            <field name="vehicle_type" readonly="not x_can_edit_vehicle"/>
+                            <field name="tank_number" readonly="not x_can_edit_vehicle"/>
+                            <field name="plate_number" readonly="not x_can_edit_vehicle"/>
+                            <field name="x_plate_en" readonly="not x_can_edit_vehicle"/>
+                            <field name="x_registration_type" readonly="not x_can_edit_vehicle"/>
+                            <field name="x_vin" readonly="not x_can_edit_vehicle"/>
                         </group>
                         <group string="Details">
-                            <field name="brand"/>
-                            <field name="model"/>
-                            <field name="year"/>
-                            <field name="x_color"/>
-                            <field name="driver_id"/>
-                            <field name="driver_name"/>
+                            <field name="brand" readonly="not x_can_edit_vehicle"/>
+                            <field name="model" readonly="not x_can_edit_vehicle"/>
+                            <field name="year" readonly="not x_can_edit_vehicle"/>
+                            <field name="x_color" readonly="not x_can_edit_vehicle"/>
+                            <field name="driver_id" readonly="not x_can_edit_vehicle"/>
+                            <field name="driver_name" readonly="not x_can_edit_vehicle"/>
                             <field name="x_custodian_id"/>
                         </group>
                     </group>

@@ -81,6 +81,8 @@
                 <field name="model" optional="hide"/>
                 <field name="year" optional="hide"/>
                 <field name="driver_name" optional="show"/>
+                <field name="x_tedder_id" optional="show"/>
+                <field name="x_head_id" optional="hide"/>
                 <field name="x_department_id"/>
                 <field name="x_allocation_state" widget="badge"
                        decoration-info="x_allocation_state == 'in_transfer'"

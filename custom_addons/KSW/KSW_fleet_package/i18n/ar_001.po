@@ -26,8 +26,12 @@ msgstr "الموظف %(d)s ليس في %(dep)s: تغيير السائق يبقى
 #. module: KSW_fleet_package
 #. odoo-python
 #: code:addons/KSW_fleet_package/models/release_vehicle.py:0
-msgid "%(e)s answers for %(v)s: say what happens to it if he leaves."
-msgstr "%(e)s صاحب عهدة %(v)s: حدّد ما يحدث لها إذا غادر."
+msgid ""
+"%(e)s answers for %(v)s: say in Vehicles in Their Custody what happens to it"
+" if he leaves."
+msgstr ""
+"%(e)s صاحب عهدة %(v)s: حدّد في تبويب «المركبات في عهدتهم» ما يحدث لها إذا "
+"غادر."
 
 #. module: KSW_fleet_package
 #. odoo-python
@@ -256,3 +260,158 @@ msgstr "المركبات في عهدتهم"
 #: code:addons/KSW_fleet_package/models/release_vehicle.py:0
 msgid "Vehicles of the leaving employees: %s"
 msgstr "مركبات الموظفين المغادرين: %s"
+
+#. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__new_driver_holds
+msgid "New Driver Already Holds"
+msgstr "يحمل السائق الجديد عهدة"
+
+#. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_decision_wizard__x_vehicle_ids
+msgid "Their Vehicles, If They Leave"
+msgstr "مركباتهم في حال مغادرتهم"
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "%(d)s, the new driver of %(v)s, is being released himself (%(r)s)."
+msgstr ""
+"%(d)s، السائق الجديد للمركبة %(v)s، مدرج هو نفسه في طلب إخلاء طرف (%(r)s)."
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid ""
+"%(d)s is chosen as the new driver of both %(v)s and %(o)s (%(r)s): one "
+"driver takes one of them."
+msgstr ""
+"تم اختيار %(d)s سائقاً جديداً لكل من %(v)s و%(o)s (%(r)s): السائق الواحد "
+"يستلم مركبة واحدة فقط."
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid ""
+"%(d)s, the new driver of %(v)s, has no confirmed driving licence in the "
+"documents register."
+msgstr ""
+"%(d)s، السائق الجديد للمركبة %(v)s، ليس لديه رخصة قيادة معتمدة في سجل "
+"الوثائق."
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid ""
+"The driving licence of %(d)s, the new driver of %(v)s, expired on %(x)s."
+msgstr "انتهت رخصة قيادة %(d)s، السائق الجديد للمركبة %(v)s، بتاريخ %(x)s."
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "Their vehicles, if they leave:"
+msgstr "مركباتهم في حال مغادرتهم:"
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "driver change to %s"
+msgstr "تغيير السائق إلى %s"
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "released to the workshop"
+msgstr "إرجاع للورشة"
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "HR has it to confirm: %s."
+msgstr "لدى الموارد البشرية للاعتماد: %s."
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "HR registers it."
+msgstr "تسجّلها الموارد البشرية."
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "Request It from HR"
+msgstr "اطلبها من الموارد البشرية"
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "Choose the new driver of %s first."
+msgstr "اختر أولاً السائق الجديد للمركبة %s."
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "New driver of %(v)s (%(r)s)"
+msgstr "السائق الجديد للمركبة %(v)s (%(r)s)"
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "%(u)s asks HR to register this licence: %(n)s"
+msgstr "يطلب %(u)s من الموارد البشرية تسجيل هذه الرخصة: %(n)s"
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "Requested from HR"
+msgstr "تم الطلب من الموارد البشرية"
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid ""
+"HR has the driving licence of %s to register. You are told when it is "
+"confirmed: then submit again."
+msgstr ""
+"لدى الموارد البشرية رخصة قيادة %s لتسجيلها. ستصلك رسالة عند اعتمادها، وبعدها"
+" أعد الإرسال."
+
+#. module: KSW_fleet_package
+#: model:ir.actions.server,name:KSW_fleet_package.action_request_driver_licence
+msgid "Request the Driving Licence from HR"
+msgstr "طلب رخصة القيادة من الموارد البشرية"
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW/KSW_fleet_package/models/release_vehicle.py:0
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid ""
+"%(r)s: HR registers the driving licence of %(d)s. Follow it in Employee "
+"Transfers, My Document Requests; you are told when it is registered, then "
+"submit again."
+msgstr ""
+"%(r)s: تسجّل الموارد البشرية رخصة قيادة %(d)s. تابعه من نقل الموظفين ← طلبات"
+" الوثائق الخاصة بي، وستصلك رسالة عند التسجيل، وبعدها أعد الإرسال."
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW/KSW_fleet_package/models/release_vehicle.py:0
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "HR has the request %(r)s since %(d)s."
+msgstr "لدى الموارد البشرية الطلب %(r)s منذ %(d)s."
+
+#. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__licence_request
+msgid "Licence Request"
+msgstr "طلب الرخصة"
+
+#. module: KSW_fleet_package
+#: model:ir.ui.menu,name:KSW_fleet_package.menu_my_document_requests
+msgid "My Document Requests"
+msgstr "طلبات الوثائق الخاصة بي"
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW/KSW_fleet_package/models/release_vehicle.py:0
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "New driver of %(v)s"
+msgstr "السائق الجديد للمركبة %(v)s"

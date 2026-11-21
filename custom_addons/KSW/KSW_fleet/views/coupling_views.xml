@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tedder ↔ head, on the vehicle form: a tedder shows its head, a head
+         its tedder; the person with the permission couples at once. -->
+    <record id="view_ksw_fleet_vehicle_form_coupling" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.form.coupling</field>
+        <field name="model">ksw.fleet.vehicle</field>
+        <field name="inherit_id" ref="view_ksw_fleet_vehicle_form"/>
+        <field name="arch" type="xml">
+            <field name="x_custody_ids" position="before">
+                <group string="Coupling" invisible="vehicle_type not in ('tank', 'trailer')">
+                    <field name="x_can_couple" invisible="1"/>
+                    <field name="x_head_id" invisible="vehicle_type != 'tank'"/>
+                    <field name="x_tedder_id" invisible="vehicle_type != 'trailer'"/>
+                    <field name="x_coupled_since" invisible="not x_coupled_since"/>
+                    <div colspan="2" invisible="not x_can_couple">
+                        <button name="action_open_couple_wizard" type="object" icon="fa-link" class="btn-secondary"
+                                string="Couple to Head" invisible="vehicle_type != 'tank'"/>
+                        <button name="action_open_couple_wizard" type="object" icon="fa-link" class="btn-secondary"
+                                string="Couple a Tedder" invisible="vehicle_type != 'trailer'"/>
+                        <button name="action_uncouple" type="object" icon="fa-chain-broken" class="btn-secondary ms-2"
+                                string="Uncouple" invisible="not x_head_id and not x_tedder_id"
+                                confirm="Uncouple now? The tedder will have no head (and no valid tank licence)."/>
+                    </div>
+                </group>
+                <field name="x_coupling_ids" readonly="1" invisible="not x_coupling_ids">
+                    <list>
+                        <field name="tedder_id"/>
+                        <field name="head_id"/>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="user_id"/>
+                        <field name="ended_by_id" optional="hide"/>
+                        <field name="note" optional="show"/>
+                    </list>
+                </field>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_ksw_fleet_vehicle_list_coupling" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.list.coupling</field>
+        <field name="model">ksw.fleet.vehicle</field>
+        <field name="inherit_id" ref="view_ksw_fleet_vehicle_list"/>
+        <field name="arch" type="xml">
+            <field name="x_custodian_id" position="after">
+                <field name="x_head_id" optional="show"/>
+                <field name="x_tedder_id" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_ksw_fleet_vehicle_search_coupling" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.search.coupling</field>
+        <field name="model">ksw.fleet.vehicle</field>
+        <field name="inherit_id" ref="view_ksw_fleet_vehicle_search"/>
+        <field name="arch" type="xml">
+            <field name="x_custodian_id" position="after">
+                <field name="x_head_id"/>
+            </field>
+            <filter name="filter_draft" position="before">
+                <filter string="Tedders Not Coupled" name="filter_uncoupled"
+                        domain="[('vehicle_type', '=', 'tank'), ('x_head_id', '=', False)]"/>
+                <separator/>
+            </filter>
+        </field>
+    </record>
+
+    <record id="view_ksw_fleet_couple_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.fleet.couple.wizard.form</field>
+        <field name="model">ksw.fleet.couple.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Couple Tedder to Head">
+                <group>
+                    <field name="tedder_id" options="{'no_create': True}"/>
+                    <field name="head_id" options="{'no_create': True}"/>
+                    <field name="note" placeholder="Why, if not obvious…"/>
+                </group>
+                <div class="alert alert-warning" role="alert" invisible="not replaces">
+                    This also changes: <field name="replaces" class="d-inline"/>
+                </div>
+                <footer>
+                    <button name="action_confirm" type="object" string="Couple Now" class="btn-primary"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <!-- The coupler's own page: every tedder and the head pulling it. -->
+    <record id="view_ksw_fleet_tedder_list" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.list.tedders</field>
+        <field name="model">ksw.fleet.vehicle</field>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <list string="Tedders" create="0" decoration-warning="not x_head_id">
+                <field name="x_can_couple" column_invisible="True"/>
+                <field name="name"/>
+                <field name="plate_number" optional="show"/>
+                <field name="x_head_id"/>
+                <field name="x_head_plate" optional="show"/>
+                <field name="x_head_custodian_id" optional="show"/>
+                <field name="x_coupled_since" optional="hide"/>
+                <field name="tank_number" optional="hide"/>
+                <field name="x_vin" optional="hide"/>
+                <button name="action_open_couple_wizard" type="object" icon="fa-link" title="Couple to Head"
+                        string="Couple" invisible="not x_can_couple"/>
+                <button name="action_uncouple" type="object" icon="fa-chain-broken" title="Uncouple"
+                        string="Uncouple" invisible="not x_head_id or not x_can_couple"
+                        confirm="Uncouple now? The tedder will have no head (and no valid tank licence)."/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_ksw_fleet_tedders" model="ir.actions.act_window">
+        <field name="name">Tedders</field>
+        <field name="res_model">ksw.fleet.vehicle</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('vehicle_type', '=', 'tank')]</field>
+        <field name="context">{'search_default_filter_uncoupled': 1}</field>
+        <field name="view_ids" eval="[(5, 0, 0), (0, 0, {'view_mode': 'list', 'view_id': ref('view_ksw_fleet_tedder_list')})]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Couple each tedder to the head that pulls it</p>
+            <p>The tank licence is issued on the head: a coupled tedder runs under its head's papers.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_ksw_fleet_tedders_root" name="Tedders" sequence="86"
+              web_icon="KSW_fleet,static/description/icon.png"
+              action="action_ksw_fleet_tedders"
+              groups="group_tedder_coupling,group_tedder_editor,base.group_system"/>
+    <menuitem id="menu_ksw_fleet_tedders" name="Tedders" parent="menu_ksw_fleet_tedders_root"
+              action="action_ksw_fleet_tedders" sequence="1"/>
+</odoo>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="seq_ksw_document_request" model="ir.sequence">
+            <field name="name">Document Request</field>
+            <field name="code">ksw.document.request</field>
+            <field name="prefix">DR/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

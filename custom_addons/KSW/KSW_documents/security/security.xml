@@ -17,4 +17,17 @@
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
         <field name="sequence">10</field>
     </record>
+    <!-- A document request is its requester's; HR sees them all. -->
+    <record id="rule_document_request_own" model="ir.rule">
+        <field name="name">Document request: own</field>
+        <field name="model_id" ref="model_ksw_document_request"/>
+        <field name="domain_force">[('requested_by_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="rule_document_request_officer" model="ir.rule">
+        <field name="name">Document request: HR</field>
+        <field name="model_id" ref="model_ksw_document_request"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_document_officer')), (4, ref('base.group_system'))]"/>
+    </record>
 </odoo>

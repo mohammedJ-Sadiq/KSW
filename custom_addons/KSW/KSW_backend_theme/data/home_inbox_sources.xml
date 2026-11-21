@@ -122,6 +122,14 @@
         <field name="domain">[('x_is_pending_my_action', '=', True)]</field>
         <field name="icon">fa-id-card-o</field>
     </record>
+    <!-- Someone outside HR waits for a document (a new driver's licence). -->
+    <record id="inbox_document_requests" model="ksw.home.inbox.source">
+        <field name="name">Document requests</field>
+        <field name="sequence">79</field>
+        <field name="model_name">ksw.document.request</field>
+        <field name="domain">[('x_is_pending_my_action', '=', True)]</field>
+        <field name="icon">fa-id-card</field>
+    </record>
     <record id="inbox_vehicle_documents_missing" model="ksw.home.inbox.source">
         <field name="name">Vehicles missing documents</field>
         <field name="sequence">81</field>

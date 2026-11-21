@@ -111,7 +111,9 @@ class KswFleetVehicle(models.Model):
         own = set(self.env['res.company'].sudo().search([]).partner_id.ids)
         result = {}
         for v in self.sudo():
-            if v.client_id.id not in own or v.state != 'confirmed':
+            # A tedder runs under its head's papers (the tank licence is issued
+            # on the head): it needs a head, not documents of its own.
+            if v.client_id.id not in own or v.state != 'confirmed' or v.vehicle_type == 'tank':
                 result[v.id] = types.browse()
                 continue
             # The operation card is for public transport only (Naql).
@@ -120,6 +122,15 @@ class KswFleetVehicle(models.Model):
                 # The tank licence is issued on the vehicle that carries the tank.
                 t.required_for == 'water_tankers' and v.vehicle_type in ('trailer', 'isuzu')))
         return result
+
+    def _ksw_document_preconditions(self):
+        self.ensure_one()
+        vehicle = self.sudo()
+        own = self.env['res.company'].sudo().search([]).partner_id
+        if vehicle.vehicle_type == 'tank' and vehicle.state == 'confirmed' and vehicle.client_id in own \
+                and 'x_head_id' in vehicle._fields and not vehicle.x_head_id:
+            return [_('Not coupled to a head')]
+        return []
 
     def action_upload_documents(self):
         self.ensure_one()

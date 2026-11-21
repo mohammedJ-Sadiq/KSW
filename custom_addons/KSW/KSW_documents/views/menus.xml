@@ -7,6 +7,8 @@
               action="action_ksw_document_import" sequence="4"/>
     <menuitem id="menu_documents_bulk" name="Bulk Upload" parent="menu_documents_root"
               action="action_ksw_document_batch" sequence="5"/>
+    <menuitem id="menu_documents_requests" name="Requests" parent="menu_documents_root"
+              action="action_ksw_document_request" sequence="8"/>
     <menuitem id="menu_documents_to_confirm" name="To Confirm" parent="menu_documents_root"
               action="action_ksw_document_to_confirm" sequence="10"/>
     <menuitem id="menu_documents_expiring" name="Expiring or Expired" parent="menu_documents_root"

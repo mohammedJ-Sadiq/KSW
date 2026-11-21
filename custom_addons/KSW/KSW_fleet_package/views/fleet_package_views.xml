@@ -21,7 +21,8 @@
             <page name="release" position="after">
                 <page string="Vehicles in Their Custody" name="vehicles"
                       invisible="request_type != 'release' or not x_vehicle_ids">
-                    <field name="x_vehicle_ids" readonly="state != 'draft'">
+                    <field name="x_vehicle_ids" readonly="state != 'draft'"
+                           context="{'ksw_validate_all_rows': True}">
                         <list editable="bottom" create="0" delete="0">
                             <field name="employee_id" readonly="1"/>
                             <field name="vehicle_id" readonly="1"/>
@@ -31,6 +32,9 @@
                                    domain="[('department_id', 'child_of', vehicle_department_id)]"
                                    invisible="disposition != 'driver_change'"
                                    required="disposition == 'driver_change'"/>
+                            <field name="new_driver_holds" readonly="1" invisible="not new_driver_holds"
+                                   decoration-warning="new_driver_holds"/>
+                            <field name="licence_request" readonly="1" invisible="not licence_request"/>
                             <field name="custody_request_id" readonly="1" optional="show"/>
                             <field name="fleet_request_id" readonly="1" optional="show"/>
                         </list>
@@ -39,4 +43,36 @@
             </page>
         </field>
     </record>
+
+    <!-- The GM sees what his decision does to their vehicles. -->
+    <record id="view_ksw_employee_release_decision_wizard_form_vehicles" model="ir.ui.view">
+        <field name="name">ksw.employee.release.decision.wizard.form.vehicles</field>
+        <field name="model">ksw.employee.release.decision.wizard</field>
+        <field name="inherit_id" ref="KSW_employee_transfer.view_ksw_employee_release_decision_wizard_form"/>
+        <field name="arch" type="xml">
+            <field name="release_line_ids" position="after">
+                <field name="x_vehicle_ids" readonly="1" invisible="not x_vehicle_ids">
+                    <list>
+                        <field name="employee_id"/>
+                        <field name="vehicle_id"/>
+                        <field name="disposition"/>
+                        <field name="new_driver_id"/>
+                        <field name="new_driver_holds" decoration-warning="new_driver_holds"/>
+                    </list>
+                </field>
+            </field>
+        </field>
+    </record>
+
+    <!-- Run from the "no licence" message (RedirectWarning in _check_ready). -->
+    <record id="action_request_driver_licence" model="ir.actions.server">
+        <field name="name">Request the Driving Licence from HR</field>
+        <field name="model_id" ref="model_ksw_employee_release_vehicle"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_request_licence()</field>
+    </record>
+
+    <menuitem id="menu_my_document_requests" name="My Document Requests"
+              parent="KSW_employee_transfer.menu_employee_requests"
+              action="KSW_documents.action_ksw_document_request_my" sequence="40"/>
 </odoo>

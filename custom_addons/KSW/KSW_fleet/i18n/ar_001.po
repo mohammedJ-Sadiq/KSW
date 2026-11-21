@@ -49,12 +49,16 @@ msgid "Confirmed"
 msgstr "معتمدة"
 
 #. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_couple_wizard__create_uid
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_coupling__create_uid
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__create_uid
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle_custody__create_uid
 msgid "Created by"
 msgstr "أنشئ بواسطة"
 
 #. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_couple_wizard__create_date
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_coupling__create_date
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__create_date
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle_custody__create_date
 msgid "Created on"
@@ -94,6 +98,8 @@ msgid "Details"
 msgstr "التفاصيل"
 
 #. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_couple_wizard__display_name
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_coupling__display_name
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__display_name
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle_custody__display_name
 msgid "Display Name"
@@ -126,11 +132,14 @@ msgid "Fleet No."
 msgstr "رقم الأسطول"
 
 #. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_coupling__date_from
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle_custody__date_from
 msgid "From"
 msgstr "من"
 
 #. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_couple_wizard__id
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_coupling__id
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__id
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle_custody__id
 msgid "ID"
@@ -152,12 +161,16 @@ msgid "Isuzu"
 msgstr "إيسوزو"
 
 #. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_couple_wizard__write_uid
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_coupling__write_uid
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__write_uid
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle_custody__write_uid
 msgid "Last Updated by"
 msgstr "آخر تحديث بواسطة"
 
 #. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_couple_wizard__write_date
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_coupling__write_date
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__write_date
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle_custody__write_date
 msgid "Last Updated on"
@@ -169,6 +182,8 @@ msgid "Model"
 msgstr "الموديل"
 
 #. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_couple_wizard__note
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_coupling__note
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle_custody__note
 msgid "Note"
 msgstr "الملاحظات"
@@ -236,6 +251,7 @@ msgstr "لا يتغير صاحب العهدة إلا بنموذج تسليم م�
 
 #. module: KSW_fleet
 #: model:ir.model.fields,help:KSW_fleet.field_ksw_fleet_vehicle__x_custodian_id
+#: model:ir.model.fields,help:KSW_fleet.field_ksw_fleet_vehicle__x_head_custodian_id
 msgid ""
 "The employee personally responsible for this vehicle (عهدة). Changes only "
 "through an approved handover form."
@@ -249,6 +265,7 @@ msgid "The handover form or transfer behind this custody."
 msgstr "نموذج التسليم أو النقل الذي نشأت عنه هذه العهدة."
 
 #. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_coupling__date_to
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle_custody__date_to
 msgid "To"
 msgstr "إلى"
@@ -327,3 +344,262 @@ msgstr "نقل عام"
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__x_registration_type
 msgid "Registration Type"
 msgstr "نوع التسجيل"
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
+msgid "%(h)s drops %(t)s"
+msgstr "%(h)s تترك %(t)s"
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
+msgid "%(t)s leaves %(h)s"
+msgstr "%(t)s يُفك من %(h)s"
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
+msgid "%s already pulls a tedder."
+msgstr "%s تسحب تيدراً بالفعل."
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
+msgid "%s is not a trailer head."
+msgstr "%s ليست رأس تريلا."
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
+msgid "A tedder is coupled to its head with Couple to Head."
+msgstr "يُربط التيدر برأسه من زر «ربط برأس»."
+
+#. module: KSW_fleet
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_couple_wizard_form
+msgid "Cancel"
+msgstr "إلغاء"
+
+#. module: KSW_fleet
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_couple_wizard_form
+msgid "Couple Now"
+msgstr "ربط الآن"
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
+#: model:ir.model,name:KSW_fleet.model_ksw_fleet_couple_wizard
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_couple_wizard_form
+msgid "Couple Tedder to Head"
+msgstr "ربط التيدر بالرأس"
+
+#. module: KSW_fleet
+#: model:res.groups,name:KSW_fleet.group_tedder_coupling
+msgid "Couple Tedders to Heads"
+msgstr "ربط التيدرات بالرؤوس"
+
+#. module: KSW_fleet
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_vehicle_form_coupling
+msgid "Couple a Tedder"
+msgstr "ربط تيدر"
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
+msgid "Couple a tedder (تيدر) to a trailer head (تريلا)."
+msgstr "اربط تيدراً برأس تريلا."
+
+#. module: KSW_fleet
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_tedder_list
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_vehicle_form_coupling
+msgid "Couple to Head"
+msgstr "ربط برأس"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_coupling__user_id
+msgid "Coupled By"
+msgstr "رُبط بواسطة"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__x_head_id
+msgid "Coupled To (Head)"
+msgstr "مربوط بالرأس"
+
+#. module: KSW_fleet
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_vehicle_form_coupling
+msgid "Coupling"
+msgstr "الربط"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__x_coupling_ids
+msgid "Coupling History"
+msgstr "سجل الربط"
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
+msgid "Coupling history is never deleted."
+msgstr "سجل الربط لا يُحذف."
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
+msgid "Coupling history is written by coupling, not by hand."
+msgstr "سجل الربط يُكتب من خلال الربط، لا يدوياً."
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
+msgid ""
+"Coupling tedders to heads is reserved to the people given that permission."
+msgstr "ربط التيدرات بالرؤوس مقصور على من مُنح هذه الصلاحية."
+
+#. module: KSW_fleet
+#: model:ir.model.fields,help:KSW_fleet.field_ksw_fleet_coupling__date_to
+msgid "Empty while coupled."
+msgstr "فارغ طالما الربط قائم."
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_couple_wizard__head_id
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_coupling__head_id
+msgid "Head"
+msgstr "الرأس"
+
+#. module: KSW_fleet
+#: model:ir.module.category,name:KSW_fleet.module_category_ksw_fleet
+msgid "KSW Fleet"
+msgstr "أسطول KSW"
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
+msgid "Only a tedder is coupled to a head."
+msgstr "لا يُربط بالرأس إلا التيدر."
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_couple_wizard__replaces
+msgid "Replaces"
+msgstr "يستبدل"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_couple_wizard__tedder_id
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_coupling__tedder_id
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__x_tedder_id
+msgid "Tedder"
+msgstr "التيدر"
+
+#. module: KSW_fleet
+#: model:res.groups.privilege,name:KSW_fleet.privilege_fleet_coupling
+msgid "Tedder Coupling"
+msgstr "ربط التيدر"
+
+#. module: KSW_fleet
+#: model:ir.model,name:KSW_fleet.model_ksw_fleet_coupling
+msgid "Tedder Coupling History"
+msgstr "سجل ربط التيدرات"
+
+#. module: KSW_fleet
+#: model:ir.actions.act_window,name:KSW_fleet.action_ksw_fleet_tedders
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__x_tedder_ids
+#: model:ir.ui.menu,name:KSW_fleet.menu_ksw_fleet_tedders
+#: model:ir.ui.menu,name:KSW_fleet.menu_ksw_fleet_tedders_root
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_tedder_list
+msgid "Tedders"
+msgstr "التيدرات"
+
+#. module: KSW_fleet
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_vehicle_search_coupling
+msgid "Tedders Not Coupled"
+msgstr "تيدرات غير مربوطة"
+
+#. module: KSW_fleet
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_couple_wizard_form
+msgid "This also changes:"
+msgstr "هذا يغيّر أيضاً:"
+
+#. module: KSW_fleet
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_tedder_list
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_vehicle_form_coupling
+msgid "Uncouple"
+msgstr "فك الربط"
+
+#. module: KSW_fleet
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_tedder_list
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_vehicle_form_coupling
+msgid ""
+"Uncouple now? The tedder will have no head (and no valid tank licence)."
+msgstr "فك الربط الآن؟ سيبقى التيدر دون رأس (ودون رخصة صهريج سارية)."
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_coupling__ended_by_id
+msgid "Uncoupled By"
+msgstr "فُك بواسطة"
+
+#. module: KSW_fleet
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_couple_wizard_form
+msgid "Why, if not obvious…"
+msgstr "السبب إن لم يكن واضحاً…"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__x_can_couple
+msgid "X Can Couple"
+msgstr "يمكنه الربط"
+
+#. module: KSW_fleet
+#: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_tedder_list
+msgid "Couple"
+msgstr "ربط"
+
+#. module: KSW_fleet
+#: model_terms:ir.actions.act_window,help:KSW_fleet.action_ksw_fleet_tedders
+msgid "Couple each tedder to the head that pulls it"
+msgstr "اربط كل تيدر بالرأس الذي يسحبه"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__x_head_custodian_id
+msgid "Head Driver"
+msgstr "سائق الرأس"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__x_head_plate
+msgid "Head Plate"
+msgstr "لوحة الرأس"
+
+#. module: KSW_fleet
+#: model_terms:ir.actions.act_window,help:KSW_fleet.action_ksw_fleet_tedders
+msgid ""
+"The tank licence is issued on the head: a coupled tedder runs under its "
+"head's papers."
+msgstr "رخصة الصهريج تصدر على الرأس: التيدر المربوط يعمل بموجب وثائق رأسه."
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__x_coupled_since
+msgid "Coupled Since"
+msgstr "مربوط منذ"
+
+#. module: KSW_fleet
+#: model:res.groups,name:KSW_fleet.group_tedder_editor
+msgid "Edit Tedder Data"
+msgstr "تعديل بيانات التيدرات"
+
+#. module: KSW_fleet
+#: model:res.groups.privilege,name:KSW_fleet.privilege_tedder_data
+msgid "Tedder Data"
+msgstr "بيانات التيدرات"
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
+msgid "You may edit tedders only, not %s."
+msgstr "يمكنك تعديل التيدرات فقط، وليس %s."
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
+msgid "Editing a tedder's data needs the «Edit Tedder Data» permission."
+msgstr "تعديل بيانات التيدر يتطلب صلاحية «تعديل بيانات التيدرات»."
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__x_can_edit_vehicle
+msgid "X Can Edit Vehicle"
+msgstr ""

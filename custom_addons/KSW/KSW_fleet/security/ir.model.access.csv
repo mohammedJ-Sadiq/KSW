@@ -4,3 +4,8 @@ access_ksw_fleet_vehicle_hr,ksw.fleet.vehicle.hr,model_ksw_fleet_vehicle,hr.grou
 access_ksw_fleet_vehicle_system,ksw.fleet.vehicle.system,model_ksw_fleet_vehicle,base.group_system,1,1,1,1
 access_ksw_fleet_vehicle_custody_user,ksw.fleet.vehicle.custody.user,model_ksw_fleet_vehicle_custody,base.group_user,1,0,0,0
 access_ksw_fleet_vehicle_custody_system,ksw.fleet.vehicle.custody.system,model_ksw_fleet_vehicle_custody,base.group_system,1,1,1,1
+access_ksw_fleet_coupling_user,ksw.fleet.coupling.user,model_ksw_fleet_coupling,base.group_user,1,0,0,0
+access_ksw_fleet_coupling_system,ksw.fleet.coupling.system,model_ksw_fleet_coupling,base.group_system,1,1,1,1
+access_ksw_fleet_couple_wizard,ksw.fleet.couple.wizard.coupler,model_ksw_fleet_couple_wizard,group_tedder_coupling,1,1,1,1
+access_ksw_fleet_couple_wizard_system,ksw.fleet.couple.wizard.system,model_ksw_fleet_couple_wizard,base.group_system,1,1,1,1
+access_ksw_fleet_vehicle_tedder_editor,ksw.fleet.vehicle.tedder.editor,model_ksw_fleet_vehicle,group_tedder_editor,1,1,0,0

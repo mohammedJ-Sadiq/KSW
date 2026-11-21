@@ -164,6 +164,13 @@ class TestAbsherImport(TransactionCase):
         self.assertNotIn('Operation Card', car.x_documents_missing or '')
         self.assertIn('Operation Card', truck.x_documents_missing or '')
 
+    def test_tedder_needs_a_head_not_documents(self):
+        tedder = self.env['ksw.fleet.vehicle'].create({'name': 'تيدر IMP', 'vehicle_type': 'tank'})
+        self.assertEqual(tedder.x_documents_missing, 'Not coupled to a head')
+        tedder._ksw_couple(self.head)
+        tedder.invalidate_recordset()
+        self.assertFalse(tedder.x_document_issue)
+
     def test_document_confirms_without_a_scan(self):
         doc = self.env['ksw.document'].with_user(self.officer).create({
             'type_id': self.env.ref('KSW_documents.type_insurance').id, 'applies_to': 'vehicle',

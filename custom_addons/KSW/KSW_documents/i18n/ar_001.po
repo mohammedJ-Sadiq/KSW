@@ -2408,3 +2408,174 @@ msgstr "صهاريج المياه (رؤوس التريلات وصهاريج ال
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "not inspected"
 msgstr "لم يتم الفحص"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/owners.py:0
+msgid "Not coupled to a head"
+msgstr "غير مربوط برأس"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__requested_by_id
+msgid "Requested By"
+msgstr "مقدّم الطلب"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__request_note
+msgid "Requested For"
+msgstr "سبب الطلب"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document.py:0
+msgid "%(d)s is confirmed. You asked for it: %(n)s"
+msgstr "تم اعتماد %(d)s الذي طلبته: %(n)s"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW/KSW_documents/models/ksw_document_request.py:0
+#: code:addons/KSW_documents/models/ksw_document_request.py:0
+msgid "%s can be cancelled by its requester or HR while it waits."
+msgstr "يلغي %s مقدّم الطلب أو الموارد البشرية طالما أنه بالانتظار."
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_request_form
+msgid "Cancel Request"
+msgstr "إلغاء الطلب"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_request_form
+msgid "Cancel this request?"
+msgstr "إلغاء هذا الطلب؟"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_request__state__cancelled
+msgid "Cancelled"
+msgstr "ملغى"
+
+#. module: KSW_documents
+#: model:ir.model,name:KSW_documents.model_ksw_document_request
+msgid "Document Request"
+msgstr "طلب وثيقة"
+
+#. module: KSW_documents
+#: model:ir.actions.act_window,name:KSW_documents.action_ksw_document_request
+msgid "Document Requests"
+msgstr "طلبات الوثائق"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW/KSW_documents/models/ksw_document_request.py:0
+#: code:addons/KSW_documents/models/ksw_document_request.py:0
+msgid "HR already has a request for the %(t)s of %(e)s."
+msgstr "لدى الموارد البشرية طلب قائم لـ%(t)s الخاصة بـ%(e)s."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW/KSW_documents/models/ksw_document_request.py:0
+#: code:addons/KSW_documents/models/ksw_document_request.py:0
+msgid "HR registered %(d)s. %(n)s can go ahead."
+msgstr "سجّلت الموارد البشرية %(d)s. يمكن متابعة: %(n)s."
+
+#. module: KSW_documents
+#: model:ir.actions.act_window,name:KSW_documents.action_ksw_document_request_my
+msgid "My Document Requests"
+msgstr "طلبات الوثائق الخاصة بي"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_request_search
+msgid "My Requests"
+msgstr "طلباتي"
+
+#. module: KSW_documents
+#: model_terms:ir.actions.act_window,help:KSW_documents.action_ksw_document_request
+msgid ""
+"No document requests. When someone outside HR needs an employee's\n"
+"            document registered (a new driver's licence), the request waits here."
+msgstr ""
+"لا توجد طلبات وثائق. عندما يحتاج أحد من خارج الموارد البشرية إلى تسجيل وثيقة موظف\n"
+"            (رخصة سائق جديد) يظهر الطلب هنا."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW/KSW_documents/models/ksw_document_request.py:0
+#: code:addons/KSW_documents/models/ksw_document_request.py:0
+msgid "Only HR registers the document of %s."
+msgstr "تسجّل الموارد البشرية وحدها وثيقة %s."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_request__reason
+msgid "Reason"
+msgstr "السبب"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_request_form
+msgid "Register the Document"
+msgstr "تسجيل الوثيقة"
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_request__state__done
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_request_search
+msgid "Registered"
+msgstr "مسجّلة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_request__document_id
+msgid "Registered Document"
+msgstr "الوثيقة المسجّلة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_request__done_date
+msgid "Registered On"
+msgstr "تاريخ التسجيل"
+
+#. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_request_form
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_request_list
+msgid "Requested On"
+msgstr "تاريخ الطلب"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW/KSW_documents/models/ksw_document_request.py:0
+#: code:addons/KSW_documents/models/ksw_document_request.py:0
+msgid "Requested by %(u)s (%(r)s): %(n)s"
+msgstr "طلبها %(u)s (%(r)s): %(n)s"
+
+#. module: KSW_documents
+#: model:ir.ui.menu,name:KSW_documents.menu_documents_requests
+msgid "Requests"
+msgstr "الطلبات"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW/KSW_documents/models/ksw_document_request.py:0
+#: code:addons/KSW_documents/models/ksw_document_request.py:0
+msgid "The %(t)s of %(e)s is already registered and valid."
+msgstr "%(t)s الخاصة بـ%(e)s مسجّلة وسارية."
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_request__state__requested
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_request_search
+msgid "Waiting for HR"
+msgstr "بانتظار الموارد البشرية"
+
+#. module: KSW_documents
+#: model:ir.model.fields,help:KSW_documents.field_ksw_document_request__reason
+msgid "What waits for the document."
+msgstr "ما الذي ينتظر هذه الوثيقة."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_request__x_can_cancel
+msgid "X Can Cancel"
+msgstr "يمكنه الإلغاء"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_request__x_can_register
+msgid "X Can Register"
+msgstr "يمكنه التسجيل"
+
+#. module: KSW_documents
+#: model_terms:ir.actions.act_window,help:KSW_documents.action_ksw_document_request_my
+msgid "You have asked HR for no documents."
+msgstr "لم تطلب أي وثائق من الموارد البشرية."

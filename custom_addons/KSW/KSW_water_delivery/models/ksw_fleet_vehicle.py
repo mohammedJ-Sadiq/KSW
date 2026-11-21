@@ -131,7 +131,11 @@ class KswFleetVehicle(models.Model):
         return [('client_id', 'in' if wanted else 'not in', self._own_partner_ids())]
 
     def write(self, vals):
-        if not self.env.su and not self.env.user.has_group('hr.group_hr_user'):
+        # «Edit Tedder Data» (KSW_fleet) keeps the tedders' own data; KSW_fleet
+        # already confines it to tedders, so dispatch's limit is not its limit.
+        tedder_editor = self.env.user.has_group('KSW_fleet.group_tedder_editor') and all(
+            v.vehicle_type == 'tank' for v in self)
+        if not self.env.su and not self.env.user.has_group('hr.group_hr_user') and not tedder_editor:
             # The dispatcher's ACL row is what lets this write through at all;
             # the row cannot say which fields, so this does.
             extra = set(vals) - _DISPATCH_FIELDS

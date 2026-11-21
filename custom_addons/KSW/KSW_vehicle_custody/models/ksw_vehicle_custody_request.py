@@ -388,12 +388,17 @@ class KswVehicleCustodyRequest(models.Model):
         """The new user's licence as the register holds it, where the form
         has none yet: HR checks it, it does not type it again."""
         for form in self.sudo().filtered(lambda f: f.new_employee_id and not f.license_expiry):
-            doc = self.env['ksw.document'].sudo().search([
-                ('employee_id', '=', form.new_employee_id.id), ('type_id.code', '=', 'driving_licence'),
-                ('state', '=', 'confirmed')], limit=1)
+            doc = self._ksw_register_licence(form.new_employee_id)
             if doc:
                 form.write({'license_type': doc.license_class or form.license_type,
                             'license_expiry': doc.expiry_date})
+
+    @api.model
+    def _ksw_register_licence(self, employee):
+        """The employee's confirmed driving licence in the documents register."""
+        return self.env['ksw.document'].sudo().search([
+            ('employee_id', '=', employee.id), ('type_id.code', '=', 'driving_licence'),
+            ('state', '=', 'confirmed')], limit=1)
 
     def _check_new_user_licence(self):
         self._fill_licence_from_register()

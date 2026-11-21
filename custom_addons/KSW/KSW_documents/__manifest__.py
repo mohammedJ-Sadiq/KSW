@@ -1,6 +1,6 @@
 {
     'name': 'KSW Documents',
-    'version': '19.0.1.7.0',
+    'version': '19.0.1.8.0',
     'summary': 'Vehicle and employee documents with expiry: istimara, insurance, inspection, licences, iqama; read from an upload by AI',
     'description': """
 Documents Register
@@ -24,12 +24,14 @@ employee's iqama, passport and visa are written back to Odoo's own fields.
         'security/ir.model.access.csv',
         'data/document_types.xml',
         'data/cron.xml',
+        'data/sequence.xml',
         'wizard/upload_wizard_views.xml',
         'views/ksw_document_views.xml',
         'views/owner_views.xml',
         'views/batch_views.xml',
         'views/registration_views.xml',
         'views/import_views.xml',
+        'views/request_views.xml',
         'views/menus.xml',
     ],
     'license': 'LGPL-3',

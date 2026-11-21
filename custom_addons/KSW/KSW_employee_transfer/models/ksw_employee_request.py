@@ -192,10 +192,15 @@ class KswEmployeeRequest(models.Model):
             request.message_post(body=Markup(
                 _('<b>%(t)s</b> from <b>%(d)s</b> waits for the GM\'s decision: %(s)s<br/><i>%(r)s</i>'))
                 % {'t': dict(request._fields['request_type']._description_selection(self.env))[request.request_type],
-                   'd': request.department_id.name, 's': request.line_summary, 'r': request.reason},
+                   'd': request.department_id.name, 's': request.line_summary, 'r': request.reason}
+                + request._submit_note_extra(),
                 subtype_xmlid='mail.mt_note')
         self._sync_activities()
         return True
+
+    def _submit_note_extra(self):
+        """More for the GM's note at submit (hook: the vehicles bridge)."""
+        return Markup('')
 
     def action_cancel(self):
         for request in self:

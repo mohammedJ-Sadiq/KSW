@@ -7,3 +7,4 @@ from . import plates
 from . import ksw_document_batch
 from . import hijri
 from . import ksw_document_import
+from . import ksw_document_request

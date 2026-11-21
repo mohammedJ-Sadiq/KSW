@@ -1,6 +1,6 @@
 {
     'name': 'KSW Vehicle Allocation: Vehicles with Their Drivers',
-    'version': '19.0.1.3.0',
+    'version': '19.0.1.3.1',
     'summary': 'Release vehicles together with their drivers: HR checks, the GM approves, both move at once',
     'description': """
 The one transfer that skips the workshop. On a release request a vehicle can
@@ -21,6 +21,11 @@ itself when all three are present.
         'security/ir.model.access.csv',
         'views/fleet_package_views.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'KSW_fleet_package/static/src/**/*',
+        ],
+    },
     'auto_install': True,
     'installable': True,
     'license': 'LGPL-3',

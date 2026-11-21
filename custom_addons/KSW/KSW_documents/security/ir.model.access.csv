@@ -14,3 +14,6 @@ access_ksw_document_import_officer,ksw.document.import.officer,model_ksw_documen
 access_ksw_document_import_system,ksw.document.import.system,model_ksw_document_import,base.group_system,1,1,1,1
 access_ksw_document_import_line_officer,ksw.document.import.line.officer,model_ksw_document_import_line,group_document_officer,1,1,1,1
 access_ksw_document_import_line_system,ksw.document.import.line.system,model_ksw_document_import_line,base.group_system,1,1,1,1
+access_ksw_document_request_user,ksw.document.request.user,model_ksw_document_request,base.group_user,1,0,1,0
+access_ksw_document_request_officer,ksw.document.request.officer,model_ksw_document_request,group_document_officer,1,1,1,0
+access_ksw_document_request_system,ksw.document.request.system,model_ksw_document_request,base.group_system,1,1,1,1

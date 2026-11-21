@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ksw_document_request_list" model="ir.ui.view">
+        <field name="name">ksw.document.request.list</field>
+        <field name="model">ksw.document.request</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="state != 'requested'">
+                <field name="name"/>
+                <field name="create_date" string="Requested On" widget="date"/>
+                <field name="type_id"/>
+                <field name="employee_id"/>
+                <field name="reason"/>
+                <field name="requested_by_id" widget="many2one_avatar_user"/>
+                <field name="state" widget="badge" decoration-warning="state == 'requested'"
+                       decoration-success="state == 'done'"/>
+                <field name="done_date" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ksw_document_request_form" model="ir.ui.view">
+        <field name="name">ksw.document.request.form</field>
+        <field name="model">ksw.document.request</field>
+        <field name="arch" type="xml">
+            <form create="0">
+                <header>
+                    <field name="x_can_register" invisible="1"/>
+                    <field name="x_can_cancel" invisible="1"/>
+                    <button name="action_register" type="object" string="Register the Document" class="oe_highlight"
+                            invisible="not x_can_register"/>
+                    <button name="action_cancel" type="object" string="Cancel Request" invisible="not x_can_cancel"
+                            confirm="Cancel this request?"/>
+                    <field name="state" widget="statusbar" statusbar_visible="requested,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="type_id"/>
+                            <field name="employee_id"/>
+                            <field name="reason"/>
+                            <field name="origin" invisible="not origin"/>
+                        </group>
+                        <group>
+                            <field name="requested_by_id"/>
+                            <field name="create_date" string="Requested On"/>
+                            <field name="document_id" invisible="not document_id" groups="KSW_documents.group_document_officer"/>
+                            <field name="done_date" invisible="not done_date"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ksw_document_request_search" model="ir.ui.view">
+        <field name="name">ksw.document.request.search</field>
+        <field name="model">ksw.document.request</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="requested_by_id"/>
+                <filter string="Waiting for Me" name="filter_mine" domain="[('x_is_pending_my_action', '=', True)]"/>
+                <filter string="My Requests" name="filter_my_requests" domain="[('requested_by_id', '=', uid)]"/>
+                <separator/>
+                <filter string="Waiting for HR" name="filter_open" domain="[('state', '=', 'requested')]"/>
+                <filter string="Registered" name="filter_done" domain="[('state', '=', 'done')]"/>
+                <group>
+                    <filter string="Document" name="groupby_type" context="{'group_by': 'type_id'}"/>
+                    <filter string="Requested By" name="groupby_requester" context="{'group_by': 'requested_by_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- HR's queue: what others are waiting for, oldest first. -->
+    <record id="action_ksw_document_request" model="ir.actions.act_window">
+        <field name="name">Document Requests</field>
+        <field name="res_model">ksw.document.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ksw_document_request_search"/>
+        <field name="context">{'search_default_filter_open': 1}</field>
+        <field name="help" type="html"><p>No document requests. When someone outside HR needs an employee's
+            document registered (a new driver's licence), the request waits here.</p></field>
+    </record>
+    <!-- The requester's own: opened from the apps that raise requests. -->
+    <record id="action_ksw_document_request_my" model="ir.actions.act_window">
+        <field name="name">My Document Requests</field>
+        <field name="res_model">ksw.document.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ksw_document_request_search"/>
+        <field name="domain">[('requested_by_id', '=', uid)]</field>
+        <field name="help" type="html"><p>You have asked HR for no documents.</p></field>
+    </record>
+</odoo>

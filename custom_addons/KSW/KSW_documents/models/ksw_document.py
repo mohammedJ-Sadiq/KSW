@@ -144,9 +144,14 @@ class KswDocument(models.Model):
     def _pending_domain(self):
         if not (self.env.su or self.env.user.has_group(OFFICER_GROUP)):
             return Domain([('id', '=', False)])
-        return Domain.OR([[('state', '=', 'draft')],
-                          Domain([('state', '=', 'confirmed')]) & Domain(
-                              self._search_expiry_status('in', ['expiring', 'expired', 'unknown']))])
+        domain = Domain.OR([[('state', '=', 'draft')],
+                            Domain([('state', '=', 'confirmed')]) & Domain(
+                                self._search_expiry_status('in', ['expiring', 'expired', 'unknown']))])
+        # One home: what answers an open document request waits on the request.
+        for request in self.env['ksw.document.request'].sudo().search([('state', '=', 'requested')]):
+            domain &= ~(Domain('employee_id', '=', request.employee_id.id)
+                        & Domain('type_id', '=', request.type_id.id))
+        return domain
 
     @api.depends_context('uid')
     def _compute_is_pending_my_action(self):
@@ -234,6 +239,8 @@ class KswDocument(models.Model):
             doc._sync_employee_fields()
             doc._fill_owner_master()
             doc._sync_registration()
+            if doc.employee_id and not (doc.expiry_date and doc.expiry_date < fields.Date.context_today(doc)):
+                self.env['ksw.document.request']._ksw_open_for(doc.employee_id, doc.type_id)._ksw_close_with(doc)
         self._sync_activities()
         return True
 
