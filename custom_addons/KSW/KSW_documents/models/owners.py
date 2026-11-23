@@ -64,6 +64,26 @@ class KswDocumentRequirement(models.AbstractModel):
             gaps[owner.id] = names
         return gaps
 
+    def _ksw_handover_gaps(self):
+        """{owner id: [(type, 'missing' | 'expired')]}: what blocks a vehicle
+        handover. The register's requirements, narrowed to the types HR
+        checks at a handover."""
+        field = self._ksw_doc_owner_field()
+        required = self._ksw_required_types()
+        docs = self.env['ksw.document'].sudo().search([(field, 'in', self.ids), ('state', '=', 'confirmed')])
+        current = {(doc[field].id, doc.type_id.id): doc for doc in docs}
+        gaps = {}
+        for owner in self:
+            found = []
+            for doc_type in required.get(owner.id, self.env['ksw.document.type']).filtered('handover_check'):
+                doc = current.get((owner.id, doc_type.id))
+                if not doc:
+                    found.append((doc_type, 'missing'))
+                elif doc.expiry_status == 'expired':
+                    found.append((doc_type, 'expired'))
+            gaps[owner.id] = found
+        return gaps
+
     def _compute_documents_missing(self):
         gaps = self._ksw_document_gaps()
         for owner in self:
@@ -119,18 +139,16 @@ class KswFleetVehicle(models.Model):
             # The operation card is for public transport only (Naql).
             result[v.id] = types.filtered(lambda t: t.required_for == 'own_fleet' or (
                 t.required_for == 'public_transport' and v.x_registration_type == 'public') or (
-                # The tank licence is issued on the vehicle that carries the tank.
-                t.required_for == 'water_tankers' and v.vehicle_type in ('trailer', 'isuzu')))
+                # The tank licence is issued on the vehicle that carries the tank:
+                # an Isuzu tanker, or a head while it pulls a tedder.
+                t.required_for == 'water_tankers' and (v.vehicle_type == 'isuzu' or (
+                    v.vehicle_type == 'trailer' and 'x_tedder_ids' in v._fields and v.x_tedder_ids))))
         return result
 
-    def _ksw_document_preconditions(self):
-        self.ensure_one()
-        vehicle = self.sudo()
-        own = self.env['res.company'].sudo().search([]).partner_id
-        if vehicle.vehicle_type == 'tank' and vehicle.state == 'confirmed' and vehicle.client_id in own \
-                and 'x_head_id' in vehicle._fields and not vehicle.x_head_id:
-            return [_('Not coupled to a head')]
-        return []
+    # A tedder needs no documents of its own: coupled, it runs under its
+    # head's (the tank licence is issued on the head); uncoupled, it is
+    # parked — a head-less tedder cannot move, so nothing of it is missing.
+    # Which ones wait for a head is the Tedders app's «Not Coupled» filter.
 
     def action_upload_documents(self):
         self.ensure_one()
@@ -171,7 +189,8 @@ class HrEmployee(models.Model):
             result[employee.id] = types.filtered(lambda t: (
                 t.required_for == 'all'
                 or (t.required_for == 'non_saudi' and non_saudi)
-                or (t.required_for == 'custodians' and employee.id in custodians)))
+                or (t.required_for == 'custodians' and (
+                    employee.id in custodians or self.env.context.get('ksw_as_custodian')))))
         return result
 
     def _ksw_document_preconditions(self):

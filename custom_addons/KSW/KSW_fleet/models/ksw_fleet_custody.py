@@ -64,11 +64,47 @@ class KswFleetVehicle(models.Model):
             raise UserError(_('The custodian changes only through an approved vehicle handover form (HR-12).'))
         return super().write(vals)
 
+    def _ksw_is_driven(self):
+        """A vehicle someone drives. A Tedder is pulled by its head: whoever
+        drives the head answers for it, so it is no one's second vehicle."""
+        self.ensure_one()
+        return self.vehicle_type != 'tank'
+
+    def _ksw_other_driven(self, employee):
+        """The driven vehicles this employee already answers for, besides these."""
+        if not employee:
+            return self.browse()
+        return self.sudo().search([('x_custodian_id', '=', employee.id), ('vehicle_type', '!=', 'tank'),
+                                   ('id', 'not in', self.ids)])
+
+    def _ksw_custody_full(self, employee):
+        """The driven vehicles that leave him no room for these, or nothing."""
+        employee = employee.sudo()
+        other = self._ksw_other_driven(employee)
+        return other if len(other) >= max(employee.x_vehicle_limit, 1) else other.browse()
+
+    def _ksw_check_custodian(self, employee):
+        """The last line, whatever route the handover took: one driven vehicle
+        per person, and never an archived one. The forms check this (and more)
+        before anyone acts; this only stops what slipped past them."""
+        if not employee or self.env.context.get('ksw_custody_unchecked'):
+            return
+        employee = employee.sudo()
+        if not employee.active:
+            raise UserError(_('%s is archived: a vehicle is not handed to him.', employee.name))
+        for vehicle in self.sudo().filtered(lambda v: v._ksw_is_driven()):
+            other = vehicle._ksw_custody_full(employee)
+            if other:
+                raise UserError(_('%(e)s already answers for %(o)s, as many vehicles as he may hold (%(n)s). '
+                                  'Hand one over first.', e=employee.name, o=', '.join(other.mapped('name')),
+                                  n=max(employee.x_vehicle_limit, 1)))
+
     def _ksw_set_custodian(self, employee, source=False, date=False, note=False):
         """Close the current custody and open the new one (employee may be
         empty: the vehicle is in nobody's custody, e.g. at the workshop)."""
         date = date or fields.Date.context_today(self)
         History = self.env['ksw.fleet.vehicle.custody'].sudo()
+        self.filtered(lambda v: v.x_custodian_id != employee)._ksw_check_custodian(employee)
         for vehicle in self.sudo():
             if vehicle.x_custodian_id == employee:
                 continue
@@ -88,6 +124,24 @@ class KswFleetVehicle(models.Model):
         for vehicle in vehicles:
             employee = (vehicle.x_bas_driver_id if has_bas else False) or vehicle.driver_id
             if employee:
-                vehicle._ksw_set_custodian(employee, source=_('Starting custodian'),
-                                           date=fields.Date.context_today(self))
+                vehicle.with_context(ksw_custody_unchecked=True)._ksw_set_custodian(
+                    employee, source=_('Starting custodian'), date=fields.Date.context_today(self))
         return True
+
+
+class HrEmployee(models.Model):
+    _inherit = 'hr.employee'
+
+    # One driver, one vehicle, unless HR records why this one keeps more
+    # (Nov 2026: the Azmi brothers each run two Isuzus).
+    x_vehicle_limit = fields.Integer(string='Vehicles He May Hold', default=1, groups='hr.group_hr_user',
+                                     help='Driven vehicles (not Tedders) this employee may have in custody at once.')
+    x_vehicle_limit_reason = fields.Char(string='Why More Than One', groups='hr.group_hr_user')
+
+    @api.constrains('x_vehicle_limit', 'x_vehicle_limit_reason')
+    def _check_vehicle_limit(self):
+        for employee in self:
+            if employee.x_vehicle_limit < 1:
+                raise UserError(_('An employee may hold at least one vehicle.'))
+            if employee.x_vehicle_limit > 1 and not (employee.x_vehicle_limit_reason or '').strip():
+                raise UserError(_('Say why %s may hold more than one vehicle.', employee.name))

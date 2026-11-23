@@ -2,6 +2,7 @@ from markupsafe import Markup
 
 from odoo import _, api, fields, models
 from odoo.exceptions import RedirectWarning, UserError
+from odoo.fields import Domain
 
 
 class KswEmployeeReleaseVehicle(models.Model):
@@ -23,22 +24,23 @@ class KswEmployeeReleaseVehicle(models.Model):
         ('driver_change', 'Another Driver in Our Department'),
         ('holding', 'Release to the Workshop'),
     ], string='If He Leaves')
-    new_driver_id = fields.Many2one('hr.employee', string='New Driver')
+    new_driver_id = fields.Many2one('hr.employee', string='New Driver',
+                                    domain="[('id', 'in', allowed_new_driver_ids)]")
+    allowed_new_driver_ids = fields.Many2many('hr.employee.public', compute='_compute_allowed_new_driver_ids')
     custody_request_id = fields.Many2one('ksw.vehicle.custody.request', string='Driver Change', readonly=True,
                                          copy=False)
     fleet_request_id = fields.Many2one('ksw.fleet.request', string='Vehicle Release', readonly=True, copy=False)
-    licence_request = fields.Char(compute='_compute_licence_request', string='Licence Request', compute_sudo=True)
-    new_driver_holds = fields.Char(compute='_compute_new_driver_holds', string='New Driver Already Holds',
-                                   compute_sudo=True)
+    document_requests = fields.Char(compute='_compute_document_requests', string='Document Requests',
+                                    compute_sudo=True)
 
-    @api.depends('new_driver_id', 'disposition')
-    def _compute_new_driver_holds(self):
-        Vehicle = self.env['ksw.fleet.vehicle']
+    @api.depends('vehicle_id', 'request_id')
+    def _compute_allowed_new_driver_ids(self):
+        Custody = self.env['ksw.vehicle.custody.request']
         for row in self:
-            held = Vehicle.search([('x_custodian_id', '=', row.new_driver_id.id),
-                                   ('id', '!=', row.vehicle_id.id)]) \
-                if row.disposition == 'driver_change' and row.new_driver_id else Vehicle
-            row.new_driver_holds = ', '.join(held.mapped('name'))
+            vehicle = row.vehicle_id.sudo()
+            allowed = vehicle and Custody.with_context(ksw_release_row=row.id)._ksw_driver_candidates(
+                vehicle, vehicle.x_department_id)
+            row.allowed_new_driver_ids = self.env['hr.employee.public'].sudo().browse(allowed.ids if allowed else [])
 
     def write(self, vals):
         if not self.env.su:
@@ -58,72 +60,37 @@ class KswEmployeeReleaseVehicle(models.Model):
                 driver = row.new_driver_id.sudo()
                 if not driver:
                     raise UserError(_('Choose the new driver of %s.', vehicle.name))
-                if driver == row.employee_id.sudo():
-                    raise UserError(_('The new driver of %s is the employee being released.', vehicle.name))
-                scope = self.env['hr.department'].sudo().search([('id', 'child_of', vehicle.x_department_id.id)])
-                if driver.department_id not in scope:
-                    raise UserError(_('%(d)s is not in %(dep)s: a driver change stays in the vehicle\'s '
-                                      'department.', d=driver.name, dep=vehicle.x_department_id.name))
-                leaving = self.env['ksw.employee.release.line'].sudo().search([
-                    ('employee_id', '=', driver.id), ('is_closed', '=', False), '|',
-                    ('request_id', '=', row.request_id.id), ('request_id.state', '=', 'submitted')], limit=1)
-                if leaving:
-                    raise UserError(_('%(d)s, the new driver of %(v)s, is being released himself (%(r)s).',
-                                      d=driver.name, v=vehicle.name, r=leaving.request_id.name))
-                twice = self.sudo().search([
-                    ('id', '!=', row.id), ('disposition', '=', 'driver_change'), ('new_driver_id', '=', driver.id),
-                    ('custody_request_id', '=', False), '|',
-                    ('request_id', '=', row.request_id.id), ('request_id.state', '=', 'submitted')], limit=1)
-                if twice:
-                    raise UserError(_('%(d)s is chosen as the new driver of both %(v)s and %(o)s (%(r)s): '
-                                      'one driver takes one of them.', d=driver.name, v=vehicle.name,
-                                      o=twice.vehicle_id.name, r=twice.request_id.name))
-                row._check_new_driver_licence()
+                problems = self.env['ksw.vehicle.custody.request'].with_context(ksw_release_row=row.id)\
+                    ._ksw_driver_problems(driver, vehicle, vehicle.x_department_id)
+                if problems:
+                    raise UserError('\n'.join(problems))
+                row._check_new_driver_documents()
 
-    def _check_new_driver_licence(self):
-        """Licences are HR's register: when it lacks his, the supervisor asks
-        HR from the message itself instead of being left with a dead end."""
+    def _check_new_driver_documents(self):
+        """The register holds what the handover needs (the new driver's and
+        the vehicle's): when it does not, the supervisor asks HR from the
+        message itself instead of being left with a dead end."""
         self.ensure_one()
-        driver, vehicle = self.new_driver_id.sudo(), self.vehicle_id.sudo()
-        licence = self.env['ksw.vehicle.custody.request']._ksw_register_licence(driver)
-        if not licence:
-            message = _('%(d)s, the new driver of %(v)s, has no confirmed driving licence in the documents '
-                        'register.', d=driver.name, v=vehicle.name)
-        elif licence.expiry_date and licence.expiry_date < fields.Date.context_today(self):
-            message = _('The driving licence of %(d)s, the new driver of %(v)s, expired on %(x)s.',
-                        d=driver.name, v=vehicle.name, x=licence.expiry_date)
-        else:
-            return
-        pending = self._licence_request(driver)
-        if pending:
-            raise UserError(message + ' ' + _('HR has the request %(r)s since %(d)s.', r=pending.name,
-                                              d=fields.Date.to_date(pending.create_date)))
-        if self.request_id.state != 'draft':
-            raise UserError(message)
-        raise RedirectWarning(message + ' ' + _('HR registers it.'),
-                              'KSW_fleet_package.action_request_driver_licence', _('Request It from HR'),
-                              {'active_model': self._name, 'active_id': self.id, 'active_ids': [self.id]})
-
-    def _licence_request(self, driver):
-        return self.env['ksw.document.request']._ksw_open_for(
-            driver, self.env.ref('KSW_documents.type_driving_licence'))
+        self.env['ksw.vehicle.custody.request']._ksw_check_documents(
+            self.new_driver_id.sudo(), self.vehicle_id.sudo(), 'KSW_fleet_package.action_request_driver_licence',
+            {'active_model': self._name, 'active_id': self.id, 'active_ids': [self.id]},
+            can_request=self.request_id.state == 'draft')
 
     @api.depends('new_driver_id', 'disposition')
-    def _compute_licence_request(self):
-        Request = self.env['ksw.document.request']
+    def _compute_document_requests(self):
+        Request = self.env['ksw.document.request'].sudo()
         for row in self:
-            request = Request
+            requests = Request
             if row.disposition == 'driver_change' and row.new_driver_id:
-                request = Request.sudo().search([
-                    ('employee_id', '=', row.new_driver_id.id),
-                    ('type_id', '=', self.env.ref('KSW_documents.type_driving_licence').id),
-                    ('state', '!=', 'cancelled')], order='id desc', limit=1)
-            state = dict(request._fields['state']._description_selection(self.env)).get(request.state)
-            row.licence_request = request and '%s: %s' % (request.name, state) or False
+                requests = Request.search([('state', '!=', 'cancelled'), '|',
+                                           ('employee_id', '=', row.new_driver_id.id),
+                                           ('vehicle_id', '=', row.vehicle_id.id)], order='id desc')
+            states = dict(Request._fields['state']._description_selection(self.env))
+            row.document_requests = ', '.join('%s: %s' % (r.name, states[r.state]) for r in requests) or False
 
-    def action_request_licence(self):
-        """A document request to HR, the supervisor's to follow: it waits on
-        the documents officers' Home and closes when HR confirms the licence."""
+    def action_request_documents(self):
+        """Document requests to HR, the supervisor's to follow: they wait on
+        the documents officers' Home and close as HR registers each."""
         self.ensure_one()
         request = self.request_id
         request._check_scope()
@@ -131,16 +98,12 @@ class KswEmployeeReleaseVehicle(models.Model):
         driver = self.new_driver_id.sudo()
         if not driver:
             raise UserError(_('Choose the new driver of %s first.', self.vehicle_id.sudo().name))
-        dr = self._licence_request(driver)
-        if not dr:
-            dr = self.env['ksw.document.request'].create({
-                'type_id': self.env.ref('KSW_documents.type_driving_licence').id, 'employee_id': driver.id,
-                'reason': _('New driver of %(v)s', v=self.vehicle_id.sudo().name), 'origin': request.name})
-        return {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {
-            'type': 'success', 'title': _('Requested from HR'),
-            'message': _('%(r)s: HR registers the driving licence of %(d)s. Follow it in Employee Transfers, '
-                         'My Document Requests; you are told when it is registered, then submit again.',
-                         r=dr.name, d=driver.name)}}
+        Custody = self.env['ksw.vehicle.custody.request']
+        requests = Custody._ksw_request_documents(
+            driver, self.vehicle_id.sudo(), _('New driver of %(v)s', v=self.vehicle_id.sudo().name), request.name)
+        if not requests:
+            raise UserError(_('The register already holds what this handover needs.'))
+        return Custody._ksw_documents_requested_note(requests)
 
     def _launch(self):
         """The GM's decision takes the employee away: carry out what his
@@ -260,3 +223,30 @@ class KswEmployeeReleaseDecisionWizard(models.TransientModel):
     def _compute_x_vehicle_ids(self):
         for wizard in self:
             wizard.x_vehicle_ids = wizard.release_line_ids.sudo().x_vehicle_ids
+
+
+class KswVehicleCustodyRequest(models.Model):
+    _inherit = 'ksw.vehicle.custody.request'
+
+    @api.model
+    def _ksw_driver_reservations(self, employees, vehicle, form=None):
+        """A release's vehicle plan speaks for its new drivers too, and an
+        employee being released takes no vehicle. Within the release being
+        planned that holds already in draft; elsewhere once it is submitted."""
+        found = super()._ksw_driver_reservations(employees, vehicle, form=form)
+        Row = self.env['ksw.employee.release.vehicle'].sudo()
+        row = Row.browse(self.env.context.get('ksw_release_row') or [])
+        same_request = [('request_id', '=', row.request_id.id)] if row else [('id', '=', False)]
+        scope = Domain.OR([same_request, [('request_id.state', '=', 'submitted')]])
+        for line in self.env['ksw.employee.release.line'].sudo().search(
+                Domain([('employee_id', 'in', employees.ids), ('is_closed', '=', False)]) & scope):
+            found.setdefault(line.employee_id.id, _('%(e)s is being released himself (%(r)s).',
+                                                    e=line.employee_id.name, r=line.request_id.name))
+        planned = Row.search(Domain([
+            ('new_driver_id', 'in', employees.ids), ('disposition', '=', 'driver_change'),
+            ('custody_request_id', '=', False), ('vehicle_id', '!=', vehicle.id), ('id', '!=', row.id)]) & scope)
+        for other in planned:
+            found.setdefault(other.new_driver_id.id, _('%(e)s is already the new driver of %(v)s (%(r)s): one '
+                                                       'driver takes one vehicle.', e=other.new_driver_id.name,
+                                                       v=other.vehicle_id.name, r=other.request_id.name))
+        return found

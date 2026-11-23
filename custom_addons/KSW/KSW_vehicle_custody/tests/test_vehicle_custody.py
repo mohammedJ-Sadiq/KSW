@@ -1,5 +1,15 @@
-from odoo.exceptions import UserError, ValidationError
+from datetime import date, timedelta
+
+from odoo.exceptions import RedirectWarning, UserError, ValidationError
 from odoo.tests import TransactionCase, tagged
+
+def _register_papers(env, vehicle):
+    """A company vehicle's handover papers, valid (the register as HR keeps it)."""
+    for doc_type, _status in vehicle._ksw_handover_gaps().get(vehicle.id, []):
+        env['ksw.document'].create({
+            'type_id': doc_type.id, 'applies_to': 'vehicle', 'vehicle_id': vehicle.id,
+            'number': 'P-%s-%s' % (vehicle.id, doc_type.id),
+            'expiry_date': date.today() + timedelta(days=365)}).action_confirm()
 
 
 @tagged('post_install', '-at_install')
@@ -36,6 +46,20 @@ class TestVehicleCustody(TransactionCase):
         cls.truck = cls.env['ksw.fleet.vehicle'].create({'name': 'VC-IS1', 'vehicle_type': 'isuzu',
                                                          'x_department_id': cls.dept_a.id})
         cls.truck._ksw_set_custodian(cls.ahmed)
+        _register_papers(cls.env, cls.truck)
+        cls.bravo_driver = Employee.create({'name': 'VC Bravo Driver', 'identification_id': '2400000003',
+                                            'department_id': cls.dept_b.id})
+        for employee in (cls.khalid, cls.bravo_driver):
+            cls._licence(employee)
+
+    @classmethod
+    def _licence(cls, employee, licence_class='نقل ثقيل', expiry=None):
+        doc = cls.env['ksw.document'].create({
+            'type_id': cls.env.ref('KSW_documents.type_driving_licence').id, 'applies_to': 'employee',
+            'employee_id': employee.id, 'number': f'L{employee.id}', 'license_class': licence_class,
+            'expiry_date': expiry or date.today() + timedelta(days=365)})
+        doc.action_confirm()
+        return doc
 
     # helpers ----------------------------------------------------------
     def _release(self, decision, need=None, **vals):
@@ -127,64 +151,163 @@ class TestVehicleCustody(TransactionCase):
         self.assertEqual(form.inspection_total, 75)  # the workshop's inspection carried over
         self.assertFalse(self.env['ksw.vehicle.custody.request'].with_user(self.user_a).search([('id', '=', form.id)]))
         form.with_user(self.user_b).write({'new_employee_id': self.khalid.id})
-        self.assertEqual(form.new_iqama, '2400000002')
+        with self.assertRaisesRegex(UserError, 'not in VC Bravo'):  # the receiving department's own driver
+            form.with_user(self.user_b).action_submit()
+        form.with_user(self.user_b).write({'new_employee_id': self.bravo_driver.id})
+        self.assertEqual(form.new_iqama, '2400000003')
         form.with_user(self.user_b).action_submit()
         self.assertEqual(form.state, 'hr')
         with self.assertRaises(UserError):  # the workshop cannot hand over before HR
             self._workshop_done(form)
-        with self.assertRaises(UserError):  # no licence recorded
-            form.with_user(self.hr).action_hr_check()
-        form.with_user(self.hr).write({'license_type': 'Heavy', 'license_expiry': '2020-01-01'})
-        with self.assertRaises(UserError):  # expired
-            form.with_user(self.hr).action_hr_check()
-        form.with_user(self.hr).write({'license_expiry': '2030-01-01'})
-        form.with_user(self.hr).action_hr_check()
-        self.assertEqual(form.state, 'workshop')
+        form.with_user(self.hr).action_hr_check()  # the licence comes from the register
+        self.assertEqual((form.license_type, form.state), ('نقل ثقيل', 'workshop'))
         self._workshop_done(form)
         self.assertEqual(form.state, 'done')
         self.assertEqual(move.state, 'done')  # arrival: no separate confirmation
         self.assertEqual(self.truck.x_department_id, self.dept_b)
-        self.assertEqual(self.truck.x_custodian_id, self.khalid)
-        self.assertEqual(self.truck.driver_id, self.khalid)
+        self.assertEqual(self.truck.x_custodian_id, self.bravo_driver)
+        self.assertEqual(self.truck.driver_id, self.bravo_driver)
 
-    # Flow 3: driver change, workshop and HR in parallel, no GM -----------
+    # Flow 3: driver change, the department's own: done at submit, HR told --
+    def _driver_change(self, employee, user=None):
+        return self.env['ksw.vehicle.custody.request'].with_user(user or self.user_a).create({
+            'kind': 'driver_change', 'vehicle_id': self.truck.id, 'new_employee_id': employee.id,
+            'change_reason': 'vacation'})
+
     def test_driver_change_route(self):
         Form = self.env['ksw.vehicle.custody.request']
         with self.assertRaises(UserError):  # hand-ins are not raised by hand
             Form.with_user(self.user_a).create({'kind': 'hand_in', 'vehicle_id': self.truck.id})
         with self.assertRaises(UserError):  # not his department's vehicle
             Form.with_user(self.user_b).create({'kind': 'driver_change', 'vehicle_id': self.truck.id})
-        form = Form.with_user(self.user_a).create({
-            'kind': 'driver_change', 'vehicle_id': self.truck.id, 'new_employee_id': self.khalid.id,
-            'change_reason': 'vacation'})
+        form = self._driver_change(self.khalid)
         self.assertEqual((form.previous_employee_id, form.department_id), (self.ahmed, self.dept_a))
+        existing = form.message_ids.ids
         form.with_user(self.user_a).action_submit()
-        self.assertEqual(form.state, 'workshop')
-        self.assertEqual(form.workshop_request_id.vehicle_id, self.truck)
-        with self.assertRaises(UserError):  # HR's part needs the new user's licence
-            form.with_user(self.hr).action_hr_check()
-        form.with_user(self.hr).write({'license_type': 'Light', 'license_expiry': '2030-01-01'})
-        form.with_user(self.hr).action_hr_check()
-        self.assertEqual(form.state, 'workshop')  # still the workshop's part
-        self._workshop_done(form)
+        # No workshop checkup, no HR step: done, and the vehicle has passed.
         self.assertEqual(form.state, 'done')
+        self.assertFalse(form.workshop_request_id)
         self.assertEqual(self.truck.x_custodian_id, self.khalid)
         history = self.truck.x_custody_ids.sorted('id')
         self.assertEqual(history.mapped('employee_id'), self.ahmed | self.khalid)
         self.assertEqual(history[-1].source, form.name)
         self.assertEqual(self.truck.x_department_id, self.dept_a)
+        # HR is told, with what the register lacks (this truck has no documents).
+        told = form.message_ids.filtered(lambda m: m.id not in existing and self.hr.partner_id in m.partner_ids)
+        self.assertTrue(told)
+        self.assertIn('missing or expired in the register', told.body)
 
-    def test_driver_change_refused(self):
-        form = self.env['ksw.vehicle.custody.request'].with_user(self.user_a).create({
-            'kind': 'driver_change', 'vehicle_id': self.truck.id, 'new_employee_id': self.khalid.id,
-            'change_reason': 'suspension'})
+    def test_one_driver_one_vehicle(self):
+        other = self.env['ksw.fleet.vehicle'].create({'name': 'VC-IS2', 'vehicle_type': 'isuzu',
+                                                      'x_department_id': self.dept_a.id})
+        other._ksw_set_custodian(self.khalid)
+        form = self._driver_change(self.ahmed.browse())
+        self.assertNotIn(self.khalid.id, form.allowed_new_employee_ids.ids)  # not even offered
+        self.assertNotIn(self.ahmed.id, form.allowed_new_employee_ids.ids)  # the current custodian
+        form.with_user(self.user_a).new_employee_id = self.khalid
+        with self.assertRaisesRegex(UserError, 'already answers for VC-IS2'):
+            form.with_user(self.user_a).action_submit()
+        # The custody move itself refuses it, whatever route reached it.
+        with self.assertRaisesRegex(UserError, 'as many vehicles as he may hold'):
+            self.truck._ksw_set_custodian(self.khalid)
+        # A Tedder is pulled by its head: it is nobody's second vehicle.
+        tedder = self.env['ksw.fleet.vehicle'].create({'name': 'VC-TD1', 'vehicle_type': 'tank'})
+        tedder._ksw_set_custodian(self.khalid)
+
+    def test_vehicle_papers_before_it_changes_hands(self):
+        """The operation card, insurance, istimara... of a company vehicle are
+        in the register before it changes hands, or HR is asked for them."""
+        bare = self.env['ksw.fleet.vehicle'].create({'name': 'VC-IS9', 'vehicle_type': 'isuzu',
+                                                     'x_department_id': self.dept_a.id})
+        bare.sudo().write({'client_id': self.env.company.partner_id.id, 'state': 'confirmed',
+                           'x_registration_type': 'public'})
+        bare._ksw_set_custodian(self.env['hr.employee'].create({'name': 'VC Bare', 'department_id': self.dept_a.id}))
+        self.truck = bare
+        needed = self.truck._ksw_handover_gaps()[self.truck.id]
+        codes = {t.code for t, _s in needed}
+        self.assertTrue({'istimara', 'insurance', 'mvpi', 'operation_card'} <= codes)
+        self.assertNotIn('driver_card', codes)  # not checked until HR switches it on
+        form = self._driver_change(self.khalid)
+        with self.assertRaisesRegex(RedirectWarning, r'VC-IS9: Operation Card \(missing\)'):
+            form.with_user(self.user_a).action_submit()
+        form.with_user(self.user_a).action_request_documents()
+        requests = self.env['ksw.document.request'].search([('vehicle_id', '=', self.truck.id)])
+        self.assertEqual(set(requests.type_id.mapped('code')), codes)
+        self.assertTrue(all(r.requested_by_id == self.user_a for r in requests))
+        with self.assertRaisesRegex(UserError, 'HR has DR/'):
+            form.with_user(self.user_a).action_submit()
+        # HR registers them, from the requests: each closes, then it goes.
+        for request in requests:
+            doc = self.env['ksw.document'].browse(request.action_register()['res_id'])
+            doc.write({'number': 'N-%s' % request.id, 'expiry_date': date.today() + timedelta(days=200)})
+            doc.action_confirm()
+        self.assertEqual(set(requests.mapped('state')), {'done'})
         form.with_user(self.user_a).action_submit()
-        with self.assertRaises(UserError):  # the supervisor cannot refuse his own
-            form.with_user(self.user_a)._refuse('no')
-        self.env['ksw.vehicle.custody.refuse.wizard'].with_user(self.hr).create(
-            {'request_id': form.id, 'reason': 'Licence not valid'}).action_confirm()
-        self.assertEqual(form.state, 'refused')
-        self.assertEqual(self.truck.x_custodian_id, self.ahmed)
+        self.assertEqual(self.truck.x_custodian_id, self.khalid)
+
+    def test_hr_allows_one_driver_two_vehicles(self):
+        """An approved exception (the Azmi brothers each run two Isuzus)."""
+        other = self.env['ksw.fleet.vehicle'].create({'name': 'VC-IS4', 'vehicle_type': 'isuzu',
+                                                      'x_department_id': self.dept_a.id})
+        other._ksw_set_custodian(self.khalid)
+        with self.assertRaisesRegex(UserError, 'Say why'):
+            self.khalid.write({'x_vehicle_limit': 2})
+        self.khalid.write({'x_vehicle_limit': 2, 'x_vehicle_limit_reason': 'Runs two Isuzus on one route'})
+        form = self._driver_change(self.khalid)
+        self.assertIn(self.khalid.id, form.allowed_new_employee_ids.ids)
+        form.with_user(self.user_a).action_submit()
+        self.assertEqual(self.truck.x_custodian_id, self.khalid)
+        # A third is still refused.
+        third = self.env['ksw.fleet.vehicle'].create({'name': 'VC-IS5', 'vehicle_type': 'isuzu',
+                                                      'x_department_id': self.dept_a.id})
+        with self.assertRaisesRegex(UserError, r'may hold \(2\)'):
+            third._ksw_set_custodian(self.khalid)
+
+    def test_new_user_spoken_for_and_one_open_form(self):
+        spare = self.env['ksw.fleet.vehicle'].create({'name': 'VC-IS3', 'vehicle_type': 'isuzu',
+                                                      'x_department_id': self.dept_a.id})
+        driver = self.env['hr.employee'].create({'name': 'VC Spare', 'department_id': self.dept_a.id})
+        spare._ksw_set_custodian(driver)
+        first = self._driver_change(self.khalid)
+        # The supervisor reads his picker (no HR rights: the public model).
+        self.assertIn(self.khalid.id, first.with_user(self.user_a).allowed_new_employee_ids.ids)
+        picked = self.env['hr.employee'].with_user(self.user_a).name_search(
+            'VC', domain=[('id', 'in', first.with_user(self.user_a).allowed_new_employee_ids.ids)])
+        self.assertIn(self.khalid.id, [i for i, _n in picked])
+        self.assertNotIn(driver.id, [i for i, _n in picked])  # holds VC-IS3
+        with self.assertRaisesRegex(UserError, 'already has'), self.env.cr.savepoint():  # one open per vehicle
+            self._driver_change(self.khalid)
+        second = self.env['ksw.vehicle.custody.request'].with_user(self.user_a).create({
+            'kind': 'driver_change', 'vehicle_id': spare.id, 'change_reason': 'vacation'})
+        # A draft driver change is only an intention: both offer him, the first confirmed wins.
+        self.assertIn(self.khalid.id, second.allowed_new_employee_ids.ids)
+        second.with_user(self.user_a).new_employee_id = self.khalid
+        first.with_user(self.user_a).action_submit()
+        self.assertEqual(self.truck.x_custodian_id, self.khalid)
+        with self.assertRaisesRegex(UserError, 'already answers for VC-IS1'):
+            second.with_user(self.user_a).action_submit()
+        second.with_user(self.user_a).action_cancel_draft()
+        self.assertEqual(second.state, 'cancelled')
+
+    def test_new_user_licence_from_the_register(self):
+        newcomer = self.env['hr.employee'].create({'name': 'VC Newcomer', 'department_id': self.dept_a.id})
+        form = self._driver_change(newcomer)
+        with self.assertRaises(RedirectWarning) as caught:
+            form.with_user(self.user_a).action_submit()
+        self.assertEqual(caught.exception.args[1], 'KSW_vehicle_custody.action_request_new_user_licence')
+        form.with_user(self.user_a).action_request_documents()
+        dr = self.env['ksw.document.request'].search([('employee_id', '=', newcomer.id)])
+        self.assertEqual((dr.state, dr.origin), ('requested', form.name))
+        with self.assertRaisesRegex(UserError, 'HR has DR/'):
+            form.with_user(self.user_a).action_submit()
+        # A private licence does not drive a truck: HR cannot fix that by registering it.
+        self._licence(newcomer, licence_class='خاصة')
+        self.assertEqual(dr.state, 'done')
+        with self.assertRaisesRegex(UserError, 'needs'):
+            form.with_user(self.user_a).action_submit()
+        self._licence(newcomer, licence_class='نقل خفيف', expiry=date.today() + timedelta(days=400))
+        form.with_user(self.user_a).action_submit()
+        self.assertEqual(self.truck.x_custodian_id, newcomer)
 
     def test_hr12_prints_both_boxes_for_a_driver_change(self):
         form = self.env['ksw.vehicle.custody.request'].with_user(self.user_a).create({

@@ -3,6 +3,14 @@ from datetime import date, timedelta
 from odoo.exceptions import RedirectWarning, UserError
 from odoo.tests import TransactionCase, tagged
 
+def _register_papers(env, vehicle):
+    """A company vehicle's handover papers, valid (the register as HR keeps it)."""
+    for doc_type, _status in vehicle._ksw_handover_gaps().get(vehicle.id, []):
+        env['ksw.document'].create({
+            'type_id': doc_type.id, 'applies_to': 'vehicle', 'vehicle_id': vehicle.id,
+            'number': 'P-%s-%s' % (vehicle.id, doc_type.id),
+            'expiry_date': date.today() + timedelta(days=365)}).action_confirm()
+
 
 @tagged('post_install', '-at_install')
 class TestFleetPackage(TransactionCase):
@@ -37,6 +45,8 @@ class TestFleetPackage(TransactionCase):
         cls.truck_2 = Vehicle.create({'name': 'PK-2', 'vehicle_type': 'isuzu', 'x_department_id': cls.dept_a.id})
         cls.truck_1._ksw_set_custodian(cls.driver_1)
         cls.truck_2._ksw_set_custodian(cls.driver_2)
+        for truck in (cls.truck_1, cls.truck_2):
+            _register_papers(cls.env, truck)
         cls.driver_3 = Employee.create({'name': 'PK Driver 3', 'department_id': cls.dept_a.id})
         for driver in (cls.driver_1, cls.driver_2, cls.driver_3):
             cls._licence(driver)
@@ -176,26 +186,31 @@ class TestFleetPackage(TransactionCase):
         request.x_vehicle_ids.with_user(self.user_a).new_driver_id = outsider
         with self.assertRaises(UserError):
             request.action_submit()  # driver change stays in the vehicle's department
+        # He already drives PK-2: not offered, and refused if forced.
+        self.assertNotIn(self.driver_2.id, request.x_vehicle_ids.allowed_new_driver_ids.ids)
+        self.assertIn(self.driver_3.id, request.x_vehicle_ids.allowed_new_driver_ids.ids)
         request.x_vehicle_ids.with_user(self.user_a).new_driver_id = self.driver_2
+        with self.assertRaisesRegex(UserError, 'already answers for PK-2'):
+            request.action_submit()
+        request.x_vehicle_ids.with_user(self.user_a).new_driver_id = self.driver_3
         request.action_submit()
         self.assertEqual(request.state, 'submitted')
 
     def test_driver_change_when_he_leaves_and_move_waits_for_it(self):
-        request = self._release_employee('driver_change', self.driver_2)
+        request = self._release_employee('driver_change', self.driver_3)
         self.assertFalse(request.x_vehicle_ids.custody_request_id)  # nothing before the GM
         self._gm(request, 'transfer', addition_line_id=self._ask_employee().id)
+        # A driver change is the department's own: done with the GM's decision.
         form = request.x_vehicle_ids.custody_request_id
-        self.assertEqual((form.kind, form.state, form.new_employee_id), ('driver_change', 'workshop', self.driver_2))
+        self.assertEqual((form.kind, form.state, form.new_employee_id), ('driver_change', 'done', self.driver_3))
+        self.assertFalse(form.workshop_request_id)
+        self.assertEqual(self.truck_1.x_custodian_id, self.driver_3)
         transfer = request.release_line_ids.sudo().transfer_id
         transfer.with_user(self.hr).write({'to_manager_id': self.user_b.employee_id.id,
                                            'to_leave_manager_id': self.user_b.id,
                                            'to_hr_responsible_id': self.hr.id})
         transfer.with_user(self.hr).action_hr_approve()
-        self.assertEqual(transfer.state, 'approved')  # still answers for PK-1
-        self.assertEqual(self.driver_1.department_id, self.dept_a)
-        # The driver change completes: the move goes through at once.
-        self.truck_1._ksw_set_custodian(self.driver_2)
-        self.assertEqual(transfer.state, 'applied')
+        self.assertEqual(transfer.state, 'applied')  # he answers for no vehicle any more
         self.assertEqual(self.driver_1.department_id, self.dept_b)
 
     def test_release_to_workshop_on_end_of_service(self):
@@ -230,7 +245,7 @@ class TestFleetPackage(TransactionCase):
     def test_one_new_driver_per_vehicle(self):
         request = self._release_both({self.truck_1: ('driver_change', self.driver_3),
                                       self.truck_2: ('driver_change', self.driver_3)})
-        with self.assertRaisesRegex(UserError, 'both'):
+        with self.assertRaisesRegex(UserError, 'already the new driver'):
             request.action_submit()
         request.x_vehicle_ids.filtered(lambda r: r.vehicle_id == self.truck_2).with_user(self.user_a).write(
             {'disposition': 'holding', 'new_driver_id': False})
@@ -246,7 +261,8 @@ class TestFleetPackage(TransactionCase):
             'release_line_ids': [(0, 0, {'employee_id': leaver.id})]})
         second.x_vehicle_ids.with_user(self.user_a).write({'disposition': 'driver_change',
                                                            'new_driver_id': self.driver_3.id})
-        with self.assertRaisesRegex(UserError, 'both'):
+        self.assertNotIn(self.driver_3.id, second.x_vehicle_ids.allowed_new_driver_ids.ids)
+        with self.assertRaisesRegex(UserError, 'already the new driver'):
             second.action_submit()
 
     def test_new_driver_is_not_leaving_himself(self):
@@ -258,10 +274,10 @@ class TestFleetPackage(TransactionCase):
     def test_new_driver_needs_a_valid_licence(self):
         newcomer = self.env['hr.employee'].create({'name': 'PK No Licence', 'department_id': self.dept_a.id})
         request = self._release_employee('driver_change', newcomer, submit=False)
-        with self.assertRaisesRegex(RedirectWarning, 'no confirmed driving licence'):
+        with self.assertRaisesRegex(RedirectWarning, r'Driving Licence \(missing\)'):
             request.action_submit()
         self._licence(newcomer, expiry=date.today() - timedelta(days=1))
-        with self.assertRaisesRegex(RedirectWarning, 'expired'):
+        with self.assertRaisesRegex(RedirectWarning, r'Driving Licence \(expired\)'):
             request.action_submit()
         self._licence(newcomer)
         request.action_submit()
@@ -276,15 +292,15 @@ class TestFleetPackage(TransactionCase):
         self.assertEqual(self.env.ref(action), self.env.ref('KSW_fleet_package.action_request_driver_licence'))
         row = self.env[context['active_model']].browse(context['active_id'])
         self.assertEqual(row, request.x_vehicle_ids)
-        row.with_user(self.user_a).action_request_licence()
-        dr = row._licence_request(newcomer)
+        row.with_user(self.user_a).action_request_documents()
+        dr = self.env['ksw.document.request'].search([('employee_id', '=', newcomer.id)])
         self.assertEqual((dr.state, dr.requested_by_id, dr.origin), ('requested', self.user_a, request.name))
-        self.assertIn(dr.name, row.licence_request)
+        self.assertIn(dr.name, row.document_requests)
         # The supervisor follows it himself; asking again files nothing new.
         self.assertEqual(self.env['ksw.document.request'].with_user(self.user_a).search([]), dr)
-        row.with_user(self.user_a).action_request_licence()
+        row.with_user(self.user_a).action_request_documents()
         self.assertEqual(self.env['ksw.document.request'].search_count([('employee_id', '=', newcomer.id)]), 1)
-        with self.assertRaisesRegex(UserError, 'HR has the request'):
+        with self.assertRaisesRegex(UserError, 'HR has DR/'):
             request.with_user(self.user_a).action_submit()
         # HR registers it from the request: closed, he is told, the release goes.
         doc = self.env['ksw.document'].browse(dr.action_register()['res_id'])
@@ -296,20 +312,19 @@ class TestFleetPackage(TransactionCase):
         self.assertEqual(request.state, 'submitted')
         # Only a draft release asks; the GM's recheck is a plain refusal.
         with self.assertRaises(UserError):
-            row.with_user(self.user_a).action_request_licence()
+            row.with_user(self.user_a).action_request_documents()
 
     def test_gm_sees_the_plan_and_it_is_rechecked(self):
-        request = self._release_employee('driver_change', self.driver_2)
+        request = self._release_employee('driver_change', self.driver_3)
         row = request.x_vehicle_ids
-        self.assertEqual(row.new_driver_holds, 'PK-2')
         note = request.message_ids.filtered(lambda m: 'PK-1' in (m.body or ''))
-        self.assertIn('PK Driver 2', note.body)
+        self.assertIn('PK Driver 3', note.body)
         wizard = self.env['ksw.employee.release.decision.wizard'].with_user(self.gm).create({
             'release_line_ids': [(6, 0, request.release_line_ids.ids)], 'decision': 'terminate'})
         self.assertEqual(wizard.x_vehicle_ids, row)
         # His licence lapses while the request waits: the GM's decision stops.
-        self.env['ksw.vehicle.custody.request']._ksw_register_licence(self.driver_2).expiry_date = \
+        self.env['ksw.vehicle.custody.request']._ksw_register_licence(self.driver_3).expiry_date = \
             date.today() - timedelta(days=1)
-        with self.assertRaisesRegex(UserError, 'expired'):
+        with self.assertRaisesRegex(UserError, r'Driving Licence \(expired\)'):
             wizard.action_confirm()
         self.assertFalse(row.custody_request_id)

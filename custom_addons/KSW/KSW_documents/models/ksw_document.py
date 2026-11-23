@@ -149,7 +149,7 @@ class KswDocument(models.Model):
                                 self._search_expiry_status('in', ['expiring', 'expired', 'unknown']))])
         # One home: what answers an open document request waits on the request.
         for request in self.env['ksw.document.request'].sudo().search([('state', '=', 'requested')]):
-            domain &= ~(Domain('employee_id', '=', request.employee_id.id)
+            domain &= ~(Domain(request._owner_field(), '=', request._owner().id)
                         & Domain('type_id', '=', request.type_id.id))
         return domain
 
@@ -239,8 +239,7 @@ class KswDocument(models.Model):
             doc._sync_employee_fields()
             doc._fill_owner_master()
             doc._sync_registration()
-            if doc.employee_id and not (doc.expiry_date and doc.expiry_date < fields.Date.context_today(doc)):
-                self.env['ksw.document.request']._ksw_open_for(doc.employee_id, doc.type_id)._ksw_close_with(doc)
+            doc._close_document_requests()
         self._sync_activities()
         return True
 
@@ -270,8 +269,17 @@ class KswDocument(models.Model):
             self.registration_id = reg
 
     @api.model
+    def _close_document_requests(self):
+        """A valid confirmed document answers the open requests for it, by
+        whichever path it was confirmed (HR, or a government export)."""
+        for doc in self.filtered(lambda d: (d.employee_id or d.vehicle_id) and d.state == 'confirmed'):
+            if doc.expiry_date and doc.expiry_date < fields.Date.context_today(doc):
+                continue
+            owner = doc.vehicle_id or doc.employee_id
+            self.env['ksw.document.request']._ksw_open_for(owner, doc.type_id)._ksw_close_with(doc)
+
     def _record_from_source(self, doc_type, owner, source, import_rec=False, number=False, expiry=False,
-                            verified=False, note=False, issue_date=False):
+                            verified=False, note=False, issue_date=False, license_class=False):
         """What a government export says about one document of one owner.
         Returns 'new', 'renewed', 'same' or 'older'. The export is the
         authority, so no scan and no HR confirmation are needed; it never
@@ -292,10 +300,12 @@ class KswDocument(models.Model):
             'type_id': doc_type.id, 'applies_to': doc_type.applies_to, field: owner.id, 'number': number,
             'expiry_date': expiry, 'source': source, 'import_id': import_rec and import_rec.id,
             'verified_date': today if verified else False, 'ai_notes': note, 'issue_date': issue_date,
+            'license_class': license_class,
         })
         current.write({'state': 'replaced'})
         doc.write({'state': 'confirmed', 'confirmed_by_id': self.env.user.id,
                    'confirmed_date': fields.Datetime.now()})
+        doc._close_document_requests()
         doc._sync_employee_fields()
         doc._sync_activities()
         current._sync_activities()

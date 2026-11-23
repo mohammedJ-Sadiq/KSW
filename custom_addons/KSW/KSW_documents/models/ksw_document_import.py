@@ -58,9 +58,20 @@ TANK_COLUMNS = {
     'رقم الرخصة': 'licence_number', 'صلاحية الرخصة': 'licence_expiry_text', 'صلاحية': 'licence_expiry_text',
     'رقم طلب في هيئة المياه': 'water_note',
 }
+# Absher Business ▸ Reports ▸ Driving licence holders among the residents.
+# It prints no licence number: a Saudi licence is numbered by the holder's
+# iqama, so the iqama is the number.
+LICENCE_COLUMNS = {
+    'رقم الاقامة': 'id_number', 'الاسم': 'person_name', 'نوع رخصة القيادة': 'driving_class',
+    'حالة رخصة القيادة': 'driving_status', 'تاريخ الانتهاء (ميلادي)': 'driving_expiry_text',
+}
+LICENCE_VALID = 'صالحة'
+# The classes that may drive each kind of vehicle: a head pulls a tanker.
+LICENCE_FOR = {'trailer': ('نقل ثقيل',), 'isuzu': ('نقل ثقيل', 'نقل خفيف')}
 # The column that identifies each export's header row.
 HEADER_MARK = {'absher_vehicles': 'رقم الهيكل', 'muqeem_residents': 'رقم الاقامة', 'gosi_subscribers': 'رقم الهوية',
-               'qiwa_contracts': 'رقم العقد', 'tank_inspection': 'رقم الهيكل'}
+               'qiwa_contracts': 'رقم العقد', 'tank_inspection': 'رقم الهيكل',
+               'absher_licences': 'نوع رخصة القيادة'}
 # Imported every month (a reminder on Home); GOSI only when HR wants to check.
 MONTHLY_SOURCES = ('absher_vehicles', 'muqeem_residents')
 VALID = 'ساري المفعول'
@@ -99,7 +110,8 @@ class KswDocumentImport(models.Model):
                                ('muqeem_residents', 'Muqeem: Active Residents'),
                                ('gosi_subscribers', 'GOSI: Active Subscribers'),
                                ('qiwa_contracts', 'Qiwa: Active Contracts'),
-                               ('tank_inspection', 'Tank Inspection Report (Fahes)')], required=True,
+                               ('tank_inspection', 'Tank Inspection Report (Fahes)'),
+                               ('absher_licences', 'Absher Business: Driving Licence Holders')], required=True,
                               default='absher_vehicles')
     registration_id = fields.Many2one('ksw.company.registration', string='Establishment (CR)',
                                       help='GOSI lists one establishment per file: the registration its '
@@ -386,6 +398,9 @@ class KswDocumentImport(models.Model):
         return lines
 
     def _preview_muqeem_residents(self, rows, preamble):
+        if rows and HEADER_MARK['absher_licences'] in rows[0]:
+            raise UserError(_('This is the Absher driving licence export: choose "Absher Business: Driving '
+                              'Licence Holders" as the source.'))
         lines = self._people_lines(rows, MUQEEM_COLUMNS)
         # Active employees on an iqama that Muqeem no longer lists.
         listed = set(lines.mapped('id_number'))
@@ -417,6 +432,22 @@ class KswDocumentImport(models.Model):
             'id_number': e.ssnid, 'person_name': e.name,
             'warnings': _('Active in Odoo but no active contract in Qiwa: left, or contract not yet '
                           'registered?')} for e in gone])
+
+    def _preview_absher_licences(self, rows, preamble):
+        lines = self._people_lines(rows, LICENCE_COLUMNS)
+        # Residents who answer for a vehicle that is driven, with no licence here.
+        listed = set(lines.mapped('id_number'))
+        custodians = self.env['ksw.fleet.vehicle'].sudo().search(
+            [('x_custodian_id', '!=', False), ('vehicle_type', '!=', 'tank')]).x_custodian_id
+        gone = custodians.filtered(lambda e: (e.ssnid or '').strip().startswith('2')
+                                   and e.ssnid.strip() not in listed)
+        self.env['ksw.document.import.line'].create([{
+            'import_id': self.id, 'kind': 'missing', 'employee_id': e.id, 'action': 'skip',
+            'id_number': e.ssnid, 'person_name': e.name,
+            'warnings': _('Holds %s in custody but has no driving licence in this export.',
+                          ', '.join(self.env['ksw.fleet.vehicle'].sudo().search(
+                              [('x_custodian_id', '=', e.id), ('vehicle_type', '!=', 'tank')]).mapped('name')))}
+            for e in gone])
 
     def _preview_gosi_subscribers(self, rows, preamble):
         if not self.registration_id:
@@ -525,17 +556,23 @@ class KswDocumentImportLine(models.Model):
     gender = fields.Char()
     join_date_text = fields.Char(string='Joining Date (as exported)')
     join_date = fields.Date(compute='_compute_dates', string='Joining Date (Qiwa)')
+    # Absher driving licences
+    driving_class = fields.Char(string='Licence Class')
+    driving_status = fields.Char(string='Licence Status')
+    driving_expiry_text = fields.Char(string='Licence Expiry (as exported)')
+    driving_expiry = fields.Date(compute='_compute_dates', string='Licence Expiry')
 
     @api.depends('istimara_expiry_text', 'mvpi_expiry_text', 'passport_expiry_text', 'iqama_expiry_text',
                  'birth_date_text', 'contract_date_text', 'join_date_text', 'card_expiry_text',
-                 'licence_expiry_text')
+                 'licence_expiry_text', 'driving_expiry_text')
     def _compute_dates(self):
         for line in self:
             for src, dst in (('istimara_expiry_text', 'istimara_expiry'), ('mvpi_expiry_text', 'mvpi_expiry'),
                              ('passport_expiry_text', 'passport_expiry'), ('iqama_expiry_text', 'iqama_expiry'),
                              ('birth_date_text', 'birth_date'), ('contract_date_text', 'contract_date'),
                              ('join_date_text', 'join_date'), ('card_expiry_text', 'card_expiry'),
-                             ('licence_expiry_text', 'licence_expiry')):
+                             ('licence_expiry_text', 'licence_expiry'),
+                             ('driving_expiry_text', 'driving_expiry')):
                 try:
                     line[dst] = parse_date(line[src])
                 except ValueError:
@@ -619,7 +656,15 @@ class KswDocumentImportLine(models.Model):
                                o=emp.x_registration_id.name, g=line.line_registration_id.name))
             if line.employer_number and not line.line_registration_id:
                 notes.append(_('Employer no. %s is not one of the registrations.', line.employer_number))
-            for label, text, value in ((_('Iqama expiry'), line.iqama_expiry_text, line.iqama_expiry),
+            if line.driving_status and line.driving_status != LICENCE_VALID:
+                notes.append(_('Absher: licence %s.', line.driving_status))
+            if emp and line.driving_class:
+                for vehicle in self.env['ksw.fleet.vehicle'].sudo().search([('x_custodian_id', '=', emp.id)]):
+                    allowed = LICENCE_FOR.get(vehicle.vehicle_type)
+                    if allowed and line.driving_class not in allowed:
+                        notes.append(_('Holds %(v)s with a %(c)s licence.', v=vehicle.name, c=line.driving_class))
+            for label, text, value in ((_('Licence expiry'), line.driving_expiry_text, line.driving_expiry),
+                                       (_('Iqama expiry'), line.iqama_expiry_text, line.iqama_expiry),
                                        (_('Passport expiry'), line.passport_expiry_text, line.passport_expiry)):
                 if text and text not in NONE_VALUES and not value:
                     notes.append(_('%(l)s not a date: %(t)s', l=label, t=text))
@@ -693,6 +738,14 @@ class KswDocumentImportLine(models.Model):
                     note=self.contract_status != 'ساري' and _('Qiwa: %s', self.contract_status) or False)
                 done.append({'new': _('Documents recorded'), 'renewed': _('Documents renewed'),
                              'same': _('Documents unchanged'), 'older': _('Older than the register (ignored)')}[outcome])
+        if self.import_id.source == 'absher_licences' and self.driving_expiry:
+            licence = self.env.ref('KSW_documents.type_driving_licence')
+            outcome = self.env['ksw.document']._record_from_source(
+                licence, emp, 'absher', self.import_id, number=self.id_number, expiry=self.driving_expiry,
+                verified=self.driving_status == LICENCE_VALID, license_class=self.driving_class or False,
+                note=self.driving_status != LICENCE_VALID and _('Absher: %s', self.driving_status) or False)
+            done.append({'new': _('Documents recorded'), 'renewed': _('Documents renewed'),
+                         'same': _('Documents unchanged'), 'older': _('Older than the register (ignored)')}[outcome])
         if self.import_id.source == 'muqeem_residents':
             types = {t.code: t for t in self.env['ksw.document.type'].search([])}
             Document = self.env['ksw.document']

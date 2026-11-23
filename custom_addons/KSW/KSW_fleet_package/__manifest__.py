@@ -1,6 +1,6 @@
 {
     'name': 'KSW Vehicle Allocation: Vehicles with Their Drivers',
-    'version': '19.0.1.3.1',
+    'version': '19.0.1.5.0',
     'summary': 'Release vehicles together with their drivers: HR checks, the GM approves, both move at once',
     'description': """
 The one transfer that skips the workshop. On a release request a vehicle can

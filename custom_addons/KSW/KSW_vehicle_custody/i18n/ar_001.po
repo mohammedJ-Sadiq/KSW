@@ -1741,3 +1741,255 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
 msgid "نموذج فحص المركبة / Vehicle Inspection Form"
 msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid " or "
+msgstr " أو "
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%(e)s already answers for %(o)s: one driver, one vehicle."
+msgstr "%(e)s صاحب عهدة %(o)s: سائق واحد لمركبة واحدة."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%(e)s holds a %(c)s licence; %(v)s needs %(n)s."
+msgstr "رخصة %(e)s من نوع %(c)s، والمركبة %(v)s تحتاج %(n)s."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%(e)s is already the new user of %(v)s on %(f)s."
+msgstr "%(e)s هو المستخدم الجديد للمركبة %(v)s في %(f)s."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%(e)s is not in %(d)s."
+msgstr "%(e)s ليس من %(d)s."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid ""
+"%(e)s, the new driver of %(v)s, has no confirmed driving licence in the "
+"documents register."
+msgstr ""
+"%(e)s، السائق الجديد للمركبة %(v)s، ليس لديه رخصة قيادة معتمدة في سجل "
+"الوثائق."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid ""
+"%(r)s: HR registers the driving licence of %(d)s. Follow it in My Document "
+"Requests; you are told when it is registered, then submit again."
+msgstr ""
+"%(r)s: تسجّل الموارد البشرية رخصة قيادة %(d)s. تابعه من طلبات الوثائق الخاصة"
+" بي، وستصلك رسالة عند التسجيل، وبعدها أعد الإرسال."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%(v)s already has %(f)s open: finish or cancel it first."
+msgstr "للمركبة %(v)s نموذج مفتوح %(f)s: أكمله أو ألغه أولاً."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%s is a Tedder: whoever drives its head answers for it."
+msgstr "%s تيدر: عهدته على سائق الرأس الذي يجره."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%s is archived."
+msgstr "%s مؤرشف."
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__allowed_new_employee_ids
+msgid "Allowed New Employee"
+msgstr "المستخدمون المسموح بهم"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Cancel"
+msgstr "إلغاء"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Cancel this driver change?"
+msgstr "إلغاء تغيير السائق هذا؟"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Cancelled by %s before it was confirmed."
+msgstr "ألغاه %s قبل التأكيد."
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Confirm Driver Change"
+msgstr "تأكيد تغيير السائق"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "For HR, missing or expired in the register:"
+msgstr "للموارد البشرية، ناقص أو منتهٍ في السجل:"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "HR has the request %(r)s since %(d)s."
+msgstr "لدى الموارد البشرية الطلب %(r)s منذ %(d)s."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "HR registers it."
+msgstr "تسجّلها الموارد البشرية."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "New user of %(v)s"
+msgstr "المستخدم الجديد للمركبة %(v)s"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Only a driver change still with its supervisor is cancelled here."
+msgstr "يُلغى هنا تغيير السائق فقط وهو لا يزال لدى المشرف."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Request It from HR"
+msgstr "اطلبها من الموارد البشرية"
+
+#. module: KSW_vehicle_custody
+#: model:ir.actions.server,name:KSW_vehicle_custody.action_request_new_user_licence
+msgid "Request the New User's Driving Licence from HR"
+msgstr "طلب رخصة قيادة المستخدم الجديد من الموارد البشرية"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Requested from HR"
+msgstr "تم الطلب من الموارد البشرية"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid ""
+"The driving licence of %(e)s, the new driver of %(v)s, expired on %(x)s."
+msgstr "انتهت رخصة قيادة %(e)s، السائق الجديد للمركبة %(v)s، بتاريخ %(x)s."
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "The vehicle passes to the new driver now. Confirm?"
+msgstr "تنتقل المركبة الآن إلى السائق الجديد. تأكيد؟"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid ""
+"%(e)s already answers for %(o)s, as many vehicles as he may hold (%(n)s)."
+msgstr "%(e)s صاحب عهدة %(o)s، وهذا الحد المسموح له (%(n)s)."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%(o)s: %(t)s (%(s)s)"
+msgstr "%(o)s: %(t)s (%(s)s)"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%s cannot change hands until the documents register holds:"
+msgstr "لا تنتقل عهدة %s حتى يحتوي سجل الوثائق على:"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid ""
+"%s: HR registers them. Follow them in My Document Requests; you are told as "
+"each is registered, then submit again."
+msgstr ""
+"%s: تسجّلها الموارد البشرية. تابعها من طلبات الوثائق الخاصة بي، وستصلك رسالة"
+" عند تسجيل كل منها، وبعدها أعد الإرسال."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Handover of %(v)s"
+msgstr "تسليم المركبة %(v)s"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Request Them from HR"
+msgstr "اطلبها من الموارد البشرية"
+
+#. module: KSW_vehicle_custody
+#: model:ir.actions.server,name:KSW_vehicle_custody.action_request_new_user_licence
+msgid "Request the Handover Documents from HR"
+msgstr "طلب وثائق التسليم من الموارد البشرية"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "The register already holds what this handover needs."
+msgstr "السجل يحتوي بالفعل على ما يحتاجه هذا التسليم."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "[HR has %(r)s since %(d)s]"
+msgstr "[لدى الموارد البشرية %(r)s منذ %(d)s]"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "expired"
+msgstr "منتهية"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "missing"
+msgstr "غير موجودة"

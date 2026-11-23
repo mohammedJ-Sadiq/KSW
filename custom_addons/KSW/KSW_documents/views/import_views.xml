@@ -67,6 +67,9 @@
                             <field name="employee_id" options="{'no_create': True}" readonly="kind == 'missing'"
                                    column_invisible="parent.source in ('absher_vehicles', 'tank_inspection')"/>
                             <field name="nationality" optional="hide" column_invisible="parent.source in ('absher_vehicles', 'tank_inspection')"/>
+                            <field name="driving_class" column_invisible="parent.source != 'absher_licences'"/>
+                            <field name="driving_expiry" column_invisible="parent.source != 'absher_licences'"/>
+                            <field name="driving_status" optional="hide" column_invisible="parent.source != 'absher_licences'"/>
                             <field name="iqama_expiry" column_invisible="parent.source != 'muqeem_residents'"/>
                             <field name="passport_no" optional="hide" column_invisible="parent.source != 'muqeem_residents'"/>
                             <field name="passport_expiry" column_invisible="parent.source != 'muqeem_residents'"/>

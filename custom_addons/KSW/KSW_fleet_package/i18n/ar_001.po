@@ -415,3 +415,43 @@ msgstr "طلبات الوثائق الخاصة بي"
 #: code:addons/KSW_fleet_package/models/release_vehicle.py:0
 msgid "New driver of %(v)s"
 msgstr "السائق الجديد للمركبة %(v)s"
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW/KSW_fleet_package/models/release_vehicle.py:0
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid ""
+"%(e)s is already the new driver of %(v)s (%(r)s): one driver takes one "
+"vehicle."
+msgstr ""
+"%(e)s هو السائق الجديد للمركبة %(v)s (%(r)s): السائق الواحد يستلم مركبة "
+"واحدة."
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW/KSW_fleet_package/models/release_vehicle.py:0
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "%(e)s is being released himself (%(r)s)."
+msgstr "%(e)s مدرج هو نفسه في طلب إخلاء طرف (%(r)s)."
+
+#. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__allowed_new_driver_ids
+msgid "Allowed New Driver"
+msgstr "السائقون المسموح بهم"
+
+#. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__document_requests
+msgid "Document Requests"
+msgstr "طلبات الوثائق"
+
+#. module: KSW_fleet_package
+#: model:ir.actions.server,name:KSW_fleet_package.action_request_driver_licence
+msgid "Request the Handover Documents from HR"
+msgstr "طلب وثائق التسليم من الموارد البشرية"
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW/KSW_fleet_package/models/release_vehicle.py:0
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "The register already holds what this handover needs."
+msgstr "السجل يحتوي بالفعل على ما يحتاجه هذا التسليم."

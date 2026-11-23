@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 08:00+0000\n"
-"PO-Revision-Date: 2026-11-21 08:00+0000\n"
+"POT-Creation-Date: 2026-11-23 10:36+0000\n"
+"PO-Revision-Date: 2026-11-23 10:36+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -17,30 +17,51 @@ msgstr ""
 
 #. module: KSW_fleet
 #. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_custody.py:0
+#: code:addons/KSW_fleet/models/ksw_fleet_custody.py:0
+msgid ""
+"%(e)s already answers for %(o)s, as many vehicles as he may hold (%(n)s). "
+"Hand one over first."
+msgstr ""
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_coupling.py:0
 #: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
 msgid "%(h)s drops %(t)s"
 msgstr ""
 
 #. module: KSW_fleet
 #. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_coupling.py:0
 #: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
 msgid "%(t)s leaves %(h)s"
 msgstr ""
 
 #. module: KSW_fleet
 #. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_coupling.py:0
 #: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
 msgid "%s already pulls a tedder."
 msgstr ""
 
 #. module: KSW_fleet
 #. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_custody.py:0
+#: code:addons/KSW_fleet/models/ksw_fleet_custody.py:0
+msgid "%s is archived: a vehicle is not handed to him."
+msgstr ""
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_coupling.py:0
 #: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
 msgid "%s is not a trailer head."
 msgstr ""
 
 #. module: KSW_fleet
 #. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_coupling.py:0
 #: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
 msgid "A tedder is coupled to its head with Couple to Head."
 msgstr ""
@@ -53,6 +74,13 @@ msgstr ""
 #. module: KSW_fleet
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__active
 msgid "Active"
+msgstr ""
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_custody.py:0
+#: code:addons/KSW_fleet/models/ksw_fleet_custody.py:0
+msgid "An employee may hold at least one vehicle."
 msgstr ""
 
 #. module: KSW_fleet
@@ -104,6 +132,7 @@ msgstr ""
 
 #. module: KSW_fleet
 #. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_coupling.py:0
 #: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
 #: model:ir.model,name:KSW_fleet.model_ksw_fleet_couple_wizard
 #: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_couple_wizard_form
@@ -122,6 +151,7 @@ msgstr ""
 
 #. module: KSW_fleet
 #. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_coupling.py:0
 #: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
 msgid "Couple a tedder (تيدر) to a trailer head (تريلا)."
 msgstr ""
@@ -164,18 +194,21 @@ msgstr ""
 
 #. module: KSW_fleet
 #. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_coupling.py:0
 #: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
 msgid "Coupling history is never deleted."
 msgstr ""
 
 #. module: KSW_fleet
 #. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_coupling.py:0
 #: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
 msgid "Coupling history is written by coupling, not by hand."
 msgstr ""
 
 #. module: KSW_fleet
 #. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_coupling.py:0
 #: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
 msgid ""
 "Coupling tedders to heads is reserved to the people given that permission."
@@ -210,12 +243,14 @@ msgstr ""
 
 #. module: KSW_fleet
 #. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_custody.py:0
 #: code:addons/KSW_fleet/models/ksw_fleet_custody.py:0
 msgid "Custody history is never deleted."
 msgstr ""
 
 #. module: KSW_fleet
 #. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_custody.py:0
 #: code:addons/KSW_fleet/models/ksw_fleet_custody.py:0
 msgid "Custody history is written by the handover process, not by hand."
 msgstr ""
@@ -231,6 +266,7 @@ msgid "Details"
 msgstr ""
 
 #. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_hr_employee__display_name
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_couple_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_coupling__display_name
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__display_name
@@ -250,6 +286,12 @@ msgid "Draft"
 msgstr ""
 
 #. module: KSW_fleet
+#: model:ir.model.fields,help:KSW_fleet.field_hr_employee__x_vehicle_limit
+msgid ""
+"Driven vehicles (not Tedders) this employee may have in custody at once."
+msgstr ""
+
+#. module: KSW_fleet
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__driver_name
 msgid "Driver Name"
 msgstr ""
@@ -261,8 +303,14 @@ msgstr ""
 
 #. module: KSW_fleet
 #. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_coupling.py:0
 #: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
 msgid "Editing a tedder's data needs the «Edit Tedder Data» permission."
+msgstr ""
+
+#. module: KSW_fleet
+#: model:ir.model,name:KSW_fleet.model_hr_employee
+msgid "Employee"
 msgstr ""
 
 #. module: KSW_fleet
@@ -303,6 +351,7 @@ msgid "Head Plate"
 msgstr ""
 
 #. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_hr_employee__id
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_couple_wizard__id
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_coupling__id
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__id
@@ -360,24 +409,28 @@ msgstr ""
 
 #. module: KSW_fleet
 #. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_vehicle.py:0
 #: code:addons/KSW_fleet/models/ksw_fleet_vehicle.py:0
 msgid "Only a fleet/workshop manager can confirm a draft vehicle."
 msgstr ""
 
 #. module: KSW_fleet
 #. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_coupling.py:0
 #: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
 msgid "Only a tedder is coupled to a head."
 msgstr ""
 
 #. module: KSW_fleet
 #. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_vehicle.py:0
 #: code:addons/KSW_fleet/models/ksw_fleet_vehicle.py:0
 msgid "Only draft vehicles can be confirmed."
 msgstr ""
 
 #. module: KSW_fleet
 #. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_vehicle.py:0
 #: code:addons/KSW_fleet/models/ksw_fleet_vehicle.py:0
 msgid ""
 "Only the system administrator can add a vehicle. Pick it from the list, or "
@@ -426,6 +479,14 @@ msgstr ""
 
 #. module: KSW_fleet
 #. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_custody.py:0
+#: code:addons/KSW_fleet/models/ksw_fleet_custody.py:0
+msgid "Say why %s may hold more than one vehicle."
+msgstr ""
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_custody.py:0
 #: code:addons/KSW_fleet/models/ksw_fleet_custody.py:0
 msgid "Starting custodian"
 msgstr ""
@@ -488,6 +549,7 @@ msgstr ""
 
 #. module: KSW_fleet
 #. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_custody.py:0
 #: code:addons/KSW_fleet/models/ksw_fleet_custody.py:0
 msgid ""
 "The custodian changes only through an approved vehicle handover form "
@@ -574,6 +636,16 @@ msgid "Vehicles"
 msgstr ""
 
 #. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_hr_employee__x_vehicle_limit
+msgid "Vehicles He May Hold"
+msgstr ""
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_hr_employee__x_vehicle_limit_reason
+msgid "Why More Than One"
+msgstr ""
+
+#. module: KSW_fleet
 #: model_terms:ir.ui.view,arch_db:KSW_fleet.view_ksw_fleet_couple_wizard_form
 msgid "Why, if not obvious…"
 msgstr ""
@@ -595,6 +667,7 @@ msgstr ""
 
 #. module: KSW_fleet
 #. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_coupling.py:0
 #: code:addons/KSW_fleet/models/ksw_fleet_coupling.py:0
 msgid "You may edit tedders only, not %s."
 msgstr ""

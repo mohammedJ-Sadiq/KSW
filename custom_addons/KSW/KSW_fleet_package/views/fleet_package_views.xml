@@ -28,13 +28,11 @@
                             <field name="vehicle_id" readonly="1"/>
                             <field name="vehicle_department_id" column_invisible="True"/>
                             <field name="disposition" required="1"/>
+                            <field name="allowed_new_driver_ids" column_invisible="True"/>
                             <field name="new_driver_id" options="{'no_create': True}"
-                                   domain="[('department_id', 'child_of', vehicle_department_id)]"
                                    invisible="disposition != 'driver_change'"
                                    required="disposition == 'driver_change'"/>
-                            <field name="new_driver_holds" readonly="1" invisible="not new_driver_holds"
-                                   decoration-warning="new_driver_holds"/>
-                            <field name="licence_request" readonly="1" invisible="not licence_request"/>
+                            <field name="document_requests" readonly="1" invisible="not document_requests"/>
                             <field name="custody_request_id" readonly="1" optional="show"/>
                             <field name="fleet_request_id" readonly="1" optional="show"/>
                         </list>
@@ -57,7 +55,6 @@
                         <field name="vehicle_id"/>
                         <field name="disposition"/>
                         <field name="new_driver_id"/>
-                        <field name="new_driver_holds" decoration-warning="new_driver_holds"/>
                     </list>
                 </field>
             </field>
@@ -66,10 +63,10 @@
 
     <!-- Run from the "no licence" message (RedirectWarning in _check_ready). -->
     <record id="action_request_driver_licence" model="ir.actions.server">
-        <field name="name">Request the Driving Licence from HR</field>
+        <field name="name">Request the Handover Documents from HR</field>
         <field name="model_id" ref="model_ksw_employee_release_vehicle"/>
         <field name="state">code</field>
-        <field name="code">action = records.action_request_licence()</field>
+        <field name="code">action = records.action_request_documents()</field>
     </record>
 
     <menuitem id="menu_my_document_requests" name="My Document Requests"

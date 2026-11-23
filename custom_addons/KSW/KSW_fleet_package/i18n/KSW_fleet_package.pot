@@ -6,47 +6,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 10:40+0000\n"
-"PO-Revision-Date: 2026-11-21 10:40+0000\n"
+"POT-Creation-Date: 2026-11-23 12:21+0000\n"
+"PO-Revision-Date: 2026-11-23 12:21+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
-
-#. module: KSW_fleet_package
-#. odoo-python
-#: code:addons/KSW/KSW_fleet_package/models/release_vehicle.py:0
-#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
-msgid ""
-"%(d)s is chosen as the new driver of both %(v)s and %(o)s (%(r)s): one "
-"driver takes one of them."
-msgstr ""
-
-#. module: KSW_fleet_package
-#. odoo-python
-#: code:addons/KSW/KSW_fleet_package/models/release_vehicle.py:0
-#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
-msgid ""
-"%(d)s is not in %(dep)s: a driver change stays in the vehicle's department."
-msgstr ""
-
-#. module: KSW_fleet_package
-#. odoo-python
-#: code:addons/KSW/KSW_fleet_package/models/release_vehicle.py:0
-#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
-msgid ""
-"%(d)s, the new driver of %(v)s, has no confirmed driving licence in the "
-"documents register."
-msgstr ""
-
-#. module: KSW_fleet_package
-#. odoo-python
-#: code:addons/KSW/KSW_fleet_package/models/release_vehicle.py:0
-#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
-msgid "%(d)s, the new driver of %(v)s, is being released himself (%(r)s)."
-msgstr ""
 
 #. module: KSW_fleet_package
 #. odoo-python
@@ -61,17 +28,23 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW/KSW_fleet_package/models/release_vehicle.py:0
 #: code:addons/KSW_fleet_package/models/release_vehicle.py:0
-msgid "%(e)s released (%(r)s)"
+msgid ""
+"%(e)s is already the new driver of %(v)s (%(r)s): one driver takes one "
+"vehicle."
 msgstr ""
 
 #. module: KSW_fleet_package
 #. odoo-python
 #: code:addons/KSW/KSW_fleet_package/models/release_vehicle.py:0
 #: code:addons/KSW_fleet_package/models/release_vehicle.py:0
-msgid ""
-"%(r)s: HR registers the driving licence of %(d)s. Follow it in Employee "
-"Transfers, My Document Requests; you are told when it is registered, then "
-"submit again."
+msgid "%(e)s is being released himself (%(r)s)."
+msgstr ""
+
+#. module: KSW_fleet_package
+#. odoo-python
+#: code:addons/KSW/KSW_fleet_package/models/release_vehicle.py:0
+#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
+msgid "%(e)s released (%(r)s)"
 msgstr ""
 
 #. module: KSW_fleet_package
@@ -115,6 +88,11 @@ msgid ""
 msgstr ""
 
 #. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__allowed_new_driver_ids
+msgid "Allowed New Driver"
+msgstr ""
+
+#. module: KSW_fleet_package
 #: model:ir.model.fields.selection,name:KSW_fleet_package.selection__ksw_employee_release_vehicle__disposition__driver_change
 msgid "Another Driver in Our Department"
 msgstr ""
@@ -155,8 +133,14 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_request__display_name
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_fleet_release_line__display_name
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_fleet_request__display_name
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_vehicle_custody_request__display_name
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_res_users__display_name
 msgid "Display Name"
+msgstr ""
+
+#. module: KSW_fleet_package
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__document_requests
+msgid "Document Requests"
 msgstr ""
 
 #. module: KSW_fleet_package
@@ -185,26 +169,13 @@ msgid "Employee Transfer"
 msgstr ""
 
 #. module: KSW_fleet_package
-#. odoo-python
-#: code:addons/KSW/KSW_fleet_package/models/release_vehicle.py:0
-#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
-msgid "HR has the request %(r)s since %(d)s."
-msgstr ""
-
-#. module: KSW_fleet_package
-#. odoo-python
-#: code:addons/KSW/KSW_fleet_package/models/release_vehicle.py:0
-#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
-msgid "HR registers it."
-msgstr ""
-
-#. module: KSW_fleet_package
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_decision_wizard__id
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_line__id
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__id
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_request__id
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_fleet_release_line__id
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_fleet_request__id
+#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_vehicle_custody_request__id
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_res_users__id
 msgid "ID"
 msgstr ""
@@ -225,11 +196,6 @@ msgid "Last Updated on"
 msgstr ""
 
 #. module: KSW_fleet_package
-#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__licence_request
-msgid "Licence Request"
-msgstr ""
-
-#. module: KSW_fleet_package
 #. odoo-python
 #: code:addons/KSW/KSW_fleet_package/models/fleet_package.py:0
 #: code:addons/KSW_fleet_package/models/fleet_package.py:0
@@ -244,11 +210,6 @@ msgstr ""
 #. module: KSW_fleet_package
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__new_driver_id
 msgid "New Driver"
-msgstr ""
-
-#. module: KSW_fleet_package
-#: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__new_driver_holds
-msgid "New Driver Already Holds"
 msgstr ""
 
 #. module: KSW_fleet_package
@@ -286,37 +247,15 @@ msgid "Request"
 msgstr ""
 
 #. module: KSW_fleet_package
-#. odoo-python
-#: code:addons/KSW/KSW_fleet_package/models/release_vehicle.py:0
-#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
-msgid "Request It from HR"
-msgstr ""
-
-#. module: KSW_fleet_package
 #: model:ir.actions.server,name:KSW_fleet_package.action_request_driver_licence
-msgid "Request the Driving Licence from HR"
+msgid "Request the Handover Documents from HR"
 msgstr ""
 
 #. module: KSW_fleet_package
 #. odoo-python
 #: code:addons/KSW/KSW_fleet_package/models/release_vehicle.py:0
 #: code:addons/KSW_fleet_package/models/release_vehicle.py:0
-msgid "Requested from HR"
-msgstr ""
-
-#. module: KSW_fleet_package
-#. odoo-python
-#: code:addons/KSW/KSW_fleet_package/models/release_vehicle.py:0
-#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
-msgid ""
-"The driving licence of %(d)s, the new driver of %(v)s, expired on %(x)s."
-msgstr ""
-
-#. module: KSW_fleet_package
-#. odoo-python
-#: code:addons/KSW/KSW_fleet_package/models/release_vehicle.py:0
-#: code:addons/KSW_fleet_package/models/release_vehicle.py:0
-msgid "The new driver of %s is the employee being released."
+msgid "The register already holds what this handover needs."
 msgstr ""
 
 #. module: KSW_fleet_package
@@ -356,6 +295,11 @@ msgstr ""
 #. module: KSW_fleet_package
 #: model:ir.model.fields,field_description:KSW_fleet_package.field_ksw_employee_release_vehicle__vehicle_department_id
 msgid "Vehicle Department"
+msgstr ""
+
+#. module: KSW_fleet_package
+#: model:ir.model,name:KSW_fleet_package.model_ksw_vehicle_custody_request
+msgid "Vehicle Handover Form (HR-12)"
 msgstr ""
 
 #. module: KSW_fleet_package

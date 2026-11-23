@@ -603,3 +603,62 @@ msgstr "تعديل بيانات التيدر يتطلب صلاحية «تعدي�
 #: model:ir.model.fields,field_description:KSW_fleet.field_ksw_fleet_vehicle__x_can_edit_vehicle
 msgid "X Can Edit Vehicle"
 msgstr ""
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_custody.py:0
+#: code:addons/KSW_fleet/models/ksw_fleet_custody.py:0
+msgid ""
+"%(e)s already answers for %(o)s: one driver, one vehicle. Hand that one over"
+" first."
+msgstr ""
+"%(e)s صاحب عهدة %(o)s: سائق واحد لمركبة واحدة. سلّم تلك المركبة أولاً."
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_custody.py:0
+#: code:addons/KSW_fleet/models/ksw_fleet_custody.py:0
+msgid "%s is archived: a vehicle is not handed to him."
+msgstr "%s مؤرشف: لا تُسلَّم له مركبة."
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_custody.py:0
+#: code:addons/KSW_fleet/models/ksw_fleet_custody.py:0
+msgid ""
+"%(e)s already answers for %(o)s, as many vehicles as he may hold (%(n)s). "
+"Hand one over first."
+msgstr ""
+"%(e)s صاحب عهدة %(o)s، وهذا الحد المسموح له (%(n)s). سلّم إحداها أولاً."
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_custody.py:0
+#: code:addons/KSW_fleet/models/ksw_fleet_custody.py:0
+msgid "An employee may hold at least one vehicle."
+msgstr "الحد الأدنى للعهدة مركبة واحدة."
+
+#. module: KSW_fleet
+#: model:ir.model.fields,help:KSW_fleet.field_hr_employee__x_vehicle_limit
+msgid ""
+"Driven vehicles (not Tedders) this employee may have in custody at once."
+msgstr ""
+"عدد المركبات المقودة (عدا التيدر) التي يجوز أن تكون في عهدة الموظف في وقت "
+"واحد."
+
+#. module: KSW_fleet
+#. odoo-python
+#: code:addons/KSW/KSW_fleet/models/ksw_fleet_custody.py:0
+#: code:addons/KSW_fleet/models/ksw_fleet_custody.py:0
+msgid "Say why %s may hold more than one vehicle."
+msgstr "اذكر سبب السماح لـ%s بعهدة أكثر من مركبة."
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_hr_employee__x_vehicle_limit
+msgid "Vehicles He May Hold"
+msgstr "عدد المركبات المسموح بعهدتها"
+
+#. module: KSW_fleet
+#: model:ir.model.fields,field_description:KSW_fleet.field_hr_employee__x_vehicle_limit_reason
+msgid "Why More Than One"
+msgstr "سبب السماح بأكثر من مركبة"

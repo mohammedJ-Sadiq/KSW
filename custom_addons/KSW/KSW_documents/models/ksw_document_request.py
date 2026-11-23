@@ -6,11 +6,11 @@ from .ksw_document import OFFICER_GROUP
 
 
 class KswDocumentRequest(models.Model):
-    """Someone outside HR needs an employee's document in the register (a
-    supervisor choosing a new driver whose licence is missing). The request
-    is his: he follows it without reading the register. HR registers the
-    document; confirming it closes every open request for that employee and
-    document, wherever it was entered."""
+    """Someone outside HR needs a document in the register: an employee's
+    (a new driver's licence) or a vehicle's (its insurance before it changes
+    hands). The request is his: he follows it without reading the register.
+    HR registers the document; confirming it closes every open request for
+    that owner and document, wherever it was entered."""
     _name = 'ksw.document.request'
     _description = 'Document Request'
     _inherit = ['mail.thread']
@@ -18,8 +18,10 @@ class KswDocumentRequest(models.Model):
 
     name = fields.Char(readonly=True, copy=False, default='/')
     type_id = fields.Many2one('ksw.document.type', string='Document', required=True, readonly=True,
-                              domain="[('applies_to', '=', 'employee')]")
-    employee_id = fields.Many2one('hr.employee', string='Employee', required=True, readonly=True, index=True)
+                              domain="[('applies_to', 'in', ('employee', 'vehicle'))]")
+    applies_to = fields.Selection(related='type_id.applies_to')
+    employee_id = fields.Many2one('hr.employee', string='Employee', readonly=True, index=True)
+    vehicle_id = fields.Many2one('ksw.fleet.vehicle', string='Vehicle', readonly=True, index=True)
     requested_by_id = fields.Many2one('res.users', string='Requested By', required=True, readonly=True,
                                       default=lambda self: self.env.user, index=True)
     reason = fields.Char(required=True, readonly=True, help='What waits for the document.')
@@ -74,29 +76,42 @@ class KswDocumentRequest(models.Model):
             vals['name'] = self.env['ir.sequence'].sudo().next_by_code('ksw.document.request') or '/'
         requests = super().create(vals_list)
         for request in requests:
+            owner = request._owner()
+            if bool(request.employee_id) == bool(request.vehicle_id) or owner._name != {
+                    'employee': 'hr.employee', 'vehicle': 'ksw.fleet.vehicle'}.get(request.type_id.applies_to):
+                raise UserError(_('A document request is for one employee or one vehicle, as its document is.'))
             if self.sudo().search_count([('id', '!=', request.id), ('state', '=', 'requested'),
-                                  ('employee_id', '=', request.employee_id.id),
-                                  ('type_id', '=', request.type_id.id)], limit=1):
+                                         (request._owner_field(), '=', owner.id),
+                                         ('type_id', '=', request.type_id.id)], limit=1):
                 raise UserError(_('HR already has a request for the %(t)s of %(e)s.',
-                                  t=request.type_id.name, e=request.employee_id.sudo().name))
+                                  t=request.type_id.name, e=owner.sudo().name))
             if request._valid_document():
                 raise UserError(_('The %(t)s of %(e)s is already registered and valid.',
-                                  t=request.type_id.name, e=request.employee_id.sudo().name))
+                                  t=request.type_id.name, e=owner.sudo().name))
         return requests
+
+    def _owner_field(self):
+        self.ensure_one()
+        return 'vehicle_id' if self.vehicle_id else 'employee_id'
+
+    def _owner(self):
+        self.ensure_one()
+        return self.vehicle_id or self.employee_id
 
     def _valid_document(self):
         self.ensure_one()
         doc = self.env['ksw.document'].sudo().search([
-            ('employee_id', '=', self.employee_id.id), ('type_id', '=', self.type_id.id),
+            (self._owner_field(), '=', self._owner().id), ('type_id', '=', self.type_id.id),
             ('state', '=', 'confirmed')], limit=1)
         if doc and doc.expiry_date and doc.expiry_date < fields.Date.context_today(self):
             return doc.browse()
         return doc
 
     @api.model
-    def _ksw_open_for(self, employee, doc_type):
-        """The open request for this employee's document, if anyone filed one."""
-        return self.sudo().search([('employee_id', '=', employee.id), ('type_id', '=', doc_type.id),
+    def _ksw_open_for(self, owner, doc_type):
+        """The open request for this employee's or vehicle's document, if any."""
+        field = 'vehicle_id' if owner._name == 'ksw.fleet.vehicle' else 'employee_id'
+        return self.sudo().search([(field, '=', owner.id), ('type_id', '=', doc_type.id),
                                    ('state', '=', 'requested')], limit=1)
 
     def action_register(self):
@@ -104,12 +119,12 @@ class KswDocumentRequest(models.Model):
         self.ensure_one()
         if not self.x_can_register:
             raise UserError(_('Only HR registers the document of %s.', self.name))
+        field, owner = self._owner_field(), self._owner()
         doc = self.env['ksw.document'].search([
-            ('employee_id', '=', self.employee_id.id), ('type_id', '=', self.type_id.id),
-            ('state', '=', 'draft')], limit=1)
+            (field, '=', owner.id), ('type_id', '=', self.type_id.id), ('state', '=', 'draft')], limit=1)
         if not doc:
-            doc = self.env['ksw.document'].create({'type_id': self.type_id.id, 'applies_to': 'employee',
-                                                   'employee_id': self.employee_id.id})
+            doc = self.env['ksw.document'].create({'type_id': self.type_id.id, 'applies_to': self.type_id.applies_to,
+                                                   field: owner.id})
             doc.message_post(body=_('Requested by %(u)s (%(r)s): %(n)s', u=self.requested_by_id.name,
                                     r=self.name, n=self.reason), subtype_xmlid='mail.mt_note')
         return {'type': 'ir.actions.act_window', 'res_model': 'ksw.document', 'res_id': doc.id,

@@ -75,6 +75,11 @@
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">
                 <page name="ksw_vehicle_custody" string="Vehicle Custody" groups="hr.group_hr_user">
+                    <group>
+                        <field name="x_vehicle_limit"/>
+                        <field name="x_vehicle_limit_reason" invisible="x_vehicle_limit &lt;= 1"
+                               required="x_vehicle_limit &gt; 1"/>
+                    </group>
                     <field name="x_custody_history_ids" readonly="1">
                         <list>
                             <field name="vehicle_id"/>

@@ -2,7 +2,9 @@ from markupsafe import Markup
 
 from odoo import _, api, fields, models
 from odoo.fields import Domain
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import RedirectWarning, UserError, ValidationError
+
+from odoo.addons.KSW_documents.models.ksw_document_import import LICENCE_FOR
 
 # Employee details the form records. Copied onto the form when the employee is
 # chosen, never computed: the paper is a record of that day, and a later
@@ -29,6 +31,8 @@ DOCUMENT_TYPES = [
 ]
 
 HR_GROUP = 'KSW_vehicle_custody.group_custody_hr'
+# A form still on its way: its new user is spoken for, its vehicle is busy.
+OPEN_STATES = ('draft', 'hr', 'workshop')
 WORKSHOP_GROUP = 'KSW_workshop.group_workshop_technician'
 
 
@@ -99,7 +103,10 @@ class KswVehicleCustodyRequest(models.Model):
     previous_iqama = fields.Char(string='Previous User ID #')
     previous_phone = fields.Char(string='Previous User Phone')
     # New vehicle user / بيانات المستخدم الجديد
-    new_employee_id = fields.Many2one('hr.employee', string='New User')
+    new_employee_id = fields.Many2one('hr.employee', string='New User',
+                                      domain="[('id', 'in', allowed_new_employee_ids)]")
+    # The public model, same ids: a supervisor reads no hr.employee rows.
+    allowed_new_employee_ids = fields.Many2many('hr.employee.public', compute='_compute_allowed_new_employee_ids')
     new_name = fields.Char(string='New User Name')
     new_emp_no = fields.Char(string='New User Emp. No')
     new_iqama = fields.Char(string='New User ID #')
@@ -161,6 +168,192 @@ class KswVehicleCustodyRequest(models.Model):
     def _compute_inspection_total(self):
         for form in self:
             form.inspection_total = sum(form.inspection_line_ids.mapped('value'))
+
+    @api.depends('vehicle_id', 'department_id', 'kind', 'previous_employee_id')
+    def _compute_allowed_new_employee_ids(self):
+        """Who may be offered as the new user: only people who could take it."""
+        for form in self:
+            vehicle = form.vehicle_id.sudo()
+            department = form._new_user_department()
+            if not (vehicle and department):
+                form.allowed_new_employee_ids = False
+                continue
+            allowed = self._ksw_driver_candidates(vehicle, department, form=form) - form.previous_employee_id.sudo()
+            form.allowed_new_employee_ids = self.env['hr.employee.public'].sudo().browse(allowed.ids)
+
+    def _new_user_department(self):
+        """A receipt's driver is the receiving department's; any other the vehicle's."""
+        self.ensure_one()
+        return self.department_id if self.kind == 'receive' else self.vehicle_id.sudo().x_department_id
+
+    # ------------------------------------------------------------------
+    # Who may take a vehicle: one place, read by the picker, by Submit, by
+    # the release's vehicle plan, and (in part) by the custody move itself.
+    # ------------------------------------------------------------------
+    @api.model
+    def _ksw_driver_candidates(self, vehicle, department, form=None):
+        Employee = self.env['hr.employee'].sudo()
+        people = Employee.search([('department_id', 'child_of', department.id)])
+        if vehicle._ksw_is_driven():
+            held = self.env['ksw.fleet.vehicle'].sudo().search([
+                ('x_custodian_id', 'in', people.ids), ('vehicle_type', '!=', 'tank'), ('id', '!=', vehicle.id)])
+            counts = {}
+            for other in held:
+                counts[other.x_custodian_id.id] = counts.get(other.x_custodian_id.id, 0) + 1
+            people = people.filtered(lambda e: counts.get(e.id, 0) < max(e.x_vehicle_limit, 1))
+        reserved = self._ksw_driver_reservations(people, vehicle, form=form)
+        return people.filtered(lambda e: e.id not in reserved)
+
+    @api.model
+    def _ksw_driver_reservations(self, employees, vehicle, form=None):
+        """{employee id: where he is already spoken for}. Extended by the
+        bridges that plan handovers of their own (a release's vehicles)."""
+        found = {}
+        # A driver change still in draft is an intention (it is done at
+        # submit); a receipt in draft comes from a GM decision and binds.
+        for other in self.sudo().search([('new_employee_id', 'in', employees.ids), ('kind', '!=', 'hand_in'),
+                                         ('id', '!=', form.id if form else 0), '|',
+                                         ('state', 'in', ('hr', 'workshop')),
+                                         '&', ('state', '=', 'draft'), ('kind', '=', 'receive')]):
+            found.setdefault(other.new_employee_id.id, _('%(e)s is already the new user of %(v)s on %(f)s.',
+                                                         e=other.new_employee_id.name, v=other.vehicle_id.name,
+                                                         f=other.name))
+        return found
+
+    @api.model
+    def _ksw_driver_problems(self, employee, vehicle, department, form=None):
+        """Why this employee cannot take this vehicle ([] when he can). The
+        licence is checked apart: it is the one HR can fix."""
+        employee, vehicle = employee.sudo(), vehicle.sudo()
+        problems = []
+        if not employee.active:
+            problems.append(_('%s is archived.', employee.name))
+        if not vehicle._ksw_is_driven():
+            problems.append(_('%s is a Tedder: whoever drives its head answers for it.', vehicle.name))
+        other = vehicle._ksw_custody_full(employee) if vehicle._ksw_is_driven() else vehicle.browse()
+        if other:
+            problems.append(_('%(e)s already answers for %(o)s, as many vehicles as he may hold (%(n)s).',
+                              e=employee.name, o=', '.join(other.mapped('name')),
+                              n=max(employee.x_vehicle_limit, 1)))
+        if department and employee.department_id not in self.env['hr.department'].sudo().search(
+                [('id', 'child_of', department.id)]):
+            problems.append(_('%(e)s is not in %(d)s.', e=employee.name, d=department.name))
+        reserved = self._ksw_driver_reservations(employee, vehicle, form=form).get(employee.id)
+        if reserved:
+            problems.append(reserved)
+        return problems
+
+    @api.model
+    def _ksw_licence_problem(self, employee, vehicle):
+        """A licence of the wrong class: HR cannot fix it by registering it."""
+        employee, vehicle = employee.sudo(), vehicle.sudo()
+        licence = self._ksw_register_licence(employee)
+        allowed = LICENCE_FOR.get(vehicle.vehicle_type)
+        known = {c for classes in LICENCE_FOR.values() for c in classes} | {'خاصة'}
+        if licence and allowed and licence.license_class in known and licence.license_class not in allowed:
+            return _('%(e)s holds a %(c)s licence; %(v)s needs %(n)s.', e=employee.name, c=licence.license_class,
+                     v=vehicle.name, n=_(' or ').join(allowed))
+        return False
+
+    @api.model
+    def _ksw_document_gaps(self, employee, vehicle):
+        """[(owner, type, 'missing' | 'expired')]: what the register lacks for
+        this handover. The vehicle's papers, and the new driver's as the
+        custodian he is about to be; only the types HR checks at a handover."""
+        gaps = []
+        vehicle = vehicle.sudo()
+        for doc_type, status in vehicle._ksw_handover_gaps().get(vehicle.id, []):
+            gaps.append((vehicle, doc_type, status))
+        if employee:
+            employee = employee.sudo().with_context(ksw_as_custodian=True)
+            for doc_type, status in employee._ksw_handover_gaps().get(employee.id, []):
+                gaps.append((employee, doc_type, status))
+        return gaps
+
+    @api.model
+    def _ksw_gap_label(self, owner, doc_type, status):
+        return _('%(o)s: %(t)s (%(s)s)', o=owner.name, t=doc_type.name,
+                 s=_('missing') if status == 'missing' else _('expired'))
+
+    @api.model
+    def _ksw_request_documents(self, employee, vehicle, reason, origin):
+        """Document requests to HR for every gap (reusing the open ones)."""
+        Request = self.env['ksw.document.request']
+        requests = Request
+        for owner, doc_type, _status in self._ksw_document_gaps(employee, vehicle):
+            request = Request._ksw_open_for(owner, doc_type)
+            if not request:
+                request = Request.create({'type_id': doc_type.id, owner._name == 'ksw.fleet.vehicle' and
+                                          'vehicle_id' or 'employee_id': owner.id,
+                                          'reason': reason, 'origin': origin})
+            requests |= request
+        return requests
+
+    @api.model
+    def _ksw_documents_requested_note(self, requests):
+        return {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {
+            'type': 'success', 'title': _('Requested from HR'),
+            'message': _('%s: HR registers them. Follow them in My Document Requests; you are told as each is '
+                         'registered, then submit again.', ', '.join(requests.mapped('name')))}}
+
+    @api.model
+    def _ksw_check_documents(self, employee, vehicle, action_xmlid, context, can_request):
+        """Refuse the handover while the register lacks a checked document;
+        when the caller may ask HR, the message carries the button."""
+        wrong_class = self._ksw_licence_problem(employee, vehicle) if employee else False
+        if wrong_class:
+            raise UserError(wrong_class)
+        gaps = self._ksw_document_gaps(employee, vehicle)
+        if not gaps:
+            return
+        Request = self.env['ksw.document.request']
+        lines, unrequested = [], False
+        for owner, doc_type, status in gaps:
+            open_request = Request._ksw_open_for(owner, doc_type)
+            label = self._ksw_gap_label(owner, doc_type, status)
+            if open_request:
+                label += ' ' + _('[HR has %(r)s since %(d)s]', r=open_request.name,
+                                 d=fields.Date.to_date(open_request.create_date))
+            else:
+                unrequested = True
+            lines.append('• ' + label)
+        message = _('%s cannot change hands until the documents register holds:', vehicle.sudo().name) \
+            + '\n' + '\n'.join(lines)
+        if unrequested and can_request:
+            raise RedirectWarning(message, action_xmlid, _('Request Them from HR'), context)
+        raise UserError(message)
+
+    def _check_new_driver(self):
+        """Submit and HR: the new user may take the vehicle, and the register
+        holds what the handover needs (his and the vehicle's)."""
+        for form in self.filtered(lambda f: f.kind != 'hand_in'):
+            employee, vehicle = form.new_employee_id.sudo(), form.vehicle_id.sudo()
+            problems = self._ksw_driver_problems(employee, vehicle, form._new_user_department(), form=form)
+            if problems:
+                raise UserError('\n'.join(problems))
+            self._ksw_check_documents(
+                employee, vehicle, 'KSW_vehicle_custody.action_request_new_user_licence',
+                {'active_model': form._name, 'active_id': form.id, 'active_ids': [form.id]},
+                can_request=form.state == 'draft')
+
+    def action_cancel_draft(self):
+        """The supervisor drops a driver change he has not confirmed."""
+        for form in self:
+            if form.kind != 'driver_change' or not form.x_can_supervisor:
+                raise UserError(_('Only a driver change still with its supervisor is cancelled here.'))
+        self._ksw_cancel(_('Cancelled by %s before it was confirmed.', self.env.user.name))
+        return True
+
+    def action_request_documents(self):
+        self.ensure_one()
+        if not self.x_can_supervisor:
+            raise UserError(_('%s is not waiting for the supervisor.', self.name))
+        requests = self._ksw_request_documents(
+            self.new_employee_id.sudo(), self.vehicle_id.sudo(),
+            _('Handover of %(v)s', v=self.vehicle_id.sudo().name), self.name)
+        if not requests:
+            raise UserError(_('The register already holds what this handover needs.'))
+        return self._ksw_documents_requested_note(requests)
 
     @api.depends_context('uid')
     def _compute_allowed_department_ids(self):
@@ -299,6 +492,7 @@ class KswVehicleCustodyRequest(models.Model):
                                         for i, (key, _label) in enumerate(DOCUMENT_TYPES)]
         forms = super().create(vals_list)
         forms._check_driver_change_scope()
+        forms._check_one_open_form()
         for form in forms.filtered(lambda f: not f.inspection_line_ids):
             form._load_inspection_items()
         forms._sync_activities()
@@ -330,6 +524,14 @@ class KswVehicleCustodyRequest(models.Model):
             if vehicle.x_department_id.id not in scope:
                 raise UserError(_('%s is not a vehicle of your departments.', vehicle.name))
 
+    def _check_one_open_form(self):
+        for form in self.filtered(lambda f: f.kind == 'driver_change' and f.state in OPEN_STATES):
+            other = self.sudo().search([('vehicle_id', '=', form.vehicle_id.id), ('state', 'in', OPEN_STATES),
+                                        ('id', '!=', form.id)], limit=1)
+            if other:
+                raise UserError(_('%(v)s already has %(f)s open: finish or cancel it first.',
+                                  v=form.vehicle_id.sudo().name, f=other.name))
+
     def _check_lines_editable(self):
         if not self.env.su and self.filtered(lambda f: f.state in ('signed', 'refused', 'cancelled')):
             raise UserError(_('A signed, refused or cancelled handover form cannot be changed.'))
@@ -358,8 +560,9 @@ class KswVehicleCustodyRequest(models.Model):
         self._sync_activities()
 
     def action_submit(self):
-        """Supervisor: a receipt goes to HR (licence before handover); a
-        driver change goes to the workshop and HR at once."""
+        """Supervisor. A receipt goes to HR, then the workshop hands it over.
+        A driver change is the department's own decision between two of its
+        drivers: once every check passes it is done, and HR is told."""
         for form in self:
             if not form.x_can_supervisor:
                 raise UserError(_('%s is not waiting for the supervisor.', form.name))
@@ -376,10 +579,14 @@ class KswVehicleCustodyRequest(models.Model):
                 if form.vehicle_id.sudo().x_allocation_state != 'assigned':
                     raise UserError(_('%s is being moved; a driver change waits until it is back '
                                       'in its department.', form.vehicle_id.name))
+        self._check_one_open_form()
+        self._check_new_driver()
         for form in self:
             if form.kind == 'driver_change':
-                form._advance('workshop')
-                form._ensure_checkup()
+                form._fill_licence_from_register()
+                form._advance('done')
+                form._apply_custody()
+                form._send_notifications()
             else:
                 form._advance('hr')
         return True
@@ -415,6 +622,7 @@ class KswVehicleCustodyRequest(models.Model):
         for form in self:
             if not form.x_can_hr:
                 raise UserError(_('Only HR completes the documents of %s at this step.', form.name))
+        self._check_new_driver()
         self._check_new_user_licence()
         stamp = {'hr_checked_by_id': self.env.user.id, 'hr_checked_date': fields.Datetime.now()}
         for form in self.sudo():
@@ -477,24 +685,6 @@ class KswVehicleCustodyRequest(models.Model):
                                      partner_ids=form.create_uid.partner_id.ids,
                                      subtype_xmlid='mail.mt_comment')
 
-    def _ensure_checkup(self):
-        """A driver change is checked by the workshop: raise its checkup
-        request when it is submitted."""
-        for form in self.sudo().filtered(lambda f: f.kind == 'driver_change' and not f.workshop_request_id):
-            vehicle = form.vehicle_id
-            requester = form.create_uid.employee_id or form.supervisor_id or form.previous_employee_id
-            workshop_request = self.env['ksw.workshop.request'].sudo().create({
-                'employee_id': requester.id,
-                'client_id': vehicle.client_id.id,
-                'vehicle_type': vehicle.vehicle_type,
-                'vehicle_id': vehicle.id,
-                'driver_id': (form.previous_employee_id or requester).id,
-                'workshop_id': self.env['ksw.workshop']._for_department(form.department_id).id,
-                'description': _('Checkup for driver change (%(f)s): %(a)s → %(b)s',
-                                 f=form.name, a=form.previous_name or '-', b=form.new_name or '-'),
-            })
-            form.write({'workshop_request_id': workshop_request.id, 'workshop_id': workshop_request.workshop_id.id})
-
     def _apply_custody(self):
         """What a done form changes. A hand-in leaves the vehicle in nobody's
         custody (it is at the workshop); a receipt or a driver change gives it
@@ -514,18 +704,32 @@ class KswVehicleCustodyRequest(models.Model):
         """Who needs to know once it is done: Accounting when a driver hands
         a vehicle in (financial matters, the depreciation value, his account
         statement), and the department, which also files the signed paper.
-        HR is not copied: it was a step."""
+        HR is not copied on a hand-in or receipt: it was a step. A driver
+        change has no HR step, so HR is told, with what the register lacks."""
         accounting = self.env.ref('KSW_vehicle_custody.group_custody_accounting').sudo().all_user_ids
         accounting = accounting.filtered(lambda u: u.active and not u.share)
+        technical = self.env.ref('base.user_admin') | self.env.ref('base.user_root')
+        hr_users = self.env.ref(HR_GROUP).sudo().all_user_ids.filtered(
+            lambda u: u.active and not u.share) - technical
         for form in self.sudo():
             partners = form.department_id._ksw_fleet_users().partner_id
             if form.kind in ('hand_in', 'driver_change'):
                 partners |= accounting.partner_id
+            if form.kind == 'driver_change':
+                partners |= hr_users.partner_id
             partners -= self.env.user.partner_id
             body = Markup(_('<b>%(n)s done</b>: %(k)s, %(v)s. %(p)s → %(w)s. Depreciation value: %(t)s.')) % {
                 'n': form.name, 'k': dict(form._fields['kind']._description_selection(self.env))[form.kind],
                 'v': form.vehicle_id.name, 'p': form.previous_name or '-', 'w': form.new_name or '-',
                 't': '{:,.2f}'.format(form.inspection_total)}
+            if form.kind == 'driver_change':
+                lacking = form.document_ids.filtered(lambda d: d.register_status in ('missing', 'expired'))
+                if lacking:
+                    labels = dict(lacking._fields['document_type']._description_selection(self.env))
+                    status = dict(lacking._fields['register_status']._description_selection(self.env))
+                    body += Markup('<br/><b>%s</b> ') % _('For HR, missing or expired in the register:')
+                    body += Markup(', ').join(Markup('%(t)s (%(s)s)') % {
+                        't': labels[d.document_type], 's': status[d.register_status]} for d in lacking)
             form.message_post(body=body, partner_ids=partners.ids, subtype_xmlid='mail.mt_comment')
 
     def action_mark_signed(self):

@@ -109,7 +109,20 @@ class TestFleetAllocation(TransactionCase):
         """The receiving department names the new driver; HR checks him; the
         workshop hands the vehicle over, which is the arrival."""
         for form in moves.sudo().x_custody_request_ids.filtered(lambda f: f.state == 'draft'):
-            form.with_user(user).write({'new_employee_id': user.employee_id.id})
+            # One driver per vehicle, of the receiving department, licensed.
+            driver = self.env['hr.employee'].create({'name': 'FA Receiver %s' % form.vehicle_id.name,
+                                                     'department_id': form.department_id.id})
+            self.env['ksw.document'].create({
+                'type_id': self.env.ref('KSW_documents.type_driving_licence').id, 'applies_to': 'employee',
+                'employee_id': driver.id, 'number': 'L%s' % driver.id, 'license_class': 'نقل ثقيل',
+                'expiry_date': '2099-01-01'}).action_confirm()
+            # The vehicle's papers, as HR keeps them in the register.
+            vehicle = form.vehicle_id.sudo()
+            for doc_type, _status in vehicle._ksw_handover_gaps().get(vehicle.id, []):
+                self.env['ksw.document'].create({
+                    'type_id': doc_type.id, 'applies_to': 'vehicle', 'vehicle_id': vehicle.id,
+                    'number': 'P-%s-%s' % (vehicle.id, doc_type.id), 'expiry_date': '2099-01-01'}).action_confirm()
+            form.with_user(user).write({'new_employee_id': driver.id})
             form.with_user(user).action_submit()
         self._finish_custody(moves.sudo().x_custody_request_ids)
 
@@ -418,5 +431,5 @@ class TestFleetAllocation(TransactionCase):
         self._receive(move, self.user_b)
         self.assertEqual(move.state, 'done')
         self.assertEqual(self.isuzu_a1.x_department_id, self.dept_b)
-        self.assertEqual(self.isuzu_a1.x_custodian_id, self.user_b.employee_id)
+        self.assertEqual(self.isuzu_a1.x_custodian_id.name, 'FA Receiver %s' % self.isuzu_a1.name)
         self.assertEqual(addition.state, 'done')

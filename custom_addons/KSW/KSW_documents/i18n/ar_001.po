@@ -2579,3 +2579,86 @@ msgstr "يمكنه التسجيل"
 #: model_terms:ir.actions.act_window,help:KSW_documents.action_ksw_document_request_my
 msgid "You have asked HR for no documents."
 msgstr "لم تطلب أي وثائق من الموارد البشرية."
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import__source__absher_licences
+msgid "Absher Business: Driving Licence Holders"
+msgstr "أبشر أعمال: حاملو رخص القيادة"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Absher: %s"
+msgstr "أبشر: %s"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Absher: licence %s."
+msgstr "أبشر: الرخصة %s."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Holds %(v)s with a %(c)s licence."
+msgstr "يحمل عهدة %(v)s برخصة %(c)s."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Holds %s in custody but has no driving licence in this export."
+msgstr "يحمل عهدة %s وليس له رخصة قيادة في هذا الملف."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__driving_class
+msgid "Licence Class"
+msgstr "نوع الرخصة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__driving_expiry
+msgid "Licence Expiry"
+msgstr "انتهاء الرخصة"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__driving_expiry_text
+msgid "Licence Expiry (as exported)"
+msgstr "انتهاء الرخصة (كما في الملف)"
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__driving_status
+msgid "Licence Status"
+msgstr "حالة الرخصة"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Licence expiry"
+msgstr "انتهاء الرخصة"
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid ""
+"This is the Absher driving licence export: choose \"Absher Business: Driving"
+" Licence Holders\" as the source."
+msgstr ""
+"هذا ملف رخص القيادة من أبشر: اختر المصدر «أبشر أعمال: حاملو رخص القيادة»."
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW/KSW_documents/models/ksw_document_request.py:0
+#: code:addons/KSW_documents/models/ksw_document_request.py:0
+msgid ""
+"A document request is for one employee or one vehicle, as its document is."
+msgstr "طلب الوثيقة يخص موظفاً واحداً أو مركبة واحدة، بحسب نوع الوثيقة."
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_type__handover_check
+msgid "Checked at Vehicle Handover"
+msgstr "تُفحص عند تسليم المركبة"

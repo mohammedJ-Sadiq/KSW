@@ -5,7 +5,17 @@ no red field. Drive the real form and check the client stops it.
 Needs the project venv: `browser_js` requires `websocket-client`, and without
 it the test silently skips.
 """
+from datetime import date, timedelta
+
 from odoo.tests import HttpCase, tagged
+
+def _register_papers(env, vehicle):
+    """A company vehicle's handover papers, valid (the register as HR keeps it)."""
+    for doc_type, _status in vehicle._ksw_handover_gaps().get(vehicle.id, []):
+        env['ksw.document'].create({
+            'type_id': doc_type.id, 'applies_to': 'vehicle', 'vehicle_id': vehicle.id,
+            'number': 'P-%s-%s' % (vehicle.id, doc_type.id),
+            'expiry_date': date.today() + timedelta(days=365)}).action_confirm()
 
 
 @tagged('post_install', '-at_install')
@@ -64,6 +74,7 @@ class TestVehicleRowsUI(HttpCase):
         truck = self.env['ksw.fleet.vehicle'].create({'name': 'PK-UI-2', 'vehicle_type': 'isuzu',
                                                       'x_department_id': department.id})
         truck._ksw_set_custodian(driver)
+        _register_papers(self.env, truck)
         request = self.env['ksw.employee.request'].create({
             'request_type': 'release', 'department_id': department.id, 'reason': 'Route closed',
             'release_line_ids': [(0, 0, {'employee_id': driver.id})]})
@@ -87,7 +98,7 @@ class TestVehicleRowsUI(HttpCase):
                 for (let i = 0; i < 40 && !el; i++) {
                     await wait(250);
                     el = [...document.querySelectorAll('.modal button')].find(
-                        (b) => b.textContent.includes('Request It from HR'));
+                        (b) => b.textContent.includes('Request Them from HR'));
                 }
                 if (!el) { console.error('the licence message offers no HR request'); return; }
                 el.click();
@@ -102,5 +113,5 @@ class TestVehicleRowsUI(HttpCase):
             })();
         """ % {'id': request.id}
         self.browser_js('/odoo', code, ready='odoo.isReady === true', login='admin', timeout=90)
-        dr = request.x_vehicle_ids._licence_request(newcomer)
+        dr = self.env['ksw.document.request'].search([('employee_id', '=', newcomer.id)])
         self.assertEqual(dr.requested_by_id, self.env.ref('base.user_admin'))

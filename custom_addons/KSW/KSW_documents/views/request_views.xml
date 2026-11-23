@@ -8,7 +8,8 @@
                 <field name="name"/>
                 <field name="create_date" string="Requested On" widget="date"/>
                 <field name="type_id"/>
-                <field name="employee_id"/>
+                <field name="employee_id" optional="show"/>
+                <field name="vehicle_id" optional="show"/>
                 <field name="reason"/>
                 <field name="requested_by_id" widget="many2one_avatar_user"/>
                 <field name="state" widget="badge" decoration-warning="state == 'requested'"
@@ -37,7 +38,8 @@
                     <group>
                         <group>
                             <field name="type_id"/>
-                            <field name="employee_id"/>
+                            <field name="employee_id" invisible="not employee_id"/>
+                            <field name="vehicle_id" invisible="not vehicle_id"/>
                             <field name="reason"/>
                             <field name="origin" invisible="not origin"/>
                         </group>
@@ -61,6 +63,7 @@
             <search>
                 <field name="name"/>
                 <field name="employee_id"/>
+                <field name="vehicle_id"/>
                 <field name="requested_by_id"/>
                 <filter string="Waiting for Me" name="filter_mine" domain="[('x_is_pending_my_action', '=', True)]"/>
                 <filter string="My Requests" name="filter_my_requests" domain="[('requested_by_id', '=', uid)]"/>

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-14 20:54+0000\n"
-"PO-Revision-Date: 2026-11-14 20:54+0000\n"
+"POT-Creation-Date: 2026-11-23 12:20+0000\n"
+"PO-Revision-Date: 2026-11-23 12:20+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -17,12 +17,85 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid " or "
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid ""
+"%(e)s already answers for %(o)s, as many vehicles as he may hold (%(n)s)."
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%(e)s holds a %(c)s licence; %(v)s needs %(n)s."
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%(e)s is already the new user of %(v)s on %(f)s."
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%(e)s is not in %(d)s."
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%(o)s: %(t)s (%(s)s)"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%(v)s already has %(f)s open: finish or cancel it first."
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "%s cannot be refused at this step."
 msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%s cannot change hands until the documents register holds:"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%s is a Tedder: whoever drives its head answers for it."
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%s is archived."
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid ""
 "%s is being moved; a driver change waits until it is back in its department."
@@ -30,26 +103,39 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "%s is not a vehicle of your departments."
 msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "%s is not approved yet; the paper is signed after approval."
 msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "%s is not waiting for the supervisor."
 msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "%s is on a release request; its department is giving it up."
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid ""
+"%s: HR registers them. Follow them in My Document Requests; you are told as "
+"each is registered, then submit again."
 msgstr ""
 
 #. module: KSW_vehicle_custody
@@ -72,6 +158,7 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid ""
 "<b>%(n)s done</b>: %(k)s, %(v)s. %(p)s → %(w)s. Depreciation value: %(t)s."
@@ -99,6 +186,7 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid ""
 "A hand-in or receipt is part of a GM decision: the GM changes it on the "
@@ -107,12 +195,14 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "A handover form is cancelled, never deleted."
 msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "A signed, refused or cancelled handover form cannot be changed."
 msgstr ""
@@ -178,6 +268,11 @@ msgid "Allowed Department"
 msgstr ""
 
 #. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__allowed_new_employee_ids
+msgid "Allowed New Employee"
+msgstr ""
+
+#. module: KSW_vehicle_custody
 #: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__state__done
 msgid "Approved"
 msgstr ""
@@ -196,6 +291,7 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "Attach the signed and scanned form first (Signed Copy)."
 msgstr ""
@@ -211,8 +307,25 @@ msgid "Batteries / البطاريات"
 msgstr ""
 
 #. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Cancel"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Cancel this driver change?"
+msgstr ""
+
+#. module: KSW_vehicle_custody
 #: model:ir.model.fields.selection,name:KSW_vehicle_custody.selection__ksw_vehicle_custody_request__state__cancelled
 msgid "Cancelled"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Cancelled by %s before it was confirmed."
 msgstr ""
 
 #. module: KSW_vehicle_custody
@@ -227,12 +340,7 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
-#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
-msgid "Checkup for driver change (%(f)s): %(a)s → %(b)s"
-msgstr ""
-
-#. module: KSW_vehicle_custody
-#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "Choose the new user of the vehicle."
 msgstr ""
@@ -250,6 +358,11 @@ msgstr ""
 #. module: KSW_vehicle_custody
 #: model:ir.ui.menu,name:KSW_vehicle_custody.menu_vehicle_custody_config
 msgid "Configuration"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Confirm Driver Change"
 msgstr ""
 
 #. module: KSW_vehicle_custody
@@ -333,6 +446,7 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "Depreciation is a percentage between 0 and 100."
 msgstr ""
@@ -438,12 +552,14 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "File the signed HR-12: %s"
 msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/fleet_integration.py:0
 #: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
 msgid ""
 "File the signed handover form first (%s): the workshop and HR complete it, "
@@ -457,6 +573,7 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "Fill in when the workshop inspected the vehicle."
 msgstr ""
@@ -509,6 +626,13 @@ msgid "Font awesome icon e.g. fa-tasks"
 msgstr ""
 
 #. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "For HR, missing or expired in the register:"
+msgstr ""
+
+#. module: KSW_vehicle_custody
 #: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
 msgid "For the Official Use (Executive Director)"
 msgstr ""
@@ -530,6 +654,7 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "Give the reason for the user change."
 msgstr ""
@@ -557,6 +682,7 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "HR documents: %s"
 msgstr ""
@@ -617,6 +743,13 @@ msgstr ""
 #: model:ir.ui.menu,name:KSW_vehicle_custody.menu_ksw_workshop_custody
 #: model:ir.ui.menu,name:KSW_vehicle_custody.menu_vehicle_custody_forms
 msgid "Handover Forms (HR-12)"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Handover of %(v)s"
 msgstr ""
 
 #. module: KSW_vehicle_custody
@@ -793,6 +926,7 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "Name the new driver: %s"
 msgstr ""
@@ -911,12 +1045,14 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "Only HR completes the documents of %s at this step."
 msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid ""
 "Only a driver change is raised by hand. Hand-ins and receipts come from "
@@ -925,6 +1061,14 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Only a driver change still with its supervisor is cancelled here."
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "Only the workshop completes %s at this step."
 msgstr ""
@@ -1085,6 +1229,7 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid ""
 "Record the new user's licence type and expiry: the vehicle is not handed "
@@ -1092,13 +1237,13 @@ msgid ""
 msgstr ""
 
 #. module: KSW_vehicle_custody
-#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
 #: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_refuse_wizard_form
 msgid "Refuse"
 msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "Refuse %s"
 msgstr ""
@@ -1120,6 +1265,7 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "Refused: %s"
 msgstr ""
@@ -1168,14 +1314,33 @@ msgid "Request"
 msgstr ""
 
 #. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Request Them from HR"
+msgstr ""
+
+#. module: KSW_vehicle_custody
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__kind
 #: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_search
 msgid "Request Type"
 msgstr ""
 
 #. module: KSW_vehicle_custody
+#: model:ir.actions.server,name:KSW_vehicle_custody.action_request_new_user_licence
+msgid "Request the Handover Documents from HR"
+msgstr ""
+
+#. module: KSW_vehicle_custody
 #: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
 msgid "Request type / نوع الطلب"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Requested from HR"
 msgstr ""
 
 #. module: KSW_vehicle_custody
@@ -1238,6 +1403,7 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "Signed copy filed by %s."
 msgstr ""
@@ -1268,6 +1434,7 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "Submit to HR: %s"
 msgstr ""
@@ -1296,12 +1463,14 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "The new user is the current custodian."
 msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "The new user's licence expired on %s."
 msgstr ""
@@ -1312,12 +1481,20 @@ msgid "The printed form, signed on paper and scanned back."
 msgstr ""
 
 #. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "The register already holds what this handover needs."
+msgstr ""
+
+#. module: KSW_vehicle_custody
 #: model:ir.model.fields,help:KSW_vehicle_custody.field_ksw_vehicle_custody_request__origin
 msgid "The release request or transfer this form belongs to."
 msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/fleet_integration.py:0
 #: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
 msgid "The release request was cancelled."
 msgstr ""
@@ -1329,6 +1506,7 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/fleet_integration.py:0
 #: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
 msgid "The transfer was cancelled by the GM."
 msgstr ""
@@ -1342,6 +1520,11 @@ msgstr ""
 #. module: KSW_vehicle_custody
 #: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
 msgid "The vehicle is not handed over without a valid regular license."
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "The vehicle passes to the new driver now. Confirm?"
 msgstr ""
 
 #. module: KSW_vehicle_custody
@@ -1360,6 +1543,7 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/fleet_integration.py:0
 #: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
 msgid "This transfer has no handover form."
 msgstr ""
@@ -1417,6 +1601,7 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "Use the buttons to move a handover form on."
 msgstr ""
@@ -1647,6 +1832,7 @@ msgstr ""
 
 #. module: KSW_vehicle_custody
 #. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "Workshop: %s"
 msgstr ""
@@ -1679,6 +1865,27 @@ msgstr ""
 #. module: KSW_vehicle_custody
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_workshop_request__x_custody_pending
 msgid "X Custody Pending"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "[HR has %(r)s since %(d)s]"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "expired"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "missing"
 msgstr ""
 
 #. module: KSW_vehicle_custody

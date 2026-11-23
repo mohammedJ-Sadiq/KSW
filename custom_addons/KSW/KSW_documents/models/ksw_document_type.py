@@ -23,6 +23,11 @@ class KswDocumentType(models.Model):
         ('non_saudi', 'Non-Saudi employees'),
         ('all', 'Every employee'),
     ], string='Required For', required=True, default='none')
+    # A handover (HR-12 driver change or receipt, a release's driver change)
+    # is refused while a required document of the vehicle or of the new
+    # driver with this flag is missing or expired. HR switches a type on
+    # when the register holds it for everyone, or every handover stops.
+    handover_check = fields.Boolean(string='Checked at Vehicle Handover')
     has_expiry = fields.Boolean(default=True)
     # The istimara card no longer prints its expiry (it is in Absher): it
     # is confirmed without one, and the date is asked for until HR adds it.

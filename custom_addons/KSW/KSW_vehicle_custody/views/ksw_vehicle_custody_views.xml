@@ -13,21 +13,28 @@
                     <field name="x_can_hr" invisible="1"/>
                     <field name="x_can_workshop" invisible="1"/>
                     <button name="action_submit" type="object" string="Submit to HR" class="oe_highlight"
-                            invisible="not x_can_supervisor"/>
+                            invisible="not x_can_supervisor or kind == 'driver_change'"/>
+                    <button name="action_submit" type="object" string="Confirm Driver Change" class="oe_highlight"
+                            invisible="not x_can_supervisor or kind != 'driver_change'"
+                            confirm="The vehicle passes to the new driver now. Confirm?"/>
+                    <button name="action_cancel_draft" type="object" string="Cancel"
+                            invisible="not x_can_supervisor or kind != 'driver_change'"
+                            confirm="Cancel this driver change?"/>
                     <button name="action_hr_check" type="object" string="Documents Checked" class="oe_highlight"
                             invisible="not x_can_hr"/>
                     <button name="action_workshop_done" type="object" class="oe_highlight"
                             string="Workshop Done" invisible="not x_can_workshop"
                             confirm="The vehicle is inspected (and, on a receipt, handed over to the new driver)?"/>
-                    <button name="action_open_refuse" type="object" string="Refuse"
-                            invisible="kind != 'driver_change' or not (x_can_hr or x_can_workshop)"/>
                     <button name="action_print" type="object" string="Print HR-12" icon="fa-print"
                             class="oe_highlight" invisible="state != 'done'"/>
                     <button name="action_mark_signed" type="object" string="Mark as Signed" icon="fa-check"
                             invisible="state != 'done'" confirm="The signed scan is attached?"/>
                     <button name="action_print" type="object" string="Print HR-12" icon="fa-print"
                             invisible="state == 'done'"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,hr,workshop,done,signed"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,hr,workshop,done,signed"
+                           invisible="kind == 'driver_change'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done,signed"
+                           invisible="kind != 'driver_change'"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -85,6 +92,7 @@
                                     <field name="previous_phone" readonly="state not in ('draft', 'hr', 'workshop', 'done')"/>
                                 </group>
                                 <group string="New Vehicle User" invisible="kind == 'hand_in'">
+                                    <field name="allowed_new_employee_ids" invisible="1"/>
                                     <field name="new_employee_id" options="{'no_create': True}"
                                            readonly="state != 'draft'"/>
                                     <field name="new_name" readonly="state not in ('draft', 'hr', 'workshop', 'done')"/>
@@ -329,5 +337,13 @@
                 </footer>
             </form>
         </field>
+    </record>
+
+    <!-- Run from the "missing documents" message when the supervisor submits. -->
+    <record id="action_request_new_user_licence" model="ir.actions.server">
+        <field name="name">Request the Handover Documents from HR</field>
+        <field name="model_id" ref="model_ksw_vehicle_custody_request"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_request_documents()</field>
     </record>
 </odoo>

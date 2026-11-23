@@ -3,6 +3,7 @@
     <!-- noupdate: HR tunes alert days, what is required, etc. -->
     <data noupdate="1">
         <record id="type_istimara" model="ksw.document.type">
+            <field name="handover_check" eval="True"/>
             <field name="name">Vehicle Registration (Istimara)</field>
             <field name="code">istimara</field><field name="sequence">1</field>
             <field name="applies_to">vehicle</field><field name="required_for">own_fleet</field>
@@ -10,24 +11,28 @@
             <field name="expiry_on_document" eval="False"/>
         </record>
         <record id="type_insurance" model="ksw.document.type">
+            <field name="handover_check" eval="True"/>
             <field name="name">Insurance</field>
             <field name="code">insurance</field><field name="sequence">2</field>
             <field name="applies_to">vehicle</field><field name="required_for">own_fleet</field>
             <field name="ai_hint">وثيقة تأمين مركبة، policy number</field>
         </record>
         <record id="type_mvpi" model="ksw.document.type">
+            <field name="handover_check" eval="True"/>
             <field name="name">Periodic Inspection</field>
             <field name="code">mvpi</field><field name="sequence">3</field>
             <field name="applies_to">vehicle</field><field name="required_for">own_fleet</field>
             <field name="ai_hint">الفحص الفني الدوري، MVPI certificate</field>
         </record>
         <record id="type_operation_card" model="ksw.document.type">
+            <field name="handover_check" eval="True"/>
             <field name="name">Operation Card</field>
             <field name="code">operation_card</field><field name="sequence">4</field>
             <field name="applies_to">vehicle</field><field name="required_for">own_fleet</field>
             <field name="ai_hint">كرت التشغيل، هيئة النقل، operating card</field>
         </record>
         <record id="type_driving_licence" model="ksw.document.type">
+            <field name="handover_check" eval="True"/>
             <field name="name">Driving Licence</field>
             <field name="code">driving_licence</field><field name="sequence">10</field>
             <field name="applies_to">employee</field><field name="required_for">custodians</field>
@@ -41,6 +46,7 @@
             <field name="ai_hint">بطاقة سائق، هيئة النقل العام</field>
         </record>
         <record id="type_iqama" model="ksw.document.type">
+            <field name="handover_check" eval="True"/>
             <field name="name">Iqama</field>
             <field name="code">iqama</field><field name="sequence">12</field>
             <field name="applies_to">employee</field><field name="required_for">non_saudi</field>
@@ -70,6 +76,7 @@
             <field name="ai_hint">ترخيص النقل، License Info on a Naql operation card</field>
         </record>
         <record id="type_water_tank_licence" model="ksw.document.type">
+            <field name="handover_check" eval="True"/>
             <field name="name">Water Tank Licence</field>
             <field name="code">water_tank_licence</field><field name="sequence">5</field>
             <field name="applies_to">vehicle</field><field name="required_for">water_tankers</field>

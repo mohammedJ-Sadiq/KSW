@@ -157,6 +157,12 @@ class TestAbsherImport(TransactionCase):
                                                    ('type_id.code', '=', 'water_tank_licence')])
         self.assertEqual((licence.number, str(licence.expiry_date), licence.source), ('26999999', '2027-05-24', 'fahes'))
         self.assertIn('Water Tank Licence', self.isuzu.x_documents_missing or '')
+        # A head with no tank needs no tank licence; pulling one, it does.
+        spare_head = self.env['ksw.fleet.vehicle'].create({'name': 'IMP-T2', 'vehicle_type': 'trailer'})
+        self.assertNotIn('Water Tank Licence', spare_head.x_documents_missing or '')
+        self.env['ksw.fleet.vehicle'].create({'name': 'تيدر IMP2', 'vehicle_type': 'tank'})._ksw_couple(spare_head)
+        spare_head.invalidate_recordset()
+        self.assertIn('Water Tank Licence', spare_head.x_documents_missing or '')
 
     def test_operation_card_only_for_public_transport(self):
         car = self.env['ksw.fleet.vehicle'].create({'name': 'IMP-CAR', 'x_registration_type': 'private'})
@@ -164,9 +170,10 @@ class TestAbsherImport(TransactionCase):
         self.assertNotIn('Operation Card', car.x_documents_missing or '')
         self.assertIn('Operation Card', truck.x_documents_missing or '')
 
-    def test_tedder_needs_a_head_not_documents(self):
+    def test_tedder_needs_no_documents_of_its_own(self):
+        # Coupled: its head's papers; uncoupled: parked (spare), nothing missing.
         tedder = self.env['ksw.fleet.vehicle'].create({'name': 'تيدر IMP', 'vehicle_type': 'tank'})
-        self.assertEqual(tedder.x_documents_missing, 'Not coupled to a head')
+        self.assertFalse(tedder.x_document_issue)
         tedder._ksw_couple(self.head)
         tedder.invalidate_recordset()
         self.assertFalse(tedder.x_document_issue)

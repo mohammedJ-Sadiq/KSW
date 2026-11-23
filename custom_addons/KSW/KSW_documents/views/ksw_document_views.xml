@@ -141,6 +141,7 @@
                 <field name="code"/>
                 <field name="applies_to"/>
                 <field name="required_for"/>
+                <field name="handover_check"/>
                 <field name="has_expiry"/>
                 <field name="has_class"/>
                 <field name="alert_days"/>
