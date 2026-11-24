@@ -20,7 +20,15 @@ ADMIN_OVERRIDE_GROUP = 'KSW_deduction.group_deduction_manager'
 _CHAIN_ORDER = ('pending_dm', 'pending_hr', 'pending_acc', 'pending_gm',
                  'pending_disbursement')
 
-# The only step at which the GM (non-admin) may use the wizard.
+# The step's own approver may send the request back from these steps, and
+# the group that holds each one (Nov 2026: HR and accounting joined the GM,
+# whose step is held by the department's GM rather than a group).
+# 'pending_disbursement' is absent on purpose: it is held by the cashier, and
+# sending a GM-approved loan back from there is the Deduction Manager's call.
+_STEP_HOLDER_GROUP = {
+    'pending_hr': 'KSW_deduction.group_loan_hr',
+    'pending_acc': 'KSW_deduction.group_loan_acc',
+}
 _GM_RETURN_STATE = 'pending_gm'
 
 # Returning to step X clears X's own stamps and every later one; anything
@@ -72,7 +80,7 @@ _TARGET_LABELS = {
 
 class KswLoanReturnApproverWizard(models.TransientModel):
     _name = 'ksw.loan.return.approver.wizard'
-    _description = 'GM: Return Loan Request to Approver'
+    _description = 'Return Loan Request to an Earlier Approver'
 
     deduction_id = fields.Many2one(
         'ksw.deduction', string='Loan Request', required=True,
@@ -121,7 +129,7 @@ class KswLoanReturnApproverWizard(models.TransientModel):
             return []
         is_admin = self.env.su or self.env.user.has_group(ADMIN_OVERRIDE_GROUP)
         current = deduction.approval_state
-        if not is_admin and current != _GM_RETURN_STATE:
+        if not is_admin and not self._holds_current_step(deduction):
             return []
         if current not in _CHAIN_ORDER:
             # Not (yet) submitted, refused, or already disbursed — nothing
@@ -129,6 +137,19 @@ class KswLoanReturnApproverWizard(models.TransientModel):
             return []
         position = _CHAIN_ORDER.index(current)
         return list(_CHAIN_ORDER[:position])
+
+    @api.model
+    def _holds_current_step(self, deduction):
+        """Is the caller the approver the loan is waiting on right now?
+
+        The same predicates the approve buttons use, so whoever may approve
+        a step is exactly whoever may send it back.
+        """
+        current = deduction.approval_state
+        if current == _GM_RETURN_STATE:
+            return deduction._department_gm_user() == self.env.user
+        group = _STEP_HOLDER_GROUP.get(current)
+        return bool(group) and self.env.user.has_group(group)
 
     @api.model
     def _steps_for_codes(self, codes):
@@ -170,23 +191,20 @@ class KswLoanReturnApproverWizard(models.TransientModel):
         target = self.target_step_id.code
         is_admin = self.env.su or self.env.user.has_group(ADMIN_OVERRIDE_GROUP)
 
-        if not is_admin:
-            # Being a GM somewhere is not enough — it has to be this
-            # employee's department. Same predicate the approve button uses.
-            deduction._check_department_gm()
-
-        if is_admin:
-            deduction = deduction.sudo()
-
         # The radio only offers reachable steps, but the check has to hold
-        # over RPC too.
-        valid_targets = self._allowed_targets(deduction)
+        # over RPC too. For everyone but the Deduction Manager it also
+        # settles authority: no targets means the caller does not hold
+        # this step.
+        valid_targets = self._allowed_targets(
+            deduction.sudo() if is_admin else deduction)
         if target not in valid_targets:
             valid_labels = ', '.join(_TARGET_LABELS[t] for t in valid_targets)
             raise UserError(
                 'From "%s" you can only return to: %s.'
                 % (current, valid_labels or '(nothing)')
             )
+        # Authorisation is settled; elevate for the write (gotcha #11).
+        deduction = deduction.sudo()
 
         write_vals = dict(_CLEAR_STAMPS.get(target, {}))
         write_vals['approval_state'] = target
@@ -199,12 +217,12 @@ class KswLoanReturnApproverWizard(models.TransientModel):
         deduction.sudo().message_post(
             body=Markup(
                 '<strong>↩ Returned for Revision — %(target)s</strong><br/>'
-                '<b>Returned by:</b> %(gm)s<br/>'
+                '<b>Returned by:</b> %(user)s<br/>'
                 '<b>From step:</b> %(from)s<br/>'
                 '<b>Message:</b> %(reason)s'
             ) % {
                 'target': target_label,
-                'gm':     self.env.user.name,
+                'user':   self.env.user.name,
                 'from':   from_label,
                 'reason': self.reason,
             },

@@ -23,9 +23,19 @@ class KswRevisionRequestReasonWizard(models.TransientModel):
         required=True, readonly=True,
     )
     mode = fields.Selection(
-        [('refuse', 'Refuse'), ('return', 'Return to HR')],
+        [('refuse', 'Refuse'), ('return', 'Return')],
         string='Action', required=True, readonly=True, default='refuse',
     )
+    # A static Selection is enough here, unlike the leave and loan return
+    # wizards: the options differ only by the request's state, and the radio
+    # is shown only at the accounting step, where both are valid. From the
+    # GM step the one target, HR, is the default (pitfall #39).
+    return_target = fields.Selection(
+        [('pending_hr', 'HR Review'), ('pending_gm', 'GM Approval')],
+        string='Return To', default='pending_hr',
+    )
+    request_state = fields.Selection(
+        related='request_id.state', string='Request Status')
     reason = fields.Text(string='Reason', required=True)
 
     employee_id = fields.Many2one(
@@ -51,11 +61,9 @@ class KswRevisionRequestReasonWizard(models.TransientModel):
         if self.mode == 'return':
             # Authority is re-checked on the request itself: the wizard is
             # reachable over RPC like any other model.
-            if request.state != 'pending_gm':
-                raise UserError(_(
-                    'This request is not waiting for GM approval.'))
-            request._check_gm()
-            request._apply_return_to_hr(reason)
+            target = self.return_target or 'pending_hr'
+            request._check_return_rights(target)
+            request._apply_return(target, reason)
         else:
             request._check_refusal_rights()
             request._apply_refusal(reason)

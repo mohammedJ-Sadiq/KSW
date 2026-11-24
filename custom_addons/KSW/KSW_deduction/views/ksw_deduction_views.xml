@@ -86,13 +86,14 @@
                          groups= — both gate fields are read by this
                          invisible= and must stay fetchable for every user
                          who can see the button, Odoo 19 Pitfalls #31).
-                         GM: only from their own step (pending_gm).
+                         HR, accounting or the GM: from their own step,
+                         back to any step it already passed.
                          Admin: from any step the loan has already reached,
                          chosen by x_can_admin_return itself. -->
                     <button name="action_open_loan_return_wizard" type="object"
                             string="↩ Return to Approver"
                             class="btn-warning"
-                            invisible="not x_can_gm_return and not x_can_admin_return"/>
+                            invisible="not x_can_step_return and not x_can_admin_return"/>
                     <button name="action_disbursement_confirm" type="object"
                             string="✅ Confirm Disbursement"
                             class="btn-success"
@@ -339,6 +340,7 @@
                             <field name="x_can_edit_installments" invisible="1"/>
                             <field name="x_can_employee_edit" invisible="1"/>
                             <field name="x_can_gm_return" invisible="1"/>
+                            <field name="x_can_step_return" invisible="1"/>
                             <field name="x_can_admin_return" invisible="1"/>
                             <!-- Per-user permission mirrors (computed from
                                  res.users). Loaded invisible because the

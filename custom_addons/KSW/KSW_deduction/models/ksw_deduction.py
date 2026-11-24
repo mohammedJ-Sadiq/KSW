@@ -2201,6 +2201,9 @@ class KswDeduction(models.Model):
     # No model-level groups= on purpose: both are read by an invisible=
     # expression on a button every user can see (Odoo 19 Pitfalls #31).
     x_can_gm_return = fields.Boolean(compute='_compute_return_role_gates')
+    # Whoever holds the current step (HR, accounting or the GM) may send the
+    # loan back to a step it already passed.
+    x_can_step_return = fields.Boolean(compute='_compute_return_role_gates')
     x_can_admin_return = fields.Boolean(
         compute='_compute_return_role_gates',
         help='True for a Deduction Manager, who may return a loan request '
@@ -2233,27 +2236,27 @@ class KswDeduction(models.Model):
             # return target, so the button stays hidden.
             rec.x_can_admin_return = bool(
                 is_admin and has_id and wizard._allowed_targets(rec))
+            rec.x_can_step_return = bool(
+                has_id and rec.is_loan and wizard._holds_current_step(rec)
+                and wizard._allowed_targets(rec))
 
     def action_open_loan_return_wizard(self):
         """Open the return wizard — two audiences, one button.
 
-        The GM may return a loan request to an earlier approver only from
-        their own step (pending_gm). A Deduction Manager may return any loan
-        request to any earlier step it has already reached; the wizard
-        itself decides which targets each role may pick.
+        The approver the loan is waiting on (HR, accounting or the
+        department's GM) may send it back to a step it already passed. A
+        Deduction Manager may return any loan request to any earlier step it
+        has already reached; the wizard itself decides which targets each
+        role may pick.
         """
         self.ensure_one()
         is_admin = self.env.su or self.env.user.has_group(
             'KSW_deduction.group_deduction_manager')
-        if not is_admin:
-            if not self.env.user.has_group('KSW_deduction.group_loan_gm'):
-                raise UserError(_(
-                    'Only the General Manager can return a loan request to '
-                    'an approver.'))
-            if self.approval_state != 'pending_gm':
-                raise UserError(_(
-                    'The loan must be at the GM Final Approval step to use '
-                    'this action.'))
+        wizard = self.env['ksw.loan.return.approver.wizard']
+        if not is_admin and not wizard._holds_current_step(self):
+            raise UserError(_(
+                'Only the approver this loan request is waiting on can '
+                'return it to an earlier step.'))
         return {
             'type': 'ir.actions.act_window',
             'name': _('Return to Approver'),

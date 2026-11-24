@@ -45,6 +45,9 @@
                             string="Confirm &amp; Pay" class="btn-primary"
                             invisible="not can_acc_act"
                             confirm="This confirms the revision payslip. A bank transfer waits for the next revision bank file (Salary Revisions &gt; Bank Files); a cash payment goes to the Loan Disbursement Officer to hand over. Continue?"/>
+                    <button name="action_acc_return" type="object"
+                            string="Return to Approver"
+                            invisible="not can_acc_act"/>
                     <button name="action_acc_refuse" type="object"
                             string="Refuse"
                             invisible="not can_acc_act"/>
@@ -392,10 +395,14 @@
                      resolve against that record (pitfall #40). -->
                 <field name="request_id" invisible="1"/>
                 <field name="mode" invisible="1"/>
+                <field name="request_state" invisible="1"/>
                 <group>
                     <field name="employee_id" readonly="1"/>
                     <field name="difference_amount" readonly="1"
                            invisible="mode != 'return'"/>
+                    <field name="return_target" widget="radio"
+                           invisible="mode != 'return' or request_state != 'pending_acc'"
+                           required="mode == 'return'"/>
                 </group>
                 <group>
                     <field name="reason" nolabel="1"

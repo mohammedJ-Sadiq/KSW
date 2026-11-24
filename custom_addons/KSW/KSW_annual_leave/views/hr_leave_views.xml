@@ -58,6 +58,7 @@
                 <field name="x_can_acc_approve" invisible="1"/>
                 <field name="x_can_gm_final_approve" invisible="1"/>
                 <field name="x_can_gm_return" invisible="1"/>
+                <field name="x_can_step_return" invisible="1"/>
                 <field name="x_can_admin_return" invisible="1"/>
                 <field name="x_is_hr_approver" invisible="1"/>
                 <field name="x_is_acc_approver" invisible="1"/>
@@ -117,7 +118,7 @@
                 <button string="↩ Return to Approver"
                         name="action_open_gm_return_wizard"
                         type="object" class="btn-warning"
-                        invisible="not x_can_gm_return and not x_can_admin_return"/>
+                        invisible="not x_can_step_return and not x_can_admin_return"/>
                 <button string="✅ Confirm &amp; Finalise"
                         name="action_open_hr_confirm_wizard"
                         type="object" class="btn-success"

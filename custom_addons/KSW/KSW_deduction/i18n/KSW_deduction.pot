@@ -4515,3 +4515,21 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_deduction.res_config_settings_view_form_ksw_deduction
 msgid "When a deduction other than a personal loan (advance,\n                                penalty, spare parts and so on) is applied to an employee,\n                                notify the employee's direct manager."
 msgstr ""
+
+#. module: KSW_deduction
+#. odoo-python
+#: code:addons/KSW_deduction/models/ksw_deduction.py:0
+msgid ""
+"Only the approver this loan request is waiting on can return it to an "
+"earlier step."
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model,name:KSW_deduction.model_ksw_loan_return_approver_wizard
+msgid "Return Loan Request to an Earlier Approver"
+msgstr ""
+
+#. module: KSW_deduction
+#: model:ir.model.fields,field_description:KSW_deduction.field_ksw_deduction__x_can_step_return
+msgid "X Can Step Return"
+msgstr ""

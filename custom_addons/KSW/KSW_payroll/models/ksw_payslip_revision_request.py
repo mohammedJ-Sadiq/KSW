@@ -879,6 +879,58 @@ class KswPayslipRevisionRequest(models.Model):
         self._check_gm()
         return self._open_reason_wizard('return')
 
+    def action_acc_return(self):
+        """Accounting sends the request back to HR or to the GM.
+
+        The steps that produced something accounting is about to pay: HR
+        built the revision payslip, the GM approved the figure. The DM step
+        is not offered — it only forwarded the employee's complaint, so
+        there is nothing there to correct.
+        """
+        self.ensure_one()
+        self._check_step('pending_acc', (ACC_GROUP,), _(
+            'Only the accounting team may act on this step.'))
+        return self._open_reason_wizard('return')
+
+    # Where the approver holding each step may send the request back to.
+    _RETURN_TARGETS = {
+        'pending_gm': ('pending_hr',),
+        'pending_acc': ('pending_hr', 'pending_gm'),
+    }
+
+    def _check_return_rights(self, target):
+        """Raise unless the caller holds the current step and `target` is a
+        step the request already passed. Called by the wizard, which is
+        reachable over RPC like any other model (pitfall #15)."""
+        self.ensure_one()
+        if target not in self._RETURN_TARGETS.get(self.state, ()):
+            raise UserError(_(
+                'A request in state "%(state)s" cannot be returned to that '
+                'step.', state=dict(self._STATES).get(self.state, self.state)))
+        if self.state == 'pending_gm':
+            self._check_gm()
+        else:
+            self._check_step('pending_acc', (ACC_GROUP,), _(
+                'Only the accounting team may act on this step.'))
+
+    def _apply_return(self, target, reason):
+        self.ensure_one()
+        if target == 'pending_hr':
+            return self._apply_return_to_hr(reason)
+        # Back to the GM: the revision payslip stands, only the GM's
+        # approval is withdrawn.
+        self.sudo().write({
+            'state': 'pending_gm',
+            'gm_user_id': False,
+            'gm_date': False,
+        })
+        self._post_step_note(
+            '↩️ Returned to the GM',
+            _('Returned by %(user)s: %(reason)s',
+              user=self.env.user.name, reason=reason),
+        )
+        self._notify_pending_approvers('pending_gm')
+
     def _apply_return_to_hr(self, reason):
         self.ensure_one()
         revision = self.revision_payslip_id.sudo()
@@ -1276,7 +1328,8 @@ class KswPayslipRevisionRequest(models.Model):
         return {
             'type': 'ir.actions.act_window',
             'name': (_('Refuse Revision Request') if mode == 'refuse'
-                     else _('Return to HR')),
+                     else _('Return to HR') if self.state == 'pending_gm'
+                     else _('Return to an Earlier Step')),
             'res_model': 'ksw.revision.request.reason.wizard',
             'view_mode': 'form',
             'target': 'new',

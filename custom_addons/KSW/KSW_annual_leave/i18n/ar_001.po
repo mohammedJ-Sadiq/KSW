@@ -2500,3 +2500,23 @@ msgid ""
 msgstr ""
 "يجب أن تكون الأيام المستهلكة من الرصيد بين الأيام المطلوبة (%(requested)s) "
 "والرصيد المتبقي (%(balance)s). القيمة المُدخلة %(days)s."
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid ""
+"Only the approver this request is waiting on can return it to an earlier "
+"step."
+msgstr ""
+"لا يمكن إعادة الطلب إلى مرحلة سابقة إلا من قِبل المعتمد الذي ينتظره الطلب "
+"حاليًا."
+
+#. module: KSW_annual_leave
+#: model:ir.model,name:KSW_annual_leave.model_ksw_gm_return_approver_wizard
+msgid "Return Time Off to an Earlier Approver"
+msgstr "إعادة طلب الإجازة إلى معتمد سابق"
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_can_step_return
+msgid "X Can Step Return"
+msgstr "يمكنه الإعادة من مرحلته"

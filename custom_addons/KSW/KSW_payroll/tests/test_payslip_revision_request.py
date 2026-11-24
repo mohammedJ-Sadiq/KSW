@@ -631,6 +631,52 @@ class TestPayslipRevisionRequest(TransactionCase):
         self.assertEqual(req.state, 'pending_gm')
         self.assertTrue(req.revision_payslip_id)
 
+    def test_accounting_returns_to_the_gm_keeping_the_revision(self):
+        req = self._at_accounting()
+        revision = req.revision_payslip_id
+        existing = req.sudo().message_ids.ids
+        req.with_user(self.user_acc).action_acc_return()
+        self.Wizard.with_user(self.user_acc).create({
+            'request_id': req.id, 'mode': 'return',
+            'return_target': 'pending_gm',
+            'reason': 'The figure does not match the timesheet.'}
+        ).action_confirm()
+        self.assertEqual(req.state, 'pending_gm')
+        self.assertEqual(req.revision_payslip_id, revision)
+        self.assertFalse(req.gm_user_id)
+        self.assertTrue(self._notified(req, existing, self.user_gm))
+        self.assertTrue(req.with_user(self.user_gm).is_pending_my_action)
+        self.assertFalse(req.with_user(self.user_acc).is_pending_my_action)
+
+    def test_accounting_returns_to_hr_dropping_the_revision(self):
+        req = self._at_accounting()
+        revision = req.revision_payslip_id.sudo()
+        self.Wizard.with_user(self.user_acc).create({
+            'request_id': req.id, 'mode': 'return',
+            'return_target': 'pending_hr',
+            'reason': 'Rebuild it.'}).action_confirm()
+        self.assertEqual(req.state, 'pending_hr')
+        self.assertFalse(req.revision_payslip_id)
+        self.assertEqual(revision.state, 'cancel')
+
+    def test_gm_cannot_return_to_its_own_step(self):
+        req = self._make_payable(self._accepted())
+        with self.assertRaises(UserError):
+            self.Wizard.with_user(self.user_gm).create({
+                'request_id': req.id, 'mode': 'return',
+                'return_target': 'pending_gm',
+                'reason': 'x'}).action_confirm()
+
+    def test_only_accounting_may_return_from_the_payment_step(self):
+        req = self._at_accounting()
+        with self.assertRaises(UserError):
+            req.with_user(self.user_hr).action_acc_return()
+        with self.assertRaises(UserError):
+            self.Wizard.with_user(self.user_hr).create({
+                'request_id': req.id, 'mode': 'return',
+                'return_target': 'pending_hr',
+                'reason': 'x'}).action_confirm()
+
     # ==================================================================
     # 4. The accounting step
     # ==================================================================

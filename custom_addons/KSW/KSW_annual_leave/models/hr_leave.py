@@ -842,6 +842,10 @@ class HrLeave(models.Model):
     x_can_acc_approve = fields.Boolean(compute='_compute_approval_role_gates')
     x_can_gm_final_approve = fields.Boolean(compute='_compute_approval_role_gates')
     x_can_gm_return = fields.Boolean(compute='_compute_approval_role_gates')
+    # Whoever holds the current step (HR, accounting or the GM) may send the
+    # request back to a step it already passed. Read by the button's
+    # invisible=, so no model-level groups= (gotcha #31).
+    x_can_step_return = fields.Boolean(compute='_compute_approval_role_gates')
     # No model-level groups= on purpose: it is read by an invisible=
     # expression on a button every user can see (gotcha #31).
     x_can_admin_return = fields.Boolean(
@@ -990,6 +994,9 @@ class HrLeave(models.Model):
                 and s in ('pending_gm_initial', 'pending_gm_final')
                 and has_id
             )
+            leave.x_can_step_return = bool(
+                has_id and wizard._holds_current_step(leave)
+                and wizard._allowed_targets(leave))
             leave.x_is_hr_approver = is_hr
             leave.x_is_acc_approver = is_acc
 
@@ -2723,19 +2730,23 @@ class HrLeave(models.Model):
     def action_open_gm_return_wizard(self):
         """Open the return wizard — two audiences, one button.
 
-        The GM may return a request to an earlier approver from either of the
-        two GM steps. The Settings Administrator may return *any* request to
-        *any* step at any time (including one already validated); the wizard
-        itself decides which targets each role may pick.
+        The approver the request is waiting on (HR, the department's
+        accountant, or its GM) may send it back to a step it already passed.
+        The Settings Administrator may return *any* request to *any* step at
+        any time (including one already validated); the wizard itself
+        decides which targets each role may pick.
         """
         self.ensure_one()
         is_admin = self.env.su or self.env.user.has_group(SETTINGS_ADMIN_GROUP)
-        if not is_admin:
-            self._check_department_gm(self)
-            if self.x_annual_approval_state not in (
+        wizard = self.env['ksw.gm.return.approver.wizard']
+        if not is_admin and not wizard._holds_current_step(self):
+            if self.x_annual_approval_state in (
                     'pending_gm_initial', 'pending_gm_final'):
-                raise UserError(
-                    'The leave must be at a GM approval step to use this action.')
+                # Names the department's GM, or says none is set.
+                self._check_department_gm(self)
+            raise UserError(_(
+                'Only the approver this request is waiting on can return it '
+                'to an earlier step.'))
         return {
             'type': 'ir.actions.act_window',
             'name': 'Return to Approver',

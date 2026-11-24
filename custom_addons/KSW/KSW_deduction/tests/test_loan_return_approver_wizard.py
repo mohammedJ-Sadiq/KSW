@@ -226,3 +226,75 @@ class TestLoanReturnApproverWizard(DeductionCommon):
         ded.with_user(self.user_dm).action_dm_approve()
         self.assertEqual(ded.approval_state, 'pending_hr')
         self.assertEqual(ded.dm_approved_by, self.manager_emp)
+
+    # ------------------------------------------------------------------
+    # HR and accounting return from their own step (Nov 2026)
+    # ------------------------------------------------------------------
+    def _step(self, code):
+        return self.env['ksw.loan.return.step'].search(
+            [('code', '=', code)], limit=1)
+
+    def _loan_at(self, state):
+        ded = self._make_deduction(ded_type=self.type_loan, amount=1200.0,
+                                    installments=3)
+        ded.action_submit()
+        ded.with_user(self.user_dm).action_dm_approve()
+        if state == 'pending_acc':
+            ded.with_user(self.user_hr).write(
+                {'x_hr_no_penalties_confirmed': True})
+            ded.with_user(self.user_hr).action_hr_approve()
+        self.assertEqual(ded.approval_state, state)
+        return ded
+
+    def _return_as(self, user, ded, code):
+        self.env['ksw.loan.return.approver.wizard'].with_user(user).create({
+            'deduction_id': ded.id,
+            'target_step_id': self._step(code).id,
+            'reason': 'Please correct.',
+        }).action_confirm()
+
+    def test_hr_returns_to_dm_from_own_step(self):
+        ded = self._loan_at('pending_hr')
+        self.assertTrue(ded.with_user(self.user_hr).x_can_step_return)
+        self.assertFalse(ded.with_user(self.user_acc).x_can_step_return)
+        ded.with_user(self.user_hr).action_open_loan_return_wizard()
+        self._return_as(self.user_hr, ded, 'pending_dm')
+        self.assertEqual(ded.approval_state, 'pending_dm')
+        self.assertFalse(ded.dm_approved_by)
+        self.assertTrue(ded.with_user(self.user_dm).x_is_pending_my_action)
+        self.assertFalse(ded.with_user(self.user_hr).x_is_pending_my_action)
+
+    def test_acc_returns_to_hr_keeps_dm_and_clears_hr(self):
+        ded = self._loan_at('pending_acc')
+        dm_by = ded.dm_approved_by
+        self.assertTrue(ded.with_user(self.user_acc).x_can_step_return)
+        existing = ded.message_ids.ids
+        self._return_as(self.user_acc, ded, 'pending_hr')
+        self.assertEqual(ded.approval_state, 'pending_hr')
+        self.assertEqual(ded.dm_approved_by, dm_by)
+        self.assertFalse(ded.hr_approved_by)
+        self.assertFalse(ded.x_hr_no_penalties_confirmed)
+        new_msgs = ded.message_ids.filtered(lambda m: m.id not in existing)
+        self.assertTrue(new_msgs.filtered(
+            lambda m: self.user_hr.partner_id in m.partner_ids))
+
+    def test_acc_cannot_return_from_someone_elses_step(self):
+        ded = self._loan_at_pending_gm()
+        self.assertFalse(ded.with_user(self.user_acc).x_can_step_return)
+        with self.assertRaises(UserError):
+            ded.with_user(self.user_acc).action_open_loan_return_wizard()
+        with self.assertRaises(UserError):
+            self._return_as(self.user_acc, ded, 'pending_hr')
+
+    def test_hr_cannot_target_a_step_not_yet_reached(self):
+        ded = self._loan_at('pending_hr')
+        with self.assertRaises(UserError):
+            self._return_as(self.user_hr, ded, 'pending_acc')
+
+    def test_no_step_return_at_disbursement(self):
+        """The cashier's step: sending a GM-approved loan back from there is
+        the Deduction Manager's call."""
+        ded = self._loan_at_pending_gm()
+        ded.with_user(self.user_gm).action_gm_approve()
+        for user in (self.user_hr, self.user_acc, self.user_gm):
+            self.assertFalse(ded.with_user(user).x_can_step_return)

@@ -532,3 +532,113 @@ class TestGmReturnApprover(TransactionCase):
         leave.with_user(self.user_acc).sudo().action_acc_approve()
         leave.with_user(self.user_gm).sudo().action_gm_final_approve()
         self.assertEqual(leave.x_annual_approval_state, 'pending_employee_signature')
+
+    # ==================================================================
+    # HR and accounting return from their own step (Nov 2026)
+    # ==================================================================
+    # The GM's rule extended to every approver: whoever the request waits
+    # on may send it back to a step it already passed. HR Confirmation
+    # (Step 6) stays out: GM final approval has auto-confirmed the payslip
+    # by then, so going back is the administrator's reversal.
+
+    def _return_as(self, user, leave, target, reason='Please correct.'):
+        wiz = self.env['ksw.gm.return.approver.wizard'].with_user(user).create({
+            'leave_id': leave.id,
+            'target_step_id': self._step(target).id,
+            'reason': reason,
+        })
+        wiz.action_confirm()
+        return wiz
+
+    def _allowed_codes(self, user, leave):
+        wiz = self.env['ksw.gm.return.approver.wizard'].with_user(user).new(
+            {'leave_id': leave.id})
+        return wiz.allowed_step_ids.mapped('code')
+
+    # HR -----------------------------------------------------------------
+
+    def test_hr_returns_to_dm_from_own_step(self):
+        leave = self._make_leave()
+        self._advance_to(leave, 'pending_hr')
+        self.assertTrue(leave.with_user(self.user_hr).x_can_step_return)
+        self.assertEqual(self._allowed_codes(self.user_hr, leave), ['pending_dm'])
+        existing = leave.message_ids.ids
+        self._return_as(self.user_hr, leave, 'pending_dm')
+        self.assertEqual(leave.x_annual_approval_state, 'pending_dm')
+        self.assertFalse(leave.x_dm_approved_by)
+        new_msgs = leave.message_ids.filtered(lambda m: m.id not in existing)
+        self.assertTrue(new_msgs.filtered(
+            lambda m: self.user_dm.partner_id in m.partner_ids))
+        # Back at the DM: it is the DM's again, and HR's button is gone.
+        self.assertTrue(leave.with_user(self.user_dm).x_is_pending_my_action)
+        self.assertFalse(leave.with_user(self.user_hr).x_can_step_return)
+
+    def test_hr_cannot_return_from_someone_elses_step(self):
+        leave = self._make_leave()
+        self._advance_to(leave, 'pending_gm_initial')
+        self.assertFalse(leave.with_user(self.user_hr).x_can_step_return)
+        with self.assertRaises(UserError):
+            leave.with_user(self.user_hr).action_open_gm_return_wizard()
+
+    def test_hr_cannot_return_from_hr_confirmation(self):
+        """Step 6 is past GM final: the payslip is confirmed, so it is the
+        administrator's reversal, not HR's return."""
+        leave = self._make_leave()
+        self._advance_to(leave, 'pending_employee_signature')
+        self.assertFalse(leave.with_user(self.user_hr).x_can_step_return)
+        with self.assertRaises(UserError):
+            leave.with_user(self.user_hr).action_open_gm_return_wizard()
+        with self.assertRaises(UserError):
+            self._return_as(self.user_hr, leave, 'pending_acc')
+
+    # Accounting ---------------------------------------------------------
+
+    def test_acc_targets_are_the_steps_already_passed(self):
+        leave = self._make_leave()
+        self._advance_to(leave, 'pending_acc')
+        self.assertTrue(leave.with_user(self.user_acc).x_can_step_return)
+        self.assertEqual(
+            self._allowed_codes(self.user_acc, leave),
+            ['pending_dm', 'pending_hr', 'pending_gm_initial'])
+
+    def test_acc_returns_to_hr_keeps_dm_stamp(self):
+        leave = self._make_leave()
+        self._advance_to(leave, 'pending_acc')
+        dm_by = leave.x_dm_approved_by
+        self._return_as(self.user_acc, leave, 'pending_hr')
+        self.assertEqual(leave.x_annual_approval_state, 'pending_hr')
+        self.assertEqual(leave.x_dm_approved_by, dm_by)
+        self.assertFalse(leave.x_hr_approved_by)
+        self.assertFalse(leave.x_gm_initial_approved_by)
+        self.assertTrue(leave.with_user(self.user_hr).x_is_pending_my_action)
+        self.assertFalse(leave.with_user(self.user_acc).x_is_pending_my_action)
+
+    def test_acc_returns_to_gm_initial_notifies_the_gm(self):
+        leave = self._make_leave()
+        self._advance_to(leave, 'pending_acc')
+        existing = leave.message_ids.ids
+        self._return_as(self.user_acc, leave, 'pending_gm_initial')
+        self.assertEqual(leave.x_annual_approval_state, 'pending_gm_initial')
+        new_msgs = leave.message_ids.filtered(lambda m: m.id not in existing)
+        self.assertTrue(new_msgs.filtered(
+            lambda m: self.user_gm.partner_id in m.partner_ids))
+
+    def test_acc_cannot_skip_forward_over_rpc(self):
+        leave = self._make_leave()
+        self._advance_to(leave, 'pending_acc')
+        with self.assertRaises(UserError):
+            self._return_as(self.user_acc, leave, 'pending_gm_final')
+
+    def test_acc_then_chain_completes(self):
+        leave = self._make_leave()
+        self._advance_to(leave, 'pending_acc')
+        self._return_as(self.user_acc, leave, 'pending_hr')
+        self._advance_to(leave, 'pending_employee_signature')
+        self.assertEqual(
+            leave.x_annual_approval_state, 'pending_employee_signature')
+
+    # Plain users --------------------------------------------------------
+
+    def test_dm_has_no_return(self):
+        leave = self._make_leave()
+        self.assertFalse(leave.with_user(self.user_dm).x_can_step_return)

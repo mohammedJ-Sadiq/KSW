@@ -14,9 +14,17 @@ _CHAIN_ORDER = (
     'pending_gm_final', 'pending_employee_signature',
 )
 
-# Steps at which the GM may use the wizard. (Their target list then falls out
-# of the rule above and matches, step for step, the map they had before.)
+# The two GM steps, which route a returned request to one named person.
 _GM_RETURN_STATES = ('pending_gm_initial', 'pending_gm_final')
+
+# Steps whose own approver may send the request back (Nov 2026: HR and
+# accounting joined the GM). HR Confirmation is absent on purpose: GM final
+# approval has already auto-confirmed the vacation / EOS payslip by then, so
+# going back from it cancels a payslip whose money may be out — that is a
+# reversal, and stays with the administrator.
+_STEP_RETURN_STATES = (
+    'pending_hr', 'pending_gm_initial', 'pending_acc', 'pending_gm_final',
+)
 
 # A leave type with no KSW chain has one meaningful "return": undo the
 # validation and put it back in the approver's queue.
@@ -86,7 +94,7 @@ _TARGET_GROUP = {
 
 class GmReturnApproverWizard(models.TransientModel):
     _name = 'ksw.gm.return.approver.wizard'
-    _description = 'GM: Return Annual Leave to Approver'
+    _description = 'Return Time Off to an Earlier Approver'
 
     leave_id = fields.Many2one(
         'hr.leave', string='Annual Leave', required=True, ondelete='cascade',
@@ -138,13 +146,30 @@ class GmReturnApproverWizard(models.TransientModel):
             return []
 
         current = leave.x_annual_approval_state
-        if not is_admin and current not in _GM_RETURN_STATES:
+        if not is_admin and not self._holds_current_step(leave):
             return []
         # A request that is validated or fully approved has left the chain
         # behind: everything in it is a legitimate target.
         position = (_CHAIN_ORDER.index(current) if current in _CHAIN_ORDER
                     else len(_CHAIN_ORDER))
         return list(_CHAIN_ORDER[:position])
+
+    @api.model
+    def _holds_current_step(self, leave):
+        """Is the caller the approver the request is waiting on right now?
+
+        The same predicates the approve buttons use, so the person who may
+        approve a step is exactly the person who may send it back.
+        """
+        current = leave.x_annual_approval_state
+        if current not in _STEP_RETURN_STATES:
+            return False
+        user = self.env.user
+        if current == 'pending_hr':
+            return user.has_group('KSW_annual_leave.group_annual_leave_hr')
+        if current == 'pending_acc':
+            return user in leave._department_accountant_users(leave)
+        return leave._department_gm_user(leave) == user
 
     @api.model
     def _steps_for_codes(self, codes):
@@ -197,27 +222,21 @@ class GmReturnApproverWizard(models.TransientModel):
         target = self.target_step_id.code
         is_admin = self.env.su or self.env.user.has_group(SETTINGS_ADMIN_GROUP)
 
-        if not is_admin:
-            # Being a GM somewhere is not enough — it has to be this
-            # employee's department. Same predicate the approve buttons use.
-            leave._check_department_gm(leave)
-
-        if is_admin:
-            # Authorisation is settled; elevate for the rest. The
-            # administrator's leave scope comes from whichever HR tier they
-            # happen to hold, and this action must not depend on that (see
-            # gotcha #11 — auth first, then sudo).
-            leave = leave.sudo()
-
         # The radio only offers reachable steps, but the check has to hold
-        # over RPC too.
-        valid_targets = self._allowed_targets(leave)
+        # over RPC too. For everyone but the administrator it also settles
+        # authority: no targets means the caller does not hold this step.
+        valid_targets = self._allowed_targets(
+            leave.sudo() if is_admin else leave)
         if target not in valid_targets:
             valid_labels = ', '.join(_TARGET_LABELS[t] for t in valid_targets)
             raise UserError(
                 'From "%s" you can only return to: %s.'
                 % (current or leave.state, valid_labels or '(nothing)')
             )
+        # Authorisation is settled; elevate for the rest. Neither the
+        # administrator nor the step's approver holds write scope on the
+        # leave in every tier (gotcha #11 — auth first, then sudo).
+        leave = leave.sudo()
 
         if is_admin:
             # A settlement payslip must not be left hanging off a request
@@ -271,12 +290,12 @@ class GmReturnApproverWizard(models.TransientModel):
         leave.sudo().message_post(
             body=Markup(
                 '<strong>↩ Returned for Revision — %(target)s</strong><br/>'
-                '<b>Returned by:</b> %(gm)s<br/>'
+                '<b>Returned by:</b> %(user)s<br/>'
                 '<b>From step:</b> %(from)s<br/>'
                 '<b>Message:</b> %(reason)s'
             ) % {
                 'target': target_label,
-                'gm':     self.env.user.name,
+                'user':   self.env.user.name,
                 'from':   from_label,
                 'reason': self.reason,
             },
@@ -287,7 +306,7 @@ class GmReturnApproverWizard(models.TransientModel):
         return {'type': 'ir.actions.act_window_close'}
 
     def _notify_return(self, leave, target, target_label):
-        """Send inbox notification to the target approver with the GM's reason."""
+        """Send inbox notification to the target approver with the reason."""
         if target in ('pending_dm', _PLAIN_RETURN_TARGET):
             dm_user = leave.employee_id.leave_manager_id
             partner_ids = (
@@ -320,7 +339,7 @@ class GmReturnApproverWizard(models.TransientModel):
                 '<b>Employee:</b> %(employee)s<br/>'
                 '<b>Period:</b> %(date_from)s &#8594; %(date_to)s<br/>'
                 '<b>Days:</b> %(days).1f<br/>'
-                '<b>GM\'s Message:</b> %(reason)s<br/>'
+                '<b>Message from %(user)s:</b> %(reason)s<br/>'
                 'Please review, make any corrections, and re-submit your approval.'
             ) % {
                 'target':    target_label,
@@ -329,6 +348,7 @@ class GmReturnApproverWizard(models.TransientModel):
                 'date_to':   leave.request_date_to,
                 'days':      leave.number_of_days,
                 'reason':    self.reason,
+                'user':      self.env.user.name,
             },
             partner_ids=partner_ids,
             subtype_xmlid='mail.mt_comment',

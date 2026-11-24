@@ -2344,3 +2344,21 @@ msgid ""
 "Days to Consume must be between the days requested (%(requested)s) and the "
 "remaining balance (%(balance)s). You entered %(days)s."
 msgstr ""
+
+#. module: KSW_annual_leave
+#. odoo-python
+#: code:addons/KSW_annual_leave/models/hr_leave.py:0
+msgid ""
+"Only the approver this request is waiting on can return it to an earlier "
+"step."
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model,name:KSW_annual_leave.model_ksw_gm_return_approver_wizard
+msgid "Return Time Off to an Earlier Approver"
+msgstr ""
+
+#. module: KSW_annual_leave
+#: model:ir.model.fields,field_description:KSW_annual_leave.field_hr_leave__x_can_step_return
+msgid "X Can Step Return"
+msgstr ""
