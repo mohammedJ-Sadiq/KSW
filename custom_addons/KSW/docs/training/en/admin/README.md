@@ -11,6 +11,8 @@ process individual requests.
 |---|---|
 | Oversee all deductions & configure deduction types | [Deductions administration](deductions.md) |
 | Configure commissions (categories, sites, rules, salespeople) | [Commissions administration](commissions.md) |
+| Set up vehicle departments, workshops, user scopes and handover checks | [Vehicles, custody, transfers and documents](vehicles-setup.md) |
+| Initial access rights at go-live | [Initial access rights](vehicles-access.md) |
 
 ## The golden rules
 

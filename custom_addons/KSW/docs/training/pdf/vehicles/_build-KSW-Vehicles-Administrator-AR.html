@@ -1,0 +1,212 @@
+<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"><title>المركبات والموظفون — التهيئة والصلاحيات</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "Noto Naskh Arabic","Noto Sans Arabic UI","DejaVu Sans",sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: right; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-right: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">المركبات والموظفون — التهيئة والصلاحيات</div>
+  <div class="meta">تخصيص المركبات · عهدة المركبات (HR-12) · نقل الموظفين · الوثائق · الورش<br/>KSW HR &amp; Payroll · 2026-11-24</div>
+</div>
+<section id="g-admin-vehicles-setup"><h1>تهيئة المركبات والعهد ونقل الموظفين والوثائق</h1>
+<p><strong>الفئة المستهدفة:</strong> مسؤول النظام
+<strong>الوقت المقدّر:</strong> جلسة واحدة عند التشغيل، ثم كلما تغيّر الأشخاص</p>
+<h2>ما الذي تفعله هذه الشاشة</h2>
+<p>تحتاج التطبيقات أربعة أنواع من التهيئة: <strong>من يعمل لأي قسم</strong>، و<strong>أي الأقسام لديها مركبات وأي ورشة
+تخدمها</strong>، و<strong>من يعمل في أي ورشة</strong>، و<strong>ما الذي يُفحص عند التسليم</strong>. نفّذها بهذا الترتيب عند التشغيل.</p>
+<h2>١. الأقسام التي لديها مركبات</h2>
+<p><strong>تخصيص المركبات ← الإعدادات ← أقسام المركبات.</strong> ضع علامة <strong>لديه مركبات</strong> للأقسام المسؤولة عن
+مركبات؛ ويعرض <strong>عدد المركبات</strong> ما لدى كل قسم. ويجب أن يكون لكل مركبة من مركبات الشركة قسم:
+<strong>تخصيص المركبات ← المركبات</strong>، مع فلتر <em>بلا قسم</em>.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/admin/veh-01.png" alt="أقسام المركبات"></p>
+<h2>٢. من يعمل لأي قسم</h2>
+<p><strong>تخصيص المركبات ← الإعدادات ← مستخدمو الأقسام.</strong> امنح كل مشرف صلاحية <strong>مستخدم القسم</strong> وقسمه
+(أو أقسامه). والمدير العام يأخذ صلاحية <strong>المدير العام</strong> التي ترى كل الأقسام وتبتّ فيها.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/admin/veh-02.png" alt="مستخدمو الأقسام"></p>
+<p>وفي <strong>نقل الموظفين</strong> يعمل <strong>مقدم الطلب</strong> للأقسام التي <strong>يديرها</strong> (<em>مدير</em> القسم): حافظ على صحة
+المدراء في الموظفين ← الأقسام.</p>
+<h2>٣. الورش: موظفوها والأقسام التي تخدمها</h2>
+<p><strong>الورشة ← الإعدادات ← الورش.</strong> لكل ورشة أضف <strong>المدراء والموظفون</strong>، وفي <strong>الأقسام المخدومة</strong>
+الأقسام التي تستقبل طلباتها (القسم الفرعي يتبع أصله، والقسم الذي لا تخدمه أي ورشة يذهب إلى
+النابية، الورشة الرئيسية). ومن ليس في أي ورشة لا يرى أي طلبات.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/admin/veh-03.png" alt="الورش"></p>
+<h2>٤. ما الذي يُفحص عند التسليم</h2>
+<p><strong>المستندات ← الإعدادات ← أنواع المستندات</strong>، عمود <strong>تُفحص عند تسليم المركبة</strong>. أي مستند مطلوب
+للمركبة أو للسائق الجديد يكون ناقصًا أو منتهيًا يوقف التسليم. فعّل النوع فقط عندما يحتويه السجل
+للجميع (استورد أولًا)، وإلا توقفت كل عمليات التسليم.</p>
+<h2>الصلاحيات باختصار</h2>
+<table>
+<thead>
+<tr>
+<th>الصلاحية (الإعدادات ← المستخدمون)</th>
+<th>تُمنح لـ</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>تخصيص المركبات: <strong>مستخدم القسم</strong> (+ الأقسام)</td>
+<td>مشرف كل قسم لديه مركبات</td>
+</tr>
+<tr>
+<td>تخصيص المركبات: <strong>المدير العام</strong></td>
+<td>المدير العام</td>
+</tr>
+<tr>
+<td>نقل الموظفين: <strong>مقدم طلب</strong></td>
+<td>مدراء الأقسام</td>
+</tr>
+<tr>
+<td>نقل الموظفين: <strong>الموارد البشرية</strong> / <strong>المدير العام</strong></td>
+<td>الموارد البشرية / المدير العام</td>
+</tr>
+<tr>
+<td>عهدة المركبات: <strong>الموارد البشرية / الشؤون الإدارية</strong> (تشمل مسؤول المستندات)</td>
+<td>الموارد البشرية / الشؤون الإدارية</td>
+</tr>
+<tr>
+<td>عهدة المركبات: <strong>الحسابات (نسخة للعلم)</strong></td>
+<td>المحاسب الذي يتابع إهلاك المركبات</td>
+</tr>
+<tr>
+<td>الورشة: <strong>مدير</strong> / <strong>الفني</strong> (+ الورش)</td>
+<td>موظفو الورش</td>
+</tr>
+<tr>
+<td>الأسطول: <strong>ربط التيدرات بالرؤوس</strong> / <strong>تعديل بيانات التيدرات</strong></td>
+<td>المنسق / الموارد البشرية</td>
+</tr>
+</tbody></table>
+</section>
+<section id="g-admin-vehicles-access"><h1>الصلاحيات الأولية: المركبات والعهد ونقل الموظفين والوثائق</h1>
+<p><strong>الفئة المستهدفة:</strong> مسؤول النظام والإدارة عند التشغيل
+<strong>الحالة:</strong> منح أولي، تقرر في ٢٠٢٦-١١-٢٣. يُعدَّل هنا أولًا ثم في النظام.</p>
+<h2>من يفعل ماذا</h2>
+<table>
+<thead>
+<tr>
+<th>الدور</th>
+<th>يقوم بـ</th>
+<th>لا يقوم أبدًا بـ</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>مشرف القسم</strong></td>
+<td>الاستغناء عن المركبات والموظفين وطلبهم لقسمه، وتحديد سائق المركبة التي يستلمها، وتغيير السائق داخل قسمه، وطلب المستندات الناقصة من الموارد البشرية، وحفظ HR-12 الموقّع</td>
+<td>تقرير وجهة مركبة أو موظف</td>
+</tr>
+<tr>
+<td><strong>المدير العام</strong></td>
+<td>البت في كل مركبة وكل موظف مستغنى عنه أو مطلوب</td>
+<td>التنفيذ (النماذج، المستندات)</td>
+</tr>
+<tr>
+<td><strong>الموارد البشرية / الشؤون الإدارية</strong></td>
+<td>مراجعة مستندات التسليم والاستلام، وحفظ سجل الوثائق والاستيراد، والرد على طلبات الوثائق، وإكمال النقل ونهاية الخدمة والتعيين</td>
+<td>التقرير</td>
+</tr>
+<tr>
+<td><strong>الورشة</strong></td>
+<td>فحص المركبات المسلَّمة، وتسليم المركبات عند وصولها، والعمل على طلبات موقعها</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>الحسابات</strong></td>
+<td>استلام نسخة للعلم عن التسليم وتغيير السائق</td>
+<td>العمل على النماذج</td>
+</tr>
+<tr>
+<td><strong>الموظف / السائق</strong></td>
+<td>التوقيع على HR-12 الورقي</td>
+<td>ليست له خطوة في النظام</td>
+</tr>
+</tbody></table>
+<h2>المنح الأولي (بيئة التشغيل)</h2>
+<table>
+<thead>
+<tr>
+<th>الشخص</th>
+<th>الصلاحيات</th>
+<th>النطاق</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>MISHAL J ALSHAKHS</strong></td>
+<td>تخصيص المركبات: مستخدم القسم · نقل الموظفين: مقدم طلب · الورشة: مقدم طلب (موجودة) · ربط التيدرات بالرؤوس</td>
+<td>Supply Chain</td>
+</tr>
+<tr>
+<td><strong>Mohammed Azouni</strong></td>
+<td>تخصيص المركبات: مستخدم القسم · نقل الموظفين: مقدم طلب</td>
+<td>Tabuk</td>
+</tr>
+<tr>
+<td><strong>Mohammed Disouky</strong></td>
+<td>تخصيص المركبات: مستخدم القسم · نقل الموظفين: مقدم طلب · الورشة: مقدم طلب (موجودة)</td>
+<td>Disouky&#39;s Branch</td>
+</tr>
+<tr>
+<td><strong>Tariq Abu Al-Hassan</strong></td>
+<td>تخصيص المركبات: مستخدم القسم · نقل الموظفين: مقدم طلب · الورشة: مقدم طلب (موجودة)</td>
+<td>Tariq&#39;s Branch</td>
+</tr>
+<tr>
+<td><strong>Taha H. Shakhs</strong></td>
+<td>تخصيص المركبات: مستخدم القسم · نقل الموظفين: مقدم طلب · الورشة: مقدم طلب (موجودة)</td>
+<td>Equipment Rental Department</td>
+</tr>
+<tr>
+<td><strong>Mohammed-Ameen Al-Shaibani</strong> (المدير العام)</td>
+<td>تخصيص المركبات: المدير العام · نقل الموظفين: المدير العام · الورشة: مراجع (موجودة)</td>
+<td>جميع الأقسام</td>
+</tr>
+<tr>
+<td><strong>Mojtaba Al-Mahmoud</strong></td>
+<td>عهدة المركبات: الموارد البشرية / الشؤون الإدارية (تشمل مسؤول المستندات) · نقل الموظفين: الموارد البشرية · تعديل بيانات التيدرات</td>
+<td>الشركة</td>
+</tr>
+<tr>
+<td><strong>Essam A. JABER</strong></td>
+<td>الورشة: مدير (موجودة)</td>
+<td>Nabiya</td>
+</tr>
+<tr>
+<td>مدراء الأقسام الآخرون</td>
+<td>نقل الموظفين: مقدم طلب، عند حاجتهم للاستغناء عن موظفين أو طلبهم</td>
+<td>الأقسام التي يديرونها</td>
+</tr>
+</tbody></table>
+<p><strong>تُترك فارغة حاليًا</strong> (تُسمّى لاحقًا): مدراء وفنيو ورشتي تبوك والحياة، ونسخة الحسابات للعلم.</p>
+<h2>القواعد وراء هذا المنح</h2>
+<ul>
+<li><strong>النطاق بيانات وليس صلاحية.</strong> مستخدم القسم يعمل للأقسام المسجّلة عليه فقط، ومقدم طلب النقل
+للأقسام التي يديرها فقط. وتغيير مدير القسم يغيّر من يستطيع الاستغناء عن موظفيه.</li>
+<li><strong>قرار واحد في مكان واحد.</strong> المدير العام وحده يقرر، ولا يملك أحد غيره زر قرار. الموارد البشرية
+والورشة تكملان قسميهما، والمشرفون يطلبون.</li>
+<li><strong>أقل صلاحية لازمة.</strong> لا تُمنح صلاحية «احتياطًا»: الصلاحية الناقصة تظهر قائمة ناقصة، وتُمنح عند الحاجة.</li>
+<li><strong>السجل يبقى لدى الموارد البشرية.</strong> المشرفون لا يطّلعون على مستندات الموظفين، ويتابعون طلبات وثائقهم فقط.</li>
+</ul>
+</section>
+</body></html>

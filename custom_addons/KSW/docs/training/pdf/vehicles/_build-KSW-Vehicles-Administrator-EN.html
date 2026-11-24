@@ -1,0 +1,225 @@
+<!doctype html><html lang="en" dir="ltr"><head>
+<meta charset="utf-8"><title>Vehicles & Staff — Setup and Access Rights</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "DejaVu Sans",Arial,sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: left; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-left: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">Vehicles & Staff — Setup and Access Rights</div>
+  <div class="meta">Vehicle Allocation · Vehicle Custody (HR-12) · Employee Transfers · Documents · Workshops<br/>KSW HR &amp; Payroll · 2026-11-23</div>
+</div>
+<section id="g-admin-vehicles-setup"><h1>Setting Up Vehicles, Custody, Transfers and Documents</h1>
+<p><strong>Who is this for:</strong> the system administrator
+<strong>How long it takes:</strong> one sitting at go-live, then as people change</p>
+<h2>What this does</h2>
+<p>The apps need four kinds of setup: <strong>who answers for which department</strong>,
+<strong>which departments hold vehicles and which workshop serves them</strong>, <strong>who
+works in which workshop</strong>, and <strong>what a handover checks</strong>. Do them in this
+order at go-live.</p>
+<h2>1. Vehicle-holding departments</h2>
+<p><strong>Vehicle Allocation → Configuration → Vehicle Departments.</strong> Tick <strong>Holds
+Vehicles</strong> for the departments that answer for vehicles; <strong>Vehicle Count</strong>
+shows how many each has. Every company vehicle needs a department:
+<strong>Vehicle Allocation → Vehicles</strong>, filter <em>No department</em>.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/admin/veh-01.png" alt="Vehicle departments"></p>
+<h2>2. Who answers for which department</h2>
+<p><strong>Vehicle Allocation → Configuration → Department Users.</strong> Give each
+supervisor the <strong>Department User</strong> role and his department(s). The GM gets
+<strong>General Manager</strong>, which sees and decides every department.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/admin/veh-02.png" alt="Department users"></p>
+<p>For <strong>Employee Transfers</strong>, a <strong>Requester</strong> acts for the departments he
+<strong>manages</strong> (the department&#39;s <em>Manager</em>): keep the managers correct in
+Employees → Departments.</p>
+<h2>3. Workshops: staff and the departments they serve</h2>
+<p><strong>Workshop → Configuration → Workshops.</strong> For each workshop, add its
+<strong>Managers &amp; Staff</strong>, and in <strong>Departments Served</strong> the departments whose
+requests it receives (a sub-department follows its parent; a department
+served by none goes to Nabiya, the main workshop). Someone in no workshop
+sees no queue.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/admin/veh-03.png" alt="Workshops"></p>
+<h2>4. What a handover checks</h2>
+<p><strong>Documents → Configuration → Document Types</strong>, column <strong>Checked at Vehicle
+Handover</strong>. A required document of the vehicle or the new driver that is
+missing or expired stops a handover. Switch a type on only when the register
+holds it for everyone (import first), or every handover stops.</p>
+<h2>Roles at a glance</h2>
+<table>
+<thead>
+<tr>
+<th>Role (Settings → Users)</th>
+<th>Give it to</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Vehicle Allocation: <strong>Department User</strong> (+ departments)</td>
+<td>each vehicle-holding department&#39;s supervisor</td>
+</tr>
+<tr>
+<td>Vehicle Allocation: <strong>General Manager</strong></td>
+<td>the GM</td>
+</tr>
+<tr>
+<td>Employee Transfers: <strong>Requester</strong></td>
+<td>department managers</td>
+</tr>
+<tr>
+<td>Employee Transfers: <strong>HR</strong> / <strong>General Manager</strong></td>
+<td>HR / the GM</td>
+</tr>
+<tr>
+<td>Vehicle Custody: <strong>HR / Administrative Affairs</strong> (includes Documents Officer)</td>
+<td>HR / Administrative Affairs</td>
+</tr>
+<tr>
+<td>Vehicle Custody: <strong>Accounting (Information Copy)</strong></td>
+<td>the accountant who follows vehicle depreciation</td>
+</tr>
+<tr>
+<td>Workshop: <strong>Manager</strong> / <strong>Technician</strong> (+ workshops)</td>
+<td>workshop staff</td>
+</tr>
+<tr>
+<td>Fleet: <strong>Couple Tedders to Heads</strong> / <strong>Edit Tedder Data</strong></td>
+<td>the dispatcher / HR</td>
+</tr>
+</tbody></table>
+</section>
+<section id="g-admin-vehicles-access"><h1>Initial Access Rights: Vehicles, Custody, Transfers and Documents</h1>
+<p><strong>Who is this for:</strong> the system administrator and management, at go-live
+<strong>Status:</strong> initial grant, decided 2026-11-23. Change it here first, then in Odoo.</p>
+<h2>Who does what</h2>
+<table>
+<thead>
+<tr>
+<th>Actor</th>
+<th>Does</th>
+<th>Never does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Department supervisor</strong></td>
+<td>releases and requests vehicles and employees for his department, names the driver of a vehicle he receives, changes a driver within his department, asks HR for missing documents, files the signed HR-12</td>
+<td>decides where a vehicle or an employee goes</td>
+</tr>
+<tr>
+<td><strong>General Manager</strong></td>
+<td>decides every vehicle and every released or requested employee</td>
+<td>executes (forms, documents)</td>
+</tr>
+<tr>
+<td><strong>HR / Administrative Affairs</strong></td>
+<td>checks the documents on hand-ins and receipts, keeps the documents register and imports, answers document requests, completes transfers, end of service and hires</td>
+<td>decides</td>
+</tr>
+<tr>
+<td><strong>Workshop</strong></td>
+<td>inspects vehicles handed in, hands vehicles over on arrival, works its own site&#39;s queue</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Accounting</strong></td>
+<td>receives the information copy of hand-ins and driver changes</td>
+<td>acts on the forms</td>
+</tr>
+<tr>
+<td><strong>Employee / driver</strong></td>
+<td>signs the paper HR-12</td>
+<td>has no step in the system</td>
+</tr>
+</tbody></table>
+<h2>Initial grant (production)</h2>
+<table>
+<thead>
+<tr>
+<th>Person</th>
+<th>Roles</th>
+<th>Scope</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>MISHAL J ALSHAKHS</strong></td>
+<td>Vehicle Allocation: Department User · Employee Transfers: Requester · Workshop: Requester (already) · Couple Tedders to Heads</td>
+<td>Supply Chain</td>
+</tr>
+<tr>
+<td><strong>Mohammed Azouni</strong></td>
+<td>Vehicle Allocation: Department User · Employee Transfers: Requester</td>
+<td>Tabuk</td>
+</tr>
+<tr>
+<td><strong>Mohammed Disouky</strong></td>
+<td>Vehicle Allocation: Department User · Employee Transfers: Requester · Workshop: Requester (already)</td>
+<td>Disouky&#39;s Branch</td>
+</tr>
+<tr>
+<td><strong>Tariq Abu Al-Hassan</strong></td>
+<td>Vehicle Allocation: Department User · Employee Transfers: Requester · Workshop: Requester (already)</td>
+<td>Tariq&#39;s Branch</td>
+</tr>
+<tr>
+<td><strong>Taha H. Shakhs</strong></td>
+<td>Vehicle Allocation: Department User · Employee Transfers: Requester · Workshop: Requester (already)</td>
+<td>Equipment Rental Department</td>
+</tr>
+<tr>
+<td><strong>Mohammed-Ameen Al-Shaibani</strong> (GM)</td>
+<td>Vehicle Allocation: General Manager · Employee Transfers: General Manager · Workshop: Reviewer (already)</td>
+<td>all departments</td>
+</tr>
+<tr>
+<td><strong>Mojtaba Al-Mahmoud</strong></td>
+<td>Vehicle Custody: HR / Administrative Affairs (includes Documents Officer) · Employee Transfers: HR · Edit Tedder Data</td>
+<td>company</td>
+</tr>
+<tr>
+<td><strong>Essam A. JABER</strong></td>
+<td>Workshop: Manager (already)</td>
+<td>Nabiya</td>
+</tr>
+<tr>
+<td>Other department managers</td>
+<td>Employee Transfers: Requester, when they need to release or request employees</td>
+<td>the departments they manage</td>
+</tr>
+</tbody></table>
+<p><strong>Left empty for now</strong> (to name later): the Tabuk and Al-Hayat workshop
+managers and technicians, and the Accounting information copy.</p>
+<h2>Rules behind the grant</h2>
+<ul>
+<li><strong>Scope is data, not a role.</strong> A Department User acts only for the
+departments named on him; a Transfer Requester only for the departments he
+manages. Changing a department&#39;s manager changes who can release its
+employees.</li>
+<li><strong>One home per decision.</strong> Only the GM decides; nobody else holds a
+decide button. HR and the workshop complete their section; supervisors ask.</li>
+<li><strong>Least privilege.</strong> Nobody receives a role &quot;to be safe&quot;: a missing
+role shows as a missing menu, and is granted when it is needed.</li>
+<li><strong>The register stays with HR.</strong> Supervisors never read employees&#39;
+documents; they follow their own Document Requests.</li>
+</ul>
+</section>
+</body></html>

@@ -1,0 +1,245 @@
+<!doctype html><html lang="en" dir="ltr"><head>
+<meta charset="utf-8"><title>Vehicles & Staff — HR & Documents Guide</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "DejaVu Sans",Arial,sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: left; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-left: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">Vehicles & Staff — HR & Documents Guide</div>
+  <div class="meta">Vehicle Allocation · Vehicle Custody (HR-12) · Employee Transfers · Documents · Workshops<br/>KSW HR &amp; Payroll · 2026-11-23</div>
+</div>
+<section id="g-hr-06-hr12-documents-check"><h1>HR-12: Checking a Handover&#39;s Documents</h1>
+<p><strong>Who is this for:</strong> HR / Administrative Affairs (Vehicle Custody, <em>HR / Administrative Affairs</em>)
+<strong>How long it takes:</strong> 2 minutes per form</p>
+<h2>What this does</h2>
+<p>The handover form <strong>HR-12</strong> follows a vehicle when it changes hands. HR has
+a step on two kinds of form; the GM already decided, so you complete your
+section, you do not approve:</p>
+<table>
+<thead>
+<tr>
+<th>Form</th>
+<th>When</th>
+<th>Your part</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Hand In (Release)</strong></td>
+<td>a released vehicle goes to the workshop</td>
+<td>check its documents are handed in, <strong>in parallel</strong> with the workshop&#39;s inspection</td>
+</tr>
+<tr>
+<td><strong>Receive</strong></td>
+<td>a department receives a vehicle and names its driver</td>
+<td>check the new driver and the documents <strong>before</strong> the workshop hands it over</td>
+</tr>
+</tbody></table>
+<p>A <strong>Driver Change</strong> inside a department has no HR step any more: it is done
+when the supervisor confirms it, and you get a message listing anything the
+register is missing, for information.</p>
+<h2>Steps</h2>
+<ol>
+<li><p><strong>Open the form</strong> from your Home page (<em>HR documents: …</em>) or <strong>Vehicle
+Custody → Handover Forms (HR-12)</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/hr/veh-01.png" alt="Handover forms"></p>
+</li>
+<li><p><strong>Open the HR / Administrative Affairs tab.</strong> Each document line shows
+what the <strong>register</strong> holds (Valid / Expiring Soon / Expired / Not in the
+Register) with its expiry, so you do not re-check it by hand. Tick
+<strong>Handed Over</strong> for what you received, and add remarks.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/hr/veh-03.png" alt="The HR section"></p>
+</li>
+<li><p>On a <strong>Receive</strong>, the new user&#39;s <strong>licence type and expiry</strong> are read from
+the register; the driver&#39;s checks (one vehicle, his department, a valid
+licence of the right class) run again.</p>
+</li>
+<li><p><strong>Click Documents Checked.</strong> On a hand-in the form waits for the
+workshop if it has not finished; on a receipt it goes to the workshop,
+whose handover is the vehicle&#39;s arrival.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/hr/veh-02.png" alt="A hand-in at the workshop and HR"></p>
+</li>
+</ol>
+<h2>What happens next</h2>
+<p>When the workshop is also done, the form is <strong>Approved</strong>: the custodian
+changes, Accounting and the department are told. The department prints,
+signs and files the paper.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>No <strong>Documents Checked</strong> button</td>
+<td>The form is not at your step</td>
+<td>Check the status bar</td>
+</tr>
+<tr>
+<td>&quot;… cannot change hands until the documents register holds …&quot;</td>
+<td>The register lacks a document of the vehicle or driver</td>
+<td>Register it (see <a href="#g-hr-07-documents-register">The documents register</a>), then click again</td>
+</tr>
+</tbody></table>
+</section>
+<section id="g-hr-07-documents-register"><h1>The Documents Register and Document Requests</h1>
+<p><strong>Who is this for:</strong> HR / Administrative Affairs (Documents, <em>Documents Officer</em>)
+<strong>How long it takes:</strong> varies</p>
+<h2>What this does</h2>
+<p>The <strong>Documents</strong> app is the one register of every vehicle&#39;s and employee&#39;s
+papers: istimara, insurance, periodic inspection, operation card, tank
+licence, driving licence, driver card, iqama, passport. Handovers read it:
+<strong>a vehicle cannot change hands while a checked document is missing or
+expired.</strong> Supervisors cannot see the register; when they need something in
+it, they send you a <strong>Document Request</strong>.</p>
+<h2>Answering document requests</h2>
+<ol>
+<li><p><strong>Open Documents → Requests</strong> (also on your Home page as <em>Document
+requests</em>). Oldest first; each says what is needed, for whom, why
+(e.g. <em>New driver of TRN-IS2</em>) and who asked.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/hr/doc-01.png" alt="Document requests"></p>
+</li>
+<li><p><strong>Open the request and click Register the Document.</strong> The document form
+opens already pointing at the employee or vehicle.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/hr/doc-02.png" alt="A request"></p>
+</li>
+<li><p><strong>Fill in the number and expiry</strong> (attach the scan if you have it) and
+<strong>Confirm</strong>. The request closes itself and the supervisor is told.</p>
+</li>
+</ol>
+<blockquote>
+<p>Any valid document of the same kind confirmed for that person or vehicle
+closes the request, however it was entered (upload, bulk upload, export).</p>
+</blockquote>
+<h2>Importing government exports</h2>
+<p>The fastest way to fill the register. <strong>Documents → Government Exports →
+New</strong>, choose the <strong>Source</strong>, attach the file, <strong>Preview</strong>, check the
+warnings, then <strong>Apply</strong>. Nothing is written before Apply; nothing in Odoo is
+overwritten by an older document.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/hr/doc-03.png" alt="New import"></p>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>From</th>
+<th>Fills</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Absher Business: Vehicles</strong></td>
+<td>Absher ▸ Vehicles</td>
+<td>istimara, inspection, insurance status, actual user</td>
+</tr>
+<tr>
+<td><strong>Absher Business: Driving Licence Holders</strong></td>
+<td>Absher ▸ licence holders (residents)</td>
+<td>driving licence: number = iqama, class, expiry</td>
+</tr>
+<tr>
+<td><strong>Muqeem: Active Residents</strong></td>
+<td>Muqeem ▸ active residents</td>
+<td>iqama, passport</td>
+</tr>
+<tr>
+<td><strong>Qiwa / GOSI</strong></td>
+<td>the portals&#39; lists</td>
+<td>contracts, registration</td>
+</tr>
+<tr>
+<td><strong>Tank Inspection Report (Fahes)</strong></td>
+<td>the inspection report</td>
+<td>water tank licence</td>
+</tr>
+</tbody></table>
+<p>The licence preview also warns about a custodian of a trailer holding a
+licence of the wrong class, and lists residents who hold a vehicle but have
+no licence in the file.</p>
+<h2>What a handover checks</h2>
+<p><strong>Documents → Configuration → Document Types</strong>: the column <strong>Checked at
+Vehicle Handover</strong> decides which documents stop a handover. The driver card
+is off until the cards are registered for everyone; switch it on then.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/hr/doc-04.png" alt="Document types"></p>
+<h2>A driver who may hold two vehicles</h2>
+<p>One driver holds one driven vehicle. For an approved exception, open the
+employee, tab <strong>Vehicle Custody</strong>, set <strong>Vehicles He May Hold</strong> to 2 and
+write <strong>Why More Than One</strong>.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>&quot;This is the Absher driving licence export…&quot;</td>
+<td>The file was imported as Muqeem</td>
+<td>Choose <strong>Absher Business: Driving Licence Holders</strong></td>
+</tr>
+<tr>
+<td>A row says <em>Not an employee in Odoo</em></td>
+<td>No employee has that iqama</td>
+<td>Add the employee (iqama in SSN No.), preview again</td>
+</tr>
+</tbody></table>
+</section>
+<section id="g-hr-08-employee-transfers"><h1>Employee Transfers: HR&#39;s Part</h1>
+<p><strong>Who is this for:</strong> HR (Employee Transfers, <em>HR</em>)
+<strong>How long it takes:</strong> 3 minutes per transfer</p>
+<h2>What this does</h2>
+<p>When the GM transfers a released employee, or ends his service, HR carries
+it out. You do not decide; you complete what the move needs.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/hr/emp-01.png" alt="All requests"></p>
+<h2>Completing a transfer</h2>
+<ol>
+<li><strong>Open it</strong> from your Home page or <strong>Employee Transfers → Transfers</strong>.
+It is <strong>With HR</strong>.</li>
+<li><strong>Check the proposed new manager, time off approver, attendance approver
+and HR responsible</strong>: they come from the new department. Correct them if
+needed (all required).</li>
+<li><strong>Click Confirm.</strong> It waits for its <strong>effective date</strong> (<strong>Waiting for
+Date</strong>) and is <strong>Applied</strong> that day: his department, manager and
+approvers change.</li>
+</ol>
+<blockquote>
+<p><strong>Vehicles first.</strong> If he still answers for a vehicle, the transfer waits
+until the vehicle is handed over (the driver change or hand-in from his
+release plan), then applies at once.</p>
+</blockquote>
+<p>If the transfer cannot go ahead, click <strong>Return to the GM</strong> with the reason.</p>
+<h2>End of service and hires</h2>
+<ul>
+<li><strong>End of Service</strong> decided by the GM: open the release and click <strong>End of
+Service</strong> to start his end-of-service request with the termination date.</li>
+<li><strong>Hire from Outside</strong>: when the new employees are created, open the
+request and click <strong>Name New Hires</strong>.</li>
+</ul>
+</section>
+</body></html>

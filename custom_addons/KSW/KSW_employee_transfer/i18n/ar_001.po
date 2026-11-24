@@ -484,7 +484,7 @@ msgstr "مسودة"
 #: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_release_decision_wizard__effective_date
 #: model:ir.model.fields,field_description:KSW_employee_transfer.field_ksw_employee_transfer__effective_date
 msgid "Effective Date"
-msgstr "تاريخ التوصيل الفعلي"
+msgstr "تاريخ النفاذ"
 
 #. module: KSW_employee_transfer
 #: model:ir.model,name:KSW_employee_transfer.model_hr_employee

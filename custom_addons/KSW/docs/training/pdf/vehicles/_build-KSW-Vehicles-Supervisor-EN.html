@@ -1,0 +1,643 @@
+<!doctype html><html lang="en" dir="ltr"><head>
+<meta charset="utf-8"><title>Vehicles & Staff — Supervisor Guide</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "DejaVu Sans",Arial,sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: left; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-left: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">Vehicles & Staff — Supervisor Guide</div>
+  <div class="meta">Vehicle Allocation · Vehicle Custody (HR-12) · Employee Transfers · Documents · Workshops<br/>KSW HR &amp; Payroll · 2026-11-23</div>
+</div>
+<section id="g-supervisor-11-release-and-request-vehicles"><h1>Releasing and Requesting Vehicles</h1>
+<p><strong>Who is this for:</strong> Department supervisors who answer for vehicles (Vehicle Allocation, <em>Department User</em>)
+<strong>How long it takes:</strong> 3 minutes per request</p>
+<h2>What this does</h2>
+<p>Every company vehicle belongs to a department. When your department no
+longer needs a vehicle you <strong>release</strong> it; when it needs more you <strong>request</strong>
+them. Both are only <em>asks</em>: the <strong>General Manager</strong> decides each vehicle. You
+never move a vehicle yourself, and no vehicle leaves another department
+unless that department released it.</p>
+<table>
+<thead>
+<tr>
+<th>Request</th>
+<th>You say</th>
+<th>The GM can</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Release Vehicles</strong></td>
+<td>which vehicles you give up, why, and whether the driver goes with it</td>
+<td>give it to a department that asked, send it to the workshop to hold, or keep it with you</td>
+</tr>
+<tr>
+<td><strong>Request Vehicles</strong></td>
+<td>how many of which type, and whether you need the driver too</td>
+<td>give released or pooled vehicles, obtain them outside (buy/rent), or refuse</td>
+</tr>
+</tbody></table>
+<h2>Before you start</h2>
+<ul>
+<li>You need <strong>Vehicle Allocation → Department User</strong> for your department(s).
+If the <strong>Vehicle Allocation</strong> app is missing, ask your system administrator.</li>
+<li>You only see and release <strong>your own department&#39;s</strong> vehicles.</li>
+</ul>
+<h2>Releasing vehicles</h2>
+<ol>
+<li><p><strong>Open Vehicle Allocation → Requests → Release Vehicles.</strong> The list shows
+your releases and their state.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/veh-01.png" alt="Release Vehicles"></p>
+</li>
+<li><p><strong>Click New.</strong> <strong>Department</strong> is filled in (pick it if you answer for
+more than one). Write the <strong>reason</strong> in the box under it.</p>
+</li>
+<li><p><strong>Add each vehicle</strong> under <strong>Vehicles to Release</strong>: the <strong>Vehicle</strong>, and in
+<strong>Why</strong> a short reason for that one. Tick <strong>With Driver</strong> only when the
+driver moves with the vehicle to the department that gets it (he keeps it
+in his custody and is transferred with it).</p>
+</li>
+<li><p><strong>Click Submit.</strong> The request moves to <strong>Waiting for GM</strong> and the GM gets
+it on his Home page.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/veh-02.png" alt="A release waiting for the GM"></p>
+</li>
+</ol>
+<h2>Requesting vehicles</h2>
+<ol>
+<li><p><strong>Open Vehicle Allocation → Requests → Request Vehicles</strong> and click <strong>New</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/veh-03.png" alt="New vehicle request"></p>
+</li>
+<li><p><strong>Add a line per vehicle type</strong> under <strong>Vehicles Needed</strong>: the
+<strong>Vehicle Type</strong>, <strong>Needs</strong>, <strong>Quantity</strong> and <strong>What For</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Needs</th>
+<th>Choose it when</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Vehicle Only</strong></td>
+<td>you have a driver for it</td>
+</tr>
+<tr>
+<td><strong>Vehicle with Driver</strong></td>
+<td>you need the driver too</td>
+</tr>
+<tr>
+<td><strong>Either</strong></td>
+<td>both are fine</td>
+</tr>
+</tbody></table>
+</li>
+<li><p><strong>Click Submit.</strong></p>
+</li>
+</ol>
+<h2>What happens next</h2>
+<ul>
+<li><strong>The GM decides each vehicle.</strong> The request stays <strong>Waiting for GM</strong> until
+every line is decided, then it is <strong>Closed</strong>. Each line shows its own
+<strong>Status</strong> (Transfer, To Workshop / Holding, Kept by Department…).</li>
+<li><strong>A vehicle that leaves you</strong> goes to the workshop with a <strong>Hand In
+(Release)</strong> handover form (HR-12): the workshop inspects it and HR checks
+its papers. Its custodian is cleared when both are done.</li>
+<li><strong>A vehicle that comes to you</strong> arrives with a <strong>Receive</strong> form. On your
+Home page you get <em>Name the new driver</em>: open the form, choose the <strong>New
+User</strong>, and click <strong>Submit to HR</strong>. HR checks his licence, then the workshop
+hands the vehicle over, which is its arrival in your department. The checks
+in <a href="#g-supervisor-12-driver-change">Changing a vehicle&#39;s driver</a> apply to that driver too.</li>
+<li><strong>With Driver</strong>: no workshop and no form; the vehicle and its driver move
+together the day the GM decides, and the driver&#39;s transfer is applied.</li>
+</ul>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A vehicle is not in the list when releasing</td>
+<td>It is not your department&#39;s, or it is already on another release or being moved</td>
+<td>Check <strong>Vehicle Allocation → Vehicles</strong>; a vehicle on its way finishes moving first</td>
+</tr>
+<tr>
+<td>I cannot edit my request</td>
+<td>It has been submitted</td>
+<td>Write in the chatter; the GM can return it to draft</td>
+</tr>
+<tr>
+<td>&quot;Waiting for GM&quot; for days</td>
+<td>The GM has not decided yet</td>
+<td>It is on his Home page; ask him</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-supervisor-12-driver-change">Changing a vehicle&#39;s driver</a></li>
+<li><a href="#g-supervisor-13-release-and-request-employees">Releasing and requesting employees</a></li>
+<li><a href="#g-supervisor-14-document-requests">Missing documents: asking HR</a></li>
+</ul>
+</section>
+<section id="g-supervisor-12-driver-change"><h1>Changing a Vehicle&#39;s Driver (HR-12)</h1>
+<p><strong>Who is this for:</strong> Department supervisors (Vehicle Allocation, <em>Department User</em>)
+<strong>How long it takes:</strong> 2 minutes</p>
+<h2>What this does</h2>
+<p>Hands one of your vehicles from its current driver to another driver <strong>of
+your own department</strong>: vacation, suspension, a new route. It is your
+department&#39;s own decision: there is no GM step, no workshop checkup and no HR
+step. When every check passes, <strong>Confirm Driver Change</strong> gives the vehicle to
+the new driver at once, and HR and Accounting are told.</p>
+<h2>Before you start</h2>
+<p>The system checks these before the vehicle changes hands, and the <strong>New
+User</strong> list only offers drivers who pass the first four:</p>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>One driver, one vehicle</strong>: he does not already answer for a driven vehicle</td>
+<td>a driver drives one truck at a time (a tedder does not count: it goes with its head)</td>
+</tr>
+<tr>
+<td>He is not already the new driver on another handover or plan</td>
+<td>no one is promised two vehicles</td>
+</tr>
+<tr>
+<td>He is not being released himself</td>
+<td>he is leaving</td>
+</tr>
+<tr>
+<td>He is in <strong>your department</strong></td>
+<td>a driver change stays inside the department</td>
+</tr>
+<tr>
+<td>The <strong>documents register</strong> holds his valid <strong>driving licence</strong>, of a class that fits the vehicle (heavy transport for a trailer), and the vehicle&#39;s papers (istimara, insurance, periodic inspection, operation card, tank licence)</td>
+<td>the vehicle cannot legally change hands without them</td>
+</tr>
+</tbody></table>
+<h2>Steps</h2>
+<ol>
+<li><p><strong>Open Vehicle Custody → Driver Change</strong> and click <strong>New</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/dc-01.png" alt="Driver Change list"></p>
+</li>
+<li><p><strong>Choose the Vehicle.</strong> <strong>Previous User</strong> fills itself in with its
+current custodian.</p>
+</li>
+<li><p><strong>Choose the New User</strong> from the list, pick the <strong>Reason for User Change</strong>
+and add a note if needed.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/dc-02.png" alt="A driver change in draft"></p>
+</li>
+<li><p><strong>Click Confirm Driver Change</strong>, then confirm. If everything is in order
+the form moves to <strong>Approved</strong> and the vehicle is now in the new driver&#39;s
+custody.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/dc-04.png" alt="Driver change done"></p>
+</li>
+<li><p><strong>Print HR-12</strong>, have it signed, scan it, attach the scan under <strong>Signed
+Copy</strong> and click <strong>Mark as Signed</strong>. Your Home page reminds you until you do.</p>
+</li>
+</ol>
+<h2>When the documents are missing</h2>
+<p>If the register lacks a document, the form is refused with the list of what
+is missing, and a <strong>Request Them from HR</strong> button:</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/dc-03.png" alt="Missing documents"></p>
+<p>Click <strong>Request Them from HR</strong>: one request per missing document goes to HR,
+and you follow them in <strong>My Document Requests</strong> (see
+<a href="#g-supervisor-14-document-requests">Missing documents: asking HR</a>). When HR registers
+them you are told; confirm the driver change again.</p>
+<p>If you already asked, the message says so instead, naming the request:</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/dc-05.png" alt="Already requested"></p>
+<p>A licence of the <strong>wrong class</strong> (a private licence for a trailer) is refused
+without the button: HR cannot fix that by registering it. Choose another driver.</p>
+<h2>What happens next</h2>
+<ul>
+<li>HR gets a message that the change is done, with anything the register is
+missing for the vehicle, for information.</li>
+<li>Accounting gets a copy (financial matters, depreciation value).</li>
+<li>The custody history (<strong>Vehicle Custody → Who Answers for What</strong>) shows the
+new driver from today.</li>
+</ul>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A driver is not in the <strong>New User</strong> list</td>
+<td>He already holds a vehicle, is promised one, is being released, or is not in your department</td>
+<td>Hand his vehicle over first, or choose another driver</td>
+</tr>
+<tr>
+<td>&quot;… already answers for …, as many vehicles as he may hold&quot;</td>
+<td>He holds a vehicle</td>
+<td>Same as above. HR can allow a second vehicle for a recorded reason</td>
+</tr>
+<tr>
+<td>&quot;… already has HR12/… open&quot;</td>
+<td>The vehicle has another open form</td>
+<td>Finish or <strong>Cancel</strong> that one first</td>
+</tr>
+<tr>
+<td>I started one by mistake</td>
+<td>It is still a draft</td>
+<td><strong>Cancel</strong> (top left)</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-supervisor-11-release-and-request-vehicles">Releasing and requesting vehicles</a></li>
+<li><a href="#g-supervisor-14-document-requests">Missing documents: asking HR</a></li>
+</ul>
+</section>
+<section id="g-supervisor-13-release-and-request-employees"><h1>Releasing and Requesting Employees</h1>
+<p><strong>Who is this for:</strong> Department managers (Employee Transfers, <em>Requester</em>)
+<strong>How long it takes:</strong> 3 minutes per request</p>
+<h2>What this does</h2>
+<p>Works like vehicles: your department <strong>releases</strong> employees it no longer
+needs, or <strong>requests</strong> employees it needs (job and number). Only the
+<strong>General Manager</strong> decides: he transfers a released employee to a
+department that asked, holds him, ends his service, or refuses the release.
+HR then carries out the decision.</p>
+<h2>Before you start</h2>
+<ul>
+<li>You need <strong>Employee Transfers → Requester</strong>. You act for the departments
+you manage (and their sub-departments).</li>
+<li>If an employee you release <strong>answers for vehicles</strong>, you also say what
+happens to each vehicle if he leaves.</li>
+</ul>
+<h2>Releasing employees</h2>
+<ol>
+<li><p><strong>Open Employee Transfers → Requests → Release Employees</strong> and click <strong>New</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/emp-01.png" alt="Release Employees"></p>
+</li>
+<li><p><strong>Write the reason</strong>, and under <strong>Employees to Release</strong> add each
+employee with <strong>Why</strong> (what the GM should know about him).</p>
+</li>
+<li><p><strong>Save.</strong> If an employee answers for vehicles, a <strong>Vehicles in Their
+Custody</strong> tab appears with one line per vehicle. For each, choose <strong>If He
+Leaves</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>If He Leaves</th>
+<th>What happens when he leaves</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Another Driver in Our Department</strong></td>
+<td>choose the <strong>New Driver</strong>; the vehicle stays with you (a driver change)</td>
+</tr>
+<tr>
+<td><strong>Release to the Workshop</strong></td>
+<td>a vehicle release goes to the GM</td>
+</tr>
+</tbody></table>
+<p>The <strong>New Driver</strong> list follows the rules in
+<a href="#g-supervisor-12-driver-change">Changing a vehicle&#39;s driver</a>: one vehicle per driver,
+not someone who is leaving, valid licence. A missing document stops the
+submit with <strong>Request Them from HR</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/emp-03.png" alt="The vehicles of a released employee"></p>
+</li>
+<li><p><strong>Click Submit to the GM.</strong> The request is <strong>Submitted</strong> and the GM sees
+the vehicle plan with it.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/emp-02.png" alt="Submitted release"></p>
+</li>
+</ol>
+<blockquote>
+<p><strong>Nothing happens to the vehicles before he actually leaves.</strong> If the GM
+keeps him, the plan is dropped; if he transfers or his service ends, the
+plan runs that day.</p>
+</blockquote>
+<h2>Requesting employees</h2>
+<ol>
+<li><strong>Open Employee Transfers → Requests → Request Employees</strong> and click <strong>New</strong>.</li>
+<li><strong>Add a line per job</strong>: the <strong>Job Position</strong>, how many, and a note.</li>
+<li><strong>Click Submit to the GM.</strong></li>
+</ol>
+<h2>What happens next</h2>
+<ul>
+<li>The GM decides each employee. A transfer goes to HR, who sets his new
+manager and approvers and applies it on the effective date. If he still
+answers for a vehicle, the transfer waits until the vehicle is handed over.</li>
+<li>For a request, the GM may give you released employees, or have HR hire
+from outside.</li>
+</ul>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>&quot;… answers for TRN-…: say in Vehicles in Their Custody what happens to it&quot;</td>
+<td>A vehicle has no plan</td>
+<td>Open the tab and choose <strong>If He Leaves</strong></td>
+</tr>
+<tr>
+<td>An employee is not in the list</td>
+<td>He is not in a department you manage, or is already released</td>
+<td>Ask HR to check his department</td>
+</tr>
+<tr>
+<td>The New Driver I want is not offered</td>
+<td>He holds a vehicle, is leaving, or is promised one</td>
+<td>See <a href="#g-supervisor-12-driver-change">Changing a vehicle&#39;s driver</a></td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><a href="#g-supervisor-11-release-and-request-vehicles">Releasing and requesting vehicles</a></li>
+<li><a href="#g-supervisor-14-document-requests">Missing documents: asking HR</a></li>
+</ul>
+</section>
+<section id="g-supervisor-14-document-requests"><h1>Missing Documents: Asking HR</h1>
+<p><strong>Who is this for:</strong> Department supervisors
+<strong>How long it takes:</strong> 1 minute</p>
+<h2>What this does</h2>
+<p>A vehicle cannot change hands while the <strong>documents register</strong> lacks one of
+its papers or the new driver&#39;s licence. HR keeps the register; you do not
+see it. Instead, the message that stops you carries a <strong>Request Them from
+HR</strong> button, and each missing document becomes a <strong>Document Request</strong>
+(<code>DR/2026/…</code>) that is yours to follow.</p>
+<h2>Steps</h2>
+<ol>
+<li><p><strong>Click Request Them from HR</strong> on the message (see
+<a href="#g-supervisor-12-driver-change">Changing a vehicle&#39;s driver</a>). A green note confirms
+the request numbers.</p>
+</li>
+<li><p><strong>Follow them</strong> in <strong>Employee Transfers → Requests → My Document
+Requests</strong>, or on the release&#39;s <strong>Vehicles in Their Custody</strong> tab
+(<strong>Document Requests</strong> column).
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/docreq-01.png" alt="My Document Requests"></p>
+</li>
+<li><p><strong>Open one</strong> to see what was asked, why, and its state.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/docreq-02.png" alt="A document request"></p>
+</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Waiting for HR</strong></td>
+<td>HR has it on their Home page</td>
+</tr>
+<tr>
+<td><strong>Registered</strong></td>
+<td>HR has registered the document; you got a message. Submit or confirm again</td>
+</tr>
+<tr>
+<td><strong>Cancelled</strong></td>
+<td>You or HR cancelled it</td>
+</tr>
+</tbody></table>
+<h2>What happens next</h2>
+<p>The request closes itself the moment a valid document is in the register,
+whether HR typed it from your request or it came in with a government export.
+You do not need to chase it: you are told.</p>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>&quot;[HR has DR/… since …]&quot; in the message</td>
+<td>You (or another supervisor) already asked</td>
+<td>Wait for the message that it is registered</td>
+</tr>
+<tr>
+<td>I asked by mistake</td>
+<td>It is still waiting</td>
+<td>Open it and click <strong>Cancel Request</strong></td>
+</tr>
+</tbody></table>
+</section>
+<section id="g-supervisor-10-workshop-request"><h1>Issuing a Workshop Service Request</h1>
+<p><strong>Who is this for:</strong> Workshop Requesters: the Isuzu and trailer supervisors, and the maintenance department manager
+<strong>How long it takes:</strong> 2 minutes</p>
+<h2>What this does</h2>
+<p>Asks the workshop to inspect or repair one of your vehicles, as a tracked
+request instead of a phone call or the old Google Form. The workshop manager
+is notified the moment you submit. You can follow the request from the same
+screen until the vehicle is done.</p>
+<p>Each request gets a number (<code>WS00001</code>, <code>WS00002</code>, …) and moves through four
+states:</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>New</strong></td>
+<td>You have submitted it; the workshop has not started yet. You can still correct it.</td>
+</tr>
+<tr>
+<td><strong>In Progress</strong></td>
+<td>The workshop accepted it and is working on the vehicle.</td>
+</tr>
+<tr>
+<td><strong>Completed</strong></td>
+<td>The work is done. You get a message, often with collection details.</td>
+</tr>
+<tr>
+<td><strong>Rejected</strong></td>
+<td>The workshop will not do this request. You get a message explaining why.</td>
+</tr>
+</tbody></table>
+<h2>Before you start</h2>
+<ul>
+<li><p><strong>You need the Workshop Requester role.</strong> Only the people who answer for
+vehicles raise requests. If you open <strong>Workshop → My Requests</strong> and there
+is no <strong>New</strong> button, you don&#39;t have the role. Ask your system
+administrator. (Drivers and other staff report a fault to their
+supervisor, who raises the request.)</p>
+</li>
+<li><p><strong>You can only pick your own vehicles.</strong> The vehicle list offers:</p>
+<ul>
+<li>the trucks in <strong>your tanker groups</strong>, and</li>
+<li>the trucks <strong>driven by your team</strong>: anyone in your reporting line, and you.</li>
+</ul>
+<p>The tanker groups are the same ones you use in <strong>Water Delivery →
+Tankers</strong>. If a truck you are responsible for is missing, it has to be added
+to your tanker group first.</p>
+</li>
+<li><p>Know the vehicle&#39;s <strong>fleet number</strong> (e.g. <code>IS042</code>, <code>T171</code>) and be ready to
+describe the problem: what is wrong, since when, and any warning light or
+noise.</p>
+</li>
+</ul>
+<h2>Steps</h2>
+<ol>
+<li><p><strong>Open the Workshop app</strong>, then <strong>My Requests</strong>. This list shows every
+request you have raised and its current state.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/workshop-01.png" alt="My Requests"></p>
+</li>
+<li><p><strong>Click New.</strong> A blank request opens. <strong>Requested By</strong> is you and cannot be
+changed. <strong>Client</strong> is already set to the company, which is right for any
+company vehicle.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/workshop-02.png" alt="New request form"></p>
+</li>
+<li><p><strong>Choose the Vehicle Type</strong>: <strong>Trailer</strong>, <strong>Isuzu</strong>, <strong>Tank</strong> or <strong>Other</strong>.
+Choose it first, because the <strong>Vehicle</strong> list only shows vehicles of that
+type.</p>
+</li>
+<li><p><strong>Pick the Vehicle.</strong> Click the field or start typing the fleet number.
+Only your own trucks of that type are listed: the ones in your tanker
+groups and the ones your team drives.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/workshop-03.png" alt="Only your vehicles are offered"></p>
+</li>
+<li><p><strong>Check the Driver.</strong> When you pick the truck, <strong>Driver</strong> fills itself in
+with the driver attached to it. That is normally the person BAS shows
+driving it most over the last two weeks, or its default driver. If
+someone else is bringing the truck in, change it. This is allowed, but the
+request will then say so (see <em>What happens next</em>). Driver is required.</p>
+</li>
+<li><p><strong>Write the Description.</strong> This is the most important field. The workshop
+reads it to plan the job, and the system uses it to sort the request by
+repair type (tyres, brakes, electrical…), so you do not choose a type
+yourself. Write plainly. For example, write <em>&quot;Engine overheats on long
+trips; the temperature needle goes into the red after about an hour&quot;</em>,
+not just <em>&quot;engine problem&quot;</em>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/workshop-04.png" alt="Filled-in request"></p>
+</li>
+<li><p><strong>Click Submit Request</strong> (top left). The request is saved, gets its <code>WS…</code>
+number and is sent to the workshop. A green <em>Request submitted</em> message
+confirms it. (Saving with the cloud icon does exactly the same thing.)
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/workshop-05.png" alt="Submitted request"></p>
+</li>
+</ol>
+<h2>What happens next</h2>
+<ul>
+<li><strong>It goes to your department&#39;s workshop</strong>: Nabiya, Tabuk or Al-Hayat,
+whichever serves your department (Nabiya if none). That workshop&#39;s manager
+is told.</li>
+<li><strong>The workshop manager reviews it.</strong> When they accept it, the state moves
+to <strong>In Progress</strong> and a technician starts on the vehicle. You can watch
+the state bar at the top of the request.</li>
+<li><strong>When the work is finished</strong>, the request moves to <strong>Completed</strong>. You
+receive a message in your Inbox (the chat icon at the top right), on the
+request itself. It often includes a note from the workshop, such as where
+to collect the vehicle.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/workshop-06.png" alt="Completed request"></li>
+<li><strong>If the workshop will not do it</strong>, the request moves to <strong>Rejected</strong>. The
+message tells you why. A common reason is that the same vehicle already
+has an open request.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/workshop-07.png" alt="Rejected request"></li>
+<li><strong>If you changed the driver</strong>, a yellow <strong>Driver changed</strong> box shows at the
+top of the request for everyone who opens it. It names the driver you
+entered and the driver attached to the truck, so the workshop knows who
+really brought it in. This is normal when the regular driver is on leave.
+Say why in the description.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/supervisor/workshop-08.png" alt="Driver changed"></li>
+<li><strong>To talk to the workshop about a request</strong>, use the message box on the
+right of the request (the chatter). Click <strong>External</strong>, type and send.
+Attach a photo of the damage or warning light the same way. Everything
+stays on the request instead of in calls.</li>
+</ul>
+<blockquote>
+<p><strong>What you can and cannot change.</strong> While the request is <strong>New</strong> you can
+correct anything except <strong>Requested By</strong>: open it, edit, save. Once the
+workshop has started, the request is locked for you. To add information,
+write in the chatter. The repair report (entry and exit times, odometer,
+parts, labour) is filled in by the workshop.</p>
+</blockquote>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>There is no <strong>New</strong> button on My Requests</td>
+<td>You don&#39;t have the Workshop Requester role</td>
+<td>Ask your system administrator. Until then, ask a supervisor who has it</td>
+</tr>
+<tr>
+<td>The <strong>Vehicle</strong> list is empty</td>
+<td><strong>Vehicle Type</strong> is not set, or none of your trucks is of that type</td>
+<td>Choose the right type first; the list follows it</td>
+</tr>
+<tr>
+<td>A truck I am responsible for is not in the list</td>
+<td>It is not in your tanker groups, and nobody on your team is its driver</td>
+<td>Ask for it to be added to your tanker group (Water Delivery → Tankers)</td>
+</tr>
+<tr>
+<td>&quot;… is not one of your vehicles: it is not in your tanker groups and none of your team drives it&quot;</td>
+<td>The truck was picked some other way but is not yours</td>
+<td>Pick one of your own trucks, or have it added to your tanker group</td>
+</tr>
+<tr>
+<td><strong>Driver</strong> filled in with the wrong person</td>
+<td>BAS shows that person driving the truck most recently</td>
+<td>Change it to whoever is bringing the truck. The request will show <em>Driver changed</em>, which is expected</td>
+</tr>
+<tr>
+<td>&quot;Vehicle Type and Driver are required…&quot; when saving</td>
+<td><strong>Driver</strong> is empty (the truck has no driver attached)</td>
+<td>Pick the driver yourself</td>
+</tr>
+<tr>
+<td>I can&#39;t edit my request any more</td>
+<td>It is no longer <strong>New</strong>: the workshop has started, finished or rejected it</td>
+<td>Write in the request&#39;s chatter instead</td>
+</tr>
+<tr>
+<td>There is no Delete option</td>
+<td>Requests are never deleted, so the history stays complete</td>
+<td>If you raised it by mistake, ask the workshop in the chatter to reject it</td>
+</tr>
+</tbody></table>
+<h2>Related guides</h2>
+<ul>
+<li><span class="xref">Getting Started</span>: login, navigation, notifications</li>
+</ul>
+</section>
+</body></html>

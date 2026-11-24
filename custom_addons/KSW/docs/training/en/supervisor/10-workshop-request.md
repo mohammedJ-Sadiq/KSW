@@ -79,6 +79,9 @@ states:
 
 ## What happens next
 
+- **It goes to your department's workshop**: Nabiya, Tabuk or Al-Hayat,
+  whichever serves your department (Nabiya if none). That workshop's manager
+  is told.
 - **The workshop manager reviews it.** When they accept it, the state moves
   to **In Progress** and a technician starts on the vehicle. You can watch
   the state bar at the top of the request.

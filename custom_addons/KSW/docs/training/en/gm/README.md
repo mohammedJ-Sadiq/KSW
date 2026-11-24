@@ -15,6 +15,8 @@ outright.
 | Send a request back to an earlier approver | [Return to approver](02-return-to-approver.md) |
 | Give final approval on a loan | [Loan: GM final approval](03-loan-gm-approval.md) |
 | Approve my departments' monthly commissions & allowances | [Commissions: monthly approval](04-commission-approval.md) |
+| Decide departments' vehicle releases and requests | [Deciding vehicle requests](05-vehicle-decisions.md) |
+| Decide released employees and requests for employees | [Deciding employee releases and requests](06-employee-decisions.md) |
 
 ## The golden rules
 

@@ -184,7 +184,11 @@ body.o_rtl .o_control_panel_actions {
 
 body.o_rtl .modal-header,
 body.o_rtl .modal-body {
-    text-align: right;
+    /* "start", not "right": rtlcss flips an unguarded "right" to "left" in
+       the RTL bundle, which left every dialog's message (validation errors
+       included) left-aligned in Arabic. "start" is the reading edge in either
+       direction and is never flipped. */
+    text-align: start;
 }
 
 body.o_rtl .modal-footer {

@@ -9,8 +9,9 @@
  * - Arabic pages render RTL with Noto Naskh Arabic.
  * Output: ../pdf/KSW-User-Manual-<lang>.pdf
  */
+import { tmpdir } from 'os';
 import { marked } from 'marked';
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, mkdtempSync, rmSync } from 'fs';
 import { dirname, join, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { execFileSync } from 'child_process';
@@ -166,11 +167,27 @@ ${body}
   const htmlPath = join(outDir, `_build-${outBase}.html`);
   const pdfPath = join(outDir, `${outBase}.pdf`);
   writeFileSync(htmlPath, html);
-  execFileSync('google-chrome-stable', [
-    '--headless', '--no-sandbox', '--disable-gpu', '--no-pdf-header-footer',
-    '--run-all-compositor-stages-before-draw', '--virtual-time-budget=20000',
-    `--print-to-pdf=${pdfPath}`, `file://${htmlPath}`,
-  ], { stdio: 'pipe' });
+  // Headless Chrome now and then never returns from --print-to-pdf (seen
+  // Nov 2026, any file, any order). Each try gets its own profile and 60 s;
+  // a hung try is killed with its helpers and retried.
+  for (let attempt = 1; ; attempt++) {
+    const profile = mkdtempSync(join(tmpdir(), 'ksw-pdf-chrome-'));
+    try {
+      execFileSync('google-chrome-stable', [
+        '--headless', '--no-sandbox', '--disable-gpu', '--no-pdf-header-footer',
+        `--user-data-dir=${profile}`, '--disable-crash-reporter', '--disable-breakpad',
+        '--run-all-compositor-stages-before-draw', '--virtual-time-budget=20000',
+        `--print-to-pdf=${pdfPath}`, `file://${htmlPath}`,
+      ], { stdio: 'ignore', timeout: 60000, killSignal: 'SIGKILL' });
+      break;
+    } catch (e) {
+      try { execFileSync('pkill', ['-9', '-f', profile]); } catch (x) { /* nothing left */ }
+      if (attempt >= 3) throw e;
+      console.warn(`  ! Chrome hung on ${outBase}, retry ${attempt + 1}/3`);
+    } finally {
+      rmSync(profile, { recursive: true, force: true });
+    }
+  }
   console.log(`  ✓ ${pdfPath}`);
   return pdfPath;
 }
@@ -291,9 +308,70 @@ function buildSingle(relPath, slug, titleEn, titleAr) {
 //                                                      built from a single guide page, e.g.:
 //   node build_pdf.mjs single supervisor/06-confirm-return.md Return-Confirmation \
 //     "Confirming a Return from Annual Leave" "تأكيد مباشرة الموظف من إجازته السنوية"
+// Vehicles & staff bundle (Nov 2026): Vehicle Allocation, Vehicle Custody
+// (HR-12), Employee Transfers, Documents and the three workshops, one
+// handbook per role -> ../pdf/vehicles/.
+const VEHICLES_DOCS = {
+  supervisor: ['Supervisor', [
+    'supervisor/11-release-and-request-vehicles.md',
+    'supervisor/12-driver-change.md',
+    'supervisor/13-release-and-request-employees.md',
+    'supervisor/14-document-requests.md',
+    'supervisor/10-workshop-request.md',
+  ], 'Vehicles & Staff — Supervisor Guide', 'المركبات والموظفون — دليل المشرف'],
+  gm: ['GM', [
+    'gm/05-vehicle-decisions.md',
+    'gm/06-employee-decisions.md',
+  ], 'Vehicles & Staff — General Manager Guide', 'المركبات والموظفون — دليل المدير العام'],
+  hr: ['HR', [
+    'hr/06-hr12-documents-check.md',
+    'hr/07-documents-register.md',
+    'hr/08-employee-transfers.md',
+  ], 'Vehicles & Staff — HR & Documents Guide', 'المركبات والموظفون — دليل الموارد البشرية والوثائق'],
+  workshop: ['Workshop', [
+    'workshop/01-workshop-sites-and-handovers.md',
+  ], 'Workshop — Manager & Technician Guide', 'الورشة — دليل المدير والفني'],
+  admin: ['Administrator', [
+    'admin/vehicles-setup.md',
+    'admin/vehicles-access.md',
+  ], 'Vehicles & Staff — Setup and Access Rights', 'المركبات والموظفون — التهيئة والصلاحيات'],
+};
+const VEHICLES_ORDER = ['supervisor', 'gm', 'hr', 'workshop', 'admin'];
+
+function buildVehicles(lang) {
+  const outDir = join(OUT, 'vehicles');
+  const sub = lang === 'ar'
+    ? 'تخصيص المركبات · عهدة المركبات (HR-12) · نقل الموظفين · الوثائق · الورش'
+    : 'Vehicle Allocation · Vehicle Custody (HR-12) · Employee Transfers · Documents · Workshops';
+  const every = [];
+  for (const role of VEHICLES_ORDER) {
+    const [slug, rel, titleEn, titleAr] = VEHICLES_DOCS[role];
+    const files = rel.map(r => join(ROOT, lang, r)).filter(f => {
+      if (existsSync(f)) return true;
+      console.warn(`  ! missing ${f}, skipped`);
+      return false;
+    });
+    if (!files.length) continue;
+    every.push(...files);
+    renderDoc(lang, files, `KSW-Vehicles-${slug}-${lang.toUpperCase()}`,
+              lang === 'ar' ? titleAr : titleEn, sub, outDir);
+  }
+  if (every.length) {
+    renderDoc(lang, every, `KSW-Vehicles-All-Roles-${lang.toUpperCase()}`,
+              lang === 'ar' ? 'المركبات والموظفون — جميع الأدوار' : 'Vehicles & Staff — All Roles', sub, outDir);
+  }
+}
+
 const args = process.argv.slice(2);
 
-if (args[0] === 'commission') {
+if (args[0] === 'vehicles') {
+  const lang = args.find(a => a === 'en' || a === 'ar');
+  for (const l of (lang ? [lang] : ['en', 'ar'])) {
+    console.log(`\n[${l}] vehicles bundle`);
+    buildVehicles(l);
+  }
+  console.log('\nDone.');
+} else if (args[0] === 'commission') {
   const lang = args.find(a => a === 'en' || a === 'ar');
   for (const l of (lang ? [lang] : ['en', 'ar'])) {
     console.log(`\n[${l}] commission bundle`);

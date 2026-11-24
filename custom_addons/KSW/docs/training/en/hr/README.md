@@ -17,6 +17,9 @@ and run the **bank file export**.
 | Change installments / mark paid / record a loan payment | [Modify deductions & change installments](04-modify-deductions.md) |
 | Review attendance sheets | [Attendance sheets (HR review)](05-attendance-sheet-management.md) |
 | Export the salary/commission bank file | [Payroll → Bank file export](../payroll/03-bank-file-export.md) |
+| Check the documents on an HR-12 hand-in or receipt | [HR-12: checking a handover's documents](06-hr12-documents-check.md) |
+| Keep the documents register, import government exports, answer document requests | [The documents register](07-documents-register.md) |
+| Complete an employee transfer, end of service or hire | [Employee transfers: HR's part](08-employee-transfers.md) |
 
 ## The golden rules
 

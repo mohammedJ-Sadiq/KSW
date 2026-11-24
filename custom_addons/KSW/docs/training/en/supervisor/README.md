@@ -22,6 +22,10 @@ attendance and commission sheets.
 | See my team's payslips | [View team payslips](07-view-team-payslips.md) |
 | Raise an IT support ticket for a team member | [IT ticket for a team member](09-ticket-for-team-member.md) |
 | Send one of my vehicles to the workshop (Workshop Requesters) | [Issue a workshop request](10-workshop-request.md) |
+| Release vehicles my department no longer needs, or request more | [Releasing and requesting vehicles](11-release-and-request-vehicles.md) |
+| Hand one of my vehicles to another driver of my department | [Changing a vehicle's driver](12-driver-change.md) |
+| Release employees (and plan their vehicles), or request employees | [Releasing and requesting employees](13-release-and-request-employees.md) |
+| A handover is stopped by a missing document | [Missing documents: asking HR](14-document-requests.md) |
 
 ## The golden rules
 

@@ -1,0 +1,1223 @@
+<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"><title>المركبات والموظفون — جميع الأدوار</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "Noto Naskh Arabic","Noto Sans Arabic UI","DejaVu Sans",sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: right; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-right: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">المركبات والموظفون — جميع الأدوار</div>
+  <div class="meta">تخصيص المركبات · عهدة المركبات (HR-12) · نقل الموظفين · الوثائق · الورش<br/>KSW HR &amp; Payroll · 2026-11-24</div>
+</div>
+<section id="g-supervisor-11-release-and-request-vehicles"><h1>الاستغناء عن المركبات وطلبها</h1>
+<p><strong>الفئة المستهدفة:</strong> مشرفو الأقسام التي لديها مركبات (تخصيص المركبات، <em>مستخدم القسم</em>)
+<strong>الوقت المقدّر:</strong> ٣ دقائق لكل طلب</p>
+<h2>ما الذي تفعله هذه الشاشة</h2>
+<p>كل مركبة من مركبات الشركة تتبع قسمًا. إذا لم يعد قسمك يحتاج مركبة فإنك
+<strong>تستغني</strong> عنها، وإذا احتاج مركبات أكثر فإنك <strong>تطلبها</strong>. وكلاهما <strong>طلب</strong> فقط:
+<strong>المدير العام</strong> وحده يبتّ في كل مركبة. أنت لا تنقل مركبة بنفسك، ولا تخرج مركبة
+من قسم آخر ما لم يستغنِ عنها ذلك القسم.</p>
+<table>
+<thead>
+<tr>
+<th>الطلب</th>
+<th>ما تحدده أنت</th>
+<th>ما يقرره المدير العام</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>الاستغناء عن مركبات</strong></td>
+<td>المركبات التي تستغني عنها، والسبب، وهل يذهب السائق معها</td>
+<td>منحها لقسم طلبها، أو إرسالها للورشة ثم الاحتياط، أو إبقاؤها لديك</td>
+</tr>
+<tr>
+<td><strong>طلب مركبات</strong></td>
+<td>العدد والنوع، وهل تحتاج السائق أيضًا</td>
+<td>منح مركبات مستغنى عنها أو من الاحتياط، أو توفيرها من الخارج (شراء/استئجار)، أو الرفض</td>
+</tr>
+</tbody></table>
+<h2>قبل أن تبدأ</h2>
+<ul>
+<li>تحتاج صلاحية <strong>تخصيص المركبات ← مستخدم القسم</strong> لقسمك (أو أقسامك). إذا لم
+يظهر تطبيق <strong>تخصيص المركبات</strong> فاطلبها من مسؤول النظام.</li>
+<li>ترى مركبات <strong>قسمك فقط</strong> وتستغني عنها.</li>
+</ul>
+<h2>الاستغناء عن مركبات</h2>
+<ol>
+<li><p><strong>افتح تخصيص المركبات ← الطلبات ← الاستغناء عن مركبات.</strong> تعرض القائمة طلباتك
+وحالتها.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/veh-01.png" alt="الاستغناء عن مركبات"></p>
+</li>
+<li><p><strong>اضغط جديد.</strong> يظهر <strong>القسم</strong> تلقائيًا (اختره إذا كنت مسؤولًا عن أكثر من قسم).
+واكتب <strong>السبب</strong> في الخانة أسفله.</p>
+</li>
+<li><p><strong>أضف كل مركبة</strong> في <strong>المركبات المستغنى عنها</strong>: <strong>المركبة</strong>، وفي <strong>السبب</strong>
+سببًا مختصرًا لها. ضع علامة <strong>مع السائق</strong> فقط إذا كان السائق سينتقل مع المركبة
+إلى القسم الذي سيستلمها (تبقى في عهدته ويُنقل معها).</p>
+</li>
+<li><p><strong>اضغط إرسال.</strong> ينتقل الطلب إلى <strong>بانتظار المدير العام</strong>، ويظهر للمدير العام في
+صفحته الرئيسية.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/veh-02.png" alt="طلب استغناء بانتظار المدير العام"></p>
+</li>
+</ol>
+<h2>طلب مركبات</h2>
+<ol>
+<li><p><strong>افتح تخصيص المركبات ← الطلبات ← طلب مركبات</strong> واضغط <strong>جديد</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/veh-03.png" alt="طلب مركبات جديد"></p>
+</li>
+<li><p><strong>أضف سطرًا لكل نوع</strong> في <strong>المركبات المطلوبة</strong>: <strong>نوع المركبة</strong>، <strong>الاحتياج</strong>،
+<strong>الكمية</strong>، <strong>الغرض</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>الاحتياج</th>
+<th>اختره عندما</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>مركبة فقط</strong></td>
+<td>يكون لديك سائق لها</td>
+</tr>
+<tr>
+<td><strong>مركبة مع سائق</strong></td>
+<td>تحتاج السائق أيضًا</td>
+</tr>
+<tr>
+<td><strong>أيهما</strong></td>
+<td>يناسبك الأمران</td>
+</tr>
+</tbody></table>
+</li>
+<li><p><strong>اضغط إرسال.</strong></p>
+</li>
+</ol>
+<h2>ماذا يحدث بعد ذلك</h2>
+<ul>
+<li><strong>المدير العام يبتّ في كل مركبة.</strong> يبقى الطلب <strong>بانتظار المدير العام</strong> حتى يُبتّ في
+كل سطر، ثم يصبح <strong>مغلق</strong>. ولكل سطر <strong>حالة</strong> خاصة به (تحويل، إلى الورشة / الاحتياط،
+أُبقيت لدى القسم…).</li>
+<li><strong>المركبة التي تخرج من قسمك</strong> تذهب إلى الورشة بنموذج <strong>تسليم (استغناء)</strong> (HR-12):
+تفحصها الورشة وتراجع الموارد البشرية مستنداتها، وتُخلى العهدة عند اكتمال الاثنين.</li>
+<li><strong>المركبة التي تأتي إلى قسمك</strong> تصل بنموذج <strong>استلام</strong>. ستجد في صفحتك الرئيسية مهمة
+<em>حدد السائق الجديد</em>: افتح النموذج، واختر <strong>المستخدم الجديد</strong>، واضغط <strong>إرسال إلى
+الموارد البشرية</strong>. تراجع الموارد البشرية رخصته، ثم تسلّم الورشة المركبة، وهذا هو
+وصولها إلى قسمك. وتنطبق على هذا السائق شروط <a href="#g-supervisor-12-driver-change">تغيير سائق المركبة</a>.</li>
+<li><strong>مع السائق</strong>: لا ورشة ولا نموذج؛ تنتقل المركبة وسائقها معًا يوم قرار المدير العام،
+ويُنفَّذ نقل السائق.</li>
+</ul>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>المشكلة</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>المركبة لا تظهر عند الاستغناء</td>
+<td>ليست من مركبات قسمك، أو مدرجة في استغناء آخر، أو في طريقها إلى قسم</td>
+<td>راجع <strong>تخصيص المركبات ← المركبات</strong>؛ المركبة المنقولة تكمل انتقالها أولًا</td>
+</tr>
+<tr>
+<td>لا أستطيع تعديل طلبي</td>
+<td>تم إرساله</td>
+<td>اكتب في المحادثة؛ ويمكن للمدير العام إعادته إلى مسودة</td>
+</tr>
+<tr>
+<td>«بانتظار المدير العام» منذ أيام</td>
+<td>لم يبتّ المدير العام بعد</td>
+<td>الطلب في صفحته الرئيسية؛ تواصل معه</td>
+</tr>
+</tbody></table>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li><a href="#g-supervisor-12-driver-change">تغيير سائق المركبة</a></li>
+<li><a href="#g-supervisor-13-release-and-request-employees">الاستغناء عن الموظفين وطلبهم</a></li>
+<li><a href="#g-supervisor-14-document-requests">المستندات الناقصة: الطلب من الموارد البشرية</a></li>
+</ul>
+</section>
+<section id="g-supervisor-12-driver-change"><h1>تغيير سائق المركبة (HR-12)</h1>
+<p><strong>الفئة المستهدفة:</strong> مشرفو الأقسام (تخصيص المركبات، <em>مستخدم القسم</em>)
+<strong>الوقت المقدّر:</strong> دقيقتان</p>
+<h2>ما الذي تفعله هذه الشاشة</h2>
+<p>تنقل إحدى مركبات قسمك من سائقها الحالي إلى سائق آخر <strong>من قسمك نفسه</strong>: إجازة،
+إيقاف عن العمل، مسار جديد. وهو قرار قسمك وحده: لا يمر على المدير العام، ولا فحص
+ورشة، ولا خطوة للموارد البشرية. عندما تنجح جميع الشروط يسلّم زر <strong>تأكيد تغيير
+السائق</strong> المركبة للسائق الجديد فورًا، وتُبلَّغ الموارد البشرية والحسابات.</p>
+<h2>قبل أن تبدأ</h2>
+<p>يتحقق النظام من الشروط التالية قبل انتقال العهدة، ولا تعرض قائمة <strong>المستخدم
+الجديد</strong> إلا من يستوفي الشروط الأربعة الأولى:</p>
+<table>
+<thead>
+<tr>
+<th>الشرط</th>
+<th>السبب</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>سائق واحد لمركبة واحدة</strong>: ليس في عهدته مركبة مقودة</td>
+<td>السائق يقود شاحنة واحدة في وقت واحد (التيدر لا يُحسب: يتبع الرأس)</td>
+</tr>
+<tr>
+<td>ليس السائق الجديد في نموذج تسليم أو خطة أخرى</td>
+<td>حتى لا يُوعد أحد بمركبتين</td>
+</tr>
+<tr>
+<td>ليس مستغنى عنه هو نفسه</td>
+<td>فهو مغادر</td>
+</tr>
+<tr>
+<td>من <strong>قسمك</strong></td>
+<td>تغيير السائق يبقى داخل القسم</td>
+</tr>
+<tr>
+<td><strong>سجل الوثائق</strong> يحتوي <strong>رخصة قيادة</strong> سارية له، من فئة تناسب المركبة (نقل ثقيل للتريلا)، وأوراق المركبة (الاستمارة، التأمين، الفحص الدوري، بطاقة التشغيل، رخصة الصهريج)</td>
+<td>لا تنتقل المركبة نظاميًا بدونها</td>
+</tr>
+</tbody></table>
+<h2>الخطوات</h2>
+<ol>
+<li><p><strong>افتح عهدة المركبات ← تغيير السائق</strong> واضغط <strong>جديد</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/dc-01.png" alt="قائمة تغيير السائق"></p>
+</li>
+<li><p><strong>اختر المركبة.</strong> يظهر <strong>المستخدم السابق</strong> تلقائيًا، وهو صاحب العهدة الحالي.</p>
+</li>
+<li><p><strong>اختر المستخدم الجديد</strong> من القائمة، وحدد <strong>سبب تغيير المستخدم</strong>، وأضف ملاحظة
+إن لزم.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/dc-02.png" alt="تغيير سائق في مسودة"></p>
+</li>
+<li><p><strong>اضغط تأكيد تغيير السائق</strong> ثم أكّد. إذا كان كل شيء سليمًا ينتقل النموذج إلى
+<strong>معتمد</strong>، وتصبح المركبة في عهدة السائق الجديد.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/dc-04.png" alt="تم تغيير السائق"></p>
+</li>
+<li><p><strong>اطبع HR-12</strong> (زر <strong>طباعة HR-12</strong>)، وأكمل التواقيع، وامسحه ضوئيًا، وأرفقه في
+<strong>النسخة الموقعة</strong> ثم اضغط <strong>تأكيد التوقيع</strong>. ستبقى تذكرة في صفحتك الرئيسية حتى تفعل.</p>
+</li>
+</ol>
+<h2>عندما تكون المستندات ناقصة</h2>
+<p>إذا كان السجل ينقصه مستند يُرفض النموذج مع قائمة بما ينقص، وزر <strong>اطلبها من الموارد
+البشرية</strong>:</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/dc-03.png" alt="مستندات ناقصة"></p>
+<p>اضغط <strong>اطلبها من الموارد البشرية</strong>: يذهب طلب لكل مستند ناقص إلى الموارد البشرية،
+وتتابعها من <strong>طلبات الوثائق الخاصة بي</strong> (انظر <a href="#g-supervisor-14-document-requests">المستندات الناقصة: الطلب من الموارد
+البشرية</a>). وعندما تسجّلها الموارد البشرية تصلك رسالة؛ أكّد
+تغيير السائق مرة أخرى.</p>
+<p>وإذا سبق أن طلبتها فستذكر الرسالة ذلك مع رقم الطلب:</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/dc-05.png" alt="طلب سابق"></p>
+<p>أما الرخصة من <strong>فئة غير مناسبة</strong> (رخصة خاصة لتريلا) فتُرفض دون الزر، لأن الموارد
+البشرية لا تستطيع إصلاحها بالتسجيل. اختر سائقًا آخر.</p>
+<h2>ماذا يحدث بعد ذلك</h2>
+<ul>
+<li>تصل الموارد البشرية رسالة بإتمام التغيير، وفيها ما ينقص سجل المركبة إن وُجد، للعلم.</li>
+<li>تصل الحسابات نسخة (المتعلقات المالية، قيمة الإهلاك).</li>
+<li>يظهر السائق الجديد في سجل العهد (<strong>عهدة المركبات ← العهد الحالية</strong>) من اليوم.</li>
+</ul>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>المشكلة</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>السائق لا يظهر في قائمة <strong>المستخدم الجديد</strong></td>
+<td>لديه مركبة، أو موعود بمركبة، أو مستغنى عنه، أو ليس من قسمك</td>
+<td>سلّم مركبته أولًا أو اختر سائقًا آخر</td>
+</tr>
+<tr>
+<td>«… صاحب عهدة …، وهذا الحد المسموح له»</td>
+<td>لديه مركبة</td>
+<td>كما سبق. ويمكن للموارد البشرية السماح بمركبة ثانية مع ذكر السبب</td>
+</tr>
+<tr>
+<td>«للمركبة … نموذج مفتوح HR12/…»</td>
+<td>للمركبة نموذج آخر مفتوح</td>
+<td>أكمله أو <strong>ألغه</strong> أولًا</td>
+</tr>
+<tr>
+<td>بدأت نموذجًا بالخطأ</td>
+<td>ما زال مسودة</td>
+<td><strong>إلغاء</strong> (أعلى اليسار)</td>
+</tr>
+</tbody></table>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li><a href="#g-supervisor-11-release-and-request-vehicles">الاستغناء عن المركبات وطلبها</a></li>
+<li><a href="#g-supervisor-14-document-requests">المستندات الناقصة: الطلب من الموارد البشرية</a></li>
+</ul>
+</section>
+<section id="g-supervisor-13-release-and-request-employees"><h1>الاستغناء عن الموظفين وطلبهم</h1>
+<p><strong>الفئة المستهدفة:</strong> مدراء الأقسام (نقل الموظفين، <em>مقدم طلب</em>)
+<strong>الوقت المقدّر:</strong> ٣ دقائق لكل طلب</p>
+<h2>ما الذي تفعله هذه الشاشة</h2>
+<p>مثل المركبات تمامًا: قسمك <strong>يستغني</strong> عن موظفين لم يعد يحتاجهم، أو <strong>يطلب</strong> موظفين
+(المسمى الوظيفي والعدد). <strong>المدير العام</strong> وحده يقرر: ينقل الموظف المستغنى عنه إلى قسم
+طلبه، أو يعلّقه، أو ينهي خدمته، أو يرفض الاستغناء. ثم تنفّذ الموارد البشرية القرار.</p>
+<h2>قبل أن تبدأ</h2>
+<ul>
+<li>تحتاج صلاحية <strong>نقل الموظفين ← مقدم طلب</strong>، وتعمل للأقسام التي تديرها (وأقسامها الفرعية).</li>
+<li>إذا كان الموظف المستغنى عنه <strong>صاحب عهدة مركبات</strong>، تحدد أيضًا مصير كل مركبة إذا غادر.</li>
+</ul>
+<h2>الاستغناء عن موظفين</h2>
+<ol>
+<li><p><strong>افتح نقل الموظفين ← الطلبات ← الاستغناء عن موظفين</strong> واضغط <strong>جديد</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/emp-01.png" alt="الاستغناء عن موظفين"></p>
+</li>
+<li><p><strong>اكتب السبب</strong>، وفي <strong>الموظفون المستغنى عنهم</strong> أضف كل موظف مع <strong>السبب</strong> (ما يحتاج
+المدير العام معرفته عنه).</p>
+</li>
+<li><p><strong>احفظ.</strong> إذا كان الموظف صاحب عهدة مركبات يظهر تبويب <strong>المركبات في عهدتهم</strong> بسطر
+لكل مركبة. حدد لكل منها <strong>إذا غادر</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>إذا غادر</th>
+<th>ما يحدث عند مغادرته</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>سائق آخر في قسمنا</strong></td>
+<td>اختر <strong>السائق الجديد</strong>؛ تبقى المركبة لديك (تغيير سائق)</td>
+</tr>
+<tr>
+<td><strong>استغناء إلى الورشة</strong></td>
+<td>يُرفع استغناء عن المركبة إلى المدير العام</td>
+</tr>
+</tbody></table>
+<p>تتبع قائمة <strong>السائق الجديد</strong> شروط <a href="#g-supervisor-12-driver-change">تغيير سائق المركبة</a>: مركبة
+واحدة لكل سائق، وليس مغادرًا، ورخصة سارية. والمستند الناقص يوقف الرفع مع زر
+<strong>اطلبها من الموارد البشرية</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/emp-03.png" alt="مركبات الموظف المستغنى عنه"></p>
+</li>
+<li><p><strong>اضغط رفع إلى المدير العام.</strong> يصبح الطلب <strong>مرفوع</strong>، ويرى المدير العام خطة المركبات معه.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/emp-02.png" alt="طلب استغناء مرفوع"></p>
+</li>
+</ol>
+<blockquote>
+<p><strong>لا يحدث شيء للمركبات قبل أن يغادر فعلًا.</strong> إذا أبقاه المدير العام تُلغى الخطة، وإذا
+نُقل أو انتهت خدمته تُنفَّذ الخطة في ذلك اليوم.</p>
+</blockquote>
+<h2>طلب موظفين</h2>
+<ol>
+<li><strong>افتح نقل الموظفين ← الطلبات ← طلب موظفين</strong> واضغط <strong>جديد</strong>.</li>
+<li><strong>أضف سطرًا لكل وظيفة</strong>: <strong>المسمى الوظيفي</strong>، والعدد، وملاحظة.</li>
+<li><strong>اضغط رفع إلى المدير العام.</strong></li>
+</ol>
+<h2>ماذا يحدث بعد ذلك</h2>
+<ul>
+<li>يبتّ المدير العام في كل موظف. يذهب النقل إلى الموارد البشرية، فتحدد مديره الجديد
+والمعتمدين وتنفّذه في تاريخ النفاذ. وإذا كان لا يزال صاحب عهدة مركبة فإن النقل ينتظر
+حتى تُسلَّم.</li>
+<li>وفي طلب الموظفين قد يعطيك المدير العام موظفين مستغنى عنهم، أو تعيّن الموارد البشرية من الخارج.</li>
+</ul>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>المشكلة</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>«… صاحب عهدة TRN-…: حدد في المركبات في عهدتهم ما يحدث لها إذا غادر»</td>
+<td>مركبة بلا خطة</td>
+<td>افتح التبويب وحدد <strong>إذا غادر</strong></td>
+</tr>
+<tr>
+<td>الموظف لا يظهر في القائمة</td>
+<td>ليس في قسم تديره، أو مستغنى عنه مسبقًا</td>
+<td>اطلب من الموارد البشرية مراجعة قسمه</td>
+</tr>
+<tr>
+<td>السائق الجديد الذي أريده لا يظهر</td>
+<td>لديه مركبة، أو مغادر، أو موعود بمركبة</td>
+<td>انظر <a href="#g-supervisor-12-driver-change">تغيير سائق المركبة</a></td>
+</tr>
+</tbody></table>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li><a href="#g-supervisor-11-release-and-request-vehicles">الاستغناء عن المركبات وطلبها</a></li>
+<li><a href="#g-supervisor-14-document-requests">المستندات الناقصة: الطلب من الموارد البشرية</a></li>
+</ul>
+</section>
+<section id="g-supervisor-14-document-requests"><h1>المستندات الناقصة: الطلب من الموارد البشرية</h1>
+<p><strong>الفئة المستهدفة:</strong> مشرفو الأقسام
+<strong>الوقت المقدّر:</strong> دقيقة واحدة</p>
+<h2>ما الذي تفعله هذه الشاشة</h2>
+<p>لا تنتقل عهدة مركبة ما دام <strong>سجل الوثائق</strong> ينقصه أحد أوراقها أو رخصة السائق الجديد.
+السجل لدى الموارد البشرية ولا تطّلع عليه أنت. بدلًا من ذلك تحمل الرسالة التي توقفك زر
+<strong>اطلبها من الموارد البشرية</strong>، ويصبح كل مستند ناقص <strong>طلب وثيقة</strong> (<code>DR/2026/…</code>) تتابعه بنفسك.</p>
+<h2>الخطوات</h2>
+<ol>
+<li><p><strong>اضغط اطلبها من الموارد البشرية</strong> في الرسالة (انظر <a href="#g-supervisor-12-driver-change">تغيير سائق
+المركبة</a>). تؤكد رسالة خضراء أرقام الطلبات.</p>
+</li>
+<li><p><strong>تابعها</strong> من <strong>نقل الموظفين ← الطلبات ← طلبات الوثائق الخاصة بي</strong>، أو من تبويب
+<strong>المركبات في عهدتهم</strong> في طلب الاستغناء (عمود <strong>طلبات الوثائق</strong>).
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/docreq-01.png" alt="طلبات الوثائق الخاصة بي"></p>
+</li>
+<li><p><strong>افتح أحدها</strong> لترى المطلوب وسببه وحالته.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/docreq-02.png" alt="طلب وثيقة"></p>
+</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>الحالة</th>
+<th>المعنى</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>بانتظار الموارد البشرية</strong></td>
+<td>الطلب في الصفحة الرئيسية للموارد البشرية</td>
+</tr>
+<tr>
+<td><strong>مسجّلة</strong></td>
+<td>سجّلت الموارد البشرية الوثيقة ووصلتك رسالة. أعد الرفع أو التأكيد</td>
+</tr>
+<tr>
+<td><strong>ملغي</strong></td>
+<td>ألغيته أنت أو الموارد البشرية</td>
+</tr>
+</tbody></table>
+<h2>ماذا يحدث بعد ذلك</h2>
+<p>يُغلق الطلب تلقائيًا لحظة وجود وثيقة سارية في السجل، سواء أدخلتها الموارد البشرية من
+طلبك أو وصلت مع ملف من البوابات الحكومية. لا تحتاج إلى المتابعة: ستصلك رسالة.</p>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>المشكلة</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>«[لدى الموارد البشرية DR/… منذ …]» في الرسالة</td>
+<td>سبق أن طلبتها أنت أو مشرف آخر</td>
+<td>انتظر رسالة التسجيل</td>
+</tr>
+<tr>
+<td>طلبتها بالخطأ</td>
+<td>ما زالت بالانتظار</td>
+<td>افتحها واضغط <strong>إلغاء الطلب</strong></td>
+</tr>
+</tbody></table>
+</section>
+<section id="g-supervisor-10-workshop-request"><h1>تقديم طلب خدمة الورشة</h1>
+<p><strong>الفئة المستهدفة:</strong> مقدمو طلبات الورشة: مشرفو الإيسوزو والتريلات، ومدير قسم الصيانة
+<strong>الوقت المقدّر:</strong> دقيقتان</p>
+<hr>
+<h2>ما الذي تفعله هذه الشاشة</h2>
+<p>تطلب من الورشة فحص إحدى مركباتك أو إصلاحها، بطلب مسجّل يمكن متابعته بدلًا
+من الاتصال الهاتفي أو نموذج Google القديم. يُشعَر مدير الورشة لحظة إرسالك
+الطلب، وتتابع الطلب من الشاشة نفسها حتى تنتهي المركبة.</p>
+<p>يحصل كل طلب على رقم (<code>WS00001</code>، <code>WS00002</code>، …) ويمرّ بأربع حالات:</p>
+<table>
+<thead>
+<tr>
+<th>الحالة</th>
+<th>معناها</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>جديد</strong></td>
+<td>أرسلت الطلب ولم تبدأ الورشة العمل بعد. ما زال بإمكانك تصحيحه.</td>
+</tr>
+<tr>
+<td><strong>قيد التنفيذ</strong></td>
+<td>قبلت الورشة الطلب وتعمل على المركبة.</td>
+</tr>
+<tr>
+<td><strong>مكتمل</strong></td>
+<td>انتهى العمل. تصلك رسالة، وغالبًا فيها تفاصيل استلام المركبة.</td>
+</tr>
+<tr>
+<td><strong>مرفوض</strong></td>
+<td>لن تنفّذ الورشة هذا الطلب. تصلك رسالة توضّح السبب.</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>قبل أن تبدأ</h2>
+<ul>
+<li><p><strong>تحتاج إلى صلاحية «مقدم طلب» في الورشة.</strong> لا يقدّم الطلبات إلا
+المسؤولون عن المركبات. إذا فتحت <strong>الورشة ← طلباتي</strong> ولم تجد زر
+<strong>جديد</strong>، فليست لديك هذه الصلاحية؛ اطلبها من مدير النظام. (يُبلغ السائقون
+وبقية الموظفين مشرفهم بالعطل، والمشرف هو من يقدّم الطلب.)</p>
+</li>
+<li><p><strong>لا يمكنك اختيار إلا مركباتك.</strong> تعرض قائمة المركبات:</p>
+<ul>
+<li>الشاحنات الموجودة في <strong>مجموعات الصهاريج التابعة لك</strong>، و</li>
+<li>الشاحنات التي <strong>يقودها أحد من فريقك</strong>: أي شخص في تسلسلك الإداري، وأنت
+منهم.</li>
+</ul>
+<p>مجموعات الصهاريج هي نفسها التي تستخدمها في <strong>Water Delivery ← Tankers</strong>
+(توصيل المياه ← الصهاريج). إذا لم تظهر شاحنة أنت مسؤول عنها، فيجب أولًا
+إضافتها إلى مجموعة الصهاريج الخاصة بك.</p>
+</li>
+<li><p>اعرف <strong>رقم الأسطول</strong> للمركبة (مثل <code>IS042</code> أو <code>T171</code>)، وجهّز وصفًا للمشكلة:
+ما العطل، ومنذ متى، وأي ضوء تحذير أو صوت.</p>
+</li>
+</ul>
+<hr>
+<h2>الخطوات</h2>
+<p>١. <strong>افتح تطبيق الورشة ← طلباتي.</strong> تعرض هذه القائمة كل طلب قدّمته وحالته
+   الحالية.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/workshop-01.png" alt="طلباتي"></p>
+<p>٢. <strong>اضغط جديد.</strong> يُفتح طلب فارغ. حقل <strong>مقدم الطلب</strong> هو أنت ولا يمكن
+   تغييره، وحقل <strong>العميل</strong> معبّأ مسبقًا باسم الشركة، وهو الصحيح لأي مركبة
+   من مركبات الشركة.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/workshop-02.png" alt="نموذج طلب جديد"></p>
+<p>٣. <strong>اختر نوع المركبة:</strong> <strong>تريلا</strong> أو <strong>إيسوزو</strong> أو <strong>صهريج</strong> أو <strong>أخرى</strong>.
+   اختره أولًا، لأن قائمة <strong>المركبة</strong> لا تعرض إلا مركبات النوع الذي تختاره.</p>
+<p>٤. <strong>اختر المركبة.</strong> اضغط على الحقل أو ابدأ بكتابة رقم الأسطول. لا تظهر إلا
+   شاحناتك من هذا النوع: الموجودة في مجموعات الصهاريج التابعة لك، والتي
+   يقودها فريقك.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/workshop-03.png" alt="لا تظهر إلا مركباتك"></p>
+<p>٥. <strong>تحقّق من السائق.</strong> عند اختيار الشاحنة يُعبّأ حقل <strong>السائق</strong> تلقائيًا
+   بالسائق المرتبط بها، وهو عادةً من يظهر في BAS أكثر من قادها خلال آخر
+   أسبوعين، أو سائقها الافتراضي. إذا كان شخص آخر هو من يُحضر الشاحنة،
+   فغيّره. هذا مسموح، لكن الطلب سيُظهر ذلك (انظر <em>ما الذي يحدث بعد ذلك</em>).
+   حقل السائق إلزامي.</p>
+<p>٦. <strong>اكتب الوصف.</strong> هذا أهم حقل في الطلب. تقرؤه الورشة لتخطيط العمل،
+   ويستخدمه النظام لتصنيف الطلب حسب نوع الإصلاح (إطارات، فرامل، كهرباء…)،
+   فلا تحتاج إلى اختيار النوع بنفسك. اكتب بوضوح، مثلًا: <em>«المحرك يسخن في
+   المشاوير الطويلة، ومؤشر الحرارة يصل إلى الأحمر بعد ساعة تقريبًا»</em>، لا
+   <em>«مشكلة في المحرك»</em> فقط.</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/workshop-04.png" alt="طلب معبّأ"></p>
+<p>٧. <strong>اضغط إرسال الطلب</strong> (أعلى النموذج). يُحفظ الطلب ويحصل على رقمه <code>WS…</code>
+   ويُرسل إلى الورشة، وتؤكّد ذلك رسالة خضراء <em>«تم إرسال الطلب»</em>. (الحفظ
+   بأيقونة السحابة يؤدي الغرض نفسه تمامًا.)</p>
+<p>   <img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/workshop-05.png" alt="الطلب بعد الإرسال"></p>
+<hr>
+<h2>ما الذي يحدث بعد ذلك</h2>
+<ul>
+<li><p><strong>يذهب الطلب إلى ورشة قسمك</strong>: النابية أو تبوك أو الحياة، أيها يخدم قسمك (والنابية إن لم
+تخدمه أي ورشة). ويُبلَّغ مدير تلك الورشة.</p>
+</li>
+<li><p><strong>يراجع مدير الورشة الطلب.</strong> عند قبوله تنتقل الحالة إلى <strong>قيد التنفيذ</strong>
+ويبدأ أحد الفنيين العمل على المركبة. تابع شريط الحالة أعلى الطلب.</p>
+</li>
+<li><p><strong>عند انتهاء العمل</strong> ينتقل الطلب إلى <strong>مكتمل</strong>، وتصلك رسالة في صندوق
+الوارد (أيقونة المحادثة أعلى يسار الشاشة) وعلى الطلب نفسه. وغالبًا تتضمّن
+ملاحظة من الورشة، مثل مكان استلام المركبة.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/workshop-06.png" alt="طلب مكتمل"></p>
+</li>
+<li><p><strong>إذا لم تنفّذ الورشة الطلب</strong> ينتقل إلى <strong>مرفوض</strong>، وتوضّح لك الرسالة
+السبب. من الأسباب الشائعة أن للمركبة نفسها طلبًا مفتوحًا بالفعل.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/workshop-07.png" alt="طلب مرفوض"></p>
+</li>
+<li><p><strong>إذا غيّرت السائق</strong> يظهر مربع أصفر بعنوان <strong>تم تغيير السائق</strong> أعلى الطلب
+لكل من يفتحه، يذكر السائق الذي أدخلته والسائق المرتبط بالشاحنة، لتعرف
+الورشة من أحضرها فعلًا. هذا طبيعي إذا كان السائق المعتاد في إجازة؛ اذكر
+السبب في الوصف.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/supervisor/workshop-08.png" alt="تم تغيير السائق"></p>
+</li>
+<li><p><strong>للتواصل مع الورشة بشأن طلب</strong> استخدم صندوق الرسائل على يسار الطلب: اضغط
+<strong>خارجي</strong> ثم اكتب رسالتك وأرسلها. أرفق صورة العطل أو ضوء التحذير بالطريقة
+نفسها. هكذا يبقى كل شيء على الطلب بدلًا من المكالمات.</p>
+</li>
+</ul>
+<blockquote>
+<p><strong>ما يمكنك تغييره وما لا يمكنك.</strong> ما دام الطلب <strong>جديدًا</strong> يمكنك تصحيح أي
+شيء عدا <strong>مقدم الطلب</strong>: افتحه وعدّله واحفظه. بعد أن تبدأ الورشة العمل
+يُقفل الطلب أمامك؛ ولإضافة أي معلومة اكتبها في صندوق الرسائل. أما تقرير
+الإصلاح (وقت الدخول والخروج، قراءة العداد، القطع، أجور العمل) فتعبّئه
+الورشة.</p>
+</blockquote>
+<hr>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>المشكلة</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>لا يوجد زر <strong>جديد</strong> في طلباتي</td>
+<td>ليست لديك صلاحية «مقدم طلب» في الورشة</td>
+<td>اطلبها من مدير النظام، وإلى ذلك الحين اطلب من مشرف لديه الصلاحية</td>
+</tr>
+<tr>
+<td>قائمة <strong>المركبة</strong> فارغة</td>
+<td>لم تختر <strong>نوع المركبة</strong>، أو ليست لديك شاحنات من هذا النوع</td>
+<td>اختر النوع الصحيح أولًا، فالقائمة تتبعه</td>
+</tr>
+<tr>
+<td>شاحنة أنا مسؤول عنها لا تظهر في القائمة</td>
+<td>ليست في مجموعات الصهاريج التابعة لك، ولا يقودها أحد من فريقك</td>
+<td>اطلب إضافتها إلى مجموعة الصهاريج الخاصة بك من شاشة Water Delivery ← Tankers</td>
+</tr>
+<tr>
+<td>«المركبة … ليست من مركباتك: فهي ليست ضمن مجموعات الصهاريج التابعة لك ولا يقودها أحد من فريقك»</td>
+<td>الشاحنة المختارة ليست من مركباتك</td>
+<td>اختر إحدى شاحناتك، أو اطلب إضافتها إلى مجموعة الصهاريج الخاصة بك</td>
+</tr>
+<tr>
+<td>حقل <strong>السائق</strong> عُبّئ بشخص غير صحيح</td>
+<td>يظهر في BAS أن هذا الشخص هو من قاد الشاحنة مؤخرًا</td>
+<td>غيّره إلى من يُحضر الشاحنة. سيُظهر الطلب «تم تغيير السائق»، وهذا متوقّع</td>
+</tr>
+<tr>
+<td>«نوع المركبة والسائق مطلوبان…» عند الحفظ</td>
+<td>حقل <strong>السائق</strong> فارغ (لا يوجد سائق مرتبط بالشاحنة)</td>
+<td>اختر السائق بنفسك</td>
+</tr>
+<tr>
+<td>لا أستطيع تعديل طلبي</td>
+<td>لم يعد الطلب <strong>جديدًا</strong>: بدأته الورشة أو أنهته أو رفضته</td>
+<td>اكتب في صندوق رسائل الطلب بدلًا من ذلك</td>
+</tr>
+<tr>
+<td>لا يوجد خيار حذف</td>
+<td>لا تُحذف الطلبات أبدًا ليبقى السجل كاملًا</td>
+<td>إذا قدّمته بالخطأ، فاطلب من الورشة في صندوق الرسائل رفضه</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>أدلة ذات صلة</h2>
+<ul>
+<li><span class="xref">البدء في استخدام النظام</span> — تسجيل الدخول، التنقّل، الإشعارات</li>
+</ul>
+</section>
+<section id="g-gm-05-vehicle-decisions"><h1>البت في طلبات المركبات</h1>
+<p><strong>الفئة المستهدفة:</strong> المدير العام (تخصيص المركبات، <em>المدير العام</em>)
+<strong>الوقت المقدّر:</strong> دقيقة لكل مركبة</p>
+<h2>ما الذي تفعله هذه الشاشة</h2>
+<p>الأقسام <strong>تستغني</strong> عن مركبات و<strong>تطلب</strong> مركبات، وأنت وحدك من يقرر. تبتّ في كل مركبة
+من الطلب نفسه. وكل ما بعد قرارك (الورشة، مراجعة الموارد البشرية، نموذج التسليم) تنفيذ
+لا يحتاج منك شيئًا آخر.</p>
+<h2>قبل أن تبدأ</h2>
+<ul>
+<li>كل طلب بانتظارك يظهر في <strong>صفحتك الرئيسية</strong> وفي <strong>تخصيص المركبات ← قرارات المدير العام
+← طلبات بانتظار البت</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/gm/veh-01.png" alt="طلبات بانتظار البت"></li>
+</ul>
+<h2>البت في استغناء</h2>
+<ol>
+<li><p><strong>افتح الطلب</strong> واضغط <strong>البت في المركبات</strong>.</p>
+</li>
+<li><p><strong>اختر القرار</strong> للمركبات المعروضة:</p>
+<table>
+<thead>
+<tr>
+<th>القرار</th>
+<th>النتيجة</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>منحها لقسم طلبها</strong></td>
+<td>اختر <strong>للطلب</strong>: لا تظهر إلا الطلبات المفتوحة من النوع نفسه، التي فيها متسع، واحتياجها يناسب (مع السائق أو بدونه). تذهب المركبة إلى الورشة للفحص ثم إلى ذلك القسم</td>
+</tr>
+<tr>
+<td><strong>إرسال للورشة ثم الاحتياط</strong></td>
+<td>تذهب المركبة إلى الورشة وتنتظر في <strong>مركبات الاحتياط</strong> لطلب قادم</td>
+</tr>
+<tr>
+<td><strong>إبقاؤها في قسمها</strong></td>
+<td>يحتفظ بها القسم. اكتب السبب في الملاحظة (فقد طلب الاستغناء عنها)</td>
+</tr>
+</tbody></table>
+<p>الجدول السفلي يعرض الطلبات المفتوحة التي يمكن لهذه المركبات تلبيتها.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/gm/veh-02.png" alt="البت في استغناء"></p>
+</li>
+<li><p><strong>اضغط تأكيد القرار.</strong></p>
+</li>
+</ol>
+<h2>البت في طلب مركبات</h2>
+<ol>
+<li><p><strong>افتح الطلب</strong> واضغط <strong>البت</strong> على السطر.</p>
+</li>
+<li><p><strong>اختر القرار</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>القرار</th>
+<th>النتيجة</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>منح مركبات متوفرة لدينا</strong></td>
+<td>اختر من المركبات التي استغنت عنها أقسام أخرى وتناسب الطلب، أو من الاحتياط (بعد اكتمال الفحص)</td>
+</tr>
+<tr>
+<td><strong>توفير خارجي (شراء / استئجار)</strong></td>
+<td>العدد المطلوب شراؤه أو استئجاره، ويبقى السطر بانتظارها</td>
+</tr>
+<tr>
+<td><strong>تخصيص مركبة تم توفيرها ووصلت</strong></td>
+<td>يمنح مركبة اشتُريت أو استؤجرت ووصلت</td>
+</tr>
+<tr>
+<td><strong>رفض</strong></td>
+<td>اكتب السبب</td>
+</tr>
+</tbody></table>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/gm/veh-03.png" alt="البت في طلب"></p>
+</li>
+<li><p><strong>اضغط تأكيد القرار.</strong></p>
+</li>
+</ol>
+<h2>ماذا يحدث بعد ذلك</h2>
+<p>تُبلَّغ الأقسام. المركبة التي تمنحها تمر على الورشة ونماذج التسليم والاستلام (HR-12)،
+ويحدد القسم المستلم سائقها. والمركبة المستغنى عنها <strong>مع السائق</strong> تنتقل معه فورًا.</p>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>المشكلة</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>للطلب</strong> لا يعرض شيئًا</td>
+<td>لا يوجد طلب مفتوح مناسب (النوع، الاحتياج، الكمية، ليس القسم نفسه)</td>
+<td>أرسلها إلى الاحتياط، أو انتظر طلبًا</td>
+</tr>
+<tr>
+<td>لا يظهر زر البت في استغناء</td>
+<td>لم يُرسل بعد أو تم البت فيه</td>
+<td>راجع حالته</td>
+</tr>
+</tbody></table>
+</section>
+<section id="g-gm-06-employee-decisions"><h1>البت في الاستغناء عن الموظفين وطلبهم</h1>
+<p><strong>الفئة المستهدفة:</strong> المدير العام (نقل الموظفين، <em>المدير العام</em>)
+<strong>الوقت المقدّر:</strong> دقيقة لكل موظف</p>
+<h2>ما الذي تفعله هذه الشاشة</h2>
+<p>الأقسام <strong>تستغني</strong> عن موظفين و<strong>تطلب</strong> موظفين، وأنت تقرر. وترى مع الموظف المستغنى عنه
+ما قرره قسمه بشأن <strong>المركبات في عهدته</strong>، لأن قرارك ينفّذ تلك الخطة.</p>
+<h2>البت في استغناء</h2>
+<ol>
+<li><p><strong>افتح الطلب</strong> من صفحتك الرئيسية أو من <strong>نقل الموظفين ← قرارات المدير العام ←
+الموظفون المستغنى عنهم</strong>، واضغط <strong>البت</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/gm/emp-01.png" alt="الموظفون المستغنى عنهم"></p>
+</li>
+<li><p><strong>راجع الجدولين</strong>: الموظفون، و<strong>مركباتهم في حال مغادرتهم</strong> (تغيير السائق إلى من، أو
+الاستغناء إلى الورشة).</p>
+</li>
+<li><p><strong>اختر القرار</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>القرار</th>
+<th>النتيجة</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>نقل إلى طلب</strong></td>
+<td>اختر <strong>للطلب</strong> (قسم طلب وظيفته) و<strong>تاريخ النفاذ</strong>. تكمل الموارد البشرية النقل</td>
+</tr>
+<tr>
+<td><strong>تعليق</strong></td>
+<td>يبقى في قسمه ويُعرض على الطلب القادم</td>
+</tr>
+<tr>
+<td><strong>نهاية الخدمة</strong></td>
+<td><strong>تاريخ النفاذ</strong> هو تاريخ انتهاء خدمته؛ وتكمله الموارد البشرية</td>
+</tr>
+<tr>
+<td><strong>رفض الاستغناء</strong></td>
+<td>يبقى، ولا يحدث شيء لمركباته</td>
+</tr>
+</tbody></table>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/gm/emp-02.png" alt="البت في استغناء"></p>
+</li>
+<li><p><strong>اضغط تأكيد.</strong> في النقل أو نهاية الخدمة تُنفَّذ خطة المركبات الآن: يكتمل تغيير السائق،
+ويذهب الاستغناء إلى الورشة إلى تخصيص المركبات. وإذا لم يعد شيء في الخطة صالحًا (رخصة
+انتهت، أو سائق أُخذ في الأثناء) يتوقف القرار مع السبب: أعده إلى القسم.</p>
+</li>
+</ol>
+<h2>البت في طلب موظفين</h2>
+<ol>
+<li><strong>افتح الطلب</strong> واضغط <strong>البت</strong> على السطر.</li>
+<li><strong>إعطاء موظفين مستغنى عنهم</strong> (اخترهم)، أو <strong>تعيين من الخارج</strong>، أو <strong>معلّق</strong>، أو <strong>رفض</strong>، مع العدد.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/gm/emp-03.png" alt="البت في طلب"></li>
+<li><strong>اضغط تأكيد.</strong></li>
+</ol>
+<h2>ماذا يحدث بعد ذلك</h2>
+<p>تحدد الموارد البشرية لكل موظف منقول مديره الجديد والمعتمدين، وتنفّذ النقل في تاريخه، وتسمّي
+المعيَّنين الجدد. وتُبلَّغ الأقسام.</p>
+</section>
+<section id="g-hr-06-hr12-documents-check"><h1>HR-12: مراجعة مستندات التسليم</h1>
+<p><strong>الفئة المستهدفة:</strong> الموارد البشرية / الشؤون الإدارية (عهدة المركبات، <em>الموارد البشرية / الشؤون الإدارية</em>)
+<strong>الوقت المقدّر:</strong> دقيقتان لكل نموذج</p>
+<h2>ما الذي تفعله هذه الشاشة</h2>
+<p>يرافق نموذج التسليم والاستلام <strong>HR-12</strong> المركبة عند انتقال عهدتها. للموارد البشرية خطوة
+في نوعين من النماذج؛ والمدير العام قد قرر مسبقًا، فأنت تكمل قسمك ولا تعتمد:</p>
+<table>
+<thead>
+<tr>
+<th>النموذج</th>
+<th>متى</th>
+<th>دورك</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>تسليم (استغناء)</strong></td>
+<td>مركبة مستغنى عنها تذهب إلى الورشة</td>
+<td>التأكد من تسليم مستنداتها، <strong>بالتوازي</strong> مع فحص الورشة</td>
+</tr>
+<tr>
+<td><strong>استلام</strong></td>
+<td>قسم يستلم مركبة ويحدد سائقها</td>
+<td>مراجعة السائق الجديد والمستندات <strong>قبل</strong> أن تسلّمها الورشة</td>
+</tr>
+</tbody></table>
+<p>أما <strong>تغيير السائق</strong> داخل القسم فلم تعد فيه خطوة للموارد البشرية: يكتمل عند تأكيد المشرف،
+وتصلك رسالة بما ينقص السجل إن وُجد، للعلم.</p>
+<h2>الخطوات</h2>
+<ol>
+<li><p><strong>افتح النموذج</strong> من صفحتك الرئيسية (<em>مستندات الموارد البشرية: …</em>) أو من <strong>عهدة
+المركبات ← نماذج التسليم والاستلام (HR-12)</strong>.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/hr/veh-01.png" alt="نماذج التسليم والاستلام"></p>
+</li>
+<li><p><strong>افتح تبويب الموارد البشرية / الشؤون الإدارية.</strong> يعرض كل سطر مستند ما يحتويه
+<strong>السجل</strong> (ساري / قارب على الانتهاء / منتهٍ / غير موجود في السجل) مع تاريخ الانتهاء،
+فلا تراجعه يدويًا. ضع علامة <strong>تم التسليم</strong> لما استلمته، وأضف الملاحظات.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/hr/veh-03.png" alt="قسم الموارد البشرية"></p>
+</li>
+<li><p>في <strong>الاستلام</strong> تُقرأ <strong>فئة رخصة</strong> المستخدم الجديد و<strong>تاريخ انتهائها</strong> من السجل، وتُعاد
+شروط السائق (مركبة واحدة، قسمه، رخصة سارية من الفئة المناسبة).</p>
+</li>
+<li><p><strong>اضغط تمت مراجعة المستندات.</strong> في التسليم ينتظر النموذج الورشة إن لم تنتهِ، وفي
+الاستلام ينتقل إلى الورشة التي يكون تسليمها هو وصول المركبة.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/hr/veh-02.png" alt="تسليم لدى الورشة والموارد البشرية"></p>
+</li>
+</ol>
+<h2>ماذا يحدث بعد ذلك</h2>
+<p>عندما تنتهي الورشة أيضًا يصبح النموذج <strong>معتمد</strong>: تنتقل العهدة، وتُبلَّغ الحسابات والقسم.
+ثم يطبع القسم الورقة ويوقّعها ويحفظها.</p>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>المشكلة</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>لا يظهر زر <strong>تمت مراجعة المستندات</strong></td>
+<td>النموذج ليس في خطوتك</td>
+<td>راجع شريط الحالة</td>
+</tr>
+<tr>
+<td>«لا تنتقل عهدة … حتى يحتوي سجل الوثائق على …»</td>
+<td>ينقص السجل مستند للمركبة أو السائق</td>
+<td>سجّله (انظر <a href="#g-hr-07-documents-register">سجل الوثائق</a>) ثم اضغط مرة أخرى</td>
+</tr>
+</tbody></table>
+</section>
+<section id="g-hr-07-documents-register"><h1>سجل الوثائق وطلبات الوثائق</h1>
+<p><strong>الفئة المستهدفة:</strong> الموارد البشرية / الشؤون الإدارية (المستندات، <em>مسؤول المستندات</em>)
+<strong>الوقت المقدّر:</strong> بحسب العمل</p>
+<h2>ما الذي تفعله هذه الشاشة</h2>
+<p>تطبيق <strong>المستندات</strong> هو السجل الوحيد لأوراق كل مركبة وكل موظف: الاستمارة، التأمين، الفحص
+الدوري، بطاقة التشغيل، رخصة الصهريج، رخصة القيادة، بطاقة السائق، الإقامة، الجواز. ونماذج
+التسليم تقرأ منه: <strong>لا تنتقل عهدة مركبة ما دام مستند مفحوص ناقصًا أو منتهيًا.</strong> المشرفون لا
+يطّلعون على السجل؛ وعندما يحتاجون شيئًا منه يرسلون إليك <strong>طلب وثيقة</strong>.</p>
+<h2>الرد على طلبات الوثائق</h2>
+<ol>
+<li><p><strong>افتح المستندات ← الطلبات</strong> (وتظهر أيضًا في صفحتك الرئيسية باسم <em>طلبات الوثائق</em>).
+الأقدم أولًا؛ وكل طلب يذكر المطلوب، ولمن، وسببه (مثل <em>السائق الجديد للمركبة TRN-IS2</em>)،
+ومن طلبه.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/hr/doc-01.png" alt="طلبات الوثائق"></p>
+</li>
+<li><p><strong>افتح الطلب واضغط تسجيل الوثيقة.</strong> يُفتح نموذج الوثيقة مرتبطًا بالموظف أو المركبة.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/hr/doc-02.png" alt="طلب"></p>
+</li>
+<li><p><strong>أدخل الرقم وتاريخ الانتهاء</strong> (وأرفق الصورة إن توفرت) ثم <strong>اعتمد</strong>. يُغلق الطلب تلقائيًا
+وتصل المشرف رسالة.</p>
+</li>
+</ol>
+<blockquote>
+<p>أي وثيقة سارية من النوع نفسه تُعتمد لذلك الموظف أو المركبة تُغلق الطلب، أيًا كانت طريقة
+إدخالها (رفع، رفع جماعي، ملف حكومي).</p>
+</blockquote>
+<h2>استيراد ملفات البوابات الحكومية</h2>
+<p>أسرع طريقة لتعبئة السجل. <strong>المستندات ← ملفات البوابات الحكومية ← جديد</strong>، اختر <strong>المصدر</strong>،
+وأرفق الملف، ثم <strong>معاينة</strong>، وراجع التنبيهات، ثم <strong>تطبيق</strong>. لا يُكتب شيء قبل التطبيق، ولا تحل
+وثيقة أقدم محل وثيقة في النظام.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/hr/doc-03.png" alt="استيراد جديد"></p>
+<table>
+<thead>
+<tr>
+<th>المصدر</th>
+<th>من</th>
+<th>يعبّئ</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>أبشر أعمال: المركبات</strong></td>
+<td>أبشر ← المركبات</td>
+<td>الاستمارة، الفحص، حالة التأمين، المستخدم الفعلي</td>
+</tr>
+<tr>
+<td><strong>أبشر أعمال: حاملو رخص القيادة</strong></td>
+<td>أبشر ← حاملو الرخص (المقيمون)</td>
+<td>رخصة القيادة: الرقم = رقم الإقامة، الفئة، الانتهاء</td>
+</tr>
+<tr>
+<td><strong>مقيم: المقيمون النشطون</strong></td>
+<td>مقيم ← المقيمون النشطون</td>
+<td>الإقامة، الجواز</td>
+</tr>
+<tr>
+<td><strong>قوى / التأمينات</strong></td>
+<td>قوائم البوابتين</td>
+<td>العقود، المنشأة</td>
+</tr>
+<tr>
+<td><strong>تقرير فحص الصهاريج (فاحص)</strong></td>
+<td>تقرير الفحص</td>
+<td>رخصة الصهريج</td>
+</tr>
+</tbody></table>
+<p>وتنبّه معاينة الرخص كذلك إلى صاحب عهدة تريلا برخصة من فئة غير مناسبة، وتعرض المقيمين الذين
+لديهم مركبة وليست لهم رخصة في الملف.</p>
+<h2>ما الذي يُفحص عند التسليم</h2>
+<p><strong>المستندات ← الإعدادات ← أنواع المستندات</strong>: يحدد عمود <strong>تُفحص عند تسليم المركبة</strong> المستندات
+التي توقف التسليم. بطاقة السائق متوقفة إلى أن تُسجَّل البطاقات للجميع؛ فعّلها حينئذ.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/hr/doc-04.png" alt="أنواع المستندات"></p>
+<h2>سائق مسموح له بمركبتين</h2>
+<p>السائق الواحد عهدته مركبة واحدة مقودة. وللاستثناء المعتمد: افتح الموظف، تبويب <strong>عهدة
+المركبات</strong>، واجعل <strong>عدد المركبات المسموح بعهدتها</strong> ٢، واكتب <strong>سبب السماح بأكثر من مركبة</strong>.</p>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>المشكلة</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>«هذا ملف رخص القيادة من أبشر…»</td>
+<td>استُورد الملف بمصدر مقيم</td>
+<td>اختر <strong>أبشر أعمال: حاملو رخص القيادة</strong></td>
+</tr>
+<tr>
+<td>سطر يقول <em>ليس موظفًا في النظام</em></td>
+<td>لا يوجد موظف بهذا الرقم</td>
+<td>أضف الموظف (رقم الإقامة في رقم الضمان الاجتماعي) وأعد المعاينة</td>
+</tr>
+</tbody></table>
+</section>
+<section id="g-hr-08-employee-transfers"><h1>نقل الموظفين: دور الموارد البشرية</h1>
+<p><strong>الفئة المستهدفة:</strong> الموارد البشرية (نقل الموظفين، <em>الموارد البشرية</em>)
+<strong>الوقت المقدّر:</strong> ٣ دقائق لكل نقل</p>
+<h2>ما الذي تفعله هذه الشاشة</h2>
+<p>عندما ينقل المدير العام موظفًا مستغنى عنه، أو ينهي خدمته، تتولى الموارد البشرية التنفيذ.
+أنت لا تقرر؛ بل تكمل ما يحتاجه النقل.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/hr/emp-01.png" alt="جميع الطلبات"></p>
+<h2>إكمال النقل</h2>
+<ol>
+<li><strong>افتحه</strong> من صفحتك الرئيسية أو من <strong>نقل الموظفين ← النقل</strong>. حالته <strong>لدى الموارد البشرية</strong>.</li>
+<li><strong>راجع المدير الجديد ومعتمد الإجازات ومعتمد الحضور ومسؤول الموارد البشرية المقترحين</strong>:
+مأخوذون من القسم الجديد. صحّحهم إن لزم (جميعها مطلوبة).</li>
+<li><strong>اضغط تأكيد.</strong> ينتظر <strong>تاريخ النفاذ</strong> (<strong>معتمد، بانتظار تاريخ النفاذ</strong>) ويصبح <strong>منفّذ</strong> في
+ذلك اليوم: يتغير قسمه ومديره ومعتمدوه.</li>
+</ol>
+<blockquote>
+<p><strong>المركبات أولًا.</strong> إذا كان لا يزال صاحب عهدة مركبة فإن النقل ينتظر حتى تُسلَّم (تغيير السائق
+أو التسليم في خطة الاستغناء)، ثم يُنفَّذ فورًا.</p>
+</blockquote>
+<p>وإذا تعذّر النقل اضغط <strong>إعادة إلى المدير العام</strong> مع السبب.</p>
+<h2>نهاية الخدمة والتعيين</h2>
+<ul>
+<li><strong>نهاية الخدمة</strong> بقرار المدير العام: افتح طلب الاستغناء واضغط <strong>نهاية الخدمة</strong> لبدء طلب نهاية
+خدمته بتاريخ الانتهاء.</li>
+<li><strong>التعيين من الخارج</strong>: بعد إنشاء الموظفين الجدد افتح الطلب واضغط <strong>تسمية المعيَّنين الجدد</strong>.</li>
+</ul>
+</section>
+<section id="g-workshop-01-workshop-sites-and-handovers"><h1>قائمة مدير الورشة والمواقع ونماذج التسليم</h1>
+<p><strong>الفئة المستهدفة:</strong> مدراء الورش والفنيون
+<strong>الوقت المقدّر:</strong> عمل يومي</p>
+<h2>ما الذي تفعله هذه الشاشة</h2>
+<p>هناك ثلاث ورش: <strong>النابية</strong> (الرئيسية)، و<strong>تبوك</strong>، و<strong>الحياة</strong>. يذهب كل طلب إلى إحداها، وتعمل
+أنت على طلبات ورشتك <strong>فقط</strong>. وإلى جانب طلبات الإصلاح، للورشة خطوة في <strong>نماذج التسليم والاستلام
+(HR-12)</strong>: فحص المركبة المسلَّمة، وتسليم المركبة لقسمها الجديد.</p>
+<h2>قبل أن تبدأ</h2>
+<ul>
+<li>أنت ضمن <strong>المدراء والموظفون</strong> في ورشتك (<strong>الورشة ← الإعدادات ← الورش</strong>). إن لم تكن في أي ورشة
+فلن ترى شيئًا: راجع مسؤول النظام.</li>
+<li>المدير العام والمراجعون يرون كل الورش، ويتنقلون بينها في لوحة البيانات.</li>
+</ul>
+<h2>إلى أين يذهب الطلب</h2>
+<p>يذهب الطلب إلى الورشة التي <strong>تخدم قسم مقدم الطلب</strong> (أو أقرب قسم أعلى منه)، وإلا فإلى النابية.
+والطلبات التي قُدّمت قبل وجود الورش الثلاث تتبع النابية.</p>
+<ol>
+<li><p><strong>افتح الورشة ← جميع الطلبات.</strong> يعرض عمود <strong>الورشة</strong> الموقع، ولا ترى إلا طلبات ورشتك.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/workshop/ws-01.png" alt="قائمة الطلبات"></p>
+</li>
+<li><p>اعمل على الطلبات كالمعتاد: القبول (قيد التنفيذ)، وتعبئة تقرير الإصلاح، ثم <strong>الإكمال</strong> أو
+<strong>الرفض</strong>. وانظر دليل مقدم الطلب <a href="#g-supervisor-10-workshop-request">تقديم طلب خدمة الورشة</a>
+لما يراه هو.</p>
+</li>
+</ol>
+<h2>نماذج التسليم والاستلام (HR-12)</h2>
+<p>افتحها من صفحتك الرئيسية (<em>الورشة: TRN-…</em>) أو من <strong>عهدة المركبات ← نماذج التسليم والاستلام (HR-12)</strong>.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/workshop/ws-02.png" alt="تسليم بانتظار الورشة"></p>
+<table>
+<thead>
+<tr>
+<th>النموذج</th>
+<th>دورك</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>تسليم (استغناء)</strong></td>
+<td>فحص المركبة المسلَّمة، <strong>بالتوازي</strong> مع مراجعة الموارد البشرية لمستنداتها. ويُفتح معه <strong>طلب الورشة</strong> للفحص (زر في الأعلى)</td>
+</tr>
+<tr>
+<td><strong>استلام</strong></td>
+<td>بعد مراجعة الموارد البشرية للسائق الجديد، سلّمه المركبة: <strong>وهذا وصولها</strong> إلى القسم الجديد</td>
+</tr>
+</tbody></table>
+<ol>
+<li><p><strong>افتح تبويب فحص المركبة.</strong> أدخل <strong>تاريخ الفحص</strong>، ولكل عنصر (الكلتش، الكفرات، البريك…) <strong>نسبة
+الإهلاك %</strong> و<strong>القيمة</strong> وملاحظة. و<strong>إجمالي القيمة</strong> هو ما يصل إلى الحسابات.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/workshop/ws-03.png" alt="الفحص"></p>
+</li>
+<li><p><strong>اضغط إتمام الورشة.</strong> في التسليم يصبح النموذج <strong>معتمد</strong> متى راجعت الموارد البشرية المستندات
+أيضًا؛ وفي الاستلام هو الوصول: المركبة للقسم والسائق من الآن.</p>
+</li>
+</ol>
+<blockquote>
+<p>تغيير السائق بين سائقين من القسم نفسه <strong>لم تعد فيه خطوة للورشة</strong>.</p>
+</blockquote>
+<h2>مشكلات شائعة</h2>
+<table>
+<thead>
+<tr>
+<th>المشكلة</th>
+<th>السبب</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>القائمة فارغة</td>
+<td>لست ضمن أي ورشة</td>
+<td>اطلب من مسؤول النظام إضافتك إلى ورشتك</td>
+</tr>
+<tr>
+<td>ذهب طلب إلى ورشة خطأ</td>
+<td>قسم مقدم الطلب تخدمه ورشة أخرى، أو لا تخدمه أي ورشة (فيذهب للنابية)</td>
+<td>يضبط مسؤول النظام <strong>الأقسام المخدومة</strong> في <strong>الورشة ← الإعدادات ← الورش</strong></td>
+</tr>
+<tr>
+<td>لا يظهر زر <strong>إتمام الورشة</strong> في الاستلام</td>
+<td>لم تراجع الموارد البشرية السائق بعد</td>
+<td>يظهر بعد <strong>تمت مراجعة المستندات</strong></td>
+</tr>
+</tbody></table>
+</section>
+<section id="g-admin-vehicles-setup"><h1>تهيئة المركبات والعهد ونقل الموظفين والوثائق</h1>
+<p><strong>الفئة المستهدفة:</strong> مسؤول النظام
+<strong>الوقت المقدّر:</strong> جلسة واحدة عند التشغيل، ثم كلما تغيّر الأشخاص</p>
+<h2>ما الذي تفعله هذه الشاشة</h2>
+<p>تحتاج التطبيقات أربعة أنواع من التهيئة: <strong>من يعمل لأي قسم</strong>، و<strong>أي الأقسام لديها مركبات وأي ورشة
+تخدمها</strong>، و<strong>من يعمل في أي ورشة</strong>، و<strong>ما الذي يُفحص عند التسليم</strong>. نفّذها بهذا الترتيب عند التشغيل.</p>
+<h2>١. الأقسام التي لديها مركبات</h2>
+<p><strong>تخصيص المركبات ← الإعدادات ← أقسام المركبات.</strong> ضع علامة <strong>لديه مركبات</strong> للأقسام المسؤولة عن
+مركبات؛ ويعرض <strong>عدد المركبات</strong> ما لدى كل قسم. ويجب أن يكون لكل مركبة من مركبات الشركة قسم:
+<strong>تخصيص المركبات ← المركبات</strong>، مع فلتر <em>بلا قسم</em>.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/admin/veh-01.png" alt="أقسام المركبات"></p>
+<h2>٢. من يعمل لأي قسم</h2>
+<p><strong>تخصيص المركبات ← الإعدادات ← مستخدمو الأقسام.</strong> امنح كل مشرف صلاحية <strong>مستخدم القسم</strong> وقسمه
+(أو أقسامه). والمدير العام يأخذ صلاحية <strong>المدير العام</strong> التي ترى كل الأقسام وتبتّ فيها.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/admin/veh-02.png" alt="مستخدمو الأقسام"></p>
+<p>وفي <strong>نقل الموظفين</strong> يعمل <strong>مقدم الطلب</strong> للأقسام التي <strong>يديرها</strong> (<em>مدير</em> القسم): حافظ على صحة
+المدراء في الموظفين ← الأقسام.</p>
+<h2>٣. الورش: موظفوها والأقسام التي تخدمها</h2>
+<p><strong>الورشة ← الإعدادات ← الورش.</strong> لكل ورشة أضف <strong>المدراء والموظفون</strong>، وفي <strong>الأقسام المخدومة</strong>
+الأقسام التي تستقبل طلباتها (القسم الفرعي يتبع أصله، والقسم الذي لا تخدمه أي ورشة يذهب إلى
+النابية، الورشة الرئيسية). ومن ليس في أي ورشة لا يرى أي طلبات.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots-ar/admin/veh-03.png" alt="الورش"></p>
+<h2>٤. ما الذي يُفحص عند التسليم</h2>
+<p><strong>المستندات ← الإعدادات ← أنواع المستندات</strong>، عمود <strong>تُفحص عند تسليم المركبة</strong>. أي مستند مطلوب
+للمركبة أو للسائق الجديد يكون ناقصًا أو منتهيًا يوقف التسليم. فعّل النوع فقط عندما يحتويه السجل
+للجميع (استورد أولًا)، وإلا توقفت كل عمليات التسليم.</p>
+<h2>الصلاحيات باختصار</h2>
+<table>
+<thead>
+<tr>
+<th>الصلاحية (الإعدادات ← المستخدمون)</th>
+<th>تُمنح لـ</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>تخصيص المركبات: <strong>مستخدم القسم</strong> (+ الأقسام)</td>
+<td>مشرف كل قسم لديه مركبات</td>
+</tr>
+<tr>
+<td>تخصيص المركبات: <strong>المدير العام</strong></td>
+<td>المدير العام</td>
+</tr>
+<tr>
+<td>نقل الموظفين: <strong>مقدم طلب</strong></td>
+<td>مدراء الأقسام</td>
+</tr>
+<tr>
+<td>نقل الموظفين: <strong>الموارد البشرية</strong> / <strong>المدير العام</strong></td>
+<td>الموارد البشرية / المدير العام</td>
+</tr>
+<tr>
+<td>عهدة المركبات: <strong>الموارد البشرية / الشؤون الإدارية</strong> (تشمل مسؤول المستندات)</td>
+<td>الموارد البشرية / الشؤون الإدارية</td>
+</tr>
+<tr>
+<td>عهدة المركبات: <strong>الحسابات (نسخة للعلم)</strong></td>
+<td>المحاسب الذي يتابع إهلاك المركبات</td>
+</tr>
+<tr>
+<td>الورشة: <strong>مدير</strong> / <strong>الفني</strong> (+ الورش)</td>
+<td>موظفو الورش</td>
+</tr>
+<tr>
+<td>الأسطول: <strong>ربط التيدرات بالرؤوس</strong> / <strong>تعديل بيانات التيدرات</strong></td>
+<td>المنسق / الموارد البشرية</td>
+</tr>
+</tbody></table>
+</section>
+<section id="g-admin-vehicles-access"><h1>الصلاحيات الأولية: المركبات والعهد ونقل الموظفين والوثائق</h1>
+<p><strong>الفئة المستهدفة:</strong> مسؤول النظام والإدارة عند التشغيل
+<strong>الحالة:</strong> منح أولي، تقرر في ٢٠٢٦-١١-٢٣. يُعدَّل هنا أولًا ثم في النظام.</p>
+<h2>من يفعل ماذا</h2>
+<table>
+<thead>
+<tr>
+<th>الدور</th>
+<th>يقوم بـ</th>
+<th>لا يقوم أبدًا بـ</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>مشرف القسم</strong></td>
+<td>الاستغناء عن المركبات والموظفين وطلبهم لقسمه، وتحديد سائق المركبة التي يستلمها، وتغيير السائق داخل قسمه، وطلب المستندات الناقصة من الموارد البشرية، وحفظ HR-12 الموقّع</td>
+<td>تقرير وجهة مركبة أو موظف</td>
+</tr>
+<tr>
+<td><strong>المدير العام</strong></td>
+<td>البت في كل مركبة وكل موظف مستغنى عنه أو مطلوب</td>
+<td>التنفيذ (النماذج، المستندات)</td>
+</tr>
+<tr>
+<td><strong>الموارد البشرية / الشؤون الإدارية</strong></td>
+<td>مراجعة مستندات التسليم والاستلام، وحفظ سجل الوثائق والاستيراد، والرد على طلبات الوثائق، وإكمال النقل ونهاية الخدمة والتعيين</td>
+<td>التقرير</td>
+</tr>
+<tr>
+<td><strong>الورشة</strong></td>
+<td>فحص المركبات المسلَّمة، وتسليم المركبات عند وصولها، والعمل على طلبات موقعها</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>الحسابات</strong></td>
+<td>استلام نسخة للعلم عن التسليم وتغيير السائق</td>
+<td>العمل على النماذج</td>
+</tr>
+<tr>
+<td><strong>الموظف / السائق</strong></td>
+<td>التوقيع على HR-12 الورقي</td>
+<td>ليست له خطوة في النظام</td>
+</tr>
+</tbody></table>
+<h2>المنح الأولي (بيئة التشغيل)</h2>
+<table>
+<thead>
+<tr>
+<th>الشخص</th>
+<th>الصلاحيات</th>
+<th>النطاق</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>MISHAL J ALSHAKHS</strong></td>
+<td>تخصيص المركبات: مستخدم القسم · نقل الموظفين: مقدم طلب · الورشة: مقدم طلب (موجودة) · ربط التيدرات بالرؤوس</td>
+<td>Supply Chain</td>
+</tr>
+<tr>
+<td><strong>Mohammed Azouni</strong></td>
+<td>تخصيص المركبات: مستخدم القسم · نقل الموظفين: مقدم طلب</td>
+<td>Tabuk</td>
+</tr>
+<tr>
+<td><strong>Mohammed Disouky</strong></td>
+<td>تخصيص المركبات: مستخدم القسم · نقل الموظفين: مقدم طلب · الورشة: مقدم طلب (موجودة)</td>
+<td>Disouky&#39;s Branch</td>
+</tr>
+<tr>
+<td><strong>Tariq Abu Al-Hassan</strong></td>
+<td>تخصيص المركبات: مستخدم القسم · نقل الموظفين: مقدم طلب · الورشة: مقدم طلب (موجودة)</td>
+<td>Tariq&#39;s Branch</td>
+</tr>
+<tr>
+<td><strong>Taha H. Shakhs</strong></td>
+<td>تخصيص المركبات: مستخدم القسم · نقل الموظفين: مقدم طلب · الورشة: مقدم طلب (موجودة)</td>
+<td>Equipment Rental Department</td>
+</tr>
+<tr>
+<td><strong>Mohammed-Ameen Al-Shaibani</strong> (المدير العام)</td>
+<td>تخصيص المركبات: المدير العام · نقل الموظفين: المدير العام · الورشة: مراجع (موجودة)</td>
+<td>جميع الأقسام</td>
+</tr>
+<tr>
+<td><strong>Mojtaba Al-Mahmoud</strong></td>
+<td>عهدة المركبات: الموارد البشرية / الشؤون الإدارية (تشمل مسؤول المستندات) · نقل الموظفين: الموارد البشرية · تعديل بيانات التيدرات</td>
+<td>الشركة</td>
+</tr>
+<tr>
+<td><strong>Essam A. JABER</strong></td>
+<td>الورشة: مدير (موجودة)</td>
+<td>Nabiya</td>
+</tr>
+<tr>
+<td>مدراء الأقسام الآخرون</td>
+<td>نقل الموظفين: مقدم طلب، عند حاجتهم للاستغناء عن موظفين أو طلبهم</td>
+<td>الأقسام التي يديرونها</td>
+</tr>
+</tbody></table>
+<p><strong>تُترك فارغة حاليًا</strong> (تُسمّى لاحقًا): مدراء وفنيو ورشتي تبوك والحياة، ونسخة الحسابات للعلم.</p>
+<h2>القواعد وراء هذا المنح</h2>
+<ul>
+<li><strong>النطاق بيانات وليس صلاحية.</strong> مستخدم القسم يعمل للأقسام المسجّلة عليه فقط، ومقدم طلب النقل
+للأقسام التي يديرها فقط. وتغيير مدير القسم يغيّر من يستطيع الاستغناء عن موظفيه.</li>
+<li><strong>قرار واحد في مكان واحد.</strong> المدير العام وحده يقرر، ولا يملك أحد غيره زر قرار. الموارد البشرية
+والورشة تكملان قسميهما، والمشرفون يطلبون.</li>
+<li><strong>أقل صلاحية لازمة.</strong> لا تُمنح صلاحية «احتياطًا»: الصلاحية الناقصة تظهر قائمة ناقصة، وتُمنح عند الحاجة.</li>
+<li><strong>السجل يبقى لدى الموارد البشرية.</strong> المشرفون لا يطّلعون على مستندات الموظفين، ويتابعون طلبات وثائقهم فقط.</li>
+</ul>
+</section>
+</body></html>

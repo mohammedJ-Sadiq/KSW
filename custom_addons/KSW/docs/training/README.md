@@ -66,6 +66,26 @@ basics everyone needs. Give each person their role handbook + the General one.
 | `pdf/KSW-Admin-Guide-EN.pdf` | Deduction & commission configuration |
 | `pdf/KSW-IT-Guide-EN.pdf` | Ticket queue, resolving & closing, IT asset register, reporting, helpdesk configuration |
 
+### Vehicles & staff handbooks → [`pdf/vehicles/`](pdf/vehicles/)
+
+Vehicle Allocation, Vehicle Custody (HR-12), Employee Transfers, Documents and
+the three workshops (Nabiya, Tabuk, Al-Hayat), one handbook per role. Build:
+`node tools/build_pdf.mjs vehicles`. Screenshots: `tools/stage_vehicles.py`
+then `tools/capture_vehicles.mjs` (Arabic: `set_train_lang.py` with
+`KSW_DEMO_LANG=ar`, `KSW_LANG=ar node capture_vehicles.mjs`, then back to `en`).
+
+| Handbook | Covers |
+|---|---|
+| `KSW-Vehicles-Supervisor-{EN,AR}.pdf` | Release / request vehicles, driver change (HR-12), release / request employees with their vehicles' plan, document requests, workshop requests |
+| `KSW-Vehicles-GM-{EN,AR}.pdf` | Deciding vehicle releases and requests, deciding released and requested employees |
+| `KSW-Vehicles-HR-{EN,AR}.pdf` | HR-12 document checks, the documents register and government imports, document requests, employee transfers |
+| `KSW-Vehicles-Workshop-{EN,AR}.pdf` | The three workshops' queues, HR-12 inspection and handover |
+| `KSW-Vehicles-Administrator-{EN,AR}.pdf` | Setup (vehicle departments, workshops, scopes, handover checks) and the initial access rights |
+| `KSW-Vehicles-All-Roles-{EN,AR}.pdf` | All of the above in one |
+
+There is no employee handbook: an employee has no step in these apps (he
+signs the paper HR-12).
+
 ### Commission-only handbooks → [`pdf/commission/`](pdf/commission/)
 
 The commission workflow spans four roles, and each role's own handbook mixes it

@@ -1,0 +1,128 @@
+<!doctype html><html lang="en" dir="ltr"><head>
+<meta charset="utf-8"><title>Workshop — Manager & Technician Guide</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "DejaVu Sans",Arial,sans-serif; font-size: 11pt; line-height: 1.55; color: #222; }
+  h1 { font-size: 20pt; color: #0b5; border-bottom: 2px solid #0b5; padding-bottom: 4px;
+       page-break-before: always; margin-top: 0; }
+  section:first-child h1 { page-break-before: avoid; }
+  h2 { font-size: 15pt; color: #146; margin-top: 1.2em; }
+  h3 { font-size: 12.5pt; color: #333; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: left; }
+  th { background: #eef6f0; }
+  code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; font-family: "DejaVu Sans Mono",monospace; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 5px; overflow-x: auto; direction: ltr; text-align: left; }
+  blockquote { border-left: 4px solid #0b5; margin: 8px 0; padding: 2px 12px; color: #444; background:#f7fbf8; }
+  img.shot { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0; display:block; page-break-inside: avoid; }
+  .ph { border: 1px dashed #bbb; background: #fafafa; color: #888; padding: 14px; border-radius: 4px;
+        margin: 8px 0; font-style: italic; text-align: center; }
+  .ph span { font-size: 9pt; }
+  section { page-break-inside: auto; }
+  a { color: #146; text-decoration: none; }
+  a[href^="#"] { color: #146; font-weight: 600; }
+  .xref { color: #146; font-weight: 600; }
+  .cover { text-align: center; padding-top: 28mm; page-break-after: always; }
+  .cover img.logo { width: 46mm; height: auto; margin-bottom: 8px; }
+  .cover .role { font-size: 18pt; color: #146; margin-top: 6px; }
+  .cover .meta { color: #777; margin-top: 12px; font-size: 10pt; }
+</style></head><body>
+<div class="cover">
+  <img class="logo" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/assets/logo.png" alt="logo">
+  <div class="role">Workshop — Manager & Technician Guide</div>
+  <div class="meta">Vehicle Allocation · Vehicle Custody (HR-12) · Employee Transfers · Documents · Workshops<br/>KSW HR &amp; Payroll · 2026-11-23</div>
+</div>
+<section id="g-workshop-01-workshop-sites-and-handovers"><h1>The Workshop Manager&#39;s Queue, Sites and Handover Forms</h1>
+<p><strong>Who is this for:</strong> Workshop Managers and Technicians
+<strong>How long it takes:</strong> ongoing</p>
+<h2>What this does</h2>
+<p>There are three workshops: <strong>Nabiya</strong> (the main one), <strong>Tabuk</strong> and
+<strong>Al-Hayat</strong>. Every request goes to one of them, and you work the queue of
+<strong>your own</strong> workshop(s). Besides repair requests, the workshop has a step
+on the vehicle <strong>handover forms (HR-12)</strong>: inspecting a vehicle that is handed
+in, and handing a vehicle over to its new department.</p>
+<h2>Before you start</h2>
+<ul>
+<li>You are in your workshop&#39;s <strong>Managers &amp; Staff</strong> (<strong>Workshop →
+Configuration → Workshops</strong>). In none, you see nothing: ask your
+administrator.</li>
+<li>The GM and the reviewers see every workshop; on the dashboard they switch
+between them.</li>
+</ul>
+<h2>Where a request goes</h2>
+<p>A request goes to the workshop that <strong>serves the requester&#39;s department</strong>
+(or its nearest parent department), otherwise to Nabiya. Requests raised
+before the three workshops existed are Nabiya&#39;s.</p>
+<ol>
+<li><p><strong>Open Workshop → All Requests.</strong> The <strong>Workshop</strong> column shows the site;
+you only see yours.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/workshop/ws-01.png" alt="The queue"></p>
+</li>
+<li><p>Work the requests as before: accept (In Progress), fill the repair report,
+<strong>Complete</strong> or <strong>Reject</strong>. See the requester&#39;s guide,
+<span class="xref">Issuing a workshop service request</span>,
+for what they see.</p>
+</li>
+</ol>
+<h2>Handover forms (HR-12)</h2>
+<p>Open them from your Home page (<em>Workshop: TRN-…</em>) or <strong>Vehicle Custody →
+Handover Forms (HR-12)</strong>.</p>
+<p><img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/workshop/ws-02.png" alt="A hand-in waiting for the workshop"></p>
+<table>
+<thead>
+<tr>
+<th>Form</th>
+<th>Your part</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Hand In (Release)</strong></td>
+<td>inspect the vehicle that is handed in, <strong>in parallel</strong> with HR&#39;s documents check. A checkup <strong>Workshop Request</strong> is opened with it (button at the top)</td>
+</tr>
+<tr>
+<td><strong>Receive</strong></td>
+<td>after HR has checked the new driver, hand the vehicle over to him: <strong>that is its arrival</strong> in the new department</td>
+</tr>
+</tbody></table>
+<ol>
+<li><p><strong>Open the Vehicle Inspection tab.</strong> Fill <strong>Inspected On</strong> and, per item
+(clutch, tyres, brakes…), the <strong>Depreciation %</strong>, <strong>Value</strong> and a remark.
+The <strong>Total Value</strong> is what Accounting receives.
+<img class="shot" src="file:///home/odoo/Odoo/odoo/custom_addons/KSW/docs/training/screenshots/workshop/ws-03.png" alt="Inspection"></p>
+</li>
+<li><p><strong>Click Workshop Done.</strong> On a hand-in the form is <strong>Approved</strong> when HR has
+also checked the documents; on a receipt it is the arrival: the vehicle is
+the department&#39;s and the driver&#39;s from now on.</p>
+</li>
+</ol>
+<blockquote>
+<p>A driver change between two drivers of the same department has <strong>no
+workshop step</strong> any more.</p>
+</blockquote>
+<h2>Common issues</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>The queue is empty</td>
+<td>Your user has no workshop</td>
+<td>Ask the administrator to add you to your workshop</td>
+</tr>
+<tr>
+<td>A request went to the wrong workshop</td>
+<td>The requester&#39;s department is served by another workshop, or by none (then Nabiya)</td>
+<td>The administrator sets <strong>Departments Served</strong> under <strong>Workshop → Configuration → Workshops</strong></td>
+</tr>
+<tr>
+<td>No <strong>Workshop Done</strong> button on a Receive</td>
+<td>HR has not checked the driver yet</td>
+<td>It comes after <strong>Documents Checked</strong></td>
+</tr>
+</tbody></table>
+</section>
+</body></html>
