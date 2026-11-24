@@ -20,7 +20,8 @@ unless that department released it.
 
 - You need **Vehicle Allocation → Department User** for your department(s).
   If the **Vehicle Allocation** app is missing, ask your system administrator.
-- You only see and release **your own department's** vehicles.
+- You can look up any company vehicle, but you can only **release your own
+  department's** vehicles: the list on a release offers only those.
 
 ## Releasing vehicles
 

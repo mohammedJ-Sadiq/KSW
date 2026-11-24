@@ -55,13 +55,16 @@
         <field name="inherit_id" ref="KSW_fleet.view_ksw_fleet_vehicle_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="inside">
-                <div groups="KSW_documents.group_document_officer">
+                <!-- Everyone who can open the vehicle reads its papers; only the
+                     officer and the administrators upload. -->
+                <div>
                     <separator string="Documents"/>
                     <div class="alert alert-warning" role="alert" invisible="not x_documents_missing">
                         Missing or expired: <field name="x_documents_missing" nolabel="1" class="d-inline"/>
                     </div>
                     <button name="action_upload_documents" type="object" string="Upload Documents"
-                            icon="fa-upload" class="btn-secondary mb-2"/>
+                            icon="fa-upload" class="btn-secondary mb-2"
+                            groups="KSW_documents.group_document_officer,base.group_system"/>
                     <field name="x_document_ids" readonly="1">
                         <list>
                             <field name="type_id"/>
@@ -84,7 +87,7 @@
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">
-                <page name="ksw_documents" string="Documents" groups="KSW_documents.group_document_officer">
+                <page name="ksw_documents" string="Documents" groups="hr.group_hr_user">
                     <div class="alert alert-warning" role="alert" invisible="not x_documents_missing">
                         Missing or expired: <field name="x_documents_missing" nolabel="1" class="d-inline"/>
                     </div>
@@ -93,7 +96,8 @@
                         <field name="x_official_occupation"/>
                     </group>
                     <button name="action_upload_documents" type="object" string="Upload Documents"
-                            icon="fa-upload" class="btn-secondary mb-2"/>
+                            icon="fa-upload" class="btn-secondary mb-2"
+                            groups="KSW_documents.group_document_officer,base.group_system"/>
                     <field name="x_document_ids" readonly="1">
                         <list>
                             <field name="type_id"/>

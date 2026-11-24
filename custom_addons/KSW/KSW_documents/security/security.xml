@@ -30,4 +30,35 @@
         <field name="domain_force">[(1, '=', 1)]</field>
         <field name="groups" eval="[(4, ref('group_document_officer')), (4, ref('base.group_system'))]"/>
     </record>
+    <!-- Who reads which documents (Nov 2026). A vehicle's papers are not
+         personal: whoever can open the vehicle sees whether they are valid.
+         An employee's are: HR only. Company papers and every change stay
+         with the Documents Officer and the system administrators. Each rule
+         names its permissions: an unused one would go live if the ACL widened. -->
+    <record id="rule_document_vehicle_read" model="ir.rule">
+        <field name="name">Documents: vehicle papers, read by everyone</field>
+        <field name="model_id" ref="model_ksw_document"/>
+        <field name="domain_force">[('applies_to', '=', 'vehicle')]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="rule_document_employee_hr_read" model="ir.rule">
+        <field name="name">Documents: employee papers, read by HR</field>
+        <field name="model_id" ref="model_ksw_document"/>
+        <field name="domain_force">[('applies_to', 'in', ('vehicle', 'employee'))]</field>
+        <field name="groups" eval="[(4, ref('hr.group_hr_user'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="rule_document_officer_all" model="ir.rule">
+        <field name="name">Documents: everything, Documents Officer and administrators</field>
+        <field name="model_id" ref="model_ksw_document"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_document_officer')), (4, ref('base.group_system'))]"/>
+    </record>
 </odoo>
