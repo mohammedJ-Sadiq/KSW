@@ -1993,3 +1993,12 @@ msgstr "منتهية"
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "missing"
 msgstr "غير موجودة"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.actions.act_window,help:KSW_vehicle_custody.action_ksw_document_readonly
+msgid ""
+"No documents you may read. You see the papers of your\n"
+"            departments' vehicles and employees; HR keeps the register."
+msgstr ""
+"<p>لا توجد مستندات متاحة لك. تظهر لك مستندات مركبات وموظفي أقسامك؛ والسجل "
+"لدى الموارد البشرية.</p>"

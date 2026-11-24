@@ -31,6 +31,12 @@ HR** button, and each missing document becomes a **Document Request**
 | **Registered** | HR has registered the document; you got a message. Submit or confirm again |
 | **Cancelled** | You or HR cancelled it |
 
+## Reading the papers yourself
+
+**Vehicle Custody → Documents** lists, read only, the papers of your
+departments' vehicles **and employees**: licences, iqamas, istimara,
+insurance, with their expiry. You cannot change them; HR does.
+
 ## What happens next
 
 The request closes itself the moment a valid document is in the register,

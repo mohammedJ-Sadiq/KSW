@@ -246,8 +246,8 @@ class TestVehicleCustody(TransactionCase):
         self.assertEqual(self.truck.x_custodian_id, self.khalid)
 
     def test_document_access_follows_the_departments(self):
-        """A supervisor reads the papers of his departments' vehicles, the GM of
-        every vehicle; neither reads employees' papers nor changes anything."""
+        """Read only, same rule for vehicles and employees: a supervisor reads
+        his departments' papers, the GM everybody's; neither changes anything."""
         bravo_truck = self.env['ksw.fleet.vehicle'].create({'name': 'VC-B1', 'vehicle_type': 'isuzu',
                                                             'x_department_id': self.dept_b.id})
         _register_papers(self.env, bravo_truck)
@@ -256,12 +256,31 @@ class TestVehicleCustody(TransactionCase):
         bravo = Doc.search([('vehicle_id', '=', bravo_truck.id)])
         licence = Doc.search([('employee_id', '=', self.khalid.id)])
         self.assertTrue(alpha and bravo and licence)
-        seen_a = Doc.with_user(self.user_a).search([('id', 'in', (alpha | bravo | licence).ids)])
-        self.assertEqual(seen_a, alpha)
-        seen_gm = Doc.with_user(self.gm).search([('id', 'in', (alpha | bravo | licence).ids)])
-        self.assertEqual(seen_gm, alpha | bravo)
+        # Same rule for employees: Khalid is in VC Alpha, so user_a reads his
+        # licence; Bravo's driver's is not his to read.
+        bravo_licence = Doc.search([('employee_id', '=', self.bravo_driver.id)])
+        everything = alpha | bravo | licence | bravo_licence
+        seen_a = Doc.with_user(self.user_a).search([('id', 'in', everything.ids)])
+        self.assertEqual(seen_a, alpha | licence)
+        seen_gm = Doc.with_user(self.gm).search([('id', 'in', everything.ids)])
+        self.assertEqual(seen_gm, everything)
         self.assertFalse(alpha[:1].with_user(self.user_a).has_access('write'))
         self.assertFalse(alpha[:1].with_user(self.gm).has_access('write'))
+        # The read-only list, read as the browser does, by a supervisor who is
+        # no HR user (employee names come through the public profile).
+        self.assertFalse(self.user_a.has_group('hr.group_hr_user'))
+        Readonly = Doc.with_user(self.user_a)
+        views = Readonly.get_views([(self.env.ref('KSW_vehicle_custody.view_ksw_document_list_readonly').id, 'list'),
+                                    (self.env.ref('KSW_vehicle_custody.view_ksw_document_form_readonly').id, 'form')])
+        spec = {f: {} for f in views['models']['ksw.document']['fields']
+                if views['models']['ksw.document']['fields'][f]['type'] not in ('one2many', 'many2many')}
+        rows = Readonly.web_search_read([('id', 'in', everything.ids)], spec)['records']
+        self.assertEqual({r['id'] for r in rows}, set((alpha | licence).ids))
+        Readonly.browse(licence.ids).web_read(spec)
+        # The read-only list is offered to both, and lists what they may read.
+        menu = self.env.ref('KSW_vehicle_custody.menu_vehicle_custody_documents')
+        for user in (self.user_a, self.gm):
+            self.assertIn(menu.id, self.env['ir.ui.menu'].with_user(user)._visible_menu_ids())
 
     def test_hr_allows_one_driver_two_vehicles(self):
         """An approved exception (the Azmi brothers each run two Isuzus)."""

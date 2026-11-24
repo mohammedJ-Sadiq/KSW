@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-23 12:20+0000\n"
-"PO-Revision-Date: 2026-11-23 12:20+0000\n"
+"POT-Creation-Date: 2026-11-24 09:05+0000\n"
+"PO-Revision-Date: 2026-11-24 09:05+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -472,7 +472,9 @@ msgid "Display Name"
 msgstr ""
 
 #. module: KSW_vehicle_custody
+#: model:ir.actions.act_window,name:KSW_vehicle_custody.action_ksw_document_readonly
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__document_ids
+#: model:ir.ui.menu,name:KSW_vehicle_custody.menu_vehicle_custody_documents
 msgid "Documents"
 msgstr ""
 
@@ -999,6 +1001,13 @@ msgstr ""
 #. module: KSW_vehicle_custody
 #: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__activity_type_id
 msgid "Next Activity Type"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.actions.act_window,help:KSW_vehicle_custody.action_ksw_document_readonly
+msgid ""
+"No documents you may read. You see the papers of your\n"
+"            departments' vehicles and employees; HR keeps the register."
 msgstr ""
 
 #. module: KSW_vehicle_custody

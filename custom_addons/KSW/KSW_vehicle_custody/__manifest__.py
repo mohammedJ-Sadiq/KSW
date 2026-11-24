@@ -34,6 +34,7 @@ complete without it.
         'views/ksw_vehicle_custody_views.xml',
         'views/integration_views.xml',
         'views/menus.xml',
+        'views/document_views.xml',
     ],
     'license': 'LGPL-3',
     'installable': True,

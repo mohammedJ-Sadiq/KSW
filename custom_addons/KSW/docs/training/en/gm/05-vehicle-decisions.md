@@ -49,6 +49,12 @@ execution and needs nothing more from you.
 
 3. **Click Confirm Decision.**
 
+## Reading the papers
+
+**Vehicle Custody → Documents** lists, read only, every vehicle's and
+employee's papers with their expiry. The employee form's **Documents** tab
+shows the same. Changing them stays with HR.
+
 ## What happens next
 
 The departments are told. A vehicle you give goes through the workshop and

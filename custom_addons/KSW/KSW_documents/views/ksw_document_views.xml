@@ -7,7 +7,8 @@
             <form string="Document">
                 <header>
                     <button name="action_confirm" type="object" string="Confirm" class="oe_highlight"
-                            invisible="state != 'draft'"/>
+                            invisible="state != 'draft'"
+                            groups="KSW_documents.group_document_officer,base.group_system"/>
                     <button name="action_open_scan" type="object" string="Open Scan" icon="fa-file-image-o"
                             invisible="not attachment_ids"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
