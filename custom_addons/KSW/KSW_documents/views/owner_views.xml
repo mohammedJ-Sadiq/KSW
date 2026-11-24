@@ -55,8 +55,9 @@
         <field name="inherit_id" ref="KSW_fleet.view_ksw_fleet_vehicle_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="inside">
-                <!-- Everyone who can open the vehicle reads its papers; only the
-                     officer and the administrators upload. -->
+                <!-- Shown to everyone who opens the vehicle; the list holds only
+                     the papers the record rules let him read. Only the officer
+                     and the administrators upload. -->
                 <div>
                     <separator string="Documents"/>
                     <div class="alert alert-warning" role="alert" invisible="not x_documents_missing">
@@ -87,7 +88,7 @@
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">
-                <page name="ksw_documents" string="Documents" groups="hr.group_hr_user">
+                <page name="ksw_documents" string="Documents" groups="KSW_documents.group_document_officer,base.group_system">
                     <div class="alert alert-warning" role="alert" invisible="not x_documents_missing">
                         Missing or expired: <field name="x_documents_missing" nolabel="1" class="d-inline"/>
                     </div>

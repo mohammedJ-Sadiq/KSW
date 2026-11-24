@@ -151,4 +151,29 @@
         <field name="groups" eval="[(4, ref('group_custody_hr'))]"/>
         <field name="perm_write" eval="False"/><field name="perm_create" eval="False"/><field name="perm_unlink" eval="False"/>
     </record>
+
+    <!-- The papers of the vehicles a supervisor answers for (his Vehicle
+         Allocation departments), and of every vehicle for the GM who decides
+         them: read only. Changing documents stays with HR and the
+         administrators (KSW_documents). -->
+    <record id="rule_document_department_vehicles_read" model="ir.rule">
+        <field name="name">Documents: papers of my departments' vehicles, read</field>
+        <field name="model_id" ref="KSW_documents.model_ksw_document"/>
+        <field name="domain_force">[('vehicle_id.x_department_id', 'child_of', user.x_fleet_department_ids.ids)]</field>
+        <field name="groups" eval="[(4, ref('KSW_fleet_allocation.group_fleet_allocation_user'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="rule_document_gm_vehicles_read" model="ir.rule">
+        <field name="name">Documents: every vehicle's papers, GM, read</field>
+        <field name="model_id" ref="KSW_documents.model_ksw_document"/>
+        <field name="domain_force">[('applies_to', '=', 'vehicle')]</field>
+        <field name="groups" eval="[(4, ref('KSW_fleet_allocation.group_fleet_allocation_gm'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
 </odoo>

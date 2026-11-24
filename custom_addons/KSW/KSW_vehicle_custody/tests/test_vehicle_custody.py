@@ -245,6 +245,24 @@ class TestVehicleCustody(TransactionCase):
         form.with_user(self.user_a).action_submit()
         self.assertEqual(self.truck.x_custodian_id, self.khalid)
 
+    def test_document_access_follows_the_departments(self):
+        """A supervisor reads the papers of his departments' vehicles, the GM of
+        every vehicle; neither reads employees' papers nor changes anything."""
+        bravo_truck = self.env['ksw.fleet.vehicle'].create({'name': 'VC-B1', 'vehicle_type': 'isuzu',
+                                                            'x_department_id': self.dept_b.id})
+        _register_papers(self.env, bravo_truck)
+        Doc = self.env['ksw.document']
+        alpha = Doc.search([('vehicle_id', '=', self.truck.id)])
+        bravo = Doc.search([('vehicle_id', '=', bravo_truck.id)])
+        licence = Doc.search([('employee_id', '=', self.khalid.id)])
+        self.assertTrue(alpha and bravo and licence)
+        seen_a = Doc.with_user(self.user_a).search([('id', 'in', (alpha | bravo | licence).ids)])
+        self.assertEqual(seen_a, alpha)
+        seen_gm = Doc.with_user(self.gm).search([('id', 'in', (alpha | bravo | licence).ids)])
+        self.assertEqual(seen_gm, alpha | bravo)
+        self.assertFalse(alpha[:1].with_user(self.user_a).has_access('write'))
+        self.assertFalse(alpha[:1].with_user(self.gm).has_access('write'))
+
     def test_hr_allows_one_driver_two_vehicles(self):
         """An approved exception (the Azmi brothers each run two Isuzus)."""
         other = self.env['ksw.fleet.vehicle'].create({'name': 'VC-IS4', 'vehicle_type': 'isuzu',

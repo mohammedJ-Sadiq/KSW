@@ -163,9 +163,9 @@ class HrEmployee(models.Model):
                                      domain=[('state', '!=', 'replaced')], groups='hr.group_hr_user')
     # HR only: a regular employee reads his own record through the public
     # model, which has none of these (gotcha #32).
-    x_documents_missing = fields.Char(groups='hr.group_hr_user')
-    x_document_issue = fields.Boolean(groups='hr.group_hr_user')
-    x_document_pending_my_action = fields.Boolean(groups='hr.group_hr_user')
+    x_documents_missing = fields.Char(groups='hr.group_hr_user,base.group_system')
+    x_document_issue = fields.Boolean(groups='hr.group_hr_user,base.group_system')
+    x_document_pending_my_action = fields.Boolean(groups='hr.group_hr_user,base.group_system')
 
     def _ksw_doc_owner_field(self):
         return 'employee_id'

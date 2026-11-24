@@ -6,8 +6,9 @@ from odoo.tests import TransactionCase, tagged
 
 @tagged('post_install', '-at_install')
 class TestDocumentAccess(TransactionCase):
-    """Vehicle papers are read by whoever opens the vehicle; employee papers
-    by HR; everything (and every change) by the officer and administrators."""
+    """HR (the Documents Officer) and the administrators read and change
+    everything; anybody else only reads his own papers and those of the
+    vehicle in his custody (department and GM scope: Vehicle Custody)."""
 
     @classmethod
     def setUpClass(cls):
@@ -36,24 +37,35 @@ class TestDocumentAccess(TransactionCase):
         return self.env['ksw.document'].with_user(user).search([('id', 'in', (self.vdoc | self.edoc).ids)])
 
     def test_who_reads_what(self):
-        self.assertEqual(self._seen(self.plain), self.vdoc)
-        self.assertEqual(self._seen(self.hr), self.vdoc | self.edoc)
+        # Nothing of anybody else's: not even an "HR user" (in Odoo that is
+        # also every Time Off / Payroll officer).
+        self.assertFalse(self._seen(self.plain))
+        self.assertFalse(self._seen(self.hr))
+        # HR (the Documents Officer) and the administrators read everything.
         self.assertEqual(self._seen(self.officer), self.vdoc | self.edoc)
         self.assertEqual(self._seen(self.admin), self.vdoc | self.edoc)
 
-    def test_the_vehicle_form_shows_its_papers(self):
-        data = self.truck.with_user(self.plain).web_read({'x_document_ids': {'fields': {
-            'type_id': {}, 'number': {}, 'expiry_date': {}, 'expiry_status': {}, 'state': {}}},
-            'x_documents_missing': {}})
+    def test_own_papers_and_the_vehicle_in_my_custody(self):
+        self.driver.user_id = self.plain
+        self.assertEqual(self._seen(self.plain), self.edoc)
+        self.truck._ksw_set_custodian(self.driver)
+        self.assertEqual(self._seen(self.plain), self.vdoc | self.edoc)
+
+    def test_the_vehicle_form_shows_only_what_he_may_read(self):
+        fields = {'x_document_ids': {'fields': {'number': {}, 'expiry_status': {}}}}
+        self.assertEqual(self.truck.with_user(self.plain).web_read(fields)[0]['x_document_ids'], [])
+        self.driver.user_id = self.plain
+        self.truck._ksw_set_custodian(self.driver)
+        self.env.invalidate_all()  # a new screen is a new request: no cached list
+        data = self.truck.with_user(self.plain).web_read(fields)
         self.assertEqual([d['number'] for d in data[0]['x_document_ids']], ['INS1'])
 
     def test_only_the_officer_and_admins_change(self):
+        self.driver.user_id = self.plain
         with self.assertRaises(AccessError):
-            self.vdoc.with_user(self.plain).write({'number': 'X'})
+            self.edoc.with_user(self.plain).write({'number': 'X'})
         with self.assertRaises(AccessError):
-            self.edoc.with_user(self.hr).write({'number': 'X'})
-        with self.assertRaises(AccessError):
-            self.env['ksw.document'].with_user(self.plain).create({
+            self.env['ksw.document'].with_user(self.hr).create({
                 'type_id': self.env.ref('KSW_documents.type_insurance').id, 'applies_to': 'vehicle',
                 'vehicle_id': self.truck.id, 'number': 'NEW'})
         self.vdoc.with_user(self.officer).write({'number': 'INS2'})
