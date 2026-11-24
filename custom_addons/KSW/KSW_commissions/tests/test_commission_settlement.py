@@ -272,6 +272,14 @@ class TestMarkPaidIsTheFinalSettlement(SettlementCommon):
 class TestCommissionSettlement(SettlementCommon):
     """The accountant's cross-month voucher."""
 
+    def test_new_voucher_header_button_as_the_browser_calls_it(self):
+        """The list-header button sends the selected ids (none ticked: []).
+        It failed for everyone while the method was @api.model."""
+        from odoo.service.model import call_kw
+        Settlement = self.env['ksw.pay.settlement'].with_user(self.env.ref('base.user_admin'))
+        action = call_kw(Settlement, 'action_new_voucher', [[]], {})
+        self.assertEqual(action['res_model'], 'ksw.pay.settlement.new.wizard')
+
     def test_01_it_collects_what_no_file_has_posted(self):
         run = self._approve(self._commission_entry(self.emp_a, 2456.0).batch_id)
         voucher = self._voucher()

@@ -175,3 +175,10 @@ class TestKeywordMaintenance(TransactionCase):
     def test_every_seeded_type_carries_a_vmrs_aligned_name(self):
         types = self.env['ksw.workshop.request.type'].search([])
         self.assertGreaterEqual(len(types), 26)
+
+    def test_rescan_all_header_button_as_the_browser_calls_it(self):
+        """A list-header button sends the selected ids (none ticked: [])."""
+        from odoo.service.model import call_kw
+        Type = self.env['ksw.workshop.request.type'].with_user(self.user_manager)
+        action = call_kw(Type, 'action_rescan_all', [[]], {})
+        self.assertEqual(action['type'], 'ir.actions.client')

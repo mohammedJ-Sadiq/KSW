@@ -774,9 +774,13 @@ class KswPaySettlement(models.Model):
         self.unlink()
         return self._open_history()
 
-    @api.model
     def action_new_voucher(self):
-        """New Settlement Voucher: what came before, then confirm."""
+        """New Settlement Voucher: what came before, then confirm.
+
+        Not @api.model: a list-header button (display="always") always sends
+        the selected ids, an empty list when none is ticked. On an @api.model
+        method Odoo passes that list on as an extra argument, and the button
+        failed for everyone ("takes 1 positional argument but 2 were given")."""
         self._check_accountant()
         return {
             'type': 'ir.actions.act_window',

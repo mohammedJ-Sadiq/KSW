@@ -176,6 +176,7 @@ class KswWorkshopRequestType(models.Model):
             },
         }
 
-    @api.model
     def action_rescan_all(self):
+        # Not @api.model: a list-header button sends the selected ids (maybe
+        # none), which an @api.model method receives as an extra argument.
         return self.search([]).action_rescan_requests()
