@@ -710,3 +710,9 @@ msgstr "عمولات أقسام بانتظار تدقيقي أو اعتمادي"
 #: model:ksw.home.inbox.source,name:KSW_backend_theme.inbox_document_imports
 msgid "Government exports to import"
 msgstr "ملفات بوابات حكومية بانتظار الاستيراد"
+
+#. module: KSW_backend_theme
+#. odoo-javascript
+#: code:addons/KSW_backend_theme/static/src/home/home.xml:0
+msgid "Change app"
+msgstr "تغيير التطبيق"

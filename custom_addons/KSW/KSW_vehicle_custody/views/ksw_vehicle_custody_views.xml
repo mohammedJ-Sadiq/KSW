@@ -176,15 +176,36 @@
                                     <field name="inspection_total"/>
                                 </group>
                             </group>
+                            <!-- The reading the vehicle was handed over on, so the change is
+                                 what happened under the user handing it over now. -->
+                            <div class="alert alert-light" role="status" invisible="not baseline_request_id">
+                                <b>Change Since</b> is the depreciation since the last inspection:
+                                <field name="baseline_request_id" readonly="1" class="d-inline"/>
+                                <field name="baseline_datetime" readonly="1" class="d-inline ms-2"/>
+                            </div>
+                            <div class="alert alert-light" role="status"
+                                 invisible="baseline_request_id or state not in ('draft', 'hr', 'workshop')">
+                                No earlier inspection of this vehicle is on record: this reading becomes the
+                                starting point for the next handover.
+                            </div>
                             <field name="inspection_line_ids" readonly="state != 'workshop'">
                                 <list editable="bottom">
                                     <field name="sequence" widget="handle"/>
                                     <field name="name"/>
+                                    <field name="previous_depreciation" optional="show"/>
                                     <field name="depreciation"/>
+                                    <field name="depreciation_change" optional="show"
+                                           decoration-danger="depreciation_change &gt; 0"
+                                           decoration-success="depreciation_change &lt; 0"/>
                                     <field name="value" sum="Total"/>
                                     <field name="remark"/>
                                 </list>
                             </field>
+                            <group string="Maintenance While He Held It" name="history"
+                                   invisible="not previous_employee_id">
+                                <field name="history_start" invisible="not history_start"/>
+                                <field name="history_html" nolabel="1" colspan="2" readonly="1"/>
+                            </group>
                             <group string="Names for the Signatures">
                                 <field name="workshop_official_name" readonly="state not in ('workshop', 'done')"/>
                                 <field name="deliverer_name" readonly="state not in ('workshop', 'done')"/>

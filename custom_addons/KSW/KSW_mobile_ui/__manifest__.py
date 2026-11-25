@@ -1,6 +1,6 @@
 {
     'name': 'KSW - Mobile Layout',
-    'version': '19.0.1.3.3',
+    'version': '19.0.1.4.0',
     'author': 'Mohammed Albadr',
     'summary': 'Phone-only layout for the most-used KSW screens; desktop unchanged',
     'description': """
@@ -13,6 +13,9 @@ Phone layout rules (pattern taken from SAP Fiori / Oracle Redwood / Odoo Enterpr
    column with class="ksw_m_hide" is dropped below the small-screen breakpoint
    (static/src/js/list_renderer_patch.js). Header, cells and totals stay aligned.
 3. Compact record header and readable long text, phone-width CSS only.
+4. Every list has a Cards / Table button on a phone: cards for a handful of
+   records, a pinned-header, pinned-name table for reviewing hundreds.
+   Remembered per screen on the device (static/src/js/layout_toggle.js).
     """,
     'license': 'LGPL-3',
     'depends': [
@@ -41,6 +44,7 @@ Phone layout rules (pattern taken from SAP Fiori / Oracle Redwood / Odoo Enterpr
     'assets': {
         'web.assets_backend': [
             'KSW_mobile_ui/static/src/js/list_renderer_patch.js',
+            'KSW_mobile_ui/static/src/js/layout_toggle.js',
             'KSW_mobile_ui/static/src/scss/mobile.scss',
             'KSW_mobile_ui/static/src/xml/list_renderer_mobile.xml',
         ],

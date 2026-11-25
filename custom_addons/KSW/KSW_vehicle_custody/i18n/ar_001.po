@@ -2015,8 +2015,15 @@ msgstr "تغيير السائق عبر الورشة"
 
 #. module: KSW_vehicle_custody
 #: model:ir.model.fields,help:KSW_vehicle_custody.field_hr_department__x_driver_change_workshop
-msgid "A driver change between two of this department's drivers goes through HR (the new driver's licence) and a workshop checkup, like a vehicle received from another department. Unticked, the supervisor's confirmation completes it and HR is told."
-msgstr "يمر تغيير السائق بين سائقَين من هذا القسم على الموارد البشرية (رخصة السائق الجديد) ثم فحص في الورشة، مثل المركبة المستلمة من قسم آخر. عند عدم التحديد يكتمل بتأكيد المشرف وتُبلَّغ الموارد البشرية."
+msgid ""
+"A driver change between two of this department's drivers goes through HR "
+"(the new driver's licence) and a workshop checkup, like a vehicle received "
+"from another department. Unticked, the supervisor's confirmation completes "
+"it and HR is told."
+msgstr ""
+"يمر تغيير السائق بين سائقَين من هذا القسم على الموارد البشرية (رخصة السائق "
+"الجديد) ثم فحص في الورشة، مثل المركبة المستلمة من قسم آخر. عند عدم التحديد "
+"يكتمل بتأكيد المشرف وتُبلَّغ الموارد البشرية."
 
 #. module: KSW_vehicle_custody
 #. odoo-python
@@ -2035,4 +2042,143 @@ msgstr "رُفض تغيير السائق %(f)s: %(r)s"
 msgid ""
 "In this department a driver change goes to <b>HR</b> (the new driver's licence)\n"
 "                        and then to a <b>workshop checkup</b>; the vehicle passes when the workshop is done."
-msgstr "في هذا القسم يمر تغيير السائق على <b>الموارد البشرية</b> (رخصة السائق الجديد) ثم <b>فحص الورشة</b>؛ وتنتقل المركبة عند انتهاء الورشة."
+msgstr ""
+"في هذا القسم يمر تغيير السائق على <b>الموارد البشرية</b> (رخصة السائق "
+"الجديد) ثم <b>فحص الورشة</b>؛ وتنتقل المركبة عند انتهاء الورشة."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%s itemised spare parts"
+msgstr "%s قطعة غيار مسجّلة"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "%s workshop visits"
+msgstr "%s زيارة للورشة"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "<b>Change Since</b> is the depreciation since the last inspection:"
+msgstr "<b>الفرق منذ آخر فحص</b> هو الإهلاك منذ آخر فحص:"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_inspection__previous_depreciation
+msgid "At Last Inspection %"
+msgstr "عند آخر فحص %"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_inspection__depreciation_change
+msgid "Change Since %"
+msgstr "الفرق منذ آخر فحص %"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Cost"
+msgstr "التكلفة"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__history_start
+msgid "Custodian Since"
+msgstr "عهدته منذ"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,help:KSW_vehicle_custody.field_ksw_vehicle_custody_inspection__depreciation_change
+msgid ""
+"Depreciation since the last inspection: what happened while the user handing"
+" it over now held it."
+msgstr "الإهلاك منذ آخر فحص: ما حدث خلال عهدة المستخدم الذي يسلّمها الآن."
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__baseline_datetime
+msgid "Last Inspected On"
+msgstr "تاريخ آخر فحص"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__baseline_request_id
+msgid "Last Inspection"
+msgstr "آخر فحص"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__history_html
+msgid "Maintenance History"
+msgstr "سجل الصيانة"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid "Maintenance While He Held It"
+msgstr "الصيانة خلال عهدته"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "No custody record for %(e)s on %(v)s."
+msgstr "لا يوجد سجل عهدة لـ %(e)s على %(v)s."
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid ""
+"No earlier inspection of this vehicle is on record: this reading becomes the\n"
+"                                starting point for the next handover."
+msgstr ""
+"لا يوجد فحص سابق لهذه المركبة: تصبح هذه القراءة نقطة البداية للتسليم القادم."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Not listed: %s oil / filter services."
+msgstr "غير مدرجة: %s خدمة زيت / فلاتر."
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,help:KSW_vehicle_custody.field_ksw_workshop_part__x_routine_service
+msgid ""
+"Oil and filters changed at every service. Left out of the maintenance "
+"history on the vehicle handover form (HR-12), which lists the repairs and "
+"parts that matter."
+msgstr ""
+"الزيوت والفلاتر التي تُغيَّر في كل صيانة دورية. لا تظهر في سجل الصيانة في "
+"نموذج تسليم واستلام المركبة (HR-12)، الذي يعرض الإصلاحات وقطع الغيار المهمة."
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_workshop_part__x_routine_service
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_workshop_part_search_custody
+msgid "Routine Service (Oil / Filter)"
+msgstr "صيانة دورية (زيت / فلتر)"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Spare Parts"
+msgstr "قطع الغيار"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,help:KSW_vehicle_custody.field_ksw_vehicle_custody_inspection__previous_depreciation
+msgid ""
+"The reading of the last inspection, which the vehicle was handed over on."
+msgstr "قراءة آخر فحص، وهي الحالة التي سُلّمت عليها المركبة."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Work Done"
+msgstr "العمل المنجز"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "from %(s)s to %(e)s"
+msgstr "من %(s)s إلى %(e)s"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "since %s"
+msgstr "منذ %s"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "<b>%(e)s</b>, %(p)s: %(v)s, %(n)s, %(t)s SAR."
+msgstr "<b>%(e)s</b>، %(p)s: %(v)s، %(n)s، %(t)s ريال."

@@ -251,7 +251,8 @@
     // runs off the screen and nothing is hidden. Columns a view marks
     // ksw_m_hide are dropped first (list_renderer_patch.js). Screens that
     // have their own kanban cards never reach this: Odoo opens those.
-    .o_list_view .o_list_renderer {
+    // A list switched to Table (layout_toggle.js) skips all of this.
+    .o_list_view .o_list_renderer:not(.ksw_m_table) {
         overflow: visible !important;
         .o_list_table {
             display: block;
@@ -385,6 +386,118 @@
                 font-size: 0.85rem;
             }
         }
+    }
+
+    // TABLE layout (the Cards / Table button): one record per line for
+    // reviewing hundreds of records. A real grid that scrolls sideways inside
+    // the screen, with the header and the first column (what the record is)
+    // pinned, like a spreadsheet app on a phone. The list itself is the
+    // scroller, so the pinned header stays while scrolling down.
+    .o_list_view:has(> .o_content > .o_list_renderer.ksw_m_table) > .o_content,
+    .o_list_view .o_content:has(> .o_list_renderer.ksw_m_table) {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden !important;
+    }
+    .o_list_view .o_list_renderer.ksw_m_table {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: auto !important;
+        overscroll-behavior: contain;
+        .o_list_table {
+            width: max-content !important;
+            min-width: 100%;
+            table-layout: auto !important;
+            font-size: 0.84rem;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        th, td {
+            max-width: 13rem;
+            padding: 0.5rem 0.6rem !important;
+            white-space: nowrap !important;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+            border-bottom: 1px solid $border-color;
+            .text-truncate,
+            .o_field_widget {
+                white-space: nowrap !important;
+            }
+        }
+        // Selecting rows for bulk actions stays a long press (core); the
+        // checkbox column only took width.
+        .o_list_record_selector {
+            display: none !important;
+        }
+        thead th {
+            position: sticky;
+            top: 0;
+            z-index: 3;
+            background: $o-view-background-color;
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: $text-muted;
+            // core's two-line header clamp is for desktop widths
+            -webkit-line-clamp: unset !important;
+        }
+        // The first column: pinned to the start edge, the name wraps to two
+        // lines at most so long names stay readable without widening it.
+        tr > .o_list_record_selector + *,
+        tr > :first-child:not(.o_list_record_selector) {
+            position: sticky;
+            inset-inline-start: 0;
+            z-index: 2;
+            max-width: 9.5rem;
+            min-width: 7rem;
+            background: $o-view-background-color;
+            box-shadow: inset -1px 0 0 $border-color;
+        }
+        .o_rtl & tr > .o_list_record_selector + *,
+        .o_rtl & tr > :first-child:not(.o_list_record_selector) {
+            box-shadow: inset 1px 0 0 $border-color;
+        }
+        tbody tr.o_data_row > .o_list_record_selector + td,
+        tbody tr.o_data_row > td:first-child:not(.o_list_record_selector) {
+            font-weight: 600;
+            white-space: normal !important;
+            display: table-cell;
+            .text-truncate,
+            .o_field_widget {
+                white-space: normal !important;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 2;
+                overflow: hidden;
+            }
+        }
+        thead tr > .o_list_record_selector + th,
+        thead tr > th:first-child:not(.o_list_record_selector) {
+            z-index: 4;
+        }
+        // Group headings and totals: bold rows, the label pinned like a name.
+        tr.o_group_header > th,
+        tr.o_group_header > td,
+        tfoot td {
+            font-weight: 600;
+            background: $gray-100;
+        }
+        tr.o_group_header > .o_group_name {
+            white-space: nowrap !important;
+            max-width: none;
+        }
+        // Odoo's blank filler rows
+        tbody tr:not(.o_data_row):not(.o_group_header):not(:has(a, button)) {
+            display: none;
+        }
+    }
+
+    // The Cards / Table button: icon and word, so it says what it does.
+    .ksw_m_layout_toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        white-space: nowrap;
     }
 
     // Line tables inside a record (one2many / many2many lists): every row

@@ -332,3 +332,93 @@ body.ksw_no_app .o_main_navbar {
         color: $ksw-text;
     }
 }
+
+// ============================================================================
+// Phone navigation panel (the burger, home.xml): Home on top, then the apps or
+// one app's screens. Colours come from body/border tokens so dark mode follows.
+// ============================================================================
+.o_app_menu_sidebar {
+    .o_sidebar_topbar {
+        min-height: 60px;
+        padding-inline-start: 12px;
+    }
+    .ksw_panel_home {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 44px;
+        padding: 0 16px;
+        border-radius: 22px;
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: $o-brand-primary;
+        background: rgba($ksw-teal, .1);
+        &.is_current {
+            color: #fff;
+            background: $o-brand-primary;
+        }
+    }
+    .ksw_panel_app {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: calc(100% - 24px);
+        margin: 12px 12px 0;
+        padding: 10px 12px;
+        border: 1px solid $border-color;
+        border-radius: 12px;
+        background: transparent;
+        color: inherit;
+        text-align: start;
+        .o_app_icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+        }
+        .ksw_panel_app_name {
+            flex: 1 1 auto;
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+        .ksw_panel_app_change {
+            flex: 0 0 auto;
+            font-size: .85rem;
+            color: $o-brand-primary;
+            white-space: nowrap;
+        }
+    }
+    .ksw_panel_heading {
+        padding: 16px 16px 6px;
+        font-size: .8rem;
+        font-weight: 700;
+        color: $text-muted;
+    }
+    .ksw_panel_apps > li {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 56px;
+        padding: 8px 16px;
+        border-top: 1px solid $border-color;
+        font-size: 1.05rem;
+        font-weight: 600;
+        cursor: pointer;
+        .o_app_icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+        }
+        > span {
+            flex: 1 1 auto;
+        }
+        .ksw_panel_chevron {
+            color: $text-muted;
+        }
+        &.is_current {
+            background: rgba($ksw-teal, .08);
+        }
+    }
+}
+.o_rtl .o_app_menu_sidebar .ksw_panel_chevron {
+    transform: scaleX(-1);
+}

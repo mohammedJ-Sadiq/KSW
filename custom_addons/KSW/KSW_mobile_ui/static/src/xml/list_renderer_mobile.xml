@@ -18,6 +18,33 @@
         <xpath expr="//td[@t-foreach='getAggregateColumns()']" position="attributes">
             <attribute name="t-att-data-label">column.label</attribute>
         </xpath>
+        <!-- Phone layout (layout_toggle.js): cards by default, table on request. -->
+        <xpath expr="//div[hasclass('o_list_renderer')]" position="attributes">
+            <attribute name="t-att-class">{ ksw_m_table: kswTableLayout }</attribute>
+        </xpath>
+    </t>
+
+    <!-- Phone: one Cards / Table button beside the pager. On a screen whose only
+         views are list and kanban it replaces Odoo's view switcher, which offered
+         the same two choices behind an unlabeled icon. -->
+    <t t-inherit="web.ControlPanel" t-inherit-mode="extension">
+        <xpath expr="//t[@t-slot='control-panel-navigation-additional']" position="before">
+            <t t-if="kswShowLayoutToggle">
+                <button t-if="kswNextLayout === 'table'" type="button"
+                        class="btn btn-secondary ksw_m_layout_toggle"
+                        t-on-click="kswToggleLayout" title="Show as a table">
+                    <i class="fa fa-table" aria-hidden="true"/><span>Table</span>
+                </button>
+                <button t-else="" type="button"
+                        class="btn btn-secondary ksw_m_layout_toggle"
+                        t-on-click="kswToggleLayout" title="Show as cards">
+                    <i class="fa fa-th-large" aria-hidden="true"/><span>Cards</span>
+                </button>
+            </t>
+        </xpath>
+        <xpath expr="//div[hasclass('o_cp_switch_buttons')][@t-if='env.isSmall']" position="attributes">
+            <attribute name="t-att-class">{ 'd-none': kswShowLayoutToggle and env.config.viewSwitcherEntries.every((v) => ['list', 'kanban'].includes(v.type)) }</attribute>
+        </xpath>
     </t>
 
 </templates>

@@ -171,13 +171,53 @@
         <xpath expr="//AppsBar" position="replace"/>
     </t>
 
-    <!-- Phones: the burger menu replaces the apps button, so Home needs its own way in. -->
+    <!-- Phones: the burger menu is the whole navigation, one panel, never empty.
+         Top: Home. Then either the apps (on Home, or after "Change app") or one
+         app's screens. Picking an app shows its screens here instead of
+         loading the app's first screen, so any screen is one pass away. Core's
+         "All Apps" button is gone: the app row does that job. -->
     <t t-name="KSW_backend_theme.NavBar.AppsMenu.Sidebar" t-inherit="web.NavBar.AppsMenu.Sidebar" t-inherit-mode="extension">
-        <xpath expr="//div[hasclass('o_sidebar_topbar')]//a" position="before">
-            <a href="/odoo/home" class="btn btn-secondary me-2 ksw_home_burger"
+        <xpath expr="//div[hasclass('o_sidebar_topbar')]/small" position="replace">
+            <a href="/odoo/home" class="ksw_panel_home"
+               t-att-class="{ 'is_current': kswOnHome }"
                t-on-click.prevent="() => { this._closeAppMenuSidebar(); this.kswOpenHome(); }">
-                <i class="fa fa-home"/><span class="px-2">Home</span>
+                <i class="fa fa-home" aria-hidden="true"/><span>Home</span>
             </a>
+        </xpath>
+        <xpath expr="//nav[hasclass('o_burger_menu_content')]" position="replace">
+            <nav class="o_burger_menu_content ksw_panel flex-grow-1 flex-shrink-1 overflow-auto o_burger_menu_app">
+                <t t-set="panelApp" t-value="kswPanelApp"/>
+                <t t-if="panelApp">
+                    <button type="button" class="ksw_panel_app" t-on-click="kswShowApps"
+                            aria-label="Change app">
+                        <img t-if="panelApp.webIconData" class="o_app_icon" t-att-src="panelApp.webIconData" alt=""/>
+                        <span class="ksw_panel_app_name" t-esc="panelApp.name"/>
+                        <span class="ksw_panel_app_change">
+                            <i class="fa fa-exchange" aria-hidden="true"/> Change app
+                        </span>
+                    </button>
+                    <ul class="list-unstyled py-2 ps-0 mb-0">
+                        <t t-foreach="kswPanelSections" t-as="subMenu" t-key="subMenu.id">
+                            <t t-call="web.SectionMenu">
+                                <t t-set="section" t-value="subMenu"/>
+                            </t>
+                        </t>
+                    </ul>
+                </t>
+                <t t-else="">
+                    <div class="ksw_panel_heading">Apps</div>
+                    <ul class="list-unstyled ksw_panel_apps mb-0">
+                        <li t-foreach="kswPanelApps" t-as="app" t-key="app.id"
+                            t-att-data-menu-xmlid="app.xmlid"
+                            t-att-class="{ 'is_current': !kswOnHome and menuService.getCurrentApp() === app }"
+                            t-on-click="() => this.kswPickApp(app)">
+                            <img t-if="app.webIconData" class="o_app_icon" t-att-src="app.webIconData" alt=""/>
+                            <span t-esc="app.name"/>
+                            <i class="fa fa-angle-right ksw_panel_chevron" aria-hidden="true"/>
+                        </li>
+                    </ul>
+                </t>
+            </nav>
         </xpath>
     </t>
 

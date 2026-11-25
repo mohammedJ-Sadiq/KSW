@@ -251,3 +251,27 @@ msgstr "عطلة أسبوعية"
 #: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_tanker_kanban_mobile
 msgid "m³"
 msgstr "م³"
+
+#. module: KSW_mobile_ui
+#. odoo-javascript
+#: code:addons/KSW_mobile_ui/static/src/xml/list_renderer_mobile.xml:0
+msgid "Table"
+msgstr "جدول"
+
+#. module: KSW_mobile_ui
+#. odoo-javascript
+#: code:addons/KSW_mobile_ui/static/src/xml/list_renderer_mobile.xml:0
+msgid "Cards"
+msgstr "بطاقات"
+
+#. module: KSW_mobile_ui
+#. odoo-javascript
+#: code:addons/KSW_mobile_ui/static/src/xml/list_renderer_mobile.xml:0
+msgid "Show as a table"
+msgstr "عرض كجدول"
+
+#. module: KSW_mobile_ui
+#. odoo-javascript
+#: code:addons/KSW_mobile_ui/static/src/xml/list_renderer_mobile.xml:0
+msgid "Show as cards"
+msgstr "عرض كبطاقات"

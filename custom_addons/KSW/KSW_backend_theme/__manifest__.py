@@ -1,6 +1,6 @@
 {
     'name': 'KSW - Backend Theme',
-    'version': '19.0.4.2.0',
+    'version': '19.0.4.3.0',
     'author': 'Mohammed Albadr',
     'summary': 'KSW look for the MuK backend: company colours, light top bar, Arabic font',
     'description': """

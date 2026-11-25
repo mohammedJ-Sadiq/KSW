@@ -239,6 +239,70 @@ class TestVehicleCustody(TransactionCase):
         checkup.with_user(self.workshop).action_complete()
         self.assertEqual(checkup.state, 'completed')
 
+    def _through_workshop(self, employee, depreciation=None):
+        """A driver change through HR and the workshop, done; `depreciation`
+        sets the first checklist line's reading at the inspection."""
+        form = self._driver_change(employee)
+        form.with_user(self.user_a).action_submit()
+        form.with_user(self.hr).action_hr_check()
+        if depreciation is not None:
+            form.inspection_line_ids[:1].sudo().depreciation = depreciation
+        self._workshop_done(form)
+        self.assertEqual(form.state, 'done')
+        return form
+
+    def test_inspection_starts_from_the_last_reading(self):
+        """The clutch was 20% when Khalid took it and 30% when he hands it back:
+        10% happened under him."""
+        self.dept_a.x_driver_change_workshop = True
+        first = self._through_workshop(self.khalid, depreciation=20)
+        self.assertFalse(first.baseline_request_id)  # nothing earlier: it is the starting point
+        clutch = first.inspection_line_ids[:1]
+        self.assertEqual((clutch.previous_depreciation, clutch.depreciation_change), (0, 20))
+        self._licence(self.ahmed)
+        second = self._driver_change(self.ahmed)
+        line = second.inspection_line_ids.filtered(lambda l: l.item_id == clutch.item_id)
+        self.assertEqual(second.baseline_request_id, first)
+        # Untouched lines start at the last reading: no change unless the workshop changes it.
+        self.assertEqual((line.previous_depreciation, line.depreciation, line.depreciation_change), (20, 20, 0))
+        second.with_user(self.user_a).action_submit()
+        second.with_user(self.hr).action_hr_check()
+        line.sudo().depreciation = 30
+        self.assertEqual(line.depreciation_change, 10)
+        self._workshop_done(second)
+        self.assertEqual(line.previous_depreciation, 20)  # kept once inspected
+        report = self.env['ir.actions.report']._render_qweb_html(
+            'KSW_vehicle_custody.action_report_vehicle_custody', second.ids)[0].decode()
+        self.assertIn('+10', report)
+
+    def test_history_since_the_custodian_took_it(self):
+        """Repairs and parts while Ahmed held the truck, without oil and filters."""
+        Part = self.env['ksw.workshop.part']
+        oil = Part.create({'name': 'VC-OIL', 'description': 'فلتر زيت', 'x_routine_service': True})
+        clutch = Part.create({'name': 'VC-CLU', 'description': 'Clutch plate'})
+        workshop = self.env['ksw.workshop']._for_department(self.dept_a)
+
+        def visit(lines, description):
+            return self.env['ksw.workshop.request'].create({
+                'employee_id': self.ahmed.id, 'client_id': self.truck.client_id.id, 'vehicle_type': 'isuzu',
+                'vehicle_id': self.truck.id, 'driver_id': self.ahmed.id, 'workshop_id': workshop.id,
+                'description': description,
+                'part_line_ids': [(0, 0, {'part_id': p.id, 'quantity': 1, 'unit_cost': c}) for p, c in lines]})
+        repair = visit([(clutch, 500.0), (oil, 40.0)], 'Clutch slipping')
+        service = visit([(oil, 40.0)], 'Service')
+        oil_change = visit([], 'Change oil')  # the history's way: tagged Oil & Filters, no parts
+        form = self._driver_change(self.khalid)
+        self.assertEqual(form.history_start, self.truck.x_custody_ids.filtered(
+            lambda c: c.employee_id == self.ahmed).date_from)
+        html = str(form.with_user(self.user_a).history_html)  # read as the department, no workshop access
+        self.assertIn(repair.name, html)
+        self.assertIn('Clutch plate', html)
+        self.assertNotIn('فلتر زيت', html)
+        self.assertNotIn(service.name, html)
+        self.assertNotIn(oil_change.name, html)
+        self.assertIn('2 oil / filter services', html)
+        self.assertIn('500.00', html)  # the repair's cost without its oil filter
+
     def test_driver_change_through_workshop_refused_by_hr(self):
         self.dept_a.x_driver_change_workshop = True
         form = self._driver_change(self.khalid)

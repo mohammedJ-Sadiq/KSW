@@ -252,3 +252,27 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_mobile_ui.view_water_tanker_kanban_mobile
 msgid "m³"
 msgstr ""
+
+#. module: KSW_mobile_ui
+#. odoo-javascript
+#: code:addons/KSW_mobile_ui/static/src/xml/list_renderer_mobile.xml:0
+msgid "Table"
+msgstr ""
+
+#. module: KSW_mobile_ui
+#. odoo-javascript
+#: code:addons/KSW_mobile_ui/static/src/xml/list_renderer_mobile.xml:0
+msgid "Cards"
+msgstr ""
+
+#. module: KSW_mobile_ui
+#. odoo-javascript
+#: code:addons/KSW_mobile_ui/static/src/xml/list_renderer_mobile.xml:0
+msgid "Show as a table"
+msgstr ""
+
+#. module: KSW_mobile_ui
+#. odoo-javascript
+#: code:addons/KSW_mobile_ui/static/src/xml/list_renderer_mobile.xml:0
+msgid "Show as cards"
+msgstr ""

@@ -193,22 +193,26 @@
                     <td style="text-align: center;" t-out="types.get(o.vehicle_type, '')"/></tr>
             </table>
             <table class="hr12">
-                <tr><th style="width: 5%;">#</th><th style="width: 35%;">Items / العناصر</th>
-                    <th style="width: 15%;">Depreciation % / نسبة الإهلاك</th>
-                    <th style="width: 15%;">Value / القيمة</th><th>Remarks / ملاحظة</th></tr>
+                <tr><th style="width: 5%;">#</th><th style="width: 29%;">Items / العناصر</th>
+                    <th style="width: 11%;">At Last Inspection % / عند آخر فحص</th>
+                    <th style="width: 11%;">Depreciation % / نسبة الإهلاك</th>
+                    <th style="width: 11%;">Change % / الفرق</th>
+                    <th style="width: 12%;">Value / القيمة</th><th>Remarks / ملاحظة</th></tr>
                 <tr t-foreach="o.inspection_line_ids" t-as="line">
                     <td style="text-align: center;" t-out="line_index + 1"/>
                     <td t-out="line.name"/>
+                    <td style="text-align: center;" t-out="'%g' % line.previous_depreciation if line.previous_depreciation else ''"/>
                     <td style="text-align: center;" t-out="'%g' % line.depreciation if line.depreciation else ''"/>
+                    <td style="text-align: center;" t-out="'%+g' % line.depreciation_change if line.depreciation_change else ''"/>
                     <td style="text-align: right;" t-out="'{:,.2f}'.format(line.value) if line.value else ''"/>
                     <td t-out="line.remark or ''"/>
                 </tr>
                 <!-- Blank rows like the paper, for anything added by hand. -->
                 <tr t-foreach="range(max(0, 15 - len(o.inspection_line_ids)))" t-as="blank">
                     <td style="text-align: center;" t-out="len(o.inspection_line_ids) + blank_index + 1"/>
-                    <td>&#160;</td><td/><td/><td/>
+                    <td>&#160;</td><td/><td/><td/><td/><td/>
                 </tr>
-                <tr><th colspan="3" style="text-align: right;">Total / الإجمالي</th>
+                <tr><th colspan="5" style="text-align: right;">Total / الإجمالي</th>
                     <th style="text-align: right;" t-out="'{:,.2f}'.format(o.inspection_total)"/><th/></tr>
             </table>
             <table class="hr12">

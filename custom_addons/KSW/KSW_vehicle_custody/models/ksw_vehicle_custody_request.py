@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from markupsafe import Markup
 
 from odoo import _, api, fields, models
@@ -153,6 +155,18 @@ class KswVehicleCustodyRequest(models.Model):
     inspection_line_ids = fields.One2many('ksw.vehicle.custody.inspection', 'request_id', string='Inspection')
     inspection_datetime = fields.Datetime(string='Inspected On')
     inspection_total = fields.Float(string='Total Value', compute='_compute_inspection_total', store=True)
+    # The reading the vehicle was handed over on: the last form of this
+    # vehicle the workshop inspected. Each line keeps that reading as a plain
+    # copy (the earlier form may be reopened, this one must not move), so the
+    # change is what happened since, under the user handing it over now.
+    baseline_request_id = fields.Many2one('ksw.vehicle.custody.request', string='Last Inspection',
+                                          readonly=True, copy=False, ondelete='set null')
+    baseline_datetime = fields.Datetime(related='baseline_request_id.inspection_datetime',
+                                        string='Last Inspected On')
+    # Maintenance while the user handing the vehicle over held it (display only).
+    history_start = fields.Date(string='Custodian Since', compute='_compute_history', compute_sudo=True)
+    history_html = fields.Html(string='Maintenance History', compute='_compute_history', compute_sudo=True,
+                               sanitize=False)
     receiver_name = fields.Char(string='Vehicle Receiver')
     deliverer_name = fields.Char(string='Vehicle Handed Over By')
     workshop_official_name = fields.Char(string='Workshop Official')
@@ -570,12 +584,124 @@ class KswVehicleCustodyRequest(models.Model):
             commands = [(0, 0, {'sequence': item.sequence, 'item_id': item.id, 'name': item.name})
                         for item in items]
         self.sudo().write({'inspection_line_ids': commands})
+        self._stamp_inspection_baseline()
+
+    def _ksw_last_inspection(self):
+        """The last form of this vehicle the workshop inspected, other than this one."""
+        self.ensure_one()
+        return self.sudo().search([
+            ('vehicle_id', '=', self.vehicle_id.id), ('id', '!=', self.id or 0), ('workshop_done', '=', True),
+            ('state', 'in', ('done', 'signed')), ('inspection_line_ids', '!=', False)], order='id desc', limit=1)
+
+    def _stamp_inspection_baseline(self):
+        """Copy the last inspection's reading onto each line while the
+        workshop has not inspected yet. A line nobody has touched starts at
+        that reading, so the workshop only changes what got worse (or was
+        repaired), and an unchanged item reads as no change, not as -20%."""
+        for form in self.sudo():
+            if form.workshop_done or form.state not in OPEN_STATES:
+                continue
+            last = form._ksw_last_inspection()
+            by_item = {l.item_id.id: l.depreciation for l in last.inspection_line_ids if l.item_id}
+            by_name = {l.name: l.depreciation for l in last.inspection_line_ids}
+            for line in form.inspection_line_ids:
+                previous = by_item.get(line.item_id.id) if line.item_id else None
+                if previous is None:
+                    previous = by_name.get(line.name, 0.0)
+                vals = {'previous_depreciation': previous}
+                untouched = line.depreciation == line.previous_depreciation and not line.value
+                if untouched:
+                    vals['depreciation'] = previous
+                line.write(vals)
+            form.baseline_request_id = last
+
+    @api.depends_context('lang')
+    @api.depends('vehicle_id', 'previous_employee_id', 'form_date', 'workshop_request_id', 'state')
+    def _compute_history(self):
+        """The vehicle's workshop visits from the day the user handing it over
+        became its custodian (to the day he stopped, on a done form): repairs
+        and the spare parts fitted, without oil and filters (items ticked
+        Routine Service). sudo: shown to the department and HR, who do not
+        read workshop requests; a failed read would take the form down."""
+        Custody = self.env['ksw.fleet.vehicle.custody']
+        Request = self.env['ksw.workshop.request']
+        today = fields.Date.context_today(self)
+        for form in self:
+            form.history_start, form.history_html = False, False
+            employee, vehicle = form.previous_employee_id, form.vehicle_id
+            if not (employee and vehicle):
+                continue
+            custody = Custody.search([('vehicle_id', '=', vehicle.id), ('employee_id', '=', employee.id),
+                                      ('date_from', '<=', form.form_date or today)],
+                                     order='date_from desc, id desc', limit=1)
+            if not custody:
+                form.history_html = Markup('<p class="text-muted">%s</p>') % _(
+                    'No custody record for %(e)s on %(v)s.', e=employee.name, v=vehicle.name)
+                continue
+            start, end = custody.date_from, custody.date_to or today
+            form.history_start = start
+            since = fields.Datetime.to_datetime(start)
+            until = fields.Datetime.to_datetime(end) + timedelta(days=1)
+            requests = Request.search([
+                ('vehicle_id', '=', vehicle.id), ('state', '!=', 'rejected'),
+                ('id', '!=', form.workshop_request_id.id or 0), '|',
+                '&', ('entry_datetime', '>=', since), ('entry_datetime', '<', until),
+                '&', '&', ('entry_datetime', '=', False), ('create_date', '>=', since), ('create_date', '<', until),
+            ])
+            requests = requests.sorted(lambda r: r.entry_datetime or r.create_date, reverse=True)
+            form.history_html = form._history_table(employee, start, custody.date_to, requests)
+
+    @api.model
+    def _history_table(self, employee, start, end, requests):
+        rows, routine_only, parts_count, total = [], 0, 0, 0.0
+        oil = self.env.ref('KSW_workshop.request_type_oil_filters', raise_if_not_found=False)
+        for request in requests:
+            routine = request.part_line_ids.filtered(lambda l: l.part_id.x_routine_service)
+            parts = request.part_line_ids - routine
+            # An oil / filter service: tagged only Oil & Filters (most of the
+            # history, typed as "Change oil" with no itemised parts), or every
+            # itemised part on it is a routine item.
+            only_oil = oil and request.request_type_ids and request.request_type_ids <= oil
+            if not parts and (only_oil or (routine and not request.parts_cost)):
+                routine_only += 1
+                continue
+            cost = request.total_cost - sum(routine.mapped('subtotal'))
+            parts_count += len(parts)
+            total += cost
+            fitted = ' · '.join('%s × %g' % (l.description or l.part_id.display_name or '', l.quantity)
+                                for l in parts) or (request.repairs_parts or '')
+            when = request.entry_datetime or request.create_date
+            rows.append(Markup(
+                '<tr><td>%(d)s</td><td><a href="/odoo/ksw.workshop.request/%(id)s">%(n)s</a></td>'
+                '<td>%(w)s</td><td>%(p)s</td><td class="text-end">%(c)s</td></tr>') % {
+                'd': fields.Date.to_string(when.date()), 'id': request.id, 'n': request.name,
+                'w': request.x_work_summary or request.description or '', 'p': fitted,
+                'c': '{:,.2f}'.format(cost) if cost else ''})
+        period = _('from %(s)s to %(e)s', s=start, e=end) if end else _('since %s', start)
+        head = Markup('<p>%s</p>') % (Markup(_('<b>%(e)s</b>, %(p)s: %(v)s, %(n)s, %(t)s SAR.')) % {
+            'e': employee.name, 'p': period,
+            'v': _('%s workshop visits', len(rows)), 'n': _('%s itemised spare parts', parts_count),
+            't': '{:,.2f}'.format(total)})
+        if routine_only:
+            head += Markup('<p class="text-muted">%s</p>') % _(
+                'Not listed: %s oil / filter services.', routine_only)
+        if not rows:
+            return head
+        return head + Markup(
+            '<table class="table table-sm o_ksw_custody_history"><thead><tr><th>%(d)s</th><th>%(r)s</th>'
+            '<th>%(w)s</th><th>%(p)s</th><th class="text-end">%(c)s</th></tr></thead><tbody>%(rows)s'
+            '</tbody></table>') % {
+            'd': _('Date'), 'r': _('Request'), 'w': _('Work Done'), 'p': _('Spare Parts'), 'c': _('Cost'),
+            'rows': Markup('').join(rows)}
 
     # ------------------------------------------------------------------
     # The route
     # ------------------------------------------------------------------
     def _advance(self, state, **vals):
         self.sudo().write(dict(vals, state=state))
+        if state == 'workshop':
+            # The reading the workshop starts from is the latest one there is.
+            self._stamp_inspection_baseline()
         self._sync_activities()
 
     def action_submit(self):
@@ -924,7 +1050,13 @@ class KswVehicleCustodyInspection(models.Model):
     sequence = fields.Integer(default=10)
     item_id = fields.Many2one('ksw.vehicle.custody.checklist', string='Checklist Item', ondelete='set null')
     name = fields.Char(string='Item', required=True)
+    previous_depreciation = fields.Float(string='At Last Inspection %', readonly=True,
+                                         help='The reading of the last inspection, which the vehicle was '
+                                              'handed over on.')
     depreciation = fields.Float(string='Depreciation %')
+    depreciation_change = fields.Float(string='Change Since %', compute='_compute_depreciation_change',
+                                       help='Depreciation since the last inspection: what happened while '
+                                            'the user handing it over now held it.')
     value = fields.Float(string='Value')
     remark = fields.Char()
 
@@ -941,6 +1073,11 @@ class KswVehicleCustodyInspection(models.Model):
     def unlink(self):
         self.request_id._check_lines_editable()
         return super().unlink()
+
+    @api.depends('depreciation', 'previous_depreciation')
+    def _compute_depreciation_change(self):
+        for line in self:
+            line.depreciation_change = line.depreciation - line.previous_depreciation
 
     @api.constrains('depreciation')
     def _check_depreciation(self):

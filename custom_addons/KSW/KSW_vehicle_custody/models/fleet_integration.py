@@ -169,3 +169,12 @@ class HrDepartment(models.Model):
         self.ensure_one()
         holder = self._ksw_fleet_holder() or self.sudo()
         return bool(holder.x_driver_change_workshop)
+
+
+class KswWorkshopPart(models.Model):
+    _inherit = 'ksw.workshop.part'
+
+    x_routine_service = fields.Boolean(
+        string='Routine Service (Oil / Filter)',
+        help='Oil and filters changed at every service. Left out of the maintenance history on the '
+             'vehicle handover form (HR-12), which lists the repairs and parts that matter.')

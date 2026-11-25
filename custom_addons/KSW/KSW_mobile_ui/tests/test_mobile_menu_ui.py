@@ -45,16 +45,24 @@ class TestMobileMenuUI(HttpCase):
                 });
                 const toggle = () => wait(() => document.querySelector(
                     '.o_main_navbar .o_menu_toggle'), 'menu button');
-                // Pick the app as a user would: All Apps, then Accounting.
+                // Pick the app as a user would. With KSW_backend_theme the menu
+                // opens on the apps and lists the picked app's pages in place;
+                // core needs All Apps, then the app, then the menu again.
                 (await toggle()).click();
-                (await wait(() => document.querySelector(
-                    '.o_app_menu_sidebar .o_sidebar_topbar a'), 'All Apps')).click();
+                await wait(() => document.querySelector('.o_app_menu_sidebar'), 'sidebar');
+                const themed = document.querySelector('.o_app_menu_sidebar .ksw_panel');
+                if (!themed) {
+                    (await wait(() => document.querySelector(
+                        '.o_app_menu_sidebar .o_sidebar_topbar a'), 'All Apps')).click();
+                }
                 (await wait(() => document.querySelector(
                     '.o_app_menu_sidebar li[data-menu-xmlid="account.menu_finance"]'),
                     'Accounting app')).click();
-                await wait(() => !document.querySelector('.o_app_menu_sidebar'),
-                    'sidebar closed');
-                (await toggle()).click();
+                if (!themed) {
+                    await wait(() => !document.querySelector('.o_app_menu_sidebar'),
+                        'sidebar closed');
+                    (await toggle()).click();
+                }
                 const title = await wait(() => document.querySelector(
                     '.o_app_menu_sidebar div[data-menu-xmlid="%(xmlid)s"]'), 'heading');
                 // Measure once the sidebar has finished sliding in.

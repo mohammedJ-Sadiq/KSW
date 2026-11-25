@@ -116,4 +116,40 @@
             </field>
         </field>
     </record>
+
+    <!-- Oil and filters are left out of the HR-12 maintenance history. -->
+    <record id="view_ksw_workshop_part_list_custody" model="ir.ui.view">
+        <field name="name">ksw.workshop.part.list.custody</field>
+        <field name="model">ksw.workshop.part</field>
+        <field name="inherit_id" ref="KSW_workshop.view_ksw_workshop_part_list"/>
+        <field name="arch" type="xml">
+            <field name="description" position="after">
+                <field name="x_routine_service" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_ksw_workshop_part_form_custody" model="ir.ui.view">
+        <field name="name">ksw.workshop.part.form.custody</field>
+        <field name="model">ksw.workshop.part</field>
+        <field name="inherit_id" ref="KSW_workshop.view_ksw_workshop_part_form"/>
+        <field name="arch" type="xml">
+            <field name="standard_cost" position="after">
+                <field name="x_routine_service"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_ksw_workshop_part_search_custody" model="ir.ui.view">
+        <field name="name">ksw.workshop.part.search.custody</field>
+        <field name="model">ksw.workshop.part</field>
+        <field name="inherit_id" ref="KSW_workshop.view_ksw_workshop_part_search"/>
+        <field name="arch" type="xml">
+            <filter name="filter_inactive" position="before">
+                <filter string="Routine Service (Oil / Filter)" name="filter_routine"
+                        domain="[('x_routine_service', '=', True)]"/>
+                <separator/>
+            </filter>
+        </field>
+    </record>
 </odoo>

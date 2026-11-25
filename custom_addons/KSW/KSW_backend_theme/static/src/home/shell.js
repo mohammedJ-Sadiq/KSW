@@ -1,4 +1,4 @@
-import { Component } from "@odoo/owl";
+import { Component, useState } from "@odoo/owl";
 import { browser } from "@web/core/browser/browser";
 import { registry } from "@web/core/registry";
 import { user } from "@web/core/user";
@@ -20,9 +20,68 @@ patch(WebClient.prototype, {
 });
 
 // The apps button opens Home: one app switcher (MuK's sidebar is hidden).
+// On a phone the burger panel (home.xml) shows one app's screens or the apps;
+// `kswPanel.appId` is an app picked in the panel but not opened yet.
 patch(NavBar.prototype, {
+    setup() {
+        super.setup(...arguments);
+        this.kswPanel = useState({ appId: null });
+    },
+
     kswOpenHome() {
         this.env.services.action.doAction(HOME_ACTION, { clearBreadcrumbs: true });
+    },
+
+    /** Home, or a screen of no app (My Activities): no app to show screens of. */
+    get kswOnHome() {
+        const classes = document.body.classList;
+        return classes.contains("ksw_on_home") || classes.contains("ksw_no_app");
+    },
+
+    get kswPanelApp() {
+        if (this.state.isAllAppsMenuOpened) {
+            return null;
+        }
+        if (this.kswPanel.appId) {
+            return this.menuService.getMenu(this.kswPanel.appId);
+        }
+        return this.kswOnHome ? null : this.currentApp || null;
+    },
+
+    get kswPanelSections() {
+        const app = this.kswPanelApp;
+        return (app && this.menuService.getMenuAsTree(app.id).childrenTree) || [];
+    },
+
+    get kswPanelApps() {
+        return this.menuService.getApps();
+    },
+
+    kswShowApps() {
+        this.kswPanel.appId = null;
+        this.state.isAllAppsMenuOpened = true;
+    },
+
+    /** An app with screens lists them here; an app that is one screen opens. */
+    kswPickApp(app) {
+        if (this.menuService.getMenuAsTree(app.id).childrenTree.length) {
+            this.kswPanel.appId = app.id;
+            this.state.isAllAppsMenuOpened = false;
+        } else {
+            this.onNavBarDropdownItemSelection(app);
+            this._closeAppMenuSidebar();
+        }
+    },
+
+    _openAppMenuSidebar() {
+        super._openAppMenuSidebar(...arguments);
+        this.kswPanel.appId = null;
+        this.state.isAllAppsMenuOpened = false;
+    },
+
+    _closeAppMenuSidebar() {
+        super._closeAppMenuSidebar(...arguments);
+        this.kswPanel.appId = null;
     },
 });
 
