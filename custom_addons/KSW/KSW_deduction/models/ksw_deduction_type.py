@@ -51,9 +51,10 @@ class KswDeductionType(models.Model):
              'Lower is collected first (e.g. penalties before loans). '
              'The unaffordable remainder is forwarded to the next month.',
     )
-    # Oct 2026: a non-loan deduction is one installment — it is taken out of
-    # unpaid commission first (KSW_commissions) and the rest by the next
-    # payslip. Only the system administrator may change that per type.
+    # Oct 2026 locked every non-loan type to one installment; Nov 2026
+    # unlocked them again (default 1, changeable). Payslips and commission
+    # months only take installments already due, so a spread deduction is
+    # collected month by month. Only the system administrator may lock a type.
     x_single_installment = fields.Boolean(
         string='Single Installment Only',
         default=False,

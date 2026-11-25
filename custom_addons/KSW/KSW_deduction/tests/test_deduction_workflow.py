@@ -47,8 +47,8 @@ class TestDeductionWorkflow(DeductionCommon):
         self.assertEqual(ded.installment_amount, 250.0)
         ded.write({'amount': 0.0})
         self.assertEqual(ded.installment_amount, 0.0)
-        ded.write({'amount': 500.0, 'installments': 0})
-        self.assertEqual(ded.installment_amount, 0.0)
+        with self.assertRaises(ValidationError):
+            ded.write({'amount': 500.0, 'installments': 0})
     def test_onchange_type_sets_default_installments(self):
         from odoo.tests import Form
         with Form(self.env['ksw.deduction']) as f:
@@ -82,9 +82,9 @@ class TestDeductionWorkflow(DeductionCommon):
         with self.assertRaises(ValidationError):
             ded.action_submit()
     def test_submit_zero_installments_raises(self):
-        ded = self._make_deduction(installments=0)
+        # Refused on save now, not only on submit.
         with self.assertRaises(ValidationError):
-            ded.action_submit()
+            self._make_deduction(installments=0)
     def test_resubmit_active_raises(self):
         ded = self._make_deduction()
         ded.action_submit()

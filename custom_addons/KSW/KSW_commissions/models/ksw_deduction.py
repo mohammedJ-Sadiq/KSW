@@ -4,11 +4,14 @@
 * Add ``_get_pending_commission_lines_for_period`` helper used by the
   commission sheet to compute the auto-pulled "Loans" deductible.
 """
+import logging
 import math
 
 from markupsafe import Markup
 
 from odoo import _, api, fields, models
+
+_logger = logging.getLogger(__name__)
 
 
 class KswDeduction(models.Model):
@@ -151,6 +154,38 @@ class KswDeduction(models.Model):
             ('type_id.is_loan', '=', False),
         ], order='x_charge_date, id')
         deductions._recover_from_unpaid_commission()
+
+    @api.model
+    def _cron_recover_newly_due_installments(self):
+        """The calendar half: a non-loan spread over several months owes its
+        next installment on the 1st, with nothing else changing. Offer it to
+        any commission month still approved and not marked Paid, as on
+        activation. Installments not yet due are never taken; a month
+        marked Paid has nothing left to give (``_recovery_available``).
+        Idempotent: what is already reserved or settled is skipped."""
+        this_month = fields.Date.context_today(self).replace(day=1)
+        employees = self.env['ksw.pay.run.line'].sudo().search([
+            ('run_id.state', '=', 'approved'),
+        ]).employee_id
+        if not employees:
+            return
+        deductions = self.sudo().search([
+            ('employee_id', 'in', employees.ids),
+            ('state', '=', 'active'),
+            ('type_id.is_loan', '=', False),
+            ('line_ids', 'any', [
+                ('state', '=', 'pending'),
+                ('x_awaiting_commission', '=', False),
+                ('period_date', '<=', this_month),
+            ]),
+        ], order='x_charge_date, id')
+        for ded in deductions:
+            try:
+                with self.env.cr.savepoint():
+                    ded._recover_from_unpaid_commission()
+            except Exception:
+                _logger.exception(
+                    'Commission recovery failed for deduction %s', ded.id)
 
     # ------------------------------------------------------------------
     # Helpers — used by ksw.commission.sheet

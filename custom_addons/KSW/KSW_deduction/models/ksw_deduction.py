@@ -1253,6 +1253,11 @@ class KswDeduction(models.Model):
     # Constraints
     # ==================================================================
 
+    @api.constrains('installments')
+    def _check_installments_positive(self):
+        if any(rec.installments < 1 for rec in self):
+            raise ValidationError(_("Installments must be at least 1."))
+
     @api.constrains('type_id')
     def _check_loan_type_allowed(self):
         """Prevent non-authorised users from selecting a loan type."""

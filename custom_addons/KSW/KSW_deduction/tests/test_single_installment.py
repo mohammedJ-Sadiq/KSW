@@ -1,9 +1,9 @@
 """A deduction type locked to one installment stays one installment.
 
-Since Oct 2026 every non-loan type starts locked (a non-loan deduction is
-taken out of unpaid commission first, the rest by the next payslip). Only a
-system administrator may lock or unlock a type, and the lock holds on every
-route that sets the count: create, write, Reschedule Installments.
+Oct 2026 locked every non-loan type; Nov 2026 unlocked them again, so the
+lock is now an opt-in setting on a type. Only a system administrator may
+lock or unlock a type, and the lock holds on every route that sets the
+count: create, write, Reschedule Installments.
 """
 from odoo.exceptions import UserError
 

@@ -15,6 +15,7 @@ voucher if the debt existed on the month end, on its own voucher dated the
 day it was charged otherwise.
 """
 from dateutil.relativedelta import relativedelta
+from freezegun import freeze_time
 
 from odoo import fields
 
@@ -184,3 +185,61 @@ class TestRecoveryJournal(AutoRecoveryCommon):
         self.assertAlmostEqual(rows[2]['debit'], 1000.0)
         self.assertFalse(run._bas_recovery_rows())
         self.env['ksw.bas.journal'].check_balanced(rows)
+
+
+class TestSpreadNonLoanByMonth(AutoRecoveryCommon):
+    """Nov 2026: a non-loan may be spread over several months. Only the
+    installments already due are taken; each later one is offered to an
+    approved, unpaid commission month when its own month arrives."""
+
+    def _spread_penalty(self, employee, amount, installments):
+        ded = self.env['ksw.deduction'].create({
+            'employee_id': employee.id,
+            'type_id': self.type_gov_pen.id,
+            'amount': amount,
+            'installments': installments,
+            'start_month': self.this_month,
+            'reason': 'Government fee in three',
+        })
+        ded.action_submit()
+        return ded
+
+    def _cron_on(self, month):
+        with freeze_time(month + relativedelta(days=1)):
+            self.env['ksw.deduction']._cron_recover_newly_due_installments()
+
+    def test_01_future_installments_wait_for_their_month(self):
+        run = self._approve(self._commission_entry(self.emp_a, 2456.0).batch_id)
+        ded = self._spread_penalty(self.emp_a, 900.0, 3)
+        lines = ded.line_ids.sorted('period_date')
+        self.assertEqual(lines.mapped('state'), ['paid', 'pending', 'pending'])
+        self.assertEqual(lines[0].x_recover_from_run_id, run)
+        self.assertFalse(lines[1:].filtered('x_awaiting_commission'))
+        # Running the pass again in the same month takes nothing more.
+        self._cron_on(self.this_month)
+        self.assertEqual(lines.mapped('state'), ['paid', 'pending', 'pending'])
+
+    def test_02_next_month_takes_from_the_still_unpaid_month(self):
+        run = self._approve(self._commission_entry(self.emp_a, 2456.0).batch_id)
+        ded = self._spread_penalty(self.emp_a, 900.0, 3)
+        lines = ded.line_ids.sorted('period_date')
+        self._cron_on(self.this_month + relativedelta(months=1))
+        self.assertEqual(lines.mapped('state'), ['paid', 'paid', 'pending'])
+        self.assertEqual(lines[1].x_recover_from_run_id, run)
+        # It keeps its own due month.
+        nxt = self.this_month + relativedelta(months=1)
+        self.assertEqual((lines[1].year, lines[1].month), (nxt.year, nxt.month))
+        self.assertAlmostEqual(
+            self._register_line(run, self.emp_a).net_payable, 2456.0 - 600.0)
+
+    def test_03_a_month_marked_paid_in_between_is_final(self):
+        run = self._approve(self._commission_entry(self.emp_a, 2456.0).batch_id)
+        ded = self._spread_penalty(self.emp_a, 900.0, 3)
+        run.sudo().write({'state': 'paid'})
+        reg = self._register_line(run, self.emp_a)
+        before = reg.net_payable
+        self._cron_on(self.this_month + relativedelta(months=1))
+        lines = ded.line_ids.sorted('period_date')
+        self.assertEqual(lines.mapped('state'), ['paid', 'pending', 'pending'])
+        self.assertFalse(lines[1].x_recover_from_run_id)
+        self.assertAlmostEqual(reg.net_payable, before)
