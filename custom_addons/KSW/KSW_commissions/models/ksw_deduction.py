@@ -162,14 +162,36 @@ class KswDeduction(models.Model):
         any commission month still approved and not marked Paid, as on
         activation. Installments not yet due are never taken; a month
         marked Paid has nothing left to give (``_recovery_available``).
-        Idempotent: what is already reserved or settled is skipped."""
-        this_month = fields.Date.context_today(self).replace(day=1)
+        Idempotent: what is already reserved or settled is skipped.
+        Scheduled at 03:00 Riyadh (00:00 UTC), outside working hours."""
         employees = self.env['ksw.pay.run.line'].sudo().search([
             ('run_id.state', '=', 'approved'),
         ]).employee_id
-        if not employees:
+        for ded in self._newly_due_for_recovery(employees):
+            try:
+                with self.env.cr.savepoint():
+                    ded._recover_from_unpaid_commission()
+            except Exception:
+                _logger.exception(
+                    'Commission recovery failed for deduction %s', ded.id)
+
+    @api.model
+    def _recover_newly_due_before_export(self, run):
+        """The same check, run by the bank / BAS export of an approved
+        month, so the file carries what is due today even when the daily
+        pass has not run yet. Errors are raised, never logged: a file
+        silently missing a deduction is worse than an export refused."""
+        if run.state != 'approved':
             return
-        deductions = self.sudo().search([
+        self._newly_due_for_recovery(
+            run.sudo().line_ids.employee_id)._recover_from_unpaid_commission()
+
+    @api.model
+    def _newly_due_for_recovery(self, employees):
+        if not employees:
+            return self.browse()
+        this_month = fields.Date.context_today(self).replace(day=1)
+        return self.sudo().search([
             ('employee_id', 'in', employees.ids),
             ('state', '=', 'active'),
             ('type_id.is_loan', '=', False),
@@ -179,13 +201,6 @@ class KswDeduction(models.Model):
                 ('period_date', '<=', this_month),
             ]),
         ], order='x_charge_date, id')
-        for ded in deductions:
-            try:
-                with self.env.cr.savepoint():
-                    ded._recover_from_unpaid_commission()
-            except Exception:
-                _logger.exception(
-                    'Commission recovery failed for deduction %s', ded.id)
 
     # ------------------------------------------------------------------
     # Helpers — used by ksw.commission.sheet

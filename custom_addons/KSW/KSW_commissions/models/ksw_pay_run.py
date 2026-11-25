@@ -1632,7 +1632,9 @@ class KswPayRunLine(models.Model):
             },
             subtype_xmlid='mail.mt_note',
         )
-        if self.x_bank_exported_date and run.state == 'approved':
+        # Not for the month being exported now: that file already has it.
+        if (self.x_bank_exported_date and run.state == 'approved'
+                and self.env.context.get('_ksw_exporting_commission') != run.id):
             run.message_post(
                 body=Markup('<strong>⚠ %(msg)s</strong>') % {
                     'msg': _('%(emp)s changed after the bank file was '

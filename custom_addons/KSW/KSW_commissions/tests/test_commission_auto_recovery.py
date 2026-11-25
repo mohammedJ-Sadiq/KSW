@@ -243,3 +243,17 @@ class TestSpreadNonLoanByMonth(AutoRecoveryCommon):
         self.assertEqual(lines.mapped('state'), ['paid', 'pending', 'pending'])
         self.assertFalse(lines[1].x_recover_from_run_id)
         self.assertAlmostEqual(reg.net_payable, before)
+
+    def test_04_export_takes_what_fell_due_before_the_daily_pass(self):
+        run = self._approve(self._commission_entry(self.emp_a, 2456.0).batch_id)
+        ded = self._spread_penalty(self.emp_a, 900.0, 3)
+        lines = ded.line_ids.sorted('period_date')
+        reg = self._register_line(run, self.emp_a)
+        with freeze_time(self.this_month + relativedelta(months=1, days=1)):
+            wizard = self.env['ksw.commission.bank.export.wizard'].sudo(
+            ).create({'run_id': run.id, 'export_mode': 'journal_entry',
+                      'journal_number': '26007265'})
+            wizard.action_export()
+        self.assertEqual(lines.mapped('state'), ['paid', 'paid', 'pending'])
+        self.assertEqual(lines[1].x_recover_from_run_id, run)
+        self.assertAlmostEqual(reg.net_payable, 2456.0 - 600.0)

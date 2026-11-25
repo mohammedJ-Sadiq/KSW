@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- A spread non-loan deduction owes its next installment on the 1st:
-         take it from a commission month approved and not yet marked Paid. -->
+         take it from a commission month approved and not yet marked Paid.
+         Runs at 03:00 Riyadh (00:00 UTC), outside working hours. -->
     <record id="cron_ksw_recover_newly_due_installments" model="ir.cron">
         <field name="name">Commissions: take newly due deductions from unpaid commission</field>
         <field name="model_id" ref="KSW_deduction.model_ksw_deduction"/>
@@ -9,6 +10,7 @@
         <field name="code">model._cron_recover_newly_due_installments()</field>
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
+        <field name="nextcall" eval="(DateTime.utcnow() + relativedelta(days=1)).strftime('%Y-%m-%d 00:00:00')"/>
         <field name="active" eval="True"/>
     </record>
 </odoo>

@@ -630,6 +630,11 @@ class KswCommissionBankExportWizard(models.TransientModel):
 
     def action_export(self):
         self.ensure_one()
+        # A non-loan installment that fell due since the month was approved
+        # is taken from it first, so the file pays what is right today.
+        self.env['ksw.deduction'].with_context(
+            _ksw_exporting_commission=self.run_id.id,
+        )._recover_newly_due_before_export(self.run_id)
         mode = self.export_mode
         handlers = {
             'all_excel':     self._export_all_excel,
