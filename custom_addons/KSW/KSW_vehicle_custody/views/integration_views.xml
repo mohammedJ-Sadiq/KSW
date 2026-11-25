@@ -92,4 +92,28 @@
             </xpath>
         </field>
     </record>
+
+    <!-- How a driver change runs, per department (Isuzu branches: through the
+         workshop and HR). -->
+    <record id="view_department_list_fleet_allocation_custody" model="ir.ui.view">
+        <field name="name">hr.department.list.fleet.allocation.custody</field>
+        <field name="model">hr.department</field>
+        <field name="inherit_id" ref="KSW_fleet_allocation.view_department_list_fleet_allocation"/>
+        <field name="arch" type="xml">
+            <field name="x_fleet_holder" position="after">
+                <field name="x_driver_change_workshop" invisible="not x_fleet_holder"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_department_form_fleet_allocation_custody" model="ir.ui.view">
+        <field name="name">hr.department.form.fleet.allocation.custody</field>
+        <field name="model">hr.department</field>
+        <field name="inherit_id" ref="KSW_fleet_allocation.view_department_form_fleet_allocation"/>
+        <field name="arch" type="xml">
+            <field name="x_fleet_holder" position="after">
+                <field name="x_driver_change_workshop" groups="base.group_system" invisible="not x_fleet_holder"/>
+            </field>
+        </field>
+    </record>
 </odoo>

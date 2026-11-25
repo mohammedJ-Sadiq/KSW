@@ -197,6 +197,58 @@ class TestVehicleCustody(TransactionCase):
         self.assertTrue(told)
         self.assertIn('missing or expired in the register', told.body)
 
+    def test_driver_change_through_workshop_where_the_department_says(self):
+        """Isuzu branches: a driver change goes the receipt's way, HR (licence)
+        then a workshop checkup; the vehicle passes when the workshop is done.
+        Departments without the setting keep the one-step change (above)."""
+        self.dept_a.x_driver_change_workshop = True
+        form = self._driver_change(self.khalid)
+        self.assertTrue(form.through_workshop)
+        with self.assertRaises(UserError):  # not the supervisor's to set
+            form.with_user(self.user_a).write({'through_workshop': False})
+        form.with_user(self.user_a).action_submit()
+        self.assertEqual(form.state, 'hr')
+        self.assertEqual(self.truck.x_custodian_id, self.ahmed)  # nothing has passed yet
+        self.assertFalse(form.workshop_request_id)  # no checkup before HR has checked the driver
+        self.assertIn(form, self.env['ksw.vehicle.custody.request'].with_user(self.hr).search(
+            [('x_is_pending_my_action', '=', True)]))
+        # Ticking the setting off now does not reroute a form on its way.
+        self.dept_a.x_driver_change_workshop = False
+        form.with_user(self.hr).action_hr_check()
+        self.assertEqual((form.state, form.hr_done), ('workshop', True))
+        self.assertNotIn(form, self.env['ksw.vehicle.custody.request'].with_user(self.hr).search(
+            [('x_is_pending_my_action', '=', True)]))
+        checkup = form.workshop_request_id.sudo()
+        self.assertTrue(checkup)
+        self.assertEqual((checkup.vehicle_id, form.workshop_id), (self.truck, checkup.workshop_id))
+        self.assertIn(form, self.env['ksw.vehicle.custody.request'].with_user(self.workshop).search(
+            [('x_is_pending_my_action', '=', True)]))
+        existing = form.message_ids.ids
+        self._workshop_done(form)
+        self.assertEqual(form.state, 'done')
+        self.assertEqual((self.truck.x_custodian_id, self.truck.driver_id), (self.khalid, self.khalid))
+        self.assertEqual(self.truck.x_department_id, self.dept_a)
+        # HR was a step: not copied again.
+        told = form.message_ids.filtered(lambda m: m.id not in existing and self.hr.partner_id in m.partner_ids)
+        self.assertFalse(told)
+        # The checkup closes only with the signed paper filed.
+        checkup.state = 'in_progress'
+        with self.assertRaises(UserError):
+            checkup.with_user(self.workshop).action_complete()
+        self._sign(form)
+        checkup.with_user(self.workshop).action_complete()
+        self.assertEqual(checkup.state, 'completed')
+
+    def test_driver_change_through_workshop_refused_by_hr(self):
+        self.dept_a.x_driver_change_workshop = True
+        form = self._driver_change(self.khalid)
+        form.with_user(self.user_a).action_submit()
+        self.env['ksw.vehicle.custody.refuse.wizard'].with_user(self.hr).create(
+            {'request_id': form.id, 'reason': 'Licence on hold'}).action_confirm()
+        self.assertEqual(form.state, 'refused')
+        self.assertEqual(self.truck.x_custodian_id, self.ahmed)
+        self.assertFalse(form.workshop_request_id)
+
     def test_one_driver_one_vehicle(self):
         other = self.env['ksw.fleet.vehicle'].create({'name': 'VC-IS2', 'vehicle_type': 'isuzu',
                                                       'x_department_id': self.dept_a.id})

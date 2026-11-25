@@ -153,3 +153,19 @@ class HrEmployee(models.Model):
 
     x_custody_history_ids = fields.One2many('ksw.fleet.vehicle.custody', 'employee_id',
                                             string='Vehicle Custody', groups='hr.group_hr_user')
+
+
+class HrDepartment(models.Model):
+    _inherit = 'hr.department'
+
+    x_driver_change_workshop = fields.Boolean(
+        string='Driver Change Through Workshop',
+        help='A driver change between two of this department\'s drivers goes through HR (the new '
+             'driver\'s licence) and a workshop checkup, like a vehicle received from another '
+             'department. Unticked, the supervisor\'s confirmation completes it and HR is told.')
+
+    def _ksw_driver_change_through_workshop(self):
+        """The setting of the vehicle-holding department this one belongs to."""
+        self.ensure_one()
+        holder = self._ksw_fleet_holder() or self.sudo()
+        return bool(holder.x_driver_change_workshop)

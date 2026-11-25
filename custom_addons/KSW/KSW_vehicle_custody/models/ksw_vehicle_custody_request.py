@@ -49,7 +49,10 @@ class KswVehicleCustodyRequest(models.Model):
                     the department names the driver → HR checks his licence
                     (before the handover, the paper's own rule) → the workshop
                     hands it over, which is the arrival.
-    Driver Change:  supervisor → workshop checkup and HR in parallel → done.
+    Driver Change:  the department's own decision. Done at the supervisor's
+                    confirmation, HR told; or, where the department's setting
+                    says so (Isuzu branches), like a receipt: supervisor → HR
+                    (licence) → workshop checkup → done.
     Done notifies Accounting (financial matters, depreciation) and the
     department; then the paper is printed, signed and filed back as a scan.
     """
@@ -72,6 +75,11 @@ class KswVehicleCustodyRequest(models.Model):
     # Hand-in and driver change: the workshop and HR work in parallel; the
     # form is done when both are.
     hr_done = fields.Boolean(string='Documents Checked', readonly=True, copy=False)
+    # A driver change that goes through HR and a workshop checkup, not done at
+    # the supervisor's confirmation. Read from the department's setting while
+    # the form is with the supervisor, then kept: a later change of the
+    # setting does not reroute a form on its way.
+    through_workshop = fields.Boolean(string='Through Workshop and HR', readonly=True, copy=False)
     workshop_done = fields.Boolean(string='Workshop Done', readonly=True, copy=False)
     form_date = fields.Date(string='Date', required=True, default=fields.Date.context_today)
 
@@ -480,7 +488,8 @@ class KswVehicleCustodyRequest(models.Model):
                 if vals.get('kind') != 'driver_change':
                     raise UserError(_('Only a driver change is raised by hand. Hand-ins and '
                                       'receipts come from vehicle releases and transfers.'))
-                for key in ('state', 'hr_done', 'workshop_done', 'workshop_request_id', 'workshop_id'):
+                for key in ('state', 'hr_done', 'workshop_done', 'workshop_request_id', 'workshop_id',
+                            'through_workshop'):
                     vals.pop(key, None)
             vehicle = self.env['ksw.fleet.vehicle'].sudo().browse(vals.get('vehicle_id'))
             if vals.get('kind') == 'driver_change' and vehicle:
@@ -492,6 +501,7 @@ class KswVehicleCustodyRequest(models.Model):
                                         for i, (key, _label) in enumerate(DOCUMENT_TYPES)]
         forms = super().create(vals_list)
         forms._check_driver_change_scope()
+        forms._stamp_route()
         forms._check_one_open_form()
         for form in forms.filtered(lambda f: not f.inspection_line_ids):
             form._load_inspection_items()
@@ -503,12 +513,21 @@ class KswVehicleCustodyRequest(models.Model):
                 and set(vals) - {'message_main_attachment_id'}:
             raise UserError(_('A signed, refused or cancelled handover form cannot be changed.'))
         if not self.env.su and {'state', 'hr_done', 'workshop_done', 'kind', 'workshop_request_id',
-                                'workshop_id'} & set(vals):
+                                'workshop_id', 'through_workshop'} & set(vals):
             raise UserError(_('Use the buttons to move a handover form on.'))
         res = super().write(self._fill_snapshots(dict(vals)))
         if 'department_id' in vals or 'vehicle_id' in vals:
             self._check_driver_change_scope()
+            self._stamp_route()
         return res
+
+    def _stamp_route(self):
+        """A driver change with its supervisor follows its department's
+        setting (Vehicle Departments ▸ Driver Change Through Workshop)."""
+        for form in self.sudo().filtered(lambda f: f.kind == 'driver_change' and f.state == 'draft'):
+            wanted = form.department_id._ksw_driver_change_through_workshop()
+            if form.through_workshop != wanted:
+                form.through_workshop = wanted
 
     def unlink(self):
         if not self.env.su:
@@ -562,7 +581,8 @@ class KswVehicleCustodyRequest(models.Model):
     def action_submit(self):
         """Supervisor. A receipt goes to HR, then the workshop hands it over.
         A driver change is the department's own decision between two of its
-        drivers: once every check passes it is done, and HR is told."""
+        drivers: once every check passes it is done, and HR is told. Where
+        the department's setting says so it goes the receipt's way instead."""
         for form in self:
             if not form.x_can_supervisor:
                 raise UserError(_('%s is not waiting for the supervisor.', form.name))
@@ -579,10 +599,11 @@ class KswVehicleCustodyRequest(models.Model):
                 if form.vehicle_id.sudo().x_allocation_state != 'assigned':
                     raise UserError(_('%s is being moved; a driver change waits until it is back '
                                       'in its department.', form.vehicle_id.name))
+        self._stamp_route()
         self._check_one_open_form()
         self._check_new_driver()
         for form in self:
-            if form.kind == 'driver_change':
+            if form.kind == 'driver_change' and not form.through_workshop:
                 form._fill_licence_from_register()
                 form._advance('done')
                 form._apply_custody()
@@ -627,7 +648,9 @@ class KswVehicleCustodyRequest(models.Model):
         stamp = {'hr_checked_by_id': self.env.user.id, 'hr_checked_date': fields.Datetime.now()}
         for form in self.sudo():
             if form.state == 'hr':
-                form._advance('workshop', **stamp)
+                # HR's part is over: on a driver change nothing waits for it.
+                form._advance('workshop', hr_done=True, **stamp)
+                form._ensure_checkup()
             else:
                 form.write(dict(stamp, hr_done=True))
                 form._finish_if_complete()
@@ -684,6 +707,30 @@ class KswVehicleCustodyRequest(models.Model):
             form.sudo().message_post(body=Markup(_('Refused: %s')) % reason,
                                      partner_ids=form.create_uid.partner_id.ids,
                                      subtype_xmlid='mail.mt_comment')
+            checkup = form.sudo().workshop_request_id
+            if checkup and checkup.state not in ('completed', 'rejected'):
+                checkup.message_post(body=Markup(_('Driver change %(f)s was refused: %(r)s')) % {
+                    'f': form.name, 'r': reason}, subtype_xmlid='mail.mt_note')
+
+    def _ensure_checkup(self):
+        """A driver change through the workshop: raise its checkup at the
+        workshop of the vehicle's department once HR has checked the driver.
+        The checkup closes only with this form signed (KSW_workshop bridge)."""
+        for form in self.sudo().filtered(lambda f: f.kind == 'driver_change' and not f.workshop_request_id):
+            vehicle = form.vehicle_id
+            requester = form.create_uid.employee_id or form.supervisor_id or form.previous_employee_id
+            checkup = self.env['ksw.workshop.request'].sudo().create({
+                'employee_id': requester.id,
+                'client_id': vehicle.client_id.id,
+                'vehicle_type': vehicle.vehicle_type,
+                'vehicle_id': vehicle.id,
+                'driver_id': (form.previous_employee_id or requester).id,
+                'workshop_id': self.env['ksw.workshop']._for_department(form.department_id).id,
+                'description': _('Checkup for driver change (%(f)s): %(a)s → %(b)s',
+                                 f=form.name, a=form.previous_name or '-', b=form.new_name or '-'),
+            })
+            form.write({'workshop_request_id': checkup.id, 'workshop_id': checkup.workshop_id.id})
+            form._sync_activities()
 
     def _apply_custody(self):
         """What a done form changes. A hand-in leaves the vehicle in nobody's
@@ -705,7 +752,8 @@ class KswVehicleCustodyRequest(models.Model):
         a vehicle in (financial matters, the depreciation value, his account
         statement), and the department, which also files the signed paper.
         HR is not copied on a hand-in or receipt: it was a step. A driver
-        change has no HR step, so HR is told, with what the register lacks."""
+        change done at confirmation had no HR step, so HR is told, with what
+        the register lacks; one through the workshop is treated as a receipt."""
         accounting = self.env.ref('KSW_vehicle_custody.group_custody_accounting').sudo().all_user_ids
         accounting = accounting.filtered(lambda u: u.active and not u.share)
         technical = self.env.ref('base.user_admin') | self.env.ref('base.user_root')
@@ -715,14 +763,15 @@ class KswVehicleCustodyRequest(models.Model):
             partners = form.department_id._ksw_fleet_users().partner_id
             if form.kind in ('hand_in', 'driver_change'):
                 partners |= accounting.partner_id
-            if form.kind == 'driver_change':
+            told_hr = form.kind == 'driver_change' and not form.hr_done
+            if told_hr:
                 partners |= hr_users.partner_id
             partners -= self.env.user.partner_id
             body = Markup(_('<b>%(n)s done</b>: %(k)s, %(v)s. %(p)s → %(w)s. Depreciation value: %(t)s.')) % {
                 'n': form.name, 'k': dict(form._fields['kind']._description_selection(self.env))[form.kind],
                 'v': form.vehicle_id.name, 'p': form.previous_name or '-', 'w': form.new_name or '-',
                 't': '{:,.2f}'.format(form.inspection_total)}
-            if form.kind == 'driver_change':
+            if told_hr:
                 lacking = form.document_ids.filtered(lambda d: d.register_status in ('missing', 'expired'))
                 if lacking:
                     labels = dict(lacking._fields['document_type']._description_selection(self.env))
@@ -777,8 +826,12 @@ class KswVehicleCustodyRequest(models.Model):
             if form.state == 'draft':
                 users = form.department_id._ksw_fleet_users() if form.kind == 'receive' else form.create_uid
                 for user in users:
-                    wanted[user.id] = _('Name the new driver: %s', form.vehicle_id.name) \
-                        if form.kind == 'receive' else _('Submit to HR: %s', form.vehicle_id.name)
+                    if form.kind == 'receive':
+                        wanted[user.id] = _('Name the new driver: %s', form.vehicle_id.name)
+                    elif form.through_workshop:
+                        wanted[user.id] = _('Submit to HR: %s', form.vehicle_id.name)
+                    else:
+                        wanted[user.id] = _('Confirm the driver change: %s', form.vehicle_id.name)
             if form._waits_for_hr():
                 for user in hr_users:
                     wanted[user.id] = _('HR documents: %s', form.vehicle_id.name)

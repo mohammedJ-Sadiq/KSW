@@ -1,6 +1,6 @@
 {
     'name': 'KSW Vehicle Custody (HR-12)',
-    'version': '19.0.1.7.0',
+    'version': '19.0.1.8.0',
     'summary': 'Vehicle handover form HR-12: who answers for each vehicle, handed in, received and changed with HR, GM and workshop',
     'description': """
 Vehicle Custody
@@ -14,7 +14,9 @@ operating driver dispatch moves day to day.
 * Receive: a department is given a vehicle. Supervisor names the new driver →
   HR checks his licence → Workshop hands it over. Arrival waits for it.
 * Driver Change: one vehicle, two drivers, same department (vacation,
-  suspension...). Supervisor → HR → Workshop checkup. No GM.
+  suspension...). No GM. Done at the supervisor's confirmation (HR told), or,
+  where the department is set to (Isuzu branches), Supervisor → HR → Workshop
+  checkup, like a receipt.
 
 Approval applies the custody and sends HR (delegation) and Accounting
 (financial matters) an information copy. The form is then printed in the HR-12

@@ -12,10 +12,11 @@
                     <field name="x_can_supervisor" invisible="1"/>
                     <field name="x_can_hr" invisible="1"/>
                     <field name="x_can_workshop" invisible="1"/>
+                    <field name="through_workshop" invisible="1"/>
                     <button name="action_submit" type="object" string="Submit to HR" class="oe_highlight"
-                            invisible="not x_can_supervisor or kind == 'driver_change'"/>
+                            invisible="not x_can_supervisor or (kind == 'driver_change' and not through_workshop)"/>
                     <button name="action_submit" type="object" string="Confirm Driver Change" class="oe_highlight"
-                            invisible="not x_can_supervisor or kind != 'driver_change'"
+                            invisible="not x_can_supervisor or kind != 'driver_change' or through_workshop"
                             confirm="The vehicle passes to the new driver now. Confirm?"/>
                     <button name="action_cancel_draft" type="object" string="Cancel"
                             invisible="not x_can_supervisor or kind != 'driver_change'"
@@ -32,9 +33,9 @@
                     <button name="action_print" type="object" string="Print HR-12" icon="fa-print"
                             invisible="state == 'done'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,hr,workshop,done,signed"
-                           invisible="kind == 'driver_change'"/>
+                           invisible="kind == 'driver_change' and not through_workshop"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done,signed"
-                           invisible="kind != 'driver_change'"/>
+                           invisible="kind != 'driver_change' or through_workshop"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -48,6 +49,11 @@
                          invisible="state != 'workshop' or kind == 'receive'">
                         <span><field name="hr_done" nolabel="1" readonly="1" class="d-inline me-1"/>HR: documents checked</span>
                         <span><field name="workshop_done" nolabel="1" readonly="1" class="d-inline me-1"/>Workshop: vehicle inspected</span>
+                    </div>
+                    <div class="alert alert-info" role="status"
+                         invisible="kind != 'driver_change' or not through_workshop or state != 'draft'">
+                        In this department a driver change goes to <b>HR</b> (the new driver's licence)
+                        and then to a <b>workshop checkup</b>; the vehicle passes when the workshop is done.
                     </div>
                     <div class="alert alert-danger" role="alert" invisible="state != 'refused'">
                         <b>Refused:</b> <field name="refuse_reason" nolabel="1" class="d-inline"/>

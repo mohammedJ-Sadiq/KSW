@@ -1936,3 +1936,37 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.report_vehicle_custody_document
 msgid "نموذج فحص المركبة / Vehicle Inspection Form"
 msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_vehicle_custody_request__through_workshop
+msgid "Through Workshop and HR"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_hr_department__x_driver_change_workshop
+msgid "Driver Change Through Workshop"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,help:KSW_vehicle_custody.field_hr_department__x_driver_change_workshop
+msgid "A driver change between two of this department's drivers goes through HR (the new driver's licence) and a workshop checkup, like a vehicle received from another department. Unticked, the supervisor's confirmation completes it and HR is told."
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Confirm the driver change: %s"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Driver change %(f)s was refused: %(r)s"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_vehicle_custody_form
+msgid ""
+"In this department a driver change goes to <b>HR</b> (the new driver's licence)\n"
+"                        and then to a <b>workshop checkup</b>; the vehicle passes when the workshop is done."
+msgstr ""
