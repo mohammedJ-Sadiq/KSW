@@ -349,3 +349,89 @@ class TestSubmitToGmTrips(SendEarlyCommon):
         self.assertEqual(subs.entry_ids, ot_row)
         self.assertEqual(ot_row.state, 'submitted')
         self.assertFalse(self.trips_batch.sudo().entry_ids)
+
+    def test_42_trips_imported_later_join_the_open_sub_batch(self):
+        """KSWCO SUB00016: the driver went into a sub-batch with his typed
+        rows before the Trips batch had any; its import afterwards made one
+        whole-month row that never fitted the sub-batch's days, and Send
+        Early hid him as already sent. The import cuts his sub-batch's
+        days into their own row, which joins it."""
+        self.bas_empty = True
+        ot_row = self._entry(self.ot, self.driver_1, user=self.sup_a)
+        wizard = self._wizard()
+        wizard.write({'employee_ids': [(6, 0, self.driver_1.ids)],
+                      'note': 'Sponsorship transfer',
+                      'date_from': '2029-03-01', 'date_to': '2029-03-15'})
+        with self._patched():
+            wizard.action_add()
+        sub = self.submission.sub_batch_ids
+        self.assertEqual(sub.state, 'draft')
+        self.assertEqual(sub.entry_ids, ot_row)
+        # Send Early on Trips names the way out instead of an empty picker.
+        hint = self._dialog(self.trips_batch, '2029-03-01',
+                            '2029-03-15').batch_hint
+        self.assertIn('press Import', hint)
+        self.assertIn(self.driver_1.name, hint)
+        self.bas_empty = False
+        self._import_batch()
+        rows = self._rows(self.driver_1).sorted('x_window_from')
+        self.assertEqual(
+            [(r.x_window_from, r.x_window_to) for r in rows],
+            [(date(2029, 3, 1), date(2029, 3, 15)),
+             (date(2029, 3, 16), date(2029, 3, 31))])
+        self.assertEqual(rows[0].x_sub_batch_id, sub)
+        self.assertFalse(rows[1].x_sub_batch_id)
+        # A driver in no sub-batch keeps one row for the month.
+        self.assertEqual(len(self._rows(self.driver_2)), 1)
+        # Importing again refreshes the same two rows.
+        self._import_batch()
+        self.assertEqual(self._rows(self.driver_1), rows)
+
+
+class TestEditSubBatchDays(SendEarlyCommon):
+    """Its creator, or a system administrator, corrects the days of a
+    sub-batch still being prepared; the trips follow the new days."""
+
+    def _prepared(self):
+        wizard = self._wizard()
+        wizard.write({'employee_ids': [(6, 0, self.driver_1.ids)],
+                      'note': 'Sponsorship transfer',
+                      'date_from': '2029-03-01', 'date_to': '2029-03-24'})
+        with self._patched():
+            wizard.action_add()
+        sub = self.submission.sub_batch_ids
+        self.assertEqual(sub.state, 'draft')
+        return sub
+
+    def test_50_creator_shortens_the_days_and_trips_follow(self):
+        sub = self._prepared()
+        self.assertTrue(sub.with_user(self.sup_a).x_can_edit_dates)
+        with self._patched():
+            sub.with_user(self.sup_a).date_to = '2029-03-19'
+        trips = self._rows(self.driver_1).filtered('x_sub_batch_id')
+        self.assertEqual(len(trips), 1)
+        self.assertEqual((trips.x_window_from, trips.x_window_to),
+                         (date(2029, 3, 1), date(2029, 3, 19)))
+        # Nothing left behind on the old days.
+        self.assertFalse(self._rows(self.driver_1) - trips)
+
+    def test_51_a_system_administrator_may_too(self):
+        sub = self._prepared()
+        admin = self._user('sub_sysadmin', 'base.group_system')
+        admin.sudo().group_ids = [(4, self.env.ref(
+            'KSW_commissions.group_commission_officer').id)]
+        self.assertTrue(sub.with_user(admin).x_can_edit_dates)
+        with self._patched():
+            sub.with_user(admin).date_to = '2029-03-19'
+        self.assertEqual(sub.date_to, date(2029, 3, 19))
+
+    def test_52_nobody_else_and_not_once_sent(self):
+        sub = self._prepared()
+        self.assertFalse(sub.with_user(self.gm).x_can_edit_dates)
+        with self.assertRaises(UserError):
+            sub.with_user(self.gm).date_to = '2029-03-19'
+        with self._patched():
+            sub.with_user(self.sup_a).action_submit()
+        self.assertFalse(sub.with_user(self.sup_a).x_can_edit_dates)
+        with self.assertRaises(UserError):
+            sub.with_user(self.sup_a).date_to = '2029-03-19'

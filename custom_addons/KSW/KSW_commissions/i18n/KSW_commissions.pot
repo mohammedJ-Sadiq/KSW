@@ -12945,3 +12945,21 @@ msgstr ""
 #: code:addons/KSW_commissions/models/ksw_deduction_commission_only.py:0
 msgid "this employee's department"
 msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/wizard/ksw_pay_handover_wizards.py:0
+msgid "Already in a sub-batch without their %(what)s — press Import on this batch and their days go into it: %(names)s"
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
+msgid "Only %(who)s, who made %(name)s, or a system administrator can change its dates."
+msgstr ""
+
+#. module: KSW_commissions
+#. odoo-python
+#: code:addons/KSW_commissions/models/ksw_pay_sub_batch.py:0
+msgid "Days changed; trips not imported again:"
+msgstr ""

@@ -194,12 +194,28 @@ class KswPaySubmitWizard(models.TransientModel):
                 # Said out loud, or an empty picker reads as a fault: they
                 # are already sent, and this component goes with them.
                 sent = mine & Wizard._busy(submissions)
+                # In a sub-batch with nothing of this component yet (it
+                # was made before this batch had rows): Import fills it.
+                in_sub = wiz.batch_id.sudo().entry_ids.filtered(
+                    'x_sub_batch_id').employee_id
+                waiting = (sent - in_sub) \
+                    if wiz.batch_id.component_id.importer else sent.browse()
+                sent -= waiting
+                hints = []
                 if sent:
-                    wiz.batch_hint = _(
+                    hints.append(_(
                         "Already in a sub-batch, with their %(what)s "
                         "entries: %(names)s",
                         what=wiz.batch_id.component_id.name,
-                        names=', '.join(sent.mapped('name')))
+                        names=', '.join(sent.mapped('name'))))
+                if waiting:
+                    hints.append(_(
+                        "Already in a sub-batch without their %(what)s — "
+                        "press Import on this batch and their days go into "
+                        "it: %(names)s",
+                        what=wiz.batch_id.component_id.name,
+                        names=', '.join(waiting.mapped('name'))))
+                wiz.batch_hint = '\n'.join(hints) or False
             wiz.allowed_employee_ids = pool
 
     # ------------------------------------------------------------------

@@ -58,6 +58,11 @@ class HrEmployee(models.Model):
     birthday = fields.Date(
         groups="hr.group_hr_user,KSW_base_security.group_hr_employee_subordinate,KSW_base_security.group_hr_employee_supervisor,KSW_base_security.group_hr_employee_supervisor_cascading"
     )
+    # Read by the stock kanban's birthday_public_display_string compute: without
+    # it a supervisor's Employees kanban (and a phone Search More) is refused.
+    birthday_public_display = fields.Boolean(
+        groups="hr.group_hr_user,KSW_base_security.group_hr_employee_subordinate,KSW_base_security.group_hr_employee_supervisor,KSW_base_security.group_hr_employee_supervisor_cascading"
+    )
     emergency_contact = fields.Char(
         groups="hr.group_hr_user,KSW_base_security.group_hr_employee_subordinate,KSW_base_security.group_hr_employee_supervisor,KSW_base_security.group_hr_employee_supervisor_cascading"
     )

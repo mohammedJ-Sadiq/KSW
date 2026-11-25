@@ -215,6 +215,15 @@ class KswPayBatchBasImport(models.Model):
         else:
             self.skip_line_ids.sudo().unlink()
         log = []
+        # Each driver's sub-batch still being prepared, by its days.
+        preparing = {}
+        if not sub_batch and self.submission_id:
+            for sub in self.env['ksw.pay.sub.batch'].sudo().search([
+                    ('submission_id', '=', self.submission_id.id),
+                    ('batch_id', 'in', [self.id, False]),
+                    ('state', 'in', ('draft', 'returned'))]):
+                for emp in sub.employee_ids:
+                    preparing[emp.id] = (sub.date_from, sub.date_to)
         for employee in employees:
             rows = self.entry_ids.filtered(
                 lambda e, emp=employee: e.employee_id == emp)
@@ -247,6 +256,13 @@ class KswPayBatchBasImport(models.Model):
                 taken = [r._span() for r in rows - mine]
                 segments = self._uncovered_days(
                     month_start, month_end, taken)
+                # Sent early before this component had rows (the Trips
+                # batch made after his sub-batch): his sub-batch's days are
+                # their own row, which joins it (_join_open_sub_batch). A
+                # whole-month row reaches past them and never would — KSWCO
+                # SUB00016 / PB000166, Nov 2026.
+                segments = self._split_at(
+                    segments, preparing.get(employee.id))
             settled = mine.filtered('x_vacation_payslip_id')[:1]
             if settled:
                 # Paid with his vacation settlement: that figure is what
@@ -684,6 +700,23 @@ class KswPayBatchBasImport(models.Model):
         if day <= month_end:
             free.append((day, month_end))
         return free
+
+    @staticmethod
+    def _split_at(segments, days):
+        """``segments`` cut at both ends of ``days``, so no stretch
+        straddles them."""
+        if not days or not all(days):
+            return segments
+        first, last = days
+        one = relativedelta(days=1)
+        out = []
+        for start, end in segments:
+            for a, b in ((start, min(end, first - one)),
+                         (max(start, first), min(end, last)),
+                         (max(start, last + one), end)):
+                if a <= b:
+                    out.append((a, b))
+        return out
 
     def _days_label(self, segments):
         """'September 2026' for the whole month, '16–30 Sep 2026' for less."""

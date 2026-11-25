@@ -141,6 +141,10 @@ class KswPaySubBatch(models.Model):
     total_amount = fields.Monetary(compute='_compute_totals')
 
     x_can_edit = fields.Boolean(compute='_compute_permissions')
+    # Whoever made it, or a system administrator — while it is still being
+    # prepared or has come back (Nov 2026: SUB00016 made to the 24th for a
+    # driver leaving on the 19th, and nobody could correct it).
+    x_can_edit_dates = fields.Boolean(compute='_compute_permissions')
     x_can_submit = fields.Boolean(compute='_compute_permissions')
     x_can_review = fields.Boolean(compute='_compute_permissions')
     x_can_reopen = fields.Boolean(compute='_compute_permissions')
@@ -195,17 +199,20 @@ class KswPaySubBatch(models.Model):
 
     @api.depends_context('uid')
     @api.depends('state', 'gm_id', 'run_id.state', 'entry_ids.state',
-                 'entry_ids.x_acc_checked_by', 'submitted_date')
+                 'entry_ids.x_acc_checked_by', 'submitted_date', 'create_uid')
     def _compute_permissions(self):
         user = self.env.user
         is_supervisor = user.has_group(
             'KSW_commissions.group_commission_supervisor')
+        is_admin = user.has_group('base.group_system')
         for rec in self:
             month_open = rec.run_id.state not in LOCKING_STATES
             is_my_gm = bool(rec.gm_id) and rec.gm_id == user
             open_ = rec.state in ('draft', 'returned')
             rec.x_can_edit = is_supervisor and month_open and open_
             rec.x_can_submit = rec.x_can_edit
+            rec.x_can_edit_dates = month_open and open_ and (
+                is_admin or rec.sudo().create_uid == user)
             rec.x_can_review = is_my_gm and month_open and bool(
                 rec.pending_count)
             rec.x_can_reopen = is_my_gm and month_open and bool(
@@ -292,7 +299,7 @@ class KswPaySubBatch(models.Model):
         range_changed = bool({'date_from', 'date_to'} & set(vals))
         if range_changed and not self.env.su:
             for rec in self:
-                rec._check_can_prepare(_("Changing its dates"))
+                rec._check_can_change_dates()
         res = super().write(vals) if vals else True
         if commands is not None:
             for rec in self:
@@ -301,7 +308,39 @@ class KswPaySubBatch(models.Model):
                 rec._write_employees(commands)
         if commands is not None or range_changed:
             self._collect_entries()
+        if range_changed:
+            self._refresh_trips_for_days()
         return res
+
+    def _check_can_change_dates(self):
+        """Its creator or a system administrator, while it is open."""
+        self.ensure_one()
+        what = _("Changing its dates")
+        user = self.env.user
+        if not (user.has_group('base.group_system')
+                or self.sudo().create_uid == user):
+            raise UserError(_(
+                "Only %(who)s, who made %(name)s, or a system administrator "
+                "can change its dates.",
+                who=self.sudo().create_uid.name, name=self.name))
+        self._check_can_prepare(what)
+
+    def _refresh_trips_for_days(self):
+        """Imported trips cover exactly the days they were fetched for: new
+        days mean fetching the sub-batch's drivers again, or its trips row
+        keeps the old days (and falls out of it on a shorter range)."""
+        for rec in self:
+            if rec.state not in ('draft', 'returned') \
+                    or not rec._importer_batches():
+                continue
+            skipped = rec._import_trips(rec.sudo().employee_ids)
+            rec._collect_entries()
+            if skipped:
+                rec.sudo().message_post(
+                    body=Markup('%(t)s<br/>%(lines)s') % {
+                        't': _('Days changed; trips not imported again:'),
+                        'lines': Markup('<br/>').join(skipped)},
+                    subtype_xmlid='mail.mt_note')
 
     @api.model
     def _default_range(self, vals):

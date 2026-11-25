@@ -10,6 +10,7 @@
         <field name="arch" type="xml">
             <form string="Sub-Batch" create="false">
                 <field name="x_can_edit" invisible="1"/>
+                <field name="x_can_edit_dates" invisible="1"/>
                 <field name="x_can_submit" invisible="1"/>
                 <field name="x_can_review" invisible="1"/>
                 <field name="x_can_reopen" invisible="1"/>
@@ -130,9 +131,11 @@
                             <field name="department_id"/>
                             <label for="date_from" string="Days"/>
                             <div class="o_row">
-                                <field name="date_from" readonly="1"/>
+                                <field name="date_from"
+                                       readonly="not x_can_edit_dates"/>
                                 <span>→</span>
-                                <field name="date_to" readonly="1"/>
+                                <field name="date_to"
+                                       readonly="not x_can_edit_dates"/>
                             </div>
                             <field name="gm_id"/>
                             <field name="currency_id" invisible="1"/>
