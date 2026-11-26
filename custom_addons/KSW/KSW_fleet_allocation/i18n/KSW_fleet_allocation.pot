@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-19 05:25+0000\n"
-"PO-Revision-Date: 2026-11-19 05:25+0000\n"
+"POT-Creation-Date: 2026-11-26 07:46+0000\n"
+"PO-Revision-Date: 2026-11-26 07:46+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -105,6 +105,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/KSW_fleet_allocation/wizard/ksw_fleet_allocate_wizard.py:0
 msgid "%s is not waiting for a decision."
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#. odoo-python
+#: code:addons/KSW_fleet_allocation/models/ksw_fleet_vehicle.py:0
+msgid "%s is stopped: put it back in service before giving it a custodian."
 msgstr ""
 
 #. module: KSW_fleet_allocation
@@ -1661,6 +1667,8 @@ msgid ""
 msgstr ""
 
 #. module: KSW_fleet_allocation
+#. odoo-python
+#: code:addons/KSW_fleet_allocation/models/ksw_fleet_vehicle.py:0
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_vehicle__x_is_stopped
 #: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_vehicle_search_allocation
 msgid "Stopped"
@@ -1999,6 +2007,12 @@ msgstr ""
 #. module: KSW_fleet_allocation
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_release_decision_wizard__vehicle_types
 msgid "Vehicle Types"
+msgstr ""
+
+#. module: KSW_fleet_allocation
+#. odoo-python
+#: code:addons/KSW_fleet_allocation/models/ksw_fleet_vehicle.py:0
+msgid "Vehicle stopped: %s no longer answers for it."
 msgstr ""
 
 #. module: KSW_fleet_allocation

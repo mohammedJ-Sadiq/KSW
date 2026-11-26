@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Time off request: paying the settlement. The only place it is done
+         (one home per decision): the Off-Cycle Bank Files menu still takes
+         a settlement nobody has chosen a cheque or cash for. -->
+    <record id="hr_leave_view_form_settlement_payment" model="ir.ui.view">
+        <field name="name">hr.leave.form.settlement.payment</field>
+        <field name="model">hr.leave</field>
+        <field name="inherit_id" ref="KSW_payroll.hr_leave_view_form_inherit_payroll_vacation"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="x_disb_state" invisible="1"/>
+                <field name="x_can_disb_pay" invisible="1"/>
+                <field name="x_can_disb_cash" invisible="1"/>
+                <field name="x_can_disb_cashed" invisible="1"/>
+                <field name="x_can_disb_post" invisible="1"/>
+                <button name="action_disb_pay" type="object" class="btn-primary"
+                        string="💳 Pay Settlement" invisible="not x_can_disb_pay"/>
+                <button name="action_disb_cash_handed" type="object" class="btn-primary"
+                        string="💵 Cash Handed Over" invisible="not x_can_disb_cash"
+                        confirm="Confirm the employee has received this settlement in cash. This posts the payment and cannot be undone here."/>
+                <button name="action_disb_cheque_cashed" type="object"
+                        string="✅ Cheque Cashed" invisible="not x_can_disb_cashed"/>
+            </xpath>
+
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <field name="x_disb_bank_file_ref" invisible="1"/>
+                <button class="oe_stat_button" name="action_open_disb_bank_file" type="object"
+                        icon="fa-university" invisible="not x_disb_bank_file_ref"
+                        groups="KSW_annual_leave.group_annual_leave_acc,om_hr_payroll.group_hr_payroll_user">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Bank File</span>
+                        <span class="o_stat_value"><field name="x_disb_bank_file_ref" nolabel="1"/></span>
+                    </div>
+                </button>
+            </xpath>
+
+            <xpath expr="//div[hasclass('o_hr_leave_content')]" position="before">
+                <div class="alert alert-warning" role="alert" invisible="not x_can_disb_cash">
+                    <strong>Cash to hand over:</strong>
+                    <field name="x_disb_amount" nolabel="1" class="oe_inline"/> SAR from
+                    <field name="x_disb_journal_name" nolabel="1" class="oe_inline"/>.
+                    Press <strong>Cash Handed Over</strong> once the employee has it.
+                </div>
+            </xpath>
+
+            <xpath expr="//page[@name='vacation_calculation']/div[1]/strong" position="replace">
+                <strong>Settlement payment:</strong>
+            </xpath>
+            <xpath expr="//page[@name='vacation_calculation']/div[1]" position="after">
+                <group string="Settlement Payment" name="settlement_payment"
+                       invisible="x_disb_state == 'none'">
+                    <group>
+                        <field name="x_disb_state" readonly="1"/>
+                        <field name="x_disb_amount" readonly="1"/>
+                        <field name="x_disb_method" readonly="1" invisible="not x_disb_method"/>
+                        <field name="x_disb_journal_name" readonly="1" invisible="not x_disb_journal_name"/>
+                        <field name="x_disb_reference" readonly="1" invisible="not x_disb_reference"/>
+                        <field name="x_disb_cheque_no" readonly="1" invisible="not x_disb_cheque_no"/>
+                        <field name="x_disb_cheque_date" readonly="1" invisible="not x_disb_cheque_no"/>
+                    </group>
+                    <group>
+                        <field name="x_disb_handed_date" readonly="1" invisible="not x_disb_handed_date"/>
+                        <field name="x_disb_handed_by" readonly="1" invisible="not x_disb_handed_by"/>
+                        <field name="x_disb_cashed_date" readonly="1" invisible="not x_disb_cashed_date"/>
+                        <field name="x_disb_bank_file_ref" readonly="1" invisible="not x_disb_bank_file_ref"/>
+                        <field name="x_disb_bank_file_attachment_ids" widget="many2many_binary" readonly="1"
+                               invisible="not x_disb_bank_file_ref"
+                               groups="KSW_annual_leave.group_annual_leave_acc,om_hr_payroll.group_hr_payroll_user"/>
+                        <field name="x_disb_entries" readonly="1" invisible="not x_disb_entries"
+                               groups="KSW_annual_leave.group_annual_leave_acc,account.group_account_readonly,account.group_account_invoice"/>
+                    </group>
+                </group>
+                <div class="alert alert-danger" role="alert" invisible="not x_disb_error">
+                    <strong>Not in the ledger yet:</strong>
+                    <field name="x_disb_error" nolabel="1" class="d-block"/>
+                    <button name="action_disb_post_ledger" type="object" class="btn-secondary mt-2"
+                            string="Post to Ledger" invisible="not x_can_disb_post"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_leave_view_search_settlement_payment" model="ir.ui.view">
+        <field name="name">hr.leave.search.settlement.payment</field>
+        <field name="model">hr.leave</field>
+        <field name="inherit_id" ref="KSW_annual_leave.hr_leave_view_search_inherit_annual_return"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='on_vacation']" position="before">
+                <filter string="💳 Settlement to Pay" name="settlement_to_pay"
+                        domain="[('x_disb_state', 'in', ['to_choose', 'cash_pending'])]"/>
+                <filter string="🧾 Cheques Not Cashed" name="settlement_cheque_not_cashed"
+                        domain="[('x_disb_state', '=', 'cheque_handed')]"/>
+                <separator/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_ksw_settlement_payment_wizard_form" model="ir.ui.view">
+        <field name="name">ksw.settlement.payment.wizard.form</field>
+        <field name="model">ksw.settlement.payment.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <!-- Needed in the arch: the summary computes read it (pitfall #40). -->
+                <field name="leave_id" invisible="1"/>
+                <field name="mode" invisible="1"/>
+                <field name="journal_type" invisible="1"/>
+                <group>
+                    <group>
+                        <field name="employee_name" readonly="1"/>
+                        <field name="amount" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="method" widget="radio" invisible="mode != 'pay'"
+                               required="mode == 'pay'"/>
+                        <field name="pay_from_ids" invisible="1"/>
+                        <field name="pay_from_count" invisible="1"/>
+                        <field name="pay_from_id" options="{'no_create': True, 'no_open': True}"
+                               invisible="mode != 'pay' or method != 'bank'"
+                               readonly="pay_from_count &lt;= 1"
+                               required="mode == 'pay' and method == 'bank'"/>
+                        <field name="pay_from_ledger" readonly="1"
+                               invisible="mode != 'pay' or method != 'bank'"/>
+                        <field name="beneficiary" readonly="1"
+                               invisible="mode != 'pay' or method not in ('bank', 'transfer')"/>
+                        <field name="journal_id" options="{'no_create': True, 'no_open': True}"
+                               invisible="mode != 'pay' or method == 'bank'"
+                               required="mode == 'pay' and method != 'bank'"/>
+                        <field name="reference" invisible="mode != 'pay' or method != 'transfer'"
+                               required="mode == 'pay' and method == 'transfer'"/>
+                        <field name="cheque_no" invisible="mode != 'pay' or method != 'cheque'"
+                               required="mode == 'pay' and method == 'cheque'"/>
+                        <field name="cheque_date" invisible="mode != 'pay' or method != 'cheque'"/>
+                        <field name="date" string="Value Date" invisible="mode != 'pay' or method not in ('bank', 'transfer')"/>
+                        <field name="date" string="Handed Over On" invisible="mode != 'pay' or method != 'cheque'"/>
+                        <field name="date" string="Cashed On" invisible="mode != 'cashed'"/>
+                    </group>
+                </group>
+                <div class="alert alert-warning" role="alert"
+                     invisible="mode != 'pay' or method not in ('bank', 'transfer') or beneficiary">
+                    The employee has no bank account of his own: a transfer has nowhere to go.
+                    Add it on his employee record, or pay by cheque or cash.
+                </div>
+                <div class="text-muted" invisible="mode != 'pay' or method != 'bank'">
+                    A bank file for this employee alone is generated now; download it from the
+                    request (Bank File) and upload it to the bank.
+                </div>
+                <div class="text-muted" invisible="mode != 'pay' or method != 'transfer'">
+                    From any company bank (Riyad, Arab, Al-Ahli…): make the transfer in that bank's
+                    online banking, then record its reference here. No bank file is generated.
+                </div>
+                <div class="text-muted" invisible="mode != 'pay' or method != 'cheque'">
+                    Confirm once the cheque is in the employee's hands: that is the payment.
+                    Until the bank pays it, it shows under Cheques Not Cashed and on the bank's
+                    «شيكات صادرة لم تصرف» account.
+                </div>
+                <div class="text-muted" invisible="mode != 'pay' or method != 'cash'">
+                    The Loan Disbursement Officer is asked to hand the cash over and confirm it.
+                </div>
+                <footer>
+                    <button name="action_confirm" type="object" class="btn-primary" string="Confirm"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_account_journal_form_settlement" model="ir.ui.view">
+        <field name="name">account.journal.form.settlement</field>
+        <field name="model">account.journal</field>
+        <field name="inherit_id" ref="account.view_account_journal_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='default_account_id']" position="after">
+                <field name="x_ledger_account_id" invisible="type not in ('bank', 'cash')"/>
+                <field name="x_cheques_account_id" invisible="type != 'bank'"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -2108,3 +2108,110 @@ msgstr ""
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "<b>%(e)s</b>, %(p)s: %(v)s, %(n)s, %(t)s SAR."
 msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
+msgid " <b>Over the limit: hand one over.</b>"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
+msgid "<b>%(e)s now holds %(n)s vehicles</b>: %(v)s. Allowed: %(l)s.%(over)s"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_employee_form_custody
+msgid ""
+"<span invisible=\"not x_over_vehicle_limit\"> (<b>more than "
+"allowed</b>)</span>"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
+msgid "Back from the workshop."
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_workshop_request__x_custodian_on_hold_id
+msgid "Driver Until Back"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_fleet_vehicle_form_several
+msgid "Driver holds several vehicles"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
+msgid "Handed over when %s was completed."
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Handover to %(d)s (%(f)s)"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_employee_form_custody
+msgid "Holds"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_hr_employee__x_holds_several
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_employee_filter_several_vehicles
+msgid "Holds Several Vehicles"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
+msgid "In the workshop; back to %s when done."
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_hr_employee__x_over_vehicle_limit
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_employee_filter_several_vehicles
+msgid "More Vehicles Than Allowed"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,help:KSW_vehicle_custody.field_ksw_workshop_request__x_custodian_on_hold_id
+msgid "Ordinary visit: the driver the vehicle goes back to when done."
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
+msgid ""
+"Released when the workshop started %(r)s: %(e)s is free for another vehicle."
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_hr_employee__x_vehicles_held_ids
+msgid "Vehicles He Holds"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_hr_employee__x_vehicles_held_count
+msgid "Vehicles Held"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_fleet_vehicle__x_custodian_vehicle_count
+msgid "Vehicles His Driver Holds"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_hr_employee__x_vehicles_pending_my_action
+msgid "Vehicles Waiting for Me"
+msgstr ""
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_employee_form_custody
+msgid "vehicles:"
+msgstr ""

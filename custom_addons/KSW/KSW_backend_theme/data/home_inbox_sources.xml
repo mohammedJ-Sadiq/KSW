@@ -146,6 +146,15 @@
     </record>
     <!-- The monthly government export (Absher vehicles…): it waits here from
          the 1st until the Documents Officer applies it. -->
+    <!-- Vehicle custody (Nov 2026): a driver holding more vehicles than HR
+         allowed him, which only an unchecked route can cause. -->
+    <record id="inbox_drivers_over_vehicle_limit" model="ksw.home.inbox.source">
+        <field name="name">Drivers holding more vehicles than allowed</field>
+        <field name="sequence">84</field>
+        <field name="model_name">hr.employee</field>
+        <field name="domain">[('x_vehicles_pending_my_action', '=', True)]</field>
+        <field name="icon">fa-car</field>
+    </record>
     <record id="inbox_document_imports" model="ksw.home.inbox.source">
         <field name="name">Government exports to import</field>
         <field name="sequence">83</field>

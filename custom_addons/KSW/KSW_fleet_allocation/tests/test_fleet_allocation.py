@@ -46,6 +46,17 @@ class TestFleetAllocation(TransactionCase):
         self.isuzu_a1.with_user(self.gm).action_back_in_service()
         self.assertFalse(self.isuzu_a1.x_is_stopped)
 
+    def test_stopped_vehicle_has_no_custodian(self):
+        driver = self.env['hr.employee'].create({'name': 'FA Stop Driver'})
+        self.isuzu_a2._ksw_set_custodian(driver)
+        self.isuzu_a2.with_user(self.user_a).action_mark_stopped()
+        self.assertFalse(self.isuzu_a2.x_custodian_id)   # released, free for another vehicle
+        with self.assertRaises(UserError):
+            self.isuzu_a2._ksw_set_custodian(driver)
+        self.isuzu_a2.with_user(self.user_a).action_back_in_service()
+        self.isuzu_a2._ksw_set_custodian(driver)
+        self.assertEqual(self.isuzu_a2.x_custodian_id, driver)
+
     def _release(self, user, department, vehicles):
         request = self.env['ksw.fleet.request'].with_user(user).create({
             'request_type': 'release', 'department_id': department.id, 'reason': 'Not needed',
@@ -124,7 +135,12 @@ class TestFleetAllocation(TransactionCase):
                     'number': 'P-%s-%s' % (vehicle.id, doc_type.id), 'expiry_date': '2099-01-01'}).action_confirm()
             form.with_user(user).write({'new_employee_id': driver.id})
             form.with_user(user).action_submit()
-        self._finish_custody(moves.sudo().x_custody_request_ids)
+        forms = moves.sudo().x_custody_request_ids
+        self._finish_custody(forms)
+        # The arrival is the handover workshop request being Done (Nov 2026).
+        for request in forms.workshop_request_id.filtered(lambda r: r.state != 'completed'):
+            request.state = 'in_progress'
+            request.with_user(self.workshop).action_complete()
 
     # tests ------------------------------------------------------------
     def test_starting_assignment_is_logged(self):

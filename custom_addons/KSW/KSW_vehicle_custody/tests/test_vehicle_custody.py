@@ -161,8 +161,15 @@ class TestVehicleCustody(TransactionCase):
             self._workshop_done(form)
         form.with_user(self.hr).action_hr_check()  # the licence comes from the register
         self.assertEqual((form.license_type, form.state), ('نقل ثقيل', 'workshop'))
+        handover = form.workshop_request_id.sudo()
+        self.assertIn('Handover to', handover.description)  # the addition's own workshop request
         self._workshop_done(form)
         self.assertEqual(form.state, 'done')
+        # Custody follows the workshop request: nothing passes until it is Done.
+        self.assertEqual((move.state, self.truck.x_custodian_id.id), ('in_transfer', False))
+        handover.with_user(self.workshop).action_start()
+        self._sign(form)
+        handover.with_user(self.workshop).action_complete()
         self.assertEqual(move.state, 'done')  # arrival: no separate confirmation
         self.assertEqual(self.truck.x_department_id, self.dept_b)
         self.assertEqual(self.truck.x_custodian_id, self.bravo_driver)
@@ -224,20 +231,23 @@ class TestVehicleCustody(TransactionCase):
         self.assertIn(form, self.env['ksw.vehicle.custody.request'].with_user(self.workshop).search(
             [('x_is_pending_my_action', '=', True)]))
         existing = form.message_ids.ids
+        # The workshop starts: Ahmed is free at once (he may be given another vehicle).
+        checkup.with_user(self.workshop).action_start()
+        self.assertFalse(self.truck.x_custodian_id)
         self._workshop_done(form)
         self.assertEqual(form.state, 'done')
-        self.assertEqual((self.truck.x_custodian_id, self.truck.driver_id), (self.khalid, self.khalid))
+        self.assertFalse(self.truck.x_custodian_id)  # Khalid gets it when the request is Done
         self.assertEqual(self.truck.x_department_id, self.dept_a)
         # HR was a step: not copied again.
         told = form.message_ids.filtered(lambda m: m.id not in existing and self.hr.partner_id in m.partner_ids)
         self.assertFalse(told)
         # The checkup closes only with the signed paper filed.
-        checkup.state = 'in_progress'
         with self.assertRaises(UserError):
             checkup.with_user(self.workshop).action_complete()
         self._sign(form)
         checkup.with_user(self.workshop).action_complete()
         self.assertEqual(checkup.state, 'completed')
+        self.assertEqual((self.truck.x_custodian_id, self.truck.driver_id), (self.khalid, self.khalid))
 
     def _through_workshop(self, employee, depreciation=None):
         """A driver change through HR and the workshop, done; `depreciation`
@@ -247,8 +257,12 @@ class TestVehicleCustody(TransactionCase):
         form.with_user(self.hr).action_hr_check()
         if depreciation is not None:
             form.inspection_line_ids[:1].sudo().depreciation = depreciation
+        checkup = form.workshop_request_id.sudo()
+        checkup.with_user(self.workshop).action_start()
         self._workshop_done(form)
         self.assertEqual(form.state, 'done')
+        self._sign(form)
+        checkup.with_user(self.workshop).action_complete()
         return form
 
     def test_inspection_starts_from_the_last_reading(self):
@@ -516,3 +530,83 @@ class TestVehicleCustody(TransactionCase):
         form.sudo().inspection_datetime = '2026-11-12 08:00:00'
         form.with_user(other_mgr).action_workshop_done()
         self.assertTrue(form.workshop_done)
+
+    def test_custody_history_follows_the_supervisor_scope(self):
+        """Who Answers for What: a supervisor reads his departments' vehicles
+        and employees only (Disouky read every vehicle, 2026-11-26)."""
+        Employee, Vehicle = self.env['hr.employee'], self.env['ksw.fleet.vehicle']
+        bravo_truck = Vehicle.create({'name': 'VC-IS2', 'vehicle_type': 'isuzu', 'x_department_id': self.dept_b.id})
+        bravo_truck._ksw_set_custodian(self.bravo_driver)
+        # An Alpha employee holding a Bravo vehicle: both supervisors answer for it.
+        lent_truck = Vehicle.create({'name': 'VC-IS3', 'vehicle_type': 'isuzu', 'x_department_id': self.dept_b.id})
+        lent_truck._ksw_set_custodian(self.khalid)
+        own, bravo, lent = (v.x_custody_ids for v in (self.truck, bravo_truck, lent_truck))
+        History = self.env['ksw.fleet.vehicle.custody']
+        mine = [('id', 'in', (own | bravo | lent).ids)]
+        self.assertEqual(History.with_user(self.user_a).search(mine), own | lent)
+        self.assertEqual(History.with_user(self.user_b).search(mine), bravo | lent)
+        for user in (self.gm, self.hr, self.accounting, self.workshop):
+            self.assertEqual(History.with_user(user).search(mine), own | bravo | lent, user.login)
+        # A plain employee reads only his own custody.
+        driver_user = self.env['res.users'].with_context(no_reset_password=True).create({
+            'name': 'vc_driver', 'login': 'vc_driver', 'group_ids': [(6, 0, [self.env.ref('base.group_user').id])]})
+        self.bravo_driver.user_id = driver_user
+        self.assertEqual(History.with_user(driver_user).search(mine), bravo)
+        # The vehicle form's history tab reads through the same rule, no error.
+        self.assertFalse(bravo_truck.with_user(self.user_a).x_custody_ids)
+
+
+    # ---- custody follows the workshop request (user, 2026-11-26) ----------
+    def _visit(self):
+        return self.env['ksw.workshop.request'].sudo().create({
+            'employee_id': self.ahmed.id, 'client_id': self.truck.client_id.id, 'vehicle_type': 'isuzu',
+            'vehicle_id': self.truck.id, 'driver_id': self.ahmed.id,
+            'workshop_id': self.env['ksw.workshop']._for_department(self.dept_a).id, 'description': 'Brakes'})
+
+    def test_ordinary_visit_takes_and_gives_back(self):
+        self.assertEqual(self.truck.x_custodian_id, self.ahmed)
+        visit = self._visit()
+        visit.with_user(self.workshop).action_start()
+        self.assertFalse(self.truck.x_custodian_id)          # at the workshop, not with him
+        self.assertEqual(visit.x_custodian_on_hold_id, self.ahmed)
+        visit.with_user(self.workshop).action_complete()     # no HR-12 needed
+        self.assertEqual(self.truck.x_custodian_id, self.ahmed)
+        sources = self.env['ksw.fleet.vehicle.custody'].search([('vehicle_id', '=', self.truck.id)]).mapped('source')
+        self.assertIn(visit.name, sources)                   # the visit is in the history
+
+    def test_release_frees_the_driver_when_the_workshop_starts(self):
+        request, hand_in = self._release('holding')
+        checkup = hand_in.workshop_request_id.sudo()
+        self.assertEqual(self.truck.x_custodian_id, self.ahmed)
+        checkup.with_user(self.workshop).action_start()
+        self.assertFalse(self.truck.x_custodian_id)
+        # Free at once: the supervisor can have another vehicle given to him,
+        # before the HR-12 hand-in is finished.
+        other = self.env['ksw.fleet.vehicle'].create({'name': 'VC-IS2', 'vehicle_type': 'isuzu',
+                                                       'x_department_id': self.dept_a.id})
+        other._ksw_set_custodian(self.ahmed)
+        self.assertEqual(other.x_custodian_id, self.ahmed)
+        hand_in.with_user(self.hr).action_hr_check()
+        self._workshop_done(hand_in)
+        self._sign(hand_in)
+        checkup.with_user(self.workshop).action_complete()
+        self.assertFalse(self.truck.x_custodian_id)          # a release does not give it back
+
+    def test_driver_with_several_vehicles_is_shown_and_announced(self):
+        self.ahmed.sudo().write({'x_vehicle_limit': 2, 'x_vehicle_limit_reason': 'Two Isuzus'})
+        second = self.env['ksw.fleet.vehicle'].create({'name': 'VC-IS3', 'vehicle_type': 'isuzu',
+                                                        'x_department_id': self.dept_a.id})
+        before = self.ahmed.message_ids.ids
+        second._ksw_set_custodian(self.ahmed)
+        self.assertEqual((self.ahmed.x_vehicles_held_count, self.ahmed.x_holds_several), (2, True))
+        self.assertFalse(self.ahmed.x_over_vehicle_limit)    # allowed: shown, not a to-do
+        self.assertEqual(self.truck.x_custodian_vehicle_count, 2)
+        told = self.ahmed.message_ids.filtered(lambda m: m.id not in before)
+        self.assertIn(self.hr.partner_id, told.partner_ids)
+        Employee = self.env['hr.employee'].with_user(self.hr)
+        self.assertIn(self.ahmed, Employee.search([('x_holds_several', '=', True)]))
+        self.assertNotIn(self.ahmed, Employee.search([('x_vehicles_pending_my_action', '=', True)]))
+        # Over the limit (only an unchecked route can do it): a to-do for HR.
+        third = self.env['ksw.fleet.vehicle'].create({'name': 'VC-IS4', 'vehicle_type': 'isuzu'})
+        third.with_context(ksw_custody_unchecked=True)._ksw_set_custodian(self.ahmed)
+        self.assertIn(self.ahmed, Employee.search([('x_vehicles_pending_my_action', '=', True)]))

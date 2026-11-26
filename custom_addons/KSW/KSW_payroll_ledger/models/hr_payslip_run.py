@@ -15,7 +15,7 @@ from markupsafe import Markup
 
 from odoo import _, api, fields, models
 from odoo.tools import float_round
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 TOTAL_CODES = ('GROSS', 'NET')
@@ -32,13 +32,89 @@ class HrPayslip(models.Model):
         help='Confirmed with every figure netting to zero (e.g. a full attendance '
              'deduction): BAS books nothing for it, and neither does the ledger.')
 
+    x_ledger_error = fields.Text(
+        string='Ledger Posting Problem', readonly=True, copy=False,
+        help='Why this leave settlement is not in the ledger yet. Fix it, then '
+             'Post to Ledger on the time off request.')
+
+    x_ledger_settlement = fields.Boolean(
+        string='Booked as a Settlement', readonly=True, copy=False,
+        help='Booked on its own at GM final approval, a line per figure. Settlements booked '
+             'before Nov 2026 went in with their off-cycle batch and are rebooked.')
+
     def write(self, vals):
         undone = self.filtered(lambda s: s.state == 'done' and s.x_ledger_move_id) \
             if vals.get('state') and vals['state'] != 'done' else self.browse()
+        newly_done = self.filtered(lambda s: s.state != 'done') \
+            if vals.get('state') == 'done' else self.browse()
         res = super().write(vals)
         for slip in undone.filtered(lambda s: s.state != 'done'):
-            slip.payslip_run_id._ksw_ledger_reverse(slip)
+            slip._ksw_ledger_run()._ksw_ledger_reverse(slip)
+        newly_done.filtered(lambda s: s.state == 'done')._ksw_ledger_post_settlement()
         return res
+
+    # ------------------------------------------------------------------ settlements
+    def _ksw_is_settlement(self):
+        """A vacation / EOS / unpaid-leave settlement: confirmed one at a time
+        at GM final approval, in no monthly batch."""
+        self.ensure_one()
+        return bool(self.x_leave_id and not self.x_is_revision and not self.x_is_vacation_preview)
+
+    def _ksw_ledger_run(self):
+        """The batch the ledger reads this payslip through. A settlement has
+        none until an off-cycle bank file puts it in a hidden one."""
+        self.ensure_one()
+        run = self.payslip_run_id or self.env['hr.payslip.run'].new({
+            'name': self.number or self.name,
+            'date_start': self.date_from, 'date_end': self.date_to})
+        return run.with_context(ksw_ledger_settlement=True) if self._ksw_is_settlement() else run
+
+    def _ksw_settlement_date(self):
+        """The day the settlement became payable: GM final approval, in
+        Riyadh. Not the payslip's period end (31 Oct for a vacation that was
+        approved and paid in November)."""
+        self.ensure_one()
+        stamp = self.x_leave_id.sudo().x_gm_final_approved_date
+        if not stamp:
+            return fields.Date.context_today(self)
+        tz_self = self.with_context(tz=self.env.user.tz or 'Asia/Riyadh')
+        return fields.Datetime.context_timestamp(tz_self, stamp).date()
+
+    def _ksw_ledger_post_settlement(self):
+        """Book each confirmed, unbooked settlement on its own, in journal SAL.
+
+        A problem is written on the payslip and the leave, never raised: GM
+        final approval must not fail because an account is missing."""
+        Ledger = self.env['ksw.payroll.ledger']
+        for slip in self.sudo().filtered(lambda s: s._ksw_is_settlement()):
+            if slip.state != 'done' or slip.x_ledger_move_id or slip.x_ledger_nothing:
+                continue
+            date = slip._ksw_settlement_date()
+            if not Ledger._applies(date):
+                continue
+            run = slip._ksw_ledger_run()
+            error = False
+            try:
+                with self.env.cr.savepoint():
+                    lines, posted, bad, zero = run._ksw_ledger_lines(slip)
+                    if zero:
+                        slip.write({'x_ledger_nothing': True, 'x_ledger_error': False})
+                        continue
+                    if bad or not posted:
+                        raise UserError('\n'.join(bad) or _('nothing to post'))
+                    move = Ledger._move(
+                        Ledger._journal('SAL', slip.company_id or self.env.company), date,
+                        _('Leave settlement %(slip)s · %(bank)s', slip=slip.number or slip.name,
+                          bank=run._ksw_ledger_bank(slip)),
+                        lines)
+                    slip.write({'x_ledger_move_id': move.id, 'x_ledger_error': False,
+                                'x_ledger_settlement': True})
+            except (UserError, ValidationError) as e:
+                error = str(e.args[0] if e.args else e)
+            if error and error != slip.x_ledger_error:
+                slip.write({'x_ledger_error': error})
+                Ledger._note(slip.x_leave_id, Markup('<b>%(t)s</b><br/>%(m)s') % {
+                    't': _('The settlement was not posted to the ledger'), 'm': error})
 
 
 class HrPayslipRun(models.Model):
@@ -90,6 +166,11 @@ class HrPayslipRun(models.Model):
         self.ensure_one()
         Ledger = self.env['ksw.payroll.ledger']
         pending = self._ksw_ledger_pending()
+        # A settlement in an off-cycle batch is booked on its own, dated its
+        # GM final approval, not with the batch's period end.
+        settlements = pending.filtered(lambda s: s._ksw_is_settlement())
+        settlements._ksw_ledger_post_settlement()
+        pending -= settlements
         if not pending or not Ledger._applies(self.date_end):
             return False
         groups = {}
@@ -178,7 +259,9 @@ class HrPayslipRun(models.Model):
             staff = Posting._staff_entity(employee, company)
             group = Posting._posting_group(employee, staff, payer)
             intercompany = Posting._intercompany(payer, staff)
-            label = Journal.ref(_('Salary'), Journal.employee_label(employee), month)
+            label = Journal.ref(
+                _('Leave settlement') if self.env.context.get('ksw_ledger_settlement') else _('Salary'),
+                Journal.employee_label(employee), month)
             try:
                 if not group:
                     raise UserError(_('no posting group'))
@@ -235,10 +318,16 @@ class HrPayslipRun(models.Model):
         wage = self._ksw_ledger_account(employee, group, False)
         cost_centre = Ledger._vehicle_cost_centre(employee)
         salary_label = Journal.ref(_('Salary'), who, month)
+        # A settlement says what each figure is (vacation pay, ticket, the
+        # penalty fund…), as BAS's «تصفيات» voucher does, a line each; its
+        # expenses all carry his cost centre, not only the wage.
+        settlement = self.env.context.get('ksw_ledger_settlement')
         earnings, credits, spread, against_wage, net, unmapped = [], [], 0.0, 0.0, 0.0, []
         for line in slip.line_ids:
             amount = line.total or 0.0
-            rule = line.salary_rule_id
+            # In the voucher's language, not the payslip's (its rule names).
+            rule = line.salary_rule_id.with_env(self.env)
+            label = Journal.ref(rule.name or rule.code, who, month) if settlement else salary_label
             posting = rule.x_bas_posting
             treatment = rule.x_ledger_deduction or 'spread'
             if posting == 'payable':
@@ -257,10 +346,12 @@ class HrPayslipRun(models.Model):
                 for label, part in self._ksw_ledger_credit_parts(slip, line, rule, who, month):
                     credits.append((own, part, label, None))
             elif rule.x_ledger_account_id:
-                earnings.append([rule.x_ledger_account_id, amount, salary_label, None])
+                earnings.append([rule.x_ledger_account_id, amount, label, None])
             elif posting == 'expense':
                 account = self._ksw_ledger_account(employee, group, rule.x_posting_category_id)
-                earnings.append([account, amount, salary_label, cost_centre if account == wage else None])
+                charged = account == wage or (
+                    settlement and (account.account_type or '').startswith('expense'))
+                earnings.append([account, amount, label, cost_centre if charged else None])
             elif posting == 'liability':
                 if treatment == 'basic':
                     against_wage += amount
@@ -275,6 +366,16 @@ class HrPayslipRun(models.Model):
                 line[1] += against_wage
             else:
                 earnings.append([wage, against_wage, salary_label, cost_centre])
+        posted = round(sum(e[1] for e in earnings) + sum(c[1] for c in credits), 2)
+        residue = round(net - posted, 2)
+        if settlement and residue and abs(residue) <= 1.0 and not unmapped:
+            # A settlement's vacation pay / EOS are fractions rounded line by
+            # line after its NET was taken from the unrounded figures
+            # (SLIP/14525: lines 4,777, NET and transfer 4,776). The entry
+            # books what was paid: the rounding goes on the largest expense.
+            expenses = [e for e in earnings if (e[0].account_type or '').startswith('expense')]
+            if expenses:
+                max(expenses, key=lambda e: e[1])[1] += residue
         block = [tuple(e) for e in earnings] + credits
         posted = round(sum(b[1] for b in block), 2)
         if unmapped or abs(posted - round(net, 2)) >= 0.005:

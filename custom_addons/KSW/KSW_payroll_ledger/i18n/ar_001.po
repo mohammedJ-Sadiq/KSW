@@ -6,15 +6,135 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 12:43+0000\n"
-"PO-Revision-Date: 2026-11-10 12:43+0000\n"
+"POT-Creation-Date: 2026-11-26 12:05+0000\n"
+"PO-Revision-Date: 2026-11-26 12:05+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
-"Language: ar_001\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid ""
+"%(bank)s belongs to another entity than the one this settlement was booked "
+"to."
+msgstr "الحساب %(bank)s تابع لجهة غير الجهة التي قُيّدت عليها هذه التسوية."
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid ""
+"%(name)s has no bank account of his own to transfer to. Add it on his "
+"employee record, or pay by cheque or cash."
+msgstr ""
+"لا يوجد حساب بنكي للموظف %(name)s للتحويل إليه. أضفه في ملف الموظف، أو اصرف "
+"بشيك أو نقدًا."
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "%(name)s has no paying bank account."
+msgstr "لا يوجد حساب بنكي للصرف للموظف %(name)s."
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/hr_payslip_run.py:0
+msgid ""
+"%(name)s: posted to the suspense account %(acc)s, no posting map row for "
+"some of his figures"
+msgstr ""
+"%(name)s: رُحِّل إلى الحساب المعلّق %(acc)s، لعدم وجود سطر توجيه لبعض بنوده"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "%(slip)s: %(amt)s SAR in cash from %(box)s, %(done)s"
+msgstr "%(slip)s: %(amt)s ريال نقدًا من %(box)s، %(done)s"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid ""
+"%(slip)s: %(amt)s SAR to pay, waiting for accounting to choose bank file, "
+"bank transfer, cheque or cash"
+msgstr ""
+"%(slip)s: %(amt)s ريال للصرف، بانتظار اختيار المحاسبة: ملف بنك الرواتب أو "
+"تحويل بنكي أو شيك أو نقدًا"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid ""
+"%(slip)s: %(amt)s SAR transferred from %(bank)s on %(date)s (ref. %(ref)s)"
+msgstr ""
+"%(slip)s: %(amt)s ريال حُوّلت من %(bank)s بتاريخ %(date)s (مرجع %(ref)s)"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid ""
+"%(slip)s: cheque %(no)s on %(bank)s for %(amt)s SAR handed over on %(date)s,"
+" %(cashed)s"
+msgstr ""
+"%(slip)s: الشيك رقم %(no)s على %(bank)s بمبلغ %(amt)s ريال سُلّم بتاريخ "
+"%(date)s، %(cashed)s"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/posting.py:0
+msgid ""
+"%(what)s → %(to)s instead of %(default)s; the rest of his salary stays on "
+"%(rest)s (%(group)s)"
+msgstr ""
+"%(what)s ← %(to)s بدلاً من %(default)s؛ وبقية راتبه تبقى على %(rest)s "
+"(%(group)s)"
+
+#. module: KSW_payroll_ledger
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.hr_leave_view_form_settlement_payment
+msgid ""
+".\n"
+"                    Press <strong>Cash Handed Over</strong> once the employee has it."
+msgstr ""
+".\n"
+"                    اضغط <strong>تم تسليم النقد</strong> بعد استلام الموظف للمبلغ."
+
+#. module: KSW_payroll_ledger
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.hr_leave_view_form_settlement_payment
+msgid "<span class=\"o_stat_text\">Bank File</span>"
+msgstr "<span class=\"o_stat_text\">ملف البنك</span>"
+
+#. module: KSW_payroll_ledger
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.hr_leave_view_form_settlement_payment
+msgid "<strong>Cash to hand over:</strong>"
+msgstr "<strong>نقد للتسليم:</strong>"
+
+#. module: KSW_payroll_ledger
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.hr_leave_view_form_settlement_payment
+msgid "<strong>Not in the ledger yet:</strong>"
+msgstr "<strong>لم يُرحَّل بعد إلى دفتر الأستاذ:</strong>"
+
+#. module: KSW_payroll_ledger
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.hr_leave_view_form_settlement_payment
+msgid "<strong>Settlement payment:</strong>"
+msgstr "<strong>صرف التسوية:</strong>"
+
+#. module: KSW_payroll_ledger
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_ksw_settlement_payment_wizard_form
+msgid ""
+"A bank file for this employee alone is generated now; download it from the\n"
+"                    request (Bank File) and upload it to the bank."
+msgstr ""
+"يُنشأ الآن ملف بنك لهذا الموظف وحده؛ حمّله من الطلب (ملف البنك)\n"
+"                    وارفعه إلى البنك."
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "A cheque cannot be cashed before it was handed over."
+msgstr "لا يمكن صرف الشيك قبل تاريخ تسليمه."
 
 #. module: KSW_payroll_ledger
 #: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_ksw_payroll_posting_group_form
@@ -42,6 +162,12 @@ msgid "Account"
 msgstr "الحساب"
 
 #. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/payroll_ledger.py:0
+msgid "Account %(code)s does not exist in the chart."
+msgstr "الحساب %(code)s غير موجود في دليل الحسابات."
+
+#. module: KSW_payroll_ledger
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_posting_group__map_ids
 #: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_ksw_payroll_posting_group_form
 msgid "Accounts"
@@ -58,6 +184,22 @@ msgstr "نشط"
 #: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__hr_salary_rule__x_ledger_deduction__basic
 msgid "Against the basic wage only"
 msgstr "من الراتب الأساسي فقط"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__amount
+msgid "Amount"
+msgstr "المبلغ"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_leave__x_disb_amount
+msgid "Amount to Pay"
+msgstr "المبلغ المستحق الصرف"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "Amount:"
+msgstr "المبلغ:"
 
 #. module: KSW_payroll_ledger
 #: model_terms:ir.actions.act_window,help:KSW_payroll_ledger.action_ksw_payroll_employee_posting
@@ -80,7 +222,37 @@ msgstr "مؤرشف"
 #. module: KSW_payroll_ledger
 #: model:ir.model,name:KSW_payroll_ledger.model_res_partner_bank
 msgid "Bank Accounts"
+msgstr "الحسابات البنكية"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_leave__x_disb_bank_file_id
+msgid "Bank File"
+msgstr "ملف البنك"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_leave__x_disb_bank_file_attachment_ids
+msgid "Bank File (Excel / TXT)"
+msgstr "ملف البنك (Excel / TXT)"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_leave__x_disb_bank_file_ref
+msgid "Bank File Ref."
+msgstr "مرجع ملف البنك"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "Bank file:"
+msgstr "ملف البنك:"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,help:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__date
+msgid ""
+"Bank transfer: the value date. Cheque: the day it is handed over. Cheque "
+"cashed: the day the bank paid it."
 msgstr ""
+"التحويل البنكي: تاريخ القيمة. الشيك: يوم تسليمه. صرف الشيك: يوم صرفه من "
+"البنك."
 
 #. module: KSW_payroll_ledger
 #: model:ir.model.fields,help:KSW_payroll_ledger.field_res_config_settings__ksw_ledger_start_date
@@ -93,15 +265,149 @@ msgstr ""
 "التاريخ أو بعده. ما قبله صُدِّر إلى BAS ولا يُرحَّل. فارغ: لا يُرحَّل شيء."
 
 #. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/posting.py:0
+msgid "Because of"
+msgstr "بسبب"
+
+#. module: KSW_payroll_ledger
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_intercompany__posting_group_id
 msgid "Book them in"
 msgstr "قيّدهم في"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_payslip__x_ledger_settlement
+msgid "Booked as a Settlement"
+msgstr "مُرحَّل كتسوية"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,help:KSW_payroll_ledger.field_hr_payslip__x_ledger_settlement
+msgid ""
+"Booked on its own at GM final approval, a line per figure. Settlements "
+"booked before Nov 2026 went in with their off-cycle batch and are rebooked."
+msgstr ""
+"يُرحَّل منفردًا عند الاعتماد النهائي للمدير العام، سطر لكل بند. التسويات "
+"المرحّلة قبل نوفمبر 2026 رُحّلت مع دفعة الصرف خارج الدورة ويُعاد ترحيلها."
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/posting.py:0
+msgid "Booked to"
+msgstr "مقيّد على"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "By:"
+msgstr "بواسطة:"
+
+#. module: KSW_payroll_ledger
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_ksw_settlement_payment_wizard_form
+msgid "Cancel"
+msgstr "إلغاء"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__hr_leave__x_disb_method__cash
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__hr_payslip__x_disb_method__cash
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__ksw_settlement_payment_wizard__method__cash
+msgid "Cash"
+msgstr "نقدًا"
+
+#. module: KSW_payroll_ledger
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_ksw_settlement_payment_wizard_form
+msgid "Cashed On"
+msgstr "تاريخ الصرف"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "Cashed on:"
+msgstr "تاريخ الصرف:"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_payslip__x_disb_cashed_by_id
+msgid "Cashing Recorded By"
+msgstr "سجّل الصرف"
 
 #. module: KSW_payroll_ledger
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_employee_posting__category_id
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_posting_map__category_id
 msgid "Category"
 msgstr "الفئة"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__hr_leave__x_disb_method__cheque
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__hr_payslip__x_disb_method__cheque
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__ksw_settlement_payment_wizard__method__cheque
+msgid "Cheque"
+msgstr "شيك"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__ksw_settlement_payment_wizard__mode__cashed
+msgid "Cheque Cashed"
+msgstr "تم صرف الشيك"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_payslip__x_disb_cashed_move_id
+msgid "Cheque Cashed Entry"
+msgstr "قيد صرف الشيك"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_leave__x_disb_cashed_date
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_payslip__x_disb_cashed_date
+msgid "Cheque Cashed On"
+msgstr "تاريخ صرف الشيك"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_leave__x_disb_cheque_date
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_payslip__x_disb_cheque_date
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__cheque_date
+msgid "Cheque Date"
+msgstr "تاريخ الشيك"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__hr_leave__x_disb_state__cheque_handed
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__hr_payslip__x_disb_state__cheque_handed
+msgid "Cheque Handed, Not Cashed"
+msgstr "شيك مُسلّم لم يُصرف"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_leave__x_disb_cheque_no
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_payslip__x_disb_cheque_no
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__cheque_no
+msgid "Cheque No."
+msgstr "رقم الشيك"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "Cheque:"
+msgstr "الشيك:"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_account_journal__x_cheques_account_id
+msgid "Cheques Issued, Not Cashed"
+msgstr "شيكات صادرة لم تصرف"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "Choose the bank the money leaves from."
+msgstr "اختر البنك الذي يُصرف منه المبلغ."
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "Choose the cash box that pays."
+msgstr "اختر الصندوق الذي يصرف المبلغ."
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "Choose the company account the transfer leaves from."
+msgstr "اختر حساب الشركة الذي يُصرف منه التحويل."
 
 #. module: KSW_payroll_ledger
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_posting_category__code
@@ -116,7 +422,32 @@ msgstr "الشركة"
 #. module: KSW_payroll_ledger
 #: model:ir.model,name:KSW_payroll_ledger.model_res_config_settings
 msgid "Config Settings"
+msgstr "إعدادات التهيئة"
+
+#. module: KSW_payroll_ledger
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_ksw_settlement_payment_wizard_form
+msgid "Confirm"
+msgstr "تأكيد"
+
+#. module: KSW_payroll_ledger
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_ksw_settlement_payment_wizard_form
+msgid ""
+"Confirm once the cheque is in the employee's hands: that is the payment.\n"
+"                    Until the bank pays it, it shows under Cheques Not Cashed and on the bank's\n"
+"                    «شيكات صادرة لم تصرف» account."
 msgstr ""
+"أكّد بعد تسليم الشيك للموظف: التسليم هو الصرف.\n"
+"                    وإلى أن يصرفه البنك يظهر ضمن «شيكات لم تُصرف» وفي حساب\n"
+"                    «شيكات صادرة لم تصرف» الخاص بالبنك."
+
+#. module: KSW_payroll_ledger
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.hr_leave_view_form_settlement_payment
+msgid ""
+"Confirm the employee has received this settlement in cash. This posts the "
+"payment and cannot be undone here."
+msgstr ""
+"أكّد أن الموظف استلم هذه التسوية نقدًا. سيُرحَّل الصرف ولا يمكن التراجع عنه "
+"من هنا."
 
 #. module: KSW_payroll_ledger
 #: model:ir.model.fields,help:KSW_payroll_ledger.field_hr_payslip__x_ledger_nothing
@@ -134,6 +465,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_posting_category__create_uid
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_posting_group__create_uid
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_posting_map__create_uid
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__create_uid
 msgid "Created by"
 msgstr "أنشئ بواسطة"
 
@@ -144,8 +476,24 @@ msgstr "أنشئ بواسطة"
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_posting_category__create_date
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_posting_group__create_date
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_posting_map__create_date
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__create_date
 msgid "Created on"
 msgstr "أنشئ في"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__pay_from_ledger
+msgid "Credited in the Ledger"
+msgstr "الحساب الدائن في الأستاذ"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,help:KSW_payroll_ledger.field_account_journal__x_cheques_account_id
+msgid ""
+"Credited when a cheque on this bank is handed over, debited when the bank "
+"pays it. Its balance is what is still to leave the bank. Created on the "
+"first cheque if empty."
+msgstr ""
+"يُقيد دائنًا عند تسليم شيك على هذا البنك، ومدينًا عند صرفه من البنك. رصيده "
+"هو ما لم يخرج من البنك بعد. يُنشأ مع أول شيك إن كان فارغًا."
 
 #. module: KSW_payroll_ledger
 #: model:ir.model.fields,help:KSW_payroll_ledger.field_ksw_payroll_intercompany__staff_account_id
@@ -162,6 +510,11 @@ msgid "Credited with the net of every salary this entity pays."
 msgstr "يُقيَّد عليه دائناً صافي كل راتب تصرفه هذه الجهة."
 
 #. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__date
+msgid "Date"
+msgstr "التاريخ"
+
+#. module: KSW_payroll_ledger
 #: model:ir.model.fields,help:KSW_payroll_ledger.field_ksw_payroll_intercompany__payer_account_id
 msgid ""
 "Debited with the net, in the paying entity's books (Al-Hayat paying a "
@@ -170,6 +523,12 @@ msgid ""
 msgstr ""
 "يُقيَّد عليه الصافي مديناً في دفاتر الجهة الصارفة (الحياة تصرف لموظف الكوثر:"
 " 2101030003). فارغ مع الحقل التالي: بدون حسابات جارية."
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/hr_payslip_run.py:0
+msgid "Deducted from salary"
+msgstr "خصم من الراتب"
 
 #. module: KSW_payroll_ledger
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_payslip_line__x_ledger_deduction
@@ -201,9 +560,18 @@ msgid "Departments"
 msgstr "الأقسام"
 
 #. module: KSW_payroll_ledger
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__hr_leave__x_disb_method__transfer
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__hr_payslip__x_disb_method__transfer
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__ksw_settlement_payment_wizard__method__transfer
+msgid "Direct Bank Transfer"
+msgstr "تحويل بنكي مباشر"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_account_journal__display_name
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_account_move_line__display_name
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_department__display_name
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_leave__display_name
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_payslip__display_name
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_payslip_run__display_name
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_salary_rule__display_name
@@ -216,10 +584,12 @@ msgstr "الأقسام"
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_posting_category__display_name
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_posting_group__display_name
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_posting_map__display_name
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_revision_bank_file__display_name
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__display_name
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_res_partner_bank__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "اسم العرض"
 
 #. module: KSW_payroll_ledger
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_intercompany__payer_account_id
@@ -235,6 +605,7 @@ msgstr "مستحق للجهة الصارفة"
 #: model:ir.model,name:KSW_payroll_ledger.model_hr_employee
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_account_move_line__x_employee_id
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_employee_posting__employee_id
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__employee_name
 #: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_account_move_line_filter_ksw_employee
 #: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_ksw_payroll_employee_posting_search
 msgid "Employee"
@@ -273,6 +644,18 @@ msgid "Empty: the wage and every category without a row of its own."
 msgstr "فارغ: الراتب الأساسي وكل فئة ليس لها سطر خاص."
 
 #. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "Enter the bank's transfer reference."
+msgstr "أدخل مرجع التحويل لدى البنك."
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "Enter the cheque number."
+msgstr "أدخل رقم الشيك."
+
+#. module: KSW_payroll_ledger
 #: model:ir.actions.act_window,name:KSW_payroll_ledger.action_ksw_payroll_entity
 #: model:ir.ui.menu,name:KSW_payroll_ledger.menu_ksw_payroll_entity
 msgid "Entities"
@@ -303,9 +686,39 @@ msgid "Fixed Ledger Account"
 msgstr "حساب ثابت في دفتر الأستاذ"
 
 #. module: KSW_payroll_ledger
+#: model:ir.model.fields,help:KSW_payroll_ledger.field_account_setup_bank_manual_config__x_ledger_journal_id
+#: model:ir.model.fields,help:KSW_payroll_ledger.field_res_partner_bank__x_ledger_journal_id
+msgid ""
+"For a paying account of the company (Kawther Raj Cards…): the bank journal "
+"whose account a transfer made from it is credited to (Al Rajhi 1202010005)."
+msgstr ""
+"لحساب صرف رواتب الشركة (بطاقات الراجحي الكوثر…): دفتر البنك الذي يُقيد حسابه"
+" دائنًا بالتحويل منه (الراجحي 1202010005)."
+
+#. module: KSW_payroll_ledger
 #: model:ir.model.fields,help:KSW_payroll_ledger.field_ksw_payroll_entity__default_group_id
 msgid "For this entity's staff whose department names no posting group."
 msgstr "لموظفي هذه الجهة الذين لا يحدد قسمهم مجموعة ترحيل."
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__journal_id
+msgid "From"
+msgstr "من"
+
+#. module: KSW_payroll_ledger
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_ksw_settlement_payment_wizard_form
+msgid ""
+"From any company bank (Riyad, Arab, Al-Ahli…): make the transfer in that bank's\n"
+"                    online banking, then record its reference here. No bank file is generated."
+msgstr ""
+"من أي بنك للشركة (الرياض، العربي، الأهلي…): نفّذ التحويل من الخدمات المصرفية\n"
+"                    الإلكترونية لذلك البنك، ثم سجّل مرجعه هنا. لا يُنشأ ملف بنك."
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "From:"
+msgstr "من:"
 
 #. module: KSW_payroll_ledger
 #: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_employee_form_ledger
@@ -317,6 +730,17 @@ msgstr "يُقيَّد على"
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_posting_map__group_id
 msgid "Group"
 msgstr "المجموعة"
+
+#. module: KSW_payroll_ledger
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_ksw_settlement_payment_wizard_form
+msgid "Handed Over On"
+msgstr "تاريخ التسليم"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "Handed over on:"
+msgstr "تاريخ التسليم:"
 
 #. module: KSW_payroll_ledger
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_employee_posting__group_id
@@ -343,9 +767,11 @@ msgstr ""
 "التأمينات؛ وإن لم يكن له حساب يُوزَّع."
 
 #. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_account_journal__id
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_account_move_line__id
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_department__id
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_employee__id
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_leave__id
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_payslip__id
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_payslip_run__id
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_salary_rule__id
@@ -358,10 +784,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_posting_category__id
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_posting_group__id
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_posting_map__id
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_revision_bank_file__id
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__id
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_res_config_settings__id
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_res_partner_bank__id
 msgid "ID"
-msgstr ""
+msgstr "المعرف"
 
 #. module: KSW_payroll_ledger
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_employee_posting__default_account_id
@@ -369,14 +797,29 @@ msgid "Instead of"
 msgstr "بدلاً من"
 
 #. module: KSW_payroll_ledger
+#: model:ir.model,name:KSW_payroll_ledger.model_account_journal
+msgid "Journal"
+msgstr "دفتر اليومية"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_leave__x_disb_entries
+msgid "Journal Entries"
+msgstr "القيود"
+
+#. module: KSW_payroll_ledger
 #: model:ir.model,name:KSW_payroll_ledger.model_account_move_line
 msgid "Journal Item"
-msgstr ""
+msgstr "عنصر دفتر اليومية "
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__journal_type
+msgid "Journal Type"
+msgstr "نوع الدفتر"
 
 #. module: KSW_payroll_ledger
 #: model:ir.model,name:KSW_payroll_ledger.model_ksw_pay_run
 msgid "KSW Monthly Pay Run"
-msgstr ""
+msgstr "دورة المستحقات الشهرية"
 
 #. module: KSW_payroll_ledger
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_employee_posting__write_uid
@@ -385,6 +828,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_posting_category__write_uid
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_posting_group__write_uid
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_posting_map__write_uid
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__write_uid
 msgid "Last Updated by"
 msgstr "آخر تحديث بواسطة"
 
@@ -395,8 +839,26 @@ msgstr "آخر تحديث بواسطة"
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_posting_category__write_date
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_posting_group__write_date
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_posting_map__write_date
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__write_date
 msgid "Last Updated on"
 msgstr "آخر تحديث في"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__leave_id
+msgid "Leave"
+msgstr "الإجازة"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/hr_payslip_run.py:0
+msgid "Leave settlement"
+msgstr "تسوية إجازة"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/hr_payslip_run.py:0
+msgid "Leave settlement %(slip)s · %(bank)s"
+msgstr "تسوية إجازة %(slip)s · %(bank)s"
 
 #. module: KSW_payroll_ledger
 #: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_employee_form_ledger
@@ -407,6 +869,11 @@ msgstr "دفتر الأستاذ"
 #: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.res_config_settings_view_form_ledger
 msgid "Ledger (parallel run)"
 msgstr "دفتر الأستاذ (التشغيل الموازي)"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_account_journal__x_ledger_account_id
+msgid "Ledger Account (BAS)"
+msgstr "حساب الأستاذ (BAS)"
 
 #. module: KSW_payroll_ledger
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_account_setup_bank_manual_config__x_ledger_entity_id
@@ -427,10 +894,27 @@ msgid "Ledger Entry"
 msgstr "قيد دفتر الأستاذ"
 
 #. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_payslip__x_ledger_error
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_payslip_run__x_ledger_error
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_pay_run__x_ledger_error
 msgid "Ledger Posting Problem"
 msgstr "مشكلة في الترحيل إلى دفتر الأستاذ"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_leave__x_disb_error
+msgid "Ledger Problem"
+msgstr "مشكلة الترحيل"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/hr_payslip_run.py:0
+msgid "Loan installment"
+msgstr "قسط قرض"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__mode
+msgid "Mode"
+msgstr "النوع"
 
 #. module: KSW_payroll_ledger
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_entity__name
@@ -440,9 +924,42 @@ msgid "Name"
 msgstr "الاسم"
 
 #. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "No bank file has paid this settlement."
+msgstr "لم يُصرف هذه التسوية أي ملف بنك."
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "No cash payment of this settlement is waiting for handover."
+msgstr "لا يوجد صرف نقدي لهذه التسوية بانتظار التسليم."
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "No cheque of this settlement is waiting to be cashed."
+msgstr "لا يوجد شيك لهذه التسوية بانتظار الصرف من البنك."
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/hr_payslip_run.py:0
+msgid ""
+"No default payroll entity in Accounting ▸ Configuration ▸ Payroll Posting ▸ "
+"Entities."
+msgstr ""
+"لا يوجد كيان رواتب افتراضي في المحاسبة ▸ التهيئة ▸ ترحيل الرواتب ▸ الكيانات."
+
+#. module: KSW_payroll_ledger
 #: model_terms:ir.actions.act_window,help:KSW_payroll_ledger.action_ksw_payroll_employee_posting
 msgid "No employee exceptions"
 msgstr "لا توجد استثناءات للموظفين"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/ksw_pay_run.py:0
+msgid "Not posted to the ledger"
+msgstr "لم يُرحَّل إلى دفتر الأستاذ"
 
 #. module: KSW_payroll_ledger
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_entity__note
@@ -453,9 +970,20 @@ msgid "Note"
 msgstr "الملاحظات"
 
 #. module: KSW_payroll_ledger
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__hr_leave__x_disb_state__none
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__hr_payslip__x_disb_state__none
+msgid "Nothing to Pay"
+msgstr "لا يوجد ما يُصرف"
+
+#. module: KSW_payroll_ledger
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_payslip__x_ledger_nothing
 msgid "Nothing to Post"
 msgstr "لا شيء للترحيل"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model,name:KSW_payroll_ledger.model_ksw_revision_bank_file
+msgid "Off-Cycle Bank File"
+msgstr "ملف بنك تعديلات الرواتب"
 
 #. module: KSW_payroll_ledger
 #: model:ir.model.fields,help:KSW_payroll_ledger.field_hr_payslip_line__x_ledger_account_id
@@ -474,6 +1002,11 @@ msgid "One account per posting group and category."
 msgstr "حساب واحد لكل مجموعة ترحيل وفئة."
 
 #. module: KSW_payroll_ledger
+#: model:ir.model.constraint,message:KSW_payroll_ledger.constraint_ksw_payroll_posting_map_group_catch_all_unique
+msgid "One account per posting group for the wage and everything else."
+msgstr "حساب واحد لكل مجموعة ترحيل للأجر وكل ما عداه."
+
+#. module: KSW_payroll_ledger
 #: model:ir.model.constraint,message:KSW_payroll_ledger.constraint_ksw_payroll_employee_posting_employee_category_unique
 msgid "One exception per employee and category."
 msgstr "استثناء واحد لكل موظف وفئة."
@@ -484,6 +1017,24 @@ msgid "One row per paying entity and staff entity."
 msgstr "سطر واحد لكل جهة صارفة وجهة موظف."
 
 #. module: KSW_payroll_ledger
+#: model:ir.model.constraint,message:KSW_payroll_ledger.constraint_ksw_payroll_employee_posting_employee_catch_all_unique
+msgid "One whole-salary exception per employee."
+msgstr "استثناء واحد للراتب كاملًا لكل موظف."
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "Only a Loan Disbursement Officer may confirm a cash handover."
+msgstr "تأكيد تسليم النقد من صلاحية مسؤول صرف السلف الخاصة فقط."
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/hr_payslip_run.py:0
+msgid ""
+"Only a Payroll Manager or an accounting administrator may post a batch."
+msgstr "يرحّل الدفعة مدير الرواتب أو مدير المحاسبة فقط."
+
+#. module: KSW_payroll_ledger
 #: model:ir.model.fields,help:KSW_payroll_ledger.field_hr_employee__x_posting_group_id
 msgid ""
 "Only for an employee booked apart from his department, whatever the reason "
@@ -491,6 +1042,50 @@ msgid ""
 msgstr ""
 "فقط للموظف الذي يُقيَّد بشكل مختلف عن قسمه أياً كان السبب (مثل رواتب مستقلة "
 "M). فارغ: مجموعة قسمه."
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/ksw_pay_run.py:0
+msgid "Only the Commission Accountant may post the month."
+msgstr "يرحّل الشهر محاسب العمولات فقط."
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid ""
+"Only this request's accountants (its accounting step) may pay the "
+"settlement."
+msgstr "صرف التسوية من صلاحية محاسبي هذا الطلب (مرحلة المحاسبة) فقط."
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__hr_leave__x_disb_state__paid
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__hr_payslip__x_disb_state__paid
+msgid "Paid"
+msgstr "مصروفة"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_leave__x_disb_handed_by
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_payslip__x_disb_handed_by_id
+msgid "Paid By"
+msgstr "صرفها"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_leave__x_disb_journal_name
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_payslip__x_disb_journal_id
+msgid "Paid From"
+msgstr "يُصرف من"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_account_setup_bank_manual_config__x_ledger_journal_id
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_res_partner_bank__x_ledger_journal_id
+msgid "Paid From (Journal)"
+msgstr "يُصرف من (الدفتر)"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_leave__x_disb_handed_date
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_payslip__x_disb_handed_date
+msgid "Paid On"
+msgstr "تاريخ الصرف"
 
 #. module: KSW_payroll_ledger
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_intercompany__payer_id
@@ -504,14 +1099,80 @@ msgid "Paid for Another Entity"
 msgstr "الصرف لجهة أخرى"
 
 #. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/posting.py:0
+msgid "Part of his salary"
+msgstr "جزء من راتبه"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__ksw_settlement_payment_wizard__mode__pay
+msgid "Pay"
+msgstr "صرف"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__method
+msgid "Pay By"
+msgstr "طريقة الصرف"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__pay_from_id
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__pay_from_ids
+msgid "Pay From"
+msgstr "يُصرف من حساب"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__pay_from_count
+msgid "Pay From Count"
+msgstr "عدد حسابات الصرف"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "Pay Settlement"
+msgstr "صرف التسوية"
+
+#. module: KSW_payroll_ledger
 #: model:ir.model,name:KSW_payroll_ledger.model_hr_payslip
 msgid "Pay Slip"
-msgstr ""
+msgstr "كشف الراتب"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model,name:KSW_payroll_ledger.model_ksw_settlement_payment_wizard
+msgid "Pay a Leave Settlement"
+msgstr "صرف تسوية إجازة"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__paying_bank
+msgid "Paying Account"
+msgstr "حساب الصرف"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_payslip__x_disb_move_id
+msgid "Payment Entry"
+msgstr "قيد الصرف"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_leave__x_disb_method
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_payslip__x_disb_method
+msgid "Payment Method"
+msgstr "طريقة الصرف"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_payslip__x_disb_error
+msgid "Payment Posting Problem"
+msgstr "مشكلة ترحيل الصرف"
 
 #. module: KSW_payroll_ledger
 #: model:ir.model,name:KSW_payroll_ledger.model_ksw_payroll_posting
 msgid "Payroll Account Determination"
 msgstr "تحديد حسابات الرواتب"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__hr_leave__x_disb_method__bank
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__hr_payslip__x_disb_method__bank
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__ksw_settlement_payment_wizard__method__bank
+msgid "Payroll Bank File"
+msgstr "تحويل بنكي"
 
 #. module: KSW_payroll_ledger
 #: model:ir.model,name:KSW_payroll_ledger.model_ksw_payroll_entity
@@ -556,7 +1217,7 @@ msgstr "الرواتب والعمولات في دفتر الأستاذ"
 #. module: KSW_payroll_ledger
 #: model:ir.model,name:KSW_payroll_ledger.model_hr_payslip_run
 msgid "Payslip Batches"
-msgstr ""
+msgstr "كشوف الرواتب"
 
 #. module: KSW_payroll_ledger
 #: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.res_config_settings_view_form_ledger
@@ -573,6 +1234,7 @@ msgid "Post payroll and commissions from"
 msgstr "ترحيل الرواتب والعمولات اعتباراً من"
 
 #. module: KSW_payroll_ledger
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.hr_leave_view_form_settlement_payment
 #: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_hr_payslip_run_form_ledger
 #: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_ksw_pay_run_form_ledger
 msgid "Post to Ledger"
@@ -627,9 +1289,32 @@ msgid "Reason"
 msgstr "السبب"
 
 #. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "Reference:"
+msgstr "المرجع:"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/hr_payslip_run.py:0
+msgid "Reversal of %(slip)s (%(move)s)"
+msgstr "عكس %(slip)s (%(move)s)"
+
+#. module: KSW_payroll_ledger
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.hr_leave_view_form_settlement_payment
+msgid "SAR from"
+msgstr "ريال من"
+
+#. module: KSW_payroll_ledger
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_entity__payable_account_id
 msgid "Salaries Payable"
 msgstr "الرواتب المستحقة"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/hr_payslip_run.py:0
+msgid "Salary"
+msgstr "راتب"
 
 #. module: KSW_payroll_ledger
 #: model:ir.model,name:KSW_payroll_ledger.model_ksw_payroll_intercompany
@@ -639,7 +1324,7 @@ msgstr "راتب مصروف لجهة أخرى"
 #. module: KSW_payroll_ledger
 #: model:ir.model,name:KSW_payroll_ledger.model_hr_salary_rule
 msgid "Salary Rule"
-msgstr ""
+msgstr "قاعدة الراتب"
 
 #. module: KSW_payroll_ledger
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_posting_category__rule_ids
@@ -655,6 +1340,49 @@ msgid "Sequence"
 msgstr "تسلسل"
 
 #. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_leave__x_disb_state
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_payslip__x_disb_state
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.hr_leave_view_form_settlement_payment
+msgid "Settlement Payment"
+msgstr "صرف التسوية"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "Settlement bank transfer"
+msgstr "تحويل بنكي لتسوية"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "Settlement cheque %(no)s"
+msgstr "شيك تسوية رقم %(no)s"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "Settlement cheque %(no)s cashed"
+msgstr "صرف شيك تسوية رقم %(no)s"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "Settlement paid in cash"
+msgstr "صرف تسوية نقدًا"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "Settlement transfer %(ref)s"
+msgstr "تحويل تسوية مرجع %(ref)s"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/hr_payslip_run.py:0
+msgid "Some payslips were not posted to the ledger"
+msgstr "بعض كشوف الراتب لم تُرحَّل إلى دفتر الأستاذ"
+
+#. module: KSW_payroll_ledger
 #: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__hr_payslip_line__x_ledger_deduction__spread
 #: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__hr_salary_rule__x_ledger_deduction__spread
 msgid "Spread over the earnings"
@@ -664,6 +1392,36 @@ msgstr "توزيع على الاستحقاقات"
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_intercompany__staff_entity_id
 msgid "Staff of"
 msgstr "موظفو"
+
+#. module: KSW_payroll_ledger
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_ksw_settlement_payment_wizard_form
+msgid ""
+"The Loan Disbursement Officer is asked to hand the cash over and confirm it."
+msgstr "يُطلب من مسؤول صرف السلف الخاصة تسليم النقد وتأكيده."
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,help:KSW_payroll_ledger.field_account_journal__x_ledger_account_id
+msgid ""
+"The account BAS moves for this bank, when it is not the journal's own: Arab "
+"Bank pays out of its overdraft current account 2103010001, which a bank "
+"journal cannot hold. Empty: the journal account."
+msgstr ""
+"الحساب الذي يحركه BAS لهذا البنك إذا اختلف عن حساب الدفتر: البنك العربي يصرف"
+" من الحساب الجاري المدين 2103010001، ولا يقبله دفتر البنك. فارغ: حساب "
+"الدفتر."
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,help:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__journal_id
+msgid ""
+"The bank the transfer leaves from or the cheque is drawn on, or the cash box"
+" that pays."
+msgstr "البنك المسحوب عليه الشيك، أو الصندوق الذي يصرف."
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,help:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__reference
+msgid ""
+"The bank's reference for the transfer, as on the online-banking receipt."
+msgstr "مرجع التحويل لدى البنك كما في إيصال الخدمات المصرفية الإلكترونية."
 
 #. module: KSW_payroll_ledger
 #: model:ir.model.fields,help:KSW_payroll_ledger.field_hr_payslip_run__x_ledger_move_ids
@@ -680,9 +1438,39 @@ msgid "The category code must be unique."
 msgstr "يجب أن يكون رمز الفئة فريداً."
 
 #. module: KSW_payroll_ledger
+#: model:ir.model.fields,help:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__pay_from_id
+msgid ""
+"The company's paying channel the transfer leaves from; it decides the bank "
+"file format. Only the channels of the entity whose salaries payable the "
+"settlement was booked to."
+msgstr ""
+"حساب الشركة الذي يخرج منه التحويل، وبه يتحدد نوع ملف البنك. تظهر فقط حسابات "
+"الجهة التي قُيّدت التسوية على رواتبها المستحقة."
+
+#. module: KSW_payroll_ledger
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_ksw_settlement_payment_wizard_form
+msgid ""
+"The employee has no bank account of his own: a transfer has nowhere to go.\n"
+"                    Add it on his employee record, or pay by cheque or cash."
+msgstr ""
+"لا يوجد حساب بنكي للموظف: لا جهة يُحوَّل إليها المبلغ.\n"
+"                    أضفه في ملف الموظف، أو اصرف بشيك أو نقدًا."
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,help:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__beneficiary
+msgid "The employee's own account the bank file pays into."
+msgstr "حساب الموظف الذي يُحوَّل إليه ملف البنك."
+
+#. module: KSW_payroll_ledger
 #: model:ir.model.fields,help:KSW_payroll_ledger.field_ksw_payroll_entity__is_default
 msgid "The entity of a department or bank account that names none."
 msgstr "جهة القسم أو الحساب البنكي الذي لا يحدد جهة."
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/payroll_ledger.py:0
+msgid "The entry does not balance (%(diff).2f)."
+msgstr "القيد غير متوازن (%(diff).2f)."
 
 #. module: KSW_payroll_ledger
 #: model:ir.model.fields,help:KSW_payroll_ledger.field_hr_payslip__x_ledger_move_id
@@ -701,15 +1489,98 @@ msgid "The month in Odoo's ledger (journal Commissions). Not the BAS export."
 msgstr "الشهر في دفتر أستاذ أودو (يومية العمولات). ليس تصدير BAS."
 
 #. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid ""
+"The paying account %(bank)s names no bank journal (Paid From) in Accounting."
+msgstr "حساب الصرف %(bank)s غير مربوط بدفتر بنك (يُصرف من) في المحاسبة."
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "The settlement payment was not posted to the ledger"
+msgstr "لم يُرحَّل صرف التسوية إلى دفتر الأستاذ"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/hr_payslip_run.py:0
+msgid "The settlement was not posted to the ledger"
+msgstr "لم تُرحَّل التسوية إلى دفتر الأستاذ"
+
+#. module: KSW_payroll_ledger
 #: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_ksw_payroll_intercompany_list
 msgid "Their own"
 msgstr "مجموعتهم"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "This settlement is not waiting to be paid."
+msgstr "هذه التسوية ليست بانتظار الصرف."
+
+#. module: KSW_payroll_ledger
+#: model:ir.model,name:KSW_payroll_ledger.model_hr_leave
+msgid "Time Off"
+msgstr "الإجازات"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__beneficiary
+msgid "To (Beneficiary)"
+msgstr "إلى (المستفيد)"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__hr_leave__x_disb_state__to_choose
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__hr_payslip__x_disb_state__to_choose
+msgid "To Pay"
+msgstr "للصرف"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_leave__x_disb_reference
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_payslip__x_disb_reference
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_settlement_payment_wizard__reference
+msgid "Transfer Reference"
+msgstr "مرجع التحويل"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,help:KSW_payroll_ledger.field_hr_payslip__x_disb_handed_date
+msgid ""
+"Transfer value date, or the day the cheque or the cash was handed over."
+msgstr "تاريخ قيمة التحويل، أو يوم تسليم الشيك أو النقد."
+
+#. module: KSW_payroll_ledger
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_ksw_settlement_payment_wizard_form
+msgid "Value Date"
+msgstr "تاريخ القيمة"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "Value date:"
+msgstr "تاريخ القيمة:"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/posting.py:0
+msgid "Wage (basic and anything without a category)"
+msgstr "الأجر (الأساسي وكل ما ليس له فئة)"
 
 #. module: KSW_payroll_ledger
 #: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_ksw_payroll_posting_group_form
 #: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_ksw_payroll_posting_map_list
 msgid "Wage and everything else"
 msgstr "الراتب الأساسي وكل ما عداه"
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__hr_leave__x_disb_state__cash_pending
+#: model:ir.model.fields.selection,name:KSW_payroll_ledger.selection__hr_payslip__x_disb_state__cash_pending
+msgid "Waiting for Cash Handover"
+msgstr "بانتظار تسليم النقد"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "Waiting for the Loan Disbursement Officer to hand it over."
+msgstr "بانتظار تسليمها من مسؤول صرف السلف الخاصة."
 
 #. module: KSW_payroll_ledger
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_ksw_payroll_employee_posting__summary
@@ -757,11 +1628,21 @@ msgstr ""
 " الافتراضية للجهة."
 
 #. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/posting.py:0
 #: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_employee_form_ledger
 #: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_ksw_payroll_employee_posting_list
-#: code:addons/KSW_payroll_ledger/models/posting.py:0
 msgid "Whole salary"
 msgstr "الراتب كاملاً"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/posting.py:0
+msgid ""
+"Whole salary → %(to)s instead of %(group)s, except categories with an "
+"exception of their own"
+msgstr ""
+"الراتب كاملاً ← %(to)s بدلاً من %(group)s، عدا الفئات التي لها استثناء خاص"
 
 #. module: KSW_payroll_ledger
 #: model:ir.model.fields,help:KSW_payroll_ledger.field_account_setup_bank_manual_config__x_ledger_entity_id
@@ -788,6 +1669,35 @@ msgid "Why these accounts (e.g. the BAS voucher it follows)"
 msgstr "سبب هذه الحسابات (مثل سند BAS الذي يتبعه)"
 
 #. module: KSW_payroll_ledger
+#: model:ir.model.fields,help:KSW_payroll_ledger.field_hr_payslip__x_ledger_error
+msgid ""
+"Why this leave settlement is not in the ledger yet. Fix it, then Post to "
+"Ledger on the time off request."
+msgstr ""
+"سبب عدم ترحيل تسوية الإجازة بعد. عالج السبب ثم اضغط «ترحيل إلى الأستاذ» في "
+"طلب الإجازة."
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_leave__x_can_disb_cash
+msgid "X Can Disb Cash"
+msgstr ""
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_leave__x_can_disb_cashed
+msgid "X Can Disb Cashed"
+msgstr ""
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_leave__x_can_disb_pay
+msgid "X Can Disb Pay"
+msgstr ""
+
+#. module: KSW_payroll_ledger
+#: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_leave__x_can_disb_post
+msgid "X Can Disb Post"
+msgstr ""
+
+#. module: KSW_payroll_ledger
 #: model:ir.model.fields,field_description:KSW_payroll_ledger.field_hr_payslip_run__x_ledger_move_count
 msgid "X Ledger Move Count"
 msgstr "عدد قيود الدفتر"
@@ -798,131 +1708,21 @@ msgid "X Ledger Unposted Count"
 msgstr "عدد قيود الدفتر غير المرحّلة"
 
 #. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "cashed on %s"
+msgstr "صُرف بتاريخ %s"
+
+#. module: KSW_payroll_ledger
 #: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.view_ksw_payroll_posting_group_form
 msgid "e.g. Jubail Camp"
 msgstr "مثال: كامب الجبيل"
 
 #. module: KSW_payroll_ledger
 #. odoo-python
-#: code:addons/KSW_payroll_ledger/models/hr_payslip_run.py:0
-msgid ""
-"%(name)s: posted to the suspense account %(acc)s, no posting map row for "
-"some of his figures"
-msgstr ""
-"%(name)s: رُحِّل إلى الحساب المعلّق %(acc)s، لعدم وجود سطر توجيه لبعض بنوده"
-
-#. module: KSW_payroll_ledger
-#. odoo-python
-#: code:addons/KSW_payroll_ledger/models/posting.py:0
-msgid ""
-"%(what)s → %(to)s instead of %(default)s; the rest of his salary stays on "
-"%(rest)s (%(group)s)"
-msgstr ""
-"%(what)s ← %(to)s بدلاً من %(default)s؛ وبقية راتبه تبقى على %(rest)s "
-"(%(group)s)"
-
-#. module: KSW_payroll_ledger
-#. odoo-python
-#: code:addons/KSW_payroll_ledger/models/payroll_ledger.py:0
-msgid "Account %(code)s does not exist in the chart."
-msgstr "الحساب %(code)s غير موجود في دليل الحسابات."
-
-#. module: KSW_payroll_ledger
-#. odoo-python
-#: code:addons/KSW_payroll_ledger/models/posting.py:0
-msgid "Because of"
-msgstr "بسبب"
-
-#. module: KSW_payroll_ledger
-#. odoo-python
-#: code:addons/KSW_payroll_ledger/models/posting.py:0
-msgid "Booked to"
-msgstr "مقيّد على"
-
-#. module: KSW_payroll_ledger
-#. odoo-python
-#: code:addons/KSW_payroll_ledger/models/hr_payslip_run.py:0
-msgid "Deducted from salary"
-msgstr "خصم من الراتب"
-
-#. module: KSW_payroll_ledger
-#. odoo-python
-#: code:addons/KSW_payroll_ledger/models/hr_payslip_run.py:0
-msgid "Loan installment"
-msgstr "قسط قرض"
-
-#. module: KSW_payroll_ledger
-#. odoo-python
-#: code:addons/KSW_payroll_ledger/models/hr_payslip_run.py:0
-msgid ""
-"No default payroll entity in Accounting ▸ Configuration ▸ Payroll Posting ▸ "
-"Entities."
-msgstr ""
-"لا يوجد كيان رواتب افتراضي في المحاسبة ▸ التهيئة ▸ ترحيل الرواتب ▸ الكيانات."
-
-#. module: KSW_payroll_ledger
-#. odoo-python
-#: code:addons/KSW_payroll_ledger/models/ksw_pay_run.py:0
-msgid "Not posted to the ledger"
-msgstr "لم يُرحَّل إلى دفتر الأستاذ"
-
-#. module: KSW_payroll_ledger
-#. odoo-python
-#: code:addons/KSW_payroll_ledger/models/hr_payslip_run.py:0
-msgid ""
-"Only a Payroll Manager or an accounting administrator may post a batch."
-msgstr "يرحّل الدفعة مدير الرواتب أو مدير المحاسبة فقط."
-
-#. module: KSW_payroll_ledger
-#. odoo-python
-#: code:addons/KSW_payroll_ledger/models/ksw_pay_run.py:0
-msgid "Only the Commission Accountant may post the month."
-msgstr "يرحّل الشهر محاسب العمولات فقط."
-
-#. module: KSW_payroll_ledger
-#. odoo-python
-#: code:addons/KSW_payroll_ledger/models/posting.py:0
-msgid "Part of his salary"
-msgstr "جزء من راتبه"
-
-#. module: KSW_payroll_ledger
-#. odoo-python
-#: code:addons/KSW_payroll_ledger/models/hr_payslip_run.py:0
-msgid "Reversal of %(slip)s (%(move)s)"
-msgstr "عكس %(slip)s (%(move)s)"
-
-#. module: KSW_payroll_ledger
-#. odoo-python
-#: code:addons/KSW_payroll_ledger/models/hr_payslip_run.py:0
-msgid "Salary"
-msgstr "راتب"
-
-#. module: KSW_payroll_ledger
-#. odoo-python
-#: code:addons/KSW_payroll_ledger/models/hr_payslip_run.py:0
-msgid "Some payslips were not posted to the ledger"
-msgstr "بعض كشوف الراتب لم تُرحَّل إلى دفتر الأستاذ"
-
-#. module: KSW_payroll_ledger
-#. odoo-python
-#: code:addons/KSW_payroll_ledger/models/payroll_ledger.py:0
-msgid "The entry does not balance (%(diff).2f)."
-msgstr "القيد غير متوازن (%(diff).2f)."
-
-#. module: KSW_payroll_ledger
-#. odoo-python
-#: code:addons/KSW_payroll_ledger/models/posting.py:0
-msgid "Wage (basic and anything without a category)"
-msgstr "الأجر (الأساسي وكل ما ليس له فئة)"
-
-#. module: KSW_payroll_ledger
-#. odoo-python
-#: code:addons/KSW_payroll_ledger/models/posting.py:0
-msgid ""
-"Whole salary → %(to)s instead of %(group)s, except categories with an "
-"exception of their own"
-msgstr ""
-"الراتب كاملاً ← %(to)s بدلاً من %(group)s، عدا الفئات التي لها استثناء خاص"
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "handed over on %s"
+msgstr "سُلّم بتاريخ %s"
 
 #. module: KSW_payroll_ledger
 #. odoo-python
@@ -950,6 +1750,24 @@ msgstr "بلا مجموعة ترحيل"
 
 #. module: KSW_payroll_ledger
 #. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "no salaries payable account for his paying entity"
+msgstr "لا يوجد حساب رواتب مستحقة للجهة الدافعة"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "not cashed yet"
+msgstr "لم يُصرف بعد"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/hr_payslip_run.py:0
+msgid "nothing to post"
+msgstr "لا يوجد ما يُرحَّل"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
 #: code:addons/KSW_payroll_ledger/models/hr_payslip_run.py:0
 msgid "payslip net %(net).2f, entry %(posted).2f%(rules)s"
 msgstr "صافي كشف الراتب %(net).2f، القيد %(posted).2f%(rules)s"
@@ -965,3 +1783,64 @@ msgstr "مجموعة الترحيل %(group)s ليس لها حساب لـ %(what
 #: code:addons/KSW_payroll_ledger/models/hr_payslip_run.py:0
 msgid "the wage"
 msgstr "الأجر"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "waiting for the disbursement officer"
+msgstr "بانتظار مسؤول الصرف"
+
+#. module: KSW_payroll_ledger
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.hr_leave_view_form_settlement_payment
+msgid "✅ Cheque Cashed"
+msgstr "✅ تم صرف الشيك"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "✅ Settlement cheque cashed"
+msgstr "✅ تم صرف شيك التسوية"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "🏦 Settlement paid by bank transfer"
+msgstr "🏦 صُرفت التسوية بتحويل بنكي"
+
+#. module: KSW_payroll_ledger
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.hr_leave_view_form_settlement_payment
+msgid "💳 Pay Settlement"
+msgstr "💳 صرف التسوية"
+
+#. module: KSW_payroll_ledger
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.hr_leave_view_search_settlement_payment
+msgid "💳 Settlement to Pay"
+msgstr "💳 تسويات للصرف"
+
+#. module: KSW_payroll_ledger
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.hr_leave_view_form_settlement_payment
+msgid "💵 Cash Handed Over"
+msgstr "💵 تم تسليم النقد"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "💵 Cash handed over"
+msgstr "💵 تم تسليم النقد"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "💵 Settlement to be paid in cash"
+msgstr "💵 تُصرف التسوية نقدًا"
+
+#. module: KSW_payroll_ledger
+#: model_terms:ir.ui.view,arch_db:KSW_payroll_ledger.hr_leave_view_search_settlement_payment
+msgid "🧾 Cheques Not Cashed"
+msgstr "🧾 شيكات لم تُصرف"
+
+#. module: KSW_payroll_ledger
+#. odoo-python
+#: code:addons/KSW_payroll_ledger/models/settlement_payment.py:0
+msgid "🧾 Settlement paid by cheque"
+msgstr "🧾 صُرفت التسوية بشيك"

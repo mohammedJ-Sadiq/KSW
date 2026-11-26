@@ -2282,6 +2282,8 @@ msgid "Plate (Arabic)"
 msgstr "رقم اللوحة (عربي)"
 
 #. module: KSW_fleet_allocation
+#. odoo-python
+#: code:addons/KSW_fleet_allocation/models/ksw_fleet_vehicle.py:0
 #: model:ir.model.fields,field_description:KSW_fleet_allocation.field_ksw_fleet_vehicle__x_is_stopped
 #: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_vehicle_search_allocation
 msgid "Stopped"
@@ -2301,3 +2303,15 @@ msgstr "سبب التوقف"
 #: model_terms:ir.ui.view,arch_db:KSW_fleet_allocation.view_ksw_fleet_vehicle_search_allocation
 msgid "Working"
 msgstr "تعمل"
+
+#. module: KSW_fleet_allocation
+#. odoo-python
+#: code:addons/KSW_fleet_allocation/models/ksw_fleet_vehicle.py:0
+msgid "%s is stopped: put it back in service before giving it a custodian."
+msgstr "%s متوقفة: أعدها للعمل قبل تعيين مسؤول عنها."
+
+#. module: KSW_fleet_allocation
+#. odoo-python
+#: code:addons/KSW_fleet_allocation/models/ksw_fleet_vehicle.py:0
+msgid "Vehicle stopped: %s no longer answers for it."
+msgstr "المركبة متوقفة: %s لم يعد مسؤولاً عنها."

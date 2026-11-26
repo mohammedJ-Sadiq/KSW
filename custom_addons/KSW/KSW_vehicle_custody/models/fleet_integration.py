@@ -1,3 +1,5 @@
+from markupsafe import Markup
+
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
@@ -80,6 +82,7 @@ class KswFleetVehicle(models.Model):
             })
             if hand_in:
                 form._load_inspection_items(source=hand_in)
+            form._ksw_open_handover_request(move)
             form._sync_activities()
         return res
 
@@ -109,7 +112,18 @@ class KswFleetMove(models.Model):
 
 
 class KswWorkshopRequest(models.Model):
+    """Custody follows the workshop request (user, 2026-11-26):
+    - an ordinary visit takes the vehicle from its driver while In Progress
+      and gives it back to him when Done (knowledge only, no HR-12);
+    - a release (hand-in HR-12) or a driver change frees the driver the
+      moment the workshop starts, so he can be given a vehicle at once; the
+      vehicle does not come back to him;
+    - a handover (receipt HR-12) or a driver change gives the vehicle to the
+      new driver when the request is Done (after the signed HR-12)."""
     _inherit = 'ksw.workshop.request'
+
+    x_custodian_on_hold_id = fields.Many2one('hr.employee', string='Driver Until Back', readonly=True, copy=False,
+                                             help='Ordinary visit: the driver the vehicle goes back to when done.')
 
     x_custody_request_ids = fields.One2many('ksw.vehicle.custody.request', 'workshop_request_id',
                                             string='Handover Forms')
@@ -125,6 +139,53 @@ class KswWorkshopRequest(models.Model):
             request.x_custody_count = len(forms)
             request.x_custody_pending = bool(forms.filtered(lambda f: f.state != 'signed'))
 
+    def _ksw_live_forms(self):
+        return self.sudo().x_custody_request_ids.filtered(lambda f: f.state not in ('cancelled', 'refused'))
+
+    def action_start(self):
+        res = super().action_start()
+        for request in self.sudo():
+            request._ksw_custody_on_start()
+        return res
+
+    def _ksw_custody_on_start(self):
+        vehicle = self.vehicle_id.sudo()
+        if not vehicle or not vehicle.x_custodian_id:
+            return
+        forms = self._ksw_live_forms()
+        leaving = forms.filtered(lambda f: f.kind in ('hand_in', 'driver_change'))
+        if leaving:
+            # For good: the supervisor may ask for another vehicle for him now.
+            who = vehicle.x_custodian_id
+            vehicle._ksw_set_custodian(self.env['hr.employee'], source=leaving[0].name,
+                                       note=_('Released when the workshop started %(r)s: %(e)s is free for '
+                                              'another vehicle.', r=self.name, e=who.name))
+        elif not forms:
+            # An ordinary visit: only while it lasts.
+            self.x_custodian_on_hold_id = vehicle.x_custodian_id
+            vehicle._ksw_set_custodian(self.env['hr.employee'], source=self.name,
+                                       note=_('In the workshop; back to %s when done.', vehicle.x_custodian_id.name))
+
+    def _ksw_custody_on_complete(self):
+        vehicle = self.vehicle_id.sudo()
+        if not vehicle:
+            return
+        forms = self._ksw_live_forms()
+        arriving = forms.filtered(lambda f: f.kind in ('receive', 'driver_change') and f.new_employee_id)[:1]
+        if arriving:
+            if vehicle.x_custodian_id != arriving.new_employee_id:
+                vehicle._ksw_set_custodian(arriving.new_employee_id, source=arriving.name,
+                                           note=_('Handed over when %s was completed.', self.name))
+            vehicle.write({'driver_id': arriving.new_employee_id.id})
+            move = arriving.move_id.sudo()
+            if arriving.kind == 'receive' and move.state == 'in_transfer':
+                move._ksw_fleet_complete({})
+        elif not forms and self.x_custodian_on_hold_id and not vehicle.x_custodian_id \
+                and not ('x_is_stopped' in vehicle._fields and vehicle.x_is_stopped):
+            vehicle.with_context(ksw_custody_unchecked=True)._ksw_set_custodian(
+                self.x_custodian_on_hold_id, source=self.name, note=_('Back from the workshop.'))
+        self.x_custodian_on_hold_id = False
+
     def action_complete(self):
         # The checkup closes only with its HR-12 approved and the signed copy
         # filed: completing it is what lets the vehicle out of the workshop.
@@ -134,7 +195,10 @@ class KswWorkshopRequest(models.Model):
             raise UserError(_(
                 'File the signed handover form first (%s): the workshop and HR complete it, it is '
                 'printed, signed, scanned and marked as signed.', ', '.join(pending.mapped('name'))))
-        return super().action_complete()
+        res = super().action_complete()
+        for request in self.sudo():
+            request._ksw_custody_on_complete()
+        return res
 
     def action_open_custody_forms(self):
         self.ensure_one()
@@ -153,6 +217,111 @@ class HrEmployee(models.Model):
 
     x_custody_history_ids = fields.One2many('ksw.fleet.vehicle.custody', 'employee_id',
                                             string='Vehicle Custody', groups='hr.group_hr_user')
+    # Driven vehicles he answers for now (a tedder is its head's, not his).
+    x_vehicles_held_ids = fields.Many2many('ksw.fleet.vehicle', compute='_compute_vehicles_held', compute_sudo=True,
+                                           string='Vehicles He Holds', groups='hr.group_hr_user')
+    x_vehicles_held_count = fields.Integer(compute='_compute_vehicles_held', compute_sudo=True,
+                                           string='Vehicles Held', groups='hr.group_hr_user')
+    x_holds_several = fields.Boolean(compute='_compute_vehicles_held', compute_sudo=True,
+                                     search='_search_holds_several', string='Holds Several Vehicles',
+                                     groups='hr.group_hr_user')
+    x_over_vehicle_limit = fields.Boolean(compute='_compute_vehicles_held', compute_sudo=True,
+                                          search='_search_over_vehicle_limit', string='More Vehicles Than Allowed',
+                                          groups='hr.group_hr_user')
+    x_vehicles_pending_my_action = fields.Boolean(compute='_compute_vehicles_pending', search='_search_vehicles_pending',
+                                                  string='Vehicles Waiting for Me', groups='hr.group_hr_user')
+
+    def _ksw_announce_several(self, held):
+        """Custody HR and his department's manager are told, on his record."""
+        self.ensure_one()
+        group = self.env.ref('KSW_vehicle_custody.group_custody_hr', raise_if_not_found=False)
+        technical = self.env.ref('base.user_admin', raise_if_not_found=False) | self.env.ref('base.user_root')
+        users = (group.user_ids - technical) if group else self.env['res.users']
+        managers = held.mapped('x_department_id.manager_id.user_id') if 'x_department_id' in held._fields \
+            else self.env['res.users']
+        users |= managers | self.department_id.manager_id.user_id
+        limit = max(self.x_vehicle_limit, 1)
+        body = Markup(_('<b>%(e)s now holds %(n)s vehicles</b>: %(v)s. Allowed: %(l)s.%(over)s')) % {
+            'e': self.name, 'n': len(held), 'v': ', '.join(held.mapped('name')), 'l': limit,
+            'over': Markup(_(' <b>Over the limit: hand one over.</b>')) if len(held) > limit else ''}
+        self.message_post(body=body, partner_ids=users.partner_id.ids, subtype_xmlid='mail.mt_comment')
+
+    def _held_counts(self):
+        rows = self.env['ksw.fleet.vehicle'].sudo()._read_group(
+            [('x_custodian_id', '!=', False), ('vehicle_type', '!=', 'tank')], ['x_custodian_id'], ['__count'])
+        return {emp.id: n for emp, n in rows}
+
+    def _compute_vehicles_held(self):
+        Vehicle = self.env['ksw.fleet.vehicle'].sudo()
+        for emp in self:
+            held = Vehicle.search([('x_custodian_id', '=', emp.id), ('vehicle_type', '!=', 'tank')]) if emp.id \
+                else Vehicle
+            emp.x_vehicles_held_ids = held
+            emp.x_vehicles_held_count = len(held)
+            emp.x_holds_several = len(held) > 1
+            emp.x_over_vehicle_limit = len(held) > max(emp.sudo().x_vehicle_limit, 1)
+
+    @staticmethod
+    def _bool_search(operator, value):
+        if operator in ('in', 'not in'):
+            return (operator == 'in') == any(value)
+        if operator in ('=', '!='):
+            return (operator == '=') == bool(value)
+        return None
+
+    def _search_holds_several(self, operator, value):
+        wanted = self._bool_search(operator, value)
+        if wanted is None:
+            return NotImplemented
+        ids = [eid for eid, n in self._held_counts().items() if n > 1]
+        return [('id', 'in' if wanted else 'not in', ids)]
+
+    def _search_over_vehicle_limit(self, operator, value):
+        wanted = self._bool_search(operator, value)
+        if wanted is None:
+            return NotImplemented
+        counts = self._held_counts()
+        limits = {e.id: max(e.x_vehicle_limit, 1) for e in self.sudo().browse(list(counts))}
+        ids = [eid for eid, n in counts.items() if n > limits.get(eid, 1)]
+        return [('id', 'in' if wanted else 'not in', ids)]
+
+    @api.depends_context('uid')
+    def _compute_vehicles_pending(self):
+        mine = self.env.su or self.env.user.has_group('KSW_vehicle_custody.group_custody_hr')
+        for emp in self:
+            emp.x_vehicles_pending_my_action = mine and emp.x_over_vehicle_limit
+
+    def _search_vehicles_pending(self, operator, value):
+        wanted = self._bool_search(operator, value)
+        if wanted is None:
+            return NotImplemented
+        if not (self.env.su or self.env.user.has_group('KSW_vehicle_custody.group_custody_hr')):
+            return [('id', '=', False)] if wanted else []
+        return self._search_over_vehicle_limit('=', wanted)
+
+
+class KswFleetVehicleCustodyAlerts(models.Model):
+    """Drivers holding more than one vehicle: allowed by exception
+    (x_vehicle_limit), but always shown and announced (user, 2026-11-26)."""
+    _inherit = 'ksw.fleet.vehicle'
+
+    x_custodian_vehicle_count = fields.Integer(compute='_compute_custodian_vehicle_count', compute_sudo=True,
+                                               string='Vehicles His Driver Holds')
+
+    @api.depends('x_custodian_id')
+    def _compute_custodian_vehicle_count(self):
+        for vehicle in self:
+            emp = vehicle.x_custodian_id
+            vehicle.x_custodian_vehicle_count = self.sudo().search_count(
+                [('x_custodian_id', '=', emp.id), ('vehicle_type', '!=', 'tank')]) if emp else 0
+
+    def _ksw_set_custodian(self, employee, source=False, date=False, note=False):
+        res = super()._ksw_set_custodian(employee, source=source, date=date, note=note)
+        if employee:
+            held = self.sudo().search([('x_custodian_id', '=', employee.id), ('vehicle_type', '!=', 'tank')])
+            if len(held) > 1:
+                employee.sudo()._ksw_announce_several(held)
+        return res
 
 
 class HrDepartment(models.Model):

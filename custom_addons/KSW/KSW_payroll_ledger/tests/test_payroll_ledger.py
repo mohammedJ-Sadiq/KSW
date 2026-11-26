@@ -15,7 +15,7 @@ from odoo.tools import mute_logger
 from odoo.addons.KSW_payroll.tests.test_bas_journal_entry import BasJournalPayrollCommon
 
 
-class TestPayrollLedger(BasJournalPayrollCommon):
+class PayrollLedgerCommon(BasJournalPayrollCommon):
 
     @classmethod
     def setUpClass(cls):
@@ -82,6 +82,9 @@ class TestPayrollLedger(BasJournalPayrollCommon):
         with patch.object(type(self.env['hr.payslip']), 'action_payslip_done', done):
             self.batch._ksw_confirm_slips(slips)
         return self.batch.x_ledger_move_ids
+
+
+class TestPayrollLedger(PayrollLedgerCommon):
 
     def test_01_earnings_deductions_and_net_as_bas_books_them(self):
         self._payslip([(self.rule_basic, 5000.0), (self.rule_hra, 1250.0),

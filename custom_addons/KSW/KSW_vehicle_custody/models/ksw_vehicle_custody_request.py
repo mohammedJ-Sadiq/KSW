@@ -866,12 +866,38 @@ class KswVehicleCustodyRequest(models.Model):
         self.ensure_one()
         vehicle = self.vehicle_id.sudo()
         if self.kind == 'hand_in':
-            vehicle._ksw_set_custodian(self.env['hr.employee'], source=self.name)
-        else:
-            vehicle._ksw_set_custodian(self.new_employee_id, source=self.name)
-            vehicle.write({'driver_id': self.new_employee_id.id})
+            if vehicle.x_custodian_id:
+                vehicle._ksw_set_custodian(self.env['hr.employee'], source=self.name)
+            return
+        if self.workshop_request_id:
+            # The new driver gets the vehicle when that request is Done
+            # (ksw.workshop.request._ksw_custody_on_complete).
+            return
+        vehicle._ksw_set_custodian(self.new_employee_id, source=self.name)
+        vehicle.write({'driver_id': self.new_employee_id.id})
         if self.kind == 'receive' and self.move_id.state == 'in_transfer':
             self.move_id.sudo()._ksw_fleet_complete({})
+
+    def _ksw_open_handover_request(self, move):
+        """An addition's handover is a workshop request too: the new driver
+        gets the vehicle when it is Done (user, 2026-11-26)."""
+        self.ensure_one()
+        vehicle = self.vehicle_id.sudo()
+        requester = self.env.user.employee_id or move.addition_line_id.request_id.user_id.employee_id
+        if not requester or self.workshop_request_id:
+            return  # no one to name as requester: the form alone hands over, as before
+        request = self.env['ksw.workshop.request'].sudo().create({
+            'employee_id': requester.id,
+            'client_id': vehicle.client_id.id,
+            'vehicle_type': vehicle.vehicle_type,
+            'vehicle_id': vehicle.id,
+            'driver_id': requester.id,
+            'workshop_id': self.workshop_id.id or self.env['ksw.workshop']._for_department(
+                move.to_department_id).id,
+            'description': _('Handover to %(d)s (%(f)s)', d=move.to_department_id.name, f=self.name),
+        })
+        self.write({'workshop_request_id': request.id, 'workshop_id': request.workshop_id.id})
+        return request
 
     def _send_notifications(self):
         """Who needs to know once it is done: Accounting when a driver hands

@@ -73,6 +73,7 @@ def post_init_hook(env):
         env['ksw.payroll.ledger']._journal('SAL', company)
         env['ksw.payroll.ledger']._journal('COMM', company)
         build_posting_config(env, company, defaults_as_legacy(env, company))
+        build_settlement_config(env, company)
 
 
 def defaults_as_legacy(env, company):
@@ -231,3 +232,94 @@ def _dept_entity(dept, default):
             return dept.x_ledger_entity_id
         dept = dept.parent_id
     return default
+
+
+# Leave settlements, as BAS's «تصفيات» vouchers book them (2026, e.g. 26011024):
+# vacation pay and air tickets to their own expense per branch, EOS to the
+# provision; excess leave to the penalty fund; fines and visa fees the company
+# paid for him back to his own account. Keyed on the posting group's wage
+# account prefix; a branch BAS has no own account for takes the head office's.
+SETTLEMENT_CATEGORIES = {
+    'VACATION': (('Vacation Pay', 'حقوق الإجازات'), ['VACATION_BAL']),
+    'TICKET': (('Air Tickets', 'تذاكر السفر'), ['FLIGHT_TICKET']),
+    'EOS': (('End of Service', 'مكافأة نهاية الخدمة'), ['EOS_AMOUNT']),
+}
+SETTLEMENT_ACCOUNTS = [
+    # (wage account prefix, {category: account}), first match wins
+    ('3204', {'VACATION': '3204010014', 'TICKET': '3204010015', 'EOS': '2108010001'}),
+    ('3205', {'VACATION': '3205010002', 'TICKET': '3205010017', 'EOS': '3205010018'}),
+    ('3206', {'VACATION': '3206010008', 'TICKET': '3206010008', 'EOS': '2108010001'}),
+    ('3201010007', {'VACATION': '3202020001', 'TICKET': '3202020002', 'EOS': '2108010004'}),
+    ('', {'VACATION': '3202020001', 'TICKET': '3202020002', 'EOS': '2108010001'}),
+]
+SETTLEMENT_FIXED = {'FIN_CONSIDERATION': '2104010004'}          # صندوق الجزاءات
+SETTLEMENT_OWN_ACCOUNT = ('PENALTY', 'VISA_COST_RECOVERY')
+# Paying accounts → the bank BAS pays them from (Kawther 578608010033217,
+# Hayat H1 580608010022844); Arab Bank's cheques leave its overdraft account.
+PAYING_BANK_ACCOUNTS = {'kawther': '1202010005', 'hayat': '1202010006'}
+JOURNAL_LEDGER_ACCOUNTS = {'1202010007': '2103010001'}
+
+
+def build_settlement_config(env, company):
+    """Fill what is empty, never overwrite: the accountant's from then on."""
+    env = env(context=dict(env.context, active_test=False, lang='en_US'))
+    Account = env['account.account'].sudo()
+    Category = env['ksw.payroll.posting.category'].sudo()
+    Rule = env['hr.salary.rule'].sudo()
+    arabic = bool(env['res.lang']._lang_get('ar_001'))
+
+    def acc(code):
+        return Account.search([('company_ids', 'in', company.id), ('code', '=', code)], limit=1)
+
+    categories = {}
+    for code, ((en, ar), rule_codes) in SETTLEMENT_CATEGORIES.items():
+        category = Category.search([('code', '=', code)], limit=1)
+        if not category:
+            category = Category.create({'name': en, 'code': code, 'sequence': 50})
+            if arabic:
+                category.update_field_translations('name', {'ar_001': ar})
+        categories[code] = category
+        for rule in Rule.search([('code', 'in', rule_codes)]):
+            if not rule.x_posting_category_id and not rule.x_ledger_account_id:
+                rule.x_posting_category_id = category
+    for group in env['ksw.payroll.posting.group'].sudo().search([]):
+        wage = group.map_ids.filtered(lambda r: not r.category_id)[:1].account_id
+        if not wage:
+            continue
+        accounts = next(a for prefix, a in SETTLEMENT_ACCOUNTS if (wage.code or '').startswith(prefix))
+        for code, category in categories.items():
+            account = acc(accounts[code])
+            if account and not group.map_ids.filtered(lambda r: r.category_id == category):
+                group.write({'map_ids': [(0, 0, {'category_id': category.id, 'account_id': account.id})]})
+    for code, account_code in SETTLEMENT_FIXED.items():
+        account = acc(account_code)
+        for rule in Rule.search([('code', '=', code)]):
+            if account and not rule.x_ledger_account_id:
+                rule.x_ledger_account_id = account
+    for rule in Rule.search([('code', 'in', SETTLEMENT_OWN_ACCOUNT), ('x_ledger_deduction', 'in', [False, 'spread'])]):
+        rule.x_ledger_deduction = 'own_account'
+
+    Journal = env['account.journal'].sudo()
+
+    def journal_for(code):
+        account = acc(code)
+        return account and Journal.search([('company_id', '=', company.id), ('type', '=', 'bank'),
+                                           ('default_account_id', '=', account.id)], limit=1)
+    hayat = env['ksw.payroll.entity'].sudo().search(
+        [('company_id', '=', company.id), ('is_default', '=', False)]).filtered(
+        lambda e: 'hayat' in (e.with_context(lang='en_US').name or '').lower())
+    for bank in env['res.partner.bank'].sudo().search([('partner_id', '=', company.partner_id.id)]):
+        if bank.x_ledger_journal_id:
+            continue
+        label = (bank.acc_number or '').lower()
+        is_hayat = (hayat and bank.x_ledger_entity_id in hayat) or label.startswith(HAYAT_BANK_PREFIX.lower())
+        if not is_hayat and 'kawther' not in label:
+            continue
+        journal = journal_for(PAYING_BANK_ACCOUNTS['hayat' if is_hayat else 'kawther'])
+        if journal:
+            bank.x_ledger_journal_id = journal
+    for journal_code, ledger_code in JOURNAL_LEDGER_ACCOUNTS.items():
+        journal, ledger = journal_for(journal_code), acc(ledger_code)
+        if journal and ledger and not journal.x_ledger_account_id:
+            journal.x_ledger_account_id = ledger
+    _logger.info('KSW_payroll_ledger: settlement posting configuration checked for %s', company.name)

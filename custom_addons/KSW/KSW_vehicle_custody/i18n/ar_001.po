@@ -2182,3 +2182,113 @@ msgstr "منذ %s"
 #: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
 msgid "<b>%(e)s</b>, %(p)s: %(v)s, %(n)s, %(t)s SAR."
 msgstr "<b>%(e)s</b>، %(p)s: %(v)s، %(n)s، %(t)s ريال."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
+msgid " <b>Over the limit: hand one over.</b>"
+msgstr " <b>تجاوز الحد المسموح: يجب تسليم إحداها.</b>"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
+msgid "<b>%(e)s now holds %(n)s vehicles</b>: %(v)s. Allowed: %(l)s.%(over)s"
+msgstr ""
+"<b>%(e)s أصبح مسؤولاً عن %(n)s مركبات</b>: %(v)s. المسموح: %(l)s.%(over)s"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_employee_form_custody
+msgid ""
+"<span invisible=\"not x_over_vehicle_limit\"> (<b>more than "
+"allowed</b>)</span>"
+msgstr ""
+"<span invisible=\"not x_over_vehicle_limit\"> (<b>أكثر من "
+"المسموح</b>)</span>"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
+msgid "Back from the workshop."
+msgstr "عادت من الورشة."
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_workshop_request__x_custodian_on_hold_id
+msgid "Driver Until Back"
+msgstr "السائق حتى العودة"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_ksw_fleet_vehicle_form_several
+msgid "Driver holds several vehicles"
+msgstr "السائق مسؤول عن أكثر من مركبة"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
+msgid "Handed over when %s was completed."
+msgstr "تم التسليم عند إنجاز %s."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/ksw_vehicle_custody_request.py:0
+msgid "Handover to %(d)s (%(f)s)"
+msgstr "تسليم إلى %(d)s (%(f)s)"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_employee_form_custody
+msgid "Holds"
+msgstr "مسؤول عن"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_hr_employee__x_holds_several
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_employee_filter_several_vehicles
+msgid "Holds Several Vehicles"
+msgstr "مسؤول عن أكثر من مركبة"
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
+msgid "In the workshop; back to %s when done."
+msgstr "في الورشة؛ تعود إلى %s عند الإنجاز."
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_hr_employee__x_over_vehicle_limit
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_employee_filter_several_vehicles
+msgid "More Vehicles Than Allowed"
+msgstr "مركبات أكثر من المسموح"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,help:KSW_vehicle_custody.field_ksw_workshop_request__x_custodian_on_hold_id
+msgid "Ordinary visit: the driver the vehicle goes back to when done."
+msgstr "زيارة عادية: السائق الذي تعود إليه المركبة عند الإنجاز."
+
+#. module: KSW_vehicle_custody
+#. odoo-python
+#: code:addons/KSW_vehicle_custody/models/fleet_integration.py:0
+msgid ""
+"Released when the workshop started %(r)s: %(e)s is free for another vehicle."
+msgstr "أُخليت العهدة عند بدء الورشة في %(r)s: %(e)s متاح لمركبة أخرى."
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_hr_employee__x_vehicles_held_ids
+msgid "Vehicles He Holds"
+msgstr "المركبات التي في عهدته"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_hr_employee__x_vehicles_held_count
+msgid "Vehicles Held"
+msgstr "عدد المركبات في عهدته"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_ksw_fleet_vehicle__x_custodian_vehicle_count
+msgid "Vehicles His Driver Holds"
+msgstr "مركبات سائقها"
+
+#. module: KSW_vehicle_custody
+#: model:ir.model.fields,field_description:KSW_vehicle_custody.field_hr_employee__x_vehicles_pending_my_action
+msgid "Vehicles Waiting for Me"
+msgstr "مركبات بانتظاري"
+
+#. module: KSW_vehicle_custody
+#: model_terms:ir.ui.view,arch_db:KSW_vehicle_custody.view_employee_form_custody
+msgid "vehicles:"
+msgstr "مركبات:"

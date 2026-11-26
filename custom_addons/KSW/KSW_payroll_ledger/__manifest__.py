@@ -1,6 +1,6 @@
 {
     'name': 'KSW Payroll & Commissions in the Ledger',
-    'version': '19.0.1.7.0',
+    'version': '19.0.1.8.0',
     'summary': 'Posts the payslip batch and the paid commission month as '
                'Odoo journal entries, booked the way BAS books them.',
     'description': """
@@ -19,8 +19,10 @@ Mark Paid; it is written on the record for the accountant to fix and post.
     'depends': ['account', 'KSW_commissions'],
     'data': [
         'security/ir.model.access.csv',
+        'security/settlement_payment_security.xml',
         'views/payroll_posting_views.xml',
         'views/payroll_ledger_views.xml',
+        'views/settlement_payment_views.xml',
     ],
     'post_init_hook': 'post_init_hook',
     'license': 'LGPL-3',

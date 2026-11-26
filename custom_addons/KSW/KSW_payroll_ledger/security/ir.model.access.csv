@@ -12,3 +12,6 @@ access_ksw_payroll_posting_map_read,ksw.payroll.posting.map read,model_ksw_payro
 access_ksw_payroll_employee_posting_manager,ksw.payroll.employee.posting manager,model_ksw_payroll_employee_posting,account.group_account_manager,1,1,1,1
 access_ksw_payroll_employee_posting_payroll,ksw.payroll.employee.posting payroll,model_ksw_payroll_employee_posting,om_hr_payroll.group_hr_payroll_user,1,1,1,1
 access_ksw_payroll_employee_posting_read,ksw.payroll.employee.posting read,model_ksw_payroll_employee_posting,base.group_user,1,0,0,0
+access_ksw_settlement_payment_wizard_acc,ksw.settlement.payment.wizard accounting,model_ksw_settlement_payment_wizard,KSW_annual_leave.group_annual_leave_acc,1,1,1,1
+access_ksw_settlement_payment_wizard_manager,ksw.settlement.payment.wizard manager,model_ksw_settlement_payment_wizard,account.group_account_manager,1,1,1,1
+access_account_journal_leave_acc,account.journal leave accountant,account.model_account_journal,KSW_annual_leave.group_annual_leave_acc,1,0,0,0

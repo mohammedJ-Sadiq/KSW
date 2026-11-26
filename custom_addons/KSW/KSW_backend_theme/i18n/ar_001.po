@@ -716,3 +716,8 @@ msgstr "ملفات بوابات حكومية بانتظار الاستيراد"
 #: code:addons/KSW_backend_theme/static/src/home/home.xml:0
 msgid "Change app"
 msgstr "تغيير التطبيق"
+
+#. module: KSW_backend_theme
+#: model:ksw.home.inbox.source,name:KSW_backend_theme.inbox_drivers_over_vehicle_limit
+msgid "Drivers holding more vehicles than allowed"
+msgstr "سائقون مسؤولون عن مركبات أكثر من المسموح"

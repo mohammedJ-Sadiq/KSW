@@ -105,6 +105,8 @@
             <xpath expr="//field[@name='acc_number']" position="after">
                 <field name="x_ledger_entity_id" options="{'no_create': True}"
                        groups="om_hr_payroll.group_hr_payroll_manager,account.group_account_manager"/>
+                <field name="x_ledger_journal_id" options="{'no_create': True}"
+                       groups="account.group_account_manager"/>
             </xpath>
         </field>
     </record>

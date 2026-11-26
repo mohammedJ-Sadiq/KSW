@@ -235,9 +235,31 @@ class KswFleetVehicle(models.Model):
 
     def action_mark_stopped(self):
         self._ksw_fleet_check_can_stop()
-        self.filtered(lambda v: not v.x_is_stopped).sudo().write(
-            {'x_is_stopped': True, 'x_stopped_since': fields.Date.context_today(self)})
+        to_stop = self.filtered(lambda v: not v.x_is_stopped).sudo()
+        to_stop.write({'x_is_stopped': True, 'x_stopped_since': fields.Date.context_today(self)})
+        to_stop._ksw_release_stopped_custody()
         return True
+
+    def _ksw_release_stopped_custody(self):
+        """A stopped vehicle has nobody answering for it (user, 2026-11-26):
+        its custodian is free for another vehicle."""
+        for vehicle in self.sudo().filtered(lambda v: v.x_is_stopped and v.x_custodian_id):
+            who = vehicle.x_custodian_id
+            vehicle._ksw_set_custodian(self.env['hr.employee'], source=_('Stopped'),
+                                       note=_('Vehicle stopped: %s no longer answers for it.', who.name))
+
+    def _ksw_set_custodian(self, employee, source=False, date=False, note=False):
+        stopped = self.filtered('x_is_stopped')
+        if employee and stopped:
+            if not self.env.context.get('ksw_custody_unchecked'):
+                raise UserError(_('%s is stopped: put it back in service before giving it a custodian.',
+                                  ', '.join(stopped.mapped('name'))))
+            # A bulk route (seeding): stopped vehicles simply take nobody.
+            if not self - stopped:
+                return True
+            return super(KswFleetVehicle, self - stopped)._ksw_set_custodian(
+                employee, source=source, date=date, note=note)
+        return super()._ksw_set_custodian(employee, source=source, date=date, note=note)
 
     def action_back_in_service(self):
         self._ksw_fleet_check_can_stop()

@@ -78,6 +78,35 @@
                                             ref('KSW_fleet_allocation.group_fleet_allocation_gm'), ref('base.group_system')])]"/>
     </record>
 
+    <!-- Who Answers for What (custody history). KSW_fleet gives every
+         internal user read with no rule, so a supervisor read every vehicle's
+         custodian (Disouky, 2026-11-26). Same scope as the documents below:
+         his departments' vehicles and employees; anyone his own custody;
+         HR, accounting, the GM, workshop staff and administrators all. -->
+    <record id="rule_fleet_custody_own" model="ir.rule">
+        <field name="name">Custody history: my own custody</field>
+        <field name="model_id" ref="KSW_fleet.model_ksw_fleet_vehicle_custody"/>
+        <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_write" eval="False"/><field name="perm_create" eval="False"/><field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="rule_fleet_custody_department" model="ir.rule">
+        <field name="name">Custody history: my departments' vehicles and employees</field>
+        <field name="model_id" ref="KSW_fleet.model_ksw_fleet_vehicle_custody"/>
+        <field name="domain_force">['|', ('vehicle_id.x_department_id', 'in', user._ksw_fleet_department_ids()), ('employee_id.department_id', 'in', user._ksw_fleet_department_ids())]</field>
+        <field name="groups" eval="[(4, ref('KSW_fleet_allocation.group_fleet_allocation_user'))]"/>
+        <field name="perm_write" eval="False"/><field name="perm_create" eval="False"/><field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="rule_fleet_custody_all" model="ir.rule">
+        <field name="name">Custody history: HR, accounting, GM, workshop and administrator see all</field>
+        <field name="model_id" ref="KSW_fleet.model_ksw_fleet_vehicle_custody"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(6, 0, [ref('group_custody_hr'), ref('group_custody_accounting'),
+                                            ref('KSW_fleet_allocation.group_fleet_allocation_gm'),
+                                            ref('KSW_workshop.group_workshop_technician'), ref('KSW_workshop.group_workshop_reviewer'),
+                                            ref('base.group_system')])]"/>
+    </record>
+
     <!-- Workshop staff: their own workshop's forms, as with workshop
          requests (manager/technician scope; the Reviewer role a Manager
          implies is scoped the same way, gotcha #256). -->

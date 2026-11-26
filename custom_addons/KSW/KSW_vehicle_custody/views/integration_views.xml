@@ -19,10 +19,11 @@
         <field name="model">ksw.fleet.move</field>
         <field name="inherit_id" ref="KSW_fleet_allocation.view_ksw_fleet_move_list"/>
         <field name="arch" type="xml">
-            <button name="action_receive" position="before">
+            <!-- The row button, not the header one: a bare name match hits the header first. -->
+            <xpath expr="/list/button[@name='action_receive']" position="before">
                 <button name="action_open_custody_form" type="object" string="HR-12" icon="fa-file-text-o"
                         invisible="kind != 'transfer' or state != 'in_transfer'"/>
-            </button>
+            </xpath>
         </field>
     </record>
 
@@ -80,6 +81,13 @@
                         <field name="x_vehicle_limit_reason" invisible="x_vehicle_limit &lt;= 1"
                                required="x_vehicle_limit &gt; 1"/>
                     </group>
+                    <div class="alert alert-warning" role="alert" invisible="not x_holds_several">
+                        Holds <field name="x_vehicles_held_count" class="d-inline"/> vehicles:
+                        <field name="x_vehicles_held_ids" widget="many2many_tags" class="d-inline" readonly="1"/>
+                        <span invisible="not x_over_vehicle_limit"> (<b>more than allowed</b>)</span>
+                    </div>
+                    <field name="x_holds_several" invisible="1"/>
+                    <field name="x_over_vehicle_limit" invisible="1"/>
                     <field name="x_custody_history_ids" readonly="1">
                         <list>
                             <field name="vehicle_id"/>
@@ -89,6 +97,34 @@
                         </list>
                     </field>
                 </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_employee_filter_several_vehicles" model="ir.ui.view">
+        <field name="name">hr.employee.search.several.vehicles</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <filter string="Holds Several Vehicles" name="filter_several_vehicles"
+                        domain="[('x_holds_several', '=', True)]" groups="hr.group_hr_user"/>
+                <filter string="More Vehicles Than Allowed" name="filter_over_vehicle_limit"
+                        domain="[('x_over_vehicle_limit', '=', True)]" groups="hr.group_hr_user"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- On the vehicle profile: its driver also holds other vehicles. -->
+    <record id="view_ksw_fleet_vehicle_form_several" model="ir.ui.view">
+        <field name="name">ksw.fleet.vehicle.form.several</field>
+        <field name="model">ksw.fleet.vehicle</field>
+        <field name="inherit_id" ref="KSW_fleet.view_ksw_fleet_vehicle_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <field name="x_custodian_vehicle_count" invisible="1"/>
+                <widget name="web_ribbon" title="Driver holds several vehicles" bg_color="text-bg-warning"
+                        invisible="x_custodian_vehicle_count &lt; 2"/>
             </xpath>
         </field>
     </record>
