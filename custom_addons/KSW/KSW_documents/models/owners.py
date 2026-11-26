@@ -174,6 +174,11 @@ class HrEmployee(models.Model):
         return set(self.env['ksw.fleet.vehicle'].sudo().search(
             [('x_custodian_id', '!=', False)]).x_custodian_id.ids)
 
+    def _ksw_public_custodian_ids(self):
+        """Who drives a Naql-licensed vehicle: a driver card is his."""
+        return set(self.env['ksw.fleet.vehicle'].sudo().search(
+            [('x_custodian_id', '!=', False), ('x_registration_type', '=', 'public')]).x_custodian_id.ids)
+
     def _ksw_requirement_candidates(self):
         return self.sudo().search([])
 
@@ -181,6 +186,11 @@ class HrEmployee(models.Model):
         types = self.env['ksw.document.type'].sudo().search(
             [('applies_to', '=', 'employee'), ('required_for', '!=', 'none')])
         custodians = self._ksw_custodian_ids()
+        public = self._ksw_public_custodian_ids() \
+            if 'public_transport_custodians' in types.mapped('required_for') else set()
+        # A handover check (ksw_as_custodian) does not say which vehicle: the
+        # new driver is asked for everything a driver may need.
+        as_custodian = self.env.context.get('ksw_as_custodian')
         result = {}
         for employee in self.sudo():
             # Only a nationality we know decides iqama/passport: an employee
@@ -189,8 +199,8 @@ class HrEmployee(models.Model):
             result[employee.id] = types.filtered(lambda t: (
                 t.required_for == 'all'
                 or (t.required_for == 'non_saudi' and non_saudi)
-                or (t.required_for == 'custodians' and (
-                    employee.id in custodians or self.env.context.get('ksw_as_custodian')))))
+                or (t.required_for == 'custodians' and (employee.id in custodians or as_custodian))
+                or (t.required_for == 'public_transport_custodians' and (employee.id in public or as_custodian))))
         return result
 
     def _ksw_document_preconditions(self):

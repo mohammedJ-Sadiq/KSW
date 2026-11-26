@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-23 12:20+0000\n"
-"PO-Revision-Date: 2026-11-23 12:20+0000\n"
+"POT-Creation-Date: 2026-11-26 12:35+0000\n"
+"PO-Revision-Date: 2026-11-26 12:35+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document.py:0
 #: code:addons/KSW_documents/models/ksw_document.py:0
 msgid ""
 "%(e)s already has %(f)s %(c)s; this document says %(n)s. Not changed: check "
@@ -26,63 +25,54 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ai_reader.py:0
 #: code:addons/KSW_documents/models/ai_reader.py:0
 msgid "%(f)s could not be read as a date: %(v)s"
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_batch.py:0
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
 msgid "%(f)s: %(t)s %(n)s is already listed (%(d)s), not added again."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "%(l)s not a date: %(t)s"
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/owners.py:0
 #: code:addons/KSW_documents/models/owners.py:0
 msgid "%s (expired)"
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/owners.py:0
 #: code:addons/KSW_documents/models/owners.py:0
 msgid "%s (expiry not entered)"
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_request.py:0
 #: code:addons/KSW_documents/models/ksw_document_request.py:0
 msgid "%s can be cancelled by its requester or HR while it waits."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document.py:0
 #: code:addons/KSW_documents/models/ksw_document.py:0
 msgid "%s is already confirmed."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document.py:0
 #: code:addons/KSW_documents/models/ksw_document.py:0
 msgid "%s is not a document of this kind of owner."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ai_reader.py:0
 #: code:addons/KSW_documents/models/ai_reader.py:0
 msgid "%s is not a photo or a PDF."
 msgstr ""
@@ -94,7 +84,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document.py:0
 #: code:addons/KSW_documents/models/ksw_document.py:0
 msgid ""
 "A confirmed document is not edited: upload the renewed one, which replaces "
@@ -103,14 +92,12 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document.py:0
 #: code:addons/KSW_documents/models/ksw_document.py:0
 msgid "A document belongs to one owner."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_request.py:0
 #: code:addons/KSW_documents/models/ksw_document_request.py:0
 msgid ""
 "A document request is for one employee or one vehicle, as its document is."
@@ -118,7 +105,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_company_registration.py:0
 #: code:addons/KSW_documents/models/ksw_company_registration.py:0
 msgid "A unified number has 10 digits and starts with 7 (%s)."
 msgstr ""
@@ -140,7 +126,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid ""
 "Absher actual user %(a)s, custodian in Odoo %(o)s: update Absher after the "
@@ -149,21 +134,18 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Absher hold: %s"
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Absher: %s"
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Absher: licence %s."
 msgstr ""
@@ -189,7 +171,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid ""
 "Active in Odoo but no active contract in Qiwa: left, or contract not yet "
@@ -198,7 +179,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid ""
 "Active in Odoo but not in Muqeem: final exit, transferred, or a wrong iqama "
@@ -242,14 +222,12 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Actual user %s is not an employee in Odoo."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/wizard/upload_wizard.py:0
 #: code:addons/KSW_documents/wizard/upload_wizard.py:0
 msgid "Add at least one scan or photo."
 msgstr ""
@@ -321,21 +299,18 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Archived in Odoo, but still in this export."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Archived in Odoo."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Attach the export file first."
 msgstr ""
@@ -388,7 +363,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_batch.py:0
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
 msgid "Bulk upload %s"
 msgstr ""
@@ -414,8 +388,28 @@ msgid "Cancelled"
 msgstr ""
 
 #. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid "Card Expiry"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__card_status
+msgid "Card Status"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__card_type
+msgid "Card Type"
+msgstr ""
+
+#. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Card expiry"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__vin
 msgid "Chassis No."
@@ -428,14 +422,12 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Chassis in Odoo %(o)s ≠ Absher %(a)s"
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_batch.py:0
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
 msgid "Chassis number"
 msgstr ""
@@ -452,21 +444,18 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/wizard/upload_wizard.py:0
 #: code:addons/KSW_documents/wizard/upload_wizard.py:0
 msgid "Choose the document type (or read it with AI)."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document.py:0
 #: code:addons/KSW_documents/models/ksw_document.py:0
 msgid "Choose which registration (main CR or branch) %s is for."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document.py:0
 #: code:addons/KSW_documents/models/ksw_document.py:0
 msgid "Choose whose document %s is."
 msgstr ""
@@ -651,7 +640,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document.py:0
 #: code:addons/KSW_documents/models/ksw_document.py:0
 msgid "Differs from %(o)s (not changed): %(d)s"
 msgstr ""
@@ -728,7 +716,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ai_reader.py:0
 #: code:addons/KSW_documents/models/ai_reader.py:0
 msgid "Document type not recognised: choose it."
 msgstr ""
@@ -773,21 +760,18 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Documents recorded"
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Documents renewed"
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Documents unchanged"
 msgstr ""
@@ -823,6 +807,11 @@ msgid "Driver Card"
 msgstr ""
 
 #. module: KSW_documents
+#: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_import_form
+msgid "Driver Card No."
+msgstr ""
+
+#. module: KSW_documents
 #: model:ksw.document.type,name:KSW_documents.type_driving_licence
 msgid "Driving Licence"
 msgstr ""
@@ -847,14 +836,12 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Employee No."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Employee No. %(n)s is also on %(e)s in Odoo."
 msgstr ""
@@ -866,14 +853,12 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Employee No. in Odoo %(o)s, in Qiwa %(q)s."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Employee details filled"
 msgstr ""
@@ -887,6 +872,11 @@ msgstr ""
 #: model:ir.ui.menu,name:KSW_documents.menu_documents_missing_employees
 #: model_terms:ir.ui.view,arch_db:KSW_documents.view_ksw_document_search
 msgid "Employees"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_type__required_for__public_transport_custodians
+msgid "Employees who hold a public-transport vehicle (نقل عام)"
 msgstr ""
 
 #. module: KSW_documents
@@ -907,7 +897,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Employer no. %s is not one of the registrations."
 msgstr ""
@@ -960,14 +949,12 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document.py:0
 #: code:addons/KSW_documents/models/ksw_document.py:0
 msgid "Expired %(d)s: %(n)s"
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document.py:0
 #: code:addons/KSW_documents/models/ksw_document.py:0
 msgid "Expires %(d)s: %(n)s"
 msgstr ""
@@ -1006,7 +993,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ai_reader.py:0
 #: code:addons/KSW_documents/models/ai_reader.py:0
 msgid "Expiry as printed: %s (converted to Gregorian; check it)."
 msgstr ""
@@ -1023,7 +1009,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Failed the tank inspection: %s"
 msgstr ""
@@ -1035,35 +1020,30 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document.py:0
 #: code:addons/KSW_documents/models/ksw_document.py:0
 msgid "Filed as history: %(d)s (valid to %(e)s) is newer."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document.py:0
 #: code:addons/KSW_documents/models/ksw_document.py:0
 msgid "Fill in the document number of %s."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document.py:0
 #: code:addons/KSW_documents/models/ksw_document.py:0
 msgid "Fill in the expiry date of %s."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document.py:0
 #: code:addons/KSW_documents/models/ksw_document.py:0
 msgid "Filled on %(o)s: %(f)s"
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Fleet No."
 msgstr ""
@@ -1157,14 +1137,12 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_request.py:0
 #: code:addons/KSW_documents/models/ksw_document_request.py:0
 msgid "HR already has a request for the %(t)s of %(e)s."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_request.py:0
 #: code:addons/KSW_documents/models/ksw_document_request.py:0
 msgid "HR registered %(d)s. %(n)s can go ahead."
 msgstr ""
@@ -1196,14 +1174,18 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Holds %(v)s with a %(c)s licence."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Holds %s in custody but has no driver card in this export."
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Holds %s in custody but has no driving licence in this export."
 msgstr ""
@@ -1308,14 +1290,12 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Inspection expiry"
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Inspection request %s"
 msgstr ""
@@ -1338,8 +1318,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_batch.py:0
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Iqama / ID number"
@@ -1357,7 +1335,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Iqama expiry"
 msgstr ""
@@ -1378,7 +1355,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_batch.py:0
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
 msgid ""
 "Issued to %(n)s (%(r)s): no registration in Odoo has this number. Add it "
@@ -1403,7 +1379,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Istimara expiry"
 msgstr ""
@@ -1420,7 +1395,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid ""
 "Joining date in Odoo %(o)s, in Qiwa %(q)s: annual leave and end of service "
@@ -1490,14 +1464,12 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Licence expiry"
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Licence expiry not a date: %s"
 msgstr ""
@@ -1510,7 +1482,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_batch.py:0
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
 msgid "Main CR %s"
 msgstr ""
@@ -1627,7 +1598,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_batch.py:0
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document__name
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_batch__name
@@ -1645,7 +1615,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/wizard/upload_wizard.py:0
 #: code:addons/KSW_documents/wizard/upload_wizard.py:0
 msgid "Name on the document (%(d)s) does not look like %(e)s."
 msgstr ""
@@ -1653,6 +1622,29 @@ msgstr ""
 #. module: KSW_documents
 #: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document__source__naql
 msgid "Naql"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Naql: %s"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Naql: %s card"
+msgstr ""
+
+#. module: KSW_documents
+#: model:ir.model.fields.selection,name:KSW_documents.selection__ksw_document_import__source__naql_driver_cards
+msgid "Naql: Driver Cards"
+msgstr ""
+
+#. module: KSW_documents
+#. odoo-python
+#: code:addons/KSW_documents/models/ksw_document_import.py:0
+msgid "Naql: card %s."
 msgstr ""
 
 #. module: KSW_documents
@@ -1667,7 +1659,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/owners.py:0
 #: code:addons/KSW_documents/models/owners.py:0
 msgid "Nationality not recorded"
 msgstr ""
@@ -1706,7 +1697,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid ""
 "No longer in the Absher export: sold, scrapped or transferred? Archive it in"
@@ -1715,28 +1705,24 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document.py:0
 #: code:addons/KSW_documents/models/ksw_document.py:0
 msgid "No scan attached."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "No tank licence yet: %s"
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "No valid insurance on Absher."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "No vehicle in Odoo with this chassis no."
 msgstr ""
@@ -1758,7 +1744,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Not an employee in Odoo: add the employee, then preview again."
 msgstr ""
@@ -1771,7 +1756,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Not required yet (new vehicle), per Absher."
 msgstr ""
@@ -1830,36 +1814,30 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Older than the register (ignored)"
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document.py:0
 #: code:addons/KSW_documents/models/ksw_document.py:0
 msgid "Only HR confirms a document."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Only HR imports government exports."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_request.py:0
 #: code:addons/KSW_documents/models/ksw_document_request.py:0
 msgid "Only HR registers the document of %s."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_batch.py:0
-#: code:addons/KSW/KSW_documents/wizard/upload_wizard.py:0
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
 #: code:addons/KSW_documents/wizard/upload_wizard.py:0
 msgid "Only HR uploads documents."
@@ -1906,7 +1884,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Outside the Kingdom now (Muqeem)."
 msgstr ""
@@ -1938,7 +1915,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Passport expiry"
 msgstr ""
@@ -1950,8 +1926,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_batch.py:0
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 #: model:ir.model.fields,field_description:KSW_documents.field_ksw_document_import_line__plate
@@ -1965,21 +1939,18 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Plate digits"
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Plate in Odoo %(o)s ≠ Absher %(a)s"
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/wizard/upload_wizard.py:0
 #: code:addons/KSW_documents/wizard/upload_wizard.py:0
 msgid "Plate on the document (%(d)s) differs from the vehicle's (%(v)s)."
 msgstr ""
@@ -1996,7 +1967,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Preview the export first."
 msgstr ""
@@ -2018,14 +1988,12 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Qiwa contract: %s"
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Qiwa: %s"
 msgstr ""
@@ -2065,8 +2033,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ai_reader.py:0
-#: code:addons/KSW/KSW_documents/models/ksw_document_batch.py:0
 #: code:addons/KSW_documents/models/ai_reader.py:0
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
 msgid ""
@@ -2119,14 +2085,12 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Registered under %(o)s in Odoo, %(g)s here: check which is right."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_batch.py:0
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
 msgid "Registration %s"
 msgstr ""
@@ -2160,7 +2124,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_request.py:0
 #: code:addons/KSW_documents/models/ksw_document_request.py:0
 msgid "Requested by %(u)s (%(r)s): %(n)s"
 msgstr ""
@@ -2207,14 +2170,12 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_batch.py:0
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
 msgid "Same person as another document"
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_batch.py:0
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
 msgid "Same vehicle as another document"
 msgstr ""
@@ -2310,28 +2271,24 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_request.py:0
 #: code:addons/KSW_documents/models/ksw_document_request.py:0
 msgid "The %(t)s of %(e)s is already registered and valid."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ai_reader.py:0
 #: code:addons/KSW_documents/models/ai_reader.py:0
 msgid "The AI reader could not be reached (%s). Fill the document by hand."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ai_reader.py:0
 #: code:addons/KSW_documents/models/ai_reader.py:0
 msgid "The AI reader found no document: fill it by hand."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ai_reader.py:0
 #: code:addons/KSW_documents/models/ai_reader.py:0
 msgid "The AI reader gave no usable answer: fill the document by hand."
 msgstr ""
@@ -2357,21 +2314,18 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ai_reader.py:0
 #: code:addons/KSW_documents/models/ai_reader.py:0
 msgid "The reader was only %s confident: check every field."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "This is not the %(s)s export: no «%(c)s» column found."
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid ""
 "This is the Absher driving licence export: choose \"Absher Business: Driving"
@@ -2419,7 +2373,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Total loss (accident) per the report."
 msgstr ""
@@ -2431,7 +2384,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/wizard/upload_wizard.py:0
 #: code:addons/KSW_documents/wizard/upload_wizard.py:0
 msgid "Type guessed as the first possible one: check it."
 msgstr ""
@@ -2470,7 +2422,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/wizard/upload_wizard.py:0
 #: code:addons/KSW_documents/wizard/upload_wizard.py:0
 #: model:ir.model,name:KSW_documents.model_ksw_document_upload_wizard
 #: model_terms:ir.ui.view,arch_db:KSW_documents.view_employee_form_documents
@@ -2517,7 +2468,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Vehicle details filled"
 msgstr ""
@@ -2535,7 +2485,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "Vehicles created"
 msgstr ""
@@ -2632,7 +2581,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_batch.py:0
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
 msgid "Whose document this is was not found: choose it."
 msgstr ""
@@ -2688,14 +2636,12 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_batch.py:0
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
 msgid "in the register"
 msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_import.py:0
 #: code:addons/KSW_documents/models/ksw_document_import.py:0
 msgid "not inspected"
 msgstr ""
@@ -2709,7 +2655,6 @@ msgstr ""
 
 #. module: KSW_documents
 #. odoo-python
-#: code:addons/KSW/KSW_documents/models/ksw_document_batch.py:0
 #: code:addons/KSW_documents/models/ksw_document_batch.py:0
 msgid "this upload"
 msgstr ""

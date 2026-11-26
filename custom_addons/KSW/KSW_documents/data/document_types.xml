@@ -112,6 +112,12 @@
         <value eval="[ref('type_operation_card')]"/>
         <value eval="{'required_for': 'public_transport'}"/>
     </function>
+    <!-- So is the driver card: only the drivers of those vehicles need one
+         (user, 2026-11-26). -->
+    <function model="ksw.document.type" name="write">
+        <value eval="[ref('type_driver_card')]"/>
+        <value eval="{'required_for': 'public_transport_custodians'}"/>
+    </function>
     <function model="ksw.document.type" name="write">
         <value eval="[ref('type_istimara')]"/>
         <value eval="{'expiry_on_document': False}"/>

@@ -20,6 +20,7 @@ class KswDocumentType(models.Model):
         ('public_transport', 'Public-transport company vehicles (نقل عام)'),
         ('water_tankers', 'Water tankers (trailer heads and Isuzu tankers)'),
         ('custodians', 'Employees who hold a vehicle'),
+        ('public_transport_custodians', 'Employees who hold a public-transport vehicle (نقل عام)'),
         ('non_saudi', 'Non-Saudi employees'),
         ('all', 'Every employee'),
     ], string='Required For', required=True, default='none')

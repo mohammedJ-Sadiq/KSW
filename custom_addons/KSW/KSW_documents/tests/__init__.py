@@ -4,3 +4,4 @@ from . import test_import
 from . import test_document_request
 from . import test_licence_import
 from . import test_document_access
+from . import test_driver_card_import

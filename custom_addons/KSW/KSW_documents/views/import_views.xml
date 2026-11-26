@@ -70,6 +70,10 @@
                             <field name="driving_class" column_invisible="parent.source != 'absher_licences'"/>
                             <field name="driving_expiry" column_invisible="parent.source != 'absher_licences'"/>
                             <field name="driving_status" optional="hide" column_invisible="parent.source != 'absher_licences'"/>
+                            <field name="card_number" string="Driver Card No." column_invisible="parent.source != 'naql_driver_cards'"/>
+                            <field name="card_expiry" string="Card Expiry" column_invisible="parent.source != 'naql_driver_cards'"/>
+                            <field name="card_type" optional="show" column_invisible="parent.source != 'naql_driver_cards'"/>
+                            <field name="card_status" optional="hide" column_invisible="parent.source != 'naql_driver_cards'"/>
                             <field name="iqama_expiry" column_invisible="parent.source != 'muqeem_residents'"/>
                             <field name="passport_no" optional="hide" column_invisible="parent.source != 'muqeem_residents'"/>
                             <field name="passport_expiry" column_invisible="parent.source != 'muqeem_residents'"/>

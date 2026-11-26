@@ -66,16 +66,41 @@ LICENCE_COLUMNS = {
     'حالة رخصة القيادة': 'driving_status', 'تاريخ الانتهاء (ميلادي)': 'driving_expiry_text',
 }
 LICENCE_VALID = 'صالحة'
+# Naql (Transport General Authority) ▸ Driver cards. The card list prints
+# «رقم الإقامة» and «تاريخ الانتهاء»; the licence report that repeats the
+# cards beside each licence prints «رقم الاقامة» and its own expiry header.
+CARD_COLUMNS = {
+    'رقم الإقامة': 'id_number', 'رقم الاقامة': 'id_number', 'الاسم': 'person_name',
+    'رقم بطاقة السائق': 'card_number', 'نوع البطاقة': 'card_type', 'حالة البطاقة': 'card_status',
+    'تاريخ الانتهاء': 'card_expiry_text', 'تاريخ انتهاء البطاقة (ميلادي)': 'card_expiry_text',
+}
+CARD_ACTIVE = 'نشط'
 # The classes that may drive each kind of vehicle: a head pulls a tanker.
 LICENCE_FOR = {'trailer': ('نقل ثقيل',), 'isuzu': ('نقل ثقيل', 'نقل خفيف')}
 # The column that identifies each export's header row.
 HEADER_MARK = {'absher_vehicles': 'رقم الهيكل', 'muqeem_residents': 'رقم الاقامة', 'gosi_subscribers': 'رقم الهوية',
                'qiwa_contracts': 'رقم العقد', 'tank_inspection': 'رقم الهيكل',
-               'absher_licences': 'نوع رخصة القيادة'}
+               'absher_licences': 'نوع رخصة القيادة', 'naql_driver_cards': 'رقم بطاقة السائق'}
+# Exports whose rows are spread over several sheets of one workbook: every
+# sheet with the header mark is read (a card listed twice is one card).
+ALL_SHEETS = ('naql_driver_cards',)
 # Imported every month (a reminder on Home); GOSI only when HR wants to check.
 MONTHLY_SOURCES = ('absher_vehicles', 'muqeem_residents')
 VALID = 'ساري المفعول'
 NONE_VALUES = ('', '-', 'لا يوجد')
+
+
+def card_number(value):
+    """A Naql driver card number, ten digits. Excel reads «1100672800» as the
+    decimal 11.006728 (and drops the trailing zeros); a card number has no
+    decimal point, so the eight decimals are put back."""
+    if isinstance(value, float):
+        return ('%.8f' % value).replace('.', '')
+    text = str(value or '').strip()
+    if re.fullmatch(r'\d{1,2}\.\d{1,8}', text):
+        head, tail = text.split('.')
+        return head + tail.ljust(8, '0')
+    return text if text.isdigit() else ''
 
 
 def _arabic_name_key(text):
@@ -111,7 +136,8 @@ class KswDocumentImport(models.Model):
                                ('gosi_subscribers', 'GOSI: Active Subscribers'),
                                ('qiwa_contracts', 'Qiwa: Active Contracts'),
                                ('tank_inspection', 'Tank Inspection Report (Fahes)'),
-                               ('absher_licences', 'Absher Business: Driving Licence Holders')], required=True,
+                               ('absher_licences', 'Absher Business: Driving Licence Holders'),
+                               ('naql_driver_cards', 'Naql: Driver Cards')], required=True,
                               default='absher_vehicles')
     registration_id = fields.Many2one('ksw.company.registration', string='Establishment (CR)',
                                       help='GOSI lists one establishment per file: the registration its '
@@ -200,12 +226,21 @@ class KswDocumentImport(models.Model):
             import openpyxl
             book = openpyxl.load_workbook(io.BytesIO(raw), read_only=True, data_only=True)
             mark = HEADER_MARK[self.source]
-            table = []
+            tables = []
             # The sheet that has the data, whichever tab it is on.
             for sheet in [book.active] + [s for s in book.worksheets if s != book.active]:
                 table = [[('' if c is None else c) for c in row] for row in sheet.iter_rows(values_only=True)]
                 if any(mark in [str(c).strip() for c in row] for row in table[:50]):
-                    break
+                    tables.append(table)
+                    if self.source not in ALL_SHEETS:
+                        break
+            if len(tables) > 1:
+                rows, preamble = [], []
+                for table in tables:
+                    more, _pre = self._rows_from_table(table)
+                    rows += more
+                return rows, preamble
+            table = tables[0] if tables else []
         else:
             text = raw.decode('utf-8-sig', errors='replace')
             try:
@@ -214,6 +249,9 @@ class KswDocumentImport(models.Model):
                 # Short or ragged files defeat the sniffer: the commonest separator wins.
                 delimiter = max('\t;,', key=text[:4096].count)
             table = list(csv.reader(io.StringIO(text), delimiter=delimiter))
+        return self._rows_from_table(table)
+
+    def _rows_from_table(self, table):
         mark = HEADER_MARK[self.source]
         for i, row in enumerate(table):
             cells = [str(c).strip() for c in row]
@@ -385,7 +423,9 @@ class KswDocumentImport(models.Model):
             vals = {'import_id': self.id, 'row_no': n, 'kind': 'row'}
             for header, field in columns.items():
                 value = row.get(header, '')
-                vals[field] = '' if value is None else str(value).strip()
+                value = '' if value is None else str(value).strip()
+                if value or field not in vals:
+                    vals[field] = value
             if not vals['id_number']:
                 continue
             emp, how = employees.get(vals['id_number']), _('Iqama / ID number')
@@ -447,6 +487,33 @@ class KswDocumentImport(models.Model):
             'warnings': _('Holds %s in custody but has no driving licence in this export.',
                           ', '.join(self.env['ksw.fleet.vehicle'].sudo().search(
                               [('x_custodian_id', '=', e.id), ('vehicle_type', '!=', 'tank')]).mapped('name')))}
+            for e in gone])
+
+    def _preview_naql_driver_cards(self, rows, preamble):
+        seen = set()
+        unique = []
+        for row in rows:
+            number = card_number(row.get('رقم بطاقة السائق'))
+            if not number:
+                continue  # «غير موجود»: a licence holder with no card
+            row['رقم بطاقة السائق'] = number
+            key = (str(row.get('رقم الإقامة') or row.get('رقم الاقامة') or '').strip(), number)
+            if key not in seen:
+                seen.add(key)
+                unique.append(row)
+        lines = self._people_lines(unique, CARD_COLUMNS)
+        # Residents who drive a public-transport vehicle, with no card here.
+        listed = set(lines.mapped('id_number'))
+        Vehicle = self.env['ksw.fleet.vehicle'].sudo()
+        public = [('x_registration_type', '=', 'public'), ('vehicle_type', '!=', 'tank')]
+        custodians = Vehicle.search([('x_custodian_id', '!=', False)] + public).x_custodian_id
+        gone = custodians.filtered(lambda e: (e.ssnid or '').strip().startswith('2')
+                                   and e.ssnid.strip() not in listed)
+        self.env['ksw.document.import.line'].create([{
+            'import_id': self.id, 'kind': 'missing', 'employee_id': e.id, 'action': 'skip',
+            'id_number': e.ssnid, 'person_name': e.name,
+            'warnings': _('Holds %s in custody but has no driver card in this export.', ', '.join(
+                Vehicle.search([('x_custodian_id', '=', e.id)] + public).mapped('name')))}
             for e in gone])
 
     def _preview_gosi_subscribers(self, rows, preamble):
@@ -561,6 +628,9 @@ class KswDocumentImportLine(models.Model):
     driving_status = fields.Char(string='Licence Status')
     driving_expiry_text = fields.Char(string='Licence Expiry (as exported)')
     driving_expiry = fields.Date(compute='_compute_dates', string='Licence Expiry')
+    # Naql driver cards (card_number / card_expiry are shared with the vehicles' operation card)
+    card_type = fields.Char(string='Card Type')
+    card_status = fields.Char(string='Card Status')
 
     @api.depends('istimara_expiry_text', 'mvpi_expiry_text', 'passport_expiry_text', 'iqama_expiry_text',
                  'birth_date_text', 'contract_date_text', 'join_date_text', 'card_expiry_text',
@@ -658,12 +728,15 @@ class KswDocumentImportLine(models.Model):
                 notes.append(_('Employer no. %s is not one of the registrations.', line.employer_number))
             if line.driving_status and line.driving_status != LICENCE_VALID:
                 notes.append(_('Absher: licence %s.', line.driving_status))
+            if line.card_status and line.card_status != CARD_ACTIVE:
+                notes.append(_('Naql: card %s.', line.card_status))
             if emp and line.driving_class:
                 for vehicle in self.env['ksw.fleet.vehicle'].sudo().search([('x_custodian_id', '=', emp.id)]):
                     allowed = LICENCE_FOR.get(vehicle.vehicle_type)
                     if allowed and line.driving_class not in allowed:
                         notes.append(_('Holds %(v)s with a %(c)s licence.', v=vehicle.name, c=line.driving_class))
             for label, text, value in ((_('Licence expiry'), line.driving_expiry_text, line.driving_expiry),
+                                       (_('Card expiry'), line.card_expiry_text, line.card_expiry),
                                        (_('Iqama expiry'), line.iqama_expiry_text, line.iqama_expiry),
                                        (_('Passport expiry'), line.passport_expiry_text, line.passport_expiry)):
                 if text and text not in NONE_VALUES and not value:
@@ -744,6 +817,17 @@ class KswDocumentImportLine(models.Model):
                 licence, emp, 'absher', self.import_id, number=self.id_number, expiry=self.driving_expiry,
                 verified=self.driving_status == LICENCE_VALID, license_class=self.driving_class or False,
                 note=self.driving_status != LICENCE_VALID and _('Absher: %s', self.driving_status) or False)
+            done.append({'new': _('Documents recorded'), 'renewed': _('Documents renewed'),
+                         'same': _('Documents unchanged'), 'older': _('Older than the register (ignored)')}[outcome])
+        if self.import_id.source == 'naql_driver_cards' and self.card_number:
+            card = self.env.ref('KSW_documents.type_driver_card')
+            outcome = self.env['ksw.document']._record_from_source(
+                card, emp, 'naql', self.import_id, number=self.card_number, expiry=self.card_expiry or False,
+                verified=self.card_status == CARD_ACTIVE,
+                note=' · '.join(filter(None, [
+                    self.card_type and self.card_type != 'سنوية' and _('Naql: %s card', self.card_type),
+                    self.card_status and self.card_status != CARD_ACTIVE and _('Naql: %s', self.card_status),
+                ])) or False)
             done.append({'new': _('Documents recorded'), 'renewed': _('Documents renewed'),
                          'same': _('Documents unchanged'), 'older': _('Older than the register (ignored)')}[outcome])
         if self.import_id.source == 'muqeem_residents':
